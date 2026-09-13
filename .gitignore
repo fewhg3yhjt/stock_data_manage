@@ -1,0 +1,31 @@
+# Python caches and local environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Local secrets and editor state
+.env
+.env.*
+!.env.example
+.idea/
+.vscode/
+
+# Generated probe data (keep the probe scripts and reports)
+tmp_test/etf_daily_probe/
+tmp_test/etf_full_probe/
+tmp_test/historical_daily_probe/
+tmp_test/market_day_probe/
+tmp_test/market_source_probe/
+tmp_test/minute_data_probe/
+tmp_test/security_comparison/
+
+# Runtime artifacts
+*.log
+*.lock
+
+# Build/package output
+build/
+dist/
+*.egg-info/
