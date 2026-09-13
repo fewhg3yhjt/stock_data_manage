@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "stock-data-manage"
+version = "0.1.0"
+description = "A traceable and recoverable stock data collection foundation"
+requires-python = ">=3.11"
+dependencies = [
+    "duckdb>=1.5",
+    "pyarrow>=18.0",
+    "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=8.0",
+]
+
+[project.scripts]
+stock-data = "stock_data_manage.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+pythonpath = ["src"]

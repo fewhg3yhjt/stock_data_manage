@@ -1,0 +1,54 @@
+providers:
+  capability_probe:
+    validation_ttl_days: 7
+    cooldown_probe_required: true
+  failure_policy:
+    consecutive_failure_threshold: 3
+    cooldown_seconds: 300
+  tencent:
+    enabled: true
+    endpoints:
+      native_1m:
+        role: primary
+        datasets: [minute_bar_1m]
+        max_symbols_per_request: 100
+        request_interval_seconds: 1
+        effective_concurrency: 1
+      bulk_snapshot:
+        role: primary
+        datasets: [snapshot, daily_bar]
+        max_symbols_per_request: 100
+  sina:
+    enabled: true
+    endpoints:
+      full_history:
+        role: primary
+        datasets: [daily_bar]
+        max_symbols_per_request: 1
+  tdx:
+    enabled: false
+    disabled_reason: public_servers_unstable_in_current_network
+    require_capability_probe_before_enable: true
+    endpoints:
+      delayed_1m:
+        role: fallback
+        datasets: [minute_bar_1m]
+        freshness_delay_seconds: 900
+  eastmoney:
+    enabled: false
+    disabled_reason: unstable_in_current_network
+    require_capability_probe_before_enable: true
+    allowed_low_frequency_capabilities: [security_master]
+  baostock:
+    enabled: true
+    default_role: validation_only
+    endpoints:
+      daily_history:
+        enabled: true
+        role: validation_only
+      minute_5m:
+        enabled: true
+        role: validation_only
+      snapshot:
+        enabled: false
+        disabled_reason: unsupported_by_provider

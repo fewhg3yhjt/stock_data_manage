@@ -1,0 +1,15 @@
+rules:
+  - provider: fixture
+    endpoint: daily_history
+    exchange: XSHG
+    asset_type: stock
+    frequency: null
+    volume_multiplier: "100"
+    amount_multiplier: "10000"
+    source_bar_time_semantics: end_time
+    version: fixture-v1
+
+# Production rules are intentionally not guessed. Each provider/endpoint/market/
+# asset/frequency combination is added only after a unit-semantics probe records
+# its evidence and validation expiry.
+

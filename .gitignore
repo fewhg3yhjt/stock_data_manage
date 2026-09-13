@@ -24,6 +24,10 @@ tmp_test/security_comparison/
 # Runtime artifacts
 *.log
 *.lock
+data/
+tmp/
+metadata/*.duckdb
+metadata/*.duckdb.wal
 
 # Build/package output
 build/
