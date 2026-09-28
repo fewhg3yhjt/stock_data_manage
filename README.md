@@ -4,6 +4,7 @@
 
 - [市场数据中心术语与数据流程规范](stock-data-terminology-and-data-flow.md)
 - [市场数据中心架构设计](STOCK_ANALYSIS_V2_MARKET_DATA_CENTER_ARCHITECTURE_V1.md)
+- [前复权日线与历史重建设计](stock-data-design-qfq-history-rebuild.md)
 - [实时采集设计](stock-data-design-realtime.md)
 - [测试设计与验收基线](stock-data-test-design-acceptance-baseline.md)
 

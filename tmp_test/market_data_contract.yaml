@@ -12,6 +12,11 @@ scope:
     - industry_board
     - concept_board
   canonical_price_adjustment: none
+  canonical_price_adjustment_note: >-
+    Current probe implementation still validates none-adjusted bars. The target
+    design uses qfq for equity, ETF and LOF daily bars after dedicated qfq
+    capability probes and history-rebuild support are implemented. Index levels
+    are not stock-adjusted.
   currency: CNY
   timezone: Asia/Shanghai
 
