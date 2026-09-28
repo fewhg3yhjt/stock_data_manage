@@ -1,7 +1,7 @@
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from stock_data_manage.scheduler import PhaseOneScheduler, load_scheduled_jobs
+from stock_data_manage.worker.scheduler import PhaseOneScheduler, load_scheduled_jobs
 
 
 SHANGHAI = ZoneInfo("Asia/Shanghai")

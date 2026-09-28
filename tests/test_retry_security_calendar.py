@@ -3,9 +3,9 @@ from datetime import date, timedelta
 import pytest
 
 from stock_data_manage.domain import AssetType, Exchange
-from stock_data_manage.provider_contract import FailureClass, ProviderContractError
-from stock_data_manage.retry import RetryPolicy, execute_with_fallback, execute_with_retry
-from stock_data_manage.security_master import (
+from stock_data_manage.providers.contracts import FailureClass, ProviderContractError
+from stock_data_manage.routing.retry import RetryPolicy, execute_with_fallback, execute_with_retry
+from stock_data_manage.service.instruments import (
     SecurityRecord,
     SecurityMasterStore,
     SymbolHistory,
@@ -13,7 +13,7 @@ from stock_data_manage.security_master import (
     merge_security_sources,
     stable_instrument_id,
 )
-from stock_data_manage.trading_calendar import CalendarDay, TradingCalendarStore, merge_calendar_sources
+from stock_data_manage.service.calendar import CalendarDay, TradingCalendarStore, merge_calendar_sources
 
 
 def test_retry_retries_timeout_but_not_rate_limit() -> None:

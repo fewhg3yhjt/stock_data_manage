@@ -1,6 +1,6 @@
 import json
 
-from stock_data_manage.acceptance import run_offline_acceptance
+from stock_data_manage.worker.acceptance import run_offline_acceptance
 from stock_data_manage.cli import main
 
 

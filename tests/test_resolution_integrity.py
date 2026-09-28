@@ -1,8 +1,8 @@
 from dataclasses import replace
 from decimal import Decimal
 
-from stock_data_manage.integrity import Manifest, row_hash
-from stock_data_manage.resolution import resolve_records
+from stock_data_manage.storage.integrity import Manifest, row_hash
+from stock_data_manage.quality.resolution import resolve_records
 
 
 def test_final_history_replaces_provisional_without_field_splicing(

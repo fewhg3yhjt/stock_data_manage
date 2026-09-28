@@ -3,12 +3,12 @@ from datetime import datetime, timezone
 
 import pytest
 
-from stock_data_manage.attempts import CollectionAttempt
+from stock_data_manage.worker.attempts import CollectionAttempt
 from stock_data_manage.domain import AttemptStatus, ItemStatus
-from stock_data_manage.integrity import Manifest
-from stock_data_manage.metadata import MetadataStore
-from stock_data_manage.raw_storage import RawObjectStore
-from stock_data_manage.resolution import resolve_records
+from stock_data_manage.storage.integrity import Manifest
+from stock_data_manage.storage.metadata import MetadataStore
+from stock_data_manage.storage.raw import RawObjectStore
+from stock_data_manage.quality.resolution import resolve_records
 
 
 def test_raw_objects_are_immutable_and_verifiable(tmp_path) -> None:

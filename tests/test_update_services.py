@@ -2,10 +2,10 @@ from dataclasses import dataclass
 from datetime import date
 
 from stock_data_manage.domain import AssetType, Exchange
-from stock_data_manage.security_master import SecurityMasterStore, stable_instrument_id
-from stock_data_manage.security_master_update import SecurityMasterUpdater
-from stock_data_manage.trading_calendar import CalendarDay, TradingCalendarStore
-from stock_data_manage.trading_calendar_update import TradingCalendarUpdater
+from stock_data_manage.service.instruments import SecurityMasterStore, stable_instrument_id
+from stock_data_manage.service.instruments_update import SecurityMasterUpdater
+from stock_data_manage.service.calendar import CalendarDay, TradingCalendarStore
+from stock_data_manage.service.calendar_update import TradingCalendarUpdater
 
 
 @dataclass
@@ -81,4 +81,3 @@ def test_calendar_update_does_not_create_holiday_from_single_empty_source(tmp_pa
         ).update(start=trade_day, end=trade_day)
         assert result.merge.days == ()
         assert store.is_trading_day(trade_day) is None
-

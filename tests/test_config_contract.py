@@ -2,7 +2,7 @@ from pathlib import Path
 
 import yaml
 
-from stock_data_manage.publication_policy import load_publication_policy
+from stock_data_manage.quality.publication import load_publication_policy
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]

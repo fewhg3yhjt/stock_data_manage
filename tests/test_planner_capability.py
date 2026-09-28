@@ -2,9 +2,9 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from stock_data_manage.capability import CapabilityRegistry, ProviderCapability
+from stock_data_manage.routing.capabilities import CapabilityRegistry, ProviderCapability
 from stock_data_manage.domain import Adjustment, AssetType, Dataset, Exchange, ItemStatus
-from stock_data_manage.planner import calculate_missing_set, plan_realtime_collection
+from stock_data_manage.routing.router import calculate_missing_set, plan_realtime_collection
 
 
 def capability(**overrides: object) -> ProviderCapability:

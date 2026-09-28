@@ -2,8 +2,8 @@ from datetime import date, datetime, timezone
 from decimal import Decimal
 
 from stock_data_manage.domain import AssetType, Exchange
-from stock_data_manage.normalizer import NormalizationRule, Normalizer
-from stock_data_manage.snapshot_daily import SnapshotDailyBuilder
+from stock_data_manage.quality.normalization import NormalizationRule, Normalizer
+from stock_data_manage.pipeline.snapshot_daily import SnapshotDailyBuilder
 
 
 def test_snapshot_daily_builder_creates_provisional_bar_with_rule_units() -> None:

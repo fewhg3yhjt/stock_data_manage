@@ -2,8 +2,8 @@ from datetime import date, datetime
 from decimal import Decimal
 from zoneinfo import ZoneInfo
 
-from stock_data_manage.canonical_storage import CanonicalPartitionStore
-from stock_data_manage.daily_reconciliation import DailyReconciliation
+from stock_data_manage.storage.parquet import CanonicalPartitionStore
+from stock_data_manage.pipeline.daily_reconciliation import DailyReconciliation
 from stock_data_manage.domain import (
     Adjustment,
     AssetType,
@@ -12,7 +12,7 @@ from stock_data_manage.domain import (
     ItemStatus,
     QualityStatus,
 )
-from stock_data_manage.metadata import MetadataStore
+from stock_data_manage.storage.metadata import MetadataStore
 
 
 SHANGHAI = ZoneInfo("Asia/Shanghai")

@@ -17,6 +17,17 @@
 - Do not modify unrelated files just to make a commit clean.
 - Before pushing, confirm that the commit contains only the requested change and no sensitive content.
 
+## Workspace Permissions
+
+- Project source, test, configuration, and documentation files must be owned by the normal project user, not `root`.
+- Do not run project editing, formatting, testing, installation, or build commands with `sudo` or as `root` unless the user explicitly requests it.
+- Before editing a target file, check its owner when a permission error occurs or when the file was created by an external tool.
+- If a required project file is owned by `root`, repair ownership only for the specific files needed by the current task; do not recursively `chown` the repository.
+- Use the current project user and group for ownership repair, and verify ownership after the repair before editing.
+- Do not change permissions or ownership of `.git`, credentials, mounted data directories, or unrelated files as part of routine development.
+- New files created during development must be checked to ensure they are owned by the normal project user.
+- If ownership cannot be repaired without broad or destructive changes, stop and report the affected paths instead of bypassing permissions.
+
 ## 方案讨论语言
 
 - 进行架构设计、方案讨论、需求分析、实施计划和技术评审时，默认使用中文。

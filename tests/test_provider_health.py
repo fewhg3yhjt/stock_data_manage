@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
-from stock_data_manage.metadata import MetadataStore
+from stock_data_manage.storage.metadata import MetadataStore
 
 
 KEY = {
@@ -61,4 +61,3 @@ def test_ordinary_failures_open_at_threshold(tmp_path) -> None:
             failure_threshold=2,
         )
         assert not metadata.provider_available(second, now + timedelta(seconds=2))
-

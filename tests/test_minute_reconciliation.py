@@ -3,11 +3,11 @@ from datetime import datetime
 from decimal import Decimal
 from zoneinfo import ZoneInfo
 
-from stock_data_manage.canonical_storage import CanonicalPartitionStore
+from stock_data_manage.storage.parquet import CanonicalPartitionStore
 from stock_data_manage.domain import Dataset, QualityStatus
-from stock_data_manage.hot_store import HotMinuteStore
-from stock_data_manage.metadata import MetadataStore
-from stock_data_manage.minute_reconciliation import MinuteReconciliation
+from stock_data_manage.storage.hot import HotMinuteStore
+from stock_data_manage.storage.metadata import MetadataStore
+from stock_data_manage.pipeline.minute_reconciliation import MinuteReconciliation
 
 
 SHANGHAI = ZoneInfo("Asia/Shanghai")

@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from stock_data_manage.publication_policy import PublicationPolicy
+from stock_data_manage.quality.publication import PublicationPolicy
 
 
 def test_publication_policy_allows_values_on_both_boundaries() -> None:

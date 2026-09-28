@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from stock_data_manage.attempts import CollectionAttempt
+from stock_data_manage.worker.attempts import CollectionAttempt
 from stock_data_manage.domain import AttemptStatus
 
 
@@ -36,4 +36,3 @@ def test_temporary_empty_is_retryable_not_complete() -> None:
     )
     attempt = attempt.transition(AttemptStatus.FETCHING).transition(AttemptStatus.TEMPORARY_EMPTY)
     assert attempt.transition(AttemptStatus.LEASED).status is AttemptStatus.LEASED
-

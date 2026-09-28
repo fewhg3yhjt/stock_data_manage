@@ -5,22 +5,21 @@ from zoneinfo import ZoneInfo
 
 import pytest
 
-from stock_data_manage.canonical_storage import CanonicalPartitionStore
-from stock_data_manage.collection import (
+from stock_data_manage.storage.parquet import CanonicalPartitionStore
+from stock_data_manage.pipeline.daily import (
     DailyCollectionService,
     Instrument,
     PublicationThresholdExceeded,
 )
 from stock_data_manage.domain import AssetType, Dataset, Exchange, ItemStatus
-from stock_data_manage.capability import ProviderCapability
-from stock_data_manage.http_providers import TencentSnapshotProvider
-from stock_data_manage.metadata import MetadataStore
-from stock_data_manage.normalizer import NormalizationRule, Normalizer
-from stock_data_manage.providers import FixtureDailyProvider
-from stock_data_manage.provider_contract import FailureClass, ProviderContractError
-from stock_data_manage.raw_storage import RawObjectStore
-from stock_data_manage.provider_contract import HttpResponse
-from stock_data_manage.publication_policy import load_publication_policy
+from stock_data_manage.routing.capabilities import ProviderCapability
+from stock_data_manage.providers.http import TencentSnapshotProvider
+from stock_data_manage.storage.metadata import MetadataStore
+from stock_data_manage.quality.normalization import NormalizationRule, Normalizer
+from stock_data_manage.providers.base import FixtureDailyProvider
+from stock_data_manage.providers.contracts import FailureClass, ProviderContractError, HttpResponse
+from stock_data_manage.storage.raw import RawObjectStore
+from stock_data_manage.quality.publication import load_publication_policy
 
 
 SHANGHAI = ZoneInfo("Asia/Shanghai")

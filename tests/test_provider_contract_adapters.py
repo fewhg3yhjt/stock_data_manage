@@ -5,8 +5,8 @@ from typing import Mapping
 
 import pytest
 
-from stock_data_manage.capability_probe import probe_daily_capability, probe_minute_capability
-from stock_data_manage.http_providers import (
+from stock_data_manage.providers.probes import probe_daily_capability, probe_minute_capability
+from stock_data_manage.providers.http import (
     SinaDailyProvider,
     SinaMinuteProvider,
     SinaSnapshotProvider,
@@ -15,10 +15,10 @@ from stock_data_manage.http_providers import (
     TencentMinuteProvider,
     TencentSnapshotProvider,
 )
-from stock_data_manage.capability import ProviderCapability
+from stock_data_manage.routing.capabilities import ProviderCapability
 from stock_data_manage.domain import Adjustment, AssetType, Dataset, Exchange
-from stock_data_manage.metadata import MetadataStore
-from stock_data_manage.provider_contract import (
+from stock_data_manage.storage.metadata import MetadataStore
+from stock_data_manage.providers.contracts import (
     EndpointContract,
     FailureClass,
     HttpResponse,

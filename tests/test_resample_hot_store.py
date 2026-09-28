@@ -4,8 +4,8 @@ from decimal import Decimal
 from zoneinfo import ZoneInfo
 
 from stock_data_manage.domain import QualityStatus
-from stock_data_manage.hot_store import HotMinuteStore
-from stock_data_manage.resample import resample_1m_to_5m
+from stock_data_manage.storage.hot import HotMinuteStore
+from stock_data_manage.pipeline.resample import resample_1m_to_5m
 
 
 SHANGHAI = ZoneInfo("Asia/Shanghai")

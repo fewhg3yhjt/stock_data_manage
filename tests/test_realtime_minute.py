@@ -5,16 +5,16 @@ from zoneinfo import ZoneInfo
 
 import pytest
 
-from stock_data_manage.capability import ProviderCapability
+from stock_data_manage.routing.capabilities import ProviderCapability
 from stock_data_manage.domain import Adjustment, AssetType, Dataset, Exchange, QualityStatus
-from stock_data_manage.hot_store import HotMinuteStore
-from stock_data_manage.minute_query import MinuteQuery
-from stock_data_manage.normalizer import NormalizationRule, Normalizer
-from stock_data_manage.realtime import FixtureRealtimeMinuteProvider, RealtimeMinuteCollector
-from stock_data_manage.sessions import MarketSchedule, MarketSession, missing_bar_times
-from stock_data_manage.snapshot_aggregator import SnapshotMinuteAggregator
-from stock_data_manage.canonical_storage import CanonicalPartitionStore
-from stock_data_manage.metadata import MetadataStore
+from stock_data_manage.storage.hot import HotMinuteStore
+from stock_data_manage.service.market_data import MinuteQuery
+from stock_data_manage.quality.normalization import NormalizationRule, Normalizer
+from stock_data_manage.pipeline.minute import FixtureRealtimeMinuteProvider, RealtimeMinuteCollector
+from stock_data_manage.domain.sessions import MarketSchedule, MarketSession, missing_bar_times
+from stock_data_manage.pipeline.snapshot_aggregator import SnapshotMinuteAggregator
+from stock_data_manage.storage.parquet import CanonicalPartitionStore
+from stock_data_manage.storage.metadata import MetadataStore
 
 
 SHANGHAI = ZoneInfo("Asia/Shanghai")
@@ -180,4 +180,3 @@ def test_minute_completeness_metadata(tmp_path) -> None:
         )
         row = metadata.minute_completeness("XSHG:600519", datetime(2026, 9, 11).date(), 1, "none")
     assert row is not None and row["status"] == "partial" and row["coverage_ratio"] == 239 / 240
-

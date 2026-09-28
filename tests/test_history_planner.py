@@ -2,8 +2,8 @@ from datetime import date, timedelta
 
 import pytest
 
-from stock_data_manage.history_planner import split_history_windows
-from stock_data_manage.provider_contract import WindowStatus, assess_returned_window
+from stock_data_manage.pipeline.history import split_history_windows
+from stock_data_manage.providers.contracts import WindowStatus, assess_returned_window
 
 
 def test_history_plan_respects_day_and_row_limits_per_symbol() -> None:
@@ -46,4 +46,3 @@ def test_returned_window_distinguishes_partial_and_truncated() -> None:
         max_rows_per_request=2,
         supports_pagination=False,
     ) is WindowStatus.PARTIAL
-

@@ -2,15 +2,15 @@ from pathlib import Path
 
 import pytest
 
-from stock_data_manage.canonical_storage import (
+from stock_data_manage.storage.parquet import (
     CanonicalPartitionStore,
     InvalidPartitionError,
     PartitionLock,
     PartitionLockedError,
 )
 from stock_data_manage.domain import Dataset, ItemStatus
-from stock_data_manage.metadata import MetadataStore
-from stock_data_manage.recovery import RecoveryScanner
+from stock_data_manage.storage.metadata import MetadataStore
+from stock_data_manage.worker.recovery import RecoveryScanner
 
 
 def test_canonical_publish_is_idempotent_and_locked(tmp_path, final_minute_bar) -> None:

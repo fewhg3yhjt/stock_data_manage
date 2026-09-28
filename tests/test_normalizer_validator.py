@@ -3,8 +3,8 @@ from decimal import Decimal
 from zoneinfo import ZoneInfo
 
 from stock_data_manage.domain import Adjustment, AssetType, Dataset, Exchange, QualityStatus
-from stock_data_manage.normalizer import NormalizationRule, Normalizer
-from stock_data_manage.validator import validate_bar
+from stock_data_manage.quality.normalization import NormalizationRule, Normalizer
+from stock_data_manage.quality.validation import validate_bar
 
 
 def test_normalizer_converts_units_and_start_time_semantics() -> None:
@@ -63,4 +63,3 @@ def test_validator_rejects_impossible_ohlc(minute_bar) -> None:
     result = validate_bar(invalid)
     assert not result.valid
     assert "high_below_ohlc" in result.errors
-

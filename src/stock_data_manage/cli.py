@@ -6,19 +6,19 @@ from dataclasses import asdict
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
-from .acceptance import run_offline_acceptance
-from .capability import ProviderCapability
-from .capability_probe import probe_daily_capability, probe_minute_capability
 from .domain import Adjustment, AssetType, Dataset, Exchange
-from .http_providers import (
+from .providers.http import (
     SinaDailyProvider,
     SinaMinuteProvider,
     TencentDailyProvider,
     TencentMinuteProvider,
     UrlLibTransport,
 )
-from .metadata import MetadataStore
-from .recovery import RecoveryScanner
+from .providers.probes import probe_daily_capability, probe_minute_capability
+from .routing.capabilities import ProviderCapability
+from .storage.metadata import MetadataStore
+from .worker.acceptance import run_offline_acceptance
+from .worker.recovery import RecoveryScanner
 
 
 def main(argv: list[str] | None = None) -> int:
