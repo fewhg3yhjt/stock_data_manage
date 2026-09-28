@@ -2,10 +2,13 @@ datasets:
   daily_bar:
     allowed_universes: [all_stock, all_etf, all_lof, all_index, watchlist, static]
     canonical_key: [instrument_id, trade_date, adjustment]
+    publish:
+      mode: atomic_replace
+      max_missing_ratio: 0.01
+      max_missing_count: 50
   minute_bar_1m:
     allowed_universes: [watchlist, strategy_candidate, static]
     canonical_key: [instrument_id, bar_time, interval_minutes, adjustment]
   minute_bar_5m:
     allowed_universes: [watchlist, strategy_candidate, static]
     canonical_key: [instrument_id, bar_time, interval_minutes, adjustment]
-

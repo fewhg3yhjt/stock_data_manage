@@ -193,7 +193,6 @@ capabilities:
         priority: 30
         acquisition: symbol
     quality:
-      min_coverage: 0.999
       required_fields:
         - symbol
         - trade_date
@@ -246,6 +245,8 @@ datasets:
       mode: routed
     publish:
       mode: atomic_replace
+      max_missing_ratio: 0.01
+      max_missing_count: 50
     storage:
       type: parquet
 ```
@@ -515,7 +516,7 @@ pct_change
 - 跨来源冲突
 - 与历史数据的异常突变
 
-只有通过数据集质量检查的数据才允许正式发布。
+只有通过数据集质量检查，并满足该数据集发布门槛的数据才允许正式发布。股票日线第一版允许最多缺失 1%，且最多缺失 50 只；两个条件必须同时满足。门槛来自 `config/datasets.yaml`，不能写死在采集代码中。
 
 ---
 
@@ -535,7 +536,7 @@ pct_change
 股票日线 / 2026-09-28
 ```
 
-这个任务的最终目标只有一个：生成一份完整、质量检查通过、可以正式发布的 `2026-09-28.parquet`。
+这个任务的最终目标只有一个：生成一份满足配置发布门槛、质量检查通过、可以正式发布的 `2026-09-28.parquet`。
 
 ### 12.1 数据获取形态
 
@@ -708,7 +709,17 @@ BaoStock 请求 23
 AkShare 请求 2
 ```
 
-如果所有路由走完仍然缺失，任务失败，`missing_symbols.json` 记录最终缺失的证券。来源接口已经返回但标准化或基础校验失败的证券仍属于缺失证券。
+如果所有路由走完仍然缺失，`missing_symbols.json` 记录最终缺失的证券，再由数据集发布门槛判断任务能否发布。来源接口已经返回但标准化或基础校验失败的证券仍属于缺失证券。
+
+股票日线第一版发布条件：
+
+```text
+缺失比例 <= 1%
+并且
+缺失数量 <= 50
+```
+
+两个条件同时满足才允许发布；任一条件超限都不发布，并保留已有正式数据。具体数值由 `config/datasets.yaml` 管理，后续管理台修改同一配置，不在代码中设置固定值。
 
 可配置一个简单阈值避免“大面积缺失时逐只补”：
 

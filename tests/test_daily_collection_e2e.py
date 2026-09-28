@@ -1,9 +1,16 @@
 from datetime import date, datetime, timezone
 from decimal import Decimal
+from pathlib import Path
 from zoneinfo import ZoneInfo
 
+import pytest
+
 from stock_data_manage.canonical_storage import CanonicalPartitionStore
-from stock_data_manage.collection import DailyCollectionService, Instrument
+from stock_data_manage.collection import (
+    DailyCollectionService,
+    Instrument,
+    PublicationThresholdExceeded,
+)
 from stock_data_manage.domain import AssetType, Dataset, Exchange, ItemStatus
 from stock_data_manage.capability import ProviderCapability
 from stock_data_manage.http_providers import TencentSnapshotProvider
@@ -13,9 +20,12 @@ from stock_data_manage.providers import FixtureDailyProvider
 from stock_data_manage.provider_contract import FailureClass, ProviderContractError
 from stock_data_manage.raw_storage import RawObjectStore
 from stock_data_manage.provider_contract import HttpResponse
+from stock_data_manage.publication_policy import load_publication_policy
 
 
 SHANGHAI = ZoneInfo("Asia/Shanghai")
+DATASETS_CONFIG = Path(__file__).resolve().parents[1] / "config" / "datasets.yaml"
+DAILY_PUBLICATION_POLICY = load_publication_policy(DATASETS_CONFIG, "daily_bar")
 
 
 def row(symbol: str, close: str) -> dict[str, str]:
@@ -70,6 +80,7 @@ def test_partial_primary_falls_back_only_for_missing_and_rerun_is_noop(tmp_path)
             raw_store=RawObjectStore(tmp_path / "raw"),
             canonical_store=canonical,
             metadata=metadata,
+            publication_policy=DAILY_PUBLICATION_POLICY,
             clock=lambda: fixed_now,
         )
         first = service.collect(
@@ -135,6 +146,7 @@ def test_rate_limited_primary_is_cooled_and_fallback_completes_partition(tmp_pat
             raw_store=RawObjectStore(tmp_path / "raw"),
             canonical_store=CanonicalPartitionStore(tmp_path / "canonical"),
             metadata=metadata,
+            publication_policy=DAILY_PUBLICATION_POLICY,
             clock=lambda: now,
         )
         result = service.collect(
@@ -220,6 +232,7 @@ def test_snapshot_provider_publishes_provisional_and_final_provider_can_replace_
             raw_store=RawObjectStore(tmp_path / "raw"),
             canonical_store=CanonicalPartitionStore(tmp_path / "canonical"),
             metadata=metadata,
+            publication_policy=DAILY_PUBLICATION_POLICY,
             clock=lambda: datetime(2026, 9, 11, 16, 30, tzinfo=SHANGHAI),
         )
         provisional = service.collect(
@@ -236,3 +249,102 @@ def test_snapshot_provider_publishes_provisional_and_final_provider_can_replace_
     )[0]
     assert record.quality_status.value == "final"
     assert record.source_provider == "history"
+
+
+def test_daily_collection_allows_publication_at_configured_missing_limit(tmp_path) -> None:
+    rows = {
+        f"sh600{index:03d}": row(f"sh600{index:03d}", "10")
+        for index in range(1, 100)
+    }
+    provider = FixtureDailyProvider("primary", "history", rows)
+    normalizer = Normalizer(
+        [
+            NormalizationRule(
+                provider="primary",
+                endpoint="history",
+                exchange=Exchange.XSHG,
+                asset_type=AssetType.STOCK,
+                frequency=None,
+                volume_multiplier=Decimal("1"),
+                amount_multiplier=Decimal("1"),
+                version="v1",
+            )
+        ]
+    )
+    instruments = [
+        Instrument(
+            f"XSHG:600{index:03d}",
+            f"sh600{index:03d}",
+            Exchange.XSHG,
+            AssetType.STOCK,
+        )
+        for index in range(1, 101)
+    ]
+    canonical = CanonicalPartitionStore(tmp_path / "canonical")
+    with MetadataStore(tmp_path / "metadata.duckdb") as metadata:
+        service = DailyCollectionService(
+            providers=[provider],
+            normalizer=normalizer,
+            raw_store=RawObjectStore(tmp_path / "raw"),
+            canonical_store=canonical,
+            metadata=metadata,
+            publication_policy=DAILY_PUBLICATION_POLICY,
+        )
+
+        service.collect(
+            instruments=instruments,
+            trade_date=date(2026, 9, 11),
+            run_id="at-missing-limit",
+        )
+
+    assert len(canonical.read(Dataset.DAILY_BAR, "stock", "2026-09-11")) == 99
+
+
+def test_daily_collection_rejects_publication_above_configured_missing_limit(tmp_path) -> None:
+    rows = {
+        f"sh600{index:03d}": row(f"sh600{index:03d}", "10")
+        for index in range(1, 99)
+    }
+    provider = FixtureDailyProvider("primary", "history", rows)
+    normalizer = Normalizer(
+        [
+            NormalizationRule(
+                provider="primary",
+                endpoint="history",
+                exchange=Exchange.XSHG,
+                asset_type=AssetType.STOCK,
+                frequency=None,
+                volume_multiplier=Decimal("1"),
+                amount_multiplier=Decimal("1"),
+                version="v1",
+            )
+        ]
+    )
+    instruments = [
+        Instrument(
+            f"XSHG:600{index:03d}",
+            f"sh600{index:03d}",
+            Exchange.XSHG,
+            AssetType.STOCK,
+        )
+        for index in range(1, 101)
+    ]
+    canonical = CanonicalPartitionStore(tmp_path / "canonical")
+    with MetadataStore(tmp_path / "metadata.duckdb") as metadata:
+        service = DailyCollectionService(
+            providers=[provider],
+            normalizer=normalizer,
+            raw_store=RawObjectStore(tmp_path / "raw"),
+            canonical_store=canonical,
+            metadata=metadata,
+            publication_policy=DAILY_PUBLICATION_POLICY,
+        )
+
+        with pytest.raises(PublicationThresholdExceeded):
+            service.collect(
+                instruments=instruments,
+                trade_date=date(2026, 9, 11),
+                run_id="too-many-missing",
+            )
+
+    assert canonical.read(Dataset.DAILY_BAR, "stock", "2026-09-11") == []

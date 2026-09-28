@@ -22,6 +22,7 @@ from .normalizer import Normalizer
 from .planner import calculate_missing_set
 from .provider_contract import FailureClass, ProviderContractError
 from .providers import DailyProvider
+from .publication_policy import PublicationPolicy
 from .raw_storage import RawObjectStore
 from .validator import validate_bar
 
@@ -42,6 +43,10 @@ class CollectionRunResult:
     attempt_ids: tuple[str, ...]
 
 
+class PublicationThresholdExceeded(ValueError):
+    pass
+
+
 class DailyCollectionService:
     """Small end-to-end daily collection path used by schedulers and replay tests."""
 
@@ -53,6 +58,7 @@ class DailyCollectionService:
         raw_store: RawObjectStore,
         canonical_store: CanonicalPartitionStore,
         metadata: MetadataStore,
+        publication_policy: PublicationPolicy,
         clock: Callable[[], datetime] | None = None,
         provider_cooldown_seconds: int = 300,
         provider_failure_threshold: int = 3,
@@ -62,6 +68,7 @@ class DailyCollectionService:
         self.raw_store = raw_store
         self.canonical_store = canonical_store
         self.metadata = metadata
+        self.publication_policy = publication_policy
         self.clock = clock or (lambda: datetime.now(timezone.utc))
         self.provider_cooldown_seconds = provider_cooldown_seconds
         self.provider_failure_threshold = provider_failure_threshold
@@ -288,6 +295,21 @@ class DailyCollectionService:
 
         for instrument_id in by_id:
             statuses.setdefault(instrument_id, ItemStatus.MISSING)
+
+        available_ids = {
+            record.instrument_id
+            for record in (*existing, *accepted)
+            if record.instrument_id in by_id
+        }
+        if not self.publication_policy.allows(
+            expected_count=len(universe), actual_count=len(available_ids)
+        ):
+            missing_count = len(universe) - len(available_ids)
+            missing_ratio = missing_count / len(universe)
+            raise PublicationThresholdExceeded(
+                "daily_bar publication rejected: "
+                f"missing_count={missing_count}, missing_ratio={missing_ratio:.6f}"
+            )
 
         publish = self.canonical_store.publish(
             dataset=Dataset.DAILY_BAR,
