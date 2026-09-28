@@ -2,6 +2,8 @@
 
 证券数据采集与管理平台 Phase 1 的实现仓库。设计目标和完整验收标准分别见：
 
+- [市场数据中心术语与数据流程规范](stock-data-terminology-and-data-flow.md)
+- [市场数据中心架构设计](STOCK_ANALYSIS_V2_MARKET_DATA_CENTER_ARCHITECTURE_V1.md)
 - [实时采集设计](stock-data-design-realtime.md)
 - [测试设计与验收基线](stock-data-test-design-acceptance-baseline.md)
 

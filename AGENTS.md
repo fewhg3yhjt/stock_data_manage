@@ -16,3 +16,10 @@
 - Do not delete, overwrite, or reset existing user data or files without explicit confirmation.
 - Do not modify unrelated files just to make a commit clean.
 - Before pushing, confirm that the commit contains only the requested change and no sensitive content.
+
+## 方案讨论语言
+
+- 进行架构设计、方案讨论、需求分析、实施计划和技术评审时，默认使用中文。
+- 专业术语第一次出现时优先使用“中文名称（English Term）”，后续优先使用中文名称。
+- 代码标识符、配置字段、协议原名和第三方产品名称可以保留英文，但应同时说明其中文含义。
+- 除引用原文、代码或外部协议外，避免使用纯英文标题、流程图和大段说明。
