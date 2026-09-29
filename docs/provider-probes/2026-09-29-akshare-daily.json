@@ -1,0 +1,15 @@
+{
+  "provider": "akshare",
+  "endpoint_group": "daily_history",
+  "capability_version": "akshare-daily-v1",
+  "validated_at": "2026-09-29T03:42:00+00:00",
+  "validation_expires_at": "2026-10-06T03:42:00+00:00",
+  "status": "not_executed_dependency_missing",
+  "eligible_for_selection": false,
+  "samples": [
+    {"asset_type": "stock", "symbol": "sh600519", "failure_class": "connection", "message": "AkShare dependency is not installed"},
+    {"asset_type": "etf", "symbol": "sh510300", "failure_class": "connection", "message": "AkShare dependency is not installed"},
+    {"asset_type": "lof", "symbol": "sh501018", "failure_class": "connection", "message": "AkShare dependency is not installed"},
+    {"asset_type": "index", "symbol": "sh000001", "failure_class": "connection", "message": "AkShare dependency is not installed"}
+  ]
+}

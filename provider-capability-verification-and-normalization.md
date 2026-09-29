@@ -554,7 +554,7 @@ Raw / Canonical / Metadata 可追溯测试
 
 - BaoStock 正式 SDK Provider；
 - EastMoney 公司行动 Provider；
-- AkShare 函数级 Provider；
+- AkShare 函数级 Provider 的真实依赖和探针验证；
 - 全量能力覆盖矩阵自动生成；
 - Probe Evidence 对所有生产路由的动态资格绑定；
 - 所有来源的完整 YAML 字段映射、单位和时间语义规则；

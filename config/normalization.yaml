@@ -74,6 +74,50 @@ rules:
     amount_multiplier: "1"
     version: eastmoney-corporate-action-v1
 
+  - provider: akshare
+    endpoint: stock_daily
+    exchange: XSHG
+    asset_type: stock
+    frequency: null
+    adjustment: none
+    volume_multiplier: "1"
+    amount_multiplier: "1"
+    volume_semantics: source_defined
+    version: akshare-stock-daily-v1
+
+  - provider: akshare
+    endpoint: etf_daily
+    exchange: XSHG
+    asset_type: etf
+    frequency: null
+    adjustment: none
+    volume_multiplier: "1"
+    amount_multiplier: "1"
+    volume_semantics: source_defined
+    version: akshare-etf-daily-v1
+
+  - provider: akshare
+    endpoint: lof_daily
+    exchange: XSHG
+    asset_type: lof
+    frequency: null
+    adjustment: none
+    volume_multiplier: "1"
+    amount_multiplier: "1"
+    volume_semantics: source_defined
+    version: akshare-lof-daily-v1
+
+  - provider: akshare
+    endpoint: index_daily
+    exchange: XSHG
+    asset_type: index
+    frequency: null
+    adjustment: none
+    volume_multiplier: "1"
+    amount_multiplier: "1"
+    volume_semantics: source_defined
+    version: akshare-index-daily-v1
+
 # Production rules are intentionally not guessed. Each provider/endpoint/market/
 # asset/frequency combination is added only after a unit-semantics probe records
 # its evidence and validation expiry.

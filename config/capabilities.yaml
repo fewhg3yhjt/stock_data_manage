@@ -14,6 +14,26 @@ capabilities:
         priority: 30
         adjustments: [none, forward, backward]
         role: validation_only
+      - provider: akshare
+        endpoint: stock_daily
+        priority: 40
+        adjustments: [none, forward, backward]
+        role: validation_only
+      - provider: akshare
+        endpoint: etf_daily
+        priority: 40
+        adjustments: [none, forward, backward]
+        role: validation_only
+      - provider: akshare
+        endpoint: lof_daily
+        priority: 40
+        adjustments: [none, forward, backward]
+        role: validation_only
+      - provider: akshare
+        endpoint: index_daily
+        priority: 40
+        adjustments: [none]
+        role: validation_only
   snapshot:
     routes:
       - provider: tencent

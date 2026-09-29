@@ -110,3 +110,47 @@ providers:
       snapshot:
         enabled: false
         disabled_reason: unsupported_by_provider
+  akshare:
+    enabled: true
+    default_role: validation_only
+    endpoints:
+      stock_daily:
+        enabled: true
+        role: validation_only
+        datasets: [daily_bar]
+        adjustments: [none, forward, backward]
+        asset_types: [stock]
+        exchanges: [XSHG, XSHE, BSE]
+        capability_version: akshare-stock-daily-v1
+        max_symbols_per_request: 1
+        request_interval_seconds: 1
+      etf_daily:
+        enabled: true
+        role: validation_only
+        datasets: [daily_bar]
+        adjustments: [none, forward, backward]
+        asset_types: [etf]
+        exchanges: [XSHG, XSHE]
+        capability_version: akshare-etf-daily-v1
+        max_symbols_per_request: 1
+        request_interval_seconds: 1
+      lof_daily:
+        enabled: true
+        role: validation_only
+        datasets: [daily_bar]
+        adjustments: [none, forward, backward]
+        asset_types: [lof]
+        exchanges: [XSHG, XSHE]
+        capability_version: akshare-lof-daily-v1
+        max_symbols_per_request: 1
+        request_interval_seconds: 1
+      index_daily:
+        enabled: true
+        role: validation_only
+        datasets: [daily_bar]
+        adjustments: [none]
+        asset_types: [index]
+        exchanges: [XSHG, XSHE]
+        capability_version: akshare-index-daily-v1
+        max_symbols_per_request: 1
+        request_interval_seconds: 1

@@ -6,6 +6,7 @@ from stock_data_manage.routing.factory import load_provider_registry
 from stock_data_manage.providers.tencent import TencentDailyProvider
 from stock_data_manage.providers.baostock import BaoStockDailyProvider
 from stock_data_manage.providers.eastmoney import EastMoneyCorporateActionProvider
+from stock_data_manage.providers.akshare import AkShareDailyProvider
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -67,3 +68,10 @@ def test_provider_factory_can_build_disabled_eastmoney_action_provider() -> None
         ROOT / "config" / "capabilities.yaml",
     )
     assert not any(isinstance(item, EastMoneyCorporateActionProvider) for item in providers)
+
+
+def test_provider_factory_registers_optional_akshare_daily_providers() -> None:
+    _, providers = load_provider_registry(
+        ROOT / "config/providers.yaml", ROOT / "config/capabilities.yaml"
+    )
+    assert sum(isinstance(item, AkShareDailyProvider) for item in providers) == 4

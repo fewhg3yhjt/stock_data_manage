@@ -12,6 +12,7 @@ from ..providers.transport import HttpTransport, UrlLibTransport
 from ..providers.tdx import TdxMinuteProvider
 from ..providers.baostock import BaoStockDailyProvider, BaoStockMinuteProvider
 from ..providers.eastmoney import EastMoneyCorporateActionProvider
+from ..providers.akshare import AkShareDailyProvider
 from .capabilities import CapabilityRegistry
 
 
@@ -58,6 +59,20 @@ def build_provider(config: ProviderConfig, transport: HttpTransport | None = Non
             capability_version=config.capability_version,
             page_size=config.max_symbols_per_request,
         )
+    if config.provider == "akshare" and config.endpoint in {
+        "stock_daily", "etf_daily", "lof_daily", "index_daily"
+    }:
+        asset_type = {
+            "stock_daily": __import__("stock_data_manage.domain", fromlist=["AssetType"]).AssetType.STOCK,
+            "etf_daily": __import__("stock_data_manage.domain", fromlist=["AssetType"]).AssetType.ETF,
+            "lof_daily": __import__("stock_data_manage.domain", fromlist=["AssetType"]).AssetType.LOF,
+            "index_daily": __import__("stock_data_manage.domain", fromlist=["AssetType"]).AssetType.INDEX,
+        }[config.endpoint]
+        return AkShareDailyProvider(
+            asset_type=asset_type,
+            adjustment=next(iter(config.adjustments), Adjustment.NONE),
+            capability_version=config.capability_version,
+        )
     raise ValueError(f"no provider factory for {config.provider}.{config.endpoint}")
 
 
@@ -84,7 +99,10 @@ def load_provider_registry(
             priority=priority,
         )
         registry.register(capability)
-        if config.endpoint in {"daily_history", "recent_history", "forward_history"}:
+        if config.endpoint in {
+            "daily_history", "recent_history", "forward_history",
+            "stock_daily", "etf_daily", "lof_daily", "index_daily",
+        }:
             try:
                 providers.append(build_provider(config))
             except ValueError:
