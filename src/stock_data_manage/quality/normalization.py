@@ -25,6 +25,7 @@ class NormalizationRule:
     code_prefixes: tuple[str, ...] = ()
     source_bar_time_semantics: str = "end_time"
     volume_semantics: str | None = None
+    adjustment: Adjustment = Adjustment.NONE
 
     def matches(
         self,
@@ -35,6 +36,7 @@ class NormalizationRule:
         asset_type: AssetType,
         source_symbol: str,
         frequency: int | None,
+        adjustment: Adjustment,
     ) -> bool:
         return (
             self.provider == provider
@@ -42,6 +44,7 @@ class NormalizationRule:
             and self.exchange == exchange
             and self.asset_type == asset_type
             and self.frequency == frequency
+            and self.adjustment == adjustment
             and (not self.code_prefixes or source_symbol.startswith(self.code_prefixes))
         )
 
@@ -90,6 +93,7 @@ class Normalizer:
             asset_type=asset_type,
             source_symbol=source_symbol,
             frequency=frequency,
+            adjustment=adjustment,
         )
         try:
             trade_date = _as_date(raw["trade_date"])

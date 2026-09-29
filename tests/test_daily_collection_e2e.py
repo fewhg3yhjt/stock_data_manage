@@ -13,7 +13,7 @@ from stock_data_manage.pipeline.daily import (
 )
 from stock_data_manage.domain import Adjustment, AssetType, Dataset, Exchange, ItemStatus
 from stock_data_manage.routing.capabilities import ProviderCapability
-from stock_data_manage.providers.http import TencentSnapshotProvider
+from stock_data_manage.providers.tencent import TencentSnapshotProvider
 from stock_data_manage.storage.metadata import MetadataStore
 from stock_data_manage.quality.normalization import NormalizationRule, Normalizer
 from stock_data_manage.providers.base import FixtureDailyProvider
@@ -135,6 +135,7 @@ def test_forward_adjusted_daily_collection_publishes_stock_etf_and_lof(
                 volume_multiplier=Decimal("1"),
                 amount_multiplier=Decimal("1"),
                 version="tencent-qfq-v1",
+                adjustment=Adjustment.FORWARD,
             )
         ]
     )
@@ -222,6 +223,7 @@ def test_forward_adjusted_collection_skips_provider_without_asset_qualification(
                 volume_multiplier=Decimal("1"),
                 amount_multiplier=Decimal("1"),
                 version="tencent-qfq-v1",
+                adjustment=Adjustment.FORWARD,
             )
         ]
     )
@@ -307,6 +309,7 @@ def test_forward_collection_does_not_reuse_unadjusted_metadata_or_break_partitio
             volume_multiplier=Decimal("1"),
             amount_multiplier=Decimal("1"),
             version="fixture-qfq-v1",
+            adjustment=Adjustment.FORWARD,
         ),
     ]
     normalizer = Normalizer(rules)

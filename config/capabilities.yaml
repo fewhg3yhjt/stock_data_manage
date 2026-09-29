@@ -1,0 +1,29 @@
+capabilities:
+  daily_bar:
+    routes:
+      - provider: tencent
+        endpoint: forward_history
+        priority: 10
+        adjustments: [forward]
+      - provider: sina
+        endpoint: full_history
+        priority: 20
+        adjustments: [none]
+  snapshot:
+    routes:
+      - provider: tencent
+        endpoint: bulk_snapshot
+        priority: 10
+        adjustments: [none]
+  minute_bar_1m:
+    routes:
+      - provider: tencent
+        endpoint: native_1m
+        priority: 10
+        adjustments: [none]
+  minute_bar_5m:
+    routes:
+      - provider: sina
+        endpoint: native_5m
+        priority: 20
+        adjustments: [none]

@@ -9,7 +9,28 @@ rules:
     source_bar_time_semantics: end_time
     version: fixture-v1
 
+  - provider: tencent
+    endpoint: forward_history
+    exchange: XSHG
+    asset_type: stock
+    frequency: null
+    adjustment: forward
+    volume_multiplier: "1"
+    amount_multiplier: "1"
+    volume_semantics: unverified
+    version: tencent-qfq-stock-v1
+
+  - provider: tencent
+    endpoint: forward_history
+    exchange: XSHG
+    asset_type: etf
+    frequency: null
+    adjustment: forward
+    volume_multiplier: "1"
+    amount_multiplier: "1"
+    volume_semantics: unverified
+    version: tencent-qfq-etf-v1
+
 # Production rules are intentionally not guessed. Each provider/endpoint/market/
 # asset/frequency combination is added only after a unit-semantics probe records
 # its evidence and validation expiry.
-

@@ -8,6 +8,30 @@ providers:
   tencent:
     enabled: true
     endpoints:
+      daily_history:
+        enabled: true
+        role: primary
+        datasets: [daily_bar]
+        adjustments: [none]
+        asset_types: [stock, etf, lof, index]
+        exchanges: [XSHG, XSHE, BSE]
+        capability_version: tencent-kline-v1
+        max_symbols_per_request: 1
+        max_rows_per_request: 1024
+        supports_pagination: false
+        request_interval_seconds: 0.5
+      forward_history:
+        enabled: true
+        role: primary
+        datasets: [daily_bar]
+        adjustments: [forward]
+        asset_types: [stock, etf]
+        exchanges: [XSHG, XSHE]
+        capability_version: tencent-qfq-kline-v1
+        max_symbols_per_request: 1
+        max_rows_per_request: 640
+        supports_pagination: false
+        request_interval_seconds: 0.5
       native_1m:
         role: primary
         datasets: [minute_bar_1m]
@@ -17,13 +41,22 @@ providers:
       bulk_snapshot:
         role: primary
         datasets: [snapshot, daily_bar]
+        adjustments: [none]
+        asset_types: [stock, etf, lof, index]
+        exchanges: [XSHG, XSHE, BSE]
+        capability_version: tencent-snapshot-v1
         max_symbols_per_request: 100
+        request_interval_seconds: 1
   sina:
     enabled: true
     endpoints:
       full_history:
         role: primary
         datasets: [daily_bar]
+        adjustments: [none]
+        asset_types: [stock, etf, lof, index]
+        exchanges: [XSHG, XSHE, BSE]
+        capability_version: sina-cn-marketdata-v1
         max_symbols_per_request: 1
   tdx:
     enabled: false

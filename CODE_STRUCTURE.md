@@ -15,7 +15,7 @@
 | 数据访问服务 | `src/stock_data_manage/service/` | Security Master、Trading Calendar 和统一分钟查询 |
 | Worker | `src/stock_data_manage/worker/` | 调度、执行记录、恢复和离线验收 |
 
-配置文件仍位于仓库根目录的 `config/`，命令行入口仍位于 `src/stock_data_manage/cli.py`。
+配置文件仍位于仓库根目录的 `config/`，包括 `providers.yaml`、`capabilities.yaml`、`normalization.yaml` 和数据集配置；命令行入口仍位于 `src/stock_data_manage/cli.py`。
 
 Provider 的离线契约、实时探针和路由资格记录见仓库根目录的 `PROVIDER_CAPABILITY_MATRIX.md`。该文档是渠道验证事实记录，不是运行时配置。
 探针摘要证据位于 `docs/provider-probes/`；临时完整探针输出位于 `/tmp/opencode/provider-probes/`，不作为生产数据目录。
@@ -34,9 +34,26 @@ Provider 的离线契约、实时探针和路由资格记录见仓库根目录�
 |---|---|
 | `providers/base.py` | 日线、分钟等 Provider 协议以及 Fixture Provider 基础实现 |
 | `providers/contracts.py` | HTTP 响应、失败分类、返回窗口和 Provider Contract |
-| `providers/http.py` | Sina、Tencent 等 HTTP 行情适配器和传输实现 |
+| `providers/transport.py` | 公共 HTTP 传输、快照返回模型、来源时间和 TDX 行记录解析工具 |
+| `providers/tencent/daily.py` | Tencent 普通历史日线和前复权历史日线 |
+| `providers/tencent/snapshot.py` | Tencent 批量收盘快照 |
+| `providers/tencent/minute.py` | Tencent 原生 1m 分钟线 |
+| `providers/sina/daily.py` | Sina 普通历史日线 |
+| `providers/sina/snapshot.py` | Sina 批量收盘快照 |
+| `providers/sina/minute.py` | Sina 原生 5m 分钟线 |
+| `providers/tdx/minute.py` | 注入式 TDX 延迟 1m 分钟线 |
+| `providers/tencent/__init__.py` | Tencent 适配器导出 |
+| `providers/sina/__init__.py` | Sina 适配器导出 |
+| `providers/tdx/__init__.py` | TDX 适配器导出 |
 | `providers/probes.py` | 日线/分钟能力探针、证据模型和探针结果生成 |
 | `providers/__init__.py` | Provider 包说明，不承载业务实现 |
+
+## 配置加载
+
+| 文件 | 职责 |
+|---|---|
+| `config/loader.py` | 加载 `providers.yaml`、`capabilities.yaml` 和 `normalization.yaml` 的静态配置 |
+| `routing/factory.py` | 根据来源 Endpoint 配置创建具体 Provider，并注册静态 Capability |
 
 ## 能力路由器
 

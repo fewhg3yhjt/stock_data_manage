@@ -7,13 +7,9 @@ from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 from .domain import Adjustment, AssetType, Dataset, Exchange
-from .providers.http import (
-    SinaDailyProvider,
-    SinaMinuteProvider,
-    TencentDailyProvider,
-    TencentMinuteProvider,
-    UrlLibTransport,
-)
+from .providers.sina import SinaDailyProvider, SinaMinuteProvider
+from .providers.tencent import TencentDailyProvider, TencentMinuteProvider
+from .providers.transport import UrlLibTransport
 from .providers.probes import probe_daily_capability, probe_minute_capability
 from .routing.capabilities import ProviderCapability
 from .storage.metadata import MetadataStore

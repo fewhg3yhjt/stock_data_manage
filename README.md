@@ -8,6 +8,7 @@
 - [实时采集设计](stock-data-design-realtime.md)
 - [测试设计与验收基线](stock-data-test-design-acceptance-baseline.md)
 - [Provider 能力验证矩阵](PROVIDER_CAPABILITY_MATRIX.md)
+- [代码目录与文件职责](CODE_STRUCTURE.md)
 
 ## 当前开发状态
 
@@ -87,4 +88,4 @@ python -m pip install -e .
 python -m pytest
 ```
 
-当前实现已覆盖 Phase 1 的离线核心链路与 Provider 契约适配；Tencent/Sina 的小流量探针已形成证据，但前复权目标来源、TDX 真实客户端、BaoStock/EastMoney/AkShare 正式适配器仍未完成。未验证或未实现的来源不会自动进入生产候选。
+当前实现已覆盖 Phase 1 的离线核心链路与 Provider 契约适配；Tencent/Sina 的适配器已按来源拆分，Endpoint 静态配置位于 `config/providers.yaml`，能力路线位于 `config/capabilities.yaml`，标准化规则位于 `config/normalization.yaml`。Tencent/Sina 的小流量探针已形成证据，但前复权完整历史来源、TDX 真实客户端、BaoStock/EastMoney/AkShare 正式适配器仍未完成。未验证或未实现的来源不会自动进入生产候选。

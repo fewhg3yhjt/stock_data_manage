@@ -6,15 +6,10 @@ from typing import Mapping
 import pytest
 
 from stock_data_manage.providers.probes import probe_daily_capability, probe_minute_capability
-from stock_data_manage.providers.http import (
-    SinaDailyProvider,
-    SinaMinuteProvider,
-    SinaSnapshotProvider,
-    TdxMinuteProvider,
-    TencentDailyProvider,
-    TencentMinuteProvider,
-    TencentSnapshotProvider,
-)
+from stock_data_manage.providers.sina import SinaDailyProvider, SinaMinuteProvider, SinaSnapshotProvider
+from stock_data_manage.providers.tdx import TdxMinuteProvider
+from stock_data_manage.providers.tencent import TencentDailyProvider, TencentMinuteProvider, TencentSnapshotProvider
+from stock_data_manage.providers.transport import UrlLibTransport
 from stock_data_manage.routing.capabilities import ProviderCapability
 from stock_data_manage.domain import Adjustment, AssetType, Dataset, Exchange
 from stock_data_manage.storage.metadata import MetadataStore

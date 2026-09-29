@@ -1,0 +1,76 @@
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from datetime import date
+from typing import Any, Sequence
+
+from ..base import FetchResult
+from ..contracts import EndpointContract, FailureClass, ProviderContractError, WindowStatus
+from ..transport import HttpTransport
+
+
+@dataclass(slots=True)
+class SinaDailyProvider:
+    transport: HttpTransport
+    name: str = "sina"
+    endpoint: str = "full_history"
+    capability_priority: int = 100
+    capability_version: str = "sina-cn-marketdata-v1"
+    timeout_seconds: float = 15.0
+    max_rows: int = 1023
+    url: str = "https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData"
+    contract: EndpointContract = field(
+        default_factory=lambda: EndpointContract(
+            frozenset({"symbol", "trade_date", "open", "high", "low", "close", "volume"}),
+            max_rows_per_request=1023, supports_pagination=False,
+        )
+    )
+
+    def fetch_daily(self, symbols: Sequence[str], trade_date: date) -> FetchResult:
+        requested = tuple(symbols)
+        rows: list[dict[str, Any]] = []
+        returned_rows: list[dict[str, Any]] = []
+        statuses: list[WindowStatus] = []
+        response_statuses: list[int] = []
+        for symbol in requested:
+            response = self.transport.get(
+                self.url,
+                params={"symbol": symbol, "scale": "240", "ma": "no", "datalen": str(self.max_rows)},
+                timeout_seconds=self.timeout_seconds,
+            )
+            response_statuses.append(response.status_code)
+            payload = self.contract.parse_json(response)
+            if payload is None:
+                parsed: list[dict[str, Any]] = []
+            elif not isinstance(payload, list):
+                raise ProviderContractError("Sina response envelope changed", FailureClass.SCHEMA_CHANGED, retryable=False)
+            else:
+                parsed = [{
+                    "symbol": symbol, "trade_date": item.get("day"), "open": item.get("open"),
+                    "high": item.get("high"), "low": item.get("low"), "close": item.get("close"),
+                    "volume": item.get("volume"), "amount": item.get("amount"),
+                } for item in parsed_items(payload)]
+            statuses.append(self.contract.validate_rows(parsed))
+            returned_rows.extend(parsed)
+            rows.extend(item for item in parsed if str(item["trade_date"]) == trade_date.isoformat())
+        return FetchResult(
+            tuple(rows), requested, _combined_status(statuses, bool(rows)), tuple(response_statuses),
+            ("trade_date", "open", "high", "low", "close", "volume", "amount"),
+            ("volume:unverified", "amount:unverified"), len(returned_rows),
+            str(returned_rows[0]["trade_date"]) if returned_rows else None,
+            str(returned_rows[-1]["trade_date"]) if returned_rows else None,
+        )
+
+
+def parsed_items(payload: list[object]) -> list[dict[str, Any]]:
+    return [item for item in payload if isinstance(item, dict)]
+
+
+def _combined_status(statuses: list[WindowStatus], target_rows_found: bool) -> WindowStatus:
+    if WindowStatus.TRUNCATED in statuses:
+        return WindowStatus.TRUNCATED
+    if not target_rows_found:
+        return WindowStatus.TEMPORARY_EMPTY
+    if WindowStatus.PARTIAL in statuses:
+        return WindowStatus.PARTIAL
+    return WindowStatus.COMPLETE
