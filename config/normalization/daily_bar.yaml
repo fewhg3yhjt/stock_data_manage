@@ -1,0 +1,58 @@
+dataset: daily_bar
+
+rules:
+  - id: fixture-daily-v1
+    provider: fixture
+    endpoint: daily_history
+    exchange: XSHG
+    asset_type: stock
+    frequency: null
+    adjustment: none
+    field_mapping: {trade_date: trade_date, open: open, high: high, low: low, close: close, volume: volume, amount: amount}
+    volume_multiplier: "100"
+    amount_multiplier: "10000"
+    source_bar_time_semantics: end_time
+    version: fixture-v1
+    status: validated
+
+  - id: tencent-qfq-stock-v1
+    provider: tencent
+    endpoint: forward_history
+    exchange: XSHG
+    asset_type: stock
+    frequency: null
+    adjustment: forward
+    field_mapping: {trade_date: trade_date, open: open, high: high, low: low, close: close, volume: volume, amount: amount}
+    volume_multiplier: "1"
+    amount_multiplier: "1"
+    volume_semantics: unverified
+    version: tencent-qfq-stock-v1
+    status: pending_validation
+
+  - id: tencent-qfq-etf-v1
+    provider: tencent
+    endpoint: forward_history
+    exchange: XSHG
+    asset_type: etf
+    frequency: null
+    adjustment: forward
+    field_mapping: {trade_date: trade_date, open: open, high: high, low: low, close: close, volume: volume, amount: amount}
+    volume_multiplier: "1"
+    amount_multiplier: "1"
+    volume_semantics: unverified
+    version: tencent-qfq-etf-v1
+    status: pending_validation
+
+  - id: baostock-daily-stock-v1
+    provider: baostock
+    endpoint: daily_history
+    exchange: XSHG
+    asset_type: stock
+    frequency: null
+    adjustment: none
+    field_mapping: {trade_date: trade_date, open: open, high: high, low: low, close: close, volume: volume, amount: amount}
+    volume_multiplier: "1"
+    amount_multiplier: "1"
+    volume_semantics: share
+    version: baostock-daily-stock-v1
+    status: pending_validation

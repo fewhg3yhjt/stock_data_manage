@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from stock_data_manage.config.loader import load_capability_routes, load_normalization_rules, load_provider_configs
+from stock_data_manage.config.loader import load_capability_routes, load_dataset_normalization_rules, load_provider_configs
 from stock_data_manage.domain import Adjustment, Dataset
 from stock_data_manage.routing.factory import load_provider_registry
 from stock_data_manage.providers.tencent import TencentDailyProvider
@@ -25,7 +25,7 @@ def test_provider_yaml_declares_tencent_qfq_and_routes() -> None:
 
 
 def test_normalization_yaml_declares_tencent_qfq_rules() -> None:
-    rules = load_normalization_rules(ROOT / "config" / "normalization.yaml")
+    rules = load_dataset_normalization_rules(ROOT / "config" / "normalization", "daily_bar")
     assert any(
         rule.provider == "tencent"
         and rule.endpoint == "forward_history"

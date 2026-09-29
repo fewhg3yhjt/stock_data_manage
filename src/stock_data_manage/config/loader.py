@@ -132,3 +132,21 @@ def load_normalization_rules(path: str | Path) -> tuple[NormalizationRule, ...]:
             )
         )
     return tuple(rules)
+
+
+def load_dataset_normalization_rules(root: str | Path, dataset: str) -> tuple[NormalizationRule, ...]:
+    """Load one dataset's rule file; the dataset file is the preferred source."""
+    path = Path(root) / f"{dataset}.yaml"
+    return load_normalization_rules(path)
+
+
+def load_normalization_document(root: str | Path, dataset: str) -> dict[str, object]:
+    path = Path(root) / f"{dataset}.yaml"
+    return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+
+
+def load_normalization_rules_for_datasets(root: str | Path, datasets: tuple[str, ...]) -> tuple[NormalizationRule, ...]:
+    rules: list[NormalizationRule] = []
+    for dataset in datasets:
+        rules.extend(load_dataset_normalization_rules(root, dataset))
+    return tuple(rules)

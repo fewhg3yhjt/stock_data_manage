@@ -12,7 +12,7 @@ def test_yaml_configuration_is_parseable_and_keeps_minute_scope_bounded() -> Non
     datasets = yaml.safe_load((PROJECT_ROOT / "config" / "datasets.yaml").read_text("utf-8"))
     collection = yaml.safe_load((PROJECT_ROOT / "config" / "collection.yaml").read_text("utf-8"))
     providers = yaml.safe_load((PROJECT_ROOT / "config" / "providers.yaml").read_text("utf-8"))
-    yaml.safe_load((PROJECT_ROOT / "config" / "normalization.yaml").read_text("utf-8"))
+    yaml.safe_load((PROJECT_ROOT / "config" / "normalization" / "daily_bar.yaml").read_text("utf-8"))
 
     allowed = set(datasets["datasets"]["minute_bar_1m"]["allowed_universes"])
     daily_policy = load_publication_policy(

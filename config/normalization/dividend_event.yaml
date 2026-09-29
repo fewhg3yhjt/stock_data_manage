@@ -1,0 +1,22 @@
+dataset: dividend_event
+
+rules:
+  - id: eastmoney-dividend-event-v1
+    provider: eastmoney
+    endpoint: dividend_event
+    exchange: XSHG
+    asset_type: stock
+    frequency: null
+    adjustment: none
+    field_mapping:
+      source_security_code: SECURITY_CODE
+      ex_dividend_date: EX_DIVIDEND_DATE
+      record_date: EQUITY_RECORD_DATE
+      pretax_bonus_rmb: PRETAX_BONUS_RMB
+      bonus_ratio: BONUS_RATIO
+      transfer_ratio: IT_RATIO
+      assignment_progress: ASSIGN_PROGRESS
+      notice_date: NOTICE_DATE
+    version: eastmoney-dividend-event-v1
+    status: pending_validation
+    notes: 分红实施字段先保留来源原始语义，完成更宽窗口验证后再提升资格。

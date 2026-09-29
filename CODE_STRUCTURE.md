@@ -15,7 +15,7 @@
 | 数据访问服务 | `src/stock_data_manage/service/` | Security Master、Trading Calendar 和统一分钟查询 |
 | Worker | `src/stock_data_manage/worker/` | 调度、执行记录、恢复和离线验收 |
 
-配置文件仍位于仓库根目录的 `config/`，包括 `providers.yaml`、`capabilities.yaml`、`normalization.yaml` 和数据集配置；命令行入口仍位于 `src/stock_data_manage/cli.py`。
+配置文件仍位于仓库根目录的 `config/`：`providers.yaml` 保存来源公共配置，`capabilities.yaml` 保存路由顺序，`datasets/` 保存数据集标准定义，`normalization/` 保存按数据集拆分的来源归一化规则；命令行入口仍位于 `src/stock_data_manage/cli.py`。
 EastMoney 各数据域的范围和实现状态见 `eastmoney-data-domain-coverage.md`，不以单个分红事件 Endpoint 代表整个来源。
 
 Provider 的离线契约、实时探针和路由资格记录见仓库根目录的 `PROVIDER_CAPABILITY_MATRIX.md`。该文档是渠道验证事实记录，不是运行时配置。

@@ -1,0 +1,19 @@
+dataset:
+  name: dividend_event
+  display_name: 分红事件
+  primary_key: [source_security_code, ex_dividend_date]
+  allowed_asset_types: [stock, etf, lof]
+  allowed_exchanges: [XSHG, XSHE, BSE]
+
+fields:
+  source_security_code: {type: string, required: true}
+  ex_dividend_date: {type: date, required: true}
+  record_date: {type: date, required: false}
+  pretax_bonus_rmb: {type: decimal, unit: CNY, required: false}
+  bonus_ratio: {type: decimal, unit: ratio, required: false}
+  transfer_ratio: {type: decimal, unit: ratio, required: false}
+  assignment_progress: {type: string, required: false}
+  notice_date: {type: date, required: false}
+
+quality:
+  reject_if: [missing_security_code, missing_ex_dividend_date, duplicate_primary_key]
