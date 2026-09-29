@@ -85,7 +85,7 @@ Phase 1 基础链路完成
 当前系统测试：
 
 ```text
-121 passed
+124 passed
 ```
 
 离线 M1 已覆盖：
@@ -106,13 +106,12 @@ Phase 1 基础链路完成
 
 当前按以下顺序逐项覆盖来源数据域：
 
-1. EastMoney 个股资金流；
-2. EastMoney 财务主指标和股东户数扩大样本验证；
-3. EastMoney 完整财务报表；
-4. EastMoney 行业板块和概念板块；
-5. EastMoney 龙虎榜；
-6. EastMoney 历史日线；
-7. 根据能力证据决定各数据域的 `primary`、`fallback`、`validation_only` 或 `disabled`。
+1. EastMoney 财务主指标和股东户数扩大样本验证；
+2. EastMoney 完整财务报表；
+3. EastMoney 行业板块和概念板块；
+4. EastMoney 龙虎榜；
+5. EastMoney 历史日线；
+6. 根据能力证据决定各数据域的 `primary`、`fallback`、`validation_only` 或 `disabled`。
 
 ## 明确不做
 

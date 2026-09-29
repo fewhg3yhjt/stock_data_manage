@@ -73,6 +73,7 @@
 - `docs/provider-probes/2026-09-29-eastmoney-security-list.json`
 - `docs/provider-probes/2026-09-29-eastmoney-realtime-quote.json`
 - `docs/provider-probes/2026-09-29-eastmoney-stock-fund-flow.json`
+- `docs/provider-probes/2026-09-29-eastmoney-full-api-3s.json`
 - `docs/provider-probes/2026-09-29-eastmoney-financial-main.json`
 - `docs/provider-probes/2026-09-29-eastmoney-shareholder-count.json`
 - `docs/provider-probes/2026-09-29-akshare-daily.json`
@@ -88,7 +89,8 @@
 3. Tencent/Sina 不复权日线和 Tencent QFQ 日线本次都达到返回上限，不能直接用于一只证券的完整历史重建。
 4. Tencent 和 Sina 的成交量单位存在差异，已经进入探针证据；日线成交量和成交额单位仍需针对历史接口分别完成语义验证，当前不能标记为已确认。
 5. 分钟探针现在会按 `as_of` 过滤未来记录，并记录来源单位；本次只验证了沪市股票，分钟的全市场、北交所、ETF、LOF 和指数覆盖仍需代表矩阵验证。
-6. BaoStock 已有正式 SDK 适配器，但当前仅历史日线小样本通过，保持 `validation_only`；5m 本次空返回。EastMoney 分红事件、证券列表、实时行情和个股资金流适配器已实现，但当前正式探针均未取得可用网络证据，保持 disabled/validation_only。AkShare 股票、ETF、LOF、指数日线代表样本已通过真实探针，仍保持 `validation_only`，等待更完整字段、单位、复权和覆盖矩阵验证。
+6. EastMoney 3 秒间隔综合探针中，个股资金流、财务主指标、股东户数、分红事件和实时行情原始脚本接口返回了业务数据；历史日线、前复权日线、1m、证券列表和行业板块受当前网络断连影响；龙虎榜本轮未猜测接口。正式适配器仍保持 validation_only/disabled。
+7. BaoStock 已有正式 SDK 适配器，但当前仅历史日线小样本通过，保持 `validation_only`；5m 本次空返回。AkShare 股票、ETF、LOF、指数日线代表样本已通过真实探针，仍保持 `validation_only`，等待更完整字段、单位、复权和覆盖矩阵验证。
 
 ## 后续资格门槛
 

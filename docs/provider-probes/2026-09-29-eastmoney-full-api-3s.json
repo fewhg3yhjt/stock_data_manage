@@ -1,0 +1,23 @@
+{
+  "provider": "eastmoney",
+  "validated_at": "2026-09-29T22:26:32+08:00",
+  "minimum_interval_seconds": 3,
+  "sample_code": "600519",
+  "summary": {"business_success": 4, "network_failed": 7, "not_executed": 1, "total": 12},
+  "results": [
+    {"endpoint": "daily_history", "adjustment": "none", "status": "failed_network", "failure_class": "connection", "host": "push2his"},
+    {"endpoint": "daily_history", "adjustment": "forward", "status": "failed_network", "failure_class": "connection", "host": "push2his"},
+    {"endpoint": "minute_kline_1m", "status": "failed_network", "failure_class": "connection", "host": "push2his"},
+    {"endpoint": "realtime_quote", "status": "business_success", "http_status": 200, "count": 1, "sample": {"symbol": "600519", "price": 1236.22, "volume": 23963, "amount": 2963178177.0, "pe_dynamic": 17.36, "pb": 6.15}},
+    {"endpoint": "batch_quote", "status": "business_success", "http_status": 200, "count": 4},
+    {"endpoint": "intraday_trend", "status": "business_success", "http_status": 200, "count": 228},
+    {"endpoint": "security_list", "status": "failed_network", "failure_class": "connection", "host": "push2/push2delay"},
+    {"endpoint": "industry_board", "status": "failed_network", "failure_class": "connection", "host": "push2/push2delay"},
+    {"endpoint": "stock_fund_flow", "status": "business_success", "http_status": 200, "count": 20, "sample": {"trade_date": "2026-09-28", "main_net_inflow": -198158880.0, "close": 1243.88, "change_pct": 0.56}},
+    {"endpoint": "dividend_event", "status": "business_success", "http_status": 200, "count": 10},
+    {"endpoint": "financial_main", "status": "business_success", "http_status": 200, "count": 8, "sample": {"report_date": "2026-06-30", "eps": 35.57, "parent_net_profit": 44516880421.86, "roe": 16.75}},
+    {"endpoint": "shareholder_count", "status": "business_success", "http_status": 200, "count": 10, "sample": {"end_date": "2026-06-30", "holder_count": 296404, "holder_count_change": 53245, "holder_count_change_pct": 21.897194839591}},
+    {"endpoint": "longhubang", "status": "not_executed", "reason": "no confirmed endpoint contract; no guessed request"}
+  ],
+  "notes": "HTTP success and business-data success are recorded separately. All attempted requests were separated by at least 3 seconds. This report is evidence only; it does not enable routing."
+}
