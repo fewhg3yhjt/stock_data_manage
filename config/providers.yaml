@@ -79,9 +79,23 @@ providers:
       daily_history:
         enabled: true
         role: validation_only
+        datasets: [daily_bar]
+        adjustments: [none, forward, backward]
+        asset_types: [stock, etf, index]
+        exchanges: [XSHG, XSHE]
+        capability_version: baostock-daily-v1
+        max_symbols_per_request: 1
+        request_interval_seconds: 0.5
       minute_5m:
         enabled: true
         role: validation_only
+        datasets: [minute_bar_5m]
+        adjustments: [none]
+        asset_types: [stock, etf]
+        exchanges: [XSHG, XSHE]
+        capability_version: baostock-minute-5m-v1
+        max_symbols_per_request: 1
+        request_interval_seconds: 0.5
       snapshot:
         enabled: false
         disabled_reason: unsupported_by_provider

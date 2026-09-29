@@ -1,0 +1,18 @@
+{
+  "provider": "baostock",
+  "endpoint": "daily_history",
+  "capability_version": "baostock-daily-v1",
+  "validated_at": "2026-09-29T03:32:37.363642+00:00",
+  "validation_expires_at": "2026-10-06T03:32:37.363642+00:00",
+  "status": "complete",
+  "eligible_for_selection": true,
+  "request_scope": ["sh600519"],
+  "returned_window": "complete",
+  "row_count": 6077,
+  "first_key": "2001-08-27",
+  "last_key": "2026-09-11",
+  "field_semantics": ["trade_date", "open", "high", "low", "close", "volume", "amount", "adjustflag"],
+  "units": ["volume:share", "amount:cny"],
+  "adjustment": "none",
+  "evidence_hash": "58bbc9bcc5f6cdeecd1fc720dd289f9439698629aeace95ea7f0494d2783ab79"
+}

@@ -10,6 +10,7 @@ from ..providers.sina import SinaDailyProvider, SinaMinuteProvider, SinaSnapshot
 from ..providers.tencent import TencentDailyProvider, TencentMinuteProvider, TencentSnapshotProvider
 from ..providers.transport import HttpTransport, UrlLibTransport
 from ..providers.tdx import TdxMinuteProvider
+from ..providers.baostock import BaoStockDailyProvider, BaoStockMinuteProvider
 from .capabilities import CapabilityRegistry
 
 
@@ -34,6 +35,22 @@ def build_provider(config: ProviderConfig, transport: HttpTransport | None = Non
         return SinaSnapshotProvider(transport, capability or config.capability(now()))
     if config.provider == "sina" and config.endpoint == "native_5m":
         return SinaMinuteProvider(transport, capability or config.capability(now()))
+    if config.provider == "baostock" and config.endpoint == "daily_history":
+        return BaoStockDailyProvider(
+            capability_priority=config.priority,
+            capability_version=config.capability_version,
+            adjustment=next(
+                (adjustment for adjustment in (Adjustment.NONE, Adjustment.FORWARD, Adjustment.BACKWARD)
+                 if adjustment in config.adjustments),
+                Adjustment.NONE,
+            ),
+            supported_asset_types=config.asset_types,
+        )
+    if config.provider == "baostock" and config.endpoint == "minute_5m":
+        return BaoStockMinuteProvider(
+            capability_version=config.capability_version,
+            adjustment=next(iter(config.adjustments), Adjustment.NONE),
+        )
     raise ValueError(f"no provider factory for {config.provider}.{config.endpoint}")
 
 

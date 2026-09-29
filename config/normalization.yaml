@@ -31,6 +31,39 @@ rules:
     volume_semantics: unverified
     version: tencent-qfq-etf-v1
 
+  - provider: baostock
+    endpoint: daily_history
+    exchange: XSHG
+    asset_type: stock
+    frequency: null
+    adjustment: none
+    volume_multiplier: "1"
+    amount_multiplier: "1"
+    volume_semantics: share
+    version: baostock-daily-stock-v1
+
+  - provider: baostock
+    endpoint: daily_history
+    exchange: XSHG
+    asset_type: stock
+    frequency: null
+    adjustment: forward
+    volume_multiplier: "1"
+    amount_multiplier: "1"
+    volume_semantics: share
+    version: baostock-daily-qfq-stock-v1
+
+  - provider: baostock
+    endpoint: minute_5m
+    exchange: XSHG
+    asset_type: stock
+    frequency: 5
+    adjustment: none
+    volume_multiplier: "1"
+    amount_multiplier: "1"
+    volume_semantics: share
+    version: baostock-minute-5m-stock-v1
+
 # Production rules are intentionally not guessed. Each provider/endpoint/market/
 # asset/frequency combination is added only after a unit-semantics probe records
 # its evidence and validation expiry.

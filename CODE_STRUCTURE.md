@@ -43,6 +43,10 @@ Provider 的离线契约、实时探针和路由资格记录见仓库根目录�
 | `providers/sina/snapshot.py` | Sina 批量收盘快照 |
 | `providers/sina/minute.py` | Sina 原生 5m 分钟线 |
 | `providers/tdx/minute.py` | 注入式 TDX 延迟 1m 分钟线 |
+| `providers/baostock/session.py` | BaoStock SDK 登录、登出、代码映射和结果集读取 |
+| `providers/baostock/daily.py` | BaoStock 历史日线，初始角色为校验来源 |
+| `providers/baostock/minute.py` | BaoStock 原生 5m，初始角色为校验来源 |
+| `providers/baostock/__init__.py` | BaoStock 适配器导出 |
 | `providers/tencent/__init__.py` | Tencent 适配器导出 |
 | `providers/sina/__init__.py` | Sina 适配器导出 |
 | `providers/tdx/__init__.py` | TDX 适配器导出 |

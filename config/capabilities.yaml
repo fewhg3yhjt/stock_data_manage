@@ -9,6 +9,11 @@ capabilities:
         endpoint: full_history
         priority: 20
         adjustments: [none]
+      - provider: baostock
+        endpoint: daily_history
+        priority: 30
+        adjustments: [none, forward, backward]
+        role: validation_only
   snapshot:
     routes:
       - provider: tencent
@@ -27,3 +32,8 @@ capabilities:
         endpoint: native_5m
         priority: 20
         adjustments: [none]
+      - provider: baostock
+        endpoint: minute_5m
+        priority: 30
+        adjustments: [none]
+        role: validation_only

@@ -1,0 +1,54 @@
+from __future__ import annotations
+
+from contextlib import contextmanager
+from typing import Iterator
+
+from ..contracts import FailureClass, ProviderContractError
+
+
+@contextmanager
+def logged_in_session() -> Iterator[object]:
+    try:
+        import baostock as bs
+    except ImportError as exc:
+        raise ProviderContractError(
+            "BaoStock dependency is not installed", FailureClass.CONNECTION, retryable=False
+        ) from exc
+    login = bs.login()
+    if getattr(login, "error_code", None) != "0":
+        raise ProviderContractError(
+            f"BaoStock login failed: {login.error_code} {login.error_msg}",
+            FailureClass.CONNECTION,
+            retryable=True,
+        )
+    try:
+        yield bs
+    finally:
+        bs.logout()
+
+
+def source_code(symbol: str) -> str:
+    text = str(symbol).lower()
+    if len(text) < 8 or text[:2] not in {"sh", "sz"}:
+        raise ProviderContractError(
+            f"BaoStock does not support source symbol {symbol}",
+            FailureClass.SCHEMA_CHANGED,
+            retryable=False,
+        )
+    return f"{text[:2]}.{text[2:]}"
+
+
+def read_rows(result_set: object) -> list[dict[str, object]]:
+    error_code = getattr(result_set, "error_code", None)
+    if error_code != "0":
+        raise ProviderContractError(
+            f"BaoStock query failed: {error_code} {getattr(result_set, 'error_msg', '')}",
+            FailureClass.CONNECTION,
+            retryable=True,
+        )
+    fields = getattr(result_set, "fields", [])
+    fields = fields if isinstance(fields, list) else str(fields).split(",")
+    rows: list[dict[str, object]] = []
+    while result_set.next():
+        rows.append(dict(zip(fields, result_set.get_row_data())))
+    return rows

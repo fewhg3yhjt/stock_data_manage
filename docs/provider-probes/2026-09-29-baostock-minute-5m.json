@@ -1,0 +1,19 @@
+{
+  "provider": "baostock",
+  "endpoint": "minute_5m",
+  "capability_version": "baostock-minute-5m-v1",
+  "validated_at": "2026-09-29T10:00:00+08:00",
+  "validation_expires_at": "2026-10-06T10:00:00+08:00",
+  "status": "temporary_empty",
+  "eligible_for_selection": false,
+  "request_scope": ["sh600519"],
+  "returned_window": "temporary_empty",
+  "row_count": 0,
+  "first_key": null,
+  "last_key": null,
+  "field_semantics": ["trade_date", "bar_time", "open", "high", "low", "close", "volume", "amount"],
+  "units": ["volume:share", "amount:cny"],
+  "adjustment": "none",
+  "failure_class": "temporary_empty",
+  "evidence_hash": "4e2c5c530ff6f0b150030697af09e733d86be993d6d3ef2390f6d7e520e6901e"
+}

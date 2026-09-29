@@ -4,6 +4,7 @@ from stock_data_manage.config.loader import load_capability_routes, load_normali
 from stock_data_manage.domain import Adjustment, Dataset
 from stock_data_manage.routing.factory import load_provider_registry
 from stock_data_manage.providers.tencent import TencentDailyProvider
+from stock_data_manage.providers.baostock import BaoStockDailyProvider
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -46,3 +47,14 @@ def test_provider_factory_builds_configured_qfq_provider() -> None:
         symbol="sh600519",
         adjustment=Adjustment.FORWARD,
     )[0].endpoint == "forward_history"
+
+
+def test_provider_factory_registers_baostock_validation_provider() -> None:
+    _, providers = load_provider_registry(
+        ROOT / "config" / "providers.yaml",
+        ROOT / "config" / "capabilities.yaml",
+    )
+    provider = next(item for item in providers if isinstance(item, BaoStockDailyProvider))
+    assert provider.endpoint == "daily_history"
+    assert provider.capability_version == "baostock-daily-v1"
+    assert provider.adjustment is Adjustment.NONE
