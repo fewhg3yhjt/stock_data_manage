@@ -18,6 +18,7 @@ from .contracts import (
 )
 from .base import FetchResult
 from ..routing.capabilities import ProviderCapability
+from ..domain import Adjustment, AssetType
 
 
 class HttpTransport(Protocol):
@@ -79,6 +80,25 @@ class TencentDailyProvider:
             supports_pagination=False,
         )
     )
+    adjustment: Adjustment = Adjustment.NONE
+    supported_asset_types: frozenset[AssetType] = field(
+        default_factory=lambda: frozenset(AssetType)
+    )
+
+    def __post_init__(self) -> None:
+        if self.adjustment is Adjustment.BACKWARD:
+            raise ValueError("Tencent daily adapter does not implement backward adjustment")
+        if self.adjustment is Adjustment.FORWARD:
+            self.endpoint = "forward_history"
+            self.capability_version = "tencent-qfq-kline-v1"
+            self.url = "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get"
+            self.max_rows = 640
+            self.contract = EndpointContract(
+                frozenset({"symbol", "trade_date", "open", "high", "low", "close", "volume"}),
+                max_rows_per_request=640,
+                supports_pagination=False,
+            )
+            self.supported_asset_types = frozenset({AssetType.STOCK, AssetType.ETF})
 
     def fetch_daily(self, symbols: Sequence[str], trade_date: date) -> FetchResult:
         requested = tuple(symbols)
@@ -89,7 +109,13 @@ class TencentDailyProvider:
         for symbol in requested:
             response = self.transport.get(
                 self.url,
-                params={"param": f"{symbol},day,,,{self.max_rows}"},
+                params={
+                    "param": (
+                        f"{symbol},day,,,{self.max_rows},qfq"
+                        if self.adjustment is Adjustment.FORWARD
+                        else f"{symbol},day,,,{self.max_rows}"
+                    )
+                },
                 timeout_seconds=self.timeout_seconds,
             )
             response_statuses.append(response.status_code)
@@ -101,7 +127,7 @@ class TencentDailyProvider:
                     retryable=False,
                 )
             stock = ((payload.get("data") or {}).get(symbol) or {})
-            bars = stock.get("day") or []
+            bars = stock.get("qfqday" if self.adjustment is Adjustment.FORWARD else "day") or []
             parsed = [
                 {
                     "symbol": symbol,
@@ -129,6 +155,7 @@ class TencentDailyProvider:
             len(returned_rows),
             str(returned_rows[0]["trade_date"]) if returned_rows else None,
             str(returned_rows[-1]["trade_date"]) if returned_rows else None,
+            self.adjustment,
         )
 
 

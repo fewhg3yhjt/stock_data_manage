@@ -19,6 +19,7 @@
 |---|---|---|---|---|---|---|---|
 | Tencent | `recent_history` | `daily_bar` | `providers/http.py` | 通过 | 通过 | 当前正式适配器为不复权；约 1024 行上限，实际本次返回 1025 行并标记截断；沪深、ETF、LOF、指数样本通过，北交所样本临时空返回 | 仅可按已验证资产/市场范围作为不复权近期历史能力；不能作为前复权正式主源 |
 | Sina | `full_history` | `daily_bar` | `providers/http.py` | 通过 | 通过 | 当前正式适配器为不复权；1023 行上限，本次返回 1023 行并标记截断；沪深、北交所、ETF、LOF、指数样本通过 | 仅可按已验证资产/市场范围作为不复权近期历史能力；不能作为前复权正式主源 |
+| Tencent | `forward_history` | `daily_bar` | `providers/http.py` | 通过 | 通过 | QFQ Endpoint；本次股票和 ETF 返回 641 行并标记截断，LOF 返回空；只声明股票/ETF 资格 | 股票/ETF 可进入前复权候选；LOF 暂不可用；指数在流水线入口拒绝前复权 |
 | Tencent | `native_1m` | `minute_bar_1m` | `providers/http.py` | 通过 | 通过 | OHLCV 返回；本次成交量语义为 `lot` | 可进入分钟能力候选，但仍需按市场和资产类型扩展验证 |
 | Sina | `native_5m` | `minute_bar_5m` | `providers/http.py` | 通过 | 通过 | OHLCV 返回；本次成交量语义为 `share` | 可进入分钟能力候选，但仍需按市场和资产类型扩展验证 |
 | TDX | `delayed_1m` | `minute_bar_1m` | `providers/http.py` | 通过 | 未执行 | 适配器要求外部 TDX 客户端注入；当前没有真实客户端探针 | 保持禁用，不进入正式路由 |
@@ -61,19 +62,19 @@
 
 ## 语义结论
 
-1. 当前正式 Tencent/Sina 日线适配器只请求并验证不复权数据。
-2. `tmp_test/market_data_contract.yaml` 中记录过 Tencent 前复权接口观察结果，但该接口尚未进入正式 `providers/http.py` 适配器，也没有正式能力版本和路由证据，不能据此启用前复权。
-3. Sina/Tencent 日线接口本次都达到返回上限，不能直接用于一只证券的完整历史重建。
+1. Tencent 正式代码已经支持 `forward_history` QFQ Endpoint；Sina 仍只支持不复权日线。
+2. Tencent QFQ 本次股票和 ETF 样本通过，LOF 返回空；指数不允许套用股票前复权。
+3. Tencent/Sina 不复权日线和 Tencent QFQ 日线本次都达到返回上限，不能直接用于一只证券的完整历史重建。
 4. Tencent 和 Sina 的成交量单位存在差异，已经进入探针证据；日线成交量和成交额单位仍需针对历史接口分别完成语义验证，当前不能标记为已确认。
 5. 分钟探针现在会按 `as_of` 过滤未来记录，并记录来源单位；本次只验证了沪市股票，分钟的全市场、北交所、ETF、LOF 和指数覆盖仍需代表矩阵验证。
 6. 没有正式适配器的 BaoStock、EastMoney 和 AkShare，不能因为配置或临时脚本存在而进入正式路由。
 
 ## 后续资格门槛
 
-前复权日线正式路由开启前，必须补齐：
+前复权日线扩大正式路由前，必须补齐：
 
-- 明确的前复权 Endpoint 和能力版本；
-- 沪深股票、北交所、ETF、LOF 的覆盖证据；
+- 北交所、LOF 的可用来源或明确替代路由；
+- 沪深股票、北交所、ETF、LOF 的完整覆盖证据；
 - 历史首尾边界和最大返回窗口；
 - 分页或窗口拆分规则；
 - OHLC 前复权语义和重复请求稳定性；

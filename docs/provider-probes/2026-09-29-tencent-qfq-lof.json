@@ -1,0 +1,20 @@
+{
+  "provider": "tencent",
+  "endpoint": "forward_history",
+  "capability_version": "tencent-qfq-kline-v1",
+  "adjustment": "forward",
+  "validated_at": "2026-09-29T01:58:29.036782+00:00",
+  "validation_expires_at": "2026-10-06T01:58:29.036782+00:00",
+  "status": "temporary_empty",
+  "eligible_for_selection": false,
+  "request_scope": ["sh501018"],
+  "response_status": 200,
+  "returned_window": "temporary_empty",
+  "row_count": 0,
+  "first_key": null,
+  "last_key": null,
+  "field_semantics": ["trade_date", "open", "high", "low", "close", "volume", "amount"],
+  "units": ["volume:unverified", "amount:unverified"],
+  "failure_class": "temporary_empty",
+  "evidence_hash": "29b4a10bc04b7245da6b998245a12ff655faab5b40c06315865084f225a1d443"
+}

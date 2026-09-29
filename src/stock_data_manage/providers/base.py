@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from datetime import date
 from typing import Any, Mapping, Protocol, Sequence
 
+from ..domain import Adjustment, AssetType
 from .contracts import WindowStatus
 
 
@@ -18,6 +19,7 @@ class FetchResult:
     returned_row_count: int | None = None
     returned_first_key: str | None = None
     returned_last_key: str | None = None
+    adjustment: Adjustment = Adjustment.NONE
 
     @property
     def returned_symbols(self) -> frozenset[str]:
@@ -33,6 +35,8 @@ class DailyProvider(Protocol):
     endpoint: str
     capability_priority: int
     capability_version: str
+    adjustment: Adjustment
+    supported_asset_types: frozenset[AssetType]
 
     def fetch_daily(self, symbols: Sequence[str], trade_date: date) -> FetchResult: ...
 
@@ -46,6 +50,10 @@ class FixtureDailyProvider:
     capability_version: str = "fixture-v1"
     failures: list[Exception] = field(default_factory=list)
     requests: list[tuple[str, ...]] = field(default_factory=list)
+    adjustment: Adjustment = Adjustment.NONE
+    supported_asset_types: frozenset[AssetType] = field(
+        default_factory=lambda: frozenset(AssetType)
+    )
 
     def fetch_daily(self, symbols: Sequence[str], trade_date: date) -> FetchResult:
         requested = tuple(symbols)
@@ -53,4 +61,4 @@ class FixtureDailyProvider:
         if self.failures:
             raise self.failures.pop(0)
         rows = tuple(dict(self.rows_by_symbol[symbol]) for symbol in requested if symbol in self.rows_by_symbol)
-        return FetchResult(rows=rows, requested_symbols=requested)
+        return FetchResult(rows=rows, requested_symbols=requested, adjustment=self.adjustment)

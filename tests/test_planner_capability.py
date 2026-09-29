@@ -78,6 +78,30 @@ def test_disabled_capability_is_never_selected() -> None:
     ) == []
 
 
+def test_registry_selects_forward_adjustment_only_for_forward_capability() -> None:
+    now = datetime(2026, 9, 13, tzinfo=timezone.utc)
+    registry = CapabilityRegistry(
+        [
+            capability(adjustments=frozenset({Adjustment.NONE})),
+            capability(
+                endpoint="forward_history",
+                version="qfq-v1",
+                adjustments=frozenset({Adjustment.FORWARD}),
+            ),
+        ]
+    )
+    selected = registry.select(
+        now=now,
+        dataset=Dataset.MINUTE_BAR_1M,
+        exchange=Exchange.XSHG,
+        asset_type=AssetType.STOCK,
+        symbol="600519",
+        frequency=1,
+        adjustment=Adjustment.FORWARD,
+    )
+    assert [(item.endpoint, item.version) for item in selected] == [("forward_history", "qfq-v1")]
+
+
 def test_watchlist_capacity_and_universe_guard() -> None:
     symbols = [f"{index:06d}" for index in range(200)]
     plan = plan_realtime_collection(

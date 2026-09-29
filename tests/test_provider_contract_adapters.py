@@ -115,6 +115,44 @@ def test_tencent_adapter_parses_observed_daily_envelope() -> None:
     assert transport.calls[0][1]["param"] == "sh600519,day,,,1024"
 
 
+def test_tencent_forward_daily_adapter_requires_qfq_envelope() -> None:
+    transport = FakeTransport(
+        [
+            response(
+                {
+                    "code": 0,
+                    "data": {
+                        "sh600519": {
+                            "qfqday": [["2026-09-11", "10", "10", "10", "10", "100"]],
+                            "day": [["2026-09-11", "1", "1", "1", "1", "100"]],
+                        }
+                    },
+                }
+            )
+        ]
+    )
+    provider = TencentDailyProvider(transport, adjustment=Adjustment.FORWARD)
+    result = provider.fetch_daily(["sh600519"], date(2026, 9, 11))
+    assert result.adjustment is Adjustment.FORWARD
+    assert result.rows[0]["close"] == "10"
+    assert transport.calls[0][1]["param"] == "sh600519,day,,,640,qfq"
+
+
+def test_tencent_forward_daily_does_not_fallback_to_unadjusted_day() -> None:
+    provider = TencentDailyProvider(
+        FakeTransport([response({"code": 0, "data": {"sh600519": {"day": [["2026-09-11", "1", "1", "1", "1", "100"]]}}})]),
+        adjustment=Adjustment.FORWARD,
+    )
+    result = provider.fetch_daily(["sh600519"], date(2026, 9, 11))
+    assert result.rows == ()
+    assert result.adjustment is Adjustment.FORWARD
+
+
+def test_tencent_forward_daily_is_qualified_only_for_stock_and_etf() -> None:
+    provider = TencentDailyProvider(FakeTransport([]), adjustment=Adjustment.FORWARD)
+    assert provider.supported_asset_types == frozenset({AssetType.STOCK, AssetType.ETF})
+
+
 def test_daily_adapter_reports_the_full_returned_window() -> None:
     transport = FakeTransport(
         [
@@ -218,6 +256,53 @@ def test_probe_evidence_is_persisted_in_capability_registry(tmp_path) -> None:
     assert saved["response_status"] == 200
     assert saved["returned_window"] == "complete"
     assert "trade_date" in saved["field_semantics_json"]
+    assert saved["adjustment"] == "none"
+
+
+def test_forward_probe_persists_forward_adjustment(tmp_path) -> None:
+    provider = TencentDailyProvider(
+        FakeTransport(
+            [
+                response(
+                    {
+                        "code": 0,
+                        "data": {
+                            "sh600519": {
+                                "qfqday": [["2026-09-11", "10", "10", "10", "10", "100"]]
+                            }
+                        },
+                    }
+                )
+            ]
+        ),
+        adjustment=Adjustment.FORWARD,
+    )
+    evidence = probe_daily_capability(
+        provider,
+        symbol="sh600519",
+        trade_date=date(2026, 9, 11),
+        now=datetime(2026, 9, 13, tzinfo=timezone.utc),
+        ttl=timedelta(days=7),
+    )
+    assert evidence.adjustment == "forward"
+    with MetadataStore(tmp_path / "metadata.duckdb") as metadata:
+        metadata.save_probe_evidence(
+            evidence,
+            dataset="daily_bar",
+            market="XSHG",
+            asset_type="stock",
+            adjustment="forward",
+        )
+        saved = metadata.latest_probe(
+            provider="tencent",
+            endpoint="forward_history",
+            capability_version="tencent-qfq-kline-v1",
+            dataset="daily_bar",
+            market="XSHG",
+            asset_type="stock",
+            adjustment="forward",
+        )
+    assert saved is not None and saved["adjustment"] == "forward"
 
 
 def minute_capability(provider: str, endpoint: str, frequency: int) -> ProviderCapability:

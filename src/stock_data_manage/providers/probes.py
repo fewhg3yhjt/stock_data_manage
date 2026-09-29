@@ -35,6 +35,7 @@ class ProbeEvidence:
     returned_window: str | None = None
     field_semantics: tuple[str, ...] = ()
     units: tuple[str, ...] = ()
+    adjustment: str = "none"
     failure_class: str | None = None
     message: str | None = None
 
@@ -62,6 +63,7 @@ def probe_daily_capability(
         response_status = _single_status(getattr(result, "response_statuses", ()))
         field_semantics = tuple(getattr(result, "field_semantics", ())) or _row_fields(result.rows)
         units = tuple(getattr(result, "units", ())) or _row_units(result.rows)
+        adjustment = getattr(getattr(result, "adjustment", None), "value", "none")
     except ProviderContractError as exc:
         keys = []
         status = "failed"
@@ -71,6 +73,7 @@ def probe_daily_capability(
         response_status = None
         field_semantics = ()
         units = ()
+        adjustment = "none"
     except Exception as exc:
         keys = []
         status = "failed"
@@ -80,6 +83,7 @@ def probe_daily_capability(
         response_status = None
         field_semantics = ()
         units = ()
+        adjustment = "none"
     payload = {
         "provider": provider.name,
         "endpoint": provider.endpoint,
@@ -96,6 +100,7 @@ def probe_daily_capability(
         "returned_window": str(status),
         "field_semantics": field_semantics,
         "units": units,
+        "adjustment": adjustment,
     }
     return ProbeEvidence(
         provider=provider.name,
@@ -114,6 +119,7 @@ def probe_daily_capability(
         returned_window=str(status),
         field_semantics=field_semantics,
         units=units,
+        adjustment=adjustment,
         failure_class=failure,
         message=message,
     )

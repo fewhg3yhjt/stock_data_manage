@@ -171,6 +171,7 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
             "ALTER TABLE capability_registry ADD COLUMN IF NOT EXISTS returned_window VARCHAR",
             "ALTER TABLE capability_registry ADD COLUMN IF NOT EXISTS field_semantics_json VARCHAR DEFAULT '[]'",
             "ALTER TABLE capability_registry ADD COLUMN IF NOT EXISTS units_json VARCHAR DEFAULT '[]'",
+            "ALTER TABLE capability_registry ADD COLUMN IF NOT EXISTS adjustment VARCHAR DEFAULT 'none'",
         ):
             self.connection.execute(statement)
 
@@ -577,6 +578,10 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
         frequency: str = "daily",
         adjustment: str = "none",
     ) -> None:
+        if evidence.adjustment != adjustment:
+            raise ValueError(
+                "probe evidence adjustment does not match capability registry adjustment"
+            )
         self.connection.execute(
             """
             INSERT INTO capability_registry (

@@ -34,6 +34,7 @@ def main(argv: list[str] | None = None) -> int:
     probe.add_argument("--market", default="XSHG")
     probe.add_argument("--asset-type", default="stock")
     probe.add_argument("--code-prefix", default="")
+    probe.add_argument("--adjustment", choices=("none", "forward"), default="none")
 
     minute_probe = subcommands.add_parser(
         "probe-minute", help="run one explicit minute provider capability probe"
@@ -61,10 +62,15 @@ def main(argv: list[str] | None = None) -> int:
 
     args = parser.parse_args(argv)
     if args.command == "probe-daily":
+        if args.adjustment == "forward" and args.provider != "tencent":
+            parser.error("forward daily probe currently requires --provider tencent")
+        if args.adjustment == "forward" and args.asset_type == "index":
+            parser.error("index daily bars cannot use forward adjustment")
+        adjustment = Adjustment(args.adjustment)
         provider = (
             SinaDailyProvider(UrlLibTransport())
             if args.provider == "sina"
-            else TencentDailyProvider(UrlLibTransport())
+            else TencentDailyProvider(UrlLibTransport(), adjustment=adjustment)
         )
         now = datetime.now(timezone.utc)
         evidence = probe_daily_capability(
@@ -82,6 +88,7 @@ def main(argv: list[str] | None = None) -> int:
                     market=args.market,
                     asset_type=args.asset_type,
                     code_prefix=args.code_prefix,
+                    adjustment=args.adjustment,
                 )
         print(json.dumps(asdict(evidence), ensure_ascii=False, default=_json_default, indent=2))
         return 0 if evidence.eligible_for_selection else 2

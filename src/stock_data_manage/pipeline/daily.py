@@ -88,6 +88,8 @@ class DailyCollectionService:
         if len(asset_types) != 1:
             raise ValueError("one collection partition may contain only one asset type")
         asset_type = next(iter(asset_types))
+        if adjustment is Adjustment.FORWARD and asset_type is AssetType.INDEX:
+            raise ValueError("index daily bars cannot use forward adjustment")
         partition_key = trade_date.isoformat()
         by_id = {instrument.instrument_id: instrument for instrument in universe}
         if len(by_id) != len(universe):
@@ -96,14 +98,23 @@ class DailyCollectionService:
         if len(by_symbol) != len(universe):
             raise ValueError("source_symbol must be unique within a provider collection partition")
 
-        statuses = {
-            instrument_id: status
-            for instrument_id, status in self.metadata.item_statuses(
-                Dataset.DAILY_BAR.value, partition_key
-            ).items()
-            if instrument_id in by_id
-        }
-        existing = self.canonical_store.read(Dataset.DAILY_BAR, asset_type.value, partition_key)
+        stored_statuses = self.metadata.item_statuses(Dataset.DAILY_BAR.value, partition_key)
+        statuses = (
+            {
+                instrument_id: status
+                for instrument_id, status in stored_statuses.items()
+                if instrument_id in by_id
+            }
+            if adjustment is Adjustment.NONE
+            else {}
+        )
+        all_existing = self.canonical_store.read(Dataset.DAILY_BAR, asset_type.value, partition_key)
+        existing = [
+            record
+            for record in all_existing
+            if record.adjustment is adjustment
+        ]
+        other_adjustment_count = len(all_existing) - len(existing)
         providers_by_item: dict[str, str | None] = {
             record.instrument_id: record.source_provider for record in existing
         }
@@ -120,6 +131,11 @@ class DailyCollectionService:
         attempt_ids: list[str] = []
 
         for provider in self.providers:
+            if getattr(provider, "adjustment", Adjustment.NONE) is not adjustment:
+                continue
+            supported_asset_types = getattr(provider, "supported_asset_types", frozenset(AssetType))
+            if asset_type not in supported_asset_types:
+                continue
             missing_ids = calculate_missing_set(by_id, statuses)
             if not missing_ids:
                 break
@@ -151,6 +167,12 @@ class DailyCollectionService:
             self.metadata.save_attempt(attempt, updated_at=now)
             try:
                 response = provider.fetch_daily(requested, trade_date)
+                if getattr(response, "adjustment", adjustment) is not adjustment:
+                    raise ProviderContractError(
+                        "provider returned a different adjustment than requested",
+                        FailureClass.SCHEMA_CHANGED,
+                        retryable=False,
+                    )
             except Exception as exc:
                 attempt = attempt.transition(AttemptStatus.RETRYABLE_FAILED)
                 self.metadata.save_attempt(attempt, updated_at=self.clock())
@@ -183,6 +205,7 @@ class DailyCollectionService:
                     "endpoint": provider.endpoint,
                     "trade_date": trade_date.isoformat(),
                     "requested_symbols": list(requested),
+                    "adjustment": adjustment.value,
                     "rows": [dict(row) for row in response.rows],
                 },
                 dataset=Dataset.DAILY_BAR.value,
@@ -316,7 +339,7 @@ class DailyCollectionService:
             asset_type=asset_type.value,
             partition_key=partition_key,
             new_records=accepted,
-            expected_count=len(universe),
+            expected_count=len(universe) + other_adjustment_count,
             run_id=run_id,
             item_statuses=statuses,
             source_providers=providers_by_item,
