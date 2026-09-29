@@ -298,6 +298,10 @@ freshness / finality
 
 Contract 测试分为 Fixture Contract 和小流量 Live Probe。CI 默认运行 Fixture Contract；Live Probe 按计划或发布前运行，遵守限流配置。
 
+Provider 能力验证与归一化规则的专项标准见：[Provider 能力验证与归一化设计](provider-capability-verification-and-normalization.md)。
+
+每个 Endpoint 的验收必须同时检查：静态配置、适配器实现、Probe Evidence、能力覆盖范围和唯一 YAML 归一化规则。只有这些条件全部满足，才允许进入正式路由。
+
 ## 7.3 L3：组件集成测试
 
 使用独立临时数据目录串联：

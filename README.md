@@ -9,6 +9,7 @@
 - [测试设计与验收基线](stock-data-test-design-acceptance-baseline.md)
 - [Provider 能力验证矩阵](PROVIDER_CAPABILITY_MATRIX.md)
 - [代码目录与文件职责](CODE_STRUCTURE.md)
+- [Provider 能力验证与归一化设计](provider-capability-verification-and-normalization.md)
 
 ## 当前开发状态
 

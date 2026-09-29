@@ -7,6 +7,8 @@
 > 核心术语、目录职责和逐来源数据变化以 [市场数据中心术语与数据流程规范](stock-data-terminology-and-data-flow.md) 为准。
 >
 > 前复权历史变化、公司行动发现和多日期统一切换以 [前复权日线与历史重建设计](stock-data-design-qfq-history-rebuild.md) 为准。当前代码尚未完整实现这条链路。
+>
+> Provider 能力声明、能力探针、证据生命周期、覆盖矩阵和 YAML 归一化规则以 [Provider 能力验证与归一化设计](provider-capability-verification-and-normalization.md) 为准。
 
 ## 1. 产品定位
 
@@ -273,6 +275,19 @@ Web    = 让人看得懂并能操作
 
 README、能力矩阵、管理页面都应从 YAML 和运行时数据生成，避免多处维护造成漂移。
 
+### 5.5 能力事实与运行策略分离
+
+Provider、Endpoint、Capability、Evidence、Health 和 Routing Role 必须分开管理：
+
+```text
+Capability = 来源理论上能提供什么
+Evidence = 最近是否用探针证明过
+Health = 当前是否健康、是否冷却
+Routing Role = 当前希望如何使用
+```
+
+适配器存在、配置已声明或单次 HTTP 成功，都不能单独证明能力具备正式路由资格。能力必须按数据集、市场、资产类型、复权方式和频率细分。详细的能力采集、证据和归一化规则见 [Provider 能力验证与归一化设计](provider-capability-verification-and-normalization.md)。
+
 ---
 
 ## 6. 数据源适配器
@@ -284,6 +299,8 @@ README、能力矩阵、管理页面都应从 YAML 和运行时数据生成，�
 3. 报告失败原因
 
 数据源本身不决定备用源、不决定发布、不包含投资逻辑。
+
+Provider 适配器只返回来源原始语义和结构化失败信息。字段、单位、时间和复权转换由 YAML 归一化规则驱动，不能在 Pipeline 中通过来源名称写死转换逻辑。
 
 统一接口示例：
 
@@ -346,6 +363,8 @@ BaoStock → AkShare
 ## 8. 能力路由器
 
 能力路由器负责按固定路由顺序获取数据，但具体是否真正发起请求由当前数据目标和该来源的采集模式决定。
+
+路由器只能选择同时满足静态配置、适配器实现、有效 Probe Evidence、未过期、未冷却、覆盖范围匹配且存在唯一归一化规则的 Capability。未实现或未验证的来源可以保留在能力矩阵中，但不得自动进入正式路由。
 
 第一版只保留两种与股票日线相关的采集模式：
 

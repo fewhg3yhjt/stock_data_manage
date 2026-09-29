@@ -4,6 +4,8 @@
 
 本文记录当前正式代码中 Provider 适配器的验证状态。配置声明、临时研究脚本和适配器类的存在，都不能单独证明能力已经可以进入正式路由。
 
+能力模型、Probe 生命周期、覆盖矩阵字段和 YAML 归一化规则见 [Provider 能力验证与归一化设计](provider-capability-verification-and-normalization.md)。本文只记录当前事实和证据，不替代专项设计。
+
 ## 验证分层
 
 | 层级 | 目的 | 当前结果 |
