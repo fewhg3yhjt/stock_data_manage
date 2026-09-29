@@ -1,0 +1,14 @@
+{
+  "provider": "eastmoney",
+  "dataset": "stock_fund_flow",
+  "endpoint": "stock_fund_flow",
+  "capability_version": "eastmoney-stock-fund-flow-v1",
+  "validated_at": "2026-09-29T14:55:00+08:00",
+  "validation_expires_at": "2026-10-06T14:55:00+08:00",
+  "status": "failed_network",
+  "eligible_for_selection": false,
+  "request_scope": ["sh600519"],
+  "failure_class": "connection",
+  "message": "push2his RemoteDisconnected; original supplied probe previously returned 20 rows for the same data domain",
+  "routing_role": "validation_only"
+}

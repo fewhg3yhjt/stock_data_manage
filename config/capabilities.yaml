@@ -90,3 +90,10 @@ capabilities:
         priority: 20
         adjustments: [none]
         role: validation_only
+  stock_fund_flow:
+    routes:
+      - provider: eastmoney
+        endpoint: stock_fund_flow
+        priority: 20
+        adjustments: [none]
+        role: validation_only

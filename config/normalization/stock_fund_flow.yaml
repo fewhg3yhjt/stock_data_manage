@@ -1,0 +1,26 @@
+dataset: stock_fund_flow
+
+rules:
+  - id: eastmoney-stock-fund-flow-v1
+    provider: eastmoney
+    endpoint: stock_fund_flow
+    exchange: XSHG
+    asset_type: stock
+    frequency: 1
+    adjustment: none
+    field_mapping:
+      trade_date: f51
+      main_net_inflow: f52
+      super_large_net_inflow: f53
+      large_net_inflow: f54
+      medium_net_inflow: f55
+      small_net_inflow: f56
+      main_net_inflow_pct: f57
+      super_large_net_inflow_pct: f58
+      large_net_inflow_pct: f59
+      medium_net_inflow_pct: f60
+      small_net_inflow_pct: f61
+      close: f62
+      change_pct: f63
+    status: pending_validation
+    version: eastmoney-stock-fund-flow-v1

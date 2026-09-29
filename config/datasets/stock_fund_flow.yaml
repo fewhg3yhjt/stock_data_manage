@@ -1,0 +1,17 @@
+dataset:
+  name: stock_fund_flow
+  display_name: 个股资金流
+  primary_key: [instrument_id, trade_date]
+  allowed_asset_types: [stock]
+  allowed_exchanges: [XSHG, XSHE, BSE]
+
+fields:
+  instrument_id: {type: string, required: true}
+  trade_date: {type: date, required: true}
+  main_net_inflow: {type: decimal, unit: CNY, required: false}
+  super_large_net_inflow: {type: decimal, unit: CNY, required: false}
+  large_net_inflow: {type: decimal, unit: CNY, required: false}
+  medium_net_inflow: {type: decimal, unit: CNY, required: false}
+  small_net_inflow: {type: decimal, unit: CNY, required: false}
+  close: {type: decimal, unit: CNY, required: false}
+  change_pct: {type: decimal, unit: percent, required: false}

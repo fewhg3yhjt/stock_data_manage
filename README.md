@@ -11,6 +11,7 @@
 - [代码目录与文件职责](CODE_STRUCTURE.md)
 - [Provider 能力验证与归一化设计](provider-capability-verification-and-normalization.md)
 - [EastMoney 数据域覆盖设计](eastmoney-data-domain-coverage.md)
+- [项目开发进度](PROJECT_PROGRESS.md)
 
 ## 当前开发状态
 

@@ -546,14 +546,13 @@ Raw / Canonical / Metadata 可追溯测试
 
 - Provider 按来源拆分；
 - `providers.yaml`、`capabilities.yaml`、`normalization.yaml` 基础加载；
-- Tencent/Sina/TDX 部分正式适配器；
+- Tencent/Sina/TDX/BaoStock/EastMoney/AkShare 部分正式适配器；
 - Provider Contract 和小流量探针证据；
 - Tencent QFQ 股票/ETF 原型链路。
 
 尚未完成：
 
-- BaoStock 正式 SDK Provider；
-- EastMoney 分红事件 Provider；
+- EastMoney 个股资金流、财务、股东户数、板块和龙虎榜等数据域；
 - AkShare 函数级 Provider 的完整依赖、字段、单位和探针矩阵验证；
 - 全量能力覆盖矩阵自动生成；
 - Probe Evidence 对所有生产路由的动态资格绑定；

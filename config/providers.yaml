@@ -111,6 +111,16 @@ providers:
         exchanges: [XSHG, XSHE, BSE]
         capability_version: eastmoney-intraday-trend-v1
         request_interval_seconds: 1
+      stock_fund_flow:
+        enabled: false
+        role: validation_only
+        datasets: [stock_fund_flow]
+        adjustments: [none]
+        asset_types: [stock]
+        exchanges: [XSHG, XSHE, BSE]
+        capability_version: eastmoney-stock-fund-flow-v1
+        max_symbols_per_request: 1
+        request_interval_seconds: 1
       dividend_event:
         enabled: false
         role: discovery

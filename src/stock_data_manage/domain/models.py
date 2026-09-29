@@ -16,6 +16,7 @@ class Dataset(StrEnum):
     DIVIDEND_EVENT = "dividend_event"
     REALTIME_QUOTE = "realtime_quote"
     INTRADAY_TREND = "intraday_trend"
+    STOCK_FUND_FLOW = "stock_fund_flow"
 
 
 class Exchange(StrEnum):

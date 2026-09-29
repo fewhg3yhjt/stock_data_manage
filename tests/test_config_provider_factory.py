@@ -8,6 +8,7 @@ from stock_data_manage.providers.baostock import BaoStockDailyProvider
 from stock_data_manage.providers.eastmoney import EastMoneyDividendProvider
 from stock_data_manage.providers.eastmoney import EastMoneySecurityListProvider
 from stock_data_manage.providers.eastmoney import EastMoneyRealtimeQuoteProvider
+from stock_data_manage.providers.eastmoney import EastMoneyStockFundFlowProvider
 from stock_data_manage.providers.akshare import AkShareDailyProvider
 
 
@@ -72,6 +73,7 @@ def test_provider_factory_does_not_build_disabled_eastmoney_dividend_provider() 
     assert not any(isinstance(item, EastMoneyDividendProvider) for item in providers)
     assert not any(isinstance(item, EastMoneySecurityListProvider) for item in providers)
     assert not any(isinstance(item, EastMoneyRealtimeQuoteProvider) for item in providers)
+    assert not any(isinstance(item, EastMoneyStockFundFlowProvider) for item in providers)
 
 
 def test_provider_factory_registers_optional_akshare_daily_providers() -> None:

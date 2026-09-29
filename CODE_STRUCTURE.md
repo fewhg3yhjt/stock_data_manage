@@ -17,6 +17,7 @@
 
 配置文件仍位于仓库根目录的 `config/`：`providers.yaml` 保存来源公共配置，`capabilities.yaml` 保存路由顺序，`datasets/` 保存数据集标准定义，`normalization/` 保存按数据集拆分的来源归一化规则；命令行入口仍位于 `src/stock_data_manage/cli.py`。
 EastMoney 各数据域的范围和实现状态见 `eastmoney-data-domain-coverage.md`，不以单个分红事件 Endpoint 代表整个来源。
+项目当前实现、验证、待实现和明确不做范围见 `PROJECT_PROGRESS.md`。
 
 Provider 的离线契约、实时探针和路由资格记录见仓库根目录的 `PROVIDER_CAPABILITY_MATRIX.md`。该文档是渠道验证事实记录，不是运行时配置。
 能力采集、证据生命周期和 YAML 归一化规则见 `provider-capability-verification-and-normalization.md`；它是 Provider 接入和后续验证的专项设计。
@@ -51,6 +52,7 @@ Provider 的离线契约、实时探针和路由资格记录见仓库根目录�
 | `providers/eastmoney/dividend.py` | EastMoney 分红实施事件批量查询和分红事件标准化 |
 | `providers/eastmoney/security_list.py` | EastMoney 分页证券列表、市场和资产类型映射 |
 | `providers/eastmoney/realtime.py` | EastMoney 单证券行情、批量行情和 5 日分时走势 |
+| `providers/eastmoney/fund_flow.py` | EastMoney 个股日级资金流 |
 | `providers/eastmoney/__init__.py` | EastMoney 适配器导出 |
 | `providers/akshare/session.py` | AkShare 可选依赖加载和代码转换 |
 | `providers/akshare/daily.py` | AkShare 股票、ETF、LOF、指数函数级历史日线 |

@@ -30,6 +30,7 @@
 | EastMoney | `dividend_event` | `dividend_event` | `providers/eastmoney/dividend.py` | 通过 | HTTP 200/空窗口 | `RPT_SHAREBONUS_DET` 响应可解析；2026-09-24 至 2026-09-29 返回 0 事件 | 保持 disabled/discovery，待更宽窗口和字段语义验证 |
 | EastMoney | `security_list` | `security_master` | `providers/eastmoney/security_list.py` | 通过 | RemoteDisconnected | 分页和股票/ETF/LOF/指数映射已实现；当前网络未取得响应 | 保持 validation_only/disabled，不进入正式路由 |
 | EastMoney | `single_quote` / `batch_quote` / `intraday_trend` | `realtime_quote` / `intraday_trend` | `providers/eastmoney/realtime.py` | 通过 | 原脚本曾通过；正式迁移后当前复测 RemoteDisconnected | 行为已对齐原脚本的 Session、请求头、Referer、重试、Host 降级和业务判断；当前运行环境仍未取得新证据 | 保持 validation_only/disabled，不进入正式路由 |
+| EastMoney | `stock_fund_flow` | `stock_fund_flow` | `providers/eastmoney/fund_flow.py` | 通过 | 原脚本曾通过；正式迁移后当前复测 RemoteDisconnected | 个股日级资金流字段映射已实现，当前运行环境未取得新证据 | 保持 validation_only/disabled，不进入正式路由 |
 | AkShare | `stock_daily` / `etf_daily` / `lof_daily` / `index_daily` | `daily_bar` | `providers/akshare/daily.py` | 通过 | 通过 | AkShare 1.18.97；股票、ETF、LOF、指数代表样本均可返回目标日期，历史首尾范围已记录 | 保持 `validation_only`，待更完整字段/单位/复权矩阵验证 |
 
 ## 配置或设计中但尚未形成正式适配器
@@ -69,6 +70,7 @@
 - `docs/provider-probes/2026-09-29-eastmoney-dividend-event.json`
 - `docs/provider-probes/2026-09-29-eastmoney-security-list.json`
 - `docs/provider-probes/2026-09-29-eastmoney-realtime-quote.json`
+- `docs/provider-probes/2026-09-29-eastmoney-stock-fund-flow.json`
 - `docs/provider-probes/2026-09-29-akshare-daily.json`
 - `docs/provider-probes/2026-09-29-akshare-daily-live.json`
 - 完整本地运行目录：`/tmp/opencode/provider-probes/`
@@ -82,7 +84,7 @@
 3. Tencent/Sina 不复权日线和 Tencent QFQ 日线本次都达到返回上限，不能直接用于一只证券的完整历史重建。
 4. Tencent 和 Sina 的成交量单位存在差异，已经进入探针证据；日线成交量和成交额单位仍需针对历史接口分别完成语义验证，当前不能标记为已确认。
 5. 分钟探针现在会按 `as_of` 过滤未来记录，并记录来源单位；本次只验证了沪市股票，分钟的全市场、北交所、ETF、LOF 和指数覆盖仍需代表矩阵验证。
-6. BaoStock 已有正式 SDK 适配器，但当前仅历史日线小样本通过，保持 `validation_only`；5m 本次空返回。EastMoney 分红事件、证券列表和实时行情适配器已实现，但当前正式探针均未取得可用网络证据，保持 disabled/validation_only。AkShare 股票、ETF、LOF、指数日线代表样本已通过真实探针，仍保持 `validation_only`，等待更完整字段、单位、复权和覆盖矩阵验证。
+6. BaoStock 已有正式 SDK 适配器，但当前仅历史日线小样本通过，保持 `validation_only`；5m 本次空返回。EastMoney 分红事件、证券列表、实时行情和个股资金流适配器已实现，但当前正式探针均未取得可用网络证据，保持 disabled/validation_only。AkShare 股票、ETF、LOF、指数日线代表样本已通过真实探针，仍保持 `validation_only`，等待更完整字段、单位、复权和覆盖矩阵验证。
 
 ## 后续资格门槛
 
