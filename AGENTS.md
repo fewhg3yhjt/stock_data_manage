@@ -4,7 +4,8 @@
 
 - Before starting a non-trivial task, state the target outcome, current situation, scope, execution plan, verification standard, risks, and confirmation points.
 - After the user explicitly confirms the plan, execute the confirmed scope continuously without repeatedly asking for approval on ordinary implementation details.
-- Pause and ask again only when the scope must expand, a destructive or sensitive operation is required, user changes conflict with the task, an external side effect was not covered by the plan, a data-semantic decision cannot be inferred safely, or execution is blocked.
+- Do not expand the confirmed scope, add adjacent features, introduce new management layers, or change data semantics without discussing the expansion with the user and receiving explicit confirmation.
+- Pause and ask again when the scope must expand, a destructive or sensitive operation is required, user changes conflict with the task, an external side effect was not covered by the plan, a data-semantic decision cannot be inferred safely, or execution is blocked.
 - At task completion, report the actual changes, verification results, residual risks, and any intentionally unimplemented items.
 - Treat every file edit as saved immediately; do not leave requested code changes only in an unreconciled working buffer.
 - After completing a requested change, inspect `git status` and `git diff` before committing.
@@ -28,6 +29,8 @@
 
 - Modify the existing architecture modules before creating new modules.
 - Do not create parallel implementations, compatibility shims, or temporary duplicate entry points unless an external contract requires them and the exception is documented.
+- Do not create a new service, manager, registry, backend, UI, configuration system, or abstraction layer merely to organize an existing feature unless that expansion is explicitly discussed and approved by the user.
+- If the requested work can be completed with existing configuration, metadata, routing, or storage modules, prefer that minimal implementation.
 - New provider functionality belongs under `providers/`; routing under `routing/`; normalization and quality rules under `quality/`; production flows under `pipeline/`; persistence under `storage/`.
 - Update `CODE_STRUCTURE.md` whenever a file is added, moved, merged, or its responsibility changes.
 

@@ -573,7 +573,7 @@ Schema / Dataset Contract 通过
 Sina / Tencent 主路径 Live Probe 通过
 TDX 启用时，沪深与北交所分钟 Probe 通过；禁用时必须记录原因且调度不得触发
 EastMoney / BaoStock 的 enabled/disabled 状态符合探针结果
-Capability Registry 已记录验证时间和到期时间
+ 现有 Metadata 能力验证记录已保存验证时间和到期时间
 ```
 
 ## Gate C：端到端与历史回放

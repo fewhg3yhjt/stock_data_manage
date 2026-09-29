@@ -1,7 +1,7 @@
 # 证券全量数据采集与管理平台设计方案
 
 > 版本：2026-09-13 能力验证修订版  
-> 本版依据实际接口抽样结果补充具体采集组合、来源优先级、断电恢复、重复采集与冲突隔离规则。接口能力具有时效性，生产运行以 Capability Registry 中最近一次验证结果为准。
+> 本版依据实际接口抽样结果补充具体采集组合、来源优先级、断电恢复、重复采集与冲突隔离规则。接口能力具有时效性，生产运行以现有 Metadata 中的能力验证记录和最近一次验证结果为准。这里的 Capability Registry 只是记录与筛选概念，不代表新增独立管理服务。
 > 配套测试与完成标准见：[测试设计与验收基线](stock-data-test-design-acceptance-baseline.md)。
 >
 > 2026-09-28 设计收敛说明：股票、ETF 和 LOF 正式日线目标口径调整为前复权；公司行动发现、人工历史重建和多日期统一切换以 [前复权日线与历史重建设计](stock-data-design-qfq-history-rebuild.md) 为准。本文中以不复权日线为基础的旧描述仅保留为历史讨论和当前实现说明，不再作为目标口径。分钟数据继续使用独立流程，不复用日线历史重建。
@@ -484,7 +484,7 @@ tmp_test/etf_daily_probe/gap_lof_eastmoney_only_20260913/summary.json
 
 ## 6.2 Capability 必须是可执行配置
 
-Capability Registry 不能只是文档说明。Planner 只能选择最近验证仍有效的具体记录：
+能力验证记录不能只是文档说明。Planner 只能选择现有 Metadata 中最近验证仍有效的具体记录；这里不新增独立能力管理层：
 
 ```text
 provider_family + adapter + endpoint_version
@@ -2940,7 +2940,7 @@ EastMoney / BaoStock 低优先级校验或末级补采适配器
 
 Provider Capability
 
-Capability Registry + 定期探针 + 验证过期机制
+现有 Metadata 能力验证记录 + 定期探针 + 验证过期机制
 
 Capability吞吐量与历史窗口校验
 
@@ -3017,7 +3017,7 @@ Schema Registry Service
 估值、行业、概念、财务等扩展指标的全量 SLA
 ```
 
-这些属于运行规模扩大后的增强能力。尤其扩展指标不能因为东财存在某个接口就默认“已有能力”；必须先为每个 Dataset 找到至少一个稳定主来源，完成字段语义、历史窗口、更新频率和授权边界验证，再加入 Capability Registry。当前来源组合足以启动第一阶段的证券主数据、日线、分钟和快照，不等于所有扩展指标已经具备生产级来源。
+这些属于运行规模扩大后的增强能力。尤其扩展指标不能因为东财存在某个接口就默认“已有能力”；必须先为每个 Dataset 找到至少一个稳定主来源，完成字段语义、历史窗口、更新频率和授权边界验证，再写入现有 Metadata 的能力验证记录。当前来源组合足以启动第一阶段的证券主数据、日线、分钟和快照，不等于所有扩展指标已经具备生产级来源。
 
 ---
 
@@ -3557,7 +3557,7 @@ Trading Calendar 定义交易日期
 
 Provider Capability 描述接口能力
 
-Capability Registry 保存实测能力、版本与有效期
+现有 Metadata 的能力验证记录保存实测能力、版本与有效期；不另建能力管理服务
 
 Planner 计算缺口
 

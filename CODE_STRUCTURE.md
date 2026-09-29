@@ -60,7 +60,7 @@ Provider 的离线契约、实时探针和路由资格记录见仓库根目录�
 
 | 文件 | 职责 |
 |---|---|
-| `routing/capabilities.py` | Provider Capability 模型、能力注册和有效期/范围筛选 |
+| `routing/capabilities.py` | Provider Capability 模型和有效期/范围筛选；不承载独立能力管理服务 |
 | `routing/router.py` | Missing Set 计算和实时分钟采集计划 |
 | `routing/retry.py` | 重试、Fallback、冷却相关的执行策略 |
 | `routing/__init__.py` | 路由包说明，不承载业务实现 |
@@ -96,7 +96,7 @@ Provider 的离线契约、实时探针和路由资格记录见仓库根目录�
 | `storage/raw.py` | 不覆盖 Raw Object Store 和原始响应引用 |
 | `storage/hot.py` | SQLite WAL Hot Minute Store 和即时查询数据 |
 | `storage/parquet.py` | Canonical Parquet 分区、Manifest、文件锁和原子发布 |
-| `storage/metadata.py` | DuckDB 元数据、Attempt、Provider 健康、Probe 和冲突记录 |
+| `storage/metadata.py` | DuckDB 元数据、Attempt、Provider 健康、Probe 验证记录和冲突记录；不新增能力管理数据库 |
 | `storage/integrity.py` | 确定性 row hash、Manifest 生成和完整性校验 |
 | `storage/__init__.py` | 存储包说明，不承载业务实现 |
 
