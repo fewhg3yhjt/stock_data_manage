@@ -12,6 +12,12 @@ class FetchResult:
     rows: tuple[Mapping[str, Any], ...]
     requested_symbols: tuple[str, ...]
     window_status: WindowStatus | None = None
+    response_statuses: tuple[int, ...] = ()
+    field_semantics: tuple[str, ...] = ()
+    units: tuple[str, ...] = ()
+    returned_row_count: int | None = None
+    returned_first_key: str | None = None
+    returned_last_key: str | None = None
 
     @property
     def returned_symbols(self) -> frozenset[str]:

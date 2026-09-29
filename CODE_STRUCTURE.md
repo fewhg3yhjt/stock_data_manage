@@ -17,6 +17,9 @@
 
 配置文件仍位于仓库根目录的 `config/`，命令行入口仍位于 `src/stock_data_manage/cli.py`。
 
+Provider 的离线契约、实时探针和路由资格记录见仓库根目录的 `PROVIDER_CAPABILITY_MATRIX.md`。该文档是渠道验证事实记录，不是运行时配置。
+探针摘要证据位于 `docs/provider-probes/`；临时完整探针输出位于 `/tmp/opencode/provider-probes/`，不作为生产数据目录。
+
 ## 领域模型
 
 | 文件 | 职责 |

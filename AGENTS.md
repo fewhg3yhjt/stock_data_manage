@@ -2,6 +2,10 @@
 
 ## Change And Delivery Workflow
 
+- Before starting a non-trivial task, state the target outcome, current situation, scope, execution plan, verification standard, risks, and confirmation points.
+- After the user explicitly confirms the plan, execute the confirmed scope continuously without repeatedly asking for approval on ordinary implementation details.
+- Pause and ask again only when the scope must expand, a destructive or sensitive operation is required, user changes conflict with the task, an external side effect was not covered by the plan, a data-semantic decision cannot be inferred safely, or execution is blocked.
+- At task completion, report the actual changes, verification results, residual risks, and any intentionally unimplemented items.
 - Treat every file edit as saved immediately; do not leave requested code changes only in an unreconciled working buffer.
 - After completing a requested change, inspect `git status` and `git diff` before committing.
 - Run the most relevant tests, checks, or smoke verification before committing. Do not commit a change that has not been verified unless the user explicitly asks for an unverified checkpoint.
@@ -10,6 +14,22 @@
 - Create a focused commit after verification. Use a concise message describing the change.
 - The repository `post-commit` hook automatically pushes successful commits on `main` to `origin/main`. Do not run a second push unless the hook fails.
 - If commit or push fails, preserve the local changes and report the exact failure; do not create duplicate commits or silently retry with a different remote.
+
+## Provider Verification
+
+- A provider adapter existing in code is not evidence that the provider is production-ready.
+- Validate providers in four layers: offline Provider Contract fixtures, small live probes, semantic verification, and end-to-end data production verification.
+- Live probes must use a small symbol set and must not write production data directories.
+- Persist probe evidence with provider, endpoint, request scope, response status, returned window, field semantics, units, capability version, validation time, expiry, and routing eligibility.
+- Do not enable a provider in formal routing until the matching capability is evidence-backed, unexpired, within its configured scope, and not cooling down.
+- Keep disabled or unimplemented providers explicitly marked; configuration declarations alone do not count as implementations.
+
+## Development Structure
+
+- Modify the existing architecture modules before creating new modules.
+- Do not create parallel implementations, compatibility shims, or temporary duplicate entry points unless an external contract requires them and the exception is documented.
+- New provider functionality belongs under `providers/`; routing under `routing/`; normalization and quality rules under `quality/`; production flows under `pipeline/`; persistence under `storage/`.
+- Update `CODE_STRUCTURE.md` whenever a file is added, moved, merged, or its responsibility changes.
 
 ## Safety
 

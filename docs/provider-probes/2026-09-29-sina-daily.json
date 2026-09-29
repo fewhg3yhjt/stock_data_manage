@@ -1,0 +1,18 @@
+{
+  "provider": "sina",
+  "endpoint": "full_history",
+  "capability_version": "sina-cn-marketdata-v1",
+  "validated_at": "2026-09-29T01:30:54.748326+00:00",
+  "validation_expires_at": "2026-10-06T01:30:54.748326+00:00",
+  "status": "truncated",
+  "eligible_for_selection": true,
+  "request_scope": ["sh600519"],
+  "response_status": 200,
+  "returned_window": "truncated",
+  "row_count": 1023,
+  "first_key": "2022-07-13",
+  "last_key": "2026-09-28",
+  "field_semantics": ["trade_date", "open", "high", "low", "close", "volume", "amount"],
+  "units": ["volume:unverified", "amount:unverified"],
+  "evidence_hash": "8f551567bdd4841ec0de194e81a9e021c86bdab16e1e226e62a98344050d8271"
+}

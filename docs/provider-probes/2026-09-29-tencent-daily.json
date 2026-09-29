@@ -1,0 +1,18 @@
+{
+  "provider": "tencent",
+  "endpoint": "recent_history",
+  "capability_version": "tencent-kline-v1",
+  "validated_at": "2026-09-29T01:30:56.373906+00:00",
+  "validation_expires_at": "2026-10-06T01:30:56.373906+00:00",
+  "status": "truncated",
+  "eligible_for_selection": true,
+  "request_scope": ["sh600519"],
+  "response_status": 200,
+  "returned_window": "truncated",
+  "row_count": 1025,
+  "first_key": "2022-07-12",
+  "last_key": "2026-09-29",
+  "field_semantics": ["trade_date", "open", "high", "low", "close", "volume", "amount"],
+  "units": ["volume:unverified", "amount:unverified"],
+  "evidence_hash": "87f589c8c8d051863486cbf4f12a4c835c6e3ef7f41c6acf66b9a1771ef1d499"
+}

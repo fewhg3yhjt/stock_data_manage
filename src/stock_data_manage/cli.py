@@ -33,6 +33,7 @@ def main(argv: list[str] | None = None) -> int:
     probe.add_argument("--metadata", type=Path)
     probe.add_argument("--market", default="XSHG")
     probe.add_argument("--asset-type", default="stock")
+    probe.add_argument("--code-prefix", default="")
 
     minute_probe = subcommands.add_parser(
         "probe-minute", help="run one explicit minute provider capability probe"
@@ -45,6 +46,7 @@ def main(argv: list[str] | None = None) -> int:
     minute_probe.add_argument("--metadata", type=Path)
     minute_probe.add_argument("--market", default="XSHG")
     minute_probe.add_argument("--asset-type", default="stock")
+    minute_probe.add_argument("--code-prefix", default="")
 
     recover = subcommands.add_parser("recover", help="repair canonical files and metadata after interruption")
     recover.add_argument("--canonical-root", type=Path, required=True)
@@ -79,6 +81,7 @@ def main(argv: list[str] | None = None) -> int:
                     dataset="daily_bar",
                     market=args.market,
                     asset_type=args.asset_type,
+                    code_prefix=args.code_prefix,
                 )
         print(json.dumps(asdict(evidence), ensure_ascii=False, default=_json_default, indent=2))
         return 0 if evidence.eligible_for_selection else 2
@@ -104,6 +107,7 @@ def main(argv: list[str] | None = None) -> int:
                     dataset=dataset,
                     market=args.market,
                     asset_type=args.asset_type,
+                    code_prefix=args.code_prefix,
                 )
         print(json.dumps(asdict(evidence), ensure_ascii=False, default=_json_default, indent=2))
         return 0 if evidence.eligible_for_selection else 2

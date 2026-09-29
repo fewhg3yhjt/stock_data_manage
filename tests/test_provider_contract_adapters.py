@@ -67,6 +67,28 @@ def test_contract_detects_schema_change_and_silent_row_limit() -> None:
     ) is WindowStatus.TRUNCATED
 
 
+@pytest.mark.parametrize(
+    ("status", "failure", "retryable"),
+    [
+        (500, FailureClass.HTTP_5XX, True),
+        (404, FailureClass.HTTP_ERROR, False),
+        (403, FailureClass.RATE_LIMITED, False),
+        (429, FailureClass.RATE_LIMITED, False),
+    ],
+)
+def test_contract_classifies_http_failures(status: int, failure: FailureClass, retryable: bool) -> None:
+    with pytest.raises(ProviderContractError) as error:
+        EndpointContract(frozenset()).parse_json(HttpResponse(status, {}, b"{}"))
+    assert error.value.failure_class is failure
+    assert error.value.retryable is retryable
+
+
+def test_contract_classifies_invalid_json() -> None:
+    with pytest.raises(ProviderContractError) as error:
+        EndpointContract(frozenset()).parse_json(HttpResponse(200, {}, b"not-json"))
+    assert error.value.failure_class is FailureClass.INVALID_JSON
+
+
 def test_tencent_adapter_parses_observed_daily_envelope() -> None:
     transport = FakeTransport(
         [
@@ -91,6 +113,30 @@ def test_tencent_adapter_parses_observed_daily_envelope() -> None:
     assert len(result.rows) == 1
     assert result.rows[0]["close"] == "1275.160"
     assert transport.calls[0][1]["param"] == "sh600519,day,,,1024"
+
+
+def test_daily_adapter_reports_the_full_returned_window() -> None:
+    transport = FakeTransport(
+        [
+            response(
+                {
+                    "code": 0,
+                    "data": {
+                        "sh600519": {
+                            "day": [
+                                ["2026-09-10", "1", "1", "1", "1", "1"],
+                                ["2026-09-11", "2", "2", "2", "2", "2"],
+                            ]
+                        }
+                    },
+                }
+            )
+        ]
+    )
+    result = TencentDailyProvider(transport).fetch_daily(["sh600519"], date(2026, 9, 11))
+    assert result.returned_row_count == 2
+    assert result.returned_first_key == "2026-09-10"
+    assert result.returned_last_key == "2026-09-11"
 
 
 def test_sina_adapter_parses_observed_daily_envelope_and_probe_evidence() -> None:
@@ -168,6 +214,10 @@ def test_probe_evidence_is_persisted_in_capability_registry(tmp_path) -> None:
     assert saved is not None
     assert saved["eligible_for_selection"] is True
     assert saved["evidence_hash"] == evidence.evidence_hash
+    assert saved["request_scope_json"] == '["sh600519"]'
+    assert saved["response_status"] == 200
+    assert saved["returned_window"] == "complete"
+    assert "trade_date" in saved["field_semantics_json"]
 
 
 def minute_capability(provider: str, endpoint: str, frequency: int) -> ProviderCapability:
@@ -205,6 +255,31 @@ def test_tencent_minute_adapter_parses_compact_timestamp() -> None:
     provider = TencentMinuteProvider(transport, minute_capability("tencent", "native_1m", 1))
     result = provider.fetch_realtime_minute(["sh600519"], datetime(2026, 9, 11, 13, 2, tzinfo=timezone.utc))
     assert result.rows[0]["bar_time"] == "2026-09-11T13:01:00"
+    assert result.units == ("volume:lot",)
+
+
+def test_minute_adapter_filters_rows_newer_than_as_of() -> None:
+    transport = FakeTransport(
+        [
+            response(
+                {
+                    "code": 0,
+                    "data": {
+                        "sh600519": {
+                            "m1": [
+                                ["202609111301", "1", "1", "1", "1", "10"],
+                                ["202609111302", "2", "2", "2", "2", "20"],
+                            ]
+                        }
+                    },
+                }
+            )
+        ]
+    )
+    result = TencentMinuteProvider(
+        transport, minute_capability("tencent", "native_1m", 1)
+    ).fetch_realtime_minute(["sh600519"], datetime(2026, 9, 11, 13, 1, tzinfo=timezone.utc))
+    assert [row["bar_time"] for row in result.rows] == ["2026-09-11T13:01:00"]
     assert transport.calls[0][1]["param"] == "sh600519,m1,,120"
 
 
@@ -253,6 +328,7 @@ def test_sina_minute_adapter_parses_day_timestamp() -> None:
     result = provider.fetch_realtime_minute(["sh600519"], datetime(2026, 9, 11, 15, 1, tzinfo=timezone.utc))
     assert result.rows[0]["trade_date"] == "2026-09-11"
     assert result.rows[0]["bar_time"] == "2026-09-11T15:00:00"
+    assert result.units == ("volume:share",)
 
 
 def test_tdx_minute_adapter_normalizes_client_rows_and_closes_client() -> None:

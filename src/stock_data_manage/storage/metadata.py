@@ -3,6 +3,7 @@ from __future__ import annotations
 from contextlib import AbstractContextManager
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
+import json
 from pathlib import Path
 from typing import Mapping
 
@@ -136,6 +137,11 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
                 first_key VARCHAR,
                 last_key VARCHAR,
                 evidence_hash VARCHAR NOT NULL,
+                request_scope_json VARCHAR NOT NULL DEFAULT '[]',
+                response_status INTEGER,
+                returned_window VARCHAR,
+                field_semantics_json VARCHAR NOT NULL DEFAULT '[]',
+                units_json VARCHAR NOT NULL DEFAULT '[]',
                 failure_class VARCHAR,
                 message VARCHAR,
                 PRIMARY KEY (
@@ -159,6 +165,14 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
             );
             """
         )
+        for statement in (
+            "ALTER TABLE capability_registry ADD COLUMN IF NOT EXISTS request_scope_json VARCHAR DEFAULT '[]'",
+            "ALTER TABLE capability_registry ADD COLUMN IF NOT EXISTS response_status INTEGER",
+            "ALTER TABLE capability_registry ADD COLUMN IF NOT EXISTS returned_window VARCHAR",
+            "ALTER TABLE capability_registry ADD COLUMN IF NOT EXISTS field_semantics_json VARCHAR DEFAULT '[]'",
+            "ALTER TABLE capability_registry ADD COLUMN IF NOT EXISTS units_json VARCHAR DEFAULT '[]'",
+        ):
+            self.connection.execute(statement)
 
     def save_attempt(self, attempt: CollectionAttempt, *, updated_at: datetime | None = None) -> None:
         now = updated_at or datetime.now(timezone.utc)
@@ -565,9 +579,14 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
     ) -> None:
         self.connection.execute(
             """
-            INSERT INTO capability_registry VALUES (
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-            )
+            INSERT INTO capability_registry (
+                provider, endpoint, capability_version, dataset, market, asset_type,
+                code_prefix, frequency, adjustment, validated_at,
+                validation_expires_at, status, eligible_for_selection, row_count,
+                first_key, last_key, evidence_hash, request_scope_json,
+                response_status, returned_window, field_semantics_json, units_json,
+                failure_class, message
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT (
                 provider, endpoint, capability_version, dataset, market,
                 asset_type, code_prefix, frequency, adjustment
@@ -579,8 +598,13 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
                 row_count=excluded.row_count,
                 first_key=excluded.first_key,
                 last_key=excluded.last_key,
-                evidence_hash=excluded.evidence_hash,
-                failure_class=excluded.failure_class,
+                 evidence_hash=excluded.evidence_hash,
+                 request_scope_json=excluded.request_scope_json,
+                 response_status=excluded.response_status,
+                 returned_window=excluded.returned_window,
+                 field_semantics_json=excluded.field_semantics_json,
+                 units_json=excluded.units_json,
+                 failure_class=excluded.failure_class,
                 message=excluded.message
             """,
             [
@@ -601,6 +625,11 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
                 evidence.first_key,
                 evidence.last_key,
                 evidence.evidence_hash,
+                json.dumps(evidence.request_scope, ensure_ascii=False),
+                evidence.response_status,
+                evidence.returned_window,
+                json.dumps(evidence.field_semantics, ensure_ascii=False),
+                json.dumps(evidence.units, ensure_ascii=False),
                 evidence.failure_class,
                 evidence.message,
             ],

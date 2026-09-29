@@ -7,6 +7,7 @@
 - [前复权日线与历史重建设计](stock-data-design-qfq-history-rebuild.md)
 - [实时采集设计](stock-data-design-realtime.md)
 - [测试设计与验收基线](stock-data-test-design-acceptance-baseline.md)
+- [Provider 能力验证矩阵](PROVIDER_CAPABILITY_MATRIX.md)
 
 ## 当前开发状态
 
@@ -46,7 +47,7 @@
 - 日线 Reconciliation：按主键合并 provisional/final、提升质量状态并记录缺失与冲突。
 - 独立的 `config/schedules.yaml` 调度配置；已禁用的 TDX 延迟分钟任务不会进入运行计划。
 
-当前代码只使用离线 Fixture 测试，不会访问第三方行情接口，也不会写入生产数据目录。
+默认测试只使用离线 Fixture，不会访问第三方行情接口；显式执行 `probe-*` 命令才会访问对应来源，探针证据不写入生产数据目录。
 
 显式执行一次小流量能力探针（会访问对应行情来源）：
 
@@ -72,7 +73,7 @@ python -m stock_data_manage.cli recover --canonical-root data/canonical --metada
 python -m stock_data_manage.cli acceptance-offline --root tmp/acceptance-m1 --output tmp/acceptance-m1/report.json
 ```
 
-该报告覆盖 20 个工作日回放、Canonical 幂等、断电恢复和 200 只 Watchlist 容量；真实 Provider Probe 与连续交易日试运行仍需在目标网络和运行环境执行。
+该报告覆盖 20 个工作日回放、Canonical 幂等、断电恢复和 200 只 Watchlist 容量；真实 Provider Probe 结果见 [Provider 能力验证矩阵](PROVIDER_CAPABILITY_MATRIX.md)，连续交易日试运行仍需在目标运行环境执行。
 
 ## 本地验证
 
@@ -86,4 +87,4 @@ python -m pip install -e .
 python -m pytest
 ```
 
-当前实现已覆盖 Phase 1 的离线核心链路与 Provider 契约适配。真实行情接入仍须先运行小流量 Probe，并根据返回字段语义补齐对应 Normalization Rule；未验证的来源不会自动进入生产候选。
+当前实现已覆盖 Phase 1 的离线核心链路与 Provider 契约适配；Tencent/Sina 的小流量探针已形成证据，但前复权目标来源、TDX 真实客户端、BaoStock/EastMoney/AkShare 正式适配器仍未完成。未验证或未实现的来源不会自动进入生产候选。

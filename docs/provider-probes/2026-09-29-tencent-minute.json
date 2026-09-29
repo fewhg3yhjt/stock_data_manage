@@ -1,0 +1,18 @@
+{
+  "provider": "tencent",
+  "endpoint": "native_1m",
+  "capability_version": "tencent-minute-probe-v1",
+  "validated_at": "2026-09-29T09:24:00+08:00",
+  "validation_expires_at": "2026-10-06T09:24:00+08:00",
+  "status": "complete",
+  "eligible_for_selection": true,
+  "request_scope": ["sh600519"],
+  "response_status": 200,
+  "returned_window": "complete",
+  "row_count": 118,
+  "first_key": "2026-09-28T13:03:00",
+  "last_key": "2026-09-28T15:00:00",
+  "field_semantics": ["trade_date", "bar_time", "open", "high", "low", "close", "volume"],
+  "units": ["volume:lot"],
+  "evidence_hash": "3d0a539b0279d0a6b36feffb5155501b94b78ac6e8afca12547bf1e811628060"
+}

@@ -83,13 +83,16 @@ class TencentDailyProvider:
     def fetch_daily(self, symbols: Sequence[str], trade_date: date) -> FetchResult:
         requested = tuple(symbols)
         rows: list[dict[str, Any]] = []
+        returned_rows: list[dict[str, Any]] = []
         statuses: list[WindowStatus] = []
+        response_statuses: list[int] = []
         for symbol in requested:
             response = self.transport.get(
                 self.url,
                 params={"param": f"{symbol},day,,,{self.max_rows}"},
                 timeout_seconds=self.timeout_seconds,
             )
+            response_statuses.append(response.status_code)
             payload = self.contract.parse_json(response)
             if not isinstance(payload, dict) or payload.get("code") not in {0, "0", None}:
                 raise ProviderContractError(
@@ -114,8 +117,19 @@ class TencentDailyProvider:
                 if isinstance(item, list) and len(item) >= 6
             ]
             statuses.append(self.contract.validate_rows(parsed))
+            returned_rows.extend(parsed)
             rows.extend(item for item in parsed if str(item["trade_date"]) == trade_date.isoformat())
-        return FetchResult(tuple(rows), requested, _combined_status(statuses, bool(rows)))
+        return FetchResult(
+            tuple(rows),
+            requested,
+            _combined_status(statuses, bool(rows)),
+            tuple(response_statuses),
+            ("trade_date", "open", "high", "low", "close", "volume", "amount"),
+            ("volume:unverified", "amount:unverified"),
+            len(returned_rows),
+            str(returned_rows[0]["trade_date"]) if returned_rows else None,
+            str(returned_rows[-1]["trade_date"]) if returned_rows else None,
+        )
 
 
 @dataclass(slots=True)
@@ -142,7 +156,9 @@ class SinaDailyProvider:
     def fetch_daily(self, symbols: Sequence[str], trade_date: date) -> FetchResult:
         requested = tuple(symbols)
         rows: list[dict[str, Any]] = []
+        returned_rows: list[dict[str, Any]] = []
         statuses: list[WindowStatus] = []
+        response_statuses: list[int] = []
         for symbol in requested:
             response = self.transport.get(
                 self.url,
@@ -154,6 +170,7 @@ class SinaDailyProvider:
                 },
                 timeout_seconds=self.timeout_seconds,
             )
+            response_statuses.append(response.status_code)
             payload = self.contract.parse_json(response)
             if payload is None:
                 parsed: list[dict[str, Any]] = []
@@ -177,10 +194,21 @@ class SinaDailyProvider:
                     }
                     for item in payload
                     if isinstance(item, dict)
-                ]
+            ]
             statuses.append(self.contract.validate_rows(parsed))
+            returned_rows.extend(parsed)
             rows.extend(item for item in parsed if str(item["trade_date"]) == trade_date.isoformat())
-        return FetchResult(tuple(rows), requested, _combined_status(statuses, bool(rows)))
+        return FetchResult(
+            tuple(rows),
+            requested,
+            _combined_status(statuses, bool(rows)),
+            tuple(response_statuses),
+            ("trade_date", "open", "high", "low", "close", "volume", "amount"),
+            ("volume:unverified", "amount:unverified"),
+            len(returned_rows),
+            str(returned_rows[0]["trade_date"]) if returned_rows else None,
+            str(returned_rows[-1]["trade_date"]) if returned_rows else None,
+        )
 
 
 def _combined_status(statuses: list[WindowStatus], target_rows_found: bool) -> WindowStatus:
@@ -197,6 +225,12 @@ def _combined_status(statuses: list[WindowStatus], target_rows_found: bool) -> W
 class RealtimeFetchResponse:
     rows: tuple[Mapping[str, Any], ...]
     requested_symbols: tuple[str, ...]
+    response_statuses: tuple[int, ...] = ()
+    field_semantics: tuple[str, ...] = ()
+    units: tuple[str, ...] = ()
+    returned_row_count: int | None = None
+    returned_first_key: str | None = None
+    returned_last_key: str | None = None
 
     @property
     def returned_symbols(self) -> frozenset[str]:
@@ -334,12 +368,14 @@ class TencentMinuteProvider:
     ) -> RealtimeFetchResponse:
         requested = tuple(symbols)
         rows: list[dict[str, Any]] = []
+        response_statuses: list[int] = []
         for symbol in requested:
             response = self.transport.get(
                 self.url,
                 params={"param": f"{symbol},m1,,{self.count}"},
                 timeout_seconds=self.timeout_seconds,
             )
+            response_statuses.append(response.status_code)
             payload = EndpointContract(frozenset()).parse_json(response)
             if not isinstance(payload, dict) or payload.get("code") not in {0, "0", None}:
                 raise ProviderContractError(
@@ -365,7 +401,18 @@ class TencentMinuteProvider:
                         "amount": None,
                     }
                 )
-        return RealtimeFetchResponse(tuple(rows), requested)
+        as_of_naive = as_of.replace(tzinfo=None)
+        rows = [row for row in rows if _parse_provider_datetime(row["bar_time"]) <= as_of_naive]
+        return RealtimeFetchResponse(
+            tuple(rows),
+            requested,
+            tuple(response_statuses),
+            ("trade_date", "bar_time", "open", "high", "low", "close", "volume"),
+            tuple(f"volume:{'share' if symbol[2:].startswith(('688', '689')) else 'lot'}" for symbol in requested),
+            len(rows),
+            str(rows[0]["bar_time"]) if rows else None,
+            str(rows[-1]["bar_time"]) if rows else None,
+        )
 
 
 @dataclass(slots=True)
@@ -391,6 +438,7 @@ class SinaMinuteProvider:
     ) -> RealtimeFetchResponse:
         requested = tuple(symbols)
         rows: list[dict[str, Any]] = []
+        response_statuses: list[int] = []
         for symbol in requested:
             response = self.transport.get(
                 self.url,
@@ -402,6 +450,7 @@ class SinaMinuteProvider:
                 },
                 timeout_seconds=self.timeout_seconds,
             )
+            response_statuses.append(response.status_code)
             payload = EndpointContract(frozenset()).parse_json(response)
             if payload is None:
                 continue
@@ -428,7 +477,18 @@ class SinaMinuteProvider:
                         "amount": item.get("amount"),
                     }
                 )
-        return RealtimeFetchResponse(tuple(rows), requested)
+        as_of_naive = as_of.replace(tzinfo=None)
+        rows = [row for row in rows if _parse_provider_datetime(row["bar_time"]) <= as_of_naive]
+        return RealtimeFetchResponse(
+            tuple(rows),
+            requested,
+            tuple(response_statuses),
+            ("trade_date", "bar_time", "open", "high", "low", "close", "volume", "amount"),
+            tuple("volume:share" for _ in requested),
+            len(rows),
+            str(rows[0]["bar_time"]) if rows else None,
+            str(rows[-1]["bar_time"]) if rows else None,
+        )
 
 
 @dataclass(slots=True)
@@ -508,7 +568,16 @@ class TdxMinuteProvider:
             close = getattr(client, "close", None)
             if callable(close):
                 close()
-        return RealtimeFetchResponse(tuple(rows), requested)
+        return RealtimeFetchResponse(
+            tuple(rows),
+            requested,
+            (),
+            ("trade_date", "bar_time", "open", "high", "low", "close", "volume", "amount"),
+            ("volume:client_defined", "amount:client_defined"),
+            len(rows),
+            str(rows[0]["bar_time"]) if rows else None,
+            str(rows[-1]["bar_time"]) if rows else None,
+        )
 
 
 def _tdx_code(symbol: str) -> str:

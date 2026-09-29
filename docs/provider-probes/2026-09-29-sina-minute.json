@@ -1,0 +1,18 @@
+{
+  "provider": "sina",
+  "endpoint": "native_5m",
+  "capability_version": "sina-minute-probe-v1",
+  "validated_at": "2026-09-29T09:24:00+08:00",
+  "validation_expires_at": "2026-10-06T09:24:00+08:00",
+  "status": "complete",
+  "eligible_for_selection": true,
+  "request_scope": ["sh600519"],
+  "response_status": 200,
+  "returned_window": "complete",
+  "row_count": 119,
+  "first_key": "2026-09-23T13:10:00",
+  "last_key": "2026-09-28T15:00:00",
+  "field_semantics": ["trade_date", "bar_time", "open", "high", "low", "close", "volume", "amount"],
+  "units": ["volume:share"],
+  "evidence_hash": "54f8a443f48d38384eddc1af47e8248fbd189716dc7806db7900c1b576befeac"
+}
