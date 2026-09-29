@@ -2,9 +2,9 @@ import json
 from datetime import date, datetime, timezone
 from decimal import Decimal
 
-from stock_data_manage.domain import CorporateActionEvent
+from stock_data_manage.domain import DividendEvent
 from stock_data_manage.providers.contracts import HttpResponse
-from stock_data_manage.providers.eastmoney import EastMoneyCorporateActionProvider
+from stock_data_manage.providers.eastmoney import EastMoneyDividendProvider
 from stock_data_manage.storage.metadata import MetadataStore
 
 
@@ -22,7 +22,7 @@ def payload(rows, count=None):
     return {"result": {"data": rows, "count": count if count is not None else len(rows)}}
 
 
-def test_eastmoney_corporate_action_normalizes_and_deduplicates() -> None:
+def test_eastmoney_dividend_normalizes_and_deduplicates() -> None:
     transport = FakeTransport([
         payload([
             {
@@ -42,7 +42,7 @@ def test_eastmoney_corporate_action_normalizes_and_deduplicates() -> None:
             },
         ])
     ])
-    result = EastMoneyCorporateActionProvider(transport).fetch_events(
+    result = EastMoneyDividendProvider(transport).fetch_events(
         date(2026, 9, 1), date(2026, 9, 15), fetch_time=datetime.now(timezone.utc)
     )
     assert len(result.events) == 1
@@ -51,8 +51,8 @@ def test_eastmoney_corporate_action_normalizes_and_deduplicates() -> None:
     assert "EX_DIVIDEND_DATE" in transport.calls[0][1]["filter"]
 
 
-def test_corporate_action_events_are_persisted_by_business_key(tmp_path) -> None:
-    event = CorporateActionEvent(
+def test_dividend_events_are_persisted_by_business_key(tmp_path) -> None:
+    event = DividendEvent(
         source_security_code="600519",
         ex_dividend_date=date(2026, 9, 11),
         record_date=date(2026, 9, 10),
@@ -62,14 +62,14 @@ def test_corporate_action_events_are_persisted_by_business_key(tmp_path) -> None
         assignment_progress="实施",
         notice_date=date(2026, 8, 1),
         source_provider="eastmoney",
-        endpoint="corporate_action",
-        capability_version="eastmoney-corporate-action-v1",
+        endpoint="dividend_event",
+        capability_version="eastmoney-dividend-event-v1",
         raw_object_path="raw/eastmoney.json",
         fetch_time=datetime.now(timezone.utc),
     )
     with MetadataStore(tmp_path / "metadata.duckdb") as metadata:
-        assert metadata.save_corporate_action_events([event]) == 1
-        assert metadata.save_corporate_action_events([event]) == 1
-        rows = metadata.corporate_action_events()
+        assert metadata.save_dividend_events([event]) == 1
+        assert metadata.save_dividend_events([event]) == 1
+        rows = metadata.dividend_events()
     assert len(rows) == 1
     assert rows[0]["source_security_code"] == "600519"

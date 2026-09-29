@@ -7,14 +7,14 @@ from decimal import Decimal, InvalidOperation
 from typing import Any, Mapping
 from urllib.parse import quote
 
-from ...domain import CorporateActionEvent
+from ...domain import DividendEvent
 from ..contracts import EndpointContract, FailureClass, ProviderContractError
 from ..transport import HttpTransport
 
 
 @dataclass(frozen=True, slots=True)
-class CorporateActionFetchResult:
-    events: tuple[CorporateActionEvent, ...]
+class DividendFetchResult:
+    events: tuple[DividendEvent, ...]
     request_start: date
     request_end: date
     response_status: int
@@ -23,11 +23,11 @@ class CorporateActionFetchResult:
 
 
 @dataclass(slots=True)
-class EastMoneyCorporateActionProvider:
+class EastMoneyDividendProvider:
     transport: HttpTransport
     name: str = "eastmoney"
-    endpoint: str = "corporate_action"
-    capability_version: str = "eastmoney-corporate-action-v1"
+    endpoint: str = "dividend_event"
+    capability_version: str = "eastmoney-dividend-event-v1"
     timeout_seconds: float = 20.0
     page_size: int = 100
     url: str = "https://datacenter-web.eastmoney.com/api/data/v1/get"
@@ -40,10 +40,10 @@ class EastMoneyCorporateActionProvider:
         *,
         fetch_time: datetime,
         raw_object_path: str = "",
-    ) -> CorporateActionFetchResult:
+    ) -> DividendFetchResult:
         if end_date < start_date:
-            raise ValueError("corporate action end_date cannot precede start_date")
-        events: dict[tuple[str, date], CorporateActionEvent] = {}
+            raise ValueError("dividend event end_date cannot precede start_date")
+        events: dict[tuple[str, date], DividendEvent] = {}
         page = 1
         last_payload: Mapping[str, Any] = {}
         response_status = 200
@@ -57,7 +57,7 @@ class EastMoneyCorporateActionProvider:
             payload = EndpointContract(frozenset()).parse_json(response)
             if not isinstance(payload, dict):
                 raise ProviderContractError(
-                    "EastMoney corporate action response envelope changed",
+                    "EastMoney dividend response envelope changed",
                     FailureClass.SCHEMA_CHANGED,
                     retryable=False,
                 )
@@ -66,7 +66,7 @@ class EastMoneyCorporateActionProvider:
             rows = data.get("data") or []
             if not isinstance(rows, list):
                 raise ProviderContractError(
-                    "EastMoney corporate action rows changed",
+                    "EastMoney dividend rows changed",
                     FailureClass.SCHEMA_CHANGED,
                     retryable=False,
                 )
@@ -80,7 +80,7 @@ class EastMoneyCorporateActionProvider:
             if not rows or len(events) >= total or len(rows) < self.page_size:
                 break
             page += 1
-        return CorporateActionFetchResult(
+        return DividendFetchResult(
             tuple(sorted(events.values(), key=lambda item: item.key)),
             start_date,
             end_date,
@@ -110,12 +110,12 @@ class EastMoneyCorporateActionProvider:
         *,
         fetch_time: datetime,
         raw_object_path: str,
-    ) -> CorporateActionEvent | None:
+    ) -> DividendEvent | None:
         code = _text(row, "SECURITY_CODE", "SECUCODE", "SECURITYCODE")
         ex_date = _date(row, "EX_DIVIDEND_DATE", "EXDIVIDENDDATE")
         if not code or ex_date is None:
             return None
-        return CorporateActionEvent(
+        return DividendEvent(
             source_security_code=code,
             ex_dividend_date=ex_date,
             record_date=_date(row, "EQUITY_RECORD_DATE", "EQUITYRECORDDATE"),

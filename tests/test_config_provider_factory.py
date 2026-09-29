@@ -5,7 +5,7 @@ from stock_data_manage.domain import Adjustment, Dataset
 from stock_data_manage.routing.factory import load_provider_registry
 from stock_data_manage.providers.tencent import TencentDailyProvider
 from stock_data_manage.providers.baostock import BaoStockDailyProvider
-from stock_data_manage.providers.eastmoney import EastMoneyCorporateActionProvider
+from stock_data_manage.providers.eastmoney import EastMoneyDividendProvider
 from stock_data_manage.providers.akshare import AkShareDailyProvider
 
 
@@ -62,12 +62,12 @@ def test_provider_factory_registers_baostock_validation_provider() -> None:
     assert provider.adjustment is Adjustment.NONE
 
 
-def test_provider_factory_can_build_disabled_eastmoney_action_provider() -> None:
+def test_provider_factory_does_not_build_disabled_eastmoney_dividend_provider() -> None:
     _, providers = load_provider_registry(
         ROOT / "config" / "providers.yaml",
         ROOT / "config" / "capabilities.yaml",
     )
-    assert not any(isinstance(item, EastMoneyCorporateActionProvider) for item in providers)
+    assert not any(isinstance(item, EastMoneyDividendProvider) for item in providers)
 
 
 def test_provider_factory_registers_optional_akshare_daily_providers() -> None:

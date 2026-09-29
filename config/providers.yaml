@@ -73,14 +73,14 @@ providers:
     require_capability_probe_before_enable: true
     allowed_low_frequency_capabilities: [security_master]
     endpoints:
-      corporate_action:
+      dividend_event:
         enabled: false
         role: discovery
-        datasets: [corporate_action]
+        datasets: [dividend_event]
         adjustments: [none]
         asset_types: [stock, etf, lof]
         exchanges: [XSHG, XSHE, BSE]
-        capability_version: eastmoney-corporate-action-v1
+        capability_version: eastmoney-dividend-event-v1
         request_interval_seconds: 3
         page_size: 100
   baostock:

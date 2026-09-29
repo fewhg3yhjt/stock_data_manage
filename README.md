@@ -10,6 +10,7 @@
 - [Provider 能力验证矩阵](PROVIDER_CAPABILITY_MATRIX.md)
 - [代码目录与文件职责](CODE_STRUCTURE.md)
 - [Provider 能力验证与归一化设计](provider-capability-verification-and-normalization.md)
+- [EastMoney 数据域覆盖设计](eastmoney-data-domain-coverage.md)
 
 ## 当前开发状态
 
@@ -89,4 +90,4 @@ python -m pip install -e .
 python -m pytest
 ```
 
-当前实现已覆盖 Phase 1 的离线核心链路与 Provider 契约适配；Tencent、Sina、BaoStock、EastMoney 公司行动、AkShare 日线适配器已按来源拆分，Endpoint 静态配置位于 `config/providers.yaml`，能力路线位于 `config/capabilities.yaml`，标准化规则位于 `config/normalization.yaml`。AkShare 是可选依赖，建议使用 `python -m pip install -e .[akshare]` 安装；当前股票、ETF、LOF、指数代表样本已完成真实探针，但仍保持 `validation_only`。前复权完整历史来源、TDX 真实客户端、EastMoney 公司行动完整覆盖仍未完成。未验证或未实现的来源不会自动进入生产候选。
+当前实现已覆盖 Phase 1 的离线核心链路与 Provider 契约适配；Tencent、Sina、BaoStock、EastMoney 分红事件、AkShare 日线适配器已按来源拆分，Endpoint 静态配置位于 `config/providers.yaml`，能力路线位于 `config/capabilities.yaml`，标准化规则位于 `config/normalization.yaml`。AkShare 是可选依赖，建议使用 `python -m pip install -e .[akshare]` 安装；当前股票、ETF、LOF、指数代表样本已完成真实探针，但仍保持 `validation_only`。前复权完整历史来源、TDX 真实客户端、EastMoney 分红事件完整覆盖仍未完成。未验证或未实现的来源不会自动进入生产候选。

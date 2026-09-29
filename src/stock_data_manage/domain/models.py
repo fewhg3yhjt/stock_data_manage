@@ -13,7 +13,7 @@ class Dataset(StrEnum):
     MINUTE_BAR_1M = "minute_bar_1m"
     MINUTE_BAR_5M = "minute_bar_5m"
     SNAPSHOT = "snapshot"
-    CORPORATE_ACTION = "corporate_action"
+    DIVIDEND_EVENT = "dividend_event"
 
 
 class Exchange(StrEnum):
@@ -69,7 +69,7 @@ class AttemptStatus(StrEnum):
 
 
 @dataclass(frozen=True, slots=True)
-class CorporateActionEvent:
+class DividendEvent:
     source_security_code: str
     ex_dividend_date: date
     record_date: date | None

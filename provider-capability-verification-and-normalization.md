@@ -30,7 +30,7 @@ YAML 归一化规则
 
 - Provider、Endpoint、Capability、Evidence、Health、Routing Role 的概念边界；
 - `providers.yaml`、`capabilities.yaml`、`normalization.yaml` 的职责；
-- 日线、分钟、快照、公司行动能力的探针方法；
+- 日线、分钟、快照、分红事件能力的探针方法；
 - 字段、单位、时间、复权和空值语义验证；
 - 能力覆盖矩阵和路由资格判定；
 - Tencent、Sina、TDX、BaoStock、EastMoney、AkShare 的接入边界；
@@ -58,7 +58,7 @@ Tencent.forward_history
 Tencent.bulk_snapshot
 Tencent.native_1m
 Sina.full_history
-EastMoney.corporate_action
+EastMoney.dividend_event
 BaoStock.daily_history
 ```
 
@@ -336,7 +336,7 @@ Tencent.forward_history.etf.XSHG.forward = eligible
 Tencent.forward_history.lof.XSHG.forward = unsupported
 Sina.full_history.stock.BSE.none = eligible
 BaoStock.daily_history.etf.forward = adapter_implemented
-EastMoney.corporate_action.all_market.none = declared
+EastMoney.dividend_event.all_market.none = declared
 ```
 
 ## 6. YAML 归一化规则
@@ -476,7 +476,7 @@ BaoStock 作为 SDK Provider，第一阶段优先实现历史日线、5m、Secur
 
 ### 8.5 EastMoney
 
-EastMoney 的公司行动能力与行情能力独立管理。公司行动优先实现批量分红实施查询、补偿窗口和业务键去重；行情接口不可用不自动禁用公司行动能力。
+EastMoney 的分红事件能力与行情能力独立管理。当前优先实现批量分红实施查询、补偿窗口和业务键去重；行情接口不可用不自动禁用分红事件能力。实时行情、全市场列表、历史日线、快照、板块、资金流、财务、股东户数和龙虎榜均是独立数据域，不能由分红事件适配器代替。
 
 ### 8.6 AkShare
 
@@ -553,10 +553,10 @@ Raw / Canonical / Metadata 可追溯测试
 尚未完成：
 
 - BaoStock 正式 SDK Provider；
-- EastMoney 公司行动 Provider；
+- EastMoney 分红事件 Provider；
 - AkShare 函数级 Provider 的完整依赖、字段、单位和探针矩阵验证；
 - 全量能力覆盖矩阵自动生成；
 - Probe Evidence 对所有生产路由的动态资格绑定；
 - 所有来源的完整 YAML 字段映射、单位和时间语义规则；
-- 公司行动触发的前复权历史变化确认；
+- 分红事件触发的前复权历史变化确认；
 - 人工历史重建和候选版本统一切换。

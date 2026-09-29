@@ -16,6 +16,7 @@
 | Worker | `src/stock_data_manage/worker/` | 调度、执行记录、恢复和离线验收 |
 
 配置文件仍位于仓库根目录的 `config/`，包括 `providers.yaml`、`capabilities.yaml`、`normalization.yaml` 和数据集配置；命令行入口仍位于 `src/stock_data_manage/cli.py`。
+EastMoney 各数据域的范围和实现状态见 `eastmoney-data-domain-coverage.md`，不以单个分红事件 Endpoint 代表整个来源。
 
 Provider 的离线契约、实时探针和路由资格记录见仓库根目录的 `PROVIDER_CAPABILITY_MATRIX.md`。该文档是渠道验证事实记录，不是运行时配置。
 能力采集、证据生命周期和 YAML 归一化规则见 `provider-capability-verification-and-normalization.md`；它是 Provider 接入和后续验证的专项设计。
@@ -47,7 +48,7 @@ Provider 的离线契约、实时探针和路由资格记录见仓库根目录�
 | `providers/baostock/daily.py` | BaoStock 历史日线，初始角色为校验来源 |
 | `providers/baostock/minute.py` | BaoStock 原生 5m，初始角色为校验来源 |
 | `providers/baostock/__init__.py` | BaoStock 适配器导出 |
-| `providers/eastmoney/corporate_action.py` | EastMoney 分红实施公司行动批量查询和事件标准化 |
+| `providers/eastmoney/dividend.py` | EastMoney 分红实施事件批量查询和分红事件标准化 |
 | `providers/eastmoney/__init__.py` | EastMoney 适配器导出 |
 | `providers/akshare/session.py` | AkShare 可选依赖加载和代码转换 |
 | `providers/akshare/daily.py` | AkShare 股票、ETF、LOF、指数函数级历史日线 |
@@ -137,5 +138,5 @@ Provider 的离线契约、实时探针和路由资格记录见仓库根目录�
 - 旧的根级模块路径已经删除，不保留兼容转发模块。
 - 新功能必须进入对应设计模块，不能在包根目录继续增加散落模块。
 - 目录调整只改变模块归属和导入路径，不改变现有业务行为。
-- 前复权、公司行动和历史重建应在现有 `pipeline`、`providers`、`routing`、`quality`、`storage` 边界内继续实现，不另起一套架构。
+- 前复权、分红事件和历史重建应在现有 `pipeline`、`providers`、`routing`、`quality`、`storage` 边界内继续实现，不另起一套架构。
 - `tmp_test/` 仅保留探针和研究脚本，不作为正式运行时模块入口。

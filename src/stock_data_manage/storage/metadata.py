@@ -11,7 +11,7 @@ import duckdb
 
 from ..providers.probes import ProbeEvidence
 from ..quality.resolution import Conflict
-from ..domain import AttemptStatus, CorporateActionEvent, ItemStatus
+from ..domain import AttemptStatus, DividendEvent, ItemStatus
 from ..worker.attempts import CollectionAttempt
 from .integrity import Manifest, row_hash
 
@@ -163,7 +163,7 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
                 updated_at TIMESTAMPTZ NOT NULL,
                 PRIMARY KEY (instrument_id, trade_date, interval_minutes, adjustment)
             );
-            CREATE TABLE IF NOT EXISTS corporate_action_event (
+            CREATE TABLE IF NOT EXISTS dividend_event (
                 source_security_code VARCHAR NOT NULL,
                 ex_dividend_date DATE NOT NULL,
                 record_date DATE,
@@ -191,11 +191,11 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
         ):
             self.connection.execute(statement)
 
-    def save_corporate_action_events(self, events: list[CorporateActionEvent]) -> int:
+    def save_dividend_events(self, events: list[DividendEvent]) -> int:
         for event in events:
             self.connection.execute(
                 """
-                INSERT INTO corporate_action_event VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO dividend_event VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT (source_security_code, ex_dividend_date) DO UPDATE SET
                     record_date=excluded.record_date,
                     pretax_bonus_rmb=excluded.pretax_bonus_rmb,
@@ -218,7 +218,7 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
             )
         return len(events)
 
-    def corporate_action_events(
+    def dividend_events(
         self, *, start_date: date | None = None, end_date: date | None = None
     ) -> list[dict[str, object]]:
         clauses = []
@@ -231,7 +231,7 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
             params.append(end_date)
         where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
         cursor = self.connection.execute(
-            f"SELECT * FROM corporate_action_event {where} ORDER BY ex_dividend_date, source_security_code",
+            f"SELECT * FROM dividend_event {where} ORDER BY ex_dividend_date, source_security_code",
             params,
         )
         return [dict(zip([column[0] for column in cursor.description], row)) for row in cursor.fetchall()]

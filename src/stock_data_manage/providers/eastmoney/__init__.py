@@ -1,5 +1,5 @@
 """EastMoney low-frequency adapters."""
 
-from .corporate_action import EastMoneyCorporateActionProvider, CorporateActionFetchResult
+from .dividend import EastMoneyDividendProvider, DividendFetchResult
 
-__all__ = ["CorporateActionFetchResult", "EastMoneyCorporateActionProvider"]
+__all__ = ["DividendFetchResult", "EastMoneyDividendProvider"]

@@ -57,10 +57,10 @@ capabilities:
         priority: 30
         adjustments: [none]
         role: validation_only
-  corporate_action:
+  dividend_event:
     routes:
       - provider: eastmoney
-        endpoint: corporate_action
+        endpoint: dividend_event
         priority: 10
         adjustments: [none]
         role: discovery
