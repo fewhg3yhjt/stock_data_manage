@@ -121,6 +121,26 @@ providers:
         capability_version: eastmoney-stock-fund-flow-v1
         max_symbols_per_request: 1
         request_interval_seconds: 1
+      financial_main:
+        enabled: false
+        role: validation_only
+        datasets: [financial_main]
+        adjustments: [none]
+        asset_types: [stock]
+        exchanges: [XSHG, XSHE, BSE]
+        capability_version: eastmoney-financial-main-v1
+        max_symbols_per_request: 1
+        request_interval_seconds: 1
+      shareholder_count:
+        enabled: false
+        role: validation_only
+        datasets: [shareholder_count]
+        adjustments: [none]
+        asset_types: [stock]
+        exchanges: [XSHG, XSHE, BSE]
+        capability_version: eastmoney-shareholder-count-v1
+        max_symbols_per_request: 1
+        request_interval_seconds: 1
       dividend_event:
         enabled: false
         role: discovery

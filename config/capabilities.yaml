@@ -97,3 +97,17 @@ capabilities:
         priority: 20
         adjustments: [none]
         role: validation_only
+  financial_main:
+    routes:
+      - provider: eastmoney
+        endpoint: financial_main
+        priority: 20
+        adjustments: [none]
+        role: validation_only
+  shareholder_count:
+    routes:
+      - provider: eastmoney
+        endpoint: shareholder_count
+        priority: 20
+        adjustments: [none]
+        role: validation_only

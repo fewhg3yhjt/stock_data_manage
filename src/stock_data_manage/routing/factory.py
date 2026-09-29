@@ -16,6 +16,8 @@ from ..providers.eastmoney import (
     EastMoneyRealtimeQuoteProvider,
     EastMoneySecurityListProvider,
     EastMoneyStockFundFlowProvider,
+    EastMoneyFinancialMainProvider,
+    EastMoneyShareholderCountProvider,
 )
 from ..providers.eastmoney.realtime import EastMoneyRequestsTransport
 from ..providers.akshare import AkShareDailyProvider
@@ -79,6 +81,10 @@ def build_provider(config: ProviderConfig, transport: HttpTransport | None = Non
         )
     if config.provider == "eastmoney" and config.endpoint == "stock_fund_flow":
         return EastMoneyStockFundFlowProvider(capability_version=config.capability_version)
+    if config.provider == "eastmoney" and config.endpoint == "financial_main":
+        return EastMoneyFinancialMainProvider(capability_version=config.capability_version)
+    if config.provider == "eastmoney" and config.endpoint == "shareholder_count":
+        return EastMoneyShareholderCountProvider(capability_version=config.capability_version)
     if config.provider == "akshare" and config.endpoint in {
         "stock_daily", "etf_daily", "lof_daily", "index_daily"
     }:
@@ -128,7 +134,7 @@ def load_provider_registry(
             except ValueError:
                 # Configured but unimplemented providers remain explicitly unavailable.
                 continue
-        elif config.endpoint in {"dividend_event", "security_list", "single_quote", "batch_quote", "intraday_trend", "stock_fund_flow"}:
+        elif config.endpoint in {"dividend_event", "security_list", "single_quote", "batch_quote", "intraday_trend", "stock_fund_flow", "financial_main", "shareholder_count"}:
             try:
                 providers.append(build_provider(config))
             except ValueError:

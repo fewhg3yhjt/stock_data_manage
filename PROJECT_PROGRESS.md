@@ -37,7 +37,7 @@ Phase 1 基础链路完成
 | Sina | 普通日线、快照、5m | 部分 Live Probe 通过 | 候选/校验 |
 | TDX | 注入式延迟 1m | 无真实客户端 Probe | disabled |
 | BaoStock | 历史日线、5m | 日线样本通过，5m 空返回 | validation_only |
-| EastMoney | 分红事件、证券列表、实时行情、个股资金流开发中 | 分红 HTTP 200/空窗口；证券列表和实时行情当前网络断连 | disabled/validation_only |
+| EastMoney | 分红事件、证券列表、实时行情、个股资金流、财务主指标、股东户数 | 分红 HTTP 200/空窗口；证券列表/实时行情/资金流当前网络断连；财务主指标和股东户数单股票样本通过 | disabled/validation_only |
 | AkShare | 股票、ETF、LOF、指数历史日线 | 代表样本 Live Probe 通过 | validation_only |
 
 ## 当前已完成的 EastMoney 数据域
@@ -107,8 +107,8 @@ Phase 1 基础链路完成
 当前按以下顺序逐项覆盖来源数据域：
 
 1. EastMoney 个股资金流；
-2. EastMoney 财务主指标；
-3. EastMoney 股东户数；
+2. EastMoney 财务主指标和股东户数扩大样本验证；
+3. EastMoney 完整财务报表；
 4. EastMoney 行业板块和概念板块；
 5. EastMoney 龙虎榜；
 6. EastMoney 历史日线；

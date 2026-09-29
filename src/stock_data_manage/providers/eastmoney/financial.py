@@ -1,0 +1,114 @@
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Any, Mapping, Sequence
+
+from ..contracts import EndpointContract, FailureClass, ProviderContractError
+from .realtime import EastMoneyRequestsTransport
+
+
+@dataclass(frozen=True, slots=True)
+class FinancialMainRecord:
+    symbol: str
+    report_date: str
+    notice_date: str | None
+    report_type: str | None
+    currency: str | None
+    eps: float | None
+    bps: float | None
+    operating_revenue: float | None
+    parent_net_profit: float | None
+    roe: float | None
+    operating_cash_flow: float | None
+
+
+@dataclass(frozen=True, slots=True)
+class FinancialMainFetchResult:
+    records: tuple[FinancialMainRecord, ...]
+    requested_symbols: tuple[str, ...]
+    response_status: int
+
+
+@dataclass(slots=True)
+class EastMoneyFinancialMainProvider:
+    transport: Any | None = None
+    endpoint: str = "financial_main"
+    name: str = "eastmoney"
+    capability_version: str = "eastmoney-financial-main-v1"
+    timeout_seconds: float = 20.0
+    page_size: int = 8
+    url: str = "https://datacenter-web.eastmoney.com/api/data/v1/get"
+
+    def __post_init__(self) -> None:
+        if self.transport is None:
+            self.transport = EastMoneyRequestsTransport()
+
+    def fetch(self, symbols: Sequence[str]) -> FinancialMainFetchResult:
+        requested = tuple(symbols)
+        records: list[FinancialMainRecord] = []
+        status = 200
+        for symbol in requested:
+            secucode = _secucode(symbol)
+            response = self.transport.get(
+                self.url,
+                params={
+                    "reportName": "RPT_F10_FINANCE_MAINFINADATA",
+                    "columns": "ALL",
+                    "filter": f'(SECUCODE="{secucode}")',
+                    "pageNumber": "1",
+                    "pageSize": str(self.page_size),
+                    "sortColumns": "REPORT_DATE",
+                    "sortTypes": "-1",
+                    "source": "HSF10",
+                    "client": "PC",
+                },
+                timeout_seconds=self.timeout_seconds,
+            )
+            status = response.status_code
+            payload = EndpointContract(frozenset()).parse_json(response)
+            rows = _rows(payload)
+            for row in rows:
+                records.append(FinancialMainRecord(
+                    symbol=symbol,
+                    report_date=_text(row, "REPORT_DATE") or "",
+                    notice_date=_text(row, "NOTICE_DATE"),
+                    report_type=_text(row, "REPORT_TYPE"),
+                    currency=_text(row, "CURRENCY"),
+                    eps=_number(row, "EPSJB"), bps=_number(row, "BPS"),
+                    operating_revenue=_number(row, "TOTALOPERATEREVE"),
+                    parent_net_profit=_number(row, "PARENTNETPROFIT"),
+                    roe=_number(row, "ROEJQ"), operating_cash_flow=_number(row, "MGJYXJJE"),
+                ))
+        return FinancialMainFetchResult(tuple(records), requested, status)
+
+
+def _rows(payload: object) -> list[Mapping[str, Any]]:
+    if not isinstance(payload, dict):
+        raise ProviderContractError("EastMoney financial response envelope changed", FailureClass.SCHEMA_CHANGED, retryable=False)
+    result = payload.get("result")
+    rows = result.get("data") if isinstance(result, dict) else None
+    if not isinstance(rows, list):
+        raise ProviderContractError("EastMoney financial rows changed", FailureClass.SCHEMA_CHANGED, retryable=False)
+    return [row for row in rows if isinstance(row, dict)]
+
+
+def _secucode(symbol: str) -> str:
+    text = str(symbol).lower()
+    if len(text) < 8 or text[:2] not in {"sh", "sz", "bj"}:
+        raise ValueError(f"EastMoney requires exchange-prefixed symbol: {symbol}")
+    return f"{text[2:]}.{text[:2].upper()}"
+
+
+def _text(row: Mapping[str, Any], name: str) -> str | None:
+    value = row.get(name)
+    return None if value in (None, "") else str(value)
+
+
+def _number(row: Mapping[str, Any], name: str) -> float | None:
+    value = row.get(name)
+    if value in (None, ""):
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None

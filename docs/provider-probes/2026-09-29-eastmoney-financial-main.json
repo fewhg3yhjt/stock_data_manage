@@ -1,0 +1,15 @@
+{
+  "provider": "eastmoney",
+  "dataset": "financial_main",
+  "endpoint": "financial_main",
+  "capability_version": "eastmoney-financial-main-v1",
+  "validated_at": "2026-09-29T15:05:00+08:00",
+  "validation_expires_at": "2026-10-06T15:05:00+08:00",
+  "status": "complete",
+  "eligible_for_selection": false,
+  "routing_role": "validation_only",
+  "request_scope": ["sh600519"],
+  "response_status": 200,
+  "row_count": 8,
+  "sample": {"report_date": "2026-06-30", "report_type": "中报", "eps": 35.57, "bps": 200.989754763617, "parent_net_profit": 44516880421.86, "roe": 16.75}
+}

@@ -17,6 +17,8 @@ class Dataset(StrEnum):
     REALTIME_QUOTE = "realtime_quote"
     INTRADAY_TREND = "intraday_trend"
     STOCK_FUND_FLOW = "stock_fund_flow"
+    FINANCIAL_MAIN = "financial_main"
+    SHAREHOLDER_COUNT = "shareholder_count"
 
 
 class Exchange(StrEnum):

@@ -31,6 +31,8 @@
 | EastMoney | `security_list` | `security_master` | `providers/eastmoney/security_list.py` | 通过 | RemoteDisconnected | 分页和股票/ETF/LOF/指数映射已实现；当前网络未取得响应 | 保持 validation_only/disabled，不进入正式路由 |
 | EastMoney | `single_quote` / `batch_quote` / `intraday_trend` | `realtime_quote` / `intraday_trend` | `providers/eastmoney/realtime.py` | 通过 | 原脚本曾通过；正式迁移后当前复测 RemoteDisconnected | 行为已对齐原脚本的 Session、请求头、Referer、重试、Host 降级和业务判断；当前运行环境仍未取得新证据 | 保持 validation_only/disabled，不进入正式路由 |
 | EastMoney | `stock_fund_flow` | `stock_fund_flow` | `providers/eastmoney/fund_flow.py` | 通过 | 原脚本曾通过；正式迁移后当前复测 RemoteDisconnected | 个股日级资金流字段映射已实现，当前运行环境未取得新证据 | 保持 validation_only/disabled，不进入正式路由 |
+| EastMoney | `financial_main` | `financial_main` | `providers/eastmoney/financial.py` | 通过 | 通过 | 单股票返回 8 个报告期，财务主指标字段可解析 | 保持 validation_only，待更宽资产/报告期覆盖 |
+| EastMoney | `shareholder_count` | `shareholder_count` | `providers/eastmoney/shareholder.py` | 通过 | 通过 | 单股票返回 10 个报告期，股东户数和变动字段可解析 | 保持 validation_only，待更宽资产/报告期覆盖 |
 | AkShare | `stock_daily` / `etf_daily` / `lof_daily` / `index_daily` | `daily_bar` | `providers/akshare/daily.py` | 通过 | 通过 | AkShare 1.18.97；股票、ETF、LOF、指数代表样本均可返回目标日期，历史首尾范围已记录 | 保持 `validation_only`，待更完整字段/单位/复权矩阵验证 |
 
 ## 配置或设计中但尚未形成正式适配器
@@ -71,6 +73,8 @@
 - `docs/provider-probes/2026-09-29-eastmoney-security-list.json`
 - `docs/provider-probes/2026-09-29-eastmoney-realtime-quote.json`
 - `docs/provider-probes/2026-09-29-eastmoney-stock-fund-flow.json`
+- `docs/provider-probes/2026-09-29-eastmoney-financial-main.json`
+- `docs/provider-probes/2026-09-29-eastmoney-shareholder-count.json`
 - `docs/provider-probes/2026-09-29-akshare-daily.json`
 - `docs/provider-probes/2026-09-29-akshare-daily-live.json`
 - 完整本地运行目录：`/tmp/opencode/provider-probes/`

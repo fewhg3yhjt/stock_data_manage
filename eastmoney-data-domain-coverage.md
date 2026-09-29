@@ -13,8 +13,8 @@
 | 行业板块 | `industry_board` | 只有临时探针 | 待验证 | 行业列表、行业行情、行业历史独立能力 |
 | 概念板块 | `concept_board` | 只有临时探针 | 待验证 | 概念列表、概念行情、概念历史独立能力 |
 | 资金流 | `stock_fund_flow` 等 | 个股资金流正式适配器已实现；当前正式探针 RemoteDisconnected | validation_only | 个股、行业、概念、主力资金等按 Endpoint 拆分 |
-| 财务数据 | `financial_statement` | 未实现正式适配器 | validation_only 候选 | 资产负债表、利润表、现金流量表和指标分开定义 |
-| 股东户数 | `shareholder_count` | 未实现正式适配器 | validation_only 候选 | 按报告期和公告日期记录，不能与实时行情混用 |
+| 财务数据 | `financial_main` / `financial_statement` | 财务主指标正式适配器已实现；完整报表未实现 | validation_only | 资产负债表、利润表、现金流量表和指标分开定义 |
+| 股东户数 | `shareholder_count` | 正式适配器已实现；单股票样本已通过 | validation_only | 按报告期和公告日期记录，不能与实时行情混用 |
 | 龙虎榜 | `longhubang` | 未实现正式适配器 | validation_only 候选 | 上榜日期、证券、营业部和买卖金额独立建模 |
 | 分红实施 | `dividend_event` | 已有正式适配器 | discovery，当前禁用 | `RPT_SHAREBONUS_DET`，用于缩小前复权历史检查范围 |
 
@@ -51,7 +51,7 @@ providers/eastmoney/dividend.py
 
 当前还已有 `realtime.py` 适配器，覆盖单证券行情、批量行情和 5 日分时走势；已按已验证脚本迁移 Session、请求头、Referer、重试退避、Host 降级和业务有效性判断。本次正式复测仍返回 `RemoteDisconnected`，保持 `validation_only`。
 
-当前还已有 `fund_flow.py` 适配器，覆盖个股日级资金流；原始脚本曾取得 20 条数据，当前正式复测受 `push2his` 断连影响，保持 `validation_only`。
+当前还已有 `fund_flow.py` 适配器，覆盖个股日级资金流；原始脚本曾取得 20 条数据，当前正式复测受 `push2his` 断连影响，保持 `validation_only`。`financial.py` 和 `shareholder.py` 已覆盖脚本中验证过的财务主指标和股东户数字段，当前单股票探针通过，保持 `validation_only`。
 
 ## 3. 接入原则
 

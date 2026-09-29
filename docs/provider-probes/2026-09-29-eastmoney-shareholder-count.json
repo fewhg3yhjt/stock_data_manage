@@ -1,0 +1,15 @@
+{
+  "provider": "eastmoney",
+  "dataset": "shareholder_count",
+  "endpoint": "shareholder_count",
+  "capability_version": "eastmoney-shareholder-count-v1",
+  "validated_at": "2026-09-29T15:05:00+08:00",
+  "validation_expires_at": "2026-10-06T15:05:00+08:00",
+  "status": "complete",
+  "eligible_for_selection": false,
+  "routing_role": "validation_only",
+  "request_scope": ["sh600519"],
+  "response_status": 200,
+  "row_count": 10,
+  "sample": {"end_date": "2026-06-30", "holder_count": 296404, "previous_holder_count": 243159, "holder_count_change": 53245, "holder_count_change_pct": 21.897194839591, "notice_date": "2026-08-15"}
+}

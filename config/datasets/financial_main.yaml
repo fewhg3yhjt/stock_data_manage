@@ -1,0 +1,19 @@
+dataset:
+  name: financial_main
+  display_name: 财务主指标
+  primary_key: [instrument_id, report_date]
+  allowed_asset_types: [stock]
+  allowed_exchanges: [XSHG, XSHE, BSE]
+
+fields:
+  instrument_id: {type: string, required: true}
+  report_date: {type: date, required: true}
+  notice_date: {type: date, required: false}
+  report_type: {type: string, required: false}
+  currency: {type: string, required: false}
+  eps: {type: decimal, required: false}
+  bps: {type: decimal, required: false}
+  operating_revenue: {type: decimal, unit: CNY, required: false}
+  parent_net_profit: {type: decimal, unit: CNY, required: false}
+  roe: {type: decimal, unit: percent, required: false}
+  operating_cash_flow: {type: decimal, unit: CNY, required: false}
