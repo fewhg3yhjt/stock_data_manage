@@ -13,6 +13,7 @@ class Dataset(StrEnum):
     MINUTE_BAR_1M = "minute_bar_1m"
     MINUTE_BAR_5M = "minute_bar_5m"
     SNAPSHOT = "snapshot"
+    CORPORATE_ACTION = "corporate_action"
 
 
 class Exchange(StrEnum):
@@ -65,6 +66,27 @@ class AttemptStatus(StrEnum):
     CONFIRMED_NO_DATA = "confirmed_no_data"
     CONFLICT = "conflict"
     QUARANTINED = "quarantined"
+
+
+@dataclass(frozen=True, slots=True)
+class CorporateActionEvent:
+    source_security_code: str
+    ex_dividend_date: date
+    record_date: date | None
+    pretax_bonus_rmb: Decimal | None
+    bonus_ratio: Decimal | None
+    transfer_ratio: Decimal | None
+    assignment_progress: str | None
+    notice_date: date | None
+    source_provider: str
+    endpoint: str
+    capability_version: str
+    raw_object_path: str
+    fetch_time: datetime
+
+    @property
+    def key(self) -> tuple[str, date]:
+        return (self.source_security_code, self.ex_dividend_date)
 
 
 @dataclass(frozen=True, slots=True)

@@ -11,7 +11,7 @@ import duckdb
 
 from ..providers.probes import ProbeEvidence
 from ..quality.resolution import Conflict
-from ..domain import AttemptStatus, ItemStatus
+from ..domain import AttemptStatus, CorporateActionEvent, ItemStatus
 from ..worker.attempts import CollectionAttempt
 from .integrity import Manifest, row_hash
 
@@ -163,6 +163,22 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
                 updated_at TIMESTAMPTZ NOT NULL,
                 PRIMARY KEY (instrument_id, trade_date, interval_minutes, adjustment)
             );
+            CREATE TABLE IF NOT EXISTS corporate_action_event (
+                source_security_code VARCHAR NOT NULL,
+                ex_dividend_date DATE NOT NULL,
+                record_date DATE,
+                pretax_bonus_rmb DECIMAL(38, 12),
+                bonus_ratio DECIMAL(38, 12),
+                transfer_ratio DECIMAL(38, 12),
+                assignment_progress VARCHAR,
+                notice_date DATE,
+                source_provider VARCHAR NOT NULL,
+                endpoint VARCHAR NOT NULL,
+                capability_version VARCHAR NOT NULL,
+                raw_object_path VARCHAR NOT NULL,
+                fetch_time TIMESTAMPTZ NOT NULL,
+                PRIMARY KEY (source_security_code, ex_dividend_date)
+            );
             """
         )
         for statement in (
@@ -174,6 +190,51 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
             "ALTER TABLE capability_registry ADD COLUMN IF NOT EXISTS adjustment VARCHAR DEFAULT 'none'",
         ):
             self.connection.execute(statement)
+
+    def save_corporate_action_events(self, events: list[CorporateActionEvent]) -> int:
+        for event in events:
+            self.connection.execute(
+                """
+                INSERT INTO corporate_action_event VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT (source_security_code, ex_dividend_date) DO UPDATE SET
+                    record_date=excluded.record_date,
+                    pretax_bonus_rmb=excluded.pretax_bonus_rmb,
+                    bonus_ratio=excluded.bonus_ratio,
+                    transfer_ratio=excluded.transfer_ratio,
+                    assignment_progress=excluded.assignment_progress,
+                    notice_date=excluded.notice_date,
+                    source_provider=excluded.source_provider,
+                    endpoint=excluded.endpoint,
+                    capability_version=excluded.capability_version,
+                    raw_object_path=excluded.raw_object_path,
+                    fetch_time=excluded.fetch_time
+                """,
+                [
+                    event.source_security_code, event.ex_dividend_date, event.record_date,
+                    event.pretax_bonus_rmb, event.bonus_ratio, event.transfer_ratio,
+                    event.assignment_progress, event.notice_date, event.source_provider,
+                    event.endpoint, event.capability_version, event.raw_object_path, event.fetch_time,
+                ],
+            )
+        return len(events)
+
+    def corporate_action_events(
+        self, *, start_date: date | None = None, end_date: date | None = None
+    ) -> list[dict[str, object]]:
+        clauses = []
+        params: list[object] = []
+        if start_date is not None:
+            clauses.append("ex_dividend_date >= ?")
+            params.append(start_date)
+        if end_date is not None:
+            clauses.append("ex_dividend_date <= ?")
+            params.append(end_date)
+        where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+        cursor = self.connection.execute(
+            f"SELECT * FROM corporate_action_event {where} ORDER BY ex_dividend_date, source_security_code",
+            params,
+        )
+        return [dict(zip([column[0] for column in cursor.description], row)) for row in cursor.fetchall()]
 
     def save_attempt(self, attempt: CollectionAttempt, *, updated_at: datetime | None = None) -> None:
         now = updated_at or datetime.now(timezone.utc)

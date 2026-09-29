@@ -1,0 +1,160 @@
+from __future__ import annotations
+
+import json
+from dataclasses import dataclass
+from datetime import date, datetime
+from decimal import Decimal, InvalidOperation
+from typing import Any, Mapping
+from urllib.parse import quote
+
+from ...domain import CorporateActionEvent
+from ..contracts import EndpointContract, FailureClass, ProviderContractError
+from ..transport import HttpTransport
+
+
+@dataclass(frozen=True, slots=True)
+class CorporateActionFetchResult:
+    events: tuple[CorporateActionEvent, ...]
+    request_start: date
+    request_end: date
+    response_status: int
+    raw_payload: Mapping[str, Any]
+    page_count: int
+
+
+@dataclass(slots=True)
+class EastMoneyCorporateActionProvider:
+    transport: HttpTransport
+    name: str = "eastmoney"
+    endpoint: str = "corporate_action"
+    capability_version: str = "eastmoney-corporate-action-v1"
+    timeout_seconds: float = 20.0
+    page_size: int = 100
+    url: str = "https://datacenter-web.eastmoney.com/api/data/v1/get"
+    report_name: str = "RPT_SHAREBONUS_DET"
+
+    def fetch_events(
+        self,
+        start_date: date,
+        end_date: date,
+        *,
+        fetch_time: datetime,
+        raw_object_path: str = "",
+    ) -> CorporateActionFetchResult:
+        if end_date < start_date:
+            raise ValueError("corporate action end_date cannot precede start_date")
+        events: dict[tuple[str, date], CorporateActionEvent] = {}
+        page = 1
+        last_payload: Mapping[str, Any] = {}
+        response_status = 200
+        while True:
+            response = self.transport.get(
+                self.url,
+                params=self._params(start_date, end_date, page),
+                timeout_seconds=self.timeout_seconds,
+            )
+            response_status = response.status_code
+            payload = EndpointContract(frozenset()).parse_json(response)
+            if not isinstance(payload, dict):
+                raise ProviderContractError(
+                    "EastMoney corporate action response envelope changed",
+                    FailureClass.SCHEMA_CHANGED,
+                    retryable=False,
+                )
+            last_payload = payload
+            data = payload.get("result") or {}
+            rows = data.get("data") or []
+            if not isinstance(rows, list):
+                raise ProviderContractError(
+                    "EastMoney corporate action rows changed",
+                    FailureClass.SCHEMA_CHANGED,
+                    retryable=False,
+                )
+            for row in rows:
+                if not isinstance(row, dict):
+                    continue
+                event = self._event(row, fetch_time=fetch_time, raw_object_path=raw_object_path)
+                if event is not None:
+                    events[event.key] = event
+            total = int(data.get("count") or len(events))
+            if not rows or len(events) >= total or len(rows) < self.page_size:
+                break
+            page += 1
+        return CorporateActionFetchResult(
+            tuple(sorted(events.values(), key=lambda item: item.key)),
+            start_date,
+            end_date,
+            response_status,
+            last_payload,
+            page,
+        )
+
+    def _params(self, start_date: date, end_date: date, page: int) -> dict[str, str]:
+        filter_expression = (
+            f"(EX_DIVIDEND_DATE ge '{start_date.isoformat()}')"
+            f"(EX_DIVIDEND_DATE le '{end_date.isoformat()}')"
+        )
+        return {
+            "reportName": self.report_name,
+            "columns": "ALL",
+            "filter": quote(filter_expression, safe="()'"),
+            "pageNumber": str(page),
+            "pageSize": str(self.page_size),
+            "sortColumns": "EX_DIVIDEND_DATE",
+            "sortTypes": "-1",
+        }
+
+    def _event(
+        self,
+        row: Mapping[str, Any],
+        *,
+        fetch_time: datetime,
+        raw_object_path: str,
+    ) -> CorporateActionEvent | None:
+        code = _text(row, "SECURITY_CODE", "SECUCODE", "SECURITYCODE")
+        ex_date = _date(row, "EX_DIVIDEND_DATE", "EXDIVIDENDDATE")
+        if not code or ex_date is None:
+            return None
+        return CorporateActionEvent(
+            source_security_code=code,
+            ex_dividend_date=ex_date,
+            record_date=_date(row, "EQUITY_RECORD_DATE", "EQUITYRECORDDATE"),
+            pretax_bonus_rmb=_decimal(row, "PRETAX_BONUS_RMB", "PRETAXBONUSRMB"),
+            bonus_ratio=_decimal(row, "BONUS_RATIO", "BONUSRATIO"),
+            transfer_ratio=_decimal(row, "IT_RATIO", "ITRATIO"),
+            assignment_progress=_text(row, "ASSIGN_PROGRESS", "ASSIGNPROGRESS"),
+            notice_date=_date(row, "NOTICE_DATE", "NOTICEDATE"),
+            source_provider=self.name,
+            endpoint=self.endpoint,
+            capability_version=self.capability_version,
+            raw_object_path=raw_object_path,
+            fetch_time=fetch_time,
+        )
+
+
+def _text(row: Mapping[str, Any], *names: str) -> str | None:
+    for name in names:
+        value = row.get(name)
+        if value not in (None, ""):
+            return str(value)
+    return None
+
+
+def _date(row: Mapping[str, Any], *names: str) -> date | None:
+    value = _text(row, *names)
+    if not value:
+        return None
+    try:
+        return date.fromisoformat(value[:10].replace("/", "-"))
+    except ValueError:
+        return None
+
+
+def _decimal(row: Mapping[str, Any], *names: str) -> Decimal | None:
+    value = _text(row, *names)
+    if not value:
+        return None
+    try:
+        return Decimal(value.replace(",", ""))
+    except InvalidOperation:
+        return None

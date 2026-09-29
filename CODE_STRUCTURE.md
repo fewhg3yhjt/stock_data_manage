@@ -47,6 +47,8 @@ Provider 的离线契约、实时探针和路由资格记录见仓库根目录�
 | `providers/baostock/daily.py` | BaoStock 历史日线，初始角色为校验来源 |
 | `providers/baostock/minute.py` | BaoStock 原生 5m，初始角色为校验来源 |
 | `providers/baostock/__init__.py` | BaoStock 适配器导出 |
+| `providers/eastmoney/corporate_action.py` | EastMoney 分红实施公司行动批量查询和事件标准化 |
+| `providers/eastmoney/__init__.py` | EastMoney 适配器导出 |
 | `providers/tencent/__init__.py` | Tencent 适配器导出 |
 | `providers/sina/__init__.py` | Sina 适配器导出 |
 | `providers/tdx/__init__.py` | TDX 适配器导出 |

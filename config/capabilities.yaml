@@ -37,3 +37,10 @@ capabilities:
         priority: 30
         adjustments: [none]
         role: validation_only
+  corporate_action:
+    routes:
+      - provider: eastmoney
+        endpoint: corporate_action
+        priority: 10
+        adjustments: [none]
+        role: discovery

@@ -72,6 +72,17 @@ providers:
     disabled_reason: unstable_in_current_network
     require_capability_probe_before_enable: true
     allowed_low_frequency_capabilities: [security_master]
+    endpoints:
+      corporate_action:
+        enabled: false
+        role: discovery
+        datasets: [corporate_action]
+        adjustments: [none]
+        asset_types: [stock, etf, lof]
+        exchanges: [XSHG, XSHE, BSE]
+        capability_version: eastmoney-corporate-action-v1
+        request_interval_seconds: 3
+        page_size: 100
   baostock:
     enabled: true
     default_role: validation_only

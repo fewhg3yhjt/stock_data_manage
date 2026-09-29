@@ -64,6 +64,16 @@ rules:
     volume_semantics: share
     version: baostock-minute-5m-stock-v1
 
+  - provider: eastmoney
+    endpoint: corporate_action
+    exchange: XSHG
+    asset_type: stock
+    frequency: null
+    adjustment: none
+    volume_multiplier: "1"
+    amount_multiplier: "1"
+    version: eastmoney-corporate-action-v1
+
 # Production rules are intentionally not guessed. Each provider/endpoint/market/
 # asset/frequency combination is added only after a unit-semantics probe records
 # its evidence and validation expiry.

@@ -27,6 +27,7 @@
 | TDX | `delayed_1m` | `minute_bar_1m` | `providers/tdx/minute.py` | 通过 | 未执行 | 适配器要求外部 TDX 客户端注入；当前没有真实客户端探针 | 保持禁用，不进入正式路由 |
 | BaoStock | `daily_history` | `daily_bar` | `providers/baostock/daily.py` | 通过 | 通过 | SDK 日线；本次返回 6077 行，2001-08-27 至 2026-09-11；成交量按股、成交额按元 | 保持 `validation_only`，待资产矩阵和归一化规则扩展 |
 | BaoStock | `minute_5m` | `minute_bar_5m` | `providers/baostock/minute.py` | 通过 | 空返回 | 本次沪市股票 5m 返回空 | 保持 `validation_only` 且当前不可选 |
+| EastMoney | `corporate_action` | `corporate_action` | `providers/eastmoney/corporate_action.py` | 通过 | HTTP 200/空窗口 | `RPT_SHAREBONUS_DET` 响应可解析；2026-09-24 至 2026-09-29 返回 0 事件 | 保持 disabled/discovery，待更宽窗口和字段语义验证 |
 
 ## 配置或设计中但尚未形成正式适配器
 
@@ -62,6 +63,7 @@
 - `docs/provider-probes/2026-09-29-tencent-minute.json`
 - `docs/provider-probes/2026-09-29-baostock-daily.json`
 - `docs/provider-probes/2026-09-29-baostock-minute-5m.json`
+- `docs/provider-probes/2026-09-29-eastmoney-corporate-action.json`
 - 完整本地运行目录：`/tmp/opencode/provider-probes/`
 
 每份证据包含 Provider、Endpoint、能力版本、验证时间、有效期、请求范围、HTTP 状态、返回窗口、字段语义、单位、证据哈希和路由资格。
@@ -73,7 +75,7 @@
 3. Tencent/Sina 不复权日线和 Tencent QFQ 日线本次都达到返回上限，不能直接用于一只证券的完整历史重建。
 4. Tencent 和 Sina 的成交量单位存在差异，已经进入探针证据；日线成交量和成交额单位仍需针对历史接口分别完成语义验证，当前不能标记为已确认。
 5. 分钟探针现在会按 `as_of` 过滤未来记录，并记录来源单位；本次只验证了沪市股票，分钟的全市场、北交所、ETF、LOF 和指数覆盖仍需代表矩阵验证。
-6. BaoStock 已有正式 SDK 适配器，但当前仅历史日线小样本通过，保持 `validation_only`；5m 本次空返回。EastMoney 和 AkShare 仍无正式适配器，不能因为配置或临时脚本存在而进入正式路由。
+6. BaoStock 已有正式 SDK 适配器，但当前仅历史日线小样本通过，保持 `validation_only`；5m 本次空返回。EastMoney 公司行动适配器已实现并完成 HTTP 200/空窗口探针，但尚未具备正式发现资格；AkShare 仍无正式适配器。
 
 ## 后续资格门槛
 
