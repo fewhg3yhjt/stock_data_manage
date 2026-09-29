@@ -49,7 +49,7 @@ providers/eastmoney/dividend.py
 
 当前另有正式的 `security_list` 适配器，用于分页读取股票、ETF、LOF 和指数清单；由于当前网络 Live Probe 返回 `RemoteDisconnected`，它暂不具备正式路由资格。
 
-当前还已有 `realtime.py` 适配器，覆盖单证券行情、批量行情和 5 日分时走势；本次正式探针均返回 `RemoteDisconnected`，保持 `validation_only`。
+当前还已有 `realtime.py` 适配器，覆盖单证券行情、批量行情和 5 日分时走势；已按已验证脚本迁移 Session、请求头、Referer、重试退避、Host 降级和业务有效性判断。本次正式复测仍返回 `RemoteDisconnected`，保持 `validation_only`。
 
 ## 3. 接入原则
 

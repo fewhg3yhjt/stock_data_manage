@@ -1,6 +1,6 @@
 import json
 
-from stock_data_manage.providers.eastmoney.realtime import EastMoneyRealtimeQuoteProvider
+from stock_data_manage.providers.eastmoney.realtime import EastMoneyRealtimeQuoteProvider, EastMoneyRequestsTransport
 from stock_data_manage.providers.contracts import HttpResponse
 
 
@@ -41,3 +41,48 @@ def test_intraday_trend_maps_csv_rows():
     result = provider.fetch_trends(["sh600519"])
     assert len(result.records) == 1
     assert result.records[0].price == 1236.42
+
+
+def test_eastmoney_requests_transport_matches_probe_session(monkeypatch):
+    captured = {}
+
+    class FakeSession:
+        def __init__(self):
+            self.trust_env = True
+            self.headers = {}
+
+        def mount(self, scheme, adapter):
+            captured.setdefault("mounts", []).append((scheme, adapter))
+
+        def get(self, url, *, params, timeout):
+            captured["url"] = url
+            captured["params"] = params
+            captured["timeout"] = timeout
+            return type("Response", (), {"status_code": 200, "headers": {"Content-Type": "application/json"}, "content": b'{"data": {}}'})()
+
+    monkeypatch.setattr("stock_data_manage.providers.eastmoney.realtime.requests.Session", FakeSession)
+    transport = EastMoneyRequestsTransport()
+    transport.get("https://push2.eastmoney.com/api/qt/stock/get", params={"secid": "1.600519"}, timeout_seconds=12)
+    assert transport.session.trust_env is False
+    assert "Mozilla/5.0" in transport.session.headers["User-Agent"]
+    assert transport.session.headers["Referer"] == "https://quote.eastmoney.com/"
+    assert captured["timeout"] == (5, 12)
+
+
+def test_realtime_provider_falls_back_to_next_host_on_empty_business_data():
+    class CandidateTransport:
+        def __init__(self):
+            self.urls = []
+
+        def get(self, url, *, params, timeout_seconds):
+            self.urls.append(url)
+            body = b'{"data": {}}' if "push2.eastmoney.com" in url else b'{"data": {"f57": "600519", "f13": 1, "f43": 10}}'
+            return type("Response", (), {"status_code": 200, "headers": {}, "body": body, "text": body.decode()})()
+
+    transport = CandidateTransport()
+    result = EastMoneyRealtimeQuoteProvider(transport, endpoint="single_quote").fetch_quotes(["sh600519"])
+    assert len(result.records) == 1
+    assert transport.urls == [
+        "https://push2.eastmoney.com/api/qt/stock/get",
+        "https://push2delay.eastmoney.com/api/qt/stock/get",
+    ]

@@ -19,6 +19,11 @@
 ## Provider Verification
 
 - A provider adapter existing in code is not evidence that the provider is production-ready.
+- User-provided runnable probes, scripts, or adapters with observed successful results are source behavior contracts.
+- Migrating a verified script into a formal Provider must preserve request parameters, headers, Referer, Session behavior, proxy handling, retries, backoff, host fallback, response parsing, and business-validity checks.
+- Do not replace a verified script's transport layer merely to reuse a project abstraction without discussing it with the user and proving behavioral equivalence.
+- Before labeling a source unavailable, compare the original script and formal Provider request/response behavior; a migration mismatch is an implementation defect, not source evidence.
+- Keep an explicit original-vs-Provider comparison for request URL, parameters, headers, status, field set, row count, returned window, and failure classification.
 - Validate providers in four layers: offline Provider Contract fixtures, small live probes, semantic verification, and end-to-end data production verification.
 - Live probes must use a small symbol set and must not write production data directories.
 - Persist probe evidence with provider, endpoint, request scope, response status, returned window, field semantics, units, capability version, validation time, expiry, and routing eligibility.

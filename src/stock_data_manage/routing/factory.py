@@ -16,6 +16,7 @@ from ..providers.eastmoney import (
     EastMoneyRealtimeQuoteProvider,
     EastMoneySecurityListProvider,
 )
+from ..providers.eastmoney.realtime import EastMoneyRequestsTransport
 from ..providers.akshare import AkShareDailyProvider
 from .capabilities import CapabilityRegistry
 
@@ -71,7 +72,7 @@ def build_provider(config: ProviderConfig, transport: HttpTransport | None = Non
         )
     if config.provider == "eastmoney" and config.endpoint in {"single_quote", "batch_quote", "intraday_trend"}:
         return EastMoneyRealtimeQuoteProvider(
-            transport,
+            EastMoneyRequestsTransport(),
             endpoint=config.endpoint,
             capability_version=config.capability_version,
         )

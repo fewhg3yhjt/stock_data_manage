@@ -2,10 +2,47 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Mapping, Sequence
+from typing import Any, Mapping, Protocol, Sequence
+
+import json
+import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 from ..contracts import EndpointContract, FailureClass, ProviderContractError
-from ..transport import HttpTransport
+from ..contracts import HttpResponse
+
+
+class EastMoneyTransport(Protocol):
+    def get(self, url: str, *, params: Mapping[str, str], timeout_seconds: float) -> HttpResponse: ...
+
+
+class EastMoneyRequestsTransport:
+    """Transport matching the verified EastMoney probe session behavior."""
+
+    def __init__(self) -> None:
+        self.session = requests.Session()
+        self.session.trust_env = False
+        self.session.headers.update({
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/153.0.0.0 Safari/537.36"
+            ),
+            "Referer": "https://quote.eastmoney.com/",
+            "Accept": "application/json,text/plain,*/*",
+        })
+        retry = Retry(
+            total=2, connect=2, read=2, status=2, backoff_factor=0.6,
+            status_forcelist=(429, 500, 502, 503, 504),
+            allowed_methods=frozenset(["GET"]), raise_on_status=False,
+        )
+        adapter = HTTPAdapter(max_retries=retry, pool_connections=10, pool_maxsize=10)
+        self.session.mount("https://", adapter)
+
+    def get(self, url: str, *, params: Mapping[str, str], timeout_seconds: float) -> HttpResponse:
+        response = self.session.get(url, params=params, timeout=(5, timeout_seconds))
+        return HttpResponse(response.status_code, dict(response.headers), response.content)
 
 
 @dataclass(frozen=True, slots=True)
@@ -58,7 +95,7 @@ class IntradayTrendFetchResult:
 
 @dataclass(slots=True)
 class EastMoneyRealtimeQuoteProvider:
-    transport: HttpTransport
+    transport: EastMoneyTransport | None = None
     endpoint: str = "single_quote"
     name: str = "eastmoney"
     capability_version: str = "eastmoney-realtime-quote-v1"
@@ -67,6 +104,13 @@ class EastMoneyRealtimeQuoteProvider:
     batch_url: str = "https://push2.eastmoney.com/api/qt/ulist.np/get"
     trends_url: str = "https://push2.eastmoney.com/api/qt/stock/trends2/get"
     ut: str = "fa5fd1943c7b386f172d6893dbbd1d0c"
+    push2: str = "https://push2.eastmoney.com"
+    push2_delay: str = "https://push2delay.eastmoney.com"
+    push2_his: str = "https://push2his.eastmoney.com"
+
+    def __post_init__(self) -> None:
+        if self.transport is None:
+            self.transport = EastMoneyRequestsTransport()
 
     def fetch_quotes(self, symbols: Sequence[str]) -> RealtimeQuoteFetchResult:
         requested = tuple(symbols)
@@ -74,7 +118,9 @@ class EastMoneyRealtimeQuoteProvider:
             records: list[RealtimeQuoteRecord] = []
             statuses: list[int] = []
             for symbol in requested:
-                response = self._get(self.single_url, {"secid": _secid(symbol), "fields": _quote_fields(), "fltt": "2", "invt": "2", "ut": self.ut})
+                response = self._first_valid(
+                    [(f"{host}/api/qt/stock/get", {"secid": _secid(symbol), "fields": _quote_fields(), "fltt": "2", "invt": "2", "ut": self.ut}) for host in (self.push2, self.push2_delay)]
+                )
                 statuses.append(response.status_code)
                 data = _json_data(response)
                 if not isinstance(data, dict) or not data:
@@ -84,11 +130,8 @@ class EastMoneyRealtimeQuoteProvider:
                     records.append(record)
             return RealtimeQuoteFetchResult(tuple(records), requested, statuses[0] if statuses else 200)
         if self.endpoint == "batch_quote":
-            response = self._get(self.batch_url, {
-                "secids": ",".join(_secid(symbol) for symbol in requested),
-                "fields": "f2,f3,f4,f12,f13,f14",
-                "fltt": "2", "invt": "2", "ut": self.ut,
-            })
+            params = {"secids": ",".join(_secid(symbol) for symbol in requested), "fields": "f2,f3,f4,f12,f13,f14", "fltt": "2", "invt": "2", "ut": self.ut}
+            response = self._first_valid([(f"{host}/api/qt/ulist.np/get", params) for host in (self.push2, self.push2_delay)])
             data = _json_data(response)
             rows = data.get("diff") if isinstance(data, dict) else None
             if rows is None:
@@ -103,11 +146,12 @@ class EastMoneyRealtimeQuoteProvider:
         records: list[IntradayTrendRecord] = []
         status = 200
         for symbol in requested:
-            response = self._get(self.trends_url, {
+            params = {
                 "secid": _secid(symbol), "ndays": str(days), "iscr": "0",
                 "fields1": "f1,f2,f3,f4,f5,f6",
                 "fields2": "f51,f52,f53,f54,f55,f56,f57,f58", "ut": self.ut,
-            })
+            }
+            response = self._first_valid([(f"{host}/api/qt/stock/trends2/get", params) for host in (self.push2, self.push2_delay, self.push2_his)])
             status = response.status_code
             data = _json_data(response)
             rows = data.get("trends") if isinstance(data, dict) else None
@@ -129,9 +173,28 @@ class EastMoneyRealtimeQuoteProvider:
         return IntradayTrendFetchResult(tuple(records), requested, status)
 
     def _get(self, url: str, params: Mapping[str, str]):
+        assert self.transport is not None
         response = self.transport.get(url, params=params, timeout_seconds=self.timeout_seconds)
         EndpointContract(frozenset()).parse_json(response)
         return response
+
+    def _first_valid(self, candidates):
+        errors = []
+        for url, params in candidates:
+            try:
+                response = self._get(url, params)
+                payload = json.loads(response.text)
+                data = payload.get("data") if isinstance(payload, dict) else None
+                if isinstance(data, dict) and data:
+                    return response
+                errors.append(f"{url}: business data empty")
+            except Exception as exc:
+                errors.append(f"{url}: {type(exc).__name__}: {exc}")
+        raise ProviderContractError(
+            "EastMoney realtime candidates failed: " + " | ".join(errors),
+            FailureClass.CONNECTION,
+            retryable=True,
+        )
 
 
 def _secid(symbol: str) -> str:
