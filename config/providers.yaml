@@ -73,6 +73,16 @@ providers:
     require_capability_probe_before_enable: true
     allowed_low_frequency_capabilities: [security_master]
     endpoints:
+      security_list:
+        enabled: false
+        role: validation_only
+        datasets: [security_master]
+        adjustments: [none]
+        asset_types: [stock, etf, lof, index]
+        exchanges: [XSHG, XSHE, BSE]
+        capability_version: eastmoney-security-list-v1
+        max_symbols_per_request: 100
+        request_interval_seconds: 3
       dividend_event:
         enabled: false
         role: discovery

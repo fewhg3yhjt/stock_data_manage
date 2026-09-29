@@ -1,0 +1,13 @@
+{
+  "provider": "eastmoney",
+  "endpoint": "security_list",
+  "capability_version": "eastmoney-security-list-v1",
+  "validated_at": "2026-09-29T03:55:00+00:00",
+  "validation_expires_at": "2026-10-06T03:55:00+00:00",
+  "status": "failed",
+  "eligible_for_selection": false,
+  "routing_role": "validation_only",
+  "request_scope": {"filters": ["ETF market groups"], "page_size": 100, "max_pages": 1},
+  "failure_class": "connection",
+  "message": "RemoteDisconnected: Remote end closed connection without response"
+}

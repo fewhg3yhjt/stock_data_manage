@@ -64,3 +64,10 @@ capabilities:
         priority: 10
         adjustments: [none]
         role: discovery
+  security_master:
+    routes:
+      - provider: eastmoney
+        endpoint: security_list
+        priority: 20
+        adjustments: [none]
+        role: validation_only
