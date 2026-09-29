@@ -1,0 +1,20 @@
+dataset: intraday_trend
+
+rules:
+  - id: eastmoney-intraday-trend-v1
+    provider: eastmoney
+    endpoint: intraday_trend
+    exchange: XSHG
+    asset_type: stock
+    frequency: 1
+    adjustment: none
+    field_mapping:
+      bar_time: f51
+      price: f52
+      average_price: f58
+      high: f53
+      low: f54
+      volume: f55
+      amount: f56
+    status: pending_validation
+    version: eastmoney-intraday-trend-v1

@@ -14,6 +14,8 @@ class Dataset(StrEnum):
     MINUTE_BAR_5M = "minute_bar_5m"
     SNAPSHOT = "snapshot"
     DIVIDEND_EVENT = "dividend_event"
+    REALTIME_QUOTE = "realtime_quote"
+    INTRADAY_TREND = "intraday_trend"
 
 
 class Exchange(StrEnum):

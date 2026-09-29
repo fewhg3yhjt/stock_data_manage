@@ -83,6 +83,34 @@ providers:
         capability_version: eastmoney-security-list-v1
         max_symbols_per_request: 100
         request_interval_seconds: 3
+      single_quote:
+        enabled: false
+        role: validation_only
+        datasets: [realtime_quote]
+        adjustments: [none]
+        asset_types: [stock, etf, lof, index]
+        exchanges: [XSHG, XSHE, BSE]
+        capability_version: eastmoney-realtime-quote-v1
+        request_interval_seconds: 1
+      batch_quote:
+        enabled: false
+        role: validation_only
+        datasets: [realtime_quote]
+        adjustments: [none]
+        asset_types: [stock, etf, lof, index]
+        exchanges: [XSHG, XSHE, BSE]
+        capability_version: eastmoney-batch-quote-v1
+        max_symbols_per_request: 100
+        request_interval_seconds: 1
+      intraday_trend:
+        enabled: false
+        role: validation_only
+        datasets: [intraday_trend]
+        adjustments: [none]
+        asset_types: [stock, etf, lof, index]
+        exchanges: [XSHG, XSHE, BSE]
+        capability_version: eastmoney-intraday-trend-v1
+        request_interval_seconds: 1
       dividend_event:
         enabled: false
         role: discovery

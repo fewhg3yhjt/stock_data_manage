@@ -1,0 +1,16 @@
+dataset:
+  name: intraday_trend
+  display_name: 日内分时走势
+  primary_key: [instrument_id, bar_time]
+  allowed_asset_types: [stock, etf, lof, index]
+  allowed_exchanges: [XSHG, XSHE, BSE]
+
+fields:
+  instrument_id: {type: string, required: true}
+  bar_time: {type: datetime, timezone: Asia/Shanghai, required: true}
+  price: {type: decimal, unit: CNY, required: false}
+  average_price: {type: decimal, unit: CNY, required: false}
+  high: {type: decimal, unit: CNY, required: false}
+  low: {type: decimal, unit: CNY, required: false}
+  volume: {type: decimal, unit: share, required: false}
+  amount: {type: decimal, unit: CNY, required: false}

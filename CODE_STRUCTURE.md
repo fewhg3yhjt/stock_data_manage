@@ -50,6 +50,7 @@ Provider 的离线契约、实时探针和路由资格记录见仓库根目录�
 | `providers/baostock/__init__.py` | BaoStock 适配器导出 |
 | `providers/eastmoney/dividend.py` | EastMoney 分红实施事件批量查询和分红事件标准化 |
 | `providers/eastmoney/security_list.py` | EastMoney 分页证券列表、市场和资产类型映射 |
+| `providers/eastmoney/realtime.py` | EastMoney 单证券行情、批量行情和 5 日分时走势 |
 | `providers/eastmoney/__init__.py` | EastMoney 适配器导出 |
 | `providers/akshare/session.py` | AkShare 可选依赖加载和代码转换 |
 | `providers/akshare/daily.py` | AkShare 股票、ETF、LOF、指数函数级历史日线 |

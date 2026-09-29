@@ -71,3 +71,22 @@ capabilities:
         priority: 20
         adjustments: [none]
         role: validation_only
+  realtime_quote:
+    routes:
+      - provider: eastmoney
+        endpoint: single_quote
+        priority: 20
+        adjustments: [none]
+        role: validation_only
+      - provider: eastmoney
+        endpoint: batch_quote
+        priority: 30
+        adjustments: [none]
+        role: validation_only
+  intraday_trend:
+    routes:
+      - provider: eastmoney
+        endpoint: intraday_trend
+        priority: 20
+        adjustments: [none]
+        role: validation_only

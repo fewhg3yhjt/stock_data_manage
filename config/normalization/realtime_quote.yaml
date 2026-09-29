@@ -1,0 +1,27 @@
+dataset: realtime_quote
+
+rules:
+  - id: eastmoney-realtime-quote-v1
+    provider: eastmoney
+    endpoint: single_quote
+    exchange: XSHG
+    asset_type: stock
+    frequency: null
+    adjustment: none
+    field_mapping:
+      price: f43
+      change_pct: f170
+      change_amount: f169
+      open: f46
+      high: f44
+      low: f45
+      pre_close: f60
+      volume: f47
+      amount: f48
+      total_market_cap: f116
+      float_market_cap: f117
+      pe_dynamic: f162
+      pb: f167
+      turnover_rate: f168
+    status: pending_validation
+    version: eastmoney-realtime-quote-v1

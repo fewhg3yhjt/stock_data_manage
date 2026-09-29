@@ -6,7 +6,7 @@
 
 | 数据域 | 目标 Endpoint | 当前状态 | 初始角色 | 说明 |
 |---|---|---|---|---|
-| 实时行情 | `realtime_quote` | 未实现正式适配器 | 待探针 | 面向证券实时价格、涨跌、成交量、成交额等 |
+| 实时行情 | `realtime_quote` | 正式适配器已实现；当前正式探针 RemoteDisconnected | validation_only | 面向证券实时价格、涨跌、成交量、成交额等 |
 | 全市场证券列表 | `security_list` | 正式适配器已实现；本次 Live Probe RemoteDisconnected | validation_only | 股票、ETF、LOF、指数及板块清单分开建模 |
 | 历史日线 | `daily_history` | 只有临时探针 | 待验证 | 股票、ETF、指数、板块分别验证，不默认前复权 |
 | 收盘快照 | `bulk_snapshot` | 只有临时探针/旧研究链路 | 待验证 | 只能形成 provisional 数据，不能代替历史日线 |
@@ -48,6 +48,8 @@ providers/eastmoney/dividend.py
 - EastMoney 龙虎榜。
 
 当前另有正式的 `security_list` 适配器，用于分页读取股票、ETF、LOF 和指数清单；由于当前网络 Live Probe 返回 `RemoteDisconnected`，它暂不具备正式路由资格。
+
+当前还已有 `realtime.py` 适配器，覆盖单证券行情、批量行情和 5 日分时走势；本次正式探针均返回 `RemoteDisconnected`，保持 `validation_only`。
 
 ## 3. 接入原则
 

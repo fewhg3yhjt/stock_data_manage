@@ -11,7 +11,11 @@ from ..providers.tencent import TencentDailyProvider, TencentMinuteProvider, Ten
 from ..providers.transport import HttpTransport, UrlLibTransport
 from ..providers.tdx import TdxMinuteProvider
 from ..providers.baostock import BaoStockDailyProvider, BaoStockMinuteProvider
-from ..providers.eastmoney import EastMoneyDividendProvider, EastMoneySecurityListProvider
+from ..providers.eastmoney import (
+    EastMoneyDividendProvider,
+    EastMoneyRealtimeQuoteProvider,
+    EastMoneySecurityListProvider,
+)
 from ..providers.akshare import AkShareDailyProvider
 from .capabilities import CapabilityRegistry
 
@@ -65,6 +69,12 @@ def build_provider(config: ProviderConfig, transport: HttpTransport | None = Non
             capability_version=config.capability_version,
             page_size=config.max_symbols_per_request,
         )
+    if config.provider == "eastmoney" and config.endpoint in {"single_quote", "batch_quote", "intraday_trend"}:
+        return EastMoneyRealtimeQuoteProvider(
+            transport,
+            endpoint=config.endpoint,
+            capability_version=config.capability_version,
+        )
     if config.provider == "akshare" and config.endpoint in {
         "stock_daily", "etf_daily", "lof_daily", "index_daily"
     }:
@@ -114,7 +124,7 @@ def load_provider_registry(
             except ValueError:
                 # Configured but unimplemented providers remain explicitly unavailable.
                 continue
-        elif config.endpoint in {"dividend_event", "security_list"}:
+        elif config.endpoint in {"dividend_event", "security_list", "single_quote", "batch_quote", "intraday_trend"}:
             try:
                 providers.append(build_provider(config))
             except ValueError:

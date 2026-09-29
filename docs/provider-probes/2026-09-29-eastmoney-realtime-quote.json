@@ -1,0 +1,17 @@
+{
+  "provider": "eastmoney",
+  "dataset": "realtime_quote",
+  "endpoints": ["single_quote", "batch_quote", "intraday_trend"],
+  "capability_version": "eastmoney-realtime-quote-v1",
+  "validated_at": "2026-09-29T14:46:27+08:00",
+  "validation_expires_at": "2026-10-06T14:46:27+08:00",
+  "status": "failed_network",
+  "eligible_for_selection": false,
+  "samples": ["sh600519", "sh000001", "sz399001", "sz399006"],
+  "results": [
+    {"endpoint": "single_quote", "status": "failed", "failure_class": "connection", "message": "RemoteDisconnected"},
+    {"endpoint": "batch_quote", "status": "failed", "failure_class": "connection", "message": "RemoteDisconnected"},
+    {"endpoint": "intraday_trend", "status": "failed", "failure_class": "connection", "message": "RemoteDisconnected"}
+  ],
+  "notes": "The supplied probe previously observed HTTP 200 business data on push2 for these domains; the formal adapter probe from the current runtime network failed, so routing remains disabled."
+}
