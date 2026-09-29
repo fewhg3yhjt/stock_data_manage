@@ -1,0 +1,17 @@
+{
+  "provider": "akshare",
+  "endpoint_group": "daily_history",
+  "capability_version": "akshare-daily-v1",
+  "validated_at": "2026-09-29T03:45:00+00:00",
+  "validation_expires_at": "2026-10-06T03:45:00+00:00",
+  "status": "complete",
+  "eligible_for_selection": false,
+  "routing_role": "validation_only",
+  "samples": [
+    {"asset_type": "stock", "symbol": "sh600519", "row_count": 1, "first_key": "2001-08-27", "last_key": "2026-09-11"},
+    {"asset_type": "etf", "symbol": "sh510300", "row_count": 1, "first_key": "2012-05-28", "last_key": "2026-09-11"},
+    {"asset_type": "lof", "symbol": "sh501018", "row_count": 1, "first_key": "2016-06-28", "last_key": "2026-09-11"},
+    {"asset_type": "index", "symbol": "sh000001", "row_count": 1, "first_key": "1990-12-19", "last_key": "2026-09-29"}
+  ],
+  "notes": "AkShare 1.18.97 in project .venv; samples returned the requested 2026-09-11 row. This is coverage evidence only, not formal primary-route approval."
+}

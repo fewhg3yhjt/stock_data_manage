@@ -89,4 +89,4 @@ python -m pip install -e .
 python -m pytest
 ```
 
-当前实现已覆盖 Phase 1 的离线核心链路与 Provider 契约适配；Tencent、Sina、BaoStock、EastMoney 公司行动、AkShare 日线适配器已按来源拆分，Endpoint 静态配置位于 `config/providers.yaml`，能力路线位于 `config/capabilities.yaml`，标准化规则位于 `config/normalization.yaml`。Tencent、Sina、BaoStock、EastMoney 的小流量探针已形成证据，AkShare 因当前环境缺少可选依赖未执行真实探针；前复权完整历史来源、TDX 真实客户端、EastMoney 公司行动完整覆盖仍未完成。未验证或未实现的来源不会自动进入生产候选。
+当前实现已覆盖 Phase 1 的离线核心链路与 Provider 契约适配；Tencent、Sina、BaoStock、EastMoney 公司行动、AkShare 日线适配器已按来源拆分，Endpoint 静态配置位于 `config/providers.yaml`，能力路线位于 `config/capabilities.yaml`，标准化规则位于 `config/normalization.yaml`。AkShare 是可选依赖，建议使用 `python -m pip install -e .[akshare]` 安装；当前股票、ETF、LOF、指数代表样本已完成真实探针，但仍保持 `validation_only`。前复权完整历史来源、TDX 真实客户端、EastMoney 公司行动完整覆盖仍未完成。未验证或未实现的来源不会自动进入生产候选。

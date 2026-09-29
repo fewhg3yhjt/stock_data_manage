@@ -11,11 +11,15 @@ dependencies = [
     "duckdb>=1.5",
     "pyarrow>=18.0",
     "PyYAML>=6.0",
+    "pytz>=2024.1",
 ]
 
 [project.optional-dependencies]
 test = [
     "pytest>=8.0",
+]
+akshare = [
+    "akshare>=1.18",
 ]
 
 [project.scripts]
