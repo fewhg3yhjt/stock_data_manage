@@ -19,6 +19,8 @@ class Dataset(StrEnum):
     STOCK_FUND_FLOW = "stock_fund_flow"
     FINANCIAL_MAIN = "financial_main"
     SHAREHOLDER_COUNT = "shareholder_count"
+    INDUSTRY_BOARD = "industry_board"
+    CONCEPT_BOARD = "concept_board"
 
 
 class Exchange(StrEnum):

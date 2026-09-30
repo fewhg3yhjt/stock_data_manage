@@ -222,3 +222,23 @@ providers:
         capability_version: akshare-index-daily-v1
         max_symbols_per_request: 1
         request_interval_seconds: 1
+  ths:
+    enabled: true
+    default_role: validation_only
+    endpoints:
+      industry_board:
+        enabled: true
+        role: validation_only
+        datasets: [industry_board]
+        adjustments: [none]
+        asset_types: [stock]
+        capability_version: ths-industry-members-v1
+        request_interval_seconds: 3
+      concept_board:
+        enabled: true
+        role: validation_only
+        datasets: [concept_board]
+        adjustments: [none]
+        asset_types: [stock]
+        capability_version: ths-concept-members-v1
+        request_interval_seconds: 3

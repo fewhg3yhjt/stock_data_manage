@@ -91,4 +91,4 @@ python -m pip install -e .
 python -m pytest
 ```
 
-当前实现已覆盖 Phase 1 的离线核心链路与 Provider 契约适配；Tencent、Sina、BaoStock、EastMoney 分红事件/证券列表/实时行情、AkShare 日线适配器已按来源拆分。数据集标准定义位于 `config/datasets/`，数据集专用归一化规则位于 `config/normalization/`，Endpoint 静态配置位于 `config/providers.yaml`，能力路线位于 `config/capabilities.yaml`。AkShare 是可选依赖，建议使用 `python -m pip install -e .[akshare]` 安装；当前股票、ETF、LOF、指数代表样本已完成真实探针，但仍保持 `validation_only`。EastMoney 实时行情和证券列表本次正式探针为 `RemoteDisconnected`，前复权完整历史来源、TDX 真实客户端、EastMoney 分红事件/证券列表/实时行情完整覆盖仍未完成。未验证或未实现的来源不会自动进入生产候选。
+当前实现已覆盖 Phase 1 的离线核心链路与 Provider 契约适配；Tencent、Sina、BaoStock、THS、EastMoney 分红事件/证券列表/实时行情、AkShare 日线适配器已按来源拆分。数据集标准定义位于 `config/datasets/`，数据集专用归一化规则位于 `config/normalization/`，Endpoint 静态配置位于 `config/providers.yaml`，能力路线位于 `config/capabilities.yaml`。AkShare 是可选依赖，建议使用 `python -m pip install -e .[akshare]` 安装；当前股票、ETF、LOF、指数代表样本和 THS 行业/概念代表板块已完成真实探针，但仍保持 `validation_only`。EastMoney 实时行情和证券列表本次正式探针为 `RemoteDisconnected`，前复权完整历史来源、TDX 真实客户端、EastMoney 分红事件/证券列表/实时行情完整覆盖仍未完成。未验证或未实现的来源不会自动进入生产候选。

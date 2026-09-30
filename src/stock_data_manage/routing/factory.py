@@ -21,6 +21,7 @@ from ..providers.eastmoney import (
 )
 from ..providers.eastmoney.realtime import EastMoneyRequestsTransport
 from ..providers.akshare import AkShareDailyProvider
+from ..providers.ths import ThsBoardProvider
 from .capabilities import CapabilityRegistry
 
 
@@ -99,6 +100,8 @@ def build_provider(config: ProviderConfig, transport: HttpTransport | None = Non
             adjustment=next(iter(config.adjustments), Adjustment.NONE),
             capability_version=config.capability_version,
         )
+    if config.provider == "ths" and config.endpoint in {"industry_board", "concept_board"}:
+        return ThsBoardProvider(capability_version=config.capability_version)
     raise ValueError(f"no provider factory for {config.provider}.{config.endpoint}")
 
 
@@ -134,7 +137,7 @@ def load_provider_registry(
             except ValueError:
                 # Configured but unimplemented providers remain explicitly unavailable.
                 continue
-        elif config.endpoint in {"dividend_event", "security_list", "single_quote", "batch_quote", "intraday_trend", "stock_fund_flow", "financial_main", "shareholder_count"}:
+        elif config.endpoint in {"dividend_event", "security_list", "single_quote", "batch_quote", "intraday_trend", "stock_fund_flow", "financial_main", "shareholder_count", "industry_board", "concept_board"}:
             try:
                 providers.append(build_provider(config))
             except ValueError:

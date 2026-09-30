@@ -12,6 +12,7 @@
 | 收盘快照 | `bulk_snapshot` | 只有临时探针/旧研究链路 | 待验证 | 只能形成 provisional 数据，不能代替历史日线 |
 | 行业板块 | `industry_board` | 只有临时探针 | 待验证 | 行业列表、行业行情、行业历史独立能力 |
 | 概念板块 | `concept_board` | 只有临时探针 | 待验证 | 概念列表、概念行情、概念历史独立能力 |
+| 同花顺行业/概念板块成分 | `ths.industry_board` / `ths.concept_board` | 正式适配器已实现；代表板块探针通过 | validation_only | 通过 qstock 已验证的同花顺网页行为迁移，不引入 qstock 运行时依赖 |
 | 资金流 | `stock_fund_flow` 等 | 个股资金流正式适配器已实现；当前正式探针 RemoteDisconnected | validation_only | 个股、行业、概念、主力资金等按 Endpoint 拆分 |
 | 财务数据 | `financial_main` / `financial_statement` | 财务主指标正式适配器已实现；完整报表未实现 | validation_only | 资产负债表、利润表、现金流量表和指标分开定义 |
 | 股东户数 | `shareholder_count` | 正式适配器已实现；单股票样本已通过 | validation_only | 按报告期和公告日期记录，不能与实时行情混用 |

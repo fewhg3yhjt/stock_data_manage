@@ -34,6 +34,7 @@
 | EastMoney | `financial_main` | `financial_main` | `providers/eastmoney/financial.py` | 通过 | 通过 | 单股票返回 8 个报告期，财务主指标字段可解析 | 保持 validation_only，待更宽资产/报告期覆盖 |
 | EastMoney | `shareholder_count` | `shareholder_count` | `providers/eastmoney/shareholder.py` | 通过 | 通过 | 单股票返回 10 个报告期，股东户数和变动字段可解析 | 保持 validation_only，待更宽资产/报告期覆盖 |
 | AkShare | `stock_daily` / `etf_daily` / `lof_daily` / `index_daily` | `daily_bar` | `providers/akshare/daily.py` | 通过 | 通过 | AkShare 1.18.97；股票、ETF、LOF、指数代表样本均可返回目标日期，历史首尾范围已记录 | 保持 `validation_only`，待更完整字段/单位/复权矩阵验证 |
+| THS | `industry_board` / `concept_board` | `industry_board` / `concept_board` | `providers/ths/boards.py` | 通过 | 通过 | 同花顺网页代表板块行业 20 行、概念 10 行；代码/名称字段可解析 | 保持 validation_only，待板块列表、分页和全量覆盖验证 |
 
 ## 配置或设计中但尚未形成正式适配器
 
@@ -78,6 +79,7 @@
 - `docs/provider-probes/2026-09-29-eastmoney-shareholder-count.json`
 - `docs/provider-probes/2026-09-29-akshare-daily.json`
 - `docs/provider-probes/2026-09-29-akshare-daily-live.json`
+- `docs/provider-probes/2026-09-30-ths-board-members.json`
 - 完整本地运行目录：`/tmp/opencode/provider-probes/`
 
 每份证据包含 Provider、Endpoint、能力版本、验证时间、有效期、请求范围、HTTP 状态、返回窗口、字段语义、单位、证据哈希和路由资格。

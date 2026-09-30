@@ -111,3 +111,17 @@ capabilities:
         priority: 20
         adjustments: [none]
         role: validation_only
+  industry_board:
+    routes:
+      - provider: ths
+        endpoint: industry_board
+        priority: 20
+        adjustments: [none]
+        role: validation_only
+  concept_board:
+    routes:
+      - provider: ths
+        endpoint: concept_board
+        priority: 20
+        adjustments: [none]
+        role: validation_only
