@@ -31,3 +31,22 @@ def test_ths_board_provider_rejects_unknown_board_type():
         assert "unsupported" in str(exc)
     else:
         raise AssertionError("unknown board type should be rejected")
+
+
+def test_ths_board_provider_enforces_configured_request_interval(monkeypatch):
+    table = pd.DataFrame([{"序号": 1, "代码": 2913, "名称": "奥士康"}])
+    monkeypatch.setattr(pd, "read_html", lambda source: [table])
+    monkeypatch.setattr(
+        "stock_data_manage.providers.ths.boards.requests.get",
+        lambda *args, **kwargs: FakeResponse(),
+    )
+    now = iter((0.0, 0.0, 1.0, 4.0))
+    sleeps = []
+    provider = ThsBoardProvider(
+        request_interval_seconds=3,
+        clock=lambda: next(now),
+        sleep=sleeps.append,
+    )
+    provider.fetch_members("industry", "881270")
+    provider.fetch_members("industry", "881270")
+    assert sleeps == [2.0]

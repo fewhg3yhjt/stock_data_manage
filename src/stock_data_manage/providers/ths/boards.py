@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from io import StringIO
-from typing import Any, Mapping
+from typing import Any, Callable, Mapping
 
 import pandas as pd
 import requests
+import time
 
 from ..contracts import FailureClass, ProviderContractError
 
@@ -26,13 +27,18 @@ class ThsBoardProvider:
     endpoint: str = "board_members"
     capability_version: str = "ths-board-members-v1"
     timeout_seconds: float = 20.0
+    request_interval_seconds: float = 3.0
     user_agent: str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/153 Safari/537.36"
     referer: str = "http://q.10jqka.com.cn/"
+    clock: Callable[[], float] = field(default=time.monotonic, repr=False)
+    sleep: Callable[[float], None] = field(default=time.sleep, repr=False)
+    _last_request_at: float | None = field(default=None, init=False, repr=False)
 
     def fetch_members(self, board_type: str, board_code: str) -> ThsBoardSnapshot:
         normalized_type = _board_type(board_type)
         prefix = "thshy" if normalized_type == "industry" else "gn"
         url = f"https://q.10jqka.com.cn/{prefix}/detail/code/{board_code}/"
+        self._wait_before_request()
         response = requests.get(
             url,
             headers={"User-Agent": self.user_agent, "Referer": self.referer},
@@ -82,6 +88,14 @@ class ThsBoardProvider:
             response.status_code,
             response.url,
         )
+
+    def _wait_before_request(self) -> None:
+        now = self.clock()
+        if self._last_request_at is not None:
+            remaining = self.request_interval_seconds - (now - self._last_request_at)
+            if remaining > 0:
+                self.sleep(remaining)
+        self._last_request_at = self.clock()
 
 
 def _board_type(value: str) -> str:

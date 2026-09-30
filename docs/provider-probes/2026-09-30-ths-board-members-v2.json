@@ -1,0 +1,16 @@
+{
+  "provider": "ths",
+  "endpoint": "board_members",
+  "capability_version": "ths-board-members-v1",
+  "validated_at": "2026-09-30T18:10:00+08:00",
+  "validation_expires_at": "2026-10-07T18:10:00+08:00",
+  "status": "complete",
+  "eligible_for_selection": false,
+  "routing_role": "validation_only",
+  "minimum_interval_seconds": 3,
+  "samples": [
+    {"board_type": "industry", "board_code": "881270", "http_status": 200, "row_count": 20, "sample_codes": ["002913", "920641", "603228"]},
+    {"board_type": "concept", "board_code": "301558", "http_status": 200, "row_count": 10, "sample_codes": ["301218", "300413", "301017"]}
+  ],
+  "notes": "Provider enforces the configured request_interval_seconds internally; no full-board concurrent crawl was executed."
+}

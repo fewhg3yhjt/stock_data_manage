@@ -101,7 +101,10 @@ def build_provider(config: ProviderConfig, transport: HttpTransport | None = Non
             capability_version=config.capability_version,
         )
     if config.provider == "ths" and config.endpoint in {"industry_board", "concept_board"}:
-        return ThsBoardProvider(capability_version=config.capability_version)
+        return ThsBoardProvider(
+            capability_version=config.capability_version,
+            request_interval_seconds=config.request_interval_seconds,
+        )
     raise ValueError(f"no provider factory for {config.provider}.{config.endpoint}")
 
 
