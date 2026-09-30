@@ -44,6 +44,7 @@ class ThsBoardProvider:
     request_interval_seconds: float = 3.0
     user_agent: str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/153 Safari/537.36"
     referer: str = "http://q.10jqka.com.cn/"
+    cookie_v: str | None = None
     clock: Callable[[], float] = field(default=time.monotonic, repr=False)
     sleep: Callable[[float], None] = field(default=time.sleep, repr=False)
     _last_request_at: float | None = field(default=None, init=False, repr=False)
@@ -125,11 +126,21 @@ class ThsBoardProvider:
 
     def _get(self, url: str) -> requests.Response:
         self._wait_before_request()
+        headers = {"User-Agent": self.user_agent, "Referer": self.referer}
+        if self.cookie_v:
+            headers["Cookie"] = f"v={self.cookie_v}"
         response = requests.get(
             url,
-            headers={"User-Agent": self.user_agent, "Referer": self.referer},
+            headers=headers,
             timeout=(8, self.timeout_seconds),
         )
+        if _is_login_redirect(response):
+            raise ProviderContractError(
+                "THS request redirected to login",
+                FailureClass.AUTH_REQUIRED,
+                retryable=False,
+                http_status=response.status_code,
+            )
         if response.status_code >= 400:
             raise ProviderContractError(
                 f"THS board request failed with HTTP {response.status_code}",
@@ -230,3 +241,13 @@ def _page_number(page: int) -> int:
 
 def _page_url(base_url: str, page: int) -> str:
     return base_url if page == 1 else f"{base_url}page/{page}/"
+
+
+def _is_login_redirect(response: requests.Response) -> bool:
+    final_url = str(getattr(response, "url", "")).lower()
+    body = str(getattr(response, "text", "")).lower()
+    return (
+        "/account/login" in final_url
+        or "upass.10jqka.com.cn/login" in body
+        or "location.href" in body and "login" in body
+    )

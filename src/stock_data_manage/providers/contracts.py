@@ -10,6 +10,7 @@ class FailureClass(StrEnum):
     TIMEOUT = "timeout"
     CONNECTION = "connection"
     RATE_LIMITED = "rate_limited"
+    AUTH_REQUIRED = "auth_required"
     HTTP_5XX = "http_5xx"
     HTTP_ERROR = "http_error"
     HTML_RESPONSE = "html_response"

@@ -1,0 +1,28 @@
+{
+  "provider": "ths",
+  "endpoint": "board_list",
+  "capability_version": "ths-board-members-v1",
+  "validated_at": "2026-09-30T20:04:54+08:00",
+  "status": "failed_authentication",
+  "eligible_for_selection": false,
+  "routing_role": "validation_only",
+  "minimum_interval_seconds": 3,
+  "request_variants": [
+    {
+      "url_style": "qstock_field_order_ajax",
+      "cookie_style": "none",
+      "pages": [6, 7],
+      "results": [{"page": 6, "http_status": 401}, {"page": 7, "http_status": 401}]
+    },
+    {
+      "url_style": "qstock_field_order_ajax",
+      "cookie_style": "dynamic_v_cookie",
+      "pages": [6, 7],
+      "results": [
+        {"page": 6, "http_status": 200, "failure_class": "auth_required", "final_url": "https://q.10jqka.com.cn/account/login/"},
+        {"page": 7, "http_status": 200, "failure_class": "auth_required", "final_url": "https://q.10jqka.com.cn/account/login/"}
+      ]
+    }
+  ],
+  "notes": "The qstock-style URL and dynamically generated v cookie were tested with a 3-second interval. Neither variant returned board rows. The current environment still receives authentication redirects; no further requests were issued."
+}

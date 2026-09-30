@@ -1,6 +1,7 @@
 import pandas as pd
 
 from stock_data_manage.providers.ths import ThsBoardProvider
+from stock_data_manage.providers.contracts import FailureClass, ProviderContractError
 from stock_data_manage.storage.raw import RawObjectStore
 
 
@@ -78,6 +79,41 @@ def test_ths_board_provider_parses_board_list_from_main_table(monkeypatch):
         {"board_type": "industry", "board_code": "881121", "board_name": "半导体", "source": "ths"},
         {"board_type": "industry", "board_code": "881273", "board_name": "白酒", "source": "ths"},
     )
+
+
+def test_ths_board_provider_classifies_login_redirect(monkeypatch):
+    response = _response(
+        "https://q.10jqka.com.cn/account/login/",
+        '<script>location.href="//upass.10jqka.com.cn/login?redir=https://q.10jqka.com.cn"</script>',
+    )
+    monkeypatch.setattr(
+        "stock_data_manage.providers.ths.boards.requests.get",
+        lambda *args, **kwargs: response,
+    )
+    try:
+        ThsBoardProvider().fetch_board_list("concept")
+    except ProviderContractError as exc:
+        assert exc.failure_class is FailureClass.AUTH_REQUIRED
+        assert not exc.retryable
+    else:
+        raise AssertionError("login redirect should be classified")
+
+
+def test_ths_board_provider_passes_qstock_cookie(monkeypatch):
+    captured = {}
+
+    def request(url, **kwargs):
+        captured.update(kwargs)
+        return _response(url, '<span class="page_info">1/1</span>')
+
+    monkeypatch.setattr("stock_data_manage.providers.ths.boards.requests.get", request)
+    provider = ThsBoardProvider(cookie_v="cookie-value")
+    try:
+        provider.fetch_board_list("concept")
+    except ProviderContractError:
+        # The fixture has no board rows; only the request headers are under test.
+        pass
+    assert captured["headers"]["Cookie"] == "v=cookie-value"
 
 
 def test_ths_board_provider_fetches_and_deduplicates_member_pages(monkeypatch):
