@@ -79,6 +79,7 @@ def test_provider_factory_does_not_build_disabled_eastmoney_dividend_provider() 
     assert not any(isinstance(item, EastMoneyFinancialMainProvider) for item in providers)
     assert not any(isinstance(item, EastMoneyShareholderCountProvider) for item in providers)
     assert sum(isinstance(item, ThsBoardProvider) for item in providers) == 2
+    assert all(item.request_interval_seconds == 3 for item in providers if isinstance(item, ThsBoardProvider))
 
 
 def test_provider_factory_registers_optional_akshare_daily_providers() -> None:

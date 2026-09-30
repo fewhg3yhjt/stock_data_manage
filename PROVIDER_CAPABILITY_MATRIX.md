@@ -1,6 +1,6 @@
 # Provider 能力验证矩阵
 
-验证日期：2026-09-29
+验证日期：2026-09-30
 
 本文记录当前正式代码中 Provider 适配器的验证状态。配置声明、临时研究脚本和适配器类的存在，都不能单独证明能力已经可以进入正式路由。
 
@@ -34,7 +34,7 @@
 | EastMoney | `financial_main` | `financial_main` | `providers/eastmoney/financial.py` | 通过 | 通过 | 单股票返回 8 个报告期，财务主指标字段可解析 | 保持 validation_only，待更宽资产/报告期覆盖 |
 | EastMoney | `shareholder_count` | `shareholder_count` | `providers/eastmoney/shareholder.py` | 通过 | 通过 | 单股票返回 10 个报告期，股东户数和变动字段可解析 | 保持 validation_only，待更宽资产/报告期覆盖 |
 | AkShare | `stock_daily` / `etf_daily` / `lof_daily` / `index_daily` | `daily_bar` | `providers/akshare/daily.py` | 通过 | 通过 | AkShare 1.18.97；股票、ETF、LOF、指数代表样本均可返回目标日期，历史首尾范围已记录 | 保持 `validation_only`，待更完整字段/单位/复权矩阵验证 |
-| THS | `industry_board` / `concept_board` | `industry_board` / `concept_board` | `providers/ths/boards.py` | 通过 | 通过 | 同花顺网页代表板块行业 20 行、概念 10 行；代码/名称字段可解析；Provider 内部执行 3 秒请求间隔 | 保持 validation_only，待板块列表、分页和全量覆盖验证 |
+| THS | `industry_board` / `concept_board` | `industry_board` / `concept_board` | `providers/ths/boards.py` | 通过 | 通过 | 同花顺网页行业列表第 1 页 50 行/共 2 页，概念列表第 1 页 10 行/共 39 页；代表行业成分第 2 页 20 行/共 4 页，概念成分第 2 页 10 行/共 35 页；代码/名称字段可解析；Provider 内部执行 3 秒请求间隔；Raw 快照写入和校验通过 | 保持 validation_only，未执行全量抓取和 Canonical 发布 |
 
 ## 配置或设计中但尚未形成正式适配器
 
@@ -81,6 +81,7 @@
 - `docs/provider-probes/2026-09-29-akshare-daily-live.json`
 - `docs/provider-probes/2026-09-30-ths-board-members.json`
 - `docs/provider-probes/2026-09-30-ths-board-members-v2.json`
+- `docs/provider-probes/2026-09-30-ths-board-list-pagination.json`
 - 完整本地运行目录：`/tmp/opencode/provider-probes/`
 
 每份证据包含 Provider、Endpoint、能力版本、验证时间、有效期、请求范围、HTTP 状态、返回窗口、字段语义、单位、证据哈希和路由资格。

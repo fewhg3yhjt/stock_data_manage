@@ -57,7 +57,7 @@ Provider 的离线契约、实时探针和路由资格记录见仓库根目录�
 | `providers/akshare/session.py` | AkShare 可选依赖加载和代码转换 |
 | `providers/akshare/daily.py` | AkShare 股票、ETF、LOF、指数函数级历史日线 |
 | `providers/akshare/__init__.py` | AkShare 适配器导出 |
-| `providers/ths/boards.py` | 同花顺行业/概念板块成分页面适配器 |
+| `providers/ths/boards.py` | 同花顺行业/概念板块列表、分页和成分页面适配器；输出可写入 Raw 的关系快照，不伪装成行情 Bar |
 | `providers/ths/__init__.py` | THS 适配器导出 |
 | `providers/tencent/__init__.py` | Tencent 适配器导出 |
 | `providers/sina/__init__.py` | Sina 适配器导出 |

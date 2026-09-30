@@ -1,0 +1,18 @@
+{
+  "provider": "ths",
+  "endpoint": "board_members",
+  "capability_version": "ths-board-members-v1",
+  "validated_at": "2026-09-30T18:56:46+08:00",
+  "validation_expires_at": "2026-10-07T18:56:46+08:00",
+  "status": "complete",
+  "eligible_for_selection": false,
+  "routing_role": "validation_only",
+  "minimum_interval_seconds": 3,
+  "results": [
+    {"scope": "industry_board_list", "page": 1, "total_pages": 2, "http_status": 200, "row_count": 50, "sample_codes": ["881142", "881175", "881273"]},
+    {"scope": "concept_board_list", "page": 1, "total_pages": 39, "http_status": 200, "row_count": 10, "sample_codes": ["309269", "309268", "309267"]},
+    {"scope": "industry_board_members", "board_code": "881270", "page": 2, "total_pages": 4, "http_status": 200, "row_count": 20, "sample_codes": ["002484", "300476", "002436"]},
+    {"scope": "concept_board_members", "board_code": "301558", "page": 2, "total_pages": 35, "http_status": 200, "row_count": 10, "sample_codes": ["002960", "603123", "688289"]}
+  ],
+  "notes": "List rows are parsed only from the main paged table. Member pages support explicit page selection and fetch_all_members merges duplicate board_code/stock_code keys. No full crawl or production write was executed."
+}

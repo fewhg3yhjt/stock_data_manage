@@ -1,6 +1,6 @@
 # 项目开发进度
 
-更新时间：2026-09-29
+更新时间：2026-09-30
 
 本文是当前项目的进度总览，记录代码、验证和设计落地状态。详细架构以设计文档为准，来源事实以 [Provider 能力验证矩阵](PROVIDER_CAPABILITY_MATRIX.md) 为准。
 
@@ -39,7 +39,7 @@ Phase 1 基础链路完成
 | BaoStock | 历史日线、5m | 日线样本通过，5m 空返回 | validation_only |
 | EastMoney | 分红事件、证券列表、实时行情、个股资金流、财务主指标、股东户数 | 分红 HTTP 200/空窗口；证券列表/实时行情/资金流当前网络断连；财务主指标和股东户数单股票样本通过 | disabled/validation_only |
 | AkShare | 股票、ETF、LOF、指数历史日线 | 代表样本 Live Probe 通过 | validation_only |
-| THS | 行业/概念板块成分 | 代表板块 Live Probe 通过，Provider 内部 3 秒间隔，全量未验证 | validation_only |
+| THS | 行业/概念板块列表和成分 | 列表分页与代表板块成分页 Live Probe 通过；Provider 内部 3 秒间隔；Raw 快照链路通过；未执行全量抓取或 Canonical 发布 | validation_only |
 
 ## 当前已完成的 EastMoney 数据域
 
@@ -87,7 +87,7 @@ Phase 1 基础链路完成
 当前系统测试：
 
 ```text
-124 passed
+130 passed
 ```
 
 离线 M1 已覆盖：
@@ -104,13 +104,15 @@ Phase 1 基础链路完成
 - 连续 5 个真实交易日 M2 试运行；
 - 生产数据正式路由开放。
 
+THS 板块关系目前保留为独立 Provider 快照，已验证 Raw 快照写入；现有 Canonical/日线 Pipeline 只接受 `BarRecord`，因此本轮不将板块关系伪装成行情分区。
+
 ## 本轮主线
 
 当前按以下顺序逐项覆盖来源数据域：
 
 1. EastMoney 财务主指标和股东户数扩大样本验证；
 2. EastMoney 完整财务报表；
-3. EastMoney 行业板块和概念板块；
+3. THS 行业板块和概念板块列表、分页与小规模数据链路；
 4. EastMoney 龙虎榜；
 5. EastMoney 历史日线；
 6. 根据能力证据决定各数据域的 `primary`、`fallback`、`validation_only` 或 `disabled`。

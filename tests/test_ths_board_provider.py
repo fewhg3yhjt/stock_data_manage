@@ -1,14 +1,20 @@
-from io import StringIO
-
 import pandas as pd
 
 from stock_data_manage.providers.ths import ThsBoardProvider
+from stock_data_manage.storage.raw import RawObjectStore
 
 
 class FakeResponse:
     status_code = 200
     url = "https://q.10jqka.com.cn/thshy/detail/code/881270/"
     text = "<html></html>"
+
+
+def _response(url: str, text: str) -> FakeResponse:
+    response = FakeResponse()
+    response.url = url
+    response.text = text
+    return response
 
 
 def test_ths_board_provider_maps_member_table(monkeypatch):
@@ -50,3 +56,72 @@ def test_ths_board_provider_enforces_configured_request_interval(monkeypatch):
     provider.fetch_members("industry", "881270")
     provider.fetch_members("industry", "881270")
     assert sleeps == [2.0]
+
+
+def test_ths_board_provider_parses_board_list_from_main_table(monkeypatch):
+    html = """
+    <table class="m-table m-pager-table">
+      <tr><th>板块</th></tr>
+      <tr><td><a href="http://q.10jqka.com.cn/thshy/detail/code/881121/">半导体</a></td></tr>
+      <tr><td><a href="http://q.10jqka.com.cn/thshy/detail/code/881273/">白酒</a></td></tr>
+    </table>
+    <div class="m-pager"><span class="page_info">1/2</span></div>
+    <a href="http://q.10jqka.com.cn/thshy/detail/code/889999/">导航重复链接</a>
+    """
+    monkeypatch.setattr(
+        "stock_data_manage.providers.ths.boards.requests.get",
+        lambda url, **kwargs: _response(url, html),
+    )
+    result = ThsBoardProvider().fetch_board_list("industry")
+    assert result.total_pages == 2
+    assert result.rows == (
+        {"board_type": "industry", "board_code": "881121", "board_name": "半导体", "source": "ths"},
+        {"board_type": "industry", "board_code": "881273", "board_name": "白酒", "source": "ths"},
+    )
+
+
+def test_ths_board_provider_fetches_and_deduplicates_member_pages(monkeypatch):
+    tables = {
+        "/": pd.DataFrame([{"代码": 2913, "名称": "奥士康"}, {"代码": 3001, "名称": "测试一"}]),
+        "/page/2/": pd.DataFrame([{"代码": 3001, "名称": "测试一"}, {"代码": 6000, "名称": "测试二"}]),
+    }
+    htmls = {
+        "/": '<span class="page_info">1/2</span>',
+        "/page/2/": '<span class="page_info">2/2</span>',
+    }
+    monkeypatch.setattr(
+        "stock_data_manage.providers.ths.boards.requests.get",
+        lambda url, **kwargs: _response(url, htmls["/page/2/"] if "/page/2/" in url else htmls["/"]),
+    )
+    parsed_tables = iter((tables["/"], tables["/page/2/"]))
+    monkeypatch.setattr(pd, "read_html", lambda source: [next(parsed_tables)])
+    result = ThsBoardProvider().fetch_all_members("industry", "881270")
+    assert result.total_pages == 2
+    assert [row["stock_code"] for row in result.rows] == ["002913", "003001", "006000"]
+
+
+def test_ths_board_snapshot_can_be_committed_to_raw_store(tmp_path):
+    from datetime import datetime, timezone
+
+    snapshot = {
+        "board_type": "industry",
+        "board_code": "881270",
+        "rows": [
+            {
+                "board_type": "industry",
+                "board_code": "881270",
+                "stock_code": "002913",
+                "stock_name": "奥士康",
+                "source": "ths",
+            }
+        ],
+    }
+    reference = RawObjectStore(tmp_path / "raw").write_json(
+        snapshot,
+        dataset="industry_board",
+        provider="ths",
+        endpoint="board_members",
+        fetched_at=datetime(2026, 9, 30, tzinfo=timezone.utc),
+        attempt_id="board-881270-page-1",
+    )
+    assert RawObjectStore.verify(reference)
