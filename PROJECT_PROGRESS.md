@@ -48,6 +48,8 @@ Phase 1 基础链路完成
 | 证券列表 `security_list` | 已实现 | 当前网络 `RemoteDisconnected` |
 | 实时行情 `realtime_quote` | 已实现单证券、批量和分时适配器 | 原始脚本曾成功；行为等价迁移后当前复测仍 `RemoteDisconnected` |
 | 个股资金流 `stock_fund_flow` | 本轮实现 | 原始探针曾成功；正式复测 `push2his` RemoteDisconnected |
+| 财务主指标 `financial_main` | 已实现 | 单股票样本返回 8 个报告期 |
+| 股东户数 `shareholder_count` | 已实现 | 单股票样本返回 10 个报告期 |
 
 ## 当前未实现 EastMoney 数据域
 
@@ -56,8 +58,7 @@ Phase 1 基础链路完成
 - 行业板块；
 - 概念板块；
 - 行业/概念资金流；
-- 财务主指标和完整财务报表；
-- 股东户数；
+- 完整财务报表；
 - 龙虎榜。
 
 这些数据域保持独立，不合并成一个“大 EastMoney Provider”。

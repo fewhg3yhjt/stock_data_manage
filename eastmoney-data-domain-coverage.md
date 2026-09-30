@@ -20,10 +20,15 @@
 
 ## 2. 当前已实现范围
 
-当前正式代码只有：
+当前正式代码已覆盖：
 
 ```text
 providers/eastmoney/dividend.py
+providers/eastmoney/security_list.py
+providers/eastmoney/realtime.py
+providers/eastmoney/fund_flow.py
+providers/eastmoney/financial.py
+providers/eastmoney/shareholder.py
 ```
 
 它实现的是：
@@ -35,16 +40,13 @@ providers/eastmoney/dividend.py
 - 事件业务键去重；
 - Raw 引用和 Metadata 持久化。
 
-它不代表以下能力已经实现：
+仍未实现的 EastMoney 数据域包括：
 
-- EastMoney 实时行情；
-- EastMoney 全市场证券列表；
 - EastMoney 历史日线；
 - EastMoney ETF/LOF 快照；
 - EastMoney 行业和概念板块；
-- EastMoney 资金流；
-- EastMoney 财务数据；
-- EastMoney 股东户数；
+- EastMoney 行业/概念资金流；
+- EastMoney 完整财务报表；
 - EastMoney 龙虎榜。
 
 当前另有正式的 `security_list` 适配器，用于分页读取股票、ETF、LOF 和指数清单；由于当前网络 Live Probe 返回 `RemoteDisconnected`，它暂不具备正式路由资格。
