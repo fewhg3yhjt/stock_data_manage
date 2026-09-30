@@ -39,7 +39,7 @@ Phase 1 基础链路完成
 | BaoStock | 历史日线、5m | 日线样本通过，5m 空返回 | validation_only |
 | EastMoney | 分红事件、证券列表、实时行情、个股资金流、财务主指标、股东户数 | 分红 HTTP 200/空窗口；证券列表/实时行情/资金流当前网络断连；财务主指标和股东户数单股票样本通过 | disabled/validation_only |
 | AkShare | 股票、ETF、LOF、指数历史日线 | 代表样本 Live Probe 通过 | validation_only |
-| THS | 行业/概念板块列表和成分 | 列表分页与代表板块成分页 Live Probe 通过；Provider 内部 3 秒间隔；Raw 快照链路通过；未执行全量抓取或 Canonical 发布 | validation_only |
+| THS | 行业/概念板块列表和成分 | 行业列表 2/2 页通过；概念列表到第 5 页，第 6 页解析失败后停止；6 个样本板块第 1 页通过；无 403/429 | validation_only |
 
 ## 当前已完成的 EastMoney 数据域
 

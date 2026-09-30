@@ -1,0 +1,30 @@
+{
+  "provider": "ths",
+  "endpoint": "board_members",
+  "capability_version": "ths-board-members-v1",
+  "validated_at": "2026-09-30T19:23:12+08:00",
+  "status": "partial",
+  "eligible_for_selection": false,
+  "routing_role": "validation_only",
+  "minimum_interval_seconds": 3,
+  "request_count": 14,
+  "elapsed_seconds": 39.14,
+  "http_403_or_429_count": 0,
+  "error_count": 1,
+  "board_lists": {
+    "industry": {"pages_requested": 2, "pages_succeeded": 2, "rows": 90},
+    "concept": {"pages_requested": 6, "pages_succeeded": 5, "rows": 50, "failed_page": 6}
+  },
+  "sample_members_page_1": [
+    {"board_type": "industry", "board_code": "881142", "board_name": "生物制品", "http_status": 200, "total_pages": 3, "row_count": 20},
+    {"board_type": "industry", "board_code": "881175", "board_name": "医疗服务", "http_status": 200, "total_pages": 3, "row_count": 20},
+    {"board_type": "industry", "board_code": "881273", "board_name": "白酒", "http_status": 200, "total_pages": 1, "row_count": 19},
+    {"board_type": "concept", "board_code": "309269", "board_name": "MLCC概念", "http_status": 200, "total_pages": 4, "row_count": 10},
+    {"board_type": "concept", "board_code": "309268", "board_name": "玻璃基板", "http_status": 200, "total_pages": 7, "row_count": 10},
+    {"board_type": "concept", "board_code": "309267", "board_name": "2026中报预增", "http_status": 200, "total_pages": 52, "row_count": 10}
+  ],
+  "errors": [
+    {"operation": "concept_board_list", "page": 6, "failure": "THS board list is empty or changed", "action": "stopped_without_retry"}
+  ],
+  "notes": "All requests were serial with no retries or concurrency. No HTTP rate-limit response was observed. The concept list was not treated as complete because page 6 failed parsing; no production or Raw data directory was written by this probe."
+}
