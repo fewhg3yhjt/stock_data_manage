@@ -37,7 +37,7 @@ Phase 1 基础链路完成
 | Sina | 普通日线、快照、5m | 部分 Live Probe 通过 | 候选/校验 |
 | TDX | 注入式延迟 1m | 无真实客户端 Probe | disabled |
 | BaoStock | 历史日线、5m | 日线样本通过，5m 空返回 | validation_only |
-| EastMoney | 分红事件、证券列表、实时行情、个股资金流、财务主指标、股东户数 | 分红 HTTP 200/空窗口；证券列表/实时行情/资金流当前网络断连；财务主指标和股东户数单股票样本通过 | disabled/validation_only |
+| EastMoney | 分红事件、证券列表、实时行情、个股资金流、财务主指标、股东户数；板块归属探针 | 分红 HTTP 200/空窗口；证券列表/实时行情/资金流/板块列表当前网络断连；个股板块归属 `slist` 单股票返回 28 条；财务主指标和股东户数单股票样本通过 | disabled/validation_only |
 | AkShare | 股票、ETF、LOF、指数历史日线 | 代表样本 Live Probe 通过 | validation_only |
 | THS | 行业/概念板块列表和成分 | 原始 URL 行业列表 2/2 页通过；概念列表到第 5 页；qstock 风格 URL（含动态 v Cookie）第 6/7 页均进入登录跳转；6 个样本板块第 1 页通过；无 403/429 | validation_only |
 

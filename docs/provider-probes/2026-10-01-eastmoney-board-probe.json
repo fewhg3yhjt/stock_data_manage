@@ -1,0 +1,52 @@
+{
+  "provider": "eastmoney",
+  "endpoints": ["board_list", "security_board_membership"],
+  "capability_version": "eastmoney-board-probe-v1",
+  "validated_at": "2026-10-01T14:59:13+08:00",
+  "status": "partial",
+  "eligible_for_selection": false,
+  "routing_role": "validation_only",
+  "request_interval_seconds": 2,
+  "transport": {
+    "trust_env": false,
+    "session_reused": true,
+    "referer": "https://quote.eastmoney.com/"
+  },
+  "results": [
+    {
+      "endpoint": "board_list",
+      "scope": "industry",
+      "url": "https://push2.eastmoney.com/api/qt/clist/get",
+      "request_parameters": {"pn": "1", "pz": "200", "po": "1", "np": "1", "fid": "f3", "fs": "m:90+t:2", "fields": "f2,f3,f4,f12,f13,f14,f104,f105,f128,f136,f140,f141,f207"},
+      "status": "transport_error",
+      "failure_class": "connection",
+      "error": "RemoteDisconnected: Remote end closed connection without response"
+    },
+    {
+      "endpoint": "board_list",
+      "scope": "concept",
+      "url": "https://push2.eastmoney.com/api/qt/clist/get",
+      "request_parameters": {"pn": "1", "pz": "200", "po": "1", "np": "1", "fid": "f3", "fs": "m:90+t:3", "fields": "f2,f3,f4,f12,f13,f14,f104,f105,f128,f136,f140,f141,f207"},
+      "status": "transport_error",
+      "failure_class": "connection",
+      "error": "RemoteDisconnected: Remote end closed connection without response"
+    },
+    {
+      "endpoint": "security_board_membership",
+      "scope": "security=1.600519",
+      "url": "https://push2.eastmoney.com/api/qt/slist/get",
+      "request_parameters": {"fltt": "2", "invt": "2", "secid": "1.600519", "spt": "3", "pi": "0", "pz": "200", "po": "1", "fields": "f12,f14,f3,f128"},
+      "status": "complete",
+      "http_status": 200,
+      "declared_total": 28,
+      "row_count": 28,
+      "field_semantics": {"f12": "板块代码", "f14": "板块名称", "f3": "板块涨跌幅", "f128": "板块领涨股"},
+      "sample": [
+        {"code": "BK0438", "name": "食品饮料", "change_pct": 1.51, "leader": "均瑶健康"},
+        {"code": "BK1575", "name": "白酒Ⅲ", "change_pct": 2.79, "leader": "金徽酒"},
+        {"code": "BK0477", "name": "酿酒概念", "change_pct": 2.21, "leader": "古越龙山"}
+      ]
+    }
+  ],
+  "notes": "The push2 clist industry/concept list probes were not usable in this environment because the remote closed the connection. The push2 slist security-membership probe returned 28 mixed industry/concept/region boards. No production writes and no formal routing enablement."
+}

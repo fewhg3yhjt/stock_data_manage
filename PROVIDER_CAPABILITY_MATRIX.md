@@ -33,6 +33,8 @@
 | EastMoney | `stock_fund_flow` | `stock_fund_flow` | `providers/eastmoney/fund_flow.py` | 通过 | 原脚本曾通过；正式迁移后当前复测 RemoteDisconnected | 个股日级资金流字段映射已实现，当前运行环境未取得新证据 | 保持 validation_only/disabled，不进入正式路由 |
 | EastMoney | `financial_main` | `financial_main` | `providers/eastmoney/financial.py` | 通过 | 通过 | 单股票返回 8 个报告期，财务主指标字段可解析 | 保持 validation_only，待更宽资产/报告期覆盖 |
 | EastMoney | `shareholder_count` | `shareholder_count` | `providers/eastmoney/shareholder.py` | 通过 | 通过 | 单股票返回 10 个报告期，股东户数和变动字段可解析 | 保持 validation_only，待更宽资产/报告期覆盖 |
+| EastMoney | `security_board_membership` | `industry_board` / `concept_board` | 待迁移，参考 `push2/api/qt/slist/get` | 未登记 | 通过 | `secid=1.600519` 返回 28 条混合行业/概念/地域板块；`f12/f14/f3/f128` 语义可解析 | 保持 validation_only，待正式 Provider 和更宽股票样本验证 |
+| EastMoney | `board_list` | `industry_board` / `concept_board` | 待迁移，参考 `push2/api/qt/clist/get` | 未登记 | 连接失败 | 行业 `m:90+t:2`、概念 `m:90+t:3` 小流量请求均 RemoteDisconnected；不能判定来源不可用 | 暂不进入路由，待其他网络/时段复测 |
 | AkShare | `stock_daily` / `etf_daily` / `lof_daily` / `index_daily` | `daily_bar` | `providers/akshare/daily.py` | 通过 | 通过 | AkShare 1.18.97；股票、ETF、LOF、指数代表样本均可返回目标日期，历史首尾范围已记录 | 保持 `validation_only`，待更完整字段/单位/复权矩阵验证 |
 | THS | `industry_board` / `concept_board` | `industry_board` / `concept_board` | `providers/ths/boards.py` | 通过 | 部分通过 | 原始 URL 行业列表 2/2 页成功；概念列表第 1-5 页成功；qstock 风格分页 URL 无 Cookie 返回 401，带动态 `v` Cookie 后第 6/7 页 HTTP 200 但跳转登录；6 个样本板块第 1 页均 HTTP 200；Provider 内部执行 3 秒请求间隔 | 保持 validation_only，概念列表未完成，未执行全量成分抓取和 Canonical 发布 |
 
@@ -84,6 +86,7 @@
 - `docs/provider-probes/2026-09-30-ths-board-list-pagination.json`
 - `docs/provider-probes/2026-09-30-ths-small-batch.json`
 - `docs/provider-probes/2026-09-30-ths-qstock-request-variant.json`
+- `docs/provider-probes/2026-10-01-eastmoney-board-probe.json`
 - 完整本地运行目录：`/tmp/opencode/provider-probes/`
 
 每份证据包含 Provider、Endpoint、能力版本、验证时间、有效期、请求范围、HTTP 状态、返回窗口、字段语义、单位、证据哈希和路由资格。
