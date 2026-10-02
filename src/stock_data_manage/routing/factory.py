@@ -10,7 +10,7 @@ from ..providers.sina import SinaDailyProvider, SinaMinuteProvider, SinaSnapshot
 from ..providers.tencent import TencentDailyProvider, TencentMinuteProvider, TencentSnapshotProvider
 from ..providers.transport import HttpTransport, UrlLibTransport
 from ..providers.tdx import TdxMinuteProvider
-from ..providers.baostock import BaoStockDailyProvider, BaoStockMinuteProvider
+from ..providers.baostock import BaoStockDailyProvider, BaoStockIndustryMembershipProvider, BaoStockMinuteProvider
 from ..providers.eastmoney import (
     EastMoneyDividendProvider,
     EastMoneyRealtimeQuoteProvider,
@@ -20,7 +20,7 @@ from ..providers.eastmoney import (
     EastMoneyShareholderCountProvider,
 )
 from ..providers.eastmoney.realtime import EastMoneyRequestsTransport
-from ..providers.akshare import AkShareDailyProvider
+from ..providers.akshare import AkShareBoardProvider, AkShareDailyProvider
 from ..providers.ths import ThsBoardProvider
 from .capabilities import CapabilityRegistry
 
@@ -62,6 +62,8 @@ def build_provider(config: ProviderConfig, transport: HttpTransport | None = Non
             capability_version=config.capability_version,
             adjustment=next(iter(config.adjustments), Adjustment.NONE),
         )
+    if config.provider == "baostock" and config.endpoint == "industry_membership":
+        return BaoStockIndustryMembershipProvider(capability_version=config.capability_version)
     if config.provider == "eastmoney" and config.endpoint == "dividend_event":
         return EastMoneyDividendProvider(
             transport,
@@ -98,6 +100,13 @@ def build_provider(config: ProviderConfig, transport: HttpTransport | None = Non
         return AkShareDailyProvider(
             asset_type=asset_type,
             adjustment=next(iter(config.adjustments), Adjustment.NONE),
+            capability_version=config.capability_version,
+        )
+    if config.provider == "akshare" and config.endpoint in {
+        "industry_index_daily", "industry_fund_flow", "concept_fund_flow"
+    }:
+        return AkShareBoardProvider(
+            endpoint=config.endpoint,
             capability_version=config.capability_version,
         )
     if config.provider == "ths" and config.endpoint in {"industry_board", "concept_board"}:
@@ -140,7 +149,11 @@ def load_provider_registry(
             except ValueError:
                 # Configured but unimplemented providers remain explicitly unavailable.
                 continue
-        elif config.endpoint in {"dividend_event", "security_list", "single_quote", "batch_quote", "intraday_trend", "stock_fund_flow", "financial_main", "shareholder_count", "industry_board", "concept_board"}:
+        elif config.endpoint in {
+            "dividend_event", "security_list", "single_quote", "batch_quote", "intraday_trend",
+            "stock_fund_flow", "financial_main", "shareholder_count", "industry_board", "concept_board",
+            "industry_membership", "industry_index_daily", "industry_fund_flow", "concept_fund_flow",
+        }:
             try:
                 providers.append(build_provider(config))
             except ValueError:

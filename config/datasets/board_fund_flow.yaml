@@ -1,0 +1,21 @@
+dataset:
+  name: board_fund_flow
+  display_name: 同花顺行业/概念资金流快照
+  primary_key: [board_type, board_name, period, snapshot_at]
+
+fields:
+  board_type: {type: string, required: true}
+  period: {type: string, required: true}
+  rank: {type: integer, required: true}
+  board_name: {type: string, required: true}
+  snapshot_at: {type: datetime, required: true}
+  index_value: {type: decimal, required: false}
+  change_pct: {type: decimal, unit: percent, required: false}
+  money_inflow: {type: decimal, unit: source_display_unit_unconfirmed, required: false}
+  money_outflow: {type: decimal, unit: source_display_unit_unconfirmed, required: false}
+  net_inflow: {type: decimal, unit: source_display_unit_unconfirmed, required: false}
+  company_count: {type: integer, required: false}
+  leader_stock_name: {type: string, required: false}
+  leader_change_pct: {type: decimal, unit: percent, required: false}
+  leader_price: {type: decimal, required: false}
+  source: {type: string, required: true}

@@ -1,6 +1,6 @@
 # Provider 能力验证矩阵
 
-验证日期：2026-09-30
+验证日期：2026-10-03
 
 本文记录当前正式代码中 Provider 适配器的验证状态。配置声明、临时研究脚本和适配器类的存在，都不能单独证明能力已经可以进入正式路由。
 
@@ -11,7 +11,7 @@
 | 层级 | 目的 | 当前结果 |
 |---|---|---|
 | Provider Contract Fixture | 验证状态码、响应格式、字段和返回窗口分类 | 已通过 |
-| 小流量 Live Probe | 验证真实接口可访问、真实返回窗口和字段 | Tencent/Sina 已执行；TDX 未执行 |
+| 小流量 Live Probe | 验证真实接口可访问、真实返回窗口和字段 | Tencent/Sina/BaoStock/AkShare 已执行；TDX 未执行 |
 | 语义验证 | 确认复权口径、单位、时间和覆盖范围 | 部分完成；前复权仍未达到正式资格 |
 | 端到端生产验证 | 验证路由、补缺、标准化、发布和恢复 | Fixture 链路已通过；真实来源尚未进入生产运行 |
 
@@ -37,6 +37,11 @@
 | EastMoney | `board_list` | `industry_board` / `concept_board` | 待迁移，参考 `push2/api/qt/clist/get` | 未登记 | 连接失败 | 行业 `m:90+t:2`、概念 `m:90+t:3` 小流量请求均 RemoteDisconnected；不能判定来源不可用 | 暂不进入路由，待其他网络/时段复测 |
 | AkShare | `stock_daily` / `etf_daily` / `lof_daily` / `index_daily` | `daily_bar` | `providers/akshare/daily.py` | 通过 | 通过 | AkShare 1.18.97；股票、ETF、LOF、指数代表样本均可返回目标日期，历史首尾范围已记录 | 保持 `validation_only`，待更完整字段/单位/复权矩阵验证 |
 | THS | `industry_board` / `concept_board` | `industry_board` / `concept_board` | `providers/ths/boards.py` | 通过 | 部分通过 | 原始 URL 行业列表 2/2 页成功；概念列表第 1-5 页成功；qstock 风格分页 URL 无 Cookie 返回 401，带动态 `v` Cookie 后第 6/7 页 HTTP 200 但跳转登录；6 个样本板块第 1 页均 HTTP 200；Provider 内部执行 3 秒请求间隔 | 保持 validation_only，概念列表未完成，未执行全量成分抓取和 Canonical 发布 |
+| BaoStock | `query_all_stock` / `query_stock_industry` | `industry_membership` | `providers/baostock/industry.py` | Fixture 通过；旧全量结果离线重放 | 旧全市场验证脚本曾通过；当前 Provider 尚无同参数新 Live Probe | 沪深 5,212 只在市证券中 5,210 只有分类（99.9616%），缺少 001246、301716；分类更新日 2026-09-28。当前 Provider 已对齐两次全量快照参数并可重放旧结果；原始 SDK 行和 TCP 帧未留存，不能算独立的 Provider 端到端验证 | 保持 validation_only；`2026-10-03` 的单股 `code=` 请求与已验证 `date=` 全量查询不同，已标记为过期证据 |
+| AkShare / THS | `stock_board_industry_name_ths` | `industry_index_daily` 的目录映射辅助 | `providers/akshare/boards.py` | Fixture 通过 | 通过 | 2026-10-02 返回 90 个行业代码且无重复；原始 HTTP 响应已归档 | 只作为指数 Provider 的目录映射；不单独注册生产目录，也不表示概念成分已验证 |
+| AkShare / THS | `stock_board_industry_index_ths` | `industry_index_daily` | `providers/akshare/boards.py` | Fixture 通过 | 部分通过 | 半导体（881121）请求 2026-09-01 至 2026-10-02，返回 21 个唯一交易日，首末日 2026-09-01 至 2026-09-30；成交量、成交额单位未确认；原始响应已归档 | validation_only；只验证一个行业和一个窗口 |
+| AkShare / THS | `stock_fund_flow_industry` | `board_fund_flow` | `providers/akshare/boards.py` | Fixture 通过 | 通过 | `即时` 返回 90 个不重复行业；快照没有逐行交易日期，资金字段单位未确认；原始分页响应已归档 | validation_only；不作为历史资金流，也不代表行业成分关系 |
+| AkShare / THS | `stock_fund_flow_concept` | `board_fund_flow` | `providers/akshare/boards.py` | Fixture 通过 | 通过 | `即时` 返回 387 个不重复概念；快照没有逐行交易日期，资金字段单位未确认；原始分页响应已归档 | validation_only；概念资金流不等同概念成员关系 |
 
 ## 配置或设计中但尚未形成正式适配器
 
@@ -87,6 +92,15 @@
 - `docs/provider-probes/2026-09-30-ths-small-batch.json`
 - `docs/provider-probes/2026-09-30-ths-qstock-request-variant.json`
 - `docs/provider-probes/2026-10-01-eastmoney-board-probe.json`
+- `docs/provider-probes/2026-10-01-security-board-coverage.json`
+- `docs/provider-probes/2026-10-02-sector-capabilities-live.json`（隔离网络连接失败）
+- `docs/provider-probes/2026-10-02-sector-capabilities-network-retry.json`
+- `docs/provider-probes/2026-10-02-sector-derived-validation.json`
+- `docs/provider-probes/replay_sector_capability_archives.py`（离线重放脚本，不发起网络请求）
+- `docs/provider-probes/replay_sector_capability_archives.py`（离线重放脚本，不发起网络请求）
+- `docs/provider-probes/2026-10-03-baostock-csrc-provider.json`（请求参数变体已标记 superseded，不计为迁移验证）
+- 原始响应：`docs/provider-probes/raw/2026-10-02-sector-capabilities-v1/`、`docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/`、`docs/provider-probes/raw/2026-10-03-csrc-provider-small-probe/`
+- 派生 CSV：`docs/provider-probes/2026-10-02-sector-derived/`
 - 完整本地运行目录：`/tmp/opencode/provider-probes/`
 
 每份证据包含 Provider、Endpoint、能力版本、验证时间、有效期、请求范围、HTTP 状态、返回窗口、字段语义、单位、证据哈希和路由资格。
@@ -99,7 +113,8 @@
 4. Tencent 和 Sina 的成交量单位存在差异，已经进入探针证据；日线成交量和成交额单位仍需针对历史接口分别完成语义验证，当前不能标记为已确认。
 5. 分钟探针现在会按 `as_of` 过滤未来记录，并记录来源单位；本次只验证了沪市股票，分钟的全市场、北交所、ETF、LOF 和指数覆盖仍需代表矩阵验证。
 6. EastMoney 3 秒间隔综合探针中，个股资金流、财务主指标、股东户数、分红事件和实时行情原始脚本接口返回了业务数据；历史日线、前复权日线、1m、证券列表和行业板块受当前网络断连影响；龙虎榜本轮未猜测接口。正式适配器仍保持 validation_only/disabled。
-7. BaoStock 已有正式 SDK 适配器，但当前仅历史日线小样本通过，保持 `validation_only`；5m 本次空返回。AkShare 股票、ETF、LOF、指数日线代表样本已通过真实探针，仍保持 `validation_only`，等待更完整字段、单位、复权和覆盖矩阵验证。
+7. BaoStock 日线、行业成分 Provider 均保持 `validation_only`；行业成分 Provider 已通过 Fixture 与旧全量证据的离线重放，历史全市场证据的在市沪深覆盖为 99.9616%，但旧证据没有原始 SDK 行或 TCP 帧，当前 Provider 尚未进行同参数新 Live Probe。AkShare 股票、ETF、LOF、指数日线代表样本已通过真实探针，THS 行业指数和资金流新增能力只验证了报告列明的样本/窗口，仍保持 `validation_only`。
+8. THS 即时行业和概念资金流是有时间戳的排行快照，不含证券-概念成员关系。所测金额字段按原值保存，单位未确认；不可用于历史逐日资金流或概念成分覆盖结论。
 
 ## 后续资格门槛
 

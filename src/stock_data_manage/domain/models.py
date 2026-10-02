@@ -21,6 +21,9 @@ class Dataset(StrEnum):
     SHAREHOLDER_COUNT = "shareholder_count"
     INDUSTRY_BOARD = "industry_board"
     CONCEPT_BOARD = "concept_board"
+    INDUSTRY_MEMBERSHIP = "industry_membership"
+    INDUSTRY_INDEX_DAILY = "industry_index_daily"
+    BOARD_FUND_FLOW = "board_fund_flow"
 
 
 class Exchange(StrEnum):

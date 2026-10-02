@@ -1,17 +1,18 @@
 from pathlib import Path
+from datetime import datetime, timezone
 
 from stock_data_manage.config.loader import load_capability_routes, load_dataset_normalization_rules, load_provider_configs
-from stock_data_manage.domain import Adjustment, Dataset
+from stock_data_manage.domain import Adjustment, AssetType, Dataset, Exchange
 from stock_data_manage.routing.factory import load_provider_registry
 from stock_data_manage.providers.tencent import TencentDailyProvider
-from stock_data_manage.providers.baostock import BaoStockDailyProvider
+from stock_data_manage.providers.baostock import BaoStockDailyProvider, BaoStockIndustryMembershipProvider
 from stock_data_manage.providers.eastmoney import EastMoneyDividendProvider
 from stock_data_manage.providers.eastmoney import EastMoneySecurityListProvider
 from stock_data_manage.providers.eastmoney import EastMoneyRealtimeQuoteProvider
 from stock_data_manage.providers.eastmoney import EastMoneyStockFundFlowProvider
 from stock_data_manage.providers.ths import ThsBoardProvider
 from stock_data_manage.providers.eastmoney import EastMoneyFinancialMainProvider, EastMoneyShareholderCountProvider
-from stock_data_manage.providers.akshare import AkShareDailyProvider
+from stock_data_manage.providers.akshare import AkShareBoardProvider, AkShareDailyProvider
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -87,3 +88,25 @@ def test_provider_factory_registers_optional_akshare_daily_providers() -> None:
         ROOT / "config/providers.yaml", ROOT / "config/capabilities.yaml"
     )
     assert sum(isinstance(item, AkShareDailyProvider) for item in providers) == 4
+
+
+def test_provider_factory_registers_sector_providers_as_validation_only() -> None:
+    registry, providers = load_provider_registry(
+        ROOT / "config/providers.yaml", ROOT / "config/capabilities.yaml"
+    )
+    assert any(isinstance(item, BaoStockIndustryMembershipProvider) for item in providers)
+    board_providers = [item for item in providers if isinstance(item, AkShareBoardProvider)]
+    assert {item.endpoint for item in board_providers} == {
+        "industry_index_daily", "industry_fund_flow", "concept_fund_flow"
+    }
+    now = datetime.now(timezone.utc)
+    selected = registry.select(
+        now=now,
+        dataset=Dataset.BOARD_FUND_FLOW,
+        exchange=Exchange.XSHG,
+        asset_type=AssetType.STOCK,
+        symbol="sh600519",
+        adjustment=Adjustment.NONE,
+        include_validation_only=True,
+    )
+    assert {item.endpoint for item in selected} == {"industry_fund_flow", "concept_fund_flow"}

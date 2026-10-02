@@ -1,0 +1,38 @@
+{
+  "run_id": "2026-10-02-sector-capabilities-v1",
+  "fetched_at_utc": "2026-10-02T15:41:33.529052+00:00",
+  "probes": [
+    {
+      "capability": "ths_industry_index",
+      "endpoint": "stock_board_industry_name_ths",
+      "scope": "all-industry-names",
+      "status": "error",
+      "error_type": "ConnectionError",
+      "error": "HTTPSConnectionPool(host='q.10jqka.com.cn', port=443): Max retries exceeded with url: /thshy/detail/code/881272/ (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x0000018EBA684590>: Failed to establish a new connection: [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。'))"
+    },
+    {
+      "capability": "ths_industry_index",
+      "endpoint": "stock_board_industry_index_ths",
+      "scope": "industry=半导体; start=20260901; end=20261002",
+      "status": "error",
+      "error_type": "ConnectionError",
+      "error": "HTTPSConnectionPool(host='q.10jqka.com.cn', port=443): Max retries exceeded with url: /thshy/detail/code/881272/ (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x0000018EBA2E34D0>: Failed to establish a new connection: [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。'))"
+    },
+    {
+      "capability": "akshare_sector_fund_flow",
+      "endpoint": "stock_fund_flow_industry",
+      "scope": "period=即时",
+      "status": "error",
+      "error_type": "ConnectionError",
+      "error": "HTTPConnectionPool(host='data.10jqka.com.cn', port=80): Max retries exceeded with url: /funds/hyzjl/field/tradezdf/order/desc/ajax/1/free/1/ (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000018EBA367CB0>: Failed to establish a new connection: [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。'))"
+    },
+    {
+      "capability": "akshare_sector_fund_flow",
+      "endpoint": "stock_fund_flow_concept",
+      "scope": "period=即时",
+      "status": "error",
+      "error_type": "ConnectionError",
+      "error": "HTTPConnectionPool(host='data.10jqka.com.cn', port=80): Max retries exceeded with url: /funds/gnzjl/field/tradezdf/order/desc/ajax/1/free/1/ (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000018EBA67DD10>: Failed to establish a new connection: [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。'))"
+    }
+  ]
+}

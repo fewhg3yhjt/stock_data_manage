@@ -125,3 +125,29 @@ capabilities:
         priority: 20
         adjustments: [none]
         role: validation_only
+  industry_membership:
+    routes:
+      - provider: baostock
+        endpoint: industry_membership
+        priority: 20
+        adjustments: [none]
+        role: validation_only
+  industry_index_daily:
+    routes:
+      - provider: akshare
+        endpoint: industry_index_daily
+        priority: 30
+        adjustments: [none]
+        role: validation_only
+  board_fund_flow:
+    routes:
+      - provider: akshare
+        endpoint: industry_fund_flow
+        priority: 30
+        adjustments: [none]
+        role: validation_only
+      - provider: akshare
+        endpoint: concept_fund_flow
+        priority: 40
+        adjustments: [none]
+        role: validation_only

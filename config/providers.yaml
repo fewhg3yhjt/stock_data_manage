@@ -175,6 +175,16 @@ providers:
         capability_version: baostock-minute-5m-v1
         max_symbols_per_request: 1
         request_interval_seconds: 0.5
+      industry_membership:
+        enabled: true
+        role: validation_only
+        datasets: [industry_membership]
+        adjustments: [none]
+        asset_types: [stock]
+        exchanges: [XSHG, XSHE]
+        capability_version: baostock-csrc-industry-v1
+        max_symbols_per_request: 1
+        request_interval_seconds: 0.5
       snapshot:
         enabled: false
         disabled_reason: unsupported_by_provider
@@ -220,6 +230,36 @@ providers:
         asset_types: [index]
         exchanges: [XSHG, XSHE]
         capability_version: akshare-index-daily-v1
+        max_symbols_per_request: 1
+        request_interval_seconds: 1
+      industry_index_daily:
+        enabled: true
+        role: validation_only
+        datasets: [industry_index_daily]
+        adjustments: [none]
+        asset_types: [stock]
+        exchanges: [XSHG, XSHE]
+        capability_version: akshare-ths-industry-index-v1
+        max_symbols_per_request: 1
+        request_interval_seconds: 1
+      industry_fund_flow:
+        enabled: true
+        role: validation_only
+        datasets: [board_fund_flow]
+        adjustments: [none]
+        asset_types: [stock]
+        exchanges: [XSHG, XSHE]
+        capability_version: akshare-ths-industry-fund-flow-v1
+        max_symbols_per_request: 1
+        request_interval_seconds: 1
+      concept_fund_flow:
+        enabled: true
+        role: validation_only
+        datasets: [board_fund_flow]
+        adjustments: [none]
+        asset_types: [stock]
+        exchanges: [XSHG, XSHE]
+        capability_version: akshare-ths-concept-fund-flow-v1
         max_symbols_per_request: 1
         request_interval_seconds: 1
   ths:

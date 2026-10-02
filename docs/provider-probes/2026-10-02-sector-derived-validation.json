@@ -1,0 +1,408 @@
+{
+  "evidence_status": "THS outputs replayed offline from retained exact application response bodies; BaoStock Provider replayed from saved merged probe rows, not raw SDK rows",
+  "run_id": "2026-10-02-sector-capabilities-network-retry",
+  "akshare_version": "1.18.83",
+  "transformation_code_sha256": {
+    "replay_script": "c16e0705c482231d6db008e44947be6f06d4463743a8367a50919f16c455f321",
+    "akshare_boards_provider": "2f8e988d652ecb2a5ecaeff665938be1a9aa6bf1d33e58628df66f706f99b5f4",
+    "baostock_industry_provider": "08362eed2be7535fbbc7052ea00990873a7b6f9b8dd7216107bbe55ac9075d28"
+  },
+  "validated_at_utc": "2026-10-02T17:00:58.999558+00:00",
+  "scope": {
+    "industry_directory": {
+      "rows": 90
+    },
+    "industry_index_daily": {
+      "board": {
+        "board_type": "industry",
+        "board_name": "半导体",
+        "board_code": "881121",
+        "source": "ths"
+      },
+      "requested_window": [
+        "2026-09-01",
+        "2026-10-02"
+      ],
+      "rows": 21,
+      "first_date": "2026-09-01",
+      "last_date": "2026-09-30"
+    },
+    "industry_fund_flow": {
+      "period": "即时",
+      "rows": 90
+    },
+    "concept_fund_flow": {
+      "period": "即时",
+      "rows": 387
+    },
+    "csrc_industry_membership": {
+      "trade_date": "2026-09-30",
+      "rows_including_suspended": 5221,
+      "listed_denominator_including_suspended": 5223,
+      "active_covered": 5210,
+      "active_denominator": 5212,
+      "active_coverage_percent": 99.9616,
+      "missing_symbols": [
+        "sz001246",
+        "sz301716"
+      ],
+      "source_evidence": "docs/provider-probes/2026-10-01-security-board-coverage.json",
+      "source_evidence_sha256": "8d39373b3494fe988acdc3fd2807f019608e17c01373f9fd8d31a96f3013571f",
+      "original_sdk_rows_available": false
+    }
+  },
+  "raw_response_refs": [
+    {
+      "provider": "ths via akshare",
+      "endpoint": "stock_board_industry_name_ths",
+      "url": "https://q.10jqka.com.cn/thshy/detail/code/881272/",
+      "method": "GET",
+      "status": 200,
+      "body_sha256": "b1639d45922f7a86173529c1f809831cfbe5b71fc19bb6c66907a00e70056282",
+      "body_bytes": 49841,
+      "manifest_path": "docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
+    },
+    {
+      "provider": "ths via akshare",
+      "endpoint": "stock_board_industry_index_ths",
+      "url": "https://d.10jqka.com.cn/v4/line/bk_881121/01/2026.js",
+      "method": "GET",
+      "status": 200,
+      "body_sha256": "6fbcb5f15fa5edac8ef542309c5ac39a63bfb74d5340753fecd5b675bbd251cf",
+      "body_bytes": 14891,
+      "manifest_path": "docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
+    },
+    {
+      "provider": "ths via akshare",
+      "endpoint": "stock_fund_flow_industry",
+      "url": "http://data.10jqka.com.cn/funds/hyzjl/field/tradezdf/order/desc/ajax/1/free/1/",
+      "method": "GET",
+      "status": 200,
+      "body_sha256": "c41ab37e510b833dcf2ac2304125463b900c333c74b33d96ed87006d2c853de9",
+      "body_bytes": 32720,
+      "manifest_path": "docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
+    },
+    {
+      "provider": "ths via akshare",
+      "endpoint": "stock_fund_flow_industry",
+      "url": "http://data.10jqka.com.cn/funds/hyzjl/field/tradezdf/order/desc/page/1/ajax/1/free/1/",
+      "method": "GET",
+      "status": 200,
+      "body_sha256": "c41ab37e510b833dcf2ac2304125463b900c333c74b33d96ed87006d2c853de9",
+      "body_bytes": 32720,
+      "manifest_path": "docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
+    },
+    {
+      "provider": "ths via akshare",
+      "endpoint": "stock_fund_flow_industry",
+      "url": "http://data.10jqka.com.cn/funds/hyzjl/field/tradezdf/order/desc/page/2/ajax/1/free/1/",
+      "method": "GET",
+      "status": 200,
+      "body_sha256": "97e32aa1430a70559fb2d17f6de67b456afb209cf6aab443c35ca8b636396e26",
+      "body_bytes": 27143,
+      "manifest_path": "docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
+    },
+    {
+      "provider": "ths via akshare",
+      "endpoint": "stock_fund_flow_concept",
+      "url": "http://data.10jqka.com.cn/funds/gnzjl/field/tradezdf/order/desc/ajax/1/free/1/",
+      "method": "GET",
+      "status": 200,
+      "body_sha256": "07895b44254d181f38a608624dd8800029fa3d5e75a4983610ee613ba99017e2",
+      "body_bytes": 33954,
+      "manifest_path": "docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
+    },
+    {
+      "provider": "ths via akshare",
+      "endpoint": "stock_fund_flow_concept",
+      "url": "http://data.10jqka.com.cn/funds/gnzjl/field/tradezdf/order/desc/page/1/ajax/1/free/1/",
+      "method": "GET",
+      "status": 200,
+      "body_sha256": "07895b44254d181f38a608624dd8800029fa3d5e75a4983610ee613ba99017e2",
+      "body_bytes": 33954,
+      "manifest_path": "docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
+    },
+    {
+      "provider": "ths via akshare",
+      "endpoint": "stock_fund_flow_concept",
+      "url": "http://data.10jqka.com.cn/funds/gnzjl/field/tradezdf/order/desc/page/2/ajax/1/free/1/",
+      "method": "GET",
+      "status": 200,
+      "body_sha256": "d04bd4e542784def7d3a505d9a761b3cfd97b1b02791d8f7ee61589c0acf9fd1",
+      "body_bytes": 34125,
+      "manifest_path": "docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
+    },
+    {
+      "provider": "ths via akshare",
+      "endpoint": "stock_fund_flow_concept",
+      "url": "http://data.10jqka.com.cn/funds/gnzjl/field/tradezdf/order/desc/page/3/ajax/1/free/1/",
+      "method": "GET",
+      "status": 200,
+      "body_sha256": "1c476d4e023c3c0429f20d1b317b495021bace6224b909d4b660b171a775a730",
+      "body_bytes": 34205,
+      "manifest_path": "docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
+    },
+    {
+      "provider": "ths via akshare",
+      "endpoint": "stock_fund_flow_concept",
+      "url": "http://data.10jqka.com.cn/funds/gnzjl/field/tradezdf/order/desc/page/4/ajax/1/free/1/",
+      "method": "GET",
+      "status": 200,
+      "body_sha256": "57a2d379884dca8c7e3e7cb439a01c52e181c23aa43f2237a2631733153f1349",
+      "body_bytes": 34315,
+      "manifest_path": "docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
+    },
+    {
+      "provider": "ths via akshare",
+      "endpoint": "stock_fund_flow_concept",
+      "url": "http://data.10jqka.com.cn/funds/gnzjl/field/tradezdf/order/desc/page/5/ajax/1/free/1/",
+      "method": "GET",
+      "status": 200,
+      "body_sha256": "5cf941abd8d37b4320675084e6e367f280e93adfd4a9824c2884f72b0a50f96e",
+      "body_bytes": 34413,
+      "manifest_path": "docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
+    },
+    {
+      "provider": "ths via akshare",
+      "endpoint": "stock_fund_flow_concept",
+      "url": "http://data.10jqka.com.cn/funds/gnzjl/field/tradezdf/order/desc/page/6/ajax/1/free/1/",
+      "method": "GET",
+      "status": 200,
+      "body_sha256": "288a5c7b512db985a117c80c1c518002f17077586e1de7e7c9506bde4320373d",
+      "body_bytes": 34238,
+      "manifest_path": "docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
+    },
+    {
+      "provider": "ths via akshare",
+      "endpoint": "stock_fund_flow_concept",
+      "url": "http://data.10jqka.com.cn/funds/gnzjl/field/tradezdf/order/desc/page/7/ajax/1/free/1/",
+      "method": "GET",
+      "status": 200,
+      "body_sha256": "754f19b7692b21d706f3061e91e4244d00d710c281a359ac72b7053f28e44e4f",
+      "body_bytes": 34236,
+      "manifest_path": "docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
+    },
+    {
+      "provider": "ths via akshare",
+      "endpoint": "stock_fund_flow_concept",
+      "url": "http://data.10jqka.com.cn/funds/gnzjl/field/tradezdf/order/desc/page/8/ajax/1/free/1/",
+      "method": "GET",
+      "status": 200,
+      "body_sha256": "9ed30a3c2816bc2c37c6ac47b7c6bd6c024de29ea5d9ed3ddc406e6c9db3c88f",
+      "body_bytes": 26381,
+      "manifest_path": "docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
+    }
+  ],
+  "initial_failed_attempts": {
+    "manifest_path": "docs/provider-probes/raw/2026-10-02-sector-capabilities-v1/manifest.ndjson",
+    "count": 4,
+    "classification": "local network sandbox socket permission block (WinError 10013); not evidence of provider unavailability",
+    "events": [
+      {
+        "capability": "ths_industry_index",
+        "endpoint": "stock_board_industry_name_ths",
+        "url": "https://q.10jqka.com.cn/thshy/detail/code/881272/",
+        "outcome": "transport_error",
+        "error_type": "ConnectionError",
+        "error": "HTTPSConnectionPool(host='q.10jqka.com.cn', port=443): Max retries exceeded with url: /thshy/detail/code/881272/ (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x0000018EBA684590>: Failed to establish a new connection: [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。'))"
+      },
+      {
+        "capability": "ths_industry_index",
+        "endpoint": "stock_board_industry_index_ths",
+        "url": "https://q.10jqka.com.cn/thshy/detail/code/881272/",
+        "outcome": "transport_error",
+        "error_type": "ConnectionError",
+        "error": "HTTPSConnectionPool(host='q.10jqka.com.cn', port=443): Max retries exceeded with url: /thshy/detail/code/881272/ (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x0000018EBA2E34D0>: Failed to establish a new connection: [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。'))"
+      },
+      {
+        "capability": "akshare_sector_fund_flow",
+        "endpoint": "stock_fund_flow_industry",
+        "url": "http://data.10jqka.com.cn/funds/hyzjl/field/tradezdf/order/desc/ajax/1/free/1/",
+        "outcome": "transport_error",
+        "error_type": "ConnectionError",
+        "error": "HTTPConnectionPool(host='data.10jqka.com.cn', port=80): Max retries exceeded with url: /funds/hyzjl/field/tradezdf/order/desc/ajax/1/free/1/ (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000018EBA367CB0>: Failed to establish a new connection: [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。'))"
+      },
+      {
+        "capability": "akshare_sector_fund_flow",
+        "endpoint": "stock_fund_flow_concept",
+        "url": "http://data.10jqka.com.cn/funds/gnzjl/field/tradezdf/order/desc/ajax/1/free/1/",
+        "outcome": "transport_error",
+        "error_type": "ConnectionError",
+        "error": "HTTPConnectionPool(host='data.10jqka.com.cn', port=80): Max retries exceeded with url: /funds/gnzjl/field/tradezdf/order/desc/ajax/1/free/1/ (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000018EBA67DD10>: Failed to establish a new connection: [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。'))"
+      }
+    ]
+  },
+  "derived": {
+    "industry_directory": {
+      "path": "docs/provider-probes/2026-10-02-sector-derived/ths-industry-directory.csv",
+      "rows": 90,
+      "columns": [
+        "board_type",
+        "board_name",
+        "board_code",
+        "source"
+      ],
+      "sha256": "ed23bd9495333d380734705a8d8268b5f47a6b2c3fa89a47e9409adba947351e"
+    },
+    "industry_index_daily": {
+      "path": "docs/provider-probes/2026-10-02-sector-derived/ths-semiconductor-index-daily.csv",
+      "rows": 21,
+      "columns": [
+        "board_type",
+        "board_code",
+        "board_name",
+        "trade_date",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "amount",
+        "source"
+      ],
+      "sha256": "1695ca65d6026ccb6d74bc964e6b0e50508a0d35032a3b90ba0e8cfed1ef3546"
+    },
+    "industry_fund_flow": {
+      "path": "docs/provider-probes/2026-10-02-sector-derived/ths-industry-fund-flow-now.csv",
+      "rows": 90,
+      "columns": [
+        "board_type",
+        "period",
+        "rank",
+        "board_name",
+        "index_value",
+        "change_pct",
+        "money_inflow",
+        "money_outflow",
+        "net_inflow",
+        "company_count",
+        "leader_stock_name",
+        "leader_change_pct",
+        "leader_price",
+        "snapshot_at",
+        "source"
+      ],
+      "sha256": "64b31beaefc814c00a06eb81c8dd3f3671bd20fae8148fed8674d748624e7d95"
+    },
+    "concept_fund_flow": {
+      "path": "docs/provider-probes/2026-10-02-sector-derived/ths-concept-fund-flow-now.csv",
+      "rows": 387,
+      "columns": [
+        "board_type",
+        "period",
+        "rank",
+        "board_name",
+        "index_value",
+        "change_pct",
+        "money_inflow",
+        "money_outflow",
+        "net_inflow",
+        "company_count",
+        "leader_stock_name",
+        "leader_change_pct",
+        "leader_price",
+        "snapshot_at",
+        "source"
+      ],
+      "sha256": "4c5dd7d4fd07ddeb084bdbcee218aa2f786c756cecc392ff8cd906f2ca1ec65e"
+    },
+    "csrc_industry_membership": {
+      "path": "docs/provider-probes/2026-10-02-sector-derived/baostock-csrc-industry-membership.csv",
+      "rows": 5221,
+      "columns": [
+        "trade_date",
+        "stock_code",
+        "stock_name",
+        "exchange",
+        "status",
+        "industry_name",
+        "classification",
+        "classification_update_date",
+        "source"
+      ],
+      "sha256": "41c9f685b6ffca6f70492a29207ba1ff225306beeddf7def390600079449d003"
+    }
+  },
+  "validation": {
+    "raw_response_hashes_verified": true,
+    "industry_directory_codes_unique": true,
+    "industry_index_dates_unique": true,
+    "industry_index_window_matches_request": true,
+    "industry_flow_names_unique": true,
+    "concept_flow_names_unique": true,
+    "csrc_membership_codes_unique": true
+  },
+  "upstream_vs_project_provider_comparison": [
+    {
+      "upstream_function": "ak.stock_board_industry_name_ths()",
+      "project_method": "AkShareBoardProvider.fetch_industry_list()",
+      "parameters": {},
+      "status_and_rows": "HTTP 200; 90 rows; 90 unique codes",
+      "raw_endpoint": "GET https://q.10jqka.com.cn/thshy/detail/code/881272/"
+    },
+    {
+      "upstream_function": "ak.stock_board_industry_index_ths(symbol, start_date, end_date)",
+      "project_method": "AkShareBoardProvider.fetch_industry_daily(board_name, start_date, end_date, board_code)",
+      "parameters": {
+        "symbol": "半导体",
+        "start_date": "20260901",
+        "end_date": "20261002"
+      },
+      "status_and_rows": "HTTP 200; 21 rows; 2026-09-01..2026-09-30",
+      "raw_endpoint": "GET https://d.10jqka.com.cn/v4/line/bk_881121/01/2026.js"
+    },
+    {
+      "upstream_function": "ak.stock_fund_flow_industry(symbol='即时')",
+      "project_method": "AkShareBoardProvider.fetch_fund_flow('industry', period='即时')",
+      "parameters": {
+        "symbol": "即时"
+      },
+      "status_and_rows": "HTTP 200 pages; 90 rows",
+      "raw_endpoint_prefix": "http://data.10jqka.com.cn/funds/hyzjl/"
+    },
+    {
+      "upstream_function": "ak.stock_fund_flow_concept(symbol='即时')",
+      "project_method": "AkShareBoardProvider.fetch_fund_flow('concept', period='即时')",
+      "parameters": {
+        "symbol": "即时"
+      },
+      "status_and_rows": "HTTP 200 pages; 387 rows",
+      "raw_endpoint_prefix": "http://data.10jqka.com.cn/funds/gnzjl/"
+    }
+  ],
+  "transport_and_field_comparison": {
+    "transport": "Project adapter calls the same AkShare functions and arguments; headers, dynamic THS v cookie, session, and pagination stay inside the installed AkShare version.",
+    "request_headers": "Sanitized request/response headers are preserved in manifest.ndjson; Cookie and hexin-v values are redacted.",
+    "http_status": "All retained THS application responses are HTTP 200; first isolated attempt failed before connection and is archived above.",
+    "fields": "Provider checks the observed exact field set and row width before mapping rows.",
+    "units_and_time": "Flow money units and index volume/amount units remain unconfirmed; fund-flow rows have no per-row trade date.",
+    "routing": "All new capabilities remain validation_only; no production data was written."
+  },
+  "baostock_provider_offline_replay": {
+    "source_evidence": "docs/provider-probes/2026-10-01-security-board-coverage.json",
+    "source_evidence_sha256": "8d39373b3494fe988acdc3fd2807f019608e17c01373f9fd8d31a96f3013571f",
+    "request_parameters_reproduced": {
+      "query_all_stock": {
+        "day": "2026-09-30"
+      },
+      "query_stock_industry": {
+        "date": "2026-09-30"
+      }
+    },
+    "request_count": 2,
+    "provider_output_rows": 5221,
+    "active_coverage_percent": 99.9616,
+    "missing_active_symbols": [
+      "sz001246",
+      "sz301716"
+    ],
+    "independent_raw_sdk_comparison": false,
+    "note": "Offline normalization replay from saved merged rows; the old evidence did not retain raw SDK field rows. A 2026-10-03 single-code request variant is preserved separately and is not counted as this Provider validation."
+  },
+  "semantic_limits": {
+    "flow_money_units": "source display units retained without conversion; unconfirmed",
+    "flow_time": "instantaneous ranking snapshot; no per-row trade date returned",
+    "flow_membership": "fund flow rows are not stock-to-board membership relations",
+    "csrc_live_provider": "no same-parameter full-snapshot live request repeated; source evidence predates the Provider and raw SDK rows were not retained"
+  }
+}

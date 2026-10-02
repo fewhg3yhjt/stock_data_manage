@@ -21,7 +21,7 @@ EastMoney 各数据域的范围和实现状态见 `eastmoney-data-domain-coverag
 
 Provider 的离线契约、实时探针和路由资格记录见仓库根目录的 `PROVIDER_CAPABILITY_MATRIX.md`。该文档是渠道验证事实记录，不是运行时配置。
 能力采集、证据生命周期和 YAML 归一化规则见 `provider-capability-verification-and-normalization.md`；它是 Provider 接入和后续验证的专项设计。
-探针摘要证据位于 `docs/provider-probes/`；临时完整探针输出位于 `/tmp/opencode/provider-probes/`，不作为生产数据目录。
+探针摘要证据位于 `docs/provider-probes/`；临时完整探针输出位于 `/tmp/opencode/provider-probes/`，不作为生产数据目录。2026-10-02 行业迁移探针原始 HTTP 响应位于 `docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/`，失败重试记录位于 `docs/provider-probes/raw/2026-10-02-sector-capabilities-v1/`；可用 `docs/provider-probes/replay_sector_capability_archives.py` 离线重放并重建派生表，摘要见 `docs/provider-probes/2026-10-02-sector-derived-validation.json`。BaoStock 证监会全市场旧证据位于 `docs/provider-probes/2026-10-01-security-board-coverage.json`，只含合并后的解码结果，不含原始 TCP 帧或原始 SDK 行。
 
 ## 领域模型
 
@@ -48,6 +48,7 @@ Provider 的离线契约、实时探针和路由资格记录见仓库根目录�
 | `providers/baostock/session.py` | BaoStock SDK 登录、登出、代码映射和结果集读取 |
 | `providers/baostock/daily.py` | BaoStock 历史日线，初始角色为校验来源 |
 | `providers/baostock/minute.py` | BaoStock 原生 5m，初始角色为校验来源 |
+| `providers/baostock/industry.py` | BaoStock 证监会行业成分快照；可保存 SDK 解码行，原始 TCP 帧不可见 |
 | `providers/baostock/__init__.py` | BaoStock 适配器导出 |
 | `providers/eastmoney/dividend.py` | EastMoney 分红实施事件批量查询和分红事件标准化 |
 | `providers/eastmoney/security_list.py` | EastMoney 分页证券列表、市场和资产类型映射 |
@@ -56,6 +57,7 @@ Provider 的离线契约、实时探针和路由资格记录见仓库根目录�
 | `providers/eastmoney/__init__.py` | EastMoney 适配器导出 |
 | `providers/akshare/session.py` | AkShare 可选依赖加载和代码转换 |
 | `providers/akshare/daily.py` | AkShare 股票、ETF、LOF、指数函数级历史日线 |
+| `providers/akshare/boards.py` | AkShare 同花顺行业目录、行业指数日线和行业/概念资金流快照 |
 | `providers/akshare/__init__.py` | AkShare 适配器导出 |
 | `providers/ths/boards.py` | 同花顺行业/概念板块列表、分页和成分页面适配器；输出可写入 Raw 的关系快照，不伪装成行情 Bar |
 | `providers/ths/__init__.py` | THS 适配器导出 |
