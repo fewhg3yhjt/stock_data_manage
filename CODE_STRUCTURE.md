@@ -171,3 +171,5 @@ BaoStock 后续两项转换见 `provider_validation/docs/2026-10-04-baostock-inp
 - `tmp_test/` 仅保留探针和研究脚本，不作为正式运行时模块入口。
 
 东财后续三项已有接口转换见 `provider_validation/docs/2026-10-04-eastmoney-input-collection.md`。原 `shareholder.py`、`dividend.py`、`fund_flow.py` 提供原成功 SDK 的历史候选方法；复用三个现有模板和归一化文件。`providers/contracts.py` 的既有输入结果补来源行、映射上下文和排除行。原验证脚本增加 `--verify-em-inputs`，证据目录为 `results/em-original-20261004/`、`em-final-20261004/`、`em-cli-20261004/` 和同前缀测试/索引。没有新增运行时模块或自动调度策略。
+
+当前输入进度的只读核对记录位于 `provider_validation/results/input-progress-review-20261004/review.json`：实际工厂绑定与配置一致，14项候选已实现、51项待转换或归并、7项阻断、2项别名。记录关联当前源码/配置及逐项来源证据哈希；未执行下一批转换，也不改变生产资格。前述各批最终索引仍代表各自提交时的版本。

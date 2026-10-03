@@ -1,0 +1,3037 @@
+{
+  "review_time_utc": "2026-10-03T22:20:55.918746+00:00",
+  "review_kind": "read-only current implementation inventory; no new provider verification",
+  "counts": {
+    "implemented_validation_only": 14,
+    "unimplemented": 50,
+    "blocked": 7,
+    "migration_pending": 1,
+    "alias": 2
+  },
+  "supported_input_methods": {
+    "ASTOCK-001": "fetch_snapshot",
+    "ASTOCK-002-daily": "fetch_window",
+    "ASTOCK-002-5m": "fetch_recent",
+    "ASTOCK-045": "fetch",
+    "ASTOCK-070": "fetch",
+    "ASTOCK-026": "fetch_history",
+    "ASTOCK-027": "fetch_history",
+    "ASTOCK-028": "fetch_history",
+    "SDA-BOARD-001": "fetch_industry_list",
+    "SDA-BOARD-002": "fetch_industry_daily",
+    "SDA-BOARD-003": "fetch_fund_flow",
+    "SDA-BOARD-004": "fetch_fund_flow",
+    "SDA-BOARD-005": "fetch_snapshot",
+    "SDA-BOARD-006": "fetch_snapshot"
+  },
+  "total_input_contracts": 74,
+  "remaining_conversion_or_merge_count": 51,
+  "last_completed_tests": 292,
+  "last_batch_artifact_audit": "em-final-20261004/verify.py executed successfully during this review",
+  "next_preparation": [
+    "ASTOCK-023: compare successful THS fallback with SDA-BOARD-003 before merging duplicate definitions",
+    "ASTOCK-046/047/048/050: expand existing limit_pool.py; use distinct necessary schemas because source field sets differ from limit_up_pool"
+  ],
+  "autonomous_remaining_scope": "awaiting one explicit scope confirmation; no runtime edits performed",
+  "scope_exclusions": [
+    "blocked source eligibility",
+    "production routing activation",
+    "automatic scheduling rollout",
+    "management UI",
+    "whole-market coverage policy"
+  ],
+  "source_refs": [
+    {
+      "path": "config/providers.yaml",
+      "sha256": "48e663776fd6b416367de1b0ceac38fea8e128e1b6261c71f71a24ad26f00ba2"
+    },
+    {
+      "path": "src/stock_data_manage/routing/factory.py",
+      "sha256": "b12059360c1bdde6033d46f96cc0ebb203f5456b015d9f2aa31408e6c30c027a"
+    },
+    {
+      "path": "PROJECT_PROGRESS.md",
+      "sha256": "709d37c40825bb668c51c56c71113d3531e4769fba578f2268631dfa4930eb63"
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004-tests.xml",
+      "sha256": "d5f1b6af0101cd76be57c480986f4ed664ba034090f53a73d08fb1568473102b"
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004-verification.json",
+      "sha256": "58da560b5ac59b064028980b5a607809fa17069a44713bbd24e9e16b191f614f"
+    }
+  ],
+  "inputs": [
+    {
+      "input_id": "ASTOCK-001",
+      "contract": {
+        "dataset": "realtime_quote",
+        "runtime_method": "fetch_snapshot",
+        "provider": "tencent",
+        "endpoint": "single_quote",
+        "parameters": {
+          "symbols": {
+            "type": "strings",
+            "source": "request.symbols",
+            "required": true
+          },
+          "as_of": {
+            "type": "datetime",
+            "source": "request.as_of",
+            "required": true
+          }
+        },
+        "data_kind": "quote",
+        "data_frequency": "snapshot",
+        "request_shape": "symbol_batch",
+        "collection_profile": "tencent_market_snapshot",
+        "implementation_status": "implemented_validation_only",
+        "runtime_endpoint": "tencent.bulk_snapshot",
+        "display_name": "腾讯财经",
+        "limitations": [
+          "原单证券响应与脚本对照；多证券分批仅有离线夹具验证，尚无在线批量和全市场完整性证据",
+          "as_of只校验返回日期，不是上游历史查询参数；量额单位未独立核验，标准量额列为空",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-001"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "call_boundary_only",
+        "forbidden_sources": [
+          "request.symbol",
+          "request.trade_date",
+          "request.start_date",
+          "request.end_date"
+        ]
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-001.json",
+          "sha256": "9dbb7c9a2159d7ea19851aaaf0059362a78c563525636ff60262295b32848376"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-002-5m",
+      "contract": {
+        "dataset": "minute_bar_5m",
+        "runtime_method": "fetch_recent",
+        "provider": "tencent",
+        "endpoint": "kline_5m",
+        "display_name": "腾讯最近5分钟线",
+        "data_kind": "time_series",
+        "data_frequency": "5m",
+        "request_shape": "single_symbol",
+        "parameters": {
+          "code": {
+            "type": "string",
+            "source": "request.symbol",
+            "required": true
+          },
+          "count": {
+            "type": "integer",
+            "source": "config.count",
+            "required": true,
+            "default": 96,
+            "minimum": 1,
+            "maximum": 320
+          }
+        },
+        "collection_profile": "tencent_minute_5m",
+        "implementation_status": "implemented_validation_only",
+        "runtime_endpoint": "tencent.native_1m",
+        "evidence_refs": [
+          "ASTOCK-002"
+        ],
+        "limitations": [
+          "仅实测沪市日线前复权/深市最近5分钟样本；其他周期和北交所不继承资格",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "forbidden_sources": [
+          "request.start_date",
+          "request.end_date"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "call_boundary_only"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-002.json",
+          "sha256": "8b398910404947944c13409be31d1394c27111aa26a5e011796d5d8e114e4258"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-002-daily",
+      "contract": {
+        "dataset": "daily_bar",
+        "runtime_method": "fetch_window",
+        "provider": "tencent",
+        "endpoint": "kline_daily",
+        "display_name": "腾讯前复权日线",
+        "data_kind": "time_series",
+        "data_frequency": "daily",
+        "request_shape": "single_symbol",
+        "parameters": {
+          "code": {
+            "type": "string",
+            "source": "request.symbol",
+            "required": true
+          },
+          "start": {
+            "type": "date",
+            "source": "request.start_date",
+            "required": true
+          },
+          "end": {
+            "type": "date",
+            "source": "request.end_date",
+            "required": true
+          },
+          "adjust": {
+            "type": "string",
+            "source": "config.adjust",
+            "required": true,
+            "default": "qfq",
+            "choices": [
+              "qfq"
+            ]
+          }
+        },
+        "collection_profile": "tencent_daily",
+        "implementation_status": "implemented_validation_only",
+        "runtime_endpoint": "tencent.forward_history",
+        "evidence_refs": [
+          "ASTOCK-002"
+        ],
+        "limitations": [
+          "仅实测沪市日线前复权/深市最近5分钟样本；其他周期和北交所不继承资格",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "call_boundary_only"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-002.json",
+          "sha256": "8b398910404947944c13409be31d1394c27111aa26a5e011796d5d8e114e4258"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-003",
+      "contract": {
+        "provider": "tdx",
+        "endpoint": "daily_package",
+        "parameters": {
+          "date": {
+            "type": "date",
+            "source": "request.trade_date",
+            "required": true
+          }
+        },
+        "data_kind": "file_package",
+        "data_frequency": "daily",
+        "request_shape": "file_package",
+        "collection_profile": "market_after_close",
+        "implementation_status": "unimplemented",
+        "display_name": "通达信盘后包",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "trading_date_parameter": "date",
+        "evidence_refs": [
+          "ASTOCK-003"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-003.json",
+          "sha256": "96e30ebcfdab10c575548e53cb86199ec24373f0bc1fc91f7491f851d147d9fe"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-004",
+      "contract": {
+        "provider": "tencent",
+        "endpoint": "ticks",
+        "parameters": {
+          "code": {
+            "type": "string",
+            "source": "request.symbol",
+            "required": true
+          }
+        },
+        "data_kind": "ticks",
+        "data_frequency": "tick",
+        "request_shape": "single_symbol",
+        "collection_profile": "market_intraday",
+        "implementation_status": "unimplemented",
+        "display_name": "腾讯逐笔成交",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-004"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-004.json",
+          "sha256": "68b1f480d2e904799dfe9bcb9a31266ce736c54bdae4ab64e0a0bdfcae368602"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-006",
+      "contract": {
+        "provider": "sina",
+        "endpoint": "adjustment_factor",
+        "parameters": {
+          "code": {
+            "type": "string",
+            "source": "request.symbol",
+            "required": true
+          },
+          "kind": {
+            "type": "string",
+            "source": "config.kind",
+            "required": true,
+            "default": "qfq",
+            "choices": [
+              "qfq",
+              "hfq"
+            ]
+          }
+        },
+        "data_kind": "factor",
+        "data_frequency": "event",
+        "request_shape": "single_symbol",
+        "collection_profile": "market_after_close",
+        "implementation_status": "unimplemented",
+        "display_name": "新浪复权因子",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-006"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-006.json",
+          "sha256": "68fdee7e084f9def253aec496a0a0aa5ba8d5a70cb9168bb07e17d157223d8b3"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-008",
+      "contract": {
+        "provider": "eastmoney",
+        "endpoint": "report_list",
+        "parameters": {
+          "code": {
+            "type": "string",
+            "source": "request.symbol",
+            "required": true
+          }
+        },
+        "data_kind": "document_index",
+        "data_frequency": "snapshot",
+        "request_shape": "single_symbol",
+        "collection_profile": "event_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "东财 reportapi",
+        "limitations": [
+          "研报列表成功不包括PDF下载能力",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-008"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-008.json",
+          "sha256": "7c94d701c424a5c6d62d9c247c2fbb9d1bd38abbc7e3d31268ffd4b93845b4ec"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-011",
+      "contract": {
+        "provider": "ths",
+        "endpoint": "earnings_consensus",
+        "parameters": {
+          "code": {
+            "type": "string",
+            "source": "request.symbol",
+            "required": true
+          }
+        },
+        "data_kind": "forecast",
+        "data_frequency": "snapshot",
+        "request_shape": "single_symbol",
+        "collection_profile": "event_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "同花顺一致预期",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-011"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-011.json",
+          "sha256": "5f2881d811d3b4faf1154bde2618eeb8ce21565fffcbc8fe816b903038dcc041"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-013",
+      "contract": {
+        "provider": "sina",
+        "endpoint": "report_list",
+        "parameters": {
+          "code": {
+            "type": "string",
+            "source": "request.symbol",
+            "required": false
+          },
+          "page": {
+            "type": "integer",
+            "source": "metadata.page",
+            "required": false,
+            "default": 1,
+            "minimum": 1
+          }
+        },
+        "data_kind": "document_index",
+        "data_frequency": "snapshot",
+        "request_shape": "paged_list",
+        "collection_profile": "event_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "新浪研报列表",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-013"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-013.json",
+          "sha256": "d0fb5dc9c22161c7badc7d4bb1dc1d2a034ed8b4ed2a8ef1ad220f57d4435d50"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-014",
+      "contract": {
+        "provider": "ths",
+        "endpoint": "hot_reason",
+        "parameters": {},
+        "data_kind": "snapshot",
+        "data_frequency": "snapshot",
+        "request_shape": "full_snapshot",
+        "collection_profile": "market_intraday",
+        "implementation_status": "unimplemented",
+        "display_name": "同花顺热点",
+        "limitations": [
+          "记录内含401响应，不能由部分非空返回推断完整性",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-014"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-014.json",
+          "sha256": "8092b25fe173e4735331321487dd3990e86610624093bfac42ede366289bb62f"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-015",
+      "contract": {
+        "provider": "eastmoney",
+        "endpoint": "northbound_summary",
+        "parameters": {},
+        "data_kind": "snapshot",
+        "data_frequency": "snapshot",
+        "request_shape": "full_snapshot",
+        "collection_profile": "market_intraday",
+        "implementation_status": "blocked",
+        "display_name": "沪深港通汇总（实时资金有效性未证明）",
+        "limitations": [
+          "净买额和净流入为0，实时资金语义未证明",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-015"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-015.json",
+          "sha256": "566169f5dac2476cbe2e1cf619aed83c5663d23ec27271c97fdceb6fef7b1aca"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-019",
+      "contract": {
+        "provider": "eastmoney",
+        "endpoint": "dragon_tiger_seats",
+        "parameters": {
+          "code": {
+            "type": "string",
+            "source": "request.symbol",
+            "required": true
+          },
+          "date": {
+            "type": "date",
+            "source": "request.trade_date",
+            "required": true
+          }
+        },
+        "data_kind": "event",
+        "data_frequency": "daily",
+        "request_shape": "single_symbol",
+        "collection_profile": "market_after_close",
+        "implementation_status": "unimplemented",
+        "display_name": "龙虎榜席位",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "trading_date_parameter": "date",
+        "evidence_refs": [
+          "ASTOCK-019"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-019.json",
+          "sha256": "0216646426ae492385bf504970d594f20057a81797018ca3ac8709d49c76136c"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-020",
+      "contract": {
+        "provider": "eastmoney",
+        "endpoint": "dragon_tiger_daily",
+        "parameters": {
+          "date": {
+            "type": "date",
+            "source": "request.trade_date",
+            "required": true
+          }
+        },
+        "data_kind": "event",
+        "data_frequency": "daily",
+        "request_shape": "date_snapshot",
+        "collection_profile": "market_after_close",
+        "implementation_status": "unimplemented",
+        "display_name": "全市场龙虎榜",
+        "limitations": [
+          "最新2026-09-30原始响应与解析输出84行；旧失败备注不作为排除依据",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "trading_date_parameter": "date",
+        "evidence_refs": [
+          "ASTOCK-020"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-020.json",
+          "sha256": "eacdf9adead18348560c1fc35bbf2f3bd3bb91537088b436af42c6fd2b2e8ed2"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-021",
+      "contract": {
+        "provider": "eastmoney",
+        "endpoint": "lockup_expiry",
+        "parameters": {
+          "code": {
+            "type": "string",
+            "source": "request.symbol",
+            "required": true
+          },
+          "start": {
+            "type": "date",
+            "source": "request.start_date",
+            "required": true
+          },
+          "end": {
+            "type": "date",
+            "source": "request.end_date",
+            "required": true
+          }
+        },
+        "data_kind": "event",
+        "data_frequency": "event",
+        "request_shape": "single_symbol",
+        "collection_profile": "event_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "限售解禁日历",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-021"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-021.json",
+          "sha256": "2bfac82f345da408245da0114307877594fb6a0b33f4c8eff86a34a190c43989"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-023",
+      "contract": {
+        "provider": "ths",
+        "endpoint": "industry_fund_flow",
+        "parameters": {
+          "period": {
+            "type": "string",
+            "source": "config.period",
+            "required": true,
+            "default": "即时",
+            "choices": [
+              "即时"
+            ]
+          }
+        },
+        "data_kind": "snapshot",
+        "data_frequency": "snapshot",
+        "request_shape": "paged_list",
+        "collection_profile": "market_intraday",
+        "implementation_status": "migration_pending",
+        "runtime_endpoint": "akshare.industry_fund_flow",
+        "display_name": "板块资金流向",
+        "limitations": [
+          "实际成功回退为同花顺行业资金流；失败的东财变体不合并授予资格",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-023"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-023.json",
+          "sha256": "36745fd42333cf0260339ab1b5469b1a4183d93849049ef7d35f31ddbd36a71b"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-024",
+      "contract": {
+        "provider": "exchange_composite",
+        "endpoint": "margin_detail",
+        "parameters": {
+          "code": {
+            "type": "string",
+            "source": "request.symbol",
+            "required": true
+          },
+          "date": {
+            "type": "date",
+            "source": "request.trade_date",
+            "required": true
+          }
+        },
+        "data_kind": "table",
+        "data_frequency": "daily",
+        "request_shape": "date_snapshot",
+        "collection_profile": "market_after_close",
+        "implementation_status": "blocked",
+        "display_name": "融资融券明细",
+        "limitations": [
+          "沪市filtered仍为全量2000行，深市为空；日期回退必须显式保留实际返回日期",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "trading_date_parameter": "date",
+        "evidence_refs": [
+          "ASTOCK-024"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-024.json",
+          "sha256": "e6565366a4b604bcec87c264447d7e543d04f4956467a2d776bde52a30acc8e4"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-026",
+      "contract": {
+        "dataset": "shareholder_count",
+        "runtime_method": "fetch_history",
+        "forbidden_sources": [
+          "request.start_date",
+          "request.end_date",
+          "request.trade_date",
+          "request.count",
+          "config.count"
+        ],
+        "base_requests_per_fetch": 2,
+        "provider": "eastmoney",
+        "endpoint": "shareholder_count",
+        "parameters": {
+          "code": {
+            "type": "string",
+            "source": "request.symbol",
+            "required": true
+          }
+        },
+        "data_kind": "event",
+        "data_frequency": "report_period",
+        "request_shape": "single_symbol",
+        "collection_profile": "event_daily",
+        "implementation_status": "implemented_validation_only",
+        "runtime_endpoint": "eastmoney.shareholder_count",
+        "display_name": "股东户数变化",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-026"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "call_boundary_only"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-026.json",
+          "sha256": "3efa49368b9559625983cdf05b4a4e67c7c36a9507f47b41e2481c0e8357d6c0"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-027",
+      "contract": {
+        "dataset": "dividend_event",
+        "runtime_method": "fetch_history",
+        "forbidden_sources": [
+          "request.start_date",
+          "request.end_date",
+          "request.trade_date",
+          "request.count",
+          "config.count"
+        ],
+        "base_requests_per_fetch": 2,
+        "provider": "eastmoney",
+        "endpoint": "dividend_history",
+        "parameters": {
+          "code": {
+            "type": "string",
+            "source": "request.symbol",
+            "required": true
+          }
+        },
+        "data_kind": "event",
+        "data_frequency": "event",
+        "request_shape": "single_symbol",
+        "collection_profile": "event_daily",
+        "implementation_status": "implemented_validation_only",
+        "runtime_endpoint": "eastmoney.dividend_event",
+        "display_name": "分红送转历史",
+        "limitations": [
+          "单证券历史接口与现有批量分红事件适配器请求契约不同；保留证券归属证据",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-027"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "call_boundary_only"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-027.json",
+          "sha256": "66eb42b9c7a18764b34f1414e45743129e4c7661e5f8cd6213b291cd8f848392"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-028",
+      "contract": {
+        "dataset": "stock_fund_flow",
+        "runtime_method": "fetch_history",
+        "forbidden_sources": [
+          "request.start_date",
+          "request.end_date",
+          "request.trade_date",
+          "request.count",
+          "config.count"
+        ],
+        "base_requests_per_fetch": 1,
+        "provider": "eastmoney",
+        "endpoint": "stock_fund_flow",
+        "parameters": {
+          "code": {
+            "type": "string",
+            "source": "request.symbol",
+            "required": true
+          }
+        },
+        "data_kind": "time_series",
+        "data_frequency": "daily",
+        "request_shape": "single_symbol",
+        "collection_profile": "market_after_close",
+        "implementation_status": "implemented_validation_only",
+        "runtime_endpoint": "eastmoney.stock_fund_flow",
+        "display_name": "个股资金流120日",
+        "limitations": [
+          "最新600519返回120行；来源控制返回长度，不能承诺固定120行；旧网络受阻备注已过时",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-028"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "call_boundary_only"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-028.json",
+          "sha256": "e7ec1ad1031c420122d5d6075ac178c75bd864890d469677754b3a36fe7cb8f5"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-029",
+      "contract": {
+        "provider": "eastmoney",
+        "endpoint": "chip_distribution",
+        "parameters": {
+          "code": {
+            "type": "string",
+            "source": "request.symbol",
+            "required": true
+          }
+        },
+        "data_kind": "derived",
+        "data_frequency": "daily",
+        "request_shape": "single_symbol",
+        "collection_profile": "market_after_close",
+        "implementation_status": "blocked",
+        "display_name": "筹码分布 CYQ",
+        "limitations": [
+          "算法派生口径未独立核准，不按外部原始输入授予资格",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-029"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-029.json",
+          "sha256": "d260b365f1411d540dafd5d1e5d7b413409ad31e079d36dc4295ade58e819214"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-030",
+      "contract": {
+        "provider": "sse",
+        "endpoint": "etf_shares",
+        "parameters": {
+          "date": {
+            "type": "date",
+            "source": "request.trade_date",
+            "required": true
+          },
+          "exchange": {
+            "type": "string",
+            "source": "request.exchange",
+            "required": true
+          }
+        },
+        "data_kind": "time_series",
+        "data_frequency": "daily",
+        "request_shape": "date_snapshot",
+        "collection_profile": "market_after_close",
+        "implementation_status": "unimplemented",
+        "display_name": "ETF 份额",
+        "limitations": [
+          "已测上交所日期数据，深交所当前快照未测",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "trading_date_parameter": "date",
+        "evidence_refs": [
+          "ASTOCK-030"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-030.json",
+          "sha256": "99e0b778d15bd69aae845b8d4dc0d70a9763c86ee13c8bdb80c470304840a0aa"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-031",
+      "contract": {
+        "provider": "eastmoney",
+        "endpoint": "stock_news",
+        "parameters": {
+          "code": {
+            "type": "string",
+            "source": "request.symbol",
+            "required": true
+          }
+        },
+        "data_kind": "document_index",
+        "data_frequency": "snapshot",
+        "request_shape": "single_symbol",
+        "collection_profile": "news_intraday",
+        "implementation_status": "unimplemented",
+        "display_name": "个股新闻",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-031"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-031.json",
+          "sha256": "ab4897b2e85474f342250b50cd4a1e0f537d01599df56e8707fb7cf83eb6b6b1"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-032",
+      "contract": {
+        "provider": "cls",
+        "endpoint": "telegraph",
+        "parameters": {},
+        "data_kind": "document_index",
+        "data_frequency": "snapshot",
+        "request_shape": "full_snapshot",
+        "collection_profile": "news_intraday",
+        "implementation_status": "unimplemented",
+        "display_name": "财联社电报",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-032"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-032.json",
+          "sha256": "b9290ad20a5c95433819566e57ef0b418232131da7897dcdc03fff2aff587ef4"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-033",
+      "contract": {
+        "provider": "sina",
+        "endpoint": "global_news",
+        "parameters": {},
+        "data_kind": "document_index",
+        "data_frequency": "snapshot",
+        "request_shape": "full_snapshot",
+        "collection_profile": "news_intraday",
+        "implementation_status": "unimplemented",
+        "display_name": "新浪全球资讯（实测成功来源）",
+        "limitations": [
+          "脚本先尝试新浪，成功响应来自新浪；东财名称不作为真实来源",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-033"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-033.json",
+          "sha256": "65c4fd808c4b803d822b165ff68ae91f6a7dc8a0e845dfa87507f41052938a03"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-034",
+      "contract": {
+        "provider": "wallstreetcn",
+        "endpoint": "news_lives",
+        "parameters": {
+          "channel": {
+            "type": "string",
+            "source": "config.channel",
+            "required": true,
+            "default": "global"
+          },
+          "limit": {
+            "type": "integer",
+            "source": "config.limit",
+            "required": true,
+            "default": 20,
+            "minimum": 1
+          },
+          "cursor": {
+            "type": "string",
+            "source": "metadata.cursor",
+            "required": false
+          }
+        },
+        "data_kind": "document_index",
+        "data_frequency": "snapshot",
+        "request_shape": "paged_list",
+        "collection_profile": "news_intraday",
+        "implementation_status": "unimplemented",
+        "display_name": "华尔街见闻快讯",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-034"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-034.json",
+          "sha256": "b3573c1cc5dba7fa77ca2dc3aa38404e65774c2a3454d7c579f5a10ffc29bd34"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-035",
+      "contract": {
+        "provider": "cctv",
+        "endpoint": "news",
+        "parameters": {
+          "date": {
+            "type": "date",
+            "source": "request.trade_date",
+            "required": true
+          },
+          "with_content": {
+            "type": "boolean",
+            "source": "config.with_content",
+            "required": true,
+            "default": true
+          }
+        },
+        "data_kind": "document",
+        "data_frequency": "daily",
+        "request_shape": "date_snapshot",
+        "collection_profile": "event_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "新闻联播",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-035"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-035.json",
+          "sha256": "691c3194bb7f90919289f595afaba1d552a74787f7a2b1e7b160dce5524e8e98"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-037",
+      "contract": {
+        "provider": "script_composite",
+        "endpoint": "company_profile",
+        "parameters": {
+          "code": {
+            "type": "string",
+            "source": "request.symbol",
+            "required": true
+          }
+        },
+        "data_kind": "composite",
+        "data_frequency": "snapshot",
+        "request_shape": "single_symbol",
+        "collection_profile": "event_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "F10 文本",
+        "limitations": [
+          "复合输出必须拆分成功子接口；不能标为通达信F10完整能力",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-037"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-037.json",
+          "sha256": "2a15406a4fbe6e9261e07395046c86f96631bc04aeb3d1ad7a57b746afd91248"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-039",
+      "contract": {
+        "provider": "sina",
+        "endpoint": "financial_statements",
+        "parameters": {
+          "code": {
+            "type": "string",
+            "source": "request.symbol",
+            "required": true
+          }
+        },
+        "data_kind": "table",
+        "data_frequency": "report_period",
+        "request_shape": "single_symbol",
+        "collection_profile": "event_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "新浪财报三表",
+        "limitations": [
+          "三张报表分别保留报告期、披露时间和来源字段，尚未定义生产标准表",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-039"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-039.json",
+          "sha256": "fb3f14fa54d9b7fbed6be8ee7081ad0c06e4357d1a2a9ba742c023379e03a8b8"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-044",
+      "contract": {
+        "provider": "eastmoney",
+        "endpoint": "st_list",
+        "parameters": {},
+        "data_kind": "snapshot",
+        "data_frequency": "snapshot",
+        "request_shape": "full_snapshot",
+        "collection_profile": "reference_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "ST 名单",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-044"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-044.json",
+          "sha256": "22da10e101139934a264849b60812b10731dbfbbe41222c9ecde3539d4f48685"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-045",
+      "contract": {
+        "dataset": "limit_up_pool",
+        "runtime_method": "fetch",
+        "provider": "eastmoney",
+        "endpoint": "limit_up_pool",
+        "parameters": {
+          "date": {
+            "type": "date",
+            "source": "request.trade_date",
+            "required": true
+          }
+        },
+        "data_kind": "snapshot",
+        "data_frequency": "daily",
+        "request_shape": "date_snapshot",
+        "collection_profile": "market_intraday",
+        "implementation_status": "implemented_validation_only",
+        "runtime_endpoint": "eastmoney.limit_up_pool",
+        "display_name": "东财涨停池",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "trading_date_parameter": "date",
+        "evidence_refs": [
+          "ASTOCK-045"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "call_boundary_only"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-045.json",
+          "sha256": "d99abecf4eacbe516af707d05f0026adc83be0906ec2ea874bd2959ed5c25202"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-046",
+      "contract": {
+        "provider": "eastmoney",
+        "endpoint": "broken_limit_pool",
+        "parameters": {
+          "date": {
+            "type": "date",
+            "source": "request.trade_date",
+            "required": true
+          }
+        },
+        "data_kind": "snapshot",
+        "data_frequency": "daily",
+        "request_shape": "date_snapshot",
+        "collection_profile": "market_intraday",
+        "implementation_status": "unimplemented",
+        "display_name": "东财炸板池",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "trading_date_parameter": "date",
+        "evidence_refs": [
+          "ASTOCK-046"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-046.json",
+          "sha256": "0fd7ea30a943f920aef99df4a308d7d75a336326c110b54a2befc1690f7ca3c1"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-047",
+      "contract": {
+        "provider": "eastmoney",
+        "endpoint": "limit_down_pool",
+        "parameters": {
+          "date": {
+            "type": "date",
+            "source": "request.trade_date",
+            "required": true
+          }
+        },
+        "data_kind": "snapshot",
+        "data_frequency": "daily",
+        "request_shape": "date_snapshot",
+        "collection_profile": "market_intraday",
+        "implementation_status": "unimplemented",
+        "display_name": "东财跌停池",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "trading_date_parameter": "date",
+        "evidence_refs": [
+          "ASTOCK-047"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-047.json",
+          "sha256": "aae190016f51e25080643fc870b5ab8116488a5e38d3a9c8a26fc8f34d0e8f4a"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-048",
+      "contract": {
+        "provider": "eastmoney",
+        "endpoint": "previous_limit_pool",
+        "parameters": {
+          "date": {
+            "type": "date",
+            "source": "request.trade_date",
+            "required": true
+          }
+        },
+        "data_kind": "snapshot",
+        "data_frequency": "daily",
+        "request_shape": "date_snapshot",
+        "collection_profile": "market_intraday",
+        "implementation_status": "unimplemented",
+        "display_name": "东财昨日涨停池",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "trading_date_parameter": "date",
+        "evidence_refs": [
+          "ASTOCK-048"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-048.json",
+          "sha256": "71d10a38757a91bf5b9c32014ad93d77bb5c62f4e1b638ce96b209fbc3e40abe"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-049",
+      "contract": {
+        "provider": "eastmoney",
+        "endpoint": "limit_up_pool",
+        "parameters": {
+          "date": {
+            "type": "date",
+            "source": "request.trade_date",
+            "required": true
+          }
+        },
+        "data_kind": "snapshot",
+        "data_frequency": "daily",
+        "request_shape": "date_snapshot",
+        "collection_profile": "market_intraday",
+        "implementation_status": "alias",
+        "display_name": "东财涨停池替代（同花顺涨停揭秘未实现）",
+        "limitations": [
+          "实际响应与东财涨停池相同，缺同花顺题材/原因字段，不作为独立来源",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "canonical_input": "ASTOCK-045",
+        "trading_date_parameter": "date",
+        "evidence_refs": [
+          "ASTOCK-049"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-049.json",
+          "sha256": "27116f34eb05ee55377a56a5c8e15441cfb5626f680a96623d315feb4032a508"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-050",
+      "contract": {
+        "provider": "eastmoney",
+        "endpoint": "strong_stock_pool",
+        "parameters": {
+          "date": {
+            "type": "date",
+            "source": "request.trade_date",
+            "required": true
+          }
+        },
+        "data_kind": "snapshot",
+        "data_frequency": "daily",
+        "request_shape": "date_snapshot",
+        "collection_profile": "market_intraday",
+        "implementation_status": "unimplemented",
+        "display_name": "东财强势股池",
+        "limitations": [
+          "不能作为交易所重点监控名单",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "trading_date_parameter": "date",
+        "evidence_refs": [
+          "ASTOCK-050"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-050.json",
+          "sha256": "2a1b67b63c520cf7a87dab43aeed824436d974194265716e296b828f1afa3c70"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-051",
+      "contract": {
+        "provider": "eastmoney",
+        "endpoint": "intraday_changes",
+        "parameters": {},
+        "data_kind": "event",
+        "data_frequency": "snapshot",
+        "request_shape": "full_snapshot",
+        "collection_profile": "market_intraday",
+        "implementation_status": "unimplemented",
+        "display_name": "东财日内异动池（明细接口）",
+        "limitations": [
+          "逐异动类型展开请求；日期和完整性待迁移核验",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-051"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-051.json",
+          "sha256": "e95d4f651f151fda31ee2765affe0d1c3feddb757b275b6265e59ee1c92ff637"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-052",
+      "contract": {
+        "provider": "local",
+        "endpoint": "intraday_change_counts",
+        "parameters": {
+          "rows": {
+            "type": "records",
+            "source": "dependency.intraday_changes",
+            "required": true
+          }
+        },
+        "data_kind": "derived",
+        "data_frequency": "snapshot",
+        "request_shape": "full_snapshot",
+        "collection_profile": "market_intraday",
+        "implementation_status": "blocked",
+        "display_name": "东财日内异动池（按标的统计接口）",
+        "limitations": [
+          "由异动明细派生，统计口径未核准；不作为独立外部来源",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-052"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-052.json",
+          "sha256": "d7c2ce1b7605b41d79c3c632f31902beba216c1edd2804456e98f2bd6896c940"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-055",
+      "contract": {
+        "provider": "sse",
+        "endpoint": "option_risk",
+        "parameters": {
+          "date": {
+            "type": "date",
+            "source": "request.trade_date",
+            "required": true
+          }
+        },
+        "data_kind": "table",
+        "data_frequency": "daily",
+        "request_shape": "date_snapshot",
+        "collection_profile": "market_after_close",
+        "implementation_status": "unimplemented",
+        "display_name": "上交所期权风险指标",
+        "limitations": [
+          "实际调用option_risk_indicator_sse；日期回退、希腊值和IV口径待核验",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "trading_date_parameter": "date",
+        "evidence_refs": [
+          "ASTOCK-055"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-055.json",
+          "sha256": "2bab1fa0cfe1428c3fc0c011bb39569253ad8d508caa8310c238f530b3243490"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-059",
+      "contract": {
+        "provider": "eastmoney",
+        "endpoint": "popularity",
+        "parameters": {},
+        "data_kind": "snapshot",
+        "data_frequency": "snapshot",
+        "request_shape": "full_snapshot",
+        "collection_profile": "market_intraday",
+        "implementation_status": "blocked",
+        "display_name": "东财人气榜",
+        "limitations": [
+          "仅10行item/value，未返回声称的股票排名字段",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-059"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-059.json",
+          "sha256": "117f067965374dcad074684845e9c05dffae6a6f2488d8938e1648755e7cf150"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-060",
+      "contract": {
+        "provider": "eastmoney",
+        "endpoint": "stock_concept_keyword",
+        "parameters": {
+          "code": {
+            "type": "string",
+            "source": "request.symbol",
+            "required": true
+          }
+        },
+        "data_kind": "snapshot",
+        "data_frequency": "snapshot",
+        "request_shape": "single_symbol",
+        "collection_profile": "reference_daily",
+        "implementation_status": "blocked",
+        "display_name": "东财个股关键词（概念归属未证明）",
+        "limitations": [
+          "关键词不等于证券-概念成员关系，related子接口失败",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-060"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-060.json",
+          "sha256": "3ad2894560223df3f9db5b79c7255c043557b591ec67cc840c9f3e6668c984ef"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-061",
+      "contract": {
+        "provider": "mofcom",
+        "endpoint": "social_financing",
+        "parameters": {},
+        "data_kind": "time_series",
+        "data_frequency": "monthly",
+        "request_shape": "full_snapshot",
+        "collection_profile": "macro_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "社融历史（商务部站点实测返回）",
+        "limitations": [
+          "保留统计期与发布时间，不用抓取日期替代；上游真实来源见原始请求",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由",
+          "最新原始响应来自data.mofcom.gov.cn，不标记为人民银行直接接口"
+        ],
+        "evidence_refs": [
+          "ASTOCK-061"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-061.json",
+          "sha256": "080bbf634bb8933baa24d29f78ea3d7634970255a3540a63f6d3c7335f93831b"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-062",
+      "contract": {
+        "provider": "eastmoney",
+        "endpoint": "pmi",
+        "parameters": {},
+        "data_kind": "time_series",
+        "data_frequency": "monthly",
+        "request_shape": "full_snapshot",
+        "collection_profile": "macro_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "PMI历史（AkShare实测接口）",
+        "limitations": [
+          "保留指标口径和原始来源，不能因原清单标题赋予国家统计局直接来源身份",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-062"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-062.json",
+          "sha256": "8340b6e7c8621035a274efecace82e344ed12ca3ad6e5825d859b08f299c4508"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-063",
+      "contract": {
+        "provider": "chinabond",
+        "endpoint": "yield_curve",
+        "parameters": {
+          "start": {
+            "type": "date",
+            "source": "request.start_date",
+            "required": true
+          },
+          "end": {
+            "type": "date",
+            "source": "request.end_date",
+            "required": true
+          },
+          "curve": {
+            "type": "string",
+            "source": "config.curve",
+            "required": true
+          }
+        },
+        "data_kind": "time_series",
+        "data_frequency": "daily",
+        "request_shape": "date_snapshot",
+        "collection_profile": "macro_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "中债收益率曲线",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-063"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-063.json",
+          "sha256": "9d6a8571bbc96fee44412a618f1870fad4ce436920ee1e6d1238e67e059fea27"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-064",
+      "contract": {
+        "provider": "chinamoney",
+        "endpoint": "repo_fixing",
+        "parameters": {
+          "kind": {
+            "type": "string",
+            "source": "config.kind",
+            "required": true
+          }
+        },
+        "data_kind": "time_series",
+        "data_frequency": "daily",
+        "request_shape": "full_snapshot",
+        "collection_profile": "macro_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "回购定盘利率",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-064"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-064.json",
+          "sha256": "3c3edf9bbc6d215e64980c05f72ea87159ebb386312eeb1a50c5f4518bdde095"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-065",
+      "contract": {
+        "provider": "eastmoney",
+        "endpoint": "lpr",
+        "parameters": {},
+        "data_kind": "time_series",
+        "data_frequency": "monthly",
+        "request_shape": "full_snapshot",
+        "collection_profile": "macro_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "LPR",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-065"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-065.json",
+          "sha256": "d6fd7f5f192a7033e419e4bbc58dbb2eb3c8fa1371e78d6a3d6f0c8033a663fd"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-066",
+      "contract": {
+        "provider": "wallstreetcn",
+        "endpoint": "macro_calendar",
+        "parameters": {
+          "start": {
+            "type": "date",
+            "source": "request.start_date",
+            "required": true
+          },
+          "end": {
+            "type": "date",
+            "source": "request.end_date",
+            "required": true
+          },
+          "country": {
+            "type": "string",
+            "source": "config.country",
+            "required": false
+          },
+          "min_importance": {
+            "type": "integer",
+            "source": "config.min_importance",
+            "required": false,
+            "minimum": 0
+          }
+        },
+        "data_kind": "event",
+        "data_frequency": "event",
+        "request_shape": "date_snapshot",
+        "collection_profile": "macro_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "全球宏观日历",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-066"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-066.json",
+          "sha256": "5417e8bedebe6e0158be9463bab5a9ad3bb606c8444f21d61098d69a2ade2e85"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-067",
+      "contract": {
+        "provider": "csindex",
+        "endpoint": "constituents",
+        "parameters": {
+          "index_code": {
+            "type": "string",
+            "source": "request.index_code",
+            "required": true
+          }
+        },
+        "data_kind": "snapshot",
+        "data_frequency": "snapshot",
+        "request_shape": "single_symbol",
+        "collection_profile": "reference_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "指数成分",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-067"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-067.json",
+          "sha256": "c02c87f8a3e86e242a8a7894eefe22768c66f7142c92c152a5c78fcb1cbdf7c7"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-068",
+      "contract": {
+        "provider": "csindex",
+        "endpoint": "weights",
+        "parameters": {
+          "index_code": {
+            "type": "string",
+            "source": "request.index_code",
+            "required": true
+          }
+        },
+        "data_kind": "snapshot",
+        "data_frequency": "snapshot",
+        "request_shape": "single_symbol",
+        "collection_profile": "reference_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "指数权重",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-068"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-068.json",
+          "sha256": "adde5e03a76b285e2440e979ecebdc5405dae8e38944e9429aaf344e3e87c51c"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-069",
+      "contract": {
+        "provider": "script_composite",
+        "endpoint": "index_valuation",
+        "parameters": {
+          "index_code": {
+            "type": "string",
+            "source": "request.index_code",
+            "required": true
+          }
+        },
+        "data_kind": "time_series",
+        "data_frequency": "daily",
+        "request_shape": "single_symbol",
+        "collection_profile": "market_after_close",
+        "implementation_status": "unimplemented",
+        "display_name": "指数估值",
+        "limitations": [
+          "来源变体及股本口径未核准，仅保留候选契约",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-069"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-069.json",
+          "sha256": "7ff8380555b8a4af80687f717dbdf50e3a1ee516de77393688028dd66a0c59b7"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-070",
+      "contract": {
+        "dataset": "trading_calendar",
+        "runtime_method": "fetch",
+        "provider": "sina",
+        "endpoint": "trading_calendar",
+        "parameters": {},
+        "data_kind": "calendar",
+        "data_frequency": "snapshot",
+        "request_shape": "full_snapshot",
+        "collection_profile": "reference_daily",
+        "implementation_status": "implemented_validation_only",
+        "runtime_endpoint": "sina.trading_calendar",
+        "display_name": "新浪交易日历",
+        "limitations": [
+          "实际调用tool_trade_date_hist_sina，不作为交易所官方日历",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-070"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "call_boundary_only"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-070.json",
+          "sha256": "366c2452c6646249f8230e677a89ba761e73473f53bbcffec172c072d39a5e05"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-071",
+      "contract": {
+        "provider": "exchange_composite",
+        "endpoint": "futures_daily",
+        "parameters": {
+          "date": {
+            "type": "date",
+            "source": "request.trade_date",
+            "required": true
+          },
+          "exchange": {
+            "type": "string",
+            "source": "request.exchange",
+            "required": true
+          }
+        },
+        "data_kind": "time_series",
+        "data_frequency": "daily",
+        "request_shape": "date_snapshot",
+        "collection_profile": "source_market_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "期货日行情",
+        "limitations": [
+          "使用各交易所自己的日历；只按原始证据授予交易所范围",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-071"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-071.json",
+          "sha256": "ddc5ae347a016084845996ccf0bc0b17fbc81ac604240979a66a9fed84d16441"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-072",
+      "contract": {
+        "provider": "exchange_composite",
+        "endpoint": "options_daily",
+        "parameters": {
+          "date": {
+            "type": "date",
+            "source": "request.trade_date",
+            "required": true
+          },
+          "exchange": {
+            "type": "string",
+            "source": "request.exchange",
+            "required": true
+          }
+        },
+        "data_kind": "time_series",
+        "data_frequency": "daily",
+        "request_shape": "date_snapshot",
+        "collection_profile": "source_market_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "期权日行情",
+        "limitations": [
+          "使用各交易所自己的日历；只按原始证据授予交易所范围",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-072"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-072.json",
+          "sha256": "95352f1515a3c22fae4378af3c90973095ebc73921c831b03d135a4564a5120c"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-073",
+      "contract": {
+        "provider": "cffex",
+        "endpoint": "position_rank",
+        "parameters": {
+          "date": {
+            "type": "date",
+            "source": "request.trade_date",
+            "required": true
+          },
+          "exchange": {
+            "type": "string",
+            "source": "request.exchange",
+            "required": true
+          },
+          "symbol": {
+            "type": "string",
+            "source": "request.contract",
+            "required": false
+          }
+        },
+        "data_kind": "table",
+        "data_frequency": "daily",
+        "request_shape": "date_snapshot",
+        "collection_profile": "source_market_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "会员持仓排名",
+        "limitations": [
+          "本轮只测试CFFEX",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-073"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-073.json",
+          "sha256": "a423fd6b7d145ea4e72f4564ca83e936fc5221e9817d3b2141f78dd6dc689f4b"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-074",
+      "contract": {
+        "provider": "sina",
+        "endpoint": "futures_quote",
+        "parameters": {
+          "symbols": {
+            "type": "strings",
+            "source": "request.contracts",
+            "required": true
+          }
+        },
+        "data_kind": "quote",
+        "data_frequency": "snapshot",
+        "request_shape": "symbol_batch",
+        "collection_profile": "source_market_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "实时期货",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-074"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-074.json",
+          "sha256": "4cf58c10f7a0da8fe83ab67054d1b67322156f2a1cab1f2d55384b2c1bb68bac"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-075",
+      "contract": {
+        "provider": "sina",
+        "endpoint": "futures_kline",
+        "parameters": {
+          "symbol": {
+            "type": "string",
+            "source": "request.contract",
+            "required": true
+          },
+          "start": {
+            "type": "date",
+            "source": "request.start_date",
+            "required": true
+          },
+          "end": {
+            "type": "date",
+            "source": "request.end_date",
+            "required": true
+          }
+        },
+        "data_kind": "time_series",
+        "data_frequency": "daily",
+        "request_shape": "single_symbol",
+        "collection_profile": "source_market_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "期货日 K",
+        "limitations": [
+          "仅RB0/M0样本；连续合约与实际合约身份分开",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-075"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-075.json",
+          "sha256": "d50fd228ac34d6e57288b1dbdde516fba45e6a0688e3124eb9a59c601fb3868a"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-076",
+      "contract": {
+        "provider": "sina",
+        "endpoint": "a50_quote",
+        "parameters": {},
+        "data_kind": "quote",
+        "data_frequency": "snapshot",
+        "request_shape": "full_snapshot",
+        "collection_profile": "source_market_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "A50 期指",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-076"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-076.json",
+          "sha256": "3afcccf0e291ae288b3a7a4b9bd4d2bda5c8d3c9ea9225c3cc9e8f57b54431d7"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-077",
+      "contract": {
+        "provider": "sge",
+        "endpoint": "spot",
+        "parameters": {
+          "instrument": {
+            "type": "string",
+            "source": "request.instrument",
+            "required": true
+          }
+        },
+        "data_kind": "quote",
+        "data_frequency": "snapshot",
+        "request_shape": "single_symbol",
+        "collection_profile": "source_market_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "上海金现货",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-077"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-077.json",
+          "sha256": "49b9143eda6187c3bddba01d19e0d5bb22cbe956eb8cd827455bb82c8d4baac3"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-078",
+      "contract": {
+        "provider": "eastmoney",
+        "endpoint": "earnings_forecast",
+        "parameters": {
+          "code": {
+            "type": "string",
+            "source": "request.symbol",
+            "required": true
+          },
+          "report_date": {
+            "type": "date",
+            "source": "request.report_date",
+            "required": false
+          },
+          "limit": {
+            "type": "integer",
+            "source": "config.limit",
+            "required": true,
+            "default": 100,
+            "minimum": 1
+          }
+        },
+        "data_kind": "event",
+        "data_frequency": "report_period",
+        "request_shape": "single_symbol",
+        "collection_profile": "event_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "业绩预告",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-078"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-078.json",
+          "sha256": "fc230e3c637cf8f86078431f2112dd1d331a662a2529c8e45b6ce2b04026dd79"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-079",
+      "contract": {
+        "provider": "eastmoney",
+        "endpoint": "institution_survey",
+        "parameters": {
+          "code": {
+            "type": "string",
+            "source": "request.symbol",
+            "required": true
+          },
+          "start": {
+            "type": "date",
+            "source": "request.start_date",
+            "required": true
+          },
+          "end": {
+            "type": "date",
+            "source": "request.end_date",
+            "required": true
+          },
+          "detail": {
+            "type": "boolean",
+            "source": "config.detail",
+            "required": true,
+            "default": false
+          },
+          "limit": {
+            "type": "integer",
+            "source": "config.limit",
+            "required": true,
+            "default": 100,
+            "minimum": 1
+          }
+        },
+        "data_kind": "event",
+        "data_frequency": "event",
+        "request_shape": "single_symbol",
+        "collection_profile": "event_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "机构调研",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-079"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-079.json",
+          "sha256": "87c1d2caa60d88ed997a918fc091bd3fcca113e25de92e79896a8ab0537f7568"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-080",
+      "contract": {
+        "provider": "eastmoney",
+        "endpoint": "holder_trades",
+        "parameters": {
+          "code": {
+            "type": "string",
+            "source": "request.symbol",
+            "required": true
+          },
+          "start": {
+            "type": "date",
+            "source": "request.start_date",
+            "required": true
+          },
+          "end": {
+            "type": "date",
+            "source": "request.end_date",
+            "required": true
+          },
+          "direction": {
+            "type": "string",
+            "source": "config.direction",
+            "required": false
+          },
+          "limit": {
+            "type": "integer",
+            "source": "config.limit",
+            "required": true,
+            "default": 100,
+            "minimum": 1
+          }
+        },
+        "data_kind": "event",
+        "data_frequency": "event",
+        "request_shape": "single_symbol",
+        "collection_profile": "event_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "股东增减持",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-080"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-080.json",
+          "sha256": "0eaa894c5b837f8fe7ccc46fa220b8dd052abb35a1dcda8d9e685a9f13554859"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-081",
+      "contract": {
+        "provider": "eastmoney",
+        "endpoint": "buyback",
+        "parameters": {
+          "code": {
+            "type": "string",
+            "source": "request.symbol",
+            "required": true
+          },
+          "progress": {
+            "type": "string",
+            "source": "config.progress",
+            "required": false
+          },
+          "limit": {
+            "type": "integer",
+            "source": "config.limit",
+            "required": true,
+            "default": 100,
+            "minimum": 1
+          }
+        },
+        "data_kind": "event",
+        "data_frequency": "event",
+        "request_shape": "single_symbol",
+        "collection_profile": "event_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "股票回购",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-081"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-081.json",
+          "sha256": "9aefbfceb651a2f2046357c67e2bd1cc27d61a183750fe080bcac60e4f0fa2d5"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-082",
+      "contract": {
+        "provider": "eastmoney",
+        "endpoint": "pledge",
+        "parameters": {
+          "code": {
+            "type": "string",
+            "source": "request.symbol",
+            "required": true
+          },
+          "date": {
+            "type": "date",
+            "source": "request.trade_date",
+            "required": true
+          },
+          "limit": {
+            "type": "integer",
+            "source": "config.limit",
+            "required": true,
+            "default": 100,
+            "minimum": 1
+          }
+        },
+        "data_kind": "event",
+        "data_frequency": "event",
+        "request_shape": "single_symbol",
+        "collection_profile": "event_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "股权质押",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-082"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-082.json",
+          "sha256": "ba3761bbaaebc9fc9cf79e61cb51d05dddc85860346186d9dfd1440198ec48a6"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-083",
+      "contract": {
+        "provider": "eastmoney",
+        "endpoint": "ipo_calendar",
+        "parameters": {
+          "limit": {
+            "type": "integer",
+            "source": "config.limit",
+            "required": true,
+            "default": 100,
+            "minimum": 1
+          }
+        },
+        "data_kind": "event",
+        "data_frequency": "event",
+        "request_shape": "full_snapshot",
+        "collection_profile": "event_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "新股申购日历",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-083"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-083.json",
+          "sha256": "76bc444912fca3e2476a57d96a1c5691402e3a29bff5a8ebb4863fc7b5b325bc"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-084",
+      "contract": {
+        "provider": "eastmoney",
+        "endpoint": "convertible_bonds",
+        "parameters": {
+          "include_delisted": {
+            "type": "boolean",
+            "source": "config.include_delisted",
+            "required": true,
+            "default": false
+          }
+        },
+        "data_kind": "snapshot",
+        "data_frequency": "snapshot",
+        "request_shape": "full_snapshot",
+        "collection_profile": "reference_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "可转债",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-084"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-084.json",
+          "sha256": "e2bc10c0d59c7e701e6eb33d5fc7ca7cda48973521fa0ff1c47035b4b420bdc8"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-085",
+      "contract": {
+        "provider": "sina",
+        "endpoint": "dragon_tiger_daily",
+        "parameters": {
+          "date": {
+            "type": "date",
+            "source": "request.trade_date",
+            "required": true
+          }
+        },
+        "data_kind": "event",
+        "data_frequency": "daily",
+        "request_shape": "date_snapshot",
+        "collection_profile": "market_after_close",
+        "implementation_status": "unimplemented",
+        "display_name": "新浪龙虎榜备用（实测来源）",
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "trading_date_parameter": "date",
+        "evidence_refs": [
+          "ASTOCK-085"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-085.json",
+          "sha256": "486825be62af955e8e55bf942f92c32077236825f0497f7ca421139eb58ca3ad"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-086",
+      "contract": {
+        "provider": "ths",
+        "endpoint": "individual_fund_flow",
+        "parameters": {
+          "period": {
+            "type": "string",
+            "source": "config.period",
+            "required": true,
+            "default": "即时",
+            "choices": [
+              "即时"
+            ]
+          }
+        },
+        "data_kind": "snapshot",
+        "data_frequency": "snapshot",
+        "request_shape": "paged_list",
+        "collection_profile": "market_intraday",
+        "implementation_status": "blocked",
+        "display_name": "资金流备胎",
+        "limitations": [
+          "105页请求仅取得16次响应后安全停止；没有完整解析结果",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-086"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-086.json",
+          "sha256": "935d7f663529d35e854c56dcd33b409d5fa0caff82a8a36f632dd7ed75ee9232"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-087",
+      "contract": {
+        "provider": "eastmoney",
+        "endpoint": "announcements",
+        "parameters": {
+          "code": {
+            "type": "string",
+            "source": "request.symbol",
+            "required": true
+          },
+          "start": {
+            "type": "date",
+            "source": "request.start_date",
+            "required": true
+          },
+          "end": {
+            "type": "date",
+            "source": "request.end_date",
+            "required": true
+          }
+        },
+        "data_kind": "document_index",
+        "data_frequency": "snapshot",
+        "request_shape": "single_symbol",
+        "collection_profile": "event_daily",
+        "implementation_status": "unimplemented",
+        "display_name": "公告备胎",
+        "limitations": [
+          "仅解析输出，缺精确原始响应；回退的全市场公告不能标成单票接口",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "evidence_refs": [
+          "ASTOCK-087"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-087.json",
+          "sha256": "8bd03ebf882e3143f76328fbea91d4b90c73b3f992099cbf0f93e65254f898e8"
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-088",
+      "contract": {
+        "provider": "exchange_composite",
+        "endpoint": "margin_detail",
+        "parameters": {
+          "code": {
+            "type": "string",
+            "source": "request.symbol",
+            "required": true
+          },
+          "date": {
+            "type": "date",
+            "source": "request.trade_date",
+            "required": true
+          }
+        },
+        "data_kind": "table",
+        "data_frequency": "daily",
+        "request_shape": "date_snapshot",
+        "collection_profile": "market_after_close",
+        "implementation_status": "alias",
+        "display_name": "官方两融备胎",
+        "limitations": [
+          "与融资融券明细复用同一脚本，不当作独立备用来源",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "canonical_input": "ASTOCK-024",
+        "trading_date_parameter": "date",
+        "evidence_refs": [
+          "ASTOCK-088"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/ASTOCK-088.json",
+          "sha256": "b3435206c29bad1d3d46146a3b70fd9bb18161c50f5247d0152cbc34df4217fb"
+        }
+      ]
+    },
+    {
+      "input_id": "SDA-BOARD-001",
+      "contract": {
+        "provider": "ths",
+        "endpoint": "industry_directory",
+        "display_name": "AkShare.stock_board_industry_name_ths()",
+        "data_kind": "snapshot",
+        "data_frequency": "snapshot",
+        "request_shape": "full_snapshot",
+        "collection_profile": "reference_daily",
+        "parameters": {},
+        "implementation_status": "implemented_validation_only",
+        "dataset": "industry_directory",
+        "runtime_method": "fetch_industry_list",
+        "runtime_endpoint": "akshare.industry_index_daily",
+        "limitations": [
+          "行业目录不等于证券概念归属；单位不适用",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "base_requests_per_fetch": 1,
+        "evidence_refs": [
+          "SDA-BOARD-001"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "call_boundary_only"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/SDA-BOARD-001.json",
+          "sha256": "70ffb5a358d6bdd8995534e6187c462f206962f3082d934a28ca40de05c95164"
+        }
+      ]
+    },
+    {
+      "input_id": "SDA-BOARD-002",
+      "contract": {
+        "provider": "ths",
+        "endpoint": "industry_index_daily",
+        "display_name": "AkShare.stock_board_industry_index_ths(symbol=..., start_date=..., end_date=...)",
+        "data_kind": "time_series",
+        "data_frequency": "daily",
+        "request_shape": "single_symbol",
+        "collection_profile": "market_after_close",
+        "parameters": {
+          "board_name": {
+            "type": "string",
+            "source": "request.board_name",
+            "required": true
+          },
+          "start_date": {
+            "type": "date",
+            "source": "request.start_date",
+            "required": true
+          },
+          "end_date": {
+            "type": "date",
+            "source": "request.end_date",
+            "required": true
+          },
+          "board_code": {
+            "type": "string",
+            "source": "dependency.board_code",
+            "required": false
+          }
+        },
+        "implementation_status": "implemented_validation_only",
+        "dataset": "industry_index_daily",
+        "runtime_method": "fetch_industry_daily",
+        "runtime_endpoint": "akshare.industry_index_daily",
+        "limitations": [
+          "只测一个板块和窗口；成交量/成交额单位未确认",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "base_requests_per_fetch": 1,
+        "evidence_refs": [
+          "SDA-BOARD-002"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "call_boundary_only"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/SDA-BOARD-002.json",
+          "sha256": "8cb6b5f5f4cf2764eb075fec8fe2f3e39be4d95285807cca349a7c0e4e028d0b"
+        }
+      ]
+    },
+    {
+      "input_id": "SDA-BOARD-003",
+      "contract": {
+        "provider": "ths",
+        "endpoint": "industry_fund_flow",
+        "display_name": "AkShare.stock_fund_flow_industry(symbol='即时')",
+        "data_kind": "snapshot",
+        "data_frequency": "snapshot",
+        "request_shape": "paged_list",
+        "collection_profile": "market_intraday",
+        "parameters": {
+          "board_type": {
+            "type": "string",
+            "source": "config.board_type",
+            "required": true,
+            "default": "industry",
+            "choices": [
+              "industry"
+            ]
+          },
+          "period": {
+            "type": "string",
+            "source": "config.period",
+            "required": true,
+            "default": "即时",
+            "choices": [
+              "即时"
+            ]
+          }
+        },
+        "implementation_status": "implemented_validation_only",
+        "dataset": "board_fund_flow",
+        "runtime_method": "fetch_fund_flow",
+        "runtime_endpoint": "akshare.industry_fund_flow",
+        "limitations": [
+          "快照无逐行日期；金额单位未确认；不是历史资金流",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "base_requests_per_fetch": 1,
+        "evidence_refs": [
+          "SDA-BOARD-003"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "call_boundary_only"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/SDA-BOARD-003.json",
+          "sha256": "4efb5f0d41a39eb5d8609f47145403acdd6670ff0474624358f5e5e7e0834dd3"
+        }
+      ]
+    },
+    {
+      "input_id": "SDA-BOARD-004",
+      "contract": {
+        "provider": "ths",
+        "endpoint": "concept_fund_flow",
+        "display_name": "AkShare.stock_fund_flow_concept(symbol='即时')",
+        "data_kind": "snapshot",
+        "data_frequency": "snapshot",
+        "request_shape": "paged_list",
+        "collection_profile": "market_intraday",
+        "parameters": {
+          "board_type": {
+            "type": "string",
+            "source": "config.board_type",
+            "required": true,
+            "default": "concept",
+            "choices": [
+              "concept"
+            ]
+          },
+          "period": {
+            "type": "string",
+            "source": "config.period",
+            "required": true,
+            "default": "即时",
+            "choices": [
+              "即时"
+            ]
+          }
+        },
+        "implementation_status": "implemented_validation_only",
+        "dataset": "board_fund_flow",
+        "runtime_method": "fetch_fund_flow",
+        "runtime_endpoint": "akshare.concept_fund_flow",
+        "limitations": [
+          "不是证券-概念成员关系；无逐行日期；金额单位未确认",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "base_requests_per_fetch": 1,
+        "evidence_refs": [
+          "SDA-BOARD-004"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "call_boundary_only"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/SDA-BOARD-004.json",
+          "sha256": "d864c93d907178ab182355f266a32af9cd1abea8be45c22b59ecd7cdc3566074"
+        }
+      ]
+    },
+    {
+      "input_id": "SDA-BOARD-005",
+      "contract": {
+        "provider": "baostock",
+        "endpoint": "security_snapshot",
+        "display_name": "BaoStock.query_all_stock(day='2026-09-30')",
+        "data_kind": "snapshot",
+        "data_frequency": "snapshot",
+        "request_shape": "full_snapshot",
+        "collection_profile": "reference_daily",
+        "parameters": {
+          "trade_date": {
+            "type": "date",
+            "source": "request.trade_date",
+            "required": true
+          },
+          "symbols": {
+            "type": "strings",
+            "source": "request.symbols",
+            "required": false,
+            "applied_at": "local_filter"
+          }
+        },
+        "implementation_status": "implemented_validation_only",
+        "dataset": "security_snapshot",
+        "runtime_method": "fetch_snapshot",
+        "forbidden_sources": [
+          "request.symbol"
+        ],
+        "runtime_endpoint": "baostock.industry_membership",
+        "limitations": [
+          "通过代码/交易所规则筛选得到沪深A股证券集合；BaoStock TCP原始帧不对SDK调用方开放。2026-10-02非交易日空返回已保存在 provider_validation/results/live-probes/baostock-industry-20261003/result.json。",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "base_requests_per_fetch": 2,
+        "trading_date_parameter": "trade_date",
+        "evidence_refs": [
+          "SDA-BOARD-005"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "call_boundary_only"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/SDA-BOARD-005.json",
+          "sha256": "987dafe0912c797665cfe44b5059832f616bfadada4ef5dce0c322ec47c7a9c3"
+        }
+      ]
+    },
+    {
+      "input_id": "SDA-BOARD-006",
+      "contract": {
+        "provider": "baostock",
+        "endpoint": "industry_membership",
+        "display_name": "BaoStock.query_stock_industry(date='2026-09-30')",
+        "data_kind": "snapshot",
+        "data_frequency": "snapshot",
+        "request_shape": "full_snapshot",
+        "collection_profile": "reference_daily",
+        "parameters": {
+          "trade_date": {
+            "type": "date",
+            "source": "request.trade_date",
+            "required": true
+          },
+          "symbols": {
+            "type": "strings",
+            "source": "request.symbols",
+            "required": false,
+            "applied_at": "local_filter"
+          }
+        },
+        "implementation_status": "implemented_validation_only",
+        "dataset": "industry_membership",
+        "runtime_method": "fetch_snapshot",
+        "forbidden_sources": [
+          "request.symbol"
+        ],
+        "runtime_endpoint": "baostock.industry_membership",
+        "limitations": [
+          "已归档query_stock_industry SDK解码字段与原始行；缺失2只，因此覆盖不完整。BaoStock TCP原始帧不对SDK调用方开放。2026-10-02非交易日空返回已单独留档。",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "base_requests_per_fetch": 2,
+        "trading_date_parameter": "trade_date",
+        "evidence_refs": [
+          "SDA-BOARD-006"
+        ],
+        "request_interval_seconds": 3,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "call_boundary_only"
+      },
+      "evidence_record_refs": [
+        {
+          "path": "provider_validation/results/interface-records/SDA-BOARD-006.json",
+          "sha256": "5b2cf8fbd24b0914e85e06da06ccb12cc02648b8ebb16e333618ef9193095caf"
+        }
+      ]
+    }
+  ]
+}
