@@ -46,7 +46,7 @@
         "sz001246",
         "sz301716"
       ],
-      "source_evidence": "docs/provider-probes/2026-10-01-security-board-coverage.json",
+      "source_evidence": "provider_validation/results/legacy/2026-10-01-security-board-coverage.json",
       "source_evidence_sha256": "8d39373b3494fe988acdc3fd2807f019608e17c01373f9fd8d31a96f3013571f",
       "original_sdk_rows_available": false
     }
@@ -60,7 +60,7 @@
       "status": 200,
       "body_sha256": "b1639d45922f7a86173529c1f809831cfbe5b71fc19bb6c66907a00e70056282",
       "body_bytes": 49841,
-      "manifest_path": "docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
+      "manifest_path": "provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
     },
     {
       "provider": "ths via akshare",
@@ -70,7 +70,7 @@
       "status": 200,
       "body_sha256": "6fbcb5f15fa5edac8ef542309c5ac39a63bfb74d5340753fecd5b675bbd251cf",
       "body_bytes": 14891,
-      "manifest_path": "docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
+      "manifest_path": "provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
     },
     {
       "provider": "ths via akshare",
@@ -80,7 +80,7 @@
       "status": 200,
       "body_sha256": "c41ab37e510b833dcf2ac2304125463b900c333c74b33d96ed87006d2c853de9",
       "body_bytes": 32720,
-      "manifest_path": "docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
+      "manifest_path": "provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
     },
     {
       "provider": "ths via akshare",
@@ -90,7 +90,7 @@
       "status": 200,
       "body_sha256": "c41ab37e510b833dcf2ac2304125463b900c333c74b33d96ed87006d2c853de9",
       "body_bytes": 32720,
-      "manifest_path": "docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
+      "manifest_path": "provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
     },
     {
       "provider": "ths via akshare",
@@ -100,7 +100,7 @@
       "status": 200,
       "body_sha256": "97e32aa1430a70559fb2d17f6de67b456afb209cf6aab443c35ca8b636396e26",
       "body_bytes": 27143,
-      "manifest_path": "docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
+      "manifest_path": "provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
     },
     {
       "provider": "ths via akshare",
@@ -110,7 +110,7 @@
       "status": 200,
       "body_sha256": "07895b44254d181f38a608624dd8800029fa3d5e75a4983610ee613ba99017e2",
       "body_bytes": 33954,
-      "manifest_path": "docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
+      "manifest_path": "provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
     },
     {
       "provider": "ths via akshare",
@@ -120,7 +120,7 @@
       "status": 200,
       "body_sha256": "07895b44254d181f38a608624dd8800029fa3d5e75a4983610ee613ba99017e2",
       "body_bytes": 33954,
-      "manifest_path": "docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
+      "manifest_path": "provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
     },
     {
       "provider": "ths via akshare",
@@ -130,7 +130,7 @@
       "status": 200,
       "body_sha256": "d04bd4e542784def7d3a505d9a761b3cfd97b1b02791d8f7ee61589c0acf9fd1",
       "body_bytes": 34125,
-      "manifest_path": "docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
+      "manifest_path": "provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
     },
     {
       "provider": "ths via akshare",
@@ -140,7 +140,7 @@
       "status": 200,
       "body_sha256": "1c476d4e023c3c0429f20d1b317b495021bace6224b909d4b660b171a775a730",
       "body_bytes": 34205,
-      "manifest_path": "docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
+      "manifest_path": "provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
     },
     {
       "provider": "ths via akshare",
@@ -150,7 +150,7 @@
       "status": 200,
       "body_sha256": "57a2d379884dca8c7e3e7cb439a01c52e181c23aa43f2237a2631733153f1349",
       "body_bytes": 34315,
-      "manifest_path": "docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
+      "manifest_path": "provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
     },
     {
       "provider": "ths via akshare",
@@ -160,7 +160,7 @@
       "status": 200,
       "body_sha256": "5cf941abd8d37b4320675084e6e367f280e93adfd4a9824c2884f72b0a50f96e",
       "body_bytes": 34413,
-      "manifest_path": "docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
+      "manifest_path": "provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
     },
     {
       "provider": "ths via akshare",
@@ -170,7 +170,7 @@
       "status": 200,
       "body_sha256": "288a5c7b512db985a117c80c1c518002f17077586e1de7e7c9506bde4320373d",
       "body_bytes": 34238,
-      "manifest_path": "docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
+      "manifest_path": "provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
     },
     {
       "provider": "ths via akshare",
@@ -180,7 +180,7 @@
       "status": 200,
       "body_sha256": "754f19b7692b21d706f3061e91e4244d00d710c281a359ac72b7053f28e44e4f",
       "body_bytes": 34236,
-      "manifest_path": "docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
+      "manifest_path": "provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
     },
     {
       "provider": "ths via akshare",
@@ -190,11 +190,11 @@
       "status": 200,
       "body_sha256": "9ed30a3c2816bc2c37c6ac47b7c6bd6c024de29ea5d9ed3ddc406e6c9db3c88f",
       "body_bytes": 26381,
-      "manifest_path": "docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
+      "manifest_path": "provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
     }
   ],
   "initial_failed_attempts": {
-    "manifest_path": "docs/provider-probes/raw/2026-10-02-sector-capabilities-v1/manifest.ndjson",
+    "manifest_path": "provider_validation/results/raw/2026-10-02-sector-capabilities-v1/manifest.ndjson",
     "count": 4,
     "classification": "local network sandbox socket permission block (WinError 10013); not evidence of provider unavailability",
     "events": [
@@ -234,7 +234,7 @@
   },
   "derived": {
     "industry_directory": {
-      "path": "docs/provider-probes/2026-10-02-sector-derived/ths-industry-directory.csv",
+      "path": "provider_validation/results/2026-10-02-sector-derived/ths-industry-directory.csv",
       "rows": 90,
       "columns": [
         "board_type",
@@ -245,7 +245,7 @@
       "sha256": "ed23bd9495333d380734705a8d8268b5f47a6b2c3fa89a47e9409adba947351e"
     },
     "industry_index_daily": {
-      "path": "docs/provider-probes/2026-10-02-sector-derived/ths-semiconductor-index-daily.csv",
+      "path": "provider_validation/results/2026-10-02-sector-derived/ths-semiconductor-index-daily.csv",
       "rows": 21,
       "columns": [
         "board_type",
@@ -263,7 +263,7 @@
       "sha256": "1695ca65d6026ccb6d74bc964e6b0e50508a0d35032a3b90ba0e8cfed1ef3546"
     },
     "industry_fund_flow": {
-      "path": "docs/provider-probes/2026-10-02-sector-derived/ths-industry-fund-flow-now.csv",
+      "path": "provider_validation/results/2026-10-02-sector-derived/ths-industry-fund-flow-now.csv",
       "rows": 90,
       "columns": [
         "board_type",
@@ -285,7 +285,7 @@
       "sha256": "64b31beaefc814c00a06eb81c8dd3f3671bd20fae8148fed8674d748624e7d95"
     },
     "concept_fund_flow": {
-      "path": "docs/provider-probes/2026-10-02-sector-derived/ths-concept-fund-flow-now.csv",
+      "path": "provider_validation/results/2026-10-02-sector-derived/ths-concept-fund-flow-now.csv",
       "rows": 387,
       "columns": [
         "board_type",
@@ -307,7 +307,7 @@
       "sha256": "4c5dd7d4fd07ddeb084bdbcee218aa2f786c756cecc392ff8cd906f2ca1ec65e"
     },
     "csrc_industry_membership": {
-      "path": "docs/provider-probes/2026-10-02-sector-derived/baostock-csrc-industry-membership.csv",
+      "path": "provider_validation/results/2026-10-02-sector-derived/baostock-csrc-industry-membership.csv",
       "rows": 5221,
       "columns": [
         "trade_date",
@@ -379,7 +379,7 @@
     "routing": "All new capabilities remain validation_only; no production data was written."
   },
   "baostock_provider_offline_replay": {
-    "source_evidence": "docs/provider-probes/2026-10-01-security-board-coverage.json",
+    "source_evidence": "provider_validation/results/legacy/2026-10-01-security-board-coverage.json",
     "source_evidence_sha256": "8d39373b3494fe988acdc3fd2807f019608e17c01373f9fd8d31a96f3013571f",
     "request_parameters_reproduced": {
       "query_all_stock": {

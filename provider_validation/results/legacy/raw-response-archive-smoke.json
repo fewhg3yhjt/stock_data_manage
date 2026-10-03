@@ -1,0 +1,11 @@
+{
+  "status": "passed",
+  "checks": [
+    "exact response bytes round-trip",
+    "request secrets redacted",
+    "secret-bearing response suppressed",
+    "transport errors persisted with secret redaction",
+    "fresh exact-scope cache hit without network"
+  ],
+  "network_requests": 0
+}

@@ -27,9 +27,10 @@ from stock_data_manage.providers.baostock.industry import (  # noqa: E402
 
 
 THS_RUN_ID = "2026-10-02-sector-capabilities-network-retry"
-CSRC_INPUT = ROOT / "docs/provider-probes/2026-10-01-security-board-coverage.json"
-DERIVED_DIR = ROOT / "docs/provider-probes/2026-10-02-sector-derived"
-SUMMARY_PATH = ROOT / "docs/provider-probes/2026-10-02-sector-derived-validation.json"
+RESULTS_DIR = ROOT / "provider_validation/results"
+CSRC_INPUT = RESULTS_DIR / "legacy/2026-10-01-security-board-coverage.json"
+DERIVED_DIR = RESULTS_DIR / "2026-10-02-sector-derived"
+SUMMARY_PATH = RESULTS_DIR / "legacy/2026-10-02-sector-derived-validation.json"
 
 
 def _sha256(data: bytes) -> str:
@@ -126,7 +127,7 @@ def _bao_session(client: _BaoStockReplay):
 
 
 def main() -> None:
-    archive_dir = ROOT / "docs/provider-probes/raw" / THS_RUN_ID
+    archive_dir = RESULTS_DIR / "raw" / THS_RUN_ID
     manifest_path = archive_dir / "manifest.ndjson"
     manifest = [json.loads(line) for line in manifest_path.read_text(encoding="utf-8").splitlines()]
     responses: dict[str, list[tuple[dict[str, Any], bytes]]] = defaultdict(list)
@@ -248,7 +249,7 @@ def main() -> None:
 
     source_hash = _sha256(CSRC_INPUT.read_bytes())
     failed_manifest_path = (
-        ROOT / "docs/provider-probes/raw/2026-10-02-sector-capabilities-v1/manifest.ndjson"
+        RESULTS_DIR / "raw/2026-10-02-sector-capabilities-v1/manifest.ndjson"
     )
     failed_manifest = [
         json.loads(line)

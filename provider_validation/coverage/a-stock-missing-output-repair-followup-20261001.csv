@@ -1,0 +1,3 @@
+"脚本能力ID","覆盖表序号","能力项","代码修复","复测结果","解析结果","原始证据","说明"
+"16","18","东财资金流向","em_market改为AKShare要求的sh/sz/bj","请求地址参数secid=1.600519正确；WinError 10013在建连阶段阻断","无","D:\Project\PythonProgram\stock_data_manage\provider_validation\results\a-stock-missing-repaired-live-20261001\_raw\missing-capabilities-20261001T224030\manifest.ndjson","传输失败事件已存档，未收到响应体。"
+"26","28","个股资金流120日","与#16共用fetch_em_fund_flow修复","为避免重复同一接口未另请求；等待可联网环境验证","无","D:\Project\PythonProgram\stock_data_manage\provider_validation\results\a-stock-missing-repaired-live-20261001\_raw\missing-capabilities-20261001T224030\manifest.ndjson","与#16同一失败原因。"

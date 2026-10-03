@@ -1,0 +1,47 @@
+{
+  "record_type": "capability_audit_summary",
+  "created_at_utc": "2026-10-01T13:01:06+00:00",
+  "inventory": "a-stock-data-capability-inventory.csv",
+  "published_endpoint_rows": 87,
+  "non_endpoint_rows": 2,
+  "status_counts": {
+    "documented_unavailable_or_partial": 1,
+    "historical_live_raw_missing": 7,
+    "historical_or_documented_only": 51,
+    "key_required_not_live_verified": 1,
+    "local_cache_unverified": 1,
+    "partial_live_format_error_raw_saved": 1,
+    "shared_endpoint_variant_not_separately_live_verified": 1,
+    "verified_live_raw_saved": 26
+  },
+  "offline_tests": {
+    "total": 168,
+    "passed": 165,
+    "skipped_opt_in_live": 3,
+    "failures": 0,
+    "errors": 0,
+    "interpretation": "offline contract tests do not independently verify current provider availability"
+  },
+  "live_runs": {
+    "v39": {
+      "test_suite_tests": 115,
+      "test_errors": 1,
+      "test_failure": "sse_e_interaction returned a reply-time value '18:18' that the parser rejected",
+      "http_events": 54,
+      "http_responses_saved": 50,
+      "transport_errors": 4,
+      "raw_manifest": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+      "test_log": "2026-10-01-v39-live-escalated.log"
+    },
+    "v310": {
+      "test_suite_tests": 26,
+      "test_failures": 0,
+      "test_errors": 0,
+      "http_events": 69,
+      "http_responses_saved": 69,
+      "raw_manifest": "provider_validation/results/raw/2026-10-01-v310-live/manifest.ndjson",
+      "test_log": "2026-10-01-v310-live.log"
+    }
+  },
+  "important_limit": "Historical V3.8 and older live results do not retain raw responses; they were not re-requested solely to recreate missing archives."
+}

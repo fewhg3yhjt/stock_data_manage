@@ -53,7 +53,7 @@
 
 ## Live Probe 证据
 
-探针使用少量代表证券，证据写入 `/tmp/opencode/provider-probes/`，摘要证据同步保存于 `docs/provider-probes/`，没有写入项目生产目录或项目 `metadata/` 目录。
+探针使用少量代表证券，证据写入 `/tmp/opencode/provider-probes/`，摘要证据同步保存于 `provider_validation/results/legacy/`，没有写入项目生产目录或项目 `metadata/` 目录。
 
 | Provider | Endpoint | 请求范围 | HTTP | 返回窗口 | 行数 | 首键 | 末键 | 字段语义 | 单位 | 资格 |
 |---|---|---|---:|---|---:|---|---|---|---|---|
@@ -71,36 +71,36 @@
 
 探针证据文件：
 
-- `docs/provider-probes/2026-09-29-sina-daily.json`
-- `docs/provider-probes/2026-09-29-tencent-daily.json`
-- `docs/provider-probes/2026-09-29-sina-minute.json`
-- `docs/provider-probes/2026-09-29-tencent-minute.json`
-- `docs/provider-probes/2026-09-29-baostock-daily.json`
-- `docs/provider-probes/2026-09-29-baostock-minute-5m.json`
-- `docs/provider-probes/2026-09-29-eastmoney-dividend-event.json`
-- `docs/provider-probes/2026-09-29-eastmoney-security-list.json`
-- `docs/provider-probes/2026-09-29-eastmoney-realtime-quote.json`
-- `docs/provider-probes/2026-09-29-eastmoney-stock-fund-flow.json`
-- `docs/provider-probes/2026-09-29-eastmoney-full-api-3s.json`
-- `docs/provider-probes/2026-09-29-eastmoney-financial-main.json`
-- `docs/provider-probes/2026-09-29-eastmoney-shareholder-count.json`
-- `docs/provider-probes/2026-09-29-akshare-daily.json`
-- `docs/provider-probes/2026-09-29-akshare-daily-live.json`
-- `docs/provider-probes/2026-09-30-ths-board-members.json`
-- `docs/provider-probes/2026-09-30-ths-board-members-v2.json`
-- `docs/provider-probes/2026-09-30-ths-board-list-pagination.json`
-- `docs/provider-probes/2026-09-30-ths-small-batch.json`
-- `docs/provider-probes/2026-09-30-ths-qstock-request-variant.json`
-- `docs/provider-probes/2026-10-01-eastmoney-board-probe.json`
-- `docs/provider-probes/2026-10-01-security-board-coverage.json`
-- `docs/provider-probes/2026-10-02-sector-capabilities-live.json`（隔离网络连接失败）
-- `docs/provider-probes/2026-10-02-sector-capabilities-network-retry.json`
-- `docs/provider-probes/2026-10-02-sector-derived-validation.json`
-- `docs/provider-probes/replay_sector_capability_archives.py`（离线重放脚本，不发起网络请求）
-- `docs/provider-probes/replay_sector_capability_archives.py`（离线重放脚本，不发起网络请求）
-- `docs/provider-probes/2026-10-03-baostock-csrc-provider.json`（请求参数变体已标记 superseded，不计为迁移验证）
-- 原始响应：`docs/provider-probes/raw/2026-10-02-sector-capabilities-v1/`、`docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/`、`docs/provider-probes/raw/2026-10-03-csrc-provider-small-probe/`
-- 派生 CSV：`docs/provider-probes/2026-10-02-sector-derived/`
+- `provider_validation/results/legacy/2026-09-29-sina-daily.json`
+- `provider_validation/results/legacy/2026-09-29-tencent-daily.json`
+- `provider_validation/results/legacy/2026-09-29-sina-minute.json`
+- `provider_validation/results/legacy/2026-09-29-tencent-minute.json`
+- `provider_validation/results/legacy/2026-09-29-baostock-daily.json`
+- `provider_validation/results/legacy/2026-09-29-baostock-minute-5m.json`
+- `provider_validation/results/legacy/2026-09-29-eastmoney-dividend-event.json`
+- `provider_validation/results/legacy/2026-09-29-eastmoney-security-list.json`
+- `provider_validation/results/legacy/2026-09-29-eastmoney-realtime-quote.json`
+- `provider_validation/results/legacy/2026-09-29-eastmoney-stock-fund-flow.json`
+- `provider_validation/results/legacy/2026-09-29-eastmoney-full-api-3s.json`
+- `provider_validation/results/legacy/2026-09-29-eastmoney-financial-main.json`
+- `provider_validation/results/legacy/2026-09-29-eastmoney-shareholder-count.json`
+- `provider_validation/results/legacy/2026-09-29-akshare-daily.json`
+- `provider_validation/results/legacy/2026-09-29-akshare-daily-live.json`
+- `provider_validation/results/legacy/2026-09-30-ths-board-members.json`
+- `provider_validation/results/legacy/2026-09-30-ths-board-members-v2.json`
+- `provider_validation/results/legacy/2026-09-30-ths-board-list-pagination.json`
+- `provider_validation/results/legacy/2026-09-30-ths-small-batch.json`
+- `provider_validation/results/legacy/2026-09-30-ths-qstock-request-variant.json`
+- `provider_validation/results/legacy/2026-10-01-eastmoney-board-probe.json`
+- `provider_validation/results/legacy/2026-10-01-security-board-coverage.json`
+- `provider_validation/results/legacy/2026-10-02-sector-capabilities-live.json`（隔离网络连接失败）
+- `provider_validation/results/legacy/2026-10-02-sector-capabilities-network-retry.json`
+- `provider_validation/results/legacy/2026-10-02-sector-derived-validation.json`
+- `provider_validation/tests/replay_sector_capability_archives.py`（离线重放脚本，不发起网络请求）
+- `provider_validation/tests/replay_sector_capability_archives.py`（离线重放脚本，不发起网络请求）
+- `provider_validation/results/legacy/2026-10-03-baostock-csrc-provider.json`（请求参数变体已标记 superseded，不计为迁移验证）
+- 原始响应：`provider_validation/results/raw/2026-10-02-sector-capabilities-v1/`、`provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/`、`provider_validation/results/raw/2026-10-03-csrc-provider-small-probe/`
+- 派生 CSV：`provider_validation/results/2026-10-02-sector-derived/`
 - 完整本地运行目录：`/tmp/opencode/provider-probes/`
 
 每份证据包含 Provider、Endpoint、能力版本、验证时间、有效期、请求范围、HTTP 状态、返回窗口、字段语义、单位、证据哈希和路由资格。

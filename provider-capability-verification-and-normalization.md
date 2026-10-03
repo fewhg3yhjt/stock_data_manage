@@ -399,7 +399,7 @@ rules:
     evidence:
       status: validated
       references:
-        - docs/provider-probes/2026-09-29-tencent-minute.json
+        - provider_validation/results/legacy/2026-09-29-tencent-minute.json
       validated_at: 2026-09-29
     version: tencent-minute-stock-v1
     notes: "688/689 代码使用独立的股单位规则，不复用本条规则。"

@@ -1,0 +1,22 @@
+{
+  "record_type": "offline_source_validation",
+  "run_date": "2026-10-01",
+  "source_repository": "D:\\Project\\PythonProgram\\external\\a-stock-data",
+  "source_branch": "main",
+  "source_commit": "f814dcfe209dd7958f4858f9d878d591ee85fb56",
+  "command": "python -m unittest discover -s tests -v",
+  "live_environment_flags": "removed for this process",
+  "result": {
+    "tests_run": 168,
+    "runtime_seconds": 34.916,
+    "failures": 0,
+    "errors": 0,
+    "exit_code": 0,
+    "skipped_live_tests": 3
+  },
+  "logs": {
+    "stdout": "a-stock-data-offline-tests.stdout.log",
+    "stderr": "a-stock-data-offline-tests.stderr.log"
+  },
+  "interpretation": "This is an offline contract-test result. The 3 opt-in live test groups were skipped, so the run does not establish current real-source availability."
+}

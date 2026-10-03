@@ -21,7 +21,7 @@ EastMoney 各数据域的范围和实现状态见 `eastmoney-data-domain-coverag
 
 Provider 的离线契约、实时探针和路由资格记录见仓库根目录的 `PROVIDER_CAPABILITY_MATRIX.md`。该文档是渠道验证事实记录，不是运行时配置。
 能力采集、证据生命周期和 YAML 归一化规则见 `provider-capability-verification-and-normalization.md`；它是 Provider 接入和后续验证的专项设计。
-探针摘要证据位于 `docs/provider-probes/`；临时完整探针输出位于 `/tmp/opencode/provider-probes/`，不作为生产数据目录。2026-10-02 行业迁移探针原始 HTTP 响应位于 `docs/provider-probes/raw/2026-10-02-sector-capabilities-network-retry/`，失败重试记录位于 `docs/provider-probes/raw/2026-10-02-sector-capabilities-v1/`；可用 `docs/provider-probes/replay_sector_capability_archives.py` 离线重放并重建派生表，摘要见 `docs/provider-probes/2026-10-02-sector-derived-validation.json`。BaoStock 证监会全市场旧证据位于 `docs/provider-probes/2026-10-01-security-board-coverage.json`，只含合并后的解码结果，不含原始 TCP 帧或原始 SDK 行。
+Provider 接口验证资料统一位于 `provider_validation/`：`tests/` 保存探针及离线重放脚本，`coverage/` 保存逐接口验证表，`docs/` 保存验证方法和报告，`results/` 保存原始响应与派生结果。原始 HTTP 清单及响应体位于 `provider_validation/results/raw/<run-id>/`；历史探针摘要位于 `provider_validation/results/legacy/`。行业迁移证据可用 `provider_validation/tests/replay_sector_capability_archives.py` 离线重放。BaoStock 证监会全市场旧证据只含合并后的解码结果，不含原始 TCP 帧或原始 SDK 行。详细入口见 [Provider 验证目录说明](provider_validation/README.md)。
 
 ## 领域模型
 
