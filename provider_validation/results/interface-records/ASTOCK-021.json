@@ -3,29 +3,40 @@
   "source": "a-stock-data",
   "validation_result": "部分通过",
   "current_missing_probe_status": "success",
-  "evidence_status": "parsed_only",
-  "evidence_status_description": "仅保存解析结果；没有对应的原始响应",
-  "evidence_level": "解析后输出已保存；本批未保存精确原始HTTP响应。",
-  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:662 (fetch_restricted_release); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:246 (lockup_expiry(code, date))",
+  "evidence_status": "live_raw",
+  "evidence_status_description": "实时原始响应已归档；仅代表本行注明的实测范围",
+  "evidence_level": "低频实时样本解析成功，原始响应和探测输出已留档；本轮仅单样本验证，未做全量语义核验。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:662 (fetch_restricted_release)",
   "source_code_artifacts": [
     {
       "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
       "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
     },
     {
-      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
-      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+      "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+      "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
     }
   ],
-  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:662 (CLI --run 19)",
-  "manifest_ref": "",
-  "response_artifacts": [],
-  "parsed_output_ref": "provider_validation/results/a-stock-data-missing-output/19_限售解禁日历/data.csv",
+  "test_code_ref": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 19",
+  "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+  "response_artifacts": [
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/ea6528a2204b61a7ee34683a73ca00f8afdc86aadf3f765d4dae39bbfb19dbe7.body.gz",
+      "sha256": "ea6528a2204b61a7ee34683a73ca00f8afdc86aadf3f765d4dae39bbfb19dbe7",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/084652b7c7ba2ca8df88ffbb476d7c554a29f43cfb0e30d7a51fe7ac9b69440c.body.gz",
+      "sha256": "084652b7c7ba2ca8df88ffbb476d7c554a29f43cfb0e30d7a51fe7ac9b69440c",
+      "matches_filename": true
+    }
+  ],
+  "parsed_output_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/19_限售解禁日历/data.csv",
   "derived_artifacts": [
     {
-      "path": "provider_validation/results/a-stock-data-missing-output/19_限售解禁日历/data.csv",
-      "sha256": "a32d2376c63149f2099b8b0d8598d3dbb039df2e026add27da3ea9e27111c1ad",
-      "bytes": 430193,
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/19_限售解禁日历/data.csv",
+      "sha256": "68037d3060ed350b03c9da26cb2146fc01b0c15eea7e42f0004612cb28486574",
+      "bytes": 23396,
       "field_names": [
         "序号",
         "股票代码",
@@ -40,17 +51,17 @@
         "解禁前20日涨跌幅",
         "解禁后20日涨跌幅"
       ],
-      "row_count": 2966
+      "row_count": 167
     }
   ],
   "coverage_denominator": 87,
-  "scope": "解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。 本次只核验了本行注明的样例范围。 a_stock_missing_output\\19_限售解禁日历\\data.csv [CSV行数=2966]",
-  "finding": "通过：解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。；脚本结果 success：saved 1 file(s)。解析结果非空；未留精确原始响应。",
-  "sample": "{\"columns\": [\"序号\", \"股票代码\", \"股票简称\", \"解禁时间\", \"限售股类型\", \"解禁数量\", \"实际解禁数量\", \"实际解禁市值\", \"占解禁前流通市值比例\", \"解禁前一交易日收盘价\", \"解禁前20日涨跌幅\", \"解禁后20日涨跌幅\"], \"sample\": {\"序号\": \"1\", \"股票代码\": \"300863\", \"股票简称\": \"卡倍亿\", \"解禁时间\": \"2025-01-02\", \"限售股类型\": \"股权激励限售股份\", \"解禁数量\": \"210000.0\", \"实际解禁数量\": \"210000.0\", \"实际解禁市值\": \"9359700.0\", \"占解禁前流通市值比例\": \"0.001706056145\", \"解禁前一交易日收盘价\": \"44.57\", \"解禁前20日涨跌幅\": \"2.49942674\", \"解禁后20日涨跌幅\": \"-1.67785235\"}}",
+  "scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×3；主机：datacenter-web.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "finding": "通过：解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。；本轮低频真实探测 success：saved 1 file(s); usable=1。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×3；主机：datacenter-web.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "sample": "{\"columns\": [\"序号\", \"股票代码\", \"股票简称\", \"解禁时间\", \"限售股类型\", \"解禁数量\", \"实际解禁数量\", \"实际解禁市值\", \"占解禁前流通市值比例\", \"解禁前一交易日收盘价\", \"解禁前20日涨跌幅\", \"解禁后20日涨跌幅\"], \"sample\": {\"序号\": \"1\", \"股票代码\": \"603028\", \"股票简称\": \"赛福天\", \"解禁时间\": \"2026-09-02\", \"限售股类型\": \"股权激励限售股份\", \"解禁数量\": \"1270000.0\", \"实际解禁数量\": \"1270000.0\", \"实际解禁市值\": \"9067800.0\", \"占解禁前流通市值比例\": \"0.004448959574\", \"解禁前一交易日收盘价\": \"7.14\", \"解禁前20日涨跌幅\": \"10.4387292\", \"解禁后20日涨跌幅\": \"-1.91780822\"}}",
   "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
   "transformation_code_version": {
     "path": "provider_validation/tests/build_interface_coverage.py",
-    "sha256": "7e094251e9efdf1d355f8c8b853630456f7a1778b3ce928df578283152145ef0"
+    "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
   },
-  "validation_time_utc": "2026-10-03T08:58:03.962338+00:00"
+  "validation_time_utc": "2026-10-03T10:20:06.937555+00:00"
 }

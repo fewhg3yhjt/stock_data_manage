@@ -1,0 +1,8 @@
+{
+  "record_type": "probe_failure",
+  "provider": "baostock",
+  "date_scope": "2026-10-02",
+  "error_type": "ProviderContractError",
+  "error": "BaoStock query_all_stock returned no rows",
+  "validation_time_utc": "2026-10-03T10:14:54.796073+00:00"
+}

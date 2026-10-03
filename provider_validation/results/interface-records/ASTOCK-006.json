@@ -3,37 +3,38 @@
   "source": "a-stock-data",
   "validation_result": "部分通过",
   "current_missing_probe_status": "success",
-  "evidence_status": "parsed_only",
-  "evidence_status_description": "仅保存解析结果；没有对应的原始响应",
-  "evidence_level": "解析后输出已保存；本批未保存精确原始HTTP响应。",
-  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:522 (fetch_sina_adjust_factor); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:234 (sina_adjust_factor(code, kind) / apply_adjust(bars, factors))",
+  "evidence_status": "live_raw",
+  "evidence_status_description": "实时原始响应已归档；仅代表本行注明的实测范围",
+  "evidence_level": "低频实时样本解析成功，原始响应和探测输出已留档；本轮仅单样本验证，未做全量语义核验。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:522 (fetch_sina_adjust_factor)",
   "source_code_artifacts": [
     {
       "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
       "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
     },
     {
-      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
-      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+      "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+      "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
     }
   ],
-  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:522 (CLI --run 6)",
-  "manifest_ref": "",
-  "response_artifacts": [],
-  "parsed_output_ref": "provider_validation/results/a-stock-data-missing-output/06_新浪复权因子/data/qfq_factor.csv;  provider_validation/results/a-stock-data-missing-output/06_新浪复权因子/data/hfq_factor.csv",
-  "derived_artifacts": [
+  "test_code_ref": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 6",
+  "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+  "response_artifacts": [
     {
-      "path": "provider_validation/results/a-stock-data-missing-output/06_新浪复权因子/data/qfq_factor.csv",
-      "sha256": "41dd62354b9a171d317da983396450adf9dbb0c38ad8cbf14b7ef21ce4ff0660",
-      "bytes": 1043,
-      "field_names": [
-        "date",
-        "qfq_factor"
-      ],
-      "row_count": 33
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/4454ae6d40546e3635f682392846a31da801e075bd6376959b6b285bbe3895ea.body.gz",
+      "sha256": "4454ae6d40546e3635f682392846a31da801e075bd6376959b6b285bbe3895ea",
+      "matches_filename": true
     },
     {
-      "path": "provider_validation/results/a-stock-data-missing-output/06_新浪复权因子/data/hfq_factor.csv",
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/a1ad8ba257cab55bf8c3c1798d0142273660796a809136ef6f84862a3dbe5c20.body.gz",
+      "sha256": "a1ad8ba257cab55bf8c3c1798d0142273660796a809136ef6f84862a3dbe5c20",
+      "matches_filename": true
+    }
+  ],
+  "parsed_output_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/06_新浪复权因子/data/hfq_factor.csv;  provider_validation/results/live-probes/rate-limited-all-20261003/06_新浪复权因子/data/qfq_factor.csv",
+  "derived_artifacts": [
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/06_新浪复权因子/data/hfq_factor.csv",
       "sha256": "fd88e894dd6571cfa51a7b32698e23c75a9e9566892d5a189a998cd96857a4f1",
       "bytes": 1043,
       "field_names": [
@@ -41,16 +42,26 @@
         "hfq_factor"
       ],
       "row_count": 33
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/06_新浪复权因子/data/qfq_factor.csv",
+      "sha256": "41dd62354b9a171d317da983396450adf9dbb0c38ad8cbf14b7ef21ce4ff0660",
+      "bytes": 1043,
+      "field_names": [
+        "date",
+        "qfq_factor"
+      ],
+      "row_count": 33
     }
   ],
   "coverage_denominator": 87,
-  "scope": "解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。 本次只核验了本行注明的样例范围。 a_stock_missing_output\\06_新浪复权因子\\data\\qfq_factor.csv [CSV行数=33]; a_stock_missing_output\\06_新浪复权因子\\data\\hfq_factor.csv [CSV行数=33]",
-  "finding": "通过：解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。；脚本结果 success：saved 2 file(s)。解析结果非空；未留精确原始响应。",
-  "sample": "{\"columns\": [\"date\", \"qfq_factor\"], \"sample\": {\"date\": \"2026-06-26\", \"qfq_factor\": \"1.0000000000000000\"}}",
+  "scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×2；主机：finance.sina.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "finding": "通过：解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。；本轮低频真实探测 success：saved 2 files; usable=2。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×2；主机：finance.sina.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "sample": "{\"columns\": [\"date\", \"hfq_factor\"], \"sample\": {\"date\": \"2026-06-26\", \"hfq_factor\": \"8.8825126710204000\"}}",
   "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
   "transformation_code_version": {
     "path": "provider_validation/tests/build_interface_coverage.py",
-    "sha256": "7e094251e9efdf1d355f8c8b853630456f7a1778b3ce928df578283152145ef0"
+    "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
   },
-  "validation_time_utc": "2026-10-03T08:58:03.530629+00:00"
+  "validation_time_utc": "2026-10-03T10:20:06.728929+00:00"
 }

@@ -2,34 +2,70 @@
   "interface_id": "ASTOCK-037",
   "source": "a-stock-data",
   "validation_result": "部分通过",
-  "current_missing_probe_status": "success",
-  "evidence_status": "parsed_only",
-  "evidence_status_description": "仅保存解析结果；没有对应的原始响应",
-  "evidence_level": "解析后输出已保存；本批未保存精确原始HTTP响应。",
-  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:799 (fetch_f10_composite); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:235 (tdx_client(check='finance').F10(symbol, name))",
+  "current_missing_probe_status": "partial",
+  "evidence_status": "live_raw",
+  "evidence_status_description": "实时原始响应已归档；仅代表本行注明的实测范围",
+  "evidence_level": "低频实时探测有部分数据，原始响应/失败事件及输出已留档；结果不完整。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:799 (fetch_f10_composite)",
   "source_code_artifacts": [
     {
       "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
       "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
     },
     {
-      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
-      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+      "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+      "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
     }
   ],
-  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:799 (CLI --run 35)",
-  "manifest_ref": "",
-  "response_artifacts": [],
-  "parsed_output_ref": "provider_validation/results/a-stock-data-missing-output/35_F10结构化资料/data/individual_info_em.json;  provider_validation/results/a-stock-data-missing-output/35_F10结构化资料/data/main_business_ths.csv;  provider_validation/results/a-stock-data-missing-output/35_F10结构化资料/data/business_composition_em.json;  provider_validation/results/a-stock-data-missing-output/35_F10结构化资料/data/profile_cninfo.csv;  provider_validation/results/a-stock-data-missing-output/35_F10结构化资料/data/company_events_em.csv",
+  "test_code_ref": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 35",
+  "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+  "response_artifacts": [
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/ef8be25eebd4b5ebe01f92930bcbc59ff6abdc9b2411fb03002ee05628025241.body.gz",
+      "sha256": "ef8be25eebd4b5ebe01f92930bcbc59ff6abdc9b2411fb03002ee05628025241",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/9f6f270d58fe87dfb6a6c3df35de7475d95ee83750105cfa653144e38f2a0b81.body.gz",
+      "sha256": "9f6f270d58fe87dfb6a6c3df35de7475d95ee83750105cfa653144e38f2a0b81",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/235673dbe4d79fec9eed2a592e05d5232fbed11481c9e0b74993722e88fb9eea.body.gz",
+      "sha256": "235673dbe4d79fec9eed2a592e05d5232fbed11481c9e0b74993722e88fb9eea",
+      "matches_filename": true
+    }
+  ],
+  "parsed_output_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/business_composition_em.json;  provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/company_events_em.csv;  provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/individual_info_em.json;  provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/main_business_ths.csv;  provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/profile_cninfo.csv",
   "derived_artifacts": [
     {
-      "path": "provider_validation/results/a-stock-data-missing-output/35_F10结构化资料/data/individual_info_em.json",
-      "sha256": "af056d578e34000ae334a28a16ed9440a33bddca660297fc33f55f2373431a3d",
-      "bytes": 1083,
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/business_composition_em.json",
+      "sha256": "dfc831d7a5134fe93e2265d3585e2b307944bedfb0b523f45f718e0fd4365791",
+      "bytes": 37,
       "row_count": null
     },
     {
-      "path": "provider_validation/results/a-stock-data-missing-output/35_F10结构化资料/data/main_business_ths.csv",
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/company_events_em.csv",
+      "sha256": "8592ae85c936e3948cd0f99ec1740d856dbac866955005e8861a3ee7dcd195a9",
+      "bytes": 35749,
+      "field_names": [
+        "序号",
+        "代码",
+        "简称",
+        "事件类型",
+        "具体事项",
+        "交易日"
+      ],
+      "row_count": 75
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/individual_info_em.json",
+      "sha256": "e09489a5fbe1f663b8a63bc2cab06280cf50ba4508a10fc957a5b1e73ee04f3c",
+      "bytes": 108,
+      "row_count": null
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/main_business_ths.csv",
       "sha256": "4a3eb62c1cf920f5791fb7980b455fb1911fa2549ee133784ec5f02a57fe9c17",
       "bytes": 504,
       "field_names": [
@@ -42,13 +78,7 @@
       "row_count": 1
     },
     {
-      "path": "provider_validation/results/a-stock-data-missing-output/35_F10结构化资料/data/business_composition_em.json",
-      "sha256": "dfc831d7a5134fe93e2265d3585e2b307944bedfb0b523f45f718e0fd4365791",
-      "bytes": 37,
-      "row_count": null
-    },
-    {
-      "path": "provider_validation/results/a-stock-data-missing-output/35_F10结构化资料/data/profile_cninfo.csv",
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/profile_cninfo.csv",
       "sha256": "d150bfd361991954244e845181f46997a5389412d3a037e9a9f3ea6b81004600",
       "bytes": 1999,
       "field_names": [
@@ -80,30 +110,16 @@
         "机构简介"
       ],
       "row_count": 1
-    },
-    {
-      "path": "provider_validation/results/a-stock-data-missing-output/35_F10结构化资料/data/company_events_em.csv",
-      "sha256": "8592ae85c936e3948cd0f99ec1740d856dbac866955005e8861a3ee7dcd195a9",
-      "bytes": 35749,
-      "field_names": [
-        "序号",
-        "代码",
-        "简称",
-        "事件类型",
-        "具体事项",
-        "交易日"
-      ],
-      "row_count": 75
     }
   ],
   "coverage_denominator": 87,
-  "scope": "5个子结果中个股信息文件内是ProxyError；其余4个子文件有数据，因此仅部分返回。 本项只部分返回或有未核准范围。 a_stock_missing_output\\35_F10结构化资料\\data\\individual_info_em.json [JSON错误字段]; a_stock_missing_output\\35_F10结构化资料\\data\\main_business_ths.csv [CSV行数=1]; a_stock_missing_output\\35_F10结构化资料\\data\\business_composition_em.json [JSON错误字段]; a_stock_missing_output\\35_F10结构化资料\\data\\profile_cninfo.csv [CSV行数=1]; a_stock_missing_output\\35_F10结构化资料\\data\\company_events_em.csv [CSV行数=75]",
-  "finding": "部分：5个子结果中个股信息文件内是ProxyError；其余4个子文件有数据，因此仅部分返回。；脚本结果 success：saved 5 file(s)。解析结果非空；未留精确原始响应。",
-  "sample": "{\"error\": \"ProxyError: HTTPSConnectionPool(host='push2.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/get?fltt=2&invt=2&fields=f120%2Cf121%2Cf122%2Cf174%2Cf175%2Cf59%2Cf163%2Cf43%2Cf57%2Cf58%2Cf169%2Cf170%2Cf46%2Cf44%2Cf51%2Cf168%2Cf47%2Cf164%2Cf116%2Cf60%2Cf45%2Cf52%2Cf50%2Cf48%2Cf167%2Cf117%2Cf71%2Cf161%2Cf49%2Cf530%2Cf135%2Cf136%2Cf137%2Cf138%2Cf139%2Cf141%2Cf142%2Cf144%2Cf145%2Cf147%2Cf148%2Cf140%2Cf143%2Cf146%2Cf149%2Cf55%2Cf62%2Cf162%2Cf92%2Cf173%2Cf104%2Cf105%2Cf84%2Cf85%2Cf183%2Cf184%2Cf185%2Cf186%2Cf187%2Cf188%2Cf189%2Cf190%2Cf191%2Cf192%2Cf107%2Cf111%2Cf86%2Cf177%2Cf78%2Cf110%2Cf262%2Cf263%2Cf264%2Cf267%2Cf268%2Cf255%2Cf256%2Cf257%2Cf258%2Cf127%2Cf199%2Cf128%2Cf198%2Cf259%2Cf260%2Cf261%2Cf171%2Cf277%2Cf278%2Cf279%2Cf288%2Cf152%2Cf250%2Cf251%2Cf252%2Cf253%2Cf254%2Cf269%2Cf270%2Cf271%2Cf272%2Cf273%2Cf274%2Cf275%2Cf276%2Cf265%2Cf266%2Cf289%2Cf290%2Cf286%2…",
+  "scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×5, transport_error×1；主机：basic.10jqka.com.cn, datacenter-web.eastmoney.com, emweb.securities.eastmoney.com, push2.eastmoney.com, webapi.cninfo.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "finding": "部分：5个子结果中个股信息文件内是ProxyError；其余4个子文件有数据，因此仅部分返回。；本轮低频真实探测 partial：5 outputs: usable=3, errors=2。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×5, transport_error×1；主机：basic.10jqka.com.cn, datacenter-web.eastmoney.com, emweb.securities.eastmoney.com, push2.eastmoney.com, webapi.cninfo.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "sample": "{\"error\": \"KeyError: 'zygcfx'\"}",
   "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
   "transformation_code_version": {
     "path": "provider_validation/tests/build_interface_coverage.py",
-    "sha256": "7e094251e9efdf1d355f8c8b853630456f7a1778b3ce928df578283152145ef0"
+    "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
   },
-  "validation_time_utc": "2026-10-03T08:58:04.612326+00:00"
+  "validation_time_utc": "2026-10-03T10:20:07.147050+00:00"
 }

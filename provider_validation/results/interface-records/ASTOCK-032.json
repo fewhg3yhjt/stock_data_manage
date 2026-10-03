@@ -3,29 +3,35 @@
   "source": "a-stock-data",
   "validation_result": "部分通过",
   "current_missing_probe_status": "success",
-  "evidence_status": "parsed_only",
-  "evidence_status_description": "仅保存解析结果；没有对应的原始响应",
-  "evidence_level": "解析后输出已保存；本批未保存精确原始HTTP响应。",
-  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:771 (fetch_cls_telegraph); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:258 (cls_telegraph())",
+  "evidence_status": "live_raw",
+  "evidence_status_description": "实时原始响应已归档；仅代表本行注明的实测范围",
+  "evidence_level": "低频实时样本解析成功，原始响应和探测输出已留档；本轮仅单样本验证，未做全量语义核验。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:771 (fetch_cls_telegraph)",
   "source_code_artifacts": [
     {
       "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
       "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
     },
     {
-      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
-      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+      "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+      "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
     }
   ],
-  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:771 (CLI --run 30)",
-  "manifest_ref": "",
-  "response_artifacts": [],
-  "parsed_output_ref": "provider_validation/results/a-stock-data-missing-output/30_财联社电报/data.csv",
+  "test_code_ref": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 30",
+  "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+  "response_artifacts": [
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/015c5b37ffa4c6d337ab8e984272ed407fc43782a417a8cf223cca2c55704336.body.gz",
+      "sha256": "015c5b37ffa4c6d337ab8e984272ed407fc43782a417a8cf223cca2c55704336",
+      "matches_filename": true
+    }
+  ],
+  "parsed_output_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/30_财联社电报/data.csv",
   "derived_artifacts": [
     {
-      "path": "provider_validation/results/a-stock-data-missing-output/30_财联社电报/data.csv",
-      "sha256": "7a17b2af2cfb47b583ac1c9b7585d1448b47258eb30eebe45b7437e591e0d638",
-      "bytes": 6802,
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/30_财联社电报/data.csv",
+      "sha256": "4b9bd8347e31fb383ca436b3fe7d6020fb46536bc398e4f0f7127ff80c2188cd",
+      "bytes": 9784,
       "field_names": [
         "标题",
         "内容",
@@ -36,13 +42,13 @@
     }
   ],
   "coverage_denominator": 87,
-  "scope": "解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。 本次只核验了本行注明的样例范围。 a_stock_missing_output\\30_财联社电报\\data.csv [CSV行数=20]",
-  "finding": "通过：解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。；脚本结果 success：saved 1 file(s)。解析结果非空；未留精确原始响应。",
-  "sample": "{\"columns\": [\"标题\", \"内容\", \"发布日期\", \"发布时间\"], \"sample\": {\"标题\": \"俄罗斯预计2029年液化天然气出口量将增至6450万吨 接近翻倍\", \"内容\": \"【俄罗斯预计2029年液化天然气出口量将增至6450万吨 接近翻倍】财联社10月1日电，根据俄罗斯宏观经济展望的基准情景，俄罗斯液化天然气出口量预计将从今年的3500万吨升至2029年的6450万吨。该预测已与2027至2029年预算草案一并提交国家杜马。包括伴生气在内的天然气产量预计将从今年的6831亿立方米逐步升至2029年的7401亿立方米。\", \"发布日期\": \"2026-10-01\", \"发布时间\": \"21:12:52\"}}",
+  "scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：www.cls.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "finding": "通过：解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。；本轮低频真实探测 success：saved 1 file(s); usable=1。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：www.cls.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "sample": "{\"columns\": [\"标题\", \"内容\", \"发布日期\", \"发布时间\"], \"sample\": {\"标题\": \"“21世纪海上丝绸之路”航线已覆盖全球100多个国家和地区\", \"内容\": \"【“21世纪海上丝绸之路”航线已覆盖全球100多个国家和地区】财联社10月3日电，今天（3日）是共同建设“21世纪海上丝绸之路”提出13周年。这条海上丝绸之路的建设，有力促进了我国与东南亚、非洲、拉美等地区国家经贸合作不断迈上新台阶。今年以来，我国新开通多条直达拉美、东南亚等地的外贸航线，国际集装箱班轮航线已覆盖全球100多个国家和地区。 （央视新闻）\", \"发布日期\": \"2026-10-03\", \"发布时间\": \"14:10:54\"}}",
   "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
   "transformation_code_version": {
     "path": "provider_validation/tests/build_interface_coverage.py",
-    "sha256": "7e094251e9efdf1d355f8c8b853630456f7a1778b3ce928df578283152145ef0"
+    "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
   },
-  "validation_time_utc": "2026-10-03T08:58:04.418724+00:00"
+  "validation_time_utc": "2026-10-03T10:20:07.092862+00:00"
 }

@@ -5,25 +5,25 @@
   "current_missing_probe_status": "success",
   "evidence_status": "parsed_only",
   "evidence_status_description": "仅保存解析结果；没有对应的原始响应",
-  "evidence_level": "解析后输出已保存；本批未保存精确原始HTTP响应。",
-  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:1139 (fetch_index_valuation); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:289 (index_valuation(index_code))",
+  "evidence_level": "低频实时样本解析成功，原始响应和探测输出已留档；本轮仅单样本验证，未做全量语义核验。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:1139 (fetch_index_valuation)",
   "source_code_artifacts": [
     {
       "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
       "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
     },
     {
-      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
-      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+      "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+      "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
     }
   ],
-  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:1139 (CLI --run 67)",
+  "test_code_ref": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 67",
   "manifest_ref": "",
   "response_artifacts": [],
-  "parsed_output_ref": "provider_validation/results/a-stock-data-missing-output/67_指数估值/data.csv",
+  "parsed_output_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/67_指数估值/data.csv",
   "derived_artifacts": [
     {
-      "path": "provider_validation/results/a-stock-data-missing-output/67_指数估值/data.csv",
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/67_指数估值/data.csv",
       "sha256": "d147285486e18d205670f80e974de2f6aa3b3695dcdc5625a3542f329c585af6",
       "bytes": 1857,
       "field_names": [
@@ -42,13 +42,13 @@
     }
   ],
   "coverage_denominator": 87,
-  "scope": "20行估值字段可读；指数日期和股本口径未与源数据独立核对。 本项只部分返回或有未核准范围。 a_stock_missing_output\\67_指数估值\\data.csv [CSV行数=20]",
-  "finding": "部分：20行估值字段可读；指数日期和股本口径未与源数据独立核对。；脚本结果 success：saved 1 file(s)。解析结果非空；未留精确原始响应。",
+  "scope": "低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "finding": "部分：20行估值字段可读；指数日期和股本口径未与源数据独立核对。；本轮低频真实探测 success：saved 1 file(s); usable=1。低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
   "sample": "{\"columns\": [\"日期\", \"指数代码\", \"指数中文全称\", \"指数中文简称\", \"指数英文全称\", \"指数英文简称\", \"市盈率1\", \"市盈率2\", \"股息率1\", \"股息率2\"], \"sample\": {\"日期\": \"2026-09-30\", \"指数代码\": \"300\", \"指数中文全称\": \"沪深300指数\", \"指数中文简称\": \"沪深300\", \"指数英文全称\": \"CSI 300 Index\", \"指数英文简称\": \"CSI 300\", \"市盈率1\": \"14.34\", \"市盈率2\": \"16.35\", \"股息率1\": \"2.74\", \"股息率2\": \"2.49\"}}",
   "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
   "transformation_code_version": {
     "path": "provider_validation/tests/build_interface_coverage.py",
-    "sha256": "7e094251e9efdf1d355f8c8b853630456f7a1778b3ce928df578283152145ef0"
+    "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
   },
-  "validation_time_utc": "2026-10-03T08:58:05.742477+00:00"
+  "validation_time_utc": "2026-10-03T10:20:07.643825+00:00"
 }

@@ -23,6 +23,22 @@ const col = (name) => headers.indexOf(name);
 const included = rows.filter((r) => r[col("是否计入87项")] === "是");
 const countBy = (status) => included.filter((r) => r[col("接口取数结果")] === status).length;
 const supplementary = rows.filter((r) => r[col("清单范围")].includes("补充"));
+const reportSummaryPath = path.join(repo, "provider_validation", "results", "interface-coverage-summary.json");
+const reportSummary = JSON.parse(await fs.readFile(reportSummaryPath, "utf8"));
+const liveProbeIds = new Set();
+const liveProbeRoot = path.join(repo, "provider_validation", "results", "live-probes");
+for (const entry of await fs.readdir(liveProbeRoot, { withFileTypes: true })) {
+  if (!entry.isDirectory()) continue;
+  const runDir = path.join(liveProbeRoot, entry.name);
+  try {
+    const policy = JSON.parse(await fs.readFile(path.join(runDir, "probe-run-policy.json"), "utf8"));
+    if (policy.policy_version !== "rate-limited-live-probe-v1") continue;
+    const summary = (await fs.readFile(path.join(runDir, "_summary.csv"), "utf8")).replace(/^\uFEFF/, "");
+    for (const match of summary.matchAll(/^(\d+),/gm)) liveProbeIds.add(Number(match[1]));
+  } catch {
+    // An incomplete batch is not counted as a completed capability probe.
+  }
+}
 
 const workbook = Workbook.create();
 const overview = workbook.worksheets.add("覆盖概览");
@@ -37,7 +53,7 @@ glossary.tabColor = "#70AD47";
 
 overview.getRange("A2").values = [["接口测试覆盖度报告"]];
 overview.getRange("A2:D2").format = { font: { name: "Arial", size: 16, bold: true, color: "#17365D" } };
-overview.getRange("A3").values = [["数据基准：2026-10-03；“能力声明”与“实测范围”分列，证据状态代码及中文解释见明细和“状态释义”"]];
+overview.getRange("A3").values = [[`数据基准：${new Date().toISOString().slice(0, 10)}；“能力声明”与“实测范围”分列，证据状态代码及中文解释见明细和“状态释义”`]];
 overview.getRange("A3:D3").format = { font: { name: "Arial", size: 10, color: "#666666" } };
 overview.getRange("A5:C5").values = [["统计项", "数量", "口径说明"]];
 overview.getRange("A6:C14").values = [
@@ -48,8 +64,8 @@ overview.getRange("A6:C14").values = [
   ["部分通过", countBy("部分通过"), "有解析输出或历史合并结果；证据/覆盖范围仍有明确限制"],
   ["未通过", countBy("未通过"), "失败、不可用或返回不完整；见逐项错误和结果证据"],
   ["未验证", countBy("未验证"), "需要凭据或缺少可复查的实时返回"],
-  ["本轮补抓输出", 61, "61项执行结果全部匹配到逐接口行；执行状态单独列示"],
-  ["原始响应哈希核对", 114, "114个归档响应文件与SHA-256文件名一致；0个不匹配"],
+  ["a-stock-data低频实时探测接口数", liveProbeIds.size, "按逐接口摘要去重，含1项因全市场分页超出采样范围而停止的部分记录；BaoStock SDK探针另见明细"],
+  ["原始响应哈希核对", reportSummary.retained_raw_response_bodies_hash_checked, `${reportSummary.retained_raw_response_bodies_hash_checked}个报告引用的原始响应文件完成SHA-256核对；${reportSummary.retained_raw_response_hash_failures}个不匹配`],
 ];
 overview.getRange("A5:C14").format.wrapText = true;
 overview.getRange("A5:C5").format = { fill: "#1F4E78", font: { name: "Arial", size: 10, bold: true, color: "#FFFFFF" }, verticalAlignment: "center" };

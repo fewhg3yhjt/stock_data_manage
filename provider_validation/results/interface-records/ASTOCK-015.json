@@ -3,29 +3,35 @@
   "source": "a-stock-data",
   "validation_result": "部分通过",
   "current_missing_probe_status": "success",
-  "evidence_status": "parsed_only",
-  "evidence_status_description": "仅保存解析结果；没有对应的原始响应",
-  "evidence_level": "解析后输出已保存；本批未保存精确原始HTTP响应。",
-  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:547 (fetch_northbound_realtime); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:242 (hsgt_realtime())",
+  "evidence_status": "live_raw",
+  "evidence_status_description": "实时原始响应已归档；仅代表本行注明的实测范围",
+  "evidence_level": "低频实时样本解析成功，原始响应和探测输出已留档；本轮仅单样本验证，未做全量语义核验。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:547 (fetch_northbound_realtime)",
   "source_code_artifacts": [
     {
       "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
       "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
     },
     {
-      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
-      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+      "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+      "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
     }
   ],
-  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:547 (CLI --run 14)",
-  "manifest_ref": "",
-  "response_artifacts": [],
-  "parsed_output_ref": "provider_validation/results/a-stock-data-missing-output/14_北向_沪深港通当前资金汇总/data.csv",
+  "test_code_ref": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 14",
+  "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+  "response_artifacts": [
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/dc1f86534d738cbb9e7c7947e4dfc7707d7fbe727761d4b8bb7dce00956bc964.body.gz",
+      "sha256": "dc1f86534d738cbb9e7c7947e4dfc7707d7fbe727761d4b8bb7dce00956bc964",
+      "matches_filename": true
+    }
+  ],
+  "parsed_output_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/14_北向_沪深港通当前资金汇总/data.csv",
   "derived_artifacts": [
     {
-      "path": "provider_validation/results/a-stock-data-missing-output/14_北向_沪深港通当前资金汇总/data.csv",
-      "sha256": "9aab54e96e3fbafc42b97091fd68e15b6420a9afe8766c7397590de70e5d0a88",
-      "bytes": 519,
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/14_北向_沪深港通当前资金汇总/data.csv",
+      "sha256": "52dabaedc5a9e6c37c81bc82c3df80803e78e5b9d5f16edfa006acfa7af0de3d",
+      "bytes": 517,
       "field_names": [
         "交易日",
         "类型",
@@ -45,13 +51,13 @@
     }
   ],
   "coverage_denominator": 87,
-  "scope": "4条汇总可解析，但北向净买额/净流入为0，不能证明实时资金数据有效。 本项只部分返回或有未核准范围。 a_stock_missing_output\\14_北向_沪深港通当前资金汇总\\data.csv [CSV行数=4]",
-  "finding": "部分：4条汇总可解析，但北向净买额/净流入为0，不能证明实时资金数据有效。；脚本结果 success：saved 1 file(s)。解析结果非空；未留精确原始响应。",
-  "sample": "{\"columns\": [\"交易日\", \"类型\", \"板块\", \"资金方向\", \"交易状态\", \"成交净买额\", \"资金净流入\", \"当日资金余额\", \"上涨数\", \"持平数\", \"下跌数\", \"相关指数\", \"指数涨跌幅\"], \"sample\": {\"交易日\": \"2026-10-01\", \"类型\": \"沪港通\", \"板块\": \"沪股通\", \"资金方向\": \"北向\", \"交易状态\": \"4\", \"成交净买额\": \"0.0\", \"资金净流入\": \"0.0\", \"当日资金余额\": \"0.0\", \"上涨数\": \"941\", \"持平数\": \"41\", \"下跌数\": \"662\", \"相关指数\": \"上证指数\", \"指数涨跌幅\": \"0.31\"}}",
+  "scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：datacenter-web.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "finding": "部分：4条汇总可解析，但北向净买额/净流入为0，不能证明实时资金数据有效。；本轮低频真实探测 success：saved 1 file(s); usable=1。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：datacenter-web.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "sample": "{\"columns\": [\"交易日\", \"类型\", \"板块\", \"资金方向\", \"交易状态\", \"成交净买额\", \"资金净流入\", \"当日资金余额\", \"上涨数\", \"持平数\", \"下跌数\", \"相关指数\", \"指数涨跌幅\"], \"sample\": {\"交易日\": \"2026-10-03\", \"类型\": \"沪港通\", \"板块\": \"沪股通\", \"资金方向\": \"北向\", \"交易状态\": \"3\", \"成交净买额\": \"0.0\", \"资金净流入\": \"0.0\", \"当日资金余额\": \"0.0\", \"上涨数\": \"941\", \"持平数\": \"41\", \"下跌数\": \"662\", \"相关指数\": \"上证指数\", \"指数涨跌幅\": \"0.31\"}}",
   "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
   "transformation_code_version": {
     "path": "provider_validation/tests/build_interface_coverage.py",
-    "sha256": "7e094251e9efdf1d355f8c8b853630456f7a1778b3ce928df578283152145ef0"
+    "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
   },
-  "validation_time_utc": "2026-10-03T08:58:03.742604+00:00"
+  "validation_time_utc": "2026-10-03T10:20:06.882957+00:00"
 }

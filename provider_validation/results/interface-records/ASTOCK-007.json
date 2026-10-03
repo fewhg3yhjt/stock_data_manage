@@ -3,33 +3,33 @@
   "source": "a-stock-data",
   "validation_result": "未通过",
   "current_missing_probe_status": "unavailable",
-  "evidence_status": "unavailable",
-  "evidence_status_description": "接口当前不可用或受到访问阻断",
-  "evidence_level": "探针明确失败/不可用；保存了执行摘要或失败信息，无成功原始业务响应。",
-  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:1206 (unavailable_mootdx); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:235 (tdx_client() → .bars() / .quotes() / .transaction())",
+  "evidence_status": "failed",
+  "evidence_status_description": "本轮探针或数据校验失败",
+  "evidence_level": "低频实时探测未取得可用业务数据；失败事件已留档，不能将传输阻断判为源数据为空。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:1206 (unavailable_mootdx)",
   "source_code_artifacts": [
     {
       "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
       "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
     },
     {
-      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
-      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+      "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+      "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
     }
   ],
-  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:1206 (CLI --run 7)",
+  "test_code_ref": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 7",
   "manifest_ref": "",
   "response_artifacts": [],
   "parsed_output_ref": "",
   "derived_artifacts": [],
   "coverage_denominator": 87,
-  "scope": "mootdx/通达信在线行情在你表中已记录 2026-09 起返回空数据；盘后包能力已通过，因此这里不重复包装成“成功”。 本轮未取得可用且匹配能力定义的数据。",
-  "finding": "未通过：mootdx/通达信在线行情在你表中已记录 2026-09 起返回空数据；盘后包能力已通过，因此这里不重复包装成“成功”。；脚本结果 unavailable: mootdx/通达信在线行情在你表中已记录 2026-09 起返回空数据；盘后包能力已通过，因此这里不重复包装成“成功”。",
-  "sample": "mootdx/通达信在线行情在你表中已记录 2026-09 起返回空数据；盘后包能力已通过，因此这里不重复包装成“成功”。",
+  "scope": "低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "finding": "未通过：mootdx/通达信在线行情在你表中已记录 2026-09 起返回空数据；盘后包能力已通过，因此这里不重复包装成“成功”。；本轮低频真实探测 unavailable：Upstream capability explicitly unavailable。低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "sample": "Upstream capability explicitly unavailable",
   "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
   "transformation_code_version": {
     "path": "provider_validation/tests/build_interface_coverage.py",
-    "sha256": "7e094251e9efdf1d355f8c8b853630456f7a1778b3ce928df578283152145ef0"
+    "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
   },
-  "validation_time_utc": "2026-10-03T08:58:03.560672+00:00"
+  "validation_time_utc": "2026-10-03T10:20:06.769718+00:00"
 }

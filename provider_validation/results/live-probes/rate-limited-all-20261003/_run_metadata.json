@@ -1,0 +1,7 @@
+{
+  "run_id": "missing-capabilities-20261003T174623",
+  "requested_trade_date": "20260930",
+  "effective_trade_date": "20260930",
+  "trade_date_source": "tool_trade_date_hist_sina",
+  "calendar_rows": 8797
+}

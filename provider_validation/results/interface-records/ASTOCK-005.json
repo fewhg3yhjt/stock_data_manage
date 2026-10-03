@@ -3,33 +3,39 @@
   "source": "a-stock-data",
   "validation_result": "未通过",
   "current_missing_probe_status": "unavailable",
-  "evidence_status": "unavailable",
-  "evidence_status_description": "接口当前不可用或受到访问阻断",
-  "evidence_level": "探针明确失败/不可用；保存了执行摘要或失败信息，无成功原始业务响应。",
-  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:372 (fetch_baidu_kline); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:233 (baidu_kline_with_ma(code))",
+  "evidence_status": "live_raw",
+  "evidence_status_description": "实时原始响应已归档；仅代表本行注明的实测范围",
+  "evidence_level": "低频实时探测未取得可用业务数据；失败事件已留档，不能将传输阻断判为源数据为空。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:372 (fetch_baidu_kline)",
   "source_code_artifacts": [
     {
       "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
       "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
     },
     {
-      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
-      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+      "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+      "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
     }
   ],
-  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:372 (CLI --run 5)",
-  "manifest_ref": "",
-  "response_artifacts": [],
+  "test_code_ref": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 5",
+  "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+  "response_artifacts": [
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/2c95333e10dd4f9ebd526a5e8172e3cb3fbfbaab50f9cb9edb721bba5c164d37.body.gz",
+      "sha256": "2c95333e10dd4f9ebd526a5e8172e3cb3fbfbaab50f9cb9edb721bba5c164d37",
+      "matches_filename": true
+    }
+  ],
   "parsed_output_ref": "",
   "derived_artifacts": [],
   "coverage_denominator": 87,
-  "scope": "百度当前对该运行环境返回 403；不是代码解析错误。 本轮未取得可用且匹配能力定义的数据。",
-  "finding": "未通过：百度当前对该运行环境返回 403；不是代码解析错误。；脚本结果 unavailable: 百度当前对该运行环境返回 403；不是代码解析错误。",
-  "sample": "百度当前对该运行环境返回 403；不是代码解析错误。",
+  "scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP403×1；主机：finance.pae.baidu.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "finding": "未通过：百度当前对该运行环境返回 403；不是代码解析错误。；本轮低频真实探测 unavailable：HTTP 403; no retry。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP403×1；主机：finance.pae.baidu.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "sample": "{\"QueryID\":\"0\",\"ResultCode\":0,\"Result\":{\"code\":403,\"isCaptchaEnabled\":true,\"msg\":\"hit risk\"}}",
   "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
   "transformation_code_version": {
     "path": "provider_validation/tests/build_interface_coverage.py",
-    "sha256": "7e094251e9efdf1d355f8c8b853630456f7a1778b3ce928df578283152145ef0"
+    "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
   },
-  "validation_time_utc": "2026-10-03T08:58:03.493534+00:00"
+  "validation_time_utc": "2026-10-03T10:20:06.714722+00:00"
 }

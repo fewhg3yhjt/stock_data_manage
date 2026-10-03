@@ -1,35 +1,59 @@
 {
   "interface_id": "ASTOCK-029",
   "source": "a-stock-data",
-  "validation_result": "未通过",
-  "current_missing_probe_status": "failed",
-  "evidence_status": "failed",
-  "evidence_status_description": "本轮探针或数据校验失败",
-  "evidence_level": "探针明确失败/不可用；保存了执行摘要或失败信息，无成功原始业务响应。",
-  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:756 (fetch_cyq); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:255 (chip_distribution(df))",
+  "validation_result": "部分通过",
+  "current_missing_probe_status": "success",
+  "evidence_status": "live_raw",
+  "evidence_status_description": "实时原始响应已归档；仅代表本行注明的实测范围",
+  "evidence_level": "低频实时样本解析成功，原始响应和探测输出已留档；本轮仅单样本验证，未做全量语义核验。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:756 (fetch_cyq)",
   "source_code_artifacts": [
     {
       "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
       "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
     },
     {
-      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
-      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+      "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+      "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
     }
   ],
-  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:756 (CLI --run 27)",
-  "manifest_ref": "",
-  "response_artifacts": [],
-  "parsed_output_ref": "",
-  "derived_artifacts": [],
+  "test_code_ref": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 27",
+  "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+  "response_artifacts": [
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/dfd7f1948d4b4950a381a20661f333edf4e4a1dbe384a535a2798375d6f8ae0f.body.gz",
+      "sha256": "dfd7f1948d4b4950a381a20661f333edf4e4a1dbe384a535a2798375d6f8ae0f",
+      "matches_filename": true
+    }
+  ],
+  "parsed_output_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/27_筹码分布CYQ/data.csv",
+  "derived_artifacts": [
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/27_筹码分布CYQ/data.csv",
+      "sha256": "dc4f675f614b1793cf6e926292510b62be970a59ff62fe3cbd31b41d770e95bf",
+      "bytes": 10108,
+      "field_names": [
+        "日期",
+        "获利比例",
+        "平均成本",
+        "90成本-低",
+        "90成本-高",
+        "90集中度",
+        "70成本-低",
+        "70成本-高",
+        "70集中度"
+      ],
+      "row_count": 90
+    }
+  ],
   "coverage_denominator": 87,
-  "scope": "RuntimeError: stock_cyq_em: ProxyError: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?secid=1.600519&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61&klt=101&fqt=0&end=20261001&lmt=210 (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response'))) | stock_cyq_em: ProxyError: HTTPSConnectionPool(host='push2his…",
-  "finding": "未通过：RuntimeError: stock_cyq_em: ProxyError: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?secid=1.600519&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61&klt=101&fqt=0&end=20261001&lmt=210 (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response'))) | stock_cyq_em: ProxyError: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?secid=1.600519&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61&klt=101&fqt=1&end=20261001&lmt=210 (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))；脚本结果 failed: RuntimeError: stock_cyq_em: ProxyError: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?secid=1.600519&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61&klt=101&fqt=0&end=20261001&lmt=210 (Caus…",
-  "sample": "RuntimeError: stock_cyq_em: ProxyError: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?secid=1.600519&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61&klt=101&fqt=0&end=20261001&lmt=210 (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response'))) | stock_cyq_em: ProxyError: HTTPSConnectionPool(host='push2his…",
+  "scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：push2his.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "finding": "未通过：RuntimeError: stock_cyq_em: ProxyError: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?secid=1.600519&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61&klt=101&fqt=0&end=20261001&lmt=210 (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response'))) | stock_cyq_em: ProxyError: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?secid=1.600519&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61&klt=101&fqt=1&end=20261001&lmt=210 (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))；本轮低频真实探测 success：saved 1 file(s); usable=1。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：push2his.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "sample": "{\"columns\": [\"日期\", \"获利比例\", \"平均成本\", \"90成本-低\", \"90成本-高\", \"90集中度\", \"70成本-低\", \"70成本-高\", \"70集中度\"], \"sample\": {\"日期\": \"2026-05-26\", \"获利比例\": \"0.00046500877768612523\", \"平均成本\": \"1412.01\", \"90成本-低\": \"1322.01\", \"90成本-高\": \"1514.0\", \"90集中度\": \"0.06769847514763978\", \"70成本-低\": \"1348.01\", \"70成本-高\": \"1468.0\", \"70集中度\": \"0.0426120438832982\"}}",
   "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
   "transformation_code_version": {
     "path": "provider_validation/tests/build_interface_coverage.py",
-    "sha256": "7e094251e9efdf1d355f8c8b853630456f7a1778b3ce928df578283152145ef0"
+    "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
   },
-  "validation_time_utc": "2026-10-03T08:58:04.343096+00:00"
+  "validation_time_utc": "2026-10-03T10:20:07.039810+00:00"
 }

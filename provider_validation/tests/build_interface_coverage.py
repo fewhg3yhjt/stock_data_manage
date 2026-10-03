@@ -14,12 +14,14 @@ from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 
 ROOT = Path(__file__).resolve().parents[2]
 VALIDATION = ROOT / "provider_validation"
 INVENTORY = VALIDATION / "coverage" / "a-stock-data-capability-inventory.csv"
 SUMMARY = VALIDATION / "results" / "a-stock-data-missing-output" / "_summary.csv"
+LIVE_PROBES_ROOT = VALIDATION / "results" / "live-probes"
 PROBE_SOURCE = VALIDATION / "tests" / "source_snapshots" / "a-stock-data" / "a_stock_missing_capabilities.py"
 SKILL = VALIDATION / "tests" / "source_snapshots" / "a-stock-data" / "SKILL.md"
 OUT_CSV = VALIDATION / "coverage" / "interface-coverage.csv"
@@ -359,10 +361,89 @@ def raw_refs(row: dict[str, str]) -> tuple[str, str]:
     return "; ".join(dict.fromkeys(fix_ref(x) for x in manifest)), "; ".join(dict.fromkeys(fix_ref(x) for x in bodies))
 
 
+def load_live_probe_results() -> dict[int, dict[str, Any]]:
+    """Load the newest completed, persisted low-frequency probe result per upstream capability ID."""
+    latest: dict[int, dict[str, Any]] = {}
+    if not LIVE_PROBES_ROOT.is_dir():
+        return latest
+    for run_dir in LIVE_PROBES_ROOT.iterdir():
+        policy_path = run_dir / "probe-run-policy.json"
+        summary_path = run_dir / "_summary.csv"
+        if not policy_path.is_file() or not summary_path.is_file():
+            continue
+        try:
+            policy = json.loads(policy_path.read_text(encoding="utf-8"))
+            probe_rows = read_csv(summary_path)
+            manifests = sorted((run_dir / "_raw").glob("*/manifest.ndjson"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        for probe_row in probe_rows:
+            try:
+                probe_id = int(probe_row["id"])
+            except (KeyError, ValueError):
+                continue
+            events: list[dict[str, Any]] = []
+            manifest_refs: list[str] = []
+            body_refs: list[str] = []
+            for manifest in manifests:
+                matching = []
+                for line in manifest.read_text(encoding="utf-8").splitlines():
+                    try:
+                        event = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    cap = str(event.get("scope", {}).get("capability", ""))
+                    match = re.match(r"^(\d+):", cap)
+                    if not match or int(match.group(1)) != probe_id:
+                        continue
+                    matching.append(event)
+                    body_storage = event.get("body_storage")
+                    if body_storage:
+                        body_path = (manifest.parent / str(body_storage)).resolve()
+                        if body_path.is_file():
+                            body_refs.append(rel(body_path))
+                if matching:
+                    events.extend(matching)
+                    manifest_refs.append(rel(manifest))
+            scope_parts = []
+            capability_events = [e for e in events if e.get("scope", {}).get("capability", "").startswith(f"{probe_id:02d}:")]
+            if capability_events:
+                first_scope = capability_events[0].get("scope", {})
+                params = [f"{key}={first_scope[key]}" for key in ("code", "date", "start", "end") if first_scope.get(key)]
+                if params:
+                    scope_parts.append("参数范围：" + ", ".join(params))
+                outcomes = Counter(
+                    (f"HTTP{e.get('status_code')}" if e.get("outcome") == "response" else str(e.get("outcome", "unknown")))
+                    for e in capability_events
+                )
+                scope_parts.append("请求事件：" + ", ".join(f"{k}×{v}" for k, v in sorted(outcomes.items())))
+                hosts = sorted({urlparse(str(e.get("url", ""))).hostname or "unknown" for e in capability_events if e.get("url")})
+                if hosts:
+                    scope_parts.append("主机：" + ", ".join(hosts))
+            scope_parts.append(f"低频探测批次：{run_dir.name}；策略={policy.get('policy_version', 'unknown')}；每主机最短间隔{policy.get('min_interval_seconds_per_hostname', 'n/a')}秒")
+            entry = {
+                **probe_row,
+                "probe_id": probe_id,
+                "policy": policy,
+                "run_dir": run_dir,
+                "manifest_ref": "; ".join(dict.fromkeys(manifest_refs)),
+                "body_ref": "; ".join(dict.fromkeys(body_refs)),
+                "events": events,
+                "scope_summary": "；".join(scope_parts),
+                "created_at_utc": str(policy.get("created_at_utc", "")),
+                "files": [x.strip() for x in str(probe_row.get("files", "")).split(";") if x.strip()],
+            }
+            current = latest.get(probe_id)
+            if current is None or entry["created_at_utc"] > current["created_at_utc"]:
+                latest[probe_id] = entry
+    return latest
+
+
 def main() -> None:
     inventory = read_csv(INVENTORY)
     summary_rows = read_csv(SUMMARY)
     summary_by_id = {int(r["id"]): r for r in summary_rows}
+    live_probe_by_id = load_live_probe_results()
     cap_map = upstream_capability_functions(PROBE_SOURCE)
     manifest_body_index = build_manifest_body_index()
     skill_text = SKILL.read_text(encoding="utf-8")
@@ -374,6 +455,17 @@ def main() -> None:
     counted = 0
 
     summary_name_map = {normalize_name(r["name"]): int(r["id"]) for r in summary_rows}
+    capability_name_map: dict[str, int] = {}
+    cap_tree = ast.parse(PROBE_SOURCE.read_text(encoding="utf-8"))
+    for node in ast.walk(cap_tree):
+        if not isinstance(node, (ast.Assign, ast.AnnAssign)):
+            continue
+        targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+        if not any(isinstance(t, ast.Name) and t.id == "CAPABILITIES" for t in targets) or not isinstance(node.value, ast.Dict):
+            continue
+        for key, value in zip(node.value.keys, node.value.values):
+            if isinstance(key, ast.Constant) and isinstance(key.value, int) and isinstance(value, ast.Tuple) and value.elts and isinstance(value.elts[0], ast.Constant):
+                capability_name_map[normalize_name(str(value.elts[0].value))] = key.value
     for inv in inventory:
         num = int(inv["序号"])
         name = inv["能力项"]
@@ -382,7 +474,10 @@ def main() -> None:
             counted += 1
         source_name = PROBE_NAME_BY_INVENTORY.get(name, name)
         probe_id = summary_name_map.get(normalize_name(source_name))
-        result = summary_by_id.get(probe_id) if probe_id is not None else None
+        if probe_id is None:
+            probe_id = capability_name_map.get(normalize_name(source_name))
+        result = live_probe_by_id.get(probe_id) if probe_id is not None and probe_id in live_probe_by_id else (summary_by_id.get(probe_id) if probe_id is not None else None)
+        live_result = bool(result and result.get("policy", {}).get("policy_version") == "rate-limited-live-probe-v1")
         api_symbol = UPSTREAM_API_SYMBOLS.get(name, "")
         api_line = api_doc_line(api_symbol, skill_lines)
         if result:
@@ -417,7 +512,34 @@ def main() -> None:
         notes = inv.get("本轮数据核验结论", "") or inv.get("本轮备注", "") or inv.get("备注", "") or inv.get("证据说明", "")
         current_run_note = inv.get("本轮备注", "")
         manifest_ref, body_ref = raw_refs(inv)
-        if result:
+        if live_result:
+            manifest_ref = result.get("manifest_ref", "")
+            body_ref = result.get("body_ref", "")
+            probe_status = result.get("status", "")
+            result_files = result.get("files", [])
+            output_ref = "; ".join(rel(p) for p in result_files)
+            status_msg = result.get("message", "")
+            notes = short((notes + "；" if notes else "") + f"本轮低频真实探测 {probe_status}：{status_msg}。{result.get('scope_summary', '')}", 1200)
+            if probe_status == "success":
+                verdict = "部分通过"  # A live parseable sample is not sufficient for full semantic validation.
+                evidence = "低频实时样本解析成功，原始响应和探测输出已留档；本轮仅单样本验证，未做全量语义核验。"
+            elif probe_status == "partial":
+                verdict = "部分通过"
+                evidence = "低频实时探测有部分数据，原始响应/失败事件及输出已留档；结果不完整。"
+            elif probe_status == "credential_required":
+                verdict = "未验证"
+                evidence = "实际调用受凭据限制；已留存失败/凭据状态，不能据此判源不可用。"
+            else:
+                verdict = "未通过"
+                evidence = "低频实时探测未取得可用业务数据；失败事件已留档，不能将传输阻断判为源数据为空。"
+            validation_scope = result.get("scope_summary", "")
+            validation_finding = notes
+            if probe_id in cap_map:
+                function, script_rel, line = cap_map[probe_id]
+                code_ref = f"{script_rel}:{line} ({function})"
+                test_ref = f"provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids {probe_id}"
+            endpoint_parts = list(dict.fromkeys(f"{e.get('method', '')} {e.get('url', '')}".strip() for e in result.get("events", []) if e.get("url")))
+        if result and not live_result:
             status_msg = result.get("message", "")
             if probe_status == "success":
                 verdict = "部分通过"
@@ -436,7 +558,7 @@ def main() -> None:
                 verdict = "未通过"
                 evidence = "探针明确失败/不可用；保存了执行摘要或失败信息，无成功原始业务响应。"
                 notes = short((notes + "；" if notes else "") + f"脚本结果 {probe_status}: {status_msg}", 1200)
-        else:
+        elif not live_result:
             status_map = {
                 "verified_live_raw_saved": ("通过", "实时接口响应与原始响应均已归档。"),
                 "partial_live_format_error_raw_saved": ("未通过", "源有返回且原始响应已保存，但解析/语义验证未通过。"),
@@ -448,29 +570,30 @@ def main() -> None:
                 "shared_endpoint_variant_not_separately_live_verified": ("未验证", "与共享接口为不同参数变体，未单独发请求验证。"),
             }
             verdict, evidence = status_map.get(original_status, ("未验证", f"原状态={original_status or '缺失'}；没有本轮专属结果。"))
-        if original_status == "verified_live_raw_saved":
+        if original_status == "verified_live_raw_saved" and not live_result:
             verdict = "通过"
             evidence = "此前实时验证已保存原始响应；本轮补抓脚本结果另列，测试范围不自动视为相同。"
-        if not included:
+        if not included and not live_result:
             verdict = "说明项"
             evidence = "不计入87项能力分母；行内记录未单独测试的接口变体或本地行为。"
 
         source_id = f"ASTOCK-{num:03d}"
-        output_ref = inv.get("本轮解析数据文件", "")
+        output_ref = output_ref if live_result else inv.get("本轮解析数据文件", "")
         if not output_ref or output_ref.startswith(("无", "未")):
             # Preserve older known derived-output reference if one was recorded.
             output_ref = inv.get("派生解析数据文件", "") or ""
         output_ref = "; ".join(rel(p) for p in output_ref.split(";") if p.strip()) if output_ref else ""
         sample = examples_for_file(output_ref.split(";")[0] if output_ref else "") or example_from_raw(body_ref)
-        if name == "腾讯 K 线":
+        if name == "腾讯 K 线" and not live_result:
             sample = kline_period_samples(body_ref)
         if not sample and result:
             sample = short(result.get("message", ""), 500)
         if not function:
             function = "未在本轮脚本中独立映射；参见上游调用代码快照"
         declared_content = short(inv.get("claimed_data", "") or inv.get("数据内容", ""), 800)
-        validation_scope = short((inv.get("本轮备注", "") + " " + inv.get("本轮文件行数结构检查", "")).strip() or inv.get("证据说明", ""), 500)
-        validation_finding = notes
+        if not live_result:
+            validation_scope = short((inv.get("本轮备注", "") + " " + inv.get("本轮文件行数结构检查", "")).strip() or inv.get("证据说明", ""), 500)
+            validation_finding = notes
         if name == "腾讯 K 线":
             declared_content = "上游声明支持：沪深日/周/月K（前/后复权）及1/5/15/30/60分钟K；上游文档注明不含北交所。此处是能力声明，不代表各周期均已实测。"
             validation_scope = (
@@ -484,10 +607,12 @@ def main() -> None:
                 "5分钟请求未限制日期窗口，响应日期与清单requested_data_date不同，因此不能将其视为2026-09-18历史5分钟数据验证。"
                 "通过结论仅覆盖上述日线及未限定日期的最近96条5分钟样本，不能代表其他周期或北交所。"
             )
-        evidence_status = "live_raw" if original_status == "verified_live_raw_saved" else ("parsed_only" if result and probe_status in ("success", "partial") else (probe_status or original_status or "undetermined"))
+        evidence_status = ("live_raw" if body_ref else ("failed" if probe_status not in ("success", "partial") else "parsed_only")) if live_result else ("live_raw" if original_status == "verified_live_raw_saved" else ("parsed_only" if result and probe_status in ("success", "partial") else (probe_status or original_status or "undetermined")))
         raw_digests = [Path(x.strip()).name.split(".")[0] for x in body_ref.split(";") if x.strip()]
         manifest_events = [manifest_body_index[d] for d in raw_digests if d in manifest_body_index]
         endpoint_parts = list(dict.fromkeys(f"{e['method']} {e['url']}".strip() for e in manifest_events if e.get("url")))
+        if live_result:
+            endpoint_parts = list(dict.fromkeys(endpoint_parts + [f"{e.get('method', '')} {e.get('url', '')}".strip() for e in result.get("events", []) if e.get("url")]))
         if not endpoint_parts and result and function.startswith(("fetch_", "unavailable_")):
             endpoint_parts = [urls_from_function(PROBE_SOURCE, function)]
         endpoint_info = "; ".join(x for x in endpoint_parts if x) or "未从现存探针清单提取；见来源函数/代码快照"
@@ -541,28 +666,75 @@ def main() -> None:
         ("SDA-BOARD-005", "证券清单/行业快照", "BaoStock.query_all_stock(day='2026-09-30')", "查询当日沪深上市证券清单", "部分通过", "旧全量探针日期2026-09-30；与行业查询合并统计5,212只在市证券", "", "provider_validation/results/legacy/2026-10-01-security-board-coverage.json", "上游 warehouse/industry.py:125；本项目 src/stock_data_manage/providers/baostock/industry.py:32 fetch_snapshot", "BaoStock只保存旧合并解析结果；无原始SDK行或TCP帧；不是当前Provider独立Live Probe"),
         ("SDA-BOARD-006", "证券-证监会行业关系", "BaoStock.query_stock_industry(date='2026-09-30')", "查询日期快照中的证券与证监会行业分类", "部分通过", "旧全量探针日期2026-09-30；5,212只中5,210只获得分类（99.9616%），缺2只", "", "provider_validation/results/legacy/2026-10-01-security-board-coverage.json", "上游 warehouse/industry.py:125；本项目 src/stock_data_manage/providers/baostock/industry.py:32 fetch_snapshot", "旧合并结果可离线重放，缺原始SDK行/TCP帧；不可标为原始返回已归档"),
     ]
+    baostock_run = VALIDATION / "results" / "live-probes" / "baostock-industry-20260930-20261003"
+    baostock_result_path = baostock_run / "result.json"
+    baostock_manifest_path = baostock_run / "_raw" / "baostock-industry" / "manifest.ndjson"
+    baostock_raw_by_endpoint: dict[str, str] = {}
+    baostock_rows_by_endpoint: dict[str, int] = {}
+    baostock_result: dict[str, Any] = {}
+    if baostock_result_path.is_file() and baostock_manifest_path.is_file():
+        try:
+            baostock_result = json.loads(baostock_result_path.read_text(encoding="utf-8"))
+            for line in baostock_manifest_path.read_text(encoding="utf-8").splitlines():
+                event = json.loads(line)
+                storage = event.get("body_storage")
+                baostock_rows_by_endpoint[str(event.get("endpoint", ""))] = int(event.get("metadata", {}).get("row_count", 0))
+                if storage:
+                    body_path = (baostock_manifest_path.parent / storage).resolve()
+                    baostock_raw_by_endpoint[str(event.get("endpoint", ""))] = rel(body_path)
+        except (OSError, json.JSONDecodeError):
+            baostock_result = {}
+    if baostock_result.get("status") == "success":
+        date_scope = str(baostock_result.get("date_scope", ""))
+        listed_count = int(baostock_result.get("listed_symbol_count", 0))
+        classified_count = int(baostock_result.get("classified_row_count", 0))
+        missing_count = int(baostock_result.get("missing_symbol_count", 0))
+        derived_path = str(baostock_result.get("parsed_output", ""))
+        manifest_ref = rel(baostock_manifest_path)
+        raw_listed_count = baostock_rows_by_endpoint.get("query_all_stock", 0)
+        board_rows[4] = (
+            "SDA-BOARD-005", "证券清单/行业快照", f"BaoStock.query_all_stock(day='{date_scope}')",
+            "查询当日全市场证券清单；原始SDK行已归档", "通过",
+            f"{date_scope}；原始SDK返回{raw_listed_count}条记录；Provider筛得沪深A股{listed_count}只",
+            manifest_ref, derived_path,
+            "本项目 src/stock_data_manage/providers/baostock/industry.py:32 fetch_snapshot；provider_validation/tests/run_baostock_industry_live_probe.py",
+            "通过代码/交易所规则筛选得到沪深A股证券集合；BaoStock TCP原始帧不对SDK调用方开放。2026-10-02非交易日空返回已保存在 provider_validation/results/live-probes/baostock-industry-20261003/result.json。",
+        )
+        board_rows[5] = (
+            "SDA-BOARD-006", "证券-证监会行业关系", f"BaoStock.query_stock_industry(date='{date_scope}')",
+            "查询沪深证券与证监会行业分类关系", "部分通过",
+            f"{date_scope}；沪深A股分母{listed_count}只，成功匹配{classified_count}只，缺失{missing_count}只：{','.join(baostock_result.get('missing_symbols', []))}",
+            manifest_ref, derived_path,
+            "本项目 src/stock_data_manage/providers/baostock/industry.py:32 fetch_snapshot；provider_validation/tests/run_baostock_industry_live_probe.py",
+            f"已归档query_stock_industry SDK解码字段与原始行；缺失{missing_count}只，因此覆盖不完整。BaoStock TCP原始帧不对SDK调用方开放。2026-10-02非交易日空返回已单独留档。",
+        )
     board_test_by_id = {
         "SDA-BOARD-001": "tests/test_sector_data_providers.py:53; provider_validation/tests/replay_sector_capability_archives.py:176",
         "SDA-BOARD-002": "tests/test_sector_data_providers.py:53; provider_validation/tests/replay_sector_capability_archives.py:178",
         "SDA-BOARD-003": "tests/test_sector_data_providers.py:73; provider_validation/tests/replay_sector_capability_archives.py:196",
         "SDA-BOARD-004": "tests/test_sector_data_providers.py:73; provider_validation/tests/replay_sector_capability_archives.py:196",
-        "SDA-BOARD-005": "tests/test_sector_data_providers.py:138; provider_validation/tests/replay_sector_capability_archives.py:212",
-        "SDA-BOARD-006": "tests/test_sector_data_providers.py:138; provider_validation/tests/replay_sector_capability_archives.py:212",
+        "SDA-BOARD-005": "tests/test_sector_data_providers.py:138; provider_validation/tests/replay_sector_capability_archives.py:212; provider_validation/tests/run_baostock_industry_live_probe.py",
+        "SDA-BOARD-006": "tests/test_sector_data_providers.py:138; provider_validation/tests/replay_sector_capability_archives.py:212; provider_validation/tests/run_baostock_industry_live_probe.py",
     }
     board_source = "provider_validation/tests/source_snapshots/stock-data-analyse/warehouse/industry.py; provider_validation/tests/source_snapshots/stock-data-analyse/fundflow/sources.py"
     for ident, category, symbol, content, verdict, scope, manifest, output, provider_ref, limitation in board_rows:
-        evidence = "原始HTTP响应已按 manifest/hash 归档" if manifest else "旧派生/合并结果可复核；BaoStock SDK原始行不可见，未保存原始返回帧。"
+        endpoint_key = "query_all_stock" if ident == "SDA-BOARD-005" else "query_stock_industry" if ident == "SDA-BOARD-006" else ""
+        board_body_ref = baostock_raw_by_endpoint.get(endpoint_key, "")
+        if endpoint_key and board_body_ref:
+            evidence = "BaoStock SDK解码字段与原始行已归档（非TCP线缆帧）；派生覆盖表已保存。"
+        else:
+            evidence = "原始HTTP响应已按 manifest/hash 归档" if manifest else "旧派生/合并结果可复核；BaoStock SDK原始行不可见，未保存原始返回帧。"
         code_ref = board_source + "; " + provider_ref
         sample = examples_for_file(output) or limitation
         row = {
             "接口ID": ident, "清单范围": "stock-data-analyse 板块接口补充，不计入87项", "是否计入87项": "否",
             "项目/来源": "stock-data-analyse → 本项目 Provider", "类别": category, "接口/能力名称": symbol,
-            "接口地址/协议": "HTTPS/HTTP，精确URL见Manifest；BaoStock为SDK/TCP，原始帧不可见" if manifest else "BaoStock SDK over TCP（底层原始帧不可见）",
+            "接口地址/协议": "BaoStock SDK/TCP（SDK解码行见归档；底层TCP帧不可见）" if endpoint_key else ("HTTPS/HTTP，精确URL见Manifest" if manifest else "BaoStock SDK over TCP（底层原始帧不可见）"),
             "接口/调用符号": symbol, "接口说明": content, "能力说明（文档声明）/返回字段": content,
             "调用方式/参数范围": symbol, "来源代码文件/行号": code_ref, "测试代码文件/行号": board_test_by_id[ident],
             "项目Provider对照代码": provider_ref, "接口取数结果": verdict, "本轮补抓脚本结果": "不适用", "证据完整度": evidence,
             "实测范围/日期/结果": scope, "验证备注/数据核验结论": limitation,
-            "原始响应Manifest": manifest, "原始响应文件/哈希": "见对应Manifest下的body文件；BaoStock无原始body" if manifest else "未保存：SDK没有暴露原始TCP帧/原始SDK行",
+            "原始响应Manifest": manifest, "原始响应文件/哈希": ("; ".join(f"{a['path']} sha256={a['sha256']}" for a in response_hashes(board_body_ref)) if board_body_ref else ("见对应Manifest下的body文件" if manifest else "未保存：SDK没有暴露原始TCP帧/原始SDK行")),
             "解析结果/输出文件": output, "返回示例": sample,
             "逐接口结果记录": f"provider_validation/results/interface-records/{ident}.json",
             "来源版本/提交": "stock-data-analyse c26cabcf89443ec8f1445d0e5af86bf3d6dacf3; 本项目代码以当前工作树为准",
@@ -570,11 +742,12 @@ def main() -> None:
             "证据状态说明": EVIDENCE_STATUS_LABELS["live_raw" if manifest else "historical_parsed_only"],
         }
         board_artifacts = output_artifacts(output)
+        board_response_artifacts = response_hashes(board_body_ref)
         board_code_artifacts = code_hashes(code_ref, board_test_by_id[ident], provider_ref)
         row["代码SHA-256"] = "; ".join(f"{a['path']}={a['sha256']}" for a in board_code_artifacts)
         row["结果文件SHA-256/行数"] = "; ".join(f"{a['path']} (rows={a.get('row_count', 'n/a')}; sha256={a['sha256']})" for a in board_artifacts)
         rows.append(row)
-        result_payloads.append({"interface_id": ident, "source": "stock-data-analyse / local Provider", "validation_result": verdict, "evidence_status": row["证据状态代码"], "evidence_status_description": row["证据状态说明"], "evidence_level": evidence, "source_code_ref": code_ref, "source_code_artifacts": board_code_artifacts, "test_code_ref": board_test_by_id[ident], "manifest_ref": manifest, "response_artifacts": [], "parsed_output_ref": output, "derived_artifacts": board_artifacts, "coverage_denominator": None, "scope": scope, "finding": limitation, "sample": sample, "source_version": row["来源版本/提交"], "transformation_code_version": {"path": rel(Path(__file__)), "sha256": sha256(Path(__file__))}, "validation_time_utc": datetime.now(timezone.utc).isoformat()})
+        result_payloads.append({"interface_id": ident, "source": "stock-data-analyse / local Provider", "validation_result": verdict, "evidence_status": row["证据状态代码"], "evidence_status_description": row["证据状态说明"], "evidence_level": evidence, "source_code_ref": code_ref, "source_code_artifacts": board_code_artifacts, "test_code_ref": board_test_by_id[ident], "manifest_ref": manifest, "response_artifacts": board_response_artifacts, "parsed_output_ref": output, "derived_artifacts": board_artifacts, "coverage_denominator": None, "scope": scope, "finding": limitation, "sample": sample, "source_version": row["来源版本/提交"], "transformation_code_version": {"path": rel(Path(__file__)), "sha256": sha256(Path(__file__))}, "validation_time_utc": datetime.now(timezone.utc).isoformat()})
 
     if counted != 87:
         raise SystemExit(f"Expected 87 counted capabilities; found {counted}")
@@ -619,6 +792,13 @@ def main() -> None:
     raw_hash_results = [r for payload in result_payloads for r in payload.get("response_artifacts", [])]
     raw_integrity_failures = [r for r in raw_hash_results if not r.get("matches_filename")]
     tally = Counter(r["接口取数结果"] for r in rows if r["是否计入87项"] == "是")
+    live_probe_status_counts = Counter(str(r.get("status", "unknown")) for r in live_probe_by_id.values())
+    live_probe_body_hashes = {
+        str(event.get("body_sha256"))
+        for result in live_probe_by_id.values()
+        for event in result.get("events", [])
+        if event.get("body_sha256")
+    }
     summary = {
         "record_type": "interface_coverage_report_summary",
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
@@ -627,6 +807,9 @@ def main() -> None:
         "non_counted_inventory_explanatory_rows": sum(1 for x in inventory if x["是否计入87项"] != "是"),
         "stock_data_analyse_board_interfaces": len(board_rows),
         "counted_result_counts": dict(tally),
+        "latest_rate_limited_live_probe_capability_count": len(live_probe_by_id),
+        "latest_rate_limited_live_probe_status_counts": dict(live_probe_status_counts),
+        "latest_rate_limited_live_probe_unique_response_bodies": len(live_probe_body_hashes),
         "missing_output_summary_rows": len(summary_rows),
         "missing_output_summary_matched_inventory": len(matched_output_ids),
         "missing_output_summary_unmatched_ids": [r["id"] for r in summary_rows if int(r["id"]) not in matched_output_ids],

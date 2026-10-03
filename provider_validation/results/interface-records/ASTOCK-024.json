@@ -2,107 +2,118 @@
   "interface_id": "ASTOCK-024",
   "source": "a-stock-data",
   "validation_result": "部分通过",
-  "current_missing_probe_status": "success",
-  "evidence_status": "parsed_only",
-  "evidence_status_description": "仅保存解析结果；没有对应的原始响应",
-  "evidence_level": "解析后输出已保存；本批未保存精确原始HTTP响应。",
-  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:697 (fetch_margin_detail); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:250 (margin_trading(code))",
+  "current_missing_probe_status": "partial",
+  "evidence_status": "live_raw",
+  "evidence_status_description": "实时原始响应已归档；仅代表本行注明的实测范围",
+  "evidence_level": "低频实时探测有部分数据，原始响应/失败事件及输出已留档；结果不完整。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:697 (fetch_margin_detail)",
   "source_code_artifacts": [
     {
       "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
       "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
     },
     {
-      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
-      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+      "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+      "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
     }
   ],
-  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:697 (CLI --run 22)",
-  "manifest_ref": "",
-  "response_artifacts": [],
-  "parsed_output_ref": "provider_validation/results/a-stock-data-missing-output/22_融资融券明细/data/sse_all.csv;  provider_validation/results/a-stock-data-missing-output/22_融资融券明细/data/szse_all.csv;  provider_validation/results/a-stock-data-missing-output/22_融资融券明细/data/sse_filtered.csv;  provider_validation/results/a-stock-data-missing-output/22_融资融券明细/data/szse_filtered.csv;  provider_validation/results/a-stock-data-missing-output/22_融资融券明细/data/_meta.json",
+  "test_code_ref": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 22",
+  "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+  "response_artifacts": [
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/ab1d195c803f392a34e1223a6beeaf78d22ebad7e950854931c4dc95bd1f9892.body.gz",
+      "sha256": "ab1d195c803f392a34e1223a6beeaf78d22ebad7e950854931c4dc95bd1f9892",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/cea0bf4bdbbea5176c446f6b176f3b2cdcc2b4e2b78531fa1e4297941d558425.body.gz",
+      "sha256": "cea0bf4bdbbea5176c446f6b176f3b2cdcc2b4e2b78531fa1e4297941d558425",
+      "matches_filename": true
+    }
+  ],
+  "parsed_output_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/22_融资融券明细/data/_meta.json;  provider_validation/results/live-probes/rate-limited-all-20261003/22_融资融券明细/data/sse_all.csv;  provider_validation/results/live-probes/rate-limited-all-20261003/22_融资融券明细/data/sse_filtered.csv;  provider_validation/results/live-probes/rate-limited-all-20261003/22_融资融券明细/data/szse_all.csv;  provider_validation/results/live-probes/rate-limited-all-20261003/22_融资融券明细/data/szse_filtered.csv",
   "derived_artifacts": [
     {
-      "path": "provider_validation/results/a-stock-data-missing-output/22_融资融券明细/data/sse_all.csv",
-      "sha256": "a73163ec9435391a955678ab64a876cb6f1fa349a746e9591f78f24ff59a8c72",
-      "bytes": 139160,
-      "field_names": [
-        "信用交易日期",
-        "标的证券代码",
-        "标的证券简称",
-        "融资余额",
-        "融资买入额",
-        "融资偿还额",
-        "融券余量",
-        "融券卖出量",
-        "融券偿还量"
-      ],
-      "row_count": 2000
-    },
-    {
-      "path": "provider_validation/results/a-stock-data-missing-output/22_融资融券明细/data/szse_all.csv",
-      "sha256": "f0bd4c7c6d618ad917bd62c4f48ba4f0c09e9f49bd2a9243e29b9c9d105aeb36",
-      "bytes": 120,
-      "field_names": [
-        "证券代码",
-        "证券简称",
-        "融资买入额",
-        "融资余额",
-        "融券卖出量",
-        "融券余量",
-        "融券余额",
-        "融资融券余额"
-      ],
-      "row_count": 0
-    },
-    {
-      "path": "provider_validation/results/a-stock-data-missing-output/22_融资融券明细/data/sse_filtered.csv",
-      "sha256": "a73163ec9435391a955678ab64a876cb6f1fa349a746e9591f78f24ff59a8c72",
-      "bytes": 139160,
-      "field_names": [
-        "信用交易日期",
-        "标的证券代码",
-        "标的证券简称",
-        "融资余额",
-        "融资买入额",
-        "融资偿还额",
-        "融券余量",
-        "融券卖出量",
-        "融券偿还量"
-      ],
-      "row_count": 2000
-    },
-    {
-      "path": "provider_validation/results/a-stock-data-missing-output/22_融资融券明细/data/szse_filtered.csv",
-      "sha256": "f0bd4c7c6d618ad917bd62c4f48ba4f0c09e9f49bd2a9243e29b9c9d105aeb36",
-      "bytes": 120,
-      "field_names": [
-        "证券代码",
-        "证券简称",
-        "融资买入额",
-        "融资余额",
-        "融券卖出量",
-        "融券余量",
-        "融券余额",
-        "融资融券余额"
-      ],
-      "row_count": 0
-    },
-    {
-      "path": "provider_validation/results/a-stock-data-missing-output/22_融资融券明细/data/_meta.json",
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/22_融资融券明细/data/_meta.json",
       "sha256": "298c4d244f66517072092c18aa61341177c2a6b884bd112abe16ab1c9a608112",
       "bytes": 26,
       "row_count": null
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/22_融资融券明细/data/sse_all.csv",
+      "sha256": "a73163ec9435391a955678ab64a876cb6f1fa349a746e9591f78f24ff59a8c72",
+      "bytes": 139160,
+      "field_names": [
+        "信用交易日期",
+        "标的证券代码",
+        "标的证券简称",
+        "融资余额",
+        "融资买入额",
+        "融资偿还额",
+        "融券余量",
+        "融券卖出量",
+        "融券偿还量"
+      ],
+      "row_count": 2000
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/22_融资融券明细/data/sse_filtered.csv",
+      "sha256": "e074ae7553f21116019713d26fadc55b6f05ad01fcddd6d94f6906903f1504dc",
+      "bytes": 231,
+      "field_names": [
+        "信用交易日期",
+        "标的证券代码",
+        "标的证券简称",
+        "融资余额",
+        "融资买入额",
+        "融资偿还额",
+        "融券余量",
+        "融券卖出量",
+        "融券偿还量"
+      ],
+      "row_count": 1
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/22_融资融券明细/data/szse_all.csv",
+      "sha256": "f0bd4c7c6d618ad917bd62c4f48ba4f0c09e9f49bd2a9243e29b9c9d105aeb36",
+      "bytes": 120,
+      "field_names": [
+        "证券代码",
+        "证券简称",
+        "融资买入额",
+        "融资余额",
+        "融券卖出量",
+        "融券余量",
+        "融券余额",
+        "融资融券余额"
+      ],
+      "row_count": 0
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/22_融资融券明细/data/szse_filtered.csv",
+      "sha256": "f0bd4c7c6d618ad917bd62c4f48ba4f0c09e9f49bd2a9243e29b9c9d105aeb36",
+      "bytes": 120,
+      "field_names": [
+        "证券代码",
+        "证券简称",
+        "融资买入额",
+        "融资余额",
+        "融券卖出量",
+        "融券余量",
+        "融券余额",
+        "融资融券余额"
+      ],
+      "row_count": 0
     }
   ],
   "coverage_denominator": 87,
-  "scope": "脚本success误报：深交所文件为空，上交所filtered仍2000行、未筛选到单票。 本项只部分返回或有未核准范围。 a_stock_missing_output\\22_融资融券明细\\data\\sse_all.csv [CSV行数=2000]; a_stock_missing_output\\22_融资融券明细\\data\\szse_all.csv [CSV行数=0]; a_stock_missing_output\\22_融资融券明细\\data\\sse_filtered.csv [CSV行数=2000]; a_stock_missing_output\\22_融资融券明细\\data\\szse_filtered.csv [CSV行数=0]; a_stock_missing_output\\22_融资融券明细\\data\\_meta.json [JSON对象]",
-  "finding": "部分：脚本success误报：深交所文件为空，上交所filtered仍2000行、未筛选到单票。；脚本结果 success：saved 5 file(s)。解析结果非空；未留精确原始响应。",
-  "sample": "{\"columns\": [\"信用交易日期\", \"标的证券代码\", \"标的证券简称\", \"融资余额\", \"融资买入额\", \"融资偿还额\", \"融券余量\", \"融券卖出量\", \"融券偿还量\"], \"sample\": {\"信用交易日期\": \"20260930\", \"标的证券代码\": \"510050\", \"标的证券简称\": \"50ETF\", \"融资余额\": \"1471582857\", \"融资买入额\": \"22461752\", \"融资偿还额\": \"59353615\", \"融券余量\": \"34434340\", \"融券卖出量\": \"425900\", \"融券偿还量\": \"425200\"}}",
+  "scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×2；主机：query.sse.com.cn, www.szse.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "finding": "部分：脚本success误报：深交所文件为空，上交所filtered仍2000行、未筛选到单票。；本轮低频真实探测 partial：5 outputs: usable=3, empty=2。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×2；主机：query.sse.com.cn, www.szse.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "sample": "{\"date\": \"20260930\"}",
   "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
   "transformation_code_version": {
     "path": "provider_validation/tests/build_interface_coverage.py",
-    "sha256": "7e094251e9efdf1d355f8c8b853630456f7a1778b3ce928df578283152145ef0"
+    "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
   },
-  "validation_time_utc": "2026-10-03T08:58:04.164780+00:00"
+  "validation_time_utc": "2026-10-03T10:20:06.985146+00:00"
 }

@@ -3,33 +3,33 @@
   "source": "a-stock-data",
   "validation_result": "未验证",
   "current_missing_probe_status": "credential_required",
-  "evidence_status": "credential_required",
-  "evidence_status_description": "需要凭据；本轮未能验证",
-  "evidence_level": "调用受凭据限制；不是源不可用结论。",
-  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:1214 (unavailable_iwencai_nl); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:239 (iwencai_search(query) / iwencai_query(query))",
+  "evidence_status": "failed",
+  "evidence_status_description": "本轮探针或数据校验失败",
+  "evidence_level": "实际调用受凭据限制；已留存失败/凭据状态，不能据此判源不可用。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:1214 (unavailable_iwencai_nl)",
   "source_code_artifacts": [
     {
       "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
       "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
     },
     {
-      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
-      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+      "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+      "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
     }
   ],
-  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:1214 (CLI --run 11)",
+  "test_code_ref": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 11",
   "manifest_ref": "",
   "response_artifacts": [],
   "parsed_output_ref": "",
   "derived_artifacts": [],
   "coverage_denominator": 87,
-  "scope": "未设置 IWENCAI_API_KEY；自然语言问财接口不应在无凭据时伪装成可用。 本轮未取得可用且匹配能力定义的数据。",
-  "finding": "未通过：未设置 IWENCAI_API_KEY；自然语言问财接口不应在无凭据时伪装成可用。；未设置 IWENCAI_API_KEY；自然语言问财接口不应在无凭据时伪装成可用。",
-  "sample": "未设置 IWENCAI_API_KEY；自然语言问财接口不应在无凭据时伪装成可用。",
+  "scope": "低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "finding": "未通过：未设置 IWENCAI_API_KEY；自然语言问财接口不应在无凭据时伪装成可用。；本轮低频真实探测 credential_required：IWENCAI_API_KEY not configured。低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "sample": "IWENCAI_API_KEY not configured",
   "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
   "transformation_code_version": {
     "path": "provider_validation/tests/build_interface_coverage.py",
-    "sha256": "7e094251e9efdf1d355f8c8b853630456f7a1778b3ce928df578283152145ef0"
+    "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
   },
-  "validation_time_utc": "2026-10-03T08:58:03.668894+00:00"
+  "validation_time_utc": "2026-10-03T10:20:06.834678+00:00"
 }

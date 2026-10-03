@@ -2,53 +2,115 @@
   "interface_id": "ASTOCK-086",
   "source": "a-stock-data",
   "validation_result": "部分通过",
-  "current_missing_probe_status": "success",
-  "evidence_status": "parsed_only",
-  "evidence_status_description": "仅保存解析结果；没有对应的原始响应",
-  "evidence_level": "解析后输出已保存；本批未保存精确原始HTTP响应。",
-  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:1168 (fetch_fund_flow_backup); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:307 (fund_flow_backup())",
+  "current_missing_probe_status": "partial",
+  "evidence_status": "live_raw",
+  "evidence_status_description": "实时原始响应已归档；仅代表本行注明的实测范围",
+  "evidence_level": "低频实时探测有部分数据，原始响应/失败事件及输出已留档；结果不完整。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:1168 (fetch_fund_flow_backup)",
   "source_code_artifacts": [
     {
       "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
       "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
     },
     {
-      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
-      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+      "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+      "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
     }
   ],
-  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:1168 (CLI --run 84)",
-  "manifest_ref": "",
-  "response_artifacts": [],
-  "parsed_output_ref": "provider_validation/results/a-stock-data-missing-output/84_资金流备胎/data.csv",
-  "derived_artifacts": [
+  "test_code_ref": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 84",
+  "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+  "response_artifacts": [
     {
-      "path": "provider_validation/results/a-stock-data-missing-output/84_资金流备胎/data.csv",
-      "sha256": "08b2f22a7ca5ab305a4905ddf8e25e063789020ae263f133957658cf17a0cbe3",
-      "bytes": 433988,
-      "field_names": [
-        "序号",
-        "股票代码",
-        "股票简称",
-        "最新价",
-        "涨跌幅",
-        "换手率",
-        "流入资金",
-        "流出资金",
-        "净额",
-        "成交额"
-      ],
-      "row_count": 5213
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/e9d66967af573c094d5a31314af82e809d10f93d697488e9244199e08659ba20.body.gz",
+      "sha256": "e9d66967af573c094d5a31314af82e809d10f93d697488e9244199e08659ba20",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/75ca8e3dc303c69dbcf526773fba2dd73c839b5c4e351b0f2b93c36d19d6b9b4.body.gz",
+      "sha256": "75ca8e3dc303c69dbcf526773fba2dd73c839b5c4e351b0f2b93c36d19d6b9b4",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/c4cba264e95fc0b7e0e67ebd02bd472b993d1478d33a347908349263cfcef2db.body.gz",
+      "sha256": "c4cba264e95fc0b7e0e67ebd02bd472b993d1478d33a347908349263cfcef2db",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/6c888f0c551cc3bd6453c1a0cb70171c0eb5a6465d969a4ffd9e164334aab4c1.body.gz",
+      "sha256": "6c888f0c551cc3bd6453c1a0cb70171c0eb5a6465d969a4ffd9e164334aab4c1",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/b5df4b0eb743133d3bfca7c3c437dea26d47c6c826e838ed67b28510f8f82ca3.body.gz",
+      "sha256": "b5df4b0eb743133d3bfca7c3c437dea26d47c6c826e838ed67b28510f8f82ca3",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/f6d67979d2d907b887275377c73a76038ab84b61fb728906b57c9b295c10381b.body.gz",
+      "sha256": "f6d67979d2d907b887275377c73a76038ab84b61fb728906b57c9b295c10381b",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/29102c475238cdd00b087c557c313e0e07a4167c87696509f0617859805fc598.body.gz",
+      "sha256": "29102c475238cdd00b087c557c313e0e07a4167c87696509f0617859805fc598",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/f4c646e95515663813c85ede45e37ea4d9152dda9f39bf35f9cfe54e3e9e7124.body.gz",
+      "sha256": "f4c646e95515663813c85ede45e37ea4d9152dda9f39bf35f9cfe54e3e9e7124",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/9e6cb62b0a98d3af0c4d9663948cc3791d770c3b6b003869b6b8118252539a70.body.gz",
+      "sha256": "9e6cb62b0a98d3af0c4d9663948cc3791d770c3b6b003869b6b8118252539a70",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/22da1637e4d5a47cd898c532b1b5c63f02d5c80d5d933b0a6320b77cb46a5426.body.gz",
+      "sha256": "22da1637e4d5a47cd898c532b1b5c63f02d5c80d5d933b0a6320b77cb46a5426",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/5538c2eb738c6a0f88793efe3a8339f8b131881feceaf106c97568ad266be804.body.gz",
+      "sha256": "5538c2eb738c6a0f88793efe3a8339f8b131881feceaf106c97568ad266be804",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/6a30b73287c188d04f2ec68486e82b9b9b26901aa734e1674c3b79d3e6d54360.body.gz",
+      "sha256": "6a30b73287c188d04f2ec68486e82b9b9b26901aa734e1674c3b79d3e6d54360",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/a51c285349848497b985976af8074cc8d1b020c3c843e6428c3099c990529629.body.gz",
+      "sha256": "a51c285349848497b985976af8074cc8d1b020c3c843e6428c3099c990529629",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/efaa02bf7b60c021d0a3655fa3194f45fb1238a919e97c3f484eb4831a6e865c.body.gz",
+      "sha256": "efaa02bf7b60c021d0a3655fa3194f45fb1238a919e97c3f484eb4831a6e865c",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/b0bd0a32be859503e00b656b8266d0d4d0b2565656287c5b0fd16d43819acb3f.body.gz",
+      "sha256": "b0bd0a32be859503e00b656b8266d0d4d0b2565656287c5b0fd16d43819acb3f",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/0a77f9adb8d609fd74c6e5ac05f1ce84a60cedb75073c00c954c230f79d37b4f.body.gz",
+      "sha256": "0a77f9adb8d609fd74c6e5ac05f1ce84a60cedb75073c00c954c230f79d37b4f",
+      "matches_filename": true
     }
   ],
+  "parsed_output_ref": "",
+  "derived_artifacts": [],
   "coverage_denominator": 87,
-  "scope": "解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。 本次只核验了本行注明的样例范围。 a_stock_missing_output\\84_资金流备胎\\data.csv [CSV行数=5213]",
-  "finding": "通过：解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。；脚本结果 success：saved 1 file(s)。解析结果非空；未留精确原始响应。",
-  "sample": "{\"columns\": [\"序号\", \"股票代码\", \"股票简称\", \"最新价\", \"涨跌幅\", \"换手率\", \"流入资金\", \"流出资金\", \"净额\", \"成交额\"], \"sample\": {\"序号\": \"1\", \"股票代码\": \"1246\", \"股票简称\": \"力勤资源\", \"最新价\": \"65.09\", \"涨跌幅\": \"206.59%\", \"换手率\": \"74.93%\", \"流入资金\": \"39.39亿\", \"流出资金\": \"42.80亿\", \"净额\": \"-3.41亿\", \"成交额\": \"83.45亿\"}}",
+  "scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×16；主机：data.10jqka.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "finding": "通过：解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。；本轮低频真实探测 partial：Safely stopped after 16 paginated requests to avoid continuing a 105-page market-wide fetch; exact 16 raw responses retained; parsed result intentionally not produced.。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×16；主机：data.10jqka.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "sample": "<div class=\"page-loading\" style=\"display: none;\"> <div class=\"mask\"></div> <div class=\"loading-img\"></div> </div> <table class=\"m-table J-ajax-table\"> <thead> <tr> <th width=\"40\">���</th> <th width=\"100\" class=\"cur\"><a href=\"javascript:void(0);\" field=\"code\" class=\"J-ajax-a\" order=\"asc\">��Ʊ����</a><i class=\"arr-down\"></i></th> <th width=\"80\" ><a href=\"javascript:void(0);\" field=\"codename\" class=\"J-ajax-a\" >��Ʊ���</a><i class=\"arr-down\"></i></th> <th width=\"80\" ><a href=\"javascript:void(0);\" field=\"zxj\" class=\"J-ajax-a\" >���¼�</a><i class=\"arr-down\"></i></th> <th width=\"100\" ><a href=\"javascript:void(0);\" field=\"zdf\" class=\"J-ajax-a\" >�ǵ���</a><i class=\"arr-down\"></i></th> <th width=\"100\" ><…",
   "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
   "transformation_code_version": {
     "path": "provider_validation/tests/build_interface_coverage.py",
-    "sha256": "7e094251e9efdf1d355f8c8b853630456f7a1778b3ce928df578283152145ef0"
+    "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
   },
-  "validation_time_utc": "2026-10-03T08:58:06.018457+00:00"
+  "validation_time_utc": "2026-10-03T10:20:07.872220+00:00"
 }

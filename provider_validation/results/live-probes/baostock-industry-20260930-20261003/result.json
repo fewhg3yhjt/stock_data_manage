@@ -1,0 +1,26 @@
+{
+  "record_type": "baostock_industry_probe_result",
+  "status": "success",
+  "date_scope": "2026-09-30",
+  "listed_symbol_count": 5223,
+  "classified_row_count": 5221,
+  "missing_symbol_count": 2,
+  "missing_symbols": [
+    "sz001246",
+    "sz301716"
+  ],
+  "field_semantics": [
+    "stock_code",
+    "stock_name",
+    "exchange",
+    "status",
+    "industry_name",
+    "classification",
+    "classification_update_date"
+  ],
+  "decoded_rows_manifest": "_raw/baostock-industry/manifest.ndjson",
+  "parsed_output": "provider_validation/results/live-probes/baostock-industry-20260930-20261003/industry-membership.csv",
+  "parsed_output_sha256": "41c9f685b6ffca6f70492a29207ba1ff225306beeddf7def390600079449d003",
+  "validation_time_utc": "2026-10-03T10:16:32.627217+00:00",
+  "elapsed_seconds": 57.988828
+}

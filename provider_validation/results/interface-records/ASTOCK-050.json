@@ -3,27 +3,33 @@
   "source": "a-stock-data",
   "validation_result": "部分通过",
   "current_missing_probe_status": "success",
-  "evidence_status": "parsed_only",
-  "evidence_status_description": "仅保存解析结果；没有对应的原始响应",
-  "evidence_level": "解析后输出已保存；本批未保存精确原始HTTP响应。",
-  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:924 (fetch_strong_pool); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:275 (em_stock_monitor())",
+  "evidence_status": "live_raw",
+  "evidence_status_description": "实时原始响应已归档；仅代表本行注明的实测范围",
+  "evidence_level": "低频实时样本解析成功，原始响应和探测输出已留档；本轮仅单样本验证，未做全量语义核验。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:924 (fetch_strong_pool)",
   "source_code_artifacts": [
     {
       "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
       "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
     },
     {
-      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
-      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+      "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+      "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
     }
   ],
-  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:924 (CLI --run 48)",
-  "manifest_ref": "",
-  "response_artifacts": [],
-  "parsed_output_ref": "provider_validation/results/a-stock-data-missing-output/48_东财强势_重点监控替代池/data.csv",
+  "test_code_ref": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 48",
+  "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+  "response_artifacts": [
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/4f9d16d10f9bfd7fd6a9ba0190b9ff362a62aa9dcdfc557a5b11cf5345bc51a8.body.gz",
+      "sha256": "4f9d16d10f9bfd7fd6a9ba0190b9ff362a62aa9dcdfc557a5b11cf5345bc51a8",
+      "matches_filename": true
+    }
+  ],
+  "parsed_output_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/48_东财强势_重点监控替代池/data.csv",
   "derived_artifacts": [
     {
-      "path": "provider_validation/results/a-stock-data-missing-output/48_东财强势_重点监控替代池/data.csv",
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/48_东财强势_重点监控替代池/data.csv",
       "sha256": "69e90f34f18d92346382673792347c369df5f2d0ddca0f753a151878f5fec3a0",
       "bytes": 33754,
       "field_names": [
@@ -48,13 +54,13 @@
     }
   ],
   "coverage_denominator": 87,
-  "scope": "199行来自东财强势股池，不能代表交易所重点监控名单。 本项只部分返回或有未核准范围。 a_stock_missing_output\\48_东财强势_重点监控替代池\\data.csv [CSV行数=199]",
-  "finding": "部分：199行来自东财强势股池，不能代表交易所重点监控名单。；脚本结果 success：saved 1 file(s)。解析结果非空；未留精确原始响应。",
+  "scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：push2ex.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "finding": "部分：199行来自东财强势股池，不能代表交易所重点监控名单。；本轮低频真实探测 success：saved 1 file(s); usable=1。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：push2ex.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
   "sample": "{\"columns\": [\"序号\", \"代码\", \"名称\", \"涨跌幅\", \"最新价\", \"涨停价\", \"成交额\", \"流通市值\", \"总市值\", \"换手率\", \"涨速\", \"是否新高\", \"量比\", \"涨停统计\", \"入选理由\", \"所属行业\"], \"sample\": {\"序号\": \"1\", \"代码\": \"301190\", \"名称\": \"善水科技\", \"涨跌幅\": \"20.00667953491211\", \"最新价\": \"35.93\", \"涨停价\": \"35.93\", \"成交额\": \"510373312\", \"流通市值\": \"6534014220.0\", \"总市值\": \"7711889445.0\", \"换手率\": \"7.954790115356445\", \"涨速\": \"0.0\", \"是否新高\": \"是\", \"量比\": \"2.2809367179870605\", \"涨停统计\": \"3/3\", \"入选理由\": \"60日新高且近期多次涨停\", \"所属行业\": \"化学原料\"}}",
   "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
   "transformation_code_version": {
     "path": "provider_validation/tests/build_interface_coverage.py",
-    "sha256": "7e094251e9efdf1d355f8c8b853630456f7a1778b3ce928df578283152145ef0"
+    "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
   },
-  "validation_time_utc": "2026-10-03T08:58:05.114744+00:00"
+  "validation_time_utc": "2026-10-03T10:20:07.321276+00:00"
 }

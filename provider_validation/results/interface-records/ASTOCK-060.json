@@ -2,30 +2,41 @@
   "interface_id": "ASTOCK-060",
   "source": "a-stock-data",
   "validation_result": "部分通过",
-  "current_missing_probe_status": "success",
-  "evidence_status": "parsed_only",
-  "evidence_status_description": "仅保存解析结果；没有对应的原始响应",
-  "evidence_level": "解析后输出已保存；本批未保存精确原始HTTP响应。",
-  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:1088 (fetch_em_stock_concept_hit); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:279 (em_hot_concept(code))",
+  "current_missing_probe_status": "partial",
+  "evidence_status": "live_raw",
+  "evidence_status_description": "实时原始响应已归档；仅代表本行注明的实测范围",
+  "evidence_level": "低频实时探测有部分数据，原始响应/失败事件及输出已留档；结果不完整。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:1088 (fetch_em_stock_concept_hit)",
   "source_code_artifacts": [
     {
       "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
       "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
     },
     {
-      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
-      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+      "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+      "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
     }
   ],
-  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:1088 (CLI --run 58)",
-  "manifest_ref": "",
-  "response_artifacts": [],
-  "parsed_output_ref": "provider_validation/results/a-stock-data-missing-output/58_东财个股概念_关键词命中/data/hot_keyword.csv;  provider_validation/results/a-stock-data-missing-output/58_东财个股概念_关键词命中/data/related.json",
+  "test_code_ref": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 58",
+  "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+  "response_artifacts": [
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/6a21efb8bbf29bc20da04ec0de56ad0bd1b2d1d7eaaf9148ad0ed47661b14f4c.body.gz",
+      "sha256": "6a21efb8bbf29bc20da04ec0de56ad0bd1b2d1d7eaaf9148ad0ed47661b14f4c",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/457ebfc43414d533b9d341e32f202381b49b1d71e22db217d70a5211c4e04067.body.gz",
+      "sha256": "457ebfc43414d533b9d341e32f202381b49b1d71e22db217d70a5211c4e04067",
+      "matches_filename": true
+    }
+  ],
+  "parsed_output_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/58_东财个股概念_关键词命中/data/hot_keyword.csv;  provider_validation/results/live-probes/rate-limited-all-20261003/58_东财个股概念_关键词命中/data/related.json",
   "derived_artifacts": [
     {
-      "path": "provider_validation/results/a-stock-data-missing-output/58_东财个股概念_关键词命中/data/hot_keyword.csv",
-      "sha256": "f9230d6bf2dc04623e053bcad858f3391a58675c3f3a26f5061f29fbba51329e",
-      "bytes": 265,
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/58_东财个股概念_关键词命中/data/hot_keyword.csv",
+      "sha256": "aeebeffae998cd62b8a6269ff18d72ab06f2abcbb9a1dd4e0a7d8c9485cbe3fa",
+      "bytes": 266,
       "field_names": [
         "时间",
         "股票代码",
@@ -36,20 +47,20 @@
       "row_count": 4
     },
     {
-      "path": "provider_validation/results/a-stock-data-missing-output/58_东财个股概念_关键词命中/data/related.json",
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/58_东财个股概念_关键词命中/data/related.json",
       "sha256": "5c4e1d63e3263223442779c73da2bf1d0134b9bf0921fd39809da310e67cce28",
       "bytes": 170,
       "row_count": null
     }
   ],
   "coverage_denominator": 87,
-  "scope": "关键词文件4行；related.json有接口不存在错误，概念归属仅部分取得。 本项只部分返回或有未核准范围。 a_stock_missing_output\\58_东财个股概念_关键词命中\\data\\hot_keyword.csv [CSV行数=4]; a_stock_missing_output\\58_东财个股概念_关键词命中\\data\\related.json [JSON错误字段]",
-  "finding": "部分：关键词文件4行；related.json有接口不存在错误，概念归属仅部分取得。；脚本结果 success：saved 2 file(s)。解析结果非空；未留精确原始响应。",
-  "sample": "{\"columns\": [\"时间\", \"股票代码\", \"概念名称\", \"概念代码\", \"热度\"], \"sample\": {\"时间\": \"2026-10-01 22:00:00\", \"股票代码\": \"SZ000665\", \"概念名称\": \"算力概念\", \"概念代码\": \"BK1134\", \"热度\": \"60\"}}",
+  "scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×2；主机：emappdata.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "finding": "部分：关键词文件4行；related.json有接口不存在错误，概念归属仅部分取得。；本轮低频真实探测 partial：2 outputs: usable=1, errors=1。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×2；主机：emappdata.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "sample": "{\"columns\": [\"时间\", \"股票代码\", \"概念名称\", \"概念代码\", \"热度\"], \"sample\": {\"时间\": \"2026-10-03 17:00:00\", \"股票代码\": \"SZ000665\", \"概念名称\": \"算力概念\", \"概念代码\": \"BK1134\", \"热度\": \"56\"}}",
   "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
   "transformation_code_version": {
     "path": "provider_validation/tests/build_interface_coverage.py",
-    "sha256": "7e094251e9efdf1d355f8c8b853630456f7a1778b3ce928df578283152145ef0"
+    "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
   },
-  "validation_time_utc": "2026-10-03T08:58:05.454700+00:00"
+  "validation_time_utc": "2026-10-03T10:20:07.538288+00:00"
 }

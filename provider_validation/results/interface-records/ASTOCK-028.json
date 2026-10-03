@@ -1,35 +1,63 @@
 {
   "interface_id": "ASTOCK-028",
   "source": "a-stock-data",
-  "validation_result": "未通过",
-  "current_missing_probe_status": "failed",
-  "evidence_status": "failed",
-  "evidence_status_description": "本轮探针或数据校验失败",
-  "evidence_level": "探针明确失败/不可用；保存了执行摘要或失败信息，无成功原始业务响应。",
-  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:748 (fetch_fund_flow_120); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:254 (stock_fund_flow_120d(code))",
+  "validation_result": "部分通过",
+  "current_missing_probe_status": "success",
+  "evidence_status": "live_raw",
+  "evidence_status_description": "实时原始响应已归档；仅代表本行注明的实测范围",
+  "evidence_level": "低频实时样本解析成功，原始响应和探测输出已留档；本轮仅单样本验证，未做全量语义核验。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:748 (fetch_fund_flow_120)",
   "source_code_artifacts": [
     {
       "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
       "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
     },
     {
-      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
-      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+      "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+      "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
     }
   ],
-  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:748 (CLI --run 26)",
-  "manifest_ref": "",
-  "response_artifacts": [],
-  "parsed_output_ref": "",
-  "derived_artifacts": [],
+  "test_code_ref": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 26",
+  "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+  "response_artifacts": [
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/cbd78a5ab0c29ece3e5bd163f88364c0c0fc55056814dddee8e43ea21bc8aeb6.body.gz",
+      "sha256": "cbd78a5ab0c29ece3e5bd163f88364c0c0fc55056814dddee8e43ea21bc8aeb6",
+      "matches_filename": true
+    }
+  ],
+  "parsed_output_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/26_个股资金流近100~120日/data.csv",
+  "derived_artifacts": [
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/26_个股资金流近100~120日/data.csv",
+      "sha256": "3658e7d541d910eef031726374eece79be09ecaae94f9d320dc7851ec6560b57",
+      "bytes": 13762,
+      "field_names": [
+        "日期",
+        "收盘价",
+        "涨跌幅",
+        "主力净流入-净额",
+        "主力净流入-净占比",
+        "超大单净流入-净额",
+        "超大单净流入-净占比",
+        "大单净流入-净额",
+        "大单净流入-净占比",
+        "中单净流入-净额",
+        "中单净流入-净占比",
+        "小单净流入-净额",
+        "小单净流入-净占比"
+      ],
+      "row_count": 120
+    }
+  ],
   "coverage_denominator": 87,
-  "scope": "与#16共用修复后的资金流函数；为避免重复同一上游请求未再调用。因#16被网络权限拦截，本项仍未验证。",
-  "finding": "未通过：与#16共用修复后的资金流函数；为避免重复同一上游请求未再调用。因#16被网络权限拦截，本项仍未验证。；脚本结果 failed: KeyError: '沪'",
-  "sample": "KeyError: '沪'",
+  "scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：push2his.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "finding": "未通过：与#16共用修复后的资金流函数；为避免重复同一上游请求未再调用。因#16被网络权限拦截，本项仍未验证。；本轮低频真实探测 success：saved 1 file(s); usable=1。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：push2his.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "sample": "{\"columns\": [\"日期\", \"收盘价\", \"涨跌幅\", \"主力净流入-净额\", \"主力净流入-净占比\", \"超大单净流入-净额\", \"超大单净流入-净占比\", \"大单净流入-净额\", \"大单净流入-净占比\", \"中单净流入-净额\", \"中单净流入-净占比\", \"小单净流入-净额\", \"小单净流入-净占比\"], \"sample\": {\"日期\": \"2026-04-09\", \"收盘价\": \"1432.47\", \"涨跌幅\": \"-0.32\", \"主力净流入-净额\": \"-241092656.0\", \"主力净流入-净占比\": \"-8.0\", \"超大单净流入-净额\": \"-52333824.0\", \"超大单净流入-净占比\": \"-1.74\", \"大单净流入-净额\": \"-188758832.0\", \"大单净流入-净占比\": \"-6.27\", \"中单净流入-净额\": \"241156800.0\", \"中单净流入-净占比\": \"8.01\", \"小单净流入-净额\": \"-64149.0\", \"小单净流入-净占比\": \"-0.0\"}}",
   "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
   "transformation_code_version": {
     "path": "provider_validation/tests/build_interface_coverage.py",
-    "sha256": "7e094251e9efdf1d355f8c8b853630456f7a1778b3ce928df578283152145ef0"
+    "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
   },
-  "validation_time_utc": "2026-10-03T08:58:04.311012+00:00"
+  "validation_time_utc": "2026-10-03T10:20:07.030472+00:00"
 }

@@ -33,3 +33,9 @@ python provider_validation/tests/replay_sector_capability_archives.py
 该脚本只读取已保存证据并重建行业派生表，不请求网络。北交所历史覆盖结果可直接查看 `results/legacy/2026-10-01-security-board-coverage.json`；如需刷新，应显式传入 `--refresh`，新原始响应会进入 `results/raw/`。
 
 探针结果说明见 [验证运行手册](docs/a-stock-data-validation-runbook.md)。逐接口结果另有 `results/interface-records/` 下的 JSON 记录及 `results/interface-coverage-summary.json` 总结。主表可由 `python provider_validation/tests/build_interface_coverage.py` 从已留存证据重建；该脚本不请求网络。
+
+本次低频真实验证使用 `python provider_validation/tests/run_a_stock_rate_limited_probes.py --ids <显式编号列表>`。入口要求显式列出能力编号，不默认全跑；请求串行执行，同一主机最短间隔3秒，瞬时错误最多重试2次且至少退避5秒，不重试403/429；主机触发403/429或连续两次传输/服务器错误后，本轮暂停该主机。报表/PDF最多请求1页/1份。每批写入独立 `results/live-probes/<run-id>/`，原始HTTP返回在 `_raw/`，策略文件、摘要CSV和解析输出与原始证据同批保存。
+
+BaoStock行业快照使用 `python provider_validation/tests/run_baostock_industry_live_probe.py --date YYYY-MM-DD --output results/live-probes/<unique-run-id>`。只执行证券清单与行业快照各一次，查询间最少等待3秒；持久化SDK解码字段和行（不包含SDK未暴露的TCP线缆帧），再保存派生交叉核验表。
+
+部分上游函数会自行分页或展开全市场（例如上证互动、同花顺资金流）。限速只控制频率，不能代替范围控制；发现超出单样本验证范围时应安全停止并把已取得响应作为部分证据，不能把未完成结果标为通过。本次资金流备用接口在105页全市场分页中止于第16个HTTP响应，报告中标为部分；未生成全量解析结果。对包含会话/认证语义的请求头（如 `hexin-v`）只留脱敏标记，不留原值。

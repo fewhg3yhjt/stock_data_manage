@@ -1,0 +1,26 @@
+{
+  "record_type": "rate_limited_probe_run_policy",
+  "policy_version": "rate-limited-live-probe-v1",
+  "created_at_utc": "2026-10-03T09:36:49.671324+00:00",
+  "source_script": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+  "selected_capability_ids": [
+    1
+  ],
+  "min_interval_seconds_per_hostname": 3.0,
+  "requests_are_serial": true,
+  "max_retries_for_transient_errors": 2,
+  "min_retry_backoff_seconds": 5.0,
+  "retry_after_header_honored": true,
+  "retry_statuses": [
+    500,
+    502,
+    503,
+    504
+  ],
+  "403_and_429_retry": false,
+  "max_report_pages": 1,
+  "max_pdf_downloads_per_capability": 1,
+  "fresh_output_directory": "provider_validation/results/live-probes/pilot-20261003-tencent-quote-network",
+  "raw_archive_subdirectory": "_raw/",
+  "note": "The runner only executes explicitly listed IDs. A 403, 429, credential block, or unavailable result is retained as evidence and not retried automatically."
+}

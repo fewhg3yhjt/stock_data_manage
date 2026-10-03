@@ -3,38 +3,49 @@
   "source": "a-stock-data",
   "validation_result": "部分通过",
   "current_missing_probe_status": "success",
-  "evidence_status": "parsed_only",
-  "evidence_status_description": "仅保存解析结果；没有对应的原始响应",
-  "evidence_level": "解析后输出已保存；本批未保存精确原始HTTP响应。",
-  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:617 (fetch_lhb_seats); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:245 (dragon_tiger_board(code, date))",
+  "evidence_status": "live_raw",
+  "evidence_status_description": "实时原始响应已归档；仅代表本行注明的实测范围",
+  "evidence_level": "低频实时样本解析成功，原始响应和探测输出已留档；本轮仅单样本验证，未做全量语义核验。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:617 (fetch_lhb_seats)",
   "source_code_artifacts": [
     {
       "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
       "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
     },
     {
-      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
-      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+      "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+      "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
     }
   ],
-  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:617 (CLI --run 17)",
-  "manifest_ref": "",
-  "response_artifacts": [],
-  "parsed_output_ref": "provider_validation/results/a-stock-data-missing-output/17_龙虎榜席位/data/dates.csv;  provider_validation/results/a-stock-data-missing-output/17_龙虎榜席位/data/buy.csv;  provider_validation/results/a-stock-data-missing-output/17_龙虎榜席位/data/sell.csv;  provider_validation/results/a-stock-data-missing-output/17_龙虎榜席位/data/_meta.json",
-  "derived_artifacts": [
+  "test_code_ref": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 17",
+  "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+  "response_artifacts": [
     {
-      "path": "provider_validation/results/a-stock-data-missing-output/17_龙虎榜席位/data/dates.csv",
-      "sha256": "8031ea97bd0c2c7695e210b54d1e7645bf52749a992953e1372e488414053a17",
-      "bytes": 76,
-      "field_names": [
-        "序号",
-        "股票代码",
-        "交易日"
-      ],
-      "row_count": 2
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/bb562e80dfcff31208dd0a78762da71e790ef85e12e0f1367dcab5ac02c1ea8c.body.gz",
+      "sha256": "bb562e80dfcff31208dd0a78762da71e790ef85e12e0f1367dcab5ac02c1ea8c",
+      "matches_filename": true
     },
     {
-      "path": "provider_validation/results/a-stock-data-missing-output/17_龙虎榜席位/data/buy.csv",
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/79c9b649544f48049cb8e39bb28b201360d17ae79ed35c91716e659ea6386a16.body.gz",
+      "sha256": "79c9b649544f48049cb8e39bb28b201360d17ae79ed35c91716e659ea6386a16",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/fcb616bfc685257915bb87a1684395d02ba69efd164a1bd9d9512349d1aaa2a0.body.gz",
+      "sha256": "fcb616bfc685257915bb87a1684395d02ba69efd164a1bd9d9512349d1aaa2a0",
+      "matches_filename": true
+    }
+  ],
+  "parsed_output_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/17_龙虎榜席位/data/_meta.json;  provider_validation/results/live-probes/rate-limited-all-20261003/17_龙虎榜席位/data/buy.csv;  provider_validation/results/live-probes/rate-limited-all-20261003/17_龙虎榜席位/data/dates.csv;  provider_validation/results/live-probes/rate-limited-all-20261003/17_龙虎榜席位/data/sell.csv",
+  "derived_artifacts": [
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/17_龙虎榜席位/data/_meta.json",
+      "sha256": "7f13e4733211de8eca8243694ce1ef409457f2da75ad721bae7aa8b9983e385b",
+      "bytes": 33,
+      "row_count": null
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/17_龙虎榜席位/data/buy.csv",
       "sha256": "864bc3813a3ee7c869e72de6164cd3d8bd3fdd765d8ae927054898e40eb6ff38",
       "bytes": 985,
       "field_names": [
@@ -50,7 +61,18 @@
       "row_count": 5
     },
     {
-      "path": "provider_validation/results/a-stock-data-missing-output/17_龙虎榜席位/data/sell.csv",
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/17_龙虎榜席位/data/dates.csv",
+      "sha256": "8031ea97bd0c2c7695e210b54d1e7645bf52749a992953e1372e488414053a17",
+      "bytes": 76,
+      "field_names": [
+        "序号",
+        "股票代码",
+        "交易日"
+      ],
+      "row_count": 2
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/17_龙虎榜席位/data/sell.csv",
       "sha256": "9334bd54ca1dc425c09185bf1c446e71ee7ce40e76992e484ca24692c31bb338",
       "bytes": 853,
       "field_names": [
@@ -64,22 +86,16 @@
         "类型"
       ],
       "row_count": 5
-    },
-    {
-      "path": "provider_validation/results/a-stock-data-missing-output/17_龙虎榜席位/data/_meta.json",
-      "sha256": "7f13e4733211de8eca8243694ce1ef409457f2da75ad721bae7aa8b9983e385b",
-      "bytes": 33,
-      "row_count": null
     }
   ],
   "coverage_denominator": 87,
-  "scope": "600519只有2个历史上榜日；席位文件各5行，没有本次日期的上榜记录。 本项只部分返回或有未核准范围。 a_stock_missing_output\\17_龙虎榜席位\\data\\dates.csv [CSV行数=2]; a_stock_missing_output\\17_龙虎榜席位\\data\\buy.csv [CSV行数=5]; a_stock_missing_output\\17_龙虎榜席位\\data\\sell.csv [CSV行数=5]; a_stock_missing_output\\17_龙虎榜席位\\data\\_meta.json [JSON对象]",
-  "finding": "部分：600519只有2个历史上榜日；席位文件各5行，没有本次日期的上榜记录。；脚本结果 success：saved 4 file(s)。解析结果非空；未留精确原始响应。",
-  "sample": "{\"columns\": [\"序号\", \"股票代码\", \"交易日\"], \"sample\": {\"序号\": \"1\", \"股票代码\": \"600519\", \"交易日\": \"2013-01-28\"}}",
+  "scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×3；主机：datacenter-web.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "finding": "部分：600519只有2个历史上榜日；席位文件各5行，没有本次日期的上榜记录。；本轮低频真实探测 success：saved 4 file(s); usable=4。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×3；主机：datacenter-web.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "sample": "{\"chosen_date\": \"20130128\"}",
   "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
   "transformation_code_version": {
     "path": "provider_validation/tests/build_interface_coverage.py",
-    "sha256": "7e094251e9efdf1d355f8c8b853630456f7a1778b3ce928df578283152145ef0"
+    "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
   },
-  "validation_time_utc": "2026-10-03T08:58:03.852393+00:00"
+  "validation_time_utc": "2026-10-03T10:20:06.917858+00:00"
 }

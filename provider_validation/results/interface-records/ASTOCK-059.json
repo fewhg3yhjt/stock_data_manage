@@ -3,29 +3,35 @@
   "source": "a-stock-data",
   "validation_result": "部分通过",
   "current_missing_probe_status": "success",
-  "evidence_status": "parsed_only",
-  "evidence_status_description": "仅保存解析结果；没有对应的原始响应",
-  "evidence_level": "解析后输出已保存；本批未保存精确原始HTTP响应。",
-  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:1078 (fetch_em_hot_rank); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:279 (em_hot_rank())",
+  "evidence_status": "live_raw",
+  "evidence_status_description": "实时原始响应已归档；仅代表本行注明的实测范围",
+  "evidence_level": "低频实时样本解析成功，原始响应和探测输出已留档；本轮仅单样本验证，未做全量语义核验。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:1078 (fetch_em_hot_rank)",
   "source_code_artifacts": [
     {
       "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
       "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
     },
     {
-      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
-      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+      "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+      "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
     }
   ],
-  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:1078 (CLI --run 57)",
-  "manifest_ref": "",
-  "response_artifacts": [],
-  "parsed_output_ref": "provider_validation/results/a-stock-data-missing-output/57_东财人气榜/data.csv",
+  "test_code_ref": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 57",
+  "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+  "response_artifacts": [
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/c7cb17045b84893e7dd773ec15f311ec24de3c2737cd562d5c5415adfb82677e.body.gz",
+      "sha256": "c7cb17045b84893e7dd773ec15f311ec24de3c2737cd562d5c5415adfb82677e",
+      "matches_filename": true
+    }
+  ],
+  "parsed_output_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/57_东财人气榜/data.csv",
   "derived_artifacts": [
     {
-      "path": "provider_validation/results/a-stock-data-missing-output/57_东财人气榜/data.csv",
-      "sha256": "3cf423d0dd16b5a69cb77eb7204f2f12f18ebeb264e2568f6775fb360a07969b",
-      "bytes": 207,
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/57_东财人气榜/data.csv",
+      "sha256": "c0be13d2a2eec1bb5275f735f34db20d08c10d9bbcba77aa1a781c768f9c858b",
+      "bytes": 205,
       "field_names": [
         "item",
         "value"
@@ -34,13 +40,13 @@
     }
   ],
   "coverage_denominator": 87,
-  "scope": "只有10行item/value键值，没有股票代码、排名变化等声称字段。 本项只部分返回或有未核准范围。 a_stock_missing_output\\57_东财人气榜\\data.csv [CSV行数=10]",
-  "finding": "部分：只有10行item/value键值，没有股票代码、排名变化等声称字段。；脚本结果 success：saved 1 file(s)。解析结果非空；未留精确原始响应。",
+  "scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：emappdata.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "finding": "部分：只有10行item/value键值，没有股票代码、排名变化等声称字段。；本轮低频真实探测 success：saved 1 file(s); usable=1。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：emappdata.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
   "sample": "{\"columns\": [\"item\", \"value\"], \"sample\": {\"item\": \"marketType\", \"value\": \"000001\"}}",
   "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
   "transformation_code_version": {
     "path": "provider_validation/tests/build_interface_coverage.py",
-    "sha256": "7e094251e9efdf1d355f8c8b853630456f7a1778b3ce928df578283152145ef0"
+    "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
   },
-  "validation_time_utc": "2026-10-03T08:58:05.416577+00:00"
+  "validation_time_utc": "2026-10-03T10:20:07.525078+00:00"
 }

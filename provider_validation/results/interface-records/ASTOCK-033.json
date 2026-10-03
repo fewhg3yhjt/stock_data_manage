@@ -3,29 +3,35 @@
   "source": "a-stock-data",
   "validation_result": "部分通过",
   "current_missing_probe_status": "success",
-  "evidence_status": "parsed_only",
-  "evidence_status_description": "仅保存解析结果；没有对应的原始响应",
-  "evidence_level": "解析后输出已保存；本批未保存精确原始HTTP响应。",
-  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:779 (fetch_global_news); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:259 (eastmoney_global_news())",
+  "evidence_status": "live_raw",
+  "evidence_status_description": "实时原始响应已归档；仅代表本行注明的实测范围",
+  "evidence_level": "低频实时样本解析成功，原始响应和探测输出已留档；本轮仅单样本验证，未做全量语义核验。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:779 (fetch_global_news)",
   "source_code_artifacts": [
     {
       "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
       "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
     },
     {
-      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
-      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+      "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+      "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
     }
   ],
-  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:779 (CLI --run 31)",
-  "manifest_ref": "",
-  "response_artifacts": [],
-  "parsed_output_ref": "provider_validation/results/a-stock-data-missing-output/31_全球资讯/data.csv",
+  "test_code_ref": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 31",
+  "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+  "response_artifacts": [
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/07c6926ed23a9e9be235bbfe45d7bd3af98cab8b60e8d7a1966bec0e56f5f228.body.gz",
+      "sha256": "07c6926ed23a9e9be235bbfe45d7bd3af98cab8b60e8d7a1966bec0e56f5f228",
+      "matches_filename": true
+    }
+  ],
+  "parsed_output_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/31_全球资讯/data.csv",
   "derived_artifacts": [
     {
-      "path": "provider_validation/results/a-stock-data-missing-output/31_全球资讯/data.csv",
-      "sha256": "374e5639adc0ac51ca071fde0590be026db04e06ee0ad637108bf2873da5f2bf",
-      "bytes": 4066,
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/31_全球资讯/data.csv",
+      "sha256": "36507fdc2641835b9c142b85986a5830ec17d306dab2e2d23af338391fc6381b",
+      "bytes": 7002,
       "field_names": [
         "时间",
         "内容"
@@ -34,13 +40,13 @@
     }
   ],
   "coverage_denominator": 87,
-  "scope": "解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。 本次只核验了本行注明的样例范围。 a_stock_missing_output\\31_全球资讯\\data.csv [CSV行数=20]",
-  "finding": "通过：解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。；脚本结果 success：saved 1 file(s)。解析结果非空；未留精确原始响应。",
-  "sample": "{\"columns\": [\"时间\", \"内容\"], \"sample\": {\"时间\": \"2026-10-01 22:15:49\", \"内容\": \"佩斯科夫：匈牙利的行动可能影响俄罗斯的经济关系。\"}}",
+  "scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：zhibo.sina.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "finding": "通过：解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。；本轮低频真实探测 success：saved 1 file(s); usable=1。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：zhibo.sina.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "sample": "{\"columns\": [\"时间\", \"内容\"], \"sample\": {\"时间\": \"2026-10-03 17:51:23\", \"内容\": \"【俄官员：普京是否出席G20峰会取决于一系列因素】据塔斯社10月3日报道，俄罗斯二十国集团（G20）事务协调人、俄总统办公厅专家局局长丹尼斯·阿加福诺夫表示，俄罗斯总统普京是否出席今年12月在美国迈阿密举行的G20峰会，将取决于一系列因素，包括峰会的实质性筹备情况和整体地缘政治背景。阿加福诺夫在俄罗斯驻美使馆举行的新闻发布会上说，出席峰会“须有一个目的”，相关决定可能将在此基础上作出。他还表示，美国总统特朗普“已非常明确”表示支持俄总统出席此次峰会。阿加福诺夫说，最终决定将在临近峰会日期时作出。（环球网）\"}}",
   "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
   "transformation_code_version": {
     "path": "provider_validation/tests/build_interface_coverage.py",
-    "sha256": "7e094251e9efdf1d355f8c8b853630456f7a1778b3ce928df578283152145ef0"
+    "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
   },
-  "validation_time_utc": "2026-10-03T08:58:04.456423+00:00"
+  "validation_time_utc": "2026-10-03T10:20:07.102890+00:00"
 }

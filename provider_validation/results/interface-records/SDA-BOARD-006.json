@@ -2,10 +2,10 @@
   "interface_id": "SDA-BOARD-006",
   "source": "stock-data-analyse / local Provider",
   "validation_result": "部分通过",
-  "evidence_status": "historical_parsed_only",
-  "evidence_status_description": "仅有历史解析/合并结果；未做本轮实时验证",
-  "evidence_level": "旧派生/合并结果可复核；BaoStock SDK原始行不可见，未保存原始返回帧。",
-  "source_code_ref": "provider_validation/tests/source_snapshots/stock-data-analyse/warehouse/industry.py; provider_validation/tests/source_snapshots/stock-data-analyse/fundflow/sources.py; 上游 warehouse/industry.py:125；本项目 src/stock_data_manage/providers/baostock/industry.py:32 fetch_snapshot",
+  "evidence_status": "live_raw",
+  "evidence_status_description": "实时原始响应已归档；仅代表本行注明的实测范围",
+  "evidence_level": "BaoStock SDK解码字段与原始行已归档（非TCP线缆帧）；派生覆盖表已保存。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/stock-data-analyse/warehouse/industry.py; provider_validation/tests/source_snapshots/stock-data-analyse/fundflow/sources.py; 本项目 src/stock_data_manage/providers/baostock/industry.py:32 fetch_snapshot；provider_validation/tests/run_baostock_industry_live_probe.py",
   "source_code_artifacts": [
     {
       "path": "provider_validation/tests/source_snapshots/stock-data-analyse/warehouse/industry.py",
@@ -20,6 +20,10 @@
       "sha256": "08362eed2be7535fbbc7052ea00990873a7b6f9b8dd7216107bbe55ac9075d28"
     },
     {
+      "path": "provider_validation/tests/run_baostock_industry_live_probe.py",
+      "sha256": "3c7ed302b00b2b3ce4d4a03919e4e4e3cb1b0e27e1c48905f0d333116ed38fba"
+    },
+    {
       "path": "tests/test_sector_data_providers.py",
       "sha256": "1643bb03759fb230d418d270036eb59d742aefe01724850962466a7897c58efa"
     },
@@ -28,26 +32,43 @@
       "sha256": "e6e9bbd83cf299df3c4de6ef1570edf6061413850e91988b84d8163081cc4d09"
     }
   ],
-  "test_code_ref": "tests/test_sector_data_providers.py:138; provider_validation/tests/replay_sector_capability_archives.py:212",
-  "manifest_ref": "",
-  "response_artifacts": [],
-  "parsed_output_ref": "provider_validation/results/legacy/2026-10-01-security-board-coverage.json",
+  "test_code_ref": "tests/test_sector_data_providers.py:138; provider_validation/tests/replay_sector_capability_archives.py:212; provider_validation/tests/run_baostock_industry_live_probe.py",
+  "manifest_ref": "provider_validation/results/live-probes/baostock-industry-20260930-20261003/_raw/baostock-industry/manifest.ndjson",
+  "response_artifacts": [
+    {
+      "path": "provider_validation/results/live-probes/baostock-industry-20260930-20261003/_raw/baostock-industry/bodies/3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26.body.gz",
+      "sha256": "3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26",
+      "matches_filename": true
+    }
+  ],
+  "parsed_output_ref": "provider_validation/results/live-probes/baostock-industry-20260930-20261003/industry-membership.csv",
   "derived_artifacts": [
     {
-      "path": "provider_validation/results/legacy/2026-10-01-security-board-coverage.json",
-      "sha256": "8d39373b3494fe988acdc3fd2807f019608e17c01373f9fd8d31a96f3013571f",
-      "bytes": 2253177,
-      "row_count": null
+      "path": "provider_validation/results/live-probes/baostock-industry-20260930-20261003/industry-membership.csv",
+      "sha256": "41c9f685b6ffca6f70492a29207ba1ff225306beeddf7def390600079449d003",
+      "bytes": 607955,
+      "field_names": [
+        "trade_date",
+        "stock_code",
+        "stock_name",
+        "exchange",
+        "status",
+        "industry_name",
+        "classification",
+        "classification_update_date",
+        "source"
+      ],
+      "row_count": 5221
     }
   ],
   "coverage_denominator": null,
-  "scope": "旧全量探针日期2026-09-30；5,212只中5,210只获得分类（99.9616%），缺2只",
-  "finding": "旧合并结果可离线重放，缺原始SDK行/TCP帧；不可标为原始返回已归档",
-  "sample": "{\"probe\": \"full_security_board_coverage\", \"trade_date\": \"2026-09-30\", \"fetched_at\": \"2026-10-01T17:40:45+08:00\", \"sources\": {\"sh_sz_universe_and_industry\": \"BaoStock query_all_stock + query_stock_industry\", \"bse_universe\": \"BSE official full quotation list (nqhq_en.do)\", \"bse_affiliations\": \"EastMoney push2 slist/get, per-security\", \"all_concept_board_directory\": \"EastMoney clist/get probe (see directory_checks)\"}, \"scope_note\": \"EastMoney slist returns mixed industry, concept, and region board affiliations. A successful per-security response does not by itself prove a complete categorized concept-board directory or complete SH/SZ concept memberships.\", \"summary\": {\"sh_sz\": {\"security_count_including_suspended\": 5223, \"active_security_count\": 5212, \"suspended_security_count\": 11, \"classification_rows_for_a_shares\": 5555, \"classification_snapshot_dates\": [\"2026-09-28\"], \"distinct_industr…",
+  "scope": "2026-09-30；沪深A股分母5223只，成功匹配5221只，缺失2只：sz001246,sz301716",
+  "finding": "已归档query_stock_industry SDK解码字段与原始行；缺失2只，因此覆盖不完整。BaoStock TCP原始帧不对SDK调用方开放。2026-10-02非交易日空返回已单独留档。",
+  "sample": "{\"columns\": [\"trade_date\", \"stock_code\", \"stock_name\", \"exchange\", \"status\", \"industry_name\", \"classification\", \"classification_update_date\", \"source\"], \"sample\": {\"trade_date\": \"2026-09-30\", \"stock_code\": \"000001\", \"stock_name\": \"平安银行\", \"exchange\": \"XSHE\", \"status\": \"active\", \"industry_name\": \"J66货币金融服务\", \"classification\": \"证监会行业分类\", \"classification_update_date\": \"2026-09-28\", \"source\": \"baostock\"}}",
   "source_version": "stock-data-analyse c26cabcf89443ec8f1445d0e5af86bf3d6dacf3; 本项目代码以当前工作树为准",
   "transformation_code_version": {
     "path": "provider_validation/tests/build_interface_coverage.py",
-    "sha256": "7e094251e9efdf1d355f8c8b853630456f7a1778b3ce928df578283152145ef0"
+    "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
   },
-  "validation_time_utc": "2026-10-03T08:58:06.638141+00:00"
+  "validation_time_utc": "2026-10-03T10:20:08.158049+00:00"
 }

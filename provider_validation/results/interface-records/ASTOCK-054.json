@@ -1,51 +1,41 @@
 {
   "interface_id": "ASTOCK-054",
   "source": "a-stock-data",
-  "validation_result": "部分通过",
-  "current_missing_probe_status": "success",
-  "evidence_status": "parsed_only",
-  "evidence_status_description": "仅保存解析结果；没有对应的原始响应",
-  "evidence_level": "解析后输出已保存；本批未保存精确原始HTTP响应。",
-  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:1010 (fetch_option_t_board); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:277 (sina_option_tquote(underlying, call, month))",
+  "validation_result": "未通过",
+  "current_missing_probe_status": "failed",
+  "evidence_status": "live_raw",
+  "evidence_status_description": "实时原始响应已归档；仅代表本行注明的实测范围",
+  "evidence_level": "低频实时探测未取得可用业务数据；失败事件已留档，不能将传输阻断判为源数据为空。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:1010 (fetch_option_t_board)",
   "source_code_artifacts": [
     {
       "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
       "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
     },
     {
-      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
-      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+      "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+      "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
     }
   ],
-  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:1010 (CLI --run 52)",
-  "manifest_ref": "",
-  "response_artifacts": [],
-  "parsed_output_ref": "provider_validation/results/a-stock-data-missing-output/52_期权T型报价/data.csv",
-  "derived_artifacts": [
+  "test_code_ref": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 52",
+  "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+  "response_artifacts": [
     {
-      "path": "provider_validation/results/a-stock-data-missing-output/52_期权T型报价/data.csv",
-      "sha256": "ef178586e59f06e4c09e2bdc9c6c256de39012a7f52ee4af9b961f65f81e84a1",
-      "bytes": 1530,
-      "field_names": [
-        "日期",
-        "合约交易代码",
-        "当前价",
-        "涨跌幅",
-        "前结价",
-        "行权价",
-        "数量"
-      ],
-      "row_count": 24
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/6e248ae2c5bab80d15caba261489b3e3ae0741c1f9c507a896b5ad37164e250e.body.gz",
+      "sha256": "6e248ae2c5bab80d15caba261489b3e3ae0741c1f9c507a896b5ad37164e250e",
+      "matches_filename": true
     }
   ],
+  "parsed_output_ref": "",
+  "derived_artifacts": [],
   "coverage_denominator": 87,
-  "scope": "解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。 本次只核验了本行注明的样例范围。 a_stock_missing_output\\52_期权T型报价\\data.csv [CSV行数=24]",
-  "finding": "通过：解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。；脚本结果 success：saved 1 file(s)。解析结果非空；未留精确原始响应。",
-  "sample": "{\"columns\": [\"日期\", \"合约交易代码\", \"当前价\", \"涨跌幅\", \"前结价\", \"行权价\", \"数量\"], \"sample\": {\"日期\": \"20260930162901\", \"合约交易代码\": \"510050C2610M02800\", \"当前价\": \"0.1409\", \"涨跌幅\": \"6.66\", \"前结价\": \"0.1321\", \"行权价\": \"2.8\", \"数量\": \"24\"}}",
+  "scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×2；主机：yunhq.sse.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "finding": "通过：解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。；本轮低频真实探测 failed：Option T-board returned empty schema / Length mismatch。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×2；主机：yunhq.sse.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "sample": "{\"date\":20260930,\"time\":162901,\"total\":0,\"begin\":0,\"end\":0,\"list\":[]}",
   "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
   "transformation_code_version": {
     "path": "provider_validation/tests/build_interface_coverage.py",
-    "sha256": "7e094251e9efdf1d355f8c8b853630456f7a1778b3ce928df578283152145ef0"
+    "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
   },
-  "validation_time_utc": "2026-10-03T08:58:05.266706+00:00"
+  "validation_time_utc": "2026-10-03T10:20:07.412147+00:00"
 }

@@ -3,27 +3,33 @@
   "source": "a-stock-data",
   "validation_result": "部分通过",
   "current_missing_probe_status": "success",
-  "evidence_status": "parsed_only",
-  "evidence_status_description": "仅保存解析结果；没有对应的原始响应",
-  "evidence_level": "解析后输出已保存；本批未保存精确原始HTTP响应。",
-  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:1022 (fetch_option_greeks); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:277 (sina_option_greeks(underlying, call, month))",
+  "evidence_status": "live_raw",
+  "evidence_status_description": "实时原始响应已归档；仅代表本行注明的实测范围",
+  "evidence_level": "低频实时样本解析成功，原始响应和探测输出已留档；本轮仅单样本验证，未做全量语义核验。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:1022 (fetch_option_greeks)",
   "source_code_artifacts": [
     {
       "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
       "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
     },
     {
-      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
-      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+      "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+      "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
     }
   ],
-  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:1022 (CLI --run 53)",
-  "manifest_ref": "",
-  "response_artifacts": [],
-  "parsed_output_ref": "provider_validation/results/a-stock-data-missing-output/53_期权Greeks_风险指标/data.csv",
+  "test_code_ref": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 53",
+  "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+  "response_artifacts": [
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/a856900558c9920b9d1f6ee645baf05f5f4d8582df57e2d1184a14a937a594a1.body.gz",
+      "sha256": "a856900558c9920b9d1f6ee645baf05f5f4d8582df57e2d1184a14a937a594a1",
+      "matches_filename": true
+    }
+  ],
+  "parsed_output_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/53_期权Greeks_风险指标/data.csv",
   "derived_artifacts": [
     {
-      "path": "provider_validation/results/a-stock-data-missing-output/53_期权Greeks_风险指标/data.csv",
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/53_期权Greeks_风险指标/data.csv",
       "sha256": "9e9633078e9a962321d26c2523369cd129dd659f6c488d104bfc6fe6782904af",
       "bytes": 55857,
       "field_names": [
@@ -42,13 +48,13 @@
     }
   ],
   "coverage_denominator": 87,
-  "scope": "580行且字段齐全，日期2026-09-30；希腊值和波动率口径未独立核验。 本项只部分返回或有未核准范围。 a_stock_missing_output\\53_期权Greeks_风险指标\\data.csv [CSV行数=580]",
-  "finding": "部分：580行且字段齐全，日期2026-09-30；希腊值和波动率口径未独立核验。；脚本结果 success：saved 1 file(s)。解析结果非空；未留精确原始响应。",
+  "scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：query.sse.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "finding": "部分：580行且字段齐全，日期2026-09-30；希腊值和波动率口径未独立核验。；本轮低频真实探测 success：saved 1 file(s); usable=1。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：query.sse.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
   "sample": "{\"columns\": [\"TRADE_DATE\", \"SECURITY_ID\", \"CONTRACT_ID\", \"CONTRACT_SYMBOL\", \"DELTA_VALUE\", \"THETA_VALUE\", \"GAMMA_VALUE\", \"VEGA_VALUE\", \"RHO_VALUE\", \"IMPLC_VOLATLTY\"], \"sample\": {\"TRADE_DATE\": \"2026-09-30\", \"SECURITY_ID\": \"10012535\", \"CONTRACT_ID\": \"510050C2610M02700\", \"CONTRACT_SYMBOL\": \"50ETF购10月2700\", \"DELTA_VALUE\": \"1.0\", \"THETA_VALUE\": \"-0.079\", \"GAMMA_VALUE\": \"0.0\", \"VEGA_VALUE\": \"0.0\", \"RHO_VALUE\": \"0.207\", \"IMPLC_VOLATLTY\": \"0.0\"}}",
   "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
   "transformation_code_version": {
     "path": "provider_validation/tests/build_interface_coverage.py",
-    "sha256": "7e094251e9efdf1d355f8c8b853630456f7a1778b3ce928df578283152145ef0"
+    "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
   },
-  "validation_time_utc": "2026-10-03T08:58:05.304390+00:00"
+  "validation_time_utc": "2026-10-03T10:20:07.425628+00:00"
 }

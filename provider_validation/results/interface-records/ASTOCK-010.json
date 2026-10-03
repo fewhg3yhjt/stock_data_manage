@@ -3,33 +3,44 @@
   "source": "a-stock-data",
   "validation_result": "未通过",
   "current_missing_probe_status": "failed",
-  "evidence_status": "failed",
-  "evidence_status_description": "本轮探针或数据校验失败",
-  "evidence_level": "探针明确失败/不可用；保存了执行摘要或失败信息，无成功原始业务响应。",
-  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:475 (download_eastmoney_report_pdfs); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:236 (download_pdf(rec))",
+  "evidence_status": "live_raw",
+  "evidence_status_description": "实时原始响应已归档；仅代表本行注明的实测范围",
+  "evidence_level": "低频实时探测未取得可用业务数据；失败事件已留档，不能将传输阻断判为源数据为空。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:475 (download_eastmoney_report_pdfs)",
   "source_code_artifacts": [
     {
       "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
       "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
     },
     {
-      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
-      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+      "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+      "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
     }
   ],
-  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:475 (CLI --run 9)",
-  "manifest_ref": "",
-  "response_artifacts": [],
+  "test_code_ref": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 9",
+  "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+  "response_artifacts": [
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/7b8acdc4fb408e4ed9561829dd418de90c968a3ca343b06810dfb26cb677f0a8.body.gz",
+      "sha256": "7b8acdc4fb408e4ed9561829dd418de90c968a3ca343b06810dfb26cb677f0a8",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/b329da9b8718eff5957f60194f5a466b2ed76ba4e1f286f013e4b49152e2b1c6.body.gz",
+      "sha256": "b329da9b8718eff5957f60194f5a466b2ed76ba4e1f286f013e4b49152e2b1c6",
+      "matches_filename": true
+    }
+  ],
   "parsed_output_ref": "",
   "derived_artifacts": [],
   "coverage_denominator": 87,
-  "scope": "RuntimeError: 研报列表可获取，但本次未成功下载 PDF 本轮未取得可用且匹配能力定义的数据。",
-  "finding": "未通过：RuntimeError: 研报列表可获取，但本次未成功下载 PDF；脚本结果 failed: RuntimeError: 研报列表可获取，但本次未成功下载 PDF",
-  "sample": "RuntimeError: 研报列表可获取，但本次未成功下载 PDF",
+  "scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×2；主机：pdf.dfcfw.com, reportapi.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "finding": "未通过：RuntimeError: 研报列表可获取，但本次未成功下载 PDF；本轮低频真实探测 failed：PDF acquisition returned no usable PDF。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×2；主机：pdf.dfcfw.com, reportapi.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "sample": "{\"hits\":1,\"size\":1,\"data\":[{\"title\":\"贵州茅台公司跟踪报告：以动销定投放，缓解市场压力，低速稳态发展\",\"stockName\":\"贵州茅台\",\"stockCode\":\"600519\",\"orgCode\":\"80045894\",\"orgName\":\"诚通证券股份有限公司\",\"orgSName\":\"诚通证券\",\"publishDate\":\"2026-09-21 00:00:00.000\",\"infoCode\":\"AP202609211829719676\",\"column\":\"002004002002\",\"predictNextTwoYearEps\":\"71.3200000000\",\"predictNextTwoYearPe\":\"18.0000000000\",\"predictNextYearEps\":\"67.8700000000\",\"predictNextYearPe\":\"18.9000000000\",\"predictThisYearEps\":\"65.1400000000\",\"predictThisYearPe\":\"19.7000000000\",\"predictLastYearEps\":\"\",\"predictLastYearPe\":\"\",\"actualLastTwoYearEps\":\"\",\"actualLastYearEps\":\"\",\"industryCode\":\"\",\"industryName\":\"\",\"emIndustryCode\":\"\",\"indvInduCode\":\"1277\",\"indvInduName\":\"白酒Ⅱ\",\"emRating…",
   "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
   "transformation_code_version": {
     "path": "provider_validation/tests/build_interface_coverage.py",
-    "sha256": "7e094251e9efdf1d355f8c8b853630456f7a1778b3ce928df578283152145ef0"
+    "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
   },
-  "validation_time_utc": "2026-10-03T08:58:03.605294+00:00"
+  "validation_time_utc": "2026-10-03T10:20:06.793070+00:00"
 }

@@ -64,7 +64,7 @@
   "source_version": "stock-data-analyse c26cabcf89443ec8f1445d0e5af86bf3d6dacf3; 本项目代码以当前工作树为准",
   "transformation_code_version": {
     "path": "provider_validation/tests/build_interface_coverage.py",
-    "sha256": "7e094251e9efdf1d355f8c8b853630456f7a1778b3ce928df578283152145ef0"
+    "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
   },
-  "validation_time_utc": "2026-10-03T08:58:06.242543+00:00"
+  "validation_time_utc": "2026-10-03T10:20:08.081492+00:00"
 }

@@ -5,31 +5,31 @@
   "current_missing_probe_status": "failed",
   "evidence_status": "failed",
   "evidence_status_description": "本轮探针或数据校验失败",
-  "evidence_level": "探针明确失败/不可用；保存了执行摘要或失败信息，无成功原始业务响应。",
-  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:878 (fetch_sw_industry_history); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:268 (sw_industry_history() / sw_industry_as_of(df, code, d))",
+  "evidence_level": "低频实时探测未取得可用业务数据；失败事件已留档，不能将传输阻断判为源数据为空。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:878 (fetch_sw_industry_history)",
   "source_code_artifacts": [
     {
       "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
       "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
     },
     {
-      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
-      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+      "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+      "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
     }
   ],
-  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:878 (CLI --run 41)",
-  "manifest_ref": "",
+  "test_code_ref": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 41",
+  "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
   "response_artifacts": [],
   "parsed_output_ref": "",
   "derived_artifacts": [],
   "coverage_denominator": 87,
-  "scope": "RuntimeError: stock_industry_clf_hist_sw: SSLError: HTTPSConnectionPool(host='www.swsresearch.com', port=443): Max retries exceeded with url: /swindex/pdf/SwClass2021/StockClassifyUse_stock.xls (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1020)'))) | stock_industry_clf_hist_sw: SSLError: HTTPSConnectionPool(host='www.swsresearch.com', port=443): Max retries exceeded with url: /swindex/…",
-  "finding": "未通过：RuntimeError: stock_industry_clf_hist_sw: SSLError: HTTPSConnectionPool(host='www.swsresearch.com', port=443): Max retries exceeded with url: /swindex/pdf/SwClass2021/StockClassifyUse_stock.xls (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1020)'))) | stock_industry_clf_hist_sw: SSLError: HTTPSConnectionPool(host='www.swsresearch.com', port=443): Max retries exceeded with url: /swindex/pdf/SwClass2021/StockClassifyUse_stock.xls (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1020)')))；脚本结果 failed: RuntimeError: stock_industry_clf_hist_sw: SSLError: HTTPSConnectionPool(host='www.swsresearch.com', port=443): Max retries exceeded with url: /swindex/pdf/SwClass2021/StockClassifyUse_stock.xls (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1020)'))) | stock_industry_clf_hist_sw: SSLError: HTTPSConnectionPool(host='www.swsresearch.com', port=443): Max retries exc…",
-  "sample": "RuntimeError: stock_industry_clf_hist_sw: SSLError: HTTPSConnectionPool(host='www.swsresearch.com', port=443): Max retries exceeded with url: /swindex/pdf/SwClass2021/StockClassifyUse_stock.xls (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1020)'))) | stock_industry_clf_hist_sw: SSLError: HTTPSConnectionPool(host='www.swsresearch.com', port=443): Max retries exceeded with url: /swindex/…",
+  "scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：transport_error×2；主机：www.swsresearch.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "finding": "未通过：RuntimeError: stock_industry_clf_hist_sw: SSLError: HTTPSConnectionPool(host='www.swsresearch.com', port=443): Max retries exceeded with url: /swindex/pdf/SwClass2021/StockClassifyUse_stock.xls (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1020)'))) | stock_industry_clf_hist_sw: SSLError: HTTPSConnectionPool(host='www.swsresearch.com', port=443): Max retries exceeded with url: /swindex/pdf/SwClass2021/StockClassifyUse_stock.xls (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1020)')))；本轮低频真实探测 failed：SwResearch connection aborted。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：transport_error×2；主机：www.swsresearch.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "sample": "SwResearch connection aborted",
   "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
   "transformation_code_version": {
     "path": "provider_validation/tests/build_interface_coverage.py",
-    "sha256": "7e094251e9efdf1d355f8c8b853630456f7a1778b3ce928df578283152145ef0"
+    "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
   },
-  "validation_time_utc": "2026-10-03T08:58:04.890897+00:00"
+  "validation_time_utc": "2026-10-03T10:20:07.249802+00:00"
 }

@@ -5,31 +5,31 @@
   "current_missing_probe_status": "failed",
   "evidence_status": "failed",
   "evidence_status_description": "本轮探针或数据校验失败",
-  "evidence_level": "探针明确失败/不可用；保存了执行摘要或失败信息，无成功原始业务响应。",
-  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:1067 (fetch_ths_hot_rank); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:279 (ths_hot_list())",
+  "evidence_level": "低频实时探测未取得可用业务数据；失败事件已留档，不能将传输阻断判为源数据为空。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:1067 (fetch_ths_hot_rank)",
   "source_code_artifacts": [
     {
       "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
       "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
     },
     {
-      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
-      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+      "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+      "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
     }
   ],
-  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:1067 (CLI --run 56)",
+  "test_code_ref": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 56",
   "manifest_ref": "",
   "response_artifacts": [],
   "parsed_output_ref": "",
   "derived_artifacts": [],
   "coverage_denominator": 87,
-  "scope": "RuntimeError: stock_wc_hot_top: AttributeError: 当前 AKShare 不包含 stock_wc_hot_top；请先升级 AKShare，再检查该接口是否被上游移除。 | stock_hot_rank_wc: AttributeError: 当前 AKShare 不包含 stock_hot_rank_wc；请先升级 AKShare，再检查该接口是否被上游移除。 | stock_hot_rank_wc: AttributeError: 当前 AKShare 不包含 stock_hot_rank_wc；请先升级 AKShare，再检查该接口是否被上游移除。 本轮未取得可用且匹配能力定义的数据。",
-  "finding": "未通过：RuntimeError: stock_wc_hot_top: AttributeError: 当前 AKShare 不包含 stock_wc_hot_top；请先升级 AKShare，再检查该接口是否被上游移除。 | stock_hot_rank_wc: AttributeError: 当前 AKShare 不包含 stock_hot_rank_wc；请先升级 AKShare，再检查该接口是否被上游移除。 | stock_hot_rank_wc: AttributeError: 当前 AKShare 不包含 stock_hot_rank_wc；请先升级 AKShare，再检查该接口是否被上游移除。；脚本结果 failed: RuntimeError: stock_wc_hot_top: AttributeError: 当前 AKShare 不包含 stock_wc_hot_top；请先升级 AKShare，再检查该接口是否被上游移除。 | stock_hot_rank_wc: AttributeError: 当前 AKShare 不包含 stock_hot_rank_wc；请先升级 AKShare，再检查该接口是否被上游移除。 | stock_hot_rank_wc: AttributeError: 当前 AKShare 不包含 stock_hot_rank_wc；请先升级 AKShare，再检查该接口是否被上游移除。",
-  "sample": "RuntimeError: stock_wc_hot_top: AttributeError: 当前 AKShare 不包含 stock_wc_hot_top；请先升级 AKShare，再检查该接口是否被上游移除。 | stock_hot_rank_wc: AttributeError: 当前 AKShare 不包含 stock_hot_rank_wc；请先升级 AKShare，再检查该接口是否被上游移除。 | stock_hot_rank_wc: AttributeError: 当前 AKShare 不包含 stock_hot_rank_wc；请先升级 AKShare，再检查该接口是否被上游移除。",
+  "scope": "低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "finding": "未通过：RuntimeError: stock_wc_hot_top: AttributeError: 当前 AKShare 不包含 stock_wc_hot_top；请先升级 AKShare，再检查该接口是否被上游移除。 | stock_hot_rank_wc: AttributeError: 当前 AKShare 不包含 stock_hot_rank_wc；请先升级 AKShare，再检查该接口是否被上游移除。 | stock_hot_rank_wc: AttributeError: 当前 AKShare 不包含 stock_hot_rank_wc；请先升级 AKShare，再检查该接口是否被上游移除。；本轮低频真实探测 failed：All listed AKShare hot-rank variants absent in installed version。低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "sample": "All listed AKShare hot-rank variants absent in installed version",
   "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
   "transformation_code_version": {
     "path": "provider_validation/tests/build_interface_coverage.py",
-    "sha256": "7e094251e9efdf1d355f8c8b853630456f7a1778b3ce928df578283152145ef0"
+    "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
   },
-  "validation_time_utc": "2026-10-03T08:58:05.377587+00:00"
+  "validation_time_utc": "2026-10-03T10:20:07.516099+00:00"
 }

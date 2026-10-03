@@ -3,27 +3,138 @@
   "source": "a-stock-data",
   "validation_result": "部分通过",
   "current_missing_probe_status": "success",
-  "evidence_status": "parsed_only",
-  "evidence_status_description": "仅保存解析结果；没有对应的原始响应",
-  "evidence_level": "解析后输出已保存；本批未保存精确原始HTTP响应。",
-  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:932 (fetch_intraday_changes); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:276 (em_price_anomaly())",
+  "evidence_status": "live_raw",
+  "evidence_status_description": "实时原始响应已归档；仅代表本行注明的实测范围",
+  "evidence_level": "低频实时样本解析成功，原始响应和探测输出已留档；本轮仅单样本验证，未做全量语义核验。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:932 (fetch_intraday_changes)",
   "source_code_artifacts": [
     {
       "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
       "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
     },
     {
-      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
-      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+      "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+      "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
     }
   ],
-  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:932 (CLI --run 49)",
-  "manifest_ref": "",
-  "response_artifacts": [],
-  "parsed_output_ref": "provider_validation/results/a-stock-data-missing-output/49_东财日内异动池明细/data.csv",
+  "test_code_ref": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 49",
+  "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+  "response_artifacts": [
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/b29f298faa3998b897db395251f08b636e2687a4a3132d5779df9569b02782b0.body.gz",
+      "sha256": "b29f298faa3998b897db395251f08b636e2687a4a3132d5779df9569b02782b0",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/596cf9ef47367a192f6f1af7ed898925fa749056f584756e8a8e12ddcb59fd9f.body.gz",
+      "sha256": "596cf9ef47367a192f6f1af7ed898925fa749056f584756e8a8e12ddcb59fd9f",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/249f89e882224beb6684f076653c87de3cdbd7178d31a6d440aec4653843e1d4.body.gz",
+      "sha256": "249f89e882224beb6684f076653c87de3cdbd7178d31a6d440aec4653843e1d4",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/af23a14951d65d8f68e33add6176ad32b5f18687c4f0e0c5d0f2a445be964637.body.gz",
+      "sha256": "af23a14951d65d8f68e33add6176ad32b5f18687c4f0e0c5d0f2a445be964637",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/e81096a1bd339bdd14020153417dc3b1766378239117e13e3d626b2e3928b38f.body.gz",
+      "sha256": "e81096a1bd339bdd14020153417dc3b1766378239117e13e3d626b2e3928b38f",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/a39989243d3104aaa0a592921af6b16182661b44001a4b906062b31fcd6290c9.body.gz",
+      "sha256": "a39989243d3104aaa0a592921af6b16182661b44001a4b906062b31fcd6290c9",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/c125d09f654caf5996d7d5188c938c83c0d2aa57393349d1207bd055fb94a39e.body.gz",
+      "sha256": "c125d09f654caf5996d7d5188c938c83c0d2aa57393349d1207bd055fb94a39e",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/321f16a2a080b7bb53657a3204d2ee6346c657fecaad4e97301d821187f0dae0.body.gz",
+      "sha256": "321f16a2a080b7bb53657a3204d2ee6346c657fecaad4e97301d821187f0dae0",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/9cf6b6f5e23beb466fc8f78a660cb0edad8ff62f1fe30d0b87bdad0b76baf658.body.gz",
+      "sha256": "9cf6b6f5e23beb466fc8f78a660cb0edad8ff62f1fe30d0b87bdad0b76baf658",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/0c36bef5b1413480c56381670473c748aedaae6c1f47e0f1cff058b8025f39a9.body.gz",
+      "sha256": "0c36bef5b1413480c56381670473c748aedaae6c1f47e0f1cff058b8025f39a9",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/1cd7fbe74b6457eaabff9b44822b6f3fec7bd8b08bfcd44bf2971cd7760dc7c0.body.gz",
+      "sha256": "1cd7fbe74b6457eaabff9b44822b6f3fec7bd8b08bfcd44bf2971cd7760dc7c0",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/66f1e0cf797b6a9f519378da7c94b092e32d04786bf9ea771be1aa2e135f981d.body.gz",
+      "sha256": "66f1e0cf797b6a9f519378da7c94b092e32d04786bf9ea771be1aa2e135f981d",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/4fc927d304ac8d576c34f59116a5031b6c3d2409675095b227f157e672d77e43.body.gz",
+      "sha256": "4fc927d304ac8d576c34f59116a5031b6c3d2409675095b227f157e672d77e43",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/bdb7cdaad4729d324b8d8ed93c101ed8693ff85f549db4fb9b73deebdf65f25c.body.gz",
+      "sha256": "bdb7cdaad4729d324b8d8ed93c101ed8693ff85f549db4fb9b73deebdf65f25c",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/a3b6bc1e34c513bf08b3a2da2a39cc686f49a6df6cafeba394eae62ac221f5e1.body.gz",
+      "sha256": "a3b6bc1e34c513bf08b3a2da2a39cc686f49a6df6cafeba394eae62ac221f5e1",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/7bfe5cd05abf2c07bc01a1f5c3572725ee6064d1d77954e20b3765d16a8786ae.body.gz",
+      "sha256": "7bfe5cd05abf2c07bc01a1f5c3572725ee6064d1d77954e20b3765d16a8786ae",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/1a05e2f07a6e2eeaac6d24297a67af3b07e2283b8c4935f55331932bd9b77aa1.body.gz",
+      "sha256": "1a05e2f07a6e2eeaac6d24297a67af3b07e2283b8c4935f55331932bd9b77aa1",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/97c10fbb438fd3c8a268ff30bb60c2e2ac2e4e14ed0d8066d61a32628a9f372d.body.gz",
+      "sha256": "97c10fbb438fd3c8a268ff30bb60c2e2ac2e4e14ed0d8066d61a32628a9f372d",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/da5006c097cde288796152d8e630fe2c2cb9a5a549e78fc2553a1a1eb1b34b98.body.gz",
+      "sha256": "da5006c097cde288796152d8e630fe2c2cb9a5a549e78fc2553a1a1eb1b34b98",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/c4aaa1d068702ff03ebb1af06916759e3b580d2c3cca85f3c9c88ae844531d3f.body.gz",
+      "sha256": "c4aaa1d068702ff03ebb1af06916759e3b580d2c3cca85f3c9c88ae844531d3f",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/bfd8a6df9d6d47ec77adb06ce7c51ffee9b39d0c1f3738b812d55e636c9acb66.body.gz",
+      "sha256": "bfd8a6df9d6d47ec77adb06ce7c51ffee9b39d0c1f3738b812d55e636c9acb66",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/024a282e3047cee8faf60c48d4afc0d02eda20dd64600d82c6b5ff03cbab7ef5.body.gz",
+      "sha256": "024a282e3047cee8faf60c48d4afc0d02eda20dd64600d82c6b5ff03cbab7ef5",
+      "matches_filename": true
+    }
+  ],
+  "parsed_output_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/49_东财日内异动池明细/data.csv",
   "derived_artifacts": [
     {
-      "path": "provider_validation/results/a-stock-data-missing-output/49_东财日内异动池明细/data.csv",
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/49_东财日内异动池明细/data.csv",
       "sha256": "9c8483a90a1f97fce49844d0c228ff2c2e708cde97dccc305cfde2752df38cbe",
       "bytes": 701291,
       "field_names": [
@@ -38,13 +149,13 @@
     }
   ],
   "coverage_denominator": 87,
-  "scope": "7831行异动明细，但输出无请求日期字段，原始返回未留存。 本项只部分返回或有未核准范围。 a_stock_missing_output\\49_东财日内异动池明细\\data.csv [CSV行数=7831]",
-  "finding": "部分：7831行异动明细，但输出无请求日期字段，原始返回未留存。；脚本结果 success：saved 1 file(s)。解析结果非空；未留精确原始响应。",
+  "scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×22；主机：push2ex.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+  "finding": "部分：7831行异动明细，但输出无请求日期字段，原始返回未留存。；本轮低频真实探测 success：saved 1 file(s); usable=1。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×22；主机：push2ex.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
   "sample": "{\"columns\": [\"时间\", \"代码\", \"名称\", \"板块\", \"相关信息\", \"异动类型\"], \"sample\": {\"时间\": \"14:55:47\", \"代码\": \"600289\", \"名称\": \"ST信通\", \"板块\": \"火箭发射\", \"相关信息\": \"0.042254,4.44000,0.042254\", \"异动类型\": \"火箭发射\"}}",
   "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
   "transformation_code_version": {
     "path": "provider_validation/tests/build_interface_coverage.py",
-    "sha256": "7e094251e9efdf1d355f8c8b853630456f7a1778b3ce928df578283152145ef0"
+    "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
   },
-  "validation_time_utc": "2026-10-03T08:58:05.161806+00:00"
+  "validation_time_utc": "2026-10-03T10:20:07.368257+00:00"
 }
