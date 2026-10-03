@@ -141,6 +141,126 @@ class EastMoneyFinancialMainProvider:
             empty_is_valid=not rows and narrowed, mapping_context={"source_total_count": self._event_total,
                 "source_page_count": self._event_pages, "requested_limit": limit, "source_report": report})
 
+    def fetch_action_list(self, *, code=None, start=None, end=None, direction=None, progress=None, date=None, limit=100):
+        """Source financial actions, preserving the successful V3.9 query contracts."""
+        import json
+        import re
+        from ..contracts import InputFetchResult
+        from .realtime import history_stock_identity
+        if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= 5000:
+            raise ValueError("limit must be an integer in 1..5000")
+        bare, market = history_stock_identity(code)[:2] if code is not None else (None, None)
+        equal = {}
+        dates = {}
+        code_field = "DIM_SCODE" if self.endpoint == "buyback" else "SECURITY_CODE"
+        if bare:
+            equal[code_field] = bare
+        self._event_total = self._event_pages = None
+        if self.endpoint == "holder_trades":
+            if progress is not None or date is not None:
+                raise ValueError("holder trades do not support progress or statistic date")
+            if direction not in {None, "增持", "减持"}:
+                raise ValueError("direction must be 增持 or 减持")
+            if direction:
+                equal["DIRECTION"] = direction
+            lo, hi = _event_day(start) if start else None, _event_day(end) if end else None
+            if lo and hi and lo > hi:
+                raise ValueError("start must not follow end")
+            filter_str = (f'(DIRECTION="{direction}")' if direction else "") + (f'(SECURITY_CODE="{bare}")' if bare else "")
+            if lo:
+                filter_str += f"(NOTICE_DATE>='{lo}')"
+            if hi:
+                filter_str += f"(NOTICE_DATE<='{hi}')"
+            if lo or hi:
+                dates["NOTICE_DATE"] = (lo, hi)
+            report, sort, order = "RPT_SHARE_HOLDER_INCREASE", "NOTICE_DATE,SECURITY_CODE,HOLDER_NAME,START_DATE,END_DATE", "-1,1,1,1,1"
+            narrowed = bool(bare or lo or hi)
+            numeric = ("CHANGE_NUM_SYMBOL", "AFTER_CHANGE_RATE", "CHANGE_FREE_RATIO", "AFTER_HOLDER_NUM", "HOLD_RATIO", "FREE_SHARES", "FREE_SHARES_RATIO", "TRADE_AVERAGE_PRICE")
+            date_fields = ("NOTICE_DATE", "START_DATE", "END_DATE")
+        elif self.endpoint == "buyback":
+            if start is not None or end is not None or direction is not None or date is not None:
+                raise ValueError("buyback does not support a date window or direction")
+            progress_codes = {"董事会预案":"001", "股东大会通过":"002", "股东大会否决":"003", "实施中":"004", "停止实施":"005", "完成实施":"006"}
+            if progress is not None:
+                if progress not in progress_codes:
+                    raise ValueError("unsupported buyback progress")
+                equal["REPURPROGRESS"] = progress_codes[progress]
+            filter_str = "".join(f'({field}="{value}")' for field, value in equal.items())
+            report, sort, order = "RPTA_WEB_GETHGLIST_NEW", "UPD,DIM_SCODE,REPURCODE", "-1,1,1"
+            narrowed = bool(equal)
+            numeric = ("REPURPRICECAP", "REPURNUMLOWER", "REPURNUMCAP", "REPURAMOUNTLOWER", "REPURAMOUNTLIMIT", "ZSZXX", "ZSZSX", "REPURNUM", "REPURAMOUNT", "REPURPRICELOWER1", "REPURPRICECAP1")
+            date_fields = ("REPURSTARTDATE", "REPURENDDATE", "UPDATEDATE")
+        elif self.endpoint == "pledge":
+            if start is not None or end is not None or direction is not None or progress is not None:
+                raise ValueError("pledge accepts only a stock or a statistic date")
+            if code is not None and date is not None:
+                raise ValueError("pledge code and date cannot be supplied together")
+            if market == "bj":
+                raise ValueError("pledge source covers only SH/SZ stocks")
+            report = "RPT_CSDC_LIST"
+            if bare:
+                filter_str = f'(SECURITY_CODE="{bare}")'
+                sort, order = "TRADE_DATE", "-1"
+            else:
+                if date is None:
+                    latest = self._event_rows(report, "", "TRADE_DATE", "-1", page_size=1, max_rows=1)
+                    if not latest:
+                        raise RuntimeError("pledge latest statistic date is missing")
+                    date = latest[0].get("TRADE_DATE")
+                    if not date:
+                        raise RuntimeError("pledge source statistic date field changed")
+                day = _event_day(date)
+                if day is None:
+                    raise ValueError("pledge statistic date is required")
+                filter_str = f"(TRADE_DATE='{day}')"
+                sort, order = "PLEDGE_RATIO,SECURITY_CODE", "-1,1"
+                dates["TRADE_DATE"] = (day, day)
+            narrowed = True
+            numeric = ("PLEDGE_RATIO", "REPURCHASE_BALANCE", "PLEDGE_MARKET_CAP", "PLEDGE_DEAL_NUM", "REPURCHASE_UNLIMITED_BALANCE", "REPURCHASE_LIMITED_BALANCE")
+            date_fields = ("TRADE_DATE",)
+        elif self.endpoint == "ipo_calendar":
+            if any(value is not None for value in (code, start, end, direction, progress, date)):
+                raise ValueError("IPO calendar accepts only limit")
+            report, filter_str, sort, order = "RPTA_APP_IPOAPPLY", "", "APPLY_DATE,SECURITY_CODE", "-1,-1"
+            narrowed = False
+            numeric = ("ISSUE_PRICE", "AFTER_ISSUE_PE", "INDUSTRY_PE", "ISSUE_NUM", "ONLINE_ISSUE_NUM", "ONLINE_APPLY_UPPER", "TOP_APPLY_MARKETCAP", "ONLINE_ISSUE_LWR", "CLOSE_PRICE", "LD_CLOSE_CHANGE")
+            date_fields = ("APPLY_DATE", "BALLOT_NUM_DATE", "BALLOT_PAY_DATE", "LISTING_DATE")
+        else:
+            raise ValueError("financial action endpoint is not implemented")
+        rows = self._event_rows(report, filter_str, sort, order, page_size=min(limit, 500), max_rows=limit)
+        if not rows and self.endpoint == "pledge" and bare is None:
+            raise ValueError("requested date is not a published pledge statistic date")
+        if not rows and not narrowed:
+            raise RuntimeError("unfiltered source action list is empty")
+        if len({json.dumps(row, sort_keys=True, ensure_ascii=False) for row in rows}) != len(rows):
+            raise RuntimeError("action pages returned duplicate source rows")
+        for row in rows:
+            if not re.fullmatch(r"[0-9]{6}", str(row.get(code_field, ""))):
+                raise RuntimeError("action source security code changed")
+            for name, value in equal.items():
+                if row.get(name) != value:
+                    raise RuntimeError("action response ignored requested equality filter")
+            for name, (lo, hi) in dates.items():
+                day = _event_day(row.get(name))
+                if day is None or lo and day < lo or hi and day > hi:
+                    raise RuntimeError("action response ignored requested date filter")
+            for name in numeric:
+                _event_num(row.get(name))
+            for name in date_fields:
+                _event_day(row.get(name))
+            if self.endpoint == "holder_trades":
+                signed = _event_num(row.get("CHANGE_NUM_SYMBOL"))
+                if signed is not None and row.get("DIRECTION") in {"增持", "减持"} and (signed < 0) != (row["DIRECTION"] == "减持"):
+                    raise RuntimeError("holder direction and signed shares disagree")
+            if self.endpoint == "pledge":
+                total, free, locked = (_event_num(row.get(name)) for name in ("REPURCHASE_BALANCE", "REPURCHASE_UNLIMITED_BALANCE", "REPURCHASE_LIMITED_BALANCE"))
+                if None not in (total, free, locked) and abs(free + locked - total) > max(1.0, total * 0.001):
+                    raise RuntimeError("pledge free and restricted shares do not sum to total")
+        return InputFetchResult(tuple(rows), source_url=self.url + "?reportName=" + report,
+            empty_is_valid=not rows and narrowed, mapping_context={"source_total_count":self._event_total,
+                "source_page_count":self._event_pages, "requested_limit":limit, "source_report":report,
+                "returned_date_field":{"holder_trades":"NOTICE_DATE","buyback":"UPDATEDATE","pledge":"TRADE_DATE","ipo_calendar":"APPLY_DATE"}[self.endpoint]})
+
     def _event_rows(self, report_name, filter_str="", sort_columns="", sort_types="",
                               page_size=500, max_rows=5000, columns="ALL", extra=None):
         """东财 datacenter 严格版：code=0 取数据；第 1 页就 9201(返回数据为空) → []；其他错误码直接抛。

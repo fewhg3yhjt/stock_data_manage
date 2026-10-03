@@ -6,7 +6,7 @@
 
 ## 当前阶段
 
-通用候选入口已接通二十项输入：腾讯行情快照、前复权日线、最近5分钟线，东财涨停池、新浪交易日历，同花顺行业目录、行业指数日线、行业/概念即时资金流，以及复用原两查询完成的 BaoStock 证券快照和行业归属，及原东财股东户数、已实施分红历史、个股资金流，和扩展原股票池模块的炸板、跌停、昨日涨停、强势股池，以及原财务Provider的业绩预告与机构调研汇总。参数来源、字段模板、来源映射与候选留证实际执行；自动调度和正式路由保持关闭。同花顺说明见 [同花顺记录](provider_validation/docs/2026-10-04-ths-input-collection.md)，BaoStock 两项见 [BaoStock记录](provider_validation/docs/2026-10-04-baostock-input-collection.md)，腾讯快照见 [本批记录](provider_validation/docs/2026-10-04-tencent-snapshot-input-collection.md)。下方历史来源状态表示各自已记录样本，不代表当前全量在线可用性。
+通用候选入口已接通二十四项输入：腾讯行情快照、前复权日线、最近5分钟线，东财涨停池、新浪交易日历，同花顺行业目录、行业指数日线、行业/概念即时资金流，以及复用原两查询完成的 BaoStock 证券快照和行业归属，及原东财股东户数、已实施分红历史、个股资金流，和扩展原股票池模块的炸板、跌停、昨日涨停、强势股池，以及原财务Provider的业绩预告、机构调研汇总、股东增减持、回购、质押和新股申购日历。参数来源、字段模板、来源映射与候选留证实际执行；自动调度和正式路由保持关闭。同花顺说明见 [同花顺记录](provider_validation/docs/2026-10-04-ths-input-collection.md)，BaoStock 两项见 [BaoStock记录](provider_validation/docs/2026-10-04-baostock-input-collection.md)，腾讯快照见 [本批记录](provider_validation/docs/2026-10-04-tencent-snapshot-input-collection.md)。下方历史来源状态表示各自已记录样本，不代表当前全量在线可用性。
 
 当前处于：
 
@@ -143,3 +143,7 @@ THS 板块关系目前保留为独立 Provider 快照，已验证 Raw 快照写�
 ## 自主转换后续：业绩预告与机构调研（2026-10-04）
 
 扩展原财务Provider，两项各50行的原始响应、原可执行脚本和候选标准字段逐项对照；默认财务方法保持。补两组必要字段模板/映射，数量上限可配置，有效筛选空表与失败分开。当前20项候选、44项待转换、7项阻断、3项别名；完整回归335项，见 `provider_validation/results/events-final-20261004-tests.xml`，详细证据见 [本批记录](provider_validation/docs/2026-10-04-eastmoney-events-input-collection.md)。ST原东财失败、BaoStock兜底缺可回放结果，继续待转换；金额单位、实时可用性、全量覆盖和生产资格未认证。
+
+## 自主转换后续：四项金融事件（2026-10-04）
+
+复用原财务Provider及原会话/分页查询，转换增减持、回购、质押、新股日历，分别与原脚本50/50/50/30行对照。质押保留先查最新统计日再查名单的原请求流程；未知回购进度和新股未来排期保留。回购进度标签与板块备用字段在原归一化YAML管理。当前24项候选、40项待转换、7项阻断、3项别名；完整回归354项，见 `provider_validation/results/actions-final-20261004-tests.xml`，详细记录见 [四项事件记录](provider_validation/docs/2026-10-04-eastmoney-actions-input-collection.md)。单位、实时、独立完整性、持续容量和生产资格均未认证。

@@ -1,0 +1,211 @@
+{
+  "validation_time_utc": "2026-10-03T23:34:18.670105+00:00",
+  "mode": "offline_replay",
+  "network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "verification_code": {
+    "path": "tests/test_input_collection.py",
+    "sha256": "6316fe425211d28cf5a79a8a647fb73eb323d9e69e771c112c82e7c7450c587e"
+  },
+  "runner": {
+    "path": "provider_validation/tests/replay_input_capabilities.py",
+    "sha256": "5b12eb4c5519b716ffd88a080211ab89429416bffd11ab283c24808ae0338fe3"
+  },
+  "inputs": [
+    {
+      "input_id": "ASTOCK-080",
+      "report_path": "provider_validation/results/actions-final-20261004/ASTOCK-080/candidate/ASTOCK-080-55044a8ec9e5/2026-10-03/input_report/eastmoney/holder_trades/report.json",
+      "report_sha256": "4f2fcb09477a3172afd384d836694d852308960c2cc6f5004dda36c7aa4753c9",
+      "source_manifest": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+      "source_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+      "row_count": 50,
+      "scope": {
+        "limit": 50
+      },
+      "code_version": "7a2c59e8747a3d5dffd661c8065589427ff2d6315d415fe31d1f960495a00140",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-081",
+      "report_path": "provider_validation/results/actions-final-20261004/ASTOCK-081/candidate/ASTOCK-081-85313d5bded3/2026-10-03/input_report/eastmoney/buyback/report.json",
+      "report_sha256": "761ac378ed87562548c787f75e61919119c681acde3149e29418253710ed2e76",
+      "source_manifest": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+      "source_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+      "row_count": 50,
+      "scope": {
+        "limit": 50
+      },
+      "code_version": "7a2c59e8747a3d5dffd661c8065589427ff2d6315d415fe31d1f960495a00140",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-082",
+      "report_path": "provider_validation/results/actions-final-20261004/ASTOCK-082/candidate/ASTOCK-082-87d977099424/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "report_sha256": "7b9a1543b274598d395331a32e2d26dcd665898a3f682b1962a26f3fc7cd1727",
+      "source_manifest": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+      "source_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+      "row_count": 50,
+      "scope": {
+        "limit": 50
+      },
+      "code_version": "7a2c59e8747a3d5dffd661c8065589427ff2d6315d415fe31d1f960495a00140",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-083",
+      "report_path": "provider_validation/results/actions-final-20261004/ASTOCK-083/candidate/ASTOCK-083-7099d9a4394b/2026-10-03/input_report/eastmoney/ipo_calendar/report.json",
+      "report_sha256": "5c37a11968656e8fd2e214ebd58fd9ad00b09b728981e2ff80ca3b1eeebf489a",
+      "source_manifest": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+      "source_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+      "row_count": 30,
+      "scope": {
+        "limit": 30
+      },
+      "code_version": "7a2c59e8747a3d5dffd661c8065589427ff2d6315d415fe31d1f960495a00140",
+      "result": "passed"
+    }
+  ],
+  "original_vs_provider": [
+    {
+      "input_id": "ASTOCK-080",
+      "mode": "offline_replay",
+      "row_count": 50,
+      "all_retained_source_fields_equal": true,
+      "all_business_fields_equal": true,
+      "request_comparison_equal": true,
+      "source_total_count": 146773,
+      "source_response_hashes": [
+        "1c2a8d00cf4f119dd234ffaa5345995ee5c49ab2a671f2090f015c566ba67bec"
+      ],
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-final-20261004\\ASTOCK-080\\candidate\\ASTOCK-080-55044a8ec9e5\\2026-10-03\\input_report\\eastmoney\\holder_trades\\report.json",
+      "report_sha256": "4f2fcb09477a3172afd384d836694d852308960c2cc6f5004dda36c7aa4753c9",
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-final-20261004\\ASTOCK-080\\original-parsed.json",
+      "original_parsed_sha256": "075f49d8644c4393ddee24b315648b3f87caab6d08d1465cd4950b84a158a8ed"
+    },
+    {
+      "input_id": "ASTOCK-081",
+      "mode": "offline_replay",
+      "row_count": 50,
+      "all_retained_source_fields_equal": true,
+      "all_business_fields_equal": true,
+      "request_comparison_equal": true,
+      "source_total_count": 5532,
+      "source_response_hashes": [
+        "cd9747ca8dbb0823a1cbdf8db5eb9b755b6ca739ee537c34705e57d6076554ed"
+      ],
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-final-20261004\\ASTOCK-081\\candidate\\ASTOCK-081-85313d5bded3\\2026-10-03\\input_report\\eastmoney\\buyback\\report.json",
+      "report_sha256": "761ac378ed87562548c787f75e61919119c681acde3149e29418253710ed2e76",
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-final-20261004\\ASTOCK-081\\original-parsed.json",
+      "original_parsed_sha256": "30f7fc6ead873876717cb46d1b054ff45c090a134bdeab0204e8de3e9470e347"
+    },
+    {
+      "input_id": "ASTOCK-082",
+      "mode": "offline_replay",
+      "row_count": 50,
+      "all_retained_source_fields_equal": true,
+      "all_business_fields_equal": true,
+      "request_comparison_equal": true,
+      "source_total_count": 2211,
+      "source_response_hashes": [
+        "82a09f7e8dbbd644d5daa57db655b9f6d80976a9218dd68a2e5910415178de4a",
+        "1cf99b8e98fc2410e1fd438310c2d7d42b0ee134df2b56e93a5673beafded8cf"
+      ],
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-final-20261004\\ASTOCK-082\\candidate\\ASTOCK-082-87d977099424\\2026-10-03\\input_report\\eastmoney\\pledge\\report.json",
+      "report_sha256": "7b9a1543b274598d395331a32e2d26dcd665898a3f682b1962a26f3fc7cd1727",
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-final-20261004\\ASTOCK-082\\original-parsed.json",
+      "original_parsed_sha256": "138d1f5451a3c8fe28d7daca3c4a2f3679caf0a79f0d05cb8a25f73537a1b7d3"
+    },
+    {
+      "input_id": "ASTOCK-083",
+      "mode": "offline_replay",
+      "row_count": 30,
+      "all_retained_source_fields_equal": true,
+      "all_business_fields_equal": true,
+      "request_comparison_equal": true,
+      "source_total_count": 5639,
+      "source_response_hashes": [
+        "083373253312402772f8dffb213639ac9edf877a9a728ba1aaad9b6d7fe864af"
+      ],
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-final-20261004\\ASTOCK-083\\candidate\\ASTOCK-083-7099d9a4394b\\2026-10-03\\input_report\\eastmoney\\ipo_calendar\\report.json",
+      "report_sha256": "5c37a11968656e8fd2e214ebd58fd9ad00b09b728981e2ff80ca3b1eeebf489a",
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-final-20261004\\ASTOCK-083\\original-parsed.json",
+      "original_parsed_sha256": "9ab9724552f3dd86323332637694ec0f2ab415bc93961608e8f2900a0d297459"
+    }
+  ],
+  "known_differences": [
+    "扩展原财务Provider，复用已验证的原会话和严格分页，不新增Provider或管理层。",
+    "增减持和回购各50行、质押1行日期查询后50行名单、新股日历30行，均为有界归档结果。",
+    "质押仅沪深，统计日来自原响应；数量受限不证明全市场或全部历史。",
+    "回购进度翻译、新股板块备用字段及未定价零值由现YAML归一化规则管理。",
+    "未知进度保留代码、标签为空；新股未来申购/上市排期保持原语义。",
+    "量额单位尚未独立认证，标准列为空；原全部字段与精确响应字节保留。",
+    "没有新实时调用或生产写入；会话/cache为注入夹具，实时可用性与Cookie状态仍未认证。"
+  ],
+  "negative_checks": [
+    {
+      "input_id": "ASTOCK-080",
+      "mutation": "direction",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/actions-final-20261004/f0/candidate/ASTOCK-080-aa006a9114b8/2026-10-03/input_report/eastmoney/holder_trades/report.json",
+      "report_sha256": "731b45ed9726094e197df5b44ea27e408d60a152b33b2d469a8d82aaf1effd02",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-082",
+      "mutation": "pledge_sum",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/actions-final-20261004/f1/candidate/ASTOCK-082-c4ea4dd28b72/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "report_sha256": "6172d330b4897743f5a11250373901b0b86f728d31a751da10b0565e21c82933",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-082",
+      "mutation": "pledge_date",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/actions-final-20261004/f2/candidate/ASTOCK-082-bbac8807785d/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "report_sha256": "59d21488fb27743a3b6bb9f043158f01982bf9a6eeef05766f4cfe56d3ddba11",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-082",
+      "mutation": "latest_date_missing",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/actions-final-20261004/f3/candidate/ASTOCK-082-291120bb1e8b/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "report_sha256": "11ae2722369c7c286f5991dbb5a6d62a3d66647a310f57bf16663b7a1f12dea0",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-081",
+      "mutation": "numeric",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/actions-final-20261004/f4/candidate/ASTOCK-081-91b2f587bef7/2026-10-03/input_report/eastmoney/buyback/report.json",
+      "report_sha256": "e16603ba053d2f0ac019f97c512b9f4fdfcacb08f68085beb79a6e1924ced33f",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-081",
+      "mutation": "plan_missing",
+      "failure_class": "NormalizationError",
+      "report_path": "provider_validation/results/actions-final-20261004/f5/candidate/ASTOCK-081-8876d2e45659/2026-10-03/input_report/eastmoney/buyback/report.json",
+      "report_sha256": "a8d6cbe6381e5dacbaa18dfdb0a0a02689ebe13fcb9c740131dc55d5e0265c52",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-083",
+      "mutation": "code",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/actions-final-20261004/f6/candidate/ASTOCK-083-e12e1187465a/2026-10-03/input_report/eastmoney/ipo_calendar/report.json",
+      "report_sha256": "4c9e7f9f94d4786a6d337ab907bc630d44ed322c110d070fd2abe8ca5924cb16",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-083",
+      "mutation": "duplicate",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/actions-final-20261004/f7/candidate/ASTOCK-083-63eeac3e209e/2026-10-03/input_report/eastmoney/ipo_calendar/report.json",
+      "report_sha256": "eb5f2e0d90026592e4150576a38744379a2a91f40f5f41371ad1079cd19b03f1",
+      "result": "passed"
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+dataset: ipo_calendar
+rules:
+- id: eastmoney-ipo_calendar-input-v1
+  input_id: ASTOCK-083
+  provider: eastmoney
+  endpoint: ipo_calendar
+  field_mapping:
+    source_security_code: SECURITY_CODE
+    name: SECURITY_NAME
+    apply_code: APPLY_CODE
+    exchange: TRADE_MARKET
+    board: MARKET
+    apply_date: APPLY_DATE
+    ballot_date: BALLOT_NUM_DATE
+    pay_date: BALLOT_PAY_DATE
+    listing_date: LISTING_DATE
+    issue_price: ISSUE_PRICE
+    issue_pe: AFTER_ISSUE_PE
+    industry_pe: INDUSTRY_PE
+    issue_shares_10k: ISSUE_NUM
+    online_shares: ONLINE_ISSUE_NUM
+    apply_upper_shares: ONLINE_APPLY_UPPER
+    top_apply_mktcap_10k: TOP_APPLY_MARKETCAP
+    win_rate_pct: ONLINE_ISSUE_LWR
+    first_close: CLOSE_PRICE
+    first_close_chg_pct: LD_CLOSE_CHANGE
+  context_fields:
+    snapshot_at: source_snapshot_at
+  transforms:
+    apply_date:
+      format: '%Y-%m-%d %H:%M:%S'
+    ballot_date:
+      format: '%Y-%m-%d %H:%M:%S'
+    pay_date:
+      format: '%Y-%m-%d %H:%M:%S'
+    listing_date:
+      format: '%Y-%m-%d %H:%M:%S'
+    issue_price:
+      remove_commas: true
+      nonfinite_is_null: true
+      zero_is_null: true
+    issue_pe:
+      remove_commas: true
+      nonfinite_is_null: true
+    industry_pe:
+      remove_commas: true
+      nonfinite_is_null: true
+    issue_shares_10k:
+      remove_commas: true
+      nonfinite_is_null: true
+    online_shares:
+      remove_commas: true
+      nonfinite_is_null: true
+    apply_upper_shares:
+      remove_commas: true
+      nonfinite_is_null: true
+    top_apply_mktcap_10k:
+      remove_commas: true
+      nonfinite_is_null: true
+    win_rate_pct:
+      remove_commas: true
+      nonfinite_is_null: true
+    first_close:
+      remove_commas: true
+      nonfinite_is_null: true
+    first_close_chg_pct:
+      remove_commas: true
+      nonfinite_is_null: true
+    board:
+      fallback_source: MARKET_TYPE_NEW
+  null_values:
+  - null
+  - ''
+  - '-'
+  - --
+  - None
+  - 'null'
+  unverified_fields:
+  - issue_price
+  - issue_shares_10k
+  - online_shares
+  - apply_upper_shares
+  - top_apply_mktcap_10k
+  - first_close
+  status: pending_validation
+  version: eastmoney-actions-input-v1
+  evidence_refs:
+  - ASTOCK-083
+  notes: 保留原脚本数据含义与全部原字段；进度标签和板块备用字段在YAML管理。量额单位未独立核验，标准值为空；原值保留。

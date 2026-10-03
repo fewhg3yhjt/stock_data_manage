@@ -1,0 +1,99 @@
+dataset: buyback
+rules:
+- context_fields:
+    snapshot_at: source_snapshot_at
+  endpoint: buyback
+  evidence_refs:
+  - ASTOCK-081
+  field_mapping:
+    amount_lower: REPURAMOUNTLOWER
+    amount_upper: REPURAMOUNTLIMIT
+    done_amount: REPURAMOUNT
+    done_price_high: REPURPRICECAP1
+    done_price_low: REPURPRICELOWER1
+    done_shares: REPURNUM
+    latest_notice: UPDATEDATE
+    name: SECURITYSHORTNAME
+    objective: REPUROBJECTIVE
+    pct_total_lower: ZSZXX
+    pct_total_upper: ZSZSX
+    plan_end: REPURENDDATE
+    plan_start: REPURSTARTDATE
+    price_cap: REPURPRICECAP
+    progress: REPURPROGRESS
+    progress_code: REPURPROGRESS
+    shares_lower: REPURNUMLOWER
+    shares_upper: REPURNUMCAP
+    source_plan_code: REPURCODE
+    source_security_code: DIM_SCODE
+  id: eastmoney-buyback-input-v1
+  input_id: ASTOCK-081
+  notes: 保留原脚本数据含义与全部原字段；进度标签和板块备用字段在YAML管理。量额单位未独立核验，标准值为空；原值保留。
+  null_values:
+  - null
+  - ''
+  - '-'
+  - --
+  - None
+  - 'null'
+  provider: eastmoney
+  status: pending_validation
+  transforms:
+    amount_lower:
+      nonfinite_is_null: true
+      remove_commas: true
+    amount_upper:
+      nonfinite_is_null: true
+      remove_commas: true
+    done_amount:
+      nonfinite_is_null: true
+      remove_commas: true
+    done_price_high:
+      nonfinite_is_null: true
+      remove_commas: true
+    done_price_low:
+      nonfinite_is_null: true
+      remove_commas: true
+    done_shares:
+      nonfinite_is_null: true
+      remove_commas: true
+    latest_notice:
+      format: '%Y-%m-%d %H:%M:%S'
+    pct_total_lower:
+      nonfinite_is_null: true
+      remove_commas: true
+    pct_total_upper:
+      nonfinite_is_null: true
+      remove_commas: true
+    plan_end:
+      format: '%Y-%m-%d %H:%M:%S'
+    plan_start:
+      format: '%Y-%m-%d %H:%M:%S'
+    price_cap:
+      nonfinite_is_null: true
+      remove_commas: true
+    progress:
+      value_mapping:
+        '001': 董事会预案
+        '002': 股东大会通过
+        '003': 股东大会否决
+        '004': 实施中
+        '005': 停止实施
+        '006': 自定义标签
+    shares_lower:
+      nonfinite_is_null: true
+      remove_commas: true
+    shares_upper:
+      nonfinite_is_null: true
+      remove_commas: true
+  unverified_fields:
+  - price_cap
+  - shares_lower
+  - shares_upper
+  - amount_lower
+  - amount_upper
+  - done_shares
+  - done_amount
+  - done_price_low
+  - done_price_high
+  version: eastmoney-actions-input-v1

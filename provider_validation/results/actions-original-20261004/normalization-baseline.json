@@ -1,0 +1,7 @@
+{
+  "path": "src/stock_data_manage/quality/normalization.py",
+  "git_revision": "e12124f",
+  "snapshot": "provider_validation/results/actions-original-20261004/7-normalization.py.bin",
+  "sha256": "e9541deab839fcbb91a9fca228e90012179bde05f584bded02491359b7b7917c",
+  "reason": "necessary YAML-managed progress labels, fallback board and IPO zero-price semantics"
+}

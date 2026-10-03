@@ -1,0 +1,47 @@
+dataset:
+  name: pledge
+  display_name: 质押统计输入
+  primary_key:
+  - snapshot_at
+  - source_security_code
+  - statistic_date
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  source_security_code:
+    type: string
+    required: true
+  name:
+    type: string
+    required: false
+  statistic_date:
+    type: date
+    required: true
+  industry:
+    type: string
+    required: false
+  pledge_ratio_pct:
+    type: decimal
+    required: false
+    unit: percent
+  pledged_shares_10k:
+    type: decimal
+    required: false
+    unit: 10k_shares
+  pledged_mktcap_10k:
+    type: decimal
+    required: false
+    unit: 10k_CNY
+  pledge_count:
+    type: integer
+    required: false
+    unit: count
+  unrestricted_pledged_10k:
+    type: decimal
+    required: false
+    unit: 10k_shares
+  restricted_pledged_10k:
+    type: decimal
+    required: false
+    unit: 10k_shares

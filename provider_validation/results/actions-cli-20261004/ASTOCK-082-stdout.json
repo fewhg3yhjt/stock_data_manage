@@ -1,0 +1,379 @@
+{
+  "input_id": "ASTOCK-082",
+  "dataset": "pledge",
+  "mode": "replay",
+  "parameters": {
+    "limit": 50
+  },
+  "provider": "eastmoney",
+  "endpoint": "pledge",
+  "collection_profile": {
+    "name": "event_daily",
+    "mode": "daily",
+    "refresh_interval_seconds": null,
+    "business_day": "calendar_day",
+    "scheduling_enabled": false,
+    "frequency_unit": null,
+    "frequency_interval": 1,
+    "at_time": null,
+    "anchor_date": null,
+    "settle_delay_seconds": 0,
+    "trigger_grace_seconds": 30,
+    "universe": "static",
+    "max_symbols": null
+  },
+  "request_interval_seconds": 3,
+  "effective_concurrency": 1,
+  "request_limit_enforcement": "call_boundary_only",
+  "adapter_version": "eastmoney-events-input-v1",
+  "code_version": "7a2c59e8747a3d5dffd661c8065589427ff2d6315d415fe31d1f960495a00140",
+  "code_files": [
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\pipeline\\inputs.py",
+      "sha256": "a8a775a8ed568e622032b766d0ae666ab7a22aa67ba7e104c8c694fa1f3948f2"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\cli.py",
+      "sha256": "582f5caedfc538a012d7a2f6e8cd7af3fe8b6fc9152e5b9e0a3fa2cb8810ae19"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\config\\loader.py",
+      "sha256": "93bb55ab150c88751fe9a58a2b75737878c1b0f07233b8ec47009c4901bb11e9"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\contracts.py",
+      "sha256": "a4b16abc7e3686a4eb2791dcd4545fb2404e0214bf32e20db19d2582d39ea447"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\quality\\normalization.py",
+      "sha256": "f7101ced3225a16204f2adf265c65963bb1739741f0f64f6c73e2196c7e1df98"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\transport.py",
+      "sha256": "7cf1c5f1f9b526e54e7d82e60b95b35e1f8f91e60effc31d74052f9273988b03"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\storage\\raw.py",
+      "sha256": "564c940feb99b358c41c5456c3142e7501b21505b5c2d8d88d811c53e145b752"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\routing\\factory.py",
+      "sha256": "e0e572c72c2f72d50931414b6b5be4e83691fdd38fce43f33701065139a6aa1f"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\daily.py",
+      "sha256": "487a14fcbfc47146d6d5fd291fbf41667aba435e5fed22ea1ef61ded513fcaa7"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\minute.py",
+      "sha256": "ff5cf1e91327bcab2e072bcfae9f1f77dca71a84ba26e456c26580a4d59d9cc1"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\snapshot.py",
+      "sha256": "3278cadac776fe8cfe5d02775a5bf8f53bc1cb96c595a5f418172f53047434bf"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\limit_pool.py",
+      "sha256": "2fbdfe3da3129545dfe8d2e457be7c42225696ddd74270567ae765e4b413f5ae"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\shareholder.py",
+      "sha256": "4c9d80f4d51845ac5541c42275f44f2a18643db5e9ccb705a3e16168f8db44c1"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\financial.py",
+      "sha256": "ff9e8f647711208d57fdcd157d9dce52d6b6bc10c5421b1a667b465466c50ea2"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\dividend.py",
+      "sha256": "5706a8cdb37eeeb8f66cb033a3091dd1b6ec1ed83d72d0f9fbeb8f5c75d9649b"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\fund_flow.py",
+      "sha256": "0cf655efa0854d18651bb4f04f985f0f210b81a6d9eff065604d235ed8f75280"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\realtime.py",
+      "sha256": "6e09d2a5014cf316c4d1e26e913a44d5c2fbad95fb44d95cba159ef881f03bca"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\calendar.py",
+      "sha256": "3d114045f960bfcc94ade1ee03e4d25ebdf6980ba68aa2d0a2236bed78aaef05"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\akshare\\boards.py",
+      "sha256": "2060f150831cebaf707ed5becedc35428bc41d4428bab31555ed1d2bf817d122"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\baostock\\industry.py",
+      "sha256": "16c41b379eecbd87f082bd042e27fad7f3d8d77b5bfc6a3e8a286209b068494a"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\baostock\\session.py",
+      "sha256": "70ce19cdde1d6a8ed0c3d3db29caa28d1d8069826136ab6dd7fb6a2ef8c7b832"
+    }
+  ],
+  "config_files": [
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\providers.yaml",
+      "sha256": "5e86c03754724cb2ac78aa788c1149b20cf67a8aaafaba73c61138946ebd2b79"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\collection.yaml",
+      "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\datasets\\pledge.yaml",
+      "sha256": "40b46e96e55d8b1061c98ec979094b4f98ef4800e513cfa7a9c2c5f2152b2fb1"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\normalization\\pledge.yaml",
+      "sha256": "4c8f7636e0b20e5923adbbf4c5e696247da67869d90ed19f0aee62f2e5612710"
+    }
+  ],
+  "normalization_version": "eastmoney-actions-input-v1",
+  "normalization_status": "pending_validation",
+  "field_units": {
+    "snapshot_at": null,
+    "source_security_code": null,
+    "name": null,
+    "statistic_date": null,
+    "industry": null,
+    "pledge_ratio_pct": "percent",
+    "pledged_shares_10k": "unverified; source value retained separately",
+    "pledged_mktcap_10k": "unverified; source value retained separately",
+    "pledge_count": "count",
+    "unrestricted_pledged_10k": "unverified; source value retained separately",
+    "restricted_pledged_10k": "unverified; source value retained separately"
+  },
+  "unverified_fields": [
+    "pledged_shares_10k",
+    "pledged_mktcap_10k",
+    "unrestricted_pledged_10k",
+    "restricted_pledged_10k"
+  ],
+  "selected_fields": [
+    "industry",
+    "name",
+    "pledge_count",
+    "pledge_ratio_pct",
+    "pledged_mktcap_10k",
+    "pledged_shares_10k",
+    "restricted_pledged_10k",
+    "snapshot_at",
+    "source_security_code",
+    "statistic_date",
+    "unrestricted_pledged_10k"
+  ],
+  "eligible_for_production_routing": false,
+  "production_writes": 0,
+  "live_http_calls": 0,
+  "validation_time_utc": "2026-10-03T23:35:18.335684+00:00",
+  "status": "candidate_complete",
+  "response_freshness_seconds": 86400,
+  "transport_dependency": {
+    "requests": "2.32.5",
+    "urllib3": "2.3.0"
+  },
+  "event_transport_policy": {
+    "source_contract": "successful runnable V3.9 test loader",
+    "headers": "requests Session defaults",
+    "trust_env": true,
+    "timeout_seconds": 20,
+    "retry_total": 3,
+    "retry_connect": 3,
+    "backoff_factor": 0.6,
+    "status_forcelist": [
+      429,
+      500,
+      502,
+      503,
+      504
+    ],
+    "minimum_interval_seconds": 1,
+    "conditional_wait_jitter_seconds": [
+      0.1,
+      0.5
+    ],
+    "outer_capture_interval_seconds": 3,
+    "physical_retry_count_observable": false
+  },
+  "context_dependency": {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-cli-20261004\\ASTOCK-082-context.json",
+    "sha256": "3732d08d9bd9def42d0bb29d73bd80e11b8159eabcab1cff3dddd4b54d6afc31"
+  },
+  "responses": [
+    {
+      "event": "http_response",
+      "method": "GET",
+      "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?client=WEB&columns=ALL&filter=&pageNumber=1&pageSize=1&reportName=RPT_CSDC_LIST&sortColumns=TRADE_DATE&sortTypes=-1&source=WEB",
+      "request_headers": {
+        "User-Agent": "python-requests/2.32.5",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept": "*/*",
+        "Connection": "keep-alive"
+      },
+      "scope": {
+        "input_id": "ASTOCK-082",
+        "parameters": {
+          "limit": 50
+        }
+      },
+      "request_options": {
+        "timeout": 20,
+        "allow_redirects": true,
+        "trust_env": true,
+        "proxies": {},
+        "sdk_retry_policy": false
+      },
+      "provider": "eastmoney",
+      "endpoint": "pledge",
+      "code_version": "7a2c59e8747a3d5dffd661c8065589427ff2d6315d415fe31d1f960495a00140",
+      "fetched_at_utc": "2026-10-03T23:35:18.339639+00:00",
+      "mode": "replay",
+      "source_ref": {
+        "manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\manifest.ndjson",
+        "line": 49,
+        "fetched_at_utc": "2026-10-01T12:56:05.150+00:00"
+      },
+      "outcome": "response",
+      "status_code": 200,
+      "response_headers": {
+        "Ali-Swift-Global-Savetime": "1790859370",
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+        "Content-Type": "text/plain;charset=UTF-8",
+        "Date": "Thu, 01 Oct 2026 12:56:10 GMT",
+        "EagleId": "27af041e17908593692574369e",
+        "Server": "Tengine",
+        "Set-Cookie": "<redacted>",
+        "Timing-Allow-Origin": "*",
+        "Transfer-Encoding": "chunked",
+        "Vary": "Accept-Encoding",
+        "Via": "ens-cache8.l2cn9026[758,758,200-0,M], ens-cache24.l2cn9026[759,0], vcache5.cn4431[769,769,200-0,M], vcache10.cn4431[771,0]",
+        "X-Cache": "MISS TCP_MISS dirn:-2:-2",
+        "X-Swift-CacheTime": "0",
+        "X-Swift-SaveTime": "Thu, 01 Oct 2026 12:56:10 GMT"
+      },
+      "content_type": "text/plain;charset=UTF-8",
+      "encoding": "UTF-8",
+      "body_bytes": 534,
+      "body_sha256": "82a09f7e8dbbd644d5daa57db655b9f6d80976a9218dd68a2e5910415178de4a",
+      "body_storage": "bodies/82a09f7e8dbbd644d5daa57db655b9f6d80976a9218dd68a2e5910415178de4a.bin",
+      "persistence_status": "exact_application_payload_saved"
+    },
+    {
+      "event": "http_response",
+      "method": "GET",
+      "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?client=WEB&columns=ALL&filter=%28TRADE_DATE%3D%272026-09-30%27%29&pageNumber=1&pageSize=50&reportName=RPT_CSDC_LIST&sortColumns=PLEDGE_RATIO%2CSECURITY_CODE&sortTypes=-1%2C1&source=WEB",
+      "request_headers": {
+        "User-Agent": "python-requests/2.32.5",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept": "*/*",
+        "Connection": "keep-alive"
+      },
+      "scope": {
+        "input_id": "ASTOCK-082",
+        "parameters": {
+          "limit": 50
+        }
+      },
+      "request_options": {
+        "timeout": 20,
+        "allow_redirects": true,
+        "trust_env": true,
+        "proxies": {},
+        "sdk_retry_policy": false
+      },
+      "provider": "eastmoney",
+      "endpoint": "pledge",
+      "code_version": "7a2c59e8747a3d5dffd661c8065589427ff2d6315d415fe31d1f960495a00140",
+      "fetched_at_utc": "2026-10-03T23:35:19.578943+00:00",
+      "mode": "replay",
+      "source_ref": {
+        "manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\manifest.ndjson",
+        "line": 50,
+        "fetched_at_utc": "2026-10-01T12:56:07.186+00:00"
+      },
+      "outcome": "response",
+      "status_code": 200,
+      "response_headers": {
+        "Ali-Swift-Global-Savetime": "1790859371",
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+        "Content-Type": "text/plain;charset=UTF-8",
+        "Date": "Thu, 01 Oct 2026 12:56:11 GMT",
+        "EagleId": "27af041e17908593712932940e",
+        "Server": "Tengine",
+        "Set-Cookie": "<redacted>",
+        "Timing-Allow-Origin": "*",
+        "Transfer-Encoding": "chunked",
+        "Vary": "Accept-Encoding",
+        "Via": "ens-cache21.l2cn9026[30,30,200-0,M], ens-cache7.l2cn9026[31,0], vcache6.cn4431[33,32,200-0,M], vcache10.cn4431[36,0]",
+        "X-Cache": "MISS TCP_MISS dirn:-2:-2",
+        "X-Swift-CacheTime": "0",
+        "X-Swift-SaveTime": "Thu, 01 Oct 2026 12:56:11 GMT"
+      },
+      "content_type": "text/plain;charset=UTF-8",
+      "encoding": "UTF-8",
+      "body_bytes": 19819,
+      "body_sha256": "1cf99b8e98fc2410e1fd438310c2d7d42b0ee134df2b56e93a5673beafded8cf",
+      "body_storage": "bodies/1cf99b8e98fc2410e1fd438310c2d7d42b0ee134df2b56e93a5673beafded8cf.bin",
+      "persistence_status": "exact_application_payload_saved"
+    }
+  ],
+  "source_rows": {
+    "path": "2026-10-03/source_rows/eastmoney/pledge/source-rows.json",
+    "sha256": "8966939a5e866d84e0f24bb94d9a69860f881334ae509222768517aad8c60f91",
+    "row_count": 50
+  },
+  "source_url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_CSDC_LIST",
+  "source_urls": [
+    "https://datacenter-web.eastmoney.com/api/data/v1/get?client=WEB&columns=ALL&filter=&pageNumber=1&pageSize=1&reportName=RPT_CSDC_LIST&sortColumns=TRADE_DATE&sortTypes=-1&source=WEB",
+    "https://datacenter-web.eastmoney.com/api/data/v1/get?client=WEB&columns=ALL&filter=%28TRADE_DATE%3D%272026-09-30%27%29&pageNumber=1&pageSize=50&reportName=RPT_CSDC_LIST&sortColumns=PLEDGE_RATIO%2CSECURITY_CODE&sortTypes=-1%2C1&source=WEB"
+  ],
+  "source_capture_window": {
+    "first": "2026-10-01T12:56:05.150000+00:00",
+    "last": "2026-10-01T12:56:07.186000+00:00",
+    "meaning": "source response capture times; not row-level market timestamps"
+  },
+  "source_total_count": 2211,
+  "source_page_count": 45,
+  "requested_limit": 50,
+  "valid_empty_dataset": false,
+  "result_limited": true,
+  "coverage_basis": "bounded latest source events; denominator is returned rows, not whole-market coverage",
+  "universe_completeness_verified": false,
+  "returned_window": {
+    "first": "2026-09-30",
+    "last": "2026-09-30",
+    "field": "TRADE_DATE"
+  },
+  "output": {
+    "path": "2026-10-03/pledge/eastmoney/pledge/mapped-rows.json",
+    "sha256": "4105853b5d38c9c599ab4955eabe4f6d3302c403b2d3bf22d2a28a65d2749a40",
+    "row_count": 50,
+    "source_response_hashes": [
+      "82a09f7e8dbbd644d5daa57db655b9f6d80976a9218dd68a2e5910415178de4a",
+      "1cf99b8e98fc2410e1fd438310c2d7d42b0ee134df2b56e93a5673beafded8cf"
+    ]
+  },
+  "row_count": 50,
+  "coverage_denominator": 50,
+  "first_key": [
+    "2026-10-01T12:56:07.186000+00:00",
+    "600370",
+    "2026-09-30"
+  ],
+  "last_key": [
+    "2026-10-01T12:56:07.186000+00:00",
+    "301015",
+    "2026-09-30"
+  ],
+  "raw_manifest": {
+    "path": "_raw/manifest.ndjson",
+    "sha256": "b9668c3277008e635444cb21232d82cecbd40b83d80c2568dff38534c531835e"
+  },
+  "run_directory": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-cli-20261004\\candidate\\ASTOCK-082-574ea7f5e1d7",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-cli-20261004\\candidate\\ASTOCK-082-574ea7f5e1d7\\2026-10-03\\input_report\\eastmoney\\pledge\\report.json"
+}

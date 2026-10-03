@@ -1,0 +1,16 @@
+{
+  "input_id": "ASTOCK-083",
+  "mode": "offline_replay",
+  "row_count": 30,
+  "all_retained_source_fields_equal": true,
+  "all_business_fields_equal": true,
+  "request_comparison_equal": true,
+  "source_total_count": 5639,
+  "source_response_hashes": [
+    "083373253312402772f8dffb213639ac9edf877a9a728ba1aaad9b6d7fe864af"
+  ],
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-final-v2-20261004\\ASTOCK-083\\candidate\\ASTOCK-083-89a642ebcea2\\2026-10-03\\input_report\\eastmoney\\ipo_calendar\\report.json",
+  "report_sha256": "c45006a4a3a55e606d8c2fefa1853c20c65260a58c5e924a366ba73b20315a3a",
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-final-v2-20261004\\ASTOCK-083\\original-parsed.json",
+  "original_parsed_sha256": "4d34cd8988a2929693dd4da572f21d36eca3d0d64a71221a2e72f2db4c43132d"
+}

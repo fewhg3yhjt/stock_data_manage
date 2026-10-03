@@ -1,0 +1,112 @@
+{
+  "validation_time_utc": "2026-10-03T23:35:20.405978+00:00",
+  "mode": "actual CLI offline replay",
+  "network_requests": 0,
+  "production_writes": 0,
+  "results": [
+    {
+      "input_id": "ASTOCK-080",
+      "count": 50,
+      "command": [
+        "D:\\Program Files\\Python\\python.exe",
+        "-m",
+        "stock_data_manage.cli",
+        "collect-input",
+        "--input",
+        "ASTOCK-080",
+        "--mode",
+        "replay",
+        "--replay-manifest",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\manifest.ndjson",
+        "--output-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-cli-20261004\\candidate",
+        "--context-file",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-cli-20261004\\ASTOCK-080-context.json"
+      ],
+      "exit_code": 0,
+      "stdout": "provider_validation/results/actions-cli-20261004/ASTOCK-080-stdout.json",
+      "stdout_sha256": "e30212277a6943ee63623a95264460a7e8c931580cec611a2e2007677cbe9070",
+      "stderr": "provider_validation/results/actions-cli-20261004/ASTOCK-080-stderr.bin",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-cli-20261004\\candidate\\ASTOCK-080-4309631f675a\\2026-10-03\\input_report\\eastmoney\\holder_trades\\report.json"
+    },
+    {
+      "input_id": "ASTOCK-081",
+      "count": 50,
+      "command": [
+        "D:\\Program Files\\Python\\python.exe",
+        "-m",
+        "stock_data_manage.cli",
+        "collect-input",
+        "--input",
+        "ASTOCK-081",
+        "--mode",
+        "replay",
+        "--replay-manifest",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\manifest.ndjson",
+        "--output-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-cli-20261004\\candidate",
+        "--context-file",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-cli-20261004\\ASTOCK-081-context.json"
+      ],
+      "exit_code": 0,
+      "stdout": "provider_validation/results/actions-cli-20261004/ASTOCK-081-stdout.json",
+      "stdout_sha256": "0273c80bf5957cdb08b0be8632503c134e3c377c34bc5539087e643263c0c818",
+      "stderr": "provider_validation/results/actions-cli-20261004/ASTOCK-081-stderr.bin",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-cli-20261004\\candidate\\ASTOCK-081-eac37d31bd2c\\2026-10-03\\input_report\\eastmoney\\buyback\\report.json"
+    },
+    {
+      "input_id": "ASTOCK-082",
+      "count": 50,
+      "command": [
+        "D:\\Program Files\\Python\\python.exe",
+        "-m",
+        "stock_data_manage.cli",
+        "collect-input",
+        "--input",
+        "ASTOCK-082",
+        "--mode",
+        "replay",
+        "--replay-manifest",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\manifest.ndjson",
+        "--output-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-cli-20261004\\candidate",
+        "--context-file",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-cli-20261004\\ASTOCK-082-context.json"
+      ],
+      "exit_code": 0,
+      "stdout": "provider_validation/results/actions-cli-20261004/ASTOCK-082-stdout.json",
+      "stdout_sha256": "75b77fc7148d8c2e71b919b0451dd7fcae749636b3ed6053f04d8dbf00d065c1",
+      "stderr": "provider_validation/results/actions-cli-20261004/ASTOCK-082-stderr.bin",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-cli-20261004\\candidate\\ASTOCK-082-574ea7f5e1d7\\2026-10-03\\input_report\\eastmoney\\pledge\\report.json"
+    },
+    {
+      "input_id": "ASTOCK-083",
+      "count": 30,
+      "command": [
+        "D:\\Program Files\\Python\\python.exe",
+        "-m",
+        "stock_data_manage.cli",
+        "collect-input",
+        "--input",
+        "ASTOCK-083",
+        "--mode",
+        "replay",
+        "--replay-manifest",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\manifest.ndjson",
+        "--output-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-cli-20261004\\candidate",
+        "--context-file",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-cli-20261004\\ASTOCK-083-context.json"
+      ],
+      "exit_code": 0,
+      "stdout": "provider_validation/results/actions-cli-20261004/ASTOCK-083-stdout.json",
+      "stdout_sha256": "731316f2ed71f9e6ec02774027748ca301ceea095183fe078e1f77114890c0d6",
+      "stderr": "provider_validation/results/actions-cli-20261004/ASTOCK-083-stderr.bin",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-cli-20261004\\candidate\\ASTOCK-083-f8296c540be3\\2026-10-03\\input_report\\eastmoney\\ipo_calendar\\report.json"
+    }
+  ]
+}

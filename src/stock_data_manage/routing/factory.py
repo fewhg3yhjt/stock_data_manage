@@ -35,6 +35,7 @@ def build_input_provider(contract, *, providers_path, client=None):
                         "ASTOCK-026": "fetch_history", "ASTOCK-027": "fetch_history", "ASTOCK-028": "fetch_history",
                         "ASTOCK-046": "fetch", "ASTOCK-047": "fetch", "ASTOCK-048": "fetch", "ASTOCK-050": "fetch",
                         "ASTOCK-078": "fetch_event_list", "ASTOCK-079": "fetch_event_list",
+                        "ASTOCK-080": "fetch_action_list", "ASTOCK-081": "fetch_action_list", "ASTOCK-082": "fetch_action_list", "ASTOCK-083": "fetch_action_list",
                         "SDA-BOARD-001": "fetch_industry_list", "SDA-BOARD-002": "fetch_industry_daily",
                         "SDA-BOARD-003": "fetch_fund_flow", "SDA-BOARD-004": "fetch_fund_flow",
                         "SDA-BOARD-005": "fetch_snapshot", "SDA-BOARD-006": "fetch_snapshot"}
@@ -66,7 +67,7 @@ def build_input_provider(contract, *, providers_path, client=None):
     if contract.input_id == "ASTOCK-070":
         from ..providers.sina.calendar import SinaTradingCalendarProvider
         return SinaTradingCalendarProvider(client=client)
-    if contract.input_id in {"ASTOCK-078", "ASTOCK-079"}:
+    if contract.input_id in {"ASTOCK-078", "ASTOCK-079", "ASTOCK-080", "ASTOCK-081", "ASTOCK-082", "ASTOCK-083"}:
         return EastMoneyFinancialMainProvider(endpoint=contract.endpoint, capability_version="eastmoney-events-input-v1")
     if contract.input_id in {"ASTOCK-026", "ASTOCK-027", "ASTOCK-028"}:
         from ..providers.eastmoney.shareholder import EastMoneyShareholderCountProvider

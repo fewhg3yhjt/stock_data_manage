@@ -123,14 +123,29 @@ class Normalizer:
                 # Retained in source rows; do not label an unknown unit as the dataset's canonical unit.
                 result[name] = None
                 continue
+            transform = rule.get("transforms", {}).get(name, {})
+            if set(transform) - {"format", "timezone", "multiplier", "remove_commas", "nonfinite_is_null", "fallback_source", "value_mapping", "zero_is_null"}:
+                raise NormalizationError(f"unsupported transform for {name}")
+            if value is None and "fallback_source" in transform:
+                if not isinstance(transform["fallback_source"], str):
+                    raise NormalizationError(f"invalid fallback source for {name}")
+                value = raw.get(transform["fallback_source"])
+            if "value_mapping" in transform:
+                if not isinstance(transform["value_mapping"], Mapping):
+                    raise NormalizationError(f"invalid value mapping for {name}")
+                if value is not None:
+                    value = transform["value_mapping"].get(str(value))
+            if transform.get("zero_is_null") and value is not None:
+                try:
+                    if not isinstance(value, bool) and Decimal(str(value)) == 0:
+                        value = None
+                except InvalidOperation:
+                    pass
             if value is None:
                 if definition.get("required", False):
                     raise NormalizationError(f"missing required field: {name}")
                 result[name] = None
                 continue
-            transform = rule.get("transforms", {}).get(name, {})
-            if set(transform) - {"format", "timezone", "multiplier", "remove_commas", "nonfinite_is_null"}:
-                raise NormalizationError(f"unsupported transform for {name}")
             try:
                 kind = definition["type"]
                 if kind in {"decimal", "integer"}:

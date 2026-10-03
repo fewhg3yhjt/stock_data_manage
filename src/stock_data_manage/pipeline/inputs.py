@@ -109,7 +109,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
     is_baostock = input_id in {"SDA-BOARD-005", "SDA-BOARD-006"}
     is_tencent_snapshot = input_id == "ASTOCK-001"
     is_em_history = input_id in {"ASTOCK-026", "ASTOCK-027", "ASTOCK-028"}
-    is_em_events = input_id in {"ASTOCK-078", "ASTOCK-079"}
+    is_em_events = input_id in {"ASTOCK-078", "ASTOCK-079", "ASTOCK-080", "ASTOCK-081", "ASTOCK-082", "ASTOCK-083"}
     if is_em_events:
         import requests
         import urllib3
@@ -362,7 +362,8 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                 report["source_units"] = list(fetched.units)
                 report["coverage_basis"] = "returned SDK rows; not an independently verified market universe"
         if is_em_events:
-            notice_days = [str(row["NOTICE_DATE"])[:10] for row in source_rows if row.get("NOTICE_DATE")]
+            date_field = fetched.mapping_context.get("returned_date_field", "NOTICE_DATE")
+            notice_days = [str(row[date_field])[:10] for row in source_rows if row.get(date_field)]
             report.update(source_total_count=fetched.mapping_context["source_total_count"],
                 source_page_count=fetched.mapping_context["source_page_count"],
                 requested_limit=fetched.mapping_context["requested_limit"], valid_empty_dataset=valid_empty,
@@ -370,7 +371,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                 coverage_basis="bounded latest source events; denominator is returned rows, not whole-market coverage",
                 universe_completeness_verified=False,
                 returned_window={"first": min(notice_days) if notice_days else None,
-                                 "last": max(notice_days) if notice_days else None, "field": "NOTICE_DATE"})
+                                 "last": max(notice_days) if notice_days else None, "field": date_field})
         if "date" in parameters:
             mapping_context["trade_date"] = parameters["date"]
         if input_id.startswith("ASTOCK-002"):

@@ -56,6 +56,178 @@ EVENT_ARCHIVE = ROOT / "provider_validation/results/raw/2026-10-01-v39-live-esca
 EVENT_CASES = [("ASTOCK-078", {"config": {"limit": 50}}, EVENT_ARCHIVE, 50),
                ("ASTOCK-079", {"config": {"limit": 50}}, EVENT_ARCHIVE, 50)]
 EVENT_REPORTS = {"ASTOCK-078": "RPT_PUBLIC_OP_NEWPREDICT", "ASTOCK-079": "RPT_ORG_SURVEYNEW"}
+ACTION_CASES = [("ASTOCK-080", {"config":{"limit":50}}, EVENT_ARCHIVE, 50),
+                ("ASTOCK-081", {"config":{"limit":50}}, EVENT_ARCHIVE, 50),
+                ("ASTOCK-082", {"config":{"limit":50}}, EVENT_ARCHIVE, 50),
+                ("ASTOCK-083", {"config":{"limit":30}}, EVENT_ARCHIVE, 30)]
+ACTION_REPORTS = {"ASTOCK-080":"RPT_SHARE_HOLDER_INCREASE", "ASTOCK-081":"RPTA_WEB_GETHGLIST_NEW",
+                  "ASTOCK-082":"RPT_CSDC_LIST", "ASTOCK-083":"RPTA_APP_IPOAPPLY"}
+ACTION_FUNCTIONS = {"ASTOCK-080":"holder_trades", "ASTOCK-081":"share_buyback", "ASTOCK-082":"equity_pledge", "ASTOCK-083":"ipo_calendar"}
+
+
+def action_source_records(input_id):
+    from urllib.parse import parse_qs,urlsplit
+    return [json.loads(line) for line in EVENT_ARCHIVE.read_text(encoding="utf-8").splitlines()
+            if parse_qs(urlsplit(json.loads(line)["url"]).query).get("reportName")==[ACTION_REPORTS[input_id]]]
+
+
+def compare_action_original(tmp_path,input_id,context,manifest,count):
+    import pandas as pd
+    spec=importlib.util.spec_from_file_location("action_original",ROOT/"provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py")
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);ns=module.load_shipped_code()
+    original=RawObjectStore(tmp_path/"original")
+    try:
+        with captured_requests(original,provider="eastmoney",endpoint=input_id,scope=context,code_version="original-v39-actions",pacer=RequestPacer(),replay_manifest=manifest) as events:
+            frame=ns[ACTION_FUNCTIONS[input_id]](limit=count)
+    finally:ns["EM_SESSION"].close()
+    parsed=[{k:None if pd.isna(v) else v for k,v in row.items()} for row in frame.to_dict(orient="records")]
+    tmp_path.mkdir(parents=True,exist_ok=True);original_path=tmp_path/"original-parsed.json"
+    original_path.write_text(json.dumps(parsed,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    report=collect_input(input_id=input_id,context=context,config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=manifest)
+    assert report["status"]=="candidate_complete" and report["row_count"]==count,report
+    source=read_artifact(report,"source_rows");raw=json.loads(RawObjectStore.read_response(manifest,action_source_records(input_id)[-1]))
+    assert source==raw["result"]["data"] and report["source_total_count"]==raw["result"]["count"]
+    keys=("url","method","outcome","status_code","body_sha256","request_headers","request_options")
+    assert [{k:r.get(k) for k in keys} for r in events]==[{k:r.get(k) for k in keys} for r in report["responses"]]
+    rows=read_artifact(report,"output")
+    for row,prior,raw_row in zip(rows,parsed,source):
+        assert row["snapshot_at"]==report["source_capture_window"]["last"]
+        for name,value in row.items():
+            if name=="snapshot_at":continue
+            if name=="source_plan_code":assert value==str(raw_row["REPURCODE"]);continue
+            expected=prior[{"source_security_code":"code","statistic_date":"date"}.get(name,name)]
+            if name in report["unverified_fields"]:assert value is None
+            elif expected is None:assert value is None
+            elif isinstance(expected,(float,int)):assert float(value)==pytest.approx(expected,rel=1e-14)
+            else:assert value==expected
+    comparison={"input_id":input_id,"mode":"offline_replay","row_count":count,"all_retained_source_fields_equal":True,
+        "all_business_fields_equal":True,"request_comparison_equal":True,"source_total_count":report["source_total_count"],
+        "source_response_hashes":[r["body_sha256"] for r in events],"report_path":report["report_path"],
+        "report_sha256":hashlib.sha256(Path(report["report_path"]).read_bytes()).hexdigest(),
+        "original_parsed_path":str(original_path.resolve()),"original_parsed_sha256":hashlib.sha256(original_path.read_bytes()).hexdigest()}
+    (tmp_path/"comparison.json").write_text(json.dumps(comparison,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    return comparison
+
+
+@pytest.mark.parametrize("input_id,context,manifest,count",ACTION_CASES)
+def test_action_inputs_preserve_original_business_fields(tmp_path,no_network,input_id,context,manifest,count):
+    compare_action_original(tmp_path,input_id,context,manifest,count)
+
+
+def action_fixture(tmp_path,input_id,mutation):
+    records=action_source_records(input_id);store=RawObjectStore(tmp_path/"fixture")
+    for index,record in enumerate(records):
+        body=json.loads(RawObjectStore.read_response(EVENT_ARCHIVE,record));data=body["result"]["data"]
+        if index==len(records)-1:
+            if mutation=="direction":data[0]["DIRECTION"]="减持"
+            elif mutation=="pledge_sum":data[0]["REPURCHASE_LIMITED_BALANCE"]=10000
+            elif mutation=="pledge_date":data[0]["TRADE_DATE"]="2026-09-29 00:00:00"
+            elif mutation=="numeric":data[0]["REPURAMOUNTLOWER"]="broken"
+            elif mutation=="plan_missing":data[0].pop("REPURCODE")
+            elif mutation=="code":data[0]["SECURITY_CODE"]="broken"
+            elif mutation=="duplicate":data[1]=data[0].copy()
+            elif mutation=="progress_unknown":data[0]["REPURPROGRESS"]="007"
+            elif mutation=="board_fallback":data[0]["MARKET"]=None;data[0]["MARKET_TYPE_NEW"]="北交所"
+            elif mutation=="future_date":data[0]["LISTING_DATE"]="2030-01-01 00:00:00";data[0]["ISSUE_PRICE"]=0
+        elif mutation=="latest_date_missing":data[0].pop("TRADE_DATE")
+        response=requests.Response();response.status_code=200;response.encoding="utf-8";response._content=json.dumps(body,ensure_ascii=False).encode()
+        store.record_response(response=response,url=record["url"],method="GET",request_headers=record["request_headers"],provider="eastmoney",endpoint=input_id,
+            code_version="offline-fixture",scope={"synthetic":True,"mutation":mutation,"parent_sha256":record["body_sha256"]})
+    return store.root/"manifest.ndjson"
+
+
+ACTION_FAILURES=[("ASTOCK-080","direction","RuntimeError"),("ASTOCK-082","pledge_sum","RuntimeError"),
+    ("ASTOCK-082","pledge_date","RuntimeError"),("ASTOCK-082","latest_date_missing","RuntimeError"),
+    ("ASTOCK-081","numeric","RuntimeError"),("ASTOCK-081","plan_missing","NormalizationError"),
+    ("ASTOCK-083","code","RuntimeError"),("ASTOCK-083","duplicate","RuntimeError")]
+
+
+@pytest.mark.parametrize("input_id,mutation,expected",ACTION_FAILURES)
+def test_action_semantics_failures_retain_evidence(tmp_path,no_network,input_id,mutation,expected):
+    manifest=action_fixture(tmp_path,input_id,mutation);count=30 if input_id=="ASTOCK-083" else 50
+    report=collect_input(input_id=input_id,context={"config":{"limit":count}},config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=manifest)
+    assert report["status"]=="failed" and report["failure_class"]==expected and "output" not in report,report
+    for event in report["responses"]:
+        body=RawObjectStore.read_response(Path(report["run_directory"])/report["raw_manifest"]["path"],event)
+        assert hashlib.sha256(body).hexdigest()==event["body_sha256"]
+
+
+@pytest.mark.parametrize("input_id,mutation",[("ASTOCK-081","progress_unknown"),("ASTOCK-083","board_fallback"),("ASTOCK-083","future_date")])
+def test_action_unknown_progress_and_future_ipo_are_preserved(tmp_path,no_network,input_id,mutation):
+    manifest=action_fixture(tmp_path,input_id,mutation);count=30 if input_id=="ASTOCK-083" else 50
+    report=collect_input(input_id=input_id,context={"config":{"limit":count}},config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=manifest)
+    assert report["status"]=="candidate_complete",report
+    row=read_artifact(report,"output")[0]
+    if mutation=="progress_unknown":assert row["progress"] is None and row["progress_code"]=="007"
+    elif mutation=="board_fallback":assert row["board"]=="北交所"
+    else:assert row["listing_date"]=="2030-01-01" and row["issue_price"] is None
+
+
+def test_action_yaml_mapping_scope_and_empty_statistics(tmp_path,no_network):
+    config=tmp_path/"config";shutil.copytree(ROOT/"config",config)
+    path=config/"normalization/buyback.yaml";rule=yaml.safe_load(path.read_text(encoding="utf-8"))
+    rule["rules"][0]["transforms"]["progress"]["value_mapping"]["006"]="自定义标签"
+    path.write_text(yaml.safe_dump(rule,allow_unicode=True),encoding="utf-8")
+    report=collect_input(input_id="ASTOCK-081",context={"config":{"limit":50}},config_root=config,output_root=tmp_path/"candidate",replay_manifest=EVENT_ARCHIVE)
+    assert report["status"]=="candidate_complete" and read_artifact(report,"output")[0]["progress"]=="自定义标签",report
+    for input_id,context in [("ASTOCK-080",{"config":{"direction":"买入"}}),("ASTOCK-081",{"config":{"progress":"未知"}}),
+                            ("ASTOCK-083",{"request":{"symbol":"600519"}}),("ASTOCK-082",{"request":{"trade_date":"2026-09-30"}})]:
+        with pytest.raises(ValueError):collect_input(input_id=input_id,context=context,config_root=config,output_root=tmp_path/"bad",replay_manifest=EVENT_ARCHIVE)
+    for context in [{"request":{"symbol":"bj920000"}},{"request":{"symbol":"600519","statistic_date":"2026-09-30"}}]:
+        failed=collect_input(input_id="ASTOCK-082",context=context,config_root=config,output_root=tmp_path/"bad",replay_manifest=EVENT_ARCHIVE)
+        assert failed["status"]=="failed" and failed["failure_class"]=="ValueError" and "responses" not in failed,failed
+
+
+def test_action_normalization_transform_safety():
+    fields={"board":{"type":"string","required":False},"progress":{"type":"string","required":False},"price":{"type":"decimal","required":False}}
+    rule={"status":"pending_validation","field_mapping":{"board":"MARKET","progress":"CODE","price":"PRICE"},
+        "transforms":{"board":{"fallback_source":"BOARD"},"progress":{"value_mapping":{"006":"完成"}},"price":{"zero_is_null":True}}}
+    result=Normalizer.normalize_fields({"MARKET":None,"BOARD":"北交所","CODE":"009","PRICE":0},rule=rule,fields=fields,allow_pending=True)
+    assert result=={"board":"北交所","progress":None,"price":None}
+    with pytest.raises(NormalizationError):Normalizer.normalize_fields({"PRICE":True},rule=rule,fields=fields,allow_pending=True)
+
+
+def test_action_pledge_session_and_cache_use_original_two_queries(tmp_path,monkeypatch):
+    from unittest.mock import patch
+    from stock_data_manage.storage.raw import sanitized_url
+    originals=action_source_records("ASTOCK-082");seen=[]
+    def send(session,request,**kwargs):
+        seen.append(session)
+        record=next(r for r in originals if sanitized_url(r["url"])==sanitized_url(request.url))
+        assert kwargs["timeout"]==20 and session.trust_env is True
+        assert session.get_adapter(request.url).max_retries.total==3
+        response=requests.Response();response.status_code=200;response.encoding="utf-8";response.headers["Content-Type"]="application/json"
+        response._content=RawObjectStore.read_response(EVENT_ARCHIVE,record);return response
+    with patch("requests.Session.send",send):
+        first=collect_input(input_id="ASTOCK-082",context={"config":{"limit":50}},config_root=ROOT/"config",output_root=tmp_path/"candidate",mode="live",evidence_root=tmp_path/"unused")
+        second=collect_input(input_id="ASTOCK-082",context={"config":{"limit":50}},config_root=ROOT/"config",output_root=tmp_path/"candidate",mode="live",evidence_root=tmp_path/"candidate")
+    assert first["status"]==second["status"]=="candidate_complete",(first,second)
+    assert len(seen)==2 and seen[0] is seen[1]
+    assert first["live_http_calls"]==2 and second["live_http_calls"]==0
+    assert [r["mode"] for r in second["responses"]]==["cached","cached"]
+    assert read_artifact(first,"output")==read_artifact(second,"output")
+    (tmp_path/"fixture-mode.json").write_text(json.dumps({"mode":"injected Session; not real live source verification",
+        "real_http_calls":0,"fixture_send_calls":2,"cached_send_calls":0}),encoding="utf-8")
+
+
+def test_action_pledge_unpublished_date_and_filtered_empty_are_distinct(tmp_path,no_network):
+    from urllib.parse import urlsplit,urlunsplit,parse_qs,urlencode
+    for input_id in ("ASTOCK-080","ASTOCK-082"):
+        record=action_source_records(input_id)[-1]
+        parts=urlsplit(record["url"]);query={k:v[0] for k,v in parse_qs(parts.query,keep_blank_values=True).items()}
+        context={"config":{"limit":50}}
+        if input_id=="ASTOCK-080":
+            query["filter"]='(SECURITY_CODE="600519")';context["request"]={"symbol":"600519"}
+        else:context["request"]={"statistic_date":"2026-09-30"}
+        response=requests.Response();response.status_code=200;response.encoding="utf-8";response._content=b'{"code":9201,"result":null}'
+        store=RawObjectStore(tmp_path/input_id/"fixture")
+        store.record_response(response=response,url=urlunsplit((parts.scheme,parts.netloc,parts.path,urlencode(query),"")),method="GET",
+            request_headers=record["request_headers"],provider="eastmoney",endpoint=input_id,code_version="offline-fixture",
+            scope={"synthetic":True,"mutation":"empty","parent_sha256":record["body_sha256"]})
+        report=collect_input(input_id=input_id,context=context,config_root=ROOT/"config",output_root=tmp_path/input_id/"candidate",replay_manifest=store.root/"manifest.ndjson")
+        assert len(report["responses"])==1,report
+        if input_id=="ASTOCK-080":assert report["status"]=="candidate_complete" and report["valid_empty_dataset"] and read_artifact(report,"output")==[],report
+        else:assert report["status"]=="failed" and report["failure_class"]=="ValueError" and "output" not in report,report
 
 
 def event_source_record(input_id):

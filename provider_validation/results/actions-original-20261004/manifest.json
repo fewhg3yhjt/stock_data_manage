@@ -1,0 +1,48 @@
+{
+  "validation_time_utc": "2026-10-03T23:22:01.425603+00:00",
+  "authorization": "continuous remaining-input scope confirmed by user",
+  "scope": [
+    "ASTOCK-080",
+    "ASTOCK-081",
+    "ASTOCK-082",
+    "ASTOCK-083"
+  ],
+  "original_files": [
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/financial.py",
+      "sha256": "2f436e2d929dcd4021b3d160cc5783aa6ecffc80a68cc2de8205e668b6027d9c",
+      "snapshot": "provider_validation/results/actions-original-20261004/1-financial.py.bin"
+    },
+    {
+      "path": "src/stock_data_manage/pipeline/inputs.py",
+      "sha256": "ff591e12daea04fe5094f17772219a550d09c3b3bb6126eacfc774758c353df2",
+      "snapshot": "provider_validation/results/actions-original-20261004/2-inputs.py.bin"
+    },
+    {
+      "path": "src/stock_data_manage/routing/factory.py",
+      "sha256": "d3a4d91bc0ebf0d464be1b056ad82dd32fb5d14f6695d5be7f9627c5f18f0096",
+      "snapshot": "provider_validation/results/actions-original-20261004/3-factory.py.bin"
+    },
+    {
+      "path": "config/providers.yaml",
+      "sha256": "8aa646afcde2229c31189d5a7cd831016c668e8c87acfba0d779aeb8ec188cca",
+      "snapshot": "provider_validation/results/actions-original-20261004/4-providers.yaml.bin"
+    },
+    {
+      "path": "tests/test_input_collection.py",
+      "sha256": "b4ab08d17bd6420275d903421f4423ee1f2571b7a4676883fcd821a0bcd22d2d",
+      "snapshot": "provider_validation/results/actions-original-20261004/5-test_input_collection.py.bin"
+    },
+    {
+      "path": "provider_validation/tests/replay_input_capabilities.py",
+      "sha256": "3bf799d6fa1814d0a59f51942628b3765a1eecbff54c42bcf261a1ad16fffb31",
+      "snapshot": "provider_validation/results/actions-original-20261004/6-replay_input_capabilities.py.bin"
+    }
+  ],
+  "original_source_contract": "provider_validation/results/events-original-20261004/manifest.json",
+  "source_code": "provider_validation/results/events-original-20261004/v39-events.py.bin",
+  "source_code_sha256": "7943e4d15181434564bdbf51fb2a87aa360effde9056f6c482cdd45afc384e63",
+  "raw_manifest": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+  "raw_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+  "production_routing_enabled": false
+}

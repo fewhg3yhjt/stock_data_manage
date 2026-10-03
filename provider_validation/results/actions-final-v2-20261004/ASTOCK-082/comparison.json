@@ -1,0 +1,17 @@
+{
+  "input_id": "ASTOCK-082",
+  "mode": "offline_replay",
+  "row_count": 50,
+  "all_retained_source_fields_equal": true,
+  "all_business_fields_equal": true,
+  "request_comparison_equal": true,
+  "source_total_count": 2211,
+  "source_response_hashes": [
+    "82a09f7e8dbbd644d5daa57db655b9f6d80976a9218dd68a2e5910415178de4a",
+    "1cf99b8e98fc2410e1fd438310c2d7d42b0ee134df2b56e93a5673beafded8cf"
+  ],
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-final-v2-20261004\\ASTOCK-082\\candidate\\ASTOCK-082-bbf5459f27b0\\2026-10-03\\input_report\\eastmoney\\pledge\\report.json",
+  "report_sha256": "3eb99c3eb4696b832af279ec461ebd1cc5bc981a25bfd7fb4a79c978204f9ca1",
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-final-v2-20261004\\ASTOCK-082\\original-parsed.json",
+  "original_parsed_sha256": "aa50e71435fb2e85828faad79f26a717e5bb90f73930dc207f219f2c3c2573bd"
+}

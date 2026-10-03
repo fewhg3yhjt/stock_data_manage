@@ -1,0 +1,11 @@
+{
+  "reason": "staged byte audit detected CRLF vs LF; add explicit LF convention and normalize only this edited source",
+  "path": "src/stock_data_manage/quality/normalization.py",
+  "prior_sha256": "f7101ced3225a16204f2adf265c65963bb1739741f0f64f6c73e2196c7e1df98",
+  "current_sha256": "3ed0d663b7fda9ac6cdf7f1252435f2351c783af3244ccba2c2b0f3891e29b3e",
+  "abstract_syntax_identical": true,
+  "functional_tests_reused": "provider_validation/results/actions-final-20261004-tests.xml",
+  "functional_tests": 354,
+  "final_replay_directory": "provider_validation/results/actions-final-v2-20261004",
+  "final_cli_directory": "provider_validation/results/actions-cli-v2-20261004"
+}

@@ -1,0 +1,2773 @@
+{
+  "validation_time_utc": "2026-10-03T23:46:44.367234+00:00",
+  "result": "passed",
+  "tests": 354,
+  "counts": {
+    "implemented_validation_only": 24,
+    "unimplemented": 40,
+    "blocked": 7,
+    "alias": 3
+  },
+  "real_network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "audited_reports": [
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-080/candidate/ASTOCK-080-8456ebd27e9f/2026-10-03/input_report/eastmoney/holder_trades/report.json",
+      "sha256": "50beb84c14c826e65dc09240f9036cf55d11641e6f3bf01d5afe36e6eaf4441b",
+      "status": "candidate_complete",
+      "row_count": 50,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-081/candidate/ASTOCK-081-50f91da53312/2026-10-03/input_report/eastmoney/buyback/report.json",
+      "sha256": "ed280a68238527e209d3b75183b1b39eedd87b6db8d5fb1f6b9707931085747b",
+      "status": "candidate_complete",
+      "row_count": 50,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-082/candidate/ASTOCK-082-bbf5459f27b0/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "sha256": "3eb99c3eb4696b832af279ec461ebd1cc5bc981a25bfd7fb4a79c978204f9ca1",
+      "status": "candidate_complete",
+      "row_count": 50,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-083/candidate/ASTOCK-083-89a642ebcea2/2026-10-03/input_report/eastmoney/ipo_calendar/report.json",
+      "sha256": "c45006a4a3a55e606d8c2fefa1853c20c65260a58c5e924a366ba73b20315a3a",
+      "status": "candidate_complete",
+      "row_count": 30,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/empty/ASTOCK-080/candidate/ASTOCK-080-e905d6504073/2026-10-03/input_report/eastmoney/holder_trades/report.json",
+      "sha256": "e177b38c5f0bb18af3366f8f17667b6cd0ff2485ab307f01524690f99f9f25f2",
+      "status": "candidate_complete",
+      "row_count": 0,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/empty/ASTOCK-082/candidate/ASTOCK-082-ebe76c951a22/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "sha256": "955254077bd3b3d9a37ec1559f119fd28a4cfefc75ca1ca38f906971792e03c4",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f0/candidate/ASTOCK-080-6f62ffe724eb/2026-10-03/input_report/eastmoney/holder_trades/report.json",
+      "sha256": "110285fd29bcc9d6fc8d58668b38cfd5610e69626b8a1acba22c01795fb1b528",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f1/candidate/ASTOCK-082-b597da35835a/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "sha256": "84e5d356fc0e6d656c7c493a595e1129c831682d83e849efdf26b85d174ffb83",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f2/candidate/ASTOCK-082-5568cd2dc49b/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "sha256": "154782a732c17b806ed1d05271e50f22bd10c95d1e2339e0fbe06862088582de",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f3/candidate/ASTOCK-082-cbe62a4dfab3/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "sha256": "71b451bc7e78ebb28eac56cb477a9e298af376898e6ed605632fe4601a579105",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f4/candidate/ASTOCK-081-bb650154ca9f/2026-10-03/input_report/eastmoney/buyback/report.json",
+      "sha256": "9facd4811c966d3ea577758ae02f01febc5314ec201ffed2ee8b9f4f6d4ad77a",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f5/candidate/ASTOCK-081-dd79cdcb6ffd/2026-10-03/input_report/eastmoney/buyback/report.json",
+      "sha256": "0c6f006a02089640114136d5d640897b312e9d5d13544eeb0bb2ea0004ec6624",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f6/candidate/ASTOCK-083-26288e749dca/2026-10-03/input_report/eastmoney/ipo_calendar/report.json",
+      "sha256": "874602c1101db43d924ad661800b37b0e0cd27ddead4c9e1b97da2199ce8a219",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f7/candidate/ASTOCK-083-029fac464da5/2026-10-03/input_report/eastmoney/ipo_calendar/report.json",
+      "sha256": "4f045092958c2405571255dcd8688cc12aaccbbbbd858c026b6334f771d01d86",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/semantic0/candidate/ASTOCK-081-aefa831ed212/2026-10-03/input_report/eastmoney/buyback/report.json",
+      "sha256": "b0f3cf2b24ae78063f7ba7356419f39018231d3845e5577a40d53c19c0d14ed7",
+      "status": "candidate_complete",
+      "row_count": 50,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/semantic1/candidate/ASTOCK-083-1f2fed5b2e90/2026-10-03/input_report/eastmoney/ipo_calendar/report.json",
+      "sha256": "3a412e2c1e711973844414ed49f2ad91582c42ed7b895b14800c6510870f4272",
+      "status": "candidate_complete",
+      "row_count": 30,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/semantic2/candidate/ASTOCK-083-7060c5202cf7/2026-10-03/input_report/eastmoney/ipo_calendar/report.json",
+      "sha256": "615724e5ef0c0bac8ababfdd1102e3b489c5099c3fef67b9ac7d3792a4d78884",
+      "status": "candidate_complete",
+      "row_count": 30,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/session/candidate/ASTOCK-082-02627a04380b/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "sha256": "d72c86f22b3b367eb08e582f894a3c887a36fc10f113703eb0d7908d2b365263",
+      "status": "candidate_complete",
+      "row_count": 50,
+      "live_http_calls": 2
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/session/candidate/ASTOCK-082-cd800f19fded/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "sha256": "9a73a530248efb0b24243a2da37c0c2059362dbad71e6e024c5cc93c309b6b35",
+      "status": "candidate_complete",
+      "row_count": 50,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/bad/ASTOCK-082-83c605d1f2dd/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "sha256": "1e31e771b65b09ebb80abc2d8de67513aa87a27ef22b6d6abdfc25a95660997f",
+      "status": "failed-before-request",
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/bad/ASTOCK-082-85273655726b/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "sha256": "244068e2e76a6512f45fad0c1e0e38ed90f65433d8f0ac939c097490b3de67a0",
+      "status": "failed-before-request",
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/candidate/ASTOCK-081-9691d661db89/2026-10-03/input_report/eastmoney/buyback/report.json",
+      "sha256": "74884d7ff2002b9808cc0a06911a6a93ea1c721b599c3a183a9b31c49e70248a",
+      "status": "candidate_complete",
+      "row_count": 50,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/candidate/ASTOCK-080-3cac41a7800e/2026-10-03/input_report/eastmoney/holder_trades/report.json",
+      "sha256": "096ea0f42fdedecea326a9905c24510feaf3a53bafafa49ac9ee5559fe127cd9",
+      "status": "candidate_complete",
+      "row_count": 50,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/candidate/ASTOCK-081-a9801c1a86fd/2026-10-03/input_report/eastmoney/buyback/report.json",
+      "sha256": "a63271bbf750ec07a985aa9a70f5f374a9c40fce3569552db94964878710d8fb",
+      "status": "candidate_complete",
+      "row_count": 50,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/candidate/ASTOCK-082-6a2a73de7deb/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "sha256": "d5e203225709131c647968870cc5bba5cfbb2dc999d0cf24758ec4c516f6dd0a",
+      "status": "candidate_complete",
+      "row_count": 50,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/candidate/ASTOCK-083-ab93a6bce257/2026-10-03/input_report/eastmoney/ipo_calendar/report.json",
+      "sha256": "c3a03eca0bf40f017bad1a2788b2d52303907a25034bfe16ccdced99a7639666",
+      "status": "candidate_complete",
+      "row_count": 30,
+      "live_http_calls": 0
+    }
+  ],
+  "files": [
+    {
+      "path": ".gitattributes",
+      "sha256": "47bcfccbd6fde0bb6c88dd984851ea4536d9a6cc7db43ea3139b90dee07ae9ca",
+      "bytes": 9740
+    },
+    {
+      "path": "CODE_STRUCTURE.md",
+      "sha256": "25d8841365a6efb95228fc1ac75dab8d56d306ffc1a7c08bd642b1f7922f465a",
+      "bytes": 20746
+    },
+    {
+      "path": "config/datasets/buyback.yaml",
+      "sha256": "807490acc8affc7dde3502ef62c2b80ad32923fe4c5ff6a6b4fd9d403b50d4f6",
+      "bytes": 1439
+    },
+    {
+      "path": "config/datasets/holder_trades.yaml",
+      "sha256": "44b0ecfc09c6e39823c50e83077354f25bc8026fc70272d92046ba3a51d09b92",
+      "bytes": 1246
+    },
+    {
+      "path": "config/datasets/ipo_calendar.yaml",
+      "sha256": "7579b9174fd3554a92bc50865cabe7ac20604579403f748d09bcd4e8760bcac9",
+      "bytes": 1331
+    },
+    {
+      "path": "config/datasets/pledge.yaml",
+      "sha256": "40b46e96e55d8b1061c98ec979094b4f98ef4800e513cfa7a9c2c5f2152b2fb1",
+      "bytes": 878
+    },
+    {
+      "path": "config/normalization/buyback.yaml",
+      "sha256": "70e6ee88258842e76509208c6d9df379478df717837489869ff1e9f72f82d1b3",
+      "bytes": 2520
+    },
+    {
+      "path": "config/normalization/holder_trades.yaml",
+      "sha256": "2deca39ea7c1a57254b4ee31390587f39d640559181cd1ceae7968a4684e5f40",
+      "bytes": 1959
+    },
+    {
+      "path": "config/normalization/ipo_calendar.yaml",
+      "sha256": "d72db539afed6e890e81d6e1c4680fcb09ad4285551748f3c9e12ba124e6059c",
+      "bytes": 2338
+    },
+    {
+      "path": "config/normalization/pledge.yaml",
+      "sha256": "4c8f7636e0b20e5923adbbf4c5e696247da67869d90ed19f0aee62f2e5612710",
+      "bytes": 1589
+    },
+    {
+      "path": "config/providers.yaml",
+      "sha256": "5e86c03754724cb2ac78aa788c1149b20cf67a8aaafaba73c61138946ebd2b79",
+      "bytes": 78137
+    },
+    {
+      "path": "PROJECT_PROGRESS.md",
+      "sha256": "16a7a49c204589a85211363c81bbadab5c242b95be28792ebace7aa9fb212411",
+      "bytes": 10283
+    },
+    {
+      "path": "provider_validation/docs/2026-10-04-eastmoney-actions-input-collection.md",
+      "sha256": "587a094d92d73dddcbb5b86b2fcbe04c309feafed59cdd568db96da2441ac5a1",
+      "bytes": 4026
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/ASTOCK-080-context.json",
+      "sha256": "3732d08d9bd9def42d0bb29d73bd80e11b8159eabcab1cff3dddd4b54d6afc31",
+      "bytes": 43
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/ASTOCK-080-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/ASTOCK-080-stdout.json",
+      "sha256": "e30212277a6943ee63623a95264460a7e8c931580cec611a2e2007677cbe9070",
+      "bytes": 13771
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/ASTOCK-081-context.json",
+      "sha256": "3732d08d9bd9def42d0bb29d73bd80e11b8159eabcab1cff3dddd4b54d6afc31",
+      "bytes": 43
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/ASTOCK-081-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/ASTOCK-081-stdout.json",
+      "sha256": "0273c80bf5957cdb08b0be8632503c134e3c377c34bc5539087e643263c0c818",
+      "bytes": 13903
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/ASTOCK-082-context.json",
+      "sha256": "3732d08d9bd9def42d0bb29d73bd80e11b8159eabcab1cff3dddd4b54d6afc31",
+      "bytes": 43
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/ASTOCK-082-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/ASTOCK-082-stdout.json",
+      "sha256": "75b77fc7148d8c2e71b919b0451dd7fcae749636b3ed6053f04d8dbf00d065c1",
+      "bytes": 15998
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/ASTOCK-083-context.json",
+      "sha256": "4021898832c511769726d407f305bf92b0168d88be5e8628c0fbe4f36994bb72",
+      "bytes": 43
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/ASTOCK-083-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/ASTOCK-083-stdout.json",
+      "sha256": "731316f2ed71f9e6ec02774027748ca301ceea095183fe078e1f77114890c0d6",
+      "bytes": 13663
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/candidate/ASTOCK-080-4309631f675a/2026-10-03/holder_trades/eastmoney/holder_trades/mapped-rows.json",
+      "sha256": "29d2c80df10f581a260d1791cb7951eaa7a2e969aac8a83a203f536864320404",
+      "bytes": 24175
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/candidate/ASTOCK-080-4309631f675a/2026-10-03/input_report/eastmoney/holder_trades/report.json",
+      "sha256": "8154f682acaa7cdb0a5e8a43903d945ef277f09fb70f41e8a1a73e56337490d5",
+      "bytes": 11026
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/candidate/ASTOCK-080-4309631f675a/2026-10-03/source_rows/eastmoney/holder_trades/source-rows.json",
+      "sha256": "100ed90ee1ec288e2b645a7d984032441ca92df9734f2dc346a1213104af13c7",
+      "bytes": 33081
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/candidate/ASTOCK-080-4309631f675a/_raw/bodies/1c2a8d00cf4f119dd234ffaa5345995ee5c49ab2a671f2090f015c566ba67bec.bin",
+      "sha256": "1c2a8d00cf4f119dd234ffaa5345995ee5c49ab2a671f2090f015c566ba67bec",
+      "bytes": 33213
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/candidate/ASTOCK-080-4309631f675a/_raw/manifest.ndjson",
+      "sha256": "61971281cd2f7a314eb176cedb2d700843ce3275c356274412bf42e69cd31a66",
+      "bytes": 2086
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/candidate/ASTOCK-081-eac37d31bd2c/2026-10-03/buyback/eastmoney/buyback/mapped-rows.json",
+      "sha256": "58c6cbfd0057c64bafa212ba8596064bf2c85116c4e998b5d34394af65aa42ce",
+      "bytes": 50385
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/candidate/ASTOCK-081-eac37d31bd2c/2026-10-03/input_report/eastmoney/buyback/report.json",
+      "sha256": "0722d695e5c5f59d8c88e595280d71868a9d699cf8bdf2bc1780d7ab41b45a18",
+      "bytes": 11118
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/candidate/ASTOCK-081-eac37d31bd2c/2026-10-03/source_rows/eastmoney/buyback/source-rows.json",
+      "sha256": "c1cb85845fb64b77d8fa4e8b957dd114d343e1324f24c0a1f5aefa795c66a79a",
+      "bytes": 113757
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/candidate/ASTOCK-081-eac37d31bd2c/_raw/bodies/cd9747ca8dbb0823a1cbdf8db5eb9b755b6ca739ee537c34705e57d6076554ed.bin",
+      "sha256": "cd9747ca8dbb0823a1cbdf8db5eb9b755b6ca739ee537c34705e57d6076554ed",
+      "bytes": 113886
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/candidate/ASTOCK-081-eac37d31bd2c/_raw/manifest.ndjson",
+      "sha256": "6390e1cfa0a5a78fafb5d26ee2e1ce36de29c9b5054ec066a170469c98ef02e3",
+      "bytes": 2031
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/candidate/ASTOCK-082-574ea7f5e1d7/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "sha256": "6ff721658c394a5febfcab157e84df73eb23e35de5b05eddbb0e52cafda2b223",
+      "bytes": 12777
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/candidate/ASTOCK-082-574ea7f5e1d7/2026-10-03/pledge/eastmoney/pledge/mapped-rows.json",
+      "sha256": "4105853b5d38c9c599ab4955eabe4f6d3302c403b2d3bf22d2a28a65d2749a40",
+      "bytes": 15907
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/candidate/ASTOCK-082-574ea7f5e1d7/2026-10-03/source_rows/eastmoney/pledge/source-rows.json",
+      "sha256": "8966939a5e866d84e0f24bb94d9a69860f881334ae509222768517aad8c60f91",
+      "bytes": 19691
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/candidate/ASTOCK-082-574ea7f5e1d7/_raw/bodies/1cf99b8e98fc2410e1fd438310c2d7d42b0ee134df2b56e93a5673beafded8cf.bin",
+      "sha256": "1cf99b8e98fc2410e1fd438310c2d7d42b0ee134df2b56e93a5673beafded8cf",
+      "bytes": 19819
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/candidate/ASTOCK-082-574ea7f5e1d7/_raw/bodies/82a09f7e8dbbd644d5daa57db655b9f6d80976a9218dd68a2e5910415178de4a.bin",
+      "sha256": "82a09f7e8dbbd644d5daa57db655b9f6d80976a9218dd68a2e5910415178de4a",
+      "bytes": 534
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/candidate/ASTOCK-082-574ea7f5e1d7/_raw/manifest.ndjson",
+      "sha256": "b9668c3277008e635444cb21232d82cecbd40b83d80c2568dff38534c531835e",
+      "bytes": 4050
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/candidate/ASTOCK-083-f8296c540be3/2026-10-03/input_report/eastmoney/ipo_calendar/report.json",
+      "sha256": "22e0be1fdf14a6816080c95e1a6bbb088bc9627cadf3f3e462912018ade3930d",
+      "bytes": 10927
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/candidate/ASTOCK-083-f8296c540be3/2026-10-03/ipo_calendar/eastmoney/ipo_calendar/mapped-rows.json",
+      "sha256": "1c8e9b31bc7c4a07140a953a97ae249b37b695f77387383a588a824786075704",
+      "bytes": 15639
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/candidate/ASTOCK-083-f8296c540be3/2026-10-03/source_rows/eastmoney/ipo_calendar/source-rows.json",
+      "sha256": "a23e5998a51a8905bdf58331786d4ede727a642e82968170ff3e19924ce7981a",
+      "bytes": 128509
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/candidate/ASTOCK-083-f8296c540be3/_raw/bodies/083373253312402772f8dffb213639ac9edf877a9a728ba1aaad9b6d7fe864af.bin",
+      "sha256": "083373253312402772f8dffb213639ac9edf877a9a728ba1aaad9b6d7fe864af",
+      "bytes": 128643
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/candidate/ASTOCK-083-f8296c540be3/_raw/manifest.ndjson",
+      "sha256": "927f1d2471c91bd88d3be4edf5049cb15929a11e6b12980c77553962deb8cb0b",
+      "bytes": 2022
+    },
+    {
+      "path": "provider_validation/results/actions-cli-20261004/verification.json",
+      "sha256": "d1eb4b385073050949e24e7ba3f5ab74101bbe36261bc577bb1e5685354023b0",
+      "bytes": 5751
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/ASTOCK-080-context.json",
+      "sha256": "3732d08d9bd9def42d0bb29d73bd80e11b8159eabcab1cff3dddd4b54d6afc31",
+      "bytes": 43
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/ASTOCK-080-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/ASTOCK-080-stdout.json",
+      "sha256": "f2adf74e690ab571da0f2b3b4f0e1b84b540ea9701bccba3e889048be8d5140e",
+      "bytes": 13780
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/ASTOCK-081-context.json",
+      "sha256": "3732d08d9bd9def42d0bb29d73bd80e11b8159eabcab1cff3dddd4b54d6afc31",
+      "bytes": 43
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/ASTOCK-081-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/ASTOCK-081-stdout.json",
+      "sha256": "f55acac9753dd362d47b0c80dab5681fc4a28338765a9afeea153faa7b309c64",
+      "bytes": 13912
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/ASTOCK-082-context.json",
+      "sha256": "3732d08d9bd9def42d0bb29d73bd80e11b8159eabcab1cff3dddd4b54d6afc31",
+      "bytes": 43
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/ASTOCK-082-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/ASTOCK-082-stdout.json",
+      "sha256": "fb4cae56bd593fd1bee1aeb8e475512177518d1c1e4d5b580afb835b331157e1",
+      "bytes": 16007
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/ASTOCK-083-context.json",
+      "sha256": "4021898832c511769726d407f305bf92b0168d88be5e8628c0fbe4f36994bb72",
+      "bytes": 43
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/ASTOCK-083-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/ASTOCK-083-stdout.json",
+      "sha256": "05302686ab03c15d27055042385955e6ee3cbd2edd0f1b1cec021bb7be317288",
+      "bytes": 13672
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/candidate/ASTOCK-080-3cac41a7800e/2026-10-03/holder_trades/eastmoney/holder_trades/mapped-rows.json",
+      "sha256": "29d2c80df10f581a260d1791cb7951eaa7a2e969aac8a83a203f536864320404",
+      "bytes": 24175
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/candidate/ASTOCK-080-3cac41a7800e/2026-10-03/input_report/eastmoney/holder_trades/report.json",
+      "sha256": "096ea0f42fdedecea326a9905c24510feaf3a53bafafa49ac9ee5559fe127cd9",
+      "bytes": 11029
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/candidate/ASTOCK-080-3cac41a7800e/2026-10-03/source_rows/eastmoney/holder_trades/source-rows.json",
+      "sha256": "100ed90ee1ec288e2b645a7d984032441ca92df9734f2dc346a1213104af13c7",
+      "bytes": 33081
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/candidate/ASTOCK-080-3cac41a7800e/_raw/bodies/1c2a8d00cf4f119dd234ffaa5345995ee5c49ab2a671f2090f015c566ba67bec.bin",
+      "sha256": "1c2a8d00cf4f119dd234ffaa5345995ee5c49ab2a671f2090f015c566ba67bec",
+      "bytes": 33213
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/candidate/ASTOCK-080-3cac41a7800e/_raw/manifest.ndjson",
+      "sha256": "55d2ecbffe2d512cada1da887bf561485f260f8775caca1a851002e0caff1d6e",
+      "bytes": 2086
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/candidate/ASTOCK-081-a9801c1a86fd/2026-10-03/buyback/eastmoney/buyback/mapped-rows.json",
+      "sha256": "58c6cbfd0057c64bafa212ba8596064bf2c85116c4e998b5d34394af65aa42ce",
+      "bytes": 50385
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/candidate/ASTOCK-081-a9801c1a86fd/2026-10-03/input_report/eastmoney/buyback/report.json",
+      "sha256": "a63271bbf750ec07a985aa9a70f5f374a9c40fce3569552db94964878710d8fb",
+      "bytes": 11121
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/candidate/ASTOCK-081-a9801c1a86fd/2026-10-03/source_rows/eastmoney/buyback/source-rows.json",
+      "sha256": "c1cb85845fb64b77d8fa4e8b957dd114d343e1324f24c0a1f5aefa795c66a79a",
+      "bytes": 113757
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/candidate/ASTOCK-081-a9801c1a86fd/_raw/bodies/cd9747ca8dbb0823a1cbdf8db5eb9b755b6ca739ee537c34705e57d6076554ed.bin",
+      "sha256": "cd9747ca8dbb0823a1cbdf8db5eb9b755b6ca739ee537c34705e57d6076554ed",
+      "bytes": 113886
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/candidate/ASTOCK-081-a9801c1a86fd/_raw/manifest.ndjson",
+      "sha256": "332d2750f70afe79468d9244e2fe11e7dbf196443249dfbafe89070d1bb42fd7",
+      "bytes": 2031
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/candidate/ASTOCK-082-6a2a73de7deb/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "sha256": "d5e203225709131c647968870cc5bba5cfbb2dc999d0cf24758ec4c516f6dd0a",
+      "bytes": 12780
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/candidate/ASTOCK-082-6a2a73de7deb/2026-10-03/pledge/eastmoney/pledge/mapped-rows.json",
+      "sha256": "4105853b5d38c9c599ab4955eabe4f6d3302c403b2d3bf22d2a28a65d2749a40",
+      "bytes": 15907
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/candidate/ASTOCK-082-6a2a73de7deb/2026-10-03/source_rows/eastmoney/pledge/source-rows.json",
+      "sha256": "8966939a5e866d84e0f24bb94d9a69860f881334ae509222768517aad8c60f91",
+      "bytes": 19691
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/candidate/ASTOCK-082-6a2a73de7deb/_raw/bodies/1cf99b8e98fc2410e1fd438310c2d7d42b0ee134df2b56e93a5673beafded8cf.bin",
+      "sha256": "1cf99b8e98fc2410e1fd438310c2d7d42b0ee134df2b56e93a5673beafded8cf",
+      "bytes": 19819
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/candidate/ASTOCK-082-6a2a73de7deb/_raw/bodies/82a09f7e8dbbd644d5daa57db655b9f6d80976a9218dd68a2e5910415178de4a.bin",
+      "sha256": "82a09f7e8dbbd644d5daa57db655b9f6d80976a9218dd68a2e5910415178de4a",
+      "bytes": 534
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/candidate/ASTOCK-082-6a2a73de7deb/_raw/manifest.ndjson",
+      "sha256": "5dae7c20760bb93f2e5cb50670f3a6289ae4e9977230059d5bba54080709c752",
+      "bytes": 4050
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/candidate/ASTOCK-083-ab93a6bce257/2026-10-03/input_report/eastmoney/ipo_calendar/report.json",
+      "sha256": "c3a03eca0bf40f017bad1a2788b2d52303907a25034bfe16ccdced99a7639666",
+      "bytes": 10930
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/candidate/ASTOCK-083-ab93a6bce257/2026-10-03/ipo_calendar/eastmoney/ipo_calendar/mapped-rows.json",
+      "sha256": "1c8e9b31bc7c4a07140a953a97ae249b37b695f77387383a588a824786075704",
+      "bytes": 15639
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/candidate/ASTOCK-083-ab93a6bce257/2026-10-03/source_rows/eastmoney/ipo_calendar/source-rows.json",
+      "sha256": "a23e5998a51a8905bdf58331786d4ede727a642e82968170ff3e19924ce7981a",
+      "bytes": 128509
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/candidate/ASTOCK-083-ab93a6bce257/_raw/bodies/083373253312402772f8dffb213639ac9edf877a9a728ba1aaad9b6d7fe864af.bin",
+      "sha256": "083373253312402772f8dffb213639ac9edf877a9a728ba1aaad9b6d7fe864af",
+      "bytes": 128643
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/candidate/ASTOCK-083-ab93a6bce257/_raw/manifest.ndjson",
+      "sha256": "4282072f8d89547477f773d73a5713e6e87ddf99f94353c28085219a14a55e36",
+      "bytes": 2022
+    },
+    {
+      "path": "provider_validation/results/actions-cli-v2-20261004/verification.json",
+      "sha256": "bf5a75827623661ef94541d6d367118da2eccb9f8da7d2bc20497fc15e65b8ba",
+      "bytes": 5811
+    },
+    {
+      "path": "provider_validation/results/actions-dev-20261004-tests.xml",
+      "sha256": "92e5f7d84c4924efe6a8b5c74d4e43276d8b2a4e03e31b0a1e2dc48aa5f5acab",
+      "bytes": 2845
+    },
+    {
+      "path": "provider_validation/results/actions-expanded-20261004-tests.xml",
+      "sha256": "af4e6d5128ca9efa22f79f594bc4dd54d626af4dee42bcba25d222ee0c21171d",
+      "bytes": 2979
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-080/candidate/ASTOCK-080-55044a8ec9e5/2026-10-03/holder_trades/eastmoney/holder_trades/mapped-rows.json",
+      "sha256": "29d2c80df10f581a260d1791cb7951eaa7a2e969aac8a83a203f536864320404",
+      "bytes": 24175
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-080/candidate/ASTOCK-080-55044a8ec9e5/2026-10-03/input_report/eastmoney/holder_trades/report.json",
+      "sha256": "4f2fcb09477a3172afd384d836694d852308960c2cc6f5004dda36c7aa4753c9",
+      "bytes": 10795
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-080/candidate/ASTOCK-080-55044a8ec9e5/2026-10-03/source_rows/eastmoney/holder_trades/source-rows.json",
+      "sha256": "100ed90ee1ec288e2b645a7d984032441ca92df9734f2dc346a1213104af13c7",
+      "bytes": 33081
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-080/candidate/ASTOCK-080-55044a8ec9e5/_raw/bodies/1c2a8d00cf4f119dd234ffaa5345995ee5c49ab2a671f2090f015c566ba67bec.bin",
+      "sha256": "1c2a8d00cf4f119dd234ffaa5345995ee5c49ab2a671f2090f015c566ba67bec",
+      "bytes": 33213
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-080/candidate/ASTOCK-080-55044a8ec9e5/_raw/manifest.ndjson",
+      "sha256": "7249067901edf79ebc5c60a593abfbe8e3cc77508910c4f3a8239efa3cb06901",
+      "bytes": 2086
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-080/comparison.json",
+      "sha256": "efc5ad27c83e49e3d880376b8c050cb512397d07967bfa124533c12bf3eb7f3d",
+      "bytes": 928
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-080/original/bodies/1c2a8d00cf4f119dd234ffaa5345995ee5c49ab2a671f2090f015c566ba67bec.bin",
+      "sha256": "1c2a8d00cf4f119dd234ffaa5345995ee5c49ab2a671f2090f015c566ba67bec",
+      "bytes": 33213
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-080/original/manifest.ndjson",
+      "sha256": "5d3eaf9b741d371c7d5b7f10fdc115f69d97b9b1404fd4a1aaa3020e96e14975",
+      "bytes": 2009
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-080/original-parsed.json",
+      "sha256": "075f49d8644c4393ddee24b315648b3f87caab6d08d1465cd4950b84a158a8ed",
+      "bytes": 36776
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-081/candidate/ASTOCK-081-85313d5bded3/2026-10-03/buyback/eastmoney/buyback/mapped-rows.json",
+      "sha256": "58c6cbfd0057c64bafa212ba8596064bf2c85116c4e998b5d34394af65aa42ce",
+      "bytes": 50385
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-081/candidate/ASTOCK-081-85313d5bded3/2026-10-03/input_report/eastmoney/buyback/report.json",
+      "sha256": "761ac378ed87562548c787f75e61919119c681acde3149e29418253710ed2e76",
+      "bytes": 10887
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-081/candidate/ASTOCK-081-85313d5bded3/2026-10-03/source_rows/eastmoney/buyback/source-rows.json",
+      "sha256": "c1cb85845fb64b77d8fa4e8b957dd114d343e1324f24c0a1f5aefa795c66a79a",
+      "bytes": 113757
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-081/candidate/ASTOCK-081-85313d5bded3/_raw/bodies/cd9747ca8dbb0823a1cbdf8db5eb9b755b6ca739ee537c34705e57d6076554ed.bin",
+      "sha256": "cd9747ca8dbb0823a1cbdf8db5eb9b755b6ca739ee537c34705e57d6076554ed",
+      "bytes": 113886
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-081/candidate/ASTOCK-081-85313d5bded3/_raw/manifest.ndjson",
+      "sha256": "f8625bf409b54e397535248017297da35ac1bdda6978d220c0a4ceb10a152449",
+      "bytes": 2031
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-081/comparison.json",
+      "sha256": "7ffe63fc03220fbdfbbdc0455ecba1fab48d1d81c5d9533f2cf85692f9de53ff",
+      "bytes": 920
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-081/original/bodies/cd9747ca8dbb0823a1cbdf8db5eb9b755b6ca739ee537c34705e57d6076554ed.bin",
+      "sha256": "cd9747ca8dbb0823a1cbdf8db5eb9b755b6ca739ee537c34705e57d6076554ed",
+      "bytes": 113886
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-081/original/manifest.ndjson",
+      "sha256": "23f955198c7c19c7acfe36b2748ee87fd864c9ea8b5e28ddb102e5e3e385c27c",
+      "bytes": 1960
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-081/original-parsed.json",
+      "sha256": "30f7fc6ead873876717cb46d1b054ff45c090a134bdeab0204e8de3e9470e347",
+      "bytes": 63959
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-082/candidate/ASTOCK-082-87d977099424/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "sha256": "7b9a1543b274598d395331a32e2d26dcd665898a3f682b1962a26f3fc7cd1727",
+      "bytes": 12546
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-082/candidate/ASTOCK-082-87d977099424/2026-10-03/pledge/eastmoney/pledge/mapped-rows.json",
+      "sha256": "4105853b5d38c9c599ab4955eabe4f6d3302c403b2d3bf22d2a28a65d2749a40",
+      "bytes": 15907
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-082/candidate/ASTOCK-082-87d977099424/2026-10-03/source_rows/eastmoney/pledge/source-rows.json",
+      "sha256": "8966939a5e866d84e0f24bb94d9a69860f881334ae509222768517aad8c60f91",
+      "bytes": 19691
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-082/candidate/ASTOCK-082-87d977099424/_raw/bodies/1cf99b8e98fc2410e1fd438310c2d7d42b0ee134df2b56e93a5673beafded8cf.bin",
+      "sha256": "1cf99b8e98fc2410e1fd438310c2d7d42b0ee134df2b56e93a5673beafded8cf",
+      "bytes": 19819
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-082/candidate/ASTOCK-082-87d977099424/_raw/bodies/82a09f7e8dbbd644d5daa57db655b9f6d80976a9218dd68a2e5910415178de4a.bin",
+      "sha256": "82a09f7e8dbbd644d5daa57db655b9f6d80976a9218dd68a2e5910415178de4a",
+      "bytes": 534
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-082/candidate/ASTOCK-082-87d977099424/_raw/manifest.ndjson",
+      "sha256": "b22d2c5133def58701edc61457bd9d3be6f7845ce99d124a6277a3e772ff164d",
+      "bytes": 4050
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-082/comparison.json",
+      "sha256": "afa7da314ff98c374deb7b94be7071648f5b8b7b439c6d1c640d40afcee505a3",
+      "bytes": 992
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-082/original/bodies/1cf99b8e98fc2410e1fd438310c2d7d42b0ee134df2b56e93a5673beafded8cf.bin",
+      "sha256": "1cf99b8e98fc2410e1fd438310c2d7d42b0ee134df2b56e93a5673beafded8cf",
+      "bytes": 19819
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-082/original/bodies/82a09f7e8dbbd644d5daa57db655b9f6d80976a9218dd68a2e5910415178de4a.bin",
+      "sha256": "82a09f7e8dbbd644d5daa57db655b9f6d80976a9218dd68a2e5910415178de4a",
+      "bytes": 534
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-082/original/manifest.ndjson",
+      "sha256": "598d77a0b611ca9c3aa54b14f4a04f8b232772f4498e0b3b1a13a3fc2e46c58e",
+      "bytes": 3910
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-082/original-parsed.json",
+      "sha256": "138d1f5451a3c8fe28d7daca3c4a2f3679caf0a79f0d05cb8a25f73537a1b7d3",
+      "bytes": 25858
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-083/candidate/ASTOCK-083-7099d9a4394b/2026-10-03/input_report/eastmoney/ipo_calendar/report.json",
+      "sha256": "5c37a11968656e8fd2e214ebd58fd9ad00b09b728981e2ff80ca3b1eeebf489a",
+      "bytes": 10696
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-083/candidate/ASTOCK-083-7099d9a4394b/2026-10-03/ipo_calendar/eastmoney/ipo_calendar/mapped-rows.json",
+      "sha256": "1c8e9b31bc7c4a07140a953a97ae249b37b695f77387383a588a824786075704",
+      "bytes": 15639
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-083/candidate/ASTOCK-083-7099d9a4394b/2026-10-03/source_rows/eastmoney/ipo_calendar/source-rows.json",
+      "sha256": "a23e5998a51a8905bdf58331786d4ede727a642e82968170ff3e19924ce7981a",
+      "bytes": 128509
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-083/candidate/ASTOCK-083-7099d9a4394b/_raw/bodies/083373253312402772f8dffb213639ac9edf877a9a728ba1aaad9b6d7fe864af.bin",
+      "sha256": "083373253312402772f8dffb213639ac9edf877a9a728ba1aaad9b6d7fe864af",
+      "bytes": 128643
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-083/candidate/ASTOCK-083-7099d9a4394b/_raw/manifest.ndjson",
+      "sha256": "cf7fc9f9575dda03fedf038411d96baec6ef4374c65054d787c25f824de0b413",
+      "bytes": 2022
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-083/comparison.json",
+      "sha256": "84f5a1c75195990cf5bae9afab5d91a4d8c8103d8408ae3297e1a037655230ba",
+      "bytes": 925
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-083/original/bodies/083373253312402772f8dffb213639ac9edf877a9a728ba1aaad9b6d7fe864af.bin",
+      "sha256": "083373253312402772f8dffb213639ac9edf877a9a728ba1aaad9b6d7fe864af",
+      "bytes": 128643
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-083/original/manifest.ndjson",
+      "sha256": "969905a1fb406bbf603788901dd9d1b032323ba55073414d5e85a65e4a4e489b",
+      "bytes": 1946
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/ASTOCK-083/original-parsed.json",
+      "sha256": "9ab9724552f3dd86323332637694ec0f2ab415bc93961608e8f2900a0d297459",
+      "bytes": 23805
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/comparison.json",
+      "sha256": "f2f5d96fc4d1219de7f3f2ffda0988977f33a71c840f2a907a03e2cee5fdfaa6",
+      "bytes": 11574
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/empty/ASTOCK-080/candidate/ASTOCK-080-3ec789d8c469/2026-10-03/holder_trades/eastmoney/holder_trades/mapped-rows.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/empty/ASTOCK-080/candidate/ASTOCK-080-3ec789d8c469/2026-10-03/input_report/eastmoney/holder_trades/report.json",
+      "sha256": "bbac8cd4af664439e362bead8772127b055026d3028f76c85cccd33024fdd513",
+      "bytes": 10057
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/empty/ASTOCK-080/candidate/ASTOCK-080-3ec789d8c469/2026-10-03/source_rows/eastmoney/holder_trades/source-rows.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/empty/ASTOCK-080/candidate/ASTOCK-080-3ec789d8c469/_raw/bodies/b6e4b73cab605c5aabc2e99924cc3506799db0dbd266f8ff536771c89d4683e9.bin",
+      "sha256": "b6e4b73cab605c5aabc2e99924cc3506799db0dbd266f8ff536771c89d4683e9",
+      "bytes": 27
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/empty/ASTOCK-080/candidate/ASTOCK-080-3ec789d8c469/_raw/manifest.ndjson",
+      "sha256": "16abaeebe0d19fb5f60850c68c803c77e2d2f9e142814278a67e1bb89966c4e1",
+      "bytes": 1525
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/empty/ASTOCK-080/fixture/bodies/b6e4b73cab605c5aabc2e99924cc3506799db0dbd266f8ff536771c89d4683e9.bin",
+      "sha256": "b6e4b73cab605c5aabc2e99924cc3506799db0dbd266f8ff536771c89d4683e9",
+      "bytes": 27
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/empty/ASTOCK-080/fixture/manifest.ndjson",
+      "sha256": "750da0dfdacf43a13713035affe505c9fe94a7add0cb90396e83cf2d1711a25b",
+      "bytes": 1227
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/empty/ASTOCK-082/candidate/ASTOCK-082-7230c87d9871/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "sha256": "e07ef10e101232e51d1dff714eb3257dc8f20ea7a935e5ae92a584a6ad6b9e56",
+      "bytes": 8442
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/empty/ASTOCK-082/candidate/ASTOCK-082-7230c87d9871/_raw/bodies/b6e4b73cab605c5aabc2e99924cc3506799db0dbd266f8ff536771c89d4683e9.bin",
+      "sha256": "b6e4b73cab605c5aabc2e99924cc3506799db0dbd266f8ff536771c89d4683e9",
+      "bytes": 27
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/empty/ASTOCK-082/candidate/ASTOCK-082-7230c87d9871/_raw/manifest.ndjson",
+      "sha256": "ec4b621cf652ca4fd2487bc9918c1f4d56660855cf839d1fed3d3e1fdb91f212",
+      "bytes": 1462
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/empty/ASTOCK-082/fixture/bodies/b6e4b73cab605c5aabc2e99924cc3506799db0dbd266f8ff536771c89d4683e9.bin",
+      "sha256": "b6e4b73cab605c5aabc2e99924cc3506799db0dbd266f8ff536771c89d4683e9",
+      "bytes": 27
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/empty/ASTOCK-082/fixture/manifest.ndjson",
+      "sha256": "0477dcc43b5fd8fa127a1d89e210417739226e07fa55de4b65c0b43e7c5fcf9d",
+      "bytes": 1167
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f0/candidate/ASTOCK-080-aa006a9114b8/2026-10-03/input_report/eastmoney/holder_trades/report.json",
+      "sha256": "731b45ed9726094e197df5b44ea27e408d60a152b33b2d469a8d82aaf1effd02",
+      "bytes": 8560
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f0/candidate/ASTOCK-080-aa006a9114b8/_raw/bodies/b74aa530beac573a60871d69bf48b425ae94826c66bc6084ac7be67eea272f21.bin",
+      "sha256": "b74aa530beac573a60871d69bf48b425ae94826c66bc6084ac7be67eea272f21",
+      "bytes": 35626
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f0/candidate/ASTOCK-080-aa006a9114b8/_raw/manifest.ndjson",
+      "sha256": "67cfb179581046bd6bc5ccd79708d5af5b1da89a5f501e89a3bf72c4d9731b33",
+      "bytes": 1461
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f0/fixture/bodies/b74aa530beac573a60871d69bf48b425ae94826c66bc6084ac7be67eea272f21.bin",
+      "sha256": "b74aa530beac573a60871d69bf48b425ae94826c66bc6084ac7be67eea272f21",
+      "bytes": 35626
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f0/fixture/manifest.ndjson",
+      "sha256": "94cf8563283320a9a14ecd007b785662ef8b6b14ada14692d9547ee88bce8d26",
+      "bytes": 1200
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f1/candidate/ASTOCK-082-c4ea4dd28b72/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "sha256": "6172d330b4897743f5a11250373901b0b86f728d31a751da10b0565e21c82933",
+      "bytes": 9650
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f1/candidate/ASTOCK-082-c4ea4dd28b72/_raw/bodies/2bc2508e2551095cb1a163b7864468279701af69657b3cf0cad8af8e61d5f83e.bin",
+      "sha256": "2bc2508e2551095cb1a163b7864468279701af69657b3cf0cad8af8e61d5f83e",
+      "bytes": 575
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f1/candidate/ASTOCK-082-c4ea4dd28b72/_raw/bodies/cda6a8988c6750e9f01f17837ce986d37a0f603934b735edde42f5612ddba877.bin",
+      "sha256": "cda6a8988c6750e9f01f17837ce986d37a0f603934b735edde42f5612ddba877",
+      "bytes": 21236
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f1/candidate/ASTOCK-082-c4ea4dd28b72/_raw/manifest.ndjson",
+      "sha256": "16cca70bc9c90811c994f42e52d0c3117c2050a37367231de1262ae67a59a437",
+      "bytes": 2796
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f1/fixture/bodies/2bc2508e2551095cb1a163b7864468279701af69657b3cf0cad8af8e61d5f83e.bin",
+      "sha256": "2bc2508e2551095cb1a163b7864468279701af69657b3cf0cad8af8e61d5f83e",
+      "bytes": 575
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f1/fixture/bodies/cda6a8988c6750e9f01f17837ce986d37a0f603934b735edde42f5612ddba877.bin",
+      "sha256": "cda6a8988c6750e9f01f17837ce986d37a0f603934b735edde42f5612ddba877",
+      "bytes": 21236
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f1/fixture/manifest.ndjson",
+      "sha256": "6fa03e63f61b2ed461ed003763f8421e03831f85ce01a2dfb65c8af3383da155",
+      "bytes": 2290
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f2/candidate/ASTOCK-082-bbac8807785d/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "sha256": "59d21488fb27743a3b6bb9f043158f01982bf9a6eeef05766f4cfe56d3ddba11",
+      "bytes": 9650
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f2/candidate/ASTOCK-082-bbac8807785d/_raw/bodies/2bc2508e2551095cb1a163b7864468279701af69657b3cf0cad8af8e61d5f83e.bin",
+      "sha256": "2bc2508e2551095cb1a163b7864468279701af69657b3cf0cad8af8e61d5f83e",
+      "bytes": 575
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f2/candidate/ASTOCK-082-bbac8807785d/_raw/bodies/a42f0fec341c9e63766cba26d8930fe0e1fa775c0b0d2a3d1474e51c0245558a.bin",
+      "sha256": "a42f0fec341c9e63766cba26d8930fe0e1fa775c0b0d2a3d1474e51c0245558a",
+      "bytes": 21232
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f2/candidate/ASTOCK-082-bbac8807785d/_raw/manifest.ndjson",
+      "sha256": "f66676f9b9e01303abf3d735e5156d5e89e16a3ab4803818fa9746fe031b803a",
+      "bytes": 2796
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f2/fixture/bodies/2bc2508e2551095cb1a163b7864468279701af69657b3cf0cad8af8e61d5f83e.bin",
+      "sha256": "2bc2508e2551095cb1a163b7864468279701af69657b3cf0cad8af8e61d5f83e",
+      "bytes": 575
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f2/fixture/bodies/a42f0fec341c9e63766cba26d8930fe0e1fa775c0b0d2a3d1474e51c0245558a.bin",
+      "sha256": "a42f0fec341c9e63766cba26d8930fe0e1fa775c0b0d2a3d1474e51c0245558a",
+      "bytes": 21232
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f2/fixture/manifest.ndjson",
+      "sha256": "81afe047d660e40ffb46bafd9bf2d9373ba78d5c211a616c7234ca13d0c490c1",
+      "bytes": 2292
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f3/candidate/ASTOCK-082-291120bb1e8b/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "sha256": "11ae2722369c7c286f5991dbb5a6d62a3d66647a310f57bf16663b7a1f12dea0",
+      "bytes": 8289
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f3/candidate/ASTOCK-082-291120bb1e8b/_raw/bodies/e72ee2e0a408f1122d4a18f17f787fb9e23e89367c7960d5504570f7a69b8ecb.bin",
+      "sha256": "e72ee2e0a408f1122d4a18f17f787fb9e23e89367c7960d5504570f7a69b8ecb",
+      "bytes": 538
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f3/candidate/ASTOCK-082-291120bb1e8b/_raw/manifest.ndjson",
+      "sha256": "b3ac60500e8fe10e78e4379ee820f84c82d374206d80d3f20af720cd6d00faa3",
+      "bytes": 1368
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f3/fixture/bodies/e72ee2e0a408f1122d4a18f17f787fb9e23e89367c7960d5504570f7a69b8ecb.bin",
+      "sha256": "e72ee2e0a408f1122d4a18f17f787fb9e23e89367c7960d5504570f7a69b8ecb",
+      "bytes": 538
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f3/fixture/bodies/ecfb95dfe6af9c52c9738d32cc4e1918940e6cf5e20b8dbe0b3a07460253d03c.bin",
+      "sha256": "ecfb95dfe6af9c52c9738d32cc4e1918940e6cf5e20b8dbe0b3a07460253d03c",
+      "bytes": 21232
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f3/fixture/manifest.ndjson",
+      "sha256": "2506654ca2b15e2faa83ce8f5eee0cefea4e3b052c3d609beae2d1177cd944de",
+      "bytes": 2308
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f4/candidate/ASTOCK-081-91b2f587bef7/2026-10-03/input_report/eastmoney/buyback/report.json",
+      "sha256": "e16603ba053d2f0ac019f97c512b9f4fdfcacb08f68085beb79a6e1924ced33f",
+      "bytes": 8861
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f4/candidate/ASTOCK-081-91b2f587bef7/_raw/bodies/e3325b393571deec96b8baf749445332c58edc643a8d8a1ad99d9ef890e5eca9.bin",
+      "sha256": "e3325b393571deec96b8baf749445332c58edc643a8d8a1ad99d9ef890e5eca9",
+      "bytes": 120699
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f4/candidate/ASTOCK-081-91b2f587bef7/_raw/manifest.ndjson",
+      "sha256": "58e51686ff860d6b5726e26838d990d70b5688583136b65a5cb1308340401871",
+      "bytes": 1407
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f4/fixture/bodies/e3325b393571deec96b8baf749445332c58edc643a8d8a1ad99d9ef890e5eca9.bin",
+      "sha256": "e3325b393571deec96b8baf749445332c58edc643a8d8a1ad99d9ef890e5eca9",
+      "bytes": 120699
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f4/fixture/manifest.ndjson",
+      "sha256": "b346d330c2242e564bf1246c9f051a7ce9c5759cf6856ddd0e9e3213ebe08cda",
+      "bytes": 1150
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f5/candidate/ASTOCK-081-8876d2e45659/2026-10-03/input_report/eastmoney/buyback/report.json",
+      "sha256": "a8d6cbe6381e5dacbaa18dfdb0a0a02689ebe13fcb9c740131dc55d5e0265c52",
+      "bytes": 9937
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f5/candidate/ASTOCK-081-8876d2e45659/2026-10-03/source_rows/eastmoney/buyback/source-rows.json",
+      "sha256": "71628fa14de3972018c1d9ae712177698a2da84ff3dd6970050d9dc5dcf5cf1c",
+      "bytes": 113737
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f5/candidate/ASTOCK-081-8876d2e45659/_raw/bodies/e9fbd04b0cb7ad46f34d36ea45bc002fdabb621247eb2cfd446dda9b730945e1.bin",
+      "sha256": "e9fbd04b0cb7ad46f34d36ea45bc002fdabb621247eb2cfd446dda9b730945e1",
+      "bytes": 120677
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f5/candidate/ASTOCK-081-8876d2e45659/_raw/manifest.ndjson",
+      "sha256": "927e5fb3c2cc36f18519e9abb0ae706d73448abf742018314860d2143279546a",
+      "bytes": 1407
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f5/fixture/bodies/e9fbd04b0cb7ad46f34d36ea45bc002fdabb621247eb2cfd446dda9b730945e1.bin",
+      "sha256": "e9fbd04b0cb7ad46f34d36ea45bc002fdabb621247eb2cfd446dda9b730945e1",
+      "bytes": 120677
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f5/fixture/manifest.ndjson",
+      "sha256": "edc630b8ce8733322d1f7f87f739f1c6f143339fcea6d43f36f5974764c3b71c",
+      "bytes": 1155
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f6/candidate/ASTOCK-083-e12e1187465a/2026-10-03/input_report/eastmoney/ipo_calendar/report.json",
+      "sha256": "4c9e7f9f94d4786a6d337ab907bc630d44ed322c110d070fd2abe8ca5924cb16",
+      "bytes": 8688
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f6/candidate/ASTOCK-083-e12e1187465a/_raw/bodies/6d82364f1bdf1b905e761d36e72817c0f0fbf42f95d83b71e8c7d9de8a5c59cc.bin",
+      "sha256": "6d82364f1bdf1b905e761d36e72817c0f0fbf42f95d83b71e8c7d9de8a5c59cc",
+      "bytes": 137711
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f6/candidate/ASTOCK-083-e12e1187465a/_raw/manifest.ndjson",
+      "sha256": "deb1d6821db4f7f28fc14ce2f7f1c03022c9708c904dfa9b7bda5a23d5f4bfb9",
+      "bytes": 1403
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f6/fixture/bodies/6d82364f1bdf1b905e761d36e72817c0f0fbf42f95d83b71e8c7d9de8a5c59cc.bin",
+      "sha256": "6d82364f1bdf1b905e761d36e72817c0f0fbf42f95d83b71e8c7d9de8a5c59cc",
+      "bytes": 137711
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f6/fixture/manifest.ndjson",
+      "sha256": "a7b79bba2e4fbd9771eaa583cd535222bb088253f8ba5dbff82544194465f538",
+      "bytes": 1138
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f7/candidate/ASTOCK-083-63eeac3e209e/2026-10-03/input_report/eastmoney/ipo_calendar/report.json",
+      "sha256": "eb5f2e0d90026592e4150576a38744379a2a91f40f5f41371ad1079cd19b03f1",
+      "bytes": 8688
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f7/candidate/ASTOCK-083-63eeac3e209e/_raw/bodies/8131a13cdba4e7a65c7b09f805bf7e77231b6124f5ce225387bbbfe3cec03d2f.bin",
+      "sha256": "8131a13cdba4e7a65c7b09f805bf7e77231b6124f5ce225387bbbfe3cec03d2f",
+      "bytes": 137683
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f7/candidate/ASTOCK-083-63eeac3e209e/_raw/manifest.ndjson",
+      "sha256": "94236979564111c3788f50dfdc5c58cbe15fa2c49255b55f019dad5be2c2d313",
+      "bytes": 1403
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f7/fixture/bodies/8131a13cdba4e7a65c7b09f805bf7e77231b6124f5ce225387bbbfe3cec03d2f.bin",
+      "sha256": "8131a13cdba4e7a65c7b09f805bf7e77231b6124f5ce225387bbbfe3cec03d2f",
+      "bytes": 137683
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/f7/fixture/manifest.ndjson",
+      "sha256": "eaadaaf9b7bfa9716fa597d3fb889bcd2f0f450a3bec960ab40a1a5d5212f5da",
+      "bytes": 1143
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/legacy/legacy-comparison.json",
+      "sha256": "968cc357532c0fdff0d215cd276709bdd143df8350acf4c66b6b8e3ff7074759",
+      "bytes": 164
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/semantic0/candidate/ASTOCK-081-37519dc36b78/2026-10-03/buyback/eastmoney/buyback/mapped-rows.json",
+      "sha256": "10259c96635166cc4f07b4db9272141418857a6f07dca1e8e7b673683e963302",
+      "bytes": 50375
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/semantic0/candidate/ASTOCK-081-37519dc36b78/2026-10-03/input_report/eastmoney/buyback/report.json",
+      "sha256": "c9d6403eb2a0c34bd24a143c2dec6d3b286fd169e2c25e359009d5eb1e618565",
+      "bytes": 10299
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/semantic0/candidate/ASTOCK-081-37519dc36b78/2026-10-03/source_rows/eastmoney/buyback/source-rows.json",
+      "sha256": "9592610622348c25a33521e63203161a5c934b51c2e4b6b8258523400a378afd",
+      "bytes": 113757
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/semantic0/candidate/ASTOCK-081-37519dc36b78/_raw/bodies/90c69d8221df09771b121d4cb33c372e5eb467fb76b5a01823a7fa6829878176.bin",
+      "sha256": "90c69d8221df09771b121d4cb33c372e5eb467fb76b5a01823a7fa6829878176",
+      "bytes": 120699
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/semantic0/candidate/ASTOCK-081-37519dc36b78/_raw/manifest.ndjson",
+      "sha256": "a774213588e13222d0f2d66a94cdf015b259d57ca79c4b07daf193b564b5d546",
+      "bytes": 1414
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/semantic0/fixture/bodies/90c69d8221df09771b121d4cb33c372e5eb467fb76b5a01823a7fa6829878176.bin",
+      "sha256": "90c69d8221df09771b121d4cb33c372e5eb467fb76b5a01823a7fa6829878176",
+      "bytes": 120699
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/semantic0/fixture/manifest.ndjson",
+      "sha256": "800bfcaf51c2997383c86873d8076d08fc47621346b321e1fea8381c2c1d90f6",
+      "bytes": 1159
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/semantic1/candidate/ASTOCK-083-1dd3dbfb34d4/2026-10-03/input_report/eastmoney/ipo_calendar/report.json",
+      "sha256": "992c06d07ba41ed78a59ba05d60ca981696d9ec2cbc7a93763a775c95a31a51a",
+      "bytes": 10111
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/semantic1/candidate/ASTOCK-083-1dd3dbfb34d4/2026-10-03/ipo_calendar/eastmoney/ipo_calendar/mapped-rows.json",
+      "sha256": "6cb0788c0d18b7a65c7bfb48ff9d37c5f23a198a648d691bed35973876628ac6",
+      "bytes": 15633
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/semantic1/candidate/ASTOCK-083-1dd3dbfb34d4/2026-10-03/source_rows/eastmoney/ipo_calendar/source-rows.json",
+      "sha256": "bf728a281046a0912dcaa1c37104cae5f7b00f6d8cb6e27ca2aeb8bb565e542f",
+      "bytes": 128490
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/semantic1/candidate/ASTOCK-083-1dd3dbfb34d4/_raw/bodies/15a4407208e85c85fcf0777380be79f3bd7af1093850640d4e6a8148d4b1d853.bin",
+      "sha256": "15a4407208e85c85fcf0777380be79f3bd7af1093850640d4e6a8148d4b1d853",
+      "bytes": 137692
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/semantic1/candidate/ASTOCK-083-1dd3dbfb34d4/_raw/manifest.ndjson",
+      "sha256": "a11f6717afd686fd27407407c3256cc81e20a5dc8567f92fb5079063be5598ca",
+      "bytes": 1410
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/semantic1/fixture/bodies/15a4407208e85c85fcf0777380be79f3bd7af1093850640d4e6a8148d4b1d853.bin",
+      "sha256": "15a4407208e85c85fcf0777380be79f3bd7af1093850640d4e6a8148d4b1d853",
+      "bytes": 137692
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/semantic1/fixture/manifest.ndjson",
+      "sha256": "d9f0882161823892d9ea5617a256ec0e44026d84e0a251b4b9a7fa9c010d5f1e",
+      "bytes": 1148
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/semantic2/candidate/ASTOCK-083-2acdd455f9c4/2026-10-03/input_report/eastmoney/ipo_calendar/report.json",
+      "sha256": "fb8a0f340a399c4909c44daed4e55e3fcf65f7ce4d561f678ff50062f7063e55",
+      "bytes": 10111
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/semantic2/candidate/ASTOCK-083-2acdd455f9c4/2026-10-03/ipo_calendar/eastmoney/ipo_calendar/mapped-rows.json",
+      "sha256": "9e7dd246c8dad43261d66b7dfa11c67f0985af98c74af9f51875f1f138c7a799",
+      "bytes": 15647
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/semantic2/candidate/ASTOCK-083-2acdd455f9c4/2026-10-03/source_rows/eastmoney/ipo_calendar/source-rows.json",
+      "sha256": "8cacc9bb2938b4e7f04d6a4cf575ac69b661750f7435fc1aff5e97f681ff5c0b",
+      "bytes": 128523
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/semantic2/candidate/ASTOCK-083-2acdd455f9c4/_raw/bodies/a58d81c8e168c3086913d90635614742345dce892cc8465368531317c8160315.bin",
+      "sha256": "a58d81c8e168c3086913d90635614742345dce892cc8465368531317c8160315",
+      "bytes": 137725
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/semantic2/candidate/ASTOCK-083-2acdd455f9c4/_raw/manifest.ndjson",
+      "sha256": "be3fbaedbbc8df3e08f80e5d56b24f0ed91bfab04f68fe56089ba86b129c3165",
+      "bytes": 1410
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/semantic2/fixture/bodies/a58d81c8e168c3086913d90635614742345dce892cc8465368531317c8160315.bin",
+      "sha256": "a58d81c8e168c3086913d90635614742345dce892cc8465368531317c8160315",
+      "bytes": 137725
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/semantic2/fixture/manifest.ndjson",
+      "sha256": "cc4c269a81bf22eb82c4b91d184d861fbff234f42d2ce129c4db6d232e974e60",
+      "bytes": 1145
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/session/candidate/ASTOCK-082-4184f708eb70/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "sha256": "7b01fcac6a5e0550d55d726c8adaa7ede88045a9875f5c165d2741052fc320b5",
+      "bytes": 11036
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/session/candidate/ASTOCK-082-4184f708eb70/2026-10-03/pledge/eastmoney/pledge/mapped-rows.json",
+      "sha256": "6cb041ae66143b4089f26bbec64c8f342518cd95852f8f40271eb998b9116e04",
+      "bytes": 15907
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/session/candidate/ASTOCK-082-4184f708eb70/2026-10-03/source_rows/eastmoney/pledge/source-rows.json",
+      "sha256": "8966939a5e866d84e0f24bb94d9a69860f881334ae509222768517aad8c60f91",
+      "bytes": 19691
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/session/candidate/ASTOCK-082-4184f708eb70/_raw/bodies/1cf99b8e98fc2410e1fd438310c2d7d42b0ee134df2b56e93a5673beafded8cf.bin",
+      "sha256": "1cf99b8e98fc2410e1fd438310c2d7d42b0ee134df2b56e93a5673beafded8cf",
+      "bytes": 19819
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/session/candidate/ASTOCK-082-4184f708eb70/_raw/bodies/82a09f7e8dbbd644d5daa57db655b9f6d80976a9218dd68a2e5910415178de4a.bin",
+      "sha256": "82a09f7e8dbbd644d5daa57db655b9f6d80976a9218dd68a2e5910415178de4a",
+      "bytes": 534
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/session/candidate/ASTOCK-082-4184f708eb70/_raw/manifest.ndjson",
+      "sha256": "c2375c6f4bb5c5d523dbfedd0adc38f687c8ebf8dcce00ecc34837ab1eb81ffd",
+      "bytes": 2476
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/session/candidate/ASTOCK-082-6a453c109ce1/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "sha256": "6dffbc04329340533b7afecaa80a0e789f3f8d5211a5a718b942493f21437e5d",
+      "bytes": 11652
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/session/candidate/ASTOCK-082-6a453c109ce1/2026-10-03/pledge/eastmoney/pledge/mapped-rows.json",
+      "sha256": "6cb041ae66143b4089f26bbec64c8f342518cd95852f8f40271eb998b9116e04",
+      "bytes": 15907
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/session/candidate/ASTOCK-082-6a453c109ce1/2026-10-03/source_rows/eastmoney/pledge/source-rows.json",
+      "sha256": "8966939a5e866d84e0f24bb94d9a69860f881334ae509222768517aad8c60f91",
+      "bytes": 19691
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/session/candidate/ASTOCK-082-6a453c109ce1/_raw/bodies/1cf99b8e98fc2410e1fd438310c2d7d42b0ee134df2b56e93a5673beafded8cf.bin",
+      "sha256": "1cf99b8e98fc2410e1fd438310c2d7d42b0ee134df2b56e93a5673beafded8cf",
+      "bytes": 19819
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/session/candidate/ASTOCK-082-6a453c109ce1/_raw/bodies/82a09f7e8dbbd644d5daa57db655b9f6d80976a9218dd68a2e5910415178de4a.bin",
+      "sha256": "82a09f7e8dbbd644d5daa57db655b9f6d80976a9218dd68a2e5910415178de4a",
+      "bytes": 534
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/session/candidate/ASTOCK-082-6a453c109ce1/_raw/manifest.ndjson",
+      "sha256": "6682eb0b62aa627efbf28f3b92b4c48467b9d3e7ca8ffbbe23e86d99b136c542",
+      "bytes": 3102
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/session/fixture-mode.json",
+      "sha256": "e828c3de5feaf2ec033a6dec9737b062fbcc2acd834aea279bd5589b28a8b3e2",
+      "bytes": 134
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/verify.py",
+      "sha256": "f25482b7c47e8f3fac3ccd857a3562152813cffbf06beeec69a1bc1780671014",
+      "bytes": 8827
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/bad/ASTOCK-082-7382d0e8a2ce/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "sha256": "0c8c346c4b32a1f8e30dcf92d1fe8cecf866c57e120c8270f633259e4ee04339",
+      "bytes": 7134
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/bad/ASTOCK-082-c46eb7b17990/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "sha256": "196c0039bd47addcaed04e8afd1e9b09398b07310e284fcf0792f2e8623dcd3d",
+      "bytes": 7162
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/candidate/ASTOCK-081-784f44fa85a6/2026-10-03/buyback/eastmoney/buyback/mapped-rows.json",
+      "sha256": "78e0f82c37e8aeb46ad15146e40a0060a976162fc9fde5e3efc0b5fe26203ba8",
+      "bytes": 50421
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/candidate/ASTOCK-081-784f44fa85a6/2026-10-03/input_report/eastmoney/buyback/report.json",
+      "sha256": "2d6c1e617664bfcc75a3dbe027ac9b704fb9cab5ebbdc87285408a05e4bd9d3b",
+      "bytes": 11127
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/candidate/ASTOCK-081-784f44fa85a6/2026-10-03/source_rows/eastmoney/buyback/source-rows.json",
+      "sha256": "c1cb85845fb64b77d8fa4e8b957dd114d343e1324f24c0a1f5aefa795c66a79a",
+      "bytes": 113757
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/candidate/ASTOCK-081-784f44fa85a6/_raw/bodies/cd9747ca8dbb0823a1cbdf8db5eb9b755b6ca739ee537c34705e57d6076554ed.bin",
+      "sha256": "cd9747ca8dbb0823a1cbdf8db5eb9b755b6ca739ee537c34705e57d6076554ed",
+      "bytes": 113886
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/candidate/ASTOCK-081-784f44fa85a6/_raw/manifest.ndjson",
+      "sha256": "803c8d0c730dd61ee54c282116a617ef7e1aa42419433d7876808fdb62893e26",
+      "bytes": 2031
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/capabilities.yaml",
+      "sha256": "7b7ce0da1d33b333165c6081a3ed788f85cb05d5f6945c745eec97d73e24f6e2",
+      "bytes": 4009
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/collection.yaml",
+      "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d",
+      "bytes": 2934
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/datasets/board_fund_flow.yaml",
+      "sha256": "08f3566d0cf2787186e6106e4915d0d89b70232d737898480eda03785ea3c53a",
+      "bytes": 1110
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/datasets/broken_limit_pool.yaml",
+      "sha256": "60b3790eae896c968093c8d26a818c9dab325aca620510b4ec1dde061af7f65e",
+      "bytes": 1162
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/datasets/buyback.yaml",
+      "sha256": "807490acc8affc7dde3502ef62c2b80ad32923fe4c5ff6a6b4fd9d403b50d4f6",
+      "bytes": 1439
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/datasets/concept_board.yaml",
+      "sha256": "eef0b07c9a41bfd5ef1a52f4f39516cb26d42b088d63a15783af0f94985fd76f",
+      "bytes": 379
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/datasets/daily_bar.yaml",
+      "sha256": "0a8c1dcae7e1c062ae70c224defc1362adc1d58bc196bbeb2f1edd61d6fd39e7",
+      "bytes": 995
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/datasets/dividend_event.yaml",
+      "sha256": "67a2b02063cb9a891e3fb388048407cbc08b05ce8ae97deea6976d3904340d2e",
+      "bytes": 759
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/datasets/earnings_forecast.yaml",
+      "sha256": "ded845c047fcefdbeb163f27620d4e67f2bc78e62a0bcfea5678d6df8758f8fd",
+      "bytes": 1060
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/datasets/financial_main.yaml",
+      "sha256": "23d8b55356620439d5c1b507601b782b31aa965fe24eaf194e869466bb271ab0",
+      "bytes": 766
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/datasets/holder_trades.yaml",
+      "sha256": "44b0ecfc09c6e39823c50e83077354f25bc8026fc70272d92046ba3a51d09b92",
+      "bytes": 1246
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/datasets/industry_board.yaml",
+      "sha256": "c6930c70b55e171dee94b74b80f3c37df1466d4a10dadc3016975004b8b47ba4",
+      "bytes": 380
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/datasets/industry_directory.yaml",
+      "sha256": "9325d485bf7a1bc2b075c2d920b43b17caa039916536bedd8163be0f972bfe5b",
+      "bytes": 346
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/datasets/industry_index_daily.yaml",
+      "sha256": "5d542c72443410747f2ac643589bfd8160cdea07d01d6d0dd9c5e4753096043b",
+      "bytes": 676
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/datasets/industry_membership.yaml",
+      "sha256": "dff512c9b7f00330bbe408ba1e1eb74d99b49bc0b38ee419d4c463047c6fe69d",
+      "bytes": 709
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/datasets/institution_survey.yaml",
+      "sha256": "470fd4503d45cf0839e887fd276a0c3c82cdcae7cae8f52001006464c212733e",
+      "bytes": 703
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/datasets/intraday_trend.yaml",
+      "sha256": "5983e0eb29c1cd7a781fbad0be7332dda14e887ccd744e55ad4b8664c7a0c38a",
+      "bytes": 665
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/datasets/ipo_calendar.yaml",
+      "sha256": "7579b9174fd3554a92bc50865cabe7ac20604579403f748d09bcd4e8760bcac9",
+      "bytes": 1331
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/datasets/limit_down_pool.yaml",
+      "sha256": "67b3ca1ae9edf0f863d2b2d5257a315fe721f042086d4b5966653c0f2758d806",
+      "bytes": 1177
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/datasets/limit_up_pool.yaml",
+      "sha256": "73c1fa4ed6d7281d1857208a2ec9696a3637214bb256661ce943313c75772a69",
+      "bytes": 982
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/datasets/minute_bar_5m.yaml",
+      "sha256": "fb6f822ed42479422a0b4c227577d8e559bb6b2238562af566af0464304bd873",
+      "bytes": 708
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/datasets/pledge.yaml",
+      "sha256": "40b46e96e55d8b1061c98ec979094b4f98ef4800e513cfa7a9c2c5f2152b2fb1",
+      "bytes": 878
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/datasets/previous_limit_pool.yaml",
+      "sha256": "5234397a7b87ed3e03c11431de1f00c012e135ba5ef57bf63a2f431f659703bc",
+      "bytes": 1199
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/datasets/realtime_quote.yaml",
+      "sha256": "ebc3e97bb7469eb4c7c80daf50991ebe38f0eb5b2476a9a579d22236d416378b",
+      "bytes": 1121
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/datasets/security_snapshot.yaml",
+      "sha256": "255115893f64837a3b95ea9fe44551948eefa9604aca9d59214de87a580300be",
+      "bytes": 519
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/datasets/shareholder_count.yaml",
+      "sha256": "d325df1784c873bea73a1d907e9964e06c26e4d6b356dd6c16148837b57feccf",
+      "bytes": 923
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/datasets/stock_fund_flow.yaml",
+      "sha256": "df3f21341463f3538a1f855ef19b7bbdb683405aaa65d5418c255023c18a429f",
+      "bytes": 736
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/datasets/strong_stock_pool.yaml",
+      "sha256": "264c9d759405d37733cf4daf29996240cb46fed46c3eb8835405a4311e1c1131",
+      "bytes": 1194
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/datasets/trading_calendar.yaml",
+      "sha256": "924b17a5be104252e85a377e4579432c6725bab99cbaa0ad70e71102149a1f49",
+      "bytes": 192
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/datasets.yaml",
+      "sha256": "e992d13297e1f9a8f64acabc25f65f138b21ce12dca16689cc3f17bf1385a6eb",
+      "bytes": 587
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/normalization/board_fund_flow.yaml",
+      "sha256": "fb7c6f1f2d425181b189e25152e465306982e10c7c6ee06b2917dfa00b891baa",
+      "bytes": 1395
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/normalization/broken_limit_pool.yaml",
+      "sha256": "8bd046757fc9fb3e7d144a0e9d41106267e828a60bc5a099280158c15459a84d",
+      "bytes": 1238
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/normalization/buyback.yaml",
+      "sha256": "8f81591b1f77564473325e8c77d334b782b0a46880717c3dd186e27acf4b1f80",
+      "bytes": 2622
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/normalization/concept_board.yaml",
+      "sha256": "2b7e7f57d189541d6a232cd5391d2dab4289f9f3438f397d9fefd82bb1d996b7",
+      "bytes": 206
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/normalization/daily_bar.yaml",
+      "sha256": "41f9bbd0824e20d70f7ed276758b286094c33c79180befca4d8985afc3c8ad0b",
+      "bytes": 2913
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/normalization/dividend_event.yaml",
+      "sha256": "188df2f7f075b92e993136aef3f977eea419f9c6957404bd2f7071c76ed24a71",
+      "bytes": 1532
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/normalization/earnings_forecast.yaml",
+      "sha256": "5b323a3c3c6577527701985248bb13b54102463a167ba04c749f4908e2b401c4",
+      "bytes": 1633
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/normalization/financial_main.yaml",
+      "sha256": "eeeb2e7418aab430168f0c7e16c69f1b24a9e49ec8d156a28390cae0e7a69bda",
+      "bytes": 603
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/normalization/holder_trades.yaml",
+      "sha256": "2deca39ea7c1a57254b4ee31390587f39d640559181cd1ceae7968a4684e5f40",
+      "bytes": 1959
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/normalization/industry_board.yaml",
+      "sha256": "f3ff8bbe7fc4e8d4e5af1c36b9312e8db1c8c9cb09a09aadb472b22ae09de152",
+      "bytes": 210
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/normalization/industry_directory.yaml",
+      "sha256": "823d97db8afe4adb3f963faaa04b42b8f151e93f2e75f3eb18f8c678a68bae37",
+      "bytes": 478
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/normalization/industry_index_daily.yaml",
+      "sha256": "953087294fd2c3a3cb1b46f204d0a0f606f9060f0f89676fb3a189222a68dab1",
+      "bytes": 805
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/normalization/industry_membership.yaml",
+      "sha256": "7eb72a1b8ce7aff27aa1ad62534af2bf7183f3d78c6392208035396a11e21ccb",
+      "bytes": 765
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/normalization/institution_survey.yaml",
+      "sha256": "e33c639f75da6a7a1d699936d0624084ed3488ef773aa9fcf3eaefc66e829423",
+      "bytes": 1118
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/normalization/intraday_trend.yaml",
+      "sha256": "14b0b22ad1308c70b65152e711c4248d3c8bf1c28d842fba36309194ed38870a",
+      "bytes": 440
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/normalization/ipo_calendar.yaml",
+      "sha256": "d72db539afed6e890e81d6e1c4680fcb09ad4285551748f3c9e12ba124e6059c",
+      "bytes": 2338
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/normalization/limit_down_pool.yaml",
+      "sha256": "456b0a779929bb6ff71ed70e07cd420d42596068f142879926b86972e3704f7b",
+      "bytes": 1314
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/normalization/limit_up_pool.yaml",
+      "sha256": "411e6e6ead10a4d2cbff7ecf4de9bee26f411a66d005a33bc640865ef4b6e7ba",
+      "bytes": 1079
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/normalization/minute_bar_5m.yaml",
+      "sha256": "f3e9abaededc01a15c651a99a22131a80067133deb89548dd12b17278e0e55b7",
+      "bytes": 1134
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/normalization/pledge.yaml",
+      "sha256": "4c8f7636e0b20e5923adbbf4c5e696247da67869d90ed19f0aee62f2e5612710",
+      "bytes": 1589
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/normalization/previous_limit_pool.yaml",
+      "sha256": "4c14b9ad1f0497e2d6f13a72978f1ddda74039b7c0d182c5a5a98ac01a678443",
+      "bytes": 1276
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/normalization/realtime_quote.yaml",
+      "sha256": "e9141547fbb85cb71c8e2336c20a2ebc948e3926f4b2a09e4f59505adea91b94",
+      "bytes": 1308
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/normalization/security_snapshot.yaml",
+      "sha256": "474ab0397cb1aad33abcd070942586a8460c468b1d3f7af97c2d152eee5a6537",
+      "bytes": 621
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/normalization/shareholder_count.yaml",
+      "sha256": "f8801367f055e0b1d419e648c9bd3e1d72984ffe2823c2d464770403c1b7c9e4",
+      "bytes": 1702
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/normalization/stock_fund_flow.yaml",
+      "sha256": "3d99bacf48ba3438c90d2d544f7223ffcb0a464f69f95841affe3e99a503bbe1",
+      "bytes": 1741
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/normalization/strong_stock_pool.yaml",
+      "sha256": "41733f419a6dd9d3a25edf361294a973df76d878d01bbf46b9f25f53a38f2304",
+      "bytes": 1234
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/normalization/trading_calendar.yaml",
+      "sha256": "4be7571914129769aeca321d892b8aa2fbd068db1c7c0b691ae0d5cefe7f69e0",
+      "bytes": 476
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/providers.yaml",
+      "sha256": "5e86c03754724cb2ac78aa788c1149b20cf67a8aaafaba73c61138946ebd2b79",
+      "bytes": 78137
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004/yaml/config/schedules.yaml",
+      "sha256": "01b7e269ea4231024bf1c520f78fa571c2909986aad5573006bd80e186119113",
+      "bytes": 525
+    },
+    {
+      "path": "provider_validation/results/actions-final-20261004-tests.xml",
+      "sha256": "3d31f74345d987a1f33544efcdbb644f0b930f1b41bdd599b5066ed4719058ce",
+      "bytes": 49621
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-080/candidate/ASTOCK-080-8456ebd27e9f/2026-10-03/holder_trades/eastmoney/holder_trades/mapped-rows.json",
+      "sha256": "29d2c80df10f581a260d1791cb7951eaa7a2e969aac8a83a203f536864320404",
+      "bytes": 24175
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-080/candidate/ASTOCK-080-8456ebd27e9f/2026-10-03/input_report/eastmoney/holder_trades/report.json",
+      "sha256": "50beb84c14c826e65dc09240f9036cf55d11641e6f3bf01d5afe36e6eaf4441b",
+      "bytes": 10795
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-080/candidate/ASTOCK-080-8456ebd27e9f/2026-10-03/source_rows/eastmoney/holder_trades/source-rows.json",
+      "sha256": "100ed90ee1ec288e2b645a7d984032441ca92df9734f2dc346a1213104af13c7",
+      "bytes": 33081
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-080/candidate/ASTOCK-080-8456ebd27e9f/_raw/bodies/1c2a8d00cf4f119dd234ffaa5345995ee5c49ab2a671f2090f015c566ba67bec.bin",
+      "sha256": "1c2a8d00cf4f119dd234ffaa5345995ee5c49ab2a671f2090f015c566ba67bec",
+      "bytes": 33213
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-080/candidate/ASTOCK-080-8456ebd27e9f/_raw/manifest.ndjson",
+      "sha256": "25a8ee9f141ac99c3ee3e546ac80cb7131399188292c6b3081737881c5851de2",
+      "bytes": 2086
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-080/comparison.json",
+      "sha256": "ce6704111daff70cd9d9732d0adcbd738ccefa585e6a1938b79e380dc41352e3",
+      "bytes": 934
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-080/original/bodies/1c2a8d00cf4f119dd234ffaa5345995ee5c49ab2a671f2090f015c566ba67bec.bin",
+      "sha256": "1c2a8d00cf4f119dd234ffaa5345995ee5c49ab2a671f2090f015c566ba67bec",
+      "bytes": 33213
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-080/original/manifest.ndjson",
+      "sha256": "d38bcb25ac89c74faf12e53641cee23af6bdbb840e33d6369afbc67e947dbebb",
+      "bytes": 2009
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-080/original-parsed.json",
+      "sha256": "12630c4d82bb9b07c9f3a91ffd9ed63eb26a7e32275733f5f648994076476aa4",
+      "bytes": 36776
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-081/candidate/ASTOCK-081-50f91da53312/2026-10-03/buyback/eastmoney/buyback/mapped-rows.json",
+      "sha256": "58c6cbfd0057c64bafa212ba8596064bf2c85116c4e998b5d34394af65aa42ce",
+      "bytes": 50385
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-081/candidate/ASTOCK-081-50f91da53312/2026-10-03/input_report/eastmoney/buyback/report.json",
+      "sha256": "ed280a68238527e209d3b75183b1b39eedd87b6db8d5fb1f6b9707931085747b",
+      "bytes": 10887
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-081/candidate/ASTOCK-081-50f91da53312/2026-10-03/source_rows/eastmoney/buyback/source-rows.json",
+      "sha256": "c1cb85845fb64b77d8fa4e8b957dd114d343e1324f24c0a1f5aefa795c66a79a",
+      "bytes": 113757
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-081/candidate/ASTOCK-081-50f91da53312/_raw/bodies/cd9747ca8dbb0823a1cbdf8db5eb9b755b6ca739ee537c34705e57d6076554ed.bin",
+      "sha256": "cd9747ca8dbb0823a1cbdf8db5eb9b755b6ca739ee537c34705e57d6076554ed",
+      "bytes": 113886
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-081/candidate/ASTOCK-081-50f91da53312/_raw/manifest.ndjson",
+      "sha256": "dfe067b856229e96f9b407d871d83a3866a8d7dc75cbbe0f0fb58dc970d62af4",
+      "bytes": 2031
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-081/comparison.json",
+      "sha256": "083dc095f62126a95f7a4f447f82eaee19e9e5a21d9a04c42bfdd399da23f386",
+      "bytes": 926
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-081/original/bodies/cd9747ca8dbb0823a1cbdf8db5eb9b755b6ca739ee537c34705e57d6076554ed.bin",
+      "sha256": "cd9747ca8dbb0823a1cbdf8db5eb9b755b6ca739ee537c34705e57d6076554ed",
+      "bytes": 113886
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-081/original/manifest.ndjson",
+      "sha256": "51574473d9f59bb5a3551e3ef2f9453f13efb0dee4d96521dabb2bbff0ffa0f6",
+      "bytes": 1960
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-081/original-parsed.json",
+      "sha256": "dfd4fc1af32366a5544f59d05a70328ca72afb6ad74003f08844b7bd367fe9b6",
+      "bytes": 63959
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-082/candidate/ASTOCK-082-bbf5459f27b0/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "sha256": "3eb99c3eb4696b832af279ec461ebd1cc5bc981a25bfd7fb4a79c978204f9ca1",
+      "bytes": 12546
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-082/candidate/ASTOCK-082-bbf5459f27b0/2026-10-03/pledge/eastmoney/pledge/mapped-rows.json",
+      "sha256": "4105853b5d38c9c599ab4955eabe4f6d3302c403b2d3bf22d2a28a65d2749a40",
+      "bytes": 15907
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-082/candidate/ASTOCK-082-bbf5459f27b0/2026-10-03/source_rows/eastmoney/pledge/source-rows.json",
+      "sha256": "8966939a5e866d84e0f24bb94d9a69860f881334ae509222768517aad8c60f91",
+      "bytes": 19691
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-082/candidate/ASTOCK-082-bbf5459f27b0/_raw/bodies/1cf99b8e98fc2410e1fd438310c2d7d42b0ee134df2b56e93a5673beafded8cf.bin",
+      "sha256": "1cf99b8e98fc2410e1fd438310c2d7d42b0ee134df2b56e93a5673beafded8cf",
+      "bytes": 19819
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-082/candidate/ASTOCK-082-bbf5459f27b0/_raw/bodies/82a09f7e8dbbd644d5daa57db655b9f6d80976a9218dd68a2e5910415178de4a.bin",
+      "sha256": "82a09f7e8dbbd644d5daa57db655b9f6d80976a9218dd68a2e5910415178de4a",
+      "bytes": 534
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-082/candidate/ASTOCK-082-bbf5459f27b0/_raw/manifest.ndjson",
+      "sha256": "5c90ef895d46c204e025558cad74579a6a8fdbaeed4490ba5fe56f43874e5cb8",
+      "bytes": 4050
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-082/comparison.json",
+      "sha256": "a13e066abf4aab297a5be72b8bf7d1b9b345b332008a2df8c395a2af6acf04d5",
+      "bytes": 998
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-082/original/bodies/1cf99b8e98fc2410e1fd438310c2d7d42b0ee134df2b56e93a5673beafded8cf.bin",
+      "sha256": "1cf99b8e98fc2410e1fd438310c2d7d42b0ee134df2b56e93a5673beafded8cf",
+      "bytes": 19819
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-082/original/bodies/82a09f7e8dbbd644d5daa57db655b9f6d80976a9218dd68a2e5910415178de4a.bin",
+      "sha256": "82a09f7e8dbbd644d5daa57db655b9f6d80976a9218dd68a2e5910415178de4a",
+      "bytes": 534
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-082/original/manifest.ndjson",
+      "sha256": "bbe93c419e5f091a4e13088e9a77b6093f22019cb815cc41e6927c96fa5badaa",
+      "bytes": 3910
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-082/original-parsed.json",
+      "sha256": "aa50e71435fb2e85828faad79f26a717e5bb90f73930dc207f219f2c3c2573bd",
+      "bytes": 25858
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-083/candidate/ASTOCK-083-89a642ebcea2/2026-10-03/input_report/eastmoney/ipo_calendar/report.json",
+      "sha256": "c45006a4a3a55e606d8c2fefa1853c20c65260a58c5e924a366ba73b20315a3a",
+      "bytes": 10696
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-083/candidate/ASTOCK-083-89a642ebcea2/2026-10-03/ipo_calendar/eastmoney/ipo_calendar/mapped-rows.json",
+      "sha256": "1c8e9b31bc7c4a07140a953a97ae249b37b695f77387383a588a824786075704",
+      "bytes": 15639
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-083/candidate/ASTOCK-083-89a642ebcea2/2026-10-03/source_rows/eastmoney/ipo_calendar/source-rows.json",
+      "sha256": "a23e5998a51a8905bdf58331786d4ede727a642e82968170ff3e19924ce7981a",
+      "bytes": 128509
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-083/candidate/ASTOCK-083-89a642ebcea2/_raw/bodies/083373253312402772f8dffb213639ac9edf877a9a728ba1aaad9b6d7fe864af.bin",
+      "sha256": "083373253312402772f8dffb213639ac9edf877a9a728ba1aaad9b6d7fe864af",
+      "bytes": 128643
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-083/candidate/ASTOCK-083-89a642ebcea2/_raw/manifest.ndjson",
+      "sha256": "e128921a21972b75262a56714fdf739b45a15fae2c800c68517f66758129394e",
+      "bytes": 2022
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-083/comparison.json",
+      "sha256": "a08fdb531e04d1de5adb4606b03879144bc3f3d2f4e7f75c909e6254497a8534",
+      "bytes": 931
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-083/original/bodies/083373253312402772f8dffb213639ac9edf877a9a728ba1aaad9b6d7fe864af.bin",
+      "sha256": "083373253312402772f8dffb213639ac9edf877a9a728ba1aaad9b6d7fe864af",
+      "bytes": 128643
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-083/original/manifest.ndjson",
+      "sha256": "1a5a502575ca8a3122a108e637b760ce119c3bb4eb710f213bfdbbbccf28969e",
+      "bytes": 1946
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/ASTOCK-083/original-parsed.json",
+      "sha256": "4d34cd8988a2929693dd4da572f21d36eca3d0d64a71221a2e72f2db4c43132d",
+      "bytes": 23805
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/comparison.json",
+      "sha256": "bac8726e6cbde375a6623eb69df2f39ec937011cb93578404d76d9018ab6dbb5",
+      "bytes": 11634
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/empty/ASTOCK-080/candidate/ASTOCK-080-e905d6504073/2026-10-03/holder_trades/eastmoney/holder_trades/mapped-rows.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/empty/ASTOCK-080/candidate/ASTOCK-080-e905d6504073/2026-10-03/input_report/eastmoney/holder_trades/report.json",
+      "sha256": "e177b38c5f0bb18af3366f8f17667b6cd0ff2485ab307f01524690f99f9f25f2",
+      "bytes": 10060
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/empty/ASTOCK-080/candidate/ASTOCK-080-e905d6504073/2026-10-03/source_rows/eastmoney/holder_trades/source-rows.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/empty/ASTOCK-080/candidate/ASTOCK-080-e905d6504073/_raw/bodies/b6e4b73cab605c5aabc2e99924cc3506799db0dbd266f8ff536771c89d4683e9.bin",
+      "sha256": "b6e4b73cab605c5aabc2e99924cc3506799db0dbd266f8ff536771c89d4683e9",
+      "bytes": 27
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/empty/ASTOCK-080/candidate/ASTOCK-080-e905d6504073/_raw/manifest.ndjson",
+      "sha256": "2993a6fac44619a1cb3cd0b017ec74aa844ee395c06bc2718024229c7e332187",
+      "bytes": 1528
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/empty/ASTOCK-080/fixture/bodies/b6e4b73cab605c5aabc2e99924cc3506799db0dbd266f8ff536771c89d4683e9.bin",
+      "sha256": "b6e4b73cab605c5aabc2e99924cc3506799db0dbd266f8ff536771c89d4683e9",
+      "bytes": 27
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/empty/ASTOCK-080/fixture/manifest.ndjson",
+      "sha256": "40c27ee4ed40394117619f4bfd1c75dee54b9a0f3652841957b323ebedb7733c",
+      "bytes": 1227
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/empty/ASTOCK-082/candidate/ASTOCK-082-ebe76c951a22/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "sha256": "955254077bd3b3d9a37ec1559f119fd28a4cfefc75ca1ca38f906971792e03c4",
+      "bytes": 8445
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/empty/ASTOCK-082/candidate/ASTOCK-082-ebe76c951a22/_raw/bodies/b6e4b73cab605c5aabc2e99924cc3506799db0dbd266f8ff536771c89d4683e9.bin",
+      "sha256": "b6e4b73cab605c5aabc2e99924cc3506799db0dbd266f8ff536771c89d4683e9",
+      "bytes": 27
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/empty/ASTOCK-082/candidate/ASTOCK-082-ebe76c951a22/_raw/manifest.ndjson",
+      "sha256": "cc9c672c957f0b34c5bbafc28fb3dcb076fa5cf2c5dda4a1a9e10ca39970f31a",
+      "bytes": 1465
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/empty/ASTOCK-082/fixture/bodies/b6e4b73cab605c5aabc2e99924cc3506799db0dbd266f8ff536771c89d4683e9.bin",
+      "sha256": "b6e4b73cab605c5aabc2e99924cc3506799db0dbd266f8ff536771c89d4683e9",
+      "bytes": 27
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/empty/ASTOCK-082/fixture/manifest.ndjson",
+      "sha256": "5ea91205ba19770b1478834413e1e87e8f2616f051c18cf888ec5a4b6319bdae",
+      "bytes": 1167
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f0/candidate/ASTOCK-080-6f62ffe724eb/2026-10-03/input_report/eastmoney/holder_trades/report.json",
+      "sha256": "110285fd29bcc9d6fc8d58668b38cfd5610e69626b8a1acba22c01795fb1b528",
+      "bytes": 8563
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f0/candidate/ASTOCK-080-6f62ffe724eb/_raw/bodies/b74aa530beac573a60871d69bf48b425ae94826c66bc6084ac7be67eea272f21.bin",
+      "sha256": "b74aa530beac573a60871d69bf48b425ae94826c66bc6084ac7be67eea272f21",
+      "bytes": 35626
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f0/candidate/ASTOCK-080-6f62ffe724eb/_raw/manifest.ndjson",
+      "sha256": "08278840065ba955d1fc2d203859d03f34263c386f21ceea66eddc3b8db863d4",
+      "bytes": 1464
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f0/fixture/bodies/b74aa530beac573a60871d69bf48b425ae94826c66bc6084ac7be67eea272f21.bin",
+      "sha256": "b74aa530beac573a60871d69bf48b425ae94826c66bc6084ac7be67eea272f21",
+      "bytes": 35626
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f0/fixture/manifest.ndjson",
+      "sha256": "903ad24f99579dea7ff6d0cf825e8a695aa83d3ee85a7814fdfa0d7aa3f92f91",
+      "bytes": 1200
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f1/candidate/ASTOCK-082-b597da35835a/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "sha256": "84e5d356fc0e6d656c7c493a595e1129c831682d83e849efdf26b85d174ffb83",
+      "bytes": 9656
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f1/candidate/ASTOCK-082-b597da35835a/_raw/bodies/2bc2508e2551095cb1a163b7864468279701af69657b3cf0cad8af8e61d5f83e.bin",
+      "sha256": "2bc2508e2551095cb1a163b7864468279701af69657b3cf0cad8af8e61d5f83e",
+      "bytes": 575
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f1/candidate/ASTOCK-082-b597da35835a/_raw/bodies/cda6a8988c6750e9f01f17837ce986d37a0f603934b735edde42f5612ddba877.bin",
+      "sha256": "cda6a8988c6750e9f01f17837ce986d37a0f603934b735edde42f5612ddba877",
+      "bytes": 21236
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f1/candidate/ASTOCK-082-b597da35835a/_raw/manifest.ndjson",
+      "sha256": "29b3800c45f8b7bc6f9e8d8b663f562264fe7763b83709239595a1b41e77518b",
+      "bytes": 2802
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f1/fixture/bodies/2bc2508e2551095cb1a163b7864468279701af69657b3cf0cad8af8e61d5f83e.bin",
+      "sha256": "2bc2508e2551095cb1a163b7864468279701af69657b3cf0cad8af8e61d5f83e",
+      "bytes": 575
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f1/fixture/bodies/cda6a8988c6750e9f01f17837ce986d37a0f603934b735edde42f5612ddba877.bin",
+      "sha256": "cda6a8988c6750e9f01f17837ce986d37a0f603934b735edde42f5612ddba877",
+      "bytes": 21236
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f1/fixture/manifest.ndjson",
+      "sha256": "5fb6884c46a342176c1a442f0d9a8306269dadcb2637555b114a54e10dc22ff4",
+      "bytes": 2290
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f2/candidate/ASTOCK-082-5568cd2dc49b/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "sha256": "154782a732c17b806ed1d05271e50f22bd10c95d1e2339e0fbe06862088582de",
+      "bytes": 9656
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f2/candidate/ASTOCK-082-5568cd2dc49b/_raw/bodies/2bc2508e2551095cb1a163b7864468279701af69657b3cf0cad8af8e61d5f83e.bin",
+      "sha256": "2bc2508e2551095cb1a163b7864468279701af69657b3cf0cad8af8e61d5f83e",
+      "bytes": 575
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f2/candidate/ASTOCK-082-5568cd2dc49b/_raw/bodies/a42f0fec341c9e63766cba26d8930fe0e1fa775c0b0d2a3d1474e51c0245558a.bin",
+      "sha256": "a42f0fec341c9e63766cba26d8930fe0e1fa775c0b0d2a3d1474e51c0245558a",
+      "bytes": 21232
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f2/candidate/ASTOCK-082-5568cd2dc49b/_raw/manifest.ndjson",
+      "sha256": "41c84c48d49179862c7253c260b12f6023f7b1d3db9be91b4361721c099655f1",
+      "bytes": 2802
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f2/fixture/bodies/2bc2508e2551095cb1a163b7864468279701af69657b3cf0cad8af8e61d5f83e.bin",
+      "sha256": "2bc2508e2551095cb1a163b7864468279701af69657b3cf0cad8af8e61d5f83e",
+      "bytes": 575
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f2/fixture/bodies/a42f0fec341c9e63766cba26d8930fe0e1fa775c0b0d2a3d1474e51c0245558a.bin",
+      "sha256": "a42f0fec341c9e63766cba26d8930fe0e1fa775c0b0d2a3d1474e51c0245558a",
+      "bytes": 21232
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f2/fixture/manifest.ndjson",
+      "sha256": "ce74c8976e9e82dd095331a77a484ef23d4d11c3029342924da0140d2d57df48",
+      "bytes": 2292
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f3/candidate/ASTOCK-082-cbe62a4dfab3/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "sha256": "71b451bc7e78ebb28eac56cb477a9e298af376898e6ed605632fe4601a579105",
+      "bytes": 8292
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f3/candidate/ASTOCK-082-cbe62a4dfab3/_raw/bodies/e72ee2e0a408f1122d4a18f17f787fb9e23e89367c7960d5504570f7a69b8ecb.bin",
+      "sha256": "e72ee2e0a408f1122d4a18f17f787fb9e23e89367c7960d5504570f7a69b8ecb",
+      "bytes": 538
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f3/candidate/ASTOCK-082-cbe62a4dfab3/_raw/manifest.ndjson",
+      "sha256": "d19543e0f86b7058ee43be62b283d4e43edd3f65a3cb0be0d2bcfb6a10b335b4",
+      "bytes": 1371
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f3/fixture/bodies/e72ee2e0a408f1122d4a18f17f787fb9e23e89367c7960d5504570f7a69b8ecb.bin",
+      "sha256": "e72ee2e0a408f1122d4a18f17f787fb9e23e89367c7960d5504570f7a69b8ecb",
+      "bytes": 538
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f3/fixture/bodies/ecfb95dfe6af9c52c9738d32cc4e1918940e6cf5e20b8dbe0b3a07460253d03c.bin",
+      "sha256": "ecfb95dfe6af9c52c9738d32cc4e1918940e6cf5e20b8dbe0b3a07460253d03c",
+      "bytes": 21232
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f3/fixture/manifest.ndjson",
+      "sha256": "abd788bfb83536aed620d0036cd95b644fb41c97b51dec9ac57a1ea2200567eb",
+      "bytes": 2308
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f4/candidate/ASTOCK-081-bb650154ca9f/2026-10-03/input_report/eastmoney/buyback/report.json",
+      "sha256": "9facd4811c966d3ea577758ae02f01febc5314ec201ffed2ee8b9f4f6d4ad77a",
+      "bytes": 8864
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f4/candidate/ASTOCK-081-bb650154ca9f/_raw/bodies/e3325b393571deec96b8baf749445332c58edc643a8d8a1ad99d9ef890e5eca9.bin",
+      "sha256": "e3325b393571deec96b8baf749445332c58edc643a8d8a1ad99d9ef890e5eca9",
+      "bytes": 120699
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f4/candidate/ASTOCK-081-bb650154ca9f/_raw/manifest.ndjson",
+      "sha256": "662d9485003695981cfec15a8589fe3b9e1cf451e8eb649d3f7e152f0c38a390",
+      "bytes": 1410
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f4/fixture/bodies/e3325b393571deec96b8baf749445332c58edc643a8d8a1ad99d9ef890e5eca9.bin",
+      "sha256": "e3325b393571deec96b8baf749445332c58edc643a8d8a1ad99d9ef890e5eca9",
+      "bytes": 120699
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f4/fixture/manifest.ndjson",
+      "sha256": "424ac307e8dba89f1e71c86647493f529e141b235be983d14451df2be6d105ba",
+      "bytes": 1150
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f5/candidate/ASTOCK-081-dd79cdcb6ffd/2026-10-03/input_report/eastmoney/buyback/report.json",
+      "sha256": "0c6f006a02089640114136d5d640897b312e9d5d13544eeb0bb2ea0004ec6624",
+      "bytes": 9940
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f5/candidate/ASTOCK-081-dd79cdcb6ffd/2026-10-03/source_rows/eastmoney/buyback/source-rows.json",
+      "sha256": "71628fa14de3972018c1d9ae712177698a2da84ff3dd6970050d9dc5dcf5cf1c",
+      "bytes": 113737
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f5/candidate/ASTOCK-081-dd79cdcb6ffd/_raw/bodies/e9fbd04b0cb7ad46f34d36ea45bc002fdabb621247eb2cfd446dda9b730945e1.bin",
+      "sha256": "e9fbd04b0cb7ad46f34d36ea45bc002fdabb621247eb2cfd446dda9b730945e1",
+      "bytes": 120677
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f5/candidate/ASTOCK-081-dd79cdcb6ffd/_raw/manifest.ndjson",
+      "sha256": "6ad5a0de2efe6a791d7905986dfed0e1d04a215d8920a4e09d5e71af138d3121",
+      "bytes": 1410
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f5/fixture/bodies/e9fbd04b0cb7ad46f34d36ea45bc002fdabb621247eb2cfd446dda9b730945e1.bin",
+      "sha256": "e9fbd04b0cb7ad46f34d36ea45bc002fdabb621247eb2cfd446dda9b730945e1",
+      "bytes": 120677
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f5/fixture/manifest.ndjson",
+      "sha256": "f0a7feb676db5b04340e7e96921ccfe80fd9b168d03d50564d3851b9000c943c",
+      "bytes": 1155
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f6/candidate/ASTOCK-083-26288e749dca/2026-10-03/input_report/eastmoney/ipo_calendar/report.json",
+      "sha256": "874602c1101db43d924ad661800b37b0e0cd27ddead4c9e1b97da2199ce8a219",
+      "bytes": 8691
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f6/candidate/ASTOCK-083-26288e749dca/_raw/bodies/6d82364f1bdf1b905e761d36e72817c0f0fbf42f95d83b71e8c7d9de8a5c59cc.bin",
+      "sha256": "6d82364f1bdf1b905e761d36e72817c0f0fbf42f95d83b71e8c7d9de8a5c59cc",
+      "bytes": 137711
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f6/candidate/ASTOCK-083-26288e749dca/_raw/manifest.ndjson",
+      "sha256": "78a90ff3cb0e56851ed50dcde375dd97e2894f8010a23d32f54f6070a3f63bc6",
+      "bytes": 1406
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f6/fixture/bodies/6d82364f1bdf1b905e761d36e72817c0f0fbf42f95d83b71e8c7d9de8a5c59cc.bin",
+      "sha256": "6d82364f1bdf1b905e761d36e72817c0f0fbf42f95d83b71e8c7d9de8a5c59cc",
+      "bytes": 137711
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f6/fixture/manifest.ndjson",
+      "sha256": "3e2e1254a1b3d408073b82a3bfa3c9e85b05819c7e87fe2137c4649a8bd3511a",
+      "bytes": 1138
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f7/candidate/ASTOCK-083-029fac464da5/2026-10-03/input_report/eastmoney/ipo_calendar/report.json",
+      "sha256": "4f045092958c2405571255dcd8688cc12aaccbbbbd858c026b6334f771d01d86",
+      "bytes": 8691
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f7/candidate/ASTOCK-083-029fac464da5/_raw/bodies/8131a13cdba4e7a65c7b09f805bf7e77231b6124f5ce225387bbbfe3cec03d2f.bin",
+      "sha256": "8131a13cdba4e7a65c7b09f805bf7e77231b6124f5ce225387bbbfe3cec03d2f",
+      "bytes": 137683
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f7/candidate/ASTOCK-083-029fac464da5/_raw/manifest.ndjson",
+      "sha256": "6db4ee20f4bfd582578143d6163c2bf5311552ee397a12b8e031b6fd3bf5a89c",
+      "bytes": 1406
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f7/fixture/bodies/8131a13cdba4e7a65c7b09f805bf7e77231b6124f5ce225387bbbfe3cec03d2f.bin",
+      "sha256": "8131a13cdba4e7a65c7b09f805bf7e77231b6124f5ce225387bbbfe3cec03d2f",
+      "bytes": 137683
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/f7/fixture/manifest.ndjson",
+      "sha256": "6fe2b0fc793be386d1fd7532dc8c478c0f5ac7bbbba6579f2950fdc3b817a9f4",
+      "bytes": 1143
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/legacy/legacy-comparison.json",
+      "sha256": "968cc357532c0fdff0d215cd276709bdd143df8350acf4c66b6b8e3ff7074759",
+      "bytes": 164
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/semantic0/candidate/ASTOCK-081-aefa831ed212/2026-10-03/buyback/eastmoney/buyback/mapped-rows.json",
+      "sha256": "3fe34f6e502a06ba161933f856858ddb5068d3e0619e7b6f0f5289e443dfa286",
+      "bytes": 50375
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/semantic0/candidate/ASTOCK-081-aefa831ed212/2026-10-03/input_report/eastmoney/buyback/report.json",
+      "sha256": "b0f3cf2b24ae78063f7ba7356419f39018231d3845e5577a40d53c19c0d14ed7",
+      "bytes": 10302
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/semantic0/candidate/ASTOCK-081-aefa831ed212/2026-10-03/source_rows/eastmoney/buyback/source-rows.json",
+      "sha256": "9592610622348c25a33521e63203161a5c934b51c2e4b6b8258523400a378afd",
+      "bytes": 113757
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/semantic0/candidate/ASTOCK-081-aefa831ed212/_raw/bodies/90c69d8221df09771b121d4cb33c372e5eb467fb76b5a01823a7fa6829878176.bin",
+      "sha256": "90c69d8221df09771b121d4cb33c372e5eb467fb76b5a01823a7fa6829878176",
+      "bytes": 120699
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/semantic0/candidate/ASTOCK-081-aefa831ed212/_raw/manifest.ndjson",
+      "sha256": "e2eca4ac3b9b2c6fa5c6c0429bd4ee13710d25e3a0284a0600fc3ee53b6d294f",
+      "bytes": 1417
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/semantic0/fixture/bodies/90c69d8221df09771b121d4cb33c372e5eb467fb76b5a01823a7fa6829878176.bin",
+      "sha256": "90c69d8221df09771b121d4cb33c372e5eb467fb76b5a01823a7fa6829878176",
+      "bytes": 120699
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/semantic0/fixture/manifest.ndjson",
+      "sha256": "f128517c77b2c2c3b3ff670e08cb6f908a45fe61e0c77396a2eab32a7fe1be00",
+      "bytes": 1159
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/semantic1/candidate/ASTOCK-083-1f2fed5b2e90/2026-10-03/input_report/eastmoney/ipo_calendar/report.json",
+      "sha256": "3a412e2c1e711973844414ed49f2ad91582c42ed7b895b14800c6510870f4272",
+      "bytes": 10114
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/semantic1/candidate/ASTOCK-083-1f2fed5b2e90/2026-10-03/ipo_calendar/eastmoney/ipo_calendar/mapped-rows.json",
+      "sha256": "26e5a4b4d80056be82183a1b74289cf19342fa0e27bde7be5d1404c39495b326",
+      "bytes": 15633
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/semantic1/candidate/ASTOCK-083-1f2fed5b2e90/2026-10-03/source_rows/eastmoney/ipo_calendar/source-rows.json",
+      "sha256": "bf728a281046a0912dcaa1c37104cae5f7b00f6d8cb6e27ca2aeb8bb565e542f",
+      "bytes": 128490
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/semantic1/candidate/ASTOCK-083-1f2fed5b2e90/_raw/bodies/15a4407208e85c85fcf0777380be79f3bd7af1093850640d4e6a8148d4b1d853.bin",
+      "sha256": "15a4407208e85c85fcf0777380be79f3bd7af1093850640d4e6a8148d4b1d853",
+      "bytes": 137692
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/semantic1/candidate/ASTOCK-083-1f2fed5b2e90/_raw/manifest.ndjson",
+      "sha256": "454530b3a4b268b07bce0c76180298a8f6a1fba36ddd7f81a5f0cf8f9561ba56",
+      "bytes": 1413
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/semantic1/fixture/bodies/15a4407208e85c85fcf0777380be79f3bd7af1093850640d4e6a8148d4b1d853.bin",
+      "sha256": "15a4407208e85c85fcf0777380be79f3bd7af1093850640d4e6a8148d4b1d853",
+      "bytes": 137692
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/semantic1/fixture/manifest.ndjson",
+      "sha256": "432b930ad1d6d64f2000bea55b83b7fc3df84f4453b4331c7ed9d14a5a7f49e7",
+      "bytes": 1148
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/semantic2/candidate/ASTOCK-083-7060c5202cf7/2026-10-03/input_report/eastmoney/ipo_calendar/report.json",
+      "sha256": "615724e5ef0c0bac8ababfdd1102e3b489c5099c3fef67b9ac7d3792a4d78884",
+      "bytes": 10114
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/semantic2/candidate/ASTOCK-083-7060c5202cf7/2026-10-03/ipo_calendar/eastmoney/ipo_calendar/mapped-rows.json",
+      "sha256": "f531f8aabbc434011f616b8ee720616387e08014ab3a9c89052a707ea414d33e",
+      "bytes": 15647
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/semantic2/candidate/ASTOCK-083-7060c5202cf7/2026-10-03/source_rows/eastmoney/ipo_calendar/source-rows.json",
+      "sha256": "8cacc9bb2938b4e7f04d6a4cf575ac69b661750f7435fc1aff5e97f681ff5c0b",
+      "bytes": 128523
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/semantic2/candidate/ASTOCK-083-7060c5202cf7/_raw/bodies/a58d81c8e168c3086913d90635614742345dce892cc8465368531317c8160315.bin",
+      "sha256": "a58d81c8e168c3086913d90635614742345dce892cc8465368531317c8160315",
+      "bytes": 137725
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/semantic2/candidate/ASTOCK-083-7060c5202cf7/_raw/manifest.ndjson",
+      "sha256": "35ec58e24b2bcb22d744b07610fe01db4454aa0773d760d540d7c42a2d3c9601",
+      "bytes": 1413
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/semantic2/fixture/bodies/a58d81c8e168c3086913d90635614742345dce892cc8465368531317c8160315.bin",
+      "sha256": "a58d81c8e168c3086913d90635614742345dce892cc8465368531317c8160315",
+      "bytes": 137725
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/semantic2/fixture/manifest.ndjson",
+      "sha256": "8687e6e086319cec2319958ff8e7b65c3de3f91fd0f0c0f596cfc00d5ea1891f",
+      "bytes": 1145
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/session/candidate/ASTOCK-082-02627a04380b/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "sha256": "d72c86f22b3b367eb08e582f894a3c887a36fc10f113703eb0d7908d2b365263",
+      "bytes": 11036
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/session/candidate/ASTOCK-082-02627a04380b/2026-10-03/pledge/eastmoney/pledge/mapped-rows.json",
+      "sha256": "aa017bfd31f649df3d4a9c308309fb4fcd59389bdc5c49e0067bddbb494abaf8",
+      "bytes": 15907
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/session/candidate/ASTOCK-082-02627a04380b/2026-10-03/source_rows/eastmoney/pledge/source-rows.json",
+      "sha256": "8966939a5e866d84e0f24bb94d9a69860f881334ae509222768517aad8c60f91",
+      "bytes": 19691
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/session/candidate/ASTOCK-082-02627a04380b/_raw/bodies/1cf99b8e98fc2410e1fd438310c2d7d42b0ee134df2b56e93a5673beafded8cf.bin",
+      "sha256": "1cf99b8e98fc2410e1fd438310c2d7d42b0ee134df2b56e93a5673beafded8cf",
+      "bytes": 19819
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/session/candidate/ASTOCK-082-02627a04380b/_raw/bodies/82a09f7e8dbbd644d5daa57db655b9f6d80976a9218dd68a2e5910415178de4a.bin",
+      "sha256": "82a09f7e8dbbd644d5daa57db655b9f6d80976a9218dd68a2e5910415178de4a",
+      "bytes": 534
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/session/candidate/ASTOCK-082-02627a04380b/_raw/manifest.ndjson",
+      "sha256": "92e782073c744b107c37c084407035816c5da8fc00122ae47fa984faa0c44114",
+      "bytes": 2476
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/session/candidate/ASTOCK-082-cd800f19fded/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "sha256": "9a73a530248efb0b24243a2da37c0c2059362dbad71e6e024c5cc93c309b6b35",
+      "bytes": 11658
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/session/candidate/ASTOCK-082-cd800f19fded/2026-10-03/pledge/eastmoney/pledge/mapped-rows.json",
+      "sha256": "aa017bfd31f649df3d4a9c308309fb4fcd59389bdc5c49e0067bddbb494abaf8",
+      "bytes": 15907
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/session/candidate/ASTOCK-082-cd800f19fded/2026-10-03/source_rows/eastmoney/pledge/source-rows.json",
+      "sha256": "8966939a5e866d84e0f24bb94d9a69860f881334ae509222768517aad8c60f91",
+      "bytes": 19691
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/session/candidate/ASTOCK-082-cd800f19fded/_raw/bodies/1cf99b8e98fc2410e1fd438310c2d7d42b0ee134df2b56e93a5673beafded8cf.bin",
+      "sha256": "1cf99b8e98fc2410e1fd438310c2d7d42b0ee134df2b56e93a5673beafded8cf",
+      "bytes": 19819
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/session/candidate/ASTOCK-082-cd800f19fded/_raw/bodies/82a09f7e8dbbd644d5daa57db655b9f6d80976a9218dd68a2e5910415178de4a.bin",
+      "sha256": "82a09f7e8dbbd644d5daa57db655b9f6d80976a9218dd68a2e5910415178de4a",
+      "bytes": 534
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/session/candidate/ASTOCK-082-cd800f19fded/_raw/manifest.ndjson",
+      "sha256": "94a9b11418bbdd113721ba861d05b5d97a7c4d99be85bb3f10628f90ca1b6f8a",
+      "bytes": 3108
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/session/fixture-mode.json",
+      "sha256": "e828c3de5feaf2ec033a6dec9737b062fbcc2acd834aea279bd5589b28a8b3e2",
+      "bytes": 134
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/verify.py",
+      "sha256": "328be26d2df728dacfa58bdd7d61b0ce35142e98a805358dc9f4b45113e48c6d",
+      "bytes": 8916
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/bad/ASTOCK-082-83c605d1f2dd/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "sha256": "1e31e771b65b09ebb80abc2d8de67513aa87a27ef22b6d6abdfc25a95660997f",
+      "bytes": 7174
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/bad/ASTOCK-082-85273655726b/2026-10-03/input_report/eastmoney/pledge/report.json",
+      "sha256": "244068e2e76a6512f45fad0c1e0e38ed90f65433d8f0ac939c097490b3de67a0",
+      "bytes": 7146
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/candidate/ASTOCK-081-9691d661db89/2026-10-03/buyback/eastmoney/buyback/mapped-rows.json",
+      "sha256": "78e0f82c37e8aeb46ad15146e40a0060a976162fc9fde5e3efc0b5fe26203ba8",
+      "bytes": 50421
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/candidate/ASTOCK-081-9691d661db89/2026-10-03/input_report/eastmoney/buyback/report.json",
+      "sha256": "74884d7ff2002b9808cc0a06911a6a93ea1c721b599c3a183a9b31c49e70248a",
+      "bytes": 11139
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/candidate/ASTOCK-081-9691d661db89/2026-10-03/source_rows/eastmoney/buyback/source-rows.json",
+      "sha256": "c1cb85845fb64b77d8fa4e8b957dd114d343e1324f24c0a1f5aefa795c66a79a",
+      "bytes": 113757
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/candidate/ASTOCK-081-9691d661db89/_raw/bodies/cd9747ca8dbb0823a1cbdf8db5eb9b755b6ca739ee537c34705e57d6076554ed.bin",
+      "sha256": "cd9747ca8dbb0823a1cbdf8db5eb9b755b6ca739ee537c34705e57d6076554ed",
+      "bytes": 113886
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/candidate/ASTOCK-081-9691d661db89/_raw/manifest.ndjson",
+      "sha256": "a676cc87f01dd6d4293dd67818cc9237a1f90e16d1d962e3aee23e8effb4b4f6",
+      "bytes": 2031
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/capabilities.yaml",
+      "sha256": "7b7ce0da1d33b333165c6081a3ed788f85cb05d5f6945c745eec97d73e24f6e2",
+      "bytes": 4009
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/collection.yaml",
+      "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d",
+      "bytes": 2934
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/datasets/board_fund_flow.yaml",
+      "sha256": "08f3566d0cf2787186e6106e4915d0d89b70232d737898480eda03785ea3c53a",
+      "bytes": 1110
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/datasets/broken_limit_pool.yaml",
+      "sha256": "60b3790eae896c968093c8d26a818c9dab325aca620510b4ec1dde061af7f65e",
+      "bytes": 1162
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/datasets/buyback.yaml",
+      "sha256": "807490acc8affc7dde3502ef62c2b80ad32923fe4c5ff6a6b4fd9d403b50d4f6",
+      "bytes": 1439
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/datasets/concept_board.yaml",
+      "sha256": "eef0b07c9a41bfd5ef1a52f4f39516cb26d42b088d63a15783af0f94985fd76f",
+      "bytes": 379
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/datasets/daily_bar.yaml",
+      "sha256": "0a8c1dcae7e1c062ae70c224defc1362adc1d58bc196bbeb2f1edd61d6fd39e7",
+      "bytes": 995
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/datasets/dividend_event.yaml",
+      "sha256": "67a2b02063cb9a891e3fb388048407cbc08b05ce8ae97deea6976d3904340d2e",
+      "bytes": 759
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/datasets/earnings_forecast.yaml",
+      "sha256": "ded845c047fcefdbeb163f27620d4e67f2bc78e62a0bcfea5678d6df8758f8fd",
+      "bytes": 1060
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/datasets/financial_main.yaml",
+      "sha256": "23d8b55356620439d5c1b507601b782b31aa965fe24eaf194e869466bb271ab0",
+      "bytes": 766
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/datasets/holder_trades.yaml",
+      "sha256": "44b0ecfc09c6e39823c50e83077354f25bc8026fc70272d92046ba3a51d09b92",
+      "bytes": 1246
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/datasets/industry_board.yaml",
+      "sha256": "c6930c70b55e171dee94b74b80f3c37df1466d4a10dadc3016975004b8b47ba4",
+      "bytes": 380
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/datasets/industry_directory.yaml",
+      "sha256": "9325d485bf7a1bc2b075c2d920b43b17caa039916536bedd8163be0f972bfe5b",
+      "bytes": 346
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/datasets/industry_index_daily.yaml",
+      "sha256": "5d542c72443410747f2ac643589bfd8160cdea07d01d6d0dd9c5e4753096043b",
+      "bytes": 676
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/datasets/industry_membership.yaml",
+      "sha256": "dff512c9b7f00330bbe408ba1e1eb74d99b49bc0b38ee419d4c463047c6fe69d",
+      "bytes": 709
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/datasets/institution_survey.yaml",
+      "sha256": "470fd4503d45cf0839e887fd276a0c3c82cdcae7cae8f52001006464c212733e",
+      "bytes": 703
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/datasets/intraday_trend.yaml",
+      "sha256": "5983e0eb29c1cd7a781fbad0be7332dda14e887ccd744e55ad4b8664c7a0c38a",
+      "bytes": 665
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/datasets/ipo_calendar.yaml",
+      "sha256": "7579b9174fd3554a92bc50865cabe7ac20604579403f748d09bcd4e8760bcac9",
+      "bytes": 1331
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/datasets/limit_down_pool.yaml",
+      "sha256": "67b3ca1ae9edf0f863d2b2d5257a315fe721f042086d4b5966653c0f2758d806",
+      "bytes": 1177
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/datasets/limit_up_pool.yaml",
+      "sha256": "73c1fa4ed6d7281d1857208a2ec9696a3637214bb256661ce943313c75772a69",
+      "bytes": 982
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/datasets/minute_bar_5m.yaml",
+      "sha256": "fb6f822ed42479422a0b4c227577d8e559bb6b2238562af566af0464304bd873",
+      "bytes": 708
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/datasets/pledge.yaml",
+      "sha256": "40b46e96e55d8b1061c98ec979094b4f98ef4800e513cfa7a9c2c5f2152b2fb1",
+      "bytes": 878
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/datasets/previous_limit_pool.yaml",
+      "sha256": "5234397a7b87ed3e03c11431de1f00c012e135ba5ef57bf63a2f431f659703bc",
+      "bytes": 1199
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/datasets/realtime_quote.yaml",
+      "sha256": "ebc3e97bb7469eb4c7c80daf50991ebe38f0eb5b2476a9a579d22236d416378b",
+      "bytes": 1121
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/datasets/security_snapshot.yaml",
+      "sha256": "255115893f64837a3b95ea9fe44551948eefa9604aca9d59214de87a580300be",
+      "bytes": 519
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/datasets/shareholder_count.yaml",
+      "sha256": "d325df1784c873bea73a1d907e9964e06c26e4d6b356dd6c16148837b57feccf",
+      "bytes": 923
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/datasets/stock_fund_flow.yaml",
+      "sha256": "df3f21341463f3538a1f855ef19b7bbdb683405aaa65d5418c255023c18a429f",
+      "bytes": 736
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/datasets/strong_stock_pool.yaml",
+      "sha256": "264c9d759405d37733cf4daf29996240cb46fed46c3eb8835405a4311e1c1131",
+      "bytes": 1194
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/datasets/trading_calendar.yaml",
+      "sha256": "924b17a5be104252e85a377e4579432c6725bab99cbaa0ad70e71102149a1f49",
+      "bytes": 192
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/datasets.yaml",
+      "sha256": "e992d13297e1f9a8f64acabc25f65f138b21ce12dca16689cc3f17bf1385a6eb",
+      "bytes": 587
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/normalization/board_fund_flow.yaml",
+      "sha256": "fb7c6f1f2d425181b189e25152e465306982e10c7c6ee06b2917dfa00b891baa",
+      "bytes": 1395
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/normalization/broken_limit_pool.yaml",
+      "sha256": "8bd046757fc9fb3e7d144a0e9d41106267e828a60bc5a099280158c15459a84d",
+      "bytes": 1238
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/normalization/buyback.yaml",
+      "sha256": "8f81591b1f77564473325e8c77d334b782b0a46880717c3dd186e27acf4b1f80",
+      "bytes": 2622
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/normalization/concept_board.yaml",
+      "sha256": "2b7e7f57d189541d6a232cd5391d2dab4289f9f3438f397d9fefd82bb1d996b7",
+      "bytes": 206
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/normalization/daily_bar.yaml",
+      "sha256": "41f9bbd0824e20d70f7ed276758b286094c33c79180befca4d8985afc3c8ad0b",
+      "bytes": 2913
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/normalization/dividend_event.yaml",
+      "sha256": "188df2f7f075b92e993136aef3f977eea419f9c6957404bd2f7071c76ed24a71",
+      "bytes": 1532
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/normalization/earnings_forecast.yaml",
+      "sha256": "5b323a3c3c6577527701985248bb13b54102463a167ba04c749f4908e2b401c4",
+      "bytes": 1633
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/normalization/financial_main.yaml",
+      "sha256": "eeeb2e7418aab430168f0c7e16c69f1b24a9e49ec8d156a28390cae0e7a69bda",
+      "bytes": 603
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/normalization/holder_trades.yaml",
+      "sha256": "2deca39ea7c1a57254b4ee31390587f39d640559181cd1ceae7968a4684e5f40",
+      "bytes": 1959
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/normalization/industry_board.yaml",
+      "sha256": "f3ff8bbe7fc4e8d4e5af1c36b9312e8db1c8c9cb09a09aadb472b22ae09de152",
+      "bytes": 210
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/normalization/industry_directory.yaml",
+      "sha256": "823d97db8afe4adb3f963faaa04b42b8f151e93f2e75f3eb18f8c678a68bae37",
+      "bytes": 478
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/normalization/industry_index_daily.yaml",
+      "sha256": "953087294fd2c3a3cb1b46f204d0a0f606f9060f0f89676fb3a189222a68dab1",
+      "bytes": 805
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/normalization/industry_membership.yaml",
+      "sha256": "7eb72a1b8ce7aff27aa1ad62534af2bf7183f3d78c6392208035396a11e21ccb",
+      "bytes": 765
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/normalization/institution_survey.yaml",
+      "sha256": "e33c639f75da6a7a1d699936d0624084ed3488ef773aa9fcf3eaefc66e829423",
+      "bytes": 1118
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/normalization/intraday_trend.yaml",
+      "sha256": "14b0b22ad1308c70b65152e711c4248d3c8bf1c28d842fba36309194ed38870a",
+      "bytes": 440
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/normalization/ipo_calendar.yaml",
+      "sha256": "d72db539afed6e890e81d6e1c4680fcb09ad4285551748f3c9e12ba124e6059c",
+      "bytes": 2338
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/normalization/limit_down_pool.yaml",
+      "sha256": "456b0a779929bb6ff71ed70e07cd420d42596068f142879926b86972e3704f7b",
+      "bytes": 1314
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/normalization/limit_up_pool.yaml",
+      "sha256": "411e6e6ead10a4d2cbff7ecf4de9bee26f411a66d005a33bc640865ef4b6e7ba",
+      "bytes": 1079
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/normalization/minute_bar_5m.yaml",
+      "sha256": "f3e9abaededc01a15c651a99a22131a80067133deb89548dd12b17278e0e55b7",
+      "bytes": 1134
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/normalization/pledge.yaml",
+      "sha256": "4c8f7636e0b20e5923adbbf4c5e696247da67869d90ed19f0aee62f2e5612710",
+      "bytes": 1589
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/normalization/previous_limit_pool.yaml",
+      "sha256": "4c14b9ad1f0497e2d6f13a72978f1ddda74039b7c0d182c5a5a98ac01a678443",
+      "bytes": 1276
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/normalization/realtime_quote.yaml",
+      "sha256": "e9141547fbb85cb71c8e2336c20a2ebc948e3926f4b2a09e4f59505adea91b94",
+      "bytes": 1308
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/normalization/security_snapshot.yaml",
+      "sha256": "474ab0397cb1aad33abcd070942586a8460c468b1d3f7af97c2d152eee5a6537",
+      "bytes": 621
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/normalization/shareholder_count.yaml",
+      "sha256": "f8801367f055e0b1d419e648c9bd3e1d72984ffe2823c2d464770403c1b7c9e4",
+      "bytes": 1702
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/normalization/stock_fund_flow.yaml",
+      "sha256": "3d99bacf48ba3438c90d2d544f7223ffcb0a464f69f95841affe3e99a503bbe1",
+      "bytes": 1741
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/normalization/strong_stock_pool.yaml",
+      "sha256": "41733f419a6dd9d3a25edf361294a973df76d878d01bbf46b9f25f53a38f2304",
+      "bytes": 1234
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/normalization/trading_calendar.yaml",
+      "sha256": "4be7571914129769aeca321d892b8aa2fbd068db1c7c0b691ae0d5cefe7f69e0",
+      "bytes": 476
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/providers.yaml",
+      "sha256": "5e86c03754724cb2ac78aa788c1149b20cf67a8aaafaba73c61138946ebd2b79",
+      "bytes": 78137
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004/yaml/config/schedules.yaml",
+      "sha256": "01b7e269ea4231024bf1c520f78fa571c2909986aad5573006bd80e186119113",
+      "bytes": 525
+    },
+    {
+      "path": "provider_validation/results/actions-final-v2-20261004-line-ending.json",
+      "sha256": "42cfe3cdf9550bde7ee29fae2e2896c5942a41af18bc78d5936d49d1a9943c84",
+      "bytes": 689
+    },
+    {
+      "path": "provider_validation/results/actions-original-20261004/1-financial.py.bin",
+      "sha256": "2f436e2d929dcd4021b3d160cc5783aa6ecffc80a68cc2de8205e668b6027d9c",
+      "bytes": 16716
+    },
+    {
+      "path": "provider_validation/results/actions-original-20261004/2-inputs.py.bin",
+      "sha256": "ff591e12daea04fe5094f17772219a550d09c3b3bb6126eacfc774758c353df2",
+      "bytes": 41008
+    },
+    {
+      "path": "provider_validation/results/actions-original-20261004/3-factory.py.bin",
+      "sha256": "d3a4d91bc0ebf0d464be1b056ad82dd32fb5d14f6695d5be7f9627c5f18f0096",
+      "bytes": 20309
+    },
+    {
+      "path": "provider_validation/results/actions-original-20261004/4-providers.yaml.bin",
+      "sha256": "8aa646afcde2229c31189d5a7cd831016c668e8c87acfba0d779aeb8ec188cca",
+      "bytes": 75728
+    },
+    {
+      "path": "provider_validation/results/actions-original-20261004/5-test_input_collection.py.bin",
+      "sha256": "b4ab08d17bd6420275d903421f4423ee1f2571b7a4676883fcd821a0bcd22d2d",
+      "bytes": 114136
+    },
+    {
+      "path": "provider_validation/results/actions-original-20261004/6-replay_input_capabilities.py.bin",
+      "sha256": "3bf799d6fa1814d0a59f51942628b3765a1eecbff54c42bcf261a1ad16fffb31",
+      "bytes": 29701
+    },
+    {
+      "path": "provider_validation/results/actions-original-20261004/7-normalization.py.bin",
+      "sha256": "e9541deab839fcbb91a9fca228e90012179bde05f584bded02491359b7b7917c",
+      "bytes": 14044
+    },
+    {
+      "path": "provider_validation/results/actions-original-20261004/manifest.json",
+      "sha256": "f784e6e6f470b9f7ab9fe781053033d6571b874c16d0de9b6f9a1da2f2ed9fe9",
+      "bytes": 2326
+    },
+    {
+      "path": "provider_validation/results/actions-original-20261004/normalization-baseline.json",
+      "sha256": "1ce36336a6e652e020f11a3bb95c6ba89d4b99bceaa541c637350854ed52a06f",
+      "bytes": 372
+    },
+    {
+      "path": "provider_validation/tests/replay_input_capabilities.py",
+      "sha256": "5b12eb4c5519b716ffd88a080211ab89429416bffd11ab283c24808ae0338fe3",
+      "bytes": 32477
+    },
+    {
+      "path": "src/stock_data_manage/cli.py",
+      "sha256": "582f5caedfc538a012d7a2f6e8cd7af3fe8b6fc9152e5b9e0a3fa2cb8810ae19",
+      "bytes": 14323
+    },
+    {
+      "path": "src/stock_data_manage/config/loader.py",
+      "sha256": "93bb55ab150c88751fe9a58a2b75737878c1b0f07233b8ec47009c4901bb11e9",
+      "bytes": 26090
+    },
+    {
+      "path": "src/stock_data_manage/pipeline/inputs.py",
+      "sha256": "a8a775a8ed568e622032b766d0ae666ab7a22aa67ba7e104c8c694fa1f3948f2",
+      "bytes": 41146
+    },
+    {
+      "path": "src/stock_data_manage/providers/akshare/boards.py",
+      "sha256": "2060f150831cebaf707ed5becedc35428bc41d4428bab31555ed1d2bf817d122",
+      "bytes": 12416
+    },
+    {
+      "path": "src/stock_data_manage/providers/baostock/industry.py",
+      "sha256": "16c41b379eecbd87f082bd042e27fad7f3d8d77b5bfc6a3e8a286209b068494a",
+      "bytes": 10837
+    },
+    {
+      "path": "src/stock_data_manage/providers/baostock/session.py",
+      "sha256": "70ce19cdde1d6a8ed0c3d3db29caa28d1d8069826136ab6dd7fb6a2ef8c7b832",
+      "bytes": 15771
+    },
+    {
+      "path": "src/stock_data_manage/providers/contracts.py",
+      "sha256": "a4b16abc7e3686a4eb2791dcd4545fb2404e0214bf32e20db19d2582d39ea447",
+      "bytes": 5153
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/dividend.py",
+      "sha256": "5706a8cdb37eeeb8f66cb033a3091dd1b6ec1ed83d72d0f9fbeb8f5c75d9649b",
+      "bytes": 6407
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/financial.py",
+      "sha256": "ff9e8f647711208d57fdcd157d9dce52d6b6bc10c5421b1a667b465466c50ea2",
+      "bytes": 24936
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/fund_flow.py",
+      "sha256": "0cf655efa0854d18651bb4f04f985f0f210b81a6d9eff065604d235ed8f75280",
+      "bytes": 5046
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/limit_pool.py",
+      "sha256": "2fbdfe3da3129545dfe8d2e457be7c42225696ddd74270567ae765e4b413f5ae",
+      "bytes": 5663
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/realtime.py",
+      "sha256": "6e09d2a5014cf316c4d1e26e913a44d5c2fbad95fb44d95cba159ef881f03bca",
+      "bytes": 16746
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/shareholder.py",
+      "sha256": "4c9d80f4d51845ac5541c42275f44f2a18643db5e9ccb705a3e16168f8db44c1",
+      "bytes": 4865
+    },
+    {
+      "path": "src/stock_data_manage/providers/sina/calendar.py",
+      "sha256": "3d114045f960bfcc94ade1ee03e4d25ebdf6980ba68aa2d0a2236bed78aaef05",
+      "bytes": 1388
+    },
+    {
+      "path": "src/stock_data_manage/providers/tencent/daily.py",
+      "sha256": "487a14fcbfc47146d6d5fd291fbf41667aba435e5fed22ea1ef61ded513fcaa7",
+      "bytes": 9941
+    },
+    {
+      "path": "src/stock_data_manage/providers/tencent/minute.py",
+      "sha256": "ff5cf1e91327bcab2e072bcfae9f1f77dca71a84ba26e456c26580a4d59d9cc1",
+      "bytes": 4709
+    },
+    {
+      "path": "src/stock_data_manage/providers/tencent/snapshot.py",
+      "sha256": "3278cadac776fe8cfe5d02775a5bf8f53bc1cb96c595a5f418172f53047434bf",
+      "bytes": 5160
+    },
+    {
+      "path": "src/stock_data_manage/providers/transport.py",
+      "sha256": "7cf1c5f1f9b526e54e7d82e60b95b35e1f8f91e60effc31d74052f9273988b03",
+      "bytes": 16593
+    },
+    {
+      "path": "src/stock_data_manage/quality/normalization.py",
+      "sha256": "3ed0d663b7fda9ac6cdf7f1252435f2351c783af3244ccba2c2b0f3891e29b3e",
+      "bytes": 14958
+    },
+    {
+      "path": "src/stock_data_manage/routing/factory.py",
+      "sha256": "e0e572c72c2f72d50931414b6b5be4e83691fdd38fce43f33701065139a6aa1f",
+      "bytes": 20529
+    },
+    {
+      "path": "src/stock_data_manage/storage/raw.py",
+      "sha256": "564c940feb99b358c41c5456c3142e7501b21505b5c2d8d88d811c53e145b752",
+      "bytes": 8487
+    },
+    {
+      "path": "tests/test_input_collection.py",
+      "sha256": "6316fe425211d28cf5a79a8a647fb73eb323d9e69e771c112c82e7c7450c587e",
+      "bytes": 127843
+    }
+  ]
+}

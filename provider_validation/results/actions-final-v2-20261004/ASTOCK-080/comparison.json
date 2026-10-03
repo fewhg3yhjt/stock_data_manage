@@ -1,0 +1,16 @@
+{
+  "input_id": "ASTOCK-080",
+  "mode": "offline_replay",
+  "row_count": 50,
+  "all_retained_source_fields_equal": true,
+  "all_business_fields_equal": true,
+  "request_comparison_equal": true,
+  "source_total_count": 146773,
+  "source_response_hashes": [
+    "1c2a8d00cf4f119dd234ffaa5345995ee5c49ab2a671f2090f015c566ba67bec"
+  ],
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-final-v2-20261004\\ASTOCK-080\\candidate\\ASTOCK-080-8456ebd27e9f\\2026-10-03\\input_report\\eastmoney\\holder_trades\\report.json",
+  "report_sha256": "50beb84c14c826e65dc09240f9036cf55d11641e6f3bf01d5afe36e6eaf4441b",
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-final-v2-20261004\\ASTOCK-080\\original-parsed.json",
+  "original_parsed_sha256": "12630c4d82bb9b07c9f3a91ffd9ed63eb26a7e32275733f5f648994076476aa4"
+}

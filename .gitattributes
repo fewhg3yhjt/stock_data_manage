@@ -140,3 +140,19 @@
 /config/datasets/institution_survey.yaml text eol=lf
 /config/normalization/institution_survey.yaml text eol=lf
 /provider_validation/docs/2026-10-04-eastmoney-events-input-collection.md text eol=lf
+
+# Financial-action source and response evidence is immutable.
+/provider_validation/results/actions-*-20261004/** -text whitespace=cr-at-eol
+/provider_validation/results/actions-*-20261004/**/*.bin binary
+/provider_validation/results/actions-*-20261004-*.xml -text whitespace=-blank-at-eol,cr-at-eol
+/provider_validation/results/actions-*-20261004-*.json -text whitespace=cr-at-eol
+/config/datasets/holder_trades.yaml text eol=lf
+/config/normalization/holder_trades.yaml text eol=lf
+/config/datasets/buyback.yaml text eol=lf
+/config/normalization/buyback.yaml text eol=lf
+/config/datasets/pledge.yaml text eol=lf
+/config/normalization/pledge.yaml text eol=lf
+/config/datasets/ipo_calendar.yaml text eol=lf
+/config/normalization/ipo_calendar.yaml text eol=lf
+/provider_validation/docs/2026-10-04-eastmoney-actions-input-collection.md text eol=lf
+/src/stock_data_manage/quality/normalization.py text eol=lf

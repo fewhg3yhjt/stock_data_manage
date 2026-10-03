@@ -1,0 +1,22 @@
+dataset: industry_index_daily
+rules:
+  - id: ths-industry-index-input-v1
+    input_id: SDA-BOARD-002
+    provider: ths
+    endpoint: industry_index_daily
+    field_mapping:
+      trade_date: 日期
+      open: 开盘价
+      high: 最高价
+      low: 最低价
+      close: 收盘价
+      volume: 成交量
+      amount: 成交额
+    context_fields: {board_type: board_type, board_code: board_code, board_name: board_name, source: source}
+    source_required_numeric: [成交量, 成交额]
+    positive_fields: [open, high, low, close]
+    unverified_fields: [volume, amount]
+    status: pending_validation
+    version: ths-industry-index-input-v1
+    evidence_refs: [SDA-BOARD-002]
+    notes: 保留SDK窗口筛选；成交量及成交额单位未确认，标准字段置空、来源字段保留。

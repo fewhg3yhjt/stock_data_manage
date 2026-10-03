@@ -1,0 +1,16 @@
+{
+  "input_id": "ASTOCK-081",
+  "mode": "offline_replay",
+  "row_count": 50,
+  "all_retained_source_fields_equal": true,
+  "all_business_fields_equal": true,
+  "request_comparison_equal": true,
+  "source_total_count": 5532,
+  "source_response_hashes": [
+    "cd9747ca8dbb0823a1cbdf8db5eb9b755b6ca739ee537c34705e57d6076554ed"
+  ],
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-final-20261004\\ASTOCK-081\\candidate\\ASTOCK-081-85313d5bded3\\2026-10-03\\input_report\\eastmoney\\buyback\\report.json",
+  "report_sha256": "761ac378ed87562548c787f75e61919119c681acde3149e29418253710ed2e76",
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actions-final-20261004\\ASTOCK-081\\original-parsed.json",
+  "original_parsed_sha256": "30f7fc6ead873876717cb46d1b054ff45c090a134bdeab0204e8de3e9470e347"
+}
