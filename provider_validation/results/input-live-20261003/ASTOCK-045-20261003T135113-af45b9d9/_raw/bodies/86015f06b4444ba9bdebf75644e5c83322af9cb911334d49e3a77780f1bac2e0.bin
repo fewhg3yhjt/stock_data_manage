@@ -1,0 +1,84 @@
+def stock_zt_pool_em(date: str = "20241008") -> pd.DataFrame:
+    """
+    东方财富网-行情中心-涨停板行情-涨停股池
+    https://quote.eastmoney.com/ztb/detail#type=ztgc
+    :param date: 交易日
+    :type date: str
+    :return: 涨停股池
+    :rtype: pandas.DataFrame
+    """
+    url = "https://push2ex.eastmoney.com/getTopicZTPool"
+    params = {
+        "ut": "<redacted>",
+        "dpt": "wz.ztzt",
+        "Pageindex": "0",
+        "pagesize": "10000",
+        "sort": "fbt:asc",
+        "date": date,
+    }
+    r = requests.get(url, params=params)
+    data_json = r.json()
+    if data_json["data"] is None:
+        return pd.DataFrame()
+    if len(data_json["data"]["pool"]) == 0:
+        return pd.DataFrame()
+    temp_df = pd.DataFrame(data_json["data"]["pool"])
+    temp_df.reset_index(inplace=True)
+    temp_df["index"] = range(1, len(temp_df) + 1)
+    temp_df.columns = [
+        "序号",
+        "代码",
+        "_",
+        "名称",
+        "最新价",
+        "涨跌幅",
+        "成交额",
+        "流通市值",
+        "总市值",
+        "换手率",
+        "连板数",
+        "首次封板时间",
+        "最后封板时间",
+        "封板资金",
+        "炸板次数",
+        "所属行业",
+        "涨停统计",
+    ]
+    temp_df["涨停统计"] = (
+        temp_df["涨停统计"].apply(lambda x: dict(x)["days"]).astype(str)
+        + "/"
+        + temp_df["涨停统计"].apply(lambda x: dict(x)["ct"]).astype(str)
+    )
+    temp_df = temp_df[
+        [
+            "序号",
+            "代码",
+            "名称",
+            "涨跌幅",
+            "最新价",
+            "成交额",
+            "流通市值",
+            "总市值",
+            "换手率",
+            "封板资金",
+            "首次封板时间",
+            "最后封板时间",
+            "炸板次数",
+            "涨停统计",
+            "连板数",
+            "所属行业",
+        ]
+    ]
+    temp_df["首次封板时间"] = temp_df["首次封板时间"].astype(str).str.zfill(6)
+    temp_df["最后封板时间"] = temp_df["最后封板时间"].astype(str).str.zfill(6)
+    temp_df["最新价"] = temp_df["最新价"] / 1000
+    temp_df["涨跌幅"] = pd.to_numeric(temp_df["涨跌幅"], errors="coerce")
+    temp_df["最新价"] = pd.to_numeric(temp_df["最新价"], errors="coerce")
+    temp_df["成交额"] = pd.to_numeric(temp_df["成交额"], errors="coerce")
+    temp_df["流通市值"] = pd.to_numeric(temp_df["流通市值"], errors="coerce")
+    temp_df["总市值"] = pd.to_numeric(temp_df["总市值"], errors="coerce")
+    temp_df["换手率"] = pd.to_numeric(temp_df["换手率"], errors="coerce")
+    temp_df["封板资金"] = pd.to_numeric(temp_df["封板资金"], errors="coerce")
+    temp_df["炸板次数"] = pd.to_numeric(temp_df["炸板次数"], errors="coerce")
+    temp_df["连板数"] = pd.to_numeric(temp_df["连板数"], errors="coerce")
+    return temp_df

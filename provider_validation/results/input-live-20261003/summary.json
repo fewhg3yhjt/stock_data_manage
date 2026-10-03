@@ -1,0 +1,39 @@
+{
+  "scope": "two symbols, one explicit date pool and one calendar response",
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "reports": [
+    {
+      "input_id": "ASTOCK-002-daily",
+      "status": "candidate_complete",
+      "row_count": 14,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\input-live-20261003\\ASTOCK-002-daily-20261003T135105-ecb64641\\2026-10-03\\input_report\\tencent\\kline_daily\\report.json",
+      "failure_class": null,
+      "report_sha256": "10a08896592bc52e4522d5e5db84711a52d57f4e5503a6b1268dc13579776759"
+    },
+    {
+      "input_id": "ASTOCK-002-5m",
+      "status": "candidate_complete",
+      "row_count": 96,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\input-live-20261003\\ASTOCK-002-5m-20261003T135106-843ce1bc\\2026-10-03\\input_report\\tencent\\kline_5m\\report.json",
+      "failure_class": null,
+      "report_sha256": "6163b716e93bf33673b354a2b11affaf4ac74a1eb9874a7a00551132b56bd7be"
+    },
+    {
+      "input_id": "ASTOCK-070",
+      "status": "candidate_complete",
+      "row_count": 8797,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\input-live-20261003\\ASTOCK-070-20261003T135111-8371c45b\\2026-10-03\\input_report\\sina\\trading_calendar\\report.json",
+      "failure_class": null,
+      "report_sha256": "3175c530495b6614adde82c6336ea5c4a4b65cf2bc4c412fc3fbb92ab4c3127d"
+    },
+    {
+      "input_id": "ASTOCK-045",
+      "status": "candidate_complete",
+      "row_count": 52,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\input-live-20261003\\ASTOCK-045-20261003T135113-af45b9d9\\2026-10-03\\input_report\\eastmoney\\limit_up_pool\\report.json",
+      "failure_class": null,
+      "report_sha256": "ed1e07701ca92a4b9b0d3e31e03cabc1701a07db111d74f71061a71ab2c0846c"
+    }
+  ]
+}

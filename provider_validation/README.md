@@ -36,6 +36,10 @@ python provider_validation/tests/replay_sector_capability_archives.py
 
 成功输入的第一阶段契约见 [输入能力框架说明](docs/2026-10-03-input-capability-framework.md)，阅读清单位于 `coverage/successful-input-capabilities.csv`，证据关联位于同名 JSON。可用 `python provider_validation/tests/prepare_capability_results.py --input-catalog` 离线重建；该模式校验已存响应/派生表/源码哈希，不改写原覆盖表、不自动授予生产路由资格。
 
+四项输入已经通过现有配置与 Provider 执行字段模板和映射，入口为 `stock-data collect-input`。参数、示例与待验证边界见 [YAML 输入采集实现说明](docs/2026-10-03-yaml-input-collection.md)；[最终离线比较](results/input-verified-20261003/comparison.json)、[在线摘要](results/input-live-20261003/summary.json)及[回归测试结果](results/2026-10-03-yaml-input-collection-tests.xml)均已保存。可用 `python provider_validation/tests/replay_input_capabilities.py --output-root provider_validation/results/<新目录>` 离线重建候选与比较证据。
+
+本次实现状态清单位于 `coverage/successful-input-capabilities-20261003-implemented.csv` 与同名 JSON。第一阶段同名无日期清单保留；生成独立版本可使用 `prepare_capability_results.py --input-catalog --catalog-name <新文件名>`。
+
 本次低频真实验证使用 `python provider_validation/tests/run_a_stock_rate_limited_probes.py --ids <显式编号列表>`。入口要求显式列出能力编号，不默认全跑；请求串行执行，同一主机最短间隔3秒，瞬时错误最多重试2次且至少退避5秒，不重试403/429；主机触发403/429或连续两次传输/服务器错误后，本轮暂停该主机。报表/PDF最多请求1页/1份。每批写入独立 `results/live-probes/<run-id>/`，原始HTTP返回在 `_raw/`，策略文件、摘要CSV和解析输出与原始证据同批保存。
 
 BaoStock行业快照使用 `python provider_validation/tests/run_baostock_industry_live_probe.py --date YYYY-MM-DD --output results/live-probes/<unique-run-id>`。只执行证券清单与行业快照各一次，查询间最少等待3秒；持久化SDK解码字段和行（不包含SDK未暴露的TCP线缆帧），再保存派生交叉核验表。

@@ -9,7 +9,7 @@ from ..config.loader import ProviderConfig, load_capability_routes, load_provide
 from ..domain import Adjustment, Dataset, Exchange, AssetType
 from ..providers.sina import SinaDailyProvider, SinaMinuteProvider, SinaSnapshotProvider
 from ..providers.tencent import TencentDailyProvider, TencentMinuteProvider, TencentSnapshotProvider
-from ..providers.transport import HttpTransport, UrlLibTransport, RequestPacer, PacedTransport
+from ..providers.transport import HttpTransport, UrlLibTransport, RequestPacer, PacedTransport, RequestsTransport
 from ..providers.tdx import TdxMinuteProvider
 from ..providers.baostock import BaoStockDailyProvider, BaoStockIndustryMembershipProvider, BaoStockMinuteProvider
 from ..providers.eastmoney import (
@@ -24,6 +24,34 @@ from ..providers.eastmoney.realtime import EastMoneyRequestsTransport
 from ..providers.akshare import AkShareBoardProvider, AkShareDailyProvider
 from ..providers.ths import ThsBoardProvider
 from .capabilities import CapabilityRegistry
+
+
+def build_input_provider(contract, *, providers_path, client=None):
+    """Build the four explicit input adapters; this does not register production routing."""
+    if contract.implementation_status != "implemented_validation_only":
+        raise ValueError("input adapter is not implemented for validation")
+    expected_methods = {"ASTOCK-002-daily": "fetch_window", "ASTOCK-002-5m": "fetch_recent",
+                        "ASTOCK-045": "fetch", "ASTOCK-070": "fetch"}
+    if contract.input_id not in expected_methods or contract.runtime_method != expected_methods[contract.input_id]:
+        raise ValueError("input runtime method does not match its verified adapter")
+    headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+               "Referer": "https://gu.qq.com/"}
+    if contract.input_id == "ASTOCK-002-daily":
+        provider = TencentDailyProvider(RequestsTransport(headers), adjustment=Adjustment.FORWARD)
+        provider.endpoint, provider.capability_version = contract.endpoint, "tencent-window-input-v1"
+        return provider
+    if contract.input_id == "ASTOCK-002-5m":
+        config = next(c for c in load_provider_configs(providers_path) if c.provider == "tencent" and c.endpoint == "native_1m")
+        capability = replace(config.capability(), endpoint=contract.endpoint, version="tencent-recent-5m-input-v1",
+                             datasets=frozenset({Dataset.MINUTE_BAR_5M}), frequencies=frozenset({5}))
+        return TencentMinuteProvider(RequestsTransport(headers), capability, endpoint=contract.endpoint)
+    if contract.input_id == "ASTOCK-045":
+        from ..providers.eastmoney.limit_pool import EastMoneyLimitUpProvider
+        return EastMoneyLimitUpProvider(client=client)
+    if contract.input_id == "ASTOCK-070":
+        from ..providers.sina.calendar import SinaTradingCalendarProvider
+        return SinaTradingCalendarProvider(client=client)
+    raise ValueError("no executable input adapter for this input ID")
 
 
 def build_provider(config: ProviderConfig, transport: HttpTransport | None = None, *, capability=None, pacer=None):

@@ -25,6 +25,12 @@ Provider 接口验证资料统一位于 `provider_validation/`：`tests/` 保存
 
 输入能力第一阶段的设计与实现边界见 `provider_validation/docs/2026-10-03-input-capability-framework.md`。现有 `provider_validation/tests/prepare_capability_results.py --input-catalog` 离线生成 `coverage/successful-input-capabilities.csv` 和同名 JSON，关联源记录、原响应和哈希。该阶段回归证据保存于 `results/2026-10-03-input-capability-framework-tests.xml` 与 `results/2026-10-03-input-capability-framework-verification.json`，不属于生产数据。
 
+四项输入的 YAML 执行实现、使用方式与边界见 `provider_validation/docs/2026-10-03-yaml-input-collection.md`。`provider_validation/tests/replay_input_capabilities.py` 执行 `tests/test_input_collection.py` 中的离线合同与原实现对照，持久化比较结果；最终回放证据位于 `results/input-verified-20261003/`，在线证据位于 `results/input-live-20261003/`，回归结果位于 `results/2026-10-03-yaml-input-collection-tests.xml`。开发中间结果及存储失败记录位于同目录下其他 `input-*-20261003/` 批次，保留代码版本与失败类别，不混作最终验证结论。
+
+`config/datasets/minute_bar_5m.yaml`、`limit_up_pool.yaml`、`trading_calendar.yaml` 分别定义三种输入的字段类型/单位/必填约束/主键；`config/normalization/` 下的同名文件定义来源映射与转换规则。`results/2026-10-03-yaml-input-collection-verification.json` 关联测试、最终回放、在线证据及当前代码/配置哈希。当前实现版能力清单位于 `coverage/successful-input-capabilities-20261003-implemented.csv/json`，保留第一阶段无日期版本。`results/sdk-snapshot-redaction-20261003.json` 记录本次生成的 SDK 源码快照脱敏，不改变 HTTP 响应与来源数据。
+
+`.gitattributes` 对本次新证据目录禁用 Git 换行转换，并固定新增实现/模板的 LF 格式，避免提交和检出改变证据字节及其 SHA-256 引用；不更改旧证据属性。
+
 ## 领域模型
 
 | 文件 | 职责 |
@@ -39,10 +45,12 @@ Provider 接口验证资料统一位于 `provider_validation/`：`tests/` 保存
 |---|---|
 | `providers/base.py` | 日线、分钟等 Provider 协议以及 Fixture Provider 基础实现 |
 | `providers/contracts.py` | HTTP 响应、失败分类、返回窗口和 Provider Contract |
-| `providers/transport.py` | 公共 HTTP 传输、共享请求组限速与委托包装、快照返回模型、来源时间和 TDX 行记录解析工具；保留来源传输会话和重试行为 |
-| `providers/tencent/daily.py` | Tencent 普通历史日线和前复权历史日线 |
+| `providers/transport.py` | 公共 HTTP 传输、共享请求组限速、单项输入会话捕获与严格回放、快照和 TDX 行解析；保留来源会话/代理并复用原验证重试策略 |
+| `providers/tencent/daily.py` | Tencent 既有日线采集与明确日期窗口的前复权候选输入；共享源码合同的主机回退 |
 | `providers/tencent/snapshot.py` | Tencent 批量收盘快照 |
-| `providers/tencent/minute.py` | Tencent 原生 1m 分钟线 |
+| `providers/tencent/minute.py` | Tencent 原生 1m 分钟线与最近 5m 候选输入 |
+| `providers/sina/calendar.py` | 原 SDK 新浪交易日历来源适配，返回明确的正向日期并复用现有日历协议 |
+| `providers/eastmoney/limit_pool.py` | 原 SDK 东财涨停池日期快照，保留中文来源字段 |
 | `providers/sina/daily.py` | Sina 普通历史日线 |
 | `providers/sina/snapshot.py` | Sina 批量收盘快照 |
 | `providers/sina/minute.py` | Sina 原生 5m 分钟线 |
@@ -73,7 +81,7 @@ Provider 接口验证资料统一位于 `provider_validation/`：`tests/` 保存
 
 | 文件 | 职责 |
 |---|---|
-| `config/loader.py` | 加载来源、输入契约、参数来源、采集意图、路由和归一化配置；参数绑定与类型/范围校验；配置不生成验证有效期 |
+| `config/loader.py` | 加载来源、输入契约、参数来源、采集意图、字段模板、路由与映射/状态/范围配置；参数绑定与类型/范围校验；配置不生成验证有效期 |
 | `routing/factory.py` | 按现有端点创建 Provider，保留来源传输并共享限速；读取已有元数据证据，按实际验证范围和原有效期注册能力，并在选择时复查证据与冷却状态 |
 
 ## 能力路由器
@@ -89,7 +97,7 @@ Provider 接口验证资料统一位于 `provider_validation/`：`tests/` 保存
 
 | 文件 | 职责 |
 |---|---|
-| `quality/normalization.py` | Provider 专属字段、单位、时间和来源信息标准化 |
+| `quality/normalization.py` | 执行 YAML 来源字段映射、字段类型/倍率/时区/空值、规则状态与来源范围；支持各数据域的候选字段合同 |
 | `quality/validation.py` | OHLC、日期、时间键和基础记录质量校验 |
 | `quality/resolution.py` | 来源优先级、字段完整度、冲突识别和记录仲裁 |
 | `quality/publication.py` | 日线发布门槛和数据集发布策略加载 |
@@ -100,6 +108,7 @@ Provider 接口验证资料统一位于 `provider_validation/`：`tests/` 保存
 | 文件 | 职责 |
 |---|---|
 | `pipeline/daily.py` | 日线按来源补缺、标准化、校验、候选生成和发布编排 |
+| `pipeline/inputs.py` | 单项配置输入的采集/回放、原响应留证、来源行及按 YAML 映射的候选输出；不注册正式路由 |
 | `pipeline/daily_reconciliation.py` | 日线 provisional/final 合并、缺失统计和盘后校准 |
 | `pipeline/minute.py` | Watchlist 实时分钟采集和 Hot Store 写入 |
 | `pipeline/minute_reconciliation.py` | 分钟盘后校准、final 提升、冲突隔离和完整性处理 |
@@ -113,7 +122,7 @@ Provider 接口验证资料统一位于 `provider_validation/`：`tests/` 保存
 
 | 文件 | 职责 |
 |---|---|
-| `storage/raw.py` | 不覆盖 Raw Object Store 和原始响应引用 |
+| `storage/raw.py` | 不覆盖的 Raw Object Store、解析前响应字节/清单、哈希复查、脱敏和匹配有效响应复用 |
 | `storage/hot.py` | SQLite WAL Hot Minute Store 和即时查询数据 |
 | `storage/parquet.py` | Canonical Parquet 分区、Manifest、文件锁和原子发布 |
 | `storage/metadata.py` | DuckDB 元数据、Attempt、Provider 健康、Probe 验证记录、既有能力证据查询和冲突记录；不新增能力管理数据库 |
@@ -140,7 +149,7 @@ Provider 接口验证资料统一位于 `provider_validation/`：`tests/` 保存
 | `worker/scheduler.py` | Phase 1 配置化任务时间表和按日幂等调度 |
 | `worker/acceptance.py` | 离线验收回放和容量/恢复验收证据 |
 | `worker/__init__.py` | Worker 包说明，不承载业务实现 |
-| `cli.py` | `probe-*`、`recover`、`acceptance-offline` 等命令行入口，只负责参数解析和服务组装 |
+| `cli.py` | `collect-input`、`probe-*`、`recover`、`acceptance-offline` 等入口，负责参数解析和现有流程组装 |
 | `__init__.py` | 包级公共领域模型导出 |
 
 ## 迁移约束

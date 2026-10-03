@@ -3,11 +3,13 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import date
 from typing import Any, Sequence
+from datetime import datetime, timedelta
+from time import time
 
 from ...domain import Adjustment, AssetType
 from ...routing.capabilities import ProviderCapability
 from ..base import FetchResult
-from ..contracts import EndpointContract, FailureClass, ProviderContractError, WindowStatus
+from ..contracts import EndpointContract, FailureClass, ProviderContractError, WindowStatus, InputFetchResult
 from ..transport import HttpTransport
 
 
@@ -30,6 +32,8 @@ class TencentDailyProvider:
     )
     adjustment: Adjustment = Adjustment.NONE
     supported_asset_types: frozenset[AssetType] = field(default_factory=lambda: frozenset(AssetType))
+    input_hosts: tuple[str, ...] = ("https://web.ifzq.gtimg.cn", "https://proxy.finance.qq.com/ifzqgtimg", "https://ifzq.gtimg.cn")
+    host_down_until: dict[str, float] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         if self.adjustment is Adjustment.BACKWARD:
@@ -96,6 +100,84 @@ class TencentDailyProvider:
             str(returned_rows[0]["trade_date"]) if returned_rows else None,
             str(returned_rows[-1]["trade_date"]) if returned_rows else None, self.adjustment,
         )
+
+    def fetch_window(self, code: str, start: date, end: date, adjust: str = "qfq") -> InputFetchResult:
+        """Verified historical request shape; returns source positional fields for YAML mapping."""
+        symbol = tencent_symbol(code)
+        if adjust != "qfq" or end < start:
+            raise ValueError("only an ordered qfq window is supported by this input")
+        cursor, by_date, hosts = start, {}, []
+        while cursor <= end:
+            stop = min(cursor + timedelta(days=699), end)
+            data, host = tencent_kline_call(self.transport, "/appstock/app/fqkline/get",
+                f"{symbol},day,{cursor.isoformat()},{stop.isoformat()},640,qfq", self.input_hosts, self.host_down_until)
+            node = data.get(symbol)
+            if not isinstance(node, dict) or not isinstance(node.get("qfqday", node.get("day")), list):
+                raise ProviderContractError("Tencent daily list changed", FailureClass.SCHEMA_CHANGED, retryable=False)
+            items = node.get("qfqday", node.get("day"))
+            if "qfqday" in node and not items and node.get("day"):
+                raise ProviderContractError("empty adjusted list cannot use unadjusted prices", FailureClass.SCHEMA_CHANGED, retryable=False)
+            for item in items:
+                if not isinstance(item, list) or len(item) < 6:
+                    raise ProviderContractError("Tencent daily row changed", FailureClass.SCHEMA_CHANGED, retryable=False)
+                try:
+                    text = str(item[0]).strip()
+                    stamp = datetime.strptime(text, "%Y%m%d" if len(text) == 8 and text.isdigit() else "%Y-%m-%d").date()
+                except ValueError as exc:
+                    raise ProviderContractError("Tencent daily date changed", FailureClass.SCHEMA_CHANGED, retryable=False) from exc
+                if not cursor <= stamp <= stop:
+                    raise ProviderContractError("Tencent daily returned a date outside its requested segment", FailureClass.SCHEMA_CHANGED, retryable=False)
+                if stamp in by_date:
+                    raise ProviderContractError("duplicate Tencent daily date", FailureClass.SCHEMA_CHANGED, retryable=False)
+                by_date[stamp] = {"symbol": symbol, **{str(i): value for i, value in enumerate(item)}}
+            hosts.append(host)
+            cursor = stop + timedelta(days=1)
+        if not by_date:
+            raise ProviderContractError("Tencent window has zero bars", FailureClass.TEMPORARY_EMPTY, retryable=True)
+        return InputFetchResult(tuple(by_date[stamp] for stamp in sorted(by_date)),
+                                " | ".join(host + "/appstock/app/fqkline/get" for host in dict.fromkeys(hosts)))
+
+
+def tencent_symbol(code: str) -> str:
+    import re
+    match = re.fullmatch(r"(?:(sh|sz|bj))?(\d{6})", str(code).lower())
+    if match is None:
+        raise ValueError("invalid Tencent security code")
+    prefix, digits = match.groups()
+    inferred = "bj" if digits.startswith(("4", "8", "92")) else "sh" if digits.startswith(("5", "6", "9")) else "sz"
+    if prefix and prefix != inferred:
+        raise ValueError("security code and exchange prefix disagree")
+    if inferred == "bj":
+        raise ValueError("this verified Tencent input excludes BSE")
+    return inferred + digits
+
+
+def tencent_kline_call(transport, path, param, hosts, down_until):
+    """Keep the source helper's host order, 120s cooldown, param-error and empty checks."""
+    errors = []
+    for host in hosts:
+        if down_until.get(host, 0) > time():
+            continue
+        try:
+            response = transport.get(host + path, params={"param": param}, timeout_seconds=(8, 20))
+            payload = EndpointContract(frozenset()).parse_json(response) if response.body.strip() else {}
+        except Exception as exc:
+            # Missing archive entries / persistence failures are execution failures, never a source fallback.
+            from requests import RequestException
+            if isinstance(exc, ValueError) or (isinstance(exc, OSError) and not isinstance(exc, RequestException)):
+                raise
+            errors.append(type(exc).__name__)
+            down_until[host] = time() + 120
+            continue
+        if not isinstance(payload, dict):
+            down_until[host] = time() + 120
+            continue
+        if payload.get("msg") == "param error":
+            raise ValueError("Tencent rejected the explicit kline parameters")
+        if isinstance(payload.get("data"), dict) and payload["data"]:
+            return payload["data"], host
+        down_until[host] = time() + 120
+    raise ProviderContractError(f"Tencent hosts failed: {','.join(errors)}", FailureClass.CONNECTION, retryable=True)
 
 
 def _combined_status(statuses: list[WindowStatus], target_rows_found: bool) -> WindowStatus:

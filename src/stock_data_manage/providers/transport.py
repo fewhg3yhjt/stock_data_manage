@@ -3,21 +3,150 @@ from __future__ import annotations
 import re
 import socket
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Mapping, Protocol, Sequence
 from threading import Lock, BoundedSemaphore
 from time import monotonic, sleep
 from contextlib import contextmanager
 from math import isfinite
+import json
+from pathlib import Path
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlsplit
 from urllib.request import Request, urlopen
 
 from .contracts import EndpointContract, FailureClass, HttpResponse, ProviderContractError
+from ..storage.raw import RawObjectStore, sanitized_url, sanitized_headers, sanitized_metadata
 
 
 class HttpTransport(Protocol):
     def get(self, url: str, *, params: Mapping[str, str], timeout_seconds: float) -> HttpResponse: ...
+
+
+@dataclass(slots=True)
+class RequestsTransport:
+    """The verified Tencent helper uses requests.request, its UA, Referer and tuple timeout."""
+    headers: Mapping[str, str]
+
+    def get(self, url, *, params, timeout_seconds):
+        import requests
+        response = requests.request("GET", url, params=params, headers=dict(self.headers),
+                                    timeout=timeout_seconds, allow_redirects=True)
+        response.raise_for_status()
+        return HttpResponse(response.status_code, dict(response.headers), response.content)
+
+
+_REQUEST_CAPTURE_LOCK = Lock()
+
+
+@contextmanager
+def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
+                      replay_manifest=None, evidence_roots=(), max_age_seconds=0, sdk_retry_policy=False):
+    """Serialized single-input capture/replay. Session identity, proxies and request arguments are retained.
+
+    SDK session policy matches the saved conservative probe. Internal urllib3 retries
+    remain opaque: this scope must never be labeled physical_request enforcement.
+    """
+    import requests
+    from requests.adapters import HTTPAdapter
+    from urllib3.util.retry import Retry
+
+    events = []
+    replay_records = []
+    if replay_manifest:
+        replay_manifest = Path(replay_manifest)
+        for number, line in enumerate(replay_manifest.read_text(encoding="utf-8").splitlines(), 1):
+            record = json.loads(line)
+            if record.get("event") == "http_response":
+                replay_records.append((number, record))
+    used = set()
+    with _REQUEST_CAPTURE_LOCK:
+        original_send, original_init = requests.Session.send, requests.Session.__init__
+        scope = sanitized_metadata(scope)
+        def make_response(request, record, body):
+            response = requests.Response()
+            response.status_code = int(record["status_code"])
+            response.headers.update(record.get("response_headers", {}))
+            response.encoding = record.get("encoding") or "utf-8"
+            response._content = body
+            response._content_consumed = True
+            response.url, response.request = request.url, request
+            return response
+
+        def send(session, request, **kwargs):
+            source_ref = None
+            mode = "live"
+            if replay_manifest:
+                matching = next(((n, r) for n, r in replay_records if n not in used
+                                 and r.get("method") == request.method
+                                 and sanitized_url(r["url"]) == sanitized_url(request.url)), None)
+                if matching is None:
+                    raise ValueError("no exact archived request match; replay never falls back to network")
+                number, record = matching
+                used.add(number)
+                source_ref = {"manifest": str(replay_manifest.resolve()), "line": number}
+                if record.get("outcome") == "transport_error":
+                    store.append_event({"event": "http_response", "mode": "replay", "outcome": "transport_error",
+                                        "url": sanitized_url(request.url), "method": request.method,
+                                        "request_headers": sanitized_headers(request.headers),
+                                        "fetched_at_utc": datetime.now(timezone.utc).isoformat(),
+                                        "scope": scope, "code_version": code_version,
+                                        "provider": provider, "endpoint": endpoint, "source_ref": source_ref,
+                                        "error_type": record.get("error_type")})
+                    raise requests.ConnectionError("archived transport failure")
+                response = make_response(request, record, RawObjectStore.read_response(replay_manifest, record))
+                mode = "replay"
+            else:
+                cached = RawObjectStore.find_cached_response(evidence_roots, url=request.url, method=request.method,
+                    scope=scope, code_version=code_version, max_age_seconds=max_age_seconds)
+                if cached:
+                    manifest, record, body = cached
+                    response = make_response(request, record, body)
+                    source_ref, mode = {"manifest": str(manifest.resolve()), "sha256": record["body_sha256"]}, "cached"
+                else:
+                    host = urlsplit(request.url).hostname or "unknown"
+                    pacer.configure(host, 3, 1)
+                    try:
+                        with pacer.request(host):
+                            response = original_send(session, request, **kwargs)
+                    except Exception as exc:
+                        store.append_event({"event": "http_response", "mode": "live", "outcome": "transport_error",
+                            "url": sanitized_url(request.url), "method": request.method,
+                            "request_headers": sanitized_headers(request.headers), "scope": scope,
+                            "provider": provider, "endpoint": endpoint, "code_version": code_version,
+                            "fetched_at_utc": datetime.now(timezone.utc).isoformat(),
+                            "error_type": type(exc).__name__})
+                        raise
+            event = store.record_response(response=response, url=request.url, method=request.method,
+                request_headers=request.headers, scope=scope, provider=provider, endpoint=endpoint,
+                code_version=code_version, mode=mode, source_ref=source_ref,
+                request_options={"timeout": kwargs.get("timeout"), "allow_redirects": kwargs.get("allow_redirects", True),
+                                 "trust_env": session.trust_env, "proxies": kwargs.get("proxies", {}),
+                                 "sdk_retry_policy": sdk_retry_policy})
+            events.append(event)
+            return response
+
+        class ConservativeRetry(Retry):
+            def get_backoff_time(self):
+                return max(5.0, super().get_backoff_time()) if self.history else 0
+
+            def is_retry(self, method, status_code, has_retry_after=False):
+                return False if status_code in {403, 429} else super().is_retry(method, status_code, has_retry_after)
+
+        def init(session, *args, **kwargs):
+            original_init(session, *args, **kwargs)
+            if sdk_retry_policy:
+                policy = ConservativeRetry(total=2, connect=2, read=2, status=2, backoff_factor=5,
+                    backoff_max=300, status_forcelist=(500, 502, 503, 504), allowed_methods=frozenset({"GET", "POST"}),
+                    respect_retry_after_header=True, raise_on_status=False)
+                session.mount("https://", HTTPAdapter(max_retries=policy))
+                session.mount("http://", HTTPAdapter(max_retries=policy))
+        requests.Session.send = send
+        requests.Session.__init__ = init
+        try:
+            yield events
+        finally:
+            requests.Session.send, requests.Session.__init__ = original_send, original_init
 
 
 class RequestPacer:

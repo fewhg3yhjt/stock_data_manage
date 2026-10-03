@@ -1,0 +1,7 @@
+{
+  "reason": "Redacted SDK source-code client selector literals; no HTTP response bytes or existing user evidence changed.",
+  "superseded_generated_snapshot_paths": [
+    "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\input-replay-20261003\\ASTOCK-045\\ASTOCK-045-20261003T134948-7b63c4bb\\_raw\\bodies\\07acb88bd62a8a1c79d600382fb0a1f8b8dee5737015ac644f6cd8641ac648d4.bin",
+    "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\input-live-20261003\\ASTOCK-045-20261003T135113-af45b9d9\\_raw\\bodies\\07acb88bd62a8a1c79d600382fb0a1f8b8dee5737015ac644f6cd8641ac648d4.bin"
+  ]
+}

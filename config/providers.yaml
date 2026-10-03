@@ -631,6 +631,8 @@ input_capabilities:
     effective_concurrency: 1
     request_limit_enforcement: unimplemented
   ASTOCK-002-5m:
+    dataset: minute_bar_5m
+    runtime_method: fetch_recent
     provider: tencent
     endpoint: kline_5m
     display_name: 腾讯最近5分钟线
@@ -647,7 +649,8 @@ input_capabilities:
         minimum: 1
         maximum: 320
     collection_profile: market_intraday
-    implementation_status: unimplemented
+    implementation_status: implemented_validation_only
+    runtime_endpoint: tencent.native_1m
     evidence_refs:
     - ASTOCK-002
     limitations:
@@ -658,8 +661,10 @@ input_capabilities:
     - request.end_date
     request_interval_seconds: 3
     effective_concurrency: 1
-    request_limit_enforcement: unimplemented
+    request_limit_enforcement: call_boundary_only
   ASTOCK-002-daily:
+    dataset: daily_bar
+    runtime_method: fetch_window
     provider: tencent
     endpoint: kline_daily
     display_name: 腾讯前复权日线
@@ -684,7 +689,7 @@ input_capabilities:
         choices:
         - qfq
     collection_profile: market_after_close
-    implementation_status: migration_pending
+    implementation_status: implemented_validation_only
     runtime_endpoint: tencent.forward_history
     evidence_refs:
     - ASTOCK-002
@@ -693,7 +698,7 @@ input_capabilities:
     - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
     request_interval_seconds: 3
     effective_concurrency: 1
-    request_limit_enforcement: unimplemented
+    request_limit_enforcement: call_boundary_only
   ASTOCK-003:
     provider: tdx
     endpoint: daily_package
@@ -1222,6 +1227,8 @@ input_capabilities:
     effective_concurrency: 1
     request_limit_enforcement: unimplemented
   ASTOCK-045:
+    dataset: limit_up_pool
+    runtime_method: fetch
     provider: eastmoney
     endpoint: limit_up_pool
     parameters: *id004
@@ -1229,7 +1236,8 @@ input_capabilities:
     data_frequency: daily
     request_shape: date_snapshot
     collection_profile: market_intraday
-    implementation_status: unimplemented
+    implementation_status: implemented_validation_only
+    runtime_endpoint: eastmoney.limit_up_pool
     display_name: 东财涨停池
     limitations:
     - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
@@ -1238,7 +1246,7 @@ input_capabilities:
     - ASTOCK-045
     request_interval_seconds: 3
     effective_concurrency: 1
-    request_limit_enforcement: unimplemented
+    request_limit_enforcement: call_boundary_only
   ASTOCK-046:
     provider: eastmoney
     endpoint: broken_limit_pool
@@ -1610,6 +1618,8 @@ input_capabilities:
     effective_concurrency: 1
     request_limit_enforcement: unimplemented
   ASTOCK-070:
+    dataset: trading_calendar
+    runtime_method: fetch
     provider: sina
     endpoint: trading_calendar
     parameters: {}
@@ -1617,7 +1627,8 @@ input_capabilities:
     data_frequency: snapshot
     request_shape: full_snapshot
     collection_profile: reference_daily
-    implementation_status: unimplemented
+    implementation_status: implemented_validation_only
+    runtime_endpoint: sina.trading_calendar
     display_name: 新浪交易日历
     limitations:
     - 实际调用tool_trade_date_hist_sina，不作为交易所官方日历
@@ -1626,7 +1637,7 @@ input_capabilities:
     - ASTOCK-070
     request_interval_seconds: 3
     effective_concurrency: 1
-    request_limit_enforcement: unimplemented
+    request_limit_enforcement: call_boundary_only
   ASTOCK-071:
     provider: exchange_composite
     endpoint: futures_daily

@@ -108,6 +108,8 @@ class InputCapabilityConfig:
     effective_concurrency: int = 1
     request_limit_enforcement: str = "unimplemented"
     base_requests_per_fetch: int = 1
+    dataset: str | None = None
+    runtime_method: str | None = None
 
     def __post_init__(self) -> None:
         if not math.isfinite(self.request_interval_seconds) or self.request_interval_seconds < 0 or self.effective_concurrency < 1 or self.base_requests_per_fetch < 1:
@@ -159,6 +161,8 @@ def load_input_capabilities(path: str | Path) -> tuple[InputCapabilityConfig, ..
             effective_concurrency=int(item.get("effective_concurrency", 1)),
             request_limit_enforcement=str(item.get("request_limit_enforcement", "unimplemented")),
             base_requests_per_fetch=int(item.get("base_requests_per_fetch", 1)),
+            dataset=item.get("dataset"),
+            runtime_method=item.get("runtime_method"),
         ))
     ids = {item.input_id for item in result}
     if any(item.canonical_input and item.canonical_input not in ids for item in result):
@@ -367,6 +371,10 @@ def load_normalization_rules(path: str | Path) -> tuple[NormalizationRule, ...]:
                 source_bar_time_semantics=str(item.get("source_bar_time_semantics", "end_time")),
                 volume_semantics=item.get("volume_semantics"),
                 adjustment=Adjustment(str(item.get("adjustment", "none"))),
+                field_mapping=dict(item.get("field_mapping", {})),
+                code_prefixes=tuple(item.get("code_prefixes", ())),
+                status=str(item.get("status", "pending_validation")),
+                null_values=tuple(item.get("null_values", (None, ""))),
             )
         )
     return tuple(rules)
@@ -381,6 +389,30 @@ def load_dataset_normalization_rules(root: str | Path, dataset: str) -> tuple[No
 def load_normalization_document(root: str | Path, dataset: str) -> dict[str, object]:
     path = Path(root) / f"{dataset}.yaml"
     return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+
+
+def load_input_field_contract(root: str | Path, capability: InputCapabilityConfig):
+    """Use existing dataset/normalization files; input ID disambiguates source-specific rules."""
+    if not capability.dataset or not capability.dataset.replace("_", "").isalnum():
+        raise ValueError("input has no valid dataset field contract")
+    root = Path(root)
+    dataset = yaml.safe_load((root / "datasets" / f"{capability.dataset}.yaml").read_text(encoding="utf-8"))
+    document = load_normalization_document(root / "normalization", capability.dataset)
+    matches = [rule for rule in document.get("rules", ()) if rule.get("input_id") == capability.input_id
+               and rule.get("provider") == capability.provider and rule.get("endpoint") == capability.endpoint]
+    if len(matches) != 1:
+        raise ValueError(f"expected exactly one input mapping rule, found {len(matches)}")
+    rule = matches[0]
+    fields = dataset.get("fields", {})
+    if not fields or not dataset.get("dataset", {}).get("primary_key"):
+        raise ValueError("dataset must define fields and primary key")
+    if set(dataset["dataset"]["primary_key"]) - set(fields):
+        raise ValueError("dataset primary key contains undefined fields")
+    if set(rule.get("field_mapping", {})) - set(fields):
+        raise ValueError("mapping targets contain undefined fields")
+    if rule.get("status") not in {"validated", "pending_validation", "disabled", "expired"}:
+        raise ValueError("invalid input rule status")
+    return dataset, rule
 
 
 def load_normalization_rules_for_datasets(root: str | Path, datasets: tuple[str, ...]) -> tuple[NormalizationRule, ...]:

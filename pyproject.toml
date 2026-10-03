@@ -12,6 +12,7 @@ dependencies = [
     "pyarrow>=18.0",
     "PyYAML>=6.0",
     "pytz>=2024.1",
+    "requests>=2.31",
 ]
 
 [project.optional-dependencies]

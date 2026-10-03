@@ -1,0 +1,27 @@
+# Preserve this delivery's evidence bytes: Git newline conversion must not invalidate SHA-256 references.
+/provider_validation/results/input-collection-20261003/** -text whitespace=cr-at-eol
+/provider_validation/results/input-debug-20261003/** -text whitespace=cr-at-eol
+/provider_validation/results/input-final-20261003/** -text whitespace=cr-at-eol
+/provider_validation/results/input-live-20261003/** -text whitespace=cr-at-eol
+/provider_validation/results/input-replay-20261003/** -text whitespace=cr-at-eol
+/provider_validation/results/input-verified-20261003/** -text whitespace=cr-at-eol
+/provider_validation/results/2026-10-03-yaml-input-collection-tests.xml -text whitespace=cr-at-eol
+/provider_validation/results/2026-10-03-yaml-input-collection-verification.json -text whitespace=cr-at-eol
+/provider_validation/results/sdk-snapshot-redaction-20261003.json -text whitespace=cr-at-eol
+/provider_validation/coverage/successful-input-capabilities-20261003-implemented.* -text whitespace=cr-at-eol
+
+# Newly added implementation/configuration files are hashed as LF source files.
+/src/stock_data_manage/pipeline/inputs.py text eol=lf
+/src/stock_data_manage/providers/eastmoney/limit_pool.py text eol=lf
+/src/stock_data_manage/providers/sina/calendar.py text eol=lf
+/tests/test_input_collection.py text eol=lf
+/provider_validation/tests/replay_input_capabilities.py text eol=lf
+/config/datasets/limit_up_pool.yaml text eol=lf
+/config/datasets/minute_bar_5m.yaml text eol=lf
+/config/datasets/trading_calendar.yaml text eol=lf
+/config/normalization/limit_up_pool.yaml text eol=lf
+/config/normalization/minute_bar_5m.yaml text eol=lf
+/config/normalization/trading_calendar.yaml text eol=lf
+
+# Response payloads and SDK source snapshots are byte archives, including when they resemble text.
+/provider_validation/results/input-*-20261003/**/bodies/*.bin binary

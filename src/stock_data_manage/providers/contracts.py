@@ -38,6 +38,13 @@ class HttpResponse:
         return self.body.decode("utf-8", errors="replace")
 
 
+@dataclass(frozen=True, slots=True)
+class InputFetchResult:
+    rows: tuple[Mapping[str, Any], ...]
+    source_url: str | None = None
+    empty_is_valid: bool = False
+
+
 class ProviderContractError(RuntimeError):
     def __init__(
         self,

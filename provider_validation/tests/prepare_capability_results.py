@@ -16,7 +16,7 @@ INVENTORY = CAPABILITY_DIR / "a-stock-data-capability-inventory.csv"
 OUTPUT = CAPABILITY_DIR / "capability-results-data.json"
 
 
-def build_input_catalog():
+def build_input_catalog(output_name="successful-input-capabilities"):
     """Project reviewed contracts onto saved evidence; no provider calls or production writes."""
     sys.path.insert(0, str(ROOT / "src"))
     from stock_data_manage.config.loader import load_input_capabilities, load_collection_profiles
@@ -81,6 +81,7 @@ def build_input_catalog():
             "请求间隔秒": contract.request_interval_seconds, "并发": contract.effective_concurrency,
             "限速实现状态": contract.request_limit_enforcement, "实现状态": contract.implementation_status,
             "对应现有适配器": contract.runtime_endpoint or "", "归并到": contract.canonical_input or "",
+            "输入调用方法": contract.runtime_method or "", "输出数据集": contract.dataset or "",
             "证据范围": "; ".join(r["tested_scope"] for r in records), "限制": "; ".join(contract.limitations),
             "证据记录": "; ".join(r["path"] for r in records), "生产路由资格": "未授予",
         })
@@ -101,14 +102,16 @@ def build_input_catalog():
     summary["reference_redaction_policy"] = "Token-like query values in copied references are redacted; original archives are unchanged."
     serialized = json.dumps(summary, ensure_ascii=False, indent=2)
     serialized = redact_reference(serialized)
-    json_output = CAPABILITY_DIR / "successful-input-capabilities.json"
-    csv_output = CAPABILITY_DIR / "successful-input-capabilities.csv"
-    json_output.write_text(serialized + "\n", encoding="utf-8")
+    if not re.fullmatch(r"[A-Za-z0-9_-]+", output_name):
+        raise ValueError("catalog output name must be a simple file stem")
+    json_output = CAPABILITY_DIR / f"{output_name}.json"
+    csv_output = CAPABILITY_DIR / f"{output_name}.csv"
     with csv_output.open("w", encoding="utf-8-sig", newline="") as stream:
         writer = csv.DictWriter(stream, fieldnames=list(csv_rows[0]))
         writer.writeheader()
         writer.writerows({key: redact_reference(value) if isinstance(value, str) else value
                           for key, value in row.items()} for row in csv_rows)
+    json_output.write_text(serialized + "\n", encoding="utf-8")
     print(json.dumps({"input_count": len(contracts), "successful_interfaces": len(covered), "hash_checked_files": len(checked),
                       "network_requests": 0, "output": json_output.relative_to(ROOT).as_posix()}, ensure_ascii=False))
 
@@ -307,8 +310,9 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Prepare saved provider evidence without network requests')
     parser.add_argument('--input-catalog', action='store_true')
+    parser.add_argument('--catalog-name', default='successful-input-capabilities')
     args = parser.parse_args()
     if args.input_catalog:
-        build_input_catalog()
+        build_input_catalog(args.catalog_name)
     else:
         prepare_legacy_results()

@@ -1,6 +1,34 @@
 dataset: daily_bar
 
 rules:
+  - id: tencent-window-input-v1
+    input_id: ASTOCK-002-daily
+    provider: tencent
+    endpoint: kline_daily
+    exchange: XSHG
+    asset_type: stock
+    frequency: null
+    adjustment: forward
+    code_prefixes: [sh]
+    field_mapping: {trade_date: "0", open: "1", high: "3", low: "4", close: "2", volume: "5"}
+    context_fields: {instrument_id: instrument_id, adjustment: adjustment}
+    null_values: [null, "", "-", "--", "None", "null"]
+    source_required_numeric: ["1", "2", "3", "4", "5"]
+    transforms:
+      open: {remove_commas: true}
+      high: {remove_commas: true}
+      low: {remove_commas: true}
+      close: {remove_commas: true}
+    positive_fields: [open, high, low, close]
+    unverified_fields: [volume]
+    volume_multiplier: "1"
+    amount_multiplier: "1"
+    volume_semantics: unverified
+    status: pending_validation
+    version: tencent-window-input-v1
+    evidence_refs: [ASTOCK-002]
+    notes: 来源成交量保留在source-rows中；单位未独立核验时标准输出置空，不能标成share。没有成交额。
+
   - id: fixture-daily-v1
     provider: fixture
     endpoint: daily_history

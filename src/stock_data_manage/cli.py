@@ -56,7 +56,42 @@ def main(argv: list[str] | None = None) -> int:
     acceptance.add_argument("--end-date", type=date.fromisoformat, default=date(2026, 9, 11))
     acceptance.add_argument("--output", type=Path)
 
+    collect = subcommands.add_parser("collect-input", help="collect or replay one configured input into candidate files")
+    collect.add_argument("--input", required=True)
+    collect.add_argument("--config-root", type=Path, default=Path("config"))
+    collect.add_argument("--output-root", type=Path, required=True)
+    collect.add_argument("--mode", choices=("replay", "live"), default="replay")
+    collect.add_argument("--replay-manifest", type=Path)
+    collect.add_argument("--evidence-root", type=Path)
+    collect.add_argument("--symbol")
+    collect.add_argument("--start-date", type=date.fromisoformat)
+    collect.add_argument("--end-date", type=date.fromisoformat)
+    collect.add_argument("--trade-date", type=date.fromisoformat)
+    collect.add_argument("--count", type=int)
+    collect.add_argument("--fields", help="comma-separated declared output fields, including required fields")
+    collect.add_argument("--calendar-file", type=Path, help="explicit saved calendar rows for date-snapshot validation")
+
     args = parser.parse_args(argv)
+    if args.command == "collect-input":
+        from .pipeline.inputs import collect_input
+        request_context = {k: v for k, v in {"symbol": args.symbol, "start_date": args.start_date,
+                           "end_date": args.end_date, "trade_date": args.trade_date}.items() if v is not None}
+        try:
+            context = {"request": request_context, "config": {"count": args.count} if args.count is not None else {}}
+            if args.calendar_file:
+                saved_days = json.loads(args.calendar_file.read_text(encoding="utf-8"))
+                if not isinstance(saved_days, list):
+                    raise ValueError("calendar file must contain an explicit date-row array")
+                context["calendar"] = {"trading_dates": [date.fromisoformat(str(row["trade_date"])) for row in saved_days]}
+                context["metadata"] = {"calendar_path": str(args.calendar_file.resolve())}
+            report = collect_input(input_id=args.input, context=context,
+                config_root=args.config_root, output_root=args.output_root, mode=args.mode,
+                replay_manifest=args.replay_manifest, evidence_root=args.evidence_root,
+                fields=[name.strip() for name in args.fields.split(",")] if args.fields else None)
+        except ValueError as exc:
+            parser.error(str(exc))
+        print(json.dumps(report, ensure_ascii=False, default=_json_default, indent=2))
+        return 0 if report["status"] == "candidate_complete" else 2
     if args.command == "probe-daily":
         if args.adjustment == "forward" and args.provider != "tencent":
             parser.error("forward daily probe currently requires --provider tencent")

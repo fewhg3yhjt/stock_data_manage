@@ -1,0 +1,130 @@
+{
+  "validation_time_utc": "2026-10-03T14:15:07.198916+00:00",
+  "tests": 189,
+  "failures": 0,
+  "errors": 0,
+  "new_test_cases": 26,
+  "successful_input_contracts": 74,
+  "successful_interface_coverage": 73,
+  "original_evidence_files_hash_checked": 330,
+  "raw_application_response_hashes_checked": 26,
+  "current_implementation_reports": [
+    {
+      "input_id": "ASTOCK-002-daily",
+      "row_count": 14,
+      "report_path": "provider_validation/results/input-verified-20261003/ASTOCK-002-daily/ASTOCK-002-daily-20261003T135537-1e61130c/2026-10-03/input_report/tencent/kline_daily/report.json",
+      "report_sha256": "0381d0a6a50bbdb1902ab2e00eca30003c11850435ce780a0d659c0921c7419b",
+      "code_config_hashes_match_current_files": true
+    },
+    {
+      "input_id": "ASTOCK-002-5m",
+      "row_count": 96,
+      "report_path": "provider_validation/results/input-verified-20261003/ASTOCK-002-5m/ASTOCK-002-5m-20261003T135537-85723613/2026-10-03/input_report/tencent/kline_5m/report.json",
+      "report_sha256": "67eace209732b6668de9a475d5865d32b36dfcce6752c522686a0cc1057791a8",
+      "code_config_hashes_match_current_files": true
+    },
+    {
+      "input_id": "ASTOCK-045",
+      "row_count": 52,
+      "report_path": "provider_validation/results/input-verified-20261003/ASTOCK-045/ASTOCK-045-20261003T135538-0ac130cf/2026-10-03/input_report/eastmoney/limit_up_pool/report.json",
+      "report_sha256": "dc7a1ba65be3c1ee2861c9d3079ae12b3e234472c8f802bbdfd33fd40ab57e4e",
+      "code_config_hashes_match_current_files": true
+    },
+    {
+      "input_id": "ASTOCK-070",
+      "row_count": 8797,
+      "report_path": "provider_validation/results/input-verified-20261003/ASTOCK-070/ASTOCK-070-20261003T135538-ca4a3c87/2026-10-03/input_report/sina/trading_calendar/report.json",
+      "report_sha256": "61fd69cc2f753ccadac4029b7b6191d5d32bb1bb37bbd245d21a0340f0deefc4",
+      "code_config_hashes_match_current_files": true
+    }
+  ],
+  "test_result": {
+    "path": "provider_validation/results/2026-10-03-yaml-input-collection-tests.xml",
+    "sha256": "c1b34093831dc46fcae5854ef6321c85dbd727c0a0ec698cbca4b0590fedada8"
+  },
+  "offline_comparison": {
+    "path": "provider_validation/results/input-verified-20261003/comparison.json",
+    "sha256": "ef4109ff8d64830b5dfc23c4108b65a05613223002c49e0f0b618f4b880fa0fa"
+  },
+  "live_evidence": {
+    "path": "provider_validation/results/input-live-20261003/summary.json",
+    "sha256": "1b099edfa41801096b2357b780164411f8f66cf184e97a0a912e2e5200727380"
+  },
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "remaining": [
+    "字段单位独立语义核验",
+    "超出样本范围的覆盖验证",
+    "调度覆盖范围",
+    "正式生产发布"
+  ],
+  "development_artifacts": "Earlier input-*-20261003 runs retain intermediate code hashes and resolved persistence errors; final conclusions use input-verified-20261003 and linked live evidence.",
+  "sdk_original_vs_provider": [
+    {
+      "input_id": "ASTOCK-045",
+      "row_count": 52,
+      "source_fields_and_rows_compared_to_original_csv": true,
+      "request_comparisons": [
+        {
+          "source_ref": {
+            "line": 106,
+            "manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\_raw\\missing-capabilities-20261003T174623\\manifest.ndjson"
+          },
+          "checked": {
+            "url": true,
+            "method": true,
+            "headers": true,
+            "status": true,
+            "response_hash": true
+          },
+          "original_url": "https://push2ex.eastmoney.com/getTopicZTPool?Pageindex=0&date=20260930&dpt=wz.ztzt&pagesize=10000&sort=fbt%3Aasc&ut=%3Credacted%3E",
+          "provider_url": "https://push2ex.eastmoney.com/getTopicZTPool?Pageindex=0&date=20260930&dpt=wz.ztzt&pagesize=10000&sort=fbt%3Aasc&ut=%3Credacted%3E",
+          "status_code": 200,
+          "body_sha256": "2f8fd55e9dc60e46c707fec37e3bf6b3fdad4dfb0967217061f533add6acaed7",
+          "failure_class": null
+        }
+      ],
+      "first_key": [
+        "2026-09-30",
+        "002058"
+      ],
+      "last_key": [
+        "2026-09-30",
+        "600131"
+      ],
+      "returned_window_basis": "explicit request trade date; independent returned-date semantics pending"
+    },
+    {
+      "input_id": "ASTOCK-070",
+      "row_count": 8797,
+      "source_fields_and_rows_compared_to_original_csv": true,
+      "request_comparisons": [
+        {
+          "source_ref": {
+            "line": 1,
+            "manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\_raw\\missing-capabilities-20261003T174623\\manifest.ndjson"
+          },
+          "checked": {
+            "url": true,
+            "method": true,
+            "headers": true,
+            "status": true,
+            "response_hash": true
+          },
+          "original_url": "https://finance.sina.com.cn/realstock/company/klc_td_sh.txt",
+          "provider_url": "https://finance.sina.com.cn/realstock/company/klc_td_sh.txt",
+          "status_code": 200,
+          "body_sha256": "d5112e08726ecc435092fb63547a34fc514b071b1a4a84f9e2c29fb9023726a9",
+          "failure_class": null
+        }
+      ],
+      "first_key": [
+        "1990-12-19"
+      ],
+      "last_key": [
+        "2026-12-31"
+      ],
+      "returned_window_basis": "calendar source dates"
+    }
+  ]
+}
