@@ -46,3 +46,6 @@
 /provider_validation/coverage/successful-input-capabilities-20261003-scheduling.* -text whitespace=cr-at-eol
 
 /provider_validation/coverage/successful-input-capabilities-20261003-scheduling-release.* -text whitespace=cr-at-eol
+
+# Read-only input migration review: preserve source and report hash links.
+/provider_validation/results/input-transition-review-20261004/** -text whitespace=cr-at-eol

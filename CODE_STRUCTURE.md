@@ -31,6 +31,8 @@ Provider 接口验证资料统一位于 `provider_validation/`：`tests/` 保存
 
 腾讯采集频率与全市场快照配置见 `provider_validation/docs/2026-10-03-tencent-collection-scheduling.md`；独立四种策略写在既有 `collection.yaml`，输入契约引用具体策略。当前周期采集只生成候选，快照迁移和独立1分钟输入尚未完成。最终离线证据位于 `results/input-scheduling-accepted-20261003/`，测试和总索引位于 `results/2026-10-03-tencent-scheduling-tests-final.xml` 与同前缀 `verification.json`，能力清单采用独立的 `coverage/successful-input-capabilities-20261003-scheduling-release.csv/json` 版本。原 `schedules.yaml` 固定任务保留，未启动后台进程或管理台。
 
+其他接口转换现状与建议下一批范围见 `provider_validation/docs/2026-10-04-input-transition-review.md`；离线调查代码和逐项引用哈希保存于 `results/input-transition-review-20261004/audit.py`、`review.json`。调查不改变现有Provider、运行时配置或正式路由资格。
+
 `.gitattributes` 对本次新证据目录禁用 Git 换行转换，并固定新增实现/模板的 LF 格式，避免提交和检出改变证据字节及其 SHA-256 引用；不更改旧证据属性。
 
 ## 领域模型
