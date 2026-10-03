@@ -72,6 +72,10 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                   Path(__file__).parents[1] / "providers/tencent/minute.py",
                   Path(__file__).parents[1] / "providers/tencent/snapshot.py",
                   Path(__file__).parents[1] / "providers/eastmoney/limit_pool.py",
+                  Path(__file__).parents[1] / "providers/eastmoney/shareholder.py",
+                  Path(__file__).parents[1] / "providers/eastmoney/dividend.py",
+                  Path(__file__).parents[1] / "providers/eastmoney/fund_flow.py",
+                  Path(__file__).parents[1] / "providers/eastmoney/realtime.py",
                   Path(__file__).parents[1] / "providers/sina/calendar.py",
                   Path(__file__).parents[1] / "providers/akshare/boards.py",
                   Path(__file__).parents[1] / "providers/baostock/industry.py",
@@ -103,6 +107,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
     report["response_freshness_seconds"] = profile.refresh_interval_seconds or 86400
     is_baostock = input_id in {"SDA-BOARD-005", "SDA-BOARD-006"}
     is_tencent_snapshot = input_id == "ASTOCK-001"
+    is_em_history = input_id in {"ASTOCK-026", "ASTOCK-027", "ASTOCK-028"}
     if is_tencent_snapshot:
         report.update(coverage_denominator=len(parameters["symbols"]), requested_symbols=list(parameters["symbols"]),
                       universe_completeness_verified=False, online_batch_validation=False,
@@ -162,6 +167,8 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             report["evidence_representation"] = "SDK-decoded ResultSet fields and rows; BaoStock TCP wire bytes are not exposed"
             report["request_limit_enforcement"] = "sdk_query_boundary_only"
         sdk_functions = {"ASTOCK-045": "stock_zt_pool_em", "ASTOCK-070": "tool_trade_date_hist_sina",
+                         "ASTOCK-026": "stock_zh_a_gdhs_detail_em", "ASTOCK-027": "stock_fhps_detail_em",
+                         "ASTOCK-028": "stock_individual_fund_flow",
                          "SDA-BOARD-001": "stock_board_industry_name_ths", "SDA-BOARD-002": "stock_board_industry_index_ths",
                          "SDA-BOARD-003": "stock_fund_flow_industry", "SDA-BOARD-004": "stock_fund_flow_concept"}
         if input_id in sdk_functions:
@@ -229,7 +236,20 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                     scope={"input_id": input_id, "parameters": normalized_context}, code_version=code_version, pacer=pacer,
                     replay_manifest=replay_manifest if mode == "replay" else None,
                     evidence_roots=(evidence_root, output_root), max_age_seconds=profile.refresh_interval_seconds or 86400,
-                    sdk_retry_policy=input_id in {"ASTOCK-001", "ASTOCK-045", "ASTOCK-070"}))
+                    sdk_retry_policy=input_id in {"ASTOCK-001", "ASTOCK-045", "ASTOCK-070", "ASTOCK-026", "ASTOCK-027", "ASTOCK-028"}))
+            if is_em_history:
+                from ..providers.contracts import EndpointContract, HttpResponse
+                def retained_payloads():
+                    for event in response_events:
+                        if event.get("outcome") == "response":
+                            body = RawObjectStore.read_response(raw_store.root / "manifest.ndjson", event)
+                            yield EndpointContract(frozenset()).parse_json(HttpResponse(
+                                event["status_code"], event.get("response_headers", {}), body))
+                runtime_parameters["source_payloads"] = retained_payloads
+                if mode == "replay" and input_id == "ASTOCK-028":
+                    from ..providers.eastmoney.realtime import history_replay_clock
+                    stack.enter_context(history_replay_clock(function, replay_manifest, parameters["code"]))
+                    report["replay_clock_semantics"] = "SDK cache-buster clock from matching archived request; live clock unchanged"
             # Isolate only replay's directory cache; live SDK Session/cache policy stays intact.
             if mode == "replay" and input_id in {"SDA-BOARD-001", "SDA-BOARD-002"}:
                 from functools import lru_cache
@@ -251,6 +271,19 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="source-rows")
         report["source_rows"] = {"path": source_ref.path.relative_to(directory).as_posix(),
                                  "sha256": source_ref.content_hash, "row_count": len(source_rows)}
+        mapping_rows = fetched.rows if is_em_history else source_rows
+        if is_em_history:
+            excluded_ref = result_store.write_json(_json_value(fetched.excluded_rows), dataset="excluded_rows",
+                provider=contract.provider, endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="excluded-rows")
+            report["excluded_rows"] = {"path": excluded_ref.path.relative_to(directory).as_posix(),
+                "sha256": excluded_ref.content_hash, "row_count": len(fetched.excluded_rows)}
+            source_date = {"ASTOCK-026": "股东户数统计截止日", "ASTOCK-027": "报告期", "ASTOCK-028": "日期"}[input_id]
+            dates = [str(row[source_date]) for row in source_rows]
+            report.update(returned_window={"first": min(dates) if dates else None, "last": max(dates) if dates else None},
+                original_row_count=len(source_rows), selected_row_count=len(mapping_rows),
+                coverage_basis="selected returned SDK rows; not independently complete history or market coverage",
+                universe_completeness_verified=False,
+                selection_policy="implemented dividend events only; other plans retained in source evidence" if input_id == "ASTOCK-027" else "all returned rows")
         if actual_code is not None and fetched.mapping_context["board_code"] != actual_code:
             raise NormalizationError("board code dependency disagrees with source directory")
         report["source_url"] = fetched.source_url
@@ -272,11 +305,11 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                           coverage_scope="explicit requested stock list; no independent whole-market completeness proof")
             if any(day != parameters["as_of"].astimezone(ZoneInfo("Asia/Shanghai")).date() for day in quote_dates):
                 raise NormalizationError("source quote date differs from requested as_of date; snapshot cannot query history")
-        if not source_rows:
+        if not source_rows or not mapping_rows:
             raise NormalizationError("temporary empty input; not certified as a valid empty dataset")
         mapping_context = {"provider": contract.provider}
         mapping_context.update(getattr(fetched, "mapping_context", {}))
-        if input_id.startswith("SDA-BOARD-") or is_tencent_snapshot:
+        if input_id.startswith("SDA-BOARD-") or is_tencent_snapshot or is_em_history:
             successful = [event for event in response_events if event.get("outcome") == "response"]
             if not successful:
                 raise NormalizationError("source response evidence is required; an SDK memory cache alone is insufficient")
@@ -292,7 +325,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             mapping_context["source_snapshot_at"] = max(source_times)
             report["source_capture_window"] = {"first": min(source_times).isoformat(), "last": max(source_times).isoformat(),
                                                "meaning": "source response capture times; not row-level market timestamps"}
-            if not is_tencent_snapshot:
+            if not is_tencent_snapshot and not is_em_history:
                 report["returned_window"] = {"first": fetched.returned_first_key, "last": fetched.returned_last_key}
                 report["source_units"] = list(fetched.units)
                 report["coverage_basis"] = "returned SDK rows; not an independently verified market universe"
@@ -304,7 +337,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             mapping_context.update(instrument_id=f"{'XSHG' if symbol.startswith('sh') else 'XSHE'}:{symbol[2:]}",
                                    adjustment="forward" if input_id.endswith("daily") else "none")
         rows = [Normalizer.normalize_fields(row, rule=rule, fields=schema_fields,
-                                            context=mapping_context, allow_pending=True) for row in source_rows]
+                                            context=mapping_context, allow_pending=True) for row in mapping_rows]
         keys = [tuple(row[name] for name in dataset["dataset"]["primary_key"]) for row in rows]
         if len(set(keys)) != len(keys):
             raise NormalizationError("duplicate dataset primary key")
@@ -318,7 +351,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                             "sha256": normalized_ref.content_hash, "row_count": len(projected),
                             "source_response_hashes": [event["body_sha256"] for event in response_events]}
         report.update(status="candidate_complete", row_count=len(projected),
-                      coverage_denominator=fetched.coverage_denominator if is_baostock or is_tencent_snapshot else len(source_rows),
+                      coverage_denominator=fetched.coverage_denominator if is_baostock or is_tencent_snapshot else len(mapping_rows),
                       first_key=_json_value(keys[0]), last_key=_json_value(keys[-1]))
     except Exception as exc:
         report.update(status="failed", failure_class=getattr(getattr(exc, "failure_class", None), "value", type(exc).__name__),

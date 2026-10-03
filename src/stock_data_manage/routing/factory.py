@@ -32,6 +32,7 @@ def build_input_provider(contract, *, providers_path, client=None):
         raise ValueError("input adapter is not implemented for validation")
     expected_methods = {"ASTOCK-001": "fetch_snapshot", "ASTOCK-002-daily": "fetch_window", "ASTOCK-002-5m": "fetch_recent",
                         "ASTOCK-045": "fetch", "ASTOCK-070": "fetch",
+                        "ASTOCK-026": "fetch_history", "ASTOCK-027": "fetch_history", "ASTOCK-028": "fetch_history",
                         "SDA-BOARD-001": "fetch_industry_list", "SDA-BOARD-002": "fetch_industry_daily",
                         "SDA-BOARD-003": "fetch_fund_flow", "SDA-BOARD-004": "fetch_fund_flow",
                         "SDA-BOARD-005": "fetch_snapshot", "SDA-BOARD-006": "fetch_snapshot"}
@@ -62,6 +63,15 @@ def build_input_provider(contract, *, providers_path, client=None):
     if contract.input_id == "ASTOCK-070":
         from ..providers.sina.calendar import SinaTradingCalendarProvider
         return SinaTradingCalendarProvider(client=client)
+    if contract.input_id in {"ASTOCK-026", "ASTOCK-027", "ASTOCK-028"}:
+        from ..providers.eastmoney.shareholder import EastMoneyShareholderCountProvider
+        from ..providers.eastmoney.dividend import EastMoneyDividendProvider
+        from ..providers.eastmoney.fund_flow import EastMoneyStockFundFlowProvider
+        adapter = {"ASTOCK-026": EastMoneyShareholderCountProvider, "ASTOCK-027": EastMoneyDividendProvider,
+                   "ASTOCK-028": EastMoneyStockFundFlowProvider}[contract.input_id]
+        # fetch_history uses the original SDK; this legacy transport is never invoked by that method.
+        return adapter(transport=RequestsTransport({}), client=client, endpoint=contract.endpoint,
+                       capability_version="eastmoney-history-input-v1")
     if contract.input_id in {"SDA-BOARD-005", "SDA-BOARD-006"}:
         return BaoStockIndustryMembershipProvider(client=client, endpoint=contract.endpoint,
                                                   normalization_root=Path(providers_path).parent / "normalization")

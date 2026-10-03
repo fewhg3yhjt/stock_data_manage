@@ -1,0 +1,39 @@
+{
+  "input_id": "ASTOCK-026",
+  "source_sha256": "d9263b2827e5883a5a271290a4a1a1f1ffc326ce703739fa7c73741f245c0b73",
+  "requests": [
+    {
+      "url": "https://datacenter-web.eastmoney.com/api/data/v1/get",
+      "params": {
+        "reportName": "RPT_HOLDERNUM_DET",
+        "columns": "ALL",
+        "filter": "(SECURITY_CODE=\"600519\")",
+        "pageNumber": "1",
+        "pageSize": "10",
+        "sortColumns": "END_DATE",
+        "sortTypes": "-1",
+        "source": "WEB",
+        "client": "WEB"
+      },
+      "timeout_seconds": 20.0
+    },
+    {
+      "url": "https://datacenter-web.eastmoney.com/api/data/v1/get",
+      "params": {
+        "reportName": "RPT_HOLDERNUM_DET",
+        "columns": "ALL",
+        "filter": "(SECURITY_CODE=\"600519\")",
+        "pageNumber": "1",
+        "pageSize": "10",
+        "sortColumns": "END_DATE",
+        "sortTypes": "-1",
+        "source": "WEB",
+        "client": "WEB"
+      },
+      "timeout_seconds": 20.0
+    }
+  ],
+  "rows_compared": 63,
+  "all_legacy_fields_equal": true,
+  "mode": "offline parser/default-request regression using injected archived response"
+}

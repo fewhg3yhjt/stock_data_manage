@@ -1,0 +1,63 @@
+{
+  "input_id": "ASTOCK-028",
+  "original_count": 120,
+  "selected_count": 120,
+  "excluded_count": 0,
+  "all_sdk_columns_and_rows_equal": true,
+  "all_csv_columns_and_rows_equal": true,
+  "requests_equal": true,
+  "original_csv": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\26_个股资金流近100~120日\\data.csv",
+  "original_csv_sha256": "3658e7d541d910eef031726374eece79be09ecaae94f9d320dc7851ec6560b57",
+  "original_probe": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\tests\\source_snapshots\\a-stock-data\\a_stock_missing_capabilities.py",
+  "original_probe_sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0",
+  "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\em-check-20261004\\ASTOCK-028\\original\\manifest.ndjson",
+  "original_manifest_sha256": "802a94b2f9c4d8080c0e590da893a6d33982b4975c7adc6a0a8ce4626f17e807",
+  "provider_report": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\em-check-20261004\\ASTOCK-028\\candidate\\ASTOCK-028-f373a0d259b5\\2026-10-03\\input_report\\eastmoney\\stock_fund_flow\\report.json",
+  "provider_report_sha256": "bd5f460558048d3ece2cb90a032bfca100621a40658dc632eda146088699f2c3",
+  "request_comparison": [
+    {
+      "original": {
+        "url": "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?_=1791021103858&fields1=f1%2Cf2%2Cf3%2Cf7&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf62%2Cf63%2Cf64%2Cf65&klt=101&lmt=0&secid=1.600519&ut=%3Credacted%3E",
+        "method": "GET",
+        "request_headers": {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
+          "Accept-Encoding": "gzip, deflate, br, zstd",
+          "Accept": "*/*",
+          "Connection": "keep-alive"
+        },
+        "outcome": "response",
+        "status_code": 200,
+        "body_sha256": "cbd78a5ab0c29ece3e5bd163f88364c0c0fc55056814dddee8e43ea21bc8aeb6",
+        "error_type": null,
+        "request_options": {
+          "timeout": null,
+          "allow_redirects": true,
+          "trust_env": true,
+          "proxies": {},
+          "sdk_retry_policy": true
+        }
+      },
+      "provider": {
+        "url": "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?_=1791021103858&fields1=f1%2Cf2%2Cf3%2Cf7&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf62%2Cf63%2Cf64%2Cf65&klt=101&lmt=0&secid=1.600519&ut=%3Credacted%3E",
+        "method": "GET",
+        "request_headers": {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
+          "Accept-Encoding": "gzip, deflate, br, zstd",
+          "Accept": "*/*",
+          "Connection": "keep-alive"
+        },
+        "outcome": "response",
+        "status_code": 200,
+        "body_sha256": "cbd78a5ab0c29ece3e5bd163f88364c0c0fc55056814dddee8e43ea21bc8aeb6",
+        "error_type": null,
+        "request_options": {
+          "timeout": null,
+          "allow_redirects": true,
+          "trust_env": true,
+          "proxies": {},
+          "sdk_retry_policy": true
+        }
+      }
+    }
+  ]
+}

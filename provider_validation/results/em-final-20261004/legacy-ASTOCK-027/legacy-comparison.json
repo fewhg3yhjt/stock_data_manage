@@ -1,0 +1,35 @@
+{
+  "input_id": "ASTOCK-027",
+  "source_sha256": "e12fcabc65bb66c61ccc157b73b5e8ae1f7ad0707a78449ef239e72b58221a1e",
+  "requests": [
+    {
+      "url": "https://datacenter-web.eastmoney.com/api/data/v1/get",
+      "params": {
+        "reportName": "RPT_SHAREBONUS_DET",
+        "columns": "ALL",
+        "filter": "(EX_DIVIDEND_DATE%20ge%20'2001-01-01')(EX_DIVIDEND_DATE%20le%20'2026-09-30')",
+        "pageNumber": "1",
+        "pageSize": "100",
+        "sortColumns": "EX_DIVIDEND_DATE",
+        "sortTypes": "-1"
+      },
+      "timeout_seconds": 20.0
+    },
+    {
+      "url": "https://datacenter-web.eastmoney.com/api/data/v1/get",
+      "params": {
+        "reportName": "RPT_SHAREBONUS_DET",
+        "columns": "ALL",
+        "filter": "(EX_DIVIDEND_DATE%20ge%20'2001-01-01')(EX_DIVIDEND_DATE%20le%20'2026-09-30')",
+        "pageNumber": "1",
+        "pageSize": "100",
+        "sortColumns": "EX_DIVIDEND_DATE",
+        "sortTypes": "-1"
+      },
+      "timeout_seconds": 20.0
+    }
+  ],
+  "rows_compared": 27,
+  "all_legacy_fields_equal": true,
+  "mode": "offline parser/default-request regression using injected archived response"
+}

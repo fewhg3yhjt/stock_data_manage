@@ -1,0 +1,458 @@
+{
+  "validation_time_utc": "2026-10-03T20:47:35.774676+00:00",
+  "mode": "offline_replay",
+  "network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "verification_code": {
+    "path": "tests/test_input_collection.py",
+    "sha256": "e8682dd190bead0a71b790c3385210843dbe61c4c7b2a8d34ea0b66f12c22ca7"
+  },
+  "runner": {
+    "path": "provider_validation/tests/replay_input_capabilities.py",
+    "sha256": "78d016667e966eb36a86dba76e3b7af0a78b3d71dc14d85eab4815335afe5b10"
+  },
+  "inputs": [
+    {
+      "input_id": "ASTOCK-026",
+      "report_path": "provider_validation/results/em-check-20261004/ASTOCK-026/candidate/ASTOCK-026-b81523b78f9c/2026-10-03/input_report/eastmoney/shareholder_count/report.json",
+      "report_sha256": "c3ef21f2784377d41682bc76ce48a1c60dfa2195d7985b7936398d1e72c83e9b",
+      "source_manifest": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+      "source_manifest_sha256": "885abd6bf1c4b809b9029759f61b75c7d6a297755fd76ca6c545720db38a6767",
+      "row_count": 63,
+      "scope": {
+        "code": "600519"
+      },
+      "code_version": "e13d8b877afb9b031cc1ec76ae4da5945fd3c3d33aa837340b3a45a87d080c8c",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-027",
+      "report_path": "provider_validation/results/em-check-20261004/ASTOCK-027/candidate/ASTOCK-027-bc89c7842e39/2026-10-03/input_report/eastmoney/dividend_history/report.json",
+      "report_sha256": "8e3307663e7c9dfee0f17410077d02189f8f7eefb1f6e4992e17230c1a4fc7bc",
+      "source_manifest": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+      "source_manifest_sha256": "885abd6bf1c4b809b9029759f61b75c7d6a297755fd76ca6c545720db38a6767",
+      "row_count": 27,
+      "scope": {
+        "code": "600519"
+      },
+      "code_version": "0e405b1d3460fd1866e3e1ea41e4dee8ceb2c6c69c101922414cb842fe96b10c",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-028",
+      "report_path": "provider_validation/results/em-check-20261004/ASTOCK-028/candidate/ASTOCK-028-f373a0d259b5/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
+      "report_sha256": "bd5f460558048d3ece2cb90a032bfca100621a40658dc632eda146088699f2c3",
+      "source_manifest": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+      "source_manifest_sha256": "885abd6bf1c4b809b9029759f61b75c7d6a297755fd76ca6c545720db38a6767",
+      "row_count": 120,
+      "scope": {
+        "code": "600519"
+      },
+      "code_version": "704a6b5effde48d2d6616890056bcaf648ef17cb03e3823bc6d3158c6b739252",
+      "result": "passed"
+    }
+  ],
+  "original_vs_provider": [
+    {
+      "input_id": "ASTOCK-026",
+      "original_count": 63,
+      "selected_count": 63,
+      "excluded_count": 0,
+      "all_sdk_columns_and_rows_equal": true,
+      "all_csv_columns_and_rows_equal": true,
+      "requests_equal": true,
+      "original_csv": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\24_股东户数变化\\data.csv",
+      "original_csv_sha256": "e26e0eeec82f4a420ee212aeaa820207bfa08ade6c00fcf36dc3c098a35800ac",
+      "original_probe": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\tests\\source_snapshots\\a-stock-data\\a_stock_missing_capabilities.py",
+      "original_probe_sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0",
+      "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\em-check-20261004\\ASTOCK-026\\original\\manifest.ndjson",
+      "original_manifest_sha256": "ceadf78101a1eabc7254aaec6c4c12538ddd4fa128342fa9ae1a5063b8b90416",
+      "provider_report": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\em-check-20261004\\ASTOCK-026\\candidate\\ASTOCK-026-b81523b78f9c\\2026-10-03\\input_report\\eastmoney\\shareholder_count\\report.json",
+      "provider_report_sha256": "c3ef21f2784377d41682bc76ce48a1c60dfa2195d7985b7936398d1e72c83e9b",
+      "request_comparison": [
+        {
+          "original": {
+            "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?client=WEB&columns=SECURITY_CODE%2CSECURITY_NAME_ABBR%2CCHANGE_SHARES%2CCHANGE_REASON%2CEND_DATE%2CINTERVAL_CHRATE%2CAVG_MARKET_CAP%2CAVG_HOLD_NUM%2CTOTAL_MARKET_CAP%2CTOTAL_A_SHARES%2CHOLD_NOTICE_DATE%2CHOLDER_NUM%2CPRE_HOLDER_NUM%2CHOLDER_NUM_CHANGE%2CHOLDER_NUM_RATIO%2CEND_DATE%2CPRE_END_DATE&filter=%28SECURITY_CODE%3D%22600519%22%29&pageNumber=1&pageSize=500&quoteColumns=f2%2Cf3&reportName=RPT_HOLDERNUM_DET&sortColumns=END_DATE&sortTypes=-1&source=WEB",
+            "method": "GET",
+            "request_headers": {
+              "User-Agent": "python-requests/2.32.5",
+              "Accept-Encoding": "gzip, deflate, br, zstd",
+              "Accept": "*/*",
+              "Connection": "keep-alive"
+            },
+            "outcome": "response",
+            "status_code": 200,
+            "body_sha256": "d9263b2827e5883a5a271290a4a1a1f1ffc326ce703739fa7c73741f245c0b73",
+            "error_type": null,
+            "request_options": {
+              "timeout": null,
+              "allow_redirects": true,
+              "trust_env": true,
+              "proxies": {},
+              "sdk_retry_policy": true
+            }
+          },
+          "provider": {
+            "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?client=WEB&columns=SECURITY_CODE%2CSECURITY_NAME_ABBR%2CCHANGE_SHARES%2CCHANGE_REASON%2CEND_DATE%2CINTERVAL_CHRATE%2CAVG_MARKET_CAP%2CAVG_HOLD_NUM%2CTOTAL_MARKET_CAP%2CTOTAL_A_SHARES%2CHOLD_NOTICE_DATE%2CHOLDER_NUM%2CPRE_HOLDER_NUM%2CHOLDER_NUM_CHANGE%2CHOLDER_NUM_RATIO%2CEND_DATE%2CPRE_END_DATE&filter=%28SECURITY_CODE%3D%22600519%22%29&pageNumber=1&pageSize=500&quoteColumns=f2%2Cf3&reportName=RPT_HOLDERNUM_DET&sortColumns=END_DATE&sortTypes=-1&source=WEB",
+            "method": "GET",
+            "request_headers": {
+              "User-Agent": "python-requests/2.32.5",
+              "Accept-Encoding": "gzip, deflate, br, zstd",
+              "Accept": "*/*",
+              "Connection": "keep-alive"
+            },
+            "outcome": "response",
+            "status_code": 200,
+            "body_sha256": "d9263b2827e5883a5a271290a4a1a1f1ffc326ce703739fa7c73741f245c0b73",
+            "error_type": null,
+            "request_options": {
+              "timeout": null,
+              "allow_redirects": true,
+              "trust_env": true,
+              "proxies": {},
+              "sdk_retry_policy": true
+            }
+          }
+        },
+        {
+          "original": {
+            "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?client=WEB&columns=SECURITY_CODE%2CSECURITY_NAME_ABBR%2CCHANGE_SHARES%2CCHANGE_REASON%2CEND_DATE%2CINTERVAL_CHRATE%2CAVG_MARKET_CAP%2CAVG_HOLD_NUM%2CTOTAL_MARKET_CAP%2CTOTAL_A_SHARES%2CHOLD_NOTICE_DATE%2CHOLDER_NUM%2CPRE_HOLDER_NUM%2CHOLDER_NUM_CHANGE%2CHOLDER_NUM_RATIO%2CEND_DATE%2CPRE_END_DATE&filter=%28SECURITY_CODE%3D%22600519%22%29&pageNumber=1&pageSize=500&quoteColumns=f2%2Cf3&reportName=RPT_HOLDERNUM_DET&sortColumns=END_DATE&sortTypes=-1&source=WEB",
+            "method": "GET",
+            "request_headers": {
+              "User-Agent": "python-requests/2.32.5",
+              "Accept-Encoding": "gzip, deflate, br, zstd",
+              "Accept": "*/*",
+              "Connection": "keep-alive"
+            },
+            "outcome": "response",
+            "status_code": 200,
+            "body_sha256": "d9263b2827e5883a5a271290a4a1a1f1ffc326ce703739fa7c73741f245c0b73",
+            "error_type": null,
+            "request_options": {
+              "timeout": null,
+              "allow_redirects": true,
+              "trust_env": true,
+              "proxies": {},
+              "sdk_retry_policy": true
+            }
+          },
+          "provider": {
+            "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?client=WEB&columns=SECURITY_CODE%2CSECURITY_NAME_ABBR%2CCHANGE_SHARES%2CCHANGE_REASON%2CEND_DATE%2CINTERVAL_CHRATE%2CAVG_MARKET_CAP%2CAVG_HOLD_NUM%2CTOTAL_MARKET_CAP%2CTOTAL_A_SHARES%2CHOLD_NOTICE_DATE%2CHOLDER_NUM%2CPRE_HOLDER_NUM%2CHOLDER_NUM_CHANGE%2CHOLDER_NUM_RATIO%2CEND_DATE%2CPRE_END_DATE&filter=%28SECURITY_CODE%3D%22600519%22%29&pageNumber=1&pageSize=500&quoteColumns=f2%2Cf3&reportName=RPT_HOLDERNUM_DET&sortColumns=END_DATE&sortTypes=-1&source=WEB",
+            "method": "GET",
+            "request_headers": {
+              "User-Agent": "python-requests/2.32.5",
+              "Accept-Encoding": "gzip, deflate, br, zstd",
+              "Accept": "*/*",
+              "Connection": "keep-alive"
+            },
+            "outcome": "response",
+            "status_code": 200,
+            "body_sha256": "d9263b2827e5883a5a271290a4a1a1f1ffc326ce703739fa7c73741f245c0b73",
+            "error_type": null,
+            "request_options": {
+              "timeout": null,
+              "allow_redirects": true,
+              "trust_env": true,
+              "proxies": {},
+              "sdk_retry_policy": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-027",
+      "original_count": 28,
+      "selected_count": 27,
+      "excluded_count": 1,
+      "all_sdk_columns_and_rows_equal": true,
+      "all_csv_columns_and_rows_equal": true,
+      "requests_equal": true,
+      "original_csv": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\25_分红送转历史\\data.csv",
+      "original_csv_sha256": "a8997137c0fcfcdda419f8b70e9b780a10fab1d2081e5b001e56deb3ee87654b",
+      "original_probe": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\tests\\source_snapshots\\a-stock-data\\a_stock_missing_capabilities.py",
+      "original_probe_sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0",
+      "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\em-check-20261004\\ASTOCK-027\\original\\manifest.ndjson",
+      "original_manifest_sha256": "cf0e7af9bc2a3c720710358b54b4c0311e12dac597d2324b5a77b5344ff8cd90",
+      "provider_report": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\em-check-20261004\\ASTOCK-027\\candidate\\ASTOCK-027-bc89c7842e39\\2026-10-03\\input_report\\eastmoney\\dividend_history\\report.json",
+      "provider_report_sha256": "8e3307663e7c9dfee0f17410077d02189f8f7eefb1f6e4992e17230c1a4fc7bc",
+      "request_comparison": [
+        {
+          "original": {
+            "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?client=WEB&columns=ALL&filter=%28SECURITY_CODE%3D%22600519%22%29&js=%7B%22data%22%3A%28x%29%2C%22pages%22%3A%28tp%29%7D&pageNumber=1&pageSize=500&quoteColumns=&reportName=RPT_SHAREBONUS_DET&sortColumns=REPORT_DATE&sortTypes=-1&source=WEB",
+            "method": "GET",
+            "request_headers": {
+              "User-Agent": "python-requests/2.32.5",
+              "Accept-Encoding": "gzip, deflate, br, zstd",
+              "Accept": "*/*",
+              "Connection": "keep-alive"
+            },
+            "outcome": "response",
+            "status_code": 200,
+            "body_sha256": "e12fcabc65bb66c61ccc157b73b5e8ae1f7ad0707a78449ef239e72b58221a1e",
+            "error_type": null,
+            "request_options": {
+              "timeout": null,
+              "allow_redirects": true,
+              "trust_env": true,
+              "proxies": {},
+              "sdk_retry_policy": true
+            }
+          },
+          "provider": {
+            "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?client=WEB&columns=ALL&filter=%28SECURITY_CODE%3D%22600519%22%29&js=%7B%22data%22%3A%28x%29%2C%22pages%22%3A%28tp%29%7D&pageNumber=1&pageSize=500&quoteColumns=&reportName=RPT_SHAREBONUS_DET&sortColumns=REPORT_DATE&sortTypes=-1&source=WEB",
+            "method": "GET",
+            "request_headers": {
+              "User-Agent": "python-requests/2.32.5",
+              "Accept-Encoding": "gzip, deflate, br, zstd",
+              "Accept": "*/*",
+              "Connection": "keep-alive"
+            },
+            "outcome": "response",
+            "status_code": 200,
+            "body_sha256": "e12fcabc65bb66c61ccc157b73b5e8ae1f7ad0707a78449ef239e72b58221a1e",
+            "error_type": null,
+            "request_options": {
+              "timeout": null,
+              "allow_redirects": true,
+              "trust_env": true,
+              "proxies": {},
+              "sdk_retry_policy": true
+            }
+          }
+        },
+        {
+          "original": {
+            "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?client=WEB&columns=ALL&filter=%28SECURITY_CODE%3D%22600519%22%29&js=%7B%22data%22%3A%28x%29%2C%22pages%22%3A%28tp%29%7D&pageNumber=1&pageSize=500&quoteColumns=&reportName=RPT_SHAREBONUS_DET&sortColumns=REPORT_DATE&sortTypes=-1&source=WEB",
+            "method": "GET",
+            "request_headers": {
+              "User-Agent": "python-requests/2.32.5",
+              "Accept-Encoding": "gzip, deflate, br, zstd",
+              "Accept": "*/*",
+              "Connection": "keep-alive"
+            },
+            "outcome": "response",
+            "status_code": 200,
+            "body_sha256": "e12fcabc65bb66c61ccc157b73b5e8ae1f7ad0707a78449ef239e72b58221a1e",
+            "error_type": null,
+            "request_options": {
+              "timeout": null,
+              "allow_redirects": true,
+              "trust_env": true,
+              "proxies": {},
+              "sdk_retry_policy": true
+            }
+          },
+          "provider": {
+            "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?client=WEB&columns=ALL&filter=%28SECURITY_CODE%3D%22600519%22%29&js=%7B%22data%22%3A%28x%29%2C%22pages%22%3A%28tp%29%7D&pageNumber=1&pageSize=500&quoteColumns=&reportName=RPT_SHAREBONUS_DET&sortColumns=REPORT_DATE&sortTypes=-1&source=WEB",
+            "method": "GET",
+            "request_headers": {
+              "User-Agent": "python-requests/2.32.5",
+              "Accept-Encoding": "gzip, deflate, br, zstd",
+              "Accept": "*/*",
+              "Connection": "keep-alive"
+            },
+            "outcome": "response",
+            "status_code": 200,
+            "body_sha256": "e12fcabc65bb66c61ccc157b73b5e8ae1f7ad0707a78449ef239e72b58221a1e",
+            "error_type": null,
+            "request_options": {
+              "timeout": null,
+              "allow_redirects": true,
+              "trust_env": true,
+              "proxies": {},
+              "sdk_retry_policy": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "input_id": "ASTOCK-028",
+      "original_count": 120,
+      "selected_count": 120,
+      "excluded_count": 0,
+      "all_sdk_columns_and_rows_equal": true,
+      "all_csv_columns_and_rows_equal": true,
+      "requests_equal": true,
+      "original_csv": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\26_个股资金流近100~120日\\data.csv",
+      "original_csv_sha256": "3658e7d541d910eef031726374eece79be09ecaae94f9d320dc7851ec6560b57",
+      "original_probe": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\tests\\source_snapshots\\a-stock-data\\a_stock_missing_capabilities.py",
+      "original_probe_sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0",
+      "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\em-check-20261004\\ASTOCK-028\\original\\manifest.ndjson",
+      "original_manifest_sha256": "802a94b2f9c4d8080c0e590da893a6d33982b4975c7adc6a0a8ce4626f17e807",
+      "provider_report": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\em-check-20261004\\ASTOCK-028\\candidate\\ASTOCK-028-f373a0d259b5\\2026-10-03\\input_report\\eastmoney\\stock_fund_flow\\report.json",
+      "provider_report_sha256": "bd5f460558048d3ece2cb90a032bfca100621a40658dc632eda146088699f2c3",
+      "request_comparison": [
+        {
+          "original": {
+            "url": "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?_=1791021103858&fields1=f1%2Cf2%2Cf3%2Cf7&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf62%2Cf63%2Cf64%2Cf65&klt=101&lmt=0&secid=1.600519&ut=%3Credacted%3E",
+            "method": "GET",
+            "request_headers": {
+              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
+              "Accept-Encoding": "gzip, deflate, br, zstd",
+              "Accept": "*/*",
+              "Connection": "keep-alive"
+            },
+            "outcome": "response",
+            "status_code": 200,
+            "body_sha256": "cbd78a5ab0c29ece3e5bd163f88364c0c0fc55056814dddee8e43ea21bc8aeb6",
+            "error_type": null,
+            "request_options": {
+              "timeout": null,
+              "allow_redirects": true,
+              "trust_env": true,
+              "proxies": {},
+              "sdk_retry_policy": true
+            }
+          },
+          "provider": {
+            "url": "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?_=1791021103858&fields1=f1%2Cf2%2Cf3%2Cf7&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf62%2Cf63%2Cf64%2Cf65&klt=101&lmt=0&secid=1.600519&ut=%3Credacted%3E",
+            "method": "GET",
+            "request_headers": {
+              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
+              "Accept-Encoding": "gzip, deflate, br, zstd",
+              "Accept": "*/*",
+              "Connection": "keep-alive"
+            },
+            "outcome": "response",
+            "status_code": 200,
+            "body_sha256": "cbd78a5ab0c29ece3e5bd163f88364c0c0fc55056814dddee8e43ea21bc8aeb6",
+            "error_type": null,
+            "request_options": {
+              "timeout": null,
+              "allow_redirects": true,
+              "trust_env": true,
+              "proxies": {},
+              "sdk_retry_policy": true
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "known_differences": [
+    "修改原三个Provider，候选历史方法调用成功探针的原SDK；旧默认调用保留。",
+    "分红用户确认只接入已实施事件：来源28行、标准27行、预披露1行留证；不新增模板。",
+    "旧资金流解析大小单列曾错位，本次依据原响应、SDK和CSV修正10列映射。",
+    "分红巨潮备选未经本批验证，不自动继承；历史窗口/数量由来源控制。",
+    "只在离线回放固定SDK缓存破除时间戳以精确匹配归档；实时仍使用原SDK时钟。",
+    "金额及送转比率的单位未独立确认，原值保留、标准相应字段为空。",
+    "未新增实时请求；样本范围仅600519，不认证全市场、当前可用性或生产资格。"
+  ],
+  "negative_checks": [
+    {
+      "input_id": "ASTOCK-026",
+      "mutation": "identity",
+      "failure_class": "schema_changed",
+      "report_path": "provider_validation/results/em-check-20261004/f1/out/ASTOCK-026-15fc2371cb49/2026-10-03/input_report/eastmoney/shareholder_count/report.json",
+      "report_sha256": "50899831d12ceefd6649ff5bac98e7cce0b1dbbfa78c06c31514f35394534d99",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-027",
+      "mutation": "identity",
+      "failure_class": "schema_changed",
+      "report_path": "provider_validation/results/em-check-20261004/f2/out/ASTOCK-027-6cdac7fdc71d/2026-10-03/input_report/eastmoney/dividend_history/report.json",
+      "report_sha256": "b4e33675fea6035f77a222efa6bb5a65f6eb62e8a6317f699e3398ac3397bd29",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-028",
+      "mutation": "identity",
+      "failure_class": "schema_changed",
+      "report_path": "provider_validation/results/em-check-20261004/f3/out/ASTOCK-028-6160f91ce06c/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
+      "report_sha256": "115ed28b26549b5e56b8e9c6b9a2d42c219a59d031c1909946d0bb71fcf121a1",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-026",
+      "mutation": "count",
+      "failure_class": "schema_changed",
+      "report_path": "provider_validation/results/em-check-20261004/f4/out/ASTOCK-026-5cd9ccb55e80/2026-10-03/input_report/eastmoney/shareholder_count/report.json",
+      "report_sha256": "e7c5a74264e1a531a54801202072b593bc55617b2b6285d60081c7cf6eb7f647",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-027",
+      "mutation": "count",
+      "failure_class": "schema_changed",
+      "report_path": "provider_validation/results/em-check-20261004/f5/out/ASTOCK-027-22fb09130b3c/2026-10-03/input_report/eastmoney/dividend_history/report.json",
+      "report_sha256": "3adb0ce6f9d93eeecd0e91b4518a6743c553280cd02ab59df6455607868c6fba",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-028",
+      "mutation": "duplicate",
+      "failure_class": "NormalizationError",
+      "report_path": "provider_validation/results/em-check-20261004/f6/out/ASTOCK-028-98383ff827b3/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
+      "report_sha256": "b857324968f7aa274bc1ec9d1208050a61a4dd5ef8a5802ff11679d2e8f34299",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-026",
+      "mutation": "duplicate",
+      "failure_class": "NormalizationError",
+      "report_path": "provider_validation/results/em-check-20261004/f7/out/ASTOCK-026-22645150e3c2/2026-10-03/input_report/eastmoney/shareholder_count/report.json",
+      "report_sha256": "d604ea5c2f74423d7028978cf939049a2d1deb2149ff1bd70e8a193f7cad7e00",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-028",
+      "mutation": "numeric",
+      "failure_class": "NormalizationError",
+      "report_path": "provider_validation/results/em-check-20261004/f8/out/ASTOCK-028-bb15dfe0d3b0/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
+      "report_sha256": "714bee152d2bf4a5671cc59a7005787fba3f5b30d1ed56e34352d0d68f61155b",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-027",
+      "mutation": "all_pending",
+      "failure_class": "NormalizationError",
+      "report_path": "provider_validation/results/em-check-20261004/f9/out/ASTOCK-027-3cba598500b0/2026-10-03/input_report/eastmoney/dividend_history/report.json",
+      "report_sha256": "005e211e4a86e90b1db68d92f6b707fcb5d55e78c6e3a211d929a7572ff8bcef",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-028",
+      "mutation": "http_429",
+      "failure_class": "rate_limited",
+      "report_path": "provider_validation/results/em-check-20261004/f10/out/ASTOCK-028-328abba1b4f7/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
+      "report_sha256": "6ab98166b12700014ee29bf23c1dde4a154a969f22a6baf4615e0a25dfc54819",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-026",
+      "mutation": "business",
+      "failure_class": "schema_changed",
+      "report_path": "provider_validation/results/em-check-20261004/f11/out/ASTOCK-026-5e6345828048/2026-10-03/input_report/eastmoney/shareholder_count/report.json",
+      "report_sha256": "9b7594d7c732b114488340f2f3063565516e44f2f6ccb08883788be0a75e1ee6",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-028",
+      "mutation": "empty",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/em-check-20261004/f12/out/ASTOCK-028-3d11af31306b/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
+      "report_sha256": "aec397b02af97e9b061a2769cf2d116502116a951c509b6691648b3a816e1d78",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-028",
+      "mutation": "transport",
+      "failure_class": "ConnectionError",
+      "report_path": "provider_validation/results/em-check-20261004/f13/out/ASTOCK-028-fe2f6441c83d/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
+      "report_sha256": "e270d3b496ebd5ce60f9b8c46eadad6cb7ebe6f556330512ff853a657ed08f51",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-028",
+      "mutation": "corrupt_hash",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/em-check-20261004/f14/out/ASTOCK-028-465cac8953a1/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
+      "report_sha256": "0c20dc40ce63663b7b8c26356c87c78eb50a3a25a78e25699816a5b4e4b0964a",
+      "result": "passed"
+    }
+  ]
+}

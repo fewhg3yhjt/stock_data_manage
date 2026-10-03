@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Any, Mapping, Sequence
 
@@ -43,6 +43,9 @@ class InputFetchResult:
     rows: tuple[Mapping[str, Any], ...]
     source_url: str | None = None
     empty_is_valid: bool = False
+    source_rows: tuple[Mapping[str, Any], ...] | None = None
+    mapping_context: Mapping[str, Any] = field(default_factory=dict)
+    excluded_rows: tuple[Mapping[str, Any], ...] = ()
 
 
 class ProviderContractError(RuntimeError):

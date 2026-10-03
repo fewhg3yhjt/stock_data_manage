@@ -41,6 +41,282 @@ BAO_CONTEXT = {"request": {"trade_date": "2026-09-30"}, "calendar": {"trading_da
 BAO_CASES = [("SDA-BOARD-005", BAO_CONTEXT, BAO_ARCHIVE, 5223), ("SDA-BOARD-006", BAO_CONTEXT, BAO_ARCHIVE, 5221)]
 QUOTE_ARCHIVE = ROOT / "provider_validation/results/live-probes/pilot-20261003-tencent-quote-network/_raw/missing-capabilities-20261003T173649/manifest.ndjson"
 QUOTE_CONTEXT = {"request": {"symbols": ["sh600519"], "as_of": "2026-09-30T15:10:00+08:00"}}
+EM_CONTEXT = {"request": {"symbol": "600519"}}
+EM_CASES = [("ASTOCK-026", EM_CONTEXT, SDK_ARCHIVE, 63), ("ASTOCK-027", EM_CONTEXT, SDK_ARCHIVE, 27),
+            ("ASTOCK-028", EM_CONTEXT, SDK_ARCHIVE, 120)]
+
+
+def compare_em_original(tmp_path, input_id, context, manifest, count):
+    """Run the saved probe functions and compare every SDK column against independent CSVs."""
+    import ast
+    import inspect
+    import re
+    import types
+    import pandas as pd
+    import akshare as ak
+    from typing import Any, Callable, List, Tuple, Dict
+    from stock_data_manage.providers.eastmoney.realtime import history_replay_clock
+    probe = ROOT / "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py"
+    names = {"only_digits", "market_of", "em_market", "ak_function", "call_ak", "try_ak_variants",
+             "fetch_shareholder_count", "fetch_dividend_history", "fetch_em_fund_flow", "fetch_fund_flow_120"}
+    nodes = [node for node in ast.parse(probe.read_text(encoding="utf-8")).body
+             if isinstance(node, ast.FunctionDef) and node.name in names]
+    namespace = dict(re=re, inspect=inspect, pd=pd, Config=types.SimpleNamespace, Any=Any, Callable=Callable,
+                     List=List, Tuple=Tuple, Dict=Dict, ensure_ak=lambda: ak)
+    exec(compile(ast.Module(body=nodes, type_ignores=[]), str(probe), "exec"), namespace)
+    method, folder = {"ASTOCK-026": ("fetch_shareholder_count", "24_股东户数变化"),
+                      "ASTOCK-027": ("fetch_dividend_history", "25_分红送转历史"),
+                      "ASTOCK-028": ("fetch_fund_flow_120", "26_个股资金流近100~120日")}[input_id]
+    from contextlib import ExitStack
+    original_store = RawObjectStore(tmp_path / "original")
+    with ExitStack() as stack:
+        events = stack.enter_context(captured_requests(original_store, provider="eastmoney", endpoint=method,
+            scope=context, code_version="original-probe", pacer=RequestPacer(), replay_manifest=manifest, sdk_retry_policy=True))
+        if input_id == "ASTOCK-028":
+            stack.enter_context(history_replay_clock(ak.stock_individual_fund_flow, manifest, "600519"))
+        frame = namespace[method](types.SimpleNamespace(code="600519"))
+    report = collect_input(input_id=input_id, context=context, config_root=ROOT / "config", output_root=tmp_path / "candidate",
+                           replay_manifest=manifest)
+    assert report["status"] == "candidate_complete", report
+    source = read_artifact(report, "source_rows")
+    expected_count = 28 if input_id == "ASTOCK-027" else count
+    assert len(frame) == len(source) == expected_count
+    csv_path = manifest.parents[2] / folder / "data.csv"
+    golden = pd.read_csv(csv_path, dtype=str, keep_default_na=False)
+    assert len(golden) == expected_count and list(golden.columns) == list(frame.columns)
+    original_rows = [{k: None if pd.isna(v) else v.isoformat() if hasattr(v, "isoformat") else v for k, v in r.items()}
+                     for r in frame.to_dict(orient="records")]
+    assert source == original_rows
+    for index, raw in enumerate(source):
+        for column, value in raw.items():
+            saved = golden.iloc[index][column]
+            if value is None:
+                assert saved == ""
+            elif isinstance(value, (float, int)):
+                # CSV and SDK may differ only in shortest floating point serialization.
+                assert float(value) == pytest.approx(float(saved), rel=1e-14, abs=1e-12)
+            else:
+                assert str(value) == saved
+    keys = ["url", "method", "request_headers", "outcome", "status_code", "body_sha256", "error_type", "request_options"]
+    assert len(events) == len(report["responses"]) == (1 if input_id == "ASTOCK-028" else 2)
+    for left, right in zip(events, report["responses"]):
+        assert {k: left.get(k) for k in keys} == {k: right.get(k) for k in keys}
+    mapped = read_artifact(report, "output")
+    excluded = read_artifact(report, "excluded_rows")
+    assert len(mapped) == report["coverage_denominator"] == count
+    assert report["original_row_count"] == expected_count and report["selected_row_count"] == count
+    assert report["live_http_calls"] == report["production_writes"] == 0
+    assert report["eligible_for_production_routing"] is False
+    assert all(row[field] is None for row in mapped for field in report["unverified_fields"])
+    if input_id == "ASTOCK-027":
+        selected = [row for row in source if row["方案进度"] == "实施分配"]
+        assert len(excluded) == 1 and excluded[0]["row"]["方案进度"] == "预披露"
+        assert excluded[0]["reason"] == "not_implemented_dividend_plan"
+        assert [r["ex_dividend_date"] for r in mapped] == [r["除权除息日"] for r in selected]
+        assert [r["notice_date"] for r in mapped] == [r["最新公告日期"] for r in selected]
+    elif input_id == "ASTOCK-026":
+        assert excluded == []
+        assert [float(r["holder_count"]) for r in mapped] == [r["股东户数-本次"] for r in source]
+        assert all(r["previous_end_date"] is None for r in mapped)
+    else:
+        assert excluded == []
+        assert [float(r["close"]) for r in mapped] == [r["收盘价"] for r in source]
+    comparison = dict(input_id=input_id, original_count=expected_count, selected_count=count, excluded_count=len(excluded),
+        all_sdk_columns_and_rows_equal=True, all_csv_columns_and_rows_equal=True, requests_equal=True,
+        original_csv=str(csv_path.resolve()), original_csv_sha256=hashlib.sha256(csv_path.read_bytes()).hexdigest(),
+        original_probe=str(probe.resolve()), original_probe_sha256=hashlib.sha256(probe.read_bytes()).hexdigest(),
+        original_manifest=str((original_store.root / "manifest.ndjson").resolve()),
+        original_manifest_sha256=hashlib.sha256((original_store.root / "manifest.ndjson").read_bytes()).hexdigest(),
+        provider_report=report["report_path"], provider_report_sha256=hashlib.sha256(Path(report["report_path"]).read_bytes()).hexdigest(),
+        request_comparison=[{"original": {k: l.get(k) for k in keys}, "provider": {k: r.get(k) for k in keys}}
+                            for l, r in zip(events, report["responses"])])
+    (tmp_path / "comparison.json").write_text(json.dumps(comparison, ensure_ascii=False, indent=2), encoding="utf-8")
+    return comparison
+
+
+@pytest.mark.parametrize("input_id,context,manifest,count", EM_CASES)
+def test_em_original_script_sdk_csv_and_candidate_agree(tmp_path, no_network, input_id, context, manifest, count):
+    compare_em_original(tmp_path, input_id, context, manifest, count)
+
+
+def em_fixture(tmp_path, input_id, mutation):
+    """Synthetic mutation of retained source bytes; metadata is computed from the new payload."""
+    target = {"ASTOCK-026": "RPT_HOLDERNUM_DET", "ASTOCK-027": "RPT_SHAREBONUS_DET",
+              "ASTOCK-028": "/fflow/daykline/get"}[input_id]
+    record = next(json.loads(line) for line in reversed(SDK_ARCHIVE.read_text(encoding="utf-8").splitlines())
+                  if target in json.loads(line).get("url", ""))
+    body = json.loads(RawObjectStore.read_response(SDK_ARCHIVE, record))
+    if mutation == "identity":
+        if input_id == "ASTOCK-028": body["data"]["code"] = "000001"
+        else: body["result"]["data"][0]["SECURITY_CODE"] = "000001"
+    elif mutation == "count": body["result"]["count"] += 1
+    elif mutation == "duplicate":
+        if input_id == "ASTOCK-028": body["data"]["klines"][1] = body["data"]["klines"][0]
+        else: body["result"]["data"][1] = dict(body["result"]["data"][0])
+    elif mutation == "numeric":
+        values=body["data"]["klines"][0].split(","); values[1]="broken"; body["data"]["klines"][0]=",".join(values)
+    elif mutation == "all_pending":
+        for row in body["result"]["data"]: row["ASSIGN_PROGRESS"] = "预披露"
+    elif mutation == "business": body["success"] = False
+    elif mutation == "empty": body["data"]["klines"] = []
+    elif mutation == "schema":
+        for row in body["result"]["data"]: row.pop("END_DATE", None)
+    response = requests.Response()
+    response.status_code = 429 if mutation == "http_429" else 200
+    response._content, response.encoding = json.dumps(body).encode("utf-8"), "utf-8"
+    store = RawObjectStore(tmp_path / "fixture")
+    # Shareholder/dividend SDK performs two identical calls; archive both.
+    for index in range(1 if input_id == "ASTOCK-028" else 2):
+        store.record_response(response=response, url=record["url"], method="GET", request_headers=record["request_headers"],
+            scope={"synthetic_mutation": mutation, "original_source_sha256": record["body_sha256"]},
+            provider="eastmoney", endpoint=input_id, code_version="offline-fixture")
+    if mutation in {"transport", "corrupt_hash"}:
+        path = store.root / "manifest.ndjson"
+        records = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
+        for event in records:
+            if mutation == "transport": event.update(outcome="transport_error", error_type="ConnectionError")
+            else: event["body_sha256"] = "0" * 64
+        path.write_text("\n".join(json.dumps(event) for event in records)+"\n",encoding="utf-8")
+    return store.root / "manifest.ndjson"
+
+
+EM_FAILURES = [("ASTOCK-026", "identity", "schema_changed"), ("ASTOCK-027", "identity", "schema_changed"),
+               ("ASTOCK-028", "identity", "schema_changed"), ("ASTOCK-026", "count", "schema_changed"),
+               ("ASTOCK-027", "count", "schema_changed"), ("ASTOCK-028", "duplicate", "NormalizationError"),
+               ("ASTOCK-026", "duplicate", "NormalizationError"), ("ASTOCK-028", "numeric", "NormalizationError"),
+               ("ASTOCK-027", "all_pending", "NormalizationError"), ("ASTOCK-028", "http_429", "rate_limited"),
+               ("ASTOCK-026", "business", "schema_changed"), ("ASTOCK-028", "empty", "ValueError"),
+               ("ASTOCK-028", "transport", "ConnectionError"), ("ASTOCK-028", "corrupt_hash", "ValueError")]
+
+
+@pytest.mark.parametrize("input_id,mutation,expected", EM_FAILURES)
+def test_em_invalid_source_keeps_bytes_and_rejects_candidate(tmp_path, no_network, input_id, mutation, expected):
+    manifest = em_fixture(tmp_path, input_id, mutation)
+    report = collect_input(input_id=input_id, context=EM_CONTEXT, config_root=ROOT / "config", output_root=tmp_path / "out",
+                           replay_manifest=manifest)
+    assert report["status"] == "failed" and report["failure_class"] == expected, report
+    assert "output" not in report and report["live_http_calls"] == 0 and report["production_writes"] == 0
+    original = json.loads(manifest.read_text(encoding="utf-8").splitlines()[0])
+    if mutation == "corrupt_hash":
+        assert "responses" not in report
+        return
+    event = report["responses"][0]
+    if mutation == "transport":
+        assert event["outcome"] == "transport_error" and event["error_type"] == "ConnectionError"
+        return
+    assert event["body_sha256"] == original["body_sha256"]
+    assert RawObjectStore.read_response(Path(report["run_directory"]) / report["raw_manifest"]["path"], event) == RawObjectStore.read_response(manifest, original)
+
+
+def test_em_legacy_fund_flow_columns_match_independent_csv(tmp_path):
+    import csv
+    from stock_data_manage.providers.contracts import HttpResponse
+    from stock_data_manage.providers.eastmoney.fund_flow import EastMoneyStockFundFlowProvider
+    record = next(json.loads(line) for line in reversed(SDK_ARCHIVE.read_text(encoding="utf-8").splitlines())
+                  if "/fflow/daykline/get" in json.loads(line).get("url", ""))
+    body = RawObjectStore.read_response(SDK_ARCHIVE, record)
+    calls = []
+    class Transport:
+        def get(self, url, *, params, timeout_seconds):
+            calls.append(dict(url=url, params=params, timeout_seconds=timeout_seconds))
+            return HttpResponse(200, {}, body)
+    rows = EastMoneyStockFundFlowProvider(Transport()).fetch_daily(["sh600519"]).records
+    csv_path = SDK_ARCHIVE.parents[2] / "26_个股资金流近100~120日/data.csv"
+    golden = list(csv.DictReader(csv_path.open(encoding="utf-8-sig", newline="")))
+    mapping = {"main":"主力", "super_large":"超大单", "large":"大单", "medium":"中单", "small":"小单"}
+    assert len(rows) == len(golden) == 120
+    for row, reference in zip(rows, golden):
+        assert row.trade_date == reference["日期"]
+        for key, source in mapping.items():
+            assert getattr(row, key+"_net_inflow") == float(reference[source+"净流入-净额"])
+            assert getattr(row, key+"_net_inflow_pct") == float(reference[source+"净流入-净占比"])
+    assert calls[0]["params"]["lmt"] == "20" and calls[0]["timeout_seconds"] == 20
+    original_cls = em_original_class("2-fund_flow.py.bin", "EastMoneyStockFundFlowProvider")
+    old_rows = original_cls(Transport()).fetch_daily(["sh600519"]).records
+    assert calls[0] == calls[1]
+    assert len(old_rows) == len(rows)
+    assert all(old.main_net_inflow == new.main_net_inflow and old.close == new.close and old.change_pct == new.change_pct
+               for old, new in zip(old_rows, rows))
+    saved = dict(rows_compared=120, fields_compared=10, source_csv=str(csv_path.resolve()),
+                 source_sha256=hashlib.sha256(body).hexdigest(), legacy_request=calls[0], result="passed")
+    tmp_path.mkdir(exist_ok=True, parents=True)
+    (tmp_path / "legacy-flow-comparison.json").write_text(json.dumps(saved, ensure_ascii=False, indent=2),encoding="utf-8")
+
+
+def em_original_class(snapshot, name):
+    import sys
+    import types
+    module = types.ModuleType("em_original_" + name)
+    module.__package__ = "stock_data_manage.providers.eastmoney"
+    sys.modules[module.__name__] = module
+    try:
+        path = ROOT / "provider_validation/results/em-original-20261004" / snapshot
+        exec(compile(path.read_bytes(), str(path), "exec"), module.__dict__)
+        return getattr(module, name)
+    finally:
+        del sys.modules[module.__name__]
+
+
+@pytest.mark.parametrize("input_id,snapshot,class_name,method", [
+    ("ASTOCK-026", "1-shareholder.py.bin", "EastMoneyShareholderCountProvider", "fetch"),
+    ("ASTOCK-027", "3-dividend.py.bin", "EastMoneyDividendProvider", "fetch_events")])
+def test_em_existing_methods_preserve_requests_and_returns(tmp_path, input_id, snapshot, class_name, method):
+    from dataclasses import asdict
+    from stock_data_manage.providers.contracts import HttpResponse
+    from stock_data_manage.providers.eastmoney.shareholder import EastMoneyShareholderCountProvider
+    from stock_data_manage.providers.eastmoney.dividend import EastMoneyDividendProvider
+    token = "RPT_HOLDERNUM_DET" if input_id == "ASTOCK-026" else "RPT_SHAREBONUS_DET"
+    event = next(json.loads(line) for line in SDK_ARCHIVE.read_text(encoding="utf-8").splitlines()
+                 if token in json.loads(line).get("url", ""))
+    body = RawObjectStore.read_response(SDK_ARCHIVE, event)
+    requests_made = []
+    class Transport:
+        def get(self, url, *, params, timeout_seconds):
+            requests_made.append(dict(url=url, params=params, timeout_seconds=timeout_seconds))
+            return HttpResponse(200, {}, body)
+    current = EastMoneyShareholderCountProvider if input_id == "ASTOCK-026" else EastMoneyDividendProvider
+    old = em_original_class(snapshot, class_name)
+    args, kwargs = ((["sh600519"],), {}) if input_id == "ASTOCK-026" else (
+        (date(2001,1,1), date(2026,9,30)), {"fetch_time":datetime(2026,10,3,tzinfo=timezone.utc)})
+    previous = getattr(old(Transport()), method)(*args, **kwargs)
+    migrated = getattr(current(Transport()), method)(*args, **kwargs)
+    assert asdict(previous) == asdict(migrated) and requests_made[0] == requests_made[1]
+    tmp_path.mkdir(exist_ok=True, parents=True)
+    result = dict(input_id=input_id, source_sha256=hashlib.sha256(body).hexdigest(), requests=requests_made,
+        rows_compared=len(migrated.records if input_id == "ASTOCK-026" else migrated.events),
+        all_legacy_fields_equal=True, mode="offline parser/default-request regression using injected archived response")
+    (tmp_path / "legacy-comparison.json").write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding="utf-8")
+
+
+def test_em_yaml_selection_mapping_and_unsupported_parameters(tmp_path, no_network):
+    config = tmp_path / "config"
+    shutil.copytree(ROOT / "config", config)
+    path = config / "normalization/shareholder_count.yaml"
+    document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    document["rules"][-1]["field_mapping"]["holder_count"] = "股东户数-上次"
+    path.write_text(yaml.safe_dump(document, allow_unicode=True), encoding="utf-8")
+    report = collect_input(input_id="ASTOCK-026", context=EM_CONTEXT, config_root=config, output_root=tmp_path / "out",
+                           replay_manifest=SDK_ARCHIVE, fields=["instrument_id", "end_date", "holder_count"])
+    assert report["status"] == "candidate_complete"
+    source, mapped = read_artifact(report, "source_rows"), read_artifact(report, "output")
+    assert set(mapped[0]) == {"instrument_id", "end_date", "holder_count"}
+    assert [float(row["holder_count"]) for row in mapped] == [row["股东户数-上次"] for row in source]
+    for ident, _, _, _ in EM_CASES:
+        with pytest.raises(ValueError):
+            collect_input(input_id=ident, context={"request":{"symbol":"600519", "start_date":"2026-01-01"}},
+                config_root=config, output_root=tmp_path / "out", replay_manifest=SDK_ARCHIVE)
+        failed = collect_input(input_id=ident, context={"request":{"symbol":"sz600519"}},config_root=config,
+            output_root=tmp_path / "out", replay_manifest=SDK_ARCHIVE)
+        assert failed["status"] == "failed" and failed["failure_class"] == "ValueError"
+
+
+def test_em_replay_miss_and_clock_are_isolated(tmp_path, no_network):
+    import akshare as ak
+    clock = ak.stock_individual_fund_flow.__globals__["time"]
+    report = collect_input(input_id="ASTOCK-028", context={"request":{"symbol":"000001"}},config_root=ROOT / "config",
+        output_root=tmp_path, replay_manifest=em_fixture(tmp_path, "ASTOCK-028", "none"))
+    assert report["status"] == "failed" and "never falls back" in report["error"]
+    assert ak.stock_individual_fund_flow.__globals__["time"] is clock
 
 
 def quote_source():

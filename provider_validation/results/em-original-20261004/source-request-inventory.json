@@ -1,0 +1,272 @@
+[
+  {
+    "line": 77,
+    "body_sha256": "d9263b2827e5883a5a271290a4a1a1f1ffc326ce703739fa7c73741f245c0b73",
+    "body_storage": "bodies\\d9263b2827e5883a5a271290a4a1a1f1ffc326ce703739fa7c73741f245c0b73.body.gz",
+    "content_type": "text/plain;charset=UTF-8",
+    "event": "http_response",
+    "fetched_at_utc": "2026-10-03T09:51:29.232+00:00",
+    "method": "GET",
+    "outcome": "response",
+    "persistence_status": "exact_application_body_saved",
+    "request_body_bytes": 0,
+    "request_body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "request_headers": {
+      "Accept": "*/*",
+      "Accept-Encoding": "gzip, deflate, br, zstd",
+      "Connection": "keep-alive",
+      "User-Agent": "python-requests/2.32.5"
+    },
+    "requests_decoded_body_bytes": 31404,
+    "response_encoding": "UTF-8",
+    "response_headers": {
+      "Ali-Swift-Global-Savetime": "1791021092",
+      "Cache-Control": "no-cache",
+      "Connection": "keep-alive",
+      "Content-Type": "text/plain;charset=UTF-8",
+      "Date": "Sat, 03 Oct 2026 09:51:32 GMT",
+      "EagleId": "27af042317910210927736471e",
+      "Server": "Tengine",
+      "Set-Cookie": "[REDACTED]",
+      "Timing-Allow-Origin": "*",
+      "Transfer-Encoding": "chunked",
+      "Vary": "Accept-Encoding",
+      "Via": "ens-cache17.l2cn9026[24,23,200-0,M], ens-cache37.l2cn9026[24,0], vcache4.cn4431[27,26,200-0,M], vcache15.cn4431[29,0]",
+      "X-Cache": "MISS TCP_MISS dirn:-2:-2",
+      "X-Swift-CacheTime": "0",
+      "X-Swift-SaveTime": "Sat, 03 Oct 2026 09:51:32 GMT"
+    },
+    "scope": {
+      "capability": "24:股东户数变化",
+      "code": "600519",
+      "date": "20260930",
+      "end": "20261003",
+      "min_host_interval_seconds": "3.0",
+      "probe_policy": "rate-limited-live-probe-v1",
+      "retry_policy": "max_2_retries; min_backoff_5.0s; no_retry_403_429",
+      "start": "20260901"
+    },
+    "status_code": 200,
+    "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?sortColumns=END_DATE&sortTypes=-1&pageSize=500&pageNumber=1&reportName=RPT_HOLDERNUM_DET&columns=SECURITY_CODE%2CSECURITY_NAME_ABBR%2CCHANGE_SHARES%2CCHANGE_REASON%2CEND_DATE%2CINTERVAL_CHRATE%2CAVG_MARKET_CAP%2CAVG_HOLD_NUM%2CTOTAL_MARKET_CAP%2CTOTAL_A_SHARES%2CHOLD_NOTICE_DATE%2CHOLDER_NUM%2CPRE_HOLDER_NUM%2CHOLDER_NUM_CHANGE%2CHOLDER_NUM_RATIO%2CEND_DATE%2CPRE_END_DATE&quoteColumns=f2%2Cf3&filter=%28SECURITY_CODE%3D%22600519%22%29&source=WEB&client=WEB",
+    "evidence_redacted": true,
+    "redaction_reason": "Credential/session-like header value suppressed; exact request header value is not retained.",
+    "redacted_header_fields": [
+      "response_headers.Set-Cookie"
+    ]
+  },
+  {
+    "line": 78,
+    "body_sha256": "d9263b2827e5883a5a271290a4a1a1f1ffc326ce703739fa7c73741f245c0b73",
+    "body_storage": "bodies\\d9263b2827e5883a5a271290a4a1a1f1ffc326ce703739fa7c73741f245c0b73.body.gz",
+    "content_type": "text/plain;charset=UTF-8",
+    "event": "http_response",
+    "fetched_at_utc": "2026-10-03T09:51:30.575+00:00",
+    "method": "GET",
+    "outcome": "response",
+    "persistence_status": "exact_application_body_saved",
+    "request_body_bytes": 0,
+    "request_body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "request_headers": {
+      "Accept": "*/*",
+      "Accept-Encoding": "gzip, deflate, br, zstd",
+      "Connection": "keep-alive",
+      "User-Agent": "python-requests/2.32.5"
+    },
+    "requests_decoded_body_bytes": 31404,
+    "response_encoding": "UTF-8",
+    "response_headers": {
+      "Ali-Swift-Global-Savetime": "1791021095",
+      "Cache-Control": "no-cache",
+      "Connection": "keep-alive",
+      "Content-Type": "text/plain;charset=UTF-8",
+      "Date": "Sat, 03 Oct 2026 09:51:35 GMT",
+      "EagleId": "27af042317910210953916434e",
+      "Server": "Tengine",
+      "Set-Cookie": "[REDACTED]",
+      "Timing-Allow-Origin": "*",
+      "Transfer-Encoding": "chunked",
+      "Vary": "Accept-Encoding",
+      "Via": "ens-cache17.l2cn9026[20,20,200-0,M], ens-cache48.l2cn9026[21,0], vcache4.cn4431[23,23,200-0,M], vcache15.cn4431[24,0]",
+      "X-Cache": "MISS TCP_MISS dirn:-2:-2",
+      "X-Swift-CacheTime": "0",
+      "X-Swift-SaveTime": "Sat, 03 Oct 2026 09:51:35 GMT"
+    },
+    "scope": {
+      "capability": "24:股东户数变化",
+      "code": "600519",
+      "date": "20260930",
+      "end": "20261003",
+      "min_host_interval_seconds": "3.0",
+      "probe_policy": "rate-limited-live-probe-v1",
+      "retry_policy": "max_2_retries; min_backoff_5.0s; no_retry_403_429",
+      "start": "20260901"
+    },
+    "status_code": 200,
+    "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?sortColumns=END_DATE&sortTypes=-1&pageSize=500&pageNumber=1&reportName=RPT_HOLDERNUM_DET&columns=SECURITY_CODE%2CSECURITY_NAME_ABBR%2CCHANGE_SHARES%2CCHANGE_REASON%2CEND_DATE%2CINTERVAL_CHRATE%2CAVG_MARKET_CAP%2CAVG_HOLD_NUM%2CTOTAL_MARKET_CAP%2CTOTAL_A_SHARES%2CHOLD_NOTICE_DATE%2CHOLDER_NUM%2CPRE_HOLDER_NUM%2CHOLDER_NUM_CHANGE%2CHOLDER_NUM_RATIO%2CEND_DATE%2CPRE_END_DATE&quoteColumns=f2%2Cf3&filter=%28SECURITY_CODE%3D%22600519%22%29&source=WEB&client=WEB",
+    "evidence_redacted": true,
+    "redaction_reason": "Credential/session-like header value suppressed; exact request header value is not retained.",
+    "redacted_header_fields": [
+      "response_headers.Set-Cookie"
+    ]
+  },
+  {
+    "line": 79,
+    "body_sha256": "e12fcabc65bb66c61ccc157b73b5e8ae1f7ad0707a78449ef239e72b58221a1e",
+    "body_storage": "bodies\\e12fcabc65bb66c61ccc157b73b5e8ae1f7ad0707a78449ef239e72b58221a1e.body.gz",
+    "content_type": "text/plain;charset=UTF-8",
+    "event": "http_response",
+    "fetched_at_utc": "2026-10-03T09:51:36.497+00:00",
+    "method": "GET",
+    "outcome": "response",
+    "persistence_status": "exact_application_body_saved",
+    "request_body_bytes": 0,
+    "request_body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "request_headers": {
+      "Accept": "*/*",
+      "Accept-Encoding": "gzip, deflate, br, zstd",
+      "Connection": "keep-alive",
+      "User-Agent": "python-requests/2.32.5"
+    },
+    "requests_decoded_body_bytes": 25836,
+    "response_encoding": "UTF-8",
+    "response_headers": {
+      "Ali-Swift-Global-Savetime": "1791021099",
+      "Cache-Control": "no-cache",
+      "Connection": "keep-alive",
+      "Content-Type": "text/plain;charset=UTF-8",
+      "Date": "Sat, 03 Oct 2026 09:51:39 GMT",
+      "EagleId": "27af041d17910210997442030e",
+      "Server": "Tengine",
+      "Set-Cookie": "[REDACTED]",
+      "Timing-Allow-Origin": "*",
+      "Transfer-Encoding": "chunked",
+      "Vary": "Accept-Encoding",
+      "Via": "ens-cache45.l2cn9026[21,20,200-0,M], ens-cache64.l2cn9026[23,0], vcache15.cn4431[28,27,200-0,M], vcache9.cn4431[32,0]",
+      "X-Cache": "MISS TCP_MISS dirn:-2:-2",
+      "X-Swift-CacheTime": "0",
+      "X-Swift-SaveTime": "Sat, 03 Oct 2026 09:51:39 GMT"
+    },
+    "scope": {
+      "capability": "25:分红送转历史",
+      "code": "600519",
+      "date": "20260930",
+      "end": "20261003",
+      "min_host_interval_seconds": "3.0",
+      "probe_policy": "rate-limited-live-probe-v1",
+      "retry_policy": "max_2_retries; min_backoff_5.0s; no_retry_403_429",
+      "start": "20260901"
+    },
+    "status_code": 200,
+    "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?sortColumns=REPORT_DATE&sortTypes=-1&pageSize=500&pageNumber=1&reportName=RPT_SHAREBONUS_DET&columns=ALL&quoteColumns=&js=%7B%22data%22%3A%28x%29%2C%22pages%22%3A%28tp%29%7D&source=WEB&client=WEB&filter=%28SECURITY_CODE%3D%22600519%22%29",
+    "evidence_redacted": true,
+    "redaction_reason": "Credential/session-like header value suppressed; exact request header value is not retained.",
+    "redacted_header_fields": [
+      "response_headers.Set-Cookie"
+    ]
+  },
+  {
+    "line": 80,
+    "body_sha256": "e12fcabc65bb66c61ccc157b73b5e8ae1f7ad0707a78449ef239e72b58221a1e",
+    "body_storage": "bodies\\e12fcabc65bb66c61ccc157b73b5e8ae1f7ad0707a78449ef239e72b58221a1e.body.gz",
+    "content_type": "text/plain;charset=UTF-8",
+    "event": "http_response",
+    "fetched_at_utc": "2026-10-03T09:51:37.571+00:00",
+    "method": "GET",
+    "outcome": "response",
+    "persistence_status": "exact_application_body_saved",
+    "request_body_bytes": 0,
+    "request_body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "request_headers": {
+      "Accept": "*/*",
+      "Accept-Encoding": "gzip, deflate, br, zstd",
+      "Connection": "keep-alive",
+      "User-Agent": "python-requests/2.32.5"
+    },
+    "requests_decoded_body_bytes": 25836,
+    "response_encoding": "UTF-8",
+    "response_headers": {
+      "Ali-Swift-Global-Savetime": "1791021102",
+      "Cache-Control": "no-cache",
+      "Connection": "keep-alive",
+      "Content-Type": "text/plain;charset=UTF-8",
+      "Date": "Sat, 03 Oct 2026 09:51:42 GMT",
+      "EagleId": "27af041817910211029734402e",
+      "Server": "Tengine",
+      "Set-Cookie": "[REDACTED]",
+      "Timing-Allow-Origin": "*",
+      "Transfer-Encoding": "chunked",
+      "Vary": "Accept-Encoding",
+      "Via": "ens-cache45.l2cn9026[14,14,200-0,M], ens-cache52.l2cn9026[15,0], vcache15.cn4431[17,16,200-0,M], vcache4.cn4431[18,0]",
+      "X-Cache": "MISS TCP_MISS dirn:-2:-2",
+      "X-Swift-CacheTime": "0",
+      "X-Swift-SaveTime": "Sat, 03 Oct 2026 09:51:42 GMT"
+    },
+    "scope": {
+      "capability": "25:分红送转历史",
+      "code": "600519",
+      "date": "20260930",
+      "end": "20261003",
+      "min_host_interval_seconds": "3.0",
+      "probe_policy": "rate-limited-live-probe-v1",
+      "retry_policy": "max_2_retries; min_backoff_5.0s; no_retry_403_429",
+      "start": "20260901"
+    },
+    "status_code": 200,
+    "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?sortColumns=REPORT_DATE&sortTypes=-1&pageSize=500&pageNumber=1&reportName=RPT_SHAREBONUS_DET&columns=ALL&quoteColumns=&js=%7B%22data%22%3A%28x%29%2C%22pages%22%3A%28tp%29%7D&source=WEB&client=WEB&filter=%28SECURITY_CODE%3D%22600519%22%29",
+    "evidence_redacted": true,
+    "redaction_reason": "Credential/session-like header value suppressed; exact request header value is not retained.",
+    "redacted_header_fields": [
+      "response_headers.Set-Cookie"
+    ]
+  },
+  {
+    "line": 81,
+    "body_sha256": "cbd78a5ab0c29ece3e5bd163f88364c0c0fc55056814dddee8e43ea21bc8aeb6",
+    "body_storage": "bodies\\cbd78a5ab0c29ece3e5bd163f88364c0c0fc55056814dddee8e43ea21bc8aeb6.body.gz",
+    "content_type": "application/json; charset=UTF-8",
+    "event": "http_response",
+    "fetched_at_utc": "2026-10-03T09:51:43.860+00:00",
+    "method": "GET",
+    "outcome": "response",
+    "persistence_status": "exact_application_body_saved",
+    "request_body_bytes": 0,
+    "request_body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "request_headers": {
+      "Accept": "*/*",
+      "Accept-Encoding": "gzip, deflate, br, zstd",
+      "Connection": "keep-alive",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36"
+    },
+    "requests_decoded_body_bytes": 15083,
+    "response_encoding": "UTF-8",
+    "response_headers": {
+      "Access-Control-Allow-Credentials": "[REDACTED]",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Origin": "*",
+      "Cache-Control": "no-cache",
+      "Connection": "keep-alive",
+      "Content-Encoding": "br",
+      "Content-Length": "5711",
+      "Content-Type": "application/json; charset=UTF-8",
+      "Date": "Sat, 03 Oct 2026 09:51:48 GMT",
+      "Server": "Microsoft-IIS/10.0"
+    },
+    "scope": {
+      "capability": "26:个股资金流近100~120日",
+      "code": "600519",
+      "date": "20260930",
+      "end": "20261003",
+      "min_host_interval_seconds": "3.0",
+      "probe_policy": "rate-limited-live-probe-v1",
+      "retry_policy": "max_2_retries; min_backoff_5.0s; no_retry_403_429",
+      "start": "20260901"
+    },
+    "status_code": 200,
+    "url": "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?lmt=0&klt=101&secid=1.600519&fields1=f1%2Cf2%2Cf3%2Cf7&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf62%2Cf63%2Cf64%2Cf65&ut=b2884a393a59ad64002292a3e90d46a5&_=1791021103858",
+    "evidence_redacted": true,
+    "redaction_reason": "Credential/session-like header value suppressed; exact request header value is not retained.",
+    "redacted_header_fields": [
+      "response_headers.Access-Control-Allow-Credentials"
+    ]
+  }
+]

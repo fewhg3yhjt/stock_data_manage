@@ -1,0 +1,182 @@
+{
+  "validation_time_utc": "2026-10-03T20:27:31.119909+00:00",
+  "scope": "existing three EastMoney Provider input migration; no live calls, scheduler or production release",
+  "original_files": [
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/shareholder.py",
+      "snapshot": "provider_validation/results/em-original-20261004/1-shareholder.py.bin",
+      "sha256": "1653fb8083f9cafeccf6cb10e1e970c712bec858886403c3272450d09e8bb3a8",
+      "bytes": 4349
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/fund_flow.py",
+      "snapshot": "provider_validation/results/em-original-20261004/2-fund_flow.py.bin",
+      "sha256": "4733bc4184018760a28a78e10fc8c144db681be9d50aad47158c5d62459bad56",
+      "bytes": 4437
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/dividend.py",
+      "snapshot": "provider_validation/results/em-original-20261004/3-dividend.py.bin",
+      "sha256": "6023c4a01ad9d18ab4a8948b124fcaa5a9aa9026d0d6e78e36f2919039c6c626",
+      "bytes": 5698
+    },
+    {
+      "path": "src/stock_data_manage/pipeline/inputs.py",
+      "snapshot": "provider_validation/results/em-original-20261004/4-inputs.py.bin",
+      "sha256": "26d60ca1aadb70ed6b53f890c6a5ebcb1e4aaf4cdf730e82f08a47f120737be4",
+      "bytes": 34346
+    },
+    {
+      "path": "src/stock_data_manage/routing/factory.py",
+      "snapshot": "provider_validation/results/em-original-20261004/5-factory.py.bin",
+      "sha256": "667b2764c613ffc097850292bbdb3c4646a61e848266532cf1d70f96562ab129",
+      "bytes": 18796
+    },
+    {
+      "path": "config/providers.yaml",
+      "snapshot": "provider_validation/results/em-original-20261004/6-providers.yaml.bin",
+      "sha256": "871705749fce1ccada8d77b3c0596e66d07f870fd45d95a9332b75a1c404d2af",
+      "bytes": 73090
+    },
+    {
+      "path": "config/datasets/shareholder_count.yaml",
+      "snapshot": "provider_validation/results/em-original-20261004/7-shareholder_count.yaml.bin",
+      "sha256": "d325df1784c873bea73a1d907e9964e06c26e4d6b356dd6c16148837b57feccf",
+      "bytes": 923
+    },
+    {
+      "path": "config/datasets/stock_fund_flow.yaml",
+      "snapshot": "provider_validation/results/em-original-20261004/8-stock_fund_flow.yaml.bin",
+      "sha256": "df3f21341463f3538a1f855ef19b7bbdb683405aaa65d5418c255023c18a429f",
+      "bytes": 736
+    },
+    {
+      "path": "config/datasets/dividend_event.yaml",
+      "snapshot": "provider_validation/results/em-original-20261004/9-dividend_event.yaml.bin",
+      "sha256": "67a2b02063cb9a891e3fb388048407cbc08b05ce8ae97deea6976d3904340d2e",
+      "bytes": 759
+    },
+    {
+      "path": "config/normalization/shareholder_count.yaml",
+      "snapshot": "provider_validation/results/em-original-20261004/10-shareholder_count.yaml.bin",
+      "sha256": "4f7c23835f82e0ab648dc667df4f36bd3150959afac8f7421eea1cb1d1946ce1",
+      "bytes": 751
+    },
+    {
+      "path": "config/normalization/stock_fund_flow.yaml",
+      "snapshot": "provider_validation/results/em-original-20261004/11-stock_fund_flow.yaml.bin",
+      "sha256": "d6f2ee39cec08dee0175d244280a9a3b7e8437dd37b2da241aa270c32e5a37ac",
+      "bytes": 694
+    },
+    {
+      "path": "config/normalization/dividend_event.yaml",
+      "snapshot": "provider_validation/results/em-original-20261004/12-dividend_event.yaml.bin",
+      "sha256": "a76b4e77c5b285ab0659ee2d7bf07214ada7d91997e553a21f451b9ac5d912cb",
+      "bytes": 719
+    }
+  ],
+  "capability_inventory": [
+    {
+      "接口ID": "ASTOCK-026",
+      "清单范围": "a-stock-data published endpoint",
+      "是否计入87项": "是",
+      "项目/来源": "a-stock-data（上游）",
+      "类别": "资金面 / 筹码层（V3.0 新增）",
+      "接口/能力名称": "股东户数变化",
+      "接口地址/协议": "GET https://datacenter-web.eastmoney.com/api/data/v1/get?sortColumns=END_DATE&sortTypes=-1&pageSize=500&pageNumber=1&reportName=RPT_HOLDERNUM_DET&columns=SECURITY_CODE%2CSECURITY_NAME_ABBR%2CCHANGE_SHARES%2CCHANGE_REASON%2CEND_DATE%2CINTERVAL_CHRATE%2CAVG_MARKET_CAP%2CAVG_HOLD_NUM%2CTOTAL_MARKET_CAP%2CTOTAL_A_SHARES%2CHOLD_NOTICE_DATE%2CHOLDER_NUM%2CPRE_HOLDER_NUM%2CHOLDER_NUM_CHANGE%2CHOLDER_NUM_RATIO%2CEND_DATE%2CPRE_END_DATE&quoteColumns=f2%2Cf3&filter=%28SECURITY_CODE%3D%22600519%22%29&source=WEB&client=WEB",
+      "接口/调用符号": "holder_num_change(code)",
+      "接口说明": "股东户数变化；上游能力声明，调用细节见代码快照和能力说明/返回字段列。",
+      "能力说明（文档声明）/返回字段": "季度股东数 + 环比变化 + 户均持股（筹码集中度）",
+      "调用方式/参数范围": "探针入口：a_stock_missing_capabilities.py --run 24 → fetch_shareholder_count(cfg)；上游API：holder_num_change(code)",
+      "来源代码文件/行号": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:733 (fetch_shareholder_count)",
+      "代码SHA-256": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py=ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0; provider_validation/tests/run_a_stock_rate_limited_probes.py=fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c",
+      "测试代码文件/行号": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 24",
+      "项目Provider对照代码": "",
+      "接口取数结果": "部分通过",
+      "本轮补抓脚本结果": "成功（解析输出非空）",
+      "证据完整度": "低频实时样本解析成功，原始响应和探测输出已留档；本轮仅单样本验证，未做全量语义核验。",
+      "实测范围/日期/结果": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×2；主机：datacenter-web.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+      "验证备注/数据核验结论": "通过：解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。；本轮低频真实探测 success：saved 1 file(s); usable=1。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×2；主机：datacenter-web.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+      "原始响应Manifest": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+      "原始响应文件/哈希": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/d9263b2827e5883a5a271290a4a1a1f1ffc326ce703739fa7c73741f245c0b73.body.gz",
+      "解析结果/输出文件": "provider_validation/results/live-probes/rate-limited-all-20261003/24_股东户数变化/data.csv",
+      "结果文件SHA-256/行数": "provider_validation/results/live-probes/rate-limited-all-20261003/24_股东户数变化/data.csv (rows=63; sha256=e26e0eeec82f4a420ee212aeaa820207bfa08ade6c00fcf36dc3c098a35800ac)",
+      "返回示例": "{\"columns\": [\"股东户数统计截止日\", \"区间涨跌幅\", \"股东户数-本次\", \"股东户数-上次\", \"股东户数-增减\", \"股东户数-增减比例\", \"户均持股市值\", \"户均持股数量\", \"总市值\", \"总股本\", \"股本变动\", \"股本变动原因\", \"股东户数公告日期\", \"代码\", \"名称\"], \"sample\": {\"股东户数统计截止日\": \"2013-03-22\", \"区间涨跌幅\": \"-19.122572\", \"股东户数-本次\": \"69331\", \"股东户数-上次\": \"49870\", \"股东户数-增减\": \"19461\", \"股东户数-增减比例\": \"39.023460998596\", \"户均持股市值\": \"2531397.62876635\", \"户均持股数量\": \"14974.2539412384\", \"总市值\": \"175504329000.0\", \"总股本\": \"1038180000\", \"股本变动\": \"0\", \"股本变动原因\": \"\", \"股东户数公告日期\": \"2013-03-29\", \"代码\": \"600519\", \"名称\": \"贵州茅台\"}}",
+      "逐接口结果记录": "provider_validation/results/interface-records/ASTOCK-026.json",
+      "来源版本/提交": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
+      "证据状态代码": "live_raw",
+      "证据状态说明": "实时原始响应已归档；仅代表本行注明的实测范围"
+    },
+    {
+      "接口ID": "ASTOCK-027",
+      "清单范围": "a-stock-data published endpoint",
+      "是否计入87项": "是",
+      "项目/来源": "a-stock-data（上游）",
+      "类别": "资金面 / 筹码层（V3.0 新增）",
+      "接口/能力名称": "分红送转历史",
+      "接口地址/协议": "GET https://datacenter-web.eastmoney.com/api/data/v1/get?sortColumns=REPORT_DATE&sortTypes=-1&pageSize=500&pageNumber=1&reportName=RPT_SHAREBONUS_DET&columns=ALL&quoteColumns=&js=%7B%22data%22%3A%28x%29%2C%22pages%22%3A%28tp%29%7D&source=WEB&client=WEB&filter=%28SECURITY_CODE%3D%22600519%22%29",
+      "接口/调用符号": "dividend_history(code)",
+      "接口说明": "分红送转历史；上游能力声明，调用细节见代码快照和能力说明/返回字段列。",
+      "能力说明（文档声明）/返回字段": "每股派息/送股/转增 + 进度状态",
+      "调用方式/参数范围": "探针入口：a_stock_missing_capabilities.py --run 25 → fetch_dividend_history(cfg)；上游API：dividend_history(code)",
+      "来源代码文件/行号": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:738 (fetch_dividend_history)",
+      "代码SHA-256": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py=ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0; provider_validation/tests/run_a_stock_rate_limited_probes.py=fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c",
+      "测试代码文件/行号": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 25",
+      "项目Provider对照代码": "",
+      "接口取数结果": "部分通过",
+      "本轮补抓脚本结果": "成功（解析输出非空）",
+      "证据完整度": "低频实时样本解析成功，原始响应和探测输出已留档；本轮仅单样本验证，未做全量语义核验。",
+      "实测范围/日期/结果": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×2；主机：datacenter-web.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+      "验证备注/数据核验结论": "部分：28行分红记录，字段齐全，但输出无证券代码列，归属无法从文件独立核对。；本轮低频真实探测 success：saved 1 file(s); usable=1。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×2；主机：datacenter-web.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+      "原始响应Manifest": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+      "原始响应文件/哈希": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/e12fcabc65bb66c61ccc157b73b5e8ae1f7ad0707a78449ef239e72b58221a1e.body.gz",
+      "解析结果/输出文件": "provider_validation/results/live-probes/rate-limited-all-20261003/25_分红送转历史/data.csv",
+      "结果文件SHA-256/行数": "provider_validation/results/live-probes/rate-limited-all-20261003/25_分红送转历史/data.csv (rows=28; sha256=a8997137c0fcfcdda419f8b70e9b780a10fab1d2081e5b001e56deb3ee87654b)",
+      "返回示例": "{\"columns\": [\"报告期\", \"业绩披露日期\", \"送转股份-送转总比例\", \"送转股份-送股比例\", \"送转股份-转股比例\", \"现金分红-现金分红比例\", \"现金分红-现金分红比例描述\", \"现金分红-股息率\", \"每股收益\", \"每股净资产\", \"每股公积金\", \"每股未分配利润\", \"净利润同比增长\", \"总股本\", \"预案公告日\", \"股权登记日\", \"除权除息日\", \"方案进度\", \"最新公告日期\"], \"sample\": {\"报告期\": \"2001-12-31\", \"业绩披露日期\": \"2002-07-18\", \"送转股份-送转总比例\": \"1.0\", \"送转股份-送股比例\": \"0.0\", \"送转股份-转股比例\": \"1.0\", \"现金分红-现金分红比例\": \"6.0\", \"现金分红-现金分红比例描述\": \"10转1.00派6.00元(含税,扣税后4.80元)\", \"现金分红-股息率\": \"0.016483516484\", \"每股收益\": \"1.59\", \"每股净资产\": \"10.12\", \"每股公积金\": \"8.15675804216\", \"每股未分配利润\": \"0.31245454856\", \"净利润同比增长\": \"31.548404781656\", \"总股本\": \"250000000\", \"预案公告日\": \"\", \"股权登记日\": \"2002-07-24\", \"除权除息日\": \"2002-07-25\", \"方案进度\": \"实施分配\", \"最新公告日期\": \"2002-07-18\"}}",
+      "逐接口结果记录": "provider_validation/results/interface-records/ASTOCK-027.json",
+      "来源版本/提交": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
+      "证据状态代码": "live_raw",
+      "证据状态说明": "实时原始响应已归档；仅代表本行注明的实测范围"
+    },
+    {
+      "接口ID": "ASTOCK-028",
+      "清单范围": "a-stock-data published endpoint",
+      "是否计入87项": "是",
+      "项目/来源": "a-stock-data（上游）",
+      "类别": "资金面 / 筹码层（V3.0 新增）",
+      "接口/能力名称": "个股资金流120日",
+      "接口地址/协议": "GET https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?lmt=0&klt=101&secid=1.600519&fields1=f1%2Cf2%2Cf3%2Cf7&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf62%2Cf63%2Cf64%2Cf65&ut=b2884a393a59ad64002292a3e90d46a5&_=1791021103858",
+      "接口/调用符号": "stock_fund_flow_120d(code)",
+      "接口说明": "个股资金流120日；上游能力声明，调用细节见代码快照和能力说明/返回字段列。",
+      "能力说明（文档声明）/返回字段": "主力/大单/中单/小单日级净流入",
+      "调用方式/参数范围": "探针入口：a_stock_missing_capabilities.py --run 26 → fetch_fund_flow_120(cfg)；上游API：stock_fund_flow_120d(code)",
+      "来源代码文件/行号": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:748 (fetch_fund_flow_120)",
+      "代码SHA-256": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py=ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0; provider_validation/tests/run_a_stock_rate_limited_probes.py=fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c",
+      "测试代码文件/行号": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 26",
+      "项目Provider对照代码": "",
+      "接口取数结果": "部分通过",
+      "本轮补抓脚本结果": "成功（解析输出非空）",
+      "证据完整度": "低频实时样本解析成功，原始响应和探测输出已留档；本轮仅单样本验证，未做全量语义核验。",
+      "实测范围/日期/结果": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：push2his.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+      "验证备注/数据核验结论": "未通过：与#16共用修复后的资金流函数；为避免重复同一上游请求未再调用。因#16被网络权限拦截，本项仍未验证。；本轮低频真实探测 success：saved 1 file(s); usable=1。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：push2his.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+      "原始响应Manifest": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+      "原始响应文件/哈希": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/cbd78a5ab0c29ece3e5bd163f88364c0c0fc55056814dddee8e43ea21bc8aeb6.body.gz",
+      "解析结果/输出文件": "provider_validation/results/live-probes/rate-limited-all-20261003/26_个股资金流近100~120日/data.csv",
+      "结果文件SHA-256/行数": "provider_validation/results/live-probes/rate-limited-all-20261003/26_个股资金流近100~120日/data.csv (rows=120; sha256=3658e7d541d910eef031726374eece79be09ecaae94f9d320dc7851ec6560b57)",
+      "返回示例": "{\"columns\": [\"日期\", \"收盘价\", \"涨跌幅\", \"主力净流入-净额\", \"主力净流入-净占比\", \"超大单净流入-净额\", \"超大单净流入-净占比\", \"大单净流入-净额\", \"大单净流入-净占比\", \"中单净流入-净额\", \"中单净流入-净占比\", \"小单净流入-净额\", \"小单净流入-净占比\"], \"sample\": {\"日期\": \"2026-04-09\", \"收盘价\": \"1432.47\", \"涨跌幅\": \"-0.32\", \"主力净流入-净额\": \"-241092656.0\", \"主力净流入-净占比\": \"-8.0\", \"超大单净流入-净额\": \"-52333824.0\", \"超大单净流入-净占比\": \"-1.74\", \"大单净流入-净额\": \"-188758832.0\", \"大单净流入-净占比\": \"-6.27\", \"中单净流入-净额\": \"241156800.0\", \"中单净流入-净占比\": \"8.01\", \"小单净流入-净额\": \"-64149.0\", \"小单净流入-净占比\": \"-0.0\"}}",
+      "逐接口结果记录": "provider_validation/results/interface-records/ASTOCK-028.json",
+      "来源版本/提交": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
+      "证据状态代码": "live_raw",
+      "证据状态说明": "实时原始响应已归档；仅代表本行注明的实测范围"
+    }
+  ],
+  "decisions_pending": [
+    "dividend history includes a predisclosure row without ex-date; awaiting human choice before changing dataset or filtering"
+  ],
+  "source_manifest": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+  "source_probe": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+  "source_runner": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+  "source_manifest_sha256": "885abd6bf1c4b809b9029759f61b75c7d6a297755fd76ca6c545720db38a6767",
+  "source_probe_sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0",
+  "source_runner_sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
+}

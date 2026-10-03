@@ -1,0 +1,16 @@
+dataset:
+  name: minute_bar_5m
+  display_name: 五分钟行情输入
+  primary_key: [instrument_id, bar_time, adjustment]
+fields:
+  instrument_id: {type: string, required: true}
+  trade_date: {type: date, required: true}
+  bar_time: {type: datetime, required: true}
+  adjustment: {type: enum, values: [none], required: true}
+  open: {type: decimal, unit: CNY, required: true}
+  high: {type: decimal, unit: CNY, required: true}
+  low: {type: decimal, unit: CNY, required: true}
+  close: {type: decimal, unit: CNY, required: true}
+  volume: {type: decimal, unit: share, required: false}
+  amount: {type: decimal, unit: CNY, required: false}
+  turnover_rate_pct: {type: decimal, unit: percent, required: false}

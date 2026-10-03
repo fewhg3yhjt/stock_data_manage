@@ -6,7 +6,7 @@
 
 ## 当前阶段
 
-通用候选入口已接通十一项输入：腾讯行情快照、前复权日线、最近5分钟线，东财涨停池、新浪交易日历，同花顺行业目录、行业指数日线、行业/概念即时资金流，以及复用原两查询完成的 BaoStock 证券快照和行业归属。参数来源、字段模板、来源映射与候选留证实际执行；自动调度和正式路由保持关闭。同花顺说明见 [同花顺记录](provider_validation/docs/2026-10-04-ths-input-collection.md)，BaoStock 两项见 [BaoStock记录](provider_validation/docs/2026-10-04-baostock-input-collection.md)，腾讯快照见 [本批记录](provider_validation/docs/2026-10-04-tencent-snapshot-input-collection.md)。下方历史来源状态表示各自已记录样本，不代表当前全量在线可用性。
+通用候选入口已接通十四项输入：腾讯行情快照、前复权日线、最近5分钟线，东财涨停池、新浪交易日历，同花顺行业目录、行业指数日线、行业/概念即时资金流，以及复用原两查询完成的 BaoStock 证券快照和行业归属，及原东财股东户数、已实施分红历史、个股资金流。参数来源、字段模板、来源映射与候选留证实际执行；自动调度和正式路由保持关闭。同花顺说明见 [同花顺记录](provider_validation/docs/2026-10-04-ths-input-collection.md)，BaoStock 两项见 [BaoStock记录](provider_validation/docs/2026-10-04-baostock-input-collection.md)，腾讯快照见 [本批记录](provider_validation/docs/2026-10-04-tencent-snapshot-input-collection.md)。下方历史来源状态表示各自已记录样本，不代表当前全量在线可用性。
 
 当前处于：
 
@@ -89,7 +89,7 @@ Phase 1 基础链路完成
 当前系统测试：
 
 ```text
-270 passed
+292 passed
 ```
 
 本轮测试证据为 `provider_validation/results/ths-final-20261004-tests.xml`；四项历史响应及原实现/CSV对照为 `provider_validation/results/ths-final-20261004/comparison.json`。离线样本行数分别为90、21、90、387；未新增实时验证，未核实单位不进入候选标准金额/量额字段。
@@ -113,6 +113,8 @@ Phase 1 基础链路完成
 - 生产数据正式路由开放。
 
 THS 板块关系目前保留为独立 Provider 快照，已验证 Raw 快照写入；现有 Canonical/日线 Pipeline 只接受 `BarRecord`，因此本轮不将板块关系伪装成行情分区。
+
+东财三项转换记录见 [东财记录](provider_validation/docs/2026-10-04-eastmoney-input-collection.md)。最新回归证据为 `provider_validation/results/em-final-20261004-tests.xml`（292项），原脚本/SDK/CSV/请求及旧调用对照为 `results/em-final-20261004/`。600519样本股东63行、分红来源28行选实施27行且预披露1行留证、资金流120行；修正旧大小单净额/占比列错位。未核准单位保留来源原值、标准相应字段为空；本批没有实时请求或生产启用。
 
 ## 本轮主线
 

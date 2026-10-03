@@ -70,10 +70,10 @@ BaoStock 后续两项转换见 `provider_validation/docs/2026-10-04-baostock-inp
 | `providers/baostock/minute.py` | BaoStock 原生 5m，初始角色为校验来源 |
 | `providers/baostock/industry.py` | 原 BaoStock 两查询、沪深A股筛选与行业合并；分别提供证券快照/行业归属的 YAML 映射候选，保留旧默认返回与覆盖缺失；TCP帧不可见 |
 | `providers/baostock/__init__.py` | BaoStock 适配器导出 |
-| `providers/eastmoney/dividend.py` | EastMoney 分红实施事件批量查询和分红事件标准化 |
+| `providers/eastmoney/dividend.py` | 原批量分红事件及单证券 SDK 历史候选输入；已实施选择、预披露留证 |
 | `providers/eastmoney/security_list.py` | EastMoney 分页证券列表、市场和资产类型映射 |
-| `providers/eastmoney/realtime.py` | EastMoney 单证券行情、批量行情和 5 日分时走势 |
-| `providers/eastmoney/fund_flow.py` | EastMoney 个股日级资金流 |
+| `providers/eastmoney/realtime.py` | EastMoney 原行情/分时；三个历史输入复用的证券身份、来源计数校验及回放时钟恢复函数 |
+| `providers/eastmoney/fund_flow.py` | 原日级资金流解析及原 SDK 历史候选输入，修正大小单列对应 |
 | `providers/eastmoney/__init__.py` | EastMoney 适配器导出 |
 | `providers/akshare/session.py` | AkShare 可选依赖加载和代码转换 |
 | `providers/akshare/daily.py` | AkShare 股票、ETF、LOF、指数函数级历史日线 |
@@ -118,7 +118,7 @@ BaoStock 后续两项转换见 `provider_validation/docs/2026-10-04-baostock-inp
 | 文件 | 职责 |
 |---|---|
 | `pipeline/daily.py` | 日线按来源补缺、标准化、校验、候选生成和发布编排 |
-| `pipeline/inputs.py` | 单项输入及按周期触发的候选采集/回放；共享限速、独立候选 Attempt 幂等状态、响应留证及 YAML 映射；不注册正式路由 |
+| `pipeline/inputs.py` | 单项输入及按周期触发的候选采集/回放；共享限速、独立候选 Attempt 幂等状态、响应留证、分红选择/排除记录及 YAML 映射；不注册正式路由 |
 | `pipeline/daily_reconciliation.py` | 日线 provisional/final 合并、缺失统计和盘后校准 |
 | `pipeline/minute.py` | Watchlist 实时分钟采集和 Hot Store 写入 |
 | `pipeline/minute_reconciliation.py` | 分钟盘后校准、final 提升、冲突隔离和完整性处理 |
@@ -169,3 +169,5 @@ BaoStock 后续两项转换见 `provider_validation/docs/2026-10-04-baostock-inp
 - 目录调整只改变模块归属和导入路径，不改变现有业务行为。
 - 前复权、分红事件和历史重建应在现有 `pipeline`、`providers`、`routing`、`quality`、`storage` 边界内继续实现，不另起一套架构。
 - `tmp_test/` 仅保留探针和研究脚本，不作为正式运行时模块入口。
+
+东财后续三项已有接口转换见 `provider_validation/docs/2026-10-04-eastmoney-input-collection.md`。原 `shareholder.py`、`dividend.py`、`fund_flow.py` 提供原成功 SDK 的历史候选方法；复用三个现有模板和归一化文件。`providers/contracts.py` 的既有输入结果补来源行、映射上下文和排除行。原验证脚本增加 `--verify-em-inputs`，证据目录为 `results/em-original-20261004/`、`em-final-20261004/`、`em-cli-20261004/` 和同前缀测试/索引。没有新增运行时模块或自动调度策略。

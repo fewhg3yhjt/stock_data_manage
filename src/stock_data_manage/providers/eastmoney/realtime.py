@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from contextlib import contextmanager
 from datetime import datetime
 from typing import Any, Mapping, Protocol, Sequence
 
@@ -11,6 +12,97 @@ from urllib3.util.retry import Retry
 
 from ..contracts import EndpointContract, FailureClass, ProviderContractError
 from ..contracts import HttpResponse
+from ..contracts import InputFetchResult
+
+
+def history_stock_identity(code):
+    """Explicit stock identity for the three verified single-security SDK inputs."""
+    import re
+    text = str(code).lower()
+    explicit = text[:2] if re.fullmatch(r"(?:sh|sz|bj)\d{6}", text) else None
+    bare = text[2:] if explicit else text
+    if not re.fullmatch(r"(?:60\d{4}|68\d{4}|00\d{4}|30\d{4}|[48]\d{5}|92\d{4})", bare):
+        raise ValueError("history input requires a stock code")
+    market = "bj" if bare.startswith(("4", "8", "92")) else "sh" if bare.startswith(("60", "68")) else "sz"
+    if explicit is not None and explicit != market:
+        raise ValueError("stock code and exchange prefix disagree")
+    exchange = {"sh": "XSHG", "sz": "XSHE", "bj": "BSE"}[market]
+    return bare, market, f"{exchange}:{bare}"
+
+
+@contextmanager
+def history_replay_clock(function, manifest, code):
+    """Reproduce only the SDK's volatile request timestamp for strict offline replay."""
+    from pathlib import Path
+    from types import SimpleNamespace
+    from unittest.mock import patch
+    from urllib.parse import parse_qs, urlsplit
+    bare, market, _ = history_stock_identity(code)
+    secid = f"{1 if market == 'sh' else 0}.{bare}"
+    matches = []
+    for line in Path(manifest).read_text(encoding="utf-8").splitlines():
+        event = json.loads(line)
+        url = urlsplit(event.get("url", ""))
+        query = parse_qs(url.query)
+        if url.path == "/api/qt/stock/fflow/daykline/get" and query.get("secid") == [secid] and query.get("_"):
+            matches.append(query["_"][0])
+    if not matches:
+        raise ValueError("fund-flow replay timestamp is missing; never falls back to live")
+    # An archive may contain repeated probes; choose its latest matching timestamp.
+    stamp = max(int(value) for value in matches)
+    namespace = getattr(function, "__globals__", {})
+    if "time" not in namespace:
+        raise ValueError("fund-flow SDK clock contract changed")
+    with patch.dict(namespace, {"time": SimpleNamespace(time=lambda: stamp / 1000)}):
+        yield
+
+
+def history_input_result(frame, *, code, required_fields, source_payloads, source_url, fund_flow=False, implemented_dividends=False):
+    """Check SDK rows against retained response identities; do not replace the SDK transport/parser."""
+    import pandas as pd
+    bare, market, instrument_id = history_stock_identity(code)
+    if not set(required_fields) <= set(frame.columns):
+        raise ProviderContractError("history SDK source columns changed", FailureClass.SCHEMA_CHANGED, retryable=False)
+    payloads = tuple(source_payloads())
+    if not payloads:
+        raise ValueError("retained source responses are required for history identity verification")
+    counts = set()
+    for payload in payloads:
+        if fund_flow:
+            data = payload.get("data") if isinstance(payload, dict) else None
+            if isinstance(payload, dict) and payload.get("rc", 0) != 0:
+                raise ProviderContractError("fund-flow business response failed", FailureClass.SCHEMA_CHANGED, retryable=False)
+            if not isinstance(data, dict) or str(data.get("code")) != bare or data.get("market") != (1 if market == "sh" else 0):
+                raise ProviderContractError("fund-flow source security disagrees with request", FailureClass.SCHEMA_CHANGED, retryable=False)
+            if not isinstance(data.get("klines"), list):
+                raise ProviderContractError("fund-flow source rows changed", FailureClass.SCHEMA_CHANGED, retryable=False)
+            counts.add(len(data["klines"]))
+        else:
+            data = payload.get("result") if isinstance(payload, dict) else None
+            if isinstance(payload, dict) and payload.get("success") is False:
+                raise ProviderContractError("history business response failed", FailureClass.SCHEMA_CHANGED, retryable=False)
+            if not isinstance(data, dict) or not isinstance(data.get("data"), list):
+                raise ProviderContractError("history source envelope changed", FailureClass.SCHEMA_CHANGED, retryable=False)
+            if any(not isinstance(row, dict) or str(row.get("SECURITY_CODE")) != bare for row in data["data"]):
+                raise ProviderContractError("history source security disagrees with request", FailureClass.SCHEMA_CHANGED, retryable=False)
+            if type(data.get("count")) is not int or data["count"] < 0:
+                raise ProviderContractError("history source total count is missing", FailureClass.SCHEMA_CHANGED, retryable=False)
+            counts.add(data["count"])
+    if counts != {len(frame)}:
+        raise ProviderContractError("SDK row count disagrees with source total", FailureClass.SCHEMA_CHANGED, retryable=False)
+    rows = tuple({name: None if pd.isna(value) else value for name, value in row.items()}
+                 for row in frame.to_dict(orient="records"))
+    if "代码" in frame.columns and any(str(row["代码"]) != bare for row in rows):
+        raise ProviderContractError("SDK security identity changed", FailureClass.SCHEMA_CHANGED, retryable=False)
+    selected, excluded = [], []
+    for index, row in enumerate(rows):
+        if implemented_dividends and row["方案进度"] != "实施分配":
+            excluded.append({"source_row_index": index, "reason": "not_implemented_dividend_plan", "row": row})
+        else:
+            selected.append(row)
+    return InputFetchResult(tuple(selected), source_url, source_rows=rows,
+                            mapping_context={"instrument_id": instrument_id, "source_security_code": bare},
+                            excluded_rows=tuple(excluded))
 
 
 class EastMoneyTransport(Protocol):

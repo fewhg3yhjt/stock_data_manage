@@ -39,6 +39,15 @@ class EastMoneyShareholderCountProvider:
     timeout_seconds: float = 20.0
     page_size: int = 10
     url: str = "https://datacenter-web.eastmoney.com/api/data/v1/get"
+    client: Any | None = None
+
+    def fetch_history(self, code: str, *, source_payloads):
+        from ..akshare.session import load_client
+        from .realtime import history_stock_identity, history_input_result
+        bare, _, _ = history_stock_identity(code)
+        frame = (self.client or load_client()).stock_zh_a_gdhs_detail_em(symbol=bare)
+        return history_input_result(frame, code=code, source_payloads=source_payloads, source_url=self.url,
+            required_fields=("代码", "股东户数统计截止日", "股东户数-本次", "股东户数-上次", "股东户数-增减", "股东户数公告日期"))
 
     def __post_init__(self) -> None:
         if self.transport is None:

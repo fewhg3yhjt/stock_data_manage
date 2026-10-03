@@ -22,3 +22,33 @@ rules:
       change_reason: CHANGE_REASON
     status: pending_validation
     version: eastmoney-shareholder-count-v1
+
+  - id: eastmoney-shareholder-count-sdk-input-v1
+    provider: eastmoney
+    endpoint: shareholder_count
+    input_id: ASTOCK-026
+    field_mapping:
+      end_date: 股东户数统计截止日
+      holder_count: 股东户数-本次
+      previous_holder_count: 股东户数-上次
+      holder_count_change: 股东户数-增减
+      holder_count_change_pct: 股东户数-增减比例
+      notice_date: 股东户数公告日期
+      average_market_cap: 户均持股市值
+      average_hold_num: 户均持股数量
+      total_market_cap: 总市值
+      change_reason: 股本变动原因
+    context_fields:
+      instrument_id: instrument_id
+    unverified_fields:
+    - average_market_cap
+    - average_hold_num
+    - total_market_cap
+    status: pending_validation
+    version: eastmoney-history-input-v1
+    null_values:
+    - null
+    - ''
+    - '-'
+    - --
+    notes: 仅离线候选输入；未核准金额/比率单位保留于来源行，标准字段为空。

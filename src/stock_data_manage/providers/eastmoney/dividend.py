@@ -32,6 +32,17 @@ class EastMoneyDividendProvider:
     page_size: int = 100
     url: str = "https://datacenter-web.eastmoney.com/api/data/v1/get"
     report_name: str = "RPT_SHAREBONUS_DET"
+    client: Any | None = None
+
+    def fetch_history(self, code: str, *, source_payloads):
+        from ..akshare.session import load_client
+        from .realtime import history_stock_identity, history_input_result
+        bare, _, _ = history_stock_identity(code)
+        # Only the evidenced EastMoney variant; the original script's CNInfo alternative has no inherited eligibility.
+        frame = (self.client or load_client()).stock_fhps_detail_em(symbol=bare)
+        return history_input_result(frame, code=code, source_payloads=source_payloads, source_url=self.url,
+            implemented_dividends=True, required_fields=("报告期", "除权除息日", "股权登记日", "方案进度", "最新公告日期",
+                                                       "现金分红-现金分红比例", "送转股份-送股比例", "送转股份-转股比例"))
 
     def fetch_events(
         self,

@@ -1,0 +1,2325 @@
+{
+  "validation_time_utc": "2026-10-03T20:56:09.608560+00:00",
+  "result": "passed",
+  "tests": 292,
+  "network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "dividend_user_decision": "27 implemented events only; one predisclosure preserved as source evidence",
+  "candidate_input_count": 14,
+  "reports": [
+    {
+      "input_id": "ASTOCK-026",
+      "source_count": 63,
+      "candidate_count": 63,
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-027",
+      "source_count": 28,
+      "candidate_count": 27,
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-028",
+      "source_count": 120,
+      "candidate_count": 120,
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-026",
+      "source_count": 63,
+      "candidate_count": 63,
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-027",
+      "source_count": 28,
+      "candidate_count": 27,
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-028",
+      "source_count": 120,
+      "candidate_count": 120,
+      "result": "passed"
+    }
+  ],
+  "files": [
+    {
+      "path": ".gitattributes",
+      "sha256": "97452c37dfee12ae10a78058a18abc3526b8e2e5f0c31f1caf23d3978572345e",
+      "bytes": 7157
+    },
+    {
+      "path": "CODE_STRUCTURE.md",
+      "sha256": "57d538a8c32e4a2acc31bf729c3ad0d1ee52310d8e9d14434797e811c9a10a09",
+      "bytes": 17843
+    },
+    {
+      "path": "config/normalization/dividend_event.yaml",
+      "sha256": "188df2f7f075b92e993136aef3f977eea419f9c6957404bd2f7071c76ed24a71",
+      "bytes": 1532
+    },
+    {
+      "path": "config/normalization/shareholder_count.yaml",
+      "sha256": "f8801367f055e0b1d419e648c9bd3e1d72984ffe2823c2d464770403c1b7c9e4",
+      "bytes": 1702
+    },
+    {
+      "path": "config/normalization/stock_fund_flow.yaml",
+      "sha256": "3d99bacf48ba3438c90d2d544f7223ffcb0a464f69f95841affe3e99a503bbe1",
+      "bytes": 1741
+    },
+    {
+      "path": "config/providers.yaml",
+      "sha256": "48e663776fd6b416367de1b0ceac38fea8e128e1b6261c71f71a24ad26f00ba2",
+      "bytes": 73751
+    },
+    {
+      "path": "PROJECT_PROGRESS.md",
+      "sha256": "709d37c40825bb668c51c56c71113d3531e4769fba578f2268631dfa4930eb63",
+      "bytes": 7863
+    },
+    {
+      "path": "provider_validation/docs/2026-10-04-eastmoney-input-collection.md",
+      "sha256": "044ff26ac3638ad182aca1adad86633e18c22594833b876e761e6a6ecb9c6e8d",
+      "bytes": 5344
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/ASTOCK-026/candidate/ASTOCK-026-b81523b78f9c/2026-10-03/excluded_rows/eastmoney/shareholder_count/excluded-rows.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/ASTOCK-026/candidate/ASTOCK-026-b81523b78f9c/2026-10-03/input_report/eastmoney/shareholder_count/report.json",
+      "sha256": "c3ef21f2784377d41682bc76ce48a1c60dfa2195d7985b7936398d1e72c83e9b",
+      "bytes": 13196
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/ASTOCK-026/candidate/ASTOCK-026-b81523b78f9c/2026-10-03/shareholder_count/eastmoney/shareholder_count/mapped-rows.json",
+      "sha256": "ecc6905fe817fa4a963d02db9e15d3f493089d9f3b674c935c571d6b48c0ef15",
+      "bytes": 20983
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/ASTOCK-026/candidate/ASTOCK-026-b81523b78f9c/2026-10-03/source_rows/eastmoney/shareholder_count/source-rows.json",
+      "sha256": "fa42a34f6c4cf62de085810924ababbecfb2cb258b92aa5da509f0829de00570",
+      "bytes": 28690
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/ASTOCK-026/candidate/ASTOCK-026-b81523b78f9c/_raw/bodies/6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575.bin",
+      "sha256": "6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575",
+      "bytes": 3864
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/ASTOCK-026/candidate/ASTOCK-026-b81523b78f9c/_raw/bodies/d9263b2827e5883a5a271290a4a1a1f1ffc326ce703739fa7c73741f245c0b73.bin",
+      "sha256": "d9263b2827e5883a5a271290a4a1a1f1ffc326ce703739fa7c73741f245c0b73",
+      "bytes": 31404
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/ASTOCK-026/candidate/ASTOCK-026-b81523b78f9c/_raw/manifest.ndjson",
+      "sha256": "8c45125d7165f907cffd8ad875f88a42abefe4ea080c87bbf6c56fa1d0200ddd",
+      "bytes": 4786
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/ASTOCK-026/comparison.json",
+      "sha256": "16965016ce868063e22bceaeb806fe5ae9fe37872c2a2a57e11f2e4dd924a19a",
+      "bytes": 6133
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/ASTOCK-026/original/bodies/d9263b2827e5883a5a271290a4a1a1f1ffc326ce703739fa7c73741f245c0b73.bin",
+      "sha256": "d9263b2827e5883a5a271290a4a1a1f1ffc326ce703739fa7c73741f245c0b73",
+      "bytes": 31404
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/ASTOCK-026/original/manifest.ndjson",
+      "sha256": "ceadf78101a1eabc7254aaec6c4c12538ddd4fa128342fa9ae1a5063b8b90416",
+      "bytes": 4644
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/ASTOCK-027/candidate/ASTOCK-027-bc89c7842e39/2026-10-03/dividend_event/eastmoney/dividend_history/mapped-rows.json",
+      "sha256": "1a0be5edf183de168c0805f4852559a642f013210c66c24bebe91d660c468a68",
+      "bytes": 5995
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/ASTOCK-027/candidate/ASTOCK-027-bc89c7842e39/2026-10-03/excluded_rows/eastmoney/dividend_history/excluded-rows.json",
+      "sha256": "00479a0f1289b2c9796b4cc36a0f04b77bfc14171b51d6d8c30d93af8d9413dc",
+      "bytes": 772
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/ASTOCK-027/candidate/ASTOCK-027-bc89c7842e39/2026-10-03/input_report/eastmoney/dividend_history/report.json",
+      "sha256": "8e3307663e7c9dfee0f17410077d02189f8f7eefb1f6e4992e17230c1a4fc7bc",
+      "bytes": 12336
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/ASTOCK-027/candidate/ASTOCK-027-bc89c7842e39/2026-10-03/source_rows/eastmoney/dividend_history/source-rows.json",
+      "sha256": "404dbad5243b90088c70ff434e6a72907469a5fbfc4dfe6335f5d42a8bbbfacb",
+      "bytes": 18720
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/ASTOCK-027/candidate/ASTOCK-027-bc89c7842e39/_raw/bodies/8b51aa04a0365999515d1012f4532fd379a2930cf2cf6662a6c0a7815d28f793.bin",
+      "sha256": "8b51aa04a0365999515d1012f4532fd379a2930cf2cf6662a6c0a7815d28f793",
+      "bytes": 4613
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/ASTOCK-027/candidate/ASTOCK-027-bc89c7842e39/_raw/bodies/e12fcabc65bb66c61ccc157b73b5e8ae1f7ad0707a78449ef239e72b58221a1e.bin",
+      "sha256": "e12fcabc65bb66c61ccc157b73b5e8ae1f7ad0707a78449ef239e72b58221a1e",
+      "bytes": 25836
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/ASTOCK-027/candidate/ASTOCK-027-bc89c7842e39/_raw/manifest.ndjson",
+      "sha256": "a5552890fa27b7cd7b230432bb9949c2d553d1f92a0371919c3c183ce4c93706",
+      "bytes": 4340
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/ASTOCK-027/comparison.json",
+      "sha256": "d562f130929160b2dd93d666bd54fa02209c3f9ca855eee9b9c9ae2f754bd7f8",
+      "bytes": 5244
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/ASTOCK-027/original/bodies/e12fcabc65bb66c61ccc157b73b5e8ae1f7ad0707a78449ef239e72b58221a1e.bin",
+      "sha256": "e12fcabc65bb66c61ccc157b73b5e8ae1f7ad0707a78449ef239e72b58221a1e",
+      "bytes": 25836
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/ASTOCK-027/original/manifest.ndjson",
+      "sha256": "cf0e7af9bc2a3c720710358b54b4c0311e12dac597d2324b5a77b5344ff8cd90",
+      "bytes": 4198
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/ASTOCK-028/candidate/ASTOCK-028-f373a0d259b5/2026-10-03/excluded_rows/eastmoney/stock_fund_flow/excluded-rows.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/ASTOCK-028/candidate/ASTOCK-028-f373a0d259b5/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
+      "sha256": "bd5f460558048d3ece2cb90a032bfca100621a40658dc632eda146088699f2c3",
+      "bytes": 10237
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/ASTOCK-028/candidate/ASTOCK-028-f373a0d259b5/2026-10-03/source_rows/eastmoney/stock_fund_flow/source-rows.json",
+      "sha256": "1026e9ae47e58a6d5c0edc399eebdab25de82ff4c851745cf4f3fd53b82b8043",
+      "bytes": 50321
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/ASTOCK-028/candidate/ASTOCK-028-f373a0d259b5/2026-10-03/stock_fund_flow/eastmoney/stock_fund_flow/mapped-rows.json",
+      "sha256": "e10fdb5144b0eb7ae2c6ad8a3ebb1f3408eb4e556eb9995a70376098556fd460",
+      "bytes": 26675
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/ASTOCK-028/candidate/ASTOCK-028-f373a0d259b5/_raw/bodies/26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47.bin",
+      "sha256": "26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47",
+      "bytes": 3768
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/ASTOCK-028/candidate/ASTOCK-028-f373a0d259b5/_raw/bodies/cbd78a5ab0c29ece3e5bd163f88364c0c0fc55056814dddee8e43ea21bc8aeb6.bin",
+      "sha256": "cbd78a5ab0c29ece3e5bd163f88364c0c0fc55056814dddee8e43ea21bc8aeb6",
+      "bytes": 15083
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/ASTOCK-028/candidate/ASTOCK-028-f373a0d259b5/_raw/manifest.ndjson",
+      "sha256": "5f65c79d80f9ed2a93ea96f5617cb8474f3bb47390a678c1f937989d18f7041a",
+      "bytes": 1991
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/ASTOCK-028/comparison.json",
+      "sha256": "07fc92c41e80648d1179019a990370fde09f6bc19f3119f615505f50db386a30",
+      "bytes": 3417
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/ASTOCK-028/original/bodies/cbd78a5ab0c29ece3e5bd163f88364c0c0fc55056814dddee8e43ea21bc8aeb6.bin",
+      "sha256": "cbd78a5ab0c29ece3e5bd163f88364c0c0fc55056814dddee8e43ea21bc8aeb6",
+      "bytes": 15083
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/ASTOCK-028/original/manifest.ndjson",
+      "sha256": "802a94b2f9c4d8080c0e590da893a6d33982b4975c7adc6a0a8ce4626f17e807",
+      "bytes": 1918
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/comparison.json",
+      "sha256": "89cc703c28679fdc951584b23023c952c480768cfd0440086b077d82bef002c6",
+      "bytes": 25281
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f1/fixture/bodies/7dce05978cadaf116d47487adcc2f7b44452f8154bf7e834d4513aefee5ebd05.bin",
+      "sha256": "7dce05978cadaf116d47487adcc2f7b44452f8154bf7e834d4513aefee5ebd05",
+      "bytes": 34489
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f1/fixture/manifest.ndjson",
+      "sha256": "0dca73c70b811cc387924e4c8d242997a91bf67bd63ec7391a099c73849760d2",
+      "bytes": 2848
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f1/out/ASTOCK-026-15fc2371cb49/2026-10-03/input_report/eastmoney/shareholder_count/report.json",
+      "sha256": "50899831d12ceefd6649ff5bac98e7cce0b1dbbfa78c06c31514f35394534d99",
+      "bytes": 10037
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f1/out/ASTOCK-026-15fc2371cb49/_raw/bodies/6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575.bin",
+      "sha256": "6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575",
+      "bytes": 3864
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f1/out/ASTOCK-026-15fc2371cb49/_raw/bodies/7dce05978cadaf116d47487adcc2f7b44452f8154bf7e834d4513aefee5ebd05.bin",
+      "sha256": "7dce05978cadaf116d47487adcc2f7b44452f8154bf7e834d4513aefee5ebd05",
+      "bytes": 34489
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f1/out/ASTOCK-026-15fc2371cb49/_raw/manifest.ndjson",
+      "sha256": "d2b1ae8505a8d029cab08267619f6263600cb9477dd17070513f652587739bb3",
+      "bytes": 3430
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f10/fixture/bodies/c038229c1aecae02c05604508c25be23584ace658b774c63e16c27b53d188546.bin",
+      "sha256": "c038229c1aecae02c05604508c25be23584ace658b774c63e16c27b53d188546",
+      "bytes": 15236
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f10/fixture/manifest.ndjson",
+      "sha256": "59bfa88b24aff70dfc600a795727168db5bf184e3ddf4f306e4fde5f5d27b4ed",
+      "bytes": 1252
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f10/out/ASTOCK-028-328abba1b4f7/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
+      "sha256": "6ab98166b12700014ee29bf23c1dde4a154a969f22a6baf4615e0a25dfc54819",
+      "bytes": 8268
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f10/out/ASTOCK-028-328abba1b4f7/_raw/bodies/26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47.bin",
+      "sha256": "26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47",
+      "bytes": 3768
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f10/out/ASTOCK-028-328abba1b4f7/_raw/bodies/c038229c1aecae02c05604508c25be23584ace658b774c63e16c27b53d188546.bin",
+      "sha256": "c038229c1aecae02c05604508c25be23584ace658b774c63e16c27b53d188546",
+      "bytes": 15236
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f10/out/ASTOCK-028-328abba1b4f7/_raw/manifest.ndjson",
+      "sha256": "6dd04be1a17c76fb5bc684e3a7b60cf4e019067ecbc1c4ad76004f998cd71ef0",
+      "bytes": 1542
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f11/fixture/bodies/c431c67b531784e78088da2db315703b7fea179330cbe92f9b1a62ec7f705992.bin",
+      "sha256": "c431c67b531784e78088da2db315703b7fea179330cbe92f9b1a62ec7f705992",
+      "bytes": 34490
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f11/fixture/manifest.ndjson",
+      "sha256": "0e4f5929c29d95cfc36a2aad515ae4003c21853733b948292fdd210859fa1413",
+      "bytes": 2848
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f11/out/ASTOCK-026-5e6345828048/2026-10-03/input_report/eastmoney/shareholder_count/report.json",
+      "sha256": "9b7594d7c732b114488340f2f3063565516e44f2f6ccb08883788be0a75e1ee6",
+      "bytes": 10039
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f11/out/ASTOCK-026-5e6345828048/_raw/bodies/6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575.bin",
+      "sha256": "6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575",
+      "bytes": 3864
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f11/out/ASTOCK-026-5e6345828048/_raw/bodies/c431c67b531784e78088da2db315703b7fea179330cbe92f9b1a62ec7f705992.bin",
+      "sha256": "c431c67b531784e78088da2db315703b7fea179330cbe92f9b1a62ec7f705992",
+      "bytes": 34490
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f11/out/ASTOCK-026-5e6345828048/_raw/manifest.ndjson",
+      "sha256": "28b7ac91cc90bae824904866fd6ac1521f258b9afe80d74d8f5f9d815387f18d",
+      "bytes": 3432
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f12/fixture/bodies/1ef1c0e5740ebec8a14f335121095f59d09c30fcfb38aeb841ab83a80607be20.bin",
+      "sha256": "1ef1c0e5740ebec8a14f335121095f59d09c30fcfb38aeb841ab83a80607be20",
+      "bytes": 174
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f12/fixture/manifest.ndjson",
+      "sha256": "a732806d3cea91e6898d9f81f0c3370e87841df8974d63461b5367dbe66a2af3",
+      "bytes": 1247
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f12/out/ASTOCK-028-3d11af31306b/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
+      "sha256": "aec397b02af97e9b061a2769cf2d116502116a951c509b6691648b3a816e1d78",
+      "bytes": 8317
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f12/out/ASTOCK-028-3d11af31306b/_raw/bodies/1ef1c0e5740ebec8a14f335121095f59d09c30fcfb38aeb841ab83a80607be20.bin",
+      "sha256": "1ef1c0e5740ebec8a14f335121095f59d09c30fcfb38aeb841ab83a80607be20",
+      "bytes": 174
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f12/out/ASTOCK-028-3d11af31306b/_raw/bodies/26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47.bin",
+      "sha256": "26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47",
+      "bytes": 3768
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f12/out/ASTOCK-028-3d11af31306b/_raw/manifest.ndjson",
+      "sha256": "b3975b3bd350c73d2a0453e39ae5252bd9f96aba407023942e3dde9bf3ab66f4",
+      "bytes": 1540
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f13/fixture/bodies/c038229c1aecae02c05604508c25be23584ace658b774c63e16c27b53d188546.bin",
+      "sha256": "c038229c1aecae02c05604508c25be23584ace658b774c63e16c27b53d188546",
+      "bytes": 15236
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f13/fixture/manifest.ndjson",
+      "sha256": "3315b21583b3a49f147d590fe81dd18f9000d693e55f1568d8f2f92df22df4d1",
+      "bytes": 1293
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f13/out/ASTOCK-028-fe2f6441c83d/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
+      "sha256": "e270d3b496ebd5ce60f9b8c46eadad6cb7ebe6f556330512ff853a657ed08f51",
+      "bytes": 7864
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f13/out/ASTOCK-028-fe2f6441c83d/_raw/bodies/26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47.bin",
+      "sha256": "26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47",
+      "bytes": 3768
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f13/out/ASTOCK-028-fe2f6441c83d/_raw/manifest.ndjson",
+      "sha256": "f4357142c09145931d9064c7d0da0dc2a636d7f4cb59cac20ab410e87578cbc3",
+      "bytes": 1116
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f14/fixture/bodies/c038229c1aecae02c05604508c25be23584ace658b774c63e16c27b53d188546.bin",
+      "sha256": "c038229c1aecae02c05604508c25be23584ace658b774c63e16c27b53d188546",
+      "bytes": 15236
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f14/fixture/manifest.ndjson",
+      "sha256": "2f33b815a686a1240e67a4014ff59aa28ea5e2c784a29a263d7068bc01db3ad7",
+      "bytes": 1256
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f14/out/ASTOCK-028-465cac8953a1/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
+      "sha256": "0c20dc40ce63663b7b8c26356c87c78eb50a3a25a78e25699816a5b4e4b0964a",
+      "bytes": 6664
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f14/out/ASTOCK-028-465cac8953a1/_raw/bodies/26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47.bin",
+      "sha256": "26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47",
+      "bytes": 3768
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f2/fixture/bodies/10d91ded8bfc8e6945be096163c6a7900bf159df9de0662346c582c21ef8de56.bin",
+      "sha256": "10d91ded8bfc8e6945be096163c6a7900bf159df9de0662346c582c21ef8de56",
+      "bytes": 28948
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f2/fixture/manifest.ndjson",
+      "sha256": "5ae396ec07ab93ac68257882de28c0ef5bb91f7346fdfc9016f3870ee2e14b05",
+      "bytes": 2404
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f2/out/ASTOCK-027-6cdac7fdc71d/2026-10-03/input_report/eastmoney/dividend_history/report.json",
+      "sha256": "b4e33675fea6035f77a222efa6bb5a65f6eb62e8a6317f699e3398ac3397bd29",
+      "bytes": 9359
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f2/out/ASTOCK-027-6cdac7fdc71d/_raw/bodies/10d91ded8bfc8e6945be096163c6a7900bf159df9de0662346c582c21ef8de56.bin",
+      "sha256": "10d91ded8bfc8e6945be096163c6a7900bf159df9de0662346c582c21ef8de56",
+      "bytes": 28948
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f2/out/ASTOCK-027-6cdac7fdc71d/_raw/bodies/8b51aa04a0365999515d1012f4532fd379a2930cf2cf6662a6c0a7815d28f793.bin",
+      "sha256": "8b51aa04a0365999515d1012f4532fd379a2930cf2cf6662a6c0a7815d28f793",
+      "bytes": 4613
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f2/out/ASTOCK-027-6cdac7fdc71d/_raw/manifest.ndjson",
+      "sha256": "27e2b712e04d5a7972912d932493dbde71a5c8e0848533898d3eda8bdbf8b8ba",
+      "bytes": 2984
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f3/fixture/bodies/86d95ca3e8173086af1c68732f9e585ac3194d815331a0855beb7486e3fffd1c.bin",
+      "sha256": "86d95ca3e8173086af1c68732f9e585ac3194d815331a0855beb7486e3fffd1c",
+      "bytes": 15236
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f3/fixture/manifest.ndjson",
+      "sha256": "f654ac8a7816bbff96dcd2cd6452019a4436d03f9ff764bdcc558419afd595e3",
+      "bytes": 1252
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f3/out/ASTOCK-028-6160f91ce06c/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
+      "sha256": "115ed28b26549b5e56b8e9c6b9a2d42c219a59d031c1909946d0bb71fcf121a1",
+      "bytes": 8269
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f3/out/ASTOCK-028-6160f91ce06c/_raw/bodies/26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47.bin",
+      "sha256": "26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47",
+      "bytes": 3768
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f3/out/ASTOCK-028-6160f91ce06c/_raw/bodies/86d95ca3e8173086af1c68732f9e585ac3194d815331a0855beb7486e3fffd1c.bin",
+      "sha256": "86d95ca3e8173086af1c68732f9e585ac3194d815331a0855beb7486e3fffd1c",
+      "bytes": 15236
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f3/out/ASTOCK-028-6160f91ce06c/_raw/manifest.ndjson",
+      "sha256": "094861fe7f9e525143820006670771748315c662fadffed5e5d02a07fe1ec105",
+      "bytes": 1541
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f4/fixture/bodies/2903596cb0ff7128537c150142aea940a795ce8a52031e561bb1910523ab71c2.bin",
+      "sha256": "2903596cb0ff7128537c150142aea940a795ce8a52031e561bb1910523ab71c2",
+      "bytes": 34489
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f4/fixture/manifest.ndjson",
+      "sha256": "8ae963e86301ffa8755b8b9de74290612c3081f054a9cb2f98df622d896de848",
+      "bytes": 2842
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f4/out/ASTOCK-026-5cd9ccb55e80/2026-10-03/input_report/eastmoney/shareholder_count/report.json",
+      "sha256": "e7c5a74264e1a531a54801202072b593bc55617b2b6285d60081c7cf6eb7f647",
+      "bytes": 10037
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f4/out/ASTOCK-026-5cd9ccb55e80/_raw/bodies/2903596cb0ff7128537c150142aea940a795ce8a52031e561bb1910523ab71c2.bin",
+      "sha256": "2903596cb0ff7128537c150142aea940a795ce8a52031e561bb1910523ab71c2",
+      "bytes": 34489
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f4/out/ASTOCK-026-5cd9ccb55e80/_raw/bodies/6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575.bin",
+      "sha256": "6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575",
+      "bytes": 3864
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f4/out/ASTOCK-026-5cd9ccb55e80/_raw/manifest.ndjson",
+      "sha256": "6febd3b2840f03648c850fe3139c0bce8cfc5e4eb5fea36327abfa38a075b7b0",
+      "bytes": 3430
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f5/fixture/bodies/02d7e2d1e7ab1ef3349ec783e6493b54288c67aec3029b1de7edddf2f03134f8.bin",
+      "sha256": "02d7e2d1e7ab1ef3349ec783e6493b54288c67aec3029b1de7edddf2f03134f8",
+      "bytes": 28948
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f5/fixture/manifest.ndjson",
+      "sha256": "69be034acb87b9105d8e3639c2ab8ef6691dca4e2bf37c8e77af60abe14e1699",
+      "bytes": 2398
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f5/out/ASTOCK-027-22fb09130b3c/2026-10-03/input_report/eastmoney/dividend_history/report.json",
+      "sha256": "3adb0ce6f9d93eeecd0e91b4518a6743c553280cd02ab59df6455607868c6fba",
+      "bytes": 9359
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f5/out/ASTOCK-027-22fb09130b3c/_raw/bodies/02d7e2d1e7ab1ef3349ec783e6493b54288c67aec3029b1de7edddf2f03134f8.bin",
+      "sha256": "02d7e2d1e7ab1ef3349ec783e6493b54288c67aec3029b1de7edddf2f03134f8",
+      "bytes": 28948
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f5/out/ASTOCK-027-22fb09130b3c/_raw/bodies/8b51aa04a0365999515d1012f4532fd379a2930cf2cf6662a6c0a7815d28f793.bin",
+      "sha256": "8b51aa04a0365999515d1012f4532fd379a2930cf2cf6662a6c0a7815d28f793",
+      "bytes": 4613
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f5/out/ASTOCK-027-22fb09130b3c/_raw/manifest.ndjson",
+      "sha256": "752c649206d337b59464f6c5fed49be11b5a5f3f5f111dee4be30de9cc8d0b4e",
+      "bytes": 2984
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f6/fixture/bodies/956b0945ab951b12046990d614d815401164218630c7d0da7ee2d01817c0de8d.bin",
+      "sha256": "956b0945ab951b12046990d614d815401164218630c7d0da7ee2d01817c0de8d",
+      "bytes": 15235
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f6/fixture/manifest.ndjson",
+      "sha256": "7bfc7e271f300839238437ae18fd6f088f7abb0675eb9c495bfab814e5959951",
+      "bytes": 1253
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f6/out/ASTOCK-028-98383ff827b3/2026-10-03/excluded_rows/eastmoney/stock_fund_flow/excluded-rows.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f6/out/ASTOCK-028-98383ff827b3/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
+      "sha256": "b857324968f7aa274bc1ec9d1208050a61a4dd5ef8a5802ff11679d2e8f34299",
+      "bytes": 9471
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f6/out/ASTOCK-028-98383ff827b3/2026-10-03/source_rows/eastmoney/stock_fund_flow/source-rows.json",
+      "sha256": "e2c592ea8010c971877ce6e1f3f7718e5255fa2552520916c725c55ea69b92d9",
+      "bytes": 50320
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f6/out/ASTOCK-028-98383ff827b3/_raw/bodies/26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47.bin",
+      "sha256": "26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47",
+      "bytes": 3768
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f6/out/ASTOCK-028-98383ff827b3/_raw/bodies/956b0945ab951b12046990d614d815401164218630c7d0da7ee2d01817c0de8d.bin",
+      "sha256": "956b0945ab951b12046990d614d815401164218630c7d0da7ee2d01817c0de8d",
+      "bytes": 15235
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f6/out/ASTOCK-028-98383ff827b3/_raw/manifest.ndjson",
+      "sha256": "99f0b9717f1b01eaa6f8b7da74dada3e2bfd7cddc5af53bb622cc168e763ea10",
+      "bytes": 1541
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f7/fixture/bodies/77a4e116b4bee0680013ba726334be649716f0df6c04bb5969ec7acb99ebfcc3.bin",
+      "sha256": "77a4e116b4bee0680013ba726334be649716f0df6c04bb5969ec7acb99ebfcc3",
+      "bytes": 34522
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f7/fixture/manifest.ndjson",
+      "sha256": "64504384e546649135e8297d3914cd23530f293fc7fd33d5c7a6b8a3b3ad3d77",
+      "bytes": 2850
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f7/out/ASTOCK-026-22645150e3c2/2026-10-03/excluded_rows/eastmoney/shareholder_count/excluded-rows.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f7/out/ASTOCK-026-22645150e3c2/2026-10-03/input_report/eastmoney/shareholder_count/report.json",
+      "sha256": "d604ea5c2f74423d7028978cf939049a2d1deb2149ff1bd70e8a193f7cad7e00",
+      "bytes": 11495
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f7/out/ASTOCK-026-22645150e3c2/2026-10-03/source_rows/eastmoney/shareholder_count/source-rows.json",
+      "sha256": "db16eb85015ccaf016e16151df84260aadeddfc2f845f4c0da3f45652571fdb8",
+      "bytes": 28709
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f7/out/ASTOCK-026-22645150e3c2/_raw/bodies/6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575.bin",
+      "sha256": "6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575",
+      "bytes": 3864
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f7/out/ASTOCK-026-22645150e3c2/_raw/bodies/77a4e116b4bee0680013ba726334be649716f0df6c04bb5969ec7acb99ebfcc3.bin",
+      "sha256": "77a4e116b4bee0680013ba726334be649716f0df6c04bb5969ec7acb99ebfcc3",
+      "bytes": 34522
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f7/out/ASTOCK-026-22645150e3c2/_raw/manifest.ndjson",
+      "sha256": "085dc783882bfde7cac1a1178d6179159ea10b6ca88b1e44e79e46f7081e22b3",
+      "bytes": 3430
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f8/fixture/bodies/0311d1cbf6427bfd9fd233ca7da829c29684105c9d9d058b91260636a740f58a.bin",
+      "sha256": "0311d1cbf6427bfd9fd233ca7da829c29684105c9d9d058b91260636a740f58a",
+      "bytes": 15230
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f8/fixture/manifest.ndjson",
+      "sha256": "d28b0b9a2fa6f8b682db335ac705bd533d40c7b9850dd6159e53a231aa5bf009",
+      "bytes": 1251
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f8/out/ASTOCK-028-bb15dfe0d3b0/2026-10-03/excluded_rows/eastmoney/stock_fund_flow/excluded-rows.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f8/out/ASTOCK-028-bb15dfe0d3b0/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
+      "sha256": "714bee152d2bf4a5671cc59a7005787fba3f5b30d1ed56e34352d0d68f61155b",
+      "bytes": 9496
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f8/out/ASTOCK-028-bb15dfe0d3b0/2026-10-03/source_rows/eastmoney/stock_fund_flow/source-rows.json",
+      "sha256": "13318b9ba3445e8bfd129290a816989e864ed85ad801aa82a3b23dd650756ac2",
+      "bytes": 50313
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f8/out/ASTOCK-028-bb15dfe0d3b0/_raw/bodies/0311d1cbf6427bfd9fd233ca7da829c29684105c9d9d058b91260636a740f58a.bin",
+      "sha256": "0311d1cbf6427bfd9fd233ca7da829c29684105c9d9d058b91260636a740f58a",
+      "bytes": 15230
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f8/out/ASTOCK-028-bb15dfe0d3b0/_raw/bodies/26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47.bin",
+      "sha256": "26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47",
+      "bytes": 3768
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f8/out/ASTOCK-028-bb15dfe0d3b0/_raw/manifest.ndjson",
+      "sha256": "251a85bac57ec60d3dd01ab754df25b025815ab630eb1d1153395f0974ea2c1d",
+      "bytes": 1541
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f9/fixture/bodies/11a602a60fe1bd7decd236923d82c4c9e2f9581390359aea30b434a7ae54528a.bin",
+      "sha256": "11a602a60fe1bd7decd236923d82c4c9e2f9581390359aea30b434a7ae54528a",
+      "bytes": 28786
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f9/fixture/manifest.ndjson",
+      "sha256": "90120b9c033eea95c99f03bf7b38286f98da55deb33918d0f7b8bb0289671679",
+      "bytes": 2410
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f9/out/ASTOCK-027-3cba598500b0/2026-10-03/excluded_rows/eastmoney/dividend_history/excluded-rows.json",
+      "sha256": "72cbdb53fbe33a0941be598a381daafce627769bac8b061e0503dd44a8fd19b0",
+      "bytes": 20617
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f9/out/ASTOCK-027-3cba598500b0/2026-10-03/input_report/eastmoney/dividend_history/report.json",
+      "sha256": "005e211e4a86e90b1db68d92f6b707fcb5d55e78c6e3a211d929a7572ff8bcef",
+      "bytes": 10495
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f9/out/ASTOCK-027-3cba598500b0/2026-10-03/source_rows/eastmoney/dividend_history/source-rows.json",
+      "sha256": "5f5089cb73931d97ca08a10297399de905ab422ab54c2b60abd5c9e00f96d813",
+      "bytes": 18639
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f9/out/ASTOCK-027-3cba598500b0/_raw/bodies/11a602a60fe1bd7decd236923d82c4c9e2f9581390359aea30b434a7ae54528a.bin",
+      "sha256": "11a602a60fe1bd7decd236923d82c4c9e2f9581390359aea30b434a7ae54528a",
+      "bytes": 28786
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f9/out/ASTOCK-027-3cba598500b0/_raw/bodies/8b51aa04a0365999515d1012f4532fd379a2930cf2cf6662a6c0a7815d28f793.bin",
+      "sha256": "8b51aa04a0365999515d1012f4532fd379a2930cf2cf6662a6c0a7815d28f793",
+      "bytes": 4613
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/f9/out/ASTOCK-027-3cba598500b0/_raw/manifest.ndjson",
+      "sha256": "9a1334e56d994878f47825c6e8568c7f9ebd5831665b87d181a37b0015691dcb",
+      "bytes": 2984
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/legacy/legacy-flow-comparison.json",
+      "sha256": "3b2a9e0559b6bcee4074ecd8c3c0beaa398dc98a4d1bcadf32182de221b3c65e",
+      "bytes": 728
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/m/ASTOCK-028-2285a447978b/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
+      "sha256": "c662cd67e5becbe4702c3aff2439e87a09768d8a49ac8e795b7cc50006e53b21",
+      "bytes": 6593
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/m/ASTOCK-028-2285a447978b/_raw/bodies/26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47.bin",
+      "sha256": "26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47",
+      "bytes": 3768
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/m/fixture/bodies/c038229c1aecae02c05604508c25be23584ace658b774c63e16c27b53d188546.bin",
+      "sha256": "c038229c1aecae02c05604508c25be23584ace658b774c63e16c27b53d188546",
+      "bytes": 15236
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/m/fixture/manifest.ndjson",
+      "sha256": "ed3d2b2e803b4114aca67176c3ff6f570f3983b727b79cfdafe392db9fe7356a",
+      "bytes": 1248
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/capabilities.yaml",
+      "sha256": "7b7ce0da1d33b333165c6081a3ed788f85cb05d5f6945c745eec97d73e24f6e2",
+      "bytes": 4009
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/collection.yaml",
+      "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d",
+      "bytes": 2934
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/datasets/board_fund_flow.yaml",
+      "sha256": "08f3566d0cf2787186e6106e4915d0d89b70232d737898480eda03785ea3c53a",
+      "bytes": 1110
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/datasets/concept_board.yaml",
+      "sha256": "eef0b07c9a41bfd5ef1a52f4f39516cb26d42b088d63a15783af0f94985fd76f",
+      "bytes": 379
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/datasets/daily_bar.yaml",
+      "sha256": "0a8c1dcae7e1c062ae70c224defc1362adc1d58bc196bbeb2f1edd61d6fd39e7",
+      "bytes": 995
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/datasets/dividend_event.yaml",
+      "sha256": "67a2b02063cb9a891e3fb388048407cbc08b05ce8ae97deea6976d3904340d2e",
+      "bytes": 759
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/datasets/financial_main.yaml",
+      "sha256": "23d8b55356620439d5c1b507601b782b31aa965fe24eaf194e869466bb271ab0",
+      "bytes": 766
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/datasets/industry_board.yaml",
+      "sha256": "c6930c70b55e171dee94b74b80f3c37df1466d4a10dadc3016975004b8b47ba4",
+      "bytes": 380
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/datasets/industry_directory.yaml",
+      "sha256": "9325d485bf7a1bc2b075c2d920b43b17caa039916536bedd8163be0f972bfe5b",
+      "bytes": 346
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/datasets/industry_index_daily.yaml",
+      "sha256": "5d542c72443410747f2ac643589bfd8160cdea07d01d6d0dd9c5e4753096043b",
+      "bytes": 676
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/datasets/industry_membership.yaml",
+      "sha256": "dff512c9b7f00330bbe408ba1e1eb74d99b49bc0b38ee419d4c463047c6fe69d",
+      "bytes": 709
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/datasets/intraday_trend.yaml",
+      "sha256": "5983e0eb29c1cd7a781fbad0be7332dda14e887ccd744e55ad4b8664c7a0c38a",
+      "bytes": 665
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/datasets/limit_up_pool.yaml",
+      "sha256": "73c1fa4ed6d7281d1857208a2ec9696a3637214bb256661ce943313c75772a69",
+      "bytes": 982
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/datasets/minute_bar_5m.yaml",
+      "sha256": "fb6f822ed42479422a0b4c227577d8e559bb6b2238562af566af0464304bd873",
+      "bytes": 708
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/datasets/realtime_quote.yaml",
+      "sha256": "ebc3e97bb7469eb4c7c80daf50991ebe38f0eb5b2476a9a579d22236d416378b",
+      "bytes": 1121
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/datasets/security_snapshot.yaml",
+      "sha256": "255115893f64837a3b95ea9fe44551948eefa9604aca9d59214de87a580300be",
+      "bytes": 519
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/datasets/shareholder_count.yaml",
+      "sha256": "d325df1784c873bea73a1d907e9964e06c26e4d6b356dd6c16148837b57feccf",
+      "bytes": 923
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/datasets/stock_fund_flow.yaml",
+      "sha256": "df3f21341463f3538a1f855ef19b7bbdb683405aaa65d5418c255023c18a429f",
+      "bytes": 736
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/datasets/trading_calendar.yaml",
+      "sha256": "924b17a5be104252e85a377e4579432c6725bab99cbaa0ad70e71102149a1f49",
+      "bytes": 192
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/datasets.yaml",
+      "sha256": "e992d13297e1f9a8f64acabc25f65f138b21ce12dca16689cc3f17bf1385a6eb",
+      "bytes": 587
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/normalization/board_fund_flow.yaml",
+      "sha256": "fb7c6f1f2d425181b189e25152e465306982e10c7c6ee06b2917dfa00b891baa",
+      "bytes": 1395
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/normalization/concept_board.yaml",
+      "sha256": "2b7e7f57d189541d6a232cd5391d2dab4289f9f3438f397d9fefd82bb1d996b7",
+      "bytes": 206
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/normalization/daily_bar.yaml",
+      "sha256": "41f9bbd0824e20d70f7ed276758b286094c33c79180befca4d8985afc3c8ad0b",
+      "bytes": 2913
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/normalization/dividend_event.yaml",
+      "sha256": "188df2f7f075b92e993136aef3f977eea419f9c6957404bd2f7071c76ed24a71",
+      "bytes": 1532
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/normalization/financial_main.yaml",
+      "sha256": "eeeb2e7418aab430168f0c7e16c69f1b24a9e49ec8d156a28390cae0e7a69bda",
+      "bytes": 603
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/normalization/industry_board.yaml",
+      "sha256": "f3ff8bbe7fc4e8d4e5af1c36b9312e8db1c8c9cb09a09aadb472b22ae09de152",
+      "bytes": 210
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/normalization/industry_directory.yaml",
+      "sha256": "823d97db8afe4adb3f963faaa04b42b8f151e93f2e75f3eb18f8c678a68bae37",
+      "bytes": 478
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/normalization/industry_index_daily.yaml",
+      "sha256": "953087294fd2c3a3cb1b46f204d0a0f606f9060f0f89676fb3a189222a68dab1",
+      "bytes": 805
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/normalization/industry_membership.yaml",
+      "sha256": "7eb72a1b8ce7aff27aa1ad62534af2bf7183f3d78c6392208035396a11e21ccb",
+      "bytes": 765
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/normalization/intraday_trend.yaml",
+      "sha256": "14b0b22ad1308c70b65152e711c4248d3c8bf1c28d842fba36309194ed38870a",
+      "bytes": 440
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/normalization/limit_up_pool.yaml",
+      "sha256": "411e6e6ead10a4d2cbff7ecf4de9bee26f411a66d005a33bc640865ef4b6e7ba",
+      "bytes": 1079
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/normalization/minute_bar_5m.yaml",
+      "sha256": "f3e9abaededc01a15c651a99a22131a80067133deb89548dd12b17278e0e55b7",
+      "bytes": 1134
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/normalization/realtime_quote.yaml",
+      "sha256": "e9141547fbb85cb71c8e2336c20a2ebc948e3926f4b2a09e4f59505adea91b94",
+      "bytes": 1308
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/normalization/security_snapshot.yaml",
+      "sha256": "474ab0397cb1aad33abcd070942586a8460c468b1d3f7af97c2d152eee5a6537",
+      "bytes": 621
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/normalization/shareholder_count.yaml",
+      "sha256": "58928712ccac1b412be5348f3e1f87eaf91d679de0183bbfd15f1cdafeb849f8",
+      "bytes": 1652
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/normalization/stock_fund_flow.yaml",
+      "sha256": "3d99bacf48ba3438c90d2d544f7223ffcb0a464f69f95841affe3e99a503bbe1",
+      "bytes": 1741
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/normalization/trading_calendar.yaml",
+      "sha256": "4be7571914129769aeca321d892b8aa2fbd068db1c7c0b691ae0d5cefe7f69e0",
+      "bytes": 476
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/providers.yaml",
+      "sha256": "48e663776fd6b416367de1b0ceac38fea8e128e1b6261c71f71a24ad26f00ba2",
+      "bytes": 73751
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/config/schedules.yaml",
+      "sha256": "01b7e269ea4231024bf1c520f78fa571c2909986aad5573006bd80e186119113",
+      "bytes": 525
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/out/ASTOCK-026-e09a7e89bdb1/2026-10-03/excluded_rows/eastmoney/shareholder_count/excluded-rows.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/out/ASTOCK-026-e09a7e89bdb1/2026-10-03/input_report/eastmoney/shareholder_count/report.json",
+      "sha256": "82fa0c887ff569d783be1dabc43bc07756fb7274ce265ca73d62514c1ccc9533",
+      "bytes": 12852
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/out/ASTOCK-026-e09a7e89bdb1/2026-10-03/shareholder_count/eastmoney/shareholder_count/mapped-rows.json",
+      "sha256": "3bfd2e64c283c5777766cf32aa1320c684bdcb04b7f0030ff6ac8e5c9c67320c",
+      "bytes": 5006
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/out/ASTOCK-026-e09a7e89bdb1/2026-10-03/source_rows/eastmoney/shareholder_count/source-rows.json",
+      "sha256": "fa42a34f6c4cf62de085810924ababbecfb2cb258b92aa5da509f0829de00570",
+      "bytes": 28690
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/out/ASTOCK-026-e09a7e89bdb1/_raw/bodies/6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575.bin",
+      "sha256": "6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575",
+      "bytes": 3864
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/out/ASTOCK-026-e09a7e89bdb1/_raw/bodies/d9263b2827e5883a5a271290a4a1a1f1ffc326ce703739fa7c73741f245c0b73.bin",
+      "sha256": "d9263b2827e5883a5a271290a4a1a1f1ffc326ce703739fa7c73741f245c0b73",
+      "bytes": 31404
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/out/ASTOCK-026-e09a7e89bdb1/_raw/manifest.ndjson",
+      "sha256": "a226ab5d998cababfbfb5fb5b05e4731e871c05ef3f9a1aa02cad8039d0ecfed",
+      "bytes": 4786
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/out/ASTOCK-026-fb3aa7ea3c80/2026-10-03/input_report/eastmoney/shareholder_count/report.json",
+      "sha256": "b104f0081a45a81098a1e2dd9740309b1d7f21420c09b40cef4f72a15706e305",
+      "bytes": 6828
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/out/ASTOCK-026-fb3aa7ea3c80/_raw/bodies/6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575.bin",
+      "sha256": "6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575",
+      "bytes": 3864
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/out/ASTOCK-027-757b7579fb73/2026-10-03/input_report/eastmoney/dividend_history/report.json",
+      "sha256": "e04dcc2f04a367bcd9b9b34687389374cbed0abebc96c1917ba627287acd7003",
+      "bytes": 6596
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/out/ASTOCK-027-757b7579fb73/_raw/bodies/8b51aa04a0365999515d1012f4532fd379a2930cf2cf6662a6c0a7815d28f793.bin",
+      "sha256": "8b51aa04a0365999515d1012f4532fd379a2930cf2cf6662a6c0a7815d28f793",
+      "bytes": 4613
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/out/ASTOCK-028-e286c01c812f/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
+      "sha256": "d8e73f5a79e1f9604b5906669c6552388e96d8602a7293117ec53c0a2cf38a7a",
+      "bytes": 6779
+    },
+    {
+      "path": "provider_validation/results/em-check-20261004/y/out/ASTOCK-028-e286c01c812f/_raw/bodies/26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47.bin",
+      "sha256": "26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47",
+      "bytes": 3768
+    },
+    {
+      "path": "provider_validation/results/em-cli-20261004/ASTOCK-026-stderr.bin",
+      "sha256": "ff486e1b5adab7be5605864d02cc957fd0d57dd15084f33ffa82a46d336cdbcf",
+      "bytes": 77
+    },
+    {
+      "path": "provider_validation/results/em-cli-20261004/ASTOCK-026-stdout.json",
+      "sha256": "ac54910f7a018c7bd9dd20842e5a7be794e51bd3c661da5ae305a3712bd691d5",
+      "bytes": 16234
+    },
+    {
+      "path": "provider_validation/results/em-cli-20261004/ASTOCK-027-stderr.bin",
+      "sha256": "ff486e1b5adab7be5605864d02cc957fd0d57dd15084f33ffa82a46d336cdbcf",
+      "bytes": 77
+    },
+    {
+      "path": "provider_validation/results/em-cli-20261004/ASTOCK-027-stdout.json",
+      "sha256": "787672ec853a991bcb9686f059a5be5a7d63f42ebb2cf6be7f55561923d1237d",
+      "bytes": 15321
+    },
+    {
+      "path": "provider_validation/results/em-cli-20261004/ASTOCK-028-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "provider_validation/results/em-cli-20261004/ASTOCK-028-stdout.json",
+      "sha256": "4043c5a0c0f04b25c2877b7860b11255d2bdd0741516d7df4a19be2474799ff5",
+      "bytes": 12605
+    },
+    {
+      "path": "provider_validation/results/em-cli-20261004/candidate/ASTOCK-026-c60a40889b3c/2026-10-03/excluded_rows/eastmoney/shareholder_count/excluded-rows.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/em-cli-20261004/candidate/ASTOCK-026-c60a40889b3c/2026-10-03/input_report/eastmoney/shareholder_count/report.json",
+      "sha256": "190b345aeac54bda7479a1a30c9875b9bc31ca2b844250c5c3f1df62b2ae7249",
+      "bytes": 13196
+    },
+    {
+      "path": "provider_validation/results/em-cli-20261004/candidate/ASTOCK-026-c60a40889b3c/2026-10-03/shareholder_count/eastmoney/shareholder_count/mapped-rows.json",
+      "sha256": "ecc6905fe817fa4a963d02db9e15d3f493089d9f3b674c935c571d6b48c0ef15",
+      "bytes": 20983
+    },
+    {
+      "path": "provider_validation/results/em-cli-20261004/candidate/ASTOCK-026-c60a40889b3c/2026-10-03/source_rows/eastmoney/shareholder_count/source-rows.json",
+      "sha256": "fa42a34f6c4cf62de085810924ababbecfb2cb258b92aa5da509f0829de00570",
+      "bytes": 28690
+    },
+    {
+      "path": "provider_validation/results/em-cli-20261004/candidate/ASTOCK-026-c60a40889b3c/_raw/bodies/6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575.bin",
+      "sha256": "6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575",
+      "bytes": 3864
+    },
+    {
+      "path": "provider_validation/results/em-cli-20261004/candidate/ASTOCK-026-c60a40889b3c/_raw/bodies/d9263b2827e5883a5a271290a4a1a1f1ffc326ce703739fa7c73741f245c0b73.bin",
+      "sha256": "d9263b2827e5883a5a271290a4a1a1f1ffc326ce703739fa7c73741f245c0b73",
+      "bytes": 31404
+    },
+    {
+      "path": "provider_validation/results/em-cli-20261004/candidate/ASTOCK-026-c60a40889b3c/_raw/manifest.ndjson",
+      "sha256": "6d285e9612f0726f5bd0b0b6e20cc0904619c342986d408b58607b53e5302f15",
+      "bytes": 4786
+    },
+    {
+      "path": "provider_validation/results/em-cli-20261004/candidate/ASTOCK-027-46f97d6be846/2026-10-03/dividend_event/eastmoney/dividend_history/mapped-rows.json",
+      "sha256": "1a0be5edf183de168c0805f4852559a642f013210c66c24bebe91d660c468a68",
+      "bytes": 5995
+    },
+    {
+      "path": "provider_validation/results/em-cli-20261004/candidate/ASTOCK-027-46f97d6be846/2026-10-03/excluded_rows/eastmoney/dividend_history/excluded-rows.json",
+      "sha256": "00479a0f1289b2c9796b4cc36a0f04b77bfc14171b51d6d8c30d93af8d9413dc",
+      "bytes": 772
+    },
+    {
+      "path": "provider_validation/results/em-cli-20261004/candidate/ASTOCK-027-46f97d6be846/2026-10-03/input_report/eastmoney/dividend_history/report.json",
+      "sha256": "422021dfa38b2a18aaff2f699dcd463e8e8eb511a393919026d44756fa19578f",
+      "bytes": 12336
+    },
+    {
+      "path": "provider_validation/results/em-cli-20261004/candidate/ASTOCK-027-46f97d6be846/2026-10-03/source_rows/eastmoney/dividend_history/source-rows.json",
+      "sha256": "404dbad5243b90088c70ff434e6a72907469a5fbfc4dfe6335f5d42a8bbbfacb",
+      "bytes": 18720
+    },
+    {
+      "path": "provider_validation/results/em-cli-20261004/candidate/ASTOCK-027-46f97d6be846/_raw/bodies/8b51aa04a0365999515d1012f4532fd379a2930cf2cf6662a6c0a7815d28f793.bin",
+      "sha256": "8b51aa04a0365999515d1012f4532fd379a2930cf2cf6662a6c0a7815d28f793",
+      "bytes": 4613
+    },
+    {
+      "path": "provider_validation/results/em-cli-20261004/candidate/ASTOCK-027-46f97d6be846/_raw/bodies/e12fcabc65bb66c61ccc157b73b5e8ae1f7ad0707a78449ef239e72b58221a1e.bin",
+      "sha256": "e12fcabc65bb66c61ccc157b73b5e8ae1f7ad0707a78449ef239e72b58221a1e",
+      "bytes": 25836
+    },
+    {
+      "path": "provider_validation/results/em-cli-20261004/candidate/ASTOCK-027-46f97d6be846/_raw/manifest.ndjson",
+      "sha256": "43b2ddcb2bc8236b297f3980e4ab7f33fd978575c7b5c6994faa7036c1b0c9a9",
+      "bytes": 4340
+    },
+    {
+      "path": "provider_validation/results/em-cli-20261004/candidate/ASTOCK-028-cfd04268a193/2026-10-03/excluded_rows/eastmoney/stock_fund_flow/excluded-rows.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/em-cli-20261004/candidate/ASTOCK-028-cfd04268a193/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
+      "sha256": "15a61be04d6a06ffc3ecf674303a1b49f94cc585f1b0ad0f7142b90fb9454696",
+      "bytes": 10237
+    },
+    {
+      "path": "provider_validation/results/em-cli-20261004/candidate/ASTOCK-028-cfd04268a193/2026-10-03/source_rows/eastmoney/stock_fund_flow/source-rows.json",
+      "sha256": "1026e9ae47e58a6d5c0edc399eebdab25de82ff4c851745cf4f3fd53b82b8043",
+      "bytes": 50321
+    },
+    {
+      "path": "provider_validation/results/em-cli-20261004/candidate/ASTOCK-028-cfd04268a193/2026-10-03/stock_fund_flow/eastmoney/stock_fund_flow/mapped-rows.json",
+      "sha256": "e10fdb5144b0eb7ae2c6ad8a3ebb1f3408eb4e556eb9995a70376098556fd460",
+      "bytes": 26675
+    },
+    {
+      "path": "provider_validation/results/em-cli-20261004/candidate/ASTOCK-028-cfd04268a193/_raw/bodies/26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47.bin",
+      "sha256": "26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47",
+      "bytes": 3768
+    },
+    {
+      "path": "provider_validation/results/em-cli-20261004/candidate/ASTOCK-028-cfd04268a193/_raw/bodies/cbd78a5ab0c29ece3e5bd163f88364c0c0fc55056814dddee8e43ea21bc8aeb6.bin",
+      "sha256": "cbd78a5ab0c29ece3e5bd163f88364c0c0fc55056814dddee8e43ea21bc8aeb6",
+      "bytes": 15083
+    },
+    {
+      "path": "provider_validation/results/em-cli-20261004/candidate/ASTOCK-028-cfd04268a193/_raw/manifest.ndjson",
+      "sha256": "1bea3adf91f63617d418849468baffa820324882373c24d34c81a9f99274aabe",
+      "bytes": 1991
+    },
+    {
+      "path": "provider_validation/results/em-cli-20261004/verification.json",
+      "sha256": "53ad11a6b78d7ef62ca6079c15164d507e6a88a6551712d2bbd0288d9132d52c",
+      "bytes": 4392
+    },
+    {
+      "path": "provider_validation/results/em-dev-20261004/ASTOCK-026-8edfa39db363/2026-10-03/excluded_rows/eastmoney/shareholder_count/excluded-rows.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/em-dev-20261004/ASTOCK-026-8edfa39db363/2026-10-03/input_report/eastmoney/shareholder_count/report.json",
+      "sha256": "94dbee8db5f5f2167df2263f96703b13cf1d9be02d6a5b8cd52a9ac8969bef73",
+      "bytes": 13196
+    },
+    {
+      "path": "provider_validation/results/em-dev-20261004/ASTOCK-026-8edfa39db363/2026-10-03/shareholder_count/eastmoney/shareholder_count/mapped-rows.json",
+      "sha256": "ecc6905fe817fa4a963d02db9e15d3f493089d9f3b674c935c571d6b48c0ef15",
+      "bytes": 20983
+    },
+    {
+      "path": "provider_validation/results/em-dev-20261004/ASTOCK-026-8edfa39db363/2026-10-03/source_rows/eastmoney/shareholder_count/source-rows.json",
+      "sha256": "fa42a34f6c4cf62de085810924ababbecfb2cb258b92aa5da509f0829de00570",
+      "bytes": 28690
+    },
+    {
+      "path": "provider_validation/results/em-dev-20261004/ASTOCK-026-8edfa39db363/_raw/bodies/6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575.bin",
+      "sha256": "6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575",
+      "bytes": 3864
+    },
+    {
+      "path": "provider_validation/results/em-dev-20261004/ASTOCK-026-8edfa39db363/_raw/bodies/d9263b2827e5883a5a271290a4a1a1f1ffc326ce703739fa7c73741f245c0b73.bin",
+      "sha256": "d9263b2827e5883a5a271290a4a1a1f1ffc326ce703739fa7c73741f245c0b73",
+      "bytes": 31404
+    },
+    {
+      "path": "provider_validation/results/em-dev-20261004/ASTOCK-026-8edfa39db363/_raw/manifest.ndjson",
+      "sha256": "1dae1dac09c93f8b30d277ba82e6c4c814c76c52fa4bbb6dc9779f836aa6fb92",
+      "bytes": 4786
+    },
+    {
+      "path": "provider_validation/results/em-dev-20261004/ASTOCK-027-fb5961a8bf37/2026-10-03/dividend_event/eastmoney/dividend_history/mapped-rows.json",
+      "sha256": "1a0be5edf183de168c0805f4852559a642f013210c66c24bebe91d660c468a68",
+      "bytes": 5995
+    },
+    {
+      "path": "provider_validation/results/em-dev-20261004/ASTOCK-027-fb5961a8bf37/2026-10-03/excluded_rows/eastmoney/dividend_history/excluded-rows.json",
+      "sha256": "00479a0f1289b2c9796b4cc36a0f04b77bfc14171b51d6d8c30d93af8d9413dc",
+      "bytes": 772
+    },
+    {
+      "path": "provider_validation/results/em-dev-20261004/ASTOCK-027-fb5961a8bf37/2026-10-03/input_report/eastmoney/dividend_history/report.json",
+      "sha256": "5efe89becbdc58082eb301802cd66b3b324a1006dc6545c9f9cd0c2198c0b649",
+      "bytes": 12336
+    },
+    {
+      "path": "provider_validation/results/em-dev-20261004/ASTOCK-027-fb5961a8bf37/2026-10-03/source_rows/eastmoney/dividend_history/source-rows.json",
+      "sha256": "404dbad5243b90088c70ff434e6a72907469a5fbfc4dfe6335f5d42a8bbbfacb",
+      "bytes": 18720
+    },
+    {
+      "path": "provider_validation/results/em-dev-20261004/ASTOCK-027-fb5961a8bf37/_raw/bodies/8b51aa04a0365999515d1012f4532fd379a2930cf2cf6662a6c0a7815d28f793.bin",
+      "sha256": "8b51aa04a0365999515d1012f4532fd379a2930cf2cf6662a6c0a7815d28f793",
+      "bytes": 4613
+    },
+    {
+      "path": "provider_validation/results/em-dev-20261004/ASTOCK-027-fb5961a8bf37/_raw/bodies/e12fcabc65bb66c61ccc157b73b5e8ae1f7ad0707a78449ef239e72b58221a1e.bin",
+      "sha256": "e12fcabc65bb66c61ccc157b73b5e8ae1f7ad0707a78449ef239e72b58221a1e",
+      "bytes": 25836
+    },
+    {
+      "path": "provider_validation/results/em-dev-20261004/ASTOCK-027-fb5961a8bf37/_raw/manifest.ndjson",
+      "sha256": "edc5a09b9ea7c96647192114834a56e2a0f7b89ba084f9a76deb8f2c897e50f2",
+      "bytes": 4340
+    },
+    {
+      "path": "provider_validation/results/em-dev-20261004/ASTOCK-028-59fc2d809ae3/2026-10-03/excluded_rows/eastmoney/stock_fund_flow/excluded-rows.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/em-dev-20261004/ASTOCK-028-59fc2d809ae3/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
+      "sha256": "456c13be94c404080714fd4d8a2f7f7ad222dc5736ceece36f59e4557df277a9",
+      "bytes": 10237
+    },
+    {
+      "path": "provider_validation/results/em-dev-20261004/ASTOCK-028-59fc2d809ae3/2026-10-03/source_rows/eastmoney/stock_fund_flow/source-rows.json",
+      "sha256": "1026e9ae47e58a6d5c0edc399eebdab25de82ff4c851745cf4f3fd53b82b8043",
+      "bytes": 50321
+    },
+    {
+      "path": "provider_validation/results/em-dev-20261004/ASTOCK-028-59fc2d809ae3/2026-10-03/stock_fund_flow/eastmoney/stock_fund_flow/mapped-rows.json",
+      "sha256": "e10fdb5144b0eb7ae2c6ad8a3ebb1f3408eb4e556eb9995a70376098556fd460",
+      "bytes": 26675
+    },
+    {
+      "path": "provider_validation/results/em-dev-20261004/ASTOCK-028-59fc2d809ae3/_raw/bodies/26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47.bin",
+      "sha256": "26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47",
+      "bytes": 3768
+    },
+    {
+      "path": "provider_validation/results/em-dev-20261004/ASTOCK-028-59fc2d809ae3/_raw/bodies/cbd78a5ab0c29ece3e5bd163f88364c0c0fc55056814dddee8e43ea21bc8aeb6.bin",
+      "sha256": "cbd78a5ab0c29ece3e5bd163f88364c0c0fc55056814dddee8e43ea21bc8aeb6",
+      "bytes": 15083
+    },
+    {
+      "path": "provider_validation/results/em-dev-20261004/ASTOCK-028-59fc2d809ae3/_raw/manifest.ndjson",
+      "sha256": "fb3de540a139c205f3c05980d04e2447f53f814533052132d57e31d1496a3e04",
+      "bytes": 1991
+    },
+    {
+      "path": "provider_validation/results/em-dev-20261004-full-tests.xml",
+      "sha256": "09e662ffb1e74558e34691591bf78d54c4f9ec7ac6028317f00d440d8b5ef697",
+      "bytes": 40081
+    },
+    {
+      "path": "provider_validation/results/em-dev-20261004-legacy-tests.xml",
+      "sha256": "d050c09fcebd88972e958dc189177ac4dd6858d01b952b08022f167232af9934",
+      "bytes": 774
+    },
+    {
+      "path": "provider_validation/results/em-dev-20261004-recheck-tests.xml",
+      "sha256": "26a7c14cca07302afb2d94636355ce60d91d85f2d4f58fbb473f4c3904fc5b2e",
+      "bytes": 2762
+    },
+    {
+      "path": "provider_validation/results/em-dev-20261004-tests.xml",
+      "sha256": "b557bdeb1a13bb9543c86d87516e0e6fa5fd4594c78c48bbb2b9e9c20a9e0cab",
+      "bytes": 13823
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/ASTOCK-026/candidate/ASTOCK-026-405682b8ee77/2026-10-03/excluded_rows/eastmoney/shareholder_count/excluded-rows.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/ASTOCK-026/candidate/ASTOCK-026-405682b8ee77/2026-10-03/input_report/eastmoney/shareholder_count/report.json",
+      "sha256": "5cd7760b9675e96ab5868f123059274395b9bb11c9d14cc142b2759c602bb48b",
+      "bytes": 13196
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/ASTOCK-026/candidate/ASTOCK-026-405682b8ee77/2026-10-03/shareholder_count/eastmoney/shareholder_count/mapped-rows.json",
+      "sha256": "ecc6905fe817fa4a963d02db9e15d3f493089d9f3b674c935c571d6b48c0ef15",
+      "bytes": 20983
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/ASTOCK-026/candidate/ASTOCK-026-405682b8ee77/2026-10-03/source_rows/eastmoney/shareholder_count/source-rows.json",
+      "sha256": "fa42a34f6c4cf62de085810924ababbecfb2cb258b92aa5da509f0829de00570",
+      "bytes": 28690
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/ASTOCK-026/candidate/ASTOCK-026-405682b8ee77/_raw/bodies/6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575.bin",
+      "sha256": "6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575",
+      "bytes": 3864
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/ASTOCK-026/candidate/ASTOCK-026-405682b8ee77/_raw/bodies/d9263b2827e5883a5a271290a4a1a1f1ffc326ce703739fa7c73741f245c0b73.bin",
+      "sha256": "d9263b2827e5883a5a271290a4a1a1f1ffc326ce703739fa7c73741f245c0b73",
+      "bytes": 31404
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/ASTOCK-026/candidate/ASTOCK-026-405682b8ee77/_raw/manifest.ndjson",
+      "sha256": "052bcbbafb5d801c2cf8bfc3acfdedad8a0790f63d6e95358d52f6aa30caf6bb",
+      "bytes": 4786
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/ASTOCK-026/comparison.json",
+      "sha256": "035eb4b5cd685bda188d78333387c759d02ebfc7a24651733744f136b11b91a2",
+      "bytes": 6133
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/ASTOCK-026/original/bodies/d9263b2827e5883a5a271290a4a1a1f1ffc326ce703739fa7c73741f245c0b73.bin",
+      "sha256": "d9263b2827e5883a5a271290a4a1a1f1ffc326ce703739fa7c73741f245c0b73",
+      "bytes": 31404
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/ASTOCK-026/original/manifest.ndjson",
+      "sha256": "b7f5ef09e8ccc2584d1853853e8e7974077029b23490b4465b9cf6711d9ccb21",
+      "bytes": 4644
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/ASTOCK-027/candidate/ASTOCK-027-f8b3bab13861/2026-10-03/dividend_event/eastmoney/dividend_history/mapped-rows.json",
+      "sha256": "1a0be5edf183de168c0805f4852559a642f013210c66c24bebe91d660c468a68",
+      "bytes": 5995
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/ASTOCK-027/candidate/ASTOCK-027-f8b3bab13861/2026-10-03/excluded_rows/eastmoney/dividend_history/excluded-rows.json",
+      "sha256": "00479a0f1289b2c9796b4cc36a0f04b77bfc14171b51d6d8c30d93af8d9413dc",
+      "bytes": 772
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/ASTOCK-027/candidate/ASTOCK-027-f8b3bab13861/2026-10-03/input_report/eastmoney/dividend_history/report.json",
+      "sha256": "6e1c36dd83620d67bb5adfaec565ae3d6cbaf77345b22b9b5899b2b56cc6b8e3",
+      "bytes": 12336
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/ASTOCK-027/candidate/ASTOCK-027-f8b3bab13861/2026-10-03/source_rows/eastmoney/dividend_history/source-rows.json",
+      "sha256": "404dbad5243b90088c70ff434e6a72907469a5fbfc4dfe6335f5d42a8bbbfacb",
+      "bytes": 18720
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/ASTOCK-027/candidate/ASTOCK-027-f8b3bab13861/_raw/bodies/8b51aa04a0365999515d1012f4532fd379a2930cf2cf6662a6c0a7815d28f793.bin",
+      "sha256": "8b51aa04a0365999515d1012f4532fd379a2930cf2cf6662a6c0a7815d28f793",
+      "bytes": 4613
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/ASTOCK-027/candidate/ASTOCK-027-f8b3bab13861/_raw/bodies/e12fcabc65bb66c61ccc157b73b5e8ae1f7ad0707a78449ef239e72b58221a1e.bin",
+      "sha256": "e12fcabc65bb66c61ccc157b73b5e8ae1f7ad0707a78449ef239e72b58221a1e",
+      "bytes": 25836
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/ASTOCK-027/candidate/ASTOCK-027-f8b3bab13861/_raw/manifest.ndjson",
+      "sha256": "de80925b69bca47d5733c88cbaf0212b26698b2450ffa023bfac08a0e77cb303",
+      "bytes": 4340
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/ASTOCK-027/comparison.json",
+      "sha256": "a8c64597fd3f427209db6e0f24bd400d4a0d2bb69954d4046345f668f765d4f7",
+      "bytes": 5244
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/ASTOCK-027/original/bodies/e12fcabc65bb66c61ccc157b73b5e8ae1f7ad0707a78449ef239e72b58221a1e.bin",
+      "sha256": "e12fcabc65bb66c61ccc157b73b5e8ae1f7ad0707a78449ef239e72b58221a1e",
+      "bytes": 25836
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/ASTOCK-027/original/manifest.ndjson",
+      "sha256": "23cba76dd6d4a296cb9dbca7123087a8f200029455e12edba1fe53c910e354eb",
+      "bytes": 4198
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/ASTOCK-028/candidate/ASTOCK-028-b390a44595db/2026-10-03/excluded_rows/eastmoney/stock_fund_flow/excluded-rows.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/ASTOCK-028/candidate/ASTOCK-028-b390a44595db/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
+      "sha256": "cf62a5bbc03acf1f69564a5af86421a9375c0345d15ab44e9fe6d3d1b334b44c",
+      "bytes": 10237
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/ASTOCK-028/candidate/ASTOCK-028-b390a44595db/2026-10-03/source_rows/eastmoney/stock_fund_flow/source-rows.json",
+      "sha256": "1026e9ae47e58a6d5c0edc399eebdab25de82ff4c851745cf4f3fd53b82b8043",
+      "bytes": 50321
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/ASTOCK-028/candidate/ASTOCK-028-b390a44595db/2026-10-03/stock_fund_flow/eastmoney/stock_fund_flow/mapped-rows.json",
+      "sha256": "e10fdb5144b0eb7ae2c6ad8a3ebb1f3408eb4e556eb9995a70376098556fd460",
+      "bytes": 26675
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/ASTOCK-028/candidate/ASTOCK-028-b390a44595db/_raw/bodies/26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47.bin",
+      "sha256": "26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47",
+      "bytes": 3768
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/ASTOCK-028/candidate/ASTOCK-028-b390a44595db/_raw/bodies/cbd78a5ab0c29ece3e5bd163f88364c0c0fc55056814dddee8e43ea21bc8aeb6.bin",
+      "sha256": "cbd78a5ab0c29ece3e5bd163f88364c0c0fc55056814dddee8e43ea21bc8aeb6",
+      "bytes": 15083
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/ASTOCK-028/candidate/ASTOCK-028-b390a44595db/_raw/manifest.ndjson",
+      "sha256": "6443fc7d75df261a6b64ebde08fa9ce2b4c799de0d6a69d2c80747f74add9c97",
+      "bytes": 1991
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/ASTOCK-028/comparison.json",
+      "sha256": "45ccf39dd4895b18947417cd30040ba93d52e772563de0935e89d8095113c6e5",
+      "bytes": 3417
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/ASTOCK-028/original/bodies/cbd78a5ab0c29ece3e5bd163f88364c0c0fc55056814dddee8e43ea21bc8aeb6.bin",
+      "sha256": "cbd78a5ab0c29ece3e5bd163f88364c0c0fc55056814dddee8e43ea21bc8aeb6",
+      "bytes": 15083
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/ASTOCK-028/original/manifest.ndjson",
+      "sha256": "960d67c844fa04411880a7fb23d5161d7e63ede27a166ab6576b4a180db37986",
+      "bytes": 1918
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/comparison.json",
+      "sha256": "4160be850e5c27e6385f520acc1322f7facf8e605a3cdf2d400ccac72e551a57",
+      "bytes": 25281
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f1/fixture/bodies/7dce05978cadaf116d47487adcc2f7b44452f8154bf7e834d4513aefee5ebd05.bin",
+      "sha256": "7dce05978cadaf116d47487adcc2f7b44452f8154bf7e834d4513aefee5ebd05",
+      "bytes": 34489
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f1/fixture/manifest.ndjson",
+      "sha256": "626ce44418dcac85cb35831d62a2fc532e95e89b820d8f072723e07c9f9b0cac",
+      "bytes": 2848
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f1/out/ASTOCK-026-6b341df703b3/2026-10-03/input_report/eastmoney/shareholder_count/report.json",
+      "sha256": "56e42d581fc05b94a56554011249cc79e4195f7bcb947e1911d0fbf1a7f0285c",
+      "bytes": 10037
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f1/out/ASTOCK-026-6b341df703b3/_raw/bodies/6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575.bin",
+      "sha256": "6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575",
+      "bytes": 3864
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f1/out/ASTOCK-026-6b341df703b3/_raw/bodies/7dce05978cadaf116d47487adcc2f7b44452f8154bf7e834d4513aefee5ebd05.bin",
+      "sha256": "7dce05978cadaf116d47487adcc2f7b44452f8154bf7e834d4513aefee5ebd05",
+      "bytes": 34489
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f1/out/ASTOCK-026-6b341df703b3/_raw/manifest.ndjson",
+      "sha256": "c0d18c217e9cd896956a0566b3dd8996b8212e4285926bdc522b4d354c4c6e75",
+      "bytes": 3430
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f10/fixture/bodies/c038229c1aecae02c05604508c25be23584ace658b774c63e16c27b53d188546.bin",
+      "sha256": "c038229c1aecae02c05604508c25be23584ace658b774c63e16c27b53d188546",
+      "bytes": 15236
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f10/fixture/manifest.ndjson",
+      "sha256": "cf72b8bdf0807190823336f941bba444543a659afb8a8a23f050f11b26c952e6",
+      "bytes": 1252
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f10/out/ASTOCK-028-1e5cea24d886/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
+      "sha256": "0b778ddd61da151745f36e373bdabd0f90e79abf5b2a4bf3d1634d3c85eefc66",
+      "bytes": 8268
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f10/out/ASTOCK-028-1e5cea24d886/_raw/bodies/26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47.bin",
+      "sha256": "26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47",
+      "bytes": 3768
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f10/out/ASTOCK-028-1e5cea24d886/_raw/bodies/c038229c1aecae02c05604508c25be23584ace658b774c63e16c27b53d188546.bin",
+      "sha256": "c038229c1aecae02c05604508c25be23584ace658b774c63e16c27b53d188546",
+      "bytes": 15236
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f10/out/ASTOCK-028-1e5cea24d886/_raw/manifest.ndjson",
+      "sha256": "a56a2efbc5e902533320e37359ebce8b6c4dd1aac27a64a2dd71bd2af87c2934",
+      "bytes": 1542
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f11/fixture/bodies/c431c67b531784e78088da2db315703b7fea179330cbe92f9b1a62ec7f705992.bin",
+      "sha256": "c431c67b531784e78088da2db315703b7fea179330cbe92f9b1a62ec7f705992",
+      "bytes": 34490
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f11/fixture/manifest.ndjson",
+      "sha256": "e748cc688e5a95c6a80d4fec0a1fbda66c0ad90341c4b0b2e80c1f78078d430f",
+      "bytes": 2848
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f11/out/ASTOCK-026-0611790706b0/2026-10-03/input_report/eastmoney/shareholder_count/report.json",
+      "sha256": "a69da7f1e0097c491eea27a36d3ea89e29f06ae0ae19c3c188a12c1ad8c53940",
+      "bytes": 10039
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f11/out/ASTOCK-026-0611790706b0/_raw/bodies/6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575.bin",
+      "sha256": "6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575",
+      "bytes": 3864
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f11/out/ASTOCK-026-0611790706b0/_raw/bodies/c431c67b531784e78088da2db315703b7fea179330cbe92f9b1a62ec7f705992.bin",
+      "sha256": "c431c67b531784e78088da2db315703b7fea179330cbe92f9b1a62ec7f705992",
+      "bytes": 34490
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f11/out/ASTOCK-026-0611790706b0/_raw/manifest.ndjson",
+      "sha256": "326964876a9391c706fd36447f0666678b4386092413ae5590657ecc91782003",
+      "bytes": 3432
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f12/fixture/bodies/1ef1c0e5740ebec8a14f335121095f59d09c30fcfb38aeb841ab83a80607be20.bin",
+      "sha256": "1ef1c0e5740ebec8a14f335121095f59d09c30fcfb38aeb841ab83a80607be20",
+      "bytes": 174
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f12/fixture/manifest.ndjson",
+      "sha256": "4119df750ea8777a9ba164dc0c0bbcc2f8817ef70bdf623616843c12894d7d1e",
+      "bytes": 1247
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f12/out/ASTOCK-028-08d37798f054/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
+      "sha256": "f4c54a20ed8af800e461b9547c3c1f7a4e1c23f00d9eefa07ea368ff53ea76c7",
+      "bytes": 8317
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f12/out/ASTOCK-028-08d37798f054/_raw/bodies/1ef1c0e5740ebec8a14f335121095f59d09c30fcfb38aeb841ab83a80607be20.bin",
+      "sha256": "1ef1c0e5740ebec8a14f335121095f59d09c30fcfb38aeb841ab83a80607be20",
+      "bytes": 174
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f12/out/ASTOCK-028-08d37798f054/_raw/bodies/26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47.bin",
+      "sha256": "26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47",
+      "bytes": 3768
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f12/out/ASTOCK-028-08d37798f054/_raw/manifest.ndjson",
+      "sha256": "3ff7b125c0679103dc8688a6f96fa3cfcd3d1b03c970b92a9a968bee35af696f",
+      "bytes": 1540
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f13/fixture/bodies/c038229c1aecae02c05604508c25be23584ace658b774c63e16c27b53d188546.bin",
+      "sha256": "c038229c1aecae02c05604508c25be23584ace658b774c63e16c27b53d188546",
+      "bytes": 15236
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f13/fixture/manifest.ndjson",
+      "sha256": "d1b332444c5725c969c733ca7c2dd7a1889106aa79a1eb4323f98a4acc232d65",
+      "bytes": 1293
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f13/out/ASTOCK-028-37d8def9f00e/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
+      "sha256": "8f734f0ed986758662baccdcae55b4ac86edf6a8270546655dbb03fed261eee7",
+      "bytes": 7864
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f13/out/ASTOCK-028-37d8def9f00e/_raw/bodies/26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47.bin",
+      "sha256": "26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47",
+      "bytes": 3768
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f13/out/ASTOCK-028-37d8def9f00e/_raw/manifest.ndjson",
+      "sha256": "fcb1756a1e1bb80a77d84c90bf36f623dad31f3384ccbf3f52d37bf67283ad81",
+      "bytes": 1116
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f14/fixture/bodies/c038229c1aecae02c05604508c25be23584ace658b774c63e16c27b53d188546.bin",
+      "sha256": "c038229c1aecae02c05604508c25be23584ace658b774c63e16c27b53d188546",
+      "bytes": 15236
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f14/fixture/manifest.ndjson",
+      "sha256": "dc7e18e566881c86a3ffbf1fbfa5602c3ffedb805b89f6406174f173d79d6cdb",
+      "bytes": 1256
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f14/out/ASTOCK-028-ade169f7cf87/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
+      "sha256": "3b95220888ed82c07672188df24ce47851de0542d55acde14beb8ac1ecb88a2e",
+      "bytes": 6664
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f14/out/ASTOCK-028-ade169f7cf87/_raw/bodies/26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47.bin",
+      "sha256": "26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47",
+      "bytes": 3768
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f2/fixture/bodies/10d91ded8bfc8e6945be096163c6a7900bf159df9de0662346c582c21ef8de56.bin",
+      "sha256": "10d91ded8bfc8e6945be096163c6a7900bf159df9de0662346c582c21ef8de56",
+      "bytes": 28948
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f2/fixture/manifest.ndjson",
+      "sha256": "77e4d4cd9b0d843eda8d3e74005b3450851e08279207ce9b14905cb8b58980e7",
+      "bytes": 2404
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f2/out/ASTOCK-027-37858d43ed9d/2026-10-03/input_report/eastmoney/dividend_history/report.json",
+      "sha256": "5f444a0e6b6ccf64e36ac8c5d40d56cf9b2d4449cd4361febea5e3264d4c4c1d",
+      "bytes": 9359
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f2/out/ASTOCK-027-37858d43ed9d/_raw/bodies/10d91ded8bfc8e6945be096163c6a7900bf159df9de0662346c582c21ef8de56.bin",
+      "sha256": "10d91ded8bfc8e6945be096163c6a7900bf159df9de0662346c582c21ef8de56",
+      "bytes": 28948
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f2/out/ASTOCK-027-37858d43ed9d/_raw/bodies/8b51aa04a0365999515d1012f4532fd379a2930cf2cf6662a6c0a7815d28f793.bin",
+      "sha256": "8b51aa04a0365999515d1012f4532fd379a2930cf2cf6662a6c0a7815d28f793",
+      "bytes": 4613
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f2/out/ASTOCK-027-37858d43ed9d/_raw/manifest.ndjson",
+      "sha256": "b36cf8a180155071087f7d5bb5b0e0bb252773558db3da0902a97cf30228ea4a",
+      "bytes": 2984
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f3/fixture/bodies/86d95ca3e8173086af1c68732f9e585ac3194d815331a0855beb7486e3fffd1c.bin",
+      "sha256": "86d95ca3e8173086af1c68732f9e585ac3194d815331a0855beb7486e3fffd1c",
+      "bytes": 15236
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f3/fixture/manifest.ndjson",
+      "sha256": "c4724e85af2bcc14b37c2783712906191f57b254100ec5a11918408f94861360",
+      "bytes": 1252
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f3/out/ASTOCK-028-cd81e2a547a1/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
+      "sha256": "4e351cb010c7318834e51284e52095a02d83a9f15f955c0ce2cb0f2f67450ed9",
+      "bytes": 8269
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f3/out/ASTOCK-028-cd81e2a547a1/_raw/bodies/26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47.bin",
+      "sha256": "26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47",
+      "bytes": 3768
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f3/out/ASTOCK-028-cd81e2a547a1/_raw/bodies/86d95ca3e8173086af1c68732f9e585ac3194d815331a0855beb7486e3fffd1c.bin",
+      "sha256": "86d95ca3e8173086af1c68732f9e585ac3194d815331a0855beb7486e3fffd1c",
+      "bytes": 15236
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f3/out/ASTOCK-028-cd81e2a547a1/_raw/manifest.ndjson",
+      "sha256": "6f3d5522a48f7f61fddd7f97fe96efc7e3ae427a0ad79d53e9c75bdceb481118",
+      "bytes": 1541
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f4/fixture/bodies/2903596cb0ff7128537c150142aea940a795ce8a52031e561bb1910523ab71c2.bin",
+      "sha256": "2903596cb0ff7128537c150142aea940a795ce8a52031e561bb1910523ab71c2",
+      "bytes": 34489
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f4/fixture/manifest.ndjson",
+      "sha256": "5b78dd85c6f022dbc04d66594fcbc9627f95fed22f487acb76efd16c09c7904b",
+      "bytes": 2842
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f4/out/ASTOCK-026-82f72d26acf4/2026-10-03/input_report/eastmoney/shareholder_count/report.json",
+      "sha256": "50d42b95b8b54bee482c748486dfad018210418cfae135a5561e54dcca667b78",
+      "bytes": 10037
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f4/out/ASTOCK-026-82f72d26acf4/_raw/bodies/2903596cb0ff7128537c150142aea940a795ce8a52031e561bb1910523ab71c2.bin",
+      "sha256": "2903596cb0ff7128537c150142aea940a795ce8a52031e561bb1910523ab71c2",
+      "bytes": 34489
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f4/out/ASTOCK-026-82f72d26acf4/_raw/bodies/6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575.bin",
+      "sha256": "6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575",
+      "bytes": 3864
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f4/out/ASTOCK-026-82f72d26acf4/_raw/manifest.ndjson",
+      "sha256": "befa8fe75eca50956118129af5ccd40d1ad40c77608282ec429ea74e2d429644",
+      "bytes": 3430
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f5/fixture/bodies/02d7e2d1e7ab1ef3349ec783e6493b54288c67aec3029b1de7edddf2f03134f8.bin",
+      "sha256": "02d7e2d1e7ab1ef3349ec783e6493b54288c67aec3029b1de7edddf2f03134f8",
+      "bytes": 28948
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f5/fixture/manifest.ndjson",
+      "sha256": "1fc27f75722698dd8ff12a1915eaf88ddc53ace1f075031b2e949767afb59f2b",
+      "bytes": 2398
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f5/out/ASTOCK-027-eef88cc00d5e/2026-10-03/input_report/eastmoney/dividend_history/report.json",
+      "sha256": "704f6a321cb3cc92a40d04cf804e67906bf41e17bcfb7a57e41ccb89d4d50e3e",
+      "bytes": 9359
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f5/out/ASTOCK-027-eef88cc00d5e/_raw/bodies/02d7e2d1e7ab1ef3349ec783e6493b54288c67aec3029b1de7edddf2f03134f8.bin",
+      "sha256": "02d7e2d1e7ab1ef3349ec783e6493b54288c67aec3029b1de7edddf2f03134f8",
+      "bytes": 28948
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f5/out/ASTOCK-027-eef88cc00d5e/_raw/bodies/8b51aa04a0365999515d1012f4532fd379a2930cf2cf6662a6c0a7815d28f793.bin",
+      "sha256": "8b51aa04a0365999515d1012f4532fd379a2930cf2cf6662a6c0a7815d28f793",
+      "bytes": 4613
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f5/out/ASTOCK-027-eef88cc00d5e/_raw/manifest.ndjson",
+      "sha256": "a1ba964f3f4ee4bf0fbeb76698abf294cf91ff778cdde79f171956849770877c",
+      "bytes": 2984
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f6/fixture/bodies/956b0945ab951b12046990d614d815401164218630c7d0da7ee2d01817c0de8d.bin",
+      "sha256": "956b0945ab951b12046990d614d815401164218630c7d0da7ee2d01817c0de8d",
+      "bytes": 15235
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f6/fixture/manifest.ndjson",
+      "sha256": "fb4ed9fb0617215e95907327bd5052afdd3c00240618da1d0366554d30c2e050",
+      "bytes": 1253
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f6/out/ASTOCK-028-18075d9c5e63/2026-10-03/excluded_rows/eastmoney/stock_fund_flow/excluded-rows.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f6/out/ASTOCK-028-18075d9c5e63/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
+      "sha256": "09a850056b566186e1dfdaee5cc35f0c6c152b714f299b6929880910a60d477a",
+      "bytes": 9471
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f6/out/ASTOCK-028-18075d9c5e63/2026-10-03/source_rows/eastmoney/stock_fund_flow/source-rows.json",
+      "sha256": "e2c592ea8010c971877ce6e1f3f7718e5255fa2552520916c725c55ea69b92d9",
+      "bytes": 50320
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f6/out/ASTOCK-028-18075d9c5e63/_raw/bodies/26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47.bin",
+      "sha256": "26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47",
+      "bytes": 3768
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f6/out/ASTOCK-028-18075d9c5e63/_raw/bodies/956b0945ab951b12046990d614d815401164218630c7d0da7ee2d01817c0de8d.bin",
+      "sha256": "956b0945ab951b12046990d614d815401164218630c7d0da7ee2d01817c0de8d",
+      "bytes": 15235
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f6/out/ASTOCK-028-18075d9c5e63/_raw/manifest.ndjson",
+      "sha256": "246e6adb26ca33a96138d7adce98eab5de6828a83c10a7ba89d2412b0e55d9b4",
+      "bytes": 1541
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f7/fixture/bodies/77a4e116b4bee0680013ba726334be649716f0df6c04bb5969ec7acb99ebfcc3.bin",
+      "sha256": "77a4e116b4bee0680013ba726334be649716f0df6c04bb5969ec7acb99ebfcc3",
+      "bytes": 34522
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f7/fixture/manifest.ndjson",
+      "sha256": "572de9323174f0cbc104a7f0bb9153467d9bde4e73ea97fd40cf893161684101",
+      "bytes": 2850
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f7/out/ASTOCK-026-e66ec303765f/2026-10-03/excluded_rows/eastmoney/shareholder_count/excluded-rows.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f7/out/ASTOCK-026-e66ec303765f/2026-10-03/input_report/eastmoney/shareholder_count/report.json",
+      "sha256": "bef31d63a494e8d2ca8bf7afb8a3ec7cebd18db93ebfe19917b047292552db69",
+      "bytes": 11495
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f7/out/ASTOCK-026-e66ec303765f/2026-10-03/source_rows/eastmoney/shareholder_count/source-rows.json",
+      "sha256": "db16eb85015ccaf016e16151df84260aadeddfc2f845f4c0da3f45652571fdb8",
+      "bytes": 28709
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f7/out/ASTOCK-026-e66ec303765f/_raw/bodies/6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575.bin",
+      "sha256": "6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575",
+      "bytes": 3864
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f7/out/ASTOCK-026-e66ec303765f/_raw/bodies/77a4e116b4bee0680013ba726334be649716f0df6c04bb5969ec7acb99ebfcc3.bin",
+      "sha256": "77a4e116b4bee0680013ba726334be649716f0df6c04bb5969ec7acb99ebfcc3",
+      "bytes": 34522
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f7/out/ASTOCK-026-e66ec303765f/_raw/manifest.ndjson",
+      "sha256": "079cb33624f3398b1f1faac6b4fd20a6b54cd90ef8ceff8308732ebda1577345",
+      "bytes": 3430
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f8/fixture/bodies/0311d1cbf6427bfd9fd233ca7da829c29684105c9d9d058b91260636a740f58a.bin",
+      "sha256": "0311d1cbf6427bfd9fd233ca7da829c29684105c9d9d058b91260636a740f58a",
+      "bytes": 15230
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f8/fixture/manifest.ndjson",
+      "sha256": "15841b7a7c11bee98afcd118554f0877c255f7eb0447976c4c253818cbedb997",
+      "bytes": 1251
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f8/out/ASTOCK-028-79f857fa2232/2026-10-03/excluded_rows/eastmoney/stock_fund_flow/excluded-rows.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f8/out/ASTOCK-028-79f857fa2232/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
+      "sha256": "6e000b96e7a6872f2a247685ebfff9cc3fabf54788dd95aaee6a9e3cef27133c",
+      "bytes": 9496
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f8/out/ASTOCK-028-79f857fa2232/2026-10-03/source_rows/eastmoney/stock_fund_flow/source-rows.json",
+      "sha256": "13318b9ba3445e8bfd129290a816989e864ed85ad801aa82a3b23dd650756ac2",
+      "bytes": 50313
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f8/out/ASTOCK-028-79f857fa2232/_raw/bodies/0311d1cbf6427bfd9fd233ca7da829c29684105c9d9d058b91260636a740f58a.bin",
+      "sha256": "0311d1cbf6427bfd9fd233ca7da829c29684105c9d9d058b91260636a740f58a",
+      "bytes": 15230
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f8/out/ASTOCK-028-79f857fa2232/_raw/bodies/26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47.bin",
+      "sha256": "26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47",
+      "bytes": 3768
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f8/out/ASTOCK-028-79f857fa2232/_raw/manifest.ndjson",
+      "sha256": "5c226461ea162b509d0b7dbdbc68120ce6ef6a04d8c42d4852a7650caf4e6d28",
+      "bytes": 1541
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f9/fixture/bodies/11a602a60fe1bd7decd236923d82c4c9e2f9581390359aea30b434a7ae54528a.bin",
+      "sha256": "11a602a60fe1bd7decd236923d82c4c9e2f9581390359aea30b434a7ae54528a",
+      "bytes": 28786
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f9/fixture/manifest.ndjson",
+      "sha256": "6c3448a0a6f47dbaba831a154aa18aea978aa24efe7bbb332ad7acc9d97e426e",
+      "bytes": 2410
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f9/out/ASTOCK-027-d98e351b8a1a/2026-10-03/excluded_rows/eastmoney/dividend_history/excluded-rows.json",
+      "sha256": "72cbdb53fbe33a0941be598a381daafce627769bac8b061e0503dd44a8fd19b0",
+      "bytes": 20617
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f9/out/ASTOCK-027-d98e351b8a1a/2026-10-03/input_report/eastmoney/dividend_history/report.json",
+      "sha256": "f8f3828d72e6f45fede7f6f7221a0bdadbb33dd6989251938b159d2f5dbcbd71",
+      "bytes": 10495
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f9/out/ASTOCK-027-d98e351b8a1a/2026-10-03/source_rows/eastmoney/dividend_history/source-rows.json",
+      "sha256": "5f5089cb73931d97ca08a10297399de905ab422ab54c2b60abd5c9e00f96d813",
+      "bytes": 18639
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f9/out/ASTOCK-027-d98e351b8a1a/_raw/bodies/11a602a60fe1bd7decd236923d82c4c9e2f9581390359aea30b434a7ae54528a.bin",
+      "sha256": "11a602a60fe1bd7decd236923d82c4c9e2f9581390359aea30b434a7ae54528a",
+      "bytes": 28786
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f9/out/ASTOCK-027-d98e351b8a1a/_raw/bodies/8b51aa04a0365999515d1012f4532fd379a2930cf2cf6662a6c0a7815d28f793.bin",
+      "sha256": "8b51aa04a0365999515d1012f4532fd379a2930cf2cf6662a6c0a7815d28f793",
+      "bytes": 4613
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/f9/out/ASTOCK-027-d98e351b8a1a/_raw/manifest.ndjson",
+      "sha256": "a1d3121a920b486cfec6adc766c1efb0838e8d6f5624890b72a09483d1f73e9a",
+      "bytes": 2984
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/legacy/legacy-flow-comparison.json",
+      "sha256": "3b2a9e0559b6bcee4074ecd8c3c0beaa398dc98a4d1bcadf32182de221b3c65e",
+      "bytes": 728
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/legacy-ASTOCK-026/legacy-comparison.json",
+      "sha256": "b230a702be20cd2390be698b5e80277aa8ffa2c8b637d2e018d9ed35431c5148",
+      "bytes": 1161
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/legacy-ASTOCK-027/legacy-comparison.json",
+      "sha256": "b8044e4eec9d6f07f6a09b374978a55c823e2ef3841f0610223c1989a3c37a52",
+      "bytes": 1177
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/m/ASTOCK-028-7a421f6a6fc5/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
+      "sha256": "4e0ce7c9a2fafa1982902ea32456bc9d7beb9d057e786973a57db8ead28cc643",
+      "bytes": 6593
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/m/ASTOCK-028-7a421f6a6fc5/_raw/bodies/26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47.bin",
+      "sha256": "26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47",
+      "bytes": 3768
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/m/fixture/bodies/c038229c1aecae02c05604508c25be23584ace658b774c63e16c27b53d188546.bin",
+      "sha256": "c038229c1aecae02c05604508c25be23584ace658b774c63e16c27b53d188546",
+      "bytes": 15236
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/m/fixture/manifest.ndjson",
+      "sha256": "c41ef1cf234ce1f973ee71376bdabf207f11c079678c567ecd2095b1d0a9bfbd",
+      "bytes": 1248
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/verify.py",
+      "sha256": "20c5b3681c534dbfa184e40224a31e424c2d98e935c5a89363564a71b0c756bc",
+      "bytes": 8643
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/capabilities.yaml",
+      "sha256": "7b7ce0da1d33b333165c6081a3ed788f85cb05d5f6945c745eec97d73e24f6e2",
+      "bytes": 4009
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/collection.yaml",
+      "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d",
+      "bytes": 2934
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/datasets/board_fund_flow.yaml",
+      "sha256": "08f3566d0cf2787186e6106e4915d0d89b70232d737898480eda03785ea3c53a",
+      "bytes": 1110
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/datasets/concept_board.yaml",
+      "sha256": "eef0b07c9a41bfd5ef1a52f4f39516cb26d42b088d63a15783af0f94985fd76f",
+      "bytes": 379
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/datasets/daily_bar.yaml",
+      "sha256": "0a8c1dcae7e1c062ae70c224defc1362adc1d58bc196bbeb2f1edd61d6fd39e7",
+      "bytes": 995
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/datasets/dividend_event.yaml",
+      "sha256": "67a2b02063cb9a891e3fb388048407cbc08b05ce8ae97deea6976d3904340d2e",
+      "bytes": 759
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/datasets/financial_main.yaml",
+      "sha256": "23d8b55356620439d5c1b507601b782b31aa965fe24eaf194e869466bb271ab0",
+      "bytes": 766
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/datasets/industry_board.yaml",
+      "sha256": "c6930c70b55e171dee94b74b80f3c37df1466d4a10dadc3016975004b8b47ba4",
+      "bytes": 380
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/datasets/industry_directory.yaml",
+      "sha256": "9325d485bf7a1bc2b075c2d920b43b17caa039916536bedd8163be0f972bfe5b",
+      "bytes": 346
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/datasets/industry_index_daily.yaml",
+      "sha256": "5d542c72443410747f2ac643589bfd8160cdea07d01d6d0dd9c5e4753096043b",
+      "bytes": 676
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/datasets/industry_membership.yaml",
+      "sha256": "dff512c9b7f00330bbe408ba1e1eb74d99b49bc0b38ee419d4c463047c6fe69d",
+      "bytes": 709
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/datasets/intraday_trend.yaml",
+      "sha256": "5983e0eb29c1cd7a781fbad0be7332dda14e887ccd744e55ad4b8664c7a0c38a",
+      "bytes": 665
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/datasets/limit_up_pool.yaml",
+      "sha256": "73c1fa4ed6d7281d1857208a2ec9696a3637214bb256661ce943313c75772a69",
+      "bytes": 982
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/datasets/minute_bar_5m.yaml",
+      "sha256": "fb6f822ed42479422a0b4c227577d8e559bb6b2238562af566af0464304bd873",
+      "bytes": 708
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/datasets/realtime_quote.yaml",
+      "sha256": "ebc3e97bb7469eb4c7c80daf50991ebe38f0eb5b2476a9a579d22236d416378b",
+      "bytes": 1121
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/datasets/security_snapshot.yaml",
+      "sha256": "255115893f64837a3b95ea9fe44551948eefa9604aca9d59214de87a580300be",
+      "bytes": 519
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/datasets/shareholder_count.yaml",
+      "sha256": "d325df1784c873bea73a1d907e9964e06c26e4d6b356dd6c16148837b57feccf",
+      "bytes": 923
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/datasets/stock_fund_flow.yaml",
+      "sha256": "df3f21341463f3538a1f855ef19b7bbdb683405aaa65d5418c255023c18a429f",
+      "bytes": 736
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/datasets/trading_calendar.yaml",
+      "sha256": "924b17a5be104252e85a377e4579432c6725bab99cbaa0ad70e71102149a1f49",
+      "bytes": 192
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/datasets.yaml",
+      "sha256": "e992d13297e1f9a8f64acabc25f65f138b21ce12dca16689cc3f17bf1385a6eb",
+      "bytes": 587
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/normalization/board_fund_flow.yaml",
+      "sha256": "fb7c6f1f2d425181b189e25152e465306982e10c7c6ee06b2917dfa00b891baa",
+      "bytes": 1395
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/normalization/concept_board.yaml",
+      "sha256": "2b7e7f57d189541d6a232cd5391d2dab4289f9f3438f397d9fefd82bb1d996b7",
+      "bytes": 206
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/normalization/daily_bar.yaml",
+      "sha256": "41f9bbd0824e20d70f7ed276758b286094c33c79180befca4d8985afc3c8ad0b",
+      "bytes": 2913
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/normalization/dividend_event.yaml",
+      "sha256": "188df2f7f075b92e993136aef3f977eea419f9c6957404bd2f7071c76ed24a71",
+      "bytes": 1532
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/normalization/financial_main.yaml",
+      "sha256": "eeeb2e7418aab430168f0c7e16c69f1b24a9e49ec8d156a28390cae0e7a69bda",
+      "bytes": 603
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/normalization/industry_board.yaml",
+      "sha256": "f3ff8bbe7fc4e8d4e5af1c36b9312e8db1c8c9cb09a09aadb472b22ae09de152",
+      "bytes": 210
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/normalization/industry_directory.yaml",
+      "sha256": "823d97db8afe4adb3f963faaa04b42b8f151e93f2e75f3eb18f8c678a68bae37",
+      "bytes": 478
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/normalization/industry_index_daily.yaml",
+      "sha256": "953087294fd2c3a3cb1b46f204d0a0f606f9060f0f89676fb3a189222a68dab1",
+      "bytes": 805
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/normalization/industry_membership.yaml",
+      "sha256": "7eb72a1b8ce7aff27aa1ad62534af2bf7183f3d78c6392208035396a11e21ccb",
+      "bytes": 765
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/normalization/intraday_trend.yaml",
+      "sha256": "14b0b22ad1308c70b65152e711c4248d3c8bf1c28d842fba36309194ed38870a",
+      "bytes": 440
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/normalization/limit_up_pool.yaml",
+      "sha256": "411e6e6ead10a4d2cbff7ecf4de9bee26f411a66d005a33bc640865ef4b6e7ba",
+      "bytes": 1079
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/normalization/minute_bar_5m.yaml",
+      "sha256": "f3e9abaededc01a15c651a99a22131a80067133deb89548dd12b17278e0e55b7",
+      "bytes": 1134
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/normalization/realtime_quote.yaml",
+      "sha256": "e9141547fbb85cb71c8e2336c20a2ebc948e3926f4b2a09e4f59505adea91b94",
+      "bytes": 1308
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/normalization/security_snapshot.yaml",
+      "sha256": "474ab0397cb1aad33abcd070942586a8460c468b1d3f7af97c2d152eee5a6537",
+      "bytes": 621
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/normalization/shareholder_count.yaml",
+      "sha256": "58928712ccac1b412be5348f3e1f87eaf91d679de0183bbfd15f1cdafeb849f8",
+      "bytes": 1652
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/normalization/stock_fund_flow.yaml",
+      "sha256": "3d99bacf48ba3438c90d2d544f7223ffcb0a464f69f95841affe3e99a503bbe1",
+      "bytes": 1741
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/normalization/trading_calendar.yaml",
+      "sha256": "4be7571914129769aeca321d892b8aa2fbd068db1c7c0b691ae0d5cefe7f69e0",
+      "bytes": 476
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/providers.yaml",
+      "sha256": "48e663776fd6b416367de1b0ceac38fea8e128e1b6261c71f71a24ad26f00ba2",
+      "bytes": 73751
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/config/schedules.yaml",
+      "sha256": "01b7e269ea4231024bf1c520f78fa571c2909986aad5573006bd80e186119113",
+      "bytes": 525
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/out/ASTOCK-026-143760aa38a7/2026-10-03/input_report/eastmoney/shareholder_count/report.json",
+      "sha256": "6a9bff99f4443733ad5877431b11fdf746cce7475dc6903b5e356bccdd5df668",
+      "bytes": 6828
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/out/ASTOCK-026-143760aa38a7/_raw/bodies/6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575.bin",
+      "sha256": "6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575",
+      "bytes": 3864
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/out/ASTOCK-026-1abd13e4899d/2026-10-03/excluded_rows/eastmoney/shareholder_count/excluded-rows.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/out/ASTOCK-026-1abd13e4899d/2026-10-03/input_report/eastmoney/shareholder_count/report.json",
+      "sha256": "159c6a785bc8b36bf6c096b754133a411e4a370b3f0e230ec9fbd39897b8df42",
+      "bytes": 12852
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/out/ASTOCK-026-1abd13e4899d/2026-10-03/shareholder_count/eastmoney/shareholder_count/mapped-rows.json",
+      "sha256": "3bfd2e64c283c5777766cf32aa1320c684bdcb04b7f0030ff6ac8e5c9c67320c",
+      "bytes": 5006
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/out/ASTOCK-026-1abd13e4899d/2026-10-03/source_rows/eastmoney/shareholder_count/source-rows.json",
+      "sha256": "fa42a34f6c4cf62de085810924ababbecfb2cb258b92aa5da509f0829de00570",
+      "bytes": 28690
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/out/ASTOCK-026-1abd13e4899d/_raw/bodies/6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575.bin",
+      "sha256": "6dca2e0f2d30f59908f496254b28c3cf44a8637cc8078a6fc5ea32bbf53f4575",
+      "bytes": 3864
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/out/ASTOCK-026-1abd13e4899d/_raw/bodies/d9263b2827e5883a5a271290a4a1a1f1ffc326ce703739fa7c73741f245c0b73.bin",
+      "sha256": "d9263b2827e5883a5a271290a4a1a1f1ffc326ce703739fa7c73741f245c0b73",
+      "bytes": 31404
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/out/ASTOCK-026-1abd13e4899d/_raw/manifest.ndjson",
+      "sha256": "ac363aad3d9f00ff4f98fd680406c85be7d6b65629060d8d7d7ede3329367dac",
+      "bytes": 4786
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/out/ASTOCK-027-7840130ef884/2026-10-03/input_report/eastmoney/dividend_history/report.json",
+      "sha256": "e4e3c7d5a8c6b1f65c6ac74202bf08b2e542fb7027ad09518995621de22e1322",
+      "bytes": 6596
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/out/ASTOCK-027-7840130ef884/_raw/bodies/8b51aa04a0365999515d1012f4532fd379a2930cf2cf6662a6c0a7815d28f793.bin",
+      "sha256": "8b51aa04a0365999515d1012f4532fd379a2930cf2cf6662a6c0a7815d28f793",
+      "bytes": 4613
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/out/ASTOCK-028-db0c539c6969/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
+      "sha256": "5986f879911848a0dd40f92e7c228e3c52da386fbc3f783214ba7c62e3754a70",
+      "bytes": 6779
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004/y/out/ASTOCK-028-db0c539c6969/_raw/bodies/26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47.bin",
+      "sha256": "26538b4805317853a70ae91d97235245be2128d59d915053ed182f4e6d581d47",
+      "bytes": 3768
+    },
+    {
+      "path": "provider_validation/results/em-final-20261004-tests.xml",
+      "sha256": "d5f1b6af0101cd76be57c480986f4ed664ba034090f53a73d08fb1568473102b",
+      "bytes": 40477
+    },
+    {
+      "path": "provider_validation/results/em-original-20261004/1-shareholder.py.bin",
+      "sha256": "1653fb8083f9cafeccf6cb10e1e970c712bec858886403c3272450d09e8bb3a8",
+      "bytes": 4349
+    },
+    {
+      "path": "provider_validation/results/em-original-20261004/10-shareholder_count.yaml.bin",
+      "sha256": "4f7c23835f82e0ab648dc667df4f36bd3150959afac8f7421eea1cb1d1946ce1",
+      "bytes": 751
+    },
+    {
+      "path": "provider_validation/results/em-original-20261004/11-stock_fund_flow.yaml.bin",
+      "sha256": "d6f2ee39cec08dee0175d244280a9a3b7e8437dd37b2da241aa270c32e5a37ac",
+      "bytes": 694
+    },
+    {
+      "path": "provider_validation/results/em-original-20261004/12-dividend_event.yaml.bin",
+      "sha256": "a76b4e77c5b285ab0659ee2d7bf07214ada7d91997e553a21f451b9ac5d912cb",
+      "bytes": 719
+    },
+    {
+      "path": "provider_validation/results/em-original-20261004/2-fund_flow.py.bin",
+      "sha256": "4733bc4184018760a28a78e10fc8c144db681be9d50aad47158c5d62459bad56",
+      "bytes": 4437
+    },
+    {
+      "path": "provider_validation/results/em-original-20261004/3-dividend.py.bin",
+      "sha256": "6023c4a01ad9d18ab4a8948b124fcaa5a9aa9026d0d6e78e36f2919039c6c626",
+      "bytes": 5698
+    },
+    {
+      "path": "provider_validation/results/em-original-20261004/4-inputs.py.bin",
+      "sha256": "26d60ca1aadb70ed6b53f890c6a5ebcb1e4aaf4cdf730e82f08a47f120737be4",
+      "bytes": 34346
+    },
+    {
+      "path": "provider_validation/results/em-original-20261004/5-factory.py.bin",
+      "sha256": "667b2764c613ffc097850292bbdb3c4646a61e848266532cf1d70f96562ab129",
+      "bytes": 18796
+    },
+    {
+      "path": "provider_validation/results/em-original-20261004/6-providers.yaml.bin",
+      "sha256": "871705749fce1ccada8d77b3c0596e66d07f870fd45d95a9332b75a1c404d2af",
+      "bytes": 73090
+    },
+    {
+      "path": "provider_validation/results/em-original-20261004/7-shareholder_count.yaml.bin",
+      "sha256": "d325df1784c873bea73a1d907e9964e06c26e4d6b356dd6c16148837b57feccf",
+      "bytes": 923
+    },
+    {
+      "path": "provider_validation/results/em-original-20261004/8-stock_fund_flow.yaml.bin",
+      "sha256": "df3f21341463f3538a1f855ef19b7bbdb683405aaa65d5418c255023c18a429f",
+      "bytes": 736
+    },
+    {
+      "path": "provider_validation/results/em-original-20261004/9-dividend_event.yaml.bin",
+      "sha256": "67a2b02063cb9a891e3fb388048407cbc08b05ce8ae97deea6976d3904340d2e",
+      "bytes": 759
+    },
+    {
+      "path": "provider_validation/results/em-original-20261004/manifest.json",
+      "sha256": "5729bec61bd5aac9ef4c19f2d07e756221ae31a9fdccf04beb1cc6546adaa5b9",
+      "bytes": 19292
+    },
+    {
+      "path": "provider_validation/results/em-original-20261004/source-request-inventory.json",
+      "sha256": "a98dd6e062ac6ce5b04d99f9990d30221f7a3833ca47fd7e2f9f4023b99794b0",
+      "bytes": 12871
+    },
+    {
+      "path": "provider_validation/tests/replay_input_capabilities.py",
+      "sha256": "4e5c638fcdbee90b079787b0709d0b3e2d062138da38268ea0928920350cfe8d",
+      "bytes": 24782
+    },
+    {
+      "path": "src/stock_data_manage/cli.py",
+      "sha256": "582f5caedfc538a012d7a2f6e8cd7af3fe8b6fc9152e5b9e0a3fa2cb8810ae19",
+      "bytes": 14323
+    },
+    {
+      "path": "src/stock_data_manage/config/loader.py",
+      "sha256": "93bb55ab150c88751fe9a58a2b75737878c1b0f07233b8ec47009c4901bb11e9",
+      "bytes": 26090
+    },
+    {
+      "path": "src/stock_data_manage/pipeline/inputs.py",
+      "sha256": "88f2641ff4b3c49c3773875ab0794b701dc35181929879e2d2206bc469270db1",
+      "bytes": 37338
+    },
+    {
+      "path": "src/stock_data_manage/providers/akshare/boards.py",
+      "sha256": "2060f150831cebaf707ed5becedc35428bc41d4428bab31555ed1d2bf817d122",
+      "bytes": 12416
+    },
+    {
+      "path": "src/stock_data_manage/providers/baostock/industry.py",
+      "sha256": "16c41b379eecbd87f082bd042e27fad7f3d8d77b5bfc6a3e8a286209b068494a",
+      "bytes": 10837
+    },
+    {
+      "path": "src/stock_data_manage/providers/baostock/session.py",
+      "sha256": "70ce19cdde1d6a8ed0c3d3db29caa28d1d8069826136ab6dd7fb6a2ef8c7b832",
+      "bytes": 15771
+    },
+    {
+      "path": "src/stock_data_manage/providers/contracts.py",
+      "sha256": "a4b16abc7e3686a4eb2791dcd4545fb2404e0214bf32e20db19d2582d39ea447",
+      "bytes": 5153
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/dividend.py",
+      "sha256": "5706a8cdb37eeeb8f66cb033a3091dd1b6ec1ed83d72d0f9fbeb8f5c75d9649b",
+      "bytes": 6407
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/fund_flow.py",
+      "sha256": "0cf655efa0854d18651bb4f04f985f0f210b81a6d9eff065604d235ed8f75280",
+      "bytes": 5046
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/limit_pool.py",
+      "sha256": "4662fdfb95bd01a7d5657816ea1d9d974c8778b0f1b862787075aa56cfd10aef",
+      "bytes": 1184
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/realtime.py",
+      "sha256": "6e09d2a5014cf316c4d1e26e913a44d5c2fbad95fb44d95cba159ef881f03bca",
+      "bytes": 16746
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/shareholder.py",
+      "sha256": "4c9d80f4d51845ac5541c42275f44f2a18643db5e9ccb705a3e16168f8db44c1",
+      "bytes": 4865
+    },
+    {
+      "path": "src/stock_data_manage/providers/sina/calendar.py",
+      "sha256": "3d114045f960bfcc94ade1ee03e4d25ebdf6980ba68aa2d0a2236bed78aaef05",
+      "bytes": 1388
+    },
+    {
+      "path": "src/stock_data_manage/providers/tencent/daily.py",
+      "sha256": "487a14fcbfc47146d6d5fd291fbf41667aba435e5fed22ea1ef61ded513fcaa7",
+      "bytes": 9941
+    },
+    {
+      "path": "src/stock_data_manage/providers/tencent/minute.py",
+      "sha256": "ff5cf1e91327bcab2e072bcfae9f1f77dca71a84ba26e456c26580a4d59d9cc1",
+      "bytes": 4709
+    },
+    {
+      "path": "src/stock_data_manage/providers/tencent/snapshot.py",
+      "sha256": "3278cadac776fe8cfe5d02775a5bf8f53bc1cb96c595a5f418172f53047434bf",
+      "bytes": 5160
+    },
+    {
+      "path": "src/stock_data_manage/providers/transport.py",
+      "sha256": "7cf1c5f1f9b526e54e7d82e60b95b35e1f8f91e60effc31d74052f9273988b03",
+      "bytes": 16593
+    },
+    {
+      "path": "src/stock_data_manage/quality/normalization.py",
+      "sha256": "406a9374f921a367b8cab3e09905d9524f406582510e95feaf8ee7218fd015e1",
+      "bytes": 14340
+    },
+    {
+      "path": "src/stock_data_manage/routing/factory.py",
+      "sha256": "b12059360c1bdde6033d46f96cc0ebb203f5456b015d9f2aa31408e6c30c027a",
+      "bytes": 19699
+    },
+    {
+      "path": "src/stock_data_manage/storage/raw.py",
+      "sha256": "564c940feb99b358c41c5456c3142e7501b21505b5c2d8d88d811c53e145b752",
+      "bytes": 8487
+    },
+    {
+      "path": "tests/test_input_collection.py",
+      "sha256": "628d4064cc054760efc5b7e7198c34ba2019da2403707884ac7cef69c921dea1",
+      "bytes": 82138
+    }
+  ]
+}

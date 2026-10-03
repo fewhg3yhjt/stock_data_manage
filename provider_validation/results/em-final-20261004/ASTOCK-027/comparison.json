@@ -1,0 +1,107 @@
+{
+  "input_id": "ASTOCK-027",
+  "original_count": 28,
+  "selected_count": 27,
+  "excluded_count": 1,
+  "all_sdk_columns_and_rows_equal": true,
+  "all_csv_columns_and_rows_equal": true,
+  "requests_equal": true,
+  "original_csv": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\25_分红送转历史\\data.csv",
+  "original_csv_sha256": "a8997137c0fcfcdda419f8b70e9b780a10fab1d2081e5b001e56deb3ee87654b",
+  "original_probe": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\tests\\source_snapshots\\a-stock-data\\a_stock_missing_capabilities.py",
+  "original_probe_sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0",
+  "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\em-final-20261004\\ASTOCK-027\\original\\manifest.ndjson",
+  "original_manifest_sha256": "23cba76dd6d4a296cb9dbca7123087a8f200029455e12edba1fe53c910e354eb",
+  "provider_report": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\em-final-20261004\\ASTOCK-027\\candidate\\ASTOCK-027-f8b3bab13861\\2026-10-03\\input_report\\eastmoney\\dividend_history\\report.json",
+  "provider_report_sha256": "6e1c36dd83620d67bb5adfaec565ae3d6cbaf77345b22b9b5899b2b56cc6b8e3",
+  "request_comparison": [
+    {
+      "original": {
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?client=WEB&columns=ALL&filter=%28SECURITY_CODE%3D%22600519%22%29&js=%7B%22data%22%3A%28x%29%2C%22pages%22%3A%28tp%29%7D&pageNumber=1&pageSize=500&quoteColumns=&reportName=RPT_SHAREBONUS_DET&sortColumns=REPORT_DATE&sortTypes=-1&source=WEB",
+        "method": "GET",
+        "request_headers": {
+          "User-Agent": "python-requests/2.32.5",
+          "Accept-Encoding": "gzip, deflate, br, zstd",
+          "Accept": "*/*",
+          "Connection": "keep-alive"
+        },
+        "outcome": "response",
+        "status_code": 200,
+        "body_sha256": "e12fcabc65bb66c61ccc157b73b5e8ae1f7ad0707a78449ef239e72b58221a1e",
+        "error_type": null,
+        "request_options": {
+          "timeout": null,
+          "allow_redirects": true,
+          "trust_env": true,
+          "proxies": {},
+          "sdk_retry_policy": true
+        }
+      },
+      "provider": {
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?client=WEB&columns=ALL&filter=%28SECURITY_CODE%3D%22600519%22%29&js=%7B%22data%22%3A%28x%29%2C%22pages%22%3A%28tp%29%7D&pageNumber=1&pageSize=500&quoteColumns=&reportName=RPT_SHAREBONUS_DET&sortColumns=REPORT_DATE&sortTypes=-1&source=WEB",
+        "method": "GET",
+        "request_headers": {
+          "User-Agent": "python-requests/2.32.5",
+          "Accept-Encoding": "gzip, deflate, br, zstd",
+          "Accept": "*/*",
+          "Connection": "keep-alive"
+        },
+        "outcome": "response",
+        "status_code": 200,
+        "body_sha256": "e12fcabc65bb66c61ccc157b73b5e8ae1f7ad0707a78449ef239e72b58221a1e",
+        "error_type": null,
+        "request_options": {
+          "timeout": null,
+          "allow_redirects": true,
+          "trust_env": true,
+          "proxies": {},
+          "sdk_retry_policy": true
+        }
+      }
+    },
+    {
+      "original": {
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?client=WEB&columns=ALL&filter=%28SECURITY_CODE%3D%22600519%22%29&js=%7B%22data%22%3A%28x%29%2C%22pages%22%3A%28tp%29%7D&pageNumber=1&pageSize=500&quoteColumns=&reportName=RPT_SHAREBONUS_DET&sortColumns=REPORT_DATE&sortTypes=-1&source=WEB",
+        "method": "GET",
+        "request_headers": {
+          "User-Agent": "python-requests/2.32.5",
+          "Accept-Encoding": "gzip, deflate, br, zstd",
+          "Accept": "*/*",
+          "Connection": "keep-alive"
+        },
+        "outcome": "response",
+        "status_code": 200,
+        "body_sha256": "e12fcabc65bb66c61ccc157b73b5e8ae1f7ad0707a78449ef239e72b58221a1e",
+        "error_type": null,
+        "request_options": {
+          "timeout": null,
+          "allow_redirects": true,
+          "trust_env": true,
+          "proxies": {},
+          "sdk_retry_policy": true
+        }
+      },
+      "provider": {
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?client=WEB&columns=ALL&filter=%28SECURITY_CODE%3D%22600519%22%29&js=%7B%22data%22%3A%28x%29%2C%22pages%22%3A%28tp%29%7D&pageNumber=1&pageSize=500&quoteColumns=&reportName=RPT_SHAREBONUS_DET&sortColumns=REPORT_DATE&sortTypes=-1&source=WEB",
+        "method": "GET",
+        "request_headers": {
+          "User-Agent": "python-requests/2.32.5",
+          "Accept-Encoding": "gzip, deflate, br, zstd",
+          "Accept": "*/*",
+          "Connection": "keep-alive"
+        },
+        "outcome": "response",
+        "status_code": 200,
+        "body_sha256": "e12fcabc65bb66c61ccc157b73b5e8ae1f7ad0707a78449ef239e72b58221a1e",
+        "error_type": null,
+        "request_options": {
+          "timeout": null,
+          "allow_redirects": true,
+          "trust_env": true,
+          "proxies": {},
+          "sdk_retry_policy": true
+        }
+      }
+    }
+  ]
+}
