@@ -539,6 +539,7 @@ def test_tdx_adapter_rejects_rows_with_missing_ohlcv_fields() -> None:
 def test_tencent_snapshot_adapter_parses_observed_quote_line() -> None:
     parts = ["-"] * 38
     parts[1] = "贵州茅台"
+    parts[2] = "600519"
     parts[3:7] = ["1275.16", "1285.15", "1285.15", "34801"]
     parts[30] = "20260911150003"
     parts[33] = "1286.15"
@@ -585,7 +586,7 @@ def test_tencent_snapshot_batches_entire_requested_scope_without_dropping_remain
             parts[1] = "测试股票"
             parts[3:7] = ["10", "9", "9", "100"]
             parts[30], parts[33], parts[34], parts[37] = "20260930150000", "11", "8", "1000"
-            body = "\n".join(f'v_{s}="{"~".join(parts)}";' for s in batch).encode("gbk")
+            body = "\n".join(f'v_{s}="{"~".join(parts[:2] + [s[2:]] + parts[3:])}";' for s in batch).encode("gbk")
             return HttpResponse(200, {"content-type": "text/html; charset=GBK"}, body)
     transport = BatchTransport()
     provider = TencentSnapshotProvider(transport, minute_capability("tencent", "bulk_snapshot", 1))

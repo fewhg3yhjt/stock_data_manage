@@ -1,0 +1,24 @@
+dataset: shareholder_count
+
+rules:
+  - id: eastmoney-shareholder-count-v1
+    provider: eastmoney
+    endpoint: shareholder_count
+    exchange: XSHG
+    asset_type: stock
+    frequency: null
+    adjustment: none
+    field_mapping:
+      end_date: END_DATE
+      previous_end_date: PRE_END_DATE
+      holder_count: HOLDER_NUM
+      previous_holder_count: PRE_HOLDER_NUM
+      holder_count_change: HOLDER_NUM_CHANGE
+      holder_count_change_pct: HOLDER_NUM_RATIO
+      notice_date: HOLD_NOTICE_DATE
+      average_market_cap: AVG_MARKET_CAP
+      average_hold_num: AVG_HOLD_NUM
+      total_market_cap: TOTAL_MARKET_CAP
+      change_reason: CHANGE_REASON
+    status: pending_validation
+    version: eastmoney-shareholder-count-v1

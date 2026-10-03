@@ -30,7 +30,7 @@ def build_input_provider(contract, *, providers_path, client=None):
     """Bind explicit validation inputs to existing adapters, outside production routing."""
     if contract.implementation_status != "implemented_validation_only":
         raise ValueError("input adapter is not implemented for validation")
-    expected_methods = {"ASTOCK-002-daily": "fetch_window", "ASTOCK-002-5m": "fetch_recent",
+    expected_methods = {"ASTOCK-001": "fetch_snapshot", "ASTOCK-002-daily": "fetch_window", "ASTOCK-002-5m": "fetch_recent",
                         "ASTOCK-045": "fetch", "ASTOCK-070": "fetch",
                         "SDA-BOARD-001": "fetch_industry_list", "SDA-BOARD-002": "fetch_industry_daily",
                         "SDA-BOARD-003": "fetch_fund_flow", "SDA-BOARD-004": "fetch_fund_flow",
@@ -39,6 +39,14 @@ def build_input_provider(contract, *, providers_path, client=None):
         raise ValueError("input runtime method does not match its verified adapter")
     headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
                "Referer": "https://gu.qq.com/"}
+    if contract.input_id == "ASTOCK-001":
+        config = next(c for c in load_provider_configs(providers_path) if c.provider == "tencent" and c.endpoint == "bulk_snapshot")
+        quote_headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+                         "Accept": "*/*", "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8"}
+        capability = replace(config.capability(), endpoint=contract.endpoint, version="tencent-snapshot-input-v2")
+        return TencentSnapshotProvider(RequestsTransport(quote_headers, use_session=True), capability,
+                                       endpoint=contract.endpoint, timeout_seconds=20,
+                                       max_symbols_per_request=config.max_symbols_per_request)
     if contract.input_id == "ASTOCK-002-daily":
         provider = TencentDailyProvider(RequestsTransport(headers), adjustment=Adjustment.FORWARD)
         provider.endpoint, provider.capability_version = contract.endpoint, "tencent-window-input-v1"

@@ -29,13 +29,15 @@ Provider 接口验证资料统一位于 `provider_validation/`：`tests/` 保存
 
 `config/datasets/minute_bar_5m.yaml`、`limit_up_pool.yaml`、`trading_calendar.yaml` 分别定义三种输入的字段类型/单位/必填约束/主键；`config/normalization/` 下的同名文件定义来源映射与转换规则。`results/2026-10-03-yaml-input-collection-verification.json` 关联测试、最终回放、在线证据及当前代码/配置哈希。当前实现版能力清单位于 `coverage/successful-input-capabilities-20261003-implemented.csv/json`，保留第一阶段无日期版本。`results/sdk-snapshot-redaction-20261003.json` 记录本次生成的 SDK 源码快照脱敏，不改变 HTTP 响应与来源数据。
 
-腾讯采集频率与全市场快照配置见 `provider_validation/docs/2026-10-03-tencent-collection-scheduling.md`；独立四种策略写在既有 `collection.yaml`，输入契约引用具体策略。当前周期采集只生成候选，快照迁移和独立1分钟输入尚未完成。最终离线证据位于 `results/input-scheduling-accepted-20261003/`，测试和总索引位于 `results/2026-10-03-tencent-scheduling-tests-final.xml` 与同前缀 `verification.json`，能力清单采用独立的 `coverage/successful-input-capabilities-20261003-scheduling-release.csv/json` 版本。原 `schedules.yaml` 固定任务保留，未启动后台进程或管理台。
+腾讯采集频率与全市场快照配置的历史实施见 `provider_validation/docs/2026-10-03-tencent-collection-scheduling.md`；独立四种策略写在既有 `collection.yaml`，输入契约引用具体策略。快照后续候选迁移已完成，独立1分钟输入仍未完成；周期采集不启用生产发布。历史离线证据位于 `results/input-scheduling-accepted-20261003/`，测试和总索引位于 `results/2026-10-03-tencent-scheduling-tests-final.xml` 与同前缀 `verification.json`，原能力清单保留独立的 `coverage/successful-input-capabilities-20261003-scheduling-release.csv/json` 版本。原 `schedules.yaml` 固定任务保留，未启动后台进程或管理台。
 
 其他接口转换现状与建议下一批范围见 `provider_validation/docs/2026-10-04-input-transition-review.md`；离线调查代码和逐项引用哈希保存于 `results/input-transition-review-20261004/audit.py`、`review.json`。调查不改变现有Provider、运行时配置或正式路由资格。
 
 同花顺四项既有接口的后续实施见 `provider_validation/docs/2026-10-04-ths-input-collection.md`。原 `providers/akshare/boards.py` 通过现有 YAML 映射保留旧返回，同时提供 SDK 原列给通用候选流程；`industry_directory.yaml` 为新增目录字段模板，行业日线/资金流复用原模板，三个同名归一化文件补来源映射。原 CLI 通过 `--context-file` 接收板块与依赖参数。修改前源码存于 `results/ths-original-20261004/`，最终对照、回归和索引存于 `results/ths-final-20261004/` 及同前缀测试/验证文件，均不属于生产数据。
 
 BaoStock 后续两项转换见 `provider_validation/docs/2026-10-04-baostock-input-collection.md`。原 `industry.py` 的两查询方法分别输出证券状态快照和行业归属，保留旧默认返回；原 `session.py` 承担 SDK 解码证据回放、缓存复用、查询间隔和会话串行。新增 `datasets/security_snapshot.yaml` 及两项对应归一化文件，复用原行业模板。原源码、最终验证和 CLI 证据分别位于 `results/bao-original-20261004/`、`bao-final-20261004/` 和 `bao-cli-20261004/`；SDK 原始TCP帧不可见。
+
+腾讯快照后续转换见 `provider_validation/docs/2026-10-04-tencent-snapshot-input-collection.md`。修改原 `snapshot.py`，保留旧行情行并提供原脚本字段给现有 `realtime_quote.yaml` 的YAML映射；原 `RequestsTransport` 增加可选择的复用Session，候选工厂保留原成功快照请求行为，K线默认方式不变。已有调度器仍以在线批量验证待完成门禁阻断自动快照。原源码/调查、最终对照及真实CLI证据分别位于 `results/tencent-original-20261004/`、`tencent-final-20261004-v2/` 和 `tencent-cli-20261004/`，完整测试和哈希索引为同前缀XML/verification.json；最终目录的 `verify.py` 独立核对来源、候选、代码配置及证据哈希。初版final证据保留，第二版只修正合成夹具字节长度。
 
 `.gitattributes` 对本次新证据目录禁用 Git 换行转换，并固定新增实现/模板的 LF 格式，避免提交和检出改变证据字节及其 SHA-256 引用；不更改旧证据属性。
 
@@ -55,7 +57,7 @@ BaoStock 后续两项转换见 `provider_validation/docs/2026-10-04-baostock-inp
 | `providers/contracts.py` | HTTP 响应、失败分类、返回窗口和 Provider Contract |
 | `providers/transport.py` | 公共 HTTP 传输、共享请求组限速、单项输入会话捕获与严格回放、快照和 TDX 行解析；保留来源会话/代理并复用原验证重试策略 |
 | `providers/tencent/daily.py` | Tencent 既有日线采集与明确日期窗口的前复权候选输入；共享源码合同的主机回退 |
-| `providers/tencent/snapshot.py` | Tencent 指定证券分批快照，保留归档 GBK 解码；全市场在线验证待完成 |
+| `providers/tencent/snapshot.py` | Tencent 指定证券分批快照、原脚本来源字段、代码/格式/重复验证及请求范围覆盖；GBK解码和旧行情行保留，全市场在线验证待完成 |
 | `providers/tencent/minute.py` | Tencent 原生 1m 分钟线与最近 5m 候选输入 |
 | `providers/sina/calendar.py` | 原 SDK 新浪交易日历来源适配，返回明确的正向日期并复用现有日历协议 |
 | `providers/eastmoney/limit_pool.py` | 原 SDK 东财涨停池日期快照，保留中文来源字段 |

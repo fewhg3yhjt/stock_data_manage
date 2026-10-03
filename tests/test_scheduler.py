@@ -124,7 +124,7 @@ def test_snapshot_switch_to_minutes_keeps_full_scope_and_migration_gate(tmp_path
     job = next(j for j in plan_input_collection(root, now=stamp(9, 40), trading_dates=[DAY], securities=records)
                if j.input_id == "ASTOCK-001")
     assert job.universe == "all_stock" and job.symbols == ("sh600519",)
-    assert (job.status, job.reason) == ("blocked", "migration_pending")
+    assert (job.status, job.reason) == ("blocked", "snapshot_bulk_live_validation_pending")
 
 
 def test_minute_capacity_missing_scope_and_scope_limits_block_execution(tmp_path):

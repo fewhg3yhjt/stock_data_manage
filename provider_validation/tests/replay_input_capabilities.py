@@ -20,9 +20,10 @@ def main():
     parser.add_argument("--verify-scheduling", action="store_true", help="also preserve scheduler and quote batch offline evidence")
     parser.add_argument("--verify-ths-inputs", action="store_true", help="verify only the four existing THS board inputs")
     parser.add_argument("--verify-bao-inputs", action="store_true", help="verify only the two existing BaoStock snapshot inputs")
+    parser.add_argument("--verify-tencent-snapshot", action="store_true", help="verify snapshot migration and existing Tencent Kline inputs")
     args = parser.parse_args()
-    if sum((args.verify_ths_inputs, args.verify_bao_inputs, args.verify_scheduling)) > 1:
-        parser.error("THS, BaoStock and scheduling verification are separate scopes")
+    if sum((args.verify_ths_inputs, args.verify_bao_inputs, args.verify_scheduling, args.verify_tencent_snapshot)) > 1:
+        parser.error("THS, BaoStock, Tencent snapshot and scheduling verification are separate scopes")
     args.output_root = args.output_root.resolve()
     if not args.output_root.is_relative_to(ROOT / "provider_validation/results"):
         parser.error("verification outputs must be under provider_validation/results")
@@ -54,19 +55,48 @@ def main():
         forbidden_network()
 
     with patch("requests.adapters.HTTPAdapter.send", forbidden_network), patch("socket.socket.connect", guarded_connect):
-        cases = checks.BAO_CASES if args.verify_bao_inputs else checks.THS_CASES if args.verify_ths_inputs else checks.CASES
+        cases = ([("ASTOCK-001", checks.QUOTE_CONTEXT, checks.QUOTE_ARCHIVE, 1)] + checks.CASES[:2]
+                 if args.verify_tencent_snapshot else checks.BAO_CASES if args.verify_bao_inputs else
+                 checks.THS_CASES if args.verify_ths_inputs else checks.CASES)
         for index, (input_id, context, manifest, count) in enumerate(cases):
-            directory = args.output_root / (str(index + 1) if args.verify_ths_inputs or args.verify_bao_inputs else input_id)
+            directory = args.output_root / (str(index + 1) if args.verify_ths_inputs or args.verify_bao_inputs or args.verify_tencent_snapshot else input_id)
             validator = (checks.test_bao_archived_inputs_preserve_sdk_rows_and_coverage if args.verify_bao_inputs else
                          checks.test_ths_archived_inputs_execute_source_yaml if args.verify_ths_inputs else
                          checks.test_archived_inputs_execute_yaml_and_preserve_evidence)
-            validator(directory, None, input_id, context, manifest, count)
+            if input_id == "ASTOCK-001":
+                summary["original_vs_provider"].append(checks.compare_quote_original(directory))
+            else:
+                validator(directory, None, input_id, context, manifest, count)
             report_path = next(directory.rglob("report.json"))
             report = json.loads(report_path.read_text(encoding="utf-8"))
             summary["inputs"].append({"input_id": input_id, "report_path": report_path.relative_to(ROOT).as_posix(),
                 "report_sha256": hashlib.sha256(report_path.read_bytes()).hexdigest(), "source_manifest": manifest.relative_to(ROOT).as_posix(),
                 "source_manifest_sha256": hashlib.sha256(manifest.read_bytes()).hexdigest(), "row_count": count,
                 "scope": report["parameters"], "code_version": report["code_version"], "result": "passed"})
+        if args.verify_tencent_snapshot:
+            summary["known_differences"] = ["快照原脚本、CSV、请求头/20秒超时/会话代理/原始响应和旧Provider字段均对照。",
+                "真实证据仅sh600519单证券；203只沪深北证券的100/100/3分批是合成离线夹具。",
+                "as_of仅作为返回日期校验，不是历史查询；来源报价时间不改写为调度时间。",
+                "量额单位未独立认证，原值和raw保留，标准量额列为空。",
+                "在线分支、会话重用、保守重试配置、3秒请求间隔与缓存仅用注入夹具验证；没有新增实时请求。",
+                "盘后按天策略仍关闭，在线全量批次/覆盖/容量未完成，配置开关不能绕过门禁。"]
+            checks.test_quote_multi_batch_yaml_and_partial_scope(args.output_root / "b", None)
+            summary["batch_fixture"] = {"mode": "synthetic offline fixture", "requested": 203, "batch_sizes": [100, 100, 3],
+                                        "partial_output": 1, "partial_denominator": 2, "partial_missing": ["sz300750"], "result": "passed"}
+            summary["negative_checks"] = []
+            mutations = [("duplicate", "schema_changed"), ("identity", "schema_changed"), ("timestamp", "schema_changed"),
+                ("stale", "NormalizationError"), ("numeric", "NormalizationError"), ("unexpected", "schema_changed"),
+                ("html", "schema_changed"), ("empty", "temporary_empty"), ("http_429", "HTTPError"),
+                ("transport", "ConnectionError"), ("corrupt_hash", "ValueError")]
+            for index, (mutation, expected) in enumerate(mutations):
+                directory = args.output_root / ("f" + str(index + 1))
+                checks.test_quote_failure_retains_evidence(directory, None, mutation, expected)
+                failure_path = next(directory.rglob("report.json"))
+                summary["negative_checks"].append({"mutation": mutation, "expected_failure_class": expected, "result": "passed",
+                    "report_path": failure_path.relative_to(ROOT).as_posix(), "report_sha256": hashlib.sha256(failure_path.read_bytes()).hexdigest()})
+            checks.test_quote_yaml_mapping_selection_and_scope_restrictions(args.output_root / "y", None)
+            checks.test_quote_injected_session_pacing_retry_and_cache(args.output_root / "p", None)
+            summary["session_pacing_cache"] = {"mode": "injected Session fixture; not live source validation", "result": "passed"}
         if args.verify_bao_inputs:
             summary["known_differences"] = ["SDK解码载荷已精确归档；TCP帧、URL、HTTP头和SDK内部物理请求不可见。",
                 "证券快照保留原筛选的5223只证券；行业归属5221行、缺失2只，不能宣称全量分类。",
@@ -118,7 +148,7 @@ def main():
                                        for left, right in zip(original, report["responses"])],
                 "original_manifest": (directory / "original/manifest.ndjson").relative_to(ROOT).as_posix(),
                 "provider_report": next((directory / "adapter").rglob("report.json")).relative_to(ROOT).as_posix()})
-        for input_id, filename in ([] if args.verify_ths_inputs or args.verify_bao_inputs else [("ASTOCK-045", "43_东财涨停池"), ("ASTOCK-070", "68_交易日历")]):
+        for input_id, filename in ([] if args.verify_ths_inputs or args.verify_bao_inputs or args.verify_tencent_snapshot else [("ASTOCK-045", "43_东财涨停池"), ("ASTOCK-070", "68_交易日历")]):
             csv_path = ROOT / "provider_validation/results/live-probes/rate-limited-all-20261003" / filename / "data.csv"
             summary["original_vs_provider"].append({"input_id": input_id, "original_parsed_csv": csv_path.relative_to(ROOT).as_posix(),
                 "original_parsed_sha256": hashlib.sha256(csv_path.read_bytes()).hexdigest(),
@@ -162,7 +192,8 @@ def verify_scheduling(output_root):
     class FixtureTransport:
         def get(self, url, *, params, timeout_seconds):
             symbols = url.split("q=", 1)[1].split(",")
-            payload = b"\n".join(body.strip().replace(b"v_sh600519=", ("v_"+symbol+"=").encode()) for symbol in symbols)
+            payload = b"\n".join(body.strip().replace(b"v_sh600519=", ("v_"+symbol+"=").encode())
+                                  .replace(b"~600519~", ("~"+symbol[2:]+"~").encode()) for symbol in symbols)
             saved = store.write_bytes(payload, dataset="offline_quote_fixture", provider="tencent", endpoint="bulk_snapshot",
                 fetched_at=datetime.now(timezone.utc), attempt_id="batch-"+str(len(requests)))
             requests.append({"url": url, "params": params, "timeout_seconds": timeout_seconds,

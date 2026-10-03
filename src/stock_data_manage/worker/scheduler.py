@@ -100,6 +100,9 @@ def plan_input_collection(config_root: str | Path, *, now: datetime,
             status, reason = "disabled", "scheduling_enabled=false"
         elif contract.implementation_status != "implemented_validation_only":
             status, reason = "blocked", contract.implementation_status
+        elif contract.input_id == "ASTOCK-001":
+            # Candidate migration is complete; no live bulk/capacity evidence authorizes scheduling.
+            status, reason = "blocked", "snapshot_bulk_live_validation_pending"
         elif not selected:
             status, reason = "blocked", "explicit security scope is missing"
         elif profile.max_symbols is not None and len(selected) > profile.max_symbols:

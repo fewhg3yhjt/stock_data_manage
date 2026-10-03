@@ -1,0 +1,1663 @@
+{
+  "validation_time_utc": "2026-10-03T20:14:36.224639+00:00",
+  "mode": "offline_replay",
+  "external_network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "original_inventory": {
+    "path": "provider_validation/results/tencent-original-20261004/manifest.json",
+    "sha256": "5e202286812e79868135d498305b029f73c84ba57bfcac766f010a802126f7d6"
+  },
+  "comparison": {
+    "path": "provider_validation/results/tencent-final-20261004/comparison.json",
+    "sha256": "2e8ef8e5c665fdb50ac30cf19f5234ed9f37df3f8cbd3ffaf440be9ed6428b49"
+  },
+  "tests": {
+    "path": "provider_validation/results/tencent-final-20261004-tests.xml",
+    "sha256": "5cb22d5a0309cc9916cb36e79304ab683225179222ae40dce0921763a866ba08",
+    "passed": 270
+  },
+  "cli": {
+    "path": "provider_validation/results/tencent-cli-20261004/success/cli-validation.json",
+    "sha256": "2e4d86b3f18845fc5bec3093f743ebf65c709b2c78a52a89fcab7b940bf47499"
+  },
+  "real_source_tested_scope": [
+    "sh600519"
+  ],
+  "quote_source_sha256": "6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695",
+  "row_counts": [
+    1,
+    14,
+    96
+  ],
+  "synthetic_batch": {
+    "mode": "synthetic offline fixture",
+    "requested": 203,
+    "batch_sizes": [
+      100,
+      100,
+      3
+    ],
+    "partial_output": 1,
+    "partial_denominator": 2,
+    "partial_missing": [
+      "sz300750"
+    ],
+    "result": "passed"
+  },
+  "negative_checks": [
+    {
+      "mutation": "duplicate",
+      "expected_failure_class": "schema_changed",
+      "result": "passed",
+      "report_path": "provider_validation/results/tencent-final-20261004/f1/out/ASTOCK-001-6ee5277ba5f5/2026-10-03/input_report/tencent/single_quote/report.json",
+      "report_sha256": "b67abc152fd52645e09f04aa77fb66999a82bbd27ecea907b691d3da2c5ebc4e"
+    },
+    {
+      "mutation": "identity",
+      "expected_failure_class": "schema_changed",
+      "result": "passed",
+      "report_path": "provider_validation/results/tencent-final-20261004/f2/out/ASTOCK-001-3c8fd7a4ce64/2026-10-03/input_report/tencent/single_quote/report.json",
+      "report_sha256": "0e6a225ccee34f347d32c6e682abe5cdbb2c003835b833fb48f5011102d36741"
+    },
+    {
+      "mutation": "timestamp",
+      "expected_failure_class": "schema_changed",
+      "result": "passed",
+      "report_path": "provider_validation/results/tencent-final-20261004/f3/out/ASTOCK-001-73c40c9a3591/2026-10-03/input_report/tencent/single_quote/report.json",
+      "report_sha256": "d99aba667c4a7eec22c240d893ad9675ad4fa8fc79d843e9d53176e9d2ee873e"
+    },
+    {
+      "mutation": "stale",
+      "expected_failure_class": "NormalizationError",
+      "result": "passed",
+      "report_path": "provider_validation/results/tencent-final-20261004/f4/out/ASTOCK-001-4e827367ef85/2026-10-03/input_report/tencent/single_quote/report.json",
+      "report_sha256": "a0d8a509e08155eac22fdd6ea7c3ac1a2db5d83ca732875ad3f02048d1090477"
+    },
+    {
+      "mutation": "numeric",
+      "expected_failure_class": "NormalizationError",
+      "result": "passed",
+      "report_path": "provider_validation/results/tencent-final-20261004/f5/out/ASTOCK-001-a1f0472d5fa9/2026-10-03/input_report/tencent/single_quote/report.json",
+      "report_sha256": "c92837f3da813a58d839f63ffddd6b9399b15d563a23aaad6b7b0467b3554c12"
+    },
+    {
+      "mutation": "unexpected",
+      "expected_failure_class": "schema_changed",
+      "result": "passed",
+      "report_path": "provider_validation/results/tencent-final-20261004/f6/out/ASTOCK-001-0e91eb9e1790/2026-10-03/input_report/tencent/single_quote/report.json",
+      "report_sha256": "f1526a952de3bcdbe59cf2a77718ed80134827b0e81e722c8b8b511125e922e9"
+    },
+    {
+      "mutation": "html",
+      "expected_failure_class": "schema_changed",
+      "result": "passed",
+      "report_path": "provider_validation/results/tencent-final-20261004/f7/out/ASTOCK-001-ec1ffa70a453/2026-10-03/input_report/tencent/single_quote/report.json",
+      "report_sha256": "d29969a76259787c1ce61e8d67b29b87426c781fc4295eda3a12190e98c888c8"
+    },
+    {
+      "mutation": "empty",
+      "expected_failure_class": "temporary_empty",
+      "result": "passed",
+      "report_path": "provider_validation/results/tencent-final-20261004/f8/out/ASTOCK-001-725e78849f6e/2026-10-03/input_report/tencent/single_quote/report.json",
+      "report_sha256": "0284936dbf05b5b71eb75b079fd7214350302cd9e102ddf981e4477a95b53d49"
+    },
+    {
+      "mutation": "http_429",
+      "expected_failure_class": "HTTPError",
+      "result": "passed",
+      "report_path": "provider_validation/results/tencent-final-20261004/f9/out/ASTOCK-001-2a88077de8ca/2026-10-03/input_report/tencent/single_quote/report.json",
+      "report_sha256": "fdf91f2ed0a9c03fb47e2b78c983b612f44b99cd589be9ac80c5f74a5493dbb2"
+    },
+    {
+      "mutation": "transport",
+      "expected_failure_class": "ConnectionError",
+      "result": "passed",
+      "report_path": "provider_validation/results/tencent-final-20261004/f10/out/ASTOCK-001-732d6a2a8ecf/2026-10-03/input_report/tencent/single_quote/report.json",
+      "report_sha256": "c48dc000c96e6a9b77bb0937e7927a534187447c38abcd6b71a0340c12492618"
+    },
+    {
+      "mutation": "corrupt_hash",
+      "expected_failure_class": "ValueError",
+      "result": "passed",
+      "report_path": "provider_validation/results/tencent-final-20261004/f11/out/ASTOCK-001-7b4ad9f7e692/2026-10-03/input_report/tencent/single_quote/report.json",
+      "report_sha256": "9286310389c007b0682269a38087cbaf373344da274fd3fdf95af6dae5eb9870"
+    }
+  ],
+  "executable_inputs": [
+    {
+      "input_id": "ASTOCK-001",
+      "provider_class": "TencentSnapshotProvider",
+      "method": "fetch_snapshot"
+    },
+    {
+      "input_id": "ASTOCK-002-5m",
+      "provider_class": "TencentMinuteProvider",
+      "method": "fetch_recent"
+    },
+    {
+      "input_id": "ASTOCK-002-daily",
+      "provider_class": "TencentDailyProvider",
+      "method": "fetch_window"
+    },
+    {
+      "input_id": "ASTOCK-045",
+      "provider_class": "EastMoneyLimitUpProvider",
+      "method": "fetch"
+    },
+    {
+      "input_id": "ASTOCK-070",
+      "provider_class": "SinaTradingCalendarProvider",
+      "method": "fetch"
+    },
+    {
+      "input_id": "SDA-BOARD-001",
+      "provider_class": "AkShareBoardProvider",
+      "method": "fetch_industry_list"
+    },
+    {
+      "input_id": "SDA-BOARD-002",
+      "provider_class": "AkShareBoardProvider",
+      "method": "fetch_industry_daily"
+    },
+    {
+      "input_id": "SDA-BOARD-003",
+      "provider_class": "AkShareBoardProvider",
+      "method": "fetch_fund_flow"
+    },
+    {
+      "input_id": "SDA-BOARD-004",
+      "provider_class": "AkShareBoardProvider",
+      "method": "fetch_fund_flow"
+    },
+    {
+      "input_id": "SDA-BOARD-005",
+      "provider_class": "BaoStockIndustryMembershipProvider",
+      "method": "fetch_snapshot"
+    },
+    {
+      "input_id": "SDA-BOARD-006",
+      "provider_class": "BaoStockIndustryMembershipProvider",
+      "method": "fetch_snapshot"
+    }
+  ],
+  "other_input_contracts_unchanged": true,
+  "dataset_template_unchanged": true,
+  "eastmoney_rule_unchanged": true,
+  "artifacts": [
+    {
+      "path": "provider_validation/results/tencent-cli-20261004/context.json",
+      "sha256": "0096f87fca035550cf6310e20cc71b7739047d213a3063227f074c90199f8290"
+    },
+    {
+      "path": "provider_validation/results/tencent-cli-20261004/initial-invocation-failure.json",
+      "sha256": "01b2a328134f2e9d1b9687e02c0e42c3850685e3422a53d2c5ad51f0a90af564"
+    },
+    {
+      "path": "provider_validation/results/tencent-cli-20261004/stderr.txt",
+      "sha256": "d05117a1fa3a3b0d8761561a31054a02122b52a7621f68ff819d58e0622367ea"
+    },
+    {
+      "path": "provider_validation/results/tencent-cli-20261004/stdout.json",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "provider_validation/results/tencent-cli-20261004/success/cli-validation.json",
+      "sha256": "2e4d86b3f18845fc5bec3093f743ebf65c709b2c78a52a89fcab7b940bf47499"
+    },
+    {
+      "path": "provider_validation/results/tencent-cli-20261004/success/out/ASTOCK-001-77e3d82e81f4/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "f2a716d32801bb4763a8d890c5ad8f669a3cdc32bcecb22c426c71fcbe352c44"
+    },
+    {
+      "path": "provider_validation/results/tencent-cli-20261004/success/out/ASTOCK-001-77e3d82e81f4/2026-10-03/realtime_quote/tencent/single_quote/mapped-rows.json",
+      "sha256": "54f3714beda453604635ff8785da530acbd177f1b78ce51c999ac7235111107d"
+    },
+    {
+      "path": "provider_validation/results/tencent-cli-20261004/success/out/ASTOCK-001-77e3d82e81f4/2026-10-03/source_rows/tencent/single_quote/source-rows.json",
+      "sha256": "901877bb0190b2eeeb09dcf34188e1e82172e3d70b133ecf1ad8e8917d46ebca"
+    },
+    {
+      "path": "provider_validation/results/tencent-cli-20261004/success/out/ASTOCK-001-77e3d82e81f4/_raw/bodies/6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695.bin",
+      "sha256": "6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695"
+    },
+    {
+      "path": "provider_validation/results/tencent-cli-20261004/success/out/ASTOCK-001-77e3d82e81f4/_raw/manifest.ndjson",
+      "sha256": "ed86948a8efaa89898b86008b4398c9a0349a73c57df59ef0ae90810269f97b5"
+    },
+    {
+      "path": "provider_validation/results/tencent-cli-20261004/success/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "provider_validation/results/tencent-cli-20261004/success/stdout.json",
+      "sha256": "788c6075738b5da3b6e3f4cb77cad8184ee16bd915deba696252787b64abd9dd"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/1/adapter/ASTOCK-001-f23b3890e0bc/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "a33dd9477feda947c284943fa07803f3804a1c90ba569abe3ead10dbe92b44fe"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/1/adapter/ASTOCK-001-f23b3890e0bc/2026-10-03/realtime_quote/tencent/single_quote/mapped-rows.json",
+      "sha256": "54f3714beda453604635ff8785da530acbd177f1b78ce51c999ac7235111107d"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/1/adapter/ASTOCK-001-f23b3890e0bc/2026-10-03/source_rows/tencent/single_quote/source-rows.json",
+      "sha256": "901877bb0190b2eeeb09dcf34188e1e82172e3d70b133ecf1ad8e8917d46ebca"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/1/adapter/ASTOCK-001-f23b3890e0bc/_raw/bodies/6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695.bin",
+      "sha256": "6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/1/adapter/ASTOCK-001-f23b3890e0bc/_raw/manifest.ndjson",
+      "sha256": "1a58afe781dcdc77d9d7bc875927f770f1183cd431e1c965f90005a66c410826"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/1/comparison.json",
+      "sha256": "f0f3880872512c3398e51677fbc06ebc301df504388aab28379db4911f5282fc"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/1/original/2026-10-03/original_parsed/tencent/single_quote/parsed.json",
+      "sha256": "ae41c4f83438fef63074b60830241436dfdaceb8f2259fbc71baafe73906f685"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/1/original/bodies/6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695.bin",
+      "sha256": "6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/1/original/manifest.ndjson",
+      "sha256": "b0bd2bf2019abcf814d1445b79f3f1f87d7dd205301988ee7ce73cd4f58e7b86"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/2/ASTOCK-002-daily-fc4f7e50d5e9/2026-10-03/daily_bar/tencent/kline_daily/mapped-rows.json",
+      "sha256": "dbf2dc37354f6a0ae5fca46275a5e64c7ff2989147da9a3b17f26cca0a53ec0a"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/2/ASTOCK-002-daily-fc4f7e50d5e9/2026-10-03/input_report/tencent/kline_daily/report.json",
+      "sha256": "a4b1c2a2eef0a85eca78cfec98acb0a2d3ecf921c02f815220215049f382956c"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/2/ASTOCK-002-daily-fc4f7e50d5e9/2026-10-03/source_rows/tencent/kline_daily/source-rows.json",
+      "sha256": "bf8410ba6a4cdceceb5bf8a9a101c7628a41fb79322e7b63bcac3662e1d222b0"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/2/ASTOCK-002-daily-fc4f7e50d5e9/_raw/bodies/c3c0b821215bce77b8551f716c50f0324aadc39af7c9dc17538b0bf94b59845b.bin",
+      "sha256": "c3c0b821215bce77b8551f716c50f0324aadc39af7c9dc17538b0bf94b59845b"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/2/ASTOCK-002-daily-fc4f7e50d5e9/_raw/manifest.ndjson",
+      "sha256": "bbb69187f112bd5cc6165dcb3787e8824fa85e3494c8fdcb26d108efb87578d7"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/3/ASTOCK-002-5m-2f16f12ec1ce/2026-10-03/input_report/tencent/kline_5m/report.json",
+      "sha256": "3c98bf9b39f79f19d5f83e194de9e0382b8b9a3f398fb097a65cc37d973cee77"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/3/ASTOCK-002-5m-2f16f12ec1ce/2026-10-03/minute_bar_5m/tencent/kline_5m/mapped-rows.json",
+      "sha256": "bb3c999c8ae6d29bd870c2c091e0a3d0d396eba8bf77468de31db8ff33c9bf1e"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/3/ASTOCK-002-5m-2f16f12ec1ce/2026-10-03/source_rows/tencent/kline_5m/source-rows.json",
+      "sha256": "9ca0ab909641717eebdc06bedcead0e6d154a05eed16b8d1829fcd4b94874e80"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/3/ASTOCK-002-5m-2f16f12ec1ce/_raw/bodies/1e8158ec28e8e3262a284fd3d092e1c2bd33e3777cb057ddab140633fa8954cd.bin",
+      "sha256": "1e8158ec28e8e3262a284fd3d092e1c2bd33e3777cb057ddab140633fa8954cd"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/3/ASTOCK-002-5m-2f16f12ec1ce/_raw/manifest.ndjson",
+      "sha256": "28404c5e3e38084be3d379fbf60f120c4b6bf61f07a84187362f3511844d43a2"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/b/fixture/bodies/40fbea263c0e376387ca08966b3ab3d96994f4756955403aa49e31fcdf3af413.bin",
+      "sha256": "40fbea263c0e376387ca08966b3ab3d96994f4756955403aa49e31fcdf3af413"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/b/fixture/bodies/6e215214f01658199c9fd96cdada22f29a215abe7a716b8978d433867c4a3461.bin",
+      "sha256": "6e215214f01658199c9fd96cdada22f29a215abe7a716b8978d433867c4a3461"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/b/fixture/bodies/cee292825ac668ef99c670199b015faeb4c18bea207a1026cbf695d2c382ad38.bin",
+      "sha256": "cee292825ac668ef99c670199b015faeb4c18bea207a1026cbf695d2c382ad38"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/b/fixture/manifest.ndjson",
+      "sha256": "ebc107719e33f68bd739ae6b685dab9d71b6dc5ea4f1ea88fe6a96f23d7b12d1"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/b/out/ASTOCK-001-ecd673015f9d/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "aba2d21b98578304b4911815895234aaf65d418e25b371719e27946036dfd050"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/b/out/ASTOCK-001-ecd673015f9d/2026-10-03/realtime_quote/tencent/single_quote/mapped-rows.json",
+      "sha256": "953f29c31f4d561d460c4134598cfb743b5a7f70a433b4cf41b15a8a2a2435e9"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/b/out/ASTOCK-001-ecd673015f9d/2026-10-03/source_rows/tencent/single_quote/source-rows.json",
+      "sha256": "47fdc87485e34a7160b59afd066e1e621131a2121c295e7f0cf6abfa252b12fc"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/b/out/ASTOCK-001-ecd673015f9d/_raw/bodies/40fbea263c0e376387ca08966b3ab3d96994f4756955403aa49e31fcdf3af413.bin",
+      "sha256": "40fbea263c0e376387ca08966b3ab3d96994f4756955403aa49e31fcdf3af413"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/b/out/ASTOCK-001-ecd673015f9d/_raw/bodies/6e215214f01658199c9fd96cdada22f29a215abe7a716b8978d433867c4a3461.bin",
+      "sha256": "6e215214f01658199c9fd96cdada22f29a215abe7a716b8978d433867c4a3461"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/b/out/ASTOCK-001-ecd673015f9d/_raw/bodies/cee292825ac668ef99c670199b015faeb4c18bea207a1026cbf695d2c382ad38.bin",
+      "sha256": "cee292825ac668ef99c670199b015faeb4c18bea207a1026cbf695d2c382ad38"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/b/out/ASTOCK-001-ecd673015f9d/_raw/manifest.ndjson",
+      "sha256": "80aba756ea9c782f9e8314e120d8e38e7af70defaf897397eb9af878e4c29351"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/b/p/fixture/bodies/09bfdf5268024ff5a2b7faf3b06547de3704b30fcc49aac0edbc5d4ab70b9d5a.bin",
+      "sha256": "09bfdf5268024ff5a2b7faf3b06547de3704b30fcc49aac0edbc5d4ab70b9d5a"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/b/p/fixture/bodies/6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695.bin",
+      "sha256": "6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/b/p/fixture/manifest.ndjson",
+      "sha256": "44495fa798d029e47a545effb5e6966dd44d606a35947edd955e238154c9cf52"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/b/p/fixture/partial.ndjson",
+      "sha256": "bfcd7ee023cb8dee0a0c7da629c9cc8ba490523e01b4c5ef7b5fff5029793ed7"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/b/partial/ASTOCK-001-64ea8a44a9aa/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "6368addd137167aa7d0d190e00eb811db20e0a64d0690e3994e8679520bec8b3"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/b/partial/ASTOCK-001-64ea8a44a9aa/2026-10-03/realtime_quote/tencent/single_quote/mapped-rows.json",
+      "sha256": "54f3714beda453604635ff8785da530acbd177f1b78ce51c999ac7235111107d"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/b/partial/ASTOCK-001-64ea8a44a9aa/2026-10-03/source_rows/tencent/single_quote/source-rows.json",
+      "sha256": "901877bb0190b2eeeb09dcf34188e1e82172e3d70b133ecf1ad8e8917d46ebca"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/b/partial/ASTOCK-001-64ea8a44a9aa/_raw/bodies/6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695.bin",
+      "sha256": "6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/b/partial/ASTOCK-001-64ea8a44a9aa/_raw/manifest.ndjson",
+      "sha256": "b1db0dec7456996185a2cbe637b1af55e7cb088194aa0cbfe532424824393bf0"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/comparison.json",
+      "sha256": "5c5ab128059f67ed609eea1ace6208ba4c39a98bebec6ef61308f135f0bb0d25"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/d/adapter/ASTOCK-002-daily-c5ec19263965/2026-10-03/daily_bar/tencent/kline_daily/mapped-rows.json",
+      "sha256": "dbf2dc37354f6a0ae5fca46275a5e64c7ff2989147da9a3b17f26cca0a53ec0a"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/d/adapter/ASTOCK-002-daily-c5ec19263965/2026-10-03/input_report/tencent/kline_daily/report.json",
+      "sha256": "ba2820f0f05701dfbe199df01046f76ad88867d505a888d2865b15fa664d0611"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/d/adapter/ASTOCK-002-daily-c5ec19263965/2026-10-03/source_rows/tencent/kline_daily/source-rows.json",
+      "sha256": "bf8410ba6a4cdceceb5bf8a9a101c7628a41fb79322e7b63bcac3662e1d222b0"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/d/adapter/ASTOCK-002-daily-c5ec19263965/_raw/bodies/c3c0b821215bce77b8551f716c50f0324aadc39af7c9dc17538b0bf94b59845b.bin",
+      "sha256": "c3c0b821215bce77b8551f716c50f0324aadc39af7c9dc17538b0bf94b59845b"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/d/adapter/ASTOCK-002-daily-c5ec19263965/_raw/manifest.ndjson",
+      "sha256": "8c380894c4c56549f50744b94e1b4cca701ecdd5576a8ecb1dcc4825a00c70bb"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/d/original/bodies/c3c0b821215bce77b8551f716c50f0324aadc39af7c9dc17538b0bf94b59845b.bin",
+      "sha256": "c3c0b821215bce77b8551f716c50f0324aadc39af7c9dc17538b0bf94b59845b"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/d/original/manifest.ndjson",
+      "sha256": "bdd74fb9f5adbcae5ba9979aee3bf52835821ca8014aa9ea81d25e20aaf96161"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f1/fixture/bodies/1b087c9a05d88a8156914499121f7b2c8bd039efd6f82c27e2c48b55d2b0b108.bin",
+      "sha256": "1b087c9a05d88a8156914499121f7b2c8bd039efd6f82c27e2c48b55d2b0b108"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f1/fixture/manifest.ndjson",
+      "sha256": "a2f2bf771861416dd15f6b5b4aa2cfcfcf89adea5508ffd79be1e7103ae69d96"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f1/out/ASTOCK-001-713b737678a7/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "f0f21d8e8eecfbf76d0721279563c74ea430bb1092edfcdc129e7b3d34a75db8"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f1/out/ASTOCK-001-713b737678a7/_raw/bodies/1b087c9a05d88a8156914499121f7b2c8bd039efd6f82c27e2c48b55d2b0b108.bin",
+      "sha256": "1b087c9a05d88a8156914499121f7b2c8bd039efd6f82c27e2c48b55d2b0b108"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f1/out/ASTOCK-001-713b737678a7/_raw/manifest.ndjson",
+      "sha256": "55e17c70160b0c35e0454ba1c91b8c24efb9411d08d6c2485bf5f2a99344b28d"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f10/fixture/bodies/58dc772d30da770e90b72a889840c623070f7cfa505b9565f1ee1a54e8978642.bin",
+      "sha256": "58dc772d30da770e90b72a889840c623070f7cfa505b9565f1ee1a54e8978642"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f10/fixture/manifest.ndjson",
+      "sha256": "44a8c0b1c463e4a5529e58da0fb9c996664f6cfa8cf02550fa2814647097d635"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f10/out/ASTOCK-001-b55e0b9b8fec/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "ff042e3870f911770f73f597a2a4d0a15f26ba5b41e7460dd9aa9c5b77945b6a"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f10/out/ASTOCK-001-b55e0b9b8fec/_raw/manifest.ndjson",
+      "sha256": "3e3f60ebb0303cf974c9654e5325303e9547127ef5fb8088e9835e37553ddad5"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f11/fixture/bodies/58dc772d30da770e90b72a889840c623070f7cfa505b9565f1ee1a54e8978642.bin",
+      "sha256": "58dc772d30da770e90b72a889840c623070f7cfa505b9565f1ee1a54e8978642"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f11/fixture/manifest.ndjson",
+      "sha256": "3871ad24150137cc1232bec7b161784ec240571ad30a5e163243274cf3e637ef"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f11/out/ASTOCK-001-9431e3aa1e25/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "7d212bcdd3ccb7f3cf105783a8f70e33f6a94fae12ee2e00293c7cf1dc81191e"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f2/fixture/bodies/f7a6d70b16968e4bf36115bb85901ec75f87e42cc2d8bcc8f812686127e74c44.bin",
+      "sha256": "f7a6d70b16968e4bf36115bb85901ec75f87e42cc2d8bcc8f812686127e74c44"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f2/fixture/manifest.ndjson",
+      "sha256": "082d80cd18eca85fdb52ded97418e9028730a57c82c6e345694a4f17455becb3"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f2/out/ASTOCK-001-4e1e595a58c9/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "7126da5f7e88811674d0c7c34eb450550cb6cbaf10a43ef9df97a937ea5f4125"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f2/out/ASTOCK-001-4e1e595a58c9/_raw/bodies/f7a6d70b16968e4bf36115bb85901ec75f87e42cc2d8bcc8f812686127e74c44.bin",
+      "sha256": "f7a6d70b16968e4bf36115bb85901ec75f87e42cc2d8bcc8f812686127e74c44"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f2/out/ASTOCK-001-4e1e595a58c9/_raw/manifest.ndjson",
+      "sha256": "c6dac48782a438644d5af3c4388115357f29bc30a1ac14de52e95f91d9c5abd3"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f3/fixture/bodies/ce5b4b0fbe7e64e62258de22df3360624a345cab995b8360a258a12bae37e9ff.bin",
+      "sha256": "ce5b4b0fbe7e64e62258de22df3360624a345cab995b8360a258a12bae37e9ff"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f3/fixture/manifest.ndjson",
+      "sha256": "107794db1e3baee9106a812e353fc73a5e39930bdf454ef67379a4442fa118d0"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f3/out/ASTOCK-001-61c7d5595ab8/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "2dee6ecbaaf8b0e31aba218318039457c779e805291f8dbddfd940c04e487649"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f3/out/ASTOCK-001-61c7d5595ab8/_raw/bodies/ce5b4b0fbe7e64e62258de22df3360624a345cab995b8360a258a12bae37e9ff.bin",
+      "sha256": "ce5b4b0fbe7e64e62258de22df3360624a345cab995b8360a258a12bae37e9ff"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f3/out/ASTOCK-001-61c7d5595ab8/_raw/manifest.ndjson",
+      "sha256": "72dcbb102cf85a579b091e14dd1e26c007fe40165764ea2978ef1ffce3fe40f4"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f4/fixture/bodies/c05e08d2c27cb288360cffbb39dd8046179e770607a6db9c8f0beb1d07953c25.bin",
+      "sha256": "c05e08d2c27cb288360cffbb39dd8046179e770607a6db9c8f0beb1d07953c25"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f4/fixture/manifest.ndjson",
+      "sha256": "a81c560950d988b9f937902ce9341e8d878c9e90ea6e013d84d0d629fcd41b35"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f4/out/ASTOCK-001-66a3e5949483/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "1f80f815d1f1bcda3d37df93875d9fdc11a82b1fec4131b0d7ae3a92a390116b"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f4/out/ASTOCK-001-66a3e5949483/2026-10-03/source_rows/tencent/single_quote/source-rows.json",
+      "sha256": "280bb4b69f2c342b6987481242511c019ce38cb3d5790184a97c6fa462f7a6a9"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f4/out/ASTOCK-001-66a3e5949483/_raw/bodies/c05e08d2c27cb288360cffbb39dd8046179e770607a6db9c8f0beb1d07953c25.bin",
+      "sha256": "c05e08d2c27cb288360cffbb39dd8046179e770607a6db9c8f0beb1d07953c25"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f4/out/ASTOCK-001-66a3e5949483/_raw/manifest.ndjson",
+      "sha256": "c2d18646b747ea9bc994aa45a6ba979c05392cb6ec5d667d211df5b193393d32"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f5/fixture/bodies/3ee1d104e5cf39d05836716408abc67346e4b7da4d7f1a2c7c8fdf3b444069d9.bin",
+      "sha256": "3ee1d104e5cf39d05836716408abc67346e4b7da4d7f1a2c7c8fdf3b444069d9"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f5/fixture/manifest.ndjson",
+      "sha256": "d9f658024068b376e4820debd15f575d22fe851d3243236d9575c962e6fc7a07"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f5/out/ASTOCK-001-e79c941d3abb/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "eba97a76d9867fc4f55827c207cc0dccfe7495ca27e807e616853f2ff0a13042"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f5/out/ASTOCK-001-e79c941d3abb/2026-10-03/source_rows/tencent/single_quote/source-rows.json",
+      "sha256": "332278e3a1f1fd6e588d6e81ec052c7e085b857127267f839747b0d1e1a6a19d"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f5/out/ASTOCK-001-e79c941d3abb/_raw/bodies/3ee1d104e5cf39d05836716408abc67346e4b7da4d7f1a2c7c8fdf3b444069d9.bin",
+      "sha256": "3ee1d104e5cf39d05836716408abc67346e4b7da4d7f1a2c7c8fdf3b444069d9"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f5/out/ASTOCK-001-e79c941d3abb/_raw/manifest.ndjson",
+      "sha256": "493c9fddd867ae76c31f811dbd2d4c5687e0d2ff677cee654a00a48ba81f3b0b"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f6/fixture/bodies/a9603db9d4235aedbe92f754b1c2ad9e8e290a6ecdd3d0cfa010a16732f627ee.bin",
+      "sha256": "a9603db9d4235aedbe92f754b1c2ad9e8e290a6ecdd3d0cfa010a16732f627ee"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f6/fixture/manifest.ndjson",
+      "sha256": "99124d3d96cb121be4104dbaf5bbc6309ef1badcf9019ee27e62d4291caa3179"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f6/out/ASTOCK-001-e027eff0b6bb/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "1c1fbc1f407c2135dd1b3ae5bb3218eb8f761f109d5d045eb60f02055a33f5e5"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f6/out/ASTOCK-001-e027eff0b6bb/_raw/bodies/a9603db9d4235aedbe92f754b1c2ad9e8e290a6ecdd3d0cfa010a16732f627ee.bin",
+      "sha256": "a9603db9d4235aedbe92f754b1c2ad9e8e290a6ecdd3d0cfa010a16732f627ee"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f6/out/ASTOCK-001-e027eff0b6bb/_raw/manifest.ndjson",
+      "sha256": "4b3205d417988198ffd31753a918e0b74e2655f219004cafee0b39e320cd38cd"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f7/fixture/bodies/623da913aa519ad4ca6b3986c135b66ec6aa0d26700a700cc358a0987f43b845.bin",
+      "sha256": "623da913aa519ad4ca6b3986c135b66ec6aa0d26700a700cc358a0987f43b845"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f7/fixture/manifest.ndjson",
+      "sha256": "7a6d9a9196f7277fee80369b94b6836bb65158cc37f903bce1160a4095a37613"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f7/out/ASTOCK-001-178bdca69579/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "a910d623937c182088626c98a0b79a948b1b372756e12ac21764fc1aa359b5e1"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f7/out/ASTOCK-001-178bdca69579/_raw/bodies/623da913aa519ad4ca6b3986c135b66ec6aa0d26700a700cc358a0987f43b845.bin",
+      "sha256": "623da913aa519ad4ca6b3986c135b66ec6aa0d26700a700cc358a0987f43b845"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f7/out/ASTOCK-001-178bdca69579/_raw/manifest.ndjson",
+      "sha256": "c24b8e24e391721c92fdca60ce3889a6c5da82a7e1501bed73312acd1d40aba0"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f8/fixture/bodies/df85f632f96b6f4639ffefc31878f0d08adce6cb022241b5f0c1652718589d2a.bin",
+      "sha256": "df85f632f96b6f4639ffefc31878f0d08adce6cb022241b5f0c1652718589d2a"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f8/fixture/manifest.ndjson",
+      "sha256": "99d9d040988ade748676b9619e8610d9ddaf128ce0a3e60325776ef2a81993a6"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f8/out/ASTOCK-001-9d23c3b0fd18/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "f58d2d84b8b4990d11797e102f6ac9fecde4ad9adab154d8ff1afa0b22bcd4ae"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f8/out/ASTOCK-001-9d23c3b0fd18/_raw/bodies/df85f632f96b6f4639ffefc31878f0d08adce6cb022241b5f0c1652718589d2a.bin",
+      "sha256": "df85f632f96b6f4639ffefc31878f0d08adce6cb022241b5f0c1652718589d2a"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f8/out/ASTOCK-001-9d23c3b0fd18/_raw/manifest.ndjson",
+      "sha256": "9c61e9c2d5f0895d495354a30ca5ed56b71c1cb88d75c3dc783e17f3c9334402"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f9/fixture/bodies/58dc772d30da770e90b72a889840c623070f7cfa505b9565f1ee1a54e8978642.bin",
+      "sha256": "58dc772d30da770e90b72a889840c623070f7cfa505b9565f1ee1a54e8978642"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f9/fixture/manifest.ndjson",
+      "sha256": "f51b7481c8af659ecbf1660ebbcf3ccde2279bdb63e81279cc468a06e9f566e6"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f9/out/ASTOCK-001-8bfbb6537092/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "2f16426ffa6061798347a394a980870fcaf22145346f3490271a187bb4587aae"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f9/out/ASTOCK-001-8bfbb6537092/_raw/bodies/58dc772d30da770e90b72a889840c623070f7cfa505b9565f1ee1a54e8978642.bin",
+      "sha256": "58dc772d30da770e90b72a889840c623070f7cfa505b9565f1ee1a54e8978642"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/f9/out/ASTOCK-001-8bfbb6537092/_raw/manifest.ndjson",
+      "sha256": "e2f97b74f77783680a2f1c649a6b85a25e8cb77a8022eabae70d62cb7348d969"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/m/adapter/ASTOCK-002-5m-d4310e505bce/2026-10-03/input_report/tencent/kline_5m/report.json",
+      "sha256": "1cc0e751d28970e3e6595dfe3c0778e34ffb5dc41ca4e7f1d4f7be925a98119c"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/m/adapter/ASTOCK-002-5m-d4310e505bce/2026-10-03/minute_bar_5m/tencent/kline_5m/mapped-rows.json",
+      "sha256": "bb3c999c8ae6d29bd870c2c091e0a3d0d396eba8bf77468de31db8ff33c9bf1e"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/m/adapter/ASTOCK-002-5m-d4310e505bce/2026-10-03/source_rows/tencent/kline_5m/source-rows.json",
+      "sha256": "9ca0ab909641717eebdc06bedcead0e6d154a05eed16b8d1829fcd4b94874e80"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/m/adapter/ASTOCK-002-5m-d4310e505bce/_raw/bodies/1e8158ec28e8e3262a284fd3d092e1c2bd33e3777cb057ddab140633fa8954cd.bin",
+      "sha256": "1e8158ec28e8e3262a284fd3d092e1c2bd33e3777cb057ddab140633fa8954cd"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/m/adapter/ASTOCK-002-5m-d4310e505bce/_raw/manifest.ndjson",
+      "sha256": "dea3e83c3be000b057e3926449c6d3e6e0e3fbab838132927c1ac2481376e08f"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/m/original/bodies/1e8158ec28e8e3262a284fd3d092e1c2bd33e3777cb057ddab140633fa8954cd.bin",
+      "sha256": "1e8158ec28e8e3262a284fd3d092e1c2bd33e3777cb057ddab140633fa8954cd"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/m/original/manifest.ndjson",
+      "sha256": "7769fd59e7956f97ed533eb85d60b551f9100a915606da6f9581b6c64af23e7a"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/p/fixture-validation.json",
+      "sha256": "22cd4ca4eb0dc5f87953d0233ea814f8604e189c51002979fafcfb0e1b00e622"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/p/out/ASTOCK-001-507a8603dff1/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "740ddc802bfd5d3bd1eea93d236bee1e31f22fd34390bc83a98f51b60a7a136e"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/p/out/ASTOCK-001-507a8603dff1/2026-10-03/realtime_quote/tencent/single_quote/mapped-rows.json",
+      "sha256": "23326896e2e05207fb206a57cfef2ee2472838008e98eea873aa2bdafae3824a"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/p/out/ASTOCK-001-507a8603dff1/2026-10-03/source_rows/tencent/single_quote/source-rows.json",
+      "sha256": "cc12e1a6a63334592e4308c5c358549e0f6417a94834484125e9f539e3c0c1b5"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/p/out/ASTOCK-001-507a8603dff1/_raw/bodies/264dd0d1a52ea52847aebdfa389075b55da8aca4f96b0f9338013a40b3472dd4.bin",
+      "sha256": "264dd0d1a52ea52847aebdfa389075b55da8aca4f96b0f9338013a40b3472dd4"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/p/out/ASTOCK-001-507a8603dff1/_raw/bodies/40fbea263c0e376387ca08966b3ab3d96994f4756955403aa49e31fcdf3af413.bin",
+      "sha256": "40fbea263c0e376387ca08966b3ab3d96994f4756955403aa49e31fcdf3af413"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/p/out/ASTOCK-001-507a8603dff1/_raw/bodies/cee292825ac668ef99c670199b015faeb4c18bea207a1026cbf695d2c382ad38.bin",
+      "sha256": "cee292825ac668ef99c670199b015faeb4c18bea207a1026cbf695d2c382ad38"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/p/out/ASTOCK-001-507a8603dff1/_raw/manifest.ndjson",
+      "sha256": "0d3c4366f85d06c583fcd5c029dc5479a241c83ded44aa260dfe5ecef4b6b87c"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/p/out/ASTOCK-001-f1f52703dad3/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "23b53707324224249cdc962d519e3c3cbb87cde60a9d329e3bbd58afa671ecc9"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/p/out/ASTOCK-001-f1f52703dad3/2026-10-03/realtime_quote/tencent/single_quote/mapped-rows.json",
+      "sha256": "23326896e2e05207fb206a57cfef2ee2472838008e98eea873aa2bdafae3824a"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/p/out/ASTOCK-001-f1f52703dad3/2026-10-03/source_rows/tencent/single_quote/source-rows.json",
+      "sha256": "cc12e1a6a63334592e4308c5c358549e0f6417a94834484125e9f539e3c0c1b5"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/p/out/ASTOCK-001-f1f52703dad3/_raw/bodies/264dd0d1a52ea52847aebdfa389075b55da8aca4f96b0f9338013a40b3472dd4.bin",
+      "sha256": "264dd0d1a52ea52847aebdfa389075b55da8aca4f96b0f9338013a40b3472dd4"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/p/out/ASTOCK-001-f1f52703dad3/_raw/bodies/40fbea263c0e376387ca08966b3ab3d96994f4756955403aa49e31fcdf3af413.bin",
+      "sha256": "40fbea263c0e376387ca08966b3ab3d96994f4756955403aa49e31fcdf3af413"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/p/out/ASTOCK-001-f1f52703dad3/_raw/bodies/cee292825ac668ef99c670199b015faeb4c18bea207a1026cbf695d2c382ad38.bin",
+      "sha256": "cee292825ac668ef99c670199b015faeb4c18bea207a1026cbf695d2c382ad38"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/p/out/ASTOCK-001-f1f52703dad3/_raw/manifest.ndjson",
+      "sha256": "b3591c85eb30400f16c53a015704474730f3a54d939a9973715b043dab0b78f7"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/capabilities.yaml",
+      "sha256": "7b7ce0da1d33b333165c6081a3ed788f85cb05d5f6945c745eec97d73e24f6e2"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/collection.yaml",
+      "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/datasets/board_fund_flow.yaml",
+      "sha256": "08f3566d0cf2787186e6106e4915d0d89b70232d737898480eda03785ea3c53a"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/datasets/concept_board.yaml",
+      "sha256": "eef0b07c9a41bfd5ef1a52f4f39516cb26d42b088d63a15783af0f94985fd76f"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/datasets/daily_bar.yaml",
+      "sha256": "0a8c1dcae7e1c062ae70c224defc1362adc1d58bc196bbeb2f1edd61d6fd39e7"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/datasets/dividend_event.yaml",
+      "sha256": "67a2b02063cb9a891e3fb388048407cbc08b05ce8ae97deea6976d3904340d2e"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/datasets/financial_main.yaml",
+      "sha256": "23d8b55356620439d5c1b507601b782b31aa965fe24eaf194e869466bb271ab0"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/datasets/industry_board.yaml",
+      "sha256": "c6930c70b55e171dee94b74b80f3c37df1466d4a10dadc3016975004b8b47ba4"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/datasets/industry_directory.yaml",
+      "sha256": "9325d485bf7a1bc2b075c2d920b43b17caa039916536bedd8163be0f972bfe5b"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/datasets/industry_index_daily.yaml",
+      "sha256": "5d542c72443410747f2ac643589bfd8160cdea07d01d6d0dd9c5e4753096043b"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/datasets/industry_membership.yaml",
+      "sha256": "dff512c9b7f00330bbe408ba1e1eb74d99b49bc0b38ee419d4c463047c6fe69d"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/datasets/intraday_trend.yaml",
+      "sha256": "5983e0eb29c1cd7a781fbad0be7332dda14e887ccd744e55ad4b8664c7a0c38a"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/datasets/limit_up_pool.yaml",
+      "sha256": "73c1fa4ed6d7281d1857208a2ec9696a3637214bb256661ce943313c75772a69"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/datasets/minute_bar_5m.yaml",
+      "sha256": "fb6f822ed42479422a0b4c227577d8e559bb6b2238562af566af0464304bd873"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/datasets/realtime_quote.yaml",
+      "sha256": "ebc3e97bb7469eb4c7c80daf50991ebe38f0eb5b2476a9a579d22236d416378b"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/datasets/security_snapshot.yaml",
+      "sha256": "255115893f64837a3b95ea9fe44551948eefa9604aca9d59214de87a580300be"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/datasets/shareholder_count.yaml",
+      "sha256": "d325df1784c873bea73a1d907e9964e06c26e4d6b356dd6c16148837b57feccf"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/datasets/stock_fund_flow.yaml",
+      "sha256": "df3f21341463f3538a1f855ef19b7bbdb683405aaa65d5418c255023c18a429f"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/datasets/trading_calendar.yaml",
+      "sha256": "924b17a5be104252e85a377e4579432c6725bab99cbaa0ad70e71102149a1f49"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/datasets.yaml",
+      "sha256": "e992d13297e1f9a8f64acabc25f65f138b21ce12dca16689cc3f17bf1385a6eb"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/normalization/board_fund_flow.yaml",
+      "sha256": "fb7c6f1f2d425181b189e25152e465306982e10c7c6ee06b2917dfa00b891baa"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/normalization/concept_board.yaml",
+      "sha256": "2b7e7f57d189541d6a232cd5391d2dab4289f9f3438f397d9fefd82bb1d996b7"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/normalization/daily_bar.yaml",
+      "sha256": "41f9bbd0824e20d70f7ed276758b286094c33c79180befca4d8985afc3c8ad0b"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/normalization/dividend_event.yaml",
+      "sha256": "a76b4e77c5b285ab0659ee2d7bf07214ada7d91997e553a21f451b9ac5d912cb"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/normalization/financial_main.yaml",
+      "sha256": "eeeb2e7418aab430168f0c7e16c69f1b24a9e49ec8d156a28390cae0e7a69bda"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/normalization/industry_board.yaml",
+      "sha256": "f3ff8bbe7fc4e8d4e5af1c36b9312e8db1c8c9cb09a09aadb472b22ae09de152"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/normalization/industry_directory.yaml",
+      "sha256": "823d97db8afe4adb3f963faaa04b42b8f151e93f2e75f3eb18f8c678a68bae37"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/normalization/industry_index_daily.yaml",
+      "sha256": "953087294fd2c3a3cb1b46f204d0a0f606f9060f0f89676fb3a189222a68dab1"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/normalization/industry_membership.yaml",
+      "sha256": "7eb72a1b8ce7aff27aa1ad62534af2bf7183f3d78c6392208035396a11e21ccb"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/normalization/intraday_trend.yaml",
+      "sha256": "14b0b22ad1308c70b65152e711c4248d3c8bf1c28d842fba36309194ed38870a"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/normalization/limit_up_pool.yaml",
+      "sha256": "411e6e6ead10a4d2cbff7ecf4de9bee26f411a66d005a33bc640865ef4b6e7ba"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/normalization/minute_bar_5m.yaml",
+      "sha256": "f3e9abaededc01a15c651a99a22131a80067133deb89548dd12b17278e0e55b7"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/normalization/realtime_quote.yaml",
+      "sha256": "3924a5ce6f1be005f3d441df09b7c566946953e1bff2fbb76c7648d1a567e0c5"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/normalization/security_snapshot.yaml",
+      "sha256": "474ab0397cb1aad33abcd070942586a8460c468b1d3f7af97c2d152eee5a6537"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/normalization/shareholder_count.yaml",
+      "sha256": "4f7c23835f82e0ab648dc667df4f36bd3150959afac8f7421eea1cb1d1946ce1"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/normalization/stock_fund_flow.yaml",
+      "sha256": "d6f2ee39cec08dee0175d244280a9a3b7e8437dd37b2da241aa270c32e5a37ac"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/normalization/trading_calendar.yaml",
+      "sha256": "4be7571914129769aeca321d892b8aa2fbd068db1c7c0b691ae0d5cefe7f69e0"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/providers.yaml",
+      "sha256": "871705749fce1ccada8d77b3c0596e66d07f870fd45d95a9332b75a1c404d2af"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/config/schedules.yaml",
+      "sha256": "01b7e269ea4231024bf1c520f78fa571c2909986aad5573006bd80e186119113"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/out/ASTOCK-001-18c7bc38a2f0/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "626788616ee9aed36f627f7354d15e5d8f2333a50407940b1ebab6cb7e77a6c5"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/out/ASTOCK-001-61dc6edd3139/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "a8e8923a3f85f5f68e43e4c62e0ff2964d6a0fc3a2eceaceaccb837c37697723"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/out/ASTOCK-001-61dc6edd3139/2026-10-03/realtime_quote/tencent/single_quote/mapped-rows.json",
+      "sha256": "07d7735c7159381d73e2c7d688ac70d7cbb0ad239035760d47a43cc7b20ac137"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/out/ASTOCK-001-61dc6edd3139/2026-10-03/source_rows/tencent/single_quote/source-rows.json",
+      "sha256": "901877bb0190b2eeeb09dcf34188e1e82172e3d70b133ecf1ad8e8917d46ebca"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/out/ASTOCK-001-61dc6edd3139/_raw/bodies/6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695.bin",
+      "sha256": "6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/out/ASTOCK-001-61dc6edd3139/_raw/manifest.ndjson",
+      "sha256": "8018b206c926fbc1adc1568e4c14da2d2d56e429c82abae12669c79b1e3510cb"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/out/ASTOCK-001-c9dc47b47591/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "d407db24ee896092a096dad4e95b15cb0eb571661b83e24d6596ca5a5e34c8f8"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004/y/out/ASTOCK-001-f1929812650f/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "51bbcbcd526820506b8dd819bfc122117527920ef99c894988f69e313d6fc974"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004-contract-tests.xml",
+      "sha256": "dea7842daab4385ac13c3f78840249483cec4b1406b519f48e689f0ad6dd52b1"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004-full-tests.xml",
+      "sha256": "63e57bdbad6cbda56c4a1b8604625b5f20571731685dbb3abd9868ab64f2fb50"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004-regression-tests.xml",
+      "sha256": "d9574d963ed00edfa9ea450d20305662b33c6432b3cee03f504d3f411f7f3932"
+    },
+    {
+      "path": "provider_validation/results/tencent-dev-20261004-tests.xml",
+      "sha256": "bc882fb85f046d2f2d1a514c9ef8684686346ae4002021a8dc1fabfb052da0ed"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/1/adapter/ASTOCK-001-f6edf47aa149/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "ee8649dd767f33ea3771aafa610292417fdd7f865b66965c5fb44842db84b755"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/1/adapter/ASTOCK-001-f6edf47aa149/2026-10-03/realtime_quote/tencent/single_quote/mapped-rows.json",
+      "sha256": "54f3714beda453604635ff8785da530acbd177f1b78ce51c999ac7235111107d"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/1/adapter/ASTOCK-001-f6edf47aa149/2026-10-03/source_rows/tencent/single_quote/source-rows.json",
+      "sha256": "901877bb0190b2eeeb09dcf34188e1e82172e3d70b133ecf1ad8e8917d46ebca"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/1/adapter/ASTOCK-001-f6edf47aa149/_raw/bodies/6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695.bin",
+      "sha256": "6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/1/adapter/ASTOCK-001-f6edf47aa149/_raw/manifest.ndjson",
+      "sha256": "12775140f7c34158a48ee556bc3771fb65087147a63cb25cf0446ea07bb5a3f7"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/1/comparison.json",
+      "sha256": "a20eb0a06bab1950fdf02d20472d2406fa9c4eee7e3511848622c9b9981c8732"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/1/original/2026-10-03/original_parsed/tencent/single_quote/parsed.json",
+      "sha256": "ae41c4f83438fef63074b60830241436dfdaceb8f2259fbc71baafe73906f685"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/1/original/bodies/6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695.bin",
+      "sha256": "6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/1/original/manifest.ndjson",
+      "sha256": "66eeca2f6e8658fdb15fde018ac848d2a43f8fd20bfe1e9c8f003ed6fc173c2b"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/2/ASTOCK-002-daily-992f4189b4da/2026-10-03/daily_bar/tencent/kline_daily/mapped-rows.json",
+      "sha256": "dbf2dc37354f6a0ae5fca46275a5e64c7ff2989147da9a3b17f26cca0a53ec0a"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/2/ASTOCK-002-daily-992f4189b4da/2026-10-03/input_report/tencent/kline_daily/report.json",
+      "sha256": "9fab51455bb8aaccc002165add742236d22793911dc50e4a084f2629fe7f578f"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/2/ASTOCK-002-daily-992f4189b4da/2026-10-03/source_rows/tencent/kline_daily/source-rows.json",
+      "sha256": "bf8410ba6a4cdceceb5bf8a9a101c7628a41fb79322e7b63bcac3662e1d222b0"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/2/ASTOCK-002-daily-992f4189b4da/_raw/bodies/c3c0b821215bce77b8551f716c50f0324aadc39af7c9dc17538b0bf94b59845b.bin",
+      "sha256": "c3c0b821215bce77b8551f716c50f0324aadc39af7c9dc17538b0bf94b59845b"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/2/ASTOCK-002-daily-992f4189b4da/_raw/manifest.ndjson",
+      "sha256": "f707ce58e42ba460ff716b53a9b5ba55a6a904ddccf1f1d5fc827f90ce9e10bd"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/3/ASTOCK-002-5m-4c42cc0ab3c7/2026-10-03/input_report/tencent/kline_5m/report.json",
+      "sha256": "c0d1e2462512f902372e4aba1addedc6896cd486b0d6c1ed8dde0ee9df776a8a"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/3/ASTOCK-002-5m-4c42cc0ab3c7/2026-10-03/minute_bar_5m/tencent/kline_5m/mapped-rows.json",
+      "sha256": "bb3c999c8ae6d29bd870c2c091e0a3d0d396eba8bf77468de31db8ff33c9bf1e"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/3/ASTOCK-002-5m-4c42cc0ab3c7/2026-10-03/source_rows/tencent/kline_5m/source-rows.json",
+      "sha256": "9ca0ab909641717eebdc06bedcead0e6d154a05eed16b8d1829fcd4b94874e80"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/3/ASTOCK-002-5m-4c42cc0ab3c7/_raw/bodies/1e8158ec28e8e3262a284fd3d092e1c2bd33e3777cb057ddab140633fa8954cd.bin",
+      "sha256": "1e8158ec28e8e3262a284fd3d092e1c2bd33e3777cb057ddab140633fa8954cd"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/3/ASTOCK-002-5m-4c42cc0ab3c7/_raw/manifest.ndjson",
+      "sha256": "bbd960ccf85925ff047307d1cc6b393ca42974b90610870b4f3e97c42ff60c35"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/b/fixture/bodies/40fbea263c0e376387ca08966b3ab3d96994f4756955403aa49e31fcdf3af413.bin",
+      "sha256": "40fbea263c0e376387ca08966b3ab3d96994f4756955403aa49e31fcdf3af413"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/b/fixture/bodies/6e215214f01658199c9fd96cdada22f29a215abe7a716b8978d433867c4a3461.bin",
+      "sha256": "6e215214f01658199c9fd96cdada22f29a215abe7a716b8978d433867c4a3461"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/b/fixture/bodies/cee292825ac668ef99c670199b015faeb4c18bea207a1026cbf695d2c382ad38.bin",
+      "sha256": "cee292825ac668ef99c670199b015faeb4c18bea207a1026cbf695d2c382ad38"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/b/fixture/manifest.ndjson",
+      "sha256": "ebc107719e33f68bd739ae6b685dab9d71b6dc5ea4f1ea88fe6a96f23d7b12d1"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/b/out/ASTOCK-001-f66ad49899f1/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "e97cd39b4f7ebf3fb6b3a74ff5bed32abb48371824e182b66f57d068f973eb99"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/b/out/ASTOCK-001-f66ad49899f1/2026-10-03/realtime_quote/tencent/single_quote/mapped-rows.json",
+      "sha256": "953f29c31f4d561d460c4134598cfb743b5a7f70a433b4cf41b15a8a2a2435e9"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/b/out/ASTOCK-001-f66ad49899f1/2026-10-03/source_rows/tencent/single_quote/source-rows.json",
+      "sha256": "47fdc87485e34a7160b59afd066e1e621131a2121c295e7f0cf6abfa252b12fc"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/b/out/ASTOCK-001-f66ad49899f1/_raw/bodies/40fbea263c0e376387ca08966b3ab3d96994f4756955403aa49e31fcdf3af413.bin",
+      "sha256": "40fbea263c0e376387ca08966b3ab3d96994f4756955403aa49e31fcdf3af413"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/b/out/ASTOCK-001-f66ad49899f1/_raw/bodies/6e215214f01658199c9fd96cdada22f29a215abe7a716b8978d433867c4a3461.bin",
+      "sha256": "6e215214f01658199c9fd96cdada22f29a215abe7a716b8978d433867c4a3461"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/b/out/ASTOCK-001-f66ad49899f1/_raw/bodies/cee292825ac668ef99c670199b015faeb4c18bea207a1026cbf695d2c382ad38.bin",
+      "sha256": "cee292825ac668ef99c670199b015faeb4c18bea207a1026cbf695d2c382ad38"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/b/out/ASTOCK-001-f66ad49899f1/_raw/manifest.ndjson",
+      "sha256": "3b6d6e56f0730bf5888f1ac6ae4ed129dcd7523fc48aff6150ab25677ed0beab"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/b/p/fixture/bodies/09bfdf5268024ff5a2b7faf3b06547de3704b30fcc49aac0edbc5d4ab70b9d5a.bin",
+      "sha256": "09bfdf5268024ff5a2b7faf3b06547de3704b30fcc49aac0edbc5d4ab70b9d5a"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/b/p/fixture/bodies/6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695.bin",
+      "sha256": "6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/b/p/fixture/manifest.ndjson",
+      "sha256": "44495fa798d029e47a545effb5e6966dd44d606a35947edd955e238154c9cf52"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/b/p/fixture/partial.ndjson",
+      "sha256": "bfcd7ee023cb8dee0a0c7da629c9cc8ba490523e01b4c5ef7b5fff5029793ed7"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/b/partial/ASTOCK-001-d2ca1448fe9a/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "8455f5a93e6b86c4c4817c181c4e1fbfef4bae17c73931cda37726cbccb66717"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/b/partial/ASTOCK-001-d2ca1448fe9a/2026-10-03/realtime_quote/tencent/single_quote/mapped-rows.json",
+      "sha256": "54f3714beda453604635ff8785da530acbd177f1b78ce51c999ac7235111107d"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/b/partial/ASTOCK-001-d2ca1448fe9a/2026-10-03/source_rows/tencent/single_quote/source-rows.json",
+      "sha256": "901877bb0190b2eeeb09dcf34188e1e82172e3d70b133ecf1ad8e8917d46ebca"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/b/partial/ASTOCK-001-d2ca1448fe9a/_raw/bodies/6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695.bin",
+      "sha256": "6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/b/partial/ASTOCK-001-d2ca1448fe9a/_raw/manifest.ndjson",
+      "sha256": "101468fb1cc8bccf74fc1bc056c2100e200e01ac86e3366b484b99da790790f2"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/comparison.json",
+      "sha256": "2e8ef8e5c665fdb50ac30cf19f5234ed9f37df3f8cbd3ffaf440be9ed6428b49"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/d/adapter/ASTOCK-002-daily-a33e8c54b6ab/2026-10-03/daily_bar/tencent/kline_daily/mapped-rows.json",
+      "sha256": "dbf2dc37354f6a0ae5fca46275a5e64c7ff2989147da9a3b17f26cca0a53ec0a"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/d/adapter/ASTOCK-002-daily-a33e8c54b6ab/2026-10-03/input_report/tencent/kline_daily/report.json",
+      "sha256": "d7002aa057c8cc4d84c4341827913c9f84c937dca98afeff116bdf48cb8b8fbc"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/d/adapter/ASTOCK-002-daily-a33e8c54b6ab/2026-10-03/source_rows/tencent/kline_daily/source-rows.json",
+      "sha256": "bf8410ba6a4cdceceb5bf8a9a101c7628a41fb79322e7b63bcac3662e1d222b0"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/d/adapter/ASTOCK-002-daily-a33e8c54b6ab/_raw/bodies/c3c0b821215bce77b8551f716c50f0324aadc39af7c9dc17538b0bf94b59845b.bin",
+      "sha256": "c3c0b821215bce77b8551f716c50f0324aadc39af7c9dc17538b0bf94b59845b"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/d/adapter/ASTOCK-002-daily-a33e8c54b6ab/_raw/manifest.ndjson",
+      "sha256": "21f99fc81a31bdcbf6efcd39878dddc0da402daf331921bf621762e749b3c298"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/d/original/bodies/c3c0b821215bce77b8551f716c50f0324aadc39af7c9dc17538b0bf94b59845b.bin",
+      "sha256": "c3c0b821215bce77b8551f716c50f0324aadc39af7c9dc17538b0bf94b59845b"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/d/original/manifest.ndjson",
+      "sha256": "74b69ce66b5e83116d12daa732c6c25f1b1b6b940655aafe1a9d3bd9c76f7c67"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f1/fixture/bodies/1b087c9a05d88a8156914499121f7b2c8bd039efd6f82c27e2c48b55d2b0b108.bin",
+      "sha256": "1b087c9a05d88a8156914499121f7b2c8bd039efd6f82c27e2c48b55d2b0b108"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f1/fixture/manifest.ndjson",
+      "sha256": "a2f2bf771861416dd15f6b5b4aa2cfcfcf89adea5508ffd79be1e7103ae69d96"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f1/out/ASTOCK-001-6ee5277ba5f5/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "b67abc152fd52645e09f04aa77fb66999a82bbd27ecea907b691d3da2c5ebc4e"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f1/out/ASTOCK-001-6ee5277ba5f5/_raw/bodies/1b087c9a05d88a8156914499121f7b2c8bd039efd6f82c27e2c48b55d2b0b108.bin",
+      "sha256": "1b087c9a05d88a8156914499121f7b2c8bd039efd6f82c27e2c48b55d2b0b108"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f1/out/ASTOCK-001-6ee5277ba5f5/_raw/manifest.ndjson",
+      "sha256": "696e8f4e1b854149daa93cfd46285a6508430db8e55a6dc18990c874d6abeae0"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f10/fixture/bodies/58dc772d30da770e90b72a889840c623070f7cfa505b9565f1ee1a54e8978642.bin",
+      "sha256": "58dc772d30da770e90b72a889840c623070f7cfa505b9565f1ee1a54e8978642"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f10/fixture/manifest.ndjson",
+      "sha256": "44a8c0b1c463e4a5529e58da0fb9c996664f6cfa8cf02550fa2814647097d635"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f10/out/ASTOCK-001-732d6a2a8ecf/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "c48dc000c96e6a9b77bb0937e7927a534187447c38abcd6b71a0340c12492618"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f10/out/ASTOCK-001-732d6a2a8ecf/_raw/manifest.ndjson",
+      "sha256": "369b5a16053b62367de58d033dc0c64bf8e308829d8b7634a6f1ba12319f1aeb"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f11/fixture/bodies/58dc772d30da770e90b72a889840c623070f7cfa505b9565f1ee1a54e8978642.bin",
+      "sha256": "58dc772d30da770e90b72a889840c623070f7cfa505b9565f1ee1a54e8978642"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f11/fixture/manifest.ndjson",
+      "sha256": "3871ad24150137cc1232bec7b161784ec240571ad30a5e163243274cf3e637ef"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f11/out/ASTOCK-001-7b4ad9f7e692/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "9286310389c007b0682269a38087cbaf373344da274fd3fdf95af6dae5eb9870"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f2/fixture/bodies/f7a6d70b16968e4bf36115bb85901ec75f87e42cc2d8bcc8f812686127e74c44.bin",
+      "sha256": "f7a6d70b16968e4bf36115bb85901ec75f87e42cc2d8bcc8f812686127e74c44"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f2/fixture/manifest.ndjson",
+      "sha256": "082d80cd18eca85fdb52ded97418e9028730a57c82c6e345694a4f17455becb3"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f2/out/ASTOCK-001-3c8fd7a4ce64/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "0e6a225ccee34f347d32c6e682abe5cdbb2c003835b833fb48f5011102d36741"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f2/out/ASTOCK-001-3c8fd7a4ce64/_raw/bodies/f7a6d70b16968e4bf36115bb85901ec75f87e42cc2d8bcc8f812686127e74c44.bin",
+      "sha256": "f7a6d70b16968e4bf36115bb85901ec75f87e42cc2d8bcc8f812686127e74c44"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f2/out/ASTOCK-001-3c8fd7a4ce64/_raw/manifest.ndjson",
+      "sha256": "a1e9f442822c0569d6fab3a55a8a1cd99e532abc9f43b94ea9dee9fab9fdd55d"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f3/fixture/bodies/ce5b4b0fbe7e64e62258de22df3360624a345cab995b8360a258a12bae37e9ff.bin",
+      "sha256": "ce5b4b0fbe7e64e62258de22df3360624a345cab995b8360a258a12bae37e9ff"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f3/fixture/manifest.ndjson",
+      "sha256": "107794db1e3baee9106a812e353fc73a5e39930bdf454ef67379a4442fa118d0"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f3/out/ASTOCK-001-73c40c9a3591/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "d99aba667c4a7eec22c240d893ad9675ad4fa8fc79d843e9d53176e9d2ee873e"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f3/out/ASTOCK-001-73c40c9a3591/_raw/bodies/ce5b4b0fbe7e64e62258de22df3360624a345cab995b8360a258a12bae37e9ff.bin",
+      "sha256": "ce5b4b0fbe7e64e62258de22df3360624a345cab995b8360a258a12bae37e9ff"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f3/out/ASTOCK-001-73c40c9a3591/_raw/manifest.ndjson",
+      "sha256": "813039ac05657b9ff1163820db046eed50561e9c9449b1953843b278ff37caa4"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f4/fixture/bodies/c05e08d2c27cb288360cffbb39dd8046179e770607a6db9c8f0beb1d07953c25.bin",
+      "sha256": "c05e08d2c27cb288360cffbb39dd8046179e770607a6db9c8f0beb1d07953c25"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f4/fixture/manifest.ndjson",
+      "sha256": "a81c560950d988b9f937902ce9341e8d878c9e90ea6e013d84d0d629fcd41b35"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f4/out/ASTOCK-001-4e827367ef85/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "a0d8a509e08155eac22fdd6ea7c3ac1a2db5d83ca732875ad3f02048d1090477"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f4/out/ASTOCK-001-4e827367ef85/2026-10-03/source_rows/tencent/single_quote/source-rows.json",
+      "sha256": "280bb4b69f2c342b6987481242511c019ce38cb3d5790184a97c6fa462f7a6a9"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f4/out/ASTOCK-001-4e827367ef85/_raw/bodies/c05e08d2c27cb288360cffbb39dd8046179e770607a6db9c8f0beb1d07953c25.bin",
+      "sha256": "c05e08d2c27cb288360cffbb39dd8046179e770607a6db9c8f0beb1d07953c25"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f4/out/ASTOCK-001-4e827367ef85/_raw/manifest.ndjson",
+      "sha256": "3806fac288f62fa20082fe7b4bd181e4cb6fbcec3d2fcec66eb3f6e65b1f206c"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f5/fixture/bodies/3ee1d104e5cf39d05836716408abc67346e4b7da4d7f1a2c7c8fdf3b444069d9.bin",
+      "sha256": "3ee1d104e5cf39d05836716408abc67346e4b7da4d7f1a2c7c8fdf3b444069d9"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f5/fixture/manifest.ndjson",
+      "sha256": "d9f658024068b376e4820debd15f575d22fe851d3243236d9575c962e6fc7a07"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f5/out/ASTOCK-001-a1f0472d5fa9/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "c92837f3da813a58d839f63ffddd6b9399b15d563a23aaad6b7b0467b3554c12"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f5/out/ASTOCK-001-a1f0472d5fa9/2026-10-03/source_rows/tencent/single_quote/source-rows.json",
+      "sha256": "332278e3a1f1fd6e588d6e81ec052c7e085b857127267f839747b0d1e1a6a19d"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f5/out/ASTOCK-001-a1f0472d5fa9/_raw/bodies/3ee1d104e5cf39d05836716408abc67346e4b7da4d7f1a2c7c8fdf3b444069d9.bin",
+      "sha256": "3ee1d104e5cf39d05836716408abc67346e4b7da4d7f1a2c7c8fdf3b444069d9"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f5/out/ASTOCK-001-a1f0472d5fa9/_raw/manifest.ndjson",
+      "sha256": "5f25549c711b53fff5f4631fd8ebf0d78d313c1ad9049c070d1c76d9875e2543"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f6/fixture/bodies/a9603db9d4235aedbe92f754b1c2ad9e8e290a6ecdd3d0cfa010a16732f627ee.bin",
+      "sha256": "a9603db9d4235aedbe92f754b1c2ad9e8e290a6ecdd3d0cfa010a16732f627ee"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f6/fixture/manifest.ndjson",
+      "sha256": "99124d3d96cb121be4104dbaf5bbc6309ef1badcf9019ee27e62d4291caa3179"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f6/out/ASTOCK-001-0e91eb9e1790/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "f1526a952de3bcdbe59cf2a77718ed80134827b0e81e722c8b8b511125e922e9"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f6/out/ASTOCK-001-0e91eb9e1790/_raw/bodies/a9603db9d4235aedbe92f754b1c2ad9e8e290a6ecdd3d0cfa010a16732f627ee.bin",
+      "sha256": "a9603db9d4235aedbe92f754b1c2ad9e8e290a6ecdd3d0cfa010a16732f627ee"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f6/out/ASTOCK-001-0e91eb9e1790/_raw/manifest.ndjson",
+      "sha256": "a1e30fdb395c963644e16a33490853dadd3f2fff4aa3559058f8699748b2ad7a"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f7/fixture/bodies/623da913aa519ad4ca6b3986c135b66ec6aa0d26700a700cc358a0987f43b845.bin",
+      "sha256": "623da913aa519ad4ca6b3986c135b66ec6aa0d26700a700cc358a0987f43b845"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f7/fixture/manifest.ndjson",
+      "sha256": "7a6d9a9196f7277fee80369b94b6836bb65158cc37f903bce1160a4095a37613"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f7/out/ASTOCK-001-ec1ffa70a453/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "d29969a76259787c1ce61e8d67b29b87426c781fc4295eda3a12190e98c888c8"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f7/out/ASTOCK-001-ec1ffa70a453/_raw/bodies/623da913aa519ad4ca6b3986c135b66ec6aa0d26700a700cc358a0987f43b845.bin",
+      "sha256": "623da913aa519ad4ca6b3986c135b66ec6aa0d26700a700cc358a0987f43b845"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f7/out/ASTOCK-001-ec1ffa70a453/_raw/manifest.ndjson",
+      "sha256": "342b72962181a016790fde9ab22cbaeaa9f6e78d271a29a6187f9cf03d24b57f"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f8/fixture/bodies/df85f632f96b6f4639ffefc31878f0d08adce6cb022241b5f0c1652718589d2a.bin",
+      "sha256": "df85f632f96b6f4639ffefc31878f0d08adce6cb022241b5f0c1652718589d2a"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f8/fixture/manifest.ndjson",
+      "sha256": "99d9d040988ade748676b9619e8610d9ddaf128ce0a3e60325776ef2a81993a6"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f8/out/ASTOCK-001-725e78849f6e/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "0284936dbf05b5b71eb75b079fd7214350302cd9e102ddf981e4477a95b53d49"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f8/out/ASTOCK-001-725e78849f6e/_raw/bodies/df85f632f96b6f4639ffefc31878f0d08adce6cb022241b5f0c1652718589d2a.bin",
+      "sha256": "df85f632f96b6f4639ffefc31878f0d08adce6cb022241b5f0c1652718589d2a"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f8/out/ASTOCK-001-725e78849f6e/_raw/manifest.ndjson",
+      "sha256": "09a9073205f56594c6a9f5e83086348312d276e0e65dc631ae59b98a0bb6d0ad"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f9/fixture/bodies/58dc772d30da770e90b72a889840c623070f7cfa505b9565f1ee1a54e8978642.bin",
+      "sha256": "58dc772d30da770e90b72a889840c623070f7cfa505b9565f1ee1a54e8978642"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f9/fixture/manifest.ndjson",
+      "sha256": "f51b7481c8af659ecbf1660ebbcf3ccde2279bdb63e81279cc468a06e9f566e6"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f9/out/ASTOCK-001-2a88077de8ca/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "fdf91f2ed0a9c03fb47e2b78c983b612f44b99cd589be9ac80c5f74a5493dbb2"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f9/out/ASTOCK-001-2a88077de8ca/_raw/bodies/58dc772d30da770e90b72a889840c623070f7cfa505b9565f1ee1a54e8978642.bin",
+      "sha256": "58dc772d30da770e90b72a889840c623070f7cfa505b9565f1ee1a54e8978642"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/f9/out/ASTOCK-001-2a88077de8ca/_raw/manifest.ndjson",
+      "sha256": "70494c4b5238a7f3083bc1eda97c938323a2d528f4ee42a56141e84047acaacd"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/m/adapter/ASTOCK-002-5m-3782349b00ed/2026-10-03/input_report/tencent/kline_5m/report.json",
+      "sha256": "1b3bd86ab966e136fb676d8290ccc797a73fa57f4787dcfaaf4662eda353416d"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/m/adapter/ASTOCK-002-5m-3782349b00ed/2026-10-03/minute_bar_5m/tencent/kline_5m/mapped-rows.json",
+      "sha256": "bb3c999c8ae6d29bd870c2c091e0a3d0d396eba8bf77468de31db8ff33c9bf1e"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/m/adapter/ASTOCK-002-5m-3782349b00ed/2026-10-03/source_rows/tencent/kline_5m/source-rows.json",
+      "sha256": "9ca0ab909641717eebdc06bedcead0e6d154a05eed16b8d1829fcd4b94874e80"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/m/adapter/ASTOCK-002-5m-3782349b00ed/_raw/bodies/1e8158ec28e8e3262a284fd3d092e1c2bd33e3777cb057ddab140633fa8954cd.bin",
+      "sha256": "1e8158ec28e8e3262a284fd3d092e1c2bd33e3777cb057ddab140633fa8954cd"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/m/adapter/ASTOCK-002-5m-3782349b00ed/_raw/manifest.ndjson",
+      "sha256": "e82b0ee51932bef46ae6a6de378be51391215a790e92b91fce32e180483ff353"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/m/original/bodies/1e8158ec28e8e3262a284fd3d092e1c2bd33e3777cb057ddab140633fa8954cd.bin",
+      "sha256": "1e8158ec28e8e3262a284fd3d092e1c2bd33e3777cb057ddab140633fa8954cd"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/m/original/manifest.ndjson",
+      "sha256": "84b63a9c95a9fc797fff29eea2f39b043cd1c05920de3e4cc9cffae9817ffd61"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/p/fixture-validation.json",
+      "sha256": "22cd4ca4eb0dc5f87953d0233ea814f8604e189c51002979fafcfb0e1b00e622"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/p/out/ASTOCK-001-6de41e0d8536/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "7b5dfea3bcc084092d0b7a4bf549c5cb8e41802d65803a0e859ef6a7a117f755"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/p/out/ASTOCK-001-6de41e0d8536/2026-10-03/realtime_quote/tencent/single_quote/mapped-rows.json",
+      "sha256": "23326896e2e05207fb206a57cfef2ee2472838008e98eea873aa2bdafae3824a"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/p/out/ASTOCK-001-6de41e0d8536/2026-10-03/source_rows/tencent/single_quote/source-rows.json",
+      "sha256": "cc12e1a6a63334592e4308c5c358549e0f6417a94834484125e9f539e3c0c1b5"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/p/out/ASTOCK-001-6de41e0d8536/_raw/bodies/264dd0d1a52ea52847aebdfa389075b55da8aca4f96b0f9338013a40b3472dd4.bin",
+      "sha256": "264dd0d1a52ea52847aebdfa389075b55da8aca4f96b0f9338013a40b3472dd4"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/p/out/ASTOCK-001-6de41e0d8536/_raw/bodies/40fbea263c0e376387ca08966b3ab3d96994f4756955403aa49e31fcdf3af413.bin",
+      "sha256": "40fbea263c0e376387ca08966b3ab3d96994f4756955403aa49e31fcdf3af413"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/p/out/ASTOCK-001-6de41e0d8536/_raw/bodies/cee292825ac668ef99c670199b015faeb4c18bea207a1026cbf695d2c382ad38.bin",
+      "sha256": "cee292825ac668ef99c670199b015faeb4c18bea207a1026cbf695d2c382ad38"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/p/out/ASTOCK-001-6de41e0d8536/_raw/manifest.ndjson",
+      "sha256": "823df52732df0dfa6531dc603231d9dbf4d4f9a51730e5ae526f75d8d0c2f780"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/p/out/ASTOCK-001-8c61ff4c1f5b/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "a68cb199c10248bd29037698bf42a92de2326f9aed5356ac0329ac2b17df3f16"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/p/out/ASTOCK-001-8c61ff4c1f5b/2026-10-03/realtime_quote/tencent/single_quote/mapped-rows.json",
+      "sha256": "23326896e2e05207fb206a57cfef2ee2472838008e98eea873aa2bdafae3824a"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/p/out/ASTOCK-001-8c61ff4c1f5b/2026-10-03/source_rows/tencent/single_quote/source-rows.json",
+      "sha256": "cc12e1a6a63334592e4308c5c358549e0f6417a94834484125e9f539e3c0c1b5"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/p/out/ASTOCK-001-8c61ff4c1f5b/_raw/bodies/264dd0d1a52ea52847aebdfa389075b55da8aca4f96b0f9338013a40b3472dd4.bin",
+      "sha256": "264dd0d1a52ea52847aebdfa389075b55da8aca4f96b0f9338013a40b3472dd4"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/p/out/ASTOCK-001-8c61ff4c1f5b/_raw/bodies/40fbea263c0e376387ca08966b3ab3d96994f4756955403aa49e31fcdf3af413.bin",
+      "sha256": "40fbea263c0e376387ca08966b3ab3d96994f4756955403aa49e31fcdf3af413"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/p/out/ASTOCK-001-8c61ff4c1f5b/_raw/bodies/cee292825ac668ef99c670199b015faeb4c18bea207a1026cbf695d2c382ad38.bin",
+      "sha256": "cee292825ac668ef99c670199b015faeb4c18bea207a1026cbf695d2c382ad38"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/p/out/ASTOCK-001-8c61ff4c1f5b/_raw/manifest.ndjson",
+      "sha256": "dff16a1eaccec2dff35f845b2b771936ba70e54ae38037ba609e43fbfeea7a61"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/verify.py",
+      "sha256": "ca7e5b668de9bb4676c56086fa1548ed8c26523b7573a90cbe09f6382ac07194"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/capabilities.yaml",
+      "sha256": "7b7ce0da1d33b333165c6081a3ed788f85cb05d5f6945c745eec97d73e24f6e2"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/collection.yaml",
+      "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/datasets/board_fund_flow.yaml",
+      "sha256": "08f3566d0cf2787186e6106e4915d0d89b70232d737898480eda03785ea3c53a"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/datasets/concept_board.yaml",
+      "sha256": "eef0b07c9a41bfd5ef1a52f4f39516cb26d42b088d63a15783af0f94985fd76f"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/datasets/daily_bar.yaml",
+      "sha256": "0a8c1dcae7e1c062ae70c224defc1362adc1d58bc196bbeb2f1edd61d6fd39e7"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/datasets/dividend_event.yaml",
+      "sha256": "67a2b02063cb9a891e3fb388048407cbc08b05ce8ae97deea6976d3904340d2e"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/datasets/financial_main.yaml",
+      "sha256": "23d8b55356620439d5c1b507601b782b31aa965fe24eaf194e869466bb271ab0"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/datasets/industry_board.yaml",
+      "sha256": "c6930c70b55e171dee94b74b80f3c37df1466d4a10dadc3016975004b8b47ba4"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/datasets/industry_directory.yaml",
+      "sha256": "9325d485bf7a1bc2b075c2d920b43b17caa039916536bedd8163be0f972bfe5b"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/datasets/industry_index_daily.yaml",
+      "sha256": "5d542c72443410747f2ac643589bfd8160cdea07d01d6d0dd9c5e4753096043b"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/datasets/industry_membership.yaml",
+      "sha256": "dff512c9b7f00330bbe408ba1e1eb74d99b49bc0b38ee419d4c463047c6fe69d"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/datasets/intraday_trend.yaml",
+      "sha256": "5983e0eb29c1cd7a781fbad0be7332dda14e887ccd744e55ad4b8664c7a0c38a"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/datasets/limit_up_pool.yaml",
+      "sha256": "73c1fa4ed6d7281d1857208a2ec9696a3637214bb256661ce943313c75772a69"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/datasets/minute_bar_5m.yaml",
+      "sha256": "fb6f822ed42479422a0b4c227577d8e559bb6b2238562af566af0464304bd873"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/datasets/realtime_quote.yaml",
+      "sha256": "ebc3e97bb7469eb4c7c80daf50991ebe38f0eb5b2476a9a579d22236d416378b"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/datasets/security_snapshot.yaml",
+      "sha256": "255115893f64837a3b95ea9fe44551948eefa9604aca9d59214de87a580300be"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/datasets/shareholder_count.yaml",
+      "sha256": "d325df1784c873bea73a1d907e9964e06c26e4d6b356dd6c16148837b57feccf"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/datasets/stock_fund_flow.yaml",
+      "sha256": "df3f21341463f3538a1f855ef19b7bbdb683405aaa65d5418c255023c18a429f"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/datasets/trading_calendar.yaml",
+      "sha256": "924b17a5be104252e85a377e4579432c6725bab99cbaa0ad70e71102149a1f49"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/datasets.yaml",
+      "sha256": "e992d13297e1f9a8f64acabc25f65f138b21ce12dca16689cc3f17bf1385a6eb"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/normalization/board_fund_flow.yaml",
+      "sha256": "fb7c6f1f2d425181b189e25152e465306982e10c7c6ee06b2917dfa00b891baa"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/normalization/concept_board.yaml",
+      "sha256": "2b7e7f57d189541d6a232cd5391d2dab4289f9f3438f397d9fefd82bb1d996b7"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/normalization/daily_bar.yaml",
+      "sha256": "41f9bbd0824e20d70f7ed276758b286094c33c79180befca4d8985afc3c8ad0b"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/normalization/dividend_event.yaml",
+      "sha256": "a76b4e77c5b285ab0659ee2d7bf07214ada7d91997e553a21f451b9ac5d912cb"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/normalization/financial_main.yaml",
+      "sha256": "eeeb2e7418aab430168f0c7e16c69f1b24a9e49ec8d156a28390cae0e7a69bda"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/normalization/industry_board.yaml",
+      "sha256": "f3ff8bbe7fc4e8d4e5af1c36b9312e8db1c8c9cb09a09aadb472b22ae09de152"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/normalization/industry_directory.yaml",
+      "sha256": "823d97db8afe4adb3f963faaa04b42b8f151e93f2e75f3eb18f8c678a68bae37"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/normalization/industry_index_daily.yaml",
+      "sha256": "953087294fd2c3a3cb1b46f204d0a0f606f9060f0f89676fb3a189222a68dab1"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/normalization/industry_membership.yaml",
+      "sha256": "7eb72a1b8ce7aff27aa1ad62534af2bf7183f3d78c6392208035396a11e21ccb"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/normalization/intraday_trend.yaml",
+      "sha256": "14b0b22ad1308c70b65152e711c4248d3c8bf1c28d842fba36309194ed38870a"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/normalization/limit_up_pool.yaml",
+      "sha256": "411e6e6ead10a4d2cbff7ecf4de9bee26f411a66d005a33bc640865ef4b6e7ba"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/normalization/minute_bar_5m.yaml",
+      "sha256": "f3e9abaededc01a15c651a99a22131a80067133deb89548dd12b17278e0e55b7"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/normalization/realtime_quote.yaml",
+      "sha256": "3924a5ce6f1be005f3d441df09b7c566946953e1bff2fbb76c7648d1a567e0c5"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/normalization/security_snapshot.yaml",
+      "sha256": "474ab0397cb1aad33abcd070942586a8460c468b1d3f7af97c2d152eee5a6537"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/normalization/shareholder_count.yaml",
+      "sha256": "4f7c23835f82e0ab648dc667df4f36bd3150959afac8f7421eea1cb1d1946ce1"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/normalization/stock_fund_flow.yaml",
+      "sha256": "d6f2ee39cec08dee0175d244280a9a3b7e8437dd37b2da241aa270c32e5a37ac"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/normalization/trading_calendar.yaml",
+      "sha256": "4be7571914129769aeca321d892b8aa2fbd068db1c7c0b691ae0d5cefe7f69e0"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/providers.yaml",
+      "sha256": "871705749fce1ccada8d77b3c0596e66d07f870fd45d95a9332b75a1c404d2af"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/config/schedules.yaml",
+      "sha256": "01b7e269ea4231024bf1c520f78fa571c2909986aad5573006bd80e186119113"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/out/ASTOCK-001-001ce85d10d5/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "8bb07f1cebb3b018a18ba8a3dd8f4cbdf7b4a4aa76440f0305c6fd2c99ec36c9"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/out/ASTOCK-001-001ce85d10d5/2026-10-03/realtime_quote/tencent/single_quote/mapped-rows.json",
+      "sha256": "07d7735c7159381d73e2c7d688ac70d7cbb0ad239035760d47a43cc7b20ac137"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/out/ASTOCK-001-001ce85d10d5/2026-10-03/source_rows/tencent/single_quote/source-rows.json",
+      "sha256": "901877bb0190b2eeeb09dcf34188e1e82172e3d70b133ecf1ad8e8917d46ebca"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/out/ASTOCK-001-001ce85d10d5/_raw/bodies/6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695.bin",
+      "sha256": "6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/out/ASTOCK-001-001ce85d10d5/_raw/manifest.ndjson",
+      "sha256": "020a16944582b5975d43b5ea1a544ca151658e69ea035b9c069dd3ed5afe433d"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/out/ASTOCK-001-50305f3873bc/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "7f5c1c134026e4b33ae5d977c3efe16716a1dd6395ce9208cda8d47c3740a606"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/out/ASTOCK-001-a0e2a71b2c09/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "b5cbd4033de6b7bb6af2096b3c82f4ce82761403aba2442b0be974a7d58ce919"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004/y/out/ASTOCK-001-d45bf1927721/2026-10-03/input_report/tencent/single_quote/report.json",
+      "sha256": "fffe39c8adc09b1fd4f3559bce86d029a64069611f0e44d4d976728b24529215"
+    },
+    {
+      "path": "provider_validation/results/tencent-final-20261004-tests.xml",
+      "sha256": "5cb22d5a0309cc9916cb36e79304ab683225179222ae40dce0921763a866ba08"
+    },
+    {
+      "path": "provider_validation/results/tencent-original-20261004/1-snapshot.py.bin",
+      "sha256": "bd279457d6915ded4639dca51184f23bd202dcbb52789e496641ad9b1e1ed5f8"
+    },
+    {
+      "path": "provider_validation/results/tencent-original-20261004/2-transport.py.bin",
+      "sha256": "8c31696b47ad30b65a9cbfc975716d16ac8d67c6ed70f96610d094fa4d88bd65"
+    },
+    {
+      "path": "provider_validation/results/tencent-original-20261004/3-factory.py.bin",
+      "sha256": "4baca1c727459ee1024f43b7c90c727ecad88edcc0e7beabdb7e753e5da90dee"
+    },
+    {
+      "path": "provider_validation/results/tencent-original-20261004/4-inputs.py.bin",
+      "sha256": "d3b4d88aa314b6c5edce8f0c3425681ed0ea3084e5786afe76e56275c20b5235"
+    },
+    {
+      "path": "provider_validation/results/tencent-original-20261004/5-scheduler.py.bin",
+      "sha256": "bf677464d2044ca3611383d5e5803401df19b59b13743af0d6c2a0d419017015"
+    },
+    {
+      "path": "provider_validation/results/tencent-original-20261004/6-providers.yaml.bin",
+      "sha256": "849517ae3f16eab864dc39aa1b9d02eb2dddd96adaae94c41a0660a1f1935e61"
+    },
+    {
+      "path": "provider_validation/results/tencent-original-20261004/7-realtime_quote.yaml.bin",
+      "sha256": "ebc3e97bb7469eb4c7c80daf50991ebe38f0eb5b2476a9a579d22236d416378b"
+    },
+    {
+      "path": "provider_validation/results/tencent-original-20261004/8-realtime_quote.yaml.bin",
+      "sha256": "dc23632f5a889fd435439695f607988d2da8d212291bbb843ea6c8a3724d6e6c"
+    },
+    {
+      "path": "provider_validation/results/tencent-original-20261004/manifest.json",
+      "sha256": "5e202286812e79868135d498305b029f73c84ba57bfcac766f010a802126f7d6"
+    }
+  ],
+  "limitations": [
+    "实时来源证据仅单证券；203只分批为合成离线夹具。",
+    "会话/间隔/缓存在线分支仅注入夹具，不证明实际网络重试或容量。",
+    "标准量额单位未独立核实，1分钟未迁移；自动快照仍关闭并有在线批量门禁。",
+    "未进行生产发布、历史补采或管理台开发。"
+  ]
+}

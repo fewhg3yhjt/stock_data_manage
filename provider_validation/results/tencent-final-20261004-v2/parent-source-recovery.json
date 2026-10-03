@@ -1,0 +1,6 @@
+{
+  "path": "provider_validation/results/tencent-final-20261004-v2/parent-test-source.py.bin",
+  "sha256": "feee8612e2b41444812e01b9ed1c33c68650b4c871bb007e815fbe55c2cbd2fe",
+  "compared_to": "provider_validation/results/tencent-final-20261004/comparison.json#verification_code",
+  "method": "recovered only the prior partial-event metadata line; complete byte hash matches recorded parent source exactly"
+}

@@ -1,0 +1,64 @@
+dataset: realtime_quote
+rules:
+- endpoint: single_quote
+  field_mapping:
+    amount: source_amount_37
+    change_amount: change
+    change_pct: change_pct
+    high: high
+    instrument_id: instrument_id
+    low: low
+    open: open
+    pre_close: prev_close
+    price: prev_close
+    quote_time: datetime
+    volume: volume_lot
+  id: tencent-snapshot-input-v2
+  input_id: ASTOCK-001
+  null_values:
+  - null
+  - ''
+  - '-'
+  provider: tencent
+  source_required_numeric:
+  - price
+  - prev_close
+  - open
+  - volume_lot
+  - change
+  - change_pct
+  - high
+  - low
+  status: pending_validation
+  transforms:
+    quote_time:
+      format: '%Y%m%d%H%M%S'
+      timezone: Asia/Shanghai
+  unverified_fields:
+  - volume
+  - amount
+  version: tencent-snapshot-fields-v2
+- adjustment: none
+  asset_type: stock
+  endpoint: single_quote
+  exchange: XSHG
+  field_mapping:
+    amount: f48
+    change_amount: f169
+    change_pct: f170
+    float_market_cap: f117
+    high: f44
+    low: f45
+    open: f46
+    pb: f167
+    pe_dynamic: f162
+    pre_close: f60
+    price: f43
+    total_market_cap: f116
+    turnover_rate: f168
+    volume: f47
+  frequency: null
+  id: eastmoney-realtime-quote-v1
+  provider: eastmoney
+  status: pending_validation
+  version: eastmoney-realtime-quote-v1

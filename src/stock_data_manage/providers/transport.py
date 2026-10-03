@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 import socket
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Mapping, Protocol, Sequence
 from threading import Lock, BoundedSemaphore
@@ -27,13 +27,27 @@ class HttpTransport(Protocol):
 class RequestsTransport:
     """The verified Tencent helper uses requests.request, its UA, Referer and tuple timeout."""
     headers: Mapping[str, str]
+    use_session: bool = False
+    _session: Any = field(default=None, init=False, repr=False)
 
     def get(self, url, *, params, timeout_seconds):
         import requests
-        response = requests.request("GET", url, params=params, headers=dict(self.headers),
-                                    timeout=timeout_seconds, allow_redirects=True)
+        if self.use_session:
+            # Create inside the existing capture scope so the saved probe retry policy applies.
+            if self._session is None:
+                self._session = requests.Session()
+                self._session.headers.update(self.headers)
+            response = self._session.get(url, params=params, timeout=timeout_seconds, allow_redirects=True)
+        else:
+            response = requests.request("GET", url, params=params, headers=dict(self.headers),
+                                        timeout=timeout_seconds, allow_redirects=True)
         response.raise_for_status()
         return HttpResponse(response.status_code, dict(response.headers), response.content)
+
+    def close(self):
+        if self._session is not None:
+            self._session.close()
+            self._session = None
 
 
 _REQUEST_CAPTURE_LOCK = Lock()
@@ -242,6 +256,16 @@ class RealtimeFetchResponse:
 class SnapshotFetchResponse:
     rows: tuple[Mapping[str, Any], ...]
     requested_symbols: tuple[str, ...]
+    source_rows: tuple[Mapping[str, Any], ...] | None = None
+    source_url: str | None = None
+
+    @property
+    def coverage_denominator(self) -> int:
+        return len(self.requested_symbols)
+
+    @property
+    def missing_symbols(self) -> tuple[str, ...]:
+        return tuple(symbol for symbol in self.requested_symbols if symbol not in self.returned_symbols)
 
     @property
     def returned_symbols(self) -> frozenset[str]:

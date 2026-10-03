@@ -39,6 +39,251 @@ BAO_ARCHIVE = ROOT / "provider_validation/results/live-probes/baostock-industry-
 BAO_EMPTY_ARCHIVE = ROOT / "provider_validation/results/live-probes/baostock-industry-20261003/_raw/baostock-industry/manifest.ndjson"
 BAO_CONTEXT = {"request": {"trade_date": "2026-09-30"}, "calendar": {"trading_dates": [date(2026, 9, 30)]}}
 BAO_CASES = [("SDA-BOARD-005", BAO_CONTEXT, BAO_ARCHIVE, 5223), ("SDA-BOARD-006", BAO_CONTEXT, BAO_ARCHIVE, 5221)]
+QUOTE_ARCHIVE = ROOT / "provider_validation/results/live-probes/pilot-20261003-tencent-quote-network/_raw/missing-capabilities-20261003T173649/manifest.ndjson"
+QUOTE_CONTEXT = {"request": {"symbols": ["sh600519"], "as_of": "2026-09-30T15:10:00+08:00"}}
+
+
+def quote_source():
+    event = next(json.loads(line) for line in QUOTE_ARCHIVE.read_text(encoding="utf-8").splitlines()
+                 if json.loads(line).get("url") == "https://qt.gtimg.cn/q=sh600519")
+    return event, RawObjectStore.read_response(QUOTE_ARCHIVE, event)
+
+
+def quote_payload(symbols):
+    _, body = quote_source()
+    return b"\n".join(body.strip().replace(b"v_sh600519=", ("v_" + symbol + "=").encode())
+                       .replace(b"~600519~", ("~" + symbol[2:] + "~").encode()) for symbol in symbols)
+
+
+def compare_quote_original(tmp_path):
+    import ast
+    import csv
+    import re
+    import types
+    import pandas as pd
+    from requests.adapters import HTTPAdapter
+    from urllib3.util.retry import Retry
+    from stock_data_manage.config.loader import load_input_capabilities
+    from stock_data_manage.routing.factory import build_input_provider
+    from stock_data_manage.providers.contracts import HttpResponse
+    probe = ROOT / "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py"
+    nodes = [node for node in ast.parse(probe.read_text(encoding="utf-8")).body
+             if isinstance(node, ast.FunctionDef) and node.name in {"build_session", "only_digits", "market_of", "sina_symbol", "fetch_tencent_finance"}
+             or isinstance(node, ast.Assign) and any(isinstance(t, ast.Name) and t.id == "UA" for t in node.targets)]
+    namespace = {"requests": requests, "re": re, "pd": pd, "HTTPAdapter": HTTPAdapter, "Retry": Retry, "Config": types.SimpleNamespace}
+    exec(compile(ast.Module(body=nodes, type_ignores=[]), str(probe), "exec"), namespace)
+    runner_path = ROOT / "provider_validation/tests/run_a_stock_rate_limited_probes.py"
+    spec = importlib.util.spec_from_file_location("original_quote_probe_policy", runner_path)
+    runner = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(runner)
+    store = RawObjectStore(tmp_path / "original")
+    with captured_requests(store, provider="tencent", endpoint="single_quote", scope=QUOTE_CONTEXT, code_version="original-probe",
+                           pacer=RequestPacer(), replay_manifest=QUOTE_ARCHIVE, sdk_retry_policy=True) as events:
+        session = namespace["build_session"]()
+        for scheme in ("http://", "https://"):
+            session.mount(scheme, HTTPAdapter(max_retries=runner.retry_policy()))
+        namespace["SESSION"] = session
+        try:
+            frame = namespace["fetch_tencent_finance"](types.SimpleNamespace(code="600519"))
+        finally:
+            session.close()
+    original_rows = frame.to_dict("records")
+    golden = ROOT / "provider_validation/results/live-probes/pilot-20261003-tencent-quote-network/01_腾讯财经/data.csv"
+    with golden.open(encoding="utf-8-sig", newline="") as stream:
+        assert original_rows == list(csv.DictReader(stream))
+    parsed_ref = store.write_json(original_rows, dataset="original_parsed", provider="tencent", endpoint="single_quote",
+                                 fetched_at=datetime.now(timezone.utc), attempt_id="parsed")
+    report = collect_input(input_id="ASTOCK-001", context=QUOTE_CONTEXT, config_root=ROOT / "config",
+                           output_root=tmp_path / "adapter", replay_manifest=QUOTE_ARCHIVE)
+    assert report["status"] == "candidate_complete", report
+    source, mapped = read_artifact(report, "source_rows"), read_artifact(report, "output")
+    assert {key: source[0][key] for key in original_rows[0]} == original_rows[0]
+    assert mapped[0]["instrument_id"] == "XSHG:600519"
+    for target, column in {"price": "price", "change_pct": "change_pct", "change_amount": "change",
+                           "open": "open", "high": "high", "low": "low", "pre_close": "prev_close"}.items():
+        assert Decimal(mapped[0][target]) == Decimal(original_rows[0][column])
+    assert mapped[0]["quote_time"] == "2026-09-30T16:14:58+08:00"
+    assert mapped[0]["volume"] is mapped[0]["amount"] is None
+    keys = ("url", "method", "request_headers", "outcome", "status_code", "body_sha256", "error_type", "request_options")
+    original_request, migrated_request = ({key: event.get(key) for key in keys} for event in (events[0], report["responses"][0]))
+    assert original_request == migrated_request
+    archived, body = quote_source()
+    assert migrated_request["request_headers"] == archived["request_headers"]
+    assert migrated_request["request_options"]["timeout"] == 20
+    assert "Referer" not in migrated_request["request_headers"]
+    snapshot_path = ROOT / "provider_validation/results/tencent-original-20261004/1-snapshot.py.bin"
+    module = types.ModuleType("stock_data_manage.providers.tencent.original_quote")
+    module.__package__ = "stock_data_manage.providers.tencent"
+    import sys
+    sys.modules[module.__name__] = module
+    exec(compile(snapshot_path.read_bytes(), str(snapshot_path), "exec"), module.__dict__)
+    class ArchivedTransport:
+        def get(self, *args, **kwargs):
+            return HttpResponse(200, archived["response_headers"], body)
+    contract = next(c for c in load_input_capabilities(ROOT / "config/providers.yaml") if c.input_id == "ASTOCK-001")
+    provider = build_input_provider(contract, providers_path=ROOT / "config/providers.yaml")
+    provider.transport = ArchivedTransport()
+    stamp = datetime.fromisoformat(QUOTE_CONTEXT["request"]["as_of"])
+    legacy = module.TencentSnapshotProvider(ArchivedTransport(), provider.capability).fetch_snapshot(["sh600519"], stamp)
+    current = provider.fetch_snapshot(["sh600519"], stamp)
+    assert current.rows == legacy.rows
+    comparison = {"input_id": "ASTOCK-001", "mode": "offline_replay", "source_probe": str(probe.relative_to(ROOT)),
+        "source_response_sha256": archived["body_sha256"], "original_csv_sha256": hashlib.sha256(golden.read_bytes()).hexdigest(),
+        "original_parsed_sha256": parsed_ref.content_hash, "original_parsed_path": str(parsed_ref.path),
+        "provider_report": report["report_path"], "all_source_fields_equal": True, "all_mapped_prices_equal": True,
+        "original_request": original_request, "provider_request": migrated_request, "request_equal": True,
+        "legacy_rows_equal": True, "production_writes": 0, "eligible_for_production_routing": False}
+    (tmp_path / "comparison.json").write_text(json.dumps(comparison, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return comparison
+
+
+def test_quote_matches_original_script_csv_and_existing_provider(tmp_path, no_network):
+    compare_quote_original(tmp_path)
+
+
+def quote_fixture_manifest(tmp_path, symbols, *, mutation=None):
+    from copy import deepcopy
+    store = RawObjectStore(tmp_path / "fixture")
+    original, _ = quote_source()
+    for offset in range(0, len(symbols), 100):
+        batch = symbols[offset:offset + 100]
+        body = quote_payload(batch)
+        if mutation == "duplicate":
+            body += b"\n" + body
+        elif mutation == "identity":
+            body = body.replace(b"~600519~", b"~600000~")
+        elif mutation == "timestamp":
+            body = body.replace(b"20260930161458", b"20261399161458")
+        elif mutation == "stale":
+            body = body.replace(b"20260930161458", b"20260929161458")
+        elif mutation == "numeric":
+            body = body.replace(b"~1258.62~", b"~NaN~", 1)
+        elif mutation == "unexpected":
+            body = quote_payload(["sz300750"])
+        elif mutation == "html":
+            body = b"<html>not quote data</html>"
+        elif mutation == "empty":
+            body = b'v_sh600519="";'
+        event = deepcopy(original)
+        ref = store.write_bytes(body, dataset="fixture_payload", provider="tencent", endpoint="single_quote",
+                                fetched_at=datetime.now(timezone.utc), attempt_id=str(offset), content_addressed=True)
+        event.update(url="https://qt.gtimg.cn/q=" + ",".join(batch), mode="offline_fixture", synthetic=True,
+                     body_storage=ref.path.relative_to(store.root).as_posix(), body_sha256=ref.content_hash,
+                     requests_decoded_body_bytes=len(body), fixture_parent_sha256=original["body_sha256"], mutation=mutation)
+        if mutation == "http_429":
+            event["status_code"] = 429
+        elif mutation == "transport":
+            event.update(outcome="transport_error", error_type="ConnectionError")
+        elif mutation == "corrupt_hash":
+            event["body_sha256"] = "0" * 64
+        store.append_event(event)
+    return store.root / "manifest.ndjson"
+
+
+def test_quote_multi_batch_yaml_and_partial_scope(tmp_path, no_network):
+    symbols = tuple(f"sh{600000+i}" for i in range(201)) + ("sz300750", "bj920001")
+    manifest = quote_fixture_manifest(tmp_path, symbols)
+    context = {"request": {**QUOTE_CONTEXT["request"], "symbols": symbols}}
+    report = collect_input(input_id="ASTOCK-001", context=context, config_root=ROOT / "config", output_root=tmp_path / "out",
+                           replay_manifest=manifest)
+    assert report["status"] == "candidate_complete", report
+    assert report["row_count"] == report["coverage_denominator"] == 203
+    assert report["coverage_complete"] and not report["missing_symbols"]
+    assert [len(event["url"].split("q=")[1].split(",")) for event in report["responses"]] == [100, 100, 3]
+    assert {row["instrument_id"] for row in read_artifact(report, "output")} == {
+        {"sh": "XSHG", "sz": "XSHE", "bj": "BSE"}[s[:2]] + ":" + s[2:] for s in symbols}
+    assert report["live_http_calls"] == report["production_writes"] == 0
+    assert not report["online_batch_validation"] and not report["universe_completeness_verified"]
+    partial_symbols = ["sh600519", "sz300750"]
+    partial_manifest = quote_fixture_manifest(tmp_path / "p", partial_symbols)
+    event = json.loads(partial_manifest.read_text(encoding="utf-8"))
+    from copy import deepcopy
+    partial_event = deepcopy(event)
+    _, body = quote_source()
+    ref = RawObjectStore(partial_manifest.parent).write_bytes(body, dataset="partial", provider="tencent", endpoint="single_quote",
+        fetched_at=datetime.now(timezone.utc), attempt_id="partial", content_addressed=True)
+    partial_event.update(body_storage=ref.path.relative_to(partial_manifest.parent).as_posix(), body_sha256=ref.content_hash,
+                         requests_decoded_body_bytes=len(body))
+    assert partial_event["requests_decoded_body_bytes"] == len(RawObjectStore.read_response(partial_manifest, partial_event))
+    # A separate immutable manifest models a successful response missing one requested security.
+    missing = partial_manifest.parent / "partial.ndjson"
+    missing.write_text(json.dumps(partial_event) + "\n", encoding="utf-8")
+    partial = collect_input(input_id="ASTOCK-001", context={"request": {**QUOTE_CONTEXT["request"], "symbols": partial_symbols}},
+        config_root=ROOT / "config", output_root=tmp_path / "partial", replay_manifest=missing)
+    assert partial["status"] == "candidate_complete", partial
+    assert partial["row_count"] == 1 and partial["coverage_denominator"] == 2
+    assert partial["missing_symbols"] == ["sz300750"] and not partial["coverage_complete"]
+
+
+@pytest.mark.parametrize("mutation,expected", [("duplicate", "schema_changed"), ("identity", "schema_changed"),
+    ("timestamp", "schema_changed"), ("stale", "NormalizationError"), ("numeric", "NormalizationError"),
+    ("unexpected", "schema_changed"), ("html", "schema_changed"), ("empty", "temporary_empty"),
+    ("http_429", "HTTPError"), ("transport", "ConnectionError"), ("corrupt_hash", "ValueError")])
+def test_quote_failure_retains_evidence(tmp_path, no_network, mutation, expected):
+    manifest = quote_fixture_manifest(tmp_path, ["sh600519"], mutation=mutation)
+    report = collect_input(input_id="ASTOCK-001", context=QUOTE_CONTEXT, config_root=ROOT / "config",
+        output_root=tmp_path / "out", replay_manifest=manifest)
+    assert report["status"] == "failed" and report["failure_class"] == expected, report
+    assert report["production_writes"] == report["live_http_calls"] == 0
+    if mutation not in {"transport", "corrupt_hash"}:
+        assert report["responses"][0]["body_sha256"] == json.loads(manifest.read_text(encoding="utf-8"))["body_sha256"]
+        RawObjectStore.read_response(Path(report["run_directory"]) / report["raw_manifest"]["path"], report["responses"][0])
+
+
+def test_quote_yaml_mapping_selection_and_scope_restrictions(tmp_path, no_network):
+    config = tmp_path / "config"
+    shutil.copytree(ROOT / "config", config)
+    path = config / "normalization/realtime_quote.yaml"
+    document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    document["rules"][0]["field_mapping"]["price"] = "prev_close"
+    path.write_text(yaml.safe_dump(document, allow_unicode=True), encoding="utf-8")
+    report = collect_input(input_id="ASTOCK-001", context=QUOTE_CONTEXT, config_root=config, output_root=tmp_path / "out",
+        replay_manifest=QUOTE_ARCHIVE, fields=["instrument_id", "quote_time", "price"])
+    assert report["status"] == "candidate_complete", report
+    assert read_artifact(report, "output") == [{"instrument_id": "XSHG:600519", "quote_time": "2026-09-30T16:14:58+08:00", "price": "1235.58"}]
+    for request in ({"symbol": "600519"}, {"symbols": ["sh600519"], "as_of": "2026-09-30T15:10:00"}):
+        with pytest.raises(ValueError):
+            collect_input(input_id="ASTOCK-001", context={"request": request}, config_root=config,
+                output_root=tmp_path / "out", replay_manifest=QUOTE_ARCHIVE)
+    for symbols in (["sh600519", "sh600519"], ["sh510300"], ["sh600519&other=1"]):
+        failed = collect_input(input_id="ASTOCK-001", context={"request": {**QUOTE_CONTEXT["request"], "symbols": symbols}},
+            config_root=config, output_root=tmp_path / "out", replay_manifest=QUOTE_ARCHIVE)
+        assert failed["status"] == "failed" and failed["failure_class"] == "ValueError", failed
+
+
+def test_quote_injected_session_pacing_retry_and_cache(tmp_path, no_network):
+    from unittest.mock import patch
+    calls, sessions, starts = [], [], []
+    clock = [0.0]
+    pacer = RequestPacer(clock=lambda: clock[0], wait=lambda seconds: clock.__setitem__(0, clock[0] + seconds))
+    symbols = tuple(f"sh{600000+i}" for i in range(201))
+    def fake_send(session, request, **kwargs):
+        starts.append(clock[0]); calls.append(request.url); sessions.append(session)
+        policy = session.adapters["https://"].max_retries
+        assert policy.total == policy.connect == policy.read == policy.status == 2
+        assert not policy.is_retry("GET", 429) and not policy.is_retry("GET", 403)
+        assert policy.increment(method="GET", error=requests.ConnectionError()).get_backoff_time() >= 5
+        assert session.trust_env and kwargs["timeout"] == 20 and kwargs["allow_redirects"]
+        assert "Referer" not in request.headers
+        response = requests.Response(); response.status_code = 200
+        response.headers["Content-Type"] = "text/html; charset=GBK"; response.encoding = "gbk"
+        response._content = quote_payload(request.url.split("q=", 1)[1].split(",")); response._content_consumed = True
+        response.url = request.url; response.request = request
+        return response
+    context = {"request": {**QUOTE_CONTEXT["request"], "symbols": symbols}}
+    with patch("requests.Session.send", fake_send):
+        report = collect_input(input_id="ASTOCK-001", context=context, config_root=ROOT / "config", output_root=tmp_path / "out",
+            mode="live", evidence_root=tmp_path / "empty", pacer=pacer)
+        assert report["status"] == "candidate_complete", report
+        assert starts == [0, 3, 6] and len({id(s) for s in sessions}) == 1
+        cached = collect_input(input_id="ASTOCK-001", context=context, config_root=ROOT / "config", output_root=tmp_path / "out",
+            mode="live", evidence_root=tmp_path / "empty", pacer=pacer)
+    assert cached["status"] == "candidate_complete", cached
+    assert len(calls) == 3 and cached["live_http_calls"] == 0
+    assert all(event["mode"] == "cached" for event in cached["responses"])
+    (tmp_path / "fixture-validation.json").write_text(json.dumps({"mode": "injected Session fixture; no real live source calls",
+        "requests": calls, "start_seconds": starts, "shared_session": True, "cache_reused": True,
+        "retry_policy_equal_to_source_runner": True, "external_network_requests": 0}, indent=2) + "\n", encoding="utf-8")
 
 
 @pytest.mark.parametrize("input_id,context,manifest,count", BAO_CASES)

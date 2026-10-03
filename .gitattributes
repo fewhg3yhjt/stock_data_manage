@@ -36,6 +36,9 @@
 /src/stock_data_manage/worker/scheduler.py text eol=lf
 /tests/test_cli.py text eol=lf
 /tests/test_scheduler.py text eol=lf
+/tests/test_daily_collection_e2e.py text eol=lf
+/provider_validation/results/tencent-final-20261004-v2/** -text whitespace=cr-at-eol
+/provider_validation/results/tencent-final-20261004-v2/**/*.bin binary
 /tests/test_provider_contract_adapters.py text eol=lf
 /provider_validation/tests/prepare_capability_results.py text eol=lf
 /provider_validation/results/input-scheduling*-20261003/** -text whitespace=cr-at-eol
@@ -81,3 +84,14 @@
 /config/normalization/security_snapshot.yaml text eol=lf
 /config/normalization/industry_membership.yaml text eol=lf
 /tests/test_config_contract.py text eol=lf
+
+# Tencent migration evidence retains exact response bytes and investigation snapshots.
+/provider_validation/results/tencent-*-20261004/** -text whitespace=cr-at-eol
+/provider_validation/results/tencent-*-20261004/**/*.bin binary
+/provider_validation/results/tencent-*-20261004-*.xml -text whitespace=-blank-at-eol,cr-at-eol
+/provider_validation/results/tencent-*-20261004-*.json -text whitespace=cr-at-eol
+/src/stock_data_manage/providers/tencent/snapshot.py text eol=lf
+/src/stock_data_manage/worker/scheduler.py text eol=lf
+/config/normalization/realtime_quote.yaml text eol=lf
+/tests/test_provider_contract_adapters.py text eol=lf
+/tests/test_scheduler.py text eol=lf

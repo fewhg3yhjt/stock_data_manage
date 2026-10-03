@@ -1,0 +1,60 @@
+{
+  "input_id": "ASTOCK-001",
+  "mode": "offline_replay",
+  "source_probe": "provider_validation\\tests\\source_snapshots\\a-stock-data\\a_stock_missing_capabilities.py",
+  "source_response_sha256": "6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695",
+  "original_csv_sha256": "18a2746d17c19d96d504da26d6586d664ac3f1f2816619d79141f9972ddc56b0",
+  "original_parsed_sha256": "ae41c4f83438fef63074b60830241436dfdaceb8f2259fbc71baafe73906f685",
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\tencent-final-20261004-v2\\1\\original\\2026-10-03\\original_parsed\\tencent\\single_quote\\parsed.json",
+  "provider_report": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\tencent-final-20261004-v2\\1\\adapter\\ASTOCK-001-da16fc02d2dc\\2026-10-03\\input_report\\tencent\\single_quote\\report.json",
+  "all_source_fields_equal": true,
+  "all_mapped_prices_equal": true,
+  "original_request": {
+    "url": "https://qt.gtimg.cn/q=sh600519",
+    "method": "GET",
+    "request_headers": {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+      "Accept-Encoding": "gzip, deflate, br, zstd",
+      "Accept": "*/*",
+      "Connection": "keep-alive",
+      "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8"
+    },
+    "outcome": "response",
+    "status_code": 200,
+    "body_sha256": "6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695",
+    "error_type": null,
+    "request_options": {
+      "timeout": 20,
+      "allow_redirects": true,
+      "trust_env": true,
+      "proxies": {},
+      "sdk_retry_policy": true
+    }
+  },
+  "provider_request": {
+    "url": "https://qt.gtimg.cn/q=sh600519",
+    "method": "GET",
+    "request_headers": {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+      "Accept-Encoding": "gzip, deflate, br, zstd",
+      "Accept": "*/*",
+      "Connection": "keep-alive",
+      "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8"
+    },
+    "outcome": "response",
+    "status_code": 200,
+    "body_sha256": "6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695",
+    "error_type": null,
+    "request_options": {
+      "timeout": 20,
+      "allow_redirects": true,
+      "trust_env": true,
+      "proxies": {},
+      "sdk_retry_policy": true
+    }
+  },
+  "request_equal": true,
+  "legacy_rows_equal": true,
+  "production_writes": 0,
+  "eligible_for_production_routing": false
+}

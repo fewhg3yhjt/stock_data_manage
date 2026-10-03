@@ -1,0 +1,133 @@
+{
+  "validation_time_utc": "2026-10-03T19:51:42.368990+00:00",
+  "scope": "existing Tencent snapshot candidate migration; existing daily and recent5m regression; no new live calls or routing",
+  "original_files": [
+    {
+      "path": "src/stock_data_manage/providers/tencent/snapshot.py",
+      "snapshot": "provider_validation/results/tencent-original-20261004/1-snapshot.py.bin",
+      "sha256": "bd279457d6915ded4639dca51184f23bd202dcbb52789e496641ad9b1e1ed5f8",
+      "bytes": 2603
+    },
+    {
+      "path": "src/stock_data_manage/providers/transport.py",
+      "snapshot": "provider_validation/results/tencent-original-20261004/2-transport.py.bin",
+      "sha256": "8c31696b47ad30b65a9cbfc975716d16ac8d67c6ed70f96610d094fa4d88bd65",
+      "bytes": 15596
+    },
+    {
+      "path": "src/stock_data_manage/routing/factory.py",
+      "snapshot": "provider_validation/results/tencent-original-20261004/3-factory.py.bin",
+      "sha256": "4baca1c727459ee1024f43b7c90c727ecad88edcc0e7beabdb7e753e5da90dee",
+      "bytes": 17947
+    },
+    {
+      "path": "src/stock_data_manage/pipeline/inputs.py",
+      "snapshot": "provider_validation/results/tencent-original-20261004/4-inputs.py.bin",
+      "sha256": "d3b4d88aa314b6c5edce8f0c3425681ed0ea3084e5786afe76e56275c20b5235",
+      "bytes": 32359
+    },
+    {
+      "path": "src/stock_data_manage/worker/scheduler.py",
+      "snapshot": "provider_validation/results/tencent-original-20261004/5-scheduler.py.bin",
+      "sha256": "bf677464d2044ca3611383d5e5803401df19b59b13743af0d6c2a0d419017015",
+      "bytes": 8627
+    },
+    {
+      "path": "config/providers.yaml",
+      "snapshot": "provider_validation/results/tencent-original-20261004/6-providers.yaml.bin",
+      "sha256": "849517ae3f16eab864dc39aa1b9d02eb2dddd96adaae94c41a0660a1f1935e61",
+      "bytes": 72570
+    },
+    {
+      "path": "config/datasets/realtime_quote.yaml",
+      "snapshot": "provider_validation/results/tencent-original-20261004/7-realtime_quote.yaml.bin",
+      "sha256": "ebc3e97bb7469eb4c7c80daf50991ebe38f0eb5b2476a9a579d22236d416378b",
+      "bytes": 1121
+    },
+    {
+      "path": "config/normalization/realtime_quote.yaml",
+      "snapshot": "provider_validation/results/tencent-original-20261004/8-realtime_quote.yaml.bin",
+      "sha256": "dc23632f5a889fd435439695f607988d2da8d212291bbb843ea6c8a3724d6e6c",
+      "bytes": 611
+    }
+  ],
+  "capability_inventory": [
+    {
+      "接口ID": "ASTOCK-001",
+      "清单范围": "a-stock-data published endpoint",
+      "是否计入87项": "是",
+      "项目/来源": "a-stock-data（上游）",
+      "类别": "行情层（实时，不封 IP）",
+      "接口/能力名称": "腾讯财经",
+      "接口地址/协议": "GET https://qt.gtimg.cn/q=sh600519",
+      "接口/调用符号": "tencent_quote(codes)",
+      "接口说明": "腾讯财经；上游能力声明，调用细节见代码快照和能力说明/返回字段列。",
+      "能力说明（文档声明）/返回字段": "PE(TTM) / PB / 总市值 / 流通市值 / 换手率 / 涨跌停价 / 指数 / ETF",
+      "调用方式/参数范围": "探针入口：a_stock_missing_capabilities.py --run 1 → fetch_tencent_finance(cfg)；上游API：tencent_quote(codes)",
+      "来源代码文件/行号": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:339 (fetch_tencent_finance)",
+      "代码SHA-256": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py=ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0; provider_validation/tests/run_a_stock_rate_limited_probes.py=fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c",
+      "测试代码文件/行号": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 1",
+      "项目Provider对照代码": "",
+      "接口取数结果": "部分通过",
+      "本轮补抓脚本结果": "成功（解析输出非空）",
+      "证据完整度": "低频实时样本解析成功，原始响应和探测输出已留档；本轮仅单样本验证，未做全量语义核验。",
+      "实测范围/日期/结果": "参数范围：code=600519, date=20260930, start=20250101, end=20261003；请求事件：HTTP200×1；主机：qt.gtimg.cn；低频探测批次：pilot-20261003-tencent-quote-network；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+      "验证备注/数据核验结论": "通过：解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。；本轮低频真实探测 success：saved 1 file(s); usable=1。参数范围：code=600519, date=20260930, start=20250101, end=20261003；请求事件：HTTP200×1；主机：qt.gtimg.cn；低频探测批次：pilot-20261003-tencent-quote-network；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+      "原始响应Manifest": "provider_validation/results/live-probes/pilot-20261003-tencent-quote-network/_raw/missing-capabilities-20261003T173649/manifest.ndjson",
+      "原始响应文件/哈希": "provider_validation/results/live-probes/pilot-20261003-tencent-quote-network/_raw/missing-capabilities-20261003T173649/bodies/6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695.body.gz",
+      "解析结果/输出文件": "provider_validation/results/live-probes/pilot-20261003-tencent-quote-network/01_腾讯财经/data.csv",
+      "结果文件SHA-256/行数": "provider_validation/results/live-probes/pilot-20261003-tencent-quote-network/01_腾讯财经/data.csv (rows=1; sha256=18a2746d17c19d96d504da26d6586d664ac3f1f2816619d79141f9972ddc56b0)",
+      "返回示例": "{\"columns\": [\"name\", \"code\", \"price\", \"prev_close\", \"open\", \"volume_lot\", \"datetime\", \"change\", \"change_pct\", \"high\", \"low\", \"raw\"], \"sample\": {\"name\": \"贵州茅台\", \"code\": \"600519\", \"price\": \"1258.62\", \"prev_close\": \"1235.58\", \"open\": \"1239.53\", \"volume_lot\": \"38331\", \"datetime\": \"20260930161458\", \"change\": \"23.04\", \"change_pct\": \"1.86\", \"high\": \"1268.00\", \"low\": \"1236.05\", \"raw\": \"1~贵州茅台~600519~1258.62~1235.58~1239.53~38331~21633~16698~1258.62~14~1258.44~1~1258.16~1~1258.05~2~1258.00~41~1258.65~2~1258.66~3~1258.68~1~1258.69~2~1258.75~80~~20260930161458~23.04~1.86~1268.00~1236.05~1258.62/38331/4797246636~38331~479725~0.31~19.32~~1268.00~1236.05~2.59~15733.78~15733.78~6.26~1359.14~1112.02~1.36~-29~1251.53~17.67~19.11~~~0.06~479724.6636~453.1032~36~ A~GP-A~-6.71~0.38~4.13~32.41~27.30~1539.98~1151.01~-1.11~-3.15~5.87~1250081601~1250081601~-19.73~-9.97~1250081601~~~-9.58~0.16~~CNY~0~___D__F__N~…",
+      "逐接口结果记录": "provider_validation/results/interface-records/ASTOCK-001.json",
+      "来源版本/提交": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
+      "证据状态代码": "live_raw",
+      "证据状态说明": "实时原始响应已归档；仅代表本行注明的实测范围"
+    },
+    {
+      "接口ID": "ASTOCK-002",
+      "清单范围": "a-stock-data published endpoint",
+      "是否计入87项": "是",
+      "项目/来源": "a-stock-data（上游）",
+      "类别": "行情层（实时，不封 IP）",
+      "接口/能力名称": "腾讯 K 线",
+      "接口地址/协议": "GET https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh600519%2Cday%2C2026-09-01%2C2026-09-18%2C640%2Cqfq; GET https://proxy.finance.qq.com/ifzqgtimg/appstock/app/kline/mkline?param=sz300750%2Cm5%2C%2C96",
+      "接口/调用符号": "tencent_kline(code, period, adjust, start, end, count)",
+      "接口说明": "腾讯 K 线；上游能力声明，调用细节见代码快照和能力说明/返回字段列。",
+      "能力说明（文档声明）/返回字段": "上游声明支持：沪深日/周/月K（前/后复权）及1/5/15/30/60分钟K；上游文档注明不含北交所。此处是能力声明，不代表各周期均已实测。",
+      "调用方式/参数范围": "上游API：tencent_kline(code, period, adjust, start, end, count)；本轮无独立执行入口或未单独探测。",
+      "来源代码文件/行号": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:230 (上游内嵌接口说明/实现快照)",
+      "代码SHA-256": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md=c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03; provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py=ec18390ee2be31b5f72f4a0ff7c85ef3753a086ee9c43693bea00b08cab0ce09",
+      "测试代码文件/行号": "provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py:1 (该版本测试快照；未找到专属用例时以清单证据注明)",
+      "项目Provider对照代码": "",
+      "接口取数结果": "通过",
+      "本轮补抓脚本结果": "未执行",
+      "证据完整度": "此前实时验证已保存原始响应；本轮补抓脚本结果另列，测试范围不自动视为相同。",
+      "实测范围/日期/结果": "日线：sh600519，qfq，2026-09-01至2026-09-18，HTTP 200、code=0，返回14条日线。5分钟：sz300750，未传日期窗口、请求最近96条；直连web3.ifzq.gtimg.cn发生2次TLS EOF，使用备用域名proxy.finance.qq.com回退后HTTP 200、code=0，返回96条，样例日期为2026-09-29。未单独验证：周线、月线、1/15/30/60分钟线；不含北交所。",
+      "验证备注/数据核验结论": "实测样本的日线直连和5分钟备用域名回退均取得有效K线数据；直连5分钟请求失败已作为传输失败事件留档。5分钟请求未限制日期窗口，响应日期与清单requested_data_date不同，因此不能将其视为2026-09-18历史5分钟数据验证。通过结论仅覆盖上述日线及未限定日期的最近96条5分钟样本，不能代表其他周期或北交所。",
+      "原始响应Manifest": "传输失败记录见对应批次 manifest.ndjson：V39-002, V39-003; provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+      "原始响应文件/哈希": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/c3c0b821215bce77b8551f716c50f0324aadc39af7c9dc17538b0bf94b59845b.body.gz; provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/1e8158ec28e8e3262a284fd3d092e1c2bd33e3777cb057ddab140633fa8954cd.body.gz",
+      "解析结果/输出文件": "无解析数据文件",
+      "结果文件SHA-256/行数": "无解析输出文件",
+      "返回示例": "日线（前复权） sh600519: 14条；首条=[\"2026-09-01\", \"1295.000\", \"1299.560\", \"1307.990\", \"1286.100\", \"32664.000\"]；5分钟 sz300750: 96条；首条=[\"202609290935\", \"291.00\", \"288.53\", \"292.99\", \"287.22\", \"34155.36\", {}, \"8.0165\"]",
+      "逐接口结果记录": "provider_validation/results/interface-records/ASTOCK-002.json",
+      "来源版本/提交": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
+      "证据状态代码": "live_raw",
+      "证据状态说明": "实时原始响应已归档；仅代表本行注明的实测范围"
+    }
+  ],
+  "source_manifest": "provider_validation/results/live-probes/pilot-20261003-tencent-quote-network/_raw/missing-capabilities-20261003T173649/manifest.ndjson",
+  "source_probe": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+  "source_probe_runner": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+  "comparison_plan": [
+    "original Session headers, proxies, timeout20, redirects and conservative probe retries preserved",
+    "one archived sh600519 original query/CSV comparison",
+    "synthetic multi-batch offline tests separated from real evidence",
+    "legacy row values retained; YAML fields actually executed; unknown standard units null",
+    "daily14 and recent5m96 regression"
+  ],
+  "production_writes": 0,
+  "new_live_requests": 0,
+  "source_manifest_sha256": "b2c15224346d15fa1d750b745984e0d86501c9519be7867e575627846c647fa3",
+  "source_probe_sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0",
+  "source_probe_runner_sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
+}

@@ -434,6 +434,7 @@ def test_rate_limited_primary_is_cooled_and_fallback_completes_partition(tmp_pat
 def test_snapshot_provider_publishes_provisional_and_final_provider_can_replace_it(tmp_path) -> None:
     parts = ["-"] * 38
     parts[1] = "贵州茅台"
+    parts[2] = "600519"
     parts[3:7] = ["1275.16", "1285.15", "1285.15", "34801"]
     parts[30] = "20260911150003"
     parts[33] = "1286.15"

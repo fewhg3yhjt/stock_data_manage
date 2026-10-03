@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="72" time="15.143" timestamp="2026-10-04T03:55:04.715782+08:00" hostname="WIN-O3LLBLVKP56"><testcase classname="tests.test_scheduler" name="test_phase_one_schedule_is_configured_and_idempotent_per_day" time="0.001" /><testcase classname="tests.test_scheduler" name="test_schedule_yaml_skips_disabled_tdx_delayed_jobs" time="0.008" /><testcase classname="tests.test_scheduler" name="test_tencent_profiles_separate_scope_frequency_and_request_speed" time="0.016" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[9-30-5-None]" time="0.017" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[9-34-59-None]" time="0.015" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[9-35-4-None]" time="0.019" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[9-35-5-expected3]" time="0.016" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[9-35-34-expected4]" time="0.021" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[9-35-35-None]" time="0.023" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[11-30-5-expected6]" time="0.017" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[11-31-0-None]" time="0.018" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[12-0-0-None]" time="0.015" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[13-0-5-None]" time="0.016" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[13-5-5-expected10]" time="0.016" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[15-0-5-expected11]" time="0.015" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[15-1-0-None]" time="0.015" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[16-0-0-None]" time="0.018" /><testcase classname="tests.test_scheduler" name="test_daily_slots_calendar_intervals_and_timezone" time="0.015" /><testcase classname="tests.test_scheduler" name="test_full_stock_selection_has_no_100_or_200_symbol_truncation" time="0.308" /><testcase classname="tests.test_scheduler" name="test_snapshot_switch_to_minutes_keeps_full_scope_and_migration_gate" time="0.436" /><testcase classname="tests.test_scheduler" name="test_minute_capacity_missing_scope_and_scope_limits_block_execution" time="1.353" /><testcase classname="tests.test_scheduler" name="test_invalid_frequency_config_is_rejected[changes0]" time="0.140" /><testcase classname="tests.test_scheduler" name="test_invalid_frequency_config_is_rejected[changes1]" time="0.132" /><testcase classname="tests.test_scheduler" name="test_invalid_frequency_config_is_rejected[changes2]" time="0.104" /><testcase classname="tests.test_scheduler" name="test_invalid_frequency_config_is_rejected[changes3]" time="0.091" /><testcase classname="tests.test_scheduler" name="test_invalid_frequency_config_is_rejected[changes4]" time="0.094" /><testcase classname="tests.test_scheduler" name="test_invalid_frequency_config_is_rejected[changes5]" time="0.092" /><testcase classname="tests.test_scheduler" name="test_invalid_frequency_config_is_rejected[changes6]" time="0.095" /><testcase classname="tests.test_scheduler" name="test_invalid_frequency_config_is_rejected[changes7]" time="0.097" /><testcase classname="tests.test_scheduler" name="test_invalid_frequency_config_is_rejected[changes8]" time="0.100" /><testcase classname="tests.test_scheduler" name="test_candidate_tick_survives_restart_and_uses_existing_collector_and_shared_pacer" time="2.582" /><testcase classname="tests.test_scheduler" name="test_failed_slot_does_not_hammer_source_on_every_tick" time="1.588" /><testcase classname="tests.test_scheduler" name="test_daily_tick_passes_current_slot_date_and_does_not_change_qfq_semantics" time="0.858" /><testcase classname="tests.test_scheduler" name="test_planning_does_not_create_database_or_call_collector" time="0.700" /><testcase classname="tests.test_scheduler" name="test_scheduler_cannot_write_production_outputs" time="0.017" /><testcase classname="tests.test_scheduler" name="test_daily_time_edit_does_not_repeat_completed_day" time="1.550" /><testcase classname="tests.test_config_contract" name="test_yaml_configuration_is_parseable_and_keeps_minute_scope_bounded" time="0.297" /><testcase classname="tests.test_config_contract" name="test_input_catalog_covers_successful_rows_without_granting_production_routes" time="0.308" /><testcase classname="tests.test_config_contract" name="test_parameter_binding_uses_explicit_contexts_and_preserves_types" time="0.002" /><testcase classname="tests.test_config_contract" name="test_recent_minute_contract_rejects_history_and_invalid_count" time="0.263" /><testcase classname="tests.test_config_contract" name="test_snapshot_requires_known_trading_date_and_separates_local_filter" time="0.531" /><testcase classname="tests.test_config_contract" name="test_window_validation_and_unsupported_scheduling_are_explicit" time="0.272" /><testcase classname="tests.test_config_contract" name="test_disabled_provider_cannot_be_enabled_by_an_endpoint_override" time="0.031" /><testcase classname="tests.test_provider_contract_adapters" name="test_shared_pacer_preserves_request_response_and_releases_after_failure" time="0.002" /><testcase classname="tests.test_provider_contract_adapters" name="test_factory_paces_each_tencent_single_symbol_minute_request" time="0.256" /><testcase classname="tests.test_provider_contract_adapters" name="test_factory_keeps_eastmoney_source_transport" time="0.268" /><testcase classname="tests.test_provider_contract_adapters" name="test_contract_rejects_html_200_and_rate_limit" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_contract_detects_schema_change_and_silent_row_limit" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_contract_classifies_http_failures[500-http_5xx-True]" time="0.002" /><testcase classname="tests.test_provider_contract_adapters" name="test_contract_classifies_http_failures[404-http_error-False]" time="0.002" /><testcase classname="tests.test_provider_contract_adapters" name="test_contract_classifies_http_failures[403-rate_limited-False]" time="0.002" /><testcase classname="tests.test_provider_contract_adapters" name="test_contract_classifies_http_failures[429-rate_limited-False]" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_contract_classifies_invalid_json" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_tencent_adapter_parses_observed_daily_envelope" time="0.002" /><testcase classname="tests.test_provider_contract_adapters" name="test_tencent_forward_daily_adapter_requires_qfq_envelope" time="0.002" /><testcase classname="tests.test_provider_contract_adapters" name="test_tencent_forward_daily_does_not_fallback_to_unadjusted_day" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_tencent_forward_daily_is_qualified_only_for_stock_and_etf" time="0.002" /><testcase classname="tests.test_provider_contract_adapters" name="test_daily_adapter_reports_the_full_returned_window" time="0.002" /><testcase classname="tests.test_provider_contract_adapters" name="test_sina_adapter_parses_observed_daily_envelope_and_probe_evidence" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_empty_probe_is_not_promoted_to_success" time="0.002" /><testcase classname="tests.test_provider_contract_adapters" name="test_probe_evidence_is_persisted_in_capability_registry" time="0.266" /><testcase classname="tests.test_provider_contract_adapters" name="test_forward_probe_persists_forward_adjustment" time="0.258" /><testcase classname="tests.test_provider_contract_adapters" name="test_tencent_minute_adapter_parses_compact_timestamp" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_minute_adapter_filters_rows_newer_than_as_of" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_minute_probe_records_time_range_and_expiry" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_sina_minute_adapter_parses_day_timestamp" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_tdx_minute_adapter_normalizes_client_rows_and_closes_client" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_tdx_adapter_marks_missing_bars_as_empty_without_inventing_rows" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_tdx_adapter_rejects_rows_with_missing_ohlcv_fields" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_tencent_snapshot_adapter_parses_observed_quote_line" time="0.002"><failure message="stock_data_manage.providers.contracts.ProviderContractError: quote fields or security identity changed">self = TencentSnapshotProvider(transport=FakeTransport(responses=[], calls=[('https://qt.gtimg.cn/q=sh600519', {}, 10.0)]), c...k_snapshot', timeout_seconds=10.0, max_symbols_per_request=100, url='https://qt.gtimg.cn/q=', source_method='snapshot')
+symbols = ['sh600519']
+as_of = datetime.datetime(2026, 9, 11, 0, 0, tzinfo=datetime.timezone.utc)
+
+    def fetch_snapshot(self, symbols: Sequence[str], as_of: datetime) -&gt; SnapshotFetchResponse:
+        requested = tuple(symbols)
+        if self.max_symbols_per_request &lt; 1:
+            raise ValueError("snapshot batch size must be positive")
+        if not requested or len(set(requested)) != len(requested):
+            raise ValueError("snapshot requires a non-empty, unique security scope")
+        if any(not isinstance(symbol, str) or not re.fullmatch(r"(?:sh|sz|bj)\d{6}", symbol) for symbol in requested):
+            raise ValueError("snapshot requires explicit canonical sh/sz/bj security codes")
+        rows: list[dict[str, Any]] = []
+        source_rows: list[dict[str, Any]] = []
+        seen = set()
+        for offset in range(0, len(requested), max(1, self.max_symbols_per_request)):
+            batch = requested[offset : offset + self.max_symbols_per_request]
+            response = self.transport.get(self.url + ",".join(batch), params={}, timeout_seconds=self.timeout_seconds)
+            if response.status_code &gt;= 400:
+                EndpointContract(frozenset()).parse_json(response)
+            # The archived successful quote probe explicitly decodes Tencent bytes as GBK.
+            try:
+                lines = response.body.decode("gbk").splitlines()
+                for line in lines:
+                    if not line.strip():
+                        continue
+                    match = re.fullmatch(r'\s*v_([^=]+)="(.*?)";?\s*', line)
+                    if match is None:
+                        raise ValueError("quote response envelope changed")
+                    symbol, payload = match.groups()
+                    if symbol not in batch:
+                        raise ValueError("quote returned an unrequested security")
+                    if symbol in seen:
+                        raise ValueError("duplicate quote security")
+                    seen.add(symbol)
+                    if not payload or payload == "1":
+                        continue  # Explicit no-quote marker, retained in response bytes.
+                    parts = payload.split("~")
+                    if len(parts) &lt; 35 or parts[2] != symbol[2:]:
+&gt;                       raise ValueError("quote fields or security identity changed")
+E                       ValueError: quote fields or security identity changed
+
+src\stock_data_manage\providers\tencent\snapshot.py:74: ValueError
+
+The above exception was the direct cause of the following exception:
+
+    def test_tencent_snapshot_adapter_parses_observed_quote_line() -&gt; None:
+        parts = ["-"] * 38
+        parts[1] = "贵州茅台"
+        parts[3:7] = ["1275.16", "1285.15", "1285.15", "34801"]
+        parts[30] = "20260911150003"
+        parts[33] = "1286.15"
+        parts[34] = "1263.01"
+        parts[37] = "445001.2"
+        body = f'v_sh600519="{"~".join(parts)}";\n'
+        provider = TencentSnapshotProvider(
+            FakeTransport([HttpResponse(200, {"content-type": "text/plain"}, body.encode("gbk"))]),
+            minute_capability("tencent", "bulk_snapshot", 1),
+        )
+&gt;       result = provider.fetch_snapshot(["sh600519"], datetime(2026, 9, 11, tzinfo=timezone.utc))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_provider_contract_adapters.py:552: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = TencentSnapshotProvider(transport=FakeTransport(responses=[], calls=[('https://qt.gtimg.cn/q=sh600519', {}, 10.0)]), c...k_snapshot', timeout_seconds=10.0, max_symbols_per_request=100, url='https://qt.gtimg.cn/q=', source_method='snapshot')
+symbols = ['sh600519']
+as_of = datetime.datetime(2026, 9, 11, 0, 0, tzinfo=datetime.timezone.utc)
+
+    def fetch_snapshot(self, symbols: Sequence[str], as_of: datetime) -&gt; SnapshotFetchResponse:
+        requested = tuple(symbols)
+        if self.max_symbols_per_request &lt; 1:
+            raise ValueError("snapshot batch size must be positive")
+        if not requested or len(set(requested)) != len(requested):
+            raise ValueError("snapshot requires a non-empty, unique security scope")
+        if any(not isinstance(symbol, str) or not re.fullmatch(r"(?:sh|sz|bj)\d{6}", symbol) for symbol in requested):
+            raise ValueError("snapshot requires explicit canonical sh/sz/bj security codes")
+        rows: list[dict[str, Any]] = []
+        source_rows: list[dict[str, Any]] = []
+        seen = set()
+        for offset in range(0, len(requested), max(1, self.max_symbols_per_request)):
+            batch = requested[offset : offset + self.max_symbols_per_request]
+            response = self.transport.get(self.url + ",".join(batch), params={}, timeout_seconds=self.timeout_seconds)
+            if response.status_code &gt;= 400:
+                EndpointContract(frozenset()).parse_json(response)
+            # The archived successful quote probe explicitly decodes Tencent bytes as GBK.
+            try:
+                lines = response.body.decode("gbk").splitlines()
+                for line in lines:
+                    if not line.strip():
+                        continue
+                    match = re.fullmatch(r'\s*v_([^=]+)="(.*?)";?\s*', line)
+                    if match is None:
+                        raise ValueError("quote response envelope changed")
+                    symbol, payload = match.groups()
+                    if symbol not in batch:
+                        raise ValueError("quote returned an unrequested security")
+                    if symbol in seen:
+                        raise ValueError("duplicate quote security")
+                    seen.add(symbol)
+                    if not payload or payload == "1":
+                        continue  # Explicit no-quote marker, retained in response bytes.
+                    parts = payload.split("~")
+                    if len(parts) &lt; 35 or parts[2] != symbol[2:]:
+                        raise ValueError("quote fields or security identity changed")
+                    parsed = parse_tencent_snapshot_line(line)
+                    if parsed is None:
+                        raise ValueError("quote timestamp is missing")
+                    raw = {name: parts[index] for name, index in (
+                        ("name", 1), ("code", 2), ("price", 3), ("prev_close", 4), ("open", 5),
+                        ("volume_lot", 6), ("datetime", 30), ("change", 31), ("change_pct", 32), ("high", 33), ("low", 34))}
+                    exchange = {"sh": "XSHG", "sz": "XSHE", "bj": "BSE"}[symbol[:2]]
+                    raw.update(raw=payload, symbol=symbol,
+                               instrument_id=f"{exchange}:{symbol[2:]}",
+                               source_amount_37=parts[37] if len(parts) &gt; 37 else None)
+                    rows.append(parsed)
+                    source_rows.append(raw)
+            except (UnicodeDecodeError, ValueError) as exc:
+&gt;               raise ProviderContractError(str(exc), FailureClass.SCHEMA_CHANGED, retryable=False) from exc
+E               stock_data_manage.providers.contracts.ProviderContractError: quote fields or security identity changed
+
+src\stock_data_manage\providers\tencent\snapshot.py:88: ProviderContractError</failure></testcase><testcase classname="tests.test_provider_contract_adapters" name="test_sina_snapshot_adapter_parses_observed_quote_line" time="0.002" /><testcase classname="tests.test_provider_contract_adapters" name="test_tencent_snapshot_batches_entire_requested_scope_without_dropping_remainder" time="0.004"><failure message="stock_data_manage.providers.contracts.ProviderContractError: quote fields or security identity changed">self = TencentSnapshotProvider(transport=&lt;test_provider_contract_adapters.test_tencent_snapshot_batches_entire_requested_scop...k_snapshot', timeout_seconds=10.0, max_symbols_per_request=100, url='https://qt.gtimg.cn/q=', source_method='snapshot')
+symbols = ('sh600000', 'sh600001', 'sh600002', 'sh600003', 'sh600004', 'sh600005', ...)
+as_of = datetime.datetime(2026, 9, 30, 0, 0, tzinfo=datetime.timezone.utc)
+
+    def fetch_snapshot(self, symbols: Sequence[str], as_of: datetime) -&gt; SnapshotFetchResponse:
+        requested = tuple(symbols)
+        if self.max_symbols_per_request &lt; 1:
+            raise ValueError("snapshot batch size must be positive")
+        if not requested or len(set(requested)) != len(requested):
+            raise ValueError("snapshot requires a non-empty, unique security scope")
+        if any(not isinstance(symbol, str) or not re.fullmatch(r"(?:sh|sz|bj)\d{6}", symbol) for symbol in requested):
+            raise ValueError("snapshot requires explicit canonical sh/sz/bj security codes")
+        rows: list[dict[str, Any]] = []
+        source_rows: list[dict[str, Any]] = []
+        seen = set()
+        for offset in range(0, len(requested), max(1, self.max_symbols_per_request)):
+            batch = requested[offset : offset + self.max_symbols_per_request]
+            response = self.transport.get(self.url + ",".join(batch), params={}, timeout_seconds=self.timeout_seconds)
+            if response.status_code &gt;= 400:
+                EndpointContract(frozenset()).parse_json(response)
+            # The archived successful quote probe explicitly decodes Tencent bytes as GBK.
+            try:
+                lines = response.body.decode("gbk").splitlines()
+                for line in lines:
+                    if not line.strip():
+                        continue
+                    match = re.fullmatch(r'\s*v_([^=]+)="(.*?)";?\s*', line)
+                    if match is None:
+                        raise ValueError("quote response envelope changed")
+                    symbol, payload = match.groups()
+                    if symbol not in batch:
+                        raise ValueError("quote returned an unrequested security")
+                    if symbol in seen:
+                        raise ValueError("duplicate quote security")
+                    seen.add(symbol)
+                    if not payload or payload == "1":
+                        continue  # Explicit no-quote marker, retained in response bytes.
+                    parts = payload.split("~")
+                    if len(parts) &lt; 35 or parts[2] != symbol[2:]:
+&gt;                       raise ValueError("quote fields or security identity changed")
+E                       ValueError: quote fields or security identity changed
+
+src\stock_data_manage\providers\tencent\snapshot.py:74: ValueError
+
+The above exception was the direct cause of the following exception:
+
+    def test_tencent_snapshot_batches_entire_requested_scope_without_dropping_remainder():
+        symbols = tuple(f"sh{600000+i}" for i in range(203))
+        class BatchTransport:
+            def __init__(self):
+                self.requests = []
+            def get(self, url, *, params, timeout_seconds):
+                batch = url.split("q=", 1)[1].split(",")
+                self.requests.append(tuple(batch))
+                parts = ["-"] * 38
+                parts[1] = "测试股票"
+                parts[3:7] = ["10", "9", "9", "100"]
+                parts[30], parts[33], parts[34], parts[37] = "20260930150000", "11", "8", "1000"
+                body = "\n".join(f'v_{s}="{"~".join(parts)}";' for s in batch).encode("gbk")
+                return HttpResponse(200, {"content-type": "text/html; charset=GBK"}, body)
+        transport = BatchTransport()
+        provider = TencentSnapshotProvider(transport, minute_capability("tencent", "bulk_snapshot", 1))
+&gt;       result = provider.fetch_snapshot(symbols, datetime(2026, 9, 30, tzinfo=timezone.utc))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_provider_contract_adapters.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = TencentSnapshotProvider(transport=&lt;test_provider_contract_adapters.test_tencent_snapshot_batches_entire_requested_scop...k_snapshot', timeout_seconds=10.0, max_symbols_per_request=100, url='https://qt.gtimg.cn/q=', source_method='snapshot')
+symbols = ('sh600000', 'sh600001', 'sh600002', 'sh600003', 'sh600004', 'sh600005', ...)
+as_of = datetime.datetime(2026, 9, 30, 0, 0, tzinfo=datetime.timezone.utc)
+
+    def fetch_snapshot(self, symbols: Sequence[str], as_of: datetime) -&gt; SnapshotFetchResponse:
+        requested = tuple(symbols)
+        if self.max_symbols_per_request &lt; 1:
+            raise ValueError("snapshot batch size must be positive")
+        if not requested or len(set(requested)) != len(requested):
+            raise ValueError("snapshot requires a non-empty, unique security scope")
+        if any(not isinstance(symbol, str) or not re.fullmatch(r"(?:sh|sz|bj)\d{6}", symbol) for symbol in requested):
+            raise ValueError("snapshot requires explicit canonical sh/sz/bj security codes")
+        rows: list[dict[str, Any]] = []
+        source_rows: list[dict[str, Any]] = []
+        seen = set()
+        for offset in range(0, len(requested), max(1, self.max_symbols_per_request)):
+            batch = requested[offset : offset + self.max_symbols_per_request]
+            response = self.transport.get(self.url + ",".join(batch), params={}, timeout_seconds=self.timeout_seconds)
+            if response.status_code &gt;= 400:
+                EndpointContract(frozenset()).parse_json(response)
+            # The archived successful quote probe explicitly decodes Tencent bytes as GBK.
+            try:
+                lines = response.body.decode("gbk").splitlines()
+                for line in lines:
+                    if not line.strip():
+                        continue
+                    match = re.fullmatch(r'\s*v_([^=]+)="(.*?)";?\s*', line)
+                    if match is None:
+                        raise ValueError("quote response envelope changed")
+                    symbol, payload = match.groups()
+                    if symbol not in batch:
+                        raise ValueError("quote returned an unrequested security")
+                    if symbol in seen:
+                        raise ValueError("duplicate quote security")
+                    seen.add(symbol)
+                    if not payload or payload == "1":
+                        continue  # Explicit no-quote marker, retained in response bytes.
+                    parts = payload.split("~")
+                    if len(parts) &lt; 35 or parts[2] != symbol[2:]:
+                        raise ValueError("quote fields or security identity changed")
+                    parsed = parse_tencent_snapshot_line(line)
+                    if parsed is None:
+                        raise ValueError("quote timestamp is missing")
+                    raw = {name: parts[index] for name, index in (
+                        ("name", 1), ("code", 2), ("price", 3), ("prev_close", 4), ("open", 5),
+                        ("volume_lot", 6), ("datetime", 30), ("change", 31), ("change_pct", 32), ("high", 33), ("low", 34))}
+                    exchange = {"sh": "XSHG", "sz": "XSHE", "bj": "BSE"}[symbol[:2]]
+                    raw.update(raw=payload, symbol=symbol,
+                               instrument_id=f"{exchange}:{symbol[2:]}",
+                               source_amount_37=parts[37] if len(parts) &gt; 37 else None)
+                    rows.append(parsed)
+                    source_rows.append(raw)
+            except (UnicodeDecodeError, ValueError) as exc:
+&gt;               raise ProviderContractError(str(exc), FailureClass.SCHEMA_CHANGED, retryable=False) from exc
+E               stock_data_manage.providers.contracts.ProviderContractError: quote fields or security identity changed
+
+src\stock_data_manage\providers\tencent\snapshot.py:88: ProviderContractError</failure></testcase></testsuite></testsuites>

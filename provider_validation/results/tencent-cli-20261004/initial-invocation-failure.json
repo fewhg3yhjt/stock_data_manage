@@ -1,0 +1,8 @@
+{
+  "exit_code": 1,
+  "failure": "ModuleNotFoundError: checkout src was not on Python module search path",
+  "stdout": "stdout.json",
+  "stderr": "stderr.txt",
+  "classification": "local CLI environment; not provider failure",
+  "external_network_requests": 0
+}

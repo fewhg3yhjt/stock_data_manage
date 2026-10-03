@@ -1,0 +1,362 @@
+{
+  "validation_time_utc": "2026-10-03T20:07:04.287662+00:00",
+  "mode": "offline_replay",
+  "network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "verification_code": {
+    "path": "tests/test_input_collection.py",
+    "sha256": "feee8612e2b41444812e01b9ed1c33c68650b4c871bb007e815fbe55c2cbd2fe"
+  },
+  "runner": {
+    "path": "provider_validation/tests/replay_input_capabilities.py",
+    "sha256": "bdee308b7546945a78db41693c42c0b7e24361f1bb3ca0ec39a616b2e35bed48"
+  },
+  "inputs": [
+    {
+      "input_id": "ASTOCK-001",
+      "report_path": "provider_validation/results/tencent-final-20261004/1/adapter/ASTOCK-001-f6edf47aa149/2026-10-03/input_report/tencent/single_quote/report.json",
+      "report_sha256": "ee8649dd767f33ea3771aafa610292417fdd7f865b66965c5fb44842db84b755",
+      "source_manifest": "provider_validation/results/live-probes/pilot-20261003-tencent-quote-network/_raw/missing-capabilities-20261003T173649/manifest.ndjson",
+      "source_manifest_sha256": "b2c15224346d15fa1d750b745984e0d86501c9519be7867e575627846c647fa3",
+      "row_count": 1,
+      "scope": {
+        "as_of": "2026-09-30T15:10:00+08:00",
+        "symbols": [
+          "sh600519"
+        ]
+      },
+      "code_version": "054a959317ed262d791275b2c091231fb68fe3be0f03fed58758b5872db405b0",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-002-daily",
+      "report_path": "provider_validation/results/tencent-final-20261004/2/ASTOCK-002-daily-992f4189b4da/2026-10-03/input_report/tencent/kline_daily/report.json",
+      "report_sha256": "9fab51455bb8aaccc002165add742236d22793911dc50e4a084f2629fe7f578f",
+      "source_manifest": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+      "source_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+      "row_count": 14,
+      "scope": {
+        "adjust": "qfq",
+        "code": "600519",
+        "end": "2026-09-18",
+        "start": "2026-09-01"
+      },
+      "code_version": "054a959317ed262d791275b2c091231fb68fe3be0f03fed58758b5872db405b0",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-002-5m",
+      "report_path": "provider_validation/results/tencent-final-20261004/3/ASTOCK-002-5m-4c42cc0ab3c7/2026-10-03/input_report/tencent/kline_5m/report.json",
+      "report_sha256": "c0d1e2462512f902372e4aba1addedc6896cd486b0d6c1ed8dde0ee9df776a8a",
+      "source_manifest": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+      "source_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+      "row_count": 96,
+      "scope": {
+        "code": "300750",
+        "count": 96
+      },
+      "code_version": "054a959317ed262d791275b2c091231fb68fe3be0f03fed58758b5872db405b0",
+      "result": "passed"
+    }
+  ],
+  "original_vs_provider": [
+    {
+      "input_id": "ASTOCK-001",
+      "mode": "offline_replay",
+      "source_probe": "provider_validation\\tests\\source_snapshots\\a-stock-data\\a_stock_missing_capabilities.py",
+      "source_response_sha256": "6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695",
+      "original_csv_sha256": "18a2746d17c19d96d504da26d6586d664ac3f1f2816619d79141f9972ddc56b0",
+      "original_parsed_sha256": "ae41c4f83438fef63074b60830241436dfdaceb8f2259fbc71baafe73906f685",
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\tencent-final-20261004\\1\\original\\2026-10-03\\original_parsed\\tencent\\single_quote\\parsed.json",
+      "provider_report": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\tencent-final-20261004\\1\\adapter\\ASTOCK-001-f6edf47aa149\\2026-10-03\\input_report\\tencent\\single_quote\\report.json",
+      "all_source_fields_equal": true,
+      "all_mapped_prices_equal": true,
+      "original_request": {
+        "url": "https://qt.gtimg.cn/q=sh600519",
+        "method": "GET",
+        "request_headers": {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+          "Accept-Encoding": "gzip, deflate, br, zstd",
+          "Accept": "*/*",
+          "Connection": "keep-alive",
+          "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8"
+        },
+        "outcome": "response",
+        "status_code": 200,
+        "body_sha256": "6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695",
+        "error_type": null,
+        "request_options": {
+          "timeout": 20,
+          "allow_redirects": true,
+          "trust_env": true,
+          "proxies": {},
+          "sdk_retry_policy": true
+        }
+      },
+      "provider_request": {
+        "url": "https://qt.gtimg.cn/q=sh600519",
+        "method": "GET",
+        "request_headers": {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+          "Accept-Encoding": "gzip, deflate, br, zstd",
+          "Accept": "*/*",
+          "Connection": "keep-alive",
+          "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8"
+        },
+        "outcome": "response",
+        "status_code": 200,
+        "body_sha256": "6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695",
+        "error_type": null,
+        "request_options": {
+          "timeout": 20,
+          "allow_redirects": true,
+          "trust_env": true,
+          "proxies": {},
+          "sdk_retry_policy": true
+        }
+      },
+      "request_equal": true,
+      "legacy_rows_equal": true,
+      "production_writes": 0,
+      "eligible_for_production_routing": false
+    },
+    {
+      "input_id": "ASTOCK-002-daily",
+      "scope": {
+        "adjust": "qfq",
+        "code": "600519",
+        "end": "2026-09-18",
+        "start": "2026-09-01"
+      },
+      "rows_compared": 14,
+      "all_ohlc_equal": true,
+      "source_volume_equal": true,
+      "returned_window_equal": true,
+      "request_comparison": [
+        {
+          "original": {
+            "url": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh600519%2Cday%2C2026-09-01%2C2026-09-18%2C640%2Cqfq",
+            "method": "GET",
+            "request_headers": {
+              "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+              "Accept-Encoding": "gzip, deflate, br, zstd",
+              "Accept": "*/*",
+              "Connection": "keep-alive",
+              "Referer": "https://gu.qq.com/"
+            },
+            "outcome": "response",
+            "status_code": 200,
+            "body_sha256": "c3c0b821215bce77b8551f716c50f0324aadc39af7c9dc17538b0bf94b59845b",
+            "error_type": null
+          },
+          "provider": {
+            "url": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh600519%2Cday%2C2026-09-01%2C2026-09-18%2C640%2Cqfq",
+            "method": "GET",
+            "request_headers": {
+              "Accept": "*/*",
+              "Accept-Encoding": "gzip, deflate, br, zstd",
+              "Connection": "keep-alive",
+              "Referer": "https://gu.qq.com/",
+              "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
+            },
+            "outcome": "response",
+            "status_code": 200,
+            "body_sha256": "c3c0b821215bce77b8551f716c50f0324aadc39af7c9dc17538b0bf94b59845b",
+            "error_type": null
+          },
+          "equal": true
+        }
+      ],
+      "original_manifest": "provider_validation/results/tencent-final-20261004/d/original/manifest.ndjson",
+      "provider_report": "provider_validation/results/tencent-final-20261004/d/adapter/ASTOCK-002-daily-a33e8c54b6ab/2026-10-03/input_report/tencent/kline_daily/report.json"
+    },
+    {
+      "input_id": "ASTOCK-002-5m",
+      "scope": {
+        "code": "300750",
+        "count": 96
+      },
+      "rows_compared": 96,
+      "all_ohlc_equal": true,
+      "source_volume_equal": true,
+      "returned_window_equal": true,
+      "request_comparison": [
+        {
+          "original": {
+            "url": "https://web.ifzq.gtimg.cn/appstock/app/kline/mkline?param=sz300750%2Cm5%2C%2C96",
+            "method": "GET",
+            "request_headers": {
+              "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+              "Accept-Encoding": "gzip, deflate, br, zstd",
+              "Accept": "*/*",
+              "Connection": "keep-alive",
+              "Referer": "https://gu.qq.com/"
+            },
+            "outcome": "transport_error",
+            "status_code": null,
+            "body_sha256": null,
+            "error_type": "SSLError"
+          },
+          "provider": {
+            "url": "https://web.ifzq.gtimg.cn/appstock/app/kline/mkline?param=sz300750%2Cm5%2C%2C96",
+            "method": "GET",
+            "request_headers": {
+              "Accept": "*/*",
+              "Accept-Encoding": "gzip, deflate, br, zstd",
+              "Connection": "keep-alive",
+              "Referer": "https://gu.qq.com/",
+              "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
+            },
+            "outcome": "transport_error",
+            "status_code": null,
+            "body_sha256": null,
+            "error_type": "SSLError"
+          },
+          "equal": true
+        },
+        {
+          "original": {
+            "url": "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/kline/mkline?param=sz300750%2Cm5%2C%2C96",
+            "method": "GET",
+            "request_headers": {
+              "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+              "Accept-Encoding": "gzip, deflate, br, zstd",
+              "Accept": "*/*",
+              "Connection": "keep-alive",
+              "Referer": "https://gu.qq.com/"
+            },
+            "outcome": "response",
+            "status_code": 200,
+            "body_sha256": "1e8158ec28e8e3262a284fd3d092e1c2bd33e3777cb057ddab140633fa8954cd",
+            "error_type": null
+          },
+          "provider": {
+            "url": "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/kline/mkline?param=sz300750%2Cm5%2C%2C96",
+            "method": "GET",
+            "request_headers": {
+              "Accept": "*/*",
+              "Accept-Encoding": "gzip, deflate, br, zstd",
+              "Connection": "keep-alive",
+              "Referer": "https://gu.qq.com/",
+              "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
+            },
+            "outcome": "response",
+            "status_code": 200,
+            "body_sha256": "1e8158ec28e8e3262a284fd3d092e1c2bd33e3777cb057ddab140633fa8954cd",
+            "error_type": null
+          },
+          "equal": true
+        }
+      ],
+      "original_manifest": "provider_validation/results/tencent-final-20261004/m/original/manifest.ndjson",
+      "provider_report": "provider_validation/results/tencent-final-20261004/m/adapter/ASTOCK-002-5m-3782349b00ed/2026-10-03/input_report/tencent/kline_5m/report.json"
+    }
+  ],
+  "known_differences": [
+    "快照原脚本、CSV、请求头/20秒超时/会话代理/原始响应和旧Provider字段均对照。",
+    "真实证据仅sh600519单证券；203只沪深北证券的100/100/3分批是合成离线夹具。",
+    "as_of仅作为返回日期校验，不是历史查询；来源报价时间不改写为调度时间。",
+    "量额单位未独立认证，原值和raw保留，标准量额列为空。",
+    "在线分支、会话重用、保守重试配置、3秒请求间隔与缓存仅用注入夹具验证；没有新增实时请求。",
+    "盘后按天策略仍关闭，在线全量批次/覆盖/容量未完成，配置开关不能绕过门禁。"
+  ],
+  "batch_fixture": {
+    "mode": "synthetic offline fixture",
+    "requested": 203,
+    "batch_sizes": [
+      100,
+      100,
+      3
+    ],
+    "partial_output": 1,
+    "partial_denominator": 2,
+    "partial_missing": [
+      "sz300750"
+    ],
+    "result": "passed"
+  },
+  "negative_checks": [
+    {
+      "mutation": "duplicate",
+      "expected_failure_class": "schema_changed",
+      "result": "passed",
+      "report_path": "provider_validation/results/tencent-final-20261004/f1/out/ASTOCK-001-6ee5277ba5f5/2026-10-03/input_report/tencent/single_quote/report.json",
+      "report_sha256": "b67abc152fd52645e09f04aa77fb66999a82bbd27ecea907b691d3da2c5ebc4e"
+    },
+    {
+      "mutation": "identity",
+      "expected_failure_class": "schema_changed",
+      "result": "passed",
+      "report_path": "provider_validation/results/tencent-final-20261004/f2/out/ASTOCK-001-3c8fd7a4ce64/2026-10-03/input_report/tencent/single_quote/report.json",
+      "report_sha256": "0e6a225ccee34f347d32c6e682abe5cdbb2c003835b833fb48f5011102d36741"
+    },
+    {
+      "mutation": "timestamp",
+      "expected_failure_class": "schema_changed",
+      "result": "passed",
+      "report_path": "provider_validation/results/tencent-final-20261004/f3/out/ASTOCK-001-73c40c9a3591/2026-10-03/input_report/tencent/single_quote/report.json",
+      "report_sha256": "d99aba667c4a7eec22c240d893ad9675ad4fa8fc79d843e9d53176e9d2ee873e"
+    },
+    {
+      "mutation": "stale",
+      "expected_failure_class": "NormalizationError",
+      "result": "passed",
+      "report_path": "provider_validation/results/tencent-final-20261004/f4/out/ASTOCK-001-4e827367ef85/2026-10-03/input_report/tencent/single_quote/report.json",
+      "report_sha256": "a0d8a509e08155eac22fdd6ea7c3ac1a2db5d83ca732875ad3f02048d1090477"
+    },
+    {
+      "mutation": "numeric",
+      "expected_failure_class": "NormalizationError",
+      "result": "passed",
+      "report_path": "provider_validation/results/tencent-final-20261004/f5/out/ASTOCK-001-a1f0472d5fa9/2026-10-03/input_report/tencent/single_quote/report.json",
+      "report_sha256": "c92837f3da813a58d839f63ffddd6b9399b15d563a23aaad6b7b0467b3554c12"
+    },
+    {
+      "mutation": "unexpected",
+      "expected_failure_class": "schema_changed",
+      "result": "passed",
+      "report_path": "provider_validation/results/tencent-final-20261004/f6/out/ASTOCK-001-0e91eb9e1790/2026-10-03/input_report/tencent/single_quote/report.json",
+      "report_sha256": "f1526a952de3bcdbe59cf2a77718ed80134827b0e81e722c8b8b511125e922e9"
+    },
+    {
+      "mutation": "html",
+      "expected_failure_class": "schema_changed",
+      "result": "passed",
+      "report_path": "provider_validation/results/tencent-final-20261004/f7/out/ASTOCK-001-ec1ffa70a453/2026-10-03/input_report/tencent/single_quote/report.json",
+      "report_sha256": "d29969a76259787c1ce61e8d67b29b87426c781fc4295eda3a12190e98c888c8"
+    },
+    {
+      "mutation": "empty",
+      "expected_failure_class": "temporary_empty",
+      "result": "passed",
+      "report_path": "provider_validation/results/tencent-final-20261004/f8/out/ASTOCK-001-725e78849f6e/2026-10-03/input_report/tencent/single_quote/report.json",
+      "report_sha256": "0284936dbf05b5b71eb75b079fd7214350302cd9e102ddf981e4477a95b53d49"
+    },
+    {
+      "mutation": "http_429",
+      "expected_failure_class": "HTTPError",
+      "result": "passed",
+      "report_path": "provider_validation/results/tencent-final-20261004/f9/out/ASTOCK-001-2a88077de8ca/2026-10-03/input_report/tencent/single_quote/report.json",
+      "report_sha256": "fdf91f2ed0a9c03fb47e2b78c983b612f44b99cd589be9ac80c5f74a5493dbb2"
+    },
+    {
+      "mutation": "transport",
+      "expected_failure_class": "ConnectionError",
+      "result": "passed",
+      "report_path": "provider_validation/results/tencent-final-20261004/f10/out/ASTOCK-001-732d6a2a8ecf/2026-10-03/input_report/tencent/single_quote/report.json",
+      "report_sha256": "c48dc000c96e6a9b77bb0937e7927a534187447c38abcd6b71a0340c12492618"
+    },
+    {
+      "mutation": "corrupt_hash",
+      "expected_failure_class": "ValueError",
+      "result": "passed",
+      "report_path": "provider_validation/results/tencent-final-20261004/f11/out/ASTOCK-001-7b4ad9f7e692/2026-10-03/input_report/tencent/single_quote/report.json",
+      "report_sha256": "9286310389c007b0682269a38087cbaf373344da274fd3fdf95af6dae5eb9870"
+    }
+  ],
+  "session_pacing_cache": {
+    "mode": "injected Session fixture; not live source validation",
+    "result": "passed"
+  }
+}

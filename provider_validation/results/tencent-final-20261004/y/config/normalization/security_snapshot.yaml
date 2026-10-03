@@ -1,0 +1,16 @@
+dataset: security_snapshot
+rules:
+  - id: baostock-security-snapshot-input-v1
+    input_id: SDA-BOARD-005
+    provider: baostock
+    endpoint: security_snapshot
+    field_mapping:
+      stock_code: canonical_stock_code
+      stock_name: code_name
+      exchange: exchange
+      status: status
+    context_fields: {trade_date: trade_date, source: source}
+    status: pending_validation
+    version: baostock-security-snapshot-input-v1
+    evidence_refs: [SDA-BOARD-005]
+    notes: 原 SDK 两查询保持；沪深 A 股代码筛选沿用原适配器。行业缺失不影响证券快照行数，不更新证券主数据。

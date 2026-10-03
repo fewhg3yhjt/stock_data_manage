@@ -1,0 +1,1 @@
+D:\Program Files\Python\python.exe: Error while finding module specification for 'stock_data_manage.cli' (ModuleNotFoundError: No module named 'stock_data_manage')

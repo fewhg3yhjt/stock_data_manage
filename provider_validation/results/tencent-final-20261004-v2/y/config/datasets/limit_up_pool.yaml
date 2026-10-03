@@ -1,0 +1,21 @@
+dataset:
+  name: limit_up_pool
+  display_name: 涨停池输入
+  primary_key: [trade_date, source_security_code]
+fields:
+  trade_date: {type: date, required: true}
+  source_security_code: {type: string, required: true}
+  name: {type: string, required: true}
+  change_pct: {type: decimal, unit: percent, required: true}
+  price: {type: decimal, unit: CNY, required: true}
+  amount: {type: decimal, unit: CNY, required: false}
+  float_market_cap: {type: decimal, unit: CNY, required: false}
+  total_market_cap: {type: decimal, unit: CNY, required: false}
+  turnover_rate: {type: decimal, unit: percent, required: false}
+  limit_capital: {type: decimal, unit: CNY, required: false}
+  first_limit_time: {type: string, required: true}
+  last_limit_time: {type: string, required: true}
+  broken_count: {type: integer, required: true}
+  limit_statistics: {type: string, required: true}
+  consecutive_limit_count: {type: integer, required: true}
+  industry: {type: string, required: false}

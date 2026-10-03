@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "D:\\Program Files\\Python\\python.exe",
+    "-m",
+    "stock_data_manage.cli",
+    "collect-input",
+    "--input",
+    "ASTOCK-001",
+    "--context-file",
+    "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\tencent-cli-20261004\\context.json",
+    "--mode",
+    "replay",
+    "--replay-manifest",
+    "provider_validation/results/live-probes/pilot-20261003-tencent-quote-network/_raw/missing-capabilities-20261003T173649/manifest.ndjson",
+    "--output-root",
+    "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\tencent-cli-20261004\\success\\out"
+  ],
+  "exit_code": 0,
+  "pythonpath": "D:\\Project\\PythonProgram\\stock_data_manage\\src",
+  "report": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\tencent-cli-20261004\\success\\out\\ASTOCK-001-77e3d82e81f4\\2026-10-03\\input_report\\tencent\\single_quote\\report.json",
+  "row_count": 1,
+  "context_sha256": "0096f87fca035550cf6310e20cc71b7739047d213a3063227f074c90199f8290",
+  "mode": "offline_replay",
+  "production_writes": 0,
+  "external_network_requests": 0
+}
