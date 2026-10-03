@@ -1,0 +1,60 @@
+{
+  "validation_time_utc": "2026-10-03T23:13:29.332413+00:00",
+  "mode": "actual CLI offline replay",
+  "network_requests": 0,
+  "production_writes": 0,
+  "results": [
+    {
+      "input_id": "ASTOCK-078",
+      "count": 50,
+      "command": [
+        "D:\\Program Files\\Python\\python.exe",
+        "-m",
+        "stock_data_manage.cli",
+        "collect-input",
+        "--input",
+        "ASTOCK-078",
+        "--mode",
+        "replay",
+        "--replay-manifest",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\manifest.ndjson",
+        "--output-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\events-cli-20261004\\candidate",
+        "--context-file",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\events-cli-20261004\\context.json"
+      ],
+      "exit_code": 0,
+      "stdout": "provider_validation/results/events-cli-20261004/ASTOCK-078-stdout.json",
+      "stdout_sha256": "10f228b7e65f65c4a4fee82ca09a6db2cf4638e0c89bf2b8a3ea02dbfd8f5e2b",
+      "stderr": "provider_validation/results/events-cli-20261004/ASTOCK-078-stderr.bin",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\events-cli-20261004\\candidate\\ASTOCK-078-314d282c54be\\2026-10-03\\input_report\\eastmoney\\earnings_forecast\\report.json"
+    },
+    {
+      "input_id": "ASTOCK-079",
+      "count": 50,
+      "command": [
+        "D:\\Program Files\\Python\\python.exe",
+        "-m",
+        "stock_data_manage.cli",
+        "collect-input",
+        "--input",
+        "ASTOCK-079",
+        "--mode",
+        "replay",
+        "--replay-manifest",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\manifest.ndjson",
+        "--output-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\events-cli-20261004\\candidate",
+        "--context-file",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\events-cli-20261004\\context.json"
+      ],
+      "exit_code": 0,
+      "stdout": "provider_validation/results/events-cli-20261004/ASTOCK-079-stdout.json",
+      "stdout_sha256": "92d46fecf75d901d674eb0d9cd83ad7da7afe700a0012d7d19200a6255d09514",
+      "stderr": "provider_validation/results/events-cli-20261004/ASTOCK-079-stderr.bin",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\events-cli-20261004\\candidate\\ASTOCK-079-02e67b19d274\\2026-10-03\\input_report\\eastmoney\\institution_survey\\report.json"
+    }
+  ]
+}

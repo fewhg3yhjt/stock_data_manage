@@ -52,6 +52,239 @@ POOL_SOURCE = {"ASTOCK-046": ("fetch_broken_board_pool", "stock_zt_pool_zbgc_em"
                "ASTOCK-048": ("fetch_previous_limit_pool", "stock_zt_pool_previous_em", "getYesterdayZTPool"),
                "ASTOCK-050": ("fetch_strong_pool", "stock_zt_pool_strong_em", "getTopicQSPool")}
 
+EVENT_ARCHIVE = ROOT / "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson"
+EVENT_CASES = [("ASTOCK-078", {"config": {"limit": 50}}, EVENT_ARCHIVE, 50),
+               ("ASTOCK-079", {"config": {"limit": 50}}, EVENT_ARCHIVE, 50)]
+EVENT_REPORTS = {"ASTOCK-078": "RPT_PUBLIC_OP_NEWPREDICT", "ASTOCK-079": "RPT_ORG_SURVEYNEW"}
+
+
+def event_source_record(input_id):
+    from urllib.parse import parse_qs, urlsplit
+    return next(json.loads(line) for line in EVENT_ARCHIVE.read_text(encoding="utf-8").splitlines()
+                if parse_qs(urlsplit(json.loads(line)["url"]).query).get("reportName") == [EVENT_REPORTS[input_id]])
+
+
+def compare_event_original(tmp_path, input_id, context, manifest, count):
+    import pandas as pd
+    test = ROOT / "provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py"
+    spec = importlib.util.spec_from_file_location("event_original", test)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    ns = module.load_shipped_code()
+    store = RawObjectStore(tmp_path / "original")
+    try:
+        with captured_requests(store, provider="eastmoney", endpoint=input_id, scope=context, code_version="original-v39-script",
+                               pacer=RequestPacer(), replay_manifest=manifest) as original_events:
+            frame = ns["earnings_forecast" if input_id == "ASTOCK-078" else "institution_survey"](limit=50)
+    finally:
+        ns["EM_SESSION"].close()
+    original_rows = [{k: None if pd.isna(v) else v for k, v in row.items()} for row in frame.to_dict(orient="records")]
+    tmp_path.mkdir(parents=True, exist_ok=True)
+    original_path = tmp_path / "original-parsed.json"
+    original_path.write_text(json.dumps(original_rows, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
+    report = collect_input(input_id=input_id, context=context, config_root=ROOT / "config",
+                           output_root=tmp_path / "candidate", replay_manifest=manifest)
+    assert report["status"] == "candidate_complete", report
+    retained = json.loads(RawObjectStore.read_response(manifest, event_source_record(input_id)))
+    assert read_artifact(report, "source_rows") == retained["result"]["data"]
+    assert report["row_count"] == report["coverage_denominator"] == len(frame) == count
+    assert report["source_total_count"] == retained["result"]["count"] and report["result_limited"]
+    assert report["live_http_calls"] == report["production_writes"] == 0
+    keys = ("url", "method", "outcome", "status_code", "body_sha256", "request_headers", "request_options")
+    assert [{k: e.get(k) for k in keys} for e in original_events] == [{k: e.get(k) for k in keys} for e in report["responses"]]
+    output = read_artifact(report, "output")
+    for row, original in zip(output, original_rows):
+        for name, value in row.items():
+            if name in {"snapshot_at", "indicator_code"}: continue
+            expected = original["code" if name == "source_security_code" else name]
+            if name in report["unverified_fields"]: assert value is None
+            elif expected is None: assert value is None
+            elif isinstance(expected, (int, float)): assert float(value) == pytest.approx(expected, rel=1e-14)
+            else: assert value == expected
+        assert row["snapshot_at"] == report["source_capture_window"]["last"]
+    comparison = {"input_id":input_id, "mode":"offline_replay", "row_count":count,
+        "original_parsed_path":str(original_path.resolve()), "original_parsed_sha256":hashlib.sha256(original_path.read_bytes()).hexdigest(),
+        "source_response_sha256":event_source_record(input_id)["body_sha256"],
+        "source_total_count":report["source_total_count"], "all_retained_source_fields_equal":True,
+        "all_business_fields_equal":True, "request_comparison_equal":True, "report_path":report["report_path"],
+        "report_sha256":hashlib.sha256(Path(report["report_path"]).read_bytes()).hexdigest(),
+        "limitations":["bounded latest 50 events; not whole-market completeness", "currency units pending",
+                       "archived redacted cookies cannot reconstruct the original cross-endpoint Session cookie jar"]}
+    (tmp_path / "comparison.json").write_text(json.dumps(comparison,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    return comparison
+
+
+@pytest.mark.parametrize("input_id,context,manifest,count", EVENT_CASES)
+def test_event_inputs_preserve_original_business_fields(tmp_path, no_network, input_id, context, manifest, count):
+    compare_event_original(tmp_path,input_id,context,manifest,count)
+
+
+def event_fixture(tmp_path, mutation, input_id="ASTOCK-078", *, narrowed=False):
+    record = event_source_record(input_id)
+    body = json.loads(RawObjectStore.read_response(EVENT_ARCHIVE,record))
+    data = body["result"]["data"]
+    if mutation == "pages": body["result"]["pages"] = True
+    elif mutation == "count": body["result"].update(count=49, pages=1)
+    elif mutation == "short_page": data.pop()
+    elif mutation == "duplicate": data[1] = data[0].copy()
+    elif mutation == "code": data[0]["SECURITY_CODE"] = "1"
+    elif mutation == "numeric": data[0]["PREDICT_AMT_LOWER"] = "broken"
+    elif mutation == "date": data[0]["NOTICE_DATE"] = "2026/09/30"
+    elif mutation == "business": body["code"] = 9501
+    elif mutation == "empty": body = {"code":9201,"result":None}
+    elif mutation == "ignored_filter": data[0]["NUMBERNEW"] = "2"
+    response = requests.Response()
+    response.status_code, response.encoding = (429 if mutation=="http_429" else 200), "utf-8"
+    response._content = b"<html>login</html>" if mutation=="html" else json.dumps(body,ensure_ascii=False).encode()
+    url = record["url"]
+    if narrowed:
+        from urllib.parse import urlsplit, parse_qs, urlencode, urlunsplit
+        parts = urlsplit(url); query = {k:v[0] for k,v in parse_qs(parts.query,keep_blank_values=True).items()}
+        query["filter"] += '(SECURITY_CODE="600519")'
+        url = urlunsplit((parts.scheme,parts.netloc,parts.path,urlencode(query),""))
+    store = RawObjectStore(tmp_path/"fixture")
+    event = store.record_response(response=response,url=url,method="GET",request_headers=record["request_headers"],
+        scope={"synthetic":True,"mutation":mutation,"parent_sha256":record["body_sha256"]},provider="eastmoney",
+        endpoint=input_id,code_version="offline-fixture")
+    if mutation=="transport":
+        event.update(outcome="transport_error",error_type="ConnectionError")
+        (store.root/"manifest.ndjson").write_text(json.dumps(event)+"\n",encoding="utf-8")
+    return store.root/"manifest.ndjson"
+
+
+EVENT_FAILURES = [("pages","RuntimeError"),("count","RuntimeError"),("short_page","RuntimeError"),
+                  ("duplicate","RuntimeError"),("code","RuntimeError"),("numeric","RuntimeError"),
+                  ("date","RuntimeError"),("business","RuntimeError"),("empty","RuntimeError"),
+                  ("ignored_filter","RuntimeError"),("http_429","RuntimeError"),("html","RuntimeError"),("transport","RuntimeError")]
+
+
+@pytest.mark.parametrize("mutation,expected", EVENT_FAILURES)
+def test_event_invalid_response_is_not_a_complete_dataset(tmp_path,no_network,mutation,expected):
+    input_id = "ASTOCK-079" if mutation=="ignored_filter" else "ASTOCK-078"
+    manifest = event_fixture(tmp_path,mutation,input_id)
+    report = collect_input(input_id=input_id,context={"config":{"limit":50}},config_root=ROOT/"config",
+                           output_root=tmp_path/"candidate",replay_manifest=manifest)
+    assert report["status"]=="failed" and report["failure_class"]==expected and "output" not in report, report
+    assert len(report["responses"])==1
+    if mutation!="transport":
+        event=report["responses"][0]
+        body=RawObjectStore.read_response(Path(report["run_directory"])/report["raw_manifest"]["path"],event)
+        assert hashlib.sha256(body).hexdigest()==event["body_sha256"]
+
+
+def test_event_filtered_empty_is_valid_but_full_list_empty_is_not(tmp_path,no_network):
+    manifest=event_fixture(tmp_path,"empty",narrowed=True)
+    report=collect_input(input_id="ASTOCK-078",context={"request":{"symbol":"600519"},"config":{"limit":50}},
+        config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=manifest)
+    assert report["status"]=="candidate_complete" and report["valid_empty_dataset"] and report["row_count"]==0,report
+    assert read_artifact(report,"output")==[] and read_artifact(report,"source_rows")==[]
+    assert report["first_key"] is None and report["source_total_count"] is None
+
+
+def test_event_mapping_projection_and_unsupported_scope(tmp_path,no_network):
+    config=tmp_path/"config";shutil.copytree(ROOT/"config",config)
+    path=config/"normalization/earnings_forecast.yaml";rule=yaml.safe_load(path.read_text(encoding="utf-8"))
+    rule["rules"][0]["field_mapping"]["reason"]="PREDICT_CONTENT";path.write_text(yaml.safe_dump(rule,allow_unicode=True),encoding="utf-8")
+    fields={k for k,v in yaml.safe_load((config/"datasets/earnings_forecast.yaml").read_text(encoding="utf-8"))["fields"].items() if v.get("required")}|{"reason"}
+    report=collect_input(input_id="ASTOCK-078",context={"config":{"limit":50}},config_root=config,
+        output_root=tmp_path/"candidate",replay_manifest=EVENT_ARCHIVE,fields=fields)
+    assert report["status"]=="candidate_complete",report
+    source=read_artifact(report,"source_rows");rows=read_artifact(report,"output")
+    assert all(set(row)==fields and row["reason"]==raw["PREDICT_CONTENT"] for row,raw in zip(rows,source))
+    for input_id,context in [("ASTOCK-078",{"request":{"start_date":"2026-09-01"}}),
+                             ("ASTOCK-079",{"config":{"detail":True}}),("ASTOCK-078",{"config":{"limit":5001}})]:
+        with pytest.raises(ValueError):
+            collect_input(input_id=input_id,context=context,config_root=config,output_root=tmp_path/"bad",replay_manifest=EVENT_ARCHIVE)
+
+
+def event_page_fixture(tmp_path, mutation=None):
+    from urllib.parse import parse_qs, urlsplit, urlunsplit, urlencode
+    record=event_source_record("ASTOCK-078")
+    original=json.loads(RawObjectStore.read_response(EVENT_ARCHIVE,record))
+    store=RawObjectStore(tmp_path/"fixture")
+    for page,count in [(1,500),(2,1)]:
+        rows=[]
+        for index in range(count):
+            row=original["result"]["data"][0].copy()
+            row["SECURITY_CODE"]=str(600000+(page-1)*500+index)
+            rows.append(row)
+        body={**original,"result":{"data":rows,"pages":2,"count":501}}
+        if page==2:
+            if mutation=="empty_page":body["result"]["data"]=[]
+            elif mutation=="changed_total":body["result"]["count"]=502
+            elif mutation=="repeat_page":body["result"]["data"][0]["SECURITY_CODE"]="600000"
+        parts=urlsplit(record["url"]);query={k:v[0] for k,v in parse_qs(parts.query,keep_blank_values=True).items()}
+        query.update(pageNumber=str(page),pageSize="500")
+        response=requests.Response();response.status_code=200;response.encoding="utf-8";response._content=json.dumps(body).encode()
+        store.record_response(response=response,url=urlunsplit((parts.scheme,parts.netloc,parts.path,urlencode(query),"")),
+            method="GET",request_headers=record["request_headers"],provider="eastmoney",endpoint="earnings_forecast",
+            code_version="offline-fixture",scope={"synthetic":True,"mutation":mutation,"parent_sha256":record["body_sha256"]})
+    return store.root/"manifest.ndjson"
+
+
+@pytest.mark.parametrize("mutation",[None,"empty_page","changed_total","repeat_page"])
+def test_event_complete_paging_and_changed_total(tmp_path,no_network,mutation):
+    manifest=event_page_fixture(tmp_path,mutation)
+    report=collect_input(input_id="ASTOCK-078",context={"config":{"limit":600}},config_root=ROOT/"config",
+        output_root=tmp_path/"candidate",replay_manifest=manifest)
+    assert len(report["responses"])==2 and report["live_http_calls"]==0,report
+    if mutation is not None:
+        assert report["status"]=="failed" and report["failure_class"]=="RuntimeError" and "output" not in report,report
+    else:
+        assert report["status"]=="candidate_complete" and report["row_count"]==501 and not report["result_limited"],report
+        assert report["source_page_count"]==2 and report["source_total_count"]==501
+        assert len({r["source_security_code"] for r in read_artifact(report,"output")})==501
+
+
+def test_event_existing_financial_method_unchanged(tmp_path,no_network):
+    import sys
+    import types
+    from stock_data_manage.providers.eastmoney.financial import EastMoneyFinancialMainProvider
+    from stock_data_manage.providers.contracts import HttpResponse
+    snapshot=ROOT/"provider_validation/results/events-original-20261004/1-financial.py.bin"
+    module=types.ModuleType("stock_data_manage.providers.eastmoney.original_financial")
+    sys.modules[module.__name__]=module
+    try:exec(compile(snapshot.read_bytes(),str(snapshot),"exec"),module.__dict__)
+    finally:sys.modules.pop(module.__name__)
+    payload={"result":{"data":[{"REPORT_DATE":"2026-06-30","NOTICE_DATE":"2026-08-22","EPSJB":3.1,"CURRENCY":"CNY"}]}}
+    class Transport:
+        def __init__(self):self.calls=[]
+        def get(self,url,**kwargs):
+            self.calls.append((url,kwargs));return HttpResponse(200,{"Content-Type":"application/json"},json.dumps(payload).encode())
+    old,new=Transport(),Transport()
+    prior=module.EastMoneyFinancialMainProvider(old).fetch(["sh600519"])
+    current=EastMoneyFinancialMainProvider(new).fetch(["sh600519"])
+    from dataclasses import asdict
+    assert asdict(prior)==asdict(current) and old.calls==new.calls
+    tmp_path.mkdir(parents=True,exist_ok=True)
+    (tmp_path/"legacy-comparison.json").write_text(json.dumps({"same_request":True,"same_return":True,
+        "mode":"offline fixture","original_source_sha256":hashlib.sha256(snapshot.read_bytes()).hexdigest()}),encoding="utf-8")
+
+
+def test_event_session_policy_and_cache_before_fetch(tmp_path,monkeypatch):
+    from unittest.mock import patch
+    body=RawObjectStore.read_response(EVENT_ARCHIVE,event_source_record("ASTOCK-078"))
+    seen=[]
+    def send(session,request,**kwargs):
+        seen.append((session,request,kwargs))
+        retry=session.get_adapter(request.url).max_retries
+        assert session.trust_env is True and retry.total==retry.connect==3 and retry.backoff_factor==0.6
+        assert retry.status_forcelist==[429,500,502,503,504] and retry.allowed_methods==["GET"]
+        assert request.headers["User-Agent"].startswith("python-requests/") and "Referer" not in request.headers
+        assert kwargs["timeout"]==20
+        response=requests.Response();response.status_code=200;response.encoding="utf-8";response.headers["Content-Type"]="application/json"
+        response._content=body;return response
+    with patch("requests.Session.send",send):
+        first=collect_input(input_id="ASTOCK-078",context={"config":{"limit":50}},config_root=ROOT/"config",
+            output_root=tmp_path/"candidate",mode="live",evidence_root=tmp_path/"unused")
+        second=collect_input(input_id="ASTOCK-078",context={"config":{"limit":50}},config_root=ROOT/"config",
+            output_root=tmp_path/"candidate",mode="live",evidence_root=tmp_path/"candidate")
+    assert first["status"]==second["status"]=="candidate_complete" and len(seen)==1,(first,second)
+    assert first["live_http_calls"]==1 and second["live_http_calls"]==0 and second["responses"][0]["mode"]=="cached"
+    assert read_artifact(first,"output")==read_artifact(second,"output")
+    (tmp_path/"fixture-mode.json").write_text(json.dumps({"mode":"injected Session fixture; not a real live source call",
+        "source_http_calls":0,"fixture_send_calls":1,"cached_send_calls":0}),encoding="utf-8")
+
 
 def compare_pool_original(tmp_path, input_id, context, manifest, count):
     import ast

@@ -1,0 +1,17 @@
+dataset:
+  name: industry_membership
+  display_name: 证监会行业证券归属快照
+  primary_key: [stock_code, classification_update_date]
+  allowed_asset_types: [stock]
+  allowed_exchanges: [XSHG, XSHE]
+
+fields:
+  trade_date: {type: date, required: true}
+  stock_code: {type: string, required: true}
+  stock_name: {type: string, required: true}
+  exchange: {type: string, required: true}
+  status: {type: string, required: true}
+  industry_name: {type: string, required: true}
+  classification: {type: string, required: true}
+  classification_update_date: {type: date, required: true, description: 来源 updateDate 分类更新时间，不以请求日期替代}
+  source: {type: string, required: true}

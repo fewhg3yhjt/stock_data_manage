@@ -1,0 +1,19 @@
+{
+  "input_id": "ASTOCK-079",
+  "mode": "offline_replay",
+  "row_count": 50,
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\events-final-v2-20261004\\ASTOCK-079\\original-parsed.json",
+  "original_parsed_sha256": "f253c6c7a5c61b4c2dc6de329a28667441af43a31d7ff6985a81947e561618e3",
+  "source_response_sha256": "852a3a28fe9c3e66a4f899162d281af07a62e33a436f514dd3af33c8b82c7888",
+  "source_total_count": 21719,
+  "all_retained_source_fields_equal": true,
+  "all_business_fields_equal": true,
+  "request_comparison_equal": true,
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\events-final-v2-20261004\\ASTOCK-079\\candidate\\ASTOCK-079-feeee46e9eba\\2026-10-03\\input_report\\eastmoney\\institution_survey\\report.json",
+  "report_sha256": "3f9ab777d4078578ae3b8284f225b0e6a97199042e9f265295c0505bc8fc7570",
+  "limitations": [
+    "bounded latest 50 events; not whole-market completeness",
+    "currency units pending",
+    "archived redacted cookies cannot reconstruct the original cross-endpoint Session cookie jar"
+  ]
+}

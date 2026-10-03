@@ -1,0 +1,60 @@
+dataset:
+  name: earnings_forecast
+  display_name: 业绩预告事件输入
+  primary_key:
+  - snapshot_at
+  - source_security_code
+  - notice_date
+  - report_date
+  - indicator_code
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  source_security_code:
+    type: string
+    required: true
+  name:
+    type: string
+    required: false
+  notice_date:
+    type: date
+    required: true
+  report_date:
+    type: date
+    required: true
+  indicator_code:
+    type: string
+    required: true
+  indicator:
+    type: string
+    required: true
+  forecast_type:
+    type: string
+    required: false
+  amount_lower:
+    type: decimal
+    required: false
+    unit: CNY
+  amount_upper:
+    type: decimal
+    required: false
+    unit: CNY
+  change_pct_lower:
+    type: decimal
+    required: false
+    unit: percent
+  change_pct_upper:
+    type: decimal
+    required: false
+    unit: percent
+  prior_year_amount:
+    type: decimal
+    required: false
+    unit: CNY
+  content:
+    type: string
+    required: false
+  reason:
+    type: string
+    required: false

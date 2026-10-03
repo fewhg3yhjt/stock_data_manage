@@ -1,0 +1,215 @@
+import functools
+import math
+import re
+from datetime import date as _date_cls, datetime, timezone
+
+import pandas as pd
+import requests
+
+V39_UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+          "(KHTML, like Gecko) Chrome/126.0 Safari/537.36")
+
+
+def _v39_http(url, params=None, data=None, headers=None, method="GET", timeout=(10, 40),
+              allow_status=(), allow_redirects=True):
+    """非东财的 HTTP 请求：带浏览器 UA。网络错误、非 2xx 一律抛 RuntimeError（不把错误页当数据）；
+    allow_status 里的状态码（源用 404 表示「当天没发布」时）原样返回，由调用方判断。"""
+    merged = {"User-Agent": V39_UA}
+    merged.update(headers or {})
+    try:
+        response = requests.request(method, url, params=params, data=data, headers=merged,
+                                    timeout=timeout, allow_redirects=allow_redirects)
+        if response.status_code not in allow_status:
+            response.raise_for_status()
+    except requests.RequestException as exc:
+        raise RuntimeError(f"请求 {url} 失败: {type(exc).__name__}: {exc}") from exc
+    return response
+
+
+def _v39_json(response):
+    """解析 JSON；不是 JSON 抛 RuntimeError。json 的解析错误是 ValueError 的子类，
+    不转换会被调用方当成「确实没有数据」。"""
+    try:
+        return response.json()
+    except ValueError as exc:
+        raise RuntimeError(f"{getattr(response, 'url', '')} 返回的不是 JSON，可能是错误页") from exc
+
+
+def _v39_date(value):
+    """'2026-09-18' / '20260918' / date 对象 → '2026-09-18'；其他写法抛 ValueError。"""
+    if isinstance(value, datetime):
+        return value.date().isoformat()
+    if isinstance(value, _date_cls):
+        return value.isoformat()
+    text = str(value).strip()
+    fmt = "%Y%m%d" if re.fullmatch(r"[0-9]{8}", text) else "%Y-%m-%d"
+    return datetime.strptime(text, fmt).date().isoformat()
+
+
+def _v39_src_date(value):
+    """来源返回的日期 → 'YYYY-MM-DD'；认不出抛 RuntimeError（源格式变了，不是参数写错）。"""
+    try:
+        return _v39_date(value)
+    except ValueError as exc:
+        raise RuntimeError(f"来源返回了无法识别的日期 {value!r}") from exc
+
+
+def _v39_num(value):
+    """'1,234.50' → 1234.5；空串 / '-' / '--' / None → None；其他非数字抛 RuntimeError
+    （来源给了认不出的值是「源的格式变了」，不能和参数错误的 ValueError 混在一起）。
+    JSON 布尔值同样抛错：float(True)=1.0 会把格式错误静默写成价格 / 成交量。"""
+    if value is None:
+        return None
+    if isinstance(value, bool):
+        raise RuntimeError(f"来源在数值字段给了布尔值 {value!r}")
+    if isinstance(value, (int, float)):
+        if isinstance(value, float) and not math.isfinite(value):
+            return None
+        return float(value)
+    text = str(value).replace(",", "").strip()
+    if text in ("", "-", "--", "None", "null"):
+        return None
+    try:
+        number = float(text)
+    except ValueError as exc:
+        raise RuntimeError(f"来源返回了无法识别的数值 {value!r}") from exc
+    return number if math.isfinite(number) else None
+
+
+def _v39_rows(value, what):
+    """来源里可能整段缺失的行列表：字段没有（None）按空处理，其余必须是对象列表。
+    写成 `value or []` 会把 {} / '' / 0 这类结构改变也当成空表，静默丢掉整段数据。"""
+    if value is None:
+        return []
+    if not isinstance(value, list) or not all(isinstance(row, dict) for row in value):
+        raise RuntimeError(f"{what} 应为对象列表，实际是 {type(value).__name__}: {str(value)[:120]}")
+    return value
+
+
+def _v39_labels(value, what):
+    """来源的标签数组（频道名之类）：None 按空处理，其余必须是字符串列表。
+    直接 `value or []` 再 join，来源把数组改成字符串时会被拆成单字（'ab' → 'a,b'）。"""
+    if value is None:
+        return []
+    if not isinstance(value, list) or not all(isinstance(x, str) for x in value):
+        raise RuntimeError(f"{what} 应为字符串列表，实际是 {type(value).__name__}: {str(value)[:120]}")
+    return value
+
+
+def _v39_req_num(value, what):
+    """必填数值（价格、成交量）：在 _v39_num 之上，空值 / NaN / inf 也抛 RuntimeError，不能当缺失放过。"""
+    number = _v39_num(value)
+    if number is None:
+        raise RuntimeError(f"来源的 {what} 为空或不是有限数值: {value!r}")
+    return number
+
+
+def _v39_contract(func):
+    """统一异常契约：来源行缺字段时 row["X"] 会漏出 KeyError，调用方按「参数错 / 没数据」处理就会
+    把「来源格式变了」当成正常情况。这里把它转成带函数名和字段名的 RuntimeError。
+    （函数内所有按用户参数取字典的地方都先校验过参数，不会走到这里。）"""
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except KeyError as exc:
+            raise RuntimeError(f"{func.__name__}: 来源数据缺少字段 {exc}，格式可能已变") from exc
+    return wrapper
+
+
+def _v39_count(value, what):
+    """来源自报的页数 / 条数 → 非负 int。只认 int 或纯数字串；bool 抛错（int(True)=1 会让
+    「只返回 1 条」通过完整性核对），其他写法也抛 RuntimeError。"""
+    text = str(value).strip() if isinstance(value, (int, str)) and not isinstance(value, bool) else ""
+    if not re.fullmatch(r"[0-9]+", text):
+        raise RuntimeError(f"{what} 不是非负整数: {value!r}")
+    return int(text)
+
+
+def _v39_frame(rows, source, url, columns=None):
+    """统一出表：附 source / source_url / fetched_at。rows 为空时返回带列名的空表，
+    是否允许为空由调用方判断（「确实没有」与「接口坏了」要分开处理）。"""
+    frame = pd.DataFrame(rows, columns=columns)
+    frame["source"] = source
+    frame["source_url"] = url
+    frame["fetched_at"] = datetime.now(timezone.utc).isoformat()
+    return frame
+
+
+def _em_datacenter_strict(report_name, filter_str="", sort_columns="", sort_types="",
+                          page_size=500, max_rows=5000, columns="ALL", extra=None):
+    """东财 datacenter 严格版：code=0 取数据；第 1 页就 9201(返回数据为空) → []；其他错误码直接抛。
+
+    与旧 eastmoney_datacenter() 的区别：后者把任何失败都变成 []，调用方分不清
+    「这只票确实没有」和「参数写错/被风控」。sortTypes 个数必须与 sortColumns 一致，
+    否则东财返回 9501「排序字段和顺序数量不一致」。
+    翻页中途失败（第 2 页起 9201、空页、非末页不满页、缺 pages / count、总页数或总条数变了、
+    最终条数与 count 不符）抛 RuntimeError，不把部分结果当完整结果返回。
+    payload / result 不是对象、data 不是由对象组成的列表，同样抛 RuntimeError。
+    只有「第 1 页、pages=1、data 为空」才算确实没有数据。
+    max_rows 只在来源自报总数 count > max_rows 时提前截断；count 不超过上限的，一律走完分页并核对总数。
+    """
+    n_cols = len([c for c in sort_columns.split(",") if c]) if sort_columns else 0
+    n_types = len([t for t in sort_types.split(",") if t]) if sort_types else 0
+    if n_cols != n_types:
+        raise ValueError(f"sortColumns({n_cols}) 与 sortTypes({n_types}) 个数不一致")
+    rows, page, first = [], 1, None
+    while True:
+        params = {"reportName": report_name, "columns": columns, "filter": filter_str,
+                  "pageNumber": str(page), "pageSize": str(page_size),
+                  "sortColumns": sort_columns, "sortTypes": sort_types,
+                  "source": "WEB", "client": "WEB"}
+        params.update(extra or {})
+        try:
+            response = em_get(DATACENTER_URL, params=params, timeout=20)
+            response.raise_for_status()
+        except requests.RequestException as exc:
+            raise RuntimeError(f"东财 {report_name} 请求失败: {type(exc).__name__}: {exc}") from exc
+        payload = _v39_json(response)
+        if not isinstance(payload, dict):
+            raise RuntimeError(f"东财 {report_name} 返回的不是 JSON 对象: {str(payload)[:100]}")
+        if payload.get("code") == 9201:
+            if page == 1:
+                return []
+            raise RuntimeError(f"东财 {report_name} 第 {page} 页返回「数据为空」，"
+                               f"前面已取 {len(rows)} 条，结果不完整")
+        if payload.get("code") != 0 or not payload.get("result"):
+            raise RuntimeError(f"东财 {report_name} 返回错误: "
+                               f"{payload.get('code')} {payload.get('message')}")
+        result = payload["result"]
+        if not isinstance(result, dict):
+            raise RuntimeError(f"东财 {report_name} 的 result 不是对象: {str(result)[:100]}")
+        pages, count, data = result.get("pages"), result.get("count"), result.get("data")
+        if data is None:
+            data = []
+        if not isinstance(data, list) or not all(isinstance(r, dict) for r in data):
+            raise RuntimeError(f"东财 {report_name} 第 {page} 页的 data 不是由对象组成的列表，格式可能已变")
+        if (any(isinstance(v, bool) or not isinstance(v, int) for v in (pages, count))
+                or pages < 1 or count < 0):
+            raise RuntimeError(f"东财 {report_name} 缺少分页信息（pages={pages!r}, count={count!r}）")
+        if first is None:
+            first = (pages, count)
+        elif (pages, count) != first:
+            raise RuntimeError(f"东财 {report_name} 翻页时总页数 / 总条数从 {first} 变成 {(pages, count)}，"
+                               "结果可能错位，请重试")
+        if not data and (page > 1 or pages > 1):
+            raise RuntimeError(f"东财 {report_name} 第 {page}/{pages} 页是空的，结果不完整")
+        if page < pages and len(data) != int(page_size):
+            raise RuntimeError(f"东财 {report_name} 第 {page}/{pages} 页只有 {len(data)} 条"
+                               f"（非末页应为 {page_size} 条），结果不完整")
+        rows.extend(data)
+        # 只有来源自报的总数确实超过上限才提前截断；否则（count <= max_rows 却已拿到更多行）
+        # 必须走完分页并核对总数，不然「data 比 count 还多」这种格式异常会被当成正常截断放过
+        if len(rows) >= max_rows and count > max_rows:
+            return rows[:max_rows]
+        if page >= pages:
+            if len(rows) != count:
+                raise RuntimeError(f"东财 {report_name} 翻页后 {len(rows)} 条，与总数 {count} 不符")
+            return rows
+        page += 1
+
+
+def _em_day(value):
+    """东财日期串 '2026-09-18 00:00:00' → '2026-09-18'；空值 → None；认不出的写法抛 RuntimeError
+    （只截前 10 个字符会把 '2026/09/18' 原样放行，再拿去和日期串比较就会比错）。"""
+    return _v39_src_date(str(value)[:10]) if value else None

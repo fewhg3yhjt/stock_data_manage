@@ -1,0 +1,8 @@
+{
+  "finding": "initial event runner also included legacy Tencent and calendar summary entries; independent delivery auditor caught unexpected comparison fields",
+  "audit_failure": "KeyError: all_business_fields_equal",
+  "affected_runtime": false,
+  "first_summary": "provider_validation\\results\\events-final-20261004\\comparison.json",
+  "first_summary_sha256": "754fb065d4ac8d02302790d2ee50a28fa694a12288d8074214b3b97d183175bb",
+  "repair": "add event scope exclusion to two existing runner loops; rerun into a new v2 directory without overwriting evidence"
+}

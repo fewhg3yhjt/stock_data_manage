@@ -1,0 +1,333 @@
+{
+  "validation_time_utc": "2026-10-03T23:12:25.410777+00:00",
+  "mode": "offline_replay",
+  "network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "verification_code": {
+    "path": "tests/test_input_collection.py",
+    "sha256": "b4ab08d17bd6420275d903421f4423ee1f2571b7a4676883fcd821a0bcd22d2d"
+  },
+  "runner": {
+    "path": "provider_validation/tests/replay_input_capabilities.py",
+    "sha256": "0181013e48d5f5d3f54e2ada8ba96d41e152cf1a65378cdd23f6c88b0345bb81"
+  },
+  "inputs": [
+    {
+      "input_id": "ASTOCK-078",
+      "report_path": "provider_validation/results/events-final-20261004/ASTOCK-078/candidate/ASTOCK-078-a539afa4bf38/2026-10-03/input_report/eastmoney/earnings_forecast/report.json",
+      "report_sha256": "70e40e6f8029d92b1556ced5dfb550eafcbcdb351920ab49ddffbe8a58bfccdd",
+      "source_manifest": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+      "source_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+      "row_count": 50,
+      "scope": {
+        "limit": 50
+      },
+      "code_version": "3f7a0de09144e8422ac652c01f1e487d9410e4ab35cd36d423c902c97494426b",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-079",
+      "report_path": "provider_validation/results/events-final-20261004/ASTOCK-079/candidate/ASTOCK-079-992bd9952f6f/2026-10-03/input_report/eastmoney/institution_survey/report.json",
+      "report_sha256": "b72efbc5d60d4e077f44af77ec68f449c6f391d88ea372be15ed6ecd6d3c7b0e",
+      "source_manifest": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+      "source_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+      "row_count": 50,
+      "scope": {
+        "detail": false,
+        "limit": 50
+      },
+      "code_version": "3f7a0de09144e8422ac652c01f1e487d9410e4ab35cd36d423c902c97494426b",
+      "result": "passed"
+    }
+  ],
+  "original_vs_provider": [
+    {
+      "input_id": "ASTOCK-078",
+      "mode": "offline_replay",
+      "row_count": 50,
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\events-final-20261004\\ASTOCK-078\\original-parsed.json",
+      "original_parsed_sha256": "2b611cee2ed59f3ff71614c7315faf7b327fbf72d21eb5140c8eb5f2606c04e8",
+      "source_response_sha256": "17f23466b52f0bfbeb374f8117d9100a9c4af744d590289960da0f89d36c5464",
+      "source_total_count": 190977,
+      "all_retained_source_fields_equal": true,
+      "all_business_fields_equal": true,
+      "request_comparison_equal": true,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\events-final-20261004\\ASTOCK-078\\candidate\\ASTOCK-078-a539afa4bf38\\2026-10-03\\input_report\\eastmoney\\earnings_forecast\\report.json",
+      "report_sha256": "70e40e6f8029d92b1556ced5dfb550eafcbcdb351920ab49ddffbe8a58bfccdd",
+      "limitations": [
+        "bounded latest 50 events; not whole-market completeness",
+        "currency units pending",
+        "archived redacted cookies cannot reconstruct the original cross-endpoint Session cookie jar"
+      ]
+    },
+    {
+      "input_id": "ASTOCK-079",
+      "mode": "offline_replay",
+      "row_count": 50,
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\events-final-20261004\\ASTOCK-079\\original-parsed.json",
+      "original_parsed_sha256": "9a9b0b36cd977213b2a81255dae6b92946b58a0692fb1ff35bc0f8b25c31f13e",
+      "source_response_sha256": "852a3a28fe9c3e66a4f899162d281af07a62e33a436f514dd3af33c8b82c7888",
+      "source_total_count": 21719,
+      "all_retained_source_fields_equal": true,
+      "all_business_fields_equal": true,
+      "request_comparison_equal": true,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\events-final-20261004\\ASTOCK-079\\candidate\\ASTOCK-079-992bd9952f6f\\2026-10-03\\input_report\\eastmoney\\institution_survey\\report.json",
+      "report_sha256": "b72efbc5d60d4e077f44af77ec68f449c6f391d88ea372be15ed6ecd6d3c7b0e",
+      "limitations": [
+        "bounded latest 50 events; not whole-market completeness",
+        "currency units pending",
+        "archived redacted cookies cannot reconstruct the original cross-endpoint Session cookie jar"
+      ]
+    },
+    {
+      "input_id": "ASTOCK-002-daily",
+      "scope": {
+        "adjust": "qfq",
+        "code": "600519",
+        "end": "2026-09-18",
+        "start": "2026-09-01"
+      },
+      "rows_compared": 14,
+      "all_ohlc_equal": true,
+      "source_volume_equal": true,
+      "returned_window_equal": true,
+      "request_comparison": [
+        {
+          "original": {
+            "url": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh600519%2Cday%2C2026-09-01%2C2026-09-18%2C640%2Cqfq",
+            "method": "GET",
+            "request_headers": {
+              "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+              "Accept-Encoding": "gzip, deflate, br, zstd",
+              "Accept": "*/*",
+              "Connection": "keep-alive",
+              "Referer": "https://gu.qq.com/"
+            },
+            "outcome": "response",
+            "status_code": 200,
+            "body_sha256": "c3c0b821215bce77b8551f716c50f0324aadc39af7c9dc17538b0bf94b59845b",
+            "error_type": null
+          },
+          "provider": {
+            "url": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh600519%2Cday%2C2026-09-01%2C2026-09-18%2C640%2Cqfq",
+            "method": "GET",
+            "request_headers": {
+              "Accept": "*/*",
+              "Accept-Encoding": "gzip, deflate, br, zstd",
+              "Connection": "keep-alive",
+              "Referer": "https://gu.qq.com/",
+              "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
+            },
+            "outcome": "response",
+            "status_code": 200,
+            "body_sha256": "c3c0b821215bce77b8551f716c50f0324aadc39af7c9dc17538b0bf94b59845b",
+            "error_type": null
+          },
+          "equal": true
+        }
+      ],
+      "original_manifest": "provider_validation/results/events-final-20261004/d/original/manifest.ndjson",
+      "provider_report": "provider_validation/results/events-final-20261004/d/adapter/ASTOCK-002-daily-7ca8e5bb291c/2026-10-03/input_report/tencent/kline_daily/report.json"
+    },
+    {
+      "input_id": "ASTOCK-002-5m",
+      "scope": {
+        "code": "300750",
+        "count": 96
+      },
+      "rows_compared": 96,
+      "all_ohlc_equal": true,
+      "source_volume_equal": true,
+      "returned_window_equal": true,
+      "request_comparison": [
+        {
+          "original": {
+            "url": "https://web.ifzq.gtimg.cn/appstock/app/kline/mkline?param=sz300750%2Cm5%2C%2C96",
+            "method": "GET",
+            "request_headers": {
+              "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+              "Accept-Encoding": "gzip, deflate, br, zstd",
+              "Accept": "*/*",
+              "Connection": "keep-alive",
+              "Referer": "https://gu.qq.com/"
+            },
+            "outcome": "transport_error",
+            "status_code": null,
+            "body_sha256": null,
+            "error_type": "SSLError"
+          },
+          "provider": {
+            "url": "https://web.ifzq.gtimg.cn/appstock/app/kline/mkline?param=sz300750%2Cm5%2C%2C96",
+            "method": "GET",
+            "request_headers": {
+              "Accept": "*/*",
+              "Accept-Encoding": "gzip, deflate, br, zstd",
+              "Connection": "keep-alive",
+              "Referer": "https://gu.qq.com/",
+              "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
+            },
+            "outcome": "transport_error",
+            "status_code": null,
+            "body_sha256": null,
+            "error_type": "SSLError"
+          },
+          "equal": true
+        },
+        {
+          "original": {
+            "url": "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/kline/mkline?param=sz300750%2Cm5%2C%2C96",
+            "method": "GET",
+            "request_headers": {
+              "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+              "Accept-Encoding": "gzip, deflate, br, zstd",
+              "Accept": "*/*",
+              "Connection": "keep-alive",
+              "Referer": "https://gu.qq.com/"
+            },
+            "outcome": "response",
+            "status_code": 200,
+            "body_sha256": "1e8158ec28e8e3262a284fd3d092e1c2bd33e3777cb057ddab140633fa8954cd",
+            "error_type": null
+          },
+          "provider": {
+            "url": "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/kline/mkline?param=sz300750%2Cm5%2C%2C96",
+            "method": "GET",
+            "request_headers": {
+              "Accept": "*/*",
+              "Accept-Encoding": "gzip, deflate, br, zstd",
+              "Connection": "keep-alive",
+              "Referer": "https://gu.qq.com/",
+              "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
+            },
+            "outcome": "response",
+            "status_code": 200,
+            "body_sha256": "1e8158ec28e8e3262a284fd3d092e1c2bd33e3777cb057ddab140633fa8954cd",
+            "error_type": null
+          },
+          "equal": true
+        }
+      ],
+      "original_manifest": "provider_validation/results/events-final-20261004/m/original/manifest.ndjson",
+      "provider_report": "provider_validation/results/events-final-20261004/m/adapter/ASTOCK-002-5m-bfcb4f8e893f/2026-10-03/input_report/tencent/kline_5m/report.json"
+    },
+    {
+      "input_id": "ASTOCK-045",
+      "original_parsed_csv": "provider_validation/results/live-probes/rate-limited-all-20261003/43_东财涨停池/data.csv",
+      "original_parsed_sha256": "d47e93b4dc5e20469e7abd10030645b5a6515f274103d4d813f4699972fdf1ab",
+      "all_source_fields_compared": true,
+      "all_rows_equal": true,
+      "comparison": "原响应经原SDK函数解析，所有来源列及行与原归档CSV比较；标准化字段另按YAML执行。"
+    },
+    {
+      "input_id": "ASTOCK-070",
+      "original_parsed_csv": "provider_validation/results/live-probes/rate-limited-all-20261003/68_交易日历/data.csv",
+      "original_parsed_sha256": "97eed79324dfff82618d0306ace456f3ea183db33d3b2854c0c2fb074d898514",
+      "all_source_fields_compared": true,
+      "all_rows_equal": true,
+      "comparison": "原响应经原SDK函数解析，所有来源列及行与原归档CSV比较；标准化字段另按YAML执行。"
+    }
+  ],
+  "known_differences": [
+    "复用原财务Provider，返回完整来源字段，标准字段由必要YAML映射。",
+    "原成功可执行测试加载器跳过Session.headers.update表达式；保留实际python-requests默认头、trust_env和原3次重试。",
+    "来源Cookie已脱敏，无法复原跨端点Cookie状态；不认证实时传输等价或当前可用性。",
+    "两项分别验证归档最近50行，来源自报总数更大；明确标记数量限制，不宣称全市场全部事件。",
+    "机构调研仅汇总模式；金额标准列为空，报告期、公告日、接待日分别保留。",
+    "有效筛选空表和全市场异常空表分别验证；新增跨页检查为合成夹具。",
+    "ST原归档仅有东财失败请求，BaoStock兜底未保存可回放结果；未继承东财名单资格。"
+  ],
+  "negative_checks": [
+    {
+      "mutation": "pages",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/events-final-20261004/f0/candidate/ASTOCK-078-d093ee7750c1/2026-10-03/input_report/eastmoney/earnings_forecast/report.json",
+      "report_sha256": "9a33c7002275902783cdee520839dfc06ed0cb13f1d431731a7ff66bbc1c7758",
+      "result": "passed"
+    },
+    {
+      "mutation": "count",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/events-final-20261004/f1/candidate/ASTOCK-078-beb0b5ab364f/2026-10-03/input_report/eastmoney/earnings_forecast/report.json",
+      "report_sha256": "8aeb850ad18103b9067e05122ffe172696e750ec7c14f5bc847bb5ba94369f68",
+      "result": "passed"
+    },
+    {
+      "mutation": "short_page",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/events-final-20261004/f2/candidate/ASTOCK-078-f4eea319a533/2026-10-03/input_report/eastmoney/earnings_forecast/report.json",
+      "report_sha256": "5339fca1b5f2deaeab9b257ebee7460029f94e022c85272445a1cb196a26e974",
+      "result": "passed"
+    },
+    {
+      "mutation": "duplicate",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/events-final-20261004/f3/candidate/ASTOCK-078-01e6393e3ded/2026-10-03/input_report/eastmoney/earnings_forecast/report.json",
+      "report_sha256": "60f51d01ff1322d662f945c13384e0b2a5fbf1a03c6ac2e6dfddc5f7f59d3844",
+      "result": "passed"
+    },
+    {
+      "mutation": "code",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/events-final-20261004/f4/candidate/ASTOCK-078-561780c3b97a/2026-10-03/input_report/eastmoney/earnings_forecast/report.json",
+      "report_sha256": "63b094e566523aa73deaefddd3089da4107e98dbffbf626805f500a2498b5c03",
+      "result": "passed"
+    },
+    {
+      "mutation": "numeric",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/events-final-20261004/f5/candidate/ASTOCK-078-dbe823ae0756/2026-10-03/input_report/eastmoney/earnings_forecast/report.json",
+      "report_sha256": "88b203d2a34d69c861baf1c8f692eb2727a6df46e93d4ec8bbd1de038c3e92f3",
+      "result": "passed"
+    },
+    {
+      "mutation": "date",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/events-final-20261004/f6/candidate/ASTOCK-078-b7fa41b68404/2026-10-03/input_report/eastmoney/earnings_forecast/report.json",
+      "report_sha256": "935c02f431fc31f9199b204370ff35766a6f8d2f4c13af5d9ffdb25c25e8739e",
+      "result": "passed"
+    },
+    {
+      "mutation": "business",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/events-final-20261004/f7/candidate/ASTOCK-078-10e1d58e0593/2026-10-03/input_report/eastmoney/earnings_forecast/report.json",
+      "report_sha256": "6ffd704b765cb130a5231020150056325c1b6a918771e48434fb034821a5b7b0",
+      "result": "passed"
+    },
+    {
+      "mutation": "empty",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/events-final-20261004/f8/candidate/ASTOCK-078-0ab655b04cba/2026-10-03/input_report/eastmoney/earnings_forecast/report.json",
+      "report_sha256": "d628d82a536572effbc0a682e3a27fa9d07bf88a717fb90fb3e16937df62f595",
+      "result": "passed"
+    },
+    {
+      "mutation": "ignored_filter",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/events-final-20261004/f9/candidate/ASTOCK-079-a43cfe60e392/2026-10-03/input_report/eastmoney/institution_survey/report.json",
+      "report_sha256": "fdfde158072fd302b645c31b2e4d95dde916a3a487e86f52a42236349a6c6c3d",
+      "result": "passed"
+    },
+    {
+      "mutation": "http_429",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/events-final-20261004/f10/candidate/ASTOCK-078-95158a6239d8/2026-10-03/input_report/eastmoney/earnings_forecast/report.json",
+      "report_sha256": "103cbfcf22138ea79cc6dae00f7764bdfbee33580626a0ec1e14a26c1de5de58",
+      "result": "passed"
+    },
+    {
+      "mutation": "html",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/events-final-20261004/f11/candidate/ASTOCK-078-745ff3475c48/2026-10-03/input_report/eastmoney/earnings_forecast/report.json",
+      "report_sha256": "21c9d60fc855295609cc36db6ad8d680e01f830b215a818416f6384f218c0ff4",
+      "result": "passed"
+    },
+    {
+      "mutation": "transport",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/events-final-20261004/f12/candidate/ASTOCK-078-09d3251f9ec6/2026-10-03/input_report/eastmoney/earnings_forecast/report.json",
+      "report_sha256": "19be0134470e00cc6b5c4638a150fa4e3b2fcbbb2015cbed9fef94efa64906e7",
+      "result": "passed"
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "validation_time_utc": "2026-10-03T23:00:25.178725+00:00",
+  "authorization": "user confirmed continuous remaining input conversion",
+  "scope": [
+    "ASTOCK-078",
+    "ASTOCK-079"
+  ],
+  "original_files": [
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/financial.py",
+      "sha256": "32ebaa8847b267a60f955469a9c382d60c0b055c568973e062088323d5aeea32",
+      "snapshot": "provider_validation/results/events-original-20261004/1-financial.py.bin"
+    },
+    {
+      "path": "src/stock_data_manage/pipeline/inputs.py",
+      "sha256": "9802f0083ea315558d0cc24871051f7249fbf927085fb98fac9565897b73f16e",
+      "snapshot": "provider_validation/results/events-original-20261004/2-inputs.py.bin"
+    },
+    {
+      "path": "src/stock_data_manage/routing/factory.py",
+      "sha256": "824919b319a1f86de05c67f38c8c4a41fc329aa86eb9e9a1246ab841b977380c",
+      "snapshot": "provider_validation/results/events-original-20261004/3-factory.py.bin"
+    },
+    {
+      "path": "config/providers.yaml",
+      "sha256": "23f06aa0a71ad9aaaf7f24b40daa2efabdc38b1c71a1b8b98f80d6150afb605f",
+      "snapshot": "provider_validation/results/events-original-20261004/4-providers.yaml.bin"
+    },
+    {
+      "path": "tests/test_input_collection.py",
+      "sha256": "ac975f1c8349fdacdd2b9a6d71e8f14eb9389c720e6cd81339a6a75ad9b81321",
+      "snapshot": "provider_validation/results/events-original-20261004/5-test_input_collection.py.bin"
+    },
+    {
+      "path": "provider_validation/tests/replay_input_capabilities.py",
+      "sha256": "129d5e566e25b5c3083d8dcdd66e6f47a44a54bd35d2b6fed8b02b855437aebd",
+      "snapshot": "provider_validation/results/events-original-20261004/6-replay_input_capabilities.py.bin"
+    }
+  ],
+  "original_script": "provider_validation\\tests\\source_snapshots\\a-stock-data\\tests\\test_v39_sources.py",
+  "original_script_sha256": "ec18390ee2be31b5f72f4a0ff7c85ef3753a086ee9c43693bea00b08cab0ce09",
+  "source_snapshot": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+  "source_snapshot_sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03",
+  "observed_loader_session": {
+    "user_agent": "python-requests/2.32.5",
+    "trust_env": true,
+    "retry_total": 3
+  },
+  "finding": "the runnable test loader drops expression statements including Session.headers.update; preserve observed default headers for these validated source calls",
+  "st_finding": "ASTOCK-044: two EastMoney transport failures retained; successful BaoStock fallback result not retained as replayable raw data; coverage denominator 87 is suite count, not ST row count; conversion deferred pending matching evidence"
+}

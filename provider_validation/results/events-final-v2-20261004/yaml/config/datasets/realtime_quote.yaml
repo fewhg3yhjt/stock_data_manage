@@ -1,0 +1,24 @@
+dataset:
+  name: realtime_quote
+  display_name: 实时行情
+  primary_key: [instrument_id, quote_time]
+  allowed_asset_types: [stock, etf, lof, index]
+  allowed_exchanges: [XSHG, XSHE, BSE]
+
+fields:
+  instrument_id: {type: string, required: true}
+  quote_time: {type: datetime, timezone: Asia/Shanghai, required: true}
+  price: {type: decimal, unit: CNY, required: false}
+  change_pct: {type: decimal, unit: percent, required: false}
+  change_amount: {type: decimal, unit: CNY, required: false}
+  open: {type: decimal, unit: CNY, required: false}
+  high: {type: decimal, unit: CNY, required: false}
+  low: {type: decimal, unit: CNY, required: false}
+  pre_close: {type: decimal, unit: CNY, required: false}
+  volume: {type: decimal, unit: share, required: false}
+  amount: {type: decimal, unit: CNY, required: false}
+  total_market_cap: {type: decimal, unit: CNY, required: false}
+  float_market_cap: {type: decimal, unit: CNY, required: false}
+  pe_dynamic: {type: decimal, required: false}
+  pb: {type: decimal, required: false}
+  turnover_rate: {type: decimal, unit: percent, required: false}

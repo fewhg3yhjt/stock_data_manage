@@ -1,0 +1,41 @@
+dataset: institution_survey
+rules:
+- id: eastmoney-institution_survey-input-v1
+  input_id: ASTOCK-079
+  provider: eastmoney
+  endpoint: institution_survey
+  field_mapping:
+    source_security_code: SECURITY_CODE
+    name: SECURITY_NAME_ABBR
+    notice_date: NOTICE_DATE
+    survey_date: RECEIVE_START_DATE
+    survey_end: RECEIVE_END_DATE
+    org_count: SUM
+    survey_way: RECEIVE_WAY_EXPLAIN
+    place: RECEIVE_PLACE
+    receptionist: RECEPTIONIST
+  context_fields:
+    snapshot_at: source_snapshot_at
+  transforms:
+    notice_date:
+      format: '%Y-%m-%d %H:%M:%S'
+    survey_date:
+      format: '%Y-%m-%d %H:%M:%S'
+    survey_end:
+      format: '%Y-%m-%d %H:%M:%S'
+    org_count:
+      remove_commas: true
+      nonfinite_is_null: true
+  null_values:
+  - null
+  - ''
+  - '-'
+  - --
+  - None
+  - 'null'
+  unverified_fields: []
+  status: pending_validation
+  version: eastmoney-events-input-v1
+  evidence_refs:
+  - ASTOCK-079
+  notes: 限定返回最近limit条；公告日与实际报告期/接待日分别保留。snapshot_at是原响应采集时间，不是事件发生时间。金额单位尚未独立认证。

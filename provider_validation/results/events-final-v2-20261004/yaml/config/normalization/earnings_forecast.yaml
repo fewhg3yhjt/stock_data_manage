@@ -1,0 +1,59 @@
+dataset: earnings_forecast
+rules:
+- context_fields:
+    snapshot_at: source_snapshot_at
+  endpoint: earnings_forecast
+  evidence_refs:
+  - ASTOCK-078
+  field_mapping:
+    amount_lower: PREDICT_AMT_LOWER
+    amount_upper: PREDICT_AMT_UPPER
+    change_pct_lower: ADD_AMP_LOWER
+    change_pct_upper: ADD_AMP_UPPER
+    content: PREDICT_CONTENT
+    forecast_type: PREDICT_TYPE
+    indicator: PREDICT_FINANCE
+    indicator_code: PREDICT_FINANCE_CODE
+    name: SECURITY_NAME_ABBR
+    notice_date: NOTICE_DATE
+    prior_year_amount: PREYEAR_SAME_PERIOD
+    reason: PREDICT_CONTENT
+    report_date: REPORT_DATE
+    source_security_code: SECURITY_CODE
+  id: eastmoney-earnings_forecast-input-v1
+  input_id: ASTOCK-078
+  notes: 限定返回最近limit条；公告日与实际报告期/接待日分别保留。snapshot_at是原响应采集时间，不是事件发生时间。金额单位尚未独立认证。
+  null_values:
+  - null
+  - ''
+  - '-'
+  - --
+  - None
+  - 'null'
+  provider: eastmoney
+  status: pending_validation
+  transforms:
+    amount_lower:
+      nonfinite_is_null: true
+      remove_commas: true
+    amount_upper:
+      nonfinite_is_null: true
+      remove_commas: true
+    change_pct_lower:
+      nonfinite_is_null: true
+      remove_commas: true
+    change_pct_upper:
+      nonfinite_is_null: true
+      remove_commas: true
+    notice_date:
+      format: '%Y-%m-%d %H:%M:%S'
+    prior_year_amount:
+      nonfinite_is_null: true
+      remove_commas: true
+    report_date:
+      format: '%Y-%m-%d %H:%M:%S'
+  unverified_fields:
+  - amount_lower
+  - amount_upper
+  - prior_year_amount
+  version: eastmoney-events-input-v1

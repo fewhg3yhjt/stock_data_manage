@@ -1,0 +1,19 @@
+{
+  "input_id": "ASTOCK-078",
+  "mode": "offline_replay",
+  "row_count": 50,
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\events-final-v2-20261004\\ASTOCK-078\\original-parsed.json",
+  "original_parsed_sha256": "57936183a7fbba365a8c2724d38d72e2d8b1dc4655e3018db37a7fe2d4142c45",
+  "source_response_sha256": "17f23466b52f0bfbeb374f8117d9100a9c4af744d590289960da0f89d36c5464",
+  "source_total_count": 190977,
+  "all_retained_source_fields_equal": true,
+  "all_business_fields_equal": true,
+  "request_comparison_equal": true,
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\events-final-v2-20261004\\ASTOCK-078\\candidate\\ASTOCK-078-83559a2df75c\\2026-10-03\\input_report\\eastmoney\\earnings_forecast\\report.json",
+  "report_sha256": "656cddcaa4a987eaefc3d893f255c0ae1ae999b7e52170cd21e6ba2d0b28bf17",
+  "limitations": [
+    "bounded latest 50 events; not whole-market completeness",
+    "currency units pending",
+    "archived redacted cookies cannot reconstruct the original cross-endpoint Session cookie jar"
+  ]
+}

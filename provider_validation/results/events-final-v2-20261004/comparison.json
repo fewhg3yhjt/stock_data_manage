@@ -1,0 +1,186 @@
+{
+  "validation_time_utc": "2026-10-03T23:17:07.178931+00:00",
+  "mode": "offline_replay",
+  "network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "verification_code": {
+    "path": "tests/test_input_collection.py",
+    "sha256": "b4ab08d17bd6420275d903421f4423ee1f2571b7a4676883fcd821a0bcd22d2d"
+  },
+  "runner": {
+    "path": "provider_validation/tests/replay_input_capabilities.py",
+    "sha256": "3bf799d6fa1814d0a59f51942628b3765a1eecbff54c42bcf261a1ad16fffb31"
+  },
+  "inputs": [
+    {
+      "input_id": "ASTOCK-078",
+      "report_path": "provider_validation/results/events-final-v2-20261004/ASTOCK-078/candidate/ASTOCK-078-83559a2df75c/2026-10-03/input_report/eastmoney/earnings_forecast/report.json",
+      "report_sha256": "656cddcaa4a987eaefc3d893f255c0ae1ae999b7e52170cd21e6ba2d0b28bf17",
+      "source_manifest": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+      "source_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+      "row_count": 50,
+      "scope": {
+        "limit": 50
+      },
+      "code_version": "3f7a0de09144e8422ac652c01f1e487d9410e4ab35cd36d423c902c97494426b",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-079",
+      "report_path": "provider_validation/results/events-final-v2-20261004/ASTOCK-079/candidate/ASTOCK-079-feeee46e9eba/2026-10-03/input_report/eastmoney/institution_survey/report.json",
+      "report_sha256": "3f9ab777d4078578ae3b8284f225b0e6a97199042e9f265295c0505bc8fc7570",
+      "source_manifest": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+      "source_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+      "row_count": 50,
+      "scope": {
+        "detail": false,
+        "limit": 50
+      },
+      "code_version": "3f7a0de09144e8422ac652c01f1e487d9410e4ab35cd36d423c902c97494426b",
+      "result": "passed"
+    }
+  ],
+  "original_vs_provider": [
+    {
+      "input_id": "ASTOCK-078",
+      "mode": "offline_replay",
+      "row_count": 50,
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\events-final-v2-20261004\\ASTOCK-078\\original-parsed.json",
+      "original_parsed_sha256": "57936183a7fbba365a8c2724d38d72e2d8b1dc4655e3018db37a7fe2d4142c45",
+      "source_response_sha256": "17f23466b52f0bfbeb374f8117d9100a9c4af744d590289960da0f89d36c5464",
+      "source_total_count": 190977,
+      "all_retained_source_fields_equal": true,
+      "all_business_fields_equal": true,
+      "request_comparison_equal": true,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\events-final-v2-20261004\\ASTOCK-078\\candidate\\ASTOCK-078-83559a2df75c\\2026-10-03\\input_report\\eastmoney\\earnings_forecast\\report.json",
+      "report_sha256": "656cddcaa4a987eaefc3d893f255c0ae1ae999b7e52170cd21e6ba2d0b28bf17",
+      "limitations": [
+        "bounded latest 50 events; not whole-market completeness",
+        "currency units pending",
+        "archived redacted cookies cannot reconstruct the original cross-endpoint Session cookie jar"
+      ]
+    },
+    {
+      "input_id": "ASTOCK-079",
+      "mode": "offline_replay",
+      "row_count": 50,
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\events-final-v2-20261004\\ASTOCK-079\\original-parsed.json",
+      "original_parsed_sha256": "f253c6c7a5c61b4c2dc6de329a28667441af43a31d7ff6985a81947e561618e3",
+      "source_response_sha256": "852a3a28fe9c3e66a4f899162d281af07a62e33a436f514dd3af33c8b82c7888",
+      "source_total_count": 21719,
+      "all_retained_source_fields_equal": true,
+      "all_business_fields_equal": true,
+      "request_comparison_equal": true,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\events-final-v2-20261004\\ASTOCK-079\\candidate\\ASTOCK-079-feeee46e9eba\\2026-10-03\\input_report\\eastmoney\\institution_survey\\report.json",
+      "report_sha256": "3f9ab777d4078578ae3b8284f225b0e6a97199042e9f265295c0505bc8fc7570",
+      "limitations": [
+        "bounded latest 50 events; not whole-market completeness",
+        "currency units pending",
+        "archived redacted cookies cannot reconstruct the original cross-endpoint Session cookie jar"
+      ]
+    }
+  ],
+  "known_differences": [
+    "复用原财务Provider，返回完整来源字段，标准字段由必要YAML映射。",
+    "原成功可执行测试加载器跳过Session.headers.update表达式；保留实际python-requests默认头、trust_env和原3次重试。",
+    "来源Cookie已脱敏，无法复原跨端点Cookie状态；不认证实时传输等价或当前可用性。",
+    "两项分别验证归档最近50行，来源自报总数更大；明确标记数量限制，不宣称全市场全部事件。",
+    "机构调研仅汇总模式；金额标准列为空，报告期、公告日、接待日分别保留。",
+    "有效筛选空表和全市场异常空表分别验证；新增跨页检查为合成夹具。",
+    "ST原归档仅有东财失败请求，BaoStock兜底未保存可回放结果；未继承东财名单资格。"
+  ],
+  "negative_checks": [
+    {
+      "mutation": "pages",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/events-final-v2-20261004/f0/candidate/ASTOCK-078-504ef1dffd26/2026-10-03/input_report/eastmoney/earnings_forecast/report.json",
+      "report_sha256": "0833e09bf92db56967b0f63736b32783053d3932dda8dba22efa32e79ccb5f32",
+      "result": "passed"
+    },
+    {
+      "mutation": "count",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/events-final-v2-20261004/f1/candidate/ASTOCK-078-591bcd44a279/2026-10-03/input_report/eastmoney/earnings_forecast/report.json",
+      "report_sha256": "7e814d58d3f5af9948a7fafd449139fc51624a757f05cc86668a619d370853e0",
+      "result": "passed"
+    },
+    {
+      "mutation": "short_page",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/events-final-v2-20261004/f2/candidate/ASTOCK-078-7f913578f773/2026-10-03/input_report/eastmoney/earnings_forecast/report.json",
+      "report_sha256": "5cb7f218f0faaeaf3ac21a81808a456bb123bc47aa5fa60b38822fd17396ab39",
+      "result": "passed"
+    },
+    {
+      "mutation": "duplicate",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/events-final-v2-20261004/f3/candidate/ASTOCK-078-bb3d93c57c09/2026-10-03/input_report/eastmoney/earnings_forecast/report.json",
+      "report_sha256": "76b5f3f27d356e2ef1dd7c80347d5be63e187d41ccfacf27d3e519d5b3d0ff49",
+      "result": "passed"
+    },
+    {
+      "mutation": "code",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/events-final-v2-20261004/f4/candidate/ASTOCK-078-26860d317cb8/2026-10-03/input_report/eastmoney/earnings_forecast/report.json",
+      "report_sha256": "7659862a3241d1adf2b76b64a34b4b245d2a26e922a9340d04697a943c3bef2f",
+      "result": "passed"
+    },
+    {
+      "mutation": "numeric",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/events-final-v2-20261004/f5/candidate/ASTOCK-078-195462f37c7d/2026-10-03/input_report/eastmoney/earnings_forecast/report.json",
+      "report_sha256": "adeb1714ce05ea59ecf8f2b562b7b12fd931d3faa2f88992956b50662ff8f138",
+      "result": "passed"
+    },
+    {
+      "mutation": "date",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/events-final-v2-20261004/f6/candidate/ASTOCK-078-a68e5819aefa/2026-10-03/input_report/eastmoney/earnings_forecast/report.json",
+      "report_sha256": "d8c7954cfcd7edbdbb92d7ecdb1c84ff3324cb03ce3e2502a7193e1e0baf4ed9",
+      "result": "passed"
+    },
+    {
+      "mutation": "business",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/events-final-v2-20261004/f7/candidate/ASTOCK-078-b3a641b2d28d/2026-10-03/input_report/eastmoney/earnings_forecast/report.json",
+      "report_sha256": "d09be6a7ad6b2dca6664470239a5586ea170b9273a0bce18c42275eddb38148b",
+      "result": "passed"
+    },
+    {
+      "mutation": "empty",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/events-final-v2-20261004/f8/candidate/ASTOCK-078-dce65bc45764/2026-10-03/input_report/eastmoney/earnings_forecast/report.json",
+      "report_sha256": "78e60cb02432805aae09346409c43b2966c2ff2ecfde593bc5c8e02f389ebbd8",
+      "result": "passed"
+    },
+    {
+      "mutation": "ignored_filter",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/events-final-v2-20261004/f9/candidate/ASTOCK-079-fb6a38654f76/2026-10-03/input_report/eastmoney/institution_survey/report.json",
+      "report_sha256": "0bcf5547c9657162031bcae597576e72a852f20027935f55fc65ce16422838a1",
+      "result": "passed"
+    },
+    {
+      "mutation": "http_429",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/events-final-v2-20261004/f10/candidate/ASTOCK-078-ae83e567caea/2026-10-03/input_report/eastmoney/earnings_forecast/report.json",
+      "report_sha256": "a9406fbae680d87dc7e5cde417a5ce6dd7788ca021ae4130b9fe7030125da9af",
+      "result": "passed"
+    },
+    {
+      "mutation": "html",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/events-final-v2-20261004/f11/candidate/ASTOCK-078-18ef285321c7/2026-10-03/input_report/eastmoney/earnings_forecast/report.json",
+      "report_sha256": "0c33b02e710317790e60b4acebe16d1188915e36e1a07de62fab71c7e75dbc6c",
+      "result": "passed"
+    },
+    {
+      "mutation": "transport",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/events-final-v2-20261004/f12/candidate/ASTOCK-078-5b6fc732e0fc/2026-10-03/input_report/eastmoney/earnings_forecast/report.json",
+      "report_sha256": "b52cf4dddaf190721f3a36a7a6a7dbd3f7885dbb72174d8a692b2b0a05096161",
+      "result": "passed"
+    }
+  ]
+}
