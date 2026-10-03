@@ -1,0 +1,83 @@
+{
+  "interface_id": "ASTOCK-019",
+  "source": "a-stock-data",
+  "validation_result": "部分通过",
+  "current_missing_probe_status": "success",
+  "evidence_level": "解析后输出已保存；本批未保存精确原始HTTP响应。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:617 (fetch_lhb_seats); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:245 (dragon_tiger_board(code, date))",
+  "source_code_artifacts": [
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+      "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+    },
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+    }
+  ],
+  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:617 (CLI --run 17)",
+  "manifest_ref": "",
+  "response_artifacts": [],
+  "parsed_output_ref": "provider_validation/results/a-stock-data-missing-output/17_龙虎榜席位/data/dates.csv;  provider_validation/results/a-stock-data-missing-output/17_龙虎榜席位/data/buy.csv;  provider_validation/results/a-stock-data-missing-output/17_龙虎榜席位/data/sell.csv;  provider_validation/results/a-stock-data-missing-output/17_龙虎榜席位/data/_meta.json",
+  "derived_artifacts": [
+    {
+      "path": "provider_validation/results/a-stock-data-missing-output/17_龙虎榜席位/data/dates.csv",
+      "sha256": "8031ea97bd0c2c7695e210b54d1e7645bf52749a992953e1372e488414053a17",
+      "bytes": 76,
+      "field_names": [
+        "序号",
+        "股票代码",
+        "交易日"
+      ],
+      "row_count": 2
+    },
+    {
+      "path": "provider_validation/results/a-stock-data-missing-output/17_龙虎榜席位/data/buy.csv",
+      "sha256": "864bc3813a3ee7c869e72de6164cd3d8bd3fdd765d8ae927054898e40eb6ff38",
+      "bytes": 985,
+      "field_names": [
+        "序号",
+        "交易营业部名称",
+        "买入金额",
+        "买入金额-占总成交比例",
+        "卖出金额",
+        "卖出金额-占总成交比例",
+        "净额",
+        "类型"
+      ],
+      "row_count": 5
+    },
+    {
+      "path": "provider_validation/results/a-stock-data-missing-output/17_龙虎榜席位/data/sell.csv",
+      "sha256": "9334bd54ca1dc425c09185bf1c446e71ee7ce40e76992e484ca24692c31bb338",
+      "bytes": 853,
+      "field_names": [
+        "序号",
+        "交易营业部名称",
+        "买入金额",
+        "买入金额-占总成交比例",
+        "卖出金额",
+        "卖出金额-占总成交比例",
+        "净额",
+        "类型"
+      ],
+      "row_count": 5
+    },
+    {
+      "path": "provider_validation/results/a-stock-data-missing-output/17_龙虎榜席位/data/_meta.json",
+      "sha256": "7f13e4733211de8eca8243694ce1ef409457f2da75ad721bae7aa8b9983e385b",
+      "bytes": 33,
+      "row_count": null
+    }
+  ],
+  "coverage_denominator": 87,
+  "scope": "600519只有2个历史上榜日；席位文件各5行，没有本次日期的上榜记录。 本项只部分返回或有未核准范围。 a_stock_missing_output\\17_龙虎榜席位\\data\\dates.csv [CSV行数=2]; a_stock_missing_output\\17_龙虎榜席位\\data\\buy.csv [CSV行数=5]; a_stock_missing_output\\17_龙虎榜席位\\data\\sell.csv [CSV行数=5]; a_stock_missing_output\\17_龙虎榜席位\\data\\_meta.json [JSON对象]",
+  "finding": "部分：600519只有2个历史上榜日；席位文件各5行，没有本次日期的上榜记录。；脚本结果 success：saved 4 file(s)。解析结果非空；未留精确原始响应。",
+  "sample": "{\"columns\": [\"序号\", \"股票代码\", \"交易日\"], \"sample\": {\"序号\": \"1\", \"股票代码\": \"600519\", \"交易日\": \"2013-01-28\"}}",
+  "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
+  "transformation_code_version": {
+    "path": "provider_validation/tests/build_interface_coverage.py",
+    "sha256": "3e4ae63e410fa129a4efc2cce8e79973fd41959ef8fd709fcd3b9bfb137d3260"
+  },
+  "validation_time_utc": "2026-10-03T08:37:11.493791+00:00"
+}

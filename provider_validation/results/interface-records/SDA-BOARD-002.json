@@ -1,0 +1,64 @@
+{
+  "interface_id": "SDA-BOARD-002",
+  "source": "stock-data-analyse / local Provider",
+  "validation_result": "部分通过",
+  "evidence_level": "原始HTTP响应已按 manifest/hash 归档",
+  "source_code_ref": "provider_validation/tests/source_snapshots/stock-data-analyse/warehouse/industry.py; provider_validation/tests/source_snapshots/stock-data-analyse/fundflow/sources.py; 上游 warehouse/industry.py:201；本项目 src/stock_data_manage/providers/akshare/boards.py:66 fetch_industry_daily",
+  "source_code_artifacts": [
+    {
+      "path": "provider_validation/tests/source_snapshots/stock-data-analyse/warehouse/industry.py",
+      "sha256": "23b7a750336c44356e41067ca48c1ca374221f9ca111190f1f43bdcfc889dc73"
+    },
+    {
+      "path": "provider_validation/tests/source_snapshots/stock-data-analyse/fundflow/sources.py",
+      "sha256": "98b7aed50d2ed325ddf545b5f0d270fb0f724dbd69bec46d488165d4237e1dff"
+    },
+    {
+      "path": "src/stock_data_manage/providers/akshare/boards.py",
+      "sha256": "2f8e988d652ecb2a5ecaeff665938be1a9aa6bf1d33e58628df66f706f99b5f4"
+    },
+    {
+      "path": "tests/test_sector_data_providers.py",
+      "sha256": "1643bb03759fb230d418d270036eb59d742aefe01724850962466a7897c58efa"
+    },
+    {
+      "path": "provider_validation/tests/replay_sector_capability_archives.py",
+      "sha256": "e6e9bbd83cf299df3c4de6ef1570edf6061413850e91988b84d8163081cc4d09"
+    }
+  ],
+  "test_code_ref": "tests/test_sector_data_providers.py:53; provider_validation/tests/replay_sector_capability_archives.py:178",
+  "manifest_ref": "provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson",
+  "response_artifacts": [],
+  "parsed_output_ref": "provider_validation/results/2026-10-02-sector-derived/ths-semiconductor-index-daily.csv",
+  "derived_artifacts": [
+    {
+      "path": "provider_validation/results/2026-10-02-sector-derived/ths-semiconductor-index-daily.csv",
+      "sha256": "1695ca65d6026ccb6d74bc964e6b0e50508a0d35032a3b90ba0e8cfed1ef3546",
+      "bytes": 2348,
+      "field_names": [
+        "board_type",
+        "board_code",
+        "board_name",
+        "trade_date",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "amount",
+        "source"
+      ],
+      "row_count": 21
+    }
+  ],
+  "coverage_denominator": null,
+  "scope": "半导体（881121），2026-09-01至2026-10-02请求；返回21行，实际末日09-30",
+  "finding": "只测一个板块和窗口；成交量/成交额单位未确认",
+  "sample": "{\"columns\": [\"board_type\", \"board_code\", \"board_name\", \"trade_date\", \"open\", \"high\", \"low\", \"close\", \"volume\", \"amount\", \"source\"], \"sample\": {\"board_type\": \"industry\", \"board_code\": \"881121\", \"board_name\": \"半导体\", \"trade_date\": \"2026-09-01\", \"open\": \"17063.091\", \"high\": \"17068.104\", \"low\": \"16565.452\", \"close\": \"16613.152\", \"volume\": \"2703196000\", \"amount\": \"221990800000.0\", \"source\": \"ths\"}}",
+  "source_version": "stock-data-analyse c26cabcf89443ec8f1445d0e5af86bf3d6dacf3; 本项目代码以当前工作树为准",
+  "transformation_code_version": {
+    "path": "provider_validation/tests/build_interface_coverage.py",
+    "sha256": "3e4ae63e410fa129a4efc2cce8e79973fd41959ef8fd709fcd3b9bfb137d3260"
+  },
+  "validation_time_utc": "2026-10-03T08:37:13.288078+00:00"
+}

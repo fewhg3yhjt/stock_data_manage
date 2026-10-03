@@ -1,0 +1,44 @@
+{
+  "interface_id": "ASTOCK-075",
+  "source": "a-stock-data",
+  "validation_result": "通过",
+  "current_missing_probe_status": "not_run",
+  "evidence_level": "此前实时验证已保存原始响应；本轮补抓脚本结果另列，测试范围不自动视为相同。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:297 (上游内嵌接口说明/实现快照)",
+  "source_code_artifacts": [
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+    },
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/tests/test_v310_sources.py",
+      "sha256": "afd8fe187e1d91c14553a407ee62f371efd23e449133c33e0d6e689cafa26410"
+    }
+  ],
+  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/tests/test_v310_sources.py:1 (该版本测试快照；未找到专属用例时以清单证据注明)",
+  "manifest_ref": "provider_validation/results/raw/2026-10-01-v310-live/manifest.ndjson",
+  "response_artifacts": [
+    {
+      "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998.body.gz",
+      "sha256": "e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/ecd7f264230e49f3ace244fee9ae7155093fbac8b61e7e9d0926d674c6d9d7f7.body.gz",
+      "sha256": "ecd7f264230e49f3ace244fee9ae7155093fbac8b61e7e9d0926d674c6d9d7f7",
+      "matches_filename": true
+    }
+  ],
+  "parsed_output_ref": "",
+  "derived_artifacts": [],
+  "coverage_denominator": 87,
+  "scope": "SKILL.md §13.7；V3.10 联网测试 26 项全通过。",
+  "finding": "通过。本轮实测 RB0、M0 两个合约。",
+  "sample": "/*<script>location.href='//sina.com';</script>*/ var _RB0=([{\"d\":\"2009-03-27\",\"o\":\"3550.000\",\"h\":\"3663.000\",\"l\":\"3513.000\",\"c\":\"3561.000\",\"v\":\"354590\",\"p\":\"45548\",\"s\":\"0.000\"},{\"d\":\"2009-03-30\",\"o\":\"3550.000\",\"h\":\"3580.000\",\"l\":\"3528.000\",\"c\":\"3544.000\",\"v\":\"145168\",\"p\":\"48380\",\"s\":\"0.000\"},{\"d\":\"2009-03-31\",\"o\":\"3538.000\",\"h\":\"3566.000\",\"l\":\"3531.000\",\"c\":\"3549.000\",\"v\":\"70592\",\"p\":\"44714\",\"s\":\"0.000\"},{\"d\":\"2009-04-01\",\"o\":\"3560.000\",\"h\":\"3561.000\",\"l\":\"3543.000\",\"c\":\"3547.000\",\"v\":\"28100\",\"p\":\"42076\",\"s\":\"0.000\"},{\"d\":\"2009-04-02\",\"o\":\"3545.000\",\"h\":\"3548.000\",\"l\":\"3456.000\",\"c\":\"3473.000\",\"v\":\"235446\",\"p\":\"68888\",\"s\":\"0.000\"},{\"d\":\"2009-04-03\",\"o\":\"3481.000\",\"h\":\"3481.000\",\"l\":\"3436.000…",
+  "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
+  "transformation_code_version": {
+    "path": "provider_validation/tests/build_interface_coverage.py",
+    "sha256": "3e4ae63e410fa129a4efc2cce8e79973fd41959ef8fd709fcd3b9bfb137d3260"
+  },
+  "validation_time_utc": "2026-10-03T08:37:12.977787+00:00"
+}

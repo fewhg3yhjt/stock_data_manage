@@ -1,0 +1,54 @@
+{
+  "interface_id": "ASTOCK-065",
+  "source": "a-stock-data",
+  "validation_result": "通过",
+  "current_missing_probe_status": "not_run",
+  "evidence_level": "此前实时验证已保存原始响应；本轮补抓脚本结果另列，测试范围不自动视为相同。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:285 (上游内嵌接口说明/实现快照)",
+  "source_code_artifacts": [
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+    },
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py",
+      "sha256": "ec18390ee2be31b5f72f4a0ff7c85ef3753a086ee9c43693bea00b08cab0ce09"
+    }
+  ],
+  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py:1 (该版本测试快照；未找到专属用例时以清单证据注明)",
+  "manifest_ref": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+  "response_artifacts": [
+    {
+      "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/f6c7281468bbc966247b0d97e221c7b310abbb6727953195aef701643b165542.body.gz",
+      "sha256": "f6c7281468bbc966247b0d97e221c7b310abbb6727953195aef701643b165542",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/dbadf321af90a750a1e435b4c37e77c0b2a97a452bed04a949324b41a1341199.body.gz",
+      "sha256": "dbadf321af90a750a1e435b4c37e77c0b2a97a452bed04a949324b41a1341199",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/f08cebac096169d3177eb4f1b8ee7d9e4ca37e85bb05592cabadfac813647aba.body.gz",
+      "sha256": "f08cebac096169d3177eb4f1b8ee7d9e4ca37e85bb05592cabadfac813647aba",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/0ec24737c1be4a30209750eb7f4bb55c97578ee2f960057c687414f5bffc0cbc.body.gz",
+      "sha256": "0ec24737c1be4a30209750eb7f4bb55c97578ee2f960057c687414f5bffc0cbc",
+      "matches_filename": true
+    }
+  ],
+  "parsed_output_ref": "",
+  "derived_artifacts": [],
+  "coverage_denominator": 87,
+  "scope": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。",
+  "finding": "通过。对应联网测试返回非空数据并通过字段/来源检查；范围见原始请求清单。",
+  "sample": "{\"version\":\"a80eb7cf428feb60ceadb169ab5d90e3\",\"result\":{\"pages\":4,\"data\":[{\"TRADE_DATE\":\"1991-04-21 00:00:00\",\"LPR1Y\":null,\"LPR5Y\":null},{\"TRADE_DATE\":\"1993-05-15 00:00:00\",\"LPR1Y\":null,\"LPR5Y\":null},{\"TRADE_DATE\":\"1993-07-11 00:00:00\",\"LPR1Y\":null,\"LPR5Y\":null},{\"TRADE_DATE\":\"1995-01-01 00:00:00\",\"LPR1Y\":null,\"LPR5Y\":null},{\"TRADE_DATE\":\"1995-07-01 00:00:00\",\"LPR1Y\":null,\"LPR5Y\":null},{\"TRADE_DATE\":\"1996-05-01 00:00:00\",\"LPR1Y\":null,\"LPR5Y\":null},{\"TRADE_DATE\":\"1996-08-23 00:00:00\",\"LPR1Y\":null,\"LPR5Y\":null},{\"TRADE_DATE\":\"1997-10-23 00:00:00\",\"LPR1Y\":null,\"LPR5Y\":null},{\"TRADE_DATE\":\"1998-03-25 00:00:00\",\"LPR1Y\":null,\"LPR5Y\":null},{\"TRADE_DATE\":\"1998-07-01 00:00:00\",\"LPR1Y\":null,\"LPR5Y\":n…",
+  "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
+  "transformation_code_version": {
+    "path": "provider_validation/tests/build_interface_coverage.py",
+    "sha256": "3e4ae63e410fa129a4efc2cce8e79973fd41959ef8fd709fcd3b9bfb137d3260"
+  },
+  "validation_time_utc": "2026-10-03T08:37:12.767441+00:00"
+}

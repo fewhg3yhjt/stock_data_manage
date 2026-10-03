@@ -1,0 +1,39 @@
+{
+  "interface_id": "ASTOCK-074",
+  "source": "a-stock-data",
+  "validation_result": "通过",
+  "current_missing_probe_status": "not_run",
+  "evidence_level": "此前实时验证已保存原始响应；本轮补抓脚本结果另列，测试范围不自动视为相同。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:294 (上游内嵌接口说明/实现快照)",
+  "source_code_artifacts": [
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+    },
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py",
+      "sha256": "ec18390ee2be31b5f72f4a0ff7c85ef3753a086ee9c43693bea00b08cab0ce09"
+    }
+  ],
+  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py:1 (该版本测试快照；未找到专属用例时以清单证据注明)",
+  "manifest_ref": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+  "response_artifacts": [
+    {
+      "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/2990f9cbcb96e04bd520870b1bb097f94de7d41ec908ee032d73f4c91c155a59.body.gz",
+      "sha256": "2990f9cbcb96e04bd520870b1bb097f94de7d41ec908ee032d73f4c91c155a59",
+      "matches_filename": true
+    }
+  ],
+  "parsed_output_ref": "",
+  "derived_artifacts": [],
+  "coverage_denominator": 87,
+  "scope": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。",
+  "finding": "通过。对应联网测试返回非空数据并通过字段/来源检查；范围见原始请求清单。",
+  "sample": "var hq_str_nf_RB0=\"���Ƹ�����,150000,3111.000,3131.000,3108.000,3112.000,3112.000,3113.000,3112.000,3116.000,3109.000,407,60,1592266.000,638932,��,���Ƹ�,2026-09-30,1,,,,,,,,,3116.824,3111.000,1394,3110.000,1084,3109.000,511,3108.000,1644,3114.000,439,3115.000,938,3116.000,810,3117.000,318\"; var hq_str_nf_M0=\"��������,150448,3366.000,3390.000,3350.000,3372.000,3370.000,3372.000,3372.000,3369.000,3347.000,1,42,2445036.000,845761,��,����,2026-09-30,1,,,,,,,,,3369.443,0.000,0,0.000,0,0.000,0,0.000,0,0.000,0,0.000,0,0.000,0,0.000,0\"; var hq_str_nf_IF0=\"4292.400,4310.400,4278.000,4300.800,38676,166041153.600,166992.000,4300.800,0.000,4713.400,3856.600,0.000,0.000,4277.200,4285.000,169873.000,4300.…",
+  "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
+  "transformation_code_version": {
+    "path": "provider_validation/tests/build_interface_coverage.py",
+    "sha256": "3e4ae63e410fa129a4efc2cce8e79973fd41959ef8fd709fcd3b9bfb137d3260"
+  },
+  "validation_time_utc": "2026-10-03T08:37:12.964276+00:00"
+}

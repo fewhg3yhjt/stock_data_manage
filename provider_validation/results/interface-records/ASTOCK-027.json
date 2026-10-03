@@ -1,0 +1,61 @@
+{
+  "interface_id": "ASTOCK-027",
+  "source": "a-stock-data",
+  "validation_result": "部分通过",
+  "current_missing_probe_status": "success",
+  "evidence_level": "解析后输出已保存；本批未保存精确原始HTTP响应。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:738 (fetch_dividend_history); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:253 (dividend_history(code))",
+  "source_code_artifacts": [
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+      "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+    },
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+    }
+  ],
+  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:738 (CLI --run 25)",
+  "manifest_ref": "",
+  "response_artifacts": [],
+  "parsed_output_ref": "provider_validation/results/a-stock-data-missing-output/25_分红送转历史/data.csv",
+  "derived_artifacts": [
+    {
+      "path": "provider_validation/results/a-stock-data-missing-output/25_分红送转历史/data.csv",
+      "sha256": "a8997137c0fcfcdda419f8b70e9b780a10fab1d2081e5b001e56deb3ee87654b",
+      "bytes": 6707,
+      "field_names": [
+        "报告期",
+        "业绩披露日期",
+        "送转股份-送转总比例",
+        "送转股份-送股比例",
+        "送转股份-转股比例",
+        "现金分红-现金分红比例",
+        "现金分红-现金分红比例描述",
+        "现金分红-股息率",
+        "每股收益",
+        "每股净资产",
+        "每股公积金",
+        "每股未分配利润",
+        "净利润同比增长",
+        "总股本",
+        "预案公告日",
+        "股权登记日",
+        "除权除息日",
+        "方案进度",
+        "最新公告日期"
+      ],
+      "row_count": 28
+    }
+  ],
+  "coverage_denominator": 87,
+  "scope": "28行分红记录，字段齐全，但输出无证券代码列，归属无法从文件独立核对。 本项只部分返回或有未核准范围。 a_stock_missing_output\\25_分红送转历史\\data.csv [CSV行数=28]",
+  "finding": "部分：28行分红记录，字段齐全，但输出无证券代码列，归属无法从文件独立核对。；脚本结果 success：saved 1 file(s)。解析结果非空；未留精确原始响应。",
+  "sample": "{\"columns\": [\"报告期\", \"业绩披露日期\", \"送转股份-送转总比例\", \"送转股份-送股比例\", \"送转股份-转股比例\", \"现金分红-现金分红比例\", \"现金分红-现金分红比例描述\", \"现金分红-股息率\", \"每股收益\", \"每股净资产\", \"每股公积金\", \"每股未分配利润\", \"净利润同比增长\", \"总股本\", \"预案公告日\", \"股权登记日\", \"除权除息日\", \"方案进度\", \"最新公告日期\"], \"sample\": {\"报告期\": \"2001-12-31\", \"业绩披露日期\": \"2002-07-18\", \"送转股份-送转总比例\": \"1.0\", \"送转股份-送股比例\": \"0.0\", \"送转股份-转股比例\": \"1.0\", \"现金分红-现金分红比例\": \"6.0\", \"现金分红-现金分红比例描述\": \"10转1.00派6.00元(含税,扣税后4.80元)\", \"现金分红-股息率\": \"0.016483516484\", \"每股收益\": \"1.59\", \"每股净资产\": \"10.12\", \"每股公积金\": \"8.15675804216\", \"每股未分配利润\": \"0.31245454856\", \"净利润同比增长\": \"31.548404781656\", \"总股本\": \"250000000\", \"预案公告日\": \"\", \"股权登记日\": \"2002-07-24\", \"除权除息日\": \"2002-07-25\", \"方案进度\": \"实施分配\", \"最新公告日期\": \"2002-07-18\"}}",
+  "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
+  "transformation_code_version": {
+    "path": "provider_validation/tests/build_interface_coverage.py",
+    "sha256": "3e4ae63e410fa129a4efc2cce8e79973fd41959ef8fd709fcd3b9bfb137d3260"
+  },
+  "validation_time_utc": "2026-10-03T08:37:11.757280+00:00"
+}

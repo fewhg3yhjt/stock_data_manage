@@ -1,0 +1,47 @@
+{
+  "interface_id": "ASTOCK-040",
+  "source": "a-stock-data",
+  "validation_result": "部分通过",
+  "current_missing_probe_status": "success",
+  "evidence_level": "解析后输出已保存；本批未保存精确原始HTTP响应。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:840 (fetch_cninfo_announcements); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:270 (cninfo_announcements(code))",
+  "source_code_artifacts": [
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+      "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+    },
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+    }
+  ],
+  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:840 (CLI --run 38)",
+  "manifest_ref": "",
+  "response_artifacts": [],
+  "parsed_output_ref": "provider_validation/results/a-stock-data-missing-output/38_巨潮公告/data.csv",
+  "derived_artifacts": [
+    {
+      "path": "provider_validation/results/a-stock-data-missing-output/38_巨潮公告/data.csv",
+      "sha256": "41d877d930bb1dfed785c382b673859390e01e26cbf3b97d3d3f30a0f92a4f2b",
+      "bytes": 38950,
+      "field_names": [
+        "代码",
+        "简称",
+        "公告标题",
+        "公告时间",
+        "公告链接"
+      ],
+      "row_count": 155
+    }
+  ],
+  "coverage_denominator": 87,
+  "scope": "解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。 本次只核验了本行注明的样例范围。 a_stock_missing_output\\38_巨潮公告\\data.csv [CSV行数=155]",
+  "finding": "通过：解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。；脚本结果 success：saved 1 file(s)。解析结果非空；未留精确原始响应。",
+  "sample": "{\"columns\": [\"代码\", \"简称\", \"公告标题\", \"公告时间\", \"公告链接\"], \"sample\": {\"代码\": \"600519\", \"简称\": \"贵州茅台\", \"公告标题\": \"贵州茅台2026年半年度报告\", \"公告时间\": \"2026-08-15 00:00:00\", \"公告链接\": \"http://www.cninfo.com.cn/new/disclosure/detail?stockCode=600519&announcementId=1225475868&orgId=gssh0600519&announcementTime=2026-08-15 00:00:00\"}}",
+  "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
+  "transformation_code_version": {
+    "path": "provider_validation/tests/build_interface_coverage.py",
+    "sha256": "3e4ae63e410fa129a4efc2cce8e79973fd41959ef8fd709fcd3b9bfb137d3260"
+  },
+  "validation_time_utc": "2026-10-03T08:37:12.096319+00:00"
+}

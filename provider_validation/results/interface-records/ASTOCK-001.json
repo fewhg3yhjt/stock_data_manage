@@ -1,0 +1,54 @@
+{
+  "interface_id": "ASTOCK-001",
+  "source": "a-stock-data",
+  "validation_result": "部分通过",
+  "current_missing_probe_status": "success",
+  "evidence_level": "解析后输出已保存；本批未保存精确原始HTTP响应。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:339 (fetch_tencent_finance); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:229 (tencent_quote(codes))",
+  "source_code_artifacts": [
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+      "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+    },
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+    }
+  ],
+  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:339 (CLI --run 1)",
+  "manifest_ref": "",
+  "response_artifacts": [],
+  "parsed_output_ref": "provider_validation/results/a-stock-data-missing-output/01_腾讯财经/data.csv",
+  "derived_artifacts": [
+    {
+      "path": "provider_validation/results/a-stock-data-missing-output/01_腾讯财经/data.csv",
+      "sha256": "18a2746d17c19d96d504da26d6586d664ac3f1f2816619d79141f9972ddc56b0",
+      "bytes": 720,
+      "field_names": [
+        "name",
+        "code",
+        "price",
+        "prev_close",
+        "open",
+        "volume_lot",
+        "datetime",
+        "change",
+        "change_pct",
+        "high",
+        "low",
+        "raw"
+      ],
+      "row_count": 1
+    }
+  ],
+  "coverage_denominator": 87,
+  "scope": "解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。 本次只核验了本行注明的样例范围。 a_stock_missing_output\\01_腾讯财经\\data.csv [CSV行数=1]",
+  "finding": "通过：解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。；脚本结果 success：saved 1 file(s)。解析结果非空；未留精确原始响应。",
+  "sample": "{\"columns\": [\"name\", \"code\", \"price\", \"prev_close\", \"open\", \"volume_lot\", \"datetime\", \"change\", \"change_pct\", \"high\", \"low\", \"raw\"], \"sample\": {\"name\": \"贵州茅台\", \"code\": \"600519\", \"price\": \"1258.62\", \"prev_close\": \"1235.58\", \"open\": \"1239.53\", \"volume_lot\": \"38331\", \"datetime\": \"20260930161458\", \"change\": \"23.04\", \"change_pct\": \"1.86\", \"high\": \"1268.00\", \"low\": \"1236.05\", \"raw\": \"1~贵州茅台~600519~1258.62~1235.58~1239.53~38331~21633~16698~1258.62~14~1258.44~1~1258.16~1~1258.05~2~1258.00~41~1258.65~2~1258.66~3~1258.68~1~1258.69~2~1258.75~80~~20260930161458~23.04~1.86~1268.00~1236.05~1258.62/38331/4797246636~38331~479725~0.31~19.32~~1268.00~1236.05~2.59~15733.78~15733.78~6.26~1359.14~1112.02~1.36~-29~1251.53~17.67~19.11~~~0.06~479724.6636~453.1032~36~ A~GP-A~-6.71~0.38~4.13~32.41~27.30~1539.98~1151.01~-1.11~-3.15~5.87~1250081601~1250081601~-19.73~-9.97~1250081601~~~-9.58~0.16~~CNY~0~___D__F__N~…",
+  "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
+  "transformation_code_version": {
+    "path": "provider_validation/tests/build_interface_coverage.py",
+    "sha256": "3e4ae63e410fa129a4efc2cce8e79973fd41959ef8fd709fcd3b9bfb137d3260"
+  },
+  "validation_time_utc": "2026-10-03T08:37:11.094569+00:00"
+}

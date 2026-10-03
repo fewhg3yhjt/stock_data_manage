@@ -1,0 +1,33 @@
+{
+  "interface_id": "ASTOCK-018",
+  "source": "a-stock-data",
+  "validation_result": "未通过",
+  "current_missing_probe_status": "failed",
+  "evidence_level": "探针明确失败/不可用；保存了执行摘要或失败信息，无成功原始业务响应。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:608 (fetch_em_fund_flow); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:244 (eastmoney_fund_flow_minute(code))",
+  "source_code_artifacts": [
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+      "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+    },
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+    }
+  ],
+  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:608 (CLI --run 16)",
+  "manifest_ref": "",
+  "response_artifacts": [],
+  "parsed_output_ref": "修复后汇总：D:/Project/PythonProgram/stock_data_manage/provider_validation/results/a-stock-missing-repaired-live-20261001/_summary.csv",
+  "derived_artifacts": [],
+  "coverage_denominator": 87,
+  "scope": "已修正市场参数为AKShare要求的sh；修复后请求secid=1.600519，但执行环境在建连时返回WinError 10013，未获得上游响应。 传输失败记录见 D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\a-stock-missing-repaired-live-20261001\\_raw\\missing-capabilities-20261001T224030\\manifest.ndjson",
+  "finding": "未通过：已修正市场参数为AKShare要求的sh；修复后请求secid=1.600519，但执行环境在建连时返回WinError 10013，未获得上游响应。；脚本结果 failed: KeyError: '沪'",
+  "sample": "KeyError: '沪'",
+  "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
+  "transformation_code_version": {
+    "path": "provider_validation/tests/build_interface_coverage.py",
+    "sha256": "3e4ae63e410fa129a4efc2cce8e79973fd41959ef8fd709fcd3b9bfb137d3260"
+  },
+  "validation_time_utc": "2026-10-03T08:37:11.454842+00:00"
+}

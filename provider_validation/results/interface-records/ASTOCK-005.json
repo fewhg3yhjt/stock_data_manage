@@ -1,0 +1,33 @@
+{
+  "interface_id": "ASTOCK-005",
+  "source": "a-stock-data",
+  "validation_result": "未通过",
+  "current_missing_probe_status": "unavailable",
+  "evidence_level": "探针明确失败/不可用；保存了执行摘要或失败信息，无成功原始业务响应。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:372 (fetch_baidu_kline); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:233 (baidu_kline_with_ma(code))",
+  "source_code_artifacts": [
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+      "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+    },
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+    }
+  ],
+  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:372 (CLI --run 5)",
+  "manifest_ref": "",
+  "response_artifacts": [],
+  "parsed_output_ref": "",
+  "derived_artifacts": [],
+  "coverage_denominator": 87,
+  "scope": "百度当前对该运行环境返回 403；不是代码解析错误。 本轮未取得可用且匹配能力定义的数据。",
+  "finding": "未通过：百度当前对该运行环境返回 403；不是代码解析错误。；脚本结果 unavailable: 百度当前对该运行环境返回 403；不是代码解析错误。",
+  "sample": "百度当前对该运行环境返回 403；不是代码解析错误。",
+  "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
+  "transformation_code_version": {
+    "path": "provider_validation/tests/build_interface_coverage.py",
+    "sha256": "3e4ae63e410fa129a4efc2cce8e79973fd41959ef8fd709fcd3b9bfb137d3260"
+  },
+  "validation_time_utc": "2026-10-03T08:37:11.180766+00:00"
+}

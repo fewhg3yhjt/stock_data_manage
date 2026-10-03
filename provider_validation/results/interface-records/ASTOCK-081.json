@@ -1,0 +1,39 @@
+{
+  "interface_id": "ASTOCK-081",
+  "source": "a-stock-data",
+  "validation_result": "通过",
+  "current_missing_probe_status": "not_run",
+  "evidence_level": "此前实时验证已保存原始响应；本轮补抓脚本结果另列，测试范围不自动视为相同。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:301 (上游内嵌接口说明/实现快照)",
+  "source_code_artifacts": [
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+    },
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py",
+      "sha256": "ec18390ee2be31b5f72f4a0ff7c85ef3753a086ee9c43693bea00b08cab0ce09"
+    }
+  ],
+  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py:1 (该版本测试快照；未找到专属用例时以清单证据注明)",
+  "manifest_ref": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+  "response_artifacts": [
+    {
+      "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/cd9747ca8dbb0823a1cbdf8db5eb9b755b6ca739ee537c34705e57d6076554ed.body.gz",
+      "sha256": "cd9747ca8dbb0823a1cbdf8db5eb9b755b6ca739ee537c34705e57d6076554ed",
+      "matches_filename": true
+    }
+  ],
+  "parsed_output_ref": "",
+  "derived_artifacts": [],
+  "coverage_denominator": 87,
+  "scope": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。",
+  "finding": "通过。对应联网测试返回非空数据并通过字段/来源检查；范围见原始请求清单。",
+  "sample": "{\"version\":\"37c9707351588749255af8e04c2733e6\",\"result\":{\"pages\":111,\"data\":[{\"REPURAMOUNTLIMIT\":50000000,\"REPURAMOUNTLOWER\":25000000,\"REPURCODE\":\"16222\",\"REPURENDDATE\":\"2026-10-20 00:00:00\",\"REPURNUMCAP\":471698,\"REPURNUMLOWER\":235850,\"REPUROBJECTIVE\":\"为维护公司价值及股东权益,增强投资者对公司的投资信心,促进公司长期可持续发展和价值增长,结合公司发展战略、经营情况和财务状况,公司拟以自有资金通过集中竞价交易方式回购公司股份,并将按照有关回购规则和监管指引要求在规定期限内出售。\",\"REPURPRICECAP\":106,\"REPURPRICELOWER\":null,\"REPURPROGRESS\":\"006\",\"REPURSTARTDATE\":\"2026-07-20 00:00:00\",\"DIM_SCODE\":\"301360\",\"SECURITYSHORTNAME\":\"荣旗科技\",\"SHARETYPE\":\"流通A股\",\"SHMRSLTNOTICEDATE\":null,\"UPDATEDATE\":\"2026-10-01 00:00:00\",\"FINISHDATE\":\"2026-09-30 00:00:00\",\"COMPANYCODE\":\"10000004578\",\"DIM_DATE\":\"2026-07-21 00:00:00\",\"REM…",
+  "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
+  "transformation_code_version": {
+    "path": "provider_validation/tests/build_interface_coverage.py",
+    "sha256": "3e4ae63e410fa129a4efc2cce8e79973fd41959ef8fd709fcd3b9bfb137d3260"
+  },
+  "validation_time_utc": "2026-10-03T08:37:13.021434+00:00"
+}

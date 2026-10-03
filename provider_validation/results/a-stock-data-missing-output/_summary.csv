@@ -1,0 +1,62 @@
+﻿id,name,status,seconds,message,files
+1,腾讯财经,success,0.352,saved 1 file(s),a_stock_missing_output\01_腾讯财经\data.csv
+5,百度K线,unavailable,3.336,百度当前对该运行环境返回 403；不是代码解析错误。,
+6,新浪复权因子,success,0.593,saved 2 file(s),a_stock_missing_output\06_新浪复权因子\data\qfq_factor.csv;a_stock_missing_output\06_新浪复权因子\data\hfq_factor.csv
+7,mootdx行情,unavailable,0.0,mootdx/通达信在线行情在你表中已记录 2026-09 起返回空数据；盘后包能力已通过，因此这里不重复包装成“成功”。,
+8,东财reportapi,success,0.565,saved 1 file(s),a_stock_missing_output\08_东财reportapi\data.csv
+9,东财PDF下载,failed,1.528,RuntimeError: 研报列表可获取，但本次未成功下载 PDF,
+10,同花顺一致预期,success,0.4,saved 1 file(s),a_stock_missing_output\10_同花顺一致预期\data.csv
+11,iwencai自然语言搜索,credential_required,0.0,未设置 IWENCAI_API_KEY；自然语言问财接口不应在无凭据时伪装成可用。,
+13,同花顺热点,success,4.308,saved 1 file(s),a_stock_missing_output\13_同花顺热点\data.csv
+14,北向/沪深港通当前资金汇总,success,0.27,saved 1 file(s),a_stock_missing_output\14_北向_沪深港通当前资金汇总\data.csv
+15,东财板块归属,failed,1.36,"ProxyError: HTTPSConnectionPool(host='push2.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/get?fltt=2&invt=2&fields=f120%2Cf121%2Cf122%2Cf174%2Cf175%2Cf59%2Cf163%2Cf43%2Cf57%2Cf58%2Cf169%2Cf170%2Cf46%2Cf44%2Cf51%2Cf168%2Cf47%2Cf164%2Cf116%2Cf60%2Cf45%2Cf52%2Cf50%2Cf48%2Cf167%2Cf117%2Cf71%2Cf161%2Cf49%2Cf530%2Cf135%2Cf136%2Cf137%2Cf138%2Cf139%2Cf141%2Cf142%2Cf144%2Cf145%2Cf147%2Cf148%2Cf140%2Cf143%2Cf146%2Cf149%2Cf55%2Cf62%2Cf162%2Cf92%2Cf173%2Cf104%2Cf105%2Cf84%2Cf85%2Cf183%2Cf184%2Cf185%2Cf186%2Cf187%2Cf188%2Cf189%2Cf190%2Cf191%2Cf192%2Cf107%2Cf111%2Cf86%2Cf177%2Cf78%2Cf110%2Cf262%2Cf263%2Cf264%2Cf267%2Cf268%2Cf255%2Cf256%2Cf257%2Cf258%2Cf127%2Cf199%2Cf128%2Cf198%2Cf259%2Cf260%2Cf261%2Cf171%2Cf277%2Cf278%2Cf279%2Cf288%2Cf152%2Cf250%2Cf251%2Cf252%2Cf253%2Cf254%2Cf269%2Cf270%2Cf271%2Cf272%2Cf273%2Cf274%2Cf275%2Cf276%2Cf265%2Cf266%2Cf289%2Cf290%2Cf286%2Cf285%2Cf292%2Cf293%2Cf294%2Cf295%2Cf43&secid=1.600519 (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))",
+16,东财个股资金流向,failed,0.0,KeyError: '沪',
+17,龙虎榜席位,success,0.813,saved 4 file(s),a_stock_missing_output\17_龙虎榜席位\data\dates.csv;a_stock_missing_output\17_龙虎榜席位\data\buy.csv;a_stock_missing_output\17_龙虎榜席位\data\sell.csv;a_stock_missing_output\17_龙虎榜席位\data\_meta.json
+18,全市场龙虎榜,failed,0.617,RuntimeError: stock_lhb_detail_em: TypeError: 'NoneType' object is not subscriptable | stock_lhb_detail_daily_sina: KeyError: '股票代码',
+19,限售解禁日历,success,3.23,saved 1 file(s),a_stock_missing_output\19_限售解禁日历\data.csv
+20,行业板块排名,failed,9.451,"ProxyError: HTTPSConnectionPool(host='17.push2.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/clist/get?pn=1&pz=100&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&fid=f3&fs=m%3A90+t%3A2+f%3A%2150&fields=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6%2Cf7%2Cf8%2Cf9%2Cf10%2Cf12%2Cf13%2Cf14%2Cf15%2Cf16%2Cf17%2Cf18%2Cf20%2Cf21%2Cf23%2Cf24%2Cf25%2Cf26%2Cf22%2Cf33%2Cf11%2Cf62%2Cf128%2Cf136%2Cf115%2Cf152%2Cf124%2Cf107%2Cf104%2Cf105%2Cf140%2Cf141%2Cf207%2Cf208%2Cf209%2Cf222 (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))",
+21,板块资金流向,success,1.589,saved 1 file(s),a_stock_missing_output\21_板块资金流向\data.csv
+22,融资融券明细,success,3.445,saved 5 file(s),a_stock_missing_output\22_融资融券明细\data\sse_all.csv;a_stock_missing_output\22_融资融券明细\data\szse_all.csv;a_stock_missing_output\22_融资融券明细\data\sse_filtered.csv;a_stock_missing_output\22_融资融券明细\data\szse_filtered.csv;a_stock_missing_output\22_融资融券明细\data\_meta.json
+23,大宗交易,success,1.81,saved 1 file(s),a_stock_missing_output\23_大宗交易\data.csv
+24,股东户数变化,success,0.566,saved 1 file(s),a_stock_missing_output\24_股东户数变化\data.csv
+25,分红送转历史,success,0.623,saved 1 file(s),a_stock_missing_output\25_分红送转历史\data.csv
+26,个股资金流近100~120日,failed,0.0,KeyError: '沪',
+27,筹码分布CYQ,failed,2.556,"RuntimeError: stock_cyq_em: ProxyError: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?secid=1.600519&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61&klt=101&fqt=0&end=20261001&lmt=210 (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response'))) | stock_cyq_em: ProxyError: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?secid=1.600519&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61&klt=101&fqt=1&end=20261001&lmt=210 (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))",
+29,个股新闻,success,0.082,saved 1 file(s),a_stock_missing_output\29_个股新闻\data.csv
+30,财联社电报,success,4.822,saved 1 file(s),a_stock_missing_output\30_财联社电报\data.csv
+31,全球资讯,success,0.367,saved 1 file(s),a_stock_missing_output\31_全球资讯\data.csv
+34,季报快照,failed,0.525,RuntimeError: stock_yjbb_em: TypeError: 'NoneType' object is not subscriptable | stock_yjkb_em: TypeError: 'NoneType' object is not subscriptable,
+35,F10结构化资料,success,2.545,saved 5 file(s),a_stock_missing_output\35_F10结构化资料\data\individual_info_em.json;a_stock_missing_output\35_F10结构化资料\data\main_business_ths.csv;a_stock_missing_output\35_F10结构化资料\data\business_composition_em.json;a_stock_missing_output\35_F10结构化资料\data\profile_cninfo.csv;a_stock_missing_output\35_F10结构化资料\data\company_events_em.csv
+36,东财个股信息,failed,1.25,"ProxyError: HTTPSConnectionPool(host='push2.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/get?fltt=2&invt=2&fields=f120%2Cf121%2Cf122%2Cf174%2Cf175%2Cf59%2Cf163%2Cf43%2Cf57%2Cf58%2Cf169%2Cf170%2Cf46%2Cf44%2Cf51%2Cf168%2Cf47%2Cf164%2Cf116%2Cf60%2Cf45%2Cf52%2Cf50%2Cf48%2Cf167%2Cf117%2Cf71%2Cf161%2Cf49%2Cf530%2Cf135%2Cf136%2Cf137%2Cf138%2Cf139%2Cf141%2Cf142%2Cf144%2Cf145%2Cf147%2Cf148%2Cf140%2Cf143%2Cf146%2Cf149%2Cf55%2Cf62%2Cf162%2Cf92%2Cf173%2Cf104%2Cf105%2Cf84%2Cf85%2Cf183%2Cf184%2Cf185%2Cf186%2Cf187%2Cf188%2Cf189%2Cf190%2Cf191%2Cf192%2Cf107%2Cf111%2Cf86%2Cf177%2Cf78%2Cf110%2Cf262%2Cf263%2Cf264%2Cf267%2Cf268%2Cf255%2Cf256%2Cf257%2Cf258%2Cf127%2Cf199%2Cf128%2Cf198%2Cf259%2Cf260%2Cf261%2Cf171%2Cf277%2Cf278%2Cf279%2Cf288%2Cf152%2Cf250%2Cf251%2Cf252%2Cf253%2Cf254%2Cf269%2Cf270%2Cf271%2Cf272%2Cf273%2Cf274%2Cf275%2Cf276%2Cf265%2Cf266%2Cf289%2Cf290%2Cf286%2Cf285%2Cf292%2Cf293%2Cf294%2Cf295%2Cf43&secid=1.600519 (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))",
+37,新浪财报三表,success,2.243,saved 3 file(s),a_stock_missing_output\37_新浪财报三表\data\资产负债表.csv;a_stock_missing_output\37_新浪财报三表\data\利润表.csv;a_stock_missing_output\37_新浪财报三表\data\现金流量表.csv
+38,巨潮公告,success,1.968,saved 1 file(s),a_stock_missing_output\38_巨潮公告\data.csv
+39,估值历史,failed,1.132,TypeError: 'NoneType' object is not subscriptable,
+40,上市/退市日,failed,1.363,"ProxyError: HTTPSConnectionPool(host='push2.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/get?fltt=2&invt=2&fields=f120%2Cf121%2Cf122%2Cf174%2Cf175%2Cf59%2Cf163%2Cf43%2Cf57%2Cf58%2Cf169%2Cf170%2Cf46%2Cf44%2Cf51%2Cf168%2Cf47%2Cf164%2Cf116%2Cf60%2Cf45%2Cf52%2Cf50%2Cf48%2Cf167%2Cf117%2Cf71%2Cf161%2Cf49%2Cf530%2Cf135%2Cf136%2Cf137%2Cf138%2Cf139%2Cf141%2Cf142%2Cf144%2Cf145%2Cf147%2Cf148%2Cf140%2Cf143%2Cf146%2Cf149%2Cf55%2Cf62%2Cf162%2Cf92%2Cf173%2Cf104%2Cf105%2Cf84%2Cf85%2Cf183%2Cf184%2Cf185%2Cf186%2Cf187%2Cf188%2Cf189%2Cf190%2Cf191%2Cf192%2Cf107%2Cf111%2Cf86%2Cf177%2Cf78%2Cf110%2Cf262%2Cf263%2Cf264%2Cf267%2Cf268%2Cf255%2Cf256%2Cf257%2Cf258%2Cf127%2Cf199%2Cf128%2Cf198%2Cf259%2Cf260%2Cf261%2Cf171%2Cf277%2Cf278%2Cf279%2Cf288%2Cf152%2Cf250%2Cf251%2Cf252%2Cf253%2Cf254%2Cf269%2Cf270%2Cf271%2Cf272%2Cf273%2Cf274%2Cf275%2Cf276%2Cf265%2Cf266%2Cf289%2Cf290%2Cf286%2Cf285%2Cf292%2Cf293%2Cf294%2Cf295%2Cf43&secid=1.600519 (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))",
+41,申万行业变迁史,failed,4.236,"RuntimeError: stock_industry_clf_hist_sw: SSLError: HTTPSConnectionPool(host='www.swsresearch.com', port=443): Max retries exceeded with url: /swindex/pdf/SwClass2021/StockClassifyUse_stock.xls (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1020)'))) | stock_industry_clf_hist_sw: SSLError: HTTPSConnectionPool(host='www.swsresearch.com', port=443): Max retries exceeded with url: /swindex/pdf/SwClass2021/StockClassifyUse_stock.xls (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1020)')))",
+43,东财涨停池,success,0.765,saved 1 file(s),a_stock_missing_output\43_东财涨停池\data.csv
+44,东财炸板池,success,0.34,saved 1 file(s),a_stock_missing_output\44_东财炸板池\data.csv
+45,东财跌停池,success,0.522,saved 1 file(s),a_stock_missing_output\45_东财跌停池\data.csv
+46,东财昨日涨停池,success,0.663,saved 1 file(s),a_stock_missing_output\46_东财昨日涨停池\data.csv
+47,同花顺涨停揭秘/涨停原因替代,success,0.541,saved 1 file(s),a_stock_missing_output\47_同花顺涨停揭秘_涨停原因替代\data.csv
+48,东财强势/重点监控替代池,success,0.58,saved 1 file(s),a_stock_missing_output\48_东财强势_重点监控替代池\data.csv
+49,东财日内异动池明细,success,13.349,saved 1 file(s),a_stock_missing_output\49_东财日内异动池明细\data.csv
+50,东财日内异动按标的统计,success,18.144,saved 1 file(s),a_stock_missing_output\50_东财日内异动按标的统计\data.csv
+51,期权合约清单,success,0.454,saved 1 file(s),a_stock_missing_output\51_期权合约清单\data.json
+52,期权T型报价,success,0.074,saved 1 file(s),a_stock_missing_output\52_期权T型报价\data.csv
+53,期权Greeks/风险指标,success,1.237,saved 1 file(s),a_stock_missing_output\53_期权Greeks_风险指标\data.csv
+54,互动易问答,failed,1.018,"KeyError: ""None of [Index(['股票代码', '公司简称', '行业', '行业代码', '问题', '提问者', '来源', '提问时间', '更新时间',\n       '提问者编号', '问题编号', '回答ID', '回答内容', '回答者'],\n      dtype='object')] are in the [columns]""",
+55,上证e互动,success,68.089,saved 1 file(s),a_stock_missing_output\55_上证e互动\data.csv
+56,同花顺/问财热榜,failed,0.0,RuntimeError: stock_wc_hot_top: AttributeError: 当前 AKShare 不包含 stock_wc_hot_top；请先升级 AKShare，再检查该接口是否被上游移除。 | stock_hot_rank_wc: AttributeError: 当前 AKShare 不包含 stock_hot_rank_wc；请先升级 AKShare，再检查该接口是否被上游移除。 | stock_hot_rank_wc: AttributeError: 当前 AKShare 不包含 stock_hot_rank_wc；请先升级 AKShare，再检查该接口是否被上游移除。,
+57,东财人气榜,success,0.418,saved 1 file(s),a_stock_missing_output\57_东财人气榜\data.csv
+58,东财个股概念/关键词命中,success,0.956,saved 2 file(s),a_stock_missing_output\58_东财个股概念_关键词命中\data\hot_keyword.csv;a_stock_missing_output\58_东财个股概念_关键词命中\data\related.json
+59,人民银行社融,success,0.735,saved 1 file(s),a_stock_missing_output\59_人民银行社融\data.csv
+60,PMI,success,0.542,saved 1 file(s),a_stock_missing_output\60_PMI\data.csv
+65,指数成分,success,0.446,saved 1 file(s),a_stock_missing_output\65_指数成分\data.csv
+66,指数权重,success,0.619,saved 1 file(s),a_stock_missing_output\66_指数权重\data.csv
+67,指数估值,success,0.225,saved 1 file(s),a_stock_missing_output\67_指数估值\data.csv
+68,交易日历,success,0.493,saved 1 file(s),a_stock_missing_output\68_交易日历\data.csv
+83,龙虎榜备胎,failed,1.901,RuntimeError: stock_lhb_detail_daily_sina: KeyError: '股票代码' | stock_lhb_detail_em: TypeError: 'NoneType' object is not subscriptable,
+84,资金流备胎,success,6.829,saved 1 file(s),a_stock_missing_output\84_资金流备胎\data.csv
+85,公告备胎,success,4.744,saved 1 file(s),a_stock_missing_output\85_公告备胎\data.csv
+86,官方两融备胎,success,4.12,saved 5 file(s),a_stock_missing_output\86_官方两融备胎\data\sse_all.csv;a_stock_missing_output\86_官方两融备胎\data\szse_all.csv;a_stock_missing_output\86_官方两融备胎\data\sse_filtered.csv;a_stock_missing_output\86_官方两融备胎\data\szse_filtered.csv;a_stock_missing_output\86_官方两融备胎\data\_meta.json
+87,北交所行情备胎,failed,8.868,"ProxyError: HTTPSConnectionPool(host='82.push2.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/clist/get?pn=1&pz=100&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&fid=f12&fs=m%3A0+t%3A81+s%3A2048&fields=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6%2Cf7%2Cf8%2Cf9%2Cf10%2Cf12%2Cf13%2Cf14%2Cf15%2Cf16%2Cf17%2Cf18%2Cf20%2Cf21%2Cf23%2Cf24%2Cf25%2Cf22%2Cf11%2Cf62%2Cf128%2Cf136%2Cf115%2Cf152 (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))",

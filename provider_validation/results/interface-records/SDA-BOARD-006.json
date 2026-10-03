@@ -1,0 +1,51 @@
+{
+  "interface_id": "SDA-BOARD-006",
+  "source": "stock-data-analyse / local Provider",
+  "validation_result": "部分通过",
+  "evidence_level": "旧派生/合并结果可复核；BaoStock SDK原始行不可见，未保存原始返回帧。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/stock-data-analyse/warehouse/industry.py; provider_validation/tests/source_snapshots/stock-data-analyse/fundflow/sources.py; 上游 warehouse/industry.py:125；本项目 src/stock_data_manage/providers/baostock/industry.py:32 fetch_snapshot",
+  "source_code_artifacts": [
+    {
+      "path": "provider_validation/tests/source_snapshots/stock-data-analyse/warehouse/industry.py",
+      "sha256": "23b7a750336c44356e41067ca48c1ca374221f9ca111190f1f43bdcfc889dc73"
+    },
+    {
+      "path": "provider_validation/tests/source_snapshots/stock-data-analyse/fundflow/sources.py",
+      "sha256": "98b7aed50d2ed325ddf545b5f0d270fb0f724dbd69bec46d488165d4237e1dff"
+    },
+    {
+      "path": "src/stock_data_manage/providers/baostock/industry.py",
+      "sha256": "08362eed2be7535fbbc7052ea00990873a7b6f9b8dd7216107bbe55ac9075d28"
+    },
+    {
+      "path": "tests/test_sector_data_providers.py",
+      "sha256": "1643bb03759fb230d418d270036eb59d742aefe01724850962466a7897c58efa"
+    },
+    {
+      "path": "provider_validation/tests/replay_sector_capability_archives.py",
+      "sha256": "e6e9bbd83cf299df3c4de6ef1570edf6061413850e91988b84d8163081cc4d09"
+    }
+  ],
+  "test_code_ref": "tests/test_sector_data_providers.py:138; provider_validation/tests/replay_sector_capability_archives.py:212",
+  "manifest_ref": "",
+  "response_artifacts": [],
+  "parsed_output_ref": "provider_validation/results/legacy/2026-10-01-security-board-coverage.json",
+  "derived_artifacts": [
+    {
+      "path": "provider_validation/results/legacy/2026-10-01-security-board-coverage.json",
+      "sha256": "8d39373b3494fe988acdc3fd2807f019608e17c01373f9fd8d31a96f3013571f",
+      "bytes": 2253177,
+      "row_count": null
+    }
+  ],
+  "coverage_denominator": null,
+  "scope": "旧全量探针日期2026-09-30；5,212只中5,210只获得分类（99.9616%），缺2只",
+  "finding": "旧合并结果可离线重放，缺原始SDK行/TCP帧；不可标为原始返回已归档",
+  "sample": "{\"probe\": \"full_security_board_coverage\", \"trade_date\": \"2026-09-30\", \"fetched_at\": \"2026-10-01T17:40:45+08:00\", \"sources\": {\"sh_sz_universe_and_industry\": \"BaoStock query_all_stock + query_stock_industry\", \"bse_universe\": \"BSE official full quotation list (nqhq_en.do)\", \"bse_affiliations\": \"EastMoney push2 slist/get, per-security\", \"all_concept_board_directory\": \"EastMoney clist/get probe (see directory_checks)\"}, \"scope_note\": \"EastMoney slist returns mixed industry, concept, and region board affiliations. A successful per-security response does not by itself prove a complete categorized concept-board directory or complete SH/SZ concept memberships.\", \"summary\": {\"sh_sz\": {\"security_count_including_suspended\": 5223, \"active_security_count\": 5212, \"suspended_security_count\": 11, \"classification_rows_for_a_shares\": 5555, \"classification_snapshot_dates\": [\"2026-09-28\"], \"distinct_industr…",
+  "source_version": "stock-data-analyse c26cabcf89443ec8f1445d0e5af86bf3d6dacf3; 本项目代码以当前工作树为准",
+  "transformation_code_version": {
+    "path": "provider_validation/tests/build_interface_coverage.py",
+    "sha256": "3e4ae63e410fa129a4efc2cce8e79973fd41959ef8fd709fcd3b9bfb137d3260"
+  },
+  "validation_time_utc": "2026-10-03T08:37:13.596809+00:00"
+}

@@ -1,0 +1,40 @@
+{
+  "interface_id": "ASTOCK-053",
+  "source": "a-stock-data",
+  "validation_result": "部分通过",
+  "current_missing_probe_status": "success",
+  "evidence_level": "解析后输出已保存；本批未保存精确原始HTTP响应。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:989 (fetch_option_contracts); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:277 (sina_option_codes(underlying, call, month))",
+  "source_code_artifacts": [
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+      "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+    },
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+    }
+  ],
+  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:989 (CLI --run 51)",
+  "manifest_ref": "",
+  "response_artifacts": [],
+  "parsed_output_ref": "provider_validation/results/a-stock-data-missing-output/51_期权合约清单/data.json",
+  "derived_artifacts": [
+    {
+      "path": "provider_validation/results/a-stock-data-missing-output/51_期权合约清单/data.json",
+      "sha256": "6b4ec66e1fdcc52fc358f2778c1e122fa3dc8e41590b02b067eee6a7b9178899",
+      "bytes": 55,
+      "row_count": 4
+    }
+  ],
+  "coverage_denominator": 87,
+  "scope": "JSON只有4个到期月份字符串，不是认购/认沽合约清单。 本轮未取得可用且匹配能力定义的数据。 a_stock_missing_output\\51_期权合约清单\\data.json [JSON数组=4]",
+  "finding": "未通过：JSON只有4个到期月份字符串，不是认购/认沽合约清单。；脚本结果 success：saved 1 file(s)。解析结果非空；未留精确原始响应。",
+  "sample": "{\"items\": [\"202610\"], \"total\": 4}",
+  "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
+  "transformation_code_version": {
+    "path": "provider_validation/tests/build_interface_coverage.py",
+    "sha256": "3e4ae63e410fa129a4efc2cce8e79973fd41959ef8fd709fcd3b9bfb137d3260"
+  },
+  "validation_time_utc": "2026-10-03T08:37:12.489209+00:00"
+}

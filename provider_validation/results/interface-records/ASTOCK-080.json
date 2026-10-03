@@ -1,0 +1,39 @@
+{
+  "interface_id": "ASTOCK-080",
+  "source": "a-stock-data",
+  "validation_result": "通过",
+  "current_missing_probe_status": "not_run",
+  "evidence_level": "此前实时验证已保存原始响应；本轮补抓脚本结果另列，测试范围不自动视为相同。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:300 (上游内嵌接口说明/实现快照)",
+  "source_code_artifacts": [
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+    },
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py",
+      "sha256": "ec18390ee2be31b5f72f4a0ff7c85ef3753a086ee9c43693bea00b08cab0ce09"
+    }
+  ],
+  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py:1 (该版本测试快照；未找到专属用例时以清单证据注明)",
+  "manifest_ref": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+  "response_artifacts": [
+    {
+      "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/1c2a8d00cf4f119dd234ffaa5345995ee5c49ab2a671f2090f015c566ba67bec.body.gz",
+      "sha256": "1c2a8d00cf4f119dd234ffaa5345995ee5c49ab2a671f2090f015c566ba67bec",
+      "matches_filename": true
+    }
+  ],
+  "parsed_output_ref": "",
+  "derived_artifacts": [],
+  "coverage_denominator": 87,
+  "scope": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。",
+  "finding": "通过。对应联网测试返回非空数据并通过字段/来源检查；范围见原始请求清单。",
+  "sample": "{\"version\":\"2e3fbb0ad5cbea580f9fd5915946c20b\",\"result\":{\"pages\":2936,\"data\":[{\"CHANGE_NUM\":1341.5212,\"NOTICE_DATE\":\"2026-10-01 00:00:00\",\"SECURITY_CODE\":\"300185\",\"HOLDER_NAME\":\"山东国惠资本有限公司\",\"AFTER_CHANGE_RATE\":0.332372164726,\"CHANGE_NUM_SYMBOL\":1341.5212,\"CHANGE_RATE\":-0.7092,\"END_DATE\":\"2026-09-30 00:00:00\",\"CLOSE_PRICE\":2.8,\"AFTER_HOLDER_NUM\":65920.7612,\"HOLD_RATIO\":16.33,\"TRADE_AVERAGE_PRICE\":2.8038,\"FREE_SHARES_RATIO\":null,\"FREE_SHARES\":null,\"TRADE_DATE\":\"2026-09-30 00:00:00\",\"SECURITY_NAME_ABBR\":\"通裕重工\",\"DIRECTION\":\"增持\",\"EITIME\":\"2026-09-30 16:18:33\",\"CHANGE_FREE_RATIO\":0.35,\"START_DATE\":\"2026-09-29 00:00:00\",\"REAL_PRICE\":2.8038,\"NEWEST_PRICE\":null,\"CHANGE_RATE_QUOTES\":null,\"MARKET\":\"二级市…",
+  "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
+  "transformation_code_version": {
+    "path": "provider_validation/tests/build_interface_coverage.py",
+    "sha256": "3e4ae63e410fa129a4efc2cce8e79973fd41959ef8fd709fcd3b9bfb137d3260"
+  },
+  "validation_time_utc": "2026-10-03T08:37:13.015434+00:00"
+}

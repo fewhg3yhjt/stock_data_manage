@@ -19,7 +19,7 @@
       "能力项": "腾讯 K 线",
       "验证结果": "通过",
       "备注": "通过。本轮测了沪市日K与深市5分钟K；历史日期2026-09-18。 文档边界：不含北交所",
-      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\c3c0b821215bce77b8551f716c50f0324aadc39af7c9dc17538b0bf94b59845b.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\1e8158ec28e8e3262a284fd3d092e1c2bd33e3777cb057ddab140633fa8954cd.body.gz; 传输失败记录见对应批次 manifest.ndjson：V39-002, V39-003",
+      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\c3c0b821215bce77b8551f716c50f0324aadc39af7c9dc17538b0bf94b59845b.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\1e8158ec28e8e3262a284fd3d092e1c2bd33e3777cb057ddab140633fa8954cd.body.gz; 传输失败记录见对应批次 manifest.ndjson：V39-002, V39-003",
       "清单原始行": "152",
       "原审计状态": "verified_live_raw_saved",
       "证据说明": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。"
@@ -31,7 +31,7 @@
       "能力项": "通达信盘后包",
       "验证结果": "通过",
       "备注": "通过。本轮测了2026-09-18全市场盘后包。 文档边界：未逐日验证",
-      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\613cbca9817cde6c5f86de7659ee86d4224b29341265b2ceaf8960ed83677ca6.body.gz",
+      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\613cbca9817cde6c5f86de7659ee86d4224b29341265b2ceaf8960ed83677ca6.body.gz",
       "清单原始行": "153",
       "原审计状态": "verified_live_raw_saved",
       "证据说明": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。"
@@ -43,7 +43,7 @@
       "能力项": "腾讯逐笔成交",
       "验证结果": "通过",
       "备注": "通过。本轮用深市000001样例，获取并核验成交序号、日期和成交额。 文档边界：不含北交所",
-      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\ca6d11102c80e68faeb699a30b243bd695481005c3f37cb69ead5db7237f6f02.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\30e321e11e64f6a77fa8ae832ebe3f467a1584cbe5fea42d0539d5a759e5c29c.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\1d44479b5f0f16309a99042ed4d6d444b1c2ae51d68a069c95b4e6e7ce9c4c3e.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\4a9e825355940a58fc737bf920fbb6545278eaf371d950cfffed5ddcb3b017ef.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\f188072f6ab4731f75bc8edf4e6fd414488da71dffd2d716b9069f02f1263226.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\dff2ebcc516f4aa069f4c46f6e85c4daf396013426fe61b21788cb2b63e4aa94.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\583148dc5ca04fdc2c999e740880c2a39347781c2a749b705419457daeba3031.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\5007eaf2aea55b0b77925f94775ae8923634fc77298a43623c1a73d628a24670.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\760457fb29509e9144371ebfe179cbc75d4ae9028316820d677bd3011ebb5e13.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\1d5be94190d97c268c862cfed50593f609a688c679e76343940ca83c93083f3d.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\6fa8af075913401fd3ec79b61f91a378c701e0a4b027dc94fdcc54d32b7c5055.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\e7c0bd06cd73763c4aca0a2b481f2593eb94599f33820c4a87be51c30e45c62a.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\7404da868fc7770299d35debcefcd204415c092dd6099dce28861cb4374ea2ee.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\f51c0d60b6c8020ad2a7a25e463d33feec8d4768834e7f257feb9bf4c5b156a4.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\5e553e13393393df0a08b302cdffe42ffa3fe26cbb11828eecb484625d17a4d6.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\14118a5a27ff1d761e6cd1de36fd3da566e9adfd702ee77ee060369887586deb.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\977cf7da28ff4086b4edcb19b2d234866c1af579d4a057f04a4445ab4c67c259.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\0c7999a8fc67d3f9008e70f4c9057a638cb74fd8a70c2b6551d92ea458732343.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\33416f3de323391b85b59ab45bed131d017bd7bc4a705a8cf4929b2958d4d876.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\96a8672b35ca3d7323e5430d29dd7408aae08e2104af4c0ec76929f2e2de895d.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\d6aca7cefba3516acc9ce366ddea43ecf55bfac5a19cc2927ba7b5ca97d83f82.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\657fd92e5d2e2a95497a1fd20a6c4364268c6f4cc9645a0a85e274cfd70cb9df.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\ab3ffaefde713afc654fb467fd73a77ce384ed5fc3b3652a7d20a5267a2aa944.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\2d92a58047eab79a09c13108f501d0721929857b52bb2237c05f235300d1d909.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\0d6d428603f275df9d8d0e4405528843662f3971f245f7a1d133f2e6fa1b23a4.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\5199586b7bbf1fb94ec1e574b44671c706beee7e9f5d7874e87da96f4dad7734.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\e484b70e5f5464cc52a28f8280b79062f7bb43168dcd88b624d8ffa62f586d51.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\3f5f14fb11ad1c41da50693788aeff04fdcbdf73254a3d091237f37db8887ca6.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\31dd3c4b056341b3f8b1610c05d380a92d8761db55bddf9fb9241492f599f938.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\c0f846df4e87c65da21a2fe8a9fc9af3a3e8b55dd090e11b8338406852e1959f.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\5ad917c7cf43ef1df7b74f786392ba0fee18761f575a6ef84d5b07981b934fda.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\770b912084d9cc76cf8f93f71b77f5e10044422722d4ddfed3d3a800390214dc.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\30426ea5f39f47dc230c419d157e6514d894177972363e3c3a59cbf8891edab3.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\cb10c5359b4d3f944640f7d4c867c8ed88ce59c037e7ce12bae611b16875a612.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\3447b8c8078811902d403e0b1fbf00d4ed8d5e31b9dd7079065dbdbadf2696f8.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\f4033a77c5f51db640d48cc5b8de2050d64a7c89201bd8567de93b6911541d5a.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\b162f7f051e69ae43b49d23d1ebef083c0dd9e5a61062a4dbe1976fbf649b8ad.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\a935019a208b987b8f124fe7cfad7201b502ae5af4bd89c8d733cc74d145221a.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\dc2a025b3b0f8eb874fbf181350670ebcb7466a939237d28d823ff2bb78316c6.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\e5f46d6ad3d48f48226eb0699fd10d8a8256fd7e4e6a8bad5a5c62a6a211dc4e.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\a6faf8cbd8b1cc53521d9a363c266cab1423b28bd6ce9e0f6e39d42edbde6a31.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\cb94fa072088820fc01078322cb56ba545d113ded7e3e5eaad89ea3f3dd1e436.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\77ed874b2a738dddd474d3b25107d0e7254a611d68fbdb19b4c53599175a326f.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\de2436855748b816db0459e5adba82581d8372ffc7417dcc5a85d88f80273c4e.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\cfe02b1c90d08a1123001f68c1938c5828404f63d9b48117aac89e2b9207360a.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\acaae2d3a337b1753b89d4788c083c07964b58a52efc9929ccac67580e32da90.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\9f06c56bee1c07db4236f7a07764b329372ff4a1987bd31f61ba9867a5f575c3.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\35288d9b3bf6ce040184145e6a15e9a77313d5eebd4e57de654b3ead7495e518.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\3680646f910521cddb61509f2a74f9050cf37ab401dcd354e46bc1d3f97daa74.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\e7ba4f3e172efbdd8a641267833e5a13090190d4cd59bd34ce1742acdf721bf8.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\dd0ad602fd6df8a67fa58bcc3061213352e8fa07b3b0b1cdc37b41b4b8eaabe8.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\57d547b12b2deb36e1c20a7873aa2379c188f7ad53d975b72cd0f1a1ecc4afef.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\1d93790f4476b9235c3a24bcc0e0cfe1bbc8a8be16346700b369d68d57c2b4f5.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\61ecdef31e82086c589107dc0436c0c2b9938d0186d28fe0ba59a3dde678c59b.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\fa418a16d036b482e5c3ecf0a23c0a58327ce4614b4a9201bcd8efba8945aeff.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\f6221aec901e70a14c808fc5a0ebd4e016ab281cd963d3372426a92b6ae6b7f5.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\b63bc5e5427af61c25c7caa46876e66a43842082b9fa2d3ead67838a04247aad.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\651b321600f66f77f185e1158b3159ead0b1f9ee6232070daea46d8e8fe4cc0e.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\dc609470faac96eb8ace2a15957120a80f8ac6aad67a554b32336ca3850112e6.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\98f6d8bf85f710e6e5773c0bf9c4d608c2c4d3699d0cbbf60362c572e57358aa.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\640f383bde2e1c5415a0774a740e67e911d39e72aa7b1afae2a2bdf9267d8dcf.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\d087b8eb09611bd50956f530c3ae789f60d1c952af86072190e30ea2a510e5a5.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\927095aa55a5a74c092b89925c031b653886724b84c0fee449a813bc647b3239.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\71217ac518a67fcee5bc91b83916c981aa134f3f1fa840ec728dbb041f4ec6b4.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\d9271d5a8610e8b7ab572cc267f07821722019627127e80478974a60235e9d9f.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\ca6d11102c80e68faeb699a30b243bd695481005c3f37cb69ead5db7237f6f02.body.gz",
+      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\ca6d11102c80e68faeb699a30b243bd695481005c3f37cb69ead5db7237f6f02.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\30e321e11e64f6a77fa8ae832ebe3f467a1584cbe5fea42d0539d5a759e5c29c.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\1d44479b5f0f16309a99042ed4d6d444b1c2ae51d68a069c95b4e6e7ce9c4c3e.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\4a9e825355940a58fc737bf920fbb6545278eaf371d950cfffed5ddcb3b017ef.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\f188072f6ab4731f75bc8edf4e6fd414488da71dffd2d716b9069f02f1263226.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\dff2ebcc516f4aa069f4c46f6e85c4daf396013426fe61b21788cb2b63e4aa94.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\583148dc5ca04fdc2c999e740880c2a39347781c2a749b705419457daeba3031.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\5007eaf2aea55b0b77925f94775ae8923634fc77298a43623c1a73d628a24670.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\760457fb29509e9144371ebfe179cbc75d4ae9028316820d677bd3011ebb5e13.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\1d5be94190d97c268c862cfed50593f609a688c679e76343940ca83c93083f3d.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\6fa8af075913401fd3ec79b61f91a378c701e0a4b027dc94fdcc54d32b7c5055.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\e7c0bd06cd73763c4aca0a2b481f2593eb94599f33820c4a87be51c30e45c62a.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\7404da868fc7770299d35debcefcd204415c092dd6099dce28861cb4374ea2ee.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\f51c0d60b6c8020ad2a7a25e463d33feec8d4768834e7f257feb9bf4c5b156a4.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\5e553e13393393df0a08b302cdffe42ffa3fe26cbb11828eecb484625d17a4d6.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\14118a5a27ff1d761e6cd1de36fd3da566e9adfd702ee77ee060369887586deb.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\977cf7da28ff4086b4edcb19b2d234866c1af579d4a057f04a4445ab4c67c259.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\0c7999a8fc67d3f9008e70f4c9057a638cb74fd8a70c2b6551d92ea458732343.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\33416f3de323391b85b59ab45bed131d017bd7bc4a705a8cf4929b2958d4d876.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\96a8672b35ca3d7323e5430d29dd7408aae08e2104af4c0ec76929f2e2de895d.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\d6aca7cefba3516acc9ce366ddea43ecf55bfac5a19cc2927ba7b5ca97d83f82.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\657fd92e5d2e2a95497a1fd20a6c4364268c6f4cc9645a0a85e274cfd70cb9df.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\ab3ffaefde713afc654fb467fd73a77ce384ed5fc3b3652a7d20a5267a2aa944.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\2d92a58047eab79a09c13108f501d0721929857b52bb2237c05f235300d1d909.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\0d6d428603f275df9d8d0e4405528843662f3971f245f7a1d133f2e6fa1b23a4.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\5199586b7bbf1fb94ec1e574b44671c706beee7e9f5d7874e87da96f4dad7734.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\e484b70e5f5464cc52a28f8280b79062f7bb43168dcd88b624d8ffa62f586d51.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\3f5f14fb11ad1c41da50693788aeff04fdcbdf73254a3d091237f37db8887ca6.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\31dd3c4b056341b3f8b1610c05d380a92d8761db55bddf9fb9241492f599f938.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\c0f846df4e87c65da21a2fe8a9fc9af3a3e8b55dd090e11b8338406852e1959f.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\5ad917c7cf43ef1df7b74f786392ba0fee18761f575a6ef84d5b07981b934fda.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\770b912084d9cc76cf8f93f71b77f5e10044422722d4ddfed3d3a800390214dc.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\30426ea5f39f47dc230c419d157e6514d894177972363e3c3a59cbf8891edab3.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\cb10c5359b4d3f944640f7d4c867c8ed88ce59c037e7ce12bae611b16875a612.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\3447b8c8078811902d403e0b1fbf00d4ed8d5e31b9dd7079065dbdbadf2696f8.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\f4033a77c5f51db640d48cc5b8de2050d64a7c89201bd8567de93b6911541d5a.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\b162f7f051e69ae43b49d23d1ebef083c0dd9e5a61062a4dbe1976fbf649b8ad.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\a935019a208b987b8f124fe7cfad7201b502ae5af4bd89c8d733cc74d145221a.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\dc2a025b3b0f8eb874fbf181350670ebcb7466a939237d28d823ff2bb78316c6.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\e5f46d6ad3d48f48226eb0699fd10d8a8256fd7e4e6a8bad5a5c62a6a211dc4e.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\a6faf8cbd8b1cc53521d9a363c266cab1423b28bd6ce9e0f6e39d42edbde6a31.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\cb94fa072088820fc01078322cb56ba545d113ded7e3e5eaad89ea3f3dd1e436.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\77ed874b2a738dddd474d3b25107d0e7254a611d68fbdb19b4c53599175a326f.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\de2436855748b816db0459e5adba82581d8372ffc7417dcc5a85d88f80273c4e.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\cfe02b1c90d08a1123001f68c1938c5828404f63d9b48117aac89e2b9207360a.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\acaae2d3a337b1753b89d4788c083c07964b58a52efc9929ccac67580e32da90.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\9f06c56bee1c07db4236f7a07764b329372ff4a1987bd31f61ba9867a5f575c3.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\35288d9b3bf6ce040184145e6a15e9a77313d5eebd4e57de654b3ead7495e518.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\3680646f910521cddb61509f2a74f9050cf37ab401dcd354e46bc1d3f97daa74.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\e7ba4f3e172efbdd8a641267833e5a13090190d4cd59bd34ce1742acdf721bf8.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\dd0ad602fd6df8a67fa58bcc3061213352e8fa07b3b0b1cdc37b41b4b8eaabe8.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\57d547b12b2deb36e1c20a7873aa2379c188f7ad53d975b72cd0f1a1ecc4afef.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\1d93790f4476b9235c3a24bcc0e0cfe1bbc8a8be16346700b369d68d57c2b4f5.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\61ecdef31e82086c589107dc0436c0c2b9938d0186d28fe0ba59a3dde678c59b.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\fa418a16d036b482e5c3ecf0a23c0a58327ce4614b4a9201bcd8efba8945aeff.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\f6221aec901e70a14c808fc5a0ebd4e016ab281cd963d3372426a92b6ae6b7f5.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\b63bc5e5427af61c25c7caa46876e66a43842082b9fa2d3ead67838a04247aad.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\651b321600f66f77f185e1158b3159ead0b1f9ee6232070daea46d8e8fe4cc0e.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\dc609470faac96eb8ace2a15957120a80f8ac6aad67a554b32336ca3850112e6.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\98f6d8bf85f710e6e5773c0bf9c4d608c2c4d3699d0cbbf60362c572e57358aa.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\640f383bde2e1c5415a0774a740e67e911d39e72aa7b1afae2a2bdf9267d8dcf.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\d087b8eb09611bd50956f530c3ae789f60d1c952af86072190e30ea2a510e5a5.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\927095aa55a5a74c092b89925c031b653886724b84c0fee449a813bc647b3239.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\71217ac518a67fcee5bc91b83916c981aa134f3f1fa840ec728dbb041f4ec6b4.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\d9271d5a8610e8b7ab572cc267f07821722019627127e80478974a60235e9d9f.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\ca6d11102c80e68faeb699a30b243bd695481005c3f37cb69ead5db7237f6f02.body.gz",
       "清单原始行": "154",
       "原审计状态": "verified_live_raw_saved",
       "证据说明": "SKILL.md §1.4；V3.10 联网测试 26 项全通过。"
@@ -151,7 +151,7 @@
       "能力项": "新浪研报列表",
       "验证结果": "通过",
       "备注": "通过。对应联网测试返回非空数据并通过字段/来源检查；范围见原始请求清单。",
-      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\f6901c1bf3dc321a976c5cf7acc6f51e993fa1945c2af61b1aed4b4d2ef4c311.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\f6901c1bf3dc321a976c5cf7acc6f51e993fa1945c2af61b1aed4b4d2ef4c311.body.gz",
+      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\f6901c1bf3dc321a976c5cf7acc6f51e993fa1945c2af61b1aed4b4d2ef4c311.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\f6901c1bf3dc321a976c5cf7acc6f51e993fa1945c2af61b1aed4b4d2ef4c311.body.gz",
       "清单原始行": "168",
       "原审计状态": "verified_live_raw_saved",
       "证据说明": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。"
@@ -355,7 +355,7 @@
       "能力项": "ETF 份额",
       "验证结果": "通过",
       "备注": "通过。本轮联网样例仅覆盖上交所日期数据，未测深交所当前快照。",
-      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\30a88d08c745cd399972cea86c49065b279c7965aa726bbfc4796a4bc6309478.body.gz",
+      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\30a88d08c745cd399972cea86c49065b279c7965aa726bbfc4796a4bc6309478.body.gz",
       "清单原始行": "195",
       "原审计状态": "verified_live_raw_saved",
       "证据说明": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。"
@@ -403,7 +403,7 @@
       "能力项": "华尔街见闻快讯",
       "验证结果": "通过",
       "备注": "通过。对应联网测试返回非空数据并通过字段/来源检查；范围见原始请求清单。",
-      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\a7c874fbbe260d8b207835c57f51359e07bd92626f58f2c1ef8614592aa1dba7.body.gz",
+      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\a7c874fbbe260d8b207835c57f51359e07bd92626f58f2c1ef8614592aa1dba7.body.gz",
       "清单原始行": "204",
       "原审计状态": "verified_live_raw_saved",
       "证据说明": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。"
@@ -415,7 +415,7 @@
       "能力项": "新闻联播",
       "验证结果": "通过",
       "备注": "通过。对应联网测试返回非空数据并通过字段/来源检查；范围见原始请求清单。",
-      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\8373a95432cfd8403af3820c0c37729dc141c778f53dacfd24fec8d9fa490a5e.body.gz",
+      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\8373a95432cfd8403af3820c0c37729dc141c778f53dacfd24fec8d9fa490a5e.body.gz",
       "清单原始行": "205",
       "原审计状态": "verified_live_raw_saved",
       "证据说明": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。"
@@ -679,7 +679,7 @@
       "能力项": "上证e互动",
       "验证结果": "未通过",
       "备注": "未通过。HTTP请求有响应，但页面含相对时间“今天 18:18”，解析器无法识别并报错；原始页面已保存，可离线复核。",
-      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\58e61372a553f03b019257b18913d4a5b11dee80311098bd07779d857f13640e.body.gz",
+      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\58e61372a553f03b019257b18913d4a5b11dee80311098bd07779d857f13640e.body.gz",
       "清单原始行": "246",
       "原审计状态": "partial_live_format_error_raw_saved",
       "证据说明": "V3.9 live suite：源返回 HTTP 200，但一条回复时间值为“18:18”，解析报 RuntimeError；原始响应已存。"
@@ -751,7 +751,7 @@
       "能力项": "中债收益率曲线",
       "验证结果": "通过",
       "备注": "通过。对应联网测试返回非空数据并通过字段/来源检查；范围见原始请求清单。",
-      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\64b832cbb8482882526554b51e1b33f9f9c82eab0737f11f8fa5044ca95bda7e.body.gz",
+      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\64b832cbb8482882526554b51e1b33f9f9c82eab0737f11f8fa5044ca95bda7e.body.gz",
       "清单原始行": "257",
       "原审计状态": "verified_live_raw_saved",
       "证据说明": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。"
@@ -763,7 +763,7 @@
       "能力项": "回购定盘利率",
       "验证结果": "通过",
       "备注": "通过。对应联网测试返回非空数据并通过字段/来源检查；范围见原始请求清单。",
-      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\f3d2ab542c2d2f7436757a878a095bb99b323912de9afd742d3aa3091ff36b19.body.gz",
+      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\f3d2ab542c2d2f7436757a878a095bb99b323912de9afd742d3aa3091ff36b19.body.gz",
       "清单原始行": "258",
       "原审计状态": "verified_live_raw_saved",
       "证据说明": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。"
@@ -775,7 +775,7 @@
       "能力项": "LPR",
       "验证结果": "通过",
       "备注": "通过。对应联网测试返回非空数据并通过字段/来源检查；范围见原始请求清单。",
-      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\f6c7281468bbc966247b0d97e221c7b310abbb6727953195aef701643b165542.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\dbadf321af90a750a1e435b4c37e77c0b2a97a452bed04a949324b41a1341199.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\f08cebac096169d3177eb4f1b8ee7d9e4ca37e85bb05592cabadfac813647aba.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\0ec24737c1be4a30209750eb7f4bb55c97578ee2f960057c687414f5bffc0cbc.body.gz",
+      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\f6c7281468bbc966247b0d97e221c7b310abbb6727953195aef701643b165542.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\dbadf321af90a750a1e435b4c37e77c0b2a97a452bed04a949324b41a1341199.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\f08cebac096169d3177eb4f1b8ee7d9e4ca37e85bb05592cabadfac813647aba.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\0ec24737c1be4a30209750eb7f4bb55c97578ee2f960057c687414f5bffc0cbc.body.gz",
       "清单原始行": "259",
       "原审计状态": "verified_live_raw_saved",
       "证据说明": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。"
@@ -787,7 +787,7 @@
       "能力项": "全球宏观日历",
       "验证结果": "通过",
       "备注": "通过。对应联网测试返回非空数据并通过字段/来源检查；范围见原始请求清单。",
-      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\20aa9d6503b285ea24a9abe6757464bf039a1aaa21fbe38b8cd7d681bc07bdfc.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\4577d33c3e12fc8f5a636023a075355fbee57c077dafb969464abdd23370671a.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\1611c59a139f218b2066e1df35526cb04c87bb73f2c8b6fcde7216740467df99.body.gz",
+      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\20aa9d6503b285ea24a9abe6757464bf039a1aaa21fbe38b8cd7d681bc07bdfc.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\4577d33c3e12fc8f5a636023a075355fbee57c077dafb969464abdd23370671a.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\1611c59a139f218b2066e1df35526cb04c87bb73f2c8b6fcde7216740467df99.body.gz",
       "清单原始行": "260",
       "原审计状态": "verified_live_raw_saved",
       "证据说明": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。"
@@ -847,7 +847,7 @@
       "能力项": "期货日行情",
       "验证结果": "通过",
       "备注": "通过。本轮测了 SHFE、INE、CZCE、CFFEX、GFEX，日期2026-09-18。",
-      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\224819fc35027afc7019db9652d42bd37cf2f768e97f59df1f1eb68f3d82b123.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\8acc40cb2e802e9159ce70819788fe12b0b4f58ae7154e12cb5567d557213c79.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\8acc40cb2e802e9159ce70819788fe12b0b4f58ae7154e12cb5567d557213c79.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\595f24d939400c97bc4b64bdd43a1873ab58bf3bfa654143e9460eaf51d4ab60.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\5904fe9891a2b6d262d0fbbaedb8d219de709e44184d95e883c743a7ccb0bd27.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\012a8807c89c08c7b546cc102d35247d10e93356e488457e79e06cba9d4cee49.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\e699e8e97d7f0e9e797caa2944c87a0cf286149eb4845cbe9019c6d5111e8076.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\5904fe9891a2b6d262d0fbbaedb8d219de709e44184d95e883c743a7ccb0bd27.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\012a8807c89c08c7b546cc102d35247d10e93356e488457e79e06cba9d4cee49.body.gz",
+      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\224819fc35027afc7019db9652d42bd37cf2f768e97f59df1f1eb68f3d82b123.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\8acc40cb2e802e9159ce70819788fe12b0b4f58ae7154e12cb5567d557213c79.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\8acc40cb2e802e9159ce70819788fe12b0b4f58ae7154e12cb5567d557213c79.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\595f24d939400c97bc4b64bdd43a1873ab58bf3bfa654143e9460eaf51d4ab60.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\5904fe9891a2b6d262d0fbbaedb8d219de709e44184d95e883c743a7ccb0bd27.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\012a8807c89c08c7b546cc102d35247d10e93356e488457e79e06cba9d4cee49.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\e699e8e97d7f0e9e797caa2944c87a0cf286149eb4845cbe9019c6d5111e8076.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\5904fe9891a2b6d262d0fbbaedb8d219de709e44184d95e883c743a7ccb0bd27.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\012a8807c89c08c7b546cc102d35247d10e93356e488457e79e06cba9d4cee49.body.gz",
       "清单原始行": "275",
       "原审计状态": "verified_live_raw_saved",
       "证据说明": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。"
@@ -859,7 +859,7 @@
       "能力项": "期权日行情",
       "验证结果": "通过",
       "备注": "通过。本轮样例覆盖 SHFE 与 CFFEX，其他交易所未在本轮实测。",
-      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\d6b346d216f06855953e7661197571eeacef6f074e2f4ea2587835b9ae6b5288.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\bc1d0223e198d4748504e36b89a0a2ef777e8dbc4cccffeeb42d5574db63db96.body.gz",
+      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\d6b346d216f06855953e7661197571eeacef6f074e2f4ea2587835b9ae6b5288.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\bc1d0223e198d4748504e36b89a0a2ef777e8dbc4cccffeeb42d5574db63db96.body.gz",
       "清单原始行": "276",
       "原审计状态": "verified_live_raw_saved",
       "证据说明": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。"
@@ -871,7 +871,7 @@
       "能力项": "会员持仓排名",
       "验证结果": "通过",
       "备注": "通过。本轮样例覆盖 CFFEX；其他交易所未在本轮实测。",
-      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\12a4fb33d7f2d791a0682f31d1187f3a67072025d893e0424e1e181c9d6500cd.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\b2a8a352f5ca9ca1e58c44a41207fdc963dc8ad28def06971948f7f752a7bfe8.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\999e4fc5b309131a3e9fcaa25021e79a70587ebc3aa04dff95bd4eb56b0f16f6.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\ce529e08ad42cfd9f05a93cfea3bc95dcf446991793c37c41b9bc64bcbed6f70.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\a76e541a37f29c1af2716918bac6c7e0b6e41653b4f1658dc53fb7e837db610b.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\f48862db5bbc3679ceec6ce9b52c7d17a6c59059aa45ccf7b497c548916d804a.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\73800e28486efba4cb11553f4b9a9fd9957f5031c8828f7c155c21ed018fdfe9.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\13d298283faca25501a2d6fa991240b66f46157a8c6eaecf2cb595d7d9d01dac.body.gz",
+      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\12a4fb33d7f2d791a0682f31d1187f3a67072025d893e0424e1e181c9d6500cd.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\b2a8a352f5ca9ca1e58c44a41207fdc963dc8ad28def06971948f7f752a7bfe8.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\999e4fc5b309131a3e9fcaa25021e79a70587ebc3aa04dff95bd4eb56b0f16f6.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\ce529e08ad42cfd9f05a93cfea3bc95dcf446991793c37c41b9bc64bcbed6f70.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\a76e541a37f29c1af2716918bac6c7e0b6e41653b4f1658dc53fb7e837db610b.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\f48862db5bbc3679ceec6ce9b52c7d17a6c59059aa45ccf7b497c548916d804a.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\73800e28486efba4cb11553f4b9a9fd9957f5031c8828f7c155c21ed018fdfe9.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\13d298283faca25501a2d6fa991240b66f46157a8c6eaecf2cb595d7d9d01dac.body.gz",
       "清单原始行": "277",
       "原审计状态": "verified_live_raw_saved",
       "证据说明": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。"
@@ -883,7 +883,7 @@
       "能力项": "实时期货",
       "验证结果": "通过",
       "备注": "通过。对应联网测试返回非空数据并通过字段/来源检查；范围见原始请求清单。",
-      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\2990f9cbcb96e04bd520870b1bb097f94de7d41ec908ee032d73f4c91c155a59.body.gz",
+      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\2990f9cbcb96e04bd520870b1bb097f94de7d41ec908ee032d73f4c91c155a59.body.gz",
       "清单原始行": "278",
       "原审计状态": "verified_live_raw_saved",
       "证据说明": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。"
@@ -895,7 +895,7 @@
       "能力项": "期货日 K",
       "验证结果": "通过",
       "备注": "通过。本轮实测 RB0、M0 两个合约。",
-      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\ecd7f264230e49f3ace244fee9ae7155093fbac8b61e7e9d0926d674c6d9d7f7.body.gz",
+      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\ecd7f264230e49f3ace244fee9ae7155093fbac8b61e7e9d0926d674c6d9d7f7.body.gz",
       "清单原始行": "279",
       "原审计状态": "verified_live_raw_saved",
       "证据说明": "SKILL.md §13.7；V3.10 联网测试 26 项全通过。"
@@ -907,7 +907,7 @@
       "能力项": "A50 期指",
       "验证结果": "通过",
       "备注": "通过。对应联网测试返回非空数据并通过字段/来源检查；范围见原始请求清单。",
-      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\a67d6e37ab7d31388fe32710b0c521363473fa65b2c64439917a54d6bfb4388b.body.gz",
+      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\a67d6e37ab7d31388fe32710b0c521363473fa65b2c64439917a54d6bfb4388b.body.gz",
       "清单原始行": "280",
       "原审计状态": "verified_live_raw_saved",
       "证据说明": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。"
@@ -919,7 +919,7 @@
       "能力项": "上海金现货",
       "验证结果": "通过",
       "备注": "通过。对应联网测试返回非空数据并通过字段/来源检查；范围见原始请求清单。",
-      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\79788cd1e6502e3c31e4cceaf05596f4d903f82650ac80f971a5771c869ea655.body.gz",
+      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\79788cd1e6502e3c31e4cceaf05596f4d903f82650ac80f971a5771c869ea655.body.gz",
       "清单原始行": "281",
       "原审计状态": "verified_live_raw_saved",
       "证据说明": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。"
@@ -931,7 +931,7 @@
       "能力项": "业绩预告",
       "验证结果": "通过",
       "备注": "通过。对应联网测试返回非空数据并通过字段/来源检查；范围见原始请求清单。",
-      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\17f23466b52f0bfbeb374f8117d9100a9c4af744d590289960da0f89d36c5464.body.gz",
+      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\17f23466b52f0bfbeb374f8117d9100a9c4af744d590289960da0f89d36c5464.body.gz",
       "清单原始行": "289",
       "原审计状态": "verified_live_raw_saved",
       "证据说明": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。"
@@ -943,7 +943,7 @@
       "能力项": "机构调研",
       "验证结果": "通过",
       "备注": "通过。对应联网测试返回非空数据并通过字段/来源检查；范围见原始请求清单。",
-      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\852a3a28fe9c3e66a4f899162d281af07a62e33a436f514dd3af33c8b82c7888.body.gz",
+      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\852a3a28fe9c3e66a4f899162d281af07a62e33a436f514dd3af33c8b82c7888.body.gz",
       "清单原始行": "290",
       "原审计状态": "verified_live_raw_saved",
       "证据说明": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。"
@@ -955,7 +955,7 @@
       "能力项": "股东增减持",
       "验证结果": "通过",
       "备注": "通过。对应联网测试返回非空数据并通过字段/来源检查；范围见原始请求清单。",
-      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\1c2a8d00cf4f119dd234ffaa5345995ee5c49ab2a671f2090f015c566ba67bec.body.gz",
+      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\1c2a8d00cf4f119dd234ffaa5345995ee5c49ab2a671f2090f015c566ba67bec.body.gz",
       "清单原始行": "291",
       "原审计状态": "verified_live_raw_saved",
       "证据说明": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。"
@@ -967,7 +967,7 @@
       "能力项": "股票回购",
       "验证结果": "通过",
       "备注": "通过。对应联网测试返回非空数据并通过字段/来源检查；范围见原始请求清单。",
-      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\cd9747ca8dbb0823a1cbdf8db5eb9b755b6ca739ee537c34705e57d6076554ed.body.gz",
+      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\cd9747ca8dbb0823a1cbdf8db5eb9b755b6ca739ee537c34705e57d6076554ed.body.gz",
       "清单原始行": "292",
       "原审计状态": "verified_live_raw_saved",
       "证据说明": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。"
@@ -979,7 +979,7 @@
       "能力项": "股权质押",
       "验证结果": "通过",
       "备注": "通过。对应联网测试返回非空数据并通过字段/来源检查；范围见原始请求清单。 文档边界：只覆盖沪深",
-      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\82a09f7e8dbbd644d5daa57db655b9f6d80976a9218dd68a2e5910415178de4a.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\1cf99b8e98fc2410e1fd438310c2d7d42b0ee134df2b56e93a5673beafded8cf.body.gz",
+      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\82a09f7e8dbbd644d5daa57db655b9f6d80976a9218dd68a2e5910415178de4a.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\1cf99b8e98fc2410e1fd438310c2d7d42b0ee134df2b56e93a5673beafded8cf.body.gz",
       "清单原始行": "293",
       "原审计状态": "verified_live_raw_saved",
       "证据说明": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。"
@@ -991,7 +991,7 @@
       "能力项": "新股申购日历",
       "验证结果": "通过",
       "备注": "通过。对应联网测试返回非空数据并通过字段/来源检查；范围见原始请求清单。",
-      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\083373253312402772f8dffb213639ac9edf877a9a728ba1aaad9b6d7fe864af.body.gz",
+      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\083373253312402772f8dffb213639ac9edf877a9a728ba1aaad9b6d7fe864af.body.gz",
       "清单原始行": "294",
       "原审计状态": "verified_live_raw_saved",
       "证据说明": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。"
@@ -1003,7 +1003,7 @@
       "能力项": "可转债",
       "验证结果": "通过",
       "备注": "通过。对应联网测试返回非空数据并通过字段/来源检查；范围见原始请求清单。",
-      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb.body.gz",
+      "原始返回文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e.body.gz; D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb.body.gz",
       "清单原始行": "300",
       "原审计状态": "verified_live_raw_saved",
       "证据说明": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。"
@@ -1077,7 +1077,7 @@
       "抓取时间UTC": "2026-10-01T12:54:52.119+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\c3c0b821215bce77b8551f716c50f0324aadc39af7c9dc17538b0bf94b59845b.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\c3c0b821215bce77b8551f716c50f0324aadc39af7c9dc17538b0bf94b59845b.body.gz",
       "SHA256": "c3c0b821215bce77b8551f716c50f0324aadc39af7c9dc17538b0bf94b59845b",
       "原始请求URL": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh600519%2Cday%2C2026-09-01%2C2026-09-18%2C640%2Cqfq"
     },
@@ -1110,7 +1110,7 @@
       "抓取时间UTC": "2026-10-01T12:54:54.686+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\1e8158ec28e8e3262a284fd3d092e1c2bd33e3777cb057ddab140633fa8954cd.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\1e8158ec28e8e3262a284fd3d092e1c2bd33e3777cb057ddab140633fa8954cd.body.gz",
       "SHA256": "1e8158ec28e8e3262a284fd3d092e1c2bd33e3777cb057ddab140633fa8954cd",
       "原始请求URL": "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/kline/mkline?param=sz300750%2Cm5%2C%2C96"
     },
@@ -1121,7 +1121,7 @@
       "抓取时间UTC": "2026-10-01T12:54:55.208+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\613cbca9817cde6c5f86de7659ee86d4224b29341265b2ceaf8960ed83677ca6.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\613cbca9817cde6c5f86de7659ee86d4224b29341265b2ceaf8960ed83677ca6.body.gz",
       "SHA256": "613cbca9817cde6c5f86de7659ee86d4224b29341265b2ceaf8960ed83677ca6",
       "原始请求URL": "https://www.tdx.com.cn/products/data/data/g4day/20260918.zip"
     },
@@ -1132,7 +1132,7 @@
       "抓取时间UTC": "2026-10-01T12:55:06.781+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\f6901c1bf3dc321a976c5cf7acc6f51e993fa1945c2af61b1aed4b4d2ef4c311.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\f6901c1bf3dc321a976c5cf7acc6f51e993fa1945c2af61b1aed4b4d2ef4c311.body.gz",
       "SHA256": "f6901c1bf3dc321a976c5cf7acc6f51e993fa1945c2af61b1aed4b4d2ef4c311",
       "原始请求URL": "http://stock.finance.sina.com.cn/stock/go.php/vReport_List/kind/lastest/index.phtml?p=1"
     },
@@ -1143,7 +1143,7 @@
       "抓取时间UTC": "2026-10-01T12:55:06.241+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\f6901c1bf3dc321a976c5cf7acc6f51e993fa1945c2af61b1aed4b4d2ef4c311.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\f6901c1bf3dc321a976c5cf7acc6f51e993fa1945c2af61b1aed4b4d2ef4c311.body.gz",
       "SHA256": "f6901c1bf3dc321a976c5cf7acc6f51e993fa1945c2af61b1aed4b4d2ef4c311",
       "原始请求URL": "https://vip.stock.finance.sina.com.cn/q/go.php/vReport_List/kind/lastest/index.phtml?p=1"
     },
@@ -1154,7 +1154,7 @@
       "抓取时间UTC": "2026-10-01T12:55:07.036+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\30a88d08c745cd399972cea86c49065b279c7965aa726bbfc4796a4bc6309478.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\30a88d08c745cd399972cea86c49065b279c7965aa726bbfc4796a4bc6309478.body.gz",
       "SHA256": "30a88d08c745cd399972cea86c49065b279c7965aa726bbfc4796a4bc6309478",
       "原始请求URL": "https://query.sse.com.cn/commonQuery.do?sqlId=COMMON_SSE_ZQPZ_ETFZL_XXPL_ETFGM_SEARCH_L&STAT_DATE=2026-09-18&isPagination=true&pageHelp.pageSize=10000&pageHelp.pageNo=1&pageHelp.beginPage=1&pageHelp.cacheSize=1&pageHelp.endPage=1"
     },
@@ -1165,7 +1165,7 @@
       "抓取时间UTC": "2026-10-01T12:55:08.630+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\a7c874fbbe260d8b207835c57f51359e07bd92626f58f2c1ef8614592aa1dba7.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\a7c874fbbe260d8b207835c57f51359e07bd92626f58f2c1ef8614592aa1dba7.body.gz",
       "SHA256": "a7c874fbbe260d8b207835c57f51359e07bd92626f58f2c1ef8614592aa1dba7",
       "原始请求URL": "https://api-one-wscn.awtmt.com/apiv1/content/lives?channel=a-stock-channel&limit=50"
     },
@@ -1176,7 +1176,7 @@
       "抓取时间UTC": "2026-10-01T12:55:09.273+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\8373a95432cfd8403af3820c0c37729dc141c778f53dacfd24fec8d9fa490a5e.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\8373a95432cfd8403af3820c0c37729dc141c778f53dacfd24fec8d9fa490a5e.body.gz",
       "SHA256": "8373a95432cfd8403af3820c0c37729dc141c778f53dacfd24fec8d9fa490a5e",
       "原始请求URL": "https://tv.cctv.com/lm/xwlb/day/20260918.shtml"
     },
@@ -1209,7 +1209,7 @@
       "抓取时间UTC": "2026-10-01T12:55:31.149+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\58e61372a553f03b019257b18913d4a5b11dee80311098bd07779d857f13640e.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\58e61372a553f03b019257b18913d4a5b11dee80311098bd07779d857f13640e.body.gz",
       "SHA256": "58e61372a553f03b019257b18913d4a5b11dee80311098bd07779d857f13640e",
       "原始请求URL": "https://sns.sseinfo.com/ajax/feeds.do?type=11&pageSize=10&lastid=-1&show=1&page=1"
     },
@@ -1220,7 +1220,7 @@
       "抓取时间UTC": "2026-10-01T12:55:32.310+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\64b832cbb8482882526554b51e1b33f9f9c82eab0737f11f8fa5044ca95bda7e.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\64b832cbb8482882526554b51e1b33f9f9c82eab0737f11f8fa5044ca95bda7e.body.gz",
       "SHA256": "64b832cbb8482882526554b51e1b33f9f9c82eab0737f11f8fa5044ca95bda7e",
       "原始请求URL": "https://yield.chinabond.com.cn/cbweb-pbc-web/pbc/historyQuery?startDate=2026-09-01&endDate=2026-09-18&gjqx=0&qxId=ycqx&locale=cn_ZH"
     },
@@ -1231,7 +1231,7 @@
       "抓取时间UTC": "2026-10-01T12:55:33.739+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\f3d2ab542c2d2f7436757a878a095bb99b323912de9afd742d3aa3091ff36b19.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\f3d2ab542c2d2f7436757a878a095bb99b323912de9afd742d3aa3091ff36b19.body.gz",
       "SHA256": "f3d2ab542c2d2f7436757a878a095bb99b323912de9afd742d3aa3091ff36b19",
       "原始请求URL": "https://www.chinamoney.com.cn/r/cms/www/chinamoney/data/currency/frr-chrt.csv"
     },
@@ -1242,7 +1242,7 @@
       "抓取时间UTC": "2026-10-01T12:55:34.524+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\f6c7281468bbc966247b0d97e221c7b310abbb6727953195aef701643b165542.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\f6c7281468bbc966247b0d97e221c7b310abbb6727953195aef701643b165542.body.gz",
       "SHA256": "f6c7281468bbc966247b0d97e221c7b310abbb6727953195aef701643b165542",
       "原始请求URL": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPTA_WEB_RATE&columns=TRADE_DATE%2CLPR1Y%2CLPR5Y&filter=&pageNumber=1&pageSize=500&sortColumns=TRADE_DATE&sortTypes=1&source=WEB&client=WEB"
     },
@@ -1253,7 +1253,7 @@
       "抓取时间UTC": "2026-10-01T12:55:36.503+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\dbadf321af90a750a1e435b4c37e77c0b2a97a452bed04a949324b41a1341199.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\dbadf321af90a750a1e435b4c37e77c0b2a97a452bed04a949324b41a1341199.body.gz",
       "SHA256": "dbadf321af90a750a1e435b4c37e77c0b2a97a452bed04a949324b41a1341199",
       "原始请求URL": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPTA_WEB_RATE&columns=TRADE_DATE%2CLPR1Y%2CLPR5Y&filter=&pageNumber=2&pageSize=500&sortColumns=TRADE_DATE&sortTypes=1&source=WEB&client=WEB"
     },
@@ -1264,7 +1264,7 @@
       "抓取时间UTC": "2026-10-01T12:55:38.078+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\f08cebac096169d3177eb4f1b8ee7d9e4ca37e85bb05592cabadfac813647aba.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\f08cebac096169d3177eb4f1b8ee7d9e4ca37e85bb05592cabadfac813647aba.body.gz",
       "SHA256": "f08cebac096169d3177eb4f1b8ee7d9e4ca37e85bb05592cabadfac813647aba",
       "原始请求URL": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPTA_WEB_RATE&columns=TRADE_DATE%2CLPR1Y%2CLPR5Y&filter=&pageNumber=3&pageSize=500&sortColumns=TRADE_DATE&sortTypes=1&source=WEB&client=WEB"
     },
@@ -1275,7 +1275,7 @@
       "抓取时间UTC": "2026-10-01T12:55:39.513+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\0ec24737c1be4a30209750eb7f4bb55c97578ee2f960057c687414f5bffc0cbc.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\0ec24737c1be4a30209750eb7f4bb55c97578ee2f960057c687414f5bffc0cbc.body.gz",
       "SHA256": "0ec24737c1be4a30209750eb7f4bb55c97578ee2f960057c687414f5bffc0cbc",
       "原始请求URL": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPTA_WEB_RATE&columns=TRADE_DATE%2CLPR1Y%2CLPR5Y&filter=&pageNumber=4&pageSize=500&sortColumns=TRADE_DATE&sortTypes=1&source=WEB&client=WEB"
     },
@@ -1286,7 +1286,7 @@
       "抓取时间UTC": "2026-10-01T12:55:39.597+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\20aa9d6503b285ea24a9abe6757464bf039a1aaa21fbe38b8cd7d681bc07bdfc.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\20aa9d6503b285ea24a9abe6757464bf039a1aaa21fbe38b8cd7d681bc07bdfc.body.gz",
       "SHA256": "20aa9d6503b285ea24a9abe6757464bf039a1aaa21fbe38b8cd7d681bc07bdfc",
       "原始请求URL": "https://api-one-wscn.awtmt.com/apiv1/finance/macrodatas?start=1788192000&end=1788796799"
     },
@@ -1297,7 +1297,7 @@
       "抓取时间UTC": "2026-10-01T12:55:40.134+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\4577d33c3e12fc8f5a636023a075355fbee57c077dafb969464abdd23370671a.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\4577d33c3e12fc8f5a636023a075355fbee57c077dafb969464abdd23370671a.body.gz",
       "SHA256": "4577d33c3e12fc8f5a636023a075355fbee57c077dafb969464abdd23370671a",
       "原始请求URL": "https://api-one-wscn.awtmt.com/apiv1/finance/macrodatas?start=1788796800&end=1789401599"
     },
@@ -1308,7 +1308,7 @@
       "抓取时间UTC": "2026-10-01T12:55:40.615+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\1611c59a139f218b2066e1df35526cb04c87bb73f2c8b6fcde7216740467df99.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\1611c59a139f218b2066e1df35526cb04c87bb73f2c8b6fcde7216740467df99.body.gz",
       "SHA256": "1611c59a139f218b2066e1df35526cb04c87bb73f2c8b6fcde7216740467df99",
       "原始请求URL": "https://api-one-wscn.awtmt.com/apiv1/finance/macrodatas?start=1789401600&end=1789747199"
     },
@@ -1319,7 +1319,7 @@
       "抓取时间UTC": "2026-10-01T12:55:48.010+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\224819fc35027afc7019db9652d42bd37cf2f768e97f59df1f1eb68f3d82b123.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\224819fc35027afc7019db9652d42bd37cf2f768e97f59df1f1eb68f3d82b123.body.gz",
       "SHA256": "224819fc35027afc7019db9652d42bd37cf2f768e97f59df1f1eb68f3d82b123",
       "原始请求URL": "https://www.shfe.com.cn/data/tradedata/future/dailydata/kx20260918.dat"
     },
@@ -1330,7 +1330,7 @@
       "抓取时间UTC": "2026-10-01T12:55:48.455+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\8acc40cb2e802e9159ce70819788fe12b0b4f58ae7154e12cb5567d557213c79.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\8acc40cb2e802e9159ce70819788fe12b0b4f58ae7154e12cb5567d557213c79.body.gz",
       "SHA256": "8acc40cb2e802e9159ce70819788fe12b0b4f58ae7154e12cb5567d557213c79",
       "原始请求URL": "https://www.ine.cn/data/tradedata/future/dailydata/kx20260918.dat"
     },
@@ -1341,7 +1341,7 @@
       "抓取时间UTC": "2026-10-01T12:55:48.978+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\8acc40cb2e802e9159ce70819788fe12b0b4f58ae7154e12cb5567d557213c79.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\8acc40cb2e802e9159ce70819788fe12b0b4f58ae7154e12cb5567d557213c79.body.gz",
       "SHA256": "8acc40cb2e802e9159ce70819788fe12b0b4f58ae7154e12cb5567d557213c79",
       "原始请求URL": "https://www.ine.cn/data/tradedata/future/dailydata/kx20260918.dat"
     },
@@ -1352,7 +1352,7 @@
       "抓取时间UTC": "2026-10-01T12:55:49.420+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\595f24d939400c97bc4b64bdd43a1873ab58bf3bfa654143e9460eaf51d4ab60.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\595f24d939400c97bc4b64bdd43a1873ab58bf3bfa654143e9460eaf51d4ab60.body.gz",
       "SHA256": "595f24d939400c97bc4b64bdd43a1873ab58bf3bfa654143e9460eaf51d4ab60",
       "原始请求URL": "https://www.czce.com.cn/cn/DFSStaticFiles/Future/2026/20260918/FutureDataDaily.txt"
     },
@@ -1363,7 +1363,7 @@
       "抓取时间UTC": "2026-10-01T12:55:50.250+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\5904fe9891a2b6d262d0fbbaedb8d219de709e44184d95e883c743a7ccb0bd27.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\5904fe9891a2b6d262d0fbbaedb8d219de709e44184d95e883c743a7ccb0bd27.body.gz",
       "SHA256": "5904fe9891a2b6d262d0fbbaedb8d219de709e44184d95e883c743a7ccb0bd27",
       "原始请求URL": "http://www.cffex.com.cn/fzjy/mrhq/202609/18/20260918_1.csv"
     },
@@ -1374,7 +1374,7 @@
       "抓取时间UTC": "2026-10-01T12:55:50.717+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\012a8807c89c08c7b546cc102d35247d10e93356e488457e79e06cba9d4cee49.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\012a8807c89c08c7b546cc102d35247d10e93356e488457e79e06cba9d4cee49.body.gz",
       "SHA256": "012a8807c89c08c7b546cc102d35247d10e93356e488457e79e06cba9d4cee49",
       "原始请求URL": "http://www.cffex.com.cn/fzjy/mrhq/202609/18/index.xml"
     },
@@ -1385,7 +1385,7 @@
       "抓取时间UTC": "2026-10-01T12:55:51.238+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\e699e8e97d7f0e9e797caa2944c87a0cf286149eb4845cbe9019c6d5111e8076.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\e699e8e97d7f0e9e797caa2944c87a0cf286149eb4845cbe9019c6d5111e8076.body.gz",
       "SHA256": "e699e8e97d7f0e9e797caa2944c87a0cf286149eb4845cbe9019c6d5111e8076",
       "原始请求URL": "http://www.gfex.com.cn/u/interfacesWebTiDayQuotes/loadList"
     },
@@ -1396,7 +1396,7 @@
       "抓取时间UTC": "2026-10-01T12:55:51.462+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\d6b346d216f06855953e7661197571eeacef6f074e2f4ea2587835b9ae6b5288.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\d6b346d216f06855953e7661197571eeacef6f074e2f4ea2587835b9ae6b5288.body.gz",
       "SHA256": "d6b346d216f06855953e7661197571eeacef6f074e2f4ea2587835b9ae6b5288",
       "原始请求URL": "https://www.shfe.com.cn/data/tradedata/option/dailydata/kx20260918.dat"
     },
@@ -1407,7 +1407,7 @@
       "抓取时间UTC": "2026-10-01T12:55:52.755+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\bc1d0223e198d4748504e36b89a0a2ef777e8dbc4cccffeeb42d5574db63db96.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\bc1d0223e198d4748504e36b89a0a2ef777e8dbc4cccffeeb42d5574db63db96.body.gz",
       "SHA256": "bc1d0223e198d4748504e36b89a0a2ef777e8dbc4cccffeeb42d5574db63db96",
       "原始请求URL": "https://www.ine.cn/data/tradedata/option/dailydata/kx20260918.dat"
     },
@@ -1418,7 +1418,7 @@
       "抓取时间UTC": "2026-10-01T12:55:53.347+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\5904fe9891a2b6d262d0fbbaedb8d219de709e44184d95e883c743a7ccb0bd27.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\5904fe9891a2b6d262d0fbbaedb8d219de709e44184d95e883c743a7ccb0bd27.body.gz",
       "SHA256": "5904fe9891a2b6d262d0fbbaedb8d219de709e44184d95e883c743a7ccb0bd27",
       "原始请求URL": "http://www.cffex.com.cn/fzjy/mrhq/202609/18/20260918_1.csv"
     },
@@ -1429,7 +1429,7 @@
       "抓取时间UTC": "2026-10-01T12:55:53.732+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\012a8807c89c08c7b546cc102d35247d10e93356e488457e79e06cba9d4cee49.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\012a8807c89c08c7b546cc102d35247d10e93356e488457e79e06cba9d4cee49.body.gz",
       "SHA256": "012a8807c89c08c7b546cc102d35247d10e93356e488457e79e06cba9d4cee49",
       "原始请求URL": "http://www.cffex.com.cn/fzjy/mrhq/202609/18/index.xml"
     },
@@ -1440,7 +1440,7 @@
       "抓取时间UTC": "2026-10-01T12:55:54.237+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\12a4fb33d7f2d791a0682f31d1187f3a67072025d893e0424e1e181c9d6500cd.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\12a4fb33d7f2d791a0682f31d1187f3a67072025d893e0424e1e181c9d6500cd.body.gz",
       "SHA256": "12a4fb33d7f2d791a0682f31d1187f3a67072025d893e0424e1e181c9d6500cd",
       "原始请求URL": "http://www.cffex.com.cn/sj/ccpm/202609/18/IF_1.csv"
     },
@@ -1451,7 +1451,7 @@
       "抓取时间UTC": "2026-10-01T12:55:54.600+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\b2a8a352f5ca9ca1e58c44a41207fdc963dc8ad28def06971948f7f752a7bfe8.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\b2a8a352f5ca9ca1e58c44a41207fdc963dc8ad28def06971948f7f752a7bfe8.body.gz",
       "SHA256": "b2a8a352f5ca9ca1e58c44a41207fdc963dc8ad28def06971948f7f752a7bfe8",
       "原始请求URL": "http://www.cffex.com.cn/sj/ccpm/202609/18/IH_1.csv"
     },
@@ -1462,7 +1462,7 @@
       "抓取时间UTC": "2026-10-01T12:55:54.950+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\999e4fc5b309131a3e9fcaa25021e79a70587ebc3aa04dff95bd4eb56b0f16f6.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\999e4fc5b309131a3e9fcaa25021e79a70587ebc3aa04dff95bd4eb56b0f16f6.body.gz",
       "SHA256": "999e4fc5b309131a3e9fcaa25021e79a70587ebc3aa04dff95bd4eb56b0f16f6",
       "原始请求URL": "http://www.cffex.com.cn/sj/ccpm/202609/18/IC_1.csv"
     },
@@ -1473,7 +1473,7 @@
       "抓取时间UTC": "2026-10-01T12:55:55.304+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\ce529e08ad42cfd9f05a93cfea3bc95dcf446991793c37c41b9bc64bcbed6f70.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\ce529e08ad42cfd9f05a93cfea3bc95dcf446991793c37c41b9bc64bcbed6f70.body.gz",
       "SHA256": "ce529e08ad42cfd9f05a93cfea3bc95dcf446991793c37c41b9bc64bcbed6f70",
       "原始请求URL": "http://www.cffex.com.cn/sj/ccpm/202609/18/IM_1.csv"
     },
@@ -1484,7 +1484,7 @@
       "抓取时间UTC": "2026-10-01T12:55:55.667+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\a76e541a37f29c1af2716918bac6c7e0b6e41653b4f1658dc53fb7e837db610b.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\a76e541a37f29c1af2716918bac6c7e0b6e41653b4f1658dc53fb7e837db610b.body.gz",
       "SHA256": "a76e541a37f29c1af2716918bac6c7e0b6e41653b4f1658dc53fb7e837db610b",
       "原始请求URL": "http://www.cffex.com.cn/sj/ccpm/202609/18/TS_1.csv"
     },
@@ -1495,7 +1495,7 @@
       "抓取时间UTC": "2026-10-01T12:55:56.013+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\f48862db5bbc3679ceec6ce9b52c7d17a6c59059aa45ccf7b497c548916d804a.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\f48862db5bbc3679ceec6ce9b52c7d17a6c59059aa45ccf7b497c548916d804a.body.gz",
       "SHA256": "f48862db5bbc3679ceec6ce9b52c7d17a6c59059aa45ccf7b497c548916d804a",
       "原始请求URL": "http://www.cffex.com.cn/sj/ccpm/202609/18/TF_1.csv"
     },
@@ -1506,7 +1506,7 @@
       "抓取时间UTC": "2026-10-01T12:55:56.395+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\73800e28486efba4cb11553f4b9a9fd9957f5031c8828f7c155c21ed018fdfe9.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\73800e28486efba4cb11553f4b9a9fd9957f5031c8828f7c155c21ed018fdfe9.body.gz",
       "SHA256": "73800e28486efba4cb11553f4b9a9fd9957f5031c8828f7c155c21ed018fdfe9",
       "原始请求URL": "http://www.cffex.com.cn/sj/ccpm/202609/18/T_1.csv"
     },
@@ -1517,7 +1517,7 @@
       "抓取时间UTC": "2026-10-01T12:55:56.794+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\13d298283faca25501a2d6fa991240b66f46157a8c6eaecf2cb595d7d9d01dac.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\13d298283faca25501a2d6fa991240b66f46157a8c6eaecf2cb595d7d9d01dac.body.gz",
       "SHA256": "13d298283faca25501a2d6fa991240b66f46157a8c6eaecf2cb595d7d9d01dac",
       "原始请求URL": "http://www.cffex.com.cn/sj/ccpm/202609/18/TL_1.csv"
     },
@@ -1528,7 +1528,7 @@
       "抓取时间UTC": "2026-10-01T12:55:57.170+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\2990f9cbcb96e04bd520870b1bb097f94de7d41ec908ee032d73f4c91c155a59.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\2990f9cbcb96e04bd520870b1bb097f94de7d41ec908ee032d73f4c91c155a59.body.gz",
       "SHA256": "2990f9cbcb96e04bd520870b1bb097f94de7d41ec908ee032d73f4c91c155a59",
       "原始请求URL": "https://hq.sinajs.cn/list=nf_RB0,nf_M0,nf_IF0"
     },
@@ -1539,7 +1539,7 @@
       "抓取时间UTC": "2026-10-01T12:55:57.634+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\a67d6e37ab7d31388fe32710b0c521363473fa65b2c64439917a54d6bfb4388b.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\a67d6e37ab7d31388fe32710b0c521363473fa65b2c64439917a54d6bfb4388b.body.gz",
       "SHA256": "a67d6e37ab7d31388fe32710b0c521363473fa65b2c64439917a54d6bfb4388b",
       "原始请求URL": "https://hq.sinajs.cn/list=hf_CHA50CFD"
     },
@@ -1550,7 +1550,7 @@
       "抓取时间UTC": "2026-10-01T12:55:58.383+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\79788cd1e6502e3c31e4cceaf05596f4d903f82650ac80f971a5771c869ea655.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\79788cd1e6502e3c31e4cceaf05596f4d903f82650ac80f971a5771c869ea655.body.gz",
       "SHA256": "79788cd1e6502e3c31e4cceaf05596f4d903f82650ac80f971a5771c869ea655",
       "原始请求URL": "https://www.sge.com.cn/graph/Dailyhq"
     },
@@ -1561,7 +1561,7 @@
       "抓取时间UTC": "2026-10-01T12:55:59.121+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\17f23466b52f0bfbeb374f8117d9100a9c4af744d590289960da0f89d36c5464.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\17f23466b52f0bfbeb374f8117d9100a9c4af744d590289960da0f89d36c5464.body.gz",
       "SHA256": "17f23466b52f0bfbeb374f8117d9100a9c4af744d590289960da0f89d36c5464",
       "原始请求URL": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_PUBLIC_OP_NEWPREDICT&columns=ALL&filter=&pageNumber=1&pageSize=50&sortColumns=NOTICE_DATE%2CSECURITY_CODE%2CREPORT_DATE%2CPREDICT_FINANCE_CODE&sortTypes=-1%2C1%2C-1%2C1&source=WEB&client=WEB"
     },
@@ -1572,7 +1572,7 @@
       "抓取时间UTC": "2026-10-01T12:56:00.825+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\852a3a28fe9c3e66a4f899162d281af07a62e33a436f514dd3af33c8b82c7888.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\852a3a28fe9c3e66a4f899162d281af07a62e33a436f514dd3af33c8b82c7888.body.gz",
       "SHA256": "852a3a28fe9c3e66a4f899162d281af07a62e33a436f514dd3af33c8b82c7888",
       "原始请求URL": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_ORG_SURVEYNEW&columns=ALL&filter=%28IS_SOURCE%3D%221%22%29%28NUMBERNEW%3D%221%22%29&pageNumber=1&pageSize=50&sortColumns=NOTICE_DATE%2CSECURITY_CODE%2CRECEIVE_START_DATE&sortTypes=-1%2C1%2C-1&source=WEB&client=WEB"
     },
@@ -1583,7 +1583,7 @@
       "抓取时间UTC": "2026-10-01T12:56:02.266+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\1c2a8d00cf4f119dd234ffaa5345995ee5c49ab2a671f2090f015c566ba67bec.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\1c2a8d00cf4f119dd234ffaa5345995ee5c49ab2a671f2090f015c566ba67bec.body.gz",
       "SHA256": "1c2a8d00cf4f119dd234ffaa5345995ee5c49ab2a671f2090f015c566ba67bec",
       "原始请求URL": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_SHARE_HOLDER_INCREASE&columns=ALL&filter=&pageNumber=1&pageSize=50&sortColumns=NOTICE_DATE%2CSECURITY_CODE%2CHOLDER_NAME%2CSTART_DATE%2CEND_DATE&sortTypes=-1%2C1%2C1%2C1%2C1&source=WEB&client=WEB"
     },
@@ -1594,7 +1594,7 @@
       "抓取时间UTC": "2026-10-01T12:56:03.791+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\cd9747ca8dbb0823a1cbdf8db5eb9b755b6ca739ee537c34705e57d6076554ed.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\cd9747ca8dbb0823a1cbdf8db5eb9b755b6ca739ee537c34705e57d6076554ed.body.gz",
       "SHA256": "cd9747ca8dbb0823a1cbdf8db5eb9b755b6ca739ee537c34705e57d6076554ed",
       "原始请求URL": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPTA_WEB_GETHGLIST_NEW&columns=ALL&filter=&pageNumber=1&pageSize=50&sortColumns=UPD%2CDIM_SCODE%2CREPURCODE&sortTypes=-1%2C1%2C1&source=WEB&client=WEB"
     },
@@ -1605,7 +1605,7 @@
       "抓取时间UTC": "2026-10-01T12:56:05.150+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\82a09f7e8dbbd644d5daa57db655b9f6d80976a9218dd68a2e5910415178de4a.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\82a09f7e8dbbd644d5daa57db655b9f6d80976a9218dd68a2e5910415178de4a.body.gz",
       "SHA256": "82a09f7e8dbbd644d5daa57db655b9f6d80976a9218dd68a2e5910415178de4a",
       "原始请求URL": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_CSDC_LIST&columns=ALL&filter=&pageNumber=1&pageSize=1&sortColumns=TRADE_DATE&sortTypes=-1&source=WEB&client=WEB"
     },
@@ -1616,7 +1616,7 @@
       "抓取时间UTC": "2026-10-01T12:56:07.186+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\1cf99b8e98fc2410e1fd438310c2d7d42b0ee134df2b56e93a5673beafded8cf.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\1cf99b8e98fc2410e1fd438310c2d7d42b0ee134df2b56e93a5673beafded8cf.body.gz",
       "SHA256": "1cf99b8e98fc2410e1fd438310c2d7d42b0ee134df2b56e93a5673beafded8cf",
       "原始请求URL": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_CSDC_LIST&columns=ALL&filter=%28TRADE_DATE%3D%272026-09-30%27%29&pageNumber=1&pageSize=50&sortColumns=PLEDGE_RATIO%2CSECURITY_CODE&sortTypes=-1%2C1&source=WEB&client=WEB"
     },
@@ -1627,7 +1627,7 @@
       "抓取时间UTC": "2026-10-01T12:56:08.646+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\083373253312402772f8dffb213639ac9edf877a9a728ba1aaad9b6d7fe864af.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\083373253312402772f8dffb213639ac9edf877a9a728ba1aaad9b6d7fe864af.body.gz",
       "SHA256": "083373253312402772f8dffb213639ac9edf877a9a728ba1aaad9b6d7fe864af",
       "原始请求URL": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPTA_APP_IPOAPPLY&columns=ALL&filter=&pageNumber=1&pageSize=30&sortColumns=APPLY_DATE%2CSECURITY_CODE&sortTypes=-1%2C-1&source=WEB&client=WEB"
     },
@@ -1638,7 +1638,7 @@
       "抓取时间UTC": "2026-10-01T12:56:10.547+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5.body.gz",
       "SHA256": "ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5",
       "原始请求URL": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_BOND_CB_LIST&columns=ALL&filter=&pageNumber=1&pageSize=500&sortColumns=PUBLIC_START_DATE%2CSECURITY_CODE&sortTypes=-1%2C1&source=WEB&client=WEB&quoteColumns=f2~01~CONVERT_STOCK_CODE~CONVERT_STOCK_PRICE%2Cf235~10~SECURITY_CODE~TRANSFER_PRICE%2Cf236~10~SECURITY_CODE~TRANSFER_VALUE%2Cf2~10~SECURITY_CODE~CURRENT_BOND_PRICE%2Cf237~10~SECURITY_CODE~TRANSFER_PREMIUM_RATIO&quoteType=0"
     },
@@ -1649,7 +1649,7 @@
       "抓取时间UTC": "2026-10-01T12:56:13.617+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e.body.gz",
       "SHA256": "2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e",
       "原始请求URL": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_BOND_CB_LIST&columns=ALL&filter=&pageNumber=2&pageSize=500&sortColumns=PUBLIC_START_DATE%2CSECURITY_CODE&sortTypes=-1%2C1&source=WEB&client=WEB&quoteColumns=f2~01~CONVERT_STOCK_CODE~CONVERT_STOCK_PRICE%2Cf235~10~SECURITY_CODE~TRANSFER_PRICE%2Cf236~10~SECURITY_CODE~TRANSFER_VALUE%2Cf2~10~SECURITY_CODE~CURRENT_BOND_PRICE%2Cf237~10~SECURITY_CODE~TRANSFER_PREMIUM_RATIO&quoteType=0"
     },
@@ -1660,7 +1660,7 @@
       "抓取时间UTC": "2026-10-01T12:56:16.114+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v39-live-escalated\\bodies\\23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\bodies\\23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb.body.gz",
       "SHA256": "23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb",
       "原始请求URL": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_BOND_CB_LIST&columns=ALL&filter=&pageNumber=3&pageSize=500&sortColumns=PUBLIC_START_DATE%2CSECURITY_CODE&sortTypes=-1%2C1&source=WEB&client=WEB&quoteColumns=f2~01~CONVERT_STOCK_CODE~CONVERT_STOCK_PRICE%2Cf235~10~SECURITY_CODE~TRANSFER_PRICE%2Cf236~10~SECURITY_CODE~TRANSFER_VALUE%2Cf2~10~SECURITY_CODE~CURRENT_BOND_PRICE%2Cf237~10~SECURITY_CODE~TRANSFER_PREMIUM_RATIO&quoteType=0"
     },
@@ -1671,7 +1671,7 @@
       "抓取时间UTC": "2026-10-01T12:57:20.690+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\ca6d11102c80e68faeb699a30b243bd695481005c3f37cb69ead5db7237f6f02.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\ca6d11102c80e68faeb699a30b243bd695481005c3f37cb69ead5db7237f6f02.body.gz",
       "SHA256": "ca6d11102c80e68faeb699a30b243bd695481005c3f37cb69ead5db7237f6f02",
       "原始请求URL": "https://qt.gtimg.cn/q=sz000001"
     },
@@ -1682,7 +1682,7 @@
       "抓取时间UTC": "2026-10-01T12:57:21.027+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\30e321e11e64f6a77fa8ae832ebe3f467a1584cbe5fea42d0539d5a759e5c29c.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\30e321e11e64f6a77fa8ae832ebe3f467a1584cbe5fea42d0539d5a759e5c29c.body.gz",
       "SHA256": "30e321e11e64f6a77fa8ae832ebe3f467a1584cbe5fea42d0539d5a759e5c29c",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=0"
     },
@@ -1693,7 +1693,7 @@
       "抓取时间UTC": "2026-10-01T12:57:21.463+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\1d44479b5f0f16309a99042ed4d6d444b1c2ae51d68a069c95b4e6e7ce9c4c3e.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\1d44479b5f0f16309a99042ed4d6d444b1c2ae51d68a069c95b4e6e7ce9c4c3e.body.gz",
       "SHA256": "1d44479b5f0f16309a99042ed4d6d444b1c2ae51d68a069c95b4e6e7ce9c4c3e",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=1"
     },
@@ -1704,7 +1704,7 @@
       "抓取时间UTC": "2026-10-01T12:57:21.887+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\4a9e825355940a58fc737bf920fbb6545278eaf371d950cfffed5ddcb3b017ef.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\4a9e825355940a58fc737bf920fbb6545278eaf371d950cfffed5ddcb3b017ef.body.gz",
       "SHA256": "4a9e825355940a58fc737bf920fbb6545278eaf371d950cfffed5ddcb3b017ef",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=2"
     },
@@ -1715,7 +1715,7 @@
       "抓取时间UTC": "2026-10-01T12:57:22.324+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\f188072f6ab4731f75bc8edf4e6fd414488da71dffd2d716b9069f02f1263226.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\f188072f6ab4731f75bc8edf4e6fd414488da71dffd2d716b9069f02f1263226.body.gz",
       "SHA256": "f188072f6ab4731f75bc8edf4e6fd414488da71dffd2d716b9069f02f1263226",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=3"
     },
@@ -1726,7 +1726,7 @@
       "抓取时间UTC": "2026-10-01T12:57:22.731+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\dff2ebcc516f4aa069f4c46f6e85c4daf396013426fe61b21788cb2b63e4aa94.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\dff2ebcc516f4aa069f4c46f6e85c4daf396013426fe61b21788cb2b63e4aa94.body.gz",
       "SHA256": "dff2ebcc516f4aa069f4c46f6e85c4daf396013426fe61b21788cb2b63e4aa94",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=4"
     },
@@ -1737,7 +1737,7 @@
       "抓取时间UTC": "2026-10-01T12:57:24.109+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\583148dc5ca04fdc2c999e740880c2a39347781c2a749b705419457daeba3031.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\583148dc5ca04fdc2c999e740880c2a39347781c2a749b705419457daeba3031.body.gz",
       "SHA256": "583148dc5ca04fdc2c999e740880c2a39347781c2a749b705419457daeba3031",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=5"
     },
@@ -1748,7 +1748,7 @@
       "抓取时间UTC": "2026-10-01T12:57:24.840+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\5007eaf2aea55b0b77925f94775ae8923634fc77298a43623c1a73d628a24670.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\5007eaf2aea55b0b77925f94775ae8923634fc77298a43623c1a73d628a24670.body.gz",
       "SHA256": "5007eaf2aea55b0b77925f94775ae8923634fc77298a43623c1a73d628a24670",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=6"
     },
@@ -1759,7 +1759,7 @@
       "抓取时间UTC": "2026-10-01T12:57:25.777+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\760457fb29509e9144371ebfe179cbc75d4ae9028316820d677bd3011ebb5e13.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\760457fb29509e9144371ebfe179cbc75d4ae9028316820d677bd3011ebb5e13.body.gz",
       "SHA256": "760457fb29509e9144371ebfe179cbc75d4ae9028316820d677bd3011ebb5e13",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=7"
     },
@@ -1770,7 +1770,7 @@
       "抓取时间UTC": "2026-10-01T12:57:26.538+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\1d5be94190d97c268c862cfed50593f609a688c679e76343940ca83c93083f3d.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\1d5be94190d97c268c862cfed50593f609a688c679e76343940ca83c93083f3d.body.gz",
       "SHA256": "1d5be94190d97c268c862cfed50593f609a688c679e76343940ca83c93083f3d",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=8"
     },
@@ -1781,7 +1781,7 @@
       "抓取时间UTC": "2026-10-01T12:57:27.587+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\6fa8af075913401fd3ec79b61f91a378c701e0a4b027dc94fdcc54d32b7c5055.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\6fa8af075913401fd3ec79b61f91a378c701e0a4b027dc94fdcc54d32b7c5055.body.gz",
       "SHA256": "6fa8af075913401fd3ec79b61f91a378c701e0a4b027dc94fdcc54d32b7c5055",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=9"
     },
@@ -1792,7 +1792,7 @@
       "抓取时间UTC": "2026-10-01T12:57:28.411+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\e7c0bd06cd73763c4aca0a2b481f2593eb94599f33820c4a87be51c30e45c62a.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\e7c0bd06cd73763c4aca0a2b481f2593eb94599f33820c4a87be51c30e45c62a.body.gz",
       "SHA256": "e7c0bd06cd73763c4aca0a2b481f2593eb94599f33820c4a87be51c30e45c62a",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=10"
     },
@@ -1803,7 +1803,7 @@
       "抓取时间UTC": "2026-10-01T12:57:29.159+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\7404da868fc7770299d35debcefcd204415c092dd6099dce28861cb4374ea2ee.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\7404da868fc7770299d35debcefcd204415c092dd6099dce28861cb4374ea2ee.body.gz",
       "SHA256": "7404da868fc7770299d35debcefcd204415c092dd6099dce28861cb4374ea2ee",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=11"
     },
@@ -1814,7 +1814,7 @@
       "抓取时间UTC": "2026-10-01T12:57:29.986+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\f51c0d60b6c8020ad2a7a25e463d33feec8d4768834e7f257feb9bf4c5b156a4.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\f51c0d60b6c8020ad2a7a25e463d33feec8d4768834e7f257feb9bf4c5b156a4.body.gz",
       "SHA256": "f51c0d60b6c8020ad2a7a25e463d33feec8d4768834e7f257feb9bf4c5b156a4",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=12"
     },
@@ -1825,7 +1825,7 @@
       "抓取时间UTC": "2026-10-01T12:57:31.116+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\5e553e13393393df0a08b302cdffe42ffa3fe26cbb11828eecb484625d17a4d6.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\5e553e13393393df0a08b302cdffe42ffa3fe26cbb11828eecb484625d17a4d6.body.gz",
       "SHA256": "5e553e13393393df0a08b302cdffe42ffa3fe26cbb11828eecb484625d17a4d6",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=13"
     },
@@ -1836,7 +1836,7 @@
       "抓取时间UTC": "2026-10-01T12:57:31.990+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\14118a5a27ff1d761e6cd1de36fd3da566e9adfd702ee77ee060369887586deb.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\14118a5a27ff1d761e6cd1de36fd3da566e9adfd702ee77ee060369887586deb.body.gz",
       "SHA256": "14118a5a27ff1d761e6cd1de36fd3da566e9adfd702ee77ee060369887586deb",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=14"
     },
@@ -1847,7 +1847,7 @@
       "抓取时间UTC": "2026-10-01T12:57:32.788+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\977cf7da28ff4086b4edcb19b2d234866c1af579d4a057f04a4445ab4c67c259.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\977cf7da28ff4086b4edcb19b2d234866c1af579d4a057f04a4445ab4c67c259.body.gz",
       "SHA256": "977cf7da28ff4086b4edcb19b2d234866c1af579d4a057f04a4445ab4c67c259",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=15"
     },
@@ -1858,7 +1858,7 @@
       "抓取时间UTC": "2026-10-01T12:57:33.524+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\0c7999a8fc67d3f9008e70f4c9057a638cb74fd8a70c2b6551d92ea458732343.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\0c7999a8fc67d3f9008e70f4c9057a638cb74fd8a70c2b6551d92ea458732343.body.gz",
       "SHA256": "0c7999a8fc67d3f9008e70f4c9057a638cb74fd8a70c2b6551d92ea458732343",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=16"
     },
@@ -1869,7 +1869,7 @@
       "抓取时间UTC": "2026-10-01T12:57:34.437+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\33416f3de323391b85b59ab45bed131d017bd7bc4a705a8cf4929b2958d4d876.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\33416f3de323391b85b59ab45bed131d017bd7bc4a705a8cf4929b2958d4d876.body.gz",
       "SHA256": "33416f3de323391b85b59ab45bed131d017bd7bc4a705a8cf4929b2958d4d876",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=17"
     },
@@ -1880,7 +1880,7 @@
       "抓取时间UTC": "2026-10-01T12:57:35.237+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\96a8672b35ca3d7323e5430d29dd7408aae08e2104af4c0ec76929f2e2de895d.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\96a8672b35ca3d7323e5430d29dd7408aae08e2104af4c0ec76929f2e2de895d.body.gz",
       "SHA256": "96a8672b35ca3d7323e5430d29dd7408aae08e2104af4c0ec76929f2e2de895d",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=18"
     },
@@ -1891,7 +1891,7 @@
       "抓取时间UTC": "2026-10-01T12:57:36.360+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\d6aca7cefba3516acc9ce366ddea43ecf55bfac5a19cc2927ba7b5ca97d83f82.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\d6aca7cefba3516acc9ce366ddea43ecf55bfac5a19cc2927ba7b5ca97d83f82.body.gz",
       "SHA256": "d6aca7cefba3516acc9ce366ddea43ecf55bfac5a19cc2927ba7b5ca97d83f82",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=19"
     },
@@ -1902,7 +1902,7 @@
       "抓取时间UTC": "2026-10-01T12:57:37.265+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\657fd92e5d2e2a95497a1fd20a6c4364268c6f4cc9645a0a85e274cfd70cb9df.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\657fd92e5d2e2a95497a1fd20a6c4364268c6f4cc9645a0a85e274cfd70cb9df.body.gz",
       "SHA256": "657fd92e5d2e2a95497a1fd20a6c4364268c6f4cc9645a0a85e274cfd70cb9df",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=20"
     },
@@ -1913,7 +1913,7 @@
       "抓取时间UTC": "2026-10-01T12:57:38.276+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\ab3ffaefde713afc654fb467fd73a77ce384ed5fc3b3652a7d20a5267a2aa944.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\ab3ffaefde713afc654fb467fd73a77ce384ed5fc3b3652a7d20a5267a2aa944.body.gz",
       "SHA256": "ab3ffaefde713afc654fb467fd73a77ce384ed5fc3b3652a7d20a5267a2aa944",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=21"
     },
@@ -1924,7 +1924,7 @@
       "抓取时间UTC": "2026-10-01T12:57:39.470+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\2d92a58047eab79a09c13108f501d0721929857b52bb2237c05f235300d1d909.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\2d92a58047eab79a09c13108f501d0721929857b52bb2237c05f235300d1d909.body.gz",
       "SHA256": "2d92a58047eab79a09c13108f501d0721929857b52bb2237c05f235300d1d909",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=22"
     },
@@ -1935,7 +1935,7 @@
       "抓取时间UTC": "2026-10-01T12:57:40.283+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\0d6d428603f275df9d8d0e4405528843662f3971f245f7a1d133f2e6fa1b23a4.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\0d6d428603f275df9d8d0e4405528843662f3971f245f7a1d133f2e6fa1b23a4.body.gz",
       "SHA256": "0d6d428603f275df9d8d0e4405528843662f3971f245f7a1d133f2e6fa1b23a4",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=23"
     },
@@ -1946,7 +1946,7 @@
       "抓取时间UTC": "2026-10-01T12:57:41.361+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\5199586b7bbf1fb94ec1e574b44671c706beee7e9f5d7874e87da96f4dad7734.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\5199586b7bbf1fb94ec1e574b44671c706beee7e9f5d7874e87da96f4dad7734.body.gz",
       "SHA256": "5199586b7bbf1fb94ec1e574b44671c706beee7e9f5d7874e87da96f4dad7734",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=24"
     },
@@ -1957,7 +1957,7 @@
       "抓取时间UTC": "2026-10-01T12:57:42.311+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\e484b70e5f5464cc52a28f8280b79062f7bb43168dcd88b624d8ffa62f586d51.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\e484b70e5f5464cc52a28f8280b79062f7bb43168dcd88b624d8ffa62f586d51.body.gz",
       "SHA256": "e484b70e5f5464cc52a28f8280b79062f7bb43168dcd88b624d8ffa62f586d51",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=25"
     },
@@ -1968,7 +1968,7 @@
       "抓取时间UTC": "2026-10-01T12:57:42.989+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\3f5f14fb11ad1c41da50693788aeff04fdcbdf73254a3d091237f37db8887ca6.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\3f5f14fb11ad1c41da50693788aeff04fdcbdf73254a3d091237f37db8887ca6.body.gz",
       "SHA256": "3f5f14fb11ad1c41da50693788aeff04fdcbdf73254a3d091237f37db8887ca6",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=26"
     },
@@ -1979,7 +1979,7 @@
       "抓取时间UTC": "2026-10-01T12:57:43.772+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\31dd3c4b056341b3f8b1610c05d380a92d8761db55bddf9fb9241492f599f938.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\31dd3c4b056341b3f8b1610c05d380a92d8761db55bddf9fb9241492f599f938.body.gz",
       "SHA256": "31dd3c4b056341b3f8b1610c05d380a92d8761db55bddf9fb9241492f599f938",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=27"
     },
@@ -1990,7 +1990,7 @@
       "抓取时间UTC": "2026-10-01T12:57:44.904+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\c0f846df4e87c65da21a2fe8a9fc9af3a3e8b55dd090e11b8338406852e1959f.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\c0f846df4e87c65da21a2fe8a9fc9af3a3e8b55dd090e11b8338406852e1959f.body.gz",
       "SHA256": "c0f846df4e87c65da21a2fe8a9fc9af3a3e8b55dd090e11b8338406852e1959f",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=28"
     },
@@ -2001,7 +2001,7 @@
       "抓取时间UTC": "2026-10-01T12:57:45.760+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\5ad917c7cf43ef1df7b74f786392ba0fee18761f575a6ef84d5b07981b934fda.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\5ad917c7cf43ef1df7b74f786392ba0fee18761f575a6ef84d5b07981b934fda.body.gz",
       "SHA256": "5ad917c7cf43ef1df7b74f786392ba0fee18761f575a6ef84d5b07981b934fda",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=29"
     },
@@ -2012,7 +2012,7 @@
       "抓取时间UTC": "2026-10-01T12:57:46.845+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\770b912084d9cc76cf8f93f71b77f5e10044422722d4ddfed3d3a800390214dc.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\770b912084d9cc76cf8f93f71b77f5e10044422722d4ddfed3d3a800390214dc.body.gz",
       "SHA256": "770b912084d9cc76cf8f93f71b77f5e10044422722d4ddfed3d3a800390214dc",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=30"
     },
@@ -2023,7 +2023,7 @@
       "抓取时间UTC": "2026-10-01T12:57:47.668+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\30426ea5f39f47dc230c419d157e6514d894177972363e3c3a59cbf8891edab3.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\30426ea5f39f47dc230c419d157e6514d894177972363e3c3a59cbf8891edab3.body.gz",
       "SHA256": "30426ea5f39f47dc230c419d157e6514d894177972363e3c3a59cbf8891edab3",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=31"
     },
@@ -2034,7 +2034,7 @@
       "抓取时间UTC": "2026-10-01T12:57:48.678+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\cb10c5359b4d3f944640f7d4c867c8ed88ce59c037e7ce12bae611b16875a612.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\cb10c5359b4d3f944640f7d4c867c8ed88ce59c037e7ce12bae611b16875a612.body.gz",
       "SHA256": "cb10c5359b4d3f944640f7d4c867c8ed88ce59c037e7ce12bae611b16875a612",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=32"
     },
@@ -2045,7 +2045,7 @@
       "抓取时间UTC": "2026-10-01T12:57:49.490+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\3447b8c8078811902d403e0b1fbf00d4ed8d5e31b9dd7079065dbdbadf2696f8.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\3447b8c8078811902d403e0b1fbf00d4ed8d5e31b9dd7079065dbdbadf2696f8.body.gz",
       "SHA256": "3447b8c8078811902d403e0b1fbf00d4ed8d5e31b9dd7079065dbdbadf2696f8",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=33"
     },
@@ -2056,7 +2056,7 @@
       "抓取时间UTC": "2026-10-01T12:57:50.341+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\f4033a77c5f51db640d48cc5b8de2050d64a7c89201bd8567de93b6911541d5a.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\f4033a77c5f51db640d48cc5b8de2050d64a7c89201bd8567de93b6911541d5a.body.gz",
       "SHA256": "f4033a77c5f51db640d48cc5b8de2050d64a7c89201bd8567de93b6911541d5a",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=34"
     },
@@ -2067,7 +2067,7 @@
       "抓取时间UTC": "2026-10-01T12:57:51.157+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\b162f7f051e69ae43b49d23d1ebef083c0dd9e5a61062a4dbe1976fbf649b8ad.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\b162f7f051e69ae43b49d23d1ebef083c0dd9e5a61062a4dbe1976fbf649b8ad.body.gz",
       "SHA256": "b162f7f051e69ae43b49d23d1ebef083c0dd9e5a61062a4dbe1976fbf649b8ad",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=35"
     },
@@ -2078,7 +2078,7 @@
       "抓取时间UTC": "2026-10-01T12:57:52.412+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\a935019a208b987b8f124fe7cfad7201b502ae5af4bd89c8d733cc74d145221a.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\a935019a208b987b8f124fe7cfad7201b502ae5af4bd89c8d733cc74d145221a.body.gz",
       "SHA256": "a935019a208b987b8f124fe7cfad7201b502ae5af4bd89c8d733cc74d145221a",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=36"
     },
@@ -2089,7 +2089,7 @@
       "抓取时间UTC": "2026-10-01T12:57:53.279+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\dc2a025b3b0f8eb874fbf181350670ebcb7466a939237d28d823ff2bb78316c6.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\dc2a025b3b0f8eb874fbf181350670ebcb7466a939237d28d823ff2bb78316c6.body.gz",
       "SHA256": "dc2a025b3b0f8eb874fbf181350670ebcb7466a939237d28d823ff2bb78316c6",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=37"
     },
@@ -2100,7 +2100,7 @@
       "抓取时间UTC": "2026-10-01T12:57:54.656+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\e5f46d6ad3d48f48226eb0699fd10d8a8256fd7e4e6a8bad5a5c62a6a211dc4e.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\e5f46d6ad3d48f48226eb0699fd10d8a8256fd7e4e6a8bad5a5c62a6a211dc4e.body.gz",
       "SHA256": "e5f46d6ad3d48f48226eb0699fd10d8a8256fd7e4e6a8bad5a5c62a6a211dc4e",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=38"
     },
@@ -2111,7 +2111,7 @@
       "抓取时间UTC": "2026-10-01T12:57:55.631+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\a6faf8cbd8b1cc53521d9a363c266cab1423b28bd6ce9e0f6e39d42edbde6a31.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\a6faf8cbd8b1cc53521d9a363c266cab1423b28bd6ce9e0f6e39d42edbde6a31.body.gz",
       "SHA256": "a6faf8cbd8b1cc53521d9a363c266cab1423b28bd6ce9e0f6e39d42edbde6a31",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=39"
     },
@@ -2122,7 +2122,7 @@
       "抓取时间UTC": "2026-10-01T12:57:56.752+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\cb94fa072088820fc01078322cb56ba545d113ded7e3e5eaad89ea3f3dd1e436.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\cb94fa072088820fc01078322cb56ba545d113ded7e3e5eaad89ea3f3dd1e436.body.gz",
       "SHA256": "cb94fa072088820fc01078322cb56ba545d113ded7e3e5eaad89ea3f3dd1e436",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=40"
     },
@@ -2133,7 +2133,7 @@
       "抓取时间UTC": "2026-10-01T12:57:58.027+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\77ed874b2a738dddd474d3b25107d0e7254a611d68fbdb19b4c53599175a326f.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\77ed874b2a738dddd474d3b25107d0e7254a611d68fbdb19b4c53599175a326f.body.gz",
       "SHA256": "77ed874b2a738dddd474d3b25107d0e7254a611d68fbdb19b4c53599175a326f",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=41"
     },
@@ -2144,7 +2144,7 @@
       "抓取时间UTC": "2026-10-01T12:57:58.762+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\de2436855748b816db0459e5adba82581d8372ffc7417dcc5a85d88f80273c4e.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\de2436855748b816db0459e5adba82581d8372ffc7417dcc5a85d88f80273c4e.body.gz",
       "SHA256": "de2436855748b816db0459e5adba82581d8372ffc7417dcc5a85d88f80273c4e",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=42"
     },
@@ -2155,7 +2155,7 @@
       "抓取时间UTC": "2026-10-01T12:57:59.920+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\cfe02b1c90d08a1123001f68c1938c5828404f63d9b48117aac89e2b9207360a.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\cfe02b1c90d08a1123001f68c1938c5828404f63d9b48117aac89e2b9207360a.body.gz",
       "SHA256": "cfe02b1c90d08a1123001f68c1938c5828404f63d9b48117aac89e2b9207360a",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=43"
     },
@@ -2166,7 +2166,7 @@
       "抓取时间UTC": "2026-10-01T12:58:00.764+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\acaae2d3a337b1753b89d4788c083c07964b58a52efc9929ccac67580e32da90.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\acaae2d3a337b1753b89d4788c083c07964b58a52efc9929ccac67580e32da90.body.gz",
       "SHA256": "acaae2d3a337b1753b89d4788c083c07964b58a52efc9929ccac67580e32da90",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=44"
     },
@@ -2177,7 +2177,7 @@
       "抓取时间UTC": "2026-10-01T12:58:01.746+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\9f06c56bee1c07db4236f7a07764b329372ff4a1987bd31f61ba9867a5f575c3.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\9f06c56bee1c07db4236f7a07764b329372ff4a1987bd31f61ba9867a5f575c3.body.gz",
       "SHA256": "9f06c56bee1c07db4236f7a07764b329372ff4a1987bd31f61ba9867a5f575c3",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=45"
     },
@@ -2188,7 +2188,7 @@
       "抓取时间UTC": "2026-10-01T12:58:02.610+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\35288d9b3bf6ce040184145e6a15e9a77313d5eebd4e57de654b3ead7495e518.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\35288d9b3bf6ce040184145e6a15e9a77313d5eebd4e57de654b3ead7495e518.body.gz",
       "SHA256": "35288d9b3bf6ce040184145e6a15e9a77313d5eebd4e57de654b3ead7495e518",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=46"
     },
@@ -2199,7 +2199,7 @@
       "抓取时间UTC": "2026-10-01T12:58:03.491+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\3680646f910521cddb61509f2a74f9050cf37ab401dcd354e46bc1d3f97daa74.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\3680646f910521cddb61509f2a74f9050cf37ab401dcd354e46bc1d3f97daa74.body.gz",
       "SHA256": "3680646f910521cddb61509f2a74f9050cf37ab401dcd354e46bc1d3f97daa74",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=47"
     },
@@ -2210,7 +2210,7 @@
       "抓取时间UTC": "2026-10-01T12:58:04.501+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\e7ba4f3e172efbdd8a641267833e5a13090190d4cd59bd34ce1742acdf721bf8.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\e7ba4f3e172efbdd8a641267833e5a13090190d4cd59bd34ce1742acdf721bf8.body.gz",
       "SHA256": "e7ba4f3e172efbdd8a641267833e5a13090190d4cd59bd34ce1742acdf721bf8",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=48"
     },
@@ -2221,7 +2221,7 @@
       "抓取时间UTC": "2026-10-01T12:58:05.759+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\dd0ad602fd6df8a67fa58bcc3061213352e8fa07b3b0b1cdc37b41b4b8eaabe8.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\dd0ad602fd6df8a67fa58bcc3061213352e8fa07b3b0b1cdc37b41b4b8eaabe8.body.gz",
       "SHA256": "dd0ad602fd6df8a67fa58bcc3061213352e8fa07b3b0b1cdc37b41b4b8eaabe8",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=49"
     },
@@ -2232,7 +2232,7 @@
       "抓取时间UTC": "2026-10-01T12:58:06.443+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\57d547b12b2deb36e1c20a7873aa2379c188f7ad53d975b72cd0f1a1ecc4afef.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\57d547b12b2deb36e1c20a7873aa2379c188f7ad53d975b72cd0f1a1ecc4afef.body.gz",
       "SHA256": "57d547b12b2deb36e1c20a7873aa2379c188f7ad53d975b72cd0f1a1ecc4afef",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=50"
     },
@@ -2243,7 +2243,7 @@
       "抓取时间UTC": "2026-10-01T12:58:07.260+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\1d93790f4476b9235c3a24bcc0e0cfe1bbc8a8be16346700b369d68d57c2b4f5.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\1d93790f4476b9235c3a24bcc0e0cfe1bbc8a8be16346700b369d68d57c2b4f5.body.gz",
       "SHA256": "1d93790f4476b9235c3a24bcc0e0cfe1bbc8a8be16346700b369d68d57c2b4f5",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=51"
     },
@@ -2254,7 +2254,7 @@
       "抓取时间UTC": "2026-10-01T12:58:07.872+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\61ecdef31e82086c589107dc0436c0c2b9938d0186d28fe0ba59a3dde678c59b.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\61ecdef31e82086c589107dc0436c0c2b9938d0186d28fe0ba59a3dde678c59b.body.gz",
       "SHA256": "61ecdef31e82086c589107dc0436c0c2b9938d0186d28fe0ba59a3dde678c59b",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=52"
     },
@@ -2265,7 +2265,7 @@
       "抓取时间UTC": "2026-10-01T12:58:08.890+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\fa418a16d036b482e5c3ecf0a23c0a58327ce4614b4a9201bcd8efba8945aeff.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\fa418a16d036b482e5c3ecf0a23c0a58327ce4614b4a9201bcd8efba8945aeff.body.gz",
       "SHA256": "fa418a16d036b482e5c3ecf0a23c0a58327ce4614b4a9201bcd8efba8945aeff",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=53"
     },
@@ -2276,7 +2276,7 @@
       "抓取时间UTC": "2026-10-01T12:58:09.602+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\f6221aec901e70a14c808fc5a0ebd4e016ab281cd963d3372426a92b6ae6b7f5.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\f6221aec901e70a14c808fc5a0ebd4e016ab281cd963d3372426a92b6ae6b7f5.body.gz",
       "SHA256": "f6221aec901e70a14c808fc5a0ebd4e016ab281cd963d3372426a92b6ae6b7f5",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=54"
     },
@@ -2287,7 +2287,7 @@
       "抓取时间UTC": "2026-10-01T12:58:10.710+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\b63bc5e5427af61c25c7caa46876e66a43842082b9fa2d3ead67838a04247aad.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\b63bc5e5427af61c25c7caa46876e66a43842082b9fa2d3ead67838a04247aad.body.gz",
       "SHA256": "b63bc5e5427af61c25c7caa46876e66a43842082b9fa2d3ead67838a04247aad",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=55"
     },
@@ -2298,7 +2298,7 @@
       "抓取时间UTC": "2026-10-01T12:58:11.537+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\651b321600f66f77f185e1158b3159ead0b1f9ee6232070daea46d8e8fe4cc0e.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\651b321600f66f77f185e1158b3159ead0b1f9ee6232070daea46d8e8fe4cc0e.body.gz",
       "SHA256": "651b321600f66f77f185e1158b3159ead0b1f9ee6232070daea46d8e8fe4cc0e",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=56"
     },
@@ -2309,7 +2309,7 @@
       "抓取时间UTC": "2026-10-01T12:58:12.609+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\dc609470faac96eb8ace2a15957120a80f8ac6aad67a554b32336ca3850112e6.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\dc609470faac96eb8ace2a15957120a80f8ac6aad67a554b32336ca3850112e6.body.gz",
       "SHA256": "dc609470faac96eb8ace2a15957120a80f8ac6aad67a554b32336ca3850112e6",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=57"
     },
@@ -2320,7 +2320,7 @@
       "抓取时间UTC": "2026-10-01T12:58:13.517+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\98f6d8bf85f710e6e5773c0bf9c4d608c2c4d3699d0cbbf60362c572e57358aa.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\98f6d8bf85f710e6e5773c0bf9c4d608c2c4d3699d0cbbf60362c572e57358aa.body.gz",
       "SHA256": "98f6d8bf85f710e6e5773c0bf9c4d608c2c4d3699d0cbbf60362c572e57358aa",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=58"
     },
@@ -2331,7 +2331,7 @@
       "抓取时间UTC": "2026-10-01T12:58:14.330+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\640f383bde2e1c5415a0774a740e67e911d39e72aa7b1afae2a2bdf9267d8dcf.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\640f383bde2e1c5415a0774a740e67e911d39e72aa7b1afae2a2bdf9267d8dcf.body.gz",
       "SHA256": "640f383bde2e1c5415a0774a740e67e911d39e72aa7b1afae2a2bdf9267d8dcf",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=59"
     },
@@ -2342,7 +2342,7 @@
       "抓取时间UTC": "2026-10-01T12:58:15.169+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\d087b8eb09611bd50956f530c3ae789f60d1c952af86072190e30ea2a510e5a5.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\d087b8eb09611bd50956f530c3ae789f60d1c952af86072190e30ea2a510e5a5.body.gz",
       "SHA256": "d087b8eb09611bd50956f530c3ae789f60d1c952af86072190e30ea2a510e5a5",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=60"
     },
@@ -2353,7 +2353,7 @@
       "抓取时间UTC": "2026-10-01T12:58:16.129+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\927095aa55a5a74c092b89925c031b653886724b84c0fee449a813bc647b3239.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\927095aa55a5a74c092b89925c031b653886724b84c0fee449a813bc647b3239.body.gz",
       "SHA256": "927095aa55a5a74c092b89925c031b653886724b84c0fee449a813bc647b3239",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=61"
     },
@@ -2364,7 +2364,7 @@
       "抓取时间UTC": "2026-10-01T12:58:16.948+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\71217ac518a67fcee5bc91b83916c981aa134f3f1fa840ec728dbb041f4ec6b4.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\71217ac518a67fcee5bc91b83916c981aa134f3f1fa840ec728dbb041f4ec6b4.body.gz",
       "SHA256": "71217ac518a67fcee5bc91b83916c981aa134f3f1fa840ec728dbb041f4ec6b4",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=62"
     },
@@ -2375,7 +2375,7 @@
       "抓取时间UTC": "2026-10-01T12:58:18.098+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\d9271d5a8610e8b7ab572cc267f07821722019627127e80478974a60235e9d9f.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\d9271d5a8610e8b7ab572cc267f07821722019627127e80478974a60235e9d9f.body.gz",
       "SHA256": "d9271d5a8610e8b7ab572cc267f07821722019627127e80478974a60235e9d9f",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=63"
     },
@@ -2386,7 +2386,7 @@
       "抓取时间UTC": "2026-10-01T12:58:18.912+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.body.gz",
       "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "原始请求URL": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c=sz000001&p=64"
     },
@@ -2397,7 +2397,7 @@
       "抓取时间UTC": "2026-10-01T12:58:19.738+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\ca6d11102c80e68faeb699a30b243bd695481005c3f37cb69ead5db7237f6f02.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\ca6d11102c80e68faeb699a30b243bd695481005c3f37cb69ead5db7237f6f02.body.gz",
       "SHA256": "ca6d11102c80e68faeb699a30b243bd695481005c3f37cb69ead5db7237f6f02",
       "原始请求URL": "https://qt.gtimg.cn/q=sz000001"
     },
@@ -2408,7 +2408,7 @@
       "抓取时间UTC": "2026-10-01T12:58:20.341+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998.body.gz",
       "SHA256": "e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998",
       "原始请求URL": "https://stock2.finance.sina.com.cn/futures/api/jsonp.php/var%20_RB0=/InnerFuturesNewService.getDailyKLine?symbol=RB0"
     },
@@ -2419,7 +2419,7 @@
       "抓取时间UTC": "2026-10-01T12:58:21.462+00:00",
       "HTTP状态": 200,
       "结果": "response",
-      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\docs\\provider-probes\\raw\\2026-10-01-v310-live\\bodies\\ecd7f264230e49f3ace244fee9ae7155093fbac8b61e7e9d0926d674c6d9d7f7.body.gz",
+      "原始响应文件": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\bodies\\ecd7f264230e49f3ace244fee9ae7155093fbac8b61e7e9d0926d674c6d9d7f7.body.gz",
       "SHA256": "ecd7f264230e49f3ace244fee9ae7155093fbac8b61e7e9d0926d674c6d9d7f7",
       "原始请求URL": "https://stock2.finance.sina.com.cn/futures/api/jsonp.php/var%20_M0=/InnerFuturesNewService.getDailyKLine?symbol=M0"
     }

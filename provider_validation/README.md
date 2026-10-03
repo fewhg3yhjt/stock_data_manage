@@ -13,7 +13,7 @@
 
 ## 覆盖表字段和判定
 
-覆盖度主表为 `coverage/a-stock-data-capability-inventory.csv`。每项至少包含能力项、验证结果、备注和原始返回文件，并保留审计来源字段及本轮解析/核验信息。判定值使用“通过 / 未通过”；没有可复查的本轮证据按未通过记录，备注中说明是接口失败、解析问题、范围有限还是尚未验证。详细证据路径指向本目录下的结果文件；外部项目生成的派生数据路径会明确保留为外部路径。
+旧版87项能力审计清单为 `coverage/a-stock-data-capability-inventory.csv`。逐接口完整报告为 `coverage/interface-coverage.csv`，阅读版工作簿为 `coverage/interface-coverage.xlsx`。完整报告有95行：87项上游能力、2条不计入分母的说明/参数变体，以及6条 `stock-data-analyse` 板块接口补充项。每行记录来源、类别、接口说明、调用方式、代码/测试代码、验证结果、返回样例及原始响应/解析结果引用。字段口径、状态统计和证据限制见 [接口测试覆盖度表说明](docs/interface-coverage-method.md)。
 
 ## 结果与原始响应
 
@@ -32,4 +32,4 @@ python provider_validation/tests/replay_sector_capability_archives.py
 
 该脚本只读取已保存证据并重建行业派生表，不请求网络。北交所历史覆盖结果可直接查看 `results/legacy/2026-10-01-security-board-coverage.json`；如需刷新，应显式传入 `--refresh`，新原始响应会进入 `results/raw/`。
 
-探针结果说明见 [验证运行手册](docs/a-stock-data-validation-runbook.md)，逐项状态见 [覆盖度 CSV](coverage/a-stock-data-capability-inventory.csv) 和 [阅读版工作簿](coverage/a-stock-data-capability-results.xlsx)。
+探针结果说明见 [验证运行手册](docs/a-stock-data-validation-runbook.md)。逐接口结果另有 `results/interface-records/` 下的 JSON 记录及 `results/interface-coverage-summary.json` 总结。主表可由 `python provider_validation/tests/build_interface_coverage.py` 从已留存证据重建；该脚本不请求网络。

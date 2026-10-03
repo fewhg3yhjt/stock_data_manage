@@ -1,0 +1,68 @@
+{
+  "interface_id": "SDA-BOARD-004",
+  "source": "stock-data-analyse / local Provider",
+  "validation_result": "通过",
+  "evidence_level": "原始HTTP响应已按 manifest/hash 归档",
+  "source_code_ref": "provider_validation/tests/source_snapshots/stock-data-analyse/warehouse/industry.py; provider_validation/tests/source_snapshots/stock-data-analyse/fundflow/sources.py; 上游 fundflow/sources.py:98；本项目 src/stock_data_manage/providers/akshare/boards.py:144 fetch_fund_flow",
+  "source_code_artifacts": [
+    {
+      "path": "provider_validation/tests/source_snapshots/stock-data-analyse/warehouse/industry.py",
+      "sha256": "23b7a750336c44356e41067ca48c1ca374221f9ca111190f1f43bdcfc889dc73"
+    },
+    {
+      "path": "provider_validation/tests/source_snapshots/stock-data-analyse/fundflow/sources.py",
+      "sha256": "98b7aed50d2ed325ddf545b5f0d270fb0f724dbd69bec46d488165d4237e1dff"
+    },
+    {
+      "path": "src/stock_data_manage/providers/akshare/boards.py",
+      "sha256": "2f8e988d652ecb2a5ecaeff665938be1a9aa6bf1d33e58628df66f706f99b5f4"
+    },
+    {
+      "path": "tests/test_sector_data_providers.py",
+      "sha256": "1643bb03759fb230d418d270036eb59d742aefe01724850962466a7897c58efa"
+    },
+    {
+      "path": "provider_validation/tests/replay_sector_capability_archives.py",
+      "sha256": "e6e9bbd83cf299df3c4de6ef1570edf6061413850e91988b84d8163081cc4d09"
+    }
+  ],
+  "test_code_ref": "tests/test_sector_data_providers.py:73; provider_validation/tests/replay_sector_capability_archives.py:196",
+  "manifest_ref": "provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson",
+  "response_artifacts": [],
+  "parsed_output_ref": "provider_validation/results/2026-10-02-sector-derived/ths-concept-fund-flow-now.csv",
+  "derived_artifacts": [
+    {
+      "path": "provider_validation/results/2026-10-02-sector-derived/ths-concept-fund-flow-now.csv",
+      "sha256": "4c5dd7d4fd07ddeb084bdbcee218aa2f786c756cecc392ff8cd906f2ca1ec65e",
+      "bytes": 50239,
+      "field_names": [
+        "board_type",
+        "period",
+        "rank",
+        "board_name",
+        "index_value",
+        "change_pct",
+        "money_inflow",
+        "money_outflow",
+        "net_inflow",
+        "company_count",
+        "leader_stock_name",
+        "leader_change_pct",
+        "leader_price",
+        "snapshot_at",
+        "source"
+      ],
+      "row_count": 387
+    }
+  ],
+  "coverage_denominator": null,
+  "scope": "即时；387行、387个唯一概念名",
+  "finding": "不是证券-概念成员关系；无逐行日期；金额单位未确认",
+  "sample": "{\"columns\": [\"board_type\", \"period\", \"rank\", \"board_name\", \"index_value\", \"change_pct\", \"money_inflow\", \"money_outflow\", \"net_inflow\", \"company_count\", \"leader_stock_name\", \"leader_change_pct\", \"leader_price\", \"snapshot_at\", \"source\"], \"sample\": {\"board_type\": \"concept\", \"period\": \"即时\", \"rank\": \"1\", \"board_name\": \"重组蛋白\", \"index_value\": \"851.771\", \"change_pct\": \"3.78\", \"money_inflow\": \"95.52\", \"money_outflow\": \"75.58\", \"net_inflow\": \"19.94\", \"company_count\": \"128\", \"leader_stock_name\": \"泰诺麦博\", \"leader_change_pct\": \"19.99\", \"leader_price\": \"30.67\", \"snapshot_at\": \"2026-10-02T15:42:34.284000+00:00\", \"source\": \"ths\"}}",
+  "source_version": "stock-data-analyse c26cabcf89443ec8f1445d0e5af86bf3d6dacf3; 本项目代码以当前工作树为准",
+  "transformation_code_version": {
+    "path": "provider_validation/tests/build_interface_coverage.py",
+    "sha256": "3e4ae63e410fa129a4efc2cce8e79973fd41959ef8fd709fcd3b9bfb137d3260"
+  },
+  "validation_time_utc": "2026-10-03T08:37:13.311139+00:00"
+}

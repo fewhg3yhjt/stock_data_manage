@@ -1,0 +1,39 @@
+{
+  "interface_id": "ASTOCK-077",
+  "source": "a-stock-data",
+  "validation_result": "通过",
+  "current_missing_probe_status": "not_run",
+  "evidence_level": "此前实时验证已保存原始响应；本轮补抓脚本结果另列，测试范围不自动视为相同。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:296 (上游内嵌接口说明/实现快照)",
+  "source_code_artifacts": [
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+    },
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py",
+      "sha256": "ec18390ee2be31b5f72f4a0ff7c85ef3753a086ee9c43693bea00b08cab0ce09"
+    }
+  ],
+  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py:1 (该版本测试快照；未找到专属用例时以清单证据注明)",
+  "manifest_ref": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+  "response_artifacts": [
+    {
+      "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/79788cd1e6502e3c31e4cceaf05596f4d903f82650ac80f971a5771c869ea655.body.gz",
+      "sha256": "79788cd1e6502e3c31e4cceaf05596f4d903f82650ac80f971a5771c869ea655",
+      "matches_filename": true
+    }
+  ],
+  "parsed_output_ref": "",
+  "derived_artifacts": [],
+  "coverage_denominator": 87,
+  "scope": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。",
+  "finding": "通过。对应联网测试返回非空数据并通过字段/来源检查；范围见原始请求清单。",
+  "sample": "{\"time\":[[\"2016-12-19\",262.45,262.76,262.02,263.5],[\"2016-12-20\",262.88,262.06,261.42,263.7],[\"2016-12-21\",262.4,260.97,258.6,262.65],[\"2016-12-22\",261.18,260.0,259.05,261.18],[\"2016-12-23\",258.95,260.07,258.7,260.37],[\"2016-12-26\",260.0,261.4,259.8,261.45],[\"2016-12-27\",261.4,261.67,260.6,261.79],[\"2016-12-28\",262.5,261.91,260.11,262.9],[\"2016-12-29\",261.6,262.99,260.8,263.2],[\"2016-12-30\",262.84,263.9,261.0,265.8],[\"2017-01-03\",264.04,263.65,258.0,265.2],[\"2017-01-04\",263.99,264.87,263.2,265.0],[\"2017-01-05\",265.98,264.73,264.0,265.98],[\"2017-01-06\",264.9,265.29,263.5,265.65],[\"2017-01-09\",265.06,265.89,264.66,266.0],[\"2017-01-10\",265.89,268.11,265.89,268.6],[\"2017-01-11\",268.88,269.09,26…",
+  "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
+  "transformation_code_version": {
+    "path": "provider_validation/tests/build_interface_coverage.py",
+    "sha256": "3e4ae63e410fa129a4efc2cce8e79973fd41959ef8fd709fcd3b9bfb137d3260"
+  },
+  "validation_time_utc": "2026-10-03T08:37:12.991853+00:00"
+}

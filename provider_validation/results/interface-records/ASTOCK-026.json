@@ -1,0 +1,57 @@
+{
+  "interface_id": "ASTOCK-026",
+  "source": "a-stock-data",
+  "validation_result": "部分通过",
+  "current_missing_probe_status": "success",
+  "evidence_level": "解析后输出已保存；本批未保存精确原始HTTP响应。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:733 (fetch_shareholder_count); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:252 (holder_num_change(code))",
+  "source_code_artifacts": [
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+      "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+    },
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+    }
+  ],
+  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:733 (CLI --run 24)",
+  "manifest_ref": "",
+  "response_artifacts": [],
+  "parsed_output_ref": "provider_validation/results/a-stock-data-missing-output/24_股东户数变化/data.csv",
+  "derived_artifacts": [
+    {
+      "path": "provider_validation/results/a-stock-data-missing-output/24_股东户数变化/data.csv",
+      "sha256": "e26e0eeec82f4a420ee212aeaa820207bfa08ade6c00fcf36dc3c098a35800ac",
+      "bytes": 9934,
+      "field_names": [
+        "股东户数统计截止日",
+        "区间涨跌幅",
+        "股东户数-本次",
+        "股东户数-上次",
+        "股东户数-增减",
+        "股东户数-增减比例",
+        "户均持股市值",
+        "户均持股数量",
+        "总市值",
+        "总股本",
+        "股本变动",
+        "股本变动原因",
+        "股东户数公告日期",
+        "代码",
+        "名称"
+      ],
+      "row_count": 63
+    }
+  ],
+  "coverage_denominator": 87,
+  "scope": "解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。 本次只核验了本行注明的样例范围。 a_stock_missing_output\\24_股东户数变化\\data.csv [CSV行数=63]",
+  "finding": "通过：解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。；脚本结果 success：saved 1 file(s)。解析结果非空；未留精确原始响应。",
+  "sample": "{\"columns\": [\"股东户数统计截止日\", \"区间涨跌幅\", \"股东户数-本次\", \"股东户数-上次\", \"股东户数-增减\", \"股东户数-增减比例\", \"户均持股市值\", \"户均持股数量\", \"总市值\", \"总股本\", \"股本变动\", \"股本变动原因\", \"股东户数公告日期\", \"代码\", \"名称\"], \"sample\": {\"股东户数统计截止日\": \"2013-03-22\", \"区间涨跌幅\": \"-19.122572\", \"股东户数-本次\": \"69331\", \"股东户数-上次\": \"49870\", \"股东户数-增减\": \"19461\", \"股东户数-增减比例\": \"39.023460998596\", \"户均持股市值\": \"2531397.62876635\", \"户均持股数量\": \"14974.2539412384\", \"总市值\": \"175504329000.0\", \"总股本\": \"1038180000\", \"股本变动\": \"0\", \"股本变动原因\": \"\", \"股东户数公告日期\": \"2013-03-29\", \"代码\": \"600519\", \"名称\": \"贵州茅台\"}}",
+  "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
+  "transformation_code_version": {
+    "path": "provider_validation/tests/build_interface_coverage.py",
+    "sha256": "3e4ae63e410fa129a4efc2cce8e79973fd41959ef8fd709fcd3b9bfb137d3260"
+  },
+  "validation_time_utc": "2026-10-03T08:37:11.730211+00:00"
+}

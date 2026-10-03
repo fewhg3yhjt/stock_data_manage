@@ -1,0 +1,22 @@
+{
+  "record_type": "interface_coverage_report_summary",
+  "generated_at_utc": "2026-10-03T08:37:13.675318+00:00",
+  "report": "provider_validation/coverage/interface-coverage.csv",
+  "row_count": 95,
+  "counted_a_stock_data_capabilities": 87,
+  "non_counted_inventory_explanatory_rows": 2,
+  "stock_data_analyse_board_interfaces": 6,
+  "counted_result_counts": {
+    "部分通过": 42,
+    "通过": 26,
+    "未通过": 18,
+    "未验证": 1
+  },
+  "missing_output_summary_rows": 61,
+  "missing_output_summary_matched_inventory": 61,
+  "missing_output_summary_unmatched_ids": [],
+  "retained_raw_response_bodies_hash_checked": 114,
+  "retained_raw_response_hash_failures": 0,
+  "source_snapshot_manifest": "provider_validation/tests/source_snapshots/manifest.json",
+  "raw_response_integrity_scope": "Existing raw manifests/bodies reused; no network requests made by this builder."
+}

@@ -1,0 +1,49 @@
+{
+  "interface_id": "ASTOCK-066",
+  "source": "a-stock-data",
+  "validation_result": "通过",
+  "current_missing_probe_status": "not_run",
+  "evidence_level": "此前实时验证已保存原始响应；本轮补抓脚本结果另列，测试范围不自动视为相同。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:286 (上游内嵌接口说明/实现快照)",
+  "source_code_artifacts": [
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+    },
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py",
+      "sha256": "ec18390ee2be31b5f72f4a0ff7c85ef3753a086ee9c43693bea00b08cab0ce09"
+    }
+  ],
+  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py:1 (该版本测试快照；未找到专属用例时以清单证据注明)",
+  "manifest_ref": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+  "response_artifacts": [
+    {
+      "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/20aa9d6503b285ea24a9abe6757464bf039a1aaa21fbe38b8cd7d681bc07bdfc.body.gz",
+      "sha256": "20aa9d6503b285ea24a9abe6757464bf039a1aaa21fbe38b8cd7d681bc07bdfc",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/4577d33c3e12fc8f5a636023a075355fbee57c077dafb969464abdd23370671a.body.gz",
+      "sha256": "4577d33c3e12fc8f5a636023a075355fbee57c077dafb969464abdd23370671a",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/1611c59a139f218b2066e1df35526cb04c87bb73f2c8b6fcde7216740467df99.body.gz",
+      "sha256": "1611c59a139f218b2066e1df35526cb04c87bb73f2c8b6fcde7216740467df99",
+      "matches_filename": true
+    }
+  ],
+  "parsed_output_ref": "",
+  "derived_artifacts": [],
+  "coverage_denominator": 87,
+  "scope": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。",
+  "finding": "通过。对应联网测试返回非空数据并通过字段/来源检查；范围见原始请求清单。",
+  "sample": "{\"code\":20000,\"message\":\"OK\",\"data\":{\"items\":[{\"id\":15044,\"public_date\":1788192000,\"observation_date\":\"\",\"wscn_ticker\":\"\",\"country\":\"中国\",\"title\":\"报道：卓胜微全系列RF产品9月1日起调价\",\"event\":\"\",\"country_id\":\"CN\",\"quantity\":\"\",\"unit\":\"\",\"importance\":3,\"mark\":\"\",\"push_status\":false,\"flag_uri\":\"https://wpimg-wscn.awtmt.com/cef1c0c9-42b2-420a-b2f0-661a89ba8876.jpg\",\"calendar_key\":\"\",\"actual\":\"\",\"forecast\":\"\",\"previous\":\"\",\"revised\":\"\",\"period\":\"\",\"calendar_type\":\"FE\",\"subscribe_status\":false,\"uri\":\"\",\"assets\":\"\",\"foresight\":\"前瞻 | 据报道，国内射频前端龙头企业卓胜微向全体客户及合作伙伴正式发布产品调价通知函，宣布对公司全系列 RF 产品执行价格调整，本次调价将于2026 年 9 月 1 日正式生效。\"},{\"id\":15043,\"public_date\":1788192000,\"observation_date\":\"\",\"wscn_ticker\":\"\",\"country\":\"美国\",\"ti…",
+  "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
+  "transformation_code_version": {
+    "path": "provider_validation/tests/build_interface_coverage.py",
+    "sha256": "3e4ae63e410fa129a4efc2cce8e79973fd41959ef8fd709fcd3b9bfb137d3260"
+  },
+  "validation_time_utc": "2026-10-03T08:37:12.776456+00:00"
+}

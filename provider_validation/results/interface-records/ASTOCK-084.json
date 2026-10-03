@@ -1,0 +1,49 @@
+{
+  "interface_id": "ASTOCK-084",
+  "source": "a-stock-data",
+  "validation_result": "通过",
+  "current_missing_probe_status": "not_run",
+  "evidence_level": "此前实时验证已保存原始响应；本轮补抓脚本结果另列，测试范围不自动视为相同。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:304 (上游内嵌接口说明/实现快照)",
+  "source_code_artifacts": [
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+    },
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py",
+      "sha256": "ec18390ee2be31b5f72f4a0ff7c85ef3753a086ee9c43693bea00b08cab0ce09"
+    }
+  ],
+  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py:1 (该版本测试快照；未找到专属用例时以清单证据注明)",
+  "manifest_ref": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+  "response_artifacts": [
+    {
+      "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5.body.gz",
+      "sha256": "ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e.body.gz",
+      "sha256": "2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e",
+      "matches_filename": true
+    },
+    {
+      "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb.body.gz",
+      "sha256": "23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb",
+      "matches_filename": true
+    }
+  ],
+  "parsed_output_ref": "",
+  "derived_artifacts": [],
+  "coverage_denominator": 87,
+  "scope": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。",
+  "finding": "通过。对应联网测试返回非空数据并通过字段/来源检查；范围见原始请求清单。",
+  "sample": "{\"version\":\"7a6ca2fd91ae0aab63387e82c4e5bcc1\",\"result\":{\"pages\":3,\"data\":[{\"SECURITY_CODE\":\"118077\",\"SECUCODE\":\"118077.SH\",\"TRADE_MARKET\":\"CNSESH\",\"SECURITY_NAME_ABBR\":\"莱特转债\",\"DELIST_DATE\":null,\"LISTING_DATE\":null,\"CONVERT_STOCK_CODE\":\"688150\",\"BOND_EXPIRE\":\"6\",\"RATING\":\"AA\",\"VALUE_DATE\":\"2026-09-29 00:00:00\",\"ISSUE_YEAR\":\"2026\",\"CEASE_DATE\":\"2032-09-28 00:00:00\",\"EXPIRE_DATE\":\"2032-09-29 00:00:00\",\"PAY_INTEREST_DAY\":\"09-29\",\"INTEREST_RATE_EXPLAIN\":\"本次发行的可转债票面利率设定为:第一年0.10%、第二年0.30%、第三年0.60%、第四年1.00%、第五年1.50%、第六年2.00%。\",\"BOND_COMBINE_CODE\":\"26270600001HMQ\",\"ACTUAL_ISSUE_SCALE\":5.24779,\"ISSUE_PRICE\":100,\"REMARK\":\"本次发行的可转债向发行人在股权登记日(2026年9月28日,T-1日)收市后中国结算上海分公司登记在册的原股东优先配售,原股东优先配售后余额(含原股东放弃优先…",
+  "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
+  "transformation_code_version": {
+    "path": "provider_validation/tests/build_interface_coverage.py",
+    "sha256": "3e4ae63e410fa129a4efc2cce8e79973fd41959ef8fd709fcd3b9bfb137d3260"
+  },
+  "validation_time_utc": "2026-10-03T08:37:13.074048+00:00"
+}

@@ -1,0 +1,58 @@
+{
+  "interface_id": "ASTOCK-046",
+  "source": "a-stock-data",
+  "validation_result": "部分通过",
+  "current_missing_probe_status": "success",
+  "evidence_level": "解析后输出已保存；本批未保存精确原始HTTP响应。",
+  "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:896 (fetch_broken_board_pool); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:272 (em_zb_pool(date))",
+  "source_code_artifacts": [
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+      "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+    },
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+    }
+  ],
+  "test_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:896 (CLI --run 44)",
+  "manifest_ref": "",
+  "response_artifacts": [],
+  "parsed_output_ref": "provider_validation/results/a-stock-data-missing-output/44_东财炸板池/data.csv",
+  "derived_artifacts": [
+    {
+      "path": "provider_validation/results/a-stock-data-missing-output/44_东财炸板池/data.csv",
+      "sha256": "a655b7abf2edac2375cc8e91f6ed0634bee9260ee78ad5a10b51fa17ad95f387",
+      "bytes": 2083,
+      "field_names": [
+        "序号",
+        "代码",
+        "名称",
+        "涨跌幅",
+        "最新价",
+        "涨停价",
+        "成交额",
+        "流通市值",
+        "总市值",
+        "换手率",
+        "涨速",
+        "首次封板时间",
+        "炸板次数",
+        "涨停统计",
+        "振幅",
+        "所属行业"
+      ],
+      "row_count": 12
+    }
+  ],
+  "coverage_denominator": 87,
+  "scope": "12行有字段；请求日期20261001，文件无日期字段，不能确认记录日期。 本项只部分返回或有未核准范围。 a_stock_missing_output\\44_东财炸板池\\data.csv [CSV行数=12]",
+  "finding": "部分：12行有字段；请求日期20261001，文件无日期字段，不能确认记录日期。；脚本结果 success：saved 1 file(s)。解析结果非空；未留精确原始响应。",
+  "sample": "{\"columns\": [\"序号\", \"代码\", \"名称\", \"涨跌幅\", \"最新价\", \"涨停价\", \"成交额\", \"流通市值\", \"总市值\", \"换手率\", \"涨速\", \"首次封板时间\", \"炸板次数\", \"涨停统计\", \"振幅\", \"所属行业\"], \"sample\": {\"序号\": \"1\", \"代码\": \"002262\", \"名称\": \"恩华药业\", \"涨跌幅\": \"5.720930099487305\", \"最新价\": \"22.73\", \"涨停价\": \"23.65\", \"成交额\": \"670320320\", \"流通市值\": \"20088235412.65\", \"总市值\": \"23024840467.52\", \"换手率\": \"3.2964255809783936\", \"涨速\": \"0.0\", \"首次封板时间\": \"092500\", \"炸板次数\": \"1\", \"涨停统计\": \"0/0\", \"振幅\": \"5.581395149230957\", \"所属行业\": \"化学制药\"}}",
+  "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
+  "transformation_code_version": {
+    "path": "provider_validation/tests/build_interface_coverage.py",
+    "sha256": "3e4ae63e410fa129a4efc2cce8e79973fd41959ef8fd709fcd3b9bfb137d3260"
+  },
+  "validation_time_utc": "2026-10-03T08:37:12.249702+00:00"
+}
