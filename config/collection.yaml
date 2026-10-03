@@ -32,7 +32,7 @@ markets:
     include_opening_auction: false
     include_closing_auction: true
 
-# 采集意图；覆盖范围及调度执行另行设计。
+# 通用模板保留为采集意图；腾讯专用模板供现有调度器执行候选采集。
 collection_profiles:
   market_intraday:
     mode: intraday
@@ -64,3 +64,48 @@ collection_profiles:
     mode: daily
     business_day: source_calendar
     scheduling_enabled: false
+
+  # frequency 是频率唯一来源；请求间隔仍由 providers.yaml 单独限制。
+  # 天间隔按日历日计算，交易日门禁另行生效。interval > 1 时须配置 anchor_date。
+  tencent_market_snapshot:
+    mode: after_close
+    frequency:
+      unit: day
+      interval: 1
+      at: "15:10"
+    business_day: trading_day
+    universe: all_stock
+    scheduling_enabled: false  # 批量能力及覆盖证据尚未完成，不能自动启动。
+    settle_delay_seconds: 0
+    trigger_grace_seconds: 30
+  tencent_daily:
+    mode: after_close
+    frequency:
+      unit: day
+      interval: 1
+      at: "16:20"
+    business_day: trading_day
+    universe: static  # 调度覆盖范围后续确认；不继承快照的全市场范围。
+    scheduling_enabled: false
+  tencent_minute_5m:
+    mode: intraday
+    frequency:
+      unit: minute
+      interval: 5
+    business_day: trading_day
+    universe: watchlist
+    max_symbols: 200
+    settle_delay_seconds: 5
+    trigger_grace_seconds: 30
+    scheduling_enabled: false
+  tencent_minute_1m:
+    mode: intraday
+    frequency:
+      unit: minute
+      interval: 1
+    business_day: trading_day
+    universe: watchlist
+    max_symbols: 200
+    settle_delay_seconds: 2
+    trigger_grace_seconds: 30
+    scheduling_enabled: false  # 1分钟输入未独立验证，尚无新输入契约绑定。

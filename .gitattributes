@@ -25,3 +25,24 @@
 
 # Response payloads and SDK source snapshots are byte archives, including when they resemble text.
 /provider_validation/results/input-*-20261003/**/bodies/*.bin binary
+
+# Tencent frequency implementation: source hashes and immutable offline evidence.
+/config/collection.yaml text eol=lf
+/config/providers.yaml text eol=lf
+/src/stock_data_manage/cli.py text eol=lf
+/src/stock_data_manage/config/loader.py text eol=lf
+/src/stock_data_manage/providers/tencent/snapshot.py text eol=lf
+/src/stock_data_manage/storage/metadata.py text eol=lf
+/src/stock_data_manage/worker/scheduler.py text eol=lf
+/tests/test_cli.py text eol=lf
+/tests/test_scheduler.py text eol=lf
+/tests/test_provider_contract_adapters.py text eol=lf
+/provider_validation/tests/prepare_capability_results.py text eol=lf
+/provider_validation/results/input-scheduling*-20261003/** -text whitespace=cr-at-eol
+/provider_validation/results/input-scheduling*-20261003/**/*.bin binary
+/provider_validation/results/input-scheduling*-20261003/**/*.duckdb binary
+/provider_validation/results/2026-10-03-tencent-scheduling-*.xml -text whitespace=cr-at-eol
+/provider_validation/results/2026-10-03-tencent-scheduling-*.json -text whitespace=cr-at-eol
+/provider_validation/coverage/successful-input-capabilities-20261003-scheduling.* -text whitespace=cr-at-eol
+
+/provider_validation/coverage/successful-input-capabilities-20261003-scheduling-release.* -text whitespace=cr-at-eol

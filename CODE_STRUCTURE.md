@@ -29,6 +29,8 @@ Provider 接口验证资料统一位于 `provider_validation/`：`tests/` 保存
 
 `config/datasets/minute_bar_5m.yaml`、`limit_up_pool.yaml`、`trading_calendar.yaml` 分别定义三种输入的字段类型/单位/必填约束/主键；`config/normalization/` 下的同名文件定义来源映射与转换规则。`results/2026-10-03-yaml-input-collection-verification.json` 关联测试、最终回放、在线证据及当前代码/配置哈希。当前实现版能力清单位于 `coverage/successful-input-capabilities-20261003-implemented.csv/json`，保留第一阶段无日期版本。`results/sdk-snapshot-redaction-20261003.json` 记录本次生成的 SDK 源码快照脱敏，不改变 HTTP 响应与来源数据。
 
+腾讯采集频率与全市场快照配置见 `provider_validation/docs/2026-10-03-tencent-collection-scheduling.md`；独立四种策略写在既有 `collection.yaml`，输入契约引用具体策略。当前周期采集只生成候选，快照迁移和独立1分钟输入尚未完成。最终离线证据位于 `results/input-scheduling-accepted-20261003/`，测试和总索引位于 `results/2026-10-03-tencent-scheduling-tests-final.xml` 与同前缀 `verification.json`，能力清单采用独立的 `coverage/successful-input-capabilities-20261003-scheduling-release.csv/json` 版本。原 `schedules.yaml` 固定任务保留，未启动后台进程或管理台。
+
 `.gitattributes` 对本次新证据目录禁用 Git 换行转换，并固定新增实现/模板的 LF 格式，避免提交和检出改变证据字节及其 SHA-256 引用；不更改旧证据属性。
 
 ## 领域模型
@@ -47,7 +49,7 @@ Provider 接口验证资料统一位于 `provider_validation/`：`tests/` 保存
 | `providers/contracts.py` | HTTP 响应、失败分类、返回窗口和 Provider Contract |
 | `providers/transport.py` | 公共 HTTP 传输、共享请求组限速、单项输入会话捕获与严格回放、快照和 TDX 行解析；保留来源会话/代理并复用原验证重试策略 |
 | `providers/tencent/daily.py` | Tencent 既有日线采集与明确日期窗口的前复权候选输入；共享源码合同的主机回退 |
-| `providers/tencent/snapshot.py` | Tencent 批量收盘快照 |
+| `providers/tencent/snapshot.py` | Tencent 指定证券分批快照，保留归档 GBK 解码；全市场在线验证待完成 |
 | `providers/tencent/minute.py` | Tencent 原生 1m 分钟线与最近 5m 候选输入 |
 | `providers/sina/calendar.py` | 原 SDK 新浪交易日历来源适配，返回明确的正向日期并复用现有日历协议 |
 | `providers/eastmoney/limit_pool.py` | 原 SDK 东财涨停池日期快照，保留中文来源字段 |
@@ -108,7 +110,7 @@ Provider 接口验证资料统一位于 `provider_validation/`：`tests/` 保存
 | 文件 | 职责 |
 |---|---|
 | `pipeline/daily.py` | 日线按来源补缺、标准化、校验、候选生成和发布编排 |
-| `pipeline/inputs.py` | 单项配置输入的采集/回放、原响应留证、来源行及按 YAML 映射的候选输出；不注册正式路由 |
+| `pipeline/inputs.py` | 单项输入及按周期触发的候选采集/回放；共享限速、独立候选 Attempt 幂等状态、响应留证及 YAML 映射；不注册正式路由 |
 | `pipeline/daily_reconciliation.py` | 日线 provisional/final 合并、缺失统计和盘后校准 |
 | `pipeline/minute.py` | Watchlist 实时分钟采集和 Hot Store 写入 |
 | `pipeline/minute_reconciliation.py` | 分钟盘后校准、final 提升、冲突隔离和完整性处理 |
@@ -125,7 +127,7 @@ Provider 接口验证资料统一位于 `provider_validation/`：`tests/` 保存
 | `storage/raw.py` | 不覆盖的 Raw Object Store、解析前响应字节/清单、哈希复查、脱敏和匹配有效响应复用 |
 | `storage/hot.py` | SQLite WAL Hot Minute Store 和即时查询数据 |
 | `storage/parquet.py` | Canonical Parquet 分区、Manifest、文件锁和原子发布 |
-| `storage/metadata.py` | DuckDB 元数据、Attempt、Provider 健康、Probe 验证记录、既有能力证据查询和冲突记录；不新增能力管理数据库 |
+| `storage/metadata.py` | DuckDB 元数据、Attempt 及调度周期的原子占用、Provider 健康、Probe 验证记录、既有能力证据查询和冲突记录；不新增能力管理数据库 |
 | `storage/integrity.py` | 确定性 row hash、Manifest 生成和完整性校验 |
 | `storage/__init__.py` | 存储包说明，不承载业务实现 |
 
@@ -146,10 +148,10 @@ Provider 接口验证资料统一位于 `provider_validation/`：`tests/` 保存
 |---|---|
 | `worker/attempts.py` | Collection Attempt 状态机和租约状态 |
 | `worker/recovery.py` | 中断后的临时文件、Canonical 和元数据恢复扫描 |
-| `worker/scheduler.py` | Phase 1 配置化任务时间表和按日幂等调度 |
+| `worker/scheduler.py` | 既有 Phase 1 固定任务时间表；输入配置的天/分钟周期、交易日/交易时段槽位、证券范围绑定及容量门禁 |
 | `worker/acceptance.py` | 离线验收回放和容量/恢复验收证据 |
 | `worker/__init__.py` | Worker 包说明，不承载业务实现 |
-| `cli.py` | `collect-input`、`probe-*`、`recover`、`acceptance-offline` 等入口，负责参数解析和现有流程组装 |
+| `cli.py` | `collect-due-inputs`（默认保存计划）、`collect-input`、`probe-*`、`recover`、`acceptance-offline` 等入口，负责参数解析和现有流程组装 |
 | `__init__.py` | 包级公共领域模型导出 |
 
 ## 迁移约束

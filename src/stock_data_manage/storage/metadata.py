@@ -262,6 +262,20 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
             ],
         )
 
+    def claim_attempt(self, attempt: CollectionAttempt, *, updated_at: datetime) -> bool:
+        """Reserve a new scheduler slot atomically using the existing attempt table."""
+        self.connection.execute("BEGIN TRANSACTION")
+        try:
+            if self.load_attempt(attempt.attempt_id) is not None:
+                self.connection.execute("ROLLBACK")
+                return False
+            self.save_attempt(attempt, updated_at=updated_at)
+            self.connection.execute("COMMIT")
+            return True
+        except Exception:
+            self.connection.execute("ROLLBACK")
+            raise
+
     def load_attempt(self, attempt_id: str) -> CollectionAttempt | None:
         row = self.connection.execute(
             """SELECT attempt_id, status, lease_owner, lease_acquired_at,

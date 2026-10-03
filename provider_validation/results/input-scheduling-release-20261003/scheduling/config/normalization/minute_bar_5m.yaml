@@ -1,0 +1,24 @@
+dataset: minute_bar_5m
+rules:
+  - id: tencent-recent-5m-input-v1
+    input_id: ASTOCK-002-5m
+    provider: tencent
+    endpoint: kline_5m
+    field_mapping: {trade_date: "0", bar_time: "0", open: "1", high: "3", low: "4", close: "2", volume: "5", turnover_rate_pct: "7"}
+    context_fields: {instrument_id: instrument_id, adjustment: adjustment}
+    null_values: [null, "", "-", "--", "None", "null"]
+    source_required_numeric: ["1", "2", "3", "4", "5"]
+    transforms:
+      open: {remove_commas: true}
+      high: {remove_commas: true}
+      low: {remove_commas: true}
+      close: {remove_commas: true}
+      trade_date: {format: "%Y%m%d%H%M"}
+      bar_time: {format: "%Y%m%d%H%M", timezone: Asia/Shanghai}
+      turnover_rate_pct: {multiplier: "0.01", remove_commas: true, nonfinite_is_null: true}
+    positive_fields: [open, high, low, close]
+    unverified_fields: [volume]
+    status: pending_validation
+    version: tencent-recent-5m-input-v1
+    evidence_refs: [ASTOCK-002]
+    notes: 第8个位置为换手率基点，不能作为成交额；成交量单位未独立核验，标准化输出置空，来源值仍保留。

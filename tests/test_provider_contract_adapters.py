@@ -551,6 +551,7 @@ def test_tencent_snapshot_adapter_parses_observed_quote_line() -> None:
     )
     result = provider.fetch_snapshot(["sh600519"], datetime(2026, 9, 11, tzinfo=timezone.utc))
     assert result.returned_symbols == {"sh600519"}
+    assert result.rows[0]["name"] == "贵州茅台"
     assert result.rows[0]["close"] == "1275.16"
     assert result.rows[0]["volume_unit"] == "lot"
 
@@ -569,3 +570,32 @@ def test_sina_snapshot_adapter_parses_observed_quote_line() -> None:
     assert result.returned_symbols == {"sh600519"}
     assert result.rows[0]["trade_date"] == "2026-09-11"
     assert result.rows[0]["volume_unit"] == "share"
+
+
+
+def test_tencent_snapshot_batches_entire_requested_scope_without_dropping_remainder():
+    symbols = tuple(f"sh{600000+i}" for i in range(203))
+    class BatchTransport:
+        def __init__(self):
+            self.requests = []
+        def get(self, url, *, params, timeout_seconds):
+            batch = url.split("q=", 1)[1].split(",")
+            self.requests.append(tuple(batch))
+            parts = ["-"] * 38
+            parts[1] = "测试股票"
+            parts[3:7] = ["10", "9", "9", "100"]
+            parts[30], parts[33], parts[34], parts[37] = "20260930150000", "11", "8", "1000"
+            body = "\n".join(f'v_{s}="{"~".join(parts)}";' for s in batch).encode("gbk")
+            return HttpResponse(200, {"content-type": "text/html; charset=GBK"}, body)
+    transport = BatchTransport()
+    provider = TencentSnapshotProvider(transport, minute_capability("tencent", "bulk_snapshot", 1))
+    result = provider.fetch_snapshot(symbols, datetime(2026, 9, 30, tzinfo=timezone.utc))
+    assert [len(b) for b in transport.requests] == [100, 100, 3]
+    assert result.requested_symbols == symbols and result.returned_symbols == set(symbols)
+    assert all(row["name"] == "测试股票" for row in result.rows)
+    for invalid in ([], [symbols[0], symbols[0]]):
+        with pytest.raises(ValueError):
+            provider.fetch_snapshot(invalid, datetime(2026, 9, 30, tzinfo=timezone.utc))
+    provider.max_symbols_per_request = 0
+    with pytest.raises(ValueError, match="batch size"):
+        provider.fetch_snapshot(symbols, datetime(2026, 9, 30, tzinfo=timezone.utc))

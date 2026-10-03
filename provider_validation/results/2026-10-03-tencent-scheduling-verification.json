@@ -1,0 +1,139 @@
+{
+  "validation_time_utc": "2026-10-03T16:03:57.543197+00:00",
+  "record_type": "tencent_collection_scheduling_verification",
+  "result": "passed",
+  "network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "tests": {
+    "tests": 226,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "test_artifact": {
+    "path": "provider_validation/results/2026-10-03-tencent-scheduling-tests-final.xml",
+    "sha256": "5cfe76cabd6d33da9c999cc7e714d12e2138a8c770a1e3c12b1d561fa9f2b37c"
+  },
+  "final_replay": {
+    "path": "provider_validation/results/input-scheduling-accepted-20261003/comparison.json",
+    "sha256": "4eed4abe87339f42f50b6d3eb8a491d984d1d6efc29c3d17d93245a4203e4d5c"
+  },
+  "scheduling_verification": {
+    "path": "provider_validation/results/input-scheduling-accepted-20261003/scheduling/verification.json",
+    "sha256": "eb11cedcf51bc7f0cbf543206def45dfb5f106684b93dedac4d56bafb6606155"
+  },
+  "capability_catalog": {
+    "path": "provider_validation/coverage/successful-input-capabilities-20261003-scheduling-release.json",
+    "sha256": "4a191554c0a5a8f1b54e3b2b5175c9f99595c1e6ad3ffb2a47fed4a70a4d2adf"
+  },
+  "capability_catalog_csv": {
+    "path": "provider_validation/coverage/successful-input-capabilities-20261003-scheduling-release.csv",
+    "sha256": "e89260da9c375a425ab377a696db0032a5335291bb2e1a6c4bd73b123b78a66d"
+  },
+  "source_and_config_files": [
+    {
+      "path": "config/collection.yaml",
+      "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d"
+    },
+    {
+      "path": "config/providers.yaml",
+      "sha256": "ed5c85ef3382d0a1ad8d22530b00c17686e49b3ea4a664d6db55bf1ff4a515f3"
+    },
+    {
+      "path": "src/stock_data_manage/cli.py",
+      "sha256": "a13ad48ec59248a82d5bc9aa354ad3f65ee1b558a4c302abfaa8868e9723ae5e"
+    },
+    {
+      "path": "src/stock_data_manage/config/loader.py",
+      "sha256": "4ab5ab3be574e1994c8380a80c8e9fbe56bcaa5d95cc5a527d61ef76b627c05c"
+    },
+    {
+      "path": "src/stock_data_manage/pipeline/inputs.py",
+      "sha256": "ddaa8065c273a5f21ad332355c0b0c698b4a6a8b0702e0ccd4a849a69090f824"
+    },
+    {
+      "path": "src/stock_data_manage/providers/tencent/snapshot.py",
+      "sha256": "bd279457d6915ded4639dca51184f23bd202dcbb52789e496641ad9b1e1ed5f8"
+    },
+    {
+      "path": "src/stock_data_manage/storage/metadata.py",
+      "sha256": "d835815edf39919223a445403022790ea06a68290a13ef9038d40769d04d9a23"
+    },
+    {
+      "path": "src/stock_data_manage/worker/scheduler.py",
+      "sha256": "bf677464d2044ca3611383d5e5803401df19b59b13743af0d6c2a0d419017015"
+    },
+    {
+      "path": "provider_validation/tests/prepare_capability_results.py",
+      "sha256": "24333c8d399de7fb447edf2cfb9118cdc6a561f63374c1a26a20b9e9b1712da5"
+    },
+    {
+      "path": "provider_validation/tests/replay_input_capabilities.py",
+      "sha256": "5918435a05aa00615b560c54f8cbf8bffac11147120ad47530234b41bc536a12"
+    },
+    {
+      "path": "tests/test_cli.py",
+      "sha256": "7bc521339cf326151ba93d92a7aa2593b4154f0ebb87fee050f69ed25966a613"
+    },
+    {
+      "path": "tests/test_scheduler.py",
+      "sha256": "67ed1d53882bd8073f3c0aa1ed5bbf49ed8d85c4c43e4d2e67df8d220e1ef6aa"
+    },
+    {
+      "path": "tests/test_provider_contract_adapters.py",
+      "sha256": "82fb403165105234dfc8a978915ae841420133522706e942e05dbd54d273d3a2"
+    },
+    {
+      "path": "tests/test_input_collection.py",
+      "sha256": "38a198972b7700216dbce05f108948d74ebe81c7c1aaa83bc5f710a0002c1fe4"
+    },
+    {
+      "path": "CODE_STRUCTURE.md",
+      "sha256": "e361464097ff9295f82a96d25d830a9cdf715a5b2b68b801062c39fc8ec3f90c"
+    },
+    {
+      "path": ".gitattributes",
+      "sha256": "f396581a8393575b3940b2415b3edd4a8db8a233d3e7c2068665c76493c773d5"
+    },
+    {
+      "path": "provider_validation/docs/2026-10-03-tencent-collection-scheduling.md",
+      "sha256": "7596d7030b27094e8612818074fd4208c943f7a47294fdb85f003aed06294549"
+    }
+  ],
+  "coverage": {
+    "successful_source_interfaces": 73,
+    "configured_inputs": 74,
+    "synthetic_quote_requested_symbols": 203,
+    "synthetic_quote_returned_symbols": 203,
+    "synthetic_batch_sizes": [
+      100,
+      100,
+      3
+    ],
+    "scheduled_5m_candidate_rows": 96
+  },
+  "intermediate_failure": {
+    "classification": "Windows evidence persistence path length; not provider unavailability",
+    "failure_type": "FileNotFoundError",
+    "observed_temporary_absolute_path_length": 263,
+    "reproduction_archive": "provider_validation/results/input-scheduling-pathcheck-20261003",
+    "failed_runs": [
+      "provider_validation/results/input-scheduling-verified-20261003",
+      "provider_validation/results/input-scheduling-release-20261003"
+    ],
+    "fix": "short unique candidate run IDs; source bytes, original archive and UTC record times retained",
+    "regression": "tests/test_input_collection.py:test_candidate_response_archive_fits_nested_windows_path"
+  },
+  "intentionally_unimplemented": [
+    "snapshot input migration and verified transport equivalence",
+    "live batch and full-market coverage",
+    "independent new 1m input",
+    "single-day daily live equivalence",
+    "minute bar finality/unit semantics",
+    "production publication",
+    "history catchup/distributed coverage",
+    "background scheduler daemon",
+    "management console"
+  ]
+}

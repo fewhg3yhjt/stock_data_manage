@@ -283,3 +283,18 @@ def test_sdk_session_retry_policy_and_restoration(tmp_path):
             assert policy.is_retry("GET", 503, False)
             assert policy.increment(method="GET", error=ConnectionError()).get_backoff_time() >= 5
     assert requests.Session.__init__ is original_init
+
+
+
+def test_candidate_response_archive_fits_nested_windows_path(tmp_path, no_network):
+    padding = max(1, 130 - len(str(tmp_path.resolve())) - 1)
+    output = tmp_path / ("x" * padding)
+    report = collect_input(input_id="ASTOCK-002-5m", context={"request": {"symbol": "sz300750"}},
+                           config_root=ROOT / "config", output_root=output, replay_manifest=TENCENT_ARCHIVE)
+    assert report["status"] == "candidate_complete", report
+    assert len(Path(report["run_directory"]).name) == len("ASTOCK-002-5m-") + 12
+    manifest = Path(report["run_directory"]) / report["raw_manifest"]["path"]
+    for event in report["responses"]:
+        if event["outcome"] == "response":
+            assert len(str((manifest.parent / event["body_storage"]).resolve())) < 250
+            RawObjectStore.read_response(manifest, event)

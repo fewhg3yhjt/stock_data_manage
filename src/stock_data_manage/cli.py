@@ -71,7 +71,53 @@ def main(argv: list[str] | None = None) -> int:
     collect.add_argument("--fields", help="comma-separated declared output fields, including required fields")
     collect.add_argument("--calendar-file", type=Path, help="explicit saved calendar rows for date-snapshot validation")
 
+    due = subcommands.add_parser("collect-due-inputs", help="plan one scheduler tick, or explicitly execute candidate collection")
+    due.add_argument("--config-root", type=Path, default=Path("config"))
+    due.add_argument("--output-root", type=Path, required=True)
+    due.add_argument("--now", type=_parse_datetime, help="aware schedule time; defaults to current UTC time")
+    due.add_argument("--calendar-file", type=Path, required=True)
+    due.add_argument("--securities-file", type=Path, help="saved SecurityRecord array for all_stock scope")
+    due.add_argument("--symbol", action="append", default=[], help="explicit watchlist/static symbol; repeat for multiple symbols")
+    due.add_argument("--execute", action="store_true", help="execute enabled, implemented candidate inputs; default only saves a plan")
+    due.add_argument("--mode", choices=("replay", "live"), default="replay")
+    due.add_argument("--replay-manifest", type=Path)
+    due.add_argument("--evidence-root", type=Path)
+
     args = parser.parse_args(argv)
+    if args.command == "collect-due-inputs":
+        from .pipeline.inputs import collect_due_inputs
+        from .service.instruments import SecurityRecord
+        try:
+            rows = json.loads(args.calendar_file.read_text(encoding="utf-8"))
+            if not isinstance(rows, list):
+                raise ValueError("calendar file must contain date rows")
+            for row in rows:
+                if "is_trading_day" in row and type(row["is_trading_day"]) is not bool:
+                    raise ValueError("is_trading_day must be a boolean")
+            days = [date.fromisoformat(row["trade_date"]) for row in rows if row.get("is_trading_day", True)]
+            records = []
+            paths = [args.calendar_file]
+            if args.securities_file:
+                security_rows = json.loads(args.securities_file.read_text(encoding="utf-8"))
+                if not isinstance(security_rows, list):
+                    raise ValueError("securities file must contain SecurityRecord rows")
+                for row in security_rows:
+                    values = {**row, "exchange": Exchange(row["exchange"]), "asset_type": AssetType(row["asset_type"])}
+                    for field in ("list_date", "delist_date", "publish_date", "calculation_start_date"):
+                        if values.get(field) is not None:
+                            values[field] = date.fromisoformat(values[field])
+                    records.append(SecurityRecord(**values))
+                paths.append(args.securities_file)
+            report = collect_due_inputs(now=args.now or datetime.now(timezone.utc), config_root=args.config_root,
+                output_root=args.output_root, trading_dates=days, securities=records, symbols=args.symbol,
+                execute=args.execute, mode=args.mode, replay_manifest=args.replay_manifest,
+                evidence_root=args.evidence_root, dependency_paths=paths)
+        except (ValueError, TypeError, KeyError) as exc:
+            parser.error(str(exc))
+        print(json.dumps(report, ensure_ascii=False, default=_json_default, indent=2))
+        return 2 if any(job["status"] in {"blocked", "failed"} or
+                        (job["status"] == "already_attempted" and job.get("reason") != "validated")
+                        for job in report["jobs"]) else 0
     if args.command == "collect-input":
         from .pipeline.inputs import collect_input
         request_context = {k: v for k, v in {"symbol": args.symbol, "start_date": args.start_date,

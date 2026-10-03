@@ -78,6 +78,11 @@ def build_input_catalog(output_name="successful-input-capabilities"):
             "数据形态": contract.data_kind, "数据周期": contract.data_frequency, "请求形态": contract.request_shape,
             "参数来源": "; ".join(f"{p.name}<-{p.source} ({p.value_type}; {'必填' if p.required else '可选'})" for p in contract.parameters),
             "采集意图": contract.collection_profile, "刷新间隔秒": profiles[contract.collection_profile].refresh_interval_seconds,
+            "频率单位": profiles[contract.collection_profile].frequency_unit or "",
+            "频率间隔": profiles[contract.collection_profile].frequency_interval,
+            "日采集时间": profiles[contract.collection_profile].at_time.isoformat() if profiles[contract.collection_profile].at_time else "",
+            "采集范围": profiles[contract.collection_profile].universe,
+            "自动调度启用": profiles[contract.collection_profile].scheduling_enabled,
             "请求间隔秒": contract.request_interval_seconds, "并发": contract.effective_concurrency,
             "限速实现状态": contract.request_limit_enforcement, "实现状态": contract.implementation_status,
             "对应现有适配器": contract.runtime_endpoint or "", "归并到": contract.canonical_input or "",
@@ -100,7 +105,7 @@ def build_input_catalog(output_name="successful-input-capabilities"):
         return re.sub(r'(?i)([?&](?:ut|token|access_token)=)[^&\s;"\\]+', r'\1[REDACTED]', value)
 
     summary["reference_redaction_policy"] = "Token-like query values in copied references are redacted; original archives are unchanged."
-    serialized = json.dumps(summary, ensure_ascii=False, indent=2)
+    serialized = json.dumps(summary, ensure_ascii=False, indent=2, default=lambda value: value.isoformat())
     serialized = redact_reference(serialized)
     if not re.fullmatch(r"[A-Za-z0-9_-]+", output_name):
         raise ValueError("catalog output name must be a simple file stem")

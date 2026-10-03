@@ -1,0 +1,105 @@
+timezone: Asia/Shanghai
+storage:
+  raw_root: data/raw
+  canonical_root: data/canonical
+  metadata_path: metadata/metadata.duckdb
+  raw_retention_days:
+    daily_bar: 90
+    snapshot: 30
+    minute_bar_1m: 14
+realtime_minute:
+  enabled: true
+  universe: watchlist
+  max_watchlist_symbols: 200
+  cycle_deadline_seconds: 50
+  reject_full_market_universe: true
+  finalize_delay_seconds: 2
+  hot_store:
+    type: sqlite
+    path: data/hot/minute_hot.db
+    wal: true
+markets:
+  CN_A:
+    timezone: Asia/Shanghai
+    sessions:
+    - - 09:30
+      - '11:30'
+    - - '13:00'
+      - '15:00'
+    bar_time_semantics: end_time
+    expected_regular_minutes: 240
+    include_opening_auction: false
+    include_closing_auction: true
+collection_profiles:
+  market_intraday:
+    mode: intraday
+    refresh_interval_seconds: 60
+    business_day: trading_day
+    scheduling_enabled: false
+  news_intraday:
+    mode: intraday
+    refresh_interval_seconds: 300
+    business_day: calendar_day
+    scheduling_enabled: false
+  market_after_close:
+    mode: after_close
+    business_day: trading_day
+    scheduling_enabled: false
+  reference_daily:
+    mode: daily
+    business_day: trading_day
+    scheduling_enabled: false
+  event_daily:
+    mode: daily
+    business_day: calendar_day
+    scheduling_enabled: false
+  macro_daily:
+    mode: daily
+    business_day: calendar_day
+    scheduling_enabled: false
+  source_market_daily:
+    mode: daily
+    business_day: source_calendar
+    scheduling_enabled: false
+  tencent_market_snapshot:
+    mode: after_close
+    frequency:
+      unit: day
+      interval: 1
+      at: '15:10'
+    business_day: trading_day
+    universe: all_stock
+    scheduling_enabled: false
+    settle_delay_seconds: 0
+    trigger_grace_seconds: 30
+  tencent_daily:
+    mode: after_close
+    frequency:
+      unit: day
+      interval: 1
+      at: '16:20'
+    business_day: trading_day
+    universe: static
+    scheduling_enabled: false
+  tencent_minute_5m:
+    mode: intraday
+    frequency:
+      unit: minute
+      interval: 5
+    business_day: trading_day
+    universe: watchlist
+    max_symbols: 200
+    settle_delay_seconds: 5
+    trigger_grace_seconds: 30
+    scheduling_enabled: true
+  tencent_minute_1m:
+    mode: intraday
+    frequency:
+      unit: minute
+      interval: 1
+    business_day: trading_day
+    universe: watchlist
+    max_symbols: 200
+    settle_delay_seconds: 2
+    trigger_grace_seconds: 30
+    scheduling_enabled: false

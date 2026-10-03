@@ -1,0 +1,51 @@
+{
+  "input_id": "ASTOCK-002-5m",
+  "profile": "tencent_minute_5m",
+  "slot": "2026-09-30T13:05:00+08:00",
+  "symbols": [
+    "sz300750"
+  ],
+  "universe": "watchlist",
+  "status": "failed",
+  "reason": null,
+  "coverage_denominator": 1,
+  "results": [
+    {
+      "symbol": "sz300750",
+      "status": "failed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\input-scheduling-release-20261003\\scheduling\\candidate-ticks\\ASTOCK-002-5m-20261003T155745-c79b6473\\2026-10-03\\input_report\\tencent\\kline_5m\\report.json",
+      "report_sha256": "00830ed50efddccafe65df6a3d743a52970e5b5c45130fa913429a6a381b48dc",
+      "row_count": 0,
+      "code_version": "8f9c9c1a5e2f4eb7f82dfe85d0ffe59ec116de83858c80c4cd84f2d97a637ecb",
+      "source_response_hashes": []
+    }
+  ],
+  "validation_time_utc": "2026-10-03T15:57:45.219879+00:00",
+  "config_files": [
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\input-scheduling-release-20261003\\scheduling\\config\\collection.yaml",
+      "sha256": "8782fd8f6cc09439efd4f22b8e4a751edbcd7d9bc21d738a435f0ae123d613ce"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\input-scheduling-release-20261003\\scheduling\\config\\providers.yaml",
+      "sha256": "ed5c85ef3382d0a1ad8d22530b00c17686e49b3ea4a664d6db55bf1ff4a515f3"
+    }
+  ],
+  "code_files": [
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\pipeline\\inputs.py",
+      "sha256": "36af4aaa4bba257b5842044beb513bdf520c580702dafe8d7c7e16e310770e2e"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\worker\\scheduler.py",
+      "sha256": "bf677464d2044ca3611383d5e5803401df19b59b13743af0d6c2a0d419017015"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\config\\loader.py",
+      "sha256": "4ab5ab3be574e1994c8380a80c8e9fbe56bcaa5d95cc5a527d61ef76b627c05c"
+    }
+  ],
+  "universe_completeness_verified": false,
+  "successful_symbol_count": 0,
+  "coverage_semantics": "candidate results per requested security; bar freshness/completeness not certified"
+}

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from datetime import date, datetime, timezone
+from datetime import date, datetime, time, timezone
 from typing import Any, Mapping
 import math
 
@@ -186,24 +186,71 @@ class CollectionProfile:
     refresh_interval_seconds: float | None
     business_day: str
     scheduling_enabled: bool = False
+    frequency_unit: str | None = None
+    frequency_interval: int = 1
+    at_time: time | None = None
+    anchor_date: date | None = None
+    settle_delay_seconds: int = 0
+    trigger_grace_seconds: int = 30
+    universe: str = "static"
+    max_symbols: int | None = None
 
 
 def load_collection_profiles(path: str | Path) -> tuple[CollectionProfile, ...]:
     payload = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
     profiles = []
     for name, item in payload.get("collection_profiles", {}).items():
-        if item.get("scheduling_enabled", False):
-            raise ValueError("input collection profiles describe intent; scheduling is not implemented")
         mode = str(item["mode"])
         if mode not in {"intraday", "after_close", "daily", "periodic", "manual"}:
             raise ValueError(f"unsupported collection mode: {mode}")
+        enabled = item.get("scheduling_enabled", False)
+        if type(enabled) is not bool:
+            raise ValueError("scheduling_enabled must be a boolean")
         interval = item.get("refresh_interval_seconds")
         if interval is not None and (type(interval) not in {int, float} or not math.isfinite(interval) or interval <= 0):
             raise ValueError("refresh interval must be finite and positive")
         business_day = str(item["business_day"])
         if business_day not in {"trading_day", "calendar_day", "source_calendar"}:
             raise ValueError(f"unsupported business day: {business_day}")
-        profiles.append(CollectionProfile(name, mode, interval, business_day))
+        frequency = item.get("frequency")
+        if frequency is None:
+            if enabled:
+                raise ValueError("scheduling is not implemented without an explicit frequency")
+            profiles.append(CollectionProfile(name, mode, interval, business_day))
+            continue
+        if not isinstance(frequency, dict) or frequency.get("unit") not in {"day", "minute"}:
+            raise ValueError("frequency unit must be day or minute")
+        if interval is not None:
+            raise ValueError("frequency and refresh_interval_seconds must not both be configured")
+        unit, count = frequency["unit"], frequency.get("interval", 1)
+        if type(count) is not int or count < 1:
+            raise ValueError("frequency interval must be a positive integer")
+        at = time.fromisoformat(str(frequency["at"])) if frequency.get("at") is not None else None
+        anchor = date.fromisoformat(str(frequency["anchor_date"])) if frequency.get("anchor_date") is not None else None
+        if at is not None and (at.tzinfo is not None or at.microsecond):
+            raise ValueError("frequency at must be a local time without fractions")
+        if unit == "day" and (at is None or (count > 1 and anchor is None)):
+            raise ValueError("day frequency requires at, and intervals above one require anchor_date")
+        if unit == "minute" and business_day != "trading_day":
+            raise ValueError("minute scheduling requires trading_day and market sessions")
+        if business_day == "source_calendar":
+            raise ValueError("source_calendar frequency scheduling requires a source calendar implementation")
+        delay, grace = item.get("settle_delay_seconds", 0), item.get("trigger_grace_seconds", 30)
+        if type(delay) is not int or delay < 0 or type(grace) is not int or grace < 1:
+            raise ValueError("settle delay must be non-negative and trigger grace positive")
+        if unit == "minute" and (delay + grace >= count * 60):
+            raise ValueError("minute trigger window must be shorter than its interval")
+        universe, limit = item.get("universe", "static"), item.get("max_symbols")
+        if universe not in {"all_stock", "watchlist", "static"}:
+            raise ValueError("unsupported collection universe")
+        if limit is not None and (type(limit) is not int or limit < 1):
+            raise ValueError("max_symbols must be a positive integer")
+        if universe == "all_stock" and limit is not None:
+            raise ValueError("all_stock must not silently truncate the security universe")
+        effective_mode = "intraday" if unit == "minute" else ("after_close" if mode == "after_close" else "daily")
+        profiles.append(CollectionProfile(name, effective_mode,
+            count * (60 if unit == "minute" else 86400), business_day, enabled,
+            unit, count, at, anchor, delay, grace, universe, limit))
     return tuple(profiles)
 
 

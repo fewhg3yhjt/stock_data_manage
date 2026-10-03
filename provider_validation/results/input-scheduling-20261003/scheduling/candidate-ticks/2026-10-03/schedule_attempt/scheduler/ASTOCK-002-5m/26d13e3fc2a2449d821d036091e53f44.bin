@@ -1,0 +1,53 @@
+{
+  "input_id": "ASTOCK-002-5m",
+  "profile": "tencent_minute_5m",
+  "slot": "2026-09-30T13:05:00+08:00",
+  "symbols": [
+    "sz300750"
+  ],
+  "universe": "watchlist",
+  "status": "candidate_complete",
+  "reason": null,
+  "coverage_denominator": 1,
+  "results": [
+    {
+      "symbol": "sz300750",
+      "status": "candidate_complete",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\input-scheduling-20261003\\scheduling\\candidate-ticks\\ASTOCK-002-5m-20261003T154602-ea004c0a\\2026-10-03\\input_report\\tencent\\kline_5m\\report.json",
+      "report_sha256": "12d501f9652158d1a44541c93532f260937d31fe61406d538a7589b66b3b0084",
+      "row_count": 96,
+      "code_version": "799ede626e936002eb22a8d028c32a455a4f180097b6ccfcca52247646f11b71",
+      "source_response_hashes": [
+        "1e8158ec28e8e3262a284fd3d092e1c2bd33e3777cb057ddab140633fa8954cd"
+      ]
+    }
+  ],
+  "validation_time_utc": "2026-10-03T15:46:02.064063+00:00",
+  "config_files": [
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\input-scheduling-20261003\\scheduling\\config\\collection.yaml",
+      "sha256": "8782fd8f6cc09439efd4f22b8e4a751edbcd7d9bc21d738a435f0ae123d613ce"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\input-scheduling-20261003\\scheduling\\config\\providers.yaml",
+      "sha256": "ed5c85ef3382d0a1ad8d22530b00c17686e49b3ea4a664d6db55bf1ff4a515f3"
+    }
+  ],
+  "code_files": [
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\pipeline\\inputs.py",
+      "sha256": "bb077ab1a1c43095152c409d9d06dcdd320fde6882756bb7d96df98af11677ca"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\worker\\scheduler.py",
+      "sha256": "420e7c2a4773c75e2bbbb7c36a94f0aca23925f270f11daa4e7e0b0787892b22"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\config\\loader.py",
+      "sha256": "daf6213f363b6642875dd871eb5c7fa253b04aebcc4d9b2c5e231861a1508c54"
+    }
+  ],
+  "universe_completeness_verified": false,
+  "successful_symbol_count": 1,
+  "coverage_semantics": "candidate results per requested security; bar freshness/completeness not certified"
+}

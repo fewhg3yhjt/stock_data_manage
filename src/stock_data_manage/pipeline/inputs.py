@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import hashlib
-from datetime import datetime, timezone
+from dataclasses import asdict, replace
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from uuid import uuid4
 
@@ -25,12 +26,7 @@ def _json_value(value):
     return str(value)
 
 
-def collect_input(*, input_id, context, config_root, output_root, mode="replay", replay_manifest=None,
-                  evidence_root=None, fields=None, client=None, pacer=None):
-    """One explicit input, candidate output only. Existing Bar publication flows are unchanged."""
-    config_root, output_root = Path(config_root), Path(output_root)
-    if mode not in {"live", "replay"} or (mode == "replay" and replay_manifest is None):
-        raise ValueError("replay requires an explicit manifest; only live/replay modes are supported")
+def _validate_candidate_root(config_root, output_root):
     # Avoid accidental writes through the manual input path into configured production stores.
     import yaml
     collection_document = yaml.safe_load((config_root / "collection.yaml").read_text(encoding="utf-8"))
@@ -42,6 +38,16 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
     hot_path = (project_root / collection_document.get("realtime_minute", {}).get("hot_store", {}).get("path", "data/hot")).resolve()
     if output_root.resolve().is_relative_to(hot_path.parent):
         raise ValueError("manual input outputs must be outside production hot store")
+    return project_root
+
+
+def collect_input(*, input_id, context, config_root, output_root, mode="replay", replay_manifest=None,
+                  evidence_root=None, fields=None, client=None, pacer=None):
+    """One explicit input, candidate output only. Existing Bar publication flows are unchanged."""
+    config_root, output_root = Path(config_root), Path(output_root)
+    if mode not in {"live", "replay"} or (mode == "replay" and replay_manifest is None):
+        raise ValueError("replay requires an explicit manifest; only live/replay modes are supported")
+    project_root = _validate_candidate_root(config_root, output_root)
     contracts = {c.input_id: c for c in load_input_capabilities(config_root / "providers.yaml")}
     if input_id not in contracts:
         raise ValueError("unknown input ID")
@@ -67,16 +73,16 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                   Path(__file__).parents[1] / "providers/eastmoney/limit_pool.py",
                   Path(__file__).parents[1] / "providers/sina/calendar.py"]
     code_version = hashlib.sha256(b"".join(path.read_bytes() for path in code_files)).hexdigest()
-    run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S") + "-" + uuid4().hex[:8]
+    # Response filenames contain a full SHA-256 plus a temporary suffix. Keep the
+    # run component short for Windows paths; UTC times remain in every evidence record.
+    run_id = uuid4().hex[:12]
     directory = output_root / f"{input_id}-{run_id}"
     directory.mkdir(parents=True, exist_ok=False)
     raw_store, result_store = RawObjectStore(directory / "_raw"), RawObjectStore(directory)
     normalized_context = _json_value(parameters)
     report = {"input_id": input_id, "dataset": contract.dataset, "mode": mode,
         "parameters": sanitized_metadata(normalized_context), "provider": contract.provider, "endpoint": contract.endpoint,
-        "collection_profile": _json_value(profile.__dict__) if hasattr(profile, "__dict__") else
-            {"name": profile.name, "mode": profile.mode, "refresh_interval_seconds": profile.refresh_interval_seconds,
-             "business_day": profile.business_day, "scheduling_enabled": False},
+        "collection_profile": _json_value(asdict(profile)),
         "request_interval_seconds": max(3, contract.request_interval_seconds),
         "effective_concurrency": 1, "request_limit_enforcement": "call_boundary_only",
         "adapter_version": provider.capability_version, "code_version": code_version,
@@ -182,3 +188,114 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
     report_ref = result_store.write_json(report, dataset="input_report", provider=contract.provider, endpoint=contract.endpoint,
                                         fetched_at=datetime.now(timezone.utc), attempt_id="report")
     return {**report, "run_directory": str(directory.resolve()), "report_path": str(report_ref.path.resolve())}
+
+
+def collect_due_inputs(*, now, config_root, output_root, trading_dates, securities=(), symbols=(),
+                       execute=False, mode="replay", replay_manifest=None, evidence_root=None,
+                       dependency_paths=(), collector=None):
+    """One scheduler tick, with durable attempts in candidate storage, never production publication."""
+    from ..domain import AttemptStatus
+    from ..storage.metadata import MetadataStore
+    from ..worker.attempts import CollectionAttempt
+    from ..worker.scheduler import plan_input_collection
+    from time import monotonic
+    import json
+
+    root, output = Path(config_root), Path(output_root)
+    if now.tzinfo is None:
+        raise ValueError("schedule time must be timezone-aware")
+    if mode not in {"live", "replay"}:
+        raise ValueError("only live/replay modes are supported")
+    if execute and mode == "live" and abs((datetime.now(timezone.utc) - now).total_seconds()) > 120:
+        raise ValueError("live scheduling requires current time; use replay to inspect historical slots")
+    _validate_candidate_root(root, output)
+    trading_dates, securities, symbols = tuple(trading_dates), tuple(securities), tuple(symbols)
+    jobs = plan_input_collection(root, now=now, trading_dates=trading_dates, securities=securities, symbols=symbols)
+    profiles = {p.name: p for p in load_collection_profiles(root / "collection.yaml")}
+    contracts = {c.input_id: c for c in load_input_capabilities(root / "providers.yaml")}
+    if execute and mode == "replay" and replay_manifest is None:
+        raise ValueError("execution in replay mode requires an explicit manifest")
+    report = {"now": now.isoformat(), "execute": execute, "mode": mode,
+        "eligible_for_production_routing": False, "production_writes": 0,
+        "profiles": [_json_value(asdict(p)) for p in profiles.values() if p.frequency_unit],
+        "dependencies": [{"path": str(Path(p).resolve()), "sha256": hashlib.sha256(Path(p).read_bytes()).hexdigest()}
+                         for p in dependency_paths],
+        "config_files": [{"path": str((root / name).resolve()), "sha256": hashlib.sha256((root / name).read_bytes()).hexdigest()}
+                         for name in ("collection.yaml", "providers.yaml")],
+        "code_files": [{"path": str(p.resolve()), "sha256": hashlib.sha256(p.read_bytes()).hexdigest()}
+                       for p in (Path(__file__), Path(__file__).parents[1] / "worker/scheduler.py",
+                                 Path(__file__).parents[1] / "config/loader.py")],
+        "scope_context": _json_value({"trading_dates": trading_dates, "securities": [asdict(s) for s in securities],
+                                      "symbols": symbols}), "jobs": []}
+    output.mkdir(parents=True, exist_ok=True)
+    pacer = RequestPacer()
+    # All enabled Tencent Kline inputs share one host pacing policy before any call starts.
+    interval = max([3] + [contracts[j.input_id].request_interval_seconds for j in jobs if j.status == "ready"])
+    for host in ("web.ifzq.gtimg.cn", "proxy.finance.qq.com", "ifzq.gtimg.cn", "qt.gtimg.cn"):
+        pacer.configure(host, interval, 1)
+    collector = collector or collect_input
+    metadata = MetadataStore(output / "schedule-attempts.duckdb") if execute else None
+    try:
+        for job in jobs:
+            entry = {**_json_value(asdict(job)), "coverage_denominator": len(job.symbols), "results": [],
+                     "validation_time_utc": datetime.now(timezone.utc).isoformat(),
+                     "config_files": report["config_files"], "code_files": report["code_files"],
+                     "universe_completeness_verified": False}
+            report["jobs"].append(entry)
+            if not execute or job.status != "ready":
+                continue
+            profile = profiles[job.profile]
+            slot_key = job.slot.date().isoformat() if profile.frequency_unit == "day" else job.slot.isoformat()
+            attempt_id = f"input-slot:{job.input_id}:{slot_key}"
+            attempt = CollectionAttempt(attempt_id).lease(owner="input-scheduler", acquired_at=now,
+                expires_at=now + timedelta(days=1)).transition(AttemptStatus.FETCHING)
+            # Persist the reservation before calling any source; a restart cannot repeat the same slot.
+            if not metadata.claim_attempt(attempt, updated_at=now):
+                previous = metadata.load_attempt(attempt_id)
+                entry.update(status="already_attempted", reason=previous.status.value,
+                             previous_report_path=previous.raw_object_path)
+                continue
+            started = monotonic()
+            budget = (profile.refresh_interval_seconds - (now - job.slot).total_seconds()
+                      if profile.frequency_unit == "minute" else None)
+            try:
+                for symbol in job.symbols:
+                    if budget is not None and monotonic() - started >= budget:
+                        entry.update(status="failed", reason="collection interval budget exhausted")
+                        break
+                    request = {"symbol": symbol}
+                    if job.input_id.endswith("daily"):
+                        request.update(start_date=job.slot.date(), end_date=job.slot.date())
+                    result = collector(input_id=job.input_id, context={"request": request,
+                        "calendar": {"trading_dates": trading_dates}}, config_root=root, output_root=output,
+                        mode=mode, replay_manifest=replay_manifest, evidence_root=evidence_root, pacer=pacer)
+                    result_path = Path(result["report_path"])
+                    entry["results"].append({"symbol": symbol, "status": result["status"],
+                        "report_path": str(result_path), "report_sha256": hashlib.sha256(result_path.read_bytes()).hexdigest()
+                        if result_path.is_file() else None, "row_count": result.get("row_count", 0),
+                        "code_version": result.get("code_version"),
+                        "source_response_hashes": result.get("output", {}).get("source_response_hashes", [])})
+                complete = (len(entry["results"]) == len(job.symbols)
+                            and all(r["status"] == "candidate_complete" for r in entry["results"]))
+                entry["status"] = "candidate_complete" if complete else "failed"
+                entry["successful_symbol_count"] = sum(r["status"] == "candidate_complete" for r in entry["results"])
+                # This is collection coverage, not a claim of complete/current bars or production readiness.
+                entry["coverage_semantics"] = "candidate results per requested security; bar freshness/completeness not certified"
+            except Exception as exc:
+                entry.update(status="failed", reason=type(exc).__name__)
+            entry_bytes = json.dumps(entry, ensure_ascii=False, indent=2).encode("utf-8")
+            saved = RawObjectStore(output).write_bytes(entry_bytes, dataset="schedule_attempt", provider="scheduler",
+                endpoint=job.input_id, fetched_at=datetime.now(timezone.utc), attempt_id=uuid4().hex)
+            attempt = replace(attempt, raw_object_path=str(saved.path.resolve()), raw_content_hash=saved.content_hash)
+            entry["attempt_record"] = {"path": str(saved.path.resolve()), "sha256": saved.content_hash}
+            if entry["status"] == "candidate_complete":
+                attempt = attempt.transition(AttemptStatus.RAW_COMMITTED).transition(AttemptStatus.NORMALIZED).transition(AttemptStatus.VALIDATED)
+            else:
+                attempt = attempt.transition(AttemptStatus.TERMINAL_FAILED)
+            metadata.save_attempt(attempt, updated_at=datetime.now(timezone.utc))
+    finally:
+        if metadata is not None:
+            metadata.close()
+    saved = RawObjectStore(output).write_json(report, dataset="schedule_tick", provider="scheduler", endpoint="inputs",
+        fetched_at=datetime.now(timezone.utc), attempt_id=uuid4().hex)
+    return {**report, "report_path": str(saved.path.resolve())}

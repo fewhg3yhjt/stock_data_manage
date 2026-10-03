@@ -17,6 +17,7 @@ sys.path.insert(0, str(ROOT / "src"))
 def main():
     parser = argparse.ArgumentParser(description="保存四项输入的离线回放与原实现比较证据")
     parser.add_argument("--output-root", type=Path, required=True)
+    parser.add_argument("--verify-scheduling", action="store_true", help="also preserve scheduler and quote batch offline evidence")
     args = parser.parse_args()
     args.output_root = args.output_root.resolve()
     if not args.output_root.is_relative_to(ROOT / "provider_validation/results"):
@@ -69,9 +70,109 @@ def main():
                 "original_parsed_sha256": hashlib.sha256(csv_path.read_bytes()).hexdigest(),
                 "all_source_fields_compared": True, "all_rows_equal": True,
                 "comparison": "原响应经原SDK函数解析，所有来源列及行与原归档CSV比较；标准化字段另按YAML执行。"})
+    if args.verify_scheduling:
+        summary["scheduling"] = verify_scheduling(args.output_root)
     target = args.output_root / "comparison.json"
     target.write_text(json.dumps(summary, ensure_ascii=False, indent=2, default=str) + "\n", encoding="utf-8")
     print(json.dumps({"result": "passed", "inputs": 4, "row_counts": [14, 96, 52, 8797], "comparison": str(target)}, ensure_ascii=False))
+
+
+def verify_scheduling(output_root):
+    import csv
+    import gzip
+    import shutil
+    from datetime import date
+    from zoneinfo import ZoneInfo
+    import yaml
+    from stock_data_manage.config.loader import load_provider_configs, load_collection_profiles
+    from stock_data_manage.pipeline.inputs import collect_due_inputs
+    from stock_data_manage.providers.tencent import TencentSnapshotProvider
+    from stock_data_manage.providers.contracts import HttpResponse
+    from stock_data_manage.storage.raw import RawObjectStore
+    from stock_data_manage.worker.scheduler import collection_slot
+    from stock_data_manage.domain.sessions import MarketSchedule
+
+    sink = output_root / "scheduling"
+    sink.mkdir()
+    source = ROOT / "provider_validation/results/live-probes/pilot-20261003-tencent-quote-network"
+    manifest = source / "_raw/missing-capabilities-20261003T173649/manifest.ndjson"
+    event = next(json.loads(line) for line in manifest.read_text(encoding="utf-8").splitlines()
+                 if json.loads(line).get("url") == "https://qt.gtimg.cn/q=sh600519")
+    body = gzip.decompress((manifest.parent / event["body_storage"]).read_bytes())
+    assert hashlib.sha256(body).hexdigest() == event["body_sha256"]
+    config = next(c for c in load_provider_configs(ROOT / "config/providers.yaml")
+                  if c.provider == "tencent" and c.endpoint == "bulk_snapshot")
+    scope_time = datetime(2026, 9, 30, 15, 10, tzinfo=ZoneInfo("Asia/Shanghai"))
+    store = RawObjectStore(sink / "fixtures")
+    requests = []
+    class FixtureTransport:
+        def get(self, url, *, params, timeout_seconds):
+            symbols = url.split("q=", 1)[1].split(",")
+            payload = b"\n".join(body.strip().replace(b"v_sh600519=", ("v_"+symbol+"=").encode()) for symbol in symbols)
+            saved = store.write_bytes(payload, dataset="offline_quote_fixture", provider="tencent", endpoint="bulk_snapshot",
+                fetched_at=datetime.now(timezone.utc), attempt_id="batch-"+str(len(requests)))
+            requests.append({"url": url, "params": params, "timeout_seconds": timeout_seconds,
+                "source_response_sha256": event["body_sha256"], "synthetic": symbols != ["sh600519"],
+                "body_path": str(saved.path.relative_to(ROOT)), "body_sha256": saved.content_hash,
+                "requested_symbols": symbols, "mode": "offline_fixture"})
+            return HttpResponse(200, {"content-type": "text/html; charset=GBK"}, payload)
+    provider = TencentSnapshotProvider(FixtureTransport(), config.capability())
+    single = provider.fetch_snapshot(["sh600519"], scope_time)
+    golden_path = source / "01_腾讯财经/data.csv"
+    with golden_path.open(encoding="utf-8-sig", newline="") as file:
+        golden = next(csv.DictReader(file))
+    columns = {"name": "name", "close": "price", "pre_close": "prev_close", "open": "open",
+               "volume": "volume_lot", "quote_time": "datetime", "high": "high", "low": "low"}
+    assert all(single.rows[0][left] == golden[right] for left, right in columns.items())
+    # Synthetic fan-out exercises traversal; it is explicitly not live batch evidence.
+    symbols = tuple(f"sh{600000+i}" for i in range(203))
+    batch = provider.fetch_snapshot(symbols, scope_time)
+    assert batch.returned_symbols == set(symbols) and len(batch.rows) == 203
+    assert [len(r["requested_symbols"]) for r in requests[1:]] == [100, 100, 3]
+    rows = store.write_json(list(batch.rows), dataset="parsed_offline_quotes", provider="tencent", endpoint="bulk_snapshot",
+        fetched_at=datetime.now(timezone.utc), attempt_id="parsed")
+    # Use a minimal saved testing config; checked-in schedules remain disabled.
+    config_root = sink / "config"
+    config_root.mkdir()
+    for name in ("collection.yaml", "providers.yaml", "datasets/minute_bar_5m.yaml", "normalization/minute_bar_5m.yaml"):
+        target = config_root / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT / "config" / name, target)
+    path = config_root / "collection.yaml"
+    document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    document["collection_profiles"]["tencent_minute_5m"]["scheduling_enabled"] = True
+    path.write_text(yaml.safe_dump(document, allow_unicode=True, sort_keys=False), encoding="utf-8")
+    tick_time = datetime(2026, 9, 30, 13, 5, 5, tzinfo=ZoneInfo("Asia/Shanghai"))
+    kwargs = dict(config_root=config_root, output_root=sink / "candidate-ticks", trading_dates=[date(2026, 9, 30)],
+        symbols=["sz300750"], execute=True,
+        replay_manifest=ROOT / "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson")
+    tick = collect_due_inputs(now=tick_time, **kwargs)
+    assert tick["jobs"][0]["status"] == "candidate_complete", tick
+    assert tick["jobs"][0]["results"][0]["row_count"] == 96
+    candidate = json.loads(Path(tick["jobs"][0]["results"][0]["report_path"]).read_text(encoding="utf-8"))
+    assert candidate["live_http_calls"] == 0 and all(e["mode"] == "replay" for e in candidate["responses"])
+    repeated = collect_due_inputs(now=tick_time, **kwargs)
+    assert repeated["jobs"][0]["status"] == "already_attempted"
+    profile = next(p for p in load_collection_profiles(ROOT / "config/collection.yaml") if p.name == "tencent_minute_5m")
+    assert collection_slot(profile, tick_time.replace(hour=12), schedule=MarketSchedule(), trading_dates=[date(2026, 9, 30)]) is None
+    assert collection_slot(profile, tick_time, schedule=MarketSchedule(), trading_dates=[]) is None
+    result = {"mode": "offline", "network_requests": 0, "production_writes": 0,
+        "eligible_for_production_routing": False, "validation_time_utc": datetime.now(timezone.utc).isoformat(),
+        "source_manifest": str(manifest.relative_to(ROOT)), "source_manifest_sha256": hashlib.sha256(manifest.read_bytes()).hexdigest(),
+        "original_csv": str(golden_path.relative_to(ROOT)), "original_csv_sha256": hashlib.sha256(golden_path.read_bytes()).hexdigest(),
+        "original_response_sha256": event["body_sha256"], "single_quote_fields_compared": columns,
+        "comparison_scope": "GBK decoding and parsed field values only; transport/session equivalence remains pending",
+        "requests": requests, "batch_sizes": [100, 100, 3], "row_count": 203,
+        "coverage_denominator": 203, "parsed_rows": str(rows.path.relative_to(ROOT)), "parsed_rows_sha256": rows.content_hash,
+        "scheduler_tick": str(Path(tick["report_path"]).relative_to(ROOT)),
+        "scheduler_tick_sha256": hashlib.sha256(Path(tick["report_path"]).read_bytes()).hexdigest(),
+        "repeat_tick": str(Path(repeated["report_path"]).relative_to(ROOT)), "repeat_status": "already_attempted",
+        "limitations": ["203证券为归档响应合成，仅证明离线分批遍历，不证明全市场在线能力。",
+                        "快照仍迁移待完成，传输会话、实时批量和全市场覆盖未验证。",
+                        "5分钟候选仅复用原样本，不认证当前周期已完成或行情新鲜度；未启用生产路由。"]}
+    destination = sink / "verification.json"
+    destination.write_text(json.dumps(result, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
+    return {"report": str(destination.relative_to(ROOT)), "sha256": hashlib.sha256(destination.read_bytes()).hexdigest()}
 
 
 if __name__ == "__main__":
