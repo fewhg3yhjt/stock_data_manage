@@ -33,7 +33,8 @@ def build_input_provider(contract, *, providers_path, client=None):
     expected_methods = {"ASTOCK-002-daily": "fetch_window", "ASTOCK-002-5m": "fetch_recent",
                         "ASTOCK-045": "fetch", "ASTOCK-070": "fetch",
                         "SDA-BOARD-001": "fetch_industry_list", "SDA-BOARD-002": "fetch_industry_daily",
-                        "SDA-BOARD-003": "fetch_fund_flow", "SDA-BOARD-004": "fetch_fund_flow"}
+                        "SDA-BOARD-003": "fetch_fund_flow", "SDA-BOARD-004": "fetch_fund_flow",
+                        "SDA-BOARD-005": "fetch_snapshot", "SDA-BOARD-006": "fetch_snapshot"}
     if contract.input_id not in expected_methods or contract.runtime_method != expected_methods[contract.input_id]:
         raise ValueError("input runtime method does not match its verified adapter")
     headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
@@ -53,6 +54,9 @@ def build_input_provider(contract, *, providers_path, client=None):
     if contract.input_id == "ASTOCK-070":
         from ..providers.sina.calendar import SinaTradingCalendarProvider
         return SinaTradingCalendarProvider(client=client)
+    if contract.input_id in {"SDA-BOARD-005", "SDA-BOARD-006"}:
+        return BaoStockIndustryMembershipProvider(client=client, endpoint=contract.endpoint,
+                                                  normalization_root=Path(providers_path).parent / "normalization")
     if contract.input_id.startswith("SDA-BOARD-"):
         return AkShareBoardProvider(client=client, endpoint=contract.endpoint,
                                    normalization_root=Path(providers_path).parent / "normalization")

@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="12" skipped="0" tests="253" time="63.016" timestamp="2026-10-04T03:04:15.411894+08:00" hostname="WIN-O3LLBLVKP56"><testcase classname="tests.test_acceptance" name="test_offline_acceptance_report_covers_replay_capacity_and_recovery" time="1.894" /><testcase classname="tests.test_acceptance" name="test_offline_acceptance_cli_can_write_report" time="1.761" /><testcase classname="tests.test_akshare_provider" name="test_akshare_daily_provider_maps_function_and_rows[stock-sh600519-stock_zh_a_hist]" time="0.002" /><testcase classname="tests.test_akshare_provider" name="test_akshare_daily_provider_maps_function_and_rows[etf-sh510300-fund_etf_hist_em]" time="0.002" /><testcase classname="tests.test_akshare_provider" name="test_akshare_daily_provider_maps_function_and_rows[lof-sh501018-fund_lof_hist_em]" time="0.002" /><testcase classname="tests.test_akshare_provider" name="test_akshare_daily_provider_maps_function_and_rows[index-sh000001-stock_zh_index_daily_em]" time="0.002" /><testcase classname="tests.test_akshare_provider" name="test_akshare_index_rejects_adjustment" time="0.001" /><testcase classname="tests.test_attempts" name="test_attempt_state_machine_and_lease_expiry" time="0.002" /><testcase classname="tests.test_attempts" name="test_http_success_cannot_skip_to_published" time="0.001" /><testcase classname="tests.test_attempts" name="test_temporary_empty_is_retryable_not_complete" time="0.001" /><testcase classname="tests.test_baostock_provider" name="test_baostock_daily_normalizes_rows_and_adjustflag" time="0.001" /><testcase classname="tests.test_baostock_provider" name="test_baostock_5m_normalizes_rows_and_closes_to_response_shape" time="0.001" /><testcase classname="tests.test_canonical_recovery" name="test_canonical_publish_is_idempotent_and_locked" time="0.086" /><testcase classname="tests.test_canonical_recovery" name="test_recovery_finishes_replace_and_repairs_metadata" time="0.260" /><testcase classname="tests.test_canonical_recovery" name="test_recovery_quarantines_unverifiable_orphan_temp_file" time="0.052" /><testcase classname="tests.test_cli" name="test_collect_input_context_file_merges_explicit_flags_and_preserves_dependency" time="0.027" /><testcase classname="tests.test_cli" name="test_collect_input_rejects_malformed_context_before_execution" time="0.013" /><testcase classname="tests.test_cli" name="test_recover_cli_returns_success_for_empty_store" time="0.083" /><testcase classname="tests.test_cli" name="test_due_input_cli_saves_plan_and_filters_explicit_closed_calendar_days" time="1.082" /><testcase classname="tests.test_config_contract" name="test_yaml_configuration_is_parseable_and_keeps_minute_scope_bounded" time="0.295" /><testcase classname="tests.test_config_contract" name="test_input_catalog_covers_successful_rows_without_granting_production_routes" time="0.287" /><testcase classname="tests.test_config_contract" name="test_parameter_binding_uses_explicit_contexts_and_preserves_types" time="0.003" /><testcase classname="tests.test_config_contract" name="test_recent_minute_contract_rejects_history_and_invalid_count" time="0.306" /><testcase classname="tests.test_config_contract" name="test_snapshot_requires_known_trading_date_and_separates_local_filter" time="0.246"><failure message="AssertionError: assert {'trade_date'...(2026, 9, 30)} == {'day': datet...(2026, 9, 30)}&#10;  &#10;  Left contains 1 more item:&#10;  {'trade_date': datetime.date(2026, 9, 30)}&#10;  Right contains 1 more item:&#10;  {'day': datetime.date(2026, 9, 30)}&#10;  Use -v to get more diff">def test_snapshot_requires_known_trading_date_and_separates_local_filter():
+        contract = next(c for c in load_input_capabilities(PROJECT_ROOT / "config/providers.yaml") if c.input_id == "SDA-BOARD-005")
+        context = {"request": {"trade_date": "2026-09-30"}, "calendar": {"trading_dates": [date(2026, 9, 30)]}}
+&gt;       assert contract.bind_parameters(context) == {"day": date(2026, 9, 30)}
+E       AssertionError: assert {'trade_date'...(2026, 9, 30)} == {'day': datet...(2026, 9, 30)}
+E         
+E         Left contains 1 more item:
+E         {'trade_date': datetime.date(2026, 9, 30)}
+E         Right contains 1 more item:
+E         {'day': datetime.date(2026, 9, 30)}
+E         Use -v to get more diff
+
+tests\test_config_contract.py:98: AssertionError</failure></testcase><testcase classname="tests.test_config_contract" name="test_window_validation_and_unsupported_scheduling_are_explicit" time="0.278" /><testcase classname="tests.test_config_contract" name="test_disabled_provider_cannot_be_enabled_by_an_endpoint_override" time="0.010" /><testcase classname="tests.test_config_provider_factory" name="test_default_registry_does_not_fabricate_evidence" time="0.316" /><testcase classname="tests.test_config_provider_factory" name="test_factory_preserves_evidence_scope_expiry_and_shared_pacing_budget" time="0.641" /><testcase classname="tests.test_config_provider_factory" name="test_factory_rejects_unusable_evidence[changes0-dimensions0]" time="0.563" /><testcase classname="tests.test_config_provider_factory" name="test_factory_rejects_unusable_evidence[changes1-dimensions1]" time="0.461" /><testcase classname="tests.test_config_provider_factory" name="test_factory_rejects_unusable_evidence[changes2-dimensions2]" time="0.495" /><testcase classname="tests.test_config_provider_factory" name="test_factory_rejects_unusable_evidence[changes3-dimensions3]" time="0.481" /><testcase classname="tests.test_config_provider_factory" name="test_factory_rejects_unusable_evidence[changes4-dimensions4]" time="0.490" /><testcase classname="tests.test_config_provider_factory" name="test_factory_rejects_unusable_evidence[changes5-dimensions5]" time="0.429" /><testcase classname="tests.test_config_provider_factory" name="test_factory_rejects_unusable_evidence[changes6-dimensions6]" time="0.580" /><testcase classname="tests.test_config_provider_factory" name="test_factory_rejects_unusable_evidence[changes7-dimensions7]" time="0.485" /><testcase classname="tests.test_config_provider_factory" name="test_factory_rejects_unusable_evidence[changes8-dimensions8]" time="0.448" /><testcase classname="tests.test_config_provider_factory" name="test_factory_rejects_unusable_evidence[changes9-dimensions9]" time="0.559" /><testcase classname="tests.test_config_provider_factory" name="test_factory_rejects_unusable_evidence[changes10-dimensions10]" time="0.484" /><testcase classname="tests.test_config_provider_factory" name="test_factory_rejects_unusable_evidence[changes11-dimensions11]" time="0.488" /><testcase classname="tests.test_config_provider_factory" name="test_selection_rechecks_cooldown_and_revoked_evidence" time="0.580" /><testcase classname="tests.test_config_provider_factory" name="test_unimplemented_or_unpaced_declaration_cannot_enter_formal_routing" time="2.231" /><testcase classname="tests.test_config_provider_factory" name="test_provider_yaml_declares_tencent_qfq_and_routes" time="0.281" /><testcase classname="tests.test_config_provider_factory" name="test_normalization_yaml_declares_tencent_qfq_rules" time="0.017" /><testcase classname="tests.test_config_provider_factory" name="test_provider_factory_builds_configured_qfq_provider" time="0.275" /><testcase classname="tests.test_config_provider_factory" name="test_provider_factory_registers_baostock_validation_provider" time="0.242" /><testcase classname="tests.test_config_provider_factory" name="test_provider_factory_does_not_build_disabled_eastmoney_dividend_provider" time="0.246" /><testcase classname="tests.test_config_provider_factory" name="test_provider_factory_registers_optional_akshare_daily_providers" time="0.249" /><testcase classname="tests.test_config_provider_factory" name="test_provider_factory_registers_sector_providers_as_validation_only" time="0.262" /><testcase classname="tests.test_daily_collection_e2e" name="test_partial_primary_falls_back_only_for_missing_and_rerun_is_noop" time="0.481" /><testcase classname="tests.test_daily_collection_e2e" name="test_forward_adjusted_daily_collection_publishes_stock_etf_and_lof[stock-sh600519-XSHG:600519]" time="0.325" /><testcase classname="tests.test_daily_collection_e2e" name="test_forward_adjusted_daily_collection_publishes_stock_etf_and_lof[etf-sh510300-XSHG:510300]" time="0.315" /><testcase classname="tests.test_daily_collection_e2e" name="test_forward_adjusted_daily_collection_publishes_stock_etf_and_lof[lof-sh501018-XSHG:501018]" time="0.356" /><testcase classname="tests.test_daily_collection_e2e" name="test_forward_adjusted_collection_does_not_use_unadjusted_provider" time="0.086" /><testcase classname="tests.test_daily_collection_e2e" name="test_forward_adjusted_collection_skips_provider_without_asset_qualification" time="0.085" /><testcase classname="tests.test_daily_collection_e2e" name="test_forward_adjusted_collection_rejects_mismatched_provider_response" time="0.087" /><testcase classname="tests.test_daily_collection_e2e" name="test_forward_collection_does_not_reuse_unadjusted_metadata_or_break_partition_count" time="0.527" /><testcase classname="tests.test_daily_collection_e2e" name="test_forward_collection_rejects_index_unconditionally" time="0.083" /><testcase classname="tests.test_daily_collection_e2e" name="test_rate_limited_primary_is_cooled_and_fallback_completes_partition" time="0.361" /><testcase classname="tests.test_daily_collection_e2e" name="test_snapshot_provider_publishes_provisional_and_final_provider_can_replace_it" time="0.476" /><testcase classname="tests.test_daily_collection_e2e" name="test_daily_collection_allows_publication_at_configured_missing_limit" time="1.139" /><testcase classname="tests.test_daily_collection_e2e" name="test_daily_collection_rejects_publication_above_configured_missing_limit" time="0.303" /><testcase classname="tests.test_daily_reconciliation" name="test_daily_reconciliation_promotes_provisional_and_records_clean_partition" time="0.252" /><testcase classname="tests.test_daily_reconciliation" name="test_daily_reconciliation_marks_unseen_expected_items_missing" time="0.186" /><testcase classname="tests.test_dataset_config_files" name="test_daily_bar_uses_dataset_specific_normalization_file" time="0.015" /><testcase classname="tests.test_dataset_config_files" name="test_dividend_event_uses_dataset_specific_normalization_file" time="0.004" /><testcase classname="tests.test_dataset_config_files" name="test_dataset_rules_can_be_loaded_together_without_old_aggregate_file" time="0.017" /><testcase classname="tests.test_eastmoney_dividend" name="test_eastmoney_dividend_normalizes_and_deduplicates" time="0.001" /><testcase classname="tests.test_eastmoney_dividend" name="test_dividend_events_are_persisted_by_business_key" time="0.133" /><testcase classname="tests.test_eastmoney_financial_shareholder" name="test_financial_main_maps_script_fields" time="0.001" /><testcase classname="tests.test_eastmoney_financial_shareholder" name="test_shareholder_count_maps_script_fields" time="0.001" /><testcase classname="tests.test_eastmoney_fund_flow" name="test_eastmoney_stock_fund_flow_maps_csv_values" time="0.001" /><testcase classname="tests.test_eastmoney_realtime" name="test_single_quote_maps_eastmoney_fields" time="0.001" /><testcase classname="tests.test_eastmoney_realtime" name="test_batch_quote_maps_diff_rows" time="0.001" /><testcase classname="tests.test_eastmoney_realtime" name="test_intraday_trend_maps_csv_rows" time="0.001" /><testcase classname="tests.test_eastmoney_realtime" name="test_eastmoney_requests_transport_matches_probe_session" time="0.002" /><testcase classname="tests.test_eastmoney_realtime" name="test_realtime_provider_falls_back_to_next_host_on_empty_business_data" time="0.001" /><testcase classname="tests.test_eastmoney_security_list" name="test_eastmoney_security_list_pages_and_maps_market_asset_type" time="0.001" /><testcase classname="tests.test_eastmoney_security_list" name="test_eastmoney_security_list_deduplicates_same_exchange_symbol" time="0.001" /><testcase classname="tests.test_history_planner" name="test_history_plan_respects_day_and_row_limits_per_symbol" time="0.001" /><testcase classname="tests.test_history_planner" name="test_minute_endpoint_that_cannot_hold_one_day_is_rejected" time="0.001" /><testcase classname="tests.test_history_planner" name="test_returned_window_distinguishes_partial_and_truncated" time="0.001" /><testcase classname="tests.test_input_collection" name="test_bao_archived_inputs_preserve_sdk_rows_and_coverage[SDA-BOARD-005-context0-manifest0-5223]" time="1.004" /><testcase classname="tests.test_input_collection" name="test_bao_archived_inputs_preserve_sdk_rows_and_coverage[SDA-BOARD-006-context1-manifest1-5221]" time="1.061" /><testcase classname="tests.test_input_collection" name="test_bao_matches_original_provider" time="0.589" /><testcase classname="tests.test_input_collection" name="test_bao_symbol_subset_is_local_and_preserves_missing_denominator[SDA-BOARD-005-2-missing0]" time="0.586" /><testcase classname="tests.test_input_collection" name="test_bao_symbol_subset_is_local_and_preserves_missing_denominator[SDA-BOARD-006-1-missing1]" time="0.580" /><testcase classname="tests.test_input_collection" name="test_bao_source_yaml_mapping_is_executed" time="1.061" /><testcase classname="tests.test_input_collection" name="test_bao_requires_positive_calendar_and_rejects_ignored_single_symbol" time="0.744" /><testcase classname="tests.test_input_collection" name="test_bao_archived_empty_response_is_not_valid_empty_dataset" time="0.038" /><testcase classname="tests.test_input_collection" name="test_bao_failed_contract_retains_source_evidence[sdk_error-connection]" time="0.429" /><testcase classname="tests.test_input_collection" name="test_bao_failed_contract_retains_source_evidence[missing_query-ValueError]" time="0.524" /><testcase classname="tests.test_input_collection" name="test_bao_failed_contract_retains_source_evidence[schema-schema_changed]" time="0.657" /><testcase classname="tests.test_input_collection" name="test_bao_failed_contract_retains_source_evidence[duplicate-schema_changed]" time="0.670" /><testcase classname="tests.test_input_collection" name="test_bao_failed_contract_retains_source_evidence[corrupt_hash-ValueError]" time="0.481" /><testcase classname="tests.test_input_collection" name="test_bao_live_fixture_preserves_session_pacing_and_reuses_cache" time="0.978" /><testcase classname="tests.test_input_collection" name="test_ths_archived_inputs_execute_source_yaml[SDA-BOARD-001-context0-manifest0-90]" time="0.980"><failure message="AssertionError: {'adapter_version': 'akshare-ths-board-input-v2', 'code_files': [{'path': 'D:\\Project\\PythonProgram\\stock_data_mana...ion_profile': {'anchor_date': None, 'at_time': None, 'business_day': 'trading_day', 'frequency_interval': 1, ...}, ...}&#10;assert 'failed' == 'candidate_complete'&#10;  &#10;  - candidate_complete&#10;  + failed">tmp_path = WindowsPath('C:/Users/sp181/AppData/Local/Temp/pytest-of-sp181/pytest-62/test_ths_archived_inputs_execu0')
+no_network = None, input_id = 'SDA-BOARD-001', context = {}
+manifest = WindowsPath('D:/Project/PythonProgram/stock_data_manage/provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson')
+count = 90
+
+    @pytest.mark.parametrize("input_id,context,manifest,count", THS_CASES)
+    def test_ths_archived_inputs_execute_source_yaml(tmp_path, no_network, input_id, context, manifest, count):
+        pytest.importorskip("akshare")
+        report = collect_input(input_id=input_id, context=context, config_root=ROOT / "config",
+                               output_root=tmp_path, replay_manifest=manifest)
+&gt;       assert report["status"] == "candidate_complete", report
+E       AssertionError: {'adapter_version': 'akshare-ths-board-input-v2', 'code_files': [{'path': 'D:\\Project\\PythonProgram\\stock_data_mana...ion_profile': {'anchor_date': None, 'at_time': None, 'business_day': 'trading_day', 'frequency_interval': 1, ...}, ...}
+E       assert 'failed' == 'candidate_complete'
+E         
+E         - candidate_complete
+E         + failed
+
+tests\test_input_collection.py:279: AssertionError</failure></testcase><testcase classname="tests.test_input_collection" name="test_ths_archived_inputs_execute_source_yaml[SDA-BOARD-002-context1-manifest1-21]" time="0.370"><failure message="AssertionError: {'adapter_version': 'akshare-ths-board-input-v2', 'code_files': [{'path': 'D:\\Project\\PythonProgram\\stock_data_mana...ion_profile': {'anchor_date': None, 'at_time': None, 'business_day': 'trading_day', 'frequency_interval': 1, ...}, ...}&#10;assert 'failed' == 'candidate_complete'&#10;  &#10;  - candidate_complete&#10;  + failed">tmp_path = WindowsPath('C:/Users/sp181/AppData/Local/Temp/pytest-of-sp181/pytest-62/test_ths_archived_inputs_execu1')
+no_network = None, input_id = 'SDA-BOARD-002'
+context = {'dependency': {'board_code': '881121'}, 'request': {'board_name': '半导体', 'end_date': '2026-10-02', 'start_date': '2026-09-01'}}
+manifest = WindowsPath('D:/Project/PythonProgram/stock_data_manage/provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson')
+count = 21
+
+    @pytest.mark.parametrize("input_id,context,manifest,count", THS_CASES)
+    def test_ths_archived_inputs_execute_source_yaml(tmp_path, no_network, input_id, context, manifest, count):
+        pytest.importorskip("akshare")
+        report = collect_input(input_id=input_id, context=context, config_root=ROOT / "config",
+                               output_root=tmp_path, replay_manifest=manifest)
+&gt;       assert report["status"] == "candidate_complete", report
+E       AssertionError: {'adapter_version': 'akshare-ths-board-input-v2', 'code_files': [{'path': 'D:\\Project\\PythonProgram\\stock_data_mana...ion_profile': {'anchor_date': None, 'at_time': None, 'business_day': 'trading_day', 'frequency_interval': 1, ...}, ...}
+E       assert 'failed' == 'candidate_complete'
+E         
+E         - candidate_complete
+E         + failed
+
+tests\test_input_collection.py:279: AssertionError</failure></testcase><testcase classname="tests.test_input_collection" name="test_ths_archived_inputs_execute_source_yaml[SDA-BOARD-003-context2-manifest2-90]" time="0.287"><failure message="AssertionError: {'adapter_version': 'akshare-ths-board-input-v2', 'code_files': [{'path': 'D:\\Project\\PythonProgram\\stock_data_mana...ion_profile': {'anchor_date': None, 'at_time': None, 'business_day': 'trading_day', 'frequency_interval': 1, ...}, ...}&#10;assert 'failed' == 'candidate_complete'&#10;  &#10;  - candidate_complete&#10;  + failed">tmp_path = WindowsPath('C:/Users/sp181/AppData/Local/Temp/pytest-of-sp181/pytest-62/test_ths_archived_inputs_execu2')
+no_network = None, input_id = 'SDA-BOARD-003', context = {}
+manifest = WindowsPath('D:/Project/PythonProgram/stock_data_manage/provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson')
+count = 90
+
+    @pytest.mark.parametrize("input_id,context,manifest,count", THS_CASES)
+    def test_ths_archived_inputs_execute_source_yaml(tmp_path, no_network, input_id, context, manifest, count):
+        pytest.importorskip("akshare")
+        report = collect_input(input_id=input_id, context=context, config_root=ROOT / "config",
+                               output_root=tmp_path, replay_manifest=manifest)
+&gt;       assert report["status"] == "candidate_complete", report
+E       AssertionError: {'adapter_version': 'akshare-ths-board-input-v2', 'code_files': [{'path': 'D:\\Project\\PythonProgram\\stock_data_mana...ion_profile': {'anchor_date': None, 'at_time': None, 'business_day': 'trading_day', 'frequency_interval': 1, ...}, ...}
+E       assert 'failed' == 'candidate_complete'
+E         
+E         - candidate_complete
+E         + failed
+
+tests\test_input_collection.py:279: AssertionError</failure></testcase><testcase classname="tests.test_input_collection" name="test_ths_archived_inputs_execute_source_yaml[SDA-BOARD-004-context3-manifest3-387]" time="0.358"><failure message="AssertionError: {'adapter_version': 'akshare-ths-board-input-v2', 'code_files': [{'path': 'D:\\Project\\PythonProgram\\stock_data_mana...ion_profile': {'anchor_date': None, 'at_time': None, 'business_day': 'trading_day', 'frequency_interval': 1, ...}, ...}&#10;assert 'failed' == 'candidate_complete'&#10;  &#10;  - candidate_complete&#10;  + failed">tmp_path = WindowsPath('C:/Users/sp181/AppData/Local/Temp/pytest-of-sp181/pytest-62/test_ths_archived_inputs_execu3')
+no_network = None, input_id = 'SDA-BOARD-004', context = {}
+manifest = WindowsPath('D:/Project/PythonProgram/stock_data_manage/provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson')
+count = 387
+
+    @pytest.mark.parametrize("input_id,context,manifest,count", THS_CASES)
+    def test_ths_archived_inputs_execute_source_yaml(tmp_path, no_network, input_id, context, manifest, count):
+        pytest.importorskip("akshare")
+        report = collect_input(input_id=input_id, context=context, config_root=ROOT / "config",
+                               output_root=tmp_path, replay_manifest=manifest)
+&gt;       assert report["status"] == "candidate_complete", report
+E       AssertionError: {'adapter_version': 'akshare-ths-board-input-v2', 'code_files': [{'path': 'D:\\Project\\PythonProgram\\stock_data_mana...ion_profile': {'anchor_date': None, 'at_time': None, 'business_day': 'trading_day', 'frequency_interval': 1, ...}, ...}
+E       assert 'failed' == 'candidate_complete'
+E         
+E         - candidate_complete
+E         + failed
+
+tests\test_input_collection.py:279: AssertionError</failure></testcase><testcase classname="tests.test_input_collection" name="test_ths_matches_original_provider[SDA-BOARD-001-context0-manifest0-90]" time="0.273"><failure message="stock_data_manage.providers.contracts.ProviderContractError: AkShare THS industry list request failed">args = (&lt;socket.socket [closed] fd=-1, family=2, type=1, proto=0&gt;, ('127.0.0.1', 6820))
+kwargs = {}
+
+    def fail(*args, **kwargs):
+&gt;       raise AssertionError("offline validation must never issue a network request")
+E       AssertionError: offline validation must never issue a network request
+
+tests\test_input_collection.py:432: AssertionError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = WindowsPath('C:/Users/sp181/AppData/Local/Temp/pytest-of-sp181/pytest-62/test_ths_matches_original_prov0')
+no_network = None, input_id = 'SDA-BOARD-001', context = {}
+manifest = WindowsPath('D:/Project/PythonProgram/stock_data_manage/provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson')
+count = 90
+
+    @pytest.mark.parametrize("input_id,context,manifest,count", THS_CASES)
+    def test_ths_matches_original_provider(tmp_path, no_network, input_id, context, manifest, count):
+        pytest.importorskip("akshare")
+&gt;       compare_ths_original(tmp_path, input_id, context, manifest, count)
+
+tests\test_input_collection.py:391: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_input_collection.py:336: in compare_ths_original
+    result = getattr(provider, contract.runtime_method)(**parameters)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = AkShareBoardProvider(client=&lt;module 'akshare' from 'D:\\Program Files\\Python\\Lib\\site-packages\\akshare\\__init__.py'&gt;, name='akshare', capability_version='akshare-ths-board-v1', endpoint='industry_index_daily')
+
+    def fetch_industry_list(self) -&gt; AkShareBoardResult:
+        ak = self.client or load_client()
+        try:
+            frame = ak.stock_board_industry_name_ths()
+        except Exception as exc:
+&gt;           raise ProviderContractError(
+                "AkShare THS industry list request failed",
+                FailureClass.CONNECTION,
+                retryable=True,
+            ) from exc
+E           stock_data_manage.providers.contracts.ProviderContractError: AkShare THS industry list request failed
+
+provider_validation\results\ths-original-20261004\boards.py.bin:36: ProviderContractError</failure></testcase><testcase classname="tests.test_input_collection" name="test_ths_matches_original_provider[SDA-BOARD-002-context1-manifest1-21]" time="0.260"><failure message="stock_data_manage.providers.contracts.ProviderContractError: AkShare THS industry index request failed for 半导体">args = (&lt;socket.socket [closed] fd=-1, family=2, type=1, proto=0&gt;, ('127.0.0.1', 6821))
+kwargs = {}
+
+    def fail(*args, **kwargs):
+&gt;       raise AssertionError("offline validation must never issue a network request")
+E       AssertionError: offline validation must never issue a network request
+
+tests\test_input_collection.py:432: AssertionError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = WindowsPath('C:/Users/sp181/AppData/Local/Temp/pytest-of-sp181/pytest-62/test_ths_matches_original_prov1')
+no_network = None, input_id = 'SDA-BOARD-002'
+context = {'dependency': {'board_code': '881121'}, 'request': {'board_name': '半导体', 'end_date': '2026-10-02', 'start_date': '2026-09-01'}}
+manifest = WindowsPath('D:/Project/PythonProgram/stock_data_manage/provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson')
+count = 21
+
+    @pytest.mark.parametrize("input_id,context,manifest,count", THS_CASES)
+    def test_ths_matches_original_provider(tmp_path, no_network, input_id, context, manifest, count):
+        pytest.importorskip("akshare")
+&gt;       compare_ths_original(tmp_path, input_id, context, manifest, count)
+
+tests\test_input_collection.py:391: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_input_collection.py:336: in compare_ths_original
+    result = getattr(provider, contract.runtime_method)(**parameters)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = AkShareBoardProvider(client=&lt;module 'akshare' from 'D:\\Program Files\\Python\\Lib\\site-packages\\akshare\\__init__.py'&gt;, name='akshare', capability_version='akshare-ths-board-v1', endpoint='industry_index_daily')
+board_name = '半导体', start_date = datetime.date(2026, 9, 1)
+end_date = datetime.date(2026, 10, 2)
+
+    def fetch_industry_daily(
+        self, board_name: str, start_date: date, end_date: date, *, board_code: str | None = None
+    ) -&gt; AkShareBoardResult:
+        if end_date &lt; start_date:
+            raise ValueError("end_date must not precede start_date")
+        if not board_code:
+            directory = self.fetch_industry_list()
+            board = next(
+                (row for row in directory.rows if row["board_name"] == board_name), None
+            )
+            if board is None:
+                raise ProviderContractError(
+                    f"AkShare THS industry directory has no board named {board_name}",
+                    FailureClass.SCHEMA_CHANGED,
+                    retryable=False,
+                )
+            board_code = str(board["board_code"])
+        ak = self.client or load_client()
+        try:
+            frame = ak.stock_board_industry_index_ths(
+                symbol=board_name,
+                start_date=start_date.strftime("%Y%m%d"),
+                end_date=end_date.strftime("%Y%m%d"),
+            )
+        except Exception as exc:
+&gt;           raise ProviderContractError(
+                f"AkShare THS industry index request failed for {board_name}",
+                FailureClass.CONNECTION,
+                retryable=True,
+            ) from exc
+E           stock_data_manage.providers.contracts.ProviderContractError: AkShare THS industry index request failed for 半导体
+
+provider_validation\results\ths-original-20261004\boards.py.bin:91: ProviderContractError</failure></testcase><testcase classname="tests.test_input_collection" name="test_ths_matches_original_provider[SDA-BOARD-003-context2-manifest2-90]" time="0.291"><failure message="stock_data_manage.providers.contracts.ProviderContractError: AkShare THS industry fund-flow request failed for 即时">args = (&lt;socket.socket [closed] fd=-1, family=2, type=1, proto=0&gt;, ('127.0.0.1', 6824))
+kwargs = {}
+
+    def fail(*args, **kwargs):
+&gt;       raise AssertionError("offline validation must never issue a network request")
+E       AssertionError: offline validation must never issue a network request
+
+tests\test_input_collection.py:432: AssertionError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = WindowsPath('C:/Users/sp181/AppData/Local/Temp/pytest-of-sp181/pytest-62/test_ths_matches_original_prov2')
+no_network = None, input_id = 'SDA-BOARD-003', context = {}
+manifest = WindowsPath('D:/Project/PythonProgram/stock_data_manage/provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson')
+count = 90
+
+    @pytest.mark.parametrize("input_id,context,manifest,count", THS_CASES)
+    def test_ths_matches_original_provider(tmp_path, no_network, input_id, context, manifest, count):
+        pytest.importorskip("akshare")
+&gt;       compare_ths_original(tmp_path, input_id, context, manifest, count)
+
+tests\test_input_collection.py:391: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_input_collection.py:336: in compare_ths_original
+    result = getattr(provider, contract.runtime_method)(**parameters)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = AkShareBoardProvider(client=&lt;module 'akshare' from 'D:\\Program Files\\Python\\Lib\\site-packages\\akshare\\__init__.py'&gt;, name='akshare', capability_version='akshare-ths-board-v1', endpoint='industry_index_daily')
+board_type = 'industry'
+
+    def fetch_fund_flow(
+        self, board_type: str, *, period: str = "即时", snapshot_at: datetime | None = None
+    ) -&gt; AkShareBoardResult:
+        normalized = _board_type(board_type)
+        ak = self.client or load_client()
+        function_name = "stock_fund_flow_industry" if normalized == "industry" else "stock_fund_flow_concept"
+        try:
+            frame = getattr(ak, function_name)(symbol=period)
+        except Exception as exc:
+&gt;           raise ProviderContractError(
+                f"AkShare THS {normalized} fund-flow request failed for {period}",
+                FailureClass.CONNECTION,
+                retryable=True,
+            ) from exc
+E           stock_data_manage.providers.contracts.ProviderContractError: AkShare THS industry fund-flow request failed for 即时
+
+provider_validation\results\ths-original-20261004\boards.py.bin:153: ProviderContractError</failure></testcase><testcase classname="tests.test_input_collection" name="test_ths_matches_original_provider[SDA-BOARD-004-context3-manifest3-387]" time="0.255"><failure message="stock_data_manage.providers.contracts.ProviderContractError: AkShare THS concept fund-flow request failed for 即时">args = (&lt;socket.socket [closed] fd=-1, family=2, type=1, proto=0&gt;, ('127.0.0.1', 6825))
+kwargs = {}
+
+    def fail(*args, **kwargs):
+&gt;       raise AssertionError("offline validation must never issue a network request")
+E       AssertionError: offline validation must never issue a network request
+
+tests\test_input_collection.py:432: AssertionError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = WindowsPath('C:/Users/sp181/AppData/Local/Temp/pytest-of-sp181/pytest-62/test_ths_matches_original_prov3')
+no_network = None, input_id = 'SDA-BOARD-004', context = {}
+manifest = WindowsPath('D:/Project/PythonProgram/stock_data_manage/provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson')
+count = 387
+
+    @pytest.mark.parametrize("input_id,context,manifest,count", THS_CASES)
+    def test_ths_matches_original_provider(tmp_path, no_network, input_id, context, manifest, count):
+        pytest.importorskip("akshare")
+&gt;       compare_ths_original(tmp_path, input_id, context, manifest, count)
+
+tests\test_input_collection.py:391: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_input_collection.py:336: in compare_ths_original
+    result = getattr(provider, contract.runtime_method)(**parameters)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = AkShareBoardProvider(client=&lt;module 'akshare' from 'D:\\Program Files\\Python\\Lib\\site-packages\\akshare\\__init__.py'&gt;, name='akshare', capability_version='akshare-ths-board-v1', endpoint='industry_index_daily')
+board_type = 'concept'
+
+    def fetch_fund_flow(
+        self, board_type: str, *, period: str = "即时", snapshot_at: datetime | None = None
+    ) -&gt; AkShareBoardResult:
+        normalized = _board_type(board_type)
+        ak = self.client or load_client()
+        function_name = "stock_fund_flow_industry" if normalized == "industry" else "stock_fund_flow_concept"
+        try:
+            frame = getattr(ak, function_name)(symbol=period)
+        except Exception as exc:
+&gt;           raise ProviderContractError(
+                f"AkShare THS {normalized} fund-flow request failed for {period}",
+                FailureClass.CONNECTION,
+                retryable=True,
+            ) from exc
+E           stock_data_manage.providers.contracts.ProviderContractError: AkShare THS concept fund-flow request failed for 即时
+
+provider_validation\results\ths-original-20261004\boards.py.bin:153: ProviderContractError</failure></testcase><testcase classname="tests.test_input_collection" name="test_ths_mapping_uses_source_columns_and_rejects_identity_mismatch" time="0.468"><failure message="AssertionError: {'adapter_version': 'akshare-ths-board-input-v2', 'code_files': [{'path': 'D:\\Project\\PythonProgram\\stock_data_mana...ion_profile': {'anchor_date': None, 'at_time': None, 'business_day': 'trading_day', 'frequency_interval': 1, ...}, ...}&#10;assert 'failed' == 'candidate_complete'&#10;  &#10;  - candidate_complete&#10;  + failed">tmp_path = WindowsPath('C:/Users/sp181/AppData/Local/Temp/pytest-of-sp181/pytest-62/test_ths_mapping_uses_source_c0')
+no_network = None
+
+    def test_ths_mapping_uses_source_columns_and_rejects_identity_mismatch(tmp_path, no_network):
+        pytest.importorskip("akshare")
+        config = tmp_path / "config"
+        shutil.copytree(ROOT / "config", config)
+        input_id, context, manifest, _ = THS_CASES[1]
+        path = config / "normalization/industry_index_daily.yaml"
+        document = yaml.safe_load(path.read_text(encoding="utf-8"))
+        document["rules"][0]["field_mapping"]["open"] = "收盘价"
+        path.write_text(yaml.safe_dump(document, allow_unicode=True), encoding="utf-8")
+        report = collect_input(input_id=input_id, context=context, config_root=config, output_root=tmp_path / "out", replay_manifest=manifest)
+&gt;       assert report["status"] == "candidate_complete", report
+E       AssertionError: {'adapter_version': 'akshare-ths-board-input-v2', 'code_files': [{'path': 'D:\\Project\\PythonProgram\\stock_data_mana...ion_profile': {'anchor_date': None, 'at_time': None, 'business_day': 'trading_day', 'frequency_interval': 1, ...}, ...}
+E       assert 'failed' == 'candidate_complete'
+E         
+E         - candidate_complete
+E         + failed
+
+tests\test_input_collection.py:404: AssertionError</failure></testcase><testcase classname="tests.test_input_collection" name="test_ths_replay_miss_is_migration_failure_and_period_is_bounded" time="0.376"><failure message="AssertionError: assert ('failed' == 'failed'&#10;  &#10;    failed and 'connection' == 'ValueError'&#10;  &#10;  - ValueError&#10;  + connection)">tmp_path = WindowsPath('C:/Users/sp181/AppData/Local/Temp/pytest-of-sp181/pytest-62/test_ths_replay_miss_is_migrat0')
+no_network = None
+
+    def test_ths_replay_miss_is_migration_failure_and_period_is_bounded(tmp_path, no_network):
+        pytest.importorskip("akshare")
+        missing = tmp_path / "empty.ndjson"
+        missing.write_text("", encoding="utf-8")
+        failed = collect_input(input_id="SDA-BOARD-001", context={}, config_root=ROOT / "config", output_root=tmp_path, replay_manifest=missing)
+&gt;       assert failed["status"] == "failed" and failed["failure_class"] == "ValueError"
+E       AssertionError: assert ('failed' == 'failed'
+E         
+E           failed and 'connection' == 'ValueError'
+E         
+E         - ValueError
+E         + connection)
+
+tests\test_input_collection.py:416: AssertionError</failure></testcase><testcase classname="tests.test_input_collection" name="test_archived_inputs_execute_yaml_and_preserve_evidence[ASTOCK-002-daily-context0-manifest0-14]" time="0.433" /><testcase classname="tests.test_input_collection" name="test_archived_inputs_execute_yaml_and_preserve_evidence[ASTOCK-002-5m-context1-manifest1-96]" time="0.750" /><testcase classname="tests.test_input_collection" name="test_archived_inputs_execute_yaml_and_preserve_evidence[ASTOCK-045-context2-manifest2-52]" time="0.600" /><testcase classname="tests.test_input_collection" name="test_archived_inputs_execute_yaml_and_preserve_evidence[ASTOCK-070-context3-manifest3-8797]" time="0.370"><failure message="AssertionError: {'adapter_version': 'sina-trade-calendar-input-v1', 'code_files': [{'path': 'D:\\Project\\PythonProgram\\stock_data_ma...ion_profile': {'anchor_date': None, 'at_time': None, 'business_day': 'trading_day', 'frequency_interval': 1, ...}, ...}&#10;assert 'failed' == 'candidate_complete'&#10;  &#10;  - candidate_complete&#10;  + failed">tmp_path = WindowsPath('C:/Users/sp181/AppData/Local/Temp/pytest-of-sp181/pytest-62/test_archived_inputs_execute_y3')
+no_network = None, input_id = 'ASTOCK-070', context = {}
+manifest = WindowsPath('D:/Project/PythonProgram/stock_data_manage/provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson')
+count = 8797
+
+    @pytest.mark.parametrize("input_id,context,manifest,count", CASES)
+    def test_archived_inputs_execute_yaml_and_preserve_evidence(tmp_path, no_network, input_id, context, manifest, count):
+        if input_id in {"ASTOCK-045", "ASTOCK-070"}:
+            pytest.importorskip("akshare")
+        original_send, original_init = requests.Session.send, requests.Session.__init__
+        report = collect_input(input_id=input_id, context=context, config_root=ROOT / "config",
+                               output_root=tmp_path, replay_manifest=manifest)
+&gt;       assert report["status"] == "candidate_complete", report
+E       AssertionError: {'adapter_version': 'sina-trade-calendar-input-v1', 'code_files': [{'path': 'D:\\Project\\PythonProgram\\stock_data_ma...ion_profile': {'anchor_date': None, 'at_time': None, 'business_day': 'trading_day', 'frequency_interval': 1, ...}, ...}
+E       assert 'failed' == 'candidate_complete'
+E         
+E         - candidate_complete
+E         + failed
+
+tests\test_input_collection.py:444: AssertionError</failure></testcase><testcase classname="tests.test_input_collection" name="test_tencent_matches_original_shipped_script[ASTOCK-002-daily-context0-manifest0-14]" time="0.581" /><testcase classname="tests.test_input_collection" name="test_tencent_matches_original_shipped_script[ASTOCK-002-5m-context1-manifest1-96]" time="0.869" /><testcase classname="tests.test_input_collection" name="test_yaml_alias_mapping_status_and_code_scope_are_executed" time="0.017" /><testcase classname="tests.test_input_collection" name="test_yaml_types_units_dates_timezone_and_nullable_values" time="0.002" /><testcase classname="tests.test_input_collection" name="test_unverified_units_still_require_valid_source_numbers[True]" time="0.002" /><testcase classname="tests.test_input_collection" name="test_unverified_units_still_require_valid_source_numbers[nan]" time="0.001" /><testcase classname="tests.test_input_collection" name="test_unverified_units_still_require_valid_source_numbers[inf]" time="0.001" /><testcase classname="tests.test_input_collection" name="test_unverified_units_still_require_valid_source_numbers[None]" time="0.001" /><testcase classname="tests.test_input_collection" name="test_unverified_units_still_require_valid_source_numbers[garbage]" time="0.001" /><testcase classname="tests.test_input_collection" name="test_unvalidated_generic_rules_cannot_publish[pending_validation]" time="0.001" /><testcase classname="tests.test_input_collection" name="test_unvalidated_generic_rules_cannot_publish[disabled]" time="0.001" /><testcase classname="tests.test_input_collection" name="test_unvalidated_generic_rules_cannot_publish[expired]" time="0.002" /><testcase classname="tests.test_input_collection" name="test_field_selection_uses_yaml_and_requires_mandatory_fields" time="1.079" /><testcase classname="tests.test_input_collection" name="test_replay_missing_request_is_failure_with_no_network_fallback" time="0.314" /><testcase classname="tests.test_input_collection" name="test_date_snapshot_requires_explicit_calendar_and_blocks_production_output" time="0.269" /><testcase classname="tests.test_input_collection" name="test_exact_response_is_saved_before_json_parser_and_secrets_are_redacted" time="0.070" /><testcase classname="tests.test_input_collection" name="test_daily_source_contract_rejects_invalid_rows_and_keeps_original_bytes[duplicate]" time="0.375" /><testcase classname="tests.test_input_collection" name="test_daily_source_contract_rejects_invalid_rows_and_keeps_original_bytes[outside_window]" time="0.430" /><testcase classname="tests.test_input_collection" name="test_daily_source_contract_rejects_invalid_rows_and_keeps_original_bytes[empty_adjusted]" time="0.412" /><testcase classname="tests.test_input_collection" name="test_daily_source_contract_rejects_invalid_rows_and_keeps_original_bytes[malformed_volume]" time="0.402" /><testcase classname="tests.test_input_collection" name="test_live_path_reuses_matching_fresh_response_before_repeating_request" time="0.747" /><testcase classname="tests.test_input_collection" name="test_sdk_session_retry_policy_and_restoration" time="0.007" /><testcase classname="tests.test_input_collection" name="test_candidate_response_archive_fits_nested_windows_path" time="0.697" /><testcase classname="tests.test_minute_reconciliation" name="test_reconciliation_promotes_history_over_hot" time="0.190" /><testcase classname="tests.test_minute_reconciliation" name="test_reconciliation_isolates_hard_conflict" time="0.203" /><testcase classname="tests.test_normalizer_validator" name="test_normalizer_converts_units_and_start_time_semantics" time="0.001" /><testcase classname="tests.test_normalizer_validator" name="test_validator_rejects_impossible_ohlc" time="0.002" /><testcase classname="tests.test_planner_capability" name="test_missing_set_only_excludes_evidence_backed_completion" time="0.001" /><testcase classname="tests.test_planner_capability" name="test_registry_rejects_expired_and_over_budget_capability" time="0.002" /><testcase classname="tests.test_planner_capability" name="test_disabled_capability_is_never_selected" time="0.002" /><testcase classname="tests.test_planner_capability" name="test_registry_selects_forward_adjustment_only_for_forward_capability" time="0.001" /><testcase classname="tests.test_planner_capability" name="test_watchlist_capacity_and_universe_guard" time="0.002" /><testcase classname="tests.test_planner_capability" name="test_cost_uses_physical_request_shape_and_unknown_pagination" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_shared_pacer_preserves_request_response_and_releases_after_failure" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_factory_paces_each_tencent_single_symbol_minute_request" time="0.358" /><testcase classname="tests.test_provider_contract_adapters" name="test_factory_keeps_eastmoney_source_transport" time="0.217" /><testcase classname="tests.test_provider_contract_adapters" name="test_contract_rejects_html_200_and_rate_limit" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_contract_detects_schema_change_and_silent_row_limit" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_contract_classifies_http_failures[500-http_5xx-True]" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_contract_classifies_http_failures[404-http_error-False]" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_contract_classifies_http_failures[403-rate_limited-False]" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_contract_classifies_http_failures[429-rate_limited-False]" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_contract_classifies_invalid_json" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_tencent_adapter_parses_observed_daily_envelope" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_tencent_forward_daily_adapter_requires_qfq_envelope" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_tencent_forward_daily_does_not_fallback_to_unadjusted_day" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_tencent_forward_daily_is_qualified_only_for_stock_and_etf" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_daily_adapter_reports_the_full_returned_window" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_sina_adapter_parses_observed_daily_envelope_and_probe_evidence" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_empty_probe_is_not_promoted_to_success" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_probe_evidence_is_persisted_in_capability_registry" time="0.204" /><testcase classname="tests.test_provider_contract_adapters" name="test_forward_probe_persists_forward_adjustment" time="0.190" /><testcase classname="tests.test_provider_contract_adapters" name="test_tencent_minute_adapter_parses_compact_timestamp" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_minute_adapter_filters_rows_newer_than_as_of" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_minute_probe_records_time_range_and_expiry" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_sina_minute_adapter_parses_day_timestamp" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_tdx_minute_adapter_normalizes_client_rows_and_closes_client" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_tdx_adapter_marks_missing_bars_as_empty_without_inventing_rows" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_tdx_adapter_rejects_rows_with_missing_ohlcv_fields" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_tencent_snapshot_adapter_parses_observed_quote_line" time="0.001" /><testcase classname="tests.test_provider_contract_adapters" name="test_sina_snapshot_adapter_parses_observed_quote_line" time="0.002" /><testcase classname="tests.test_provider_contract_adapters" name="test_tencent_snapshot_batches_entire_requested_scope_without_dropping_remainder" time="0.009" /><testcase classname="tests.test_provider_health" name="test_rate_limit_opens_only_concrete_capability_until_probe_succeeds" time="0.136" /><testcase classname="tests.test_provider_health" name="test_ordinary_failures_open_at_threshold" time="0.131" /><testcase classname="tests.test_publication_policy" name="test_publication_policy_allows_values_on_both_boundaries" time="0.001" /><testcase classname="tests.test_publication_policy" name="test_publication_policy_rejects_when_either_boundary_is_exceeded" time="0.001" /><testcase classname="tests.test_raw_metadata" name="test_raw_objects_are_immutable_and_verifiable" time="0.019" /><testcase classname="tests.test_raw_metadata" name="test_metadata_round_trips_attempt_and_completed_no_trade_partition" time="0.150" /><testcase classname="tests.test_raw_metadata" name="test_conflict_log_is_deduplicated" time="0.171" /><testcase classname="tests.test_realtime_minute" name="test_session_expected_bars_and_boundaries" time="0.001" /><testcase classname="tests.test_realtime_minute" name="test_realtime_collector_writes_closed_bar_to_hot_store" time="0.044" /><testcase classname="tests.test_realtime_minute" name="test_realtime_collector_skips_outside_session_and_rejects_full_market" time="0.040" /><testcase classname="tests.test_realtime_minute" name="test_snapshot_aggregation_handles_cumulative_volume_and_sampling_flag" time="0.001" /><testcase classname="tests.test_realtime_minute" name="test_unified_query_prefers_final_canonical_over_hot" time="0.085" /><testcase classname="tests.test_realtime_minute" name="test_minute_completeness_metadata" time="0.102" /><testcase classname="tests.test_resample_hot_store" name="test_resample_five_complete_minutes" time="0.002" /><testcase classname="tests.test_resample_hot_store" name="test_resample_does_not_bridge_missing_minute" time="0.002" /><testcase classname="tests.test_resample_hot_store" name="test_resample_requires_exchange_aligned_five_minute_window" time="0.002" /><testcase classname="tests.test_resample_hot_store" name="test_hot_store_upserts_higher_quality_and_queries_immediately" time="0.046" /><testcase classname="tests.test_resolution_integrity" name="test_final_history_replaces_provisional_without_field_splicing" time="0.001" /><testcase classname="tests.test_resolution_integrity" name="test_hard_conflict_quarantines_only_the_record" time="0.001" /><testcase classname="tests.test_resolution_integrity" name="test_row_hash_is_order_stable" time="0.001" /><testcase classname="tests.test_resolution_integrity" name="test_manifest_detects_file_tampering" time="0.022" /><testcase classname="tests.test_retry_security_calendar" name="test_retry_retries_timeout_but_not_rate_limit" time="0.001" /><testcase classname="tests.test_retry_security_calendar" name="test_fallback_moves_to_next_provider_after_retry_budget" time="0.001" /><testcase classname="tests.test_retry_security_calendar" name="test_security_merge_preserves_previous_on_missing_and_records_classification_conflict" time="0.001" /><testcase classname="tests.test_retry_security_calendar" name="test_security_expected_set_uses_historical_listing_window" time="0.001" /><testcase classname="tests.test_retry_security_calendar" name="test_security_master_store_round_trips_records_and_aliases" time="0.099" /><testcase classname="tests.test_retry_security_calendar" name="test_calendar_source_priority_and_unknown_day_semantics" time="0.064" /><testcase classname="tests.test_scheduler" name="test_phase_one_schedule_is_configured_and_idempotent_per_day" time="0.001" /><testcase classname="tests.test_scheduler" name="test_schedule_yaml_skips_disabled_tdx_delayed_jobs" time="0.005" /><testcase classname="tests.test_scheduler" name="test_tencent_profiles_separate_scope_frequency_and_request_speed" time="0.011" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[9-30-5-None]" time="0.013" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[9-34-59-None]" time="0.013" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[9-35-4-None]" time="0.012" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[9-35-5-expected3]" time="0.013" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[9-35-34-expected4]" time="0.013" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[9-35-35-None]" time="0.013" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[11-30-5-expected6]" time="0.012" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[11-31-0-None]" time="0.012" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[12-0-0-None]" time="0.012" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[13-0-5-None]" time="0.011" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[13-5-5-expected10]" time="0.011" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[15-0-5-expected11]" time="0.013" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[15-1-0-None]" time="0.012" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[16-0-0-None]" time="0.013" /><testcase classname="tests.test_scheduler" name="test_daily_slots_calendar_intervals_and_timezone" time="0.013" /><testcase classname="tests.test_scheduler" name="test_full_stock_selection_has_no_100_or_200_symbol_truncation" time="0.274" /><testcase classname="tests.test_scheduler" name="test_snapshot_switch_to_minutes_keeps_full_scope_and_migration_gate" time="0.378" /><testcase classname="tests.test_scheduler" name="test_minute_capacity_missing_scope_and_scope_limits_block_execution" time="1.166" /><testcase classname="tests.test_scheduler" name="test_invalid_frequency_config_is_rejected[changes0]" time="0.081" /><testcase classname="tests.test_scheduler" name="test_invalid_frequency_config_is_rejected[changes1]" time="0.080" /><testcase classname="tests.test_scheduler" name="test_invalid_frequency_config_is_rejected[changes2]" time="0.092" /><testcase classname="tests.test_scheduler" name="test_invalid_frequency_config_is_rejected[changes3]" time="0.086" /><testcase classname="tests.test_scheduler" name="test_invalid_frequency_config_is_rejected[changes4]" time="0.084" /><testcase classname="tests.test_scheduler" name="test_invalid_frequency_config_is_rejected[changes5]" time="0.081" /><testcase classname="tests.test_scheduler" name="test_invalid_frequency_config_is_rejected[changes6]" time="0.095" /><testcase classname="tests.test_scheduler" name="test_invalid_frequency_config_is_rejected[changes7]" time="0.085" /><testcase classname="tests.test_scheduler" name="test_invalid_frequency_config_is_rejected[changes8]" time="0.087" /><testcase classname="tests.test_scheduler" name="test_candidate_tick_survives_restart_and_uses_existing_collector_and_shared_pacer" time="1.911" /><testcase classname="tests.test_scheduler" name="test_failed_slot_does_not_hammer_source_on_every_tick" time="1.396" /><testcase classname="tests.test_scheduler" name="test_daily_tick_passes_current_slot_date_and_does_not_change_qfq_semantics" time="0.898" /><testcase classname="tests.test_scheduler" name="test_planning_does_not_create_database_or_call_collector" time="0.572" /><testcase classname="tests.test_scheduler" name="test_scheduler_cannot_write_production_outputs" time="0.014" /><testcase classname="tests.test_scheduler" name="test_daily_time_edit_does_not_repeat_completed_day" time="1.449" /><testcase classname="tests.test_sector_data_providers" name="test_akshare_ths_industry_directory_and_history_preserve_request_contract" time="0.008" /><testcase classname="tests.test_sector_data_providers" name="test_akshare_board_fund_flow_is_timestamped_and_keeps_source_units" time="0.009" /><testcase classname="tests.test_sector_data_providers" name="test_existing_board_method_resolves_directory_and_keeps_period_return_contract" time="0.013" /><testcase classname="tests.test_sector_data_providers" name="test_baostock_csrc_membership_archives_sdk_rows_and_normalizes" time="0.004" /><testcase classname="tests.test_sector_data_providers" name="test_baostock_provider_archives_sdk_failure_before_raising" time="0.002" /><testcase classname="tests.test_snapshot_daily" name="test_snapshot_daily_builder_creates_provisional_bar_with_rule_units" time="0.002" /><testcase classname="tests.test_snapshot_daily" name="test_snapshot_daily_builder_rejects_wrong_date_and_missing_identity" time="0.001" /><testcase classname="tests.test_ths_board_provider" name="test_ths_board_provider_maps_member_table" time="0.003" /><testcase classname="tests.test_ths_board_provider" name="test_ths_board_provider_rejects_unknown_board_type" time="0.001" /><testcase classname="tests.test_ths_board_provider" name="test_ths_board_provider_enforces_configured_request_interval" time="0.003" /><testcase classname="tests.test_ths_board_provider" name="test_ths_board_provider_parses_board_list_from_main_table" time="0.002" /><testcase classname="tests.test_ths_board_provider" name="test_ths_board_provider_classifies_login_redirect" time="0.002" /><testcase classname="tests.test_ths_board_provider" name="test_ths_board_provider_passes_qstock_cookie" time="0.002" /><testcase classname="tests.test_ths_board_provider" name="test_ths_board_provider_fetches_and_deduplicates_member_pages" time="3.004" /><testcase classname="tests.test_ths_board_provider" name="test_ths_board_snapshot_can_be_committed_to_raw_store" time="0.041" /><testcase classname="tests.test_update_services" name="test_security_master_update_does_not_delist_when_one_source_is_empty" time="0.120" /><testcase classname="tests.test_update_services" name="test_calendar_update_keeps_previous_day_when_source_fails" time="0.076" /><testcase classname="tests.test_update_services" name="test_calendar_update_does_not_create_holiday_from_single_empty_source" time="0.059" /></testsuite></testsuites>

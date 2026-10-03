@@ -215,3 +215,29 @@ def test_baostock_provider_archives_sdk_failure_before_raising(monkeypatch):
     assert len(archive.payloads) == 1
     saved = json.loads(archive.payloads[0][0])
     assert saved["result"]["error_code"] == "10001001"
+
+
+def test_baostock_shared_sdk_session_stays_owned_until_logout():
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Barrier
+    from time import sleep
+    from types import SimpleNamespace
+    from stock_data_manage.providers.baostock.session import logged_in_session
+    active, barrier = [0], Barrier(2)
+    class SharedSDK:
+        def login(self):
+            assert active[0] == 0, "a second login replaced an active SDK session"
+            active[0] += 1
+            sleep(0.01)
+            return SimpleNamespace(error_code="0", error_msg="")
+        def logout(self):
+            active[0] -= 1
+    client = SharedSDK()
+    def work(_):
+        barrier.wait()
+        with logged_in_session(client=client):
+            sleep(0.01)
+            assert active[0] == 1
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        list(executor.map(work, range(2)))
+    assert active[0] == 0

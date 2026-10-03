@@ -95,7 +95,7 @@ def test_recent_minute_contract_rejects_history_and_invalid_count():
 def test_snapshot_requires_known_trading_date_and_separates_local_filter():
     contract = next(c for c in load_input_capabilities(PROJECT_ROOT / "config/providers.yaml") if c.input_id == "SDA-BOARD-005")
     context = {"request": {"trade_date": "2026-09-30"}, "calendar": {"trading_dates": [date(2026, 9, 30)]}}
-    assert contract.bind_parameters(context) == {"day": date(2026, 9, 30)}
+    assert contract.bind_parameters(context) == {"trade_date": date(2026, 9, 30)}
     with pytest.raises(ValueError, match="calendar coverage"):
         contract.bind_parameters({"request": {"trade_date": "2026-09-30"}})
     with pytest.raises(ValueError, match="known trading day"):

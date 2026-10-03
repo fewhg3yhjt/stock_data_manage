@@ -2187,22 +2187,30 @@ input_capabilities:
     request_shape: full_snapshot
     collection_profile: reference_daily
     parameters:
-      day:
+      trade_date:
         type: date
         source: request.trade_date
         required: true
+      symbols:
+        type: strings
+        source: request.symbols
+        required: false
+        applied_at: local_filter
     implementation_status: implemented_validation_only
+    dataset: security_snapshot
+    runtime_method: fetch_snapshot
+    forbidden_sources: [request.symbol]
     runtime_endpoint: baostock.industry_membership
     limitations:
     - 通过代码/交易所规则筛选得到沪深A股证券集合；BaoStock TCP原始帧不对SDK调用方开放。2026-10-02非交易日空返回已保存在 provider_validation/results/live-probes/baostock-industry-20261003/result.json。
     - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
     base_requests_per_fetch: 2
-    trading_date_parameter: day
+    trading_date_parameter: trade_date
     evidence_refs:
     - SDA-BOARD-005
     request_interval_seconds: 3
     effective_concurrency: 1
-    request_limit_enforcement: unimplemented
+    request_limit_enforcement: call_boundary_only
   SDA-BOARD-006:
     provider: baostock
     endpoint: industry_membership
@@ -2212,19 +2220,27 @@ input_capabilities:
     request_shape: full_snapshot
     collection_profile: reference_daily
     parameters:
-      date:
+      trade_date:
         type: date
         source: request.trade_date
         required: true
+      symbols:
+        type: strings
+        source: request.symbols
+        required: false
+        applied_at: local_filter
     implementation_status: implemented_validation_only
+    dataset: industry_membership
+    runtime_method: fetch_snapshot
+    forbidden_sources: [request.symbol]
     runtime_endpoint: baostock.industry_membership
     limitations:
     - 已归档query_stock_industry SDK解码字段与原始行；缺失2只，因此覆盖不完整。BaoStock TCP原始帧不对SDK调用方开放。2026-10-02非交易日空返回已单独留档。
     - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
     base_requests_per_fetch: 2
-    trading_date_parameter: date
+    trading_date_parameter: trade_date
     evidence_refs:
     - SDA-BOARD-006
     request_interval_seconds: 3
     effective_concurrency: 1
-    request_limit_enforcement: unimplemented
+    request_limit_enforcement: call_boundary_only

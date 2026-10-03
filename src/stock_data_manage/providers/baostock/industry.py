@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 from contextlib import nullcontext
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 import json
+from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 from ..contracts import FailureClass, ProviderContractError
+from ...quality.normalization import Normalizer
 from .session import logged_in_session, read_rows
 
 
@@ -19,6 +21,13 @@ class BaoStockIndustryResult:
     missing_symbols: tuple[str, ...]
     response_statuses: tuple[int, ...] = ()
     field_semantics: tuple[str, ...] = ()
+    source_rows: tuple[Mapping[str, Any], ...] = ()
+    mapping_context: Mapping[str, Any] = field(default_factory=dict)
+    source_url: str | None = None
+    units: tuple[str, ...] = ()
+    returned_first_key: str | None = None
+    returned_last_key: str | None = None
+    missing_industry_symbols: tuple[str, ...] = ()
 
 
 @dataclass(slots=True)
@@ -27,7 +36,9 @@ class BaoStockIndustryMembershipProvider:
 
     name: str = "baostock"
     endpoint: str = "industry_membership"
-    capability_version: str = "baostock-csrc-industry-v1"
+    capability_version: str = "baostock-snapshot-input-v2"
+    client: Any | None = None
+    normalization_root: Path | None = None
 
     def fetch_snapshot(
         self,
@@ -39,7 +50,8 @@ class BaoStockIndustryMembershipProvider:
         requested_filter = (
             {_canonical_symbol(item) for item in symbols} if symbols is not None else None
         )
-        with logged_in_session() as bs:
+        session = logged_in_session(client=self.client) if self.client is not None else logged_in_session()
+        with session as bs:
             listed_result = bs.query_all_stock(day=trade_date.isoformat())
             listed_rows = _read_success(
                 listed_result, "query_all_stock", raw_archive, trade_date
@@ -56,6 +68,12 @@ class BaoStockIndustryMembershipProvider:
                 raw_archive, "query_stock_industry", industry_result, industry_rows, trade_date
             )
 
+        for result, required in ((listed_result, {"code", "code_name", "tradeStatus"}),
+                                 (industry_result, {"code", "industry", "industryClassification", "updateDate"})):
+            fields = result.fields if isinstance(result.fields, list) else str(result.fields).split(",")
+            if not required <= set(fields):
+                raise ProviderContractError("BaoStock snapshot columns changed", FailureClass.SCHEMA_CHANGED, retryable=False)
+
         securities: dict[str, dict[str, str]] = {}
         for row in listed_rows:
             raw_code = str(row.get("code", ""))
@@ -65,7 +83,10 @@ class BaoStockIndustryMembershipProvider:
             symbol = _symbol(raw_code)
             if requested_filter is not None and symbol not in requested_filter:
                 continue
+            if code in securities:
+                raise ProviderContractError("BaoStock security snapshot has duplicate codes", FailureClass.SCHEMA_CHANGED, retryable=False)
             securities[code] = {
+                **row,
                 "symbol": symbol,
                 "stock_name": str(row.get("code_name", "")),
                 "status": "active" if str(row.get("tradeStatus", "")) == "1" else "suspended",
@@ -88,23 +109,30 @@ class BaoStockIndustryMembershipProvider:
                 industries[code] = row
 
         rows: list[Mapping[str, Any]] = []
+        source_rows = []
         missing_symbols: list[str] = []
+        dataset = "security_snapshot" if self.endpoint == "security_snapshot" else "industry_membership"
+        from ...config.loader import load_normalization_document
+        document = load_normalization_document(self.normalization_root or Path(__file__).resolve().parents[4] / "config/normalization", dataset)
+        input_id = "SDA-BOARD-005" if dataset == "security_snapshot" else "SDA-BOARD-006"
+        mapping = next(rule["field_mapping"] for rule in document["rules"]
+                       if rule.get("input_id") == input_id and rule.get("provider") == "baostock" and rule.get("endpoint") == dataset)
         for code, security in sorted(securities.items()):
             industry = industries.get(code)
             industry_name = str(industry.get("industry", "")) if industry else ""
             if not industry_name:
                 missing_symbols.append(security["symbol"])
-                continue
+                if dataset == "industry_membership":
+                    continue
+            raw = {key: value for key, value in security.items() if key in {"code", "code_name", "tradeStatus"}}
+            if dataset == "industry_membership":
+                raw.update({key: value for key, value in industry.items() if key not in {"code", "code_name"}})
+            raw.update(canonical_stock_code=code, exchange=security["exchange"], status=security["status"])
+            source_rows.append(raw)
             rows.append(
                 {
+                    **Normalizer.map_fields(raw, mapping),
                     "trade_date": trade_date.isoformat(),
-                    "stock_code": code,
-                    "stock_name": security["stock_name"],
-                    "exchange": security["exchange"],
-                    "status": security["status"],
-                    "industry_name": industry_name,
-                    "classification": industry.get("industryClassification"),
-                    "classification_update_date": industry.get("updateDate"),
                     "source": "baostock",
                 }
             )
@@ -119,11 +147,16 @@ class BaoStockIndustryMembershipProvider:
             tuple(item["symbol"] for item in securities.values()),
             trade_date,
             len(securities),
-            tuple(missing_symbols),
+            tuple(missing_symbols) if dataset == "industry_membership" else (),
             field_semantics=(
                 "stock_code", "stock_name", "exchange", "status", "industry_name",
                 "classification", "classification_update_date",
-            ),
+            ) if dataset == "industry_membership" else ("stock_code", "stock_name", "exchange", "status"),
+            source_rows=tuple(source_rows),
+            mapping_context={"trade_date": trade_date, "source": "baostock"},
+            returned_first_key=str(rows[0]["stock_code"]) if rows else None,
+            returned_last_key=str(rows[-1]["stock_code"]) if rows else None,
+            missing_industry_symbols=tuple(missing_symbols),
         )
 
 

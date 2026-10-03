@@ -1,4 +1,4 @@
-"""Persist the four-input offline migration evidence using the executable regression checks."""
+"""Persist selected input migration evidence using executable regression checks."""
 from __future__ import annotations
 
 import argparse
@@ -19,9 +19,10 @@ def main():
     parser.add_argument("--output-root", type=Path, required=True)
     parser.add_argument("--verify-scheduling", action="store_true", help="also preserve scheduler and quote batch offline evidence")
     parser.add_argument("--verify-ths-inputs", action="store_true", help="verify only the four existing THS board inputs")
+    parser.add_argument("--verify-bao-inputs", action="store_true", help="verify only the two existing BaoStock snapshot inputs")
     args = parser.parse_args()
-    if args.verify_ths_inputs and args.verify_scheduling:
-        parser.error("THS migration and scheduling verification are separate scopes")
+    if sum((args.verify_ths_inputs, args.verify_bao_inputs, args.verify_scheduling)) > 1:
+        parser.error("THS, BaoStock and scheduling verification are separate scopes")
     args.output_root = args.output_root.resolve()
     if not args.output_root.is_relative_to(ROOT / "provider_validation/results"):
         parser.error("verification outputs must be under provider_validation/results")
@@ -45,11 +46,20 @@ def main():
     def forbidden_network(*args, **kwargs):
         raise AssertionError("offline replay cannot access network")
 
-    with patch("requests.adapters.HTTPAdapter.send", forbidden_network):
-        cases = checks.THS_CASES if args.verify_ths_inputs else checks.CASES
+    import socket
+    original_connect = socket.socket.connect
+    def guarded_connect(sock, address):
+        if isinstance(address, tuple) and address[0] in {"127.0.0.1", "::1"}:
+            return original_connect(sock, address)
+        forbidden_network()
+
+    with patch("requests.adapters.HTTPAdapter.send", forbidden_network), patch("socket.socket.connect", guarded_connect):
+        cases = checks.BAO_CASES if args.verify_bao_inputs else checks.THS_CASES if args.verify_ths_inputs else checks.CASES
         for index, (input_id, context, manifest, count) in enumerate(cases):
-            directory = args.output_root / (str(index + 1) if args.verify_ths_inputs else input_id)
-            validator = checks.test_ths_archived_inputs_execute_source_yaml if args.verify_ths_inputs else checks.test_archived_inputs_execute_yaml_and_preserve_evidence
+            directory = args.output_root / (str(index + 1) if args.verify_ths_inputs or args.verify_bao_inputs else input_id)
+            validator = (checks.test_bao_archived_inputs_preserve_sdk_rows_and_coverage if args.verify_bao_inputs else
+                         checks.test_ths_archived_inputs_execute_source_yaml if args.verify_ths_inputs else
+                         checks.test_archived_inputs_execute_yaml_and_preserve_evidence)
             validator(directory, None, input_id, context, manifest, count)
             report_path = next(directory.rglob("report.json"))
             report = json.loads(report_path.read_text(encoding="utf-8"))
@@ -57,6 +67,26 @@ def main():
                 "report_sha256": hashlib.sha256(report_path.read_bytes()).hexdigest(), "source_manifest": manifest.relative_to(ROOT).as_posix(),
                 "source_manifest_sha256": hashlib.sha256(manifest.read_bytes()).hexdigest(), "row_count": count,
                 "scope": report["parameters"], "code_version": report["code_version"], "result": "passed"})
+        if args.verify_bao_inputs:
+            summary["known_differences"] = ["SDK解码载荷已精确归档；TCP帧、URL、HTTP头和SDK内部物理请求不可见。",
+                "证券快照保留原筛选的5223只证券；行业归属5221行、缺失2只，不能宣称全量分类。",
+                "新字段合同从原SDK两查询结果提取两种输出，旧行业方法的默认返回保持一致。",
+                "分类更新时间来自updateDate，不使用查询日期替代；既有行业主键定义保持。",
+                "离线回放及缓存的ResultSet仅复现SDK外部接口；没有替换在线SDK传输。"]
+            summary["original_vs_provider"].append(checks.compare_bao_original(args.output_root / "c"))
+            summary["empty_scope"] = checks.bao_empty_scope_check(args.output_root / "e")
+            summary["negative_checks"] = []
+            for index, (mutation, expected) in enumerate((("sdk_error", "connection"), ("missing_query", "ValueError"),
+                                                         ("schema", "schema_changed"), ("duplicate", "schema_changed"),
+                                                         ("corrupt_hash", "ValueError"), ("secret_payload", "ValueError"))):
+                directory = args.output_root / ("f" + str(index + 1))
+                checks.test_bao_failed_contract_retains_source_evidence(directory, None, mutation, expected)
+                failure_path = next(directory.rglob("report.json"))
+                summary["negative_checks"].append({"mutation": mutation, "expected_failure_class": expected, "result": "passed",
+                    "report_path": failure_path.relative_to(ROOT).as_posix(), "report_sha256": hashlib.sha256(failure_path.read_bytes()).hexdigest()})
+            checks.test_bao_live_fixture_preserves_session_pacing_and_reuses_cache(args.output_root / "p", None)
+            summary["session_pacing_cache"] = {"mode": "injected SDK fixture; not live provider verification",
+                "post_payload_interval_seconds": 3, "cache_reused_before_login": True, "result": "passed"}
         if args.verify_ths_inputs:
             summary["known_differences"] = ["原Provider所有旧字段、行数和窗口均对照；候选标准字段按YAML映射。",
                 "行业量额、资金流金额单位未确认，来源值保留、标准列置空。快照时间来自原响应采集批次。",
@@ -76,7 +106,7 @@ def main():
             summary["negative_checks"] = {"strict_replay_miss": "passed", "immediate_period_only": "passed",
                 "report_path": failure_path.relative_to(ROOT).as_posix(), "report_sha256": hashlib.sha256(failure_path.read_bytes()).hexdigest(),
                 "failure_class": failure["failure_class"], "production_writes": failure["production_writes"]}
-        for input_id, context, manifest, count in ([] if args.verify_ths_inputs else checks.CASES[:2]):
+        for input_id, context, manifest, count in ([] if args.verify_ths_inputs or args.verify_bao_inputs else checks.CASES[:2]):
             directory = args.output_root / ("d" if input_id.endswith("daily") else "m")
             checks.test_tencent_matches_original_shipped_script(directory, None, input_id, context, manifest, count)
             original = [json.loads(line) for line in (directory / "original/manifest.ndjson").read_text(encoding="utf-8").splitlines()]
@@ -88,7 +118,7 @@ def main():
                                        for left, right in zip(original, report["responses"])],
                 "original_manifest": (directory / "original/manifest.ndjson").relative_to(ROOT).as_posix(),
                 "provider_report": next((directory / "adapter").rglob("report.json")).relative_to(ROOT).as_posix()})
-        for input_id, filename in ([] if args.verify_ths_inputs else [("ASTOCK-045", "43_东财涨停池"), ("ASTOCK-070", "68_交易日历")]):
+        for input_id, filename in ([] if args.verify_ths_inputs or args.verify_bao_inputs else [("ASTOCK-045", "43_东财涨停池"), ("ASTOCK-070", "68_交易日历")]):
             csv_path = ROOT / "provider_validation/results/live-probes/rate-limited-all-20261003" / filename / "data.csv"
             summary["original_vs_provider"].append({"input_id": input_id, "original_parsed_csv": csv_path.relative_to(ROOT).as_posix(),
                 "original_parsed_sha256": hashlib.sha256(csv_path.read_bytes()).hexdigest(),

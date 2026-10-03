@@ -1,0 +1,73 @@
+{
+  "validation_time_utc": "2026-10-03T18:40:36.006671+00:00",
+  "scope": [
+    "SDA-BOARD-005",
+    "SDA-BOARD-006"
+  ],
+  "sources": [
+    {
+      "source_path": "src/stock_data_manage/providers/baostock/industry.py",
+      "snapshot_path": "industry.py.bin",
+      "sha256": "08362eed2be7535fbbc7052ea00990873a7b6f9b8dd7216107bbe55ac9075d28",
+      "byte_length": 8351
+    },
+    {
+      "source_path": "src/stock_data_manage/providers/baostock/session.py",
+      "snapshot_path": "session.py.bin",
+      "sha256": "a527fce3c18e3ff68a7c41040741df0cb315fc8b8c3c4e2604fcbc6b6e562f4e",
+      "byte_length": 1784
+    }
+  ],
+  "original_sdk_manifest": {
+    "path": "provider_validation/results/live-probes/baostock-industry-20260930-20261003/_raw/baostock-industry/manifest.ndjson",
+    "sha256": "7096e007984eed7f33b465d27efadc7ae2d3049de62913f15a8d95e9c8ad474e"
+  },
+  "source_payloads": [
+    {
+      "endpoint": "query_all_stock",
+      "sha256": "d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66",
+      "fields": [
+        "code",
+        "tradeStatus",
+        "code_name"
+      ],
+      "rows": 7423,
+      "fetched_at_utc": "2026-10-03T10:16:06.221+00:00"
+    },
+    {
+      "endpoint": "query_stock_industry",
+      "sha256": "3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26",
+      "fields": [
+        "updateDate",
+        "code",
+        "code_name",
+        "industry",
+        "industryClassification"
+      ],
+      "rows": 5556,
+      "fetched_at_utc": "2026-10-03T10:16:32.498+00:00"
+    }
+  ],
+  "original_result": {
+    "path": "provider_validation/results/live-probes/baostock-industry-20260930-20261003/result.json",
+    "sha256": "85f64047b2f2eabd94d5d3695a1ddfffbfea1419a54991e20d343e7a38054fb7"
+  },
+  "ashare_denominator": 5223,
+  "industry_rows": 5221,
+  "missing_symbols": [
+    "sz001246",
+    "sz301716"
+  ],
+  "implementation_plan": {
+    "reuse": "BaoStockIndustryMembershipProvider.fetch_snapshot; keep both queries, login/logout and old membership return by default",
+    "outputs": "security_snapshot and industry_membership use separate YAML contracts; report missing coverage explicitly",
+    "transport": "retain BaoStock SDK; replay and archive only SDK-decoded payloads, never claim wire capture",
+    "excluded": [
+      "automatic scheduling",
+      "production routing",
+      "security master updates",
+      "adjacent providers",
+      "new live full-market probes"
+    ]
+  }
+}

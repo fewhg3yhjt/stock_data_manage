@@ -1,0 +1,4 @@
+        def query_stock_industry(self, **kwargs):
+            calls.append(("query_stock_industry", kwargs, clock[0]))
+            return _decoded_result_set({"fields": ["code", "code_name", "industry", "industryClassification", "updateDate"],
+                "rows": [{"code": "sh.600519", "code_name": "样本股", "industry": "样本行业", "industryClassification": "证监会行业分类", "updateDate": "2026-09-28"}]})

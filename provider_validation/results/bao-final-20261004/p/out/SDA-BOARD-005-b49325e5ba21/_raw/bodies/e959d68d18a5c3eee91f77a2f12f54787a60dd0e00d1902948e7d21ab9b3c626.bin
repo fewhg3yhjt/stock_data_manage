@@ -1,0 +1,3 @@
+        def logout(self):
+            calls.append(("logout", {}, clock[0]))
+            return SimpleNamespace(error_code="0", error_msg="")

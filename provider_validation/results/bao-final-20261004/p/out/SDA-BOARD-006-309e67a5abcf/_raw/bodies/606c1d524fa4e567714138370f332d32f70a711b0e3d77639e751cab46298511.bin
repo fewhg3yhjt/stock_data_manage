@@ -1,0 +1,3 @@
+        def login(self):
+            calls.append(("login", {}, clock[0]))
+            return SimpleNamespace(error_code="0", error_msg="")

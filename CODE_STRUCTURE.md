@@ -35,6 +35,8 @@ Provider 接口验证资料统一位于 `provider_validation/`：`tests/` 保存
 
 同花顺四项既有接口的后续实施见 `provider_validation/docs/2026-10-04-ths-input-collection.md`。原 `providers/akshare/boards.py` 通过现有 YAML 映射保留旧返回，同时提供 SDK 原列给通用候选流程；`industry_directory.yaml` 为新增目录字段模板，行业日线/资金流复用原模板，三个同名归一化文件补来源映射。原 CLI 通过 `--context-file` 接收板块与依赖参数。修改前源码存于 `results/ths-original-20261004/`，最终对照、回归和索引存于 `results/ths-final-20261004/` 及同前缀测试/验证文件，均不属于生产数据。
 
+BaoStock 后续两项转换见 `provider_validation/docs/2026-10-04-baostock-input-collection.md`。原 `industry.py` 的两查询方法分别输出证券状态快照和行业归属，保留旧默认返回；原 `session.py` 承担 SDK 解码证据回放、缓存复用、查询间隔和会话串行。新增 `datasets/security_snapshot.yaml` 及两项对应归一化文件，复用原行业模板。原源码、最终验证和 CLI 证据分别位于 `results/bao-original-20261004/`、`bao-final-20261004/` 和 `bao-cli-20261004/`；SDK 原始TCP帧不可见。
+
 `.gitattributes` 对本次新证据目录禁用 Git 换行转换，并固定新增实现/模板的 LF 格式，避免提交和检出改变证据字节及其 SHA-256 引用；不更改旧证据属性。
 
 ## 领域模型
@@ -61,10 +63,10 @@ Provider 接口验证资料统一位于 `provider_validation/`：`tests/` 保存
 | `providers/sina/snapshot.py` | Sina 批量收盘快照 |
 | `providers/sina/minute.py` | Sina 原生 5m 分钟线 |
 | `providers/tdx/minute.py` | 注入式 TDX 延迟 1m 分钟线 |
-| `providers/baostock/session.py` | BaoStock SDK 登录、登出、代码映射和结果集读取 |
+| `providers/baostock/session.py` | BaoStock SDK 登录至登出的会话串行、代码映射和结果集读取；两查询解码载荷留证、严格回放、缓存及查询边界限速 |
 | `providers/baostock/daily.py` | BaoStock 历史日线，初始角色为校验来源 |
 | `providers/baostock/minute.py` | BaoStock 原生 5m，初始角色为校验来源 |
-| `providers/baostock/industry.py` | BaoStock 证监会行业成分快照；可保存 SDK 解码行，原始 TCP 帧不可见 |
+| `providers/baostock/industry.py` | 原 BaoStock 两查询、沪深A股筛选与行业合并；分别提供证券快照/行业归属的 YAML 映射候选，保留旧默认返回与覆盖缺失；TCP帧不可见 |
 | `providers/baostock/__init__.py` | BaoStock 适配器导出 |
 | `providers/eastmoney/dividend.py` | EastMoney 分红实施事件批量查询和分红事件标准化 |
 | `providers/eastmoney/security_list.py` | EastMoney 分页证券列表、市场和资产类型映射 |

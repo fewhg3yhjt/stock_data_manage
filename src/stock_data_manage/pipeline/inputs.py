@@ -72,7 +72,9 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                   Path(__file__).parents[1] / "providers/tencent/minute.py",
                   Path(__file__).parents[1] / "providers/eastmoney/limit_pool.py",
                   Path(__file__).parents[1] / "providers/sina/calendar.py",
-                  Path(__file__).parents[1] / "providers/akshare/boards.py"]
+                  Path(__file__).parents[1] / "providers/akshare/boards.py",
+                  Path(__file__).parents[1] / "providers/baostock/industry.py",
+                  Path(__file__).parents[1] / "providers/baostock/session.py"]
     code_version = hashlib.sha256(b"".join(path.read_bytes() for path in code_files)).hexdigest()
     # Response filenames contain a full SHA-256 plus a temporary suffix. Keep the
     # run component short for Windows paths; UTC times remain in every evidence record.
@@ -98,6 +100,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
         "eligible_for_production_routing": False, "production_writes": 0,
         "validation_time_utc": datetime.now(timezone.utc).isoformat(), "status": "started"}
     report["response_freshness_seconds"] = profile.refresh_interval_seconds or 86400
+    is_baostock = input_id in {"SDA-BOARD-005", "SDA-BOARD-006"}
     if input_id == "SDA-BOARD-002":
         report["config_files"].extend({"path": str(path.resolve()), "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
             for path in (config_root / "datasets/industry_directory.yaml", config_root / "normalization/industry_directory.yaml"))
@@ -121,6 +124,37 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
         pacer.configure(urlsplit(host).hostname, max(3, contract.request_interval_seconds), 1)
     evidence_root = Path(evidence_root) if evidence_root else project_root / "provider_validation/results"
     try:
+        if is_baostock:
+            import inspect
+            import importlib.metadata
+            try:
+                import baostock as sdk_module
+            except ImportError:
+                sdk_module = None
+            sdk = client or sdk_module
+            report["sdk_dependency"] = {"version": (getattr(client, "__version__", "injected_fixture") if client is not None else
+                                                     importlib.metadata.version("baostock") if sdk_module else "unavailable_offline"),
+                                        "client_injected": client is not None, "dependencies": []}
+            for name in ("query_all_stock", "query_stock_industry", "login", "logout"):
+                function = getattr(sdk, name, None)
+                if function is None:
+                    continue
+                try:
+                    source = inspect.getsource(function).encode("utf-8")
+                except (TypeError, OSError):
+                    source = repr(type(sdk)).encode("utf-8")
+                digest = hashlib.sha256(source).hexdigest()
+                import re
+                snapshot = re.sub(rb'''(?i)((?:password|user_id|token|api_key)\s*=\s*["'])[^"']*(["'])''', rb'\1<redacted>\2', source)
+                sdk_ref = raw_store.write_bytes(snapshot, dataset="source_code", provider=contract.provider, endpoint=contract.endpoint,
+                    fetched_at=datetime.now(timezone.utc), attempt_id="sdk-function", content_addressed=True)
+                report["sdk_dependency"]["dependencies"].append({"name": name, "path": sdk_ref.path.relative_to(directory).as_posix(),
+                    "sha256": sdk_ref.content_hash, "original_source_sha256": digest, "redacted": snapshot != source})
+                code_version = hashlib.sha256((code_version + name + digest).encode()).hexdigest()
+            code_version = hashlib.sha256((code_version + report["sdk_dependency"]["version"]).encode()).hexdigest()
+            report["code_version"] = code_version
+            report["evidence_representation"] = "SDK-decoded ResultSet fields and rows; BaoStock TCP wire bytes are not exposed"
+            report["request_limit_enforcement"] = "sdk_query_boundary_only"
         sdk_functions = {"ASTOCK-045": "stock_zt_pool_em", "ASTOCK-070": "tool_trade_date_hist_sina",
                          "SDA-BOARD-001": "stock_board_industry_name_ths", "SDA-BOARD-002": "stock_board_industry_index_ths",
                          "SDA-BOARD-003": "stock_fund_flow_industry", "SDA-BOARD-004": "stock_fund_flow_concept"}
@@ -167,11 +201,22 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
         from contextlib import ExitStack
         actual_code = None
         with ExitStack() as stack:
-            response_events = stack.enter_context(captured_requests(raw_store, provider=contract.provider, endpoint=contract.endpoint,
-                scope={"input_id": input_id, "parameters": normalized_context}, code_version=code_version, pacer=pacer,
-                replay_manifest=replay_manifest if mode == "replay" else None,
-                evidence_roots=(evidence_root, output_root), max_age_seconds=profile.refresh_interval_seconds or 86400,
-                sdk_retry_policy=input_id in {"ASTOCK-045", "ASTOCK-070"}))
+            runtime_parameters = dict(parameters)
+            if is_baostock:
+                from ..providers.baostock.session import captured_sdk_queries
+                sdk_client, sdk_archive, response_events = stack.enter_context(captured_sdk_queries(raw_store, mode=mode,
+                    replay_manifest=replay_manifest, evidence_roots=(evidence_root, output_root),
+                    scope={"input_id": input_id, "parameters": normalized_context}, code_version=code_version,
+                    trade_date=parameters["trade_date"], pacer=pacer, interval_seconds=max(3, contract.request_interval_seconds),
+                    max_age_seconds=profile.refresh_interval_seconds or 86400, client=client))
+                provider.client = sdk_client
+                runtime_parameters["raw_archive"] = sdk_archive
+            else:
+                response_events = stack.enter_context(captured_requests(raw_store, provider=contract.provider, endpoint=contract.endpoint,
+                    scope={"input_id": input_id, "parameters": normalized_context}, code_version=code_version, pacer=pacer,
+                    replay_manifest=replay_manifest if mode == "replay" else None,
+                    evidence_roots=(evidence_root, output_root), max_age_seconds=profile.refresh_interval_seconds or 86400,
+                    sdk_retry_policy=input_id in {"ASTOCK-045", "ASTOCK-070"}))
             # Isolate only replay's directory cache; live SDK Session/cache policy stays intact.
             if mode == "replay" and input_id in {"SDA-BOARD-001", "SDA-BOARD-002"}:
                 from functools import lru_cache
@@ -181,13 +226,13 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                 if helper is not None and hasattr(helper, "__wrapped__"):
                     stack.enter_context(patch.dict(namespace, {"_get_stock_board_industry_name_ths": lru_cache()(helper.__wrapped__)}))
                     report["replay_cache_isolated"] = True
-            fetched = getattr(provider, contract.runtime_method)(**parameters)
+            fetched = getattr(provider, contract.runtime_method)(**runtime_parameters)
             if input_id == "SDA-BOARD-002":
                 helper = getattr(function, "__globals__", {}).get("_get_stock_board_industry_name_ths")
                 if helper is not None:
                     actual_code = helper()[parameters["board_name"]]
         report["responses"] = response_events
-        report["live_http_calls"] = sum(event["mode"] == "live" for event in response_events)
+        report["live_http_calls"] = sum(event["mode"] == "live" and event.get("event") == "http_response" for event in response_events)
         source_rows = getattr(fetched, "source_rows", fetched.rows)
         source_ref = result_store.write_json(_json_value(source_rows), dataset="source_rows", provider=contract.provider,
             endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="source-rows")
@@ -196,7 +241,15 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
         if actual_code is not None and fetched.mapping_context["board_code"] != actual_code:
             raise NormalizationError("board code dependency disagrees with source directory")
         report["source_url"] = fetched.source_url
-        report["source_urls"] = list(dict.fromkeys(event["url"] for event in response_events))
+        report["source_urls"] = list(dict.fromkeys(event["url"] for event in response_events if event.get("url")))
+        if is_baostock:
+            report.update(coverage_denominator=fetched.coverage_denominator, missing_symbols=list(fetched.missing_symbols),
+                missing_industry_symbols=list(fetched.missing_industry_symbols),
+                coverage_complete=len(source_rows) == fetched.coverage_denominator,
+                live_sdk_calls=sum(event["mode"] == "live" for event in response_events),
+                sdk_query_count=len(response_events), source_sdk_row_counts={event["endpoint"]: event.get("metadata", {}).get("row_count")
+                                                                        for event in response_events})
+            report["coverage_scope"] = "SH/SZ A-share codes filtered from this SDK response; not an independent market census"
         if not source_rows:
             raise NormalizationError("temporary empty input; not certified as a valid empty dataset")
         mapping_context = {"provider": contract.provider}
@@ -216,7 +269,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                 raise NormalizationError("source capture time must be timezone-aware")
             mapping_context["source_snapshot_at"] = max(source_times)
             report["source_capture_window"] = {"first": min(source_times).isoformat(), "last": max(source_times).isoformat(),
-                                               "meaning": "HTTP response capture times; not row-level market timestamps"}
+                                               "meaning": "source response capture times; not row-level market timestamps"}
             report["returned_window"] = {"first": fetched.returned_first_key, "last": fetched.returned_last_key}
             report["source_units"] = list(fetched.units)
             report["coverage_basis"] = "returned SDK rows; not an independently verified market universe"
@@ -241,7 +294,8 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
         report["output"] = {"path": normalized_ref.path.relative_to(directory).as_posix(),
                             "sha256": normalized_ref.content_hash, "row_count": len(projected),
                             "source_response_hashes": [event["body_sha256"] for event in response_events]}
-        report.update(status="candidate_complete", row_count=len(projected), coverage_denominator=len(source_rows),
+        report.update(status="candidate_complete", row_count=len(projected),
+                      coverage_denominator=fetched.coverage_denominator if is_baostock else len(source_rows),
                       first_key=_json_value(keys[0]), last_key=_json_value(keys[-1]))
     except Exception as exc:
         report.update(status="failed", failure_class=getattr(getattr(exc, "failure_class", None), "value", type(exc).__name__),
@@ -250,10 +304,16 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
     if raw_manifest.exists():
         import json
         all_events = [json.loads(line) for line in raw_manifest.read_text(encoding="utf-8").splitlines()]
-        report["responses"] = all_events
+        report["responses"] = [event for event in all_events if event.get("event") in {"http_response", "source_payload", "sdk_query_failure"}]
+        if is_baostock:
+            report["sdk_session"] = [event for event in all_events if event.get("event") == "sdk_session"]
+            report["sdk_derived"] = [event for event in all_events if event.get("event") == "sdk_derived"]
+            report["live_sdk_calls"] = sum(event.get("mode") == "live" for event in report["responses"])
+            report["sdk_query_count"] = len(report["responses"])
+            report["sdk_dependency"]["live_sdk_executed"] = any(event.get("actual_session_called") for event in report["sdk_session"])
         report["raw_manifest"] = {"path": raw_manifest.relative_to(directory).as_posix(),
                                   "sha256": hashlib.sha256(raw_manifest.read_bytes()).hexdigest()}
-        report["live_http_calls"] = sum(event.get("mode") == "live" for event in all_events)
+        report["live_http_calls"] = sum(event.get("mode") == "live" and event.get("event") == "http_response" for event in all_events)
     report_ref = result_store.write_json(report, dataset="input_report", provider=contract.provider, endpoint=contract.endpoint,
                                         fetched_at=datetime.now(timezone.utc), attempt_id="report")
     return {**report, "run_directory": str(directory.resolve()), "report_path": str(report_ref.path.resolve())}

@@ -35,6 +35,248 @@ THS_CASES = [
     ("SDA-BOARD-003", {}, THS_ARCHIVE, 90),
     ("SDA-BOARD-004", {}, THS_ARCHIVE, 387),
 ]
+BAO_ARCHIVE = ROOT / "provider_validation/results/live-probes/baostock-industry-20260930-20261003/_raw/baostock-industry/manifest.ndjson"
+BAO_EMPTY_ARCHIVE = ROOT / "provider_validation/results/live-probes/baostock-industry-20261003/_raw/baostock-industry/manifest.ndjson"
+BAO_CONTEXT = {"request": {"trade_date": "2026-09-30"}, "calendar": {"trading_dates": [date(2026, 9, 30)]}}
+BAO_CASES = [("SDA-BOARD-005", BAO_CONTEXT, BAO_ARCHIVE, 5223), ("SDA-BOARD-006", BAO_CONTEXT, BAO_ARCHIVE, 5221)]
+
+
+@pytest.mark.parametrize("input_id,context,manifest,count", BAO_CASES)
+def test_bao_archived_inputs_preserve_sdk_rows_and_coverage(tmp_path, no_network, input_id, context, manifest, count):
+    import csv
+    import re
+    report = collect_input(input_id=input_id, context=context, config_root=ROOT / "config", output_root=tmp_path, replay_manifest=manifest)
+    assert report["status"] == "candidate_complete", report
+    assert report["row_count"] == count and report["coverage_denominator"] == 5223
+    assert report["production_writes"] == report["live_sdk_calls"] == report["live_http_calls"] == 0
+    assert not report["eligible_for_production_routing"] and not report["sdk_dependency"]["live_sdk_executed"]
+    assert report["sdk_query_count"] == 2
+    assert report["source_sdk_row_counts"] == {"query_all_stock": 7423, "query_stock_industry": 5556}
+    assert report["source_capture_window"]["last"] == "2026-10-03T10:16:32.498000+00:00"
+    assert report["missing_industry_symbols"] == ["sz001246", "sz301716"]
+    raw_manifest = Path(report["run_directory"]) / report["raw_manifest"]["path"]
+    payloads = []
+    for event in report["responses"]:
+        assert event["event"] == "source_payload" and event["mode"] == "replay"
+        assert not event["request_options"]["tcp_wire_bytes_visible"]
+        assert event["sdk_status_code"] == "0"
+        payloads.append(json.loads(RawObjectStore.read_response(raw_manifest, event)))
+    assert report["responses"][0]["request_parameters"] == {"day": "2026-09-30"}
+    assert report["responses"][1]["request_parameters"] == {"date": "2026-09-30"}
+    source, mapped = read_artifact(report, "source_rows"), read_artifact(report, "output")
+    assert len(source) == len(mapped) == count
+    assert "code_name" in source[0] and "canonical_stock_code" in source[0]
+    if input_id.endswith("005"):
+        pattern = re.compile(r"^(?:sh\.(?:60|68)\d{4}|sz\.(?:000|001|002|003|300|301)\d{3})$")
+        stocks = {row["code"]: row for row in payloads[0]["rows"] if pattern.fullmatch(row["code"])}
+        assert len(stocks) == 5223
+        assert report["coverage_complete"] and report["missing_symbols"] == []
+        for row in mapped:
+            code = ("sh." if row["exchange"] == "XSHG" else "sz.") + row["stock_code"]
+            original = stocks.pop(code)
+            assert row["stock_name"] == original["code_name"]
+            assert row["status"] == ("active" if original["tradeStatus"] == "1" else "suspended")
+            assert row["trade_date"] == "2026-09-30"
+        assert not stocks
+    else:
+        assert not report["coverage_complete"]
+        assert report["missing_symbols"] == ["sz001246", "sz301716"]
+        csv_path = manifest.parents[2] / "industry-membership.csv"
+        with csv_path.open(encoding="utf-8-sig", newline="") as stream:
+            assert mapped == list(csv.DictReader(stream))
+        assert all(row["classification_update_date"] == "2026-09-28" for row in mapped)
+
+
+def compare_bao_original(tmp_path):
+    import sys
+    import types
+    from contextlib import contextmanager
+    from unittest.mock import patch
+    from stock_data_manage.providers.baostock.industry import BaoStockIndustryMembershipProvider
+    from stock_data_manage.providers.baostock.session import captured_sdk_queries, logged_in_session
+    snapshot = ROOT / "provider_validation/results/bao-original-20261004/industry.py.bin"
+    metadata = json.loads((snapshot.parent / "manifest.json").read_text(encoding="utf-8"))
+    assert hashlib.sha256(snapshot.read_bytes()).hexdigest() == metadata["sources"][0]["sha256"]
+    module = types.ModuleType("stock_data_manage.providers.baostock.original_industry_contract")
+    module.__package__ = "stock_data_manage.providers.baostock"
+    sys.modules[module.__name__] = module
+    exec(compile(snapshot.read_bytes(), str(snapshot), "exec"), module.__dict__)
+    outputs, requests = [], []
+    for label, provider_class in (("original", module.BaoStockIndustryMembershipProvider), ("provider", BaoStockIndustryMembershipProvider)):
+        store = RawObjectStore(tmp_path / label)
+        with captured_sdk_queries(store, mode="replay", replay_manifest=BAO_ARCHIVE, evidence_roots=(), scope=BAO_CONTEXT,
+                                  code_version="original-contract-comparison", trade_date=date(2026, 9, 30),
+                                  pacer=RequestPacer(), interval_seconds=3, max_age_seconds=86400) as (client, archive, events):
+            @contextmanager
+            def session():
+                with logged_in_session(client=client) as bs:
+                    yield bs
+            with patch.object(module if label == "original" else sys.modules[provider_class.__module__], "logged_in_session", session):
+                result = provider_class().fetch_snapshot(date(2026, 9, 30), raw_archive=archive)
+        store.write_json(list(result.rows), dataset="legacy_rows", provider="baostock", endpoint="industry_membership",
+                         fetched_at=datetime.now(timezone.utc), attempt_id="parsed")
+        outputs.append(result)
+        requests.append([{key: event[key] for key in ("method", "request_parameters", "sdk_status_code", "body_sha256", "outcome")} for event in events])
+    assert outputs[0].rows == outputs[1].rows
+    assert outputs[0].requested_symbols == outputs[1].requested_symbols
+    assert outputs[0].missing_symbols == outputs[1].missing_symbols == ("sz001246", "sz301716")
+    assert outputs[0].coverage_denominator == outputs[1].coverage_denominator == 5223
+    assert requests[0] == requests[1]
+    comparison = {"original_source_sha256": metadata["sources"][0]["sha256"], "legacy_rows_compared": 5221,
+                  "security_universe_compared": 5223, "missing_symbols": list(outputs[1].missing_symbols),
+                  "all_legacy_fields_equal": True, "query_parameters_status_payload_equal": True, "request_comparison": requests,
+                  "boundary": "SDK methods/decoded payloads; URL/headers/TCP wire bytes are not exposed",
+                  "production_writes": 0, "network_requests": 0}
+    (tmp_path / "comparison.json").write_text(json.dumps(comparison, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return comparison
+
+
+def test_bao_matches_original_provider(tmp_path, no_network):
+    compare_bao_original(tmp_path)
+
+
+@pytest.mark.parametrize("input_id,count,missing", [("SDA-BOARD-005", 2, []), ("SDA-BOARD-006", 1, ["sz001246"])])
+def test_bao_symbol_subset_is_local_and_preserves_missing_denominator(tmp_path, no_network, input_id, count, missing):
+    context = {**BAO_CONTEXT, "request": {"trade_date": "2026-09-30", "symbols": ["sh600519", "sz001246"]}}
+    report = collect_input(input_id=input_id, context=context, config_root=ROOT / "config", output_root=tmp_path, replay_manifest=BAO_ARCHIVE)
+    assert report["status"] == "candidate_complete", report
+    assert report["row_count"] == count and report["coverage_denominator"] == 2
+    assert report["missing_symbols"] == missing
+    assert report["source_sdk_row_counts"]["query_all_stock"] == 7423
+
+
+def test_bao_source_yaml_mapping_is_executed(tmp_path, no_network):
+    config = tmp_path / "config"
+    shutil.copytree(ROOT / "config", config)
+    path = config / "normalization/industry_membership.yaml"
+    document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    document["rules"][0]["field_mapping"]["industry_name"] = "industryClassification"
+    path.write_text(yaml.safe_dump(document, allow_unicode=True), encoding="utf-8")
+    report = collect_input(input_id="SDA-BOARD-006", context=BAO_CONTEXT, config_root=config, output_root=tmp_path / "out", replay_manifest=BAO_ARCHIVE)
+    assert report["status"] == "candidate_complete", report
+    assert all(row["industry_name"] == row["classification"] for row in read_artifact(report, "output"))
+
+
+def test_bao_requires_positive_calendar_and_rejects_ignored_single_symbol(tmp_path, no_network):
+    for context in ({"request": {"trade_date": "2026-09-30"}},
+                    {"request": {"trade_date": "2026-10-02"}, "calendar": BAO_CONTEXT["calendar"]},
+                    {**BAO_CONTEXT, "request": {"trade_date": "2026-09-30", "symbol": "600519"}}):
+        with pytest.raises(ValueError):
+            collect_input(input_id="SDA-BOARD-005", context=context, config_root=ROOT / "config", output_root=tmp_path, replay_manifest=BAO_ARCHIVE)
+
+
+def bao_empty_scope_check(tmp_path):
+    from stock_data_manage.providers.baostock.industry import BaoStockIndustryMembershipProvider
+    from stock_data_manage.providers.baostock.session import captured_sdk_queries
+    from stock_data_manage.providers.contracts import ProviderContractError, FailureClass
+    store = RawObjectStore(tmp_path)
+    with captured_sdk_queries(store, mode="replay", replay_manifest=BAO_EMPTY_ARCHIVE, evidence_roots=(), scope={"date": "2026-10-02"},
+                              code_version="empty-sdk-contract", trade_date=date(2026, 10, 2),
+                              pacer=RequestPacer(), interval_seconds=3, max_age_seconds=86400) as (client, archive, events):
+        with pytest.raises(ProviderContractError) as exc:
+            BaoStockIndustryMembershipProvider(client=client).fetch_snapshot(date(2026, 10, 2), raw_archive=archive)
+    assert exc.value.failure_class is FailureClass.TEMPORARY_EMPTY
+    assert len(events) == 1 and events[0]["metadata"]["row_count"] == 0
+    result = {"failure_class": exc.value.failure_class.value, "valid_empty_dataset": False,
+              "sdk_status_code": events[0]["sdk_status_code"], "source_response_sha256": events[0]["body_sha256"],
+              "mode": "offline_replay", "query_count": 1}
+    (tmp_path / "validation.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+    return result
+
+
+def test_bao_archived_empty_response_is_not_valid_empty_dataset(tmp_path, no_network):
+    bao_empty_scope_check(tmp_path)
+
+
+def _sdk_fixture_archive(path, documents):
+    store = RawObjectStore(path)
+    for name, document in documents.items():
+        payload = json.dumps(document, ensure_ascii=False, separators=(",", ":")).encode()
+        ref = store.write_bytes(payload, dataset="sdk_response", provider="baostock", endpoint=name,
+                                fetched_at=datetime.now(timezone.utc), attempt_id="fixture", content_addressed=True)
+        store.append_event({"event": "source_payload", "provider": "baostock", "endpoint": name,
+                            "metadata": {"trade_date": "2026-09-30", "row_count": len(document["rows"]),
+                                         "outcome": document.get("result", "success")},
+                            "fetched_at_utc": datetime.now(timezone.utc).isoformat(),
+                            "body_storage": ref.path.relative_to(store.root).as_posix(), "body_sha256": ref.content_hash})
+    return store.root / "manifest.ndjson"
+
+
+@pytest.mark.parametrize("mutation,expected", [("sdk_error", "connection"), ("missing_query", "ValueError"),
+                                               ("schema", "schema_changed"), ("duplicate", "schema_changed"),
+                                               ("corrupt_hash", "ValueError"), ("secret_payload", "ValueError")])
+def test_bao_failed_contract_retains_source_evidence(tmp_path, no_network, mutation, expected):
+    documents = {}
+    for line in BAO_ARCHIVE.read_text(encoding="utf-8").splitlines():
+        event = json.loads(line)
+        documents[event["endpoint"]] = json.loads(RawObjectStore.read_response(BAO_ARCHIVE, event))
+    if mutation == "sdk_error":
+        documents = {"query_all_stock": {"fields": [], "rows": [], "result": {"error_code": "10001001", "error_msg": "connection failed"}}}
+    elif mutation == "missing_query":
+        documents.pop("query_stock_industry")
+    elif mutation == "schema":
+        documents["query_stock_industry"]["fields"].remove("industryClassification")
+        for row in documents["query_stock_industry"]["rows"]:
+            row.pop("industryClassification")
+    elif mutation == "duplicate":
+        row = next(row for row in documents["query_all_stock"]["rows"] if row["code"] == "sh.600519")
+        documents["query_all_stock"]["rows"].append(row)
+    elif mutation == "secret_payload":
+        documents["query_all_stock"]["fields"].append("password")
+        for row in documents["query_all_stock"]["rows"]:
+            row["password"] = "<fixture-secret>"
+    manifest = _sdk_fixture_archive(tmp_path / "archive", documents)
+    if mutation == "corrupt_hash":
+        event = json.loads(manifest.read_text(encoding="utf-8").splitlines()[0])
+        (manifest.parent / event["body_storage"]).write_bytes(b"corrupt-fixture")
+    report = collect_input(input_id="SDA-BOARD-006", context=BAO_CONTEXT, config_root=ROOT / "config",
+                           output_root=tmp_path / "out", replay_manifest=manifest)
+    assert report["status"] == "failed" and report["failure_class"] == expected, report
+    assert "output" not in report and report["live_sdk_calls"] == report["production_writes"] == 0
+    assert report["responses"] and Path(report["report_path"]).exists()
+    if mutation == "secret_payload":
+        assert report["responses"][0]["redacted"]
+        candidate = Path(report["run_directory"])
+        assert all(b"<fixture-secret>" not in path.read_bytes() for path in candidate.rglob("*") if path.is_file())
+
+
+def test_bao_live_fixture_preserves_session_pacing_and_reuses_cache(tmp_path, no_network):
+    from types import SimpleNamespace
+    from stock_data_manage.providers.baostock.session import _decoded_result_set
+    clock = [0.0]
+    calls = []
+    class FixtureSDK:
+        __version__ = "fixture-sdk-v1"
+        def login(self):
+            calls.append(("login", {}, clock[0]))
+            return SimpleNamespace(error_code="0", error_msg="")
+        def logout(self):
+            calls.append(("logout", {}, clock[0]))
+            return SimpleNamespace(error_code="0", error_msg="")
+        def query_all_stock(self, **kwargs):
+            calls.append(("query_all_stock", kwargs, clock[0]))
+            clock[0] += 10  # A long first query must still retain the post-payload three-second gap.
+            return _decoded_result_set({"fields": ["code", "tradeStatus", "code_name"], "rows": [
+                {"code": "sh.600519", "tradeStatus": "1", "code_name": "样本股"}]})
+        def query_stock_industry(self, **kwargs):
+            calls.append(("query_stock_industry", kwargs, clock[0]))
+            return _decoded_result_set({"fields": ["code", "code_name", "industry", "industryClassification", "updateDate"],
+                "rows": [{"code": "sh.600519", "code_name": "样本股", "industry": "样本行业", "industryClassification": "证监会行业分类", "updateDate": "2026-09-28"}]})
+    def advance(delay):
+        clock[0] += delay
+    sdk = FixtureSDK()
+    kwargs = dict(context=BAO_CONTEXT, config_root=ROOT / "config", output_root=tmp_path / "out", evidence_root=tmp_path / "out",
+                  mode="live", client=sdk, pacer=RequestPacer(clock=lambda: clock[0], wait=advance))
+    first = collect_input(input_id="SDA-BOARD-005", **kwargs)
+    assert first["status"] == "candidate_complete", first
+    assert calls == [("login", {}, 0), ("query_all_stock", {"day": "2026-09-30"}, 0),
+                     ("query_stock_industry", {"date": "2026-09-30"}, 13), ("logout", {}, 13)]
+    assert first["live_sdk_calls"] == 2
+    second = collect_input(input_id="SDA-BOARD-006", **kwargs)
+    assert second["status"] == "candidate_complete", second
+    assert len(calls) == 4 and second["live_sdk_calls"] == 0
+    assert all(event["mode"] == "cached" for event in second["responses"])
+    assert not second["sdk_dependency"]["live_sdk_executed"]
 
 
 @pytest.mark.parametrize("input_id,context,manifest,count", THS_CASES)
@@ -197,6 +439,14 @@ def no_network(monkeypatch):
     def fail(*args, **kwargs):
         raise AssertionError("offline validation must never issue a network request")
     monkeypatch.setattr(requests.adapters.HTTPAdapter, "send", fail)
+    import socket
+    original_connect = socket.socket.connect
+    def guard_connect(sock, address):
+        # Windows asyncio builds its self-pipe through a loopback socket pair.
+        if isinstance(address, tuple) and address[0] in {"127.0.0.1", "::1"}:
+            return original_connect(sock, address)
+        fail()
+    monkeypatch.setattr(socket.socket, "connect", guard_connect)
 
 
 @pytest.mark.parametrize("input_id,context,manifest,count", CASES)

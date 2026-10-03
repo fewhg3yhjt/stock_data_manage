@@ -1,0 +1,840 @@
+{
+  "validation_time_utc": "2026-10-03T19:26:33.639699+00:00",
+  "mode": "offline_replay",
+  "external_network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "tests": {
+    "path": "provider_validation/results/bao-final-20261004-tests.xml",
+    "sha256": "1af549afc503366909e79eb6a000720485361393abc7d46ea0dd2c9507142953",
+    "passed": 255
+  },
+  "comparison": {
+    "path": "provider_validation/results/bao-final-20261004/comparison.json",
+    "sha256": "0907aa85ecbc546d41402cb0089d29c88de0535cd7d04b73e1e94c8e84746c7b"
+  },
+  "inputs": [
+    {
+      "path": "provider_validation/results/bao-final-20261004/1/SDA-BOARD-005-b7c3fdef4d9a/2026-10-03/input_report/baostock/security_snapshot/report.json",
+      "sha256": "c98e2ac78e5eb4d06c8a5631736bcd25aedcf5a0d46b54618a4100efa87d1a9b",
+      "input_id": "SDA-BOARD-005",
+      "rows": 5223,
+      "denominator": 5223,
+      "coverage_complete": true,
+      "missing_symbols": [],
+      "code_version": "f9b337ac6a09c0545b7b591da77f1755824b52d4cd755c3211ec8ddcd93f8167",
+      "sdk_comparison": [
+        {
+          "method": "query_all_stock",
+          "parameters": {
+            "day": "2026-09-30"
+          },
+          "source_response_sha256": "d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66",
+          "decoded_rows": 7423,
+          "sdk_status_code": "0",
+          "body_time_equal": true,
+          "tcp_bytes_visible": false
+        },
+        {
+          "method": "query_stock_industry",
+          "parameters": {
+            "date": "2026-09-30"
+          },
+          "source_response_sha256": "3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26",
+          "decoded_rows": 5556,
+          "sdk_status_code": "0",
+          "body_time_equal": true,
+          "tcp_bytes_visible": false
+        }
+      ]
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/2/SDA-BOARD-006-ead29872b05d/2026-10-03/input_report/baostock/industry_membership/report.json",
+      "sha256": "983f2d98e0dd54fc1e657d17eed21ae6081585e75ae28e911cbade50443a5b59",
+      "input_id": "SDA-BOARD-006",
+      "rows": 5221,
+      "denominator": 5223,
+      "coverage_complete": false,
+      "missing_symbols": [
+        "sz001246",
+        "sz301716"
+      ],
+      "code_version": "f9b337ac6a09c0545b7b591da77f1755824b52d4cd755c3211ec8ddcd93f8167",
+      "sdk_comparison": [
+        {
+          "method": "query_all_stock",
+          "parameters": {
+            "day": "2026-09-30"
+          },
+          "source_response_sha256": "d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66",
+          "decoded_rows": 7423,
+          "sdk_status_code": "0",
+          "body_time_equal": true,
+          "tcp_bytes_visible": false
+        },
+        {
+          "method": "query_stock_industry",
+          "parameters": {
+            "date": "2026-09-30"
+          },
+          "source_response_sha256": "3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26",
+          "decoded_rows": 5556,
+          "sdk_status_code": "0",
+          "body_time_equal": true,
+          "tcp_bytes_visible": false
+        }
+      ]
+    }
+  ],
+  "cli_smoke": {
+    "path": "provider_validation/results/bao-cli-20261004/out/SDA-BOARD-005-64596e1d7473/2026-10-03/input_report/baostock/security_snapshot/report.json",
+    "sha256": "bcbed62f441d6bcf1d6dc2e79f64766c6bcaca90a887bc2987720ebca4f9a13b",
+    "input_id": "SDA-BOARD-005",
+    "rows": 5223,
+    "denominator": 5223,
+    "coverage_complete": true,
+    "missing_symbols": [],
+    "code_version": "f9b337ac6a09c0545b7b591da77f1755824b52d4cd755c3211ec8ddcd93f8167",
+    "sdk_comparison": [
+      {
+        "method": "query_all_stock",
+        "parameters": {
+          "day": "2026-09-30"
+        },
+        "source_response_sha256": "d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66",
+        "decoded_rows": 7423,
+        "sdk_status_code": "0",
+        "body_time_equal": true,
+        "tcp_bytes_visible": false
+      },
+      {
+        "method": "query_stock_industry",
+        "parameters": {
+          "date": "2026-09-30"
+        },
+        "source_response_sha256": "3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26",
+        "decoded_rows": 5556,
+        "sdk_status_code": "0",
+        "body_time_equal": true,
+        "tcp_bytes_visible": false
+      }
+    ]
+  },
+  "calendar_evidence": {
+    "path": "provider_validation/results/bao-cli-20261004/calendar-evidence.json",
+    "sha256": "01921819999e74f5fe2230d14b505985ce5894fad009795a22561307a98e0587"
+  },
+  "executable_inputs": [
+    {
+      "input_id": "ASTOCK-002-5m",
+      "method": "fetch_recent",
+      "dataset": "minute_bar_5m"
+    },
+    {
+      "input_id": "ASTOCK-002-daily",
+      "method": "fetch_window",
+      "dataset": "daily_bar"
+    },
+    {
+      "input_id": "ASTOCK-045",
+      "method": "fetch",
+      "dataset": "limit_up_pool"
+    },
+    {
+      "input_id": "ASTOCK-070",
+      "method": "fetch",
+      "dataset": "trading_calendar"
+    },
+    {
+      "input_id": "SDA-BOARD-001",
+      "method": "fetch_industry_list",
+      "dataset": "industry_directory"
+    },
+    {
+      "input_id": "SDA-BOARD-002",
+      "method": "fetch_industry_daily",
+      "dataset": "industry_index_daily"
+    },
+    {
+      "input_id": "SDA-BOARD-003",
+      "method": "fetch_fund_flow",
+      "dataset": "board_fund_flow"
+    },
+    {
+      "input_id": "SDA-BOARD-004",
+      "method": "fetch_fund_flow",
+      "dataset": "board_fund_flow"
+    },
+    {
+      "input_id": "SDA-BOARD-005",
+      "method": "fetch_snapshot",
+      "dataset": "security_snapshot"
+    },
+    {
+      "input_id": "SDA-BOARD-006",
+      "method": "fetch_snapshot",
+      "dataset": "industry_membership"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "provider_validation/results/bao-final-20261004/1/SDA-BOARD-005-b7c3fdef4d9a/2026-10-03/input_report/baostock/security_snapshot/report.json",
+      "sha256": "c98e2ac78e5eb4d06c8a5631736bcd25aedcf5a0d46b54618a4100efa87d1a9b"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/1/SDA-BOARD-005-b7c3fdef4d9a/2026-10-03/security_snapshot/baostock/security_snapshot/mapped-rows.json",
+      "sha256": "dbc8a989278cab4835351d136493f78f40835b7817b3e060d9af90a9ea4606bc"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/1/SDA-BOARD-005-b7c3fdef4d9a/2026-10-03/source_rows/baostock/security_snapshot/source-rows.json",
+      "sha256": "ad1a26000dea4741b005a605271a5d4718896f76a9b33fdfec928f6399eb6b68"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/1/SDA-BOARD-005-b7c3fdef4d9a/_raw/bodies/063bf0ce840393812c42823c9c722595a48ceb85544b41e5c9c2cbf27e9bb636.bin",
+      "sha256": "063bf0ce840393812c42823c9c722595a48ceb85544b41e5c9c2cbf27e9bb636"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/1/SDA-BOARD-005-b7c3fdef4d9a/_raw/bodies/3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26.bin",
+      "sha256": "3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/1/SDA-BOARD-005-b7c3fdef4d9a/_raw/bodies/3fcfcedd25e01709f8e90da3e2d5a1b11946846d5d19f0fb3dd98bd5e9cb31de.bin",
+      "sha256": "3fcfcedd25e01709f8e90da3e2d5a1b11946846d5d19f0fb3dd98bd5e9cb31de"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/1/SDA-BOARD-005-b7c3fdef4d9a/_raw/bodies/8931a7f94fb1f9c03a249034c5ce8d1935af1af551e9dde73b49f745b766ce10.bin",
+      "sha256": "8931a7f94fb1f9c03a249034c5ce8d1935af1af551e9dde73b49f745b766ce10"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/1/SDA-BOARD-005-b7c3fdef4d9a/_raw/bodies/a76d7e5a6fc6b7b0eecd7366331a33bc277f1a889d4def482d9dbcd3a33f2b55.bin",
+      "sha256": "a76d7e5a6fc6b7b0eecd7366331a33bc277f1a889d4def482d9dbcd3a33f2b55"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/1/SDA-BOARD-005-b7c3fdef4d9a/_raw/bodies/d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66.bin",
+      "sha256": "d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/1/SDA-BOARD-005-b7c3fdef4d9a/_raw/manifest.ndjson",
+      "sha256": "a63a83667fd66c7b0b275809d1376678c3a5d9253f81aa779b2ad901def3a2fb"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/2/SDA-BOARD-006-ead29872b05d/2026-10-03/industry_membership/baostock/industry_membership/mapped-rows.json",
+      "sha256": "db47f41c3144d56f7f22f208d460c0a68f98d6261d1f570cc18fd229a32053f2"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/2/SDA-BOARD-006-ead29872b05d/2026-10-03/input_report/baostock/industry_membership/report.json",
+      "sha256": "983f2d98e0dd54fc1e657d17eed21ae6081585e75ae28e911cbade50443a5b59"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/2/SDA-BOARD-006-ead29872b05d/2026-10-03/source_rows/baostock/industry_membership/source-rows.json",
+      "sha256": "3625466a2258df5166582cb737a138236b4cc0a2548a2b60db2edb427193fa6e"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/2/SDA-BOARD-006-ead29872b05d/_raw/bodies/063bf0ce840393812c42823c9c722595a48ceb85544b41e5c9c2cbf27e9bb636.bin",
+      "sha256": "063bf0ce840393812c42823c9c722595a48ceb85544b41e5c9c2cbf27e9bb636"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/2/SDA-BOARD-006-ead29872b05d/_raw/bodies/3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26.bin",
+      "sha256": "3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/2/SDA-BOARD-006-ead29872b05d/_raw/bodies/3fcfcedd25e01709f8e90da3e2d5a1b11946846d5d19f0fb3dd98bd5e9cb31de.bin",
+      "sha256": "3fcfcedd25e01709f8e90da3e2d5a1b11946846d5d19f0fb3dd98bd5e9cb31de"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/2/SDA-BOARD-006-ead29872b05d/_raw/bodies/8931a7f94fb1f9c03a249034c5ce8d1935af1af551e9dde73b49f745b766ce10.bin",
+      "sha256": "8931a7f94fb1f9c03a249034c5ce8d1935af1af551e9dde73b49f745b766ce10"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/2/SDA-BOARD-006-ead29872b05d/_raw/bodies/a76d7e5a6fc6b7b0eecd7366331a33bc277f1a889d4def482d9dbcd3a33f2b55.bin",
+      "sha256": "a76d7e5a6fc6b7b0eecd7366331a33bc277f1a889d4def482d9dbcd3a33f2b55"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/2/SDA-BOARD-006-ead29872b05d/_raw/bodies/d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66.bin",
+      "sha256": "d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/2/SDA-BOARD-006-ead29872b05d/_raw/manifest.ndjson",
+      "sha256": "1d118b9cdf6dbc0c23b507ab31bdab792c353850d726bd24245793d668a892e1"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/c/comparison.json",
+      "sha256": "315de53e69fbf9bec17d44a47f199006b9bc3e0ad77f5b03a19def7621487346"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/c/original/2026-10-03/legacy_rows/baostock/industry_membership/parsed.json",
+      "sha256": "db47f41c3144d56f7f22f208d460c0a68f98d6261d1f570cc18fd229a32053f2"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/c/original/bodies/3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26.bin",
+      "sha256": "3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/c/original/bodies/d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66.bin",
+      "sha256": "d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/c/original/manifest.ndjson",
+      "sha256": "aed4114aa4507a91c071f38cd2e21a99eb8f96f383c1762e71fe38fbbf9c9969"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/c/provider/2026-10-03/legacy_rows/baostock/industry_membership/parsed.json",
+      "sha256": "db47f41c3144d56f7f22f208d460c0a68f98d6261d1f570cc18fd229a32053f2"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/c/provider/bodies/3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26.bin",
+      "sha256": "3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/c/provider/bodies/d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66.bin",
+      "sha256": "d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/c/provider/manifest.ndjson",
+      "sha256": "85be7ea8ee444edb14f99dcd9eca54bd781c3449594e17c73c09ee4e45c22093"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/comparison.json",
+      "sha256": "0907aa85ecbc546d41402cb0089d29c88de0535cd7d04b73e1e94c8e84746c7b"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/e/bodies/f2ccf01e26e381d22ddc5d821613caff9eb20487e0894ede5a75a4ec5f839e5a.bin",
+      "sha256": "f2ccf01e26e381d22ddc5d821613caff9eb20487e0894ede5a75a4ec5f839e5a"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/e/manifest.ndjson",
+      "sha256": "9ce303e264a65e39a94a5d0f85bb7aa741fe069222992348a96da5a81af03a6f"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/e/validation.json",
+      "sha256": "c736741668fc2ced894775fb74c6393ac904c7ea0982f0952021f562ed195791"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f1/archive/bodies/566a50e975c3fee5e75c52997dde67bda3cfad7b6ce1879b637fd078d15854bb.bin",
+      "sha256": "566a50e975c3fee5e75c52997dde67bda3cfad7b6ce1879b637fd078d15854bb"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f1/archive/manifest.ndjson",
+      "sha256": "ef471c229bcd493adcd98ce6d00a19a8e6982941c6d7418d6e4923a90dbee82b"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f1/out/SDA-BOARD-006-0f24f2c9b355/2026-10-03/input_report/baostock/industry_membership/report.json",
+      "sha256": "bde8788b1ef667ce743ef3290f2e34bdb90adb13d772ecfb413918659bf32517"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f1/out/SDA-BOARD-006-0f24f2c9b355/_raw/bodies/063bf0ce840393812c42823c9c722595a48ceb85544b41e5c9c2cbf27e9bb636.bin",
+      "sha256": "063bf0ce840393812c42823c9c722595a48ceb85544b41e5c9c2cbf27e9bb636"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f1/out/SDA-BOARD-006-0f24f2c9b355/_raw/bodies/3fcfcedd25e01709f8e90da3e2d5a1b11946846d5d19f0fb3dd98bd5e9cb31de.bin",
+      "sha256": "3fcfcedd25e01709f8e90da3e2d5a1b11946846d5d19f0fb3dd98bd5e9cb31de"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f1/out/SDA-BOARD-006-0f24f2c9b355/_raw/bodies/566a50e975c3fee5e75c52997dde67bda3cfad7b6ce1879b637fd078d15854bb.bin",
+      "sha256": "566a50e975c3fee5e75c52997dde67bda3cfad7b6ce1879b637fd078d15854bb"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f1/out/SDA-BOARD-006-0f24f2c9b355/_raw/bodies/8931a7f94fb1f9c03a249034c5ce8d1935af1af551e9dde73b49f745b766ce10.bin",
+      "sha256": "8931a7f94fb1f9c03a249034c5ce8d1935af1af551e9dde73b49f745b766ce10"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f1/out/SDA-BOARD-006-0f24f2c9b355/_raw/bodies/a76d7e5a6fc6b7b0eecd7366331a33bc277f1a889d4def482d9dbcd3a33f2b55.bin",
+      "sha256": "a76d7e5a6fc6b7b0eecd7366331a33bc277f1a889d4def482d9dbcd3a33f2b55"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f1/out/SDA-BOARD-006-0f24f2c9b355/_raw/manifest.ndjson",
+      "sha256": "ac023634564afdc1cf7157e9f438bc395222fff39a995bef4f3725cf4a7e219d"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f2/archive/bodies/d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66.bin",
+      "sha256": "d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f2/archive/manifest.ndjson",
+      "sha256": "fe319a46c6eec80b18aee9b15f74ee3824aab0440dcea829f5d1469234f40ec1"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f2/out/SDA-BOARD-006-a3ddeb6fdd40/2026-10-03/input_report/baostock/industry_membership/report.json",
+      "sha256": "b1e9adefef3ddb24bf3012bb366c8393c18cd52fb1fd13eb5ab61e4e2ed42cd5"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f2/out/SDA-BOARD-006-a3ddeb6fdd40/_raw/bodies/063bf0ce840393812c42823c9c722595a48ceb85544b41e5c9c2cbf27e9bb636.bin",
+      "sha256": "063bf0ce840393812c42823c9c722595a48ceb85544b41e5c9c2cbf27e9bb636"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f2/out/SDA-BOARD-006-a3ddeb6fdd40/_raw/bodies/3fcfcedd25e01709f8e90da3e2d5a1b11946846d5d19f0fb3dd98bd5e9cb31de.bin",
+      "sha256": "3fcfcedd25e01709f8e90da3e2d5a1b11946846d5d19f0fb3dd98bd5e9cb31de"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f2/out/SDA-BOARD-006-a3ddeb6fdd40/_raw/bodies/8931a7f94fb1f9c03a249034c5ce8d1935af1af551e9dde73b49f745b766ce10.bin",
+      "sha256": "8931a7f94fb1f9c03a249034c5ce8d1935af1af551e9dde73b49f745b766ce10"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f2/out/SDA-BOARD-006-a3ddeb6fdd40/_raw/bodies/a76d7e5a6fc6b7b0eecd7366331a33bc277f1a889d4def482d9dbcd3a33f2b55.bin",
+      "sha256": "a76d7e5a6fc6b7b0eecd7366331a33bc277f1a889d4def482d9dbcd3a33f2b55"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f2/out/SDA-BOARD-006-a3ddeb6fdd40/_raw/bodies/d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66.bin",
+      "sha256": "d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f2/out/SDA-BOARD-006-a3ddeb6fdd40/_raw/manifest.ndjson",
+      "sha256": "b9d96592177924de2573310c2f392fad3ee7951ce4b394c4b3314483a94d75cb"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f3/archive/bodies/92444a6bdbb90699057f863a638486bace02c48385a12a57241955787aec439b.bin",
+      "sha256": "92444a6bdbb90699057f863a638486bace02c48385a12a57241955787aec439b"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f3/archive/bodies/d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66.bin",
+      "sha256": "d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f3/archive/manifest.ndjson",
+      "sha256": "dd2d5e3aa589bf1994415bfffeb3b68be8485c2dea7863368da893a4a6101d34"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f3/out/SDA-BOARD-006-e8021589e9cf/2026-10-03/input_report/baostock/industry_membership/report.json",
+      "sha256": "86f3183e56188cc1942f106cb450e8198e77f88eec87ae04af3d157d214a9ceb"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f3/out/SDA-BOARD-006-e8021589e9cf/_raw/bodies/063bf0ce840393812c42823c9c722595a48ceb85544b41e5c9c2cbf27e9bb636.bin",
+      "sha256": "063bf0ce840393812c42823c9c722595a48ceb85544b41e5c9c2cbf27e9bb636"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f3/out/SDA-BOARD-006-e8021589e9cf/_raw/bodies/3fcfcedd25e01709f8e90da3e2d5a1b11946846d5d19f0fb3dd98bd5e9cb31de.bin",
+      "sha256": "3fcfcedd25e01709f8e90da3e2d5a1b11946846d5d19f0fb3dd98bd5e9cb31de"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f3/out/SDA-BOARD-006-e8021589e9cf/_raw/bodies/8931a7f94fb1f9c03a249034c5ce8d1935af1af551e9dde73b49f745b766ce10.bin",
+      "sha256": "8931a7f94fb1f9c03a249034c5ce8d1935af1af551e9dde73b49f745b766ce10"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f3/out/SDA-BOARD-006-e8021589e9cf/_raw/bodies/92444a6bdbb90699057f863a638486bace02c48385a12a57241955787aec439b.bin",
+      "sha256": "92444a6bdbb90699057f863a638486bace02c48385a12a57241955787aec439b"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f3/out/SDA-BOARD-006-e8021589e9cf/_raw/bodies/a76d7e5a6fc6b7b0eecd7366331a33bc277f1a889d4def482d9dbcd3a33f2b55.bin",
+      "sha256": "a76d7e5a6fc6b7b0eecd7366331a33bc277f1a889d4def482d9dbcd3a33f2b55"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f3/out/SDA-BOARD-006-e8021589e9cf/_raw/bodies/d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66.bin",
+      "sha256": "d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f3/out/SDA-BOARD-006-e8021589e9cf/_raw/manifest.ndjson",
+      "sha256": "9b071119e437ea510e54fcf5b0198790860386ddb9231fbf09506340a9a433a8"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f4/archive/bodies/3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26.bin",
+      "sha256": "3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f4/archive/bodies/f65b1768c8e83f824973f20e48a7df7b74846b93a6b41aa73bc96c649df5119e.bin",
+      "sha256": "f65b1768c8e83f824973f20e48a7df7b74846b93a6b41aa73bc96c649df5119e"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f4/archive/manifest.ndjson",
+      "sha256": "39cc5e93c91ac61fa6d28f4b4c31101353b2b2ce763fc0f5a34fc471bde2a9d2"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f4/out/SDA-BOARD-006-d6d9ed9cdaa0/2026-10-03/input_report/baostock/industry_membership/report.json",
+      "sha256": "8070de27ce58e40c28c8b419f17a14b342154c49d699ac78f7df45591a135fb3"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f4/out/SDA-BOARD-006-d6d9ed9cdaa0/_raw/bodies/063bf0ce840393812c42823c9c722595a48ceb85544b41e5c9c2cbf27e9bb636.bin",
+      "sha256": "063bf0ce840393812c42823c9c722595a48ceb85544b41e5c9c2cbf27e9bb636"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f4/out/SDA-BOARD-006-d6d9ed9cdaa0/_raw/bodies/3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26.bin",
+      "sha256": "3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f4/out/SDA-BOARD-006-d6d9ed9cdaa0/_raw/bodies/3fcfcedd25e01709f8e90da3e2d5a1b11946846d5d19f0fb3dd98bd5e9cb31de.bin",
+      "sha256": "3fcfcedd25e01709f8e90da3e2d5a1b11946846d5d19f0fb3dd98bd5e9cb31de"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f4/out/SDA-BOARD-006-d6d9ed9cdaa0/_raw/bodies/8931a7f94fb1f9c03a249034c5ce8d1935af1af551e9dde73b49f745b766ce10.bin",
+      "sha256": "8931a7f94fb1f9c03a249034c5ce8d1935af1af551e9dde73b49f745b766ce10"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f4/out/SDA-BOARD-006-d6d9ed9cdaa0/_raw/bodies/a76d7e5a6fc6b7b0eecd7366331a33bc277f1a889d4def482d9dbcd3a33f2b55.bin",
+      "sha256": "a76d7e5a6fc6b7b0eecd7366331a33bc277f1a889d4def482d9dbcd3a33f2b55"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f4/out/SDA-BOARD-006-d6d9ed9cdaa0/_raw/bodies/f65b1768c8e83f824973f20e48a7df7b74846b93a6b41aa73bc96c649df5119e.bin",
+      "sha256": "f65b1768c8e83f824973f20e48a7df7b74846b93a6b41aa73bc96c649df5119e"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f4/out/SDA-BOARD-006-d6d9ed9cdaa0/_raw/manifest.ndjson",
+      "sha256": "652329c3c8531e161aacbf83e3e7ad74401682677ffb90d8ce8c98950c924609"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f5/archive/bodies/3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26.bin",
+      "sha256": "3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f5/archive/bodies/d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66.bin",
+      "sha256": "ecd91c2fc7e6b5085c7af0236b33b0b04414e94e31cba7dc70898e1969c579b3"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f5/archive/manifest.ndjson",
+      "sha256": "dc262d7fb3f0ff1363057866b30f09de925c94ce9b78ac8c0a656965c24d2f59"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f5/out/SDA-BOARD-006-d0e7aa377812/2026-10-03/input_report/baostock/industry_membership/report.json",
+      "sha256": "37053e55b2d61a585c47bed4b497f8cdd6e8fdbdeb2deaf9da7b4367826cb56b"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f5/out/SDA-BOARD-006-d0e7aa377812/_raw/bodies/063bf0ce840393812c42823c9c722595a48ceb85544b41e5c9c2cbf27e9bb636.bin",
+      "sha256": "063bf0ce840393812c42823c9c722595a48ceb85544b41e5c9c2cbf27e9bb636"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f5/out/SDA-BOARD-006-d0e7aa377812/_raw/bodies/3fcfcedd25e01709f8e90da3e2d5a1b11946846d5d19f0fb3dd98bd5e9cb31de.bin",
+      "sha256": "3fcfcedd25e01709f8e90da3e2d5a1b11946846d5d19f0fb3dd98bd5e9cb31de"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f5/out/SDA-BOARD-006-d0e7aa377812/_raw/bodies/8931a7f94fb1f9c03a249034c5ce8d1935af1af551e9dde73b49f745b766ce10.bin",
+      "sha256": "8931a7f94fb1f9c03a249034c5ce8d1935af1af551e9dde73b49f745b766ce10"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f5/out/SDA-BOARD-006-d0e7aa377812/_raw/bodies/a76d7e5a6fc6b7b0eecd7366331a33bc277f1a889d4def482d9dbcd3a33f2b55.bin",
+      "sha256": "a76d7e5a6fc6b7b0eecd7366331a33bc277f1a889d4def482d9dbcd3a33f2b55"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f5/out/SDA-BOARD-006-d0e7aa377812/_raw/manifest.ndjson",
+      "sha256": "acdb75c2dd7f5ca37baee0ad950fda8d4348eeb8f661d051b353f18c481544e0"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f6/archive/bodies/3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26.bin",
+      "sha256": "3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f6/archive/bodies/7f95e7943a2512c476f50c50403a4d14624643ba0b179f88baa5d3c47c0c9049.bin",
+      "sha256": "7f95e7943a2512c476f50c50403a4d14624643ba0b179f88baa5d3c47c0c9049"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f6/archive/manifest.ndjson",
+      "sha256": "35a1d52d7ca321b21d296c1058e597931b86017a626a7fb2576f7d8337af002a"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f6/out/SDA-BOARD-006-294d677c6c0f/2026-10-03/input_report/baostock/industry_membership/report.json",
+      "sha256": "08a9df45b65cd658a3eb361dfc51f641fe02f41ed9ae4336df0cdea7a0f5f2c7"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f6/out/SDA-BOARD-006-294d677c6c0f/_raw/bodies/063bf0ce840393812c42823c9c722595a48ceb85544b41e5c9c2cbf27e9bb636.bin",
+      "sha256": "063bf0ce840393812c42823c9c722595a48ceb85544b41e5c9c2cbf27e9bb636"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f6/out/SDA-BOARD-006-294d677c6c0f/_raw/bodies/3fcfcedd25e01709f8e90da3e2d5a1b11946846d5d19f0fb3dd98bd5e9cb31de.bin",
+      "sha256": "3fcfcedd25e01709f8e90da3e2d5a1b11946846d5d19f0fb3dd98bd5e9cb31de"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f6/out/SDA-BOARD-006-294d677c6c0f/_raw/bodies/8931a7f94fb1f9c03a249034c5ce8d1935af1af551e9dde73b49f745b766ce10.bin",
+      "sha256": "8931a7f94fb1f9c03a249034c5ce8d1935af1af551e9dde73b49f745b766ce10"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f6/out/SDA-BOARD-006-294d677c6c0f/_raw/bodies/a76d7e5a6fc6b7b0eecd7366331a33bc277f1a889d4def482d9dbcd3a33f2b55.bin",
+      "sha256": "a76d7e5a6fc6b7b0eecd7366331a33bc277f1a889d4def482d9dbcd3a33f2b55"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/f6/out/SDA-BOARD-006-294d677c6c0f/_raw/manifest.ndjson",
+      "sha256": "1fd6393e595fdb3de5ac45dcaba508a430e1dafc7344f4a7f4931d1c04429aa7"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/p/out/SDA-BOARD-005-b49325e5ba21/2026-10-03/input_report/baostock/security_snapshot/report.json",
+      "sha256": "6a3cf40c1646d18045a6010bc4f749f1f552e75eced8a02e87301713cd84a65a"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/p/out/SDA-BOARD-005-b49325e5ba21/2026-10-03/security_snapshot/baostock/security_snapshot/mapped-rows.json",
+      "sha256": "abaf947bbca29aaa026e0d323a0e9b418ebe941ee2946a7750611fbede3e4dcc"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/p/out/SDA-BOARD-005-b49325e5ba21/2026-10-03/source_rows/baostock/security_snapshot/source-rows.json",
+      "sha256": "0836fdedd1255d36e65b63c2e2eb2752d466345a63aab1abc988d47f8c49da2e"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/p/out/SDA-BOARD-005-b49325e5ba21/_raw/bodies/3d88b03b3ed9cc709c47614171d944ad3d0302d3f03e743cbd6d28f161297428.bin",
+      "sha256": "3d88b03b3ed9cc709c47614171d944ad3d0302d3f03e743cbd6d28f161297428"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/p/out/SDA-BOARD-005-b49325e5ba21/_raw/bodies/606c1d524fa4e567714138370f332d32f70a711b0e3d77639e751cab46298511.bin",
+      "sha256": "606c1d524fa4e567714138370f332d32f70a711b0e3d77639e751cab46298511"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/p/out/SDA-BOARD-005-b49325e5ba21/_raw/bodies/bf5aa3c98b46c50c89c8f9594882b73b0f6adac164219d6afa5b2a3870138ea9.bin",
+      "sha256": "bf5aa3c98b46c50c89c8f9594882b73b0f6adac164219d6afa5b2a3870138ea9"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/p/out/SDA-BOARD-005-b49325e5ba21/_raw/bodies/d16d72697d5d0b61d5e806ef140c5d99ed93047dc43a5a09f1960260f51f3d68.bin",
+      "sha256": "d16d72697d5d0b61d5e806ef140c5d99ed93047dc43a5a09f1960260f51f3d68"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/p/out/SDA-BOARD-005-b49325e5ba21/_raw/bodies/e959d68d18a5c3eee91f77a2f12f54787a60dd0e00d1902948e7d21ab9b3c626.bin",
+      "sha256": "e959d68d18a5c3eee91f77a2f12f54787a60dd0e00d1902948e7d21ab9b3c626"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/p/out/SDA-BOARD-005-b49325e5ba21/_raw/bodies/f388f8106819fd43e2231514bb2b781ba6e16f3ee5a90886e5f77bba14f2494e.bin",
+      "sha256": "f388f8106819fd43e2231514bb2b781ba6e16f3ee5a90886e5f77bba14f2494e"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/p/out/SDA-BOARD-005-b49325e5ba21/_raw/manifest.ndjson",
+      "sha256": "12f76e8d4dfc8d975a3dd938b7d63c123148f7c5cc6272f1b45d28091ba3bb2b"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/p/out/SDA-BOARD-006-309e67a5abcf/2026-10-03/industry_membership/baostock/industry_membership/mapped-rows.json",
+      "sha256": "e4a051cdb19c113ce125fd3848bb7a386ddde3ba28bfbbd2159fdf1e88d7da69"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/p/out/SDA-BOARD-006-309e67a5abcf/2026-10-03/input_report/baostock/industry_membership/report.json",
+      "sha256": "5b22f692c3ff80dd57f196ade5b71e666123f4811a43a1c6a6cdb713680d41bf"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/p/out/SDA-BOARD-006-309e67a5abcf/2026-10-03/source_rows/baostock/industry_membership/source-rows.json",
+      "sha256": "86b068448298c028a60388a8a8d9942e92434fedcd129c40191802e7ddaadd61"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/p/out/SDA-BOARD-006-309e67a5abcf/_raw/bodies/3d88b03b3ed9cc709c47614171d944ad3d0302d3f03e743cbd6d28f161297428.bin",
+      "sha256": "3d88b03b3ed9cc709c47614171d944ad3d0302d3f03e743cbd6d28f161297428"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/p/out/SDA-BOARD-006-309e67a5abcf/_raw/bodies/606c1d524fa4e567714138370f332d32f70a711b0e3d77639e751cab46298511.bin",
+      "sha256": "606c1d524fa4e567714138370f332d32f70a711b0e3d77639e751cab46298511"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/p/out/SDA-BOARD-006-309e67a5abcf/_raw/bodies/bf5aa3c98b46c50c89c8f9594882b73b0f6adac164219d6afa5b2a3870138ea9.bin",
+      "sha256": "bf5aa3c98b46c50c89c8f9594882b73b0f6adac164219d6afa5b2a3870138ea9"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/p/out/SDA-BOARD-006-309e67a5abcf/_raw/bodies/d16d72697d5d0b61d5e806ef140c5d99ed93047dc43a5a09f1960260f51f3d68.bin",
+      "sha256": "d16d72697d5d0b61d5e806ef140c5d99ed93047dc43a5a09f1960260f51f3d68"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/p/out/SDA-BOARD-006-309e67a5abcf/_raw/bodies/e959d68d18a5c3eee91f77a2f12f54787a60dd0e00d1902948e7d21ab9b3c626.bin",
+      "sha256": "e959d68d18a5c3eee91f77a2f12f54787a60dd0e00d1902948e7d21ab9b3c626"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/p/out/SDA-BOARD-006-309e67a5abcf/_raw/bodies/f388f8106819fd43e2231514bb2b781ba6e16f3ee5a90886e5f77bba14f2494e.bin",
+      "sha256": "f388f8106819fd43e2231514bb2b781ba6e16f3ee5a90886e5f77bba14f2494e"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/p/out/SDA-BOARD-006-309e67a5abcf/_raw/manifest.ndjson",
+      "sha256": "f891b7f67b1e6c7658b67a0ac5459c80c163728a3fb9c8ce48417894df57d385"
+    },
+    {
+      "path": "provider_validation/results/bao-final-20261004/verify.py",
+      "sha256": "cec2824301b53f773624380432c8bf68d113df08ef5be335637be6f6f1dfa1cc"
+    },
+    {
+      "path": "provider_validation/results/bao-original-20261004/industry.py.bin",
+      "sha256": "08362eed2be7535fbbc7052ea00990873a7b6f9b8dd7216107bbe55ac9075d28"
+    },
+    {
+      "path": "provider_validation/results/bao-original-20261004/manifest.json",
+      "sha256": "47f1507c9319376efbf50f555c5e132779cc3756c11b8b1680a0ced33eee0ec6"
+    },
+    {
+      "path": "provider_validation/results/bao-original-20261004/session.py.bin",
+      "sha256": "a527fce3c18e3ff68a7c41040741df0cb315fc8b8c3c4e2604fcbc6b6e562f4e"
+    },
+    {
+      "path": "provider_validation/results/bao-cli-20261004/calendar-evidence.json",
+      "sha256": "01921819999e74f5fe2230d14b505985ce5894fad009795a22561307a98e0587"
+    },
+    {
+      "path": "provider_validation/results/bao-cli-20261004/calendar.json",
+      "sha256": "5ba3a361eab2c763650b310ac9ab71a8e45925bce6e128fb46cc14dc57637bba"
+    },
+    {
+      "path": "provider_validation/results/bao-cli-20261004/cli-report.json",
+      "sha256": "d86ce807bb62f63d73c2424f27a58e2cd0301253b7bd91366076948bd8265af9"
+    },
+    {
+      "path": "provider_validation/results/bao-cli-20261004/context.json",
+      "sha256": "66e940fa8f0938207edfc4cb5504636d9a9ecc53dd46dc3e9cecaff83e1f9d90"
+    },
+    {
+      "path": "provider_validation/results/bao-cli-20261004/out/SDA-BOARD-005-64596e1d7473/2026-10-03/input_report/baostock/security_snapshot/report.json",
+      "sha256": "bcbed62f441d6bcf1d6dc2e79f64766c6bcaca90a887bc2987720ebca4f9a13b"
+    },
+    {
+      "path": "provider_validation/results/bao-cli-20261004/out/SDA-BOARD-005-64596e1d7473/2026-10-03/security_snapshot/baostock/security_snapshot/mapped-rows.json",
+      "sha256": "dbc8a989278cab4835351d136493f78f40835b7817b3e060d9af90a9ea4606bc"
+    },
+    {
+      "path": "provider_validation/results/bao-cli-20261004/out/SDA-BOARD-005-64596e1d7473/2026-10-03/source_rows/baostock/security_snapshot/source-rows.json",
+      "sha256": "ad1a26000dea4741b005a605271a5d4718896f76a9b33fdfec928f6399eb6b68"
+    },
+    {
+      "path": "provider_validation/results/bao-cli-20261004/out/SDA-BOARD-005-64596e1d7473/_raw/bodies/063bf0ce840393812c42823c9c722595a48ceb85544b41e5c9c2cbf27e9bb636.bin",
+      "sha256": "063bf0ce840393812c42823c9c722595a48ceb85544b41e5c9c2cbf27e9bb636"
+    },
+    {
+      "path": "provider_validation/results/bao-cli-20261004/out/SDA-BOARD-005-64596e1d7473/_raw/bodies/3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26.bin",
+      "sha256": "3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26"
+    },
+    {
+      "path": "provider_validation/results/bao-cli-20261004/out/SDA-BOARD-005-64596e1d7473/_raw/bodies/3fcfcedd25e01709f8e90da3e2d5a1b11946846d5d19f0fb3dd98bd5e9cb31de.bin",
+      "sha256": "3fcfcedd25e01709f8e90da3e2d5a1b11946846d5d19f0fb3dd98bd5e9cb31de"
+    },
+    {
+      "path": "provider_validation/results/bao-cli-20261004/out/SDA-BOARD-005-64596e1d7473/_raw/bodies/8931a7f94fb1f9c03a249034c5ce8d1935af1af551e9dde73b49f745b766ce10.bin",
+      "sha256": "8931a7f94fb1f9c03a249034c5ce8d1935af1af551e9dde73b49f745b766ce10"
+    },
+    {
+      "path": "provider_validation/results/bao-cli-20261004/out/SDA-BOARD-005-64596e1d7473/_raw/bodies/a76d7e5a6fc6b7b0eecd7366331a33bc277f1a889d4def482d9dbcd3a33f2b55.bin",
+      "sha256": "a76d7e5a6fc6b7b0eecd7366331a33bc277f1a889d4def482d9dbcd3a33f2b55"
+    },
+    {
+      "path": "provider_validation/results/bao-cli-20261004/out/SDA-BOARD-005-64596e1d7473/_raw/bodies/d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66.bin",
+      "sha256": "d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66"
+    },
+    {
+      "path": "provider_validation/results/bao-cli-20261004/out/SDA-BOARD-005-64596e1d7473/_raw/manifest.ndjson",
+      "sha256": "5df9c037a855b8f89b3c618f05db6ebb2d5b6e3995b2cdb9a0b69f72abfc12cf"
+    },
+    {
+      "path": "provider_validation/results/bao-dev-20261004/SDA-BOARD-005-337674ee3ece/2026-10-03/input_report/baostock/security_snapshot/report.json",
+      "sha256": "19ddea6cd392ceacc29bdf8014b5d7908f9fedcf371f50533427f130b52be708"
+    },
+    {
+      "path": "provider_validation/results/bao-dev-20261004/SDA-BOARD-005-337674ee3ece/2026-10-03/security_snapshot/baostock/security_snapshot/mapped-rows.json",
+      "sha256": "dbc8a989278cab4835351d136493f78f40835b7817b3e060d9af90a9ea4606bc"
+    },
+    {
+      "path": "provider_validation/results/bao-dev-20261004/SDA-BOARD-005-337674ee3ece/2026-10-03/source_rows/baostock/security_snapshot/source-rows.json",
+      "sha256": "ad1a26000dea4741b005a605271a5d4718896f76a9b33fdfec928f6399eb6b68"
+    },
+    {
+      "path": "provider_validation/results/bao-dev-20261004/SDA-BOARD-005-337674ee3ece/_raw/bodies/063bf0ce840393812c42823c9c722595a48ceb85544b41e5c9c2cbf27e9bb636.bin",
+      "sha256": "063bf0ce840393812c42823c9c722595a48ceb85544b41e5c9c2cbf27e9bb636"
+    },
+    {
+      "path": "provider_validation/results/bao-dev-20261004/SDA-BOARD-005-337674ee3ece/_raw/bodies/3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26.bin",
+      "sha256": "3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26"
+    },
+    {
+      "path": "provider_validation/results/bao-dev-20261004/SDA-BOARD-005-337674ee3ece/_raw/bodies/3fcfcedd25e01709f8e90da3e2d5a1b11946846d5d19f0fb3dd98bd5e9cb31de.bin",
+      "sha256": "3fcfcedd25e01709f8e90da3e2d5a1b11946846d5d19f0fb3dd98bd5e9cb31de"
+    },
+    {
+      "path": "provider_validation/results/bao-dev-20261004/SDA-BOARD-005-337674ee3ece/_raw/bodies/8931a7f94fb1f9c03a249034c5ce8d1935af1af551e9dde73b49f745b766ce10.bin",
+      "sha256": "8931a7f94fb1f9c03a249034c5ce8d1935af1af551e9dde73b49f745b766ce10"
+    },
+    {
+      "path": "provider_validation/results/bao-dev-20261004/SDA-BOARD-005-337674ee3ece/_raw/bodies/a76d7e5a6fc6b7b0eecd7366331a33bc277f1a889d4def482d9dbcd3a33f2b55.bin",
+      "sha256": "a76d7e5a6fc6b7b0eecd7366331a33bc277f1a889d4def482d9dbcd3a33f2b55"
+    },
+    {
+      "path": "provider_validation/results/bao-dev-20261004/SDA-BOARD-005-337674ee3ece/_raw/bodies/d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66.bin",
+      "sha256": "d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66"
+    },
+    {
+      "path": "provider_validation/results/bao-dev-20261004/SDA-BOARD-005-337674ee3ece/_raw/manifest.ndjson",
+      "sha256": "76c5d8be581a302d727d03cb74f1c66eb919d28082fd2d421dcb8a67d50941aa"
+    },
+    {
+      "path": "provider_validation/results/bao-dev-20261004/SDA-BOARD-006-569bc300b2f0/2026-10-03/industry_membership/baostock/industry_membership/mapped-rows.json",
+      "sha256": "db47f41c3144d56f7f22f208d460c0a68f98d6261d1f570cc18fd229a32053f2"
+    },
+    {
+      "path": "provider_validation/results/bao-dev-20261004/SDA-BOARD-006-569bc300b2f0/2026-10-03/input_report/baostock/industry_membership/report.json",
+      "sha256": "0808206ea49f9104a95a1a18ec44ccb36dc1af843820d71f81c890760bb30da7"
+    },
+    {
+      "path": "provider_validation/results/bao-dev-20261004/SDA-BOARD-006-569bc300b2f0/2026-10-03/source_rows/baostock/industry_membership/source-rows.json",
+      "sha256": "3625466a2258df5166582cb737a138236b4cc0a2548a2b60db2edb427193fa6e"
+    },
+    {
+      "path": "provider_validation/results/bao-dev-20261004/SDA-BOARD-006-569bc300b2f0/_raw/bodies/063bf0ce840393812c42823c9c722595a48ceb85544b41e5c9c2cbf27e9bb636.bin",
+      "sha256": "063bf0ce840393812c42823c9c722595a48ceb85544b41e5c9c2cbf27e9bb636"
+    },
+    {
+      "path": "provider_validation/results/bao-dev-20261004/SDA-BOARD-006-569bc300b2f0/_raw/bodies/3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26.bin",
+      "sha256": "3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26"
+    },
+    {
+      "path": "provider_validation/results/bao-dev-20261004/SDA-BOARD-006-569bc300b2f0/_raw/bodies/3fcfcedd25e01709f8e90da3e2d5a1b11946846d5d19f0fb3dd98bd5e9cb31de.bin",
+      "sha256": "3fcfcedd25e01709f8e90da3e2d5a1b11946846d5d19f0fb3dd98bd5e9cb31de"
+    },
+    {
+      "path": "provider_validation/results/bao-dev-20261004/SDA-BOARD-006-569bc300b2f0/_raw/bodies/8931a7f94fb1f9c03a249034c5ce8d1935af1af551e9dde73b49f745b766ce10.bin",
+      "sha256": "8931a7f94fb1f9c03a249034c5ce8d1935af1af551e9dde73b49f745b766ce10"
+    },
+    {
+      "path": "provider_validation/results/bao-dev-20261004/SDA-BOARD-006-569bc300b2f0/_raw/bodies/a76d7e5a6fc6b7b0eecd7366331a33bc277f1a889d4def482d9dbcd3a33f2b55.bin",
+      "sha256": "a76d7e5a6fc6b7b0eecd7366331a33bc277f1a889d4def482d9dbcd3a33f2b55"
+    },
+    {
+      "path": "provider_validation/results/bao-dev-20261004/SDA-BOARD-006-569bc300b2f0/_raw/bodies/d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66.bin",
+      "sha256": "d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66"
+    },
+    {
+      "path": "provider_validation/results/bao-dev-20261004/SDA-BOARD-006-569bc300b2f0/_raw/manifest.ndjson",
+      "sha256": "f73e9a81d02f4a3d3c97b15ba6cbdfb8c3b4d5be70dd92488f8135a47fd42613"
+    }
+  ],
+  "negative_checks": [
+    {
+      "mutation": "sdk_error",
+      "expected_failure_class": "connection",
+      "result": "passed",
+      "report_path": "provider_validation/results/bao-final-20261004/f1/out/SDA-BOARD-006-0f24f2c9b355/2026-10-03/input_report/baostock/industry_membership/report.json",
+      "report_sha256": "bde8788b1ef667ce743ef3290f2e34bdb90adb13d772ecfb413918659bf32517"
+    },
+    {
+      "mutation": "missing_query",
+      "expected_failure_class": "ValueError",
+      "result": "passed",
+      "report_path": "provider_validation/results/bao-final-20261004/f2/out/SDA-BOARD-006-a3ddeb6fdd40/2026-10-03/input_report/baostock/industry_membership/report.json",
+      "report_sha256": "b1e9adefef3ddb24bf3012bb366c8393c18cd52fb1fd13eb5ab61e4e2ed42cd5"
+    },
+    {
+      "mutation": "schema",
+      "expected_failure_class": "schema_changed",
+      "result": "passed",
+      "report_path": "provider_validation/results/bao-final-20261004/f3/out/SDA-BOARD-006-e8021589e9cf/2026-10-03/input_report/baostock/industry_membership/report.json",
+      "report_sha256": "86f3183e56188cc1942f106cb450e8198e77f88eec87ae04af3d157d214a9ceb"
+    },
+    {
+      "mutation": "duplicate",
+      "expected_failure_class": "schema_changed",
+      "result": "passed",
+      "report_path": "provider_validation/results/bao-final-20261004/f4/out/SDA-BOARD-006-d6d9ed9cdaa0/2026-10-03/input_report/baostock/industry_membership/report.json",
+      "report_sha256": "8070de27ce58e40c28c8b419f17a14b342154c49d699ac78f7df45591a135fb3"
+    },
+    {
+      "mutation": "corrupt_hash",
+      "expected_failure_class": "ValueError",
+      "result": "passed",
+      "report_path": "provider_validation/results/bao-final-20261004/f5/out/SDA-BOARD-006-d0e7aa377812/2026-10-03/input_report/baostock/industry_membership/report.json",
+      "report_sha256": "37053e55b2d61a585c47bed4b497f8cdd6e8fdbdeb2deaf9da7b4367826cb56b"
+    },
+    {
+      "mutation": "secret_payload",
+      "expected_failure_class": "ValueError",
+      "result": "passed",
+      "report_path": "provider_validation/results/bao-final-20261004/f6/out/SDA-BOARD-006-294d677c6c0f/2026-10-03/input_report/baostock/industry_membership/report.json",
+      "report_sha256": "08a9df45b65cd658a3eb361dfc51f641fe02f41ed9ae4336df0cdea7a0f5f2c7"
+    }
+  ],
+  "empty_scope": {
+    "failure_class": "temporary_empty",
+    "valid_empty_dataset": false,
+    "sdk_status_code": "0",
+    "source_response_sha256": "f2ccf01e26e381d22ddc5d821613caff9eb20487e0894ede5a75a4ec5f839e5a",
+    "mode": "offline_replay",
+    "query_count": 1
+  },
+  "session_pacing_cache": {
+    "mode": "injected SDK fixture; not live provider verification",
+    "post_payload_interval_seconds": 3,
+    "cache_reused_before_login": true,
+    "result": "passed"
+  },
+  "limitations": [
+    "SDK解码表示可见，TCP帧和内部物理请求不可见。",
+    "行业归属缺2只，分母仅为原SDK沪深A股筛选范围。",
+    "未新增实时来源探针，缓存/间隔在线分支仅用注入夹具；未完成生产端到端发布。"
+  ]
+}

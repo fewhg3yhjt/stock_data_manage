@@ -1,0 +1,56 @@
+{
+  "original_source_sha256": "08362eed2be7535fbbc7052ea00990873a7b6f9b8dd7216107bbe55ac9075d28",
+  "legacy_rows_compared": 5221,
+  "security_universe_compared": 5223,
+  "missing_symbols": [
+    "sz001246",
+    "sz301716"
+  ],
+  "all_legacy_fields_equal": true,
+  "query_parameters_status_payload_equal": true,
+  "request_comparison": [
+    [
+      {
+        "method": "query_all_stock",
+        "request_parameters": {
+          "day": "2026-09-30"
+        },
+        "sdk_status_code": "0",
+        "body_sha256": "d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66",
+        "outcome": "response"
+      },
+      {
+        "method": "query_stock_industry",
+        "request_parameters": {
+          "date": "2026-09-30"
+        },
+        "sdk_status_code": "0",
+        "body_sha256": "3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26",
+        "outcome": "response"
+      }
+    ],
+    [
+      {
+        "method": "query_all_stock",
+        "request_parameters": {
+          "day": "2026-09-30"
+        },
+        "sdk_status_code": "0",
+        "body_sha256": "d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66",
+        "outcome": "response"
+      },
+      {
+        "method": "query_stock_industry",
+        "request_parameters": {
+          "date": "2026-09-30"
+        },
+        "sdk_status_code": "0",
+        "body_sha256": "3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26",
+        "outcome": "response"
+      }
+    ]
+  ],
+  "boundary": "SDK methods/decoded payloads; URL/headers/TCP wire bytes are not exposed",
+  "production_writes": 0,
+  "network_requests": 0
+}

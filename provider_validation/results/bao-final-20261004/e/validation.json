@@ -1,0 +1,8 @@
+{
+  "failure_class": "temporary_empty",
+  "valid_empty_dataset": false,
+  "sdk_status_code": "0",
+  "source_response_sha256": "f2ccf01e26e381d22ddc5d821613caff9eb20487e0894ede5a75a4ec5f839e5a",
+  "mode": "offline_replay",
+  "query_count": 1
+}

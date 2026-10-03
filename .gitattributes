@@ -66,3 +66,18 @@
 /config/normalization/industry_directory.yaml text eol=lf
 /config/normalization/industry_index_daily.yaml text eol=lf
 /config/normalization/board_fund_flow.yaml text eol=lf
+
+# BaoStock migration keeps SDK representations and original code snapshots immutable.
+/provider_validation/results/bao-*-20261004/** -text whitespace=cr-at-eol
+/provider_validation/results/bao-*-20261004/**/*.bin binary
+/provider_validation/results/bao-*-20261004-*.xml -text whitespace=cr-at-eol
+# Preserve pytest failure traceback whitespace as immutable investigation evidence.
+/provider_validation/results/bao-dev-20261004-full-tests.xml -text whitespace=-blank-at-eol,cr-at-eol
+/provider_validation/results/bao-*-20261004-*.json -text whitespace=cr-at-eol
+/src/stock_data_manage/providers/baostock/industry.py text eol=lf
+/src/stock_data_manage/providers/baostock/session.py text eol=lf
+/config/datasets/security_snapshot.yaml text eol=lf
+/config/datasets/industry_membership.yaml text eol=lf
+/config/normalization/security_snapshot.yaml text eol=lf
+/config/normalization/industry_membership.yaml text eol=lf
+/tests/test_config_contract.py text eol=lf

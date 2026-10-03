@@ -1,0 +1,166 @@
+{
+  "validation_time_utc": "2026-10-03T19:18:13.147073+00:00",
+  "mode": "offline_replay",
+  "network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "verification_code": {
+    "path": "tests/test_input_collection.py",
+    "sha256": "af1b2897eee589a2ae323f2a3a4dc9fc6c44919c7efbea726dbfe7d0f8ba8e94"
+  },
+  "runner": {
+    "path": "provider_validation/tests/replay_input_capabilities.py",
+    "sha256": "f314a38d9e8b4b35f6deda212f3b3a099efb799435fc5dbb5100a3d23e4a546c"
+  },
+  "inputs": [
+    {
+      "input_id": "SDA-BOARD-005",
+      "report_path": "provider_validation/results/bao-final-20261004/1/SDA-BOARD-005-b7c3fdef4d9a/2026-10-03/input_report/baostock/security_snapshot/report.json",
+      "report_sha256": "c98e2ac78e5eb4d06c8a5631736bcd25aedcf5a0d46b54618a4100efa87d1a9b",
+      "source_manifest": "provider_validation/results/live-probes/baostock-industry-20260930-20261003/_raw/baostock-industry/manifest.ndjson",
+      "source_manifest_sha256": "7096e007984eed7f33b465d27efadc7ae2d3049de62913f15a8d95e9c8ad474e",
+      "row_count": 5223,
+      "scope": {
+        "trade_date": "2026-09-30"
+      },
+      "code_version": "f9b337ac6a09c0545b7b591da77f1755824b52d4cd755c3211ec8ddcd93f8167",
+      "result": "passed"
+    },
+    {
+      "input_id": "SDA-BOARD-006",
+      "report_path": "provider_validation/results/bao-final-20261004/2/SDA-BOARD-006-ead29872b05d/2026-10-03/input_report/baostock/industry_membership/report.json",
+      "report_sha256": "983f2d98e0dd54fc1e657d17eed21ae6081585e75ae28e911cbade50443a5b59",
+      "source_manifest": "provider_validation/results/live-probes/baostock-industry-20260930-20261003/_raw/baostock-industry/manifest.ndjson",
+      "source_manifest_sha256": "7096e007984eed7f33b465d27efadc7ae2d3049de62913f15a8d95e9c8ad474e",
+      "row_count": 5221,
+      "scope": {
+        "trade_date": "2026-09-30"
+      },
+      "code_version": "f9b337ac6a09c0545b7b591da77f1755824b52d4cd755c3211ec8ddcd93f8167",
+      "result": "passed"
+    }
+  ],
+  "original_vs_provider": [
+    {
+      "original_source_sha256": "08362eed2be7535fbbc7052ea00990873a7b6f9b8dd7216107bbe55ac9075d28",
+      "legacy_rows_compared": 5221,
+      "security_universe_compared": 5223,
+      "missing_symbols": [
+        "sz001246",
+        "sz301716"
+      ],
+      "all_legacy_fields_equal": true,
+      "query_parameters_status_payload_equal": true,
+      "request_comparison": [
+        [
+          {
+            "method": "query_all_stock",
+            "request_parameters": {
+              "day": "2026-09-30"
+            },
+            "sdk_status_code": "0",
+            "body_sha256": "d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66",
+            "outcome": "response"
+          },
+          {
+            "method": "query_stock_industry",
+            "request_parameters": {
+              "date": "2026-09-30"
+            },
+            "sdk_status_code": "0",
+            "body_sha256": "3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26",
+            "outcome": "response"
+          }
+        ],
+        [
+          {
+            "method": "query_all_stock",
+            "request_parameters": {
+              "day": "2026-09-30"
+            },
+            "sdk_status_code": "0",
+            "body_sha256": "d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66",
+            "outcome": "response"
+          },
+          {
+            "method": "query_stock_industry",
+            "request_parameters": {
+              "date": "2026-09-30"
+            },
+            "sdk_status_code": "0",
+            "body_sha256": "3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26",
+            "outcome": "response"
+          }
+        ]
+      ],
+      "boundary": "SDK methods/decoded payloads; URL/headers/TCP wire bytes are not exposed",
+      "production_writes": 0,
+      "network_requests": 0
+    }
+  ],
+  "known_differences": [
+    "SDK解码载荷已精确归档；TCP帧、URL、HTTP头和SDK内部物理请求不可见。",
+    "证券快照保留原筛选的5223只证券；行业归属5221行、缺失2只，不能宣称全量分类。",
+    "新字段合同从原SDK两查询结果提取两种输出，旧行业方法的默认返回保持一致。",
+    "分类更新时间来自updateDate，不使用查询日期替代；既有行业主键定义保持。",
+    "离线回放及缓存的ResultSet仅复现SDK外部接口；没有替换在线SDK传输。"
+  ],
+  "empty_scope": {
+    "failure_class": "temporary_empty",
+    "valid_empty_dataset": false,
+    "sdk_status_code": "0",
+    "source_response_sha256": "f2ccf01e26e381d22ddc5d821613caff9eb20487e0894ede5a75a4ec5f839e5a",
+    "mode": "offline_replay",
+    "query_count": 1
+  },
+  "negative_checks": [
+    {
+      "mutation": "sdk_error",
+      "expected_failure_class": "connection",
+      "result": "passed",
+      "report_path": "provider_validation/results/bao-final-20261004/f1/out/SDA-BOARD-006-0f24f2c9b355/2026-10-03/input_report/baostock/industry_membership/report.json",
+      "report_sha256": "bde8788b1ef667ce743ef3290f2e34bdb90adb13d772ecfb413918659bf32517"
+    },
+    {
+      "mutation": "missing_query",
+      "expected_failure_class": "ValueError",
+      "result": "passed",
+      "report_path": "provider_validation/results/bao-final-20261004/f2/out/SDA-BOARD-006-a3ddeb6fdd40/2026-10-03/input_report/baostock/industry_membership/report.json",
+      "report_sha256": "b1e9adefef3ddb24bf3012bb366c8393c18cd52fb1fd13eb5ab61e4e2ed42cd5"
+    },
+    {
+      "mutation": "schema",
+      "expected_failure_class": "schema_changed",
+      "result": "passed",
+      "report_path": "provider_validation/results/bao-final-20261004/f3/out/SDA-BOARD-006-e8021589e9cf/2026-10-03/input_report/baostock/industry_membership/report.json",
+      "report_sha256": "86f3183e56188cc1942f106cb450e8198e77f88eec87ae04af3d157d214a9ceb"
+    },
+    {
+      "mutation": "duplicate",
+      "expected_failure_class": "schema_changed",
+      "result": "passed",
+      "report_path": "provider_validation/results/bao-final-20261004/f4/out/SDA-BOARD-006-d6d9ed9cdaa0/2026-10-03/input_report/baostock/industry_membership/report.json",
+      "report_sha256": "8070de27ce58e40c28c8b419f17a14b342154c49d699ac78f7df45591a135fb3"
+    },
+    {
+      "mutation": "corrupt_hash",
+      "expected_failure_class": "ValueError",
+      "result": "passed",
+      "report_path": "provider_validation/results/bao-final-20261004/f5/out/SDA-BOARD-006-d0e7aa377812/2026-10-03/input_report/baostock/industry_membership/report.json",
+      "report_sha256": "37053e55b2d61a585c47bed4b497f8cdd6e8fdbdeb2deaf9da7b4367826cb56b"
+    },
+    {
+      "mutation": "secret_payload",
+      "expected_failure_class": "ValueError",
+      "result": "passed",
+      "report_path": "provider_validation/results/bao-final-20261004/f6/out/SDA-BOARD-006-294d677c6c0f/2026-10-03/input_report/baostock/industry_membership/report.json",
+      "report_sha256": "08a9df45b65cd658a3eb361dfc51f641fe02f41ed9ae4336df0cdea7a0f5f2c7"
+    }
+  ],
+  "session_pacing_cache": {
+    "mode": "injected SDK fixture; not live provider verification",
+    "post_payload_interval_seconds": 3,
+    "cache_reused_before_login": true,
+    "result": "passed"
+  }
+}

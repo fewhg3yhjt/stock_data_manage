@@ -1,0 +1,5 @@
+        def query_all_stock(self, **kwargs):
+            calls.append(("query_all_stock", kwargs, clock[0]))
+            clock[0] += 10  # A long first query must still retain the post-payload three-second gap.
+            return _decoded_result_set({"fields": ["code", "tradeStatus", "code_name"], "rows": [
+                {"code": "sh.600519", "tradeStatus": "1", "code_name": "样本股"}]})
