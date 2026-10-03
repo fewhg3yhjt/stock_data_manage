@@ -33,6 +33,7 @@ def build_input_provider(contract, *, providers_path, client=None):
     expected_methods = {"ASTOCK-001": "fetch_snapshot", "ASTOCK-002-daily": "fetch_window", "ASTOCK-002-5m": "fetch_recent",
                         "ASTOCK-045": "fetch", "ASTOCK-070": "fetch",
                         "ASTOCK-026": "fetch_history", "ASTOCK-027": "fetch_history", "ASTOCK-028": "fetch_history",
+                        "ASTOCK-046": "fetch", "ASTOCK-047": "fetch", "ASTOCK-048": "fetch", "ASTOCK-050": "fetch",
                         "SDA-BOARD-001": "fetch_industry_list", "SDA-BOARD-002": "fetch_industry_daily",
                         "SDA-BOARD-003": "fetch_fund_flow", "SDA-BOARD-004": "fetch_fund_flow",
                         "SDA-BOARD-005": "fetch_snapshot", "SDA-BOARD-006": "fetch_snapshot"}
@@ -57,9 +58,10 @@ def build_input_provider(contract, *, providers_path, client=None):
         capability = replace(config.capability(), endpoint=contract.endpoint, version="tencent-recent-5m-input-v1",
                              datasets=frozenset({Dataset.MINUTE_BAR_5M}), frequencies=frozenset({5}))
         return TencentMinuteProvider(RequestsTransport(headers), capability, endpoint=contract.endpoint)
-    if contract.input_id == "ASTOCK-045":
+    if contract.input_id in {"ASTOCK-045", "ASTOCK-046", "ASTOCK-047", "ASTOCK-048", "ASTOCK-050"}:
         from ..providers.eastmoney.limit_pool import EastMoneyLimitUpProvider
-        return EastMoneyLimitUpProvider(client=client)
+        return EastMoneyLimitUpProvider(client=client, endpoint=contract.endpoint,
+            capability_version="eastmoney-limit-up-input-v1" if contract.input_id == "ASTOCK-045" else "eastmoney-stock-pool-input-v1")
     if contract.input_id == "ASTOCK-070":
         from ..providers.sina.calendar import SinaTradingCalendarProvider
         return SinaTradingCalendarProvider(client=client)

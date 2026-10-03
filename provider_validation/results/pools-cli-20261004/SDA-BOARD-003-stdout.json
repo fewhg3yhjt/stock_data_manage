@@ -1,0 +1,473 @@
+{
+  "input_id": "SDA-BOARD-003",
+  "dataset": "board_fund_flow",
+  "mode": "replay",
+  "parameters": {
+    "board_type": "industry",
+    "period": "即时"
+  },
+  "provider": "ths",
+  "endpoint": "industry_fund_flow",
+  "collection_profile": {
+    "name": "market_intraday",
+    "mode": "intraday",
+    "refresh_interval_seconds": 60,
+    "business_day": "trading_day",
+    "scheduling_enabled": false,
+    "frequency_unit": null,
+    "frequency_interval": 1,
+    "at_time": null,
+    "anchor_date": null,
+    "settle_delay_seconds": 0,
+    "trigger_grace_seconds": 30,
+    "universe": "static",
+    "max_symbols": null
+  },
+  "request_interval_seconds": 3,
+  "effective_concurrency": 1,
+  "request_limit_enforcement": "call_boundary_only",
+  "adapter_version": "akshare-ths-board-input-v2",
+  "code_version": "8c8e7358634dd263520e07807c15f972736b8b54ec3a445316dd2bb435b69bf1",
+  "code_files": [
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\pipeline\\inputs.py",
+      "sha256": "9802f0083ea315558d0cc24871051f7249fbf927085fb98fac9565897b73f16e"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\cli.py",
+      "sha256": "582f5caedfc538a012d7a2f6e8cd7af3fe8b6fc9152e5b9e0a3fa2cb8810ae19"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\config\\loader.py",
+      "sha256": "93bb55ab150c88751fe9a58a2b75737878c1b0f07233b8ec47009c4901bb11e9"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\contracts.py",
+      "sha256": "a4b16abc7e3686a4eb2791dcd4545fb2404e0214bf32e20db19d2582d39ea447"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\quality\\normalization.py",
+      "sha256": "406a9374f921a367b8cab3e09905d9524f406582510e95feaf8ee7218fd015e1"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\transport.py",
+      "sha256": "7cf1c5f1f9b526e54e7d82e60b95b35e1f8f91e60effc31d74052f9273988b03"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\storage\\raw.py",
+      "sha256": "564c940feb99b358c41c5456c3142e7501b21505b5c2d8d88d811c53e145b752"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\routing\\factory.py",
+      "sha256": "824919b319a1f86de05c67f38c8c4a41fc329aa86eb9e9a1246ab841b977380c"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\daily.py",
+      "sha256": "487a14fcbfc47146d6d5fd291fbf41667aba435e5fed22ea1ef61ded513fcaa7"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\minute.py",
+      "sha256": "ff5cf1e91327bcab2e072bcfae9f1f77dca71a84ba26e456c26580a4d59d9cc1"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\snapshot.py",
+      "sha256": "3278cadac776fe8cfe5d02775a5bf8f53bc1cb96c595a5f418172f53047434bf"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\limit_pool.py",
+      "sha256": "2fbdfe3da3129545dfe8d2e457be7c42225696ddd74270567ae765e4b413f5ae"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\shareholder.py",
+      "sha256": "4c9d80f4d51845ac5541c42275f44f2a18643db5e9ccb705a3e16168f8db44c1"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\dividend.py",
+      "sha256": "5706a8cdb37eeeb8f66cb033a3091dd1b6ec1ed83d72d0f9fbeb8f5c75d9649b"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\fund_flow.py",
+      "sha256": "0cf655efa0854d18651bb4f04f985f0f210b81a6d9eff065604d235ed8f75280"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\realtime.py",
+      "sha256": "6e09d2a5014cf316c4d1e26e913a44d5c2fbad95fb44d95cba159ef881f03bca"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\calendar.py",
+      "sha256": "3d114045f960bfcc94ade1ee03e4d25ebdf6980ba68aa2d0a2236bed78aaef05"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\akshare\\boards.py",
+      "sha256": "2060f150831cebaf707ed5becedc35428bc41d4428bab31555ed1d2bf817d122"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\baostock\\industry.py",
+      "sha256": "16c41b379eecbd87f082bd042e27fad7f3d8d77b5bfc6a3e8a286209b068494a"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\baostock\\session.py",
+      "sha256": "70ce19cdde1d6a8ed0c3d3db29caa28d1d8069826136ab6dd7fb6a2ef8c7b832"
+    }
+  ],
+  "config_files": [
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\providers.yaml",
+      "sha256": "23f06aa0a71ad9aaaf7f24b40daa2efabdc38b1c71a1b8b98f80d6150afb605f"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\collection.yaml",
+      "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\datasets\\board_fund_flow.yaml",
+      "sha256": "08f3566d0cf2787186e6106e4915d0d89b70232d737898480eda03785ea3c53a"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\normalization\\board_fund_flow.yaml",
+      "sha256": "fb7c6f1f2d425181b189e25152e465306982e10c7c6ee06b2917dfa00b891baa"
+    }
+  ],
+  "normalization_version": "ths-industry-flow-input-v1",
+  "normalization_status": "pending_validation",
+  "field_units": {
+    "board_type": null,
+    "period": null,
+    "rank": null,
+    "board_name": null,
+    "snapshot_at": null,
+    "index_value": null,
+    "change_pct": "percent",
+    "money_inflow": "unverified; source value retained separately",
+    "money_outflow": "unverified; source value retained separately",
+    "net_inflow": "unverified; source value retained separately",
+    "company_count": null,
+    "leader_stock_name": null,
+    "leader_change_pct": "percent",
+    "leader_price": null,
+    "source": null
+  },
+  "unverified_fields": [
+    "money_inflow",
+    "money_outflow",
+    "net_inflow"
+  ],
+  "selected_fields": [
+    "board_name",
+    "board_type",
+    "change_pct",
+    "company_count",
+    "index_value",
+    "leader_change_pct",
+    "leader_price",
+    "leader_stock_name",
+    "money_inflow",
+    "money_outflow",
+    "net_inflow",
+    "period",
+    "rank",
+    "snapshot_at",
+    "source"
+  ],
+  "eligible_for_production_routing": false,
+  "production_writes": 0,
+  "live_http_calls": 0,
+  "validation_time_utc": "2026-10-03T22:48:25.293378+00:00",
+  "status": "candidate_complete",
+  "response_freshness_seconds": 60,
+  "sdk_dependency": {
+    "version": "1.18.83",
+    "function": "stock_fund_flow_industry",
+    "source_path": "_raw/bodies/b7425e018c31d9bde9269886169ab922bd4a71e5e5dc2527621f3c0993caabdb.bin",
+    "sha256": "b7425e018c31d9bde9269886169ab922bd4a71e5e5dc2527621f3c0993caabdb",
+    "original_source_sha256": "b7425e018c31d9bde9269886169ab922bd4a71e5e5dc2527621f3c0993caabdb",
+    "redacted": false,
+    "dependencies": [
+      {
+        "name": "_get_file_content_ths",
+        "path": "_raw/bodies/564c33bfd4989aef98823b04712a878776d212fcc886d1a6bb38752788ed88d2.bin",
+        "sha256": "564c33bfd4989aef98823b04712a878776d212fcc886d1a6bb38752788ed88d2",
+        "original_source_sha256": "564c33bfd4989aef98823b04712a878776d212fcc886d1a6bb38752788ed88d2",
+        "redacted": false
+      },
+      {
+        "name": "get_ths_js",
+        "path": "_raw/bodies/07af78156c494a0c4b0f7d6fb67731a704f3c4c9702a0db825bd3ab93bc3f93c.bin",
+        "sha256": "07af78156c494a0c4b0f7d6fb67731a704f3c4c9702a0db825bd3ab93bc3f93c",
+        "original_source_sha256": "07af78156c494a0c4b0f7d6fb67731a704f3c4c9702a0db825bd3ab93bc3f93c",
+        "redacted": false
+      },
+      {
+        "name": "ths.js",
+        "path": "_raw/bodies/0163e41dfdcbd889755142f4179a83a8d9f575f5343a56413546cc7fc0262376.bin",
+        "sha256": "0163e41dfdcbd889755142f4179a83a8d9f575f5343a56413546cc7fc0262376",
+        "original_source_sha256": "0163e41dfdcbd889755142f4179a83a8d9f575f5343a56413546cc7fc0262376",
+        "redacted": false
+      }
+    ]
+  },
+  "responses": [
+    {
+      "event": "http_response",
+      "method": "GET",
+      "url": "http://data.10jqka.com.cn/funds/hyzjl/field/tradezdf/order/desc/ajax/1/free/1/",
+      "request_headers": {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36",
+        "Accept-Encoding": "gzip, deflate",
+        "Accept": "text/html, */*; q=0.01",
+        "Connection": "keep-alive",
+        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+        "Cache-Control": "no-cache",
+        "hexin-v": "<redacted>",
+        "Host": "data.10jqka.com.cn",
+        "Pragma": "no-cache",
+        "Referer": "http://data.10jqka.com.cn/funds/hyzjl/",
+        "X-Requested-With": "XMLHttpRequest"
+      },
+      "scope": {
+        "input_id": "SDA-BOARD-003",
+        "parameters": {
+          "board_type": "industry",
+          "period": "即时"
+        }
+      },
+      "request_options": {
+        "timeout": null,
+        "allow_redirects": true,
+        "trust_env": true,
+        "proxies": {},
+        "sdk_retry_policy": false
+      },
+      "provider": "ths",
+      "endpoint": "industry_fund_flow",
+      "code_version": "8c8e7358634dd263520e07807c15f972736b8b54ec3a445316dd2bb435b69bf1",
+      "fetched_at_utc": "2026-10-03T22:48:25.616924+00:00",
+      "mode": "replay",
+      "source_ref": {
+        "manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\_raw\\missing-capabilities-20261003T174623\\manifest.ndjson",
+        "line": 71,
+        "fetched_at_utc": "2026-10-03T09:51:06.769+00:00"
+      },
+      "outcome": "response",
+      "status_code": 200,
+      "response_headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Age": "0",
+        "Cache-Control": "max-age=60",
+        "Connection": "close",
+        "Content-Encoding": "gzip",
+        "Content-Type": "text/html; charset=gbk",
+        "Date": "Sat, 03 Oct 2026 09:51:09 GMT",
+        "Expires": "Sat, 03 Oct 2026 09:52:09 GMT",
+        "News": "10.201.65.17|127.0.0.1|",
+        "Pass": "210_244",
+        "Server": "Stargate",
+        "Transfer-Encoding": "chunked",
+        "Vary": "Accept-Encoding, Accept-Encoding",
+        "Via": "1.1 cachemd215127.10jqka.com.cn (squid), http/1.1 cachehuzyd30-9.10jqka.com.cn (ApacheTrafficServer/10.0.3 [cSsSfU])",
+        "X-Cache": "MISS from cachemd215127.10jqka.com.cn",
+        "X-Gateway-Pass": "datacenter-apisix-9dfc8cb4-vdxzx",
+        "X-Gateway-Time": "03/Oct/2026:17:51:09 +0800"
+      },
+      "content_type": "text/html; charset=gbk",
+      "encoding": "gbk",
+      "body_bytes": 32720,
+      "body_sha256": "1470e17de6e09fc17ceae6a8d8d4a5b4615856e8452323c790129f825a468afb",
+      "body_storage": "bodies/1470e17de6e09fc17ceae6a8d8d4a5b4615856e8452323c790129f825a468afb.bin",
+      "persistence_status": "exact_application_payload_saved"
+    },
+    {
+      "event": "http_response",
+      "method": "GET",
+      "url": "http://data.10jqka.com.cn/funds/hyzjl/field/tradezdf/order/desc/page/1/ajax/1/free/1/",
+      "request_headers": {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36",
+        "Accept-Encoding": "gzip, deflate",
+        "Accept": "text/html, */*; q=0.01",
+        "Connection": "keep-alive",
+        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+        "Cache-Control": "no-cache",
+        "hexin-v": "<redacted>",
+        "Host": "data.10jqka.com.cn",
+        "Pragma": "no-cache",
+        "Referer": "http://data.10jqka.com.cn/funds/hyzjl/",
+        "X-Requested-With": "XMLHttpRequest"
+      },
+      "scope": {
+        "input_id": "SDA-BOARD-003",
+        "parameters": {
+          "board_type": "industry",
+          "period": "即时"
+        }
+      },
+      "request_options": {
+        "timeout": null,
+        "allow_redirects": true,
+        "trust_env": true,
+        "proxies": {},
+        "sdk_retry_policy": false
+      },
+      "provider": "ths",
+      "endpoint": "industry_fund_flow",
+      "code_version": "8c8e7358634dd263520e07807c15f972736b8b54ec3a445316dd2bb435b69bf1",
+      "fetched_at_utc": "2026-10-03T22:48:25.651559+00:00",
+      "mode": "replay",
+      "source_ref": {
+        "manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\_raw\\missing-capabilities-20261003T174623\\manifest.ndjson",
+        "line": 72,
+        "fetched_at_utc": "2026-10-03T09:51:06.955+00:00"
+      },
+      "outcome": "response",
+      "status_code": 200,
+      "response_headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Age": "0",
+        "Cache-Control": "max-age=60",
+        "Connection": "close",
+        "Content-Encoding": "gzip",
+        "Content-Type": "text/html; charset=gbk",
+        "Date": "Sat, 03 Oct 2026 09:51:12 GMT",
+        "Expires": "Sat, 03 Oct 2026 09:52:12 GMT",
+        "News": "10.201.65.18|127.0.0.1|",
+        "Pass": "210_244",
+        "Server": "Stargate",
+        "Transfer-Encoding": "chunked",
+        "Vary": "Accept-Encoding, Accept-Encoding",
+        "Via": "1.1 cachewc8.10jqka.com.cn (squid), http/1.1 cachehuzyd30-9.10jqka.com.cn (ApacheTrafficServer/10.0.3 [cSsSfU])",
+        "X-Cache": "MISS from cachewc8.10jqka.com.cn",
+        "X-Gateway-Pass": "datacenter-apisix-9dfc8cb4-vzvj4",
+        "X-Gateway-Time": "03/Oct/2026:17:51:12 +0800"
+      },
+      "content_type": "text/html; charset=gbk",
+      "encoding": "gbk",
+      "body_bytes": 32720,
+      "body_sha256": "1470e17de6e09fc17ceae6a8d8d4a5b4615856e8452323c790129f825a468afb",
+      "body_storage": "bodies/1470e17de6e09fc17ceae6a8d8d4a5b4615856e8452323c790129f825a468afb.bin",
+      "persistence_status": "exact_application_payload_saved"
+    },
+    {
+      "event": "http_response",
+      "method": "GET",
+      "url": "http://data.10jqka.com.cn/funds/hyzjl/field/tradezdf/order/desc/page/2/ajax/1/free/1/",
+      "request_headers": {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36",
+        "Accept-Encoding": "gzip, deflate",
+        "Accept": "text/html, */*; q=0.01",
+        "Connection": "keep-alive",
+        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+        "Cache-Control": "no-cache",
+        "hexin-v": "<redacted>",
+        "Host": "data.10jqka.com.cn",
+        "Pragma": "no-cache",
+        "Referer": "http://data.10jqka.com.cn/funds/hyzjl/",
+        "X-Requested-With": "XMLHttpRequest"
+      },
+      "scope": {
+        "input_id": "SDA-BOARD-003",
+        "parameters": {
+          "board_type": "industry",
+          "period": "即时"
+        }
+      },
+      "request_options": {
+        "timeout": null,
+        "allow_redirects": true,
+        "trust_env": true,
+        "proxies": {},
+        "sdk_retry_policy": false
+      },
+      "provider": "ths",
+      "endpoint": "industry_fund_flow",
+      "code_version": "8c8e7358634dd263520e07807c15f972736b8b54ec3a445316dd2bb435b69bf1",
+      "fetched_at_utc": "2026-10-03T22:48:25.694115+00:00",
+      "mode": "replay",
+      "source_ref": {
+        "manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\_raw\\missing-capabilities-20261003T174623\\manifest.ndjson",
+        "line": 73,
+        "fetched_at_utc": "2026-10-03T09:51:10.164+00:00"
+      },
+      "outcome": "response",
+      "status_code": 200,
+      "response_headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Age": "0",
+        "Cache-Control": "max-age=60",
+        "Connection": "close",
+        "Content-Encoding": "gzip",
+        "Content-Type": "text/html; charset=gbk",
+        "Date": "Sat, 03 Oct 2026 09:51:15 GMT",
+        "Expires": "Sat, 03 Oct 2026 09:52:15 GMT",
+        "News": "10.201.65.17|127.0.0.1|",
+        "Pass": "205_129",
+        "Server": "Stargate",
+        "Transfer-Encoding": "chunked",
+        "Vary": "Accept-Encoding, Accept-Encoding",
+        "Via": "1.1 cachemd204181.10jqka.com.cn (squid), http/1.1 cachehuzyd30-9.10jqka.com.cn (ApacheTrafficServer/10.0.3 [cSsSfU])",
+        "X-Cache": "MISS from cachemd204181.10jqka.com.cn",
+        "X-Gateway-Pass": "datacenter-apisix-9dfc8cb4-5kj5h",
+        "X-Gateway-Time": "03/Oct/2026:17:51:15 +0800"
+      },
+      "content_type": "text/html; charset=gbk",
+      "encoding": "gbk",
+      "body_bytes": 27143,
+      "body_sha256": "6d4200eac2fb6a69f38ee543e1bf1f742187560f9f21ddf2899857ee291d6624",
+      "body_storage": "bodies/6d4200eac2fb6a69f38ee543e1bf1f742187560f9f21ddf2899857ee291d6624.bin",
+      "persistence_status": "exact_application_payload_saved"
+    }
+  ],
+  "source_rows": {
+    "path": "2026-10-03/source_rows/ths/industry_fund_flow/source-rows.json",
+    "sha256": "fdf61aeb2f9c0aa1875f556cf6945c0e5f15f7ed5eaaf82fc5254bf48ab67107",
+    "row_count": 90
+  },
+  "source_url": null,
+  "source_urls": [
+    "http://data.10jqka.com.cn/funds/hyzjl/field/tradezdf/order/desc/ajax/1/free/1/",
+    "http://data.10jqka.com.cn/funds/hyzjl/field/tradezdf/order/desc/page/1/ajax/1/free/1/",
+    "http://data.10jqka.com.cn/funds/hyzjl/field/tradezdf/order/desc/page/2/ajax/1/free/1/"
+  ],
+  "source_capture_window": {
+    "first": "2026-10-03T09:51:06.769000+00:00",
+    "last": "2026-10-03T09:51:10.164000+00:00",
+    "meaning": "source response capture times; not row-level market timestamps"
+  },
+  "returned_window": {
+    "first": "1",
+    "last": "90"
+  },
+  "source_units": [
+    "money:source_display_unit_unconfirmed",
+    "percentage:percent"
+  ],
+  "coverage_basis": "returned SDK rows; not an independently verified market universe",
+  "output": {
+    "path": "2026-10-03/board_fund_flow/ths/industry_fund_flow/mapped-rows.json",
+    "sha256": "bdd8a142ba58213f6f4cc3955aa2564ef0c62e7a25a63fd437bcd44e999f289e",
+    "row_count": 90,
+    "source_response_hashes": [
+      "1470e17de6e09fc17ceae6a8d8d4a5b4615856e8452323c790129f825a468afb",
+      "1470e17de6e09fc17ceae6a8d8d4a5b4615856e8452323c790129f825a468afb",
+      "6d4200eac2fb6a69f38ee543e1bf1f742187560f9f21ddf2899857ee291d6624"
+    ]
+  },
+  "row_count": 90,
+  "coverage_denominator": 90,
+  "first_key": [
+    "industry",
+    "生物制品",
+    "即时",
+    "2026-10-03T09:51:10.164000+00:00"
+  ],
+  "last_key": [
+    "industry",
+    "元件",
+    "即时",
+    "2026-10-03T09:51:10.164000+00:00"
+  ],
+  "raw_manifest": {
+    "path": "_raw/manifest.ndjson",
+    "sha256": "0d303e7406095344933fb0debf33e7537e19e43a0b5cf8c0b7c9ab7f5856dd48"
+  },
+  "run_directory": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\pools-cli-20261004\\candidate\\SDA-BOARD-003-e4120e223444",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\pools-cli-20261004\\candidate\\SDA-BOARD-003-e4120e223444\\2026-10-03\\input_report\\ths\\industry_fund_flow\\report.json"
+}

@@ -1,0 +1,17 @@
+dataset:
+  name: industry_index_daily
+  display_name: 同花顺行业指数日线
+  primary_key: [board_code, trade_date]
+
+fields:
+  board_type: {type: enum, values: [industry], required: true}
+  board_code: {type: string, required: true}
+  board_name: {type: string, required: true}
+  trade_date: {type: date, required: true}
+  open: {type: decimal, required: true}
+  high: {type: decimal, required: true}
+  low: {type: decimal, required: true}
+  close: {type: decimal, required: true}
+  volume: {type: decimal, unit: source_unit_unconfirmed, required: false}
+  amount: {type: decimal, unit: source_unit_unconfirmed, required: false}
+  source: {type: string, required: true}

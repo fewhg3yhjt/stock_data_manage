@@ -1,0 +1,373 @@
+{
+  "original_files": [
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/limit_pool.py",
+      "snapshot": "provider_validation/results/pools-original-20261004/1-limit_pool.py.bin",
+      "sha256": "4662fdfb95bd01a7d5657816ea1d9d974c8778b0f1b862787075aa56cfd10aef"
+    },
+    {
+      "path": "src/stock_data_manage/pipeline/inputs.py",
+      "snapshot": "provider_validation/results/pools-original-20261004/2-inputs.py.bin",
+      "sha256": "88f2641ff4b3c49c3773875ab0794b701dc35181929879e2d2206bc469270db1"
+    },
+    {
+      "path": "src/stock_data_manage/routing/factory.py",
+      "snapshot": "provider_validation/results/pools-original-20261004/3-factory.py.bin",
+      "sha256": "b12059360c1bdde6033d46f96cc0ebb203f5456b015d9f2aa31408e6c30c027a"
+    },
+    {
+      "path": "config/providers.yaml",
+      "snapshot": "provider_validation/results/pools-original-20261004/4-providers.yaml.bin",
+      "sha256": "48e663776fd6b416367de1b0ceac38fea8e128e1b6261c71f71a24ad26f00ba2"
+    },
+    {
+      "path": "config/normalization/board_fund_flow.yaml",
+      "snapshot": "provider_validation/results/pools-original-20261004/5-board_fund_flow.yaml.bin",
+      "sha256": "fb7c6f1f2d425181b189e25152e465306982e10c7c6ee06b2917dfa00b891baa"
+    },
+    {
+      "path": "tests/test_input_collection.py",
+      "snapshot": "provider_validation/results/pools-original-20261004/6-test_input_collection.py.bin",
+      "sha256": "628d4064cc054760efc5b7e7198c34ba2019da2403707884ac7cef69c921dea1"
+    },
+    {
+      "path": "provider_validation/tests/replay_input_capabilities.py",
+      "snapshot": "provider_validation/results/pools-original-20261004/7-replay_input_capabilities.py.bin",
+      "sha256": "4e5c638fcdbee90b079787b0709d0b3e2d062138da38268ea0928920350cfe8d"
+    }
+  ],
+  "scope": "four existing stock-pool inputs plus THS duplicate alias; no live calls, scheduling or routing activation",
+  "authorization": "user confirmed autonomous remaining 51-input conversion scope",
+  "source_inputs": [
+    {
+      "interface_id": "ASTOCK-046",
+      "source": "a-stock-data",
+      "validation_result": "部分通过",
+      "current_missing_probe_status": "success",
+      "evidence_status": "live_raw",
+      "evidence_status_description": "实时原始响应已归档；仅代表本行注明的实测范围",
+      "evidence_level": "低频实时样本解析成功，原始响应和探测输出已留档；本轮仅单样本验证，未做全量语义核验。",
+      "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:896 (fetch_broken_board_pool)",
+      "source_code_artifacts": [
+        {
+          "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+          "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+        },
+        {
+          "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+          "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
+        }
+      ],
+      "test_code_ref": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 44",
+      "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+      "response_artifacts": [
+        {
+          "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/b4bd1938d591fc3cffd09746e501ac3c9e8717c3bd7bfe7f39f78785a5e334b8.body.gz",
+          "sha256": "b4bd1938d591fc3cffd09746e501ac3c9e8717c3bd7bfe7f39f78785a5e334b8",
+          "matches_filename": true
+        }
+      ],
+      "parsed_output_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/44_东财炸板池/data.csv",
+      "derived_artifacts": [
+        {
+          "path": "provider_validation/results/live-probes/rate-limited-all-20261003/44_东财炸板池/data.csv",
+          "sha256": "a655b7abf2edac2375cc8e91f6ed0634bee9260ee78ad5a10b51fa17ad95f387",
+          "bytes": 2083,
+          "field_names": [
+            "序号",
+            "代码",
+            "名称",
+            "涨跌幅",
+            "最新价",
+            "涨停价",
+            "成交额",
+            "流通市值",
+            "总市值",
+            "换手率",
+            "涨速",
+            "首次封板时间",
+            "炸板次数",
+            "涨停统计",
+            "振幅",
+            "所属行业"
+          ],
+          "row_count": 12
+        }
+      ],
+      "coverage_denominator": 87,
+      "scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：push2ex.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+      "finding": "部分：12行有字段；请求日期20261001，文件无日期字段，不能确认记录日期。；本轮低频真实探测 success：saved 1 file(s); usable=1。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：push2ex.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+      "sample": "{\"columns\": [\"序号\", \"代码\", \"名称\", \"涨跌幅\", \"最新价\", \"涨停价\", \"成交额\", \"流通市值\", \"总市值\", \"换手率\", \"涨速\", \"首次封板时间\", \"炸板次数\", \"涨停统计\", \"振幅\", \"所属行业\"], \"sample\": {\"序号\": \"1\", \"代码\": \"002262\", \"名称\": \"恩华药业\", \"涨跌幅\": \"5.720930099487305\", \"最新价\": \"22.73\", \"涨停价\": \"23.65\", \"成交额\": \"670320320\", \"流通市值\": \"20088235412.65\", \"总市值\": \"23024840467.52\", \"换手率\": \"3.2964255809783936\", \"涨速\": \"0.0\", \"首次封板时间\": \"092500\", \"炸板次数\": \"1\", \"涨停统计\": \"0/0\", \"振幅\": \"5.581395149230957\", \"所属行业\": \"化学制药\"}}",
+      "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
+      "transformation_code_version": {
+        "path": "provider_validation/tests/build_interface_coverage.py",
+        "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
+      },
+      "validation_time_utc": "2026-10-03T10:20:07.278487+00:00"
+    },
+    {
+      "interface_id": "ASTOCK-047",
+      "source": "a-stock-data",
+      "validation_result": "部分通过",
+      "current_missing_probe_status": "success",
+      "evidence_status": "live_raw",
+      "evidence_status_description": "实时原始响应已归档；仅代表本行注明的实测范围",
+      "evidence_level": "低频实时样本解析成功，原始响应和探测输出已留档；本轮仅单样本验证，未做全量语义核验。",
+      "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:901 (fetch_limit_down_pool)",
+      "source_code_artifacts": [
+        {
+          "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+          "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+        },
+        {
+          "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+          "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
+        }
+      ],
+      "test_code_ref": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 45",
+      "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+      "response_artifacts": [
+        {
+          "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/a4e93dfbb6aab53efa0722528f3c200bb03ed48477a73faf854cd1c72530557f.body.gz",
+          "sha256": "a4e93dfbb6aab53efa0722528f3c200bb03ed48477a73faf854cd1c72530557f",
+          "matches_filename": true
+        }
+      ],
+      "parsed_output_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/45_东财跌停池/data.csv",
+      "derived_artifacts": [
+        {
+          "path": "provider_validation/results/live-probes/rate-limited-all-20261003/45_东财跌停池/data.csv",
+          "sha256": "f52aaa4045fd8fe773109a8074b90255d6292ae033abc9bb2aae04849711bad5",
+          "bytes": 1626,
+          "field_names": [
+            "序号",
+            "代码",
+            "名称",
+            "涨跌幅",
+            "最新价",
+            "成交额",
+            "流通市值",
+            "总市值",
+            "动态市盈率",
+            "换手率",
+            "封单资金",
+            "最后封板时间",
+            "板上成交额",
+            "连续跌停",
+            "开板次数",
+            "所属行业"
+          ],
+          "row_count": 9
+        }
+      ],
+      "coverage_denominator": 87,
+      "scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：push2ex.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+      "finding": "部分：9行有字段；请求日期20261001，文件无日期字段，不能确认记录日期。；本轮低频真实探测 success：saved 1 file(s); usable=1。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：push2ex.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+      "sample": "{\"columns\": [\"序号\", \"代码\", \"名称\", \"涨跌幅\", \"最新价\", \"成交额\", \"流通市值\", \"总市值\", \"动态市盈率\", \"换手率\", \"封单资金\", \"最后封板时间\", \"板上成交额\", \"连续跌停\", \"开板次数\", \"所属行业\"], \"sample\": {\"序号\": \"1\", \"代码\": \"600156\", \"名称\": \"华升股份\", \"涨跌幅\": \"-10.03671932220459\", \"最新价\": \"7.35\", \"成交额\": \"314199664\", \"流通市值\": \"2955513659.7\", \"总市值\": \"2955513674.4\", \"动态市盈率\": \"-61.572723388671875\", \"换手率\": \"10.535581588745117\", \"封单资金\": \"4765005\", \"最后封板时间\": \"140731\", \"板上成交额\": \"93406261\", \"连续跌停\": \"1\", \"开板次数\": \"15\", \"所属行业\": \"纺织制造\"}}",
+      "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
+      "transformation_code_version": {
+        "path": "provider_validation/tests/build_interface_coverage.py",
+        "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
+      },
+      "validation_time_utc": "2026-10-03T10:20:07.288606+00:00"
+    },
+    {
+      "interface_id": "ASTOCK-048",
+      "source": "a-stock-data",
+      "validation_result": "部分通过",
+      "current_missing_probe_status": "success",
+      "evidence_status": "live_raw",
+      "evidence_status_description": "实时原始响应已归档；仅代表本行注明的实测范围",
+      "evidence_level": "低频实时样本解析成功，原始响应和探测输出已留档；本轮仅单样本验证，未做全量语义核验。",
+      "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:906 (fetch_previous_limit_pool)",
+      "source_code_artifacts": [
+        {
+          "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+          "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+        },
+        {
+          "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+          "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
+        }
+      ],
+      "test_code_ref": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 46",
+      "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+      "response_artifacts": [
+        {
+          "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/d4f6ab36119677ee909f1444490a4ddf233bd69e53f497ba6392030d6253328e.body.gz",
+          "sha256": "d4f6ab36119677ee909f1444490a4ddf233bd69e53f497ba6392030d6253328e",
+          "matches_filename": true
+        }
+      ],
+      "parsed_output_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/46_东财昨日涨停池/data.csv",
+      "derived_artifacts": [
+        {
+          "path": "provider_validation/results/live-probes/rate-limited-all-20261003/46_东财昨日涨停池/data.csv",
+          "sha256": "5141681d9a06948832d4b9e05ebb9a0f1a9ec8b16caa98a00293c10ea06f95a7",
+          "bytes": 9005,
+          "field_names": [
+            "序号",
+            "代码",
+            "名称",
+            "涨跌幅",
+            "最新价",
+            "涨停价",
+            "成交额",
+            "流通市值",
+            "总市值",
+            "换手率",
+            "涨速",
+            "振幅",
+            "昨日封板时间",
+            "昨日连板数",
+            "涨停统计",
+            "所属行业"
+          ],
+          "row_count": 57
+        }
+      ],
+      "coverage_denominator": 87,
+      "scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：push2ex.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+      "finding": "部分：57行有字段；请求日期20261001，文件无日期字段，不能确认记录日期。；本轮低频真实探测 success：saved 1 file(s); usable=1。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：push2ex.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+      "sample": "{\"columns\": [\"序号\", \"代码\", \"名称\", \"涨跌幅\", \"最新价\", \"涨停价\", \"成交额\", \"流通市值\", \"总市值\", \"换手率\", \"涨速\", \"振幅\", \"昨日封板时间\", \"昨日连板数\", \"涨停统计\", \"所属行业\"], \"sample\": {\"序号\": \"1\", \"代码\": \"000002\", \"名称\": \"万 科Ａ\", \"涨跌幅\": \"4.411764621734619\", \"最新价\": \"4.26\", \"涨停价\": \"4.49\", \"成交额\": \"5158052352\", \"流通市值\": \"41386382036.04\", \"总市值\": \"50824822487.04\", \"换手率\": \"13.478422164916992\", \"涨速\": \"0.0\", \"振幅\": \"17.89215660095215\", \"昨日封板时间\": \"140724\", \"昨日连板数\": \"1\", \"涨停统计\": \"2/1\", \"所属行业\": \"房地产开\"}}",
+      "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
+      "transformation_code_version": {
+        "path": "provider_validation/tests/build_interface_coverage.py",
+        "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
+      },
+      "validation_time_utc": "2026-10-03T10:20:07.299133+00:00"
+    },
+    {
+      "interface_id": "ASTOCK-050",
+      "source": "a-stock-data",
+      "validation_result": "部分通过",
+      "current_missing_probe_status": "success",
+      "evidence_status": "live_raw",
+      "evidence_status_description": "实时原始响应已归档；仅代表本行注明的实测范围",
+      "evidence_level": "低频实时样本解析成功，原始响应和探测输出已留档；本轮仅单样本验证，未做全量语义核验。",
+      "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:924 (fetch_strong_pool)",
+      "source_code_artifacts": [
+        {
+          "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+          "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+        },
+        {
+          "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+          "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
+        }
+      ],
+      "test_code_ref": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 48",
+      "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+      "response_artifacts": [
+        {
+          "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/4f9d16d10f9bfd7fd6a9ba0190b9ff362a62aa9dcdfc557a5b11cf5345bc51a8.body.gz",
+          "sha256": "4f9d16d10f9bfd7fd6a9ba0190b9ff362a62aa9dcdfc557a5b11cf5345bc51a8",
+          "matches_filename": true
+        }
+      ],
+      "parsed_output_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/48_东财强势_重点监控替代池/data.csv",
+      "derived_artifacts": [
+        {
+          "path": "provider_validation/results/live-probes/rate-limited-all-20261003/48_东财强势_重点监控替代池/data.csv",
+          "sha256": "69e90f34f18d92346382673792347c369df5f2d0ddca0f753a151878f5fec3a0",
+          "bytes": 33754,
+          "field_names": [
+            "序号",
+            "代码",
+            "名称",
+            "涨跌幅",
+            "最新价",
+            "涨停价",
+            "成交额",
+            "流通市值",
+            "总市值",
+            "换手率",
+            "涨速",
+            "是否新高",
+            "量比",
+            "涨停统计",
+            "入选理由",
+            "所属行业"
+          ],
+          "row_count": 199
+        }
+      ],
+      "coverage_denominator": 87,
+      "scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：push2ex.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+      "finding": "部分：199行来自东财强势股池，不能代表交易所重点监控名单。；本轮低频真实探测 success：saved 1 file(s); usable=1。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：push2ex.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+      "sample": "{\"columns\": [\"序号\", \"代码\", \"名称\", \"涨跌幅\", \"最新价\", \"涨停价\", \"成交额\", \"流通市值\", \"总市值\", \"换手率\", \"涨速\", \"是否新高\", \"量比\", \"涨停统计\", \"入选理由\", \"所属行业\"], \"sample\": {\"序号\": \"1\", \"代码\": \"301190\", \"名称\": \"善水科技\", \"涨跌幅\": \"20.00667953491211\", \"最新价\": \"35.93\", \"涨停价\": \"35.93\", \"成交额\": \"510373312\", \"流通市值\": \"6534014220.0\", \"总市值\": \"7711889445.0\", \"换手率\": \"7.954790115356445\", \"涨速\": \"0.0\", \"是否新高\": \"是\", \"量比\": \"2.2809367179870605\", \"涨停统计\": \"3/3\", \"入选理由\": \"60日新高且近期多次涨停\", \"所属行业\": \"化学原料\"}}",
+      "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
+      "transformation_code_version": {
+        "path": "provider_validation/tests/build_interface_coverage.py",
+        "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
+      },
+      "validation_time_utc": "2026-10-03T10:20:07.321276+00:00"
+    },
+    {
+      "interface_id": "ASTOCK-023",
+      "source": "a-stock-data",
+      "validation_result": "部分通过",
+      "current_missing_probe_status": "success",
+      "evidence_status": "live_raw",
+      "evidence_status_description": "实时原始响应已归档；仅代表本行注明的实测范围",
+      "evidence_level": "低频实时样本解析成功，原始响应和探测输出已留档；本轮仅单样本验证，未做全量语义核验。",
+      "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:684 (fetch_sector_fund_flow)",
+      "source_code_artifacts": [
+        {
+          "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+          "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+        },
+        {
+          "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+          "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
+        }
+      ],
+      "test_code_ref": "provider_validation/tests/run_a_stock_rate_limited_probes.py (低频安全入口)；--ids 21",
+      "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+      "response_artifacts": [
+        {
+          "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/1470e17de6e09fc17ceae6a8d8d4a5b4615856e8452323c790129f825a468afb.body.gz",
+          "sha256": "1470e17de6e09fc17ceae6a8d8d4a5b4615856e8452323c790129f825a468afb",
+          "matches_filename": true
+        },
+        {
+          "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/6d4200eac2fb6a69f38ee543e1bf1f742187560f9f21ddf2899857ee291d6624.body.gz",
+          "sha256": "6d4200eac2fb6a69f38ee543e1bf1f742187560f9f21ddf2899857ee291d6624",
+          "matches_filename": true
+        }
+      ],
+      "parsed_output_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/21_板块资金流向/data.csv",
+      "derived_artifacts": [
+        {
+          "path": "provider_validation/results/live-probes/rate-limited-all-20261003/21_板块资金流向/data.csv",
+          "sha256": "ee58891b1c7403cb187501b002f9cdb9a257ebef1802f357a83c6acf0387c12a",
+          "bytes": 6729,
+          "field_names": [
+            "序号",
+            "行业",
+            "行业指数",
+            "行业-涨跌幅",
+            "流入资金",
+            "流出资金",
+            "净额",
+            "公司家数",
+            "领涨股",
+            "领涨股-涨跌幅",
+            "当前价"
+          ],
+          "row_count": 90
+        }
+      ],
+      "coverage_denominator": 87,
+      "scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×3, transport_error×1；主机：data.10jqka.com.cn, push2.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+      "finding": "通过：解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。；本轮低频真实探测 success：saved 1 file(s); usable=1。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×3, transport_error×1；主机：data.10jqka.com.cn, push2.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+      "sample": "{\"columns\": [\"序号\", \"行业\", \"行业指数\", \"行业-涨跌幅\", \"流入资金\", \"流出资金\", \"净额\", \"公司家数\", \"领涨股\", \"领涨股-涨跌幅\", \"当前价\"], \"sample\": {\"序号\": \"1\", \"行业\": \"生物制品\", \"行业指数\": \"6727.88\", \"行业-涨跌幅\": \"4.63\", \"流入资金\": \"80.96\", \"流出资金\": \"66.0\", \"净额\": \"14.97\", \"公司家数\": \"56\", \"领涨股\": \"康希诺\", \"领涨股-涨跌幅\": \"20.0\", \"当前价\": \"102.64\"}}",
+      "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
+      "transformation_code_version": {
+        "path": "provider_validation/tests/build_interface_coverage.py",
+        "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
+      },
+      "validation_time_utc": "2026-10-03T10:20:06.951521+00:00"
+    }
+  ]
+}

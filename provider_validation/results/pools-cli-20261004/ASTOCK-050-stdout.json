@@ -1,0 +1,299 @@
+{
+  "input_id": "ASTOCK-050",
+  "dataset": "strong_stock_pool",
+  "mode": "replay",
+  "parameters": {
+    "date": "2026-09-30"
+  },
+  "provider": "eastmoney",
+  "endpoint": "strong_stock_pool",
+  "collection_profile": {
+    "name": "market_intraday",
+    "mode": "intraday",
+    "refresh_interval_seconds": 60,
+    "business_day": "trading_day",
+    "scheduling_enabled": false,
+    "frequency_unit": null,
+    "frequency_interval": 1,
+    "at_time": null,
+    "anchor_date": null,
+    "settle_delay_seconds": 0,
+    "trigger_grace_seconds": 30,
+    "universe": "static",
+    "max_symbols": null
+  },
+  "request_interval_seconds": 3,
+  "effective_concurrency": 1,
+  "request_limit_enforcement": "call_boundary_only",
+  "adapter_version": "eastmoney-stock-pool-input-v1",
+  "code_version": "b3ff57ca8b537919072695d5c867becc0a8bfe387a37707996d9ff3ed1e7556d",
+  "code_files": [
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\pipeline\\inputs.py",
+      "sha256": "9802f0083ea315558d0cc24871051f7249fbf927085fb98fac9565897b73f16e"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\cli.py",
+      "sha256": "582f5caedfc538a012d7a2f6e8cd7af3fe8b6fc9152e5b9e0a3fa2cb8810ae19"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\config\\loader.py",
+      "sha256": "93bb55ab150c88751fe9a58a2b75737878c1b0f07233b8ec47009c4901bb11e9"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\contracts.py",
+      "sha256": "a4b16abc7e3686a4eb2791dcd4545fb2404e0214bf32e20db19d2582d39ea447"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\quality\\normalization.py",
+      "sha256": "406a9374f921a367b8cab3e09905d9524f406582510e95feaf8ee7218fd015e1"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\transport.py",
+      "sha256": "7cf1c5f1f9b526e54e7d82e60b95b35e1f8f91e60effc31d74052f9273988b03"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\storage\\raw.py",
+      "sha256": "564c940feb99b358c41c5456c3142e7501b21505b5c2d8d88d811c53e145b752"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\routing\\factory.py",
+      "sha256": "824919b319a1f86de05c67f38c8c4a41fc329aa86eb9e9a1246ab841b977380c"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\daily.py",
+      "sha256": "487a14fcbfc47146d6d5fd291fbf41667aba435e5fed22ea1ef61ded513fcaa7"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\minute.py",
+      "sha256": "ff5cf1e91327bcab2e072bcfae9f1f77dca71a84ba26e456c26580a4d59d9cc1"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\snapshot.py",
+      "sha256": "3278cadac776fe8cfe5d02775a5bf8f53bc1cb96c595a5f418172f53047434bf"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\limit_pool.py",
+      "sha256": "2fbdfe3da3129545dfe8d2e457be7c42225696ddd74270567ae765e4b413f5ae"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\shareholder.py",
+      "sha256": "4c9d80f4d51845ac5541c42275f44f2a18643db5e9ccb705a3e16168f8db44c1"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\dividend.py",
+      "sha256": "5706a8cdb37eeeb8f66cb033a3091dd1b6ec1ed83d72d0f9fbeb8f5c75d9649b"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\fund_flow.py",
+      "sha256": "0cf655efa0854d18651bb4f04f985f0f210b81a6d9eff065604d235ed8f75280"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\realtime.py",
+      "sha256": "6e09d2a5014cf316c4d1e26e913a44d5c2fbad95fb44d95cba159ef881f03bca"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\calendar.py",
+      "sha256": "3d114045f960bfcc94ade1ee03e4d25ebdf6980ba68aa2d0a2236bed78aaef05"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\akshare\\boards.py",
+      "sha256": "2060f150831cebaf707ed5becedc35428bc41d4428bab31555ed1d2bf817d122"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\baostock\\industry.py",
+      "sha256": "16c41b379eecbd87f082bd042e27fad7f3d8d77b5bfc6a3e8a286209b068494a"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\baostock\\session.py",
+      "sha256": "70ce19cdde1d6a8ed0c3d3db29caa28d1d8069826136ab6dd7fb6a2ef8c7b832"
+    }
+  ],
+  "config_files": [
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\providers.yaml",
+      "sha256": "23f06aa0a71ad9aaaf7f24b40daa2efabdc38b1c71a1b8b98f80d6150afb605f"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\collection.yaml",
+      "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\datasets\\strong_stock_pool.yaml",
+      "sha256": "264c9d759405d37733cf4daf29996240cb46fed46c3eb8835405a4311e1c1131"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\normalization\\strong_stock_pool.yaml",
+      "sha256": "41733f419a6dd9d3a25edf361294a973df76d878d01bbf46b9f25f53a38f2304"
+    }
+  ],
+  "normalization_version": "eastmoney-stock-pool-input-v1",
+  "normalization_status": "pending_validation",
+  "field_units": {
+    "trade_date": null,
+    "snapshot_at": null,
+    "source_security_code": null,
+    "name": null,
+    "change_pct": "percent",
+    "price": "CNY",
+    "amount": "unverified; source value retained separately",
+    "float_market_cap": "unverified; source value retained separately",
+    "total_market_cap": "unverified; source value retained separately",
+    "turnover_rate": "percent",
+    "industry": null,
+    "limit_price": "CNY",
+    "change_speed": "percent",
+    "is_new_high": null,
+    "volume_ratio": "ratio",
+    "limit_statistics": null,
+    "selection_reason": null
+  },
+  "unverified_fields": [
+    "amount",
+    "float_market_cap",
+    "total_market_cap"
+  ],
+  "selected_fields": [
+    "amount",
+    "change_pct",
+    "change_speed",
+    "float_market_cap",
+    "industry",
+    "is_new_high",
+    "limit_price",
+    "limit_statistics",
+    "name",
+    "price",
+    "selection_reason",
+    "snapshot_at",
+    "source_security_code",
+    "total_market_cap",
+    "trade_date",
+    "turnover_rate",
+    "volume_ratio"
+  ],
+  "eligible_for_production_routing": false,
+  "production_writes": 0,
+  "live_http_calls": 0,
+  "validation_time_utc": "2026-10-03T22:48:24.147495+00:00",
+  "status": "candidate_complete",
+  "response_freshness_seconds": 60,
+  "calendar_context": {
+    "positive_date_count": 1,
+    "sha256": "c57c8e102441fe7da73806c4d5f92b275f3e9bd85e5007b7675e084c279bc3d9"
+  },
+  "context_dependency": {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\pools-cli-20261004\\context.json",
+    "sha256": "89a21657a76a391085e1c6c72f49d928b4f6b20804fdd3cb2d20a5a96c28ef2d"
+  },
+  "sdk_dependency": {
+    "version": "1.18.83",
+    "function": "stock_zt_pool_strong_em",
+    "source_path": "_raw/bodies/a4b314e673bf0ca546e89c8ba2c1a587c652d0c29bae36afc1c774a32d44700f.bin",
+    "sha256": "a4b314e673bf0ca546e89c8ba2c1a587c652d0c29bae36afc1c774a32d44700f",
+    "original_source_sha256": "656b65ab1e963ffe6ecde7246be4ca09c8ba41793f0d674a06090efc2e4c9fa5",
+    "redacted": true
+  },
+  "replay_clock_semantics": "original capture clock for SDK recency guard only; live clock unchanged",
+  "responses": [
+    {
+      "event": "http_response",
+      "method": "GET",
+      "url": "https://push2ex.eastmoney.com/getTopicQSPool?Pageindex=0&date=20260930&dpt=wz.ztzt&pagesize=5000&sort=zdp%3Adesc&ut=%3Credacted%3E",
+      "request_headers": {
+        "User-Agent": "python-requests/2.32.5",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept": "*/*",
+        "Connection": "keep-alive"
+      },
+      "scope": {
+        "input_id": "ASTOCK-050",
+        "parameters": {
+          "date": "2026-09-30"
+        }
+      },
+      "request_options": {
+        "timeout": null,
+        "allow_redirects": true,
+        "trust_env": true,
+        "proxies": {},
+        "sdk_retry_policy": true
+      },
+      "provider": "eastmoney",
+      "endpoint": "strong_stock_pool",
+      "code_version": "b3ff57ca8b537919072695d5c867becc0a8bfe387a37707996d9ff3ed1e7556d",
+      "fetched_at_utc": "2026-10-03T22:48:24.449574+00:00",
+      "mode": "replay",
+      "source_ref": {
+        "manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\_raw\\missing-capabilities-20261003T174623\\manifest.ndjson",
+        "line": 111,
+        "fetched_at_utc": "2026-10-03T09:54:03.082+00:00"
+      },
+      "outcome": "response",
+      "status_code": 200,
+      "response_headers": {
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+        "Content-Encoding": "gzip",
+        "Content-Length": "17431",
+        "Content-Type": "application/json; charset=UTF-8",
+        "Expires": "0",
+        "Keep-Alive": "timeout=30"
+      },
+      "content_type": "application/json; charset=UTF-8",
+      "encoding": "UTF-8",
+      "body_bytes": 55074,
+      "body_sha256": "4f9d16d10f9bfd7fd6a9ba0190b9ff362a62aa9dcdfc557a5b11cf5345bc51a8",
+      "body_storage": "bodies/4f9d16d10f9bfd7fd6a9ba0190b9ff362a62aa9dcdfc557a5b11cf5345bc51a8.bin",
+      "persistence_status": "exact_application_payload_saved"
+    }
+  ],
+  "source_rows": {
+    "path": "2026-10-03/source_rows/eastmoney/strong_stock_pool/source-rows.json",
+    "sha256": "8be31e0cd564a28532436a5fee4688bbfaa756ab19d51e6b4884f5d8ae711ddc",
+    "row_count": 199
+  },
+  "source_quote_date": "2026-09-30",
+  "source_total_count": 199,
+  "returned_window": {
+    "first": "2026-09-30",
+    "last": "2026-09-30"
+  },
+  "coverage_basis": "source tc and returned SDK rows for requested qdate; not independent whole-market proof",
+  "universe_completeness_verified": false,
+  "source_url": "https://push2ex.eastmoney.com/getTopicQSPool",
+  "source_urls": [
+    "https://push2ex.eastmoney.com/getTopicQSPool?Pageindex=0&date=20260930&dpt=wz.ztzt&pagesize=5000&sort=zdp%3Adesc&ut=%3Credacted%3E"
+  ],
+  "source_capture_window": {
+    "first": "2026-10-03T09:54:03.082000+00:00",
+    "last": "2026-10-03T09:54:03.082000+00:00",
+    "meaning": "source response capture times; not row-level market timestamps"
+  },
+  "output": {
+    "path": "2026-10-03/strong_stock_pool/eastmoney/strong_stock_pool/mapped-rows.json",
+    "sha256": "f392cae98dea691aca40a813fb4351dfb9adec80abf9f8fb6f58714debb35aac",
+    "row_count": 199,
+    "source_response_hashes": [
+      "4f9d16d10f9bfd7fd6a9ba0190b9ff362a62aa9dcdfc557a5b11cf5345bc51a8"
+    ]
+  },
+  "row_count": 199,
+  "coverage_denominator": 199,
+  "first_key": [
+    "2026-09-30",
+    "301190"
+  ],
+  "last_key": [
+    "2026-09-30",
+    "300746"
+  ],
+  "raw_manifest": {
+    "path": "_raw/manifest.ndjson",
+    "sha256": "f6c2254c6f4b2dd74eb86015baef1d77eb28abc9e9eb7ead7c82f7185cf5f35e"
+  },
+  "run_directory": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\pools-cli-20261004\\candidate\\ASTOCK-050-d3b630579343",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\pools-cli-20261004\\candidate\\ASTOCK-050-d3b630579343\\2026-10-03\\input_report\\eastmoney\\strong_stock_pool\\report.json"
+}

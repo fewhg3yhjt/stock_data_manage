@@ -1,0 +1,7 @@
+{
+  "rows_compared": 52,
+  "all_fields_equal": true,
+  "requests_equal": true,
+  "original_snapshot_sha256": "4662fdfb95bd01a7d5657816ea1d9d974c8778b0f1b862787075aa56cfd10aef",
+  "result": "passed"
+}

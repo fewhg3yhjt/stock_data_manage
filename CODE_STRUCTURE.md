@@ -173,3 +173,5 @@ BaoStock 后续两项转换见 `provider_validation/docs/2026-10-04-baostock-inp
 东财后续三项已有接口转换见 `provider_validation/docs/2026-10-04-eastmoney-input-collection.md`。原 `shareholder.py`、`dividend.py`、`fund_flow.py` 提供原成功 SDK 的历史候选方法；复用三个现有模板和归一化文件。`providers/contracts.py` 的既有输入结果补来源行、映射上下文和排除行。原验证脚本增加 `--verify-em-inputs`，证据目录为 `results/em-original-20261004/`、`em-final-20261004/`、`em-cli-20261004/` 和同前缀测试/索引。没有新增运行时模块或自动调度策略。
 
 当前输入进度的只读核对记录位于 `provider_validation/results/input-progress-review-20261004/review.json`：实际工厂绑定与配置一致，14项候选已实现、51项待转换或归并、7项阻断、2项别名。记录关联当前源码/配置及逐项来源证据哈希；未执行下一批转换，也不改变生产资格。前述各批最终索引仍代表各自提交时的版本。
+
+自主转换首批见 `provider_validation/docs/2026-10-04-stock-pool-input-collection.md`：原 `limit_pool.py` 扩展四个池，保留原涨停池默认合同；候选路径执行原响应状态/qdate/tc/证券身份校验和回放时钟恢复。新增 `datasets` 与同名 `normalization` 的 `broken_limit_pool.yaml`、`limit_down_pool.yaml`、`previous_limit_pool.yaml`、`strong_stock_pool.yaml`；ASTOCK-023仅归并为既有行业资金流别名。原验证脚本增加 `--verify-stock-pools`，源码/调查、最终回放和CLI证据分别在 `results/pools-original-20261004/`、`pools-final-20261004/`、`pools-cli-20261004/`，完整回归和总索引为同前缀XML/verification.json。当前18项可执行候选、46项待转换、7项阻断、3项别名。原进度调查记录保持其生成时版本，不覆盖。

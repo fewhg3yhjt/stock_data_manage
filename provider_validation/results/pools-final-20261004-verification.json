@@ -1,0 +1,2654 @@
+{
+  "validation_time_utc": "2026-10-03T22:49:47.430644+00:00",
+  "result": "passed",
+  "tests": 312,
+  "counts": {
+    "implemented_validation_only": 18,
+    "unimplemented": 46,
+    "blocked": 7,
+    "alias": 3
+  },
+  "network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "authorization": "confirmed autonomous remaining-input conversion; routine batches need no new confirmation",
+  "audited_reports": [
+    {
+      "input_id": "ASTOCK-046",
+      "rows": 12,
+      "report": "provider_validation/results/pools-final-20261004/ASTOCK-046/candidate/ASTOCK-046-c2c12945cbae/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-047",
+      "rows": 9,
+      "report": "provider_validation/results/pools-final-20261004/ASTOCK-047/candidate/ASTOCK-047-ee4eab8ca69b/2026-10-03/input_report/eastmoney/limit_down_pool/report.json",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-048",
+      "rows": 57,
+      "report": "provider_validation/results/pools-final-20261004/ASTOCK-048/candidate/ASTOCK-048-20504b891a16/2026-10-03/input_report/eastmoney/previous_limit_pool/report.json",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-050",
+      "rows": 199,
+      "report": "provider_validation/results/pools-final-20261004/ASTOCK-050/candidate/ASTOCK-050-65cd38f98ab6/2026-10-03/input_report/eastmoney/strong_stock_pool/report.json",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-046",
+      "rows": 12,
+      "report": "provider_validation/results/pools-cli-20261004/candidate/ASTOCK-046-c89775190e73/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-047",
+      "rows": 9,
+      "report": "provider_validation/results/pools-cli-20261004/candidate/ASTOCK-047-48596711cae7/2026-10-03/input_report/eastmoney/limit_down_pool/report.json",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-048",
+      "rows": 57,
+      "report": "provider_validation/results/pools-cli-20261004/candidate/ASTOCK-048-d936e35382fc/2026-10-03/input_report/eastmoney/previous_limit_pool/report.json",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-050",
+      "rows": 199,
+      "report": "provider_validation/results/pools-cli-20261004/candidate/ASTOCK-050-d3b630579343/2026-10-03/input_report/eastmoney/strong_stock_pool/report.json",
+      "result": "passed"
+    },
+    {
+      "input_id": "SDA-BOARD-003",
+      "rows": 90,
+      "report": "provider_validation/results/pools-cli-20261004/candidate/SDA-BOARD-003-e4120e223444/2026-10-03/input_report/ths/industry_fund_flow/report.json",
+      "result": "passed"
+    },
+    {
+      "input_id": "SDA-BOARD-003",
+      "rows": 90,
+      "report": "provider_validation/results/pools-final-20261004/alias/SDA-BOARD-003-9694ae8e2c5e/2026-10-03/input_report/ths/industry_fund_flow/report.json",
+      "result": "passed"
+    }
+  ],
+  "files": [
+    {
+      "path": ".gitattributes",
+      "sha256": "fedabd142b6509da12b368db0ce47377c22ecebaa32cc43fa72598ef8e127bca",
+      "bytes": 8073
+    },
+    {
+      "path": "CODE_STRUCTURE.md",
+      "sha256": "daddb518726d74717fd7d52002d6e7ddc3943de5207684dd68d05ffa3ea00b40",
+      "bytes": 19087
+    },
+    {
+      "path": "config/datasets/broken_limit_pool.yaml",
+      "sha256": "60b3790eae896c968093c8d26a818c9dab325aca620510b4ec1dde061af7f65e",
+      "bytes": 1162
+    },
+    {
+      "path": "config/datasets/limit_down_pool.yaml",
+      "sha256": "67b3ca1ae9edf0f863d2b2d5257a315fe721f042086d4b5966653c0f2758d806",
+      "bytes": 1177
+    },
+    {
+      "path": "config/datasets/previous_limit_pool.yaml",
+      "sha256": "5234397a7b87ed3e03c11431de1f00c012e135ba5ef57bf63a2f431f659703bc",
+      "bytes": 1199
+    },
+    {
+      "path": "config/datasets/strong_stock_pool.yaml",
+      "sha256": "264c9d759405d37733cf4daf29996240cb46fed46c3eb8835405a4311e1c1131",
+      "bytes": 1194
+    },
+    {
+      "path": "config/normalization/broken_limit_pool.yaml",
+      "sha256": "8bd046757fc9fb3e7d144a0e9d41106267e828a60bc5a099280158c15459a84d",
+      "bytes": 1238
+    },
+    {
+      "path": "config/normalization/limit_down_pool.yaml",
+      "sha256": "456b0a779929bb6ff71ed70e07cd420d42596068f142879926b86972e3704f7b",
+      "bytes": 1314
+    },
+    {
+      "path": "config/normalization/previous_limit_pool.yaml",
+      "sha256": "4c14b9ad1f0497e2d6f13a72978f1ddda74039b7c0d182c5a5a98ac01a678443",
+      "bytes": 1276
+    },
+    {
+      "path": "config/normalization/strong_stock_pool.yaml",
+      "sha256": "41733f419a6dd9d3a25edf361294a973df76d878d01bbf46b9f25f53a38f2304",
+      "bytes": 1234
+    },
+    {
+      "path": "config/providers.yaml",
+      "sha256": "23f06aa0a71ad9aaaf7f24b40daa2efabdc38b1c71a1b8b98f80d6150afb605f",
+      "bytes": 74630
+    },
+    {
+      "path": "PROJECT_PROGRESS.md",
+      "sha256": "e15ed94d5d7776c735322f67a932cabe04e5cd3a2dfa5b6b960f0e07d5826c78",
+      "bytes": 8719
+    },
+    {
+      "path": "provider_validation/docs/2026-10-04-stock-pool-input-collection.md",
+      "sha256": "b69850a3376ef16b0cda0f514fb057dc562e8c24f21831b1287a676c64c04408",
+      "bytes": 4772
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/alias/alias-comparison.json",
+      "sha256": "884dafab997c08a0478e3295ce52193c5162f4d93fb340a10058a7b97ccf8bbd",
+      "bytes": 788
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/alias/SDA-BOARD-003-148ca732f01b/2026-10-03/board_fund_flow/ths/industry_fund_flow/mapped-rows.json",
+      "sha256": "bdd8a142ba58213f6f4cc3955aa2564ef0c62e7a25a63fd437bcd44e999f289e",
+      "bytes": 31676
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/alias/SDA-BOARD-003-148ca732f01b/2026-10-03/input_report/ths/industry_fund_flow/report.json",
+      "sha256": "9b6cd831337fa7c7cf8c116034809515cf64254b94880c4f06c15a9408dc0813",
+      "bytes": 15923
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/alias/SDA-BOARD-003-148ca732f01b/2026-10-03/source_rows/ths/industry_fund_flow/source-rows.json",
+      "sha256": "fdf61aeb2f9c0aa1875f556cf6945c0e5f15f7ed5eaaf82fc5254bf48ab67107",
+      "bytes": 20726
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/alias/SDA-BOARD-003-148ca732f01b/_raw/bodies/0163e41dfdcbd889755142f4179a83a8d9f575f5343a56413546cc7fc0262376.bin",
+      "sha256": "0163e41dfdcbd889755142f4179a83a8d9f575f5343a56413546cc7fc0262376",
+      "bytes": 39664
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/alias/SDA-BOARD-003-148ca732f01b/_raw/bodies/07af78156c494a0c4b0f7d6fb67731a704f3c4c9702a0db825bd3ab93bc3f93c.bin",
+      "sha256": "07af78156c494a0c4b0f7d6fb67731a704f3c4c9702a0db825bd3ab93bc3f93c",
+      "bytes": 271
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/alias/SDA-BOARD-003-148ca732f01b/_raw/bodies/1470e17de6e09fc17ceae6a8d8d4a5b4615856e8452323c790129f825a468afb.bin",
+      "sha256": "1470e17de6e09fc17ceae6a8d8d4a5b4615856e8452323c790129f825a468afb",
+      "bytes": 32720
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/alias/SDA-BOARD-003-148ca732f01b/_raw/bodies/564c33bfd4989aef98823b04712a878776d212fcc886d1a6bb38752788ed88d2.bin",
+      "sha256": "564c33bfd4989aef98823b04712a878776d212fcc886d1a6bb38752788ed88d2",
+      "bytes": 343
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/alias/SDA-BOARD-003-148ca732f01b/_raw/bodies/6d4200eac2fb6a69f38ee543e1bf1f742187560f9f21ddf2899857ee291d6624.bin",
+      "sha256": "6d4200eac2fb6a69f38ee543e1bf1f742187560f9f21ddf2899857ee291d6624",
+      "bytes": 27143
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/alias/SDA-BOARD-003-148ca732f01b/_raw/bodies/b7425e018c31d9bde9269886169ab922bd4a71e5e5dc2527621f3c0993caabdb.bin",
+      "sha256": "b7425e018c31d9bde9269886169ab922bd4a71e5e5dc2527621f3c0993caabdb",
+      "bytes": 4373
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/alias/SDA-BOARD-003-148ca732f01b/_raw/manifest.ndjson",
+      "sha256": "c79c72f7e0f755b710d4246b9a0f6688542fc562a22dcd1362fc1b467662d71d",
+      "bytes": 7228
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-046/candidate/ASTOCK-046-d908ab07a695/2026-10-03/broken_limit_pool/eastmoney/broken_limit_pool/mapped-rows.json",
+      "sha256": "b71cadc055c470356f92b4b9e0347ebed604e7a3db14135bb40c3c9537f6abeb",
+      "bytes": 5378
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-046/candidate/ASTOCK-046-d908ab07a695/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "29cdb875596dc01eb775ae4f449a1a3360c73f53263ba22c62af2d31fbd527b4",
+      "bytes": 9827
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-046/candidate/ASTOCK-046-d908ab07a695/2026-10-03/source_rows/eastmoney/broken_limit_pool/source-rows.json",
+      "sha256": "1756a67fec7d43d3f41d5c0a6c8741d2ff437df11100518dc4d41190095a4209",
+      "bytes": 4422
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-046/candidate/ASTOCK-046-d908ab07a695/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-046/candidate/ASTOCK-046-d908ab07a695/_raw/bodies/b4bd1938d591fc3cffd09746e501ac3c9e8717c3bd7bfe7f39f78785a5e334b8.bin",
+      "sha256": "b4bd1938d591fc3cffd09746e501ac3c9e8717c3bd7bfe7f39f78785a5e334b8",
+      "bytes": 3380
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-046/candidate/ASTOCK-046-d908ab07a695/_raw/manifest.ndjson",
+      "sha256": "406441febdbd9083211b63c8fa0cc61df12b8f98ab9ef37d4192cb799bb47fc6",
+      "bytes": 1709
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-046/comparison.json",
+      "sha256": "91596ebc9c67c2748a9f65a7ac88a2c6cf06ea483f5bb5dccc0a50bd8ae1b080",
+      "bytes": 2835
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-046/original/bodies/b4bd1938d591fc3cffd09746e501ac3c9e8717c3bd7bfe7f39f78785a5e334b8.bin",
+      "sha256": "b4bd1938d591fc3cffd09746e501ac3c9e8717c3bd7bfe7f39f78785a5e334b8",
+      "bytes": 3380
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-046/original/manifest.ndjson",
+      "sha256": "ecfa60a3e0a73913d91063e89a8d9575dc0c362805d737c408fff295db755578",
+      "bytes": 1680
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-047/candidate/ASTOCK-047-ac62f9816bfd/2026-10-03/input_report/eastmoney/limit_down_pool/report.json",
+      "sha256": "46fe5f0bf2bf2c9a4f599ed94dee84c96e0a0790a7d5b8785228c2c281a852d7",
+      "bytes": 9963
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-047/candidate/ASTOCK-047-ac62f9816bfd/2026-10-03/limit_down_pool/eastmoney/limit_down_pool/mapped-rows.json",
+      "sha256": "f1b95ecc0c2c3a05304bf2aa0c70f4fa5c2cec76ac101e75bd6567c884e06ede",
+      "bytes": 4129
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-047/candidate/ASTOCK-047-ac62f9816bfd/2026-10-03/source_rows/eastmoney/limit_down_pool/source-rows.json",
+      "sha256": "bf553bbc827648dd29e17747a2271967a943d1ed5e9a76919b66bba77b69023f",
+      "bytes": 3488
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-047/candidate/ASTOCK-047-ac62f9816bfd/_raw/bodies/727be19798730115b50e9737b03070cdb6a0a21d996562390944f697554be8ad.bin",
+      "sha256": "727be19798730115b50e9737b03070cdb6a0a21d996562390944f697554be8ad",
+      "bytes": 3129
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-047/candidate/ASTOCK-047-ac62f9816bfd/_raw/bodies/a4e93dfbb6aab53efa0722528f3c200bb03ed48477a73faf854cd1c72530557f.bin",
+      "sha256": "a4e93dfbb6aab53efa0722528f3c200bb03ed48477a73faf854cd1c72530557f",
+      "bytes": 2445
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-047/candidate/ASTOCK-047-ac62f9816bfd/_raw/manifest.ndjson",
+      "sha256": "6d0392fb3da4e70f913a8e5c935ff5ec883fbce8a5466360378c7ce82b0ecf87",
+      "bytes": 1709
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-047/comparison.json",
+      "sha256": "93a13c5f81698b1253f0e2cbad29d8862cb2db1b554489172af7b665943533f6",
+      "bytes": 2885
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-047/original/bodies/a4e93dfbb6aab53efa0722528f3c200bb03ed48477a73faf854cd1c72530557f.bin",
+      "sha256": "a4e93dfbb6aab53efa0722528f3c200bb03ed48477a73faf854cd1c72530557f",
+      "bytes": 2445
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-047/original/manifest.ndjson",
+      "sha256": "6c4538a548089d2143ffd5039beb7eeba71a85494d3acb73c4b8d0175339ebba",
+      "bytes": 1682
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-048/candidate/ASTOCK-048-63add54934f5/2026-10-03/input_report/eastmoney/previous_limit_pool/report.json",
+      "sha256": "898b4297517d21de1a2e115cc8af57bfbbbfc9b2ab7f258029749a52d2e714ea",
+      "bytes": 9918
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-048/candidate/ASTOCK-048-63add54934f5/2026-10-03/previous_limit_pool/eastmoney/previous_limit_pool/mapped-rows.json",
+      "sha256": "939bc7ba19957dd57dcf8395213f72481c36cb5fd96e37b8493d2863fff0c7b9",
+      "bytes": 27025
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-048/candidate/ASTOCK-048-63add54934f5/2026-10-03/source_rows/eastmoney/previous_limit_pool/source-rows.json",
+      "sha256": "d5c7a837fea19b21c35f23b6b36428b7d5aa0f702d9f5c71a9c25dcb77faf99c",
+      "bytes": 20917
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-048/candidate/ASTOCK-048-63add54934f5/_raw/bodies/b3d372354deeee842e9162f2bd56415dc2cbddf5c2f1cc31ec053d4c052f8793.bin",
+      "sha256": "b3d372354deeee842e9162f2bd56415dc2cbddf5c2f1cc31ec053d4c052f8793",
+      "bytes": 2173
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-048/candidate/ASTOCK-048-63add54934f5/_raw/bodies/d4f6ab36119677ee909f1444490a4ddf233bd69e53f497ba6392030d6253328e.bin",
+      "sha256": "d4f6ab36119677ee909f1444490a4ddf233bd69e53f497ba6392030d6253328e",
+      "bytes": 15536
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-048/candidate/ASTOCK-048-63add54934f5/_raw/manifest.ndjson",
+      "sha256": "47fad66f36753999fb5cda3b209f7321ba2e8e1f5177a56e947d7fd6b62725e9",
+      "bytes": 1716
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-048/comparison.json",
+      "sha256": "58ec13b36a09bf80543d9e81f3a98422b20ed5b0efecd4ae99475ea92357d580",
+      "bytes": 2851
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-048/original/bodies/d4f6ab36119677ee909f1444490a4ddf233bd69e53f497ba6392030d6253328e.bin",
+      "sha256": "d4f6ab36119677ee909f1444490a4ddf233bd69e53f497ba6392030d6253328e",
+      "bytes": 15536
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-048/original/manifest.ndjson",
+      "sha256": "44c10af460bb797eec063a164b258ccb6eb2c83dc444b4e0b650cf768f56be18",
+      "bytes": 1689
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-050/candidate/ASTOCK-050-2679c729b018/2026-10-03/input_report/eastmoney/strong_stock_pool/report.json",
+      "sha256": "111bab3d2446c994a8dabf47f35f18a2bbe7e265daeccb0030d166c9ebcb3402",
+      "bytes": 9840
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-050/candidate/ASTOCK-050-2679c729b018/2026-10-03/source_rows/eastmoney/strong_stock_pool/source-rows.json",
+      "sha256": "8be31e0cd564a28532436a5fee4688bbfaa756ab19d51e6b4884f5d8ae711ddc",
+      "bytes": 74386
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-050/candidate/ASTOCK-050-2679c729b018/2026-10-03/strong_stock_pool/eastmoney/strong_stock_pool/mapped-rows.json",
+      "sha256": "f392cae98dea691aca40a813fb4351dfb9adec80abf9f8fb6f58714debb35aac",
+      "bytes": 91924
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-050/candidate/ASTOCK-050-2679c729b018/_raw/bodies/4f9d16d10f9bfd7fd6a9ba0190b9ff362a62aa9dcdfc557a5b11cf5345bc51a8.bin",
+      "sha256": "4f9d16d10f9bfd7fd6a9ba0190b9ff362a62aa9dcdfc557a5b11cf5345bc51a8",
+      "bytes": 55074
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-050/candidate/ASTOCK-050-2679c729b018/_raw/bodies/a4b314e673bf0ca546e89c8ba2c1a587c652d0c29bae36afc1c774a32d44700f.bin",
+      "sha256": "a4b314e673bf0ca546e89c8ba2c1a587c652d0c29bae36afc1c774a32d44700f",
+      "bytes": 3063
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-050/candidate/ASTOCK-050-2679c729b018/_raw/manifest.ndjson",
+      "sha256": "e44481fbb6180f3b0db5056cb083c123772bfca748a4a7f75ec8a2bd4265a21e",
+      "bytes": 1712
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-050/comparison.json",
+      "sha256": "fb0bab7ebfae00b42d01e8170acafdec6ae14015655551d95ab153bfab02612d",
+      "bytes": 2857
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-050/original/bodies/4f9d16d10f9bfd7fd6a9ba0190b9ff362a62aa9dcdfc557a5b11cf5345bc51a8.bin",
+      "sha256": "4f9d16d10f9bfd7fd6a9ba0190b9ff362a62aa9dcdfc557a5b11cf5345bc51a8",
+      "bytes": 55074
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/ASTOCK-050/original/manifest.ndjson",
+      "sha256": "348632e7568aa3eb01a485e4c4259f521f1ad059378e57790f12a4139e4b25cd",
+      "bytes": 1683
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/comparison.json",
+      "sha256": "45595c9cbfc08a7e9cfcc83a815b5ea758c36ef753c9755b523a7b78e2230a46",
+      "bytes": 21433
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f1/fixture/bodies/eca16378a9c671c7dd582324edd78b576f173af2ea7972edd7bdd24addc5ba9c.bin",
+      "sha256": "eca16378a9c671c7dd582324edd78b576f173af2ea7972edd7bdd24addc5ba9c",
+      "bytes": 4088
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f1/fixture/manifest.ndjson",
+      "sha256": "954166d4a4d6d748161957c7187c2150efd63d736e1efc2a8dab9a0e3fa47545",
+      "bytes": 1043
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f1/out/ASTOCK-046-844661a9670f/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "d248f5a5000bf8a72f58cf8c373a08d515373a4f61cc21cfa6ab70e32c938739",
+      "bytes": 8293
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f1/out/ASTOCK-046-844661a9670f/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f1/out/ASTOCK-046-844661a9670f/_raw/bodies/eca16378a9c671c7dd582324edd78b576f173af2ea7972edd7bdd24addc5ba9c.bin",
+      "sha256": "eca16378a9c671c7dd582324edd78b576f173af2ea7972edd7bdd24addc5ba9c",
+      "bytes": 4088
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f1/out/ASTOCK-046-844661a9670f/_raw/manifest.ndjson",
+      "sha256": "eaa1e6e4f94ec903c0006bfbe2bbd9205ac4a8e44472d12975e7af24ca5f5a27",
+      "bytes": 1338
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f10/fixture/bodies/4e678f910495844e412da83637852af554de4593053bca3c4023dea4df211be2.bin",
+      "sha256": "4e678f910495844e412da83637852af554de4593053bca3c4023dea4df211be2",
+      "bytes": 4088
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f10/fixture/manifest.ndjson",
+      "sha256": "6f412fbd0ccad4fcacdb13be6b3ad5015a812b4c5f67bf423d504052368c2f92",
+      "bytes": 1047
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f10/out/ASTOCK-046-b2793a28d838/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "80a75e6994b3583590a150bd2c64e4733c4a56876f2665a4d3297cb534c71bc5",
+      "bytes": 8292
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f10/out/ASTOCK-046-b2793a28d838/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f10/out/ASTOCK-046-b2793a28d838/_raw/bodies/4e678f910495844e412da83637852af554de4593053bca3c4023dea4df211be2.bin",
+      "sha256": "4e678f910495844e412da83637852af554de4593053bca3c4023dea4df211be2",
+      "bytes": 4088
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f10/out/ASTOCK-046-b2793a28d838/_raw/manifest.ndjson",
+      "sha256": "b8a1c337b4da1fbc715c79c400a62c48e063c76b295cc7ae64adda13f7aa6aa3",
+      "bytes": 1339
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f11/fixture/bodies/95e4066e1cf49427398eebf870d23fb8f209c2f6d4ce52baf2866c664eece449.bin",
+      "sha256": "95e4066e1cf49427398eebf870d23fb8f209c2f6d4ce52baf2866c664eece449",
+      "bytes": 18
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f11/fixture/manifest.ndjson",
+      "sha256": "2dc6bda2403025daca6626ce5a27a0ef3324d6ce829bc38633bdb10fa5ad6982",
+      "bytes": 1041
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f11/out/ASTOCK-046-401d6faa103c/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "3e1e264f4ee34e9c01f3355f27b72c4126fbe9aec0ae4826798fa7894893b621",
+      "bytes": 8313
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f11/out/ASTOCK-046-401d6faa103c/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f11/out/ASTOCK-046-401d6faa103c/_raw/bodies/95e4066e1cf49427398eebf870d23fb8f209c2f6d4ce52baf2866c664eece449.bin",
+      "sha256": "95e4066e1cf49427398eebf870d23fb8f209c2f6d4ce52baf2866c664eece449",
+      "bytes": 18
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f11/out/ASTOCK-046-401d6faa103c/_raw/manifest.ndjson",
+      "sha256": "23c8e3d0ac7808d2e399946092b07077d8a9b79d87125065d0f7113056fb61b2",
+      "bytes": 1337
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f12/fixture/bodies/4e678f910495844e412da83637852af554de4593053bca3c4023dea4df211be2.bin",
+      "sha256": "4e678f910495844e412da83637852af554de4593053bca3c4023dea4df211be2",
+      "bytes": 4088
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f12/fixture/manifest.ndjson",
+      "sha256": "dc6e4dcebcb41c6046b52498a6613e90a64c6578b47986c8819a7b058a0ad7c7",
+      "bytes": 1088
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f12/out/ASTOCK-046-2d9407fd465d/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "d7a6b9157b8437da3a24d1f20e48b8fb36e6e15e5b04c3ac4afe7963208e6f32",
+      "bytes": 7889
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f12/out/ASTOCK-046-2d9407fd465d/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f12/out/ASTOCK-046-2d9407fd465d/_raw/manifest.ndjson",
+      "sha256": "8e6db7050a713fd8383e069f6faba3389ccefe60e84b882a633a82d073a85d06",
+      "bytes": 914
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f2/fixture/bodies/761d2ff3ad3150e63f094e61a9f990c6866d79bb05cf1b1ec9ed2e00c8c92f73.bin",
+      "sha256": "761d2ff3ad3150e63f094e61a9f990c6866d79bb05cf1b1ec9ed2e00c8c92f73",
+      "bytes": 4088
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f2/fixture/manifest.ndjson",
+      "sha256": "160b5ba906526e61a38bc309b3292bd0ffddb966e7f3d47ce96acb1dac1570ab",
+      "bytes": 1044
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f2/out/ASTOCK-046-e6eaa30f1c4b/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "3aa9e0f20f7acfdf935a0acf9c04dd110e2851444cb9bc5b1fe8b14c7b38d3b0",
+      "bytes": 8288
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f2/out/ASTOCK-046-e6eaa30f1c4b/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f2/out/ASTOCK-046-e6eaa30f1c4b/_raw/bodies/761d2ff3ad3150e63f094e61a9f990c6866d79bb05cf1b1ec9ed2e00c8c92f73.bin",
+      "sha256": "761d2ff3ad3150e63f094e61a9f990c6866d79bb05cf1b1ec9ed2e00c8c92f73",
+      "bytes": 4088
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f2/out/ASTOCK-046-e6eaa30f1c4b/_raw/manifest.ndjson",
+      "sha256": "3ea3a3eeb8f437444564b2e6672ccad28669d4e3887a295c0d1f46409ca33c0b",
+      "bytes": 1338
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f3/fixture/bodies/34beb94058d3dcb48cd52249111eca8d8af2bb36c25e40cd6087e2faa105f327.bin",
+      "sha256": "34beb94058d3dcb48cd52249111eca8d8af2bb36c25e40cd6087e2faa105f327",
+      "bytes": 4088
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f3/fixture/manifest.ndjson",
+      "sha256": "c383334a6b7d2fc750726a30da074e6df87f298dac98b03f09a6c2eb66925622",
+      "bytes": 1048
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f3/out/ASTOCK-046-662de0c7cb82/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "91ddb9ddd2ab4621af0a3a97c5b91132f3149d5044adbd84dec96cb718d39795",
+      "bytes": 9147
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f3/out/ASTOCK-046-662de0c7cb82/2026-10-03/source_rows/eastmoney/broken_limit_pool/source-rows.json",
+      "sha256": "a525aeb65ea1f8627c5993ee24e8408775ad0563e83afbf5bc448dcb17c1f412",
+      "bytes": 4422
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f3/out/ASTOCK-046-662de0c7cb82/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f3/out/ASTOCK-046-662de0c7cb82/_raw/bodies/34beb94058d3dcb48cd52249111eca8d8af2bb36c25e40cd6087e2faa105f327.bin",
+      "sha256": "34beb94058d3dcb48cd52249111eca8d8af2bb36c25e40cd6087e2faa105f327",
+      "bytes": 4088
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f3/out/ASTOCK-046-662de0c7cb82/_raw/manifest.ndjson",
+      "sha256": "f8528921c1be4fc1bd2d307249154db7b6a3d7d4a2c8d00227c437fbb9cf3030",
+      "bytes": 1338
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f4/fixture/bodies/7506255c2313552623aa325bbcb172e2eba48732e295afcfb3f05bdcb827c3b8.bin",
+      "sha256": "7506255c2313552623aa325bbcb172e2eba48732e295afcfb3f05bdcb827c3b8",
+      "bytes": 4085
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f4/fixture/manifest.ndjson",
+      "sha256": "974a7b05465a5be697f6e0ee26a55b361ed51b909c602f8383d68ed66513f36e",
+      "bytes": 1043
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f4/out/ASTOCK-046-82d519ecdfc2/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "1897ba948e264b60fcd6bcd54630b220e47b0df7194ddcbbfd85998739b7b4cc",
+      "bytes": 8293
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f4/out/ASTOCK-046-82d519ecdfc2/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f4/out/ASTOCK-046-82d519ecdfc2/_raw/bodies/7506255c2313552623aa325bbcb172e2eba48732e295afcfb3f05bdcb827c3b8.bin",
+      "sha256": "7506255c2313552623aa325bbcb172e2eba48732e295afcfb3f05bdcb827c3b8",
+      "bytes": 4085
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f4/out/ASTOCK-046-82d519ecdfc2/_raw/manifest.ndjson",
+      "sha256": "5a48f6954b5dc58700d92a209eae47d643c9759bd4099eeae8d71310da158e06",
+      "bytes": 1338
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f5/fixture/bodies/e0382fa10fe23364e1059ac4ef6fcfb867ac6e4473c73a510d0d0e44d7534d6d.bin",
+      "sha256": "e0382fa10fe23364e1059ac4ef6fcfb867ac6e4473c73a510d0d0e44d7534d6d",
+      "bytes": 4087
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f5/fixture/manifest.ndjson",
+      "sha256": "aed03bae46876043abfc4fa2bced6a2d9663be35f801784c322a357396dc958b",
+      "bytes": 1046
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f5/out/ASTOCK-046-3bc4e2d8fdb5/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "efe199240ddf34ab9ea3476f7dd13c238e2e8d1da33085fd556af4231a1e6df7",
+      "bytes": 9159
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f5/out/ASTOCK-046-3bc4e2d8fdb5/2026-10-03/source_rows/eastmoney/broken_limit_pool/source-rows.json",
+      "sha256": "8b0df54289fcfe0a69035831f0d9a0262bb7d8de8ba748115e854d30a270115e",
+      "bytes": 4421
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f5/out/ASTOCK-046-3bc4e2d8fdb5/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f5/out/ASTOCK-046-3bc4e2d8fdb5/_raw/bodies/e0382fa10fe23364e1059ac4ef6fcfb867ac6e4473c73a510d0d0e44d7534d6d.bin",
+      "sha256": "e0382fa10fe23364e1059ac4ef6fcfb867ac6e4473c73a510d0d0e44d7534d6d",
+      "bytes": 4087
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f5/out/ASTOCK-046-3bc4e2d8fdb5/_raw/manifest.ndjson",
+      "sha256": "82b0b3d5bb5fbacf9b555b1b08920f40f484271a3bde342bea3834fa2fc782b0",
+      "bytes": 1338
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f6/fixture/bodies/12ac43ba7d01e221e040f0b8c68b6e3cd5f2a94877a9024691d0b5ee9af6d850.bin",
+      "sha256": "12ac43ba7d01e221e040f0b8c68b6e3cd5f2a94877a9024691d0b5ee9af6d850",
+      "bytes": 4084
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f6/fixture/manifest.ndjson",
+      "sha256": "bdff1557028a4e45aa614e88b000ace3df3adbc3cb9f815e64a61e6eea56e4f6",
+      "bytes": 1043
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f6/out/ASTOCK-046-6a1813cfbea6/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "b5baec9cfc1567433867c250bf9694159f59da8e8365da25eb7de2d34aa8953c",
+      "bytes": 9143
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f6/out/ASTOCK-046-6a1813cfbea6/2026-10-03/source_rows/eastmoney/broken_limit_pool/source-rows.json",
+      "sha256": "4f596318cce370a759e57389156f6aeda36c2947cae1e7568e7a193b6a0e8638",
+      "bytes": 4420
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f6/out/ASTOCK-046-6a1813cfbea6/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f6/out/ASTOCK-046-6a1813cfbea6/_raw/bodies/12ac43ba7d01e221e040f0b8c68b6e3cd5f2a94877a9024691d0b5ee9af6d850.bin",
+      "sha256": "12ac43ba7d01e221e040f0b8c68b6e3cd5f2a94877a9024691d0b5ee9af6d850",
+      "bytes": 4084
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f6/out/ASTOCK-046-6a1813cfbea6/_raw/manifest.ndjson",
+      "sha256": "8f613a236f94238cc40f1f60f342bc2239a1128712ebed4b5004e9d3db8520be",
+      "bytes": 1338
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f7/fixture/bodies/ac23469fb03cf9b1c31e0564b796887f7bbf646e6d9e860c2698abdcdecffb61.bin",
+      "sha256": "ac23469fb03cf9b1c31e0564b796887f7bbf646e6d9e860c2698abdcdecffb61",
+      "bytes": 4088
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f7/fixture/manifest.ndjson",
+      "sha256": "a077d131306eb02a73de2d810650be568cae4c03aed30c8bd5da23e9dc3ae183",
+      "bytes": 1047
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f7/out/ASTOCK-046-43edec021edb/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "1c80e6099e2e928169b4ff6883aa73a665c2e4fc0f69168c964262c254f29294",
+      "bytes": 8293
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f7/out/ASTOCK-046-43edec021edb/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f7/out/ASTOCK-046-43edec021edb/_raw/bodies/ac23469fb03cf9b1c31e0564b796887f7bbf646e6d9e860c2698abdcdecffb61.bin",
+      "sha256": "ac23469fb03cf9b1c31e0564b796887f7bbf646e6d9e860c2698abdcdecffb61",
+      "bytes": 4088
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f7/out/ASTOCK-046-43edec021edb/_raw/manifest.ndjson",
+      "sha256": "981960d4419d24920ff5ccc78e69d6cad78eb08d537912ab58f5366ef4723790",
+      "bytes": 1338
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f8/fixture/bodies/c484443c5587e7deb97ff168dfa54e203ceedf89906987adff226b2d7529884c.bin",
+      "sha256": "c484443c5587e7deb97ff168dfa54e203ceedf89906987adff226b2d7529884c",
+      "bytes": 108
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f8/fixture/manifest.ndjson",
+      "sha256": "c00ccc15aa21cadefcda655229edb832d6fe4b004c0429c14b33033358e2c573",
+      "bytes": 1043
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f8/out/ASTOCK-046-26befc202c24/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "f3b9622203f5d77322c053587d9ca95ba814bba050027f2ce94aea80fa2875b8",
+      "bytes": 8293
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f8/out/ASTOCK-046-26befc202c24/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f8/out/ASTOCK-046-26befc202c24/_raw/bodies/c484443c5587e7deb97ff168dfa54e203ceedf89906987adff226b2d7529884c.bin",
+      "sha256": "c484443c5587e7deb97ff168dfa54e203ceedf89906987adff226b2d7529884c",
+      "bytes": 108
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f8/out/ASTOCK-046-26befc202c24/_raw/manifest.ndjson",
+      "sha256": "856e15358ea2fe37bf2f64ca034e3066fb03bfd02813ab483a96cf65a9137050",
+      "bytes": 1337
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f9/fixture/bodies/14000f40f9989e64a28fe1e21e85487fa91a98a567cca3e1b3cafb2f0824ebde.bin",
+      "sha256": "14000f40f9989e64a28fe1e21e85487fa91a98a567cca3e1b3cafb2f0824ebde",
+      "bytes": 72
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f9/fixture/manifest.ndjson",
+      "sha256": "432e3ae75da55952e0505aa814012c6356cd628e521413704252a877f4801d1b",
+      "bytes": 1041
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f9/out/ASTOCK-046-a33e68c349ce/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "7104572fa66906348a8fd2e5225af9b81fbef5aec4f9eabf9997276913f0a445",
+      "bytes": 8292
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f9/out/ASTOCK-046-a33e68c349ce/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f9/out/ASTOCK-046-a33e68c349ce/_raw/bodies/14000f40f9989e64a28fe1e21e85487fa91a98a567cca3e1b3cafb2f0824ebde.bin",
+      "sha256": "14000f40f9989e64a28fe1e21e85487fa91a98a567cca3e1b3cafb2f0824ebde",
+      "bytes": 72
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/f9/out/ASTOCK-046-a33e68c349ce/_raw/manifest.ndjson",
+      "sha256": "8102f9d778c20c9dc2b61f364c68aa46d3559175e3583c59a8886b4716e19a81",
+      "bytes": 1336
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/legacy/legacy-comparison.json",
+      "sha256": "65245e5aa90eb8ba2e9f4e1be30c0725f9b1a8937c84a8ff16acbb2371cebb4e",
+      "bytes": 205
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/legacy/original/bodies/2f8fd55e9dc60e46c707fec37e3bf6b3fdad4dfb0967217061f533add6acaed7.bin",
+      "sha256": "2f8fd55e9dc60e46c707fec37e3bf6b3fdad4dfb0967217061f533add6acaed7",
+      "bytes": 13765
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/legacy/original/manifest.ndjson",
+      "sha256": "71d0d690e6ddb34e9064f3d2f10fbe3d7001542fc5e04f632fb62776f587352b",
+      "bytes": 1687
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/legacy/provider/bodies/2f8fd55e9dc60e46c707fec37e3bf6b3fdad4dfb0967217061f533add6acaed7.bin",
+      "sha256": "2f8fd55e9dc60e46c707fec37e3bf6b3fdad4dfb0967217061f533add6acaed7",
+      "bytes": 13765
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/legacy/provider/manifest.ndjson",
+      "sha256": "24144eac90b7d453b72ca640b43de6fbed3378cbeeaf9e97573f4f1a20bc1b08",
+      "bytes": 1687
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/session/out/ASTOCK-046-528eaded5114/2026-10-03/broken_limit_pool/eastmoney/broken_limit_pool/mapped-rows.json",
+      "sha256": "f7c8ec84974dd086e1f52f8393305a3537cd4f2ea03406246703cb93d8a1ba8d",
+      "bytes": 5378
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/session/out/ASTOCK-046-528eaded5114/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "0611a1608e6c1997e3da0e06b3a669b60cb1ebbb963ffcb78bc8b63a55af977c",
+      "bytes": 9171
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/session/out/ASTOCK-046-528eaded5114/2026-10-03/source_rows/eastmoney/broken_limit_pool/source-rows.json",
+      "sha256": "1756a67fec7d43d3f41d5c0a6c8741d2ff437df11100518dc4d41190095a4209",
+      "bytes": 4422
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/session/out/ASTOCK-046-528eaded5114/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/session/out/ASTOCK-046-528eaded5114/_raw/bodies/b4bd1938d591fc3cffd09746e501ac3c9e8717c3bd7bfe7f39f78785a5e334b8.bin",
+      "sha256": "b4bd1938d591fc3cffd09746e501ac3c9e8717c3bd7bfe7f39f78785a5e334b8",
+      "bytes": 3380
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/session/out/ASTOCK-046-528eaded5114/_raw/manifest.ndjson",
+      "sha256": "1be940feddbf6906ab8ca2a1124ff10405a005d219ad98792ac959970fd829cd",
+      "bytes": 1132
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/session/out/ASTOCK-046-beb2d4026aff/2026-10-03/broken_limit_pool/eastmoney/broken_limit_pool/mapped-rows.json",
+      "sha256": "f7c8ec84974dd086e1f52f8393305a3537cd4f2ea03406246703cb93d8a1ba8d",
+      "bytes": 5378
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/session/out/ASTOCK-046-beb2d4026aff/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "cfa4c432b2b6e8055e0d35f30c8bb8fafe81b51544ea42b60e849e5ba890cbd9",
+      "bytes": 9471
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/session/out/ASTOCK-046-beb2d4026aff/2026-10-03/source_rows/eastmoney/broken_limit_pool/source-rows.json",
+      "sha256": "1756a67fec7d43d3f41d5c0a6c8741d2ff437df11100518dc4d41190095a4209",
+      "bytes": 4422
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/session/out/ASTOCK-046-beb2d4026aff/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/session/out/ASTOCK-046-beb2d4026aff/_raw/bodies/b4bd1938d591fc3cffd09746e501ac3c9e8717c3bd7bfe7f39f78785a5e334b8.bin",
+      "sha256": "b4bd1938d591fc3cffd09746e501ac3c9e8717c3bd7bfe7f39f78785a5e334b8",
+      "bytes": 3380
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/session/out/ASTOCK-046-beb2d4026aff/_raw/manifest.ndjson",
+      "sha256": "64c863825ce81a490170f79146c04bf4e0fbfaaf03d58443e057a93a8855e9b0",
+      "bytes": 1437
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/session/session-comparison.json",
+      "sha256": "a21bd45a8ebd642c3b2c173f2480558dfd5c03e7eb8a9e21c71d71e18e6d20ab",
+      "bytes": 664
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/capabilities.yaml",
+      "sha256": "7b7ce0da1d33b333165c6081a3ed788f85cb05d5f6945c745eec97d73e24f6e2",
+      "bytes": 4009
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/collection.yaml",
+      "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d",
+      "bytes": 2934
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/datasets/board_fund_flow.yaml",
+      "sha256": "08f3566d0cf2787186e6106e4915d0d89b70232d737898480eda03785ea3c53a",
+      "bytes": 1110
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/datasets/broken_limit_pool.yaml",
+      "sha256": "60b3790eae896c968093c8d26a818c9dab325aca620510b4ec1dde061af7f65e",
+      "bytes": 1162
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/datasets/concept_board.yaml",
+      "sha256": "eef0b07c9a41bfd5ef1a52f4f39516cb26d42b088d63a15783af0f94985fd76f",
+      "bytes": 379
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/datasets/daily_bar.yaml",
+      "sha256": "0a8c1dcae7e1c062ae70c224defc1362adc1d58bc196bbeb2f1edd61d6fd39e7",
+      "bytes": 995
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/datasets/dividend_event.yaml",
+      "sha256": "67a2b02063cb9a891e3fb388048407cbc08b05ce8ae97deea6976d3904340d2e",
+      "bytes": 759
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/datasets/financial_main.yaml",
+      "sha256": "23d8b55356620439d5c1b507601b782b31aa965fe24eaf194e869466bb271ab0",
+      "bytes": 766
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/datasets/industry_board.yaml",
+      "sha256": "c6930c70b55e171dee94b74b80f3c37df1466d4a10dadc3016975004b8b47ba4",
+      "bytes": 380
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/datasets/industry_directory.yaml",
+      "sha256": "9325d485bf7a1bc2b075c2d920b43b17caa039916536bedd8163be0f972bfe5b",
+      "bytes": 346
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/datasets/industry_index_daily.yaml",
+      "sha256": "5d542c72443410747f2ac643589bfd8160cdea07d01d6d0dd9c5e4753096043b",
+      "bytes": 676
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/datasets/industry_membership.yaml",
+      "sha256": "dff512c9b7f00330bbe408ba1e1eb74d99b49bc0b38ee419d4c463047c6fe69d",
+      "bytes": 709
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/datasets/intraday_trend.yaml",
+      "sha256": "5983e0eb29c1cd7a781fbad0be7332dda14e887ccd744e55ad4b8664c7a0c38a",
+      "bytes": 665
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/datasets/limit_down_pool.yaml",
+      "sha256": "67b3ca1ae9edf0f863d2b2d5257a315fe721f042086d4b5966653c0f2758d806",
+      "bytes": 1177
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/datasets/limit_up_pool.yaml",
+      "sha256": "73c1fa4ed6d7281d1857208a2ec9696a3637214bb256661ce943313c75772a69",
+      "bytes": 982
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/datasets/minute_bar_5m.yaml",
+      "sha256": "fb6f822ed42479422a0b4c227577d8e559bb6b2238562af566af0464304bd873",
+      "bytes": 708
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/datasets/previous_limit_pool.yaml",
+      "sha256": "5234397a7b87ed3e03c11431de1f00c012e135ba5ef57bf63a2f431f659703bc",
+      "bytes": 1199
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/datasets/realtime_quote.yaml",
+      "sha256": "ebc3e97bb7469eb4c7c80daf50991ebe38f0eb5b2476a9a579d22236d416378b",
+      "bytes": 1121
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/datasets/security_snapshot.yaml",
+      "sha256": "255115893f64837a3b95ea9fe44551948eefa9604aca9d59214de87a580300be",
+      "bytes": 519
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/datasets/shareholder_count.yaml",
+      "sha256": "d325df1784c873bea73a1d907e9964e06c26e4d6b356dd6c16148837b57feccf",
+      "bytes": 923
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/datasets/stock_fund_flow.yaml",
+      "sha256": "df3f21341463f3538a1f855ef19b7bbdb683405aaa65d5418c255023c18a429f",
+      "bytes": 736
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/datasets/strong_stock_pool.yaml",
+      "sha256": "264c9d759405d37733cf4daf29996240cb46fed46c3eb8835405a4311e1c1131",
+      "bytes": 1194
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/datasets/trading_calendar.yaml",
+      "sha256": "924b17a5be104252e85a377e4579432c6725bab99cbaa0ad70e71102149a1f49",
+      "bytes": 192
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/datasets.yaml",
+      "sha256": "e992d13297e1f9a8f64acabc25f65f138b21ce12dca16689cc3f17bf1385a6eb",
+      "bytes": 587
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/normalization/board_fund_flow.yaml",
+      "sha256": "fb7c6f1f2d425181b189e25152e465306982e10c7c6ee06b2917dfa00b891baa",
+      "bytes": 1395
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/normalization/broken_limit_pool.yaml",
+      "sha256": "48fdbb51e57c40d0129d67caf7fbac0df67f34483380cf555535803338e73903",
+      "bytes": 1277
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/normalization/concept_board.yaml",
+      "sha256": "2b7e7f57d189541d6a232cd5391d2dab4289f9f3438f397d9fefd82bb1d996b7",
+      "bytes": 206
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/normalization/daily_bar.yaml",
+      "sha256": "41f9bbd0824e20d70f7ed276758b286094c33c79180befca4d8985afc3c8ad0b",
+      "bytes": 2913
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/normalization/dividend_event.yaml",
+      "sha256": "188df2f7f075b92e993136aef3f977eea419f9c6957404bd2f7071c76ed24a71",
+      "bytes": 1532
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/normalization/financial_main.yaml",
+      "sha256": "eeeb2e7418aab430168f0c7e16c69f1b24a9e49ec8d156a28390cae0e7a69bda",
+      "bytes": 603
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/normalization/industry_board.yaml",
+      "sha256": "f3ff8bbe7fc4e8d4e5af1c36b9312e8db1c8c9cb09a09aadb472b22ae09de152",
+      "bytes": 210
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/normalization/industry_directory.yaml",
+      "sha256": "823d97db8afe4adb3f963faaa04b42b8f151e93f2e75f3eb18f8c678a68bae37",
+      "bytes": 478
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/normalization/industry_index_daily.yaml",
+      "sha256": "953087294fd2c3a3cb1b46f204d0a0f606f9060f0f89676fb3a189222a68dab1",
+      "bytes": 805
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/normalization/industry_membership.yaml",
+      "sha256": "7eb72a1b8ce7aff27aa1ad62534af2bf7183f3d78c6392208035396a11e21ccb",
+      "bytes": 765
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/normalization/intraday_trend.yaml",
+      "sha256": "14b0b22ad1308c70b65152e711c4248d3c8bf1c28d842fba36309194ed38870a",
+      "bytes": 440
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/normalization/limit_down_pool.yaml",
+      "sha256": "456b0a779929bb6ff71ed70e07cd420d42596068f142879926b86972e3704f7b",
+      "bytes": 1314
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/normalization/limit_up_pool.yaml",
+      "sha256": "411e6e6ead10a4d2cbff7ecf4de9bee26f411a66d005a33bc640865ef4b6e7ba",
+      "bytes": 1079
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/normalization/minute_bar_5m.yaml",
+      "sha256": "f3e9abaededc01a15c651a99a22131a80067133deb89548dd12b17278e0e55b7",
+      "bytes": 1134
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/normalization/previous_limit_pool.yaml",
+      "sha256": "4c14b9ad1f0497e2d6f13a72978f1ddda74039b7c0d182c5a5a98ac01a678443",
+      "bytes": 1276
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/normalization/realtime_quote.yaml",
+      "sha256": "e9141547fbb85cb71c8e2336c20a2ebc948e3926f4b2a09e4f59505adea91b94",
+      "bytes": 1308
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/normalization/security_snapshot.yaml",
+      "sha256": "474ab0397cb1aad33abcd070942586a8460c468b1d3f7af97c2d152eee5a6537",
+      "bytes": 621
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/normalization/shareholder_count.yaml",
+      "sha256": "f8801367f055e0b1d419e648c9bd3e1d72984ffe2823c2d464770403c1b7c9e4",
+      "bytes": 1702
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/normalization/stock_fund_flow.yaml",
+      "sha256": "3d99bacf48ba3438c90d2d544f7223ffcb0a464f69f95841affe3e99a503bbe1",
+      "bytes": 1741
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/normalization/strong_stock_pool.yaml",
+      "sha256": "41733f419a6dd9d3a25edf361294a973df76d878d01bbf46b9f25f53a38f2304",
+      "bytes": 1234
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/normalization/trading_calendar.yaml",
+      "sha256": "4be7571914129769aeca321d892b8aa2fbd068db1c7c0b691ae0d5cefe7f69e0",
+      "bytes": 476
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/providers.yaml",
+      "sha256": "23f06aa0a71ad9aaaf7f24b40daa2efabdc38b1c71a1b8b98f80d6150afb605f",
+      "bytes": 74630
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/config/schedules.yaml",
+      "sha256": "01b7e269ea4231024bf1c520f78fa571c2909986aad5573006bd80e186119113",
+      "bytes": 525
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/out/ASTOCK-046-254892287a6a/2026-10-03/broken_limit_pool/eastmoney/broken_limit_pool/mapped-rows.json",
+      "sha256": "4e206fca25a2a38b286da28734ae8c3e4a60bfe7fb2141863f37919655f2cd61",
+      "bytes": 3894
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/out/ASTOCK-046-254892287a6a/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "8e27a929469f1e1c6c22328c7bfbfe844fa194ae9e9787f2fe844a3554254bdc",
+      "bytes": 9743
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/out/ASTOCK-046-254892287a6a/2026-10-03/source_rows/eastmoney/broken_limit_pool/source-rows.json",
+      "sha256": "1756a67fec7d43d3f41d5c0a6c8741d2ff437df11100518dc4d41190095a4209",
+      "bytes": 4422
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/out/ASTOCK-046-254892287a6a/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/out/ASTOCK-046-254892287a6a/_raw/bodies/b4bd1938d591fc3cffd09746e501ac3c9e8717c3bd7bfe7f39f78785a5e334b8.bin",
+      "sha256": "b4bd1938d591fc3cffd09746e501ac3c9e8717c3bd7bfe7f39f78785a5e334b8",
+      "bytes": 3380
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/out/ASTOCK-046-254892287a6a/_raw/manifest.ndjson",
+      "sha256": "cf77ba25847c0705ff3548ad63459024926c7b3055a2b4a2f034258077674efc",
+      "bytes": 1709
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/out/ASTOCK-046-fea0b3698b93/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "73d3a855b5cad51ea46419122c3b3e1be0e45b8f97a39618cf64cbbfed34397e",
+      "bytes": 7147
+    },
+    {
+      "path": "provider_validation/results/pools-check-20261004/y/out/ASTOCK-046-fea0b3698b93/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/ASTOCK-046-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/ASTOCK-046-stdout.json",
+      "sha256": "196904d4383678a22a906c436ff47673cf136a672698783d9cddd4fbf8b3b3e2",
+      "bytes": 12513
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/ASTOCK-047-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/ASTOCK-047-stdout.json",
+      "sha256": "4917b7435901b2b3edfc49188dffe02c5054d8edb5f08f246ec24df322a57791",
+      "bytes": 12659
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/ASTOCK-048-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/ASTOCK-048-stdout.json",
+      "sha256": "446780e63509dc15497fa54e240289e4acb0407761bf2e80ed206189022e3bc0",
+      "bytes": 12606
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/ASTOCK-050-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/ASTOCK-050-stdout.json",
+      "sha256": "0c591d5efc535638cd096ddbd5cab103f049cd14e6488598305aa75749996634",
+      "bytes": 12526
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/ASTOCK-046-c89775190e73/2026-10-03/broken_limit_pool/eastmoney/broken_limit_pool/mapped-rows.json",
+      "sha256": "b71cadc055c470356f92b4b9e0347ebed604e7a3db14135bb40c3c9537f6abeb",
+      "bytes": 5378
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/ASTOCK-046-c89775190e73/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "f1565c62b1ef6c223f65a90ab5a444bc2cebb899e060bf55029db502b4d545f7",
+      "bytes": 10045
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/ASTOCK-046-c89775190e73/2026-10-03/source_rows/eastmoney/broken_limit_pool/source-rows.json",
+      "sha256": "1756a67fec7d43d3f41d5c0a6c8741d2ff437df11100518dc4d41190095a4209",
+      "bytes": 4422
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/ASTOCK-046-c89775190e73/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/ASTOCK-046-c89775190e73/_raw/bodies/b4bd1938d591fc3cffd09746e501ac3c9e8717c3bd7bfe7f39f78785a5e334b8.bin",
+      "sha256": "b4bd1938d591fc3cffd09746e501ac3c9e8717c3bd7bfe7f39f78785a5e334b8",
+      "bytes": 3380
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/ASTOCK-046-c89775190e73/_raw/manifest.ndjson",
+      "sha256": "dcd3b75893f0996288191844d9b0a9ff511f38133b7dc02d8b5441de287be319",
+      "bytes": 1709
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/ASTOCK-047-48596711cae7/2026-10-03/input_report/eastmoney/limit_down_pool/report.json",
+      "sha256": "27f4ac9e9bfcd0b571d374042cc3ca334cb1dc1334eee0aa1db289690234fed6",
+      "bytes": 10181
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/ASTOCK-047-48596711cae7/2026-10-03/limit_down_pool/eastmoney/limit_down_pool/mapped-rows.json",
+      "sha256": "f1b95ecc0c2c3a05304bf2aa0c70f4fa5c2cec76ac101e75bd6567c884e06ede",
+      "bytes": 4129
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/ASTOCK-047-48596711cae7/2026-10-03/source_rows/eastmoney/limit_down_pool/source-rows.json",
+      "sha256": "bf553bbc827648dd29e17747a2271967a943d1ed5e9a76919b66bba77b69023f",
+      "bytes": 3488
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/ASTOCK-047-48596711cae7/_raw/bodies/727be19798730115b50e9737b03070cdb6a0a21d996562390944f697554be8ad.bin",
+      "sha256": "727be19798730115b50e9737b03070cdb6a0a21d996562390944f697554be8ad",
+      "bytes": 3129
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/ASTOCK-047-48596711cae7/_raw/bodies/a4e93dfbb6aab53efa0722528f3c200bb03ed48477a73faf854cd1c72530557f.bin",
+      "sha256": "a4e93dfbb6aab53efa0722528f3c200bb03ed48477a73faf854cd1c72530557f",
+      "bytes": 2445
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/ASTOCK-047-48596711cae7/_raw/manifest.ndjson",
+      "sha256": "798a366d4a8839d5fe34f1766e7d8bf8f6ab902e779f86ff266d8b6b20cfbea9",
+      "bytes": 1709
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/ASTOCK-048-d936e35382fc/2026-10-03/input_report/eastmoney/previous_limit_pool/report.json",
+      "sha256": "1f1b6f700f0d268faf697d6efe94ec4efe5503e838e64dbdd96e4ab9852dd26f",
+      "bytes": 10136
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/ASTOCK-048-d936e35382fc/2026-10-03/previous_limit_pool/eastmoney/previous_limit_pool/mapped-rows.json",
+      "sha256": "939bc7ba19957dd57dcf8395213f72481c36cb5fd96e37b8493d2863fff0c7b9",
+      "bytes": 27025
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/ASTOCK-048-d936e35382fc/2026-10-03/source_rows/eastmoney/previous_limit_pool/source-rows.json",
+      "sha256": "d5c7a837fea19b21c35f23b6b36428b7d5aa0f702d9f5c71a9c25dcb77faf99c",
+      "bytes": 20917
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/ASTOCK-048-d936e35382fc/_raw/bodies/b3d372354deeee842e9162f2bd56415dc2cbddf5c2f1cc31ec053d4c052f8793.bin",
+      "sha256": "b3d372354deeee842e9162f2bd56415dc2cbddf5c2f1cc31ec053d4c052f8793",
+      "bytes": 2173
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/ASTOCK-048-d936e35382fc/_raw/bodies/d4f6ab36119677ee909f1444490a4ddf233bd69e53f497ba6392030d6253328e.bin",
+      "sha256": "d4f6ab36119677ee909f1444490a4ddf233bd69e53f497ba6392030d6253328e",
+      "bytes": 15536
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/ASTOCK-048-d936e35382fc/_raw/manifest.ndjson",
+      "sha256": "bee2b722506646e6330828325e1606466ef006c97f5e8a2ba2c33b60c343b992",
+      "bytes": 1716
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/ASTOCK-050-d3b630579343/2026-10-03/input_report/eastmoney/strong_stock_pool/report.json",
+      "sha256": "6dca2c2ba61920488c4cf204d76d5d112ffe01c2fc8e8fbf4186e662872fa454",
+      "bytes": 10058
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/ASTOCK-050-d3b630579343/2026-10-03/source_rows/eastmoney/strong_stock_pool/source-rows.json",
+      "sha256": "8be31e0cd564a28532436a5fee4688bbfaa756ab19d51e6b4884f5d8ae711ddc",
+      "bytes": 74386
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/ASTOCK-050-d3b630579343/2026-10-03/strong_stock_pool/eastmoney/strong_stock_pool/mapped-rows.json",
+      "sha256": "f392cae98dea691aca40a813fb4351dfb9adec80abf9f8fb6f58714debb35aac",
+      "bytes": 91924
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/ASTOCK-050-d3b630579343/_raw/bodies/4f9d16d10f9bfd7fd6a9ba0190b9ff362a62aa9dcdfc557a5b11cf5345bc51a8.bin",
+      "sha256": "4f9d16d10f9bfd7fd6a9ba0190b9ff362a62aa9dcdfc557a5b11cf5345bc51a8",
+      "bytes": 55074
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/ASTOCK-050-d3b630579343/_raw/bodies/a4b314e673bf0ca546e89c8ba2c1a587c652d0c29bae36afc1c774a32d44700f.bin",
+      "sha256": "a4b314e673bf0ca546e89c8ba2c1a587c652d0c29bae36afc1c774a32d44700f",
+      "bytes": 3063
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/ASTOCK-050-d3b630579343/_raw/manifest.ndjson",
+      "sha256": "f6c2254c6f4b2dd74eb86015baef1d77eb28abc9e9eb7ead7c82f7185cf5f35e",
+      "bytes": 1712
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/SDA-BOARD-003-e4120e223444/2026-10-03/board_fund_flow/ths/industry_fund_flow/mapped-rows.json",
+      "sha256": "bdd8a142ba58213f6f4cc3955aa2564ef0c62e7a25a63fd437bcd44e999f289e",
+      "bytes": 31676
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/SDA-BOARD-003-e4120e223444/2026-10-03/input_report/ths/industry_fund_flow/report.json",
+      "sha256": "211b46b61c6aa74d2bfbcf1ce998a71a114d00d03201ffed5b044c8f43f009a2",
+      "bytes": 15923
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/SDA-BOARD-003-e4120e223444/2026-10-03/source_rows/ths/industry_fund_flow/source-rows.json",
+      "sha256": "fdf61aeb2f9c0aa1875f556cf6945c0e5f15f7ed5eaaf82fc5254bf48ab67107",
+      "bytes": 20726
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/SDA-BOARD-003-e4120e223444/_raw/bodies/0163e41dfdcbd889755142f4179a83a8d9f575f5343a56413546cc7fc0262376.bin",
+      "sha256": "0163e41dfdcbd889755142f4179a83a8d9f575f5343a56413546cc7fc0262376",
+      "bytes": 39664
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/SDA-BOARD-003-e4120e223444/_raw/bodies/07af78156c494a0c4b0f7d6fb67731a704f3c4c9702a0db825bd3ab93bc3f93c.bin",
+      "sha256": "07af78156c494a0c4b0f7d6fb67731a704f3c4c9702a0db825bd3ab93bc3f93c",
+      "bytes": 271
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/SDA-BOARD-003-e4120e223444/_raw/bodies/1470e17de6e09fc17ceae6a8d8d4a5b4615856e8452323c790129f825a468afb.bin",
+      "sha256": "1470e17de6e09fc17ceae6a8d8d4a5b4615856e8452323c790129f825a468afb",
+      "bytes": 32720
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/SDA-BOARD-003-e4120e223444/_raw/bodies/564c33bfd4989aef98823b04712a878776d212fcc886d1a6bb38752788ed88d2.bin",
+      "sha256": "564c33bfd4989aef98823b04712a878776d212fcc886d1a6bb38752788ed88d2",
+      "bytes": 343
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/SDA-BOARD-003-e4120e223444/_raw/bodies/6d4200eac2fb6a69f38ee543e1bf1f742187560f9f21ddf2899857ee291d6624.bin",
+      "sha256": "6d4200eac2fb6a69f38ee543e1bf1f742187560f9f21ddf2899857ee291d6624",
+      "bytes": 27143
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/SDA-BOARD-003-e4120e223444/_raw/bodies/b7425e018c31d9bde9269886169ab922bd4a71e5e5dc2527621f3c0993caabdb.bin",
+      "sha256": "b7425e018c31d9bde9269886169ab922bd4a71e5e5dc2527621f3c0993caabdb",
+      "bytes": 4373
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/candidate/SDA-BOARD-003-e4120e223444/_raw/manifest.ndjson",
+      "sha256": "0d303e7406095344933fb0debf33e7537e19e43a0b5cf8c0b7c9ab7f5856dd48",
+      "bytes": 7228
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/context.json",
+      "sha256": "89a21657a76a391085e1c6c72f49d928b4f6b20804fdd3cb2d20a5a96c28ef2d",
+      "bytes": 131
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/SDA-BOARD-003-stderr.bin",
+      "sha256": "8602d13459bea154a0d8f1f22bc29e0d4daea919b6291da593b116ce46471d01",
+      "bytes": 77
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/SDA-BOARD-003-stdout.json",
+      "sha256": "6540b8e21bc62b42ca55a21c520877f7c459063fa0a2dad6b0e81e757a6e8459",
+      "bytes": 20174
+    },
+    {
+      "path": "provider_validation/results/pools-cli-20261004/verification.json",
+      "sha256": "d0d6f150e6793f183ce9ec6f9cfc415ee5144261e8bf7e74833d35b12c27c55a",
+      "bytes": 7177
+    },
+    {
+      "path": "provider_validation/results/pools-dev-20261004/ASTOCK-046-80f2425f0df0/2026-10-03/broken_limit_pool/eastmoney/broken_limit_pool/mapped-rows.json",
+      "sha256": "b71cadc055c470356f92b4b9e0347ebed604e7a3db14135bb40c3c9537f6abeb",
+      "bytes": 5378
+    },
+    {
+      "path": "provider_validation/results/pools-dev-20261004/ASTOCK-046-80f2425f0df0/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "241c6be8a9937e04556d76727214e48554f0ea90c1e8ac54a1c7ed0b486c5d7e",
+      "bytes": 9827
+    },
+    {
+      "path": "provider_validation/results/pools-dev-20261004/ASTOCK-046-80f2425f0df0/2026-10-03/source_rows/eastmoney/broken_limit_pool/source-rows.json",
+      "sha256": "1756a67fec7d43d3f41d5c0a6c8741d2ff437df11100518dc4d41190095a4209",
+      "bytes": 4422
+    },
+    {
+      "path": "provider_validation/results/pools-dev-20261004/ASTOCK-046-80f2425f0df0/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-dev-20261004/ASTOCK-046-80f2425f0df0/_raw/bodies/b4bd1938d591fc3cffd09746e501ac3c9e8717c3bd7bfe7f39f78785a5e334b8.bin",
+      "sha256": "b4bd1938d591fc3cffd09746e501ac3c9e8717c3bd7bfe7f39f78785a5e334b8",
+      "bytes": 3380
+    },
+    {
+      "path": "provider_validation/results/pools-dev-20261004/ASTOCK-046-80f2425f0df0/_raw/manifest.ndjson",
+      "sha256": "aec94b535657969155f748a036054705421da77f9c0adc7828f0434990c58d57",
+      "bytes": 1709
+    },
+    {
+      "path": "provider_validation/results/pools-dev-20261004/ASTOCK-047-937eac8a8c85/2026-10-03/input_report/eastmoney/limit_down_pool/report.json",
+      "sha256": "f01205674e386881c2cd0446e28a698e300bc084b26a2da433ebcc8471f71212",
+      "bytes": 9963
+    },
+    {
+      "path": "provider_validation/results/pools-dev-20261004/ASTOCK-047-937eac8a8c85/2026-10-03/limit_down_pool/eastmoney/limit_down_pool/mapped-rows.json",
+      "sha256": "f1b95ecc0c2c3a05304bf2aa0c70f4fa5c2cec76ac101e75bd6567c884e06ede",
+      "bytes": 4129
+    },
+    {
+      "path": "provider_validation/results/pools-dev-20261004/ASTOCK-047-937eac8a8c85/2026-10-03/source_rows/eastmoney/limit_down_pool/source-rows.json",
+      "sha256": "bf553bbc827648dd29e17747a2271967a943d1ed5e9a76919b66bba77b69023f",
+      "bytes": 3488
+    },
+    {
+      "path": "provider_validation/results/pools-dev-20261004/ASTOCK-047-937eac8a8c85/_raw/bodies/727be19798730115b50e9737b03070cdb6a0a21d996562390944f697554be8ad.bin",
+      "sha256": "727be19798730115b50e9737b03070cdb6a0a21d996562390944f697554be8ad",
+      "bytes": 3129
+    },
+    {
+      "path": "provider_validation/results/pools-dev-20261004/ASTOCK-047-937eac8a8c85/_raw/bodies/a4e93dfbb6aab53efa0722528f3c200bb03ed48477a73faf854cd1c72530557f.bin",
+      "sha256": "a4e93dfbb6aab53efa0722528f3c200bb03ed48477a73faf854cd1c72530557f",
+      "bytes": 2445
+    },
+    {
+      "path": "provider_validation/results/pools-dev-20261004/ASTOCK-047-937eac8a8c85/_raw/manifest.ndjson",
+      "sha256": "2b153c896bf5aaa441ac9ac609019f87da4c8e4c34b21c186db91c5ce8d0a1c3",
+      "bytes": 1709
+    },
+    {
+      "path": "provider_validation/results/pools-dev-20261004/ASTOCK-048-93af49c26c26/2026-10-03/input_report/eastmoney/previous_limit_pool/report.json",
+      "sha256": "9cbcbe813b7cf3d241f0001255d990b7cac5cf72fd52ba6e45b315e9b5c17c41",
+      "bytes": 9918
+    },
+    {
+      "path": "provider_validation/results/pools-dev-20261004/ASTOCK-048-93af49c26c26/2026-10-03/previous_limit_pool/eastmoney/previous_limit_pool/mapped-rows.json",
+      "sha256": "939bc7ba19957dd57dcf8395213f72481c36cb5fd96e37b8493d2863fff0c7b9",
+      "bytes": 27025
+    },
+    {
+      "path": "provider_validation/results/pools-dev-20261004/ASTOCK-048-93af49c26c26/2026-10-03/source_rows/eastmoney/previous_limit_pool/source-rows.json",
+      "sha256": "d5c7a837fea19b21c35f23b6b36428b7d5aa0f702d9f5c71a9c25dcb77faf99c",
+      "bytes": 20917
+    },
+    {
+      "path": "provider_validation/results/pools-dev-20261004/ASTOCK-048-93af49c26c26/_raw/bodies/b3d372354deeee842e9162f2bd56415dc2cbddf5c2f1cc31ec053d4c052f8793.bin",
+      "sha256": "b3d372354deeee842e9162f2bd56415dc2cbddf5c2f1cc31ec053d4c052f8793",
+      "bytes": 2173
+    },
+    {
+      "path": "provider_validation/results/pools-dev-20261004/ASTOCK-048-93af49c26c26/_raw/bodies/d4f6ab36119677ee909f1444490a4ddf233bd69e53f497ba6392030d6253328e.bin",
+      "sha256": "d4f6ab36119677ee909f1444490a4ddf233bd69e53f497ba6392030d6253328e",
+      "bytes": 15536
+    },
+    {
+      "path": "provider_validation/results/pools-dev-20261004/ASTOCK-048-93af49c26c26/_raw/manifest.ndjson",
+      "sha256": "a8805505cacb582134ee2024005831e45cd307ed0c5585e9b91fd1566250fcf6",
+      "bytes": 1716
+    },
+    {
+      "path": "provider_validation/results/pools-dev-20261004/ASTOCK-050-6c694383c53c/2026-10-03/input_report/eastmoney/strong_stock_pool/report.json",
+      "sha256": "7cf78aae8c5b27174bf27a71f9b07181cd418a500ddbd9e04d84eb69e9b6230e",
+      "bytes": 9840
+    },
+    {
+      "path": "provider_validation/results/pools-dev-20261004/ASTOCK-050-6c694383c53c/2026-10-03/source_rows/eastmoney/strong_stock_pool/source-rows.json",
+      "sha256": "8be31e0cd564a28532436a5fee4688bbfaa756ab19d51e6b4884f5d8ae711ddc",
+      "bytes": 74386
+    },
+    {
+      "path": "provider_validation/results/pools-dev-20261004/ASTOCK-050-6c694383c53c/2026-10-03/strong_stock_pool/eastmoney/strong_stock_pool/mapped-rows.json",
+      "sha256": "f392cae98dea691aca40a813fb4351dfb9adec80abf9f8fb6f58714debb35aac",
+      "bytes": 91924
+    },
+    {
+      "path": "provider_validation/results/pools-dev-20261004/ASTOCK-050-6c694383c53c/_raw/bodies/4f9d16d10f9bfd7fd6a9ba0190b9ff362a62aa9dcdfc557a5b11cf5345bc51a8.bin",
+      "sha256": "4f9d16d10f9bfd7fd6a9ba0190b9ff362a62aa9dcdfc557a5b11cf5345bc51a8",
+      "bytes": 55074
+    },
+    {
+      "path": "provider_validation/results/pools-dev-20261004/ASTOCK-050-6c694383c53c/_raw/bodies/a4b314e673bf0ca546e89c8ba2c1a587c652d0c29bae36afc1c774a32d44700f.bin",
+      "sha256": "a4b314e673bf0ca546e89c8ba2c1a587c652d0c29bae36afc1c774a32d44700f",
+      "bytes": 3063
+    },
+    {
+      "path": "provider_validation/results/pools-dev-20261004/ASTOCK-050-6c694383c53c/_raw/manifest.ndjson",
+      "sha256": "0493b2b4082455b3a1cdf8211703ed4a3cbad463663170dd4181accd834d8edf",
+      "bytes": 1712
+    },
+    {
+      "path": "provider_validation/results/pools-dev-20261004/preparation-failure.json",
+      "sha256": "829be4f143633f5b0e327d84c2d71e5be1e33a265a32738bcd71d5e64284dc65",
+      "bytes": 241
+    },
+    {
+      "path": "provider_validation/results/pools-dev-20261004-full-tests.xml",
+      "sha256": "199ead3f63230fa43aafbc28ba62c5a14a73ec87df546555413e952e5e56cb15",
+      "bytes": 43502
+    },
+    {
+      "path": "provider_validation/results/pools-dev-20261004-recheck-tests.xml",
+      "sha256": "0daed7823c79c8da8f61a091a2b98904c6e3a999c5a50ea72692008e9f4d8dc6",
+      "bytes": 3278
+    },
+    {
+      "path": "provider_validation/results/pools-dev-20261004-tests.xml",
+      "sha256": "aaa5b7e39c9eb2c82a5e9015b5a80de5c06a4a9ce49786cdafa20bea44825929",
+      "bytes": 4626
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/alias/alias-comparison.json",
+      "sha256": "e3afa5bad9ec0a5011e4b0be54065b9914205daf7ad35d367137089b14d2450a",
+      "bytes": 788
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/alias/SDA-BOARD-003-9694ae8e2c5e/2026-10-03/board_fund_flow/ths/industry_fund_flow/mapped-rows.json",
+      "sha256": "bdd8a142ba58213f6f4cc3955aa2564ef0c62e7a25a63fd437bcd44e999f289e",
+      "bytes": 31676
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/alias/SDA-BOARD-003-9694ae8e2c5e/2026-10-03/input_report/ths/industry_fund_flow/report.json",
+      "sha256": "6bcb03944620aab4dd9b16da392c85bcf5cac29baef626835f3cf6f2a76abcaa",
+      "bytes": 15923
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/alias/SDA-BOARD-003-9694ae8e2c5e/2026-10-03/source_rows/ths/industry_fund_flow/source-rows.json",
+      "sha256": "fdf61aeb2f9c0aa1875f556cf6945c0e5f15f7ed5eaaf82fc5254bf48ab67107",
+      "bytes": 20726
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/alias/SDA-BOARD-003-9694ae8e2c5e/_raw/bodies/0163e41dfdcbd889755142f4179a83a8d9f575f5343a56413546cc7fc0262376.bin",
+      "sha256": "0163e41dfdcbd889755142f4179a83a8d9f575f5343a56413546cc7fc0262376",
+      "bytes": 39664
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/alias/SDA-BOARD-003-9694ae8e2c5e/_raw/bodies/07af78156c494a0c4b0f7d6fb67731a704f3c4c9702a0db825bd3ab93bc3f93c.bin",
+      "sha256": "07af78156c494a0c4b0f7d6fb67731a704f3c4c9702a0db825bd3ab93bc3f93c",
+      "bytes": 271
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/alias/SDA-BOARD-003-9694ae8e2c5e/_raw/bodies/1470e17de6e09fc17ceae6a8d8d4a5b4615856e8452323c790129f825a468afb.bin",
+      "sha256": "1470e17de6e09fc17ceae6a8d8d4a5b4615856e8452323c790129f825a468afb",
+      "bytes": 32720
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/alias/SDA-BOARD-003-9694ae8e2c5e/_raw/bodies/564c33bfd4989aef98823b04712a878776d212fcc886d1a6bb38752788ed88d2.bin",
+      "sha256": "564c33bfd4989aef98823b04712a878776d212fcc886d1a6bb38752788ed88d2",
+      "bytes": 343
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/alias/SDA-BOARD-003-9694ae8e2c5e/_raw/bodies/6d4200eac2fb6a69f38ee543e1bf1f742187560f9f21ddf2899857ee291d6624.bin",
+      "sha256": "6d4200eac2fb6a69f38ee543e1bf1f742187560f9f21ddf2899857ee291d6624",
+      "bytes": 27143
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/alias/SDA-BOARD-003-9694ae8e2c5e/_raw/bodies/b7425e018c31d9bde9269886169ab922bd4a71e5e5dc2527621f3c0993caabdb.bin",
+      "sha256": "b7425e018c31d9bde9269886169ab922bd4a71e5e5dc2527621f3c0993caabdb",
+      "bytes": 4373
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/alias/SDA-BOARD-003-9694ae8e2c5e/_raw/manifest.ndjson",
+      "sha256": "3f28984840178f4f30f264ca5ac9d80a48550aefe2e88b71ec79df40a72e54a6",
+      "bytes": 7228
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-046/candidate/ASTOCK-046-c2c12945cbae/2026-10-03/broken_limit_pool/eastmoney/broken_limit_pool/mapped-rows.json",
+      "sha256": "b71cadc055c470356f92b4b9e0347ebed604e7a3db14135bb40c3c9537f6abeb",
+      "bytes": 5378
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-046/candidate/ASTOCK-046-c2c12945cbae/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "a52c49ba310a8cad985985b21d579843cc05bae4faf5c15f677962bdb0a44852",
+      "bytes": 9827
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-046/candidate/ASTOCK-046-c2c12945cbae/2026-10-03/source_rows/eastmoney/broken_limit_pool/source-rows.json",
+      "sha256": "1756a67fec7d43d3f41d5c0a6c8741d2ff437df11100518dc4d41190095a4209",
+      "bytes": 4422
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-046/candidate/ASTOCK-046-c2c12945cbae/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-046/candidate/ASTOCK-046-c2c12945cbae/_raw/bodies/b4bd1938d591fc3cffd09746e501ac3c9e8717c3bd7bfe7f39f78785a5e334b8.bin",
+      "sha256": "b4bd1938d591fc3cffd09746e501ac3c9e8717c3bd7bfe7f39f78785a5e334b8",
+      "bytes": 3380
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-046/candidate/ASTOCK-046-c2c12945cbae/_raw/manifest.ndjson",
+      "sha256": "386f5c595db13017a9dc6dead4fa3d048759bad50b963db66f35288a5f7da23e",
+      "bytes": 1709
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-046/comparison.json",
+      "sha256": "46d7aee6852f41ce75c366d4f6a3ea8d2dd1adb906ba369b1105107d32d38cb8",
+      "bytes": 2835
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-046/original/bodies/b4bd1938d591fc3cffd09746e501ac3c9e8717c3bd7bfe7f39f78785a5e334b8.bin",
+      "sha256": "b4bd1938d591fc3cffd09746e501ac3c9e8717c3bd7bfe7f39f78785a5e334b8",
+      "bytes": 3380
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-046/original/manifest.ndjson",
+      "sha256": "c219df69be45f68c65e39e2197739dc017b267f2daf21fca6d6f6b28d9aa0119",
+      "bytes": 1680
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-047/candidate/ASTOCK-047-ee4eab8ca69b/2026-10-03/input_report/eastmoney/limit_down_pool/report.json",
+      "sha256": "646e4c0ccfe5b92c690ceaf0c3235d2d4070ae3fdbfabe4a9ecdee930bb1d005",
+      "bytes": 9963
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-047/candidate/ASTOCK-047-ee4eab8ca69b/2026-10-03/limit_down_pool/eastmoney/limit_down_pool/mapped-rows.json",
+      "sha256": "f1b95ecc0c2c3a05304bf2aa0c70f4fa5c2cec76ac101e75bd6567c884e06ede",
+      "bytes": 4129
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-047/candidate/ASTOCK-047-ee4eab8ca69b/2026-10-03/source_rows/eastmoney/limit_down_pool/source-rows.json",
+      "sha256": "bf553bbc827648dd29e17747a2271967a943d1ed5e9a76919b66bba77b69023f",
+      "bytes": 3488
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-047/candidate/ASTOCK-047-ee4eab8ca69b/_raw/bodies/727be19798730115b50e9737b03070cdb6a0a21d996562390944f697554be8ad.bin",
+      "sha256": "727be19798730115b50e9737b03070cdb6a0a21d996562390944f697554be8ad",
+      "bytes": 3129
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-047/candidate/ASTOCK-047-ee4eab8ca69b/_raw/bodies/a4e93dfbb6aab53efa0722528f3c200bb03ed48477a73faf854cd1c72530557f.bin",
+      "sha256": "a4e93dfbb6aab53efa0722528f3c200bb03ed48477a73faf854cd1c72530557f",
+      "bytes": 2445
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-047/candidate/ASTOCK-047-ee4eab8ca69b/_raw/manifest.ndjson",
+      "sha256": "a1bb01833d48f2c44976bd9a2f4020662bf56c760497a62b3109f9e5f431aae1",
+      "bytes": 1709
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-047/comparison.json",
+      "sha256": "3410855ca053892065f9a91761fbcb0bd1903510df6c8b2126b5c5671891a750",
+      "bytes": 2885
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-047/original/bodies/a4e93dfbb6aab53efa0722528f3c200bb03ed48477a73faf854cd1c72530557f.bin",
+      "sha256": "a4e93dfbb6aab53efa0722528f3c200bb03ed48477a73faf854cd1c72530557f",
+      "bytes": 2445
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-047/original/manifest.ndjson",
+      "sha256": "064e0790eaff9e47448bf1d4f9d1a671347f8fc83cbca625e0f7df62f9078f56",
+      "bytes": 1682
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-048/candidate/ASTOCK-048-20504b891a16/2026-10-03/input_report/eastmoney/previous_limit_pool/report.json",
+      "sha256": "8ade492845b692323f051e9e44dd5e2b0d0c44eb5c5d9be3ee62d4f9739af6e8",
+      "bytes": 9918
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-048/candidate/ASTOCK-048-20504b891a16/2026-10-03/previous_limit_pool/eastmoney/previous_limit_pool/mapped-rows.json",
+      "sha256": "939bc7ba19957dd57dcf8395213f72481c36cb5fd96e37b8493d2863fff0c7b9",
+      "bytes": 27025
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-048/candidate/ASTOCK-048-20504b891a16/2026-10-03/source_rows/eastmoney/previous_limit_pool/source-rows.json",
+      "sha256": "d5c7a837fea19b21c35f23b6b36428b7d5aa0f702d9f5c71a9c25dcb77faf99c",
+      "bytes": 20917
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-048/candidate/ASTOCK-048-20504b891a16/_raw/bodies/b3d372354deeee842e9162f2bd56415dc2cbddf5c2f1cc31ec053d4c052f8793.bin",
+      "sha256": "b3d372354deeee842e9162f2bd56415dc2cbddf5c2f1cc31ec053d4c052f8793",
+      "bytes": 2173
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-048/candidate/ASTOCK-048-20504b891a16/_raw/bodies/d4f6ab36119677ee909f1444490a4ddf233bd69e53f497ba6392030d6253328e.bin",
+      "sha256": "d4f6ab36119677ee909f1444490a4ddf233bd69e53f497ba6392030d6253328e",
+      "bytes": 15536
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-048/candidate/ASTOCK-048-20504b891a16/_raw/manifest.ndjson",
+      "sha256": "0edfa20f426e28d6c9109e662b794dffcc9ff7cab359990b99404878072502ee",
+      "bytes": 1716
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-048/comparison.json",
+      "sha256": "0c28a266481aac65bf95d1b17e6cce13ad875cfd2aa44ac52ee4130c1fb4995d",
+      "bytes": 2851
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-048/original/bodies/d4f6ab36119677ee909f1444490a4ddf233bd69e53f497ba6392030d6253328e.bin",
+      "sha256": "d4f6ab36119677ee909f1444490a4ddf233bd69e53f497ba6392030d6253328e",
+      "bytes": 15536
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-048/original/manifest.ndjson",
+      "sha256": "f65ac9c161e5601d36affc83c8292ec3a19e8f4994d43d3a456f4f1d7285d7fc",
+      "bytes": 1689
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-050/candidate/ASTOCK-050-65cd38f98ab6/2026-10-03/input_report/eastmoney/strong_stock_pool/report.json",
+      "sha256": "a09d193102ec649b24682a8e1bfd43e26cfec8c32fe844170e25b5cdebb0078c",
+      "bytes": 9840
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-050/candidate/ASTOCK-050-65cd38f98ab6/2026-10-03/source_rows/eastmoney/strong_stock_pool/source-rows.json",
+      "sha256": "8be31e0cd564a28532436a5fee4688bbfaa756ab19d51e6b4884f5d8ae711ddc",
+      "bytes": 74386
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-050/candidate/ASTOCK-050-65cd38f98ab6/2026-10-03/strong_stock_pool/eastmoney/strong_stock_pool/mapped-rows.json",
+      "sha256": "f392cae98dea691aca40a813fb4351dfb9adec80abf9f8fb6f58714debb35aac",
+      "bytes": 91924
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-050/candidate/ASTOCK-050-65cd38f98ab6/_raw/bodies/4f9d16d10f9bfd7fd6a9ba0190b9ff362a62aa9dcdfc557a5b11cf5345bc51a8.bin",
+      "sha256": "4f9d16d10f9bfd7fd6a9ba0190b9ff362a62aa9dcdfc557a5b11cf5345bc51a8",
+      "bytes": 55074
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-050/candidate/ASTOCK-050-65cd38f98ab6/_raw/bodies/a4b314e673bf0ca546e89c8ba2c1a587c652d0c29bae36afc1c774a32d44700f.bin",
+      "sha256": "a4b314e673bf0ca546e89c8ba2c1a587c652d0c29bae36afc1c774a32d44700f",
+      "bytes": 3063
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-050/candidate/ASTOCK-050-65cd38f98ab6/_raw/manifest.ndjson",
+      "sha256": "57e33ce82dd86d3ea2e21e310e08bc72447766256df4c3c5ef736667d25b2936",
+      "bytes": 1712
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-050/comparison.json",
+      "sha256": "cb7f0cc7469928d42ecc26667a41e15d35f9c5f875c1973476d61b91746e9f43",
+      "bytes": 2857
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-050/original/bodies/4f9d16d10f9bfd7fd6a9ba0190b9ff362a62aa9dcdfc557a5b11cf5345bc51a8.bin",
+      "sha256": "4f9d16d10f9bfd7fd6a9ba0190b9ff362a62aa9dcdfc557a5b11cf5345bc51a8",
+      "bytes": 55074
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/ASTOCK-050/original/manifest.ndjson",
+      "sha256": "04fc7abec3dc04c6a8923755f56d6a8749e968eac135a5204449b2d9b35dec50",
+      "bytes": 1683
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/comparison.json",
+      "sha256": "22c624e3038c617fa46eb5a98130b0cafe708cf05fc0ebfaa04113f1def3f75b",
+      "bytes": 21433
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f1/fixture/bodies/eca16378a9c671c7dd582324edd78b576f173af2ea7972edd7bdd24addc5ba9c.bin",
+      "sha256": "eca16378a9c671c7dd582324edd78b576f173af2ea7972edd7bdd24addc5ba9c",
+      "bytes": 4088
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f1/fixture/manifest.ndjson",
+      "sha256": "f3b6a4e1f7f97e0ad59ec1a4450235fe1032ef0ddefbe7db6d530ee099a81c7a",
+      "bytes": 1043
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f1/out/ASTOCK-046-a7cfea0e603d/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "4a5543c301e106f16b56804e4cdadddb84335e9ed9a668752defe3cccd0c5b4d",
+      "bytes": 8293
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f1/out/ASTOCK-046-a7cfea0e603d/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f1/out/ASTOCK-046-a7cfea0e603d/_raw/bodies/eca16378a9c671c7dd582324edd78b576f173af2ea7972edd7bdd24addc5ba9c.bin",
+      "sha256": "eca16378a9c671c7dd582324edd78b576f173af2ea7972edd7bdd24addc5ba9c",
+      "bytes": 4088
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f1/out/ASTOCK-046-a7cfea0e603d/_raw/manifest.ndjson",
+      "sha256": "74bf1722e19243dae50691db4f8dc64fc5234343204aa9e6da5fe9d8e8c20b65",
+      "bytes": 1338
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f10/fixture/bodies/4e678f910495844e412da83637852af554de4593053bca3c4023dea4df211be2.bin",
+      "sha256": "4e678f910495844e412da83637852af554de4593053bca3c4023dea4df211be2",
+      "bytes": 4088
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f10/fixture/manifest.ndjson",
+      "sha256": "9d03c229d6a33656098c1de0edf3ed6437ded8e7e82ab551754bc12ef3851373",
+      "bytes": 1047
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f10/out/ASTOCK-046-13662d281ec8/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "f543f62f22ae8420e4d4617cb116edd02e2b6565799c88602cf7e7df134f8c7e",
+      "bytes": 8292
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f10/out/ASTOCK-046-13662d281ec8/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f10/out/ASTOCK-046-13662d281ec8/_raw/bodies/4e678f910495844e412da83637852af554de4593053bca3c4023dea4df211be2.bin",
+      "sha256": "4e678f910495844e412da83637852af554de4593053bca3c4023dea4df211be2",
+      "bytes": 4088
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f10/out/ASTOCK-046-13662d281ec8/_raw/manifest.ndjson",
+      "sha256": "218b0296db1b5d61b1c80c2cf7b20194779c21176c35abd96af2ebe25a098a96",
+      "bytes": 1339
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f11/fixture/bodies/95e4066e1cf49427398eebf870d23fb8f209c2f6d4ce52baf2866c664eece449.bin",
+      "sha256": "95e4066e1cf49427398eebf870d23fb8f209c2f6d4ce52baf2866c664eece449",
+      "bytes": 18
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f11/fixture/manifest.ndjson",
+      "sha256": "a0afb74baff0ff72e6477319df4a9849b2d694a9010c361f7cec0ba5d882de83",
+      "bytes": 1041
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f11/out/ASTOCK-046-eeaee4a11f19/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "57c414429f19087120da1f472d7a5839d49fd8419a5ff3dd207109f078f1ca93",
+      "bytes": 8313
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f11/out/ASTOCK-046-eeaee4a11f19/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f11/out/ASTOCK-046-eeaee4a11f19/_raw/bodies/95e4066e1cf49427398eebf870d23fb8f209c2f6d4ce52baf2866c664eece449.bin",
+      "sha256": "95e4066e1cf49427398eebf870d23fb8f209c2f6d4ce52baf2866c664eece449",
+      "bytes": 18
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f11/out/ASTOCK-046-eeaee4a11f19/_raw/manifest.ndjson",
+      "sha256": "eaf475404f7bc012b206cc01c8bb3c6fb35a3dc9abba07cf7c6b4a95218bda2d",
+      "bytes": 1337
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f12/fixture/bodies/4e678f910495844e412da83637852af554de4593053bca3c4023dea4df211be2.bin",
+      "sha256": "4e678f910495844e412da83637852af554de4593053bca3c4023dea4df211be2",
+      "bytes": 4088
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f12/fixture/manifest.ndjson",
+      "sha256": "b6b8146255f4a3a34a40364da21f105be1c46cce4ee048f988700465ad4d67ff",
+      "bytes": 1088
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f12/out/ASTOCK-046-1562f5acba59/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "4c4da448eff581c70619188072f03bb0e3b572dc60efd353f205c4c5e15be44c",
+      "bytes": 7889
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f12/out/ASTOCK-046-1562f5acba59/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f12/out/ASTOCK-046-1562f5acba59/_raw/manifest.ndjson",
+      "sha256": "2c06fb5466a824035a25e48d4a4764070b3142a0b4d6263d00fb3c5ba3299903",
+      "bytes": 914
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f2/fixture/bodies/761d2ff3ad3150e63f094e61a9f990c6866d79bb05cf1b1ec9ed2e00c8c92f73.bin",
+      "sha256": "761d2ff3ad3150e63f094e61a9f990c6866d79bb05cf1b1ec9ed2e00c8c92f73",
+      "bytes": 4088
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f2/fixture/manifest.ndjson",
+      "sha256": "c9a3d164dacfaf0e14dc2425f3e9474c6ea9945d6cfcea9df0f350bebb811634",
+      "bytes": 1044
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f2/out/ASTOCK-046-329a490dca51/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "4057baace7180c7d5a81049a48e42d39f8c4b06e59517cc327fc4422ab6cf4d2",
+      "bytes": 8288
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f2/out/ASTOCK-046-329a490dca51/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f2/out/ASTOCK-046-329a490dca51/_raw/bodies/761d2ff3ad3150e63f094e61a9f990c6866d79bb05cf1b1ec9ed2e00c8c92f73.bin",
+      "sha256": "761d2ff3ad3150e63f094e61a9f990c6866d79bb05cf1b1ec9ed2e00c8c92f73",
+      "bytes": 4088
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f2/out/ASTOCK-046-329a490dca51/_raw/manifest.ndjson",
+      "sha256": "9c2edf97e7073aecfcc02c89fbc7b6de67c0577661664d32516a97f1abed5c2f",
+      "bytes": 1338
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f3/fixture/bodies/34beb94058d3dcb48cd52249111eca8d8af2bb36c25e40cd6087e2faa105f327.bin",
+      "sha256": "34beb94058d3dcb48cd52249111eca8d8af2bb36c25e40cd6087e2faa105f327",
+      "bytes": 4088
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f3/fixture/manifest.ndjson",
+      "sha256": "89335a69f0e3e5743c616ec141795db1a65927e0459740ddee68af18a08fa1f1",
+      "bytes": 1048
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f3/out/ASTOCK-046-c5f176b1a564/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "38e383777bb30a14added37a3bd1f768d4e7fe63414bb47d4ecfc674d23a702a",
+      "bytes": 9147
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f3/out/ASTOCK-046-c5f176b1a564/2026-10-03/source_rows/eastmoney/broken_limit_pool/source-rows.json",
+      "sha256": "a525aeb65ea1f8627c5993ee24e8408775ad0563e83afbf5bc448dcb17c1f412",
+      "bytes": 4422
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f3/out/ASTOCK-046-c5f176b1a564/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f3/out/ASTOCK-046-c5f176b1a564/_raw/bodies/34beb94058d3dcb48cd52249111eca8d8af2bb36c25e40cd6087e2faa105f327.bin",
+      "sha256": "34beb94058d3dcb48cd52249111eca8d8af2bb36c25e40cd6087e2faa105f327",
+      "bytes": 4088
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f3/out/ASTOCK-046-c5f176b1a564/_raw/manifest.ndjson",
+      "sha256": "62af2059224f68d23e9bf7a7abed558a5074b897bb3d205902673a708cb33cff",
+      "bytes": 1338
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f4/fixture/bodies/7506255c2313552623aa325bbcb172e2eba48732e295afcfb3f05bdcb827c3b8.bin",
+      "sha256": "7506255c2313552623aa325bbcb172e2eba48732e295afcfb3f05bdcb827c3b8",
+      "bytes": 4085
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f4/fixture/manifest.ndjson",
+      "sha256": "150d1fae06196d102b7f49e3806cb86c96df6338f793210a64e87bf542535b51",
+      "bytes": 1043
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f4/out/ASTOCK-046-7fd4e6c44c58/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "4849ab282b3f32710e31818d5831d8b85acb1a91c70eba28060af4adce80934b",
+      "bytes": 8293
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f4/out/ASTOCK-046-7fd4e6c44c58/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f4/out/ASTOCK-046-7fd4e6c44c58/_raw/bodies/7506255c2313552623aa325bbcb172e2eba48732e295afcfb3f05bdcb827c3b8.bin",
+      "sha256": "7506255c2313552623aa325bbcb172e2eba48732e295afcfb3f05bdcb827c3b8",
+      "bytes": 4085
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f4/out/ASTOCK-046-7fd4e6c44c58/_raw/manifest.ndjson",
+      "sha256": "1a8531da76be74f753b999cdc9fa97abb6aff5fb15b3033aa0347c0a566c392e",
+      "bytes": 1338
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f5/fixture/bodies/e0382fa10fe23364e1059ac4ef6fcfb867ac6e4473c73a510d0d0e44d7534d6d.bin",
+      "sha256": "e0382fa10fe23364e1059ac4ef6fcfb867ac6e4473c73a510d0d0e44d7534d6d",
+      "bytes": 4087
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f5/fixture/manifest.ndjson",
+      "sha256": "e62aedd8e365de1878b130dc36b195a184f5ef20b9a25eacee61f29128d4b592",
+      "bytes": 1046
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f5/out/ASTOCK-046-7ceeee3a58fa/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "fe19f8b8d6e32addc216a18c95cfbb9f3d8f4a0d6825033876aa273cabd9d1b2",
+      "bytes": 9159
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f5/out/ASTOCK-046-7ceeee3a58fa/2026-10-03/source_rows/eastmoney/broken_limit_pool/source-rows.json",
+      "sha256": "8b0df54289fcfe0a69035831f0d9a0262bb7d8de8ba748115e854d30a270115e",
+      "bytes": 4421
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f5/out/ASTOCK-046-7ceeee3a58fa/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f5/out/ASTOCK-046-7ceeee3a58fa/_raw/bodies/e0382fa10fe23364e1059ac4ef6fcfb867ac6e4473c73a510d0d0e44d7534d6d.bin",
+      "sha256": "e0382fa10fe23364e1059ac4ef6fcfb867ac6e4473c73a510d0d0e44d7534d6d",
+      "bytes": 4087
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f5/out/ASTOCK-046-7ceeee3a58fa/_raw/manifest.ndjson",
+      "sha256": "9e9f5390ee17540cf25002e8049f3e66b613e0437975f61ccc6ab6f86d92b866",
+      "bytes": 1338
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f6/fixture/bodies/12ac43ba7d01e221e040f0b8c68b6e3cd5f2a94877a9024691d0b5ee9af6d850.bin",
+      "sha256": "12ac43ba7d01e221e040f0b8c68b6e3cd5f2a94877a9024691d0b5ee9af6d850",
+      "bytes": 4084
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f6/fixture/manifest.ndjson",
+      "sha256": "bbd922c39bdb08d51e889accd465a2affe186f09f32dd867e3840936ec3255c5",
+      "bytes": 1043
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f6/out/ASTOCK-046-858492e33344/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "857963c66383bb231fb4cd00632c83791f5222caeaf6f77d511f5969ddf88f8f",
+      "bytes": 9143
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f6/out/ASTOCK-046-858492e33344/2026-10-03/source_rows/eastmoney/broken_limit_pool/source-rows.json",
+      "sha256": "4f596318cce370a759e57389156f6aeda36c2947cae1e7568e7a193b6a0e8638",
+      "bytes": 4420
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f6/out/ASTOCK-046-858492e33344/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f6/out/ASTOCK-046-858492e33344/_raw/bodies/12ac43ba7d01e221e040f0b8c68b6e3cd5f2a94877a9024691d0b5ee9af6d850.bin",
+      "sha256": "12ac43ba7d01e221e040f0b8c68b6e3cd5f2a94877a9024691d0b5ee9af6d850",
+      "bytes": 4084
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f6/out/ASTOCK-046-858492e33344/_raw/manifest.ndjson",
+      "sha256": "dcf90b2c12695b679f97cc576b21a688808c6ec8b15a0574ccb218e69cd07f4c",
+      "bytes": 1338
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f7/fixture/bodies/ac23469fb03cf9b1c31e0564b796887f7bbf646e6d9e860c2698abdcdecffb61.bin",
+      "sha256": "ac23469fb03cf9b1c31e0564b796887f7bbf646e6d9e860c2698abdcdecffb61",
+      "bytes": 4088
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f7/fixture/manifest.ndjson",
+      "sha256": "3ac0863209904dcb063bf44fe76fa11f0ce92b4d26f0a9cacac65ba70f273374",
+      "bytes": 1047
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f7/out/ASTOCK-046-146873658ebf/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "a485f71509e63f9c08304426a5d803b6d6b56c5a74b2b7461d69378ef7580f7e",
+      "bytes": 8293
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f7/out/ASTOCK-046-146873658ebf/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f7/out/ASTOCK-046-146873658ebf/_raw/bodies/ac23469fb03cf9b1c31e0564b796887f7bbf646e6d9e860c2698abdcdecffb61.bin",
+      "sha256": "ac23469fb03cf9b1c31e0564b796887f7bbf646e6d9e860c2698abdcdecffb61",
+      "bytes": 4088
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f7/out/ASTOCK-046-146873658ebf/_raw/manifest.ndjson",
+      "sha256": "c150efd36d8fe3846b5f906397a3256feeaf0f33367b39ed1540698b397d9a8d",
+      "bytes": 1338
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f8/fixture/bodies/c484443c5587e7deb97ff168dfa54e203ceedf89906987adff226b2d7529884c.bin",
+      "sha256": "c484443c5587e7deb97ff168dfa54e203ceedf89906987adff226b2d7529884c",
+      "bytes": 108
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f8/fixture/manifest.ndjson",
+      "sha256": "2352835c2c482260150b2b290ce50961e7eec24baffc6a191cb6d71d0ba652ca",
+      "bytes": 1043
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f8/out/ASTOCK-046-86da077aa28e/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "8ba99563284d1d9654cbd26e12cf71249d12dc5872db3ade39ee5b05490cba93",
+      "bytes": 8293
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f8/out/ASTOCK-046-86da077aa28e/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f8/out/ASTOCK-046-86da077aa28e/_raw/bodies/c484443c5587e7deb97ff168dfa54e203ceedf89906987adff226b2d7529884c.bin",
+      "sha256": "c484443c5587e7deb97ff168dfa54e203ceedf89906987adff226b2d7529884c",
+      "bytes": 108
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f8/out/ASTOCK-046-86da077aa28e/_raw/manifest.ndjson",
+      "sha256": "465ca48a42c4d8e0188f735768ec3f9a5212ef4867aea1195f60e4b0a725db5e",
+      "bytes": 1337
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f9/fixture/bodies/14000f40f9989e64a28fe1e21e85487fa91a98a567cca3e1b3cafb2f0824ebde.bin",
+      "sha256": "14000f40f9989e64a28fe1e21e85487fa91a98a567cca3e1b3cafb2f0824ebde",
+      "bytes": 72
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f9/fixture/manifest.ndjson",
+      "sha256": "12313c21a857373cbd39b1d500ff69a41ce2dea186342477d9a0fa7771ce591a",
+      "bytes": 1041
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f9/out/ASTOCK-046-1e9c00c55f5a/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "acbbc84dc9846eec12e907a8a414a6d23e58de04f376a91424897c57f57f1fb0",
+      "bytes": 8292
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f9/out/ASTOCK-046-1e9c00c55f5a/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f9/out/ASTOCK-046-1e9c00c55f5a/_raw/bodies/14000f40f9989e64a28fe1e21e85487fa91a98a567cca3e1b3cafb2f0824ebde.bin",
+      "sha256": "14000f40f9989e64a28fe1e21e85487fa91a98a567cca3e1b3cafb2f0824ebde",
+      "bytes": 72
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/f9/out/ASTOCK-046-1e9c00c55f5a/_raw/manifest.ndjson",
+      "sha256": "8a3bd79590002c133f83b7a9a1790c252d49ff3e3fa14510c1cd4af2e67eb095",
+      "bytes": 1336
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/legacy/legacy-comparison.json",
+      "sha256": "65245e5aa90eb8ba2e9f4e1be30c0725f9b1a8937c84a8ff16acbb2371cebb4e",
+      "bytes": 205
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/legacy/original/bodies/2f8fd55e9dc60e46c707fec37e3bf6b3fdad4dfb0967217061f533add6acaed7.bin",
+      "sha256": "2f8fd55e9dc60e46c707fec37e3bf6b3fdad4dfb0967217061f533add6acaed7",
+      "bytes": 13765
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/legacy/original/manifest.ndjson",
+      "sha256": "fd5b6070c1146b139a85d0ef23eb4352e36306d5b16d4a4ce2711e95617e947d",
+      "bytes": 1687
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/legacy/provider/bodies/2f8fd55e9dc60e46c707fec37e3bf6b3fdad4dfb0967217061f533add6acaed7.bin",
+      "sha256": "2f8fd55e9dc60e46c707fec37e3bf6b3fdad4dfb0967217061f533add6acaed7",
+      "bytes": 13765
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/legacy/provider/manifest.ndjson",
+      "sha256": "00cb17ab5fee0ae478990a16c2e58e6cb9c08920d145a40e390713a5832112b3",
+      "bytes": 1687
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/session/out/ASTOCK-046-a0693e8378d4/2026-10-03/broken_limit_pool/eastmoney/broken_limit_pool/mapped-rows.json",
+      "sha256": "058409027dd43488971cf14f51b08fd8e15ec5bdd304ef5a276f813d0da25b97",
+      "bytes": 5378
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/session/out/ASTOCK-046-a0693e8378d4/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "b2208c9ac9cd0a30c3a1ed3363e2f61aee8367e15398ff196907e398deb5e5eb",
+      "bytes": 9471
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/session/out/ASTOCK-046-a0693e8378d4/2026-10-03/source_rows/eastmoney/broken_limit_pool/source-rows.json",
+      "sha256": "1756a67fec7d43d3f41d5c0a6c8741d2ff437df11100518dc4d41190095a4209",
+      "bytes": 4422
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/session/out/ASTOCK-046-a0693e8378d4/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/session/out/ASTOCK-046-a0693e8378d4/_raw/bodies/b4bd1938d591fc3cffd09746e501ac3c9e8717c3bd7bfe7f39f78785a5e334b8.bin",
+      "sha256": "b4bd1938d591fc3cffd09746e501ac3c9e8717c3bd7bfe7f39f78785a5e334b8",
+      "bytes": 3380
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/session/out/ASTOCK-046-a0693e8378d4/_raw/manifest.ndjson",
+      "sha256": "45b46d76cb50649ffb11d285496773e5858107d7951e2c0debb0d1db6ce4acff",
+      "bytes": 1437
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/session/out/ASTOCK-046-f518cb0957a5/2026-10-03/broken_limit_pool/eastmoney/broken_limit_pool/mapped-rows.json",
+      "sha256": "058409027dd43488971cf14f51b08fd8e15ec5bdd304ef5a276f813d0da25b97",
+      "bytes": 5378
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/session/out/ASTOCK-046-f518cb0957a5/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "e2af4e760a92782f42922d55eb4e3ae54de66780147ddda458cbbf57a2249b78",
+      "bytes": 9171
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/session/out/ASTOCK-046-f518cb0957a5/2026-10-03/source_rows/eastmoney/broken_limit_pool/source-rows.json",
+      "sha256": "1756a67fec7d43d3f41d5c0a6c8741d2ff437df11100518dc4d41190095a4209",
+      "bytes": 4422
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/session/out/ASTOCK-046-f518cb0957a5/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/session/out/ASTOCK-046-f518cb0957a5/_raw/bodies/b4bd1938d591fc3cffd09746e501ac3c9e8717c3bd7bfe7f39f78785a5e334b8.bin",
+      "sha256": "b4bd1938d591fc3cffd09746e501ac3c9e8717c3bd7bfe7f39f78785a5e334b8",
+      "bytes": 3380
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/session/out/ASTOCK-046-f518cb0957a5/_raw/manifest.ndjson",
+      "sha256": "2d4ba8164fac6791c52f315f5befd4290a2bf67ae843c9ef9c70c6ccd0e8cf59",
+      "bytes": 1132
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/session/session-comparison.json",
+      "sha256": "f0292eaaf9e98a78875dbd16f7ce775d2f9a8004a60288732301a406334dfe53",
+      "bytes": 664
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/verify.py",
+      "sha256": "dde5a8ac2054c39ace7605c8ab808e07214c6aca69e3ab3de4690f66d5763877",
+      "bytes": 8666
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/capabilities.yaml",
+      "sha256": "7b7ce0da1d33b333165c6081a3ed788f85cb05d5f6945c745eec97d73e24f6e2",
+      "bytes": 4009
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/collection.yaml",
+      "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d",
+      "bytes": 2934
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/datasets/board_fund_flow.yaml",
+      "sha256": "08f3566d0cf2787186e6106e4915d0d89b70232d737898480eda03785ea3c53a",
+      "bytes": 1110
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/datasets/broken_limit_pool.yaml",
+      "sha256": "60b3790eae896c968093c8d26a818c9dab325aca620510b4ec1dde061af7f65e",
+      "bytes": 1162
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/datasets/concept_board.yaml",
+      "sha256": "eef0b07c9a41bfd5ef1a52f4f39516cb26d42b088d63a15783af0f94985fd76f",
+      "bytes": 379
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/datasets/daily_bar.yaml",
+      "sha256": "0a8c1dcae7e1c062ae70c224defc1362adc1d58bc196bbeb2f1edd61d6fd39e7",
+      "bytes": 995
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/datasets/dividend_event.yaml",
+      "sha256": "67a2b02063cb9a891e3fb388048407cbc08b05ce8ae97deea6976d3904340d2e",
+      "bytes": 759
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/datasets/financial_main.yaml",
+      "sha256": "23d8b55356620439d5c1b507601b782b31aa965fe24eaf194e869466bb271ab0",
+      "bytes": 766
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/datasets/industry_board.yaml",
+      "sha256": "c6930c70b55e171dee94b74b80f3c37df1466d4a10dadc3016975004b8b47ba4",
+      "bytes": 380
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/datasets/industry_directory.yaml",
+      "sha256": "9325d485bf7a1bc2b075c2d920b43b17caa039916536bedd8163be0f972bfe5b",
+      "bytes": 346
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/datasets/industry_index_daily.yaml",
+      "sha256": "5d542c72443410747f2ac643589bfd8160cdea07d01d6d0dd9c5e4753096043b",
+      "bytes": 676
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/datasets/industry_membership.yaml",
+      "sha256": "dff512c9b7f00330bbe408ba1e1eb74d99b49bc0b38ee419d4c463047c6fe69d",
+      "bytes": 709
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/datasets/intraday_trend.yaml",
+      "sha256": "5983e0eb29c1cd7a781fbad0be7332dda14e887ccd744e55ad4b8664c7a0c38a",
+      "bytes": 665
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/datasets/limit_down_pool.yaml",
+      "sha256": "67b3ca1ae9edf0f863d2b2d5257a315fe721f042086d4b5966653c0f2758d806",
+      "bytes": 1177
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/datasets/limit_up_pool.yaml",
+      "sha256": "73c1fa4ed6d7281d1857208a2ec9696a3637214bb256661ce943313c75772a69",
+      "bytes": 982
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/datasets/minute_bar_5m.yaml",
+      "sha256": "fb6f822ed42479422a0b4c227577d8e559bb6b2238562af566af0464304bd873",
+      "bytes": 708
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/datasets/previous_limit_pool.yaml",
+      "sha256": "5234397a7b87ed3e03c11431de1f00c012e135ba5ef57bf63a2f431f659703bc",
+      "bytes": 1199
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/datasets/realtime_quote.yaml",
+      "sha256": "ebc3e97bb7469eb4c7c80daf50991ebe38f0eb5b2476a9a579d22236d416378b",
+      "bytes": 1121
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/datasets/security_snapshot.yaml",
+      "sha256": "255115893f64837a3b95ea9fe44551948eefa9604aca9d59214de87a580300be",
+      "bytes": 519
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/datasets/shareholder_count.yaml",
+      "sha256": "d325df1784c873bea73a1d907e9964e06c26e4d6b356dd6c16148837b57feccf",
+      "bytes": 923
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/datasets/stock_fund_flow.yaml",
+      "sha256": "df3f21341463f3538a1f855ef19b7bbdb683405aaa65d5418c255023c18a429f",
+      "bytes": 736
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/datasets/strong_stock_pool.yaml",
+      "sha256": "264c9d759405d37733cf4daf29996240cb46fed46c3eb8835405a4311e1c1131",
+      "bytes": 1194
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/datasets/trading_calendar.yaml",
+      "sha256": "924b17a5be104252e85a377e4579432c6725bab99cbaa0ad70e71102149a1f49",
+      "bytes": 192
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/datasets.yaml",
+      "sha256": "e992d13297e1f9a8f64acabc25f65f138b21ce12dca16689cc3f17bf1385a6eb",
+      "bytes": 587
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/normalization/board_fund_flow.yaml",
+      "sha256": "fb7c6f1f2d425181b189e25152e465306982e10c7c6ee06b2917dfa00b891baa",
+      "bytes": 1395
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/normalization/broken_limit_pool.yaml",
+      "sha256": "48fdbb51e57c40d0129d67caf7fbac0df67f34483380cf555535803338e73903",
+      "bytes": 1277
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/normalization/concept_board.yaml",
+      "sha256": "2b7e7f57d189541d6a232cd5391d2dab4289f9f3438f397d9fefd82bb1d996b7",
+      "bytes": 206
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/normalization/daily_bar.yaml",
+      "sha256": "41f9bbd0824e20d70f7ed276758b286094c33c79180befca4d8985afc3c8ad0b",
+      "bytes": 2913
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/normalization/dividend_event.yaml",
+      "sha256": "188df2f7f075b92e993136aef3f977eea419f9c6957404bd2f7071c76ed24a71",
+      "bytes": 1532
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/normalization/financial_main.yaml",
+      "sha256": "eeeb2e7418aab430168f0c7e16c69f1b24a9e49ec8d156a28390cae0e7a69bda",
+      "bytes": 603
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/normalization/industry_board.yaml",
+      "sha256": "f3ff8bbe7fc4e8d4e5af1c36b9312e8db1c8c9cb09a09aadb472b22ae09de152",
+      "bytes": 210
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/normalization/industry_directory.yaml",
+      "sha256": "823d97db8afe4adb3f963faaa04b42b8f151e93f2e75f3eb18f8c678a68bae37",
+      "bytes": 478
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/normalization/industry_index_daily.yaml",
+      "sha256": "953087294fd2c3a3cb1b46f204d0a0f606f9060f0f89676fb3a189222a68dab1",
+      "bytes": 805
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/normalization/industry_membership.yaml",
+      "sha256": "7eb72a1b8ce7aff27aa1ad62534af2bf7183f3d78c6392208035396a11e21ccb",
+      "bytes": 765
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/normalization/intraday_trend.yaml",
+      "sha256": "14b0b22ad1308c70b65152e711c4248d3c8bf1c28d842fba36309194ed38870a",
+      "bytes": 440
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/normalization/limit_down_pool.yaml",
+      "sha256": "456b0a779929bb6ff71ed70e07cd420d42596068f142879926b86972e3704f7b",
+      "bytes": 1314
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/normalization/limit_up_pool.yaml",
+      "sha256": "411e6e6ead10a4d2cbff7ecf4de9bee26f411a66d005a33bc640865ef4b6e7ba",
+      "bytes": 1079
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/normalization/minute_bar_5m.yaml",
+      "sha256": "f3e9abaededc01a15c651a99a22131a80067133deb89548dd12b17278e0e55b7",
+      "bytes": 1134
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/normalization/previous_limit_pool.yaml",
+      "sha256": "4c14b9ad1f0497e2d6f13a72978f1ddda74039b7c0d182c5a5a98ac01a678443",
+      "bytes": 1276
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/normalization/realtime_quote.yaml",
+      "sha256": "e9141547fbb85cb71c8e2336c20a2ebc948e3926f4b2a09e4f59505adea91b94",
+      "bytes": 1308
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/normalization/security_snapshot.yaml",
+      "sha256": "474ab0397cb1aad33abcd070942586a8460c468b1d3f7af97c2d152eee5a6537",
+      "bytes": 621
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/normalization/shareholder_count.yaml",
+      "sha256": "f8801367f055e0b1d419e648c9bd3e1d72984ffe2823c2d464770403c1b7c9e4",
+      "bytes": 1702
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/normalization/stock_fund_flow.yaml",
+      "sha256": "3d99bacf48ba3438c90d2d544f7223ffcb0a464f69f95841affe3e99a503bbe1",
+      "bytes": 1741
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/normalization/strong_stock_pool.yaml",
+      "sha256": "41733f419a6dd9d3a25edf361294a973df76d878d01bbf46b9f25f53a38f2304",
+      "bytes": 1234
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/normalization/trading_calendar.yaml",
+      "sha256": "4be7571914129769aeca321d892b8aa2fbd068db1c7c0b691ae0d5cefe7f69e0",
+      "bytes": 476
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/providers.yaml",
+      "sha256": "23f06aa0a71ad9aaaf7f24b40daa2efabdc38b1c71a1b8b98f80d6150afb605f",
+      "bytes": 74630
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/config/schedules.yaml",
+      "sha256": "01b7e269ea4231024bf1c520f78fa571c2909986aad5573006bd80e186119113",
+      "bytes": 525
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/out/ASTOCK-046-34c212c12ef3/2026-10-03/broken_limit_pool/eastmoney/broken_limit_pool/mapped-rows.json",
+      "sha256": "4e206fca25a2a38b286da28734ae8c3e4a60bfe7fb2141863f37919655f2cd61",
+      "bytes": 3894
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/out/ASTOCK-046-34c212c12ef3/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "6ad50fb22665fc0f205104c7eb41199db22b2da160efda813c0bce3949e955d8",
+      "bytes": 9743
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/out/ASTOCK-046-34c212c12ef3/2026-10-03/source_rows/eastmoney/broken_limit_pool/source-rows.json",
+      "sha256": "1756a67fec7d43d3f41d5c0a6c8741d2ff437df11100518dc4d41190095a4209",
+      "bytes": 4422
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/out/ASTOCK-046-34c212c12ef3/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/out/ASTOCK-046-34c212c12ef3/_raw/bodies/b4bd1938d591fc3cffd09746e501ac3c9e8717c3bd7bfe7f39f78785a5e334b8.bin",
+      "sha256": "b4bd1938d591fc3cffd09746e501ac3c9e8717c3bd7bfe7f39f78785a5e334b8",
+      "bytes": 3380
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/out/ASTOCK-046-34c212c12ef3/_raw/manifest.ndjson",
+      "sha256": "cc80e67975d552d2e9cbc425afd4d8bf3b7cc06c86ae4e400b3ae65e17fbccd9",
+      "bytes": 1709
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/out/ASTOCK-046-e3c252431053/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "sha256": "95b2eaec8c015eea3a7ca078a194f49f79d8f5713c129b79efd1f3fad7233c61",
+      "bytes": 7147
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004/y/out/ASTOCK-046-e3c252431053/_raw/bodies/0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32.bin",
+      "sha256": "0dd3d68f9be532f3e6bbf83ee80b989c3f75d1527b8eef0c8e078e16325bcb32",
+      "bytes": 2396
+    },
+    {
+      "path": "provider_validation/results/pools-final-20261004-tests.xml",
+      "sha256": "1f096f6816e025c26642cf523cddc5f519183a02264babac1885d004e5a57e25",
+      "bytes": 43501
+    },
+    {
+      "path": "provider_validation/results/pools-original-20261004/1-limit_pool.py.bin",
+      "sha256": "4662fdfb95bd01a7d5657816ea1d9d974c8778b0f1b862787075aa56cfd10aef",
+      "bytes": 1184
+    },
+    {
+      "path": "provider_validation/results/pools-original-20261004/2-inputs.py.bin",
+      "sha256": "88f2641ff4b3c49c3773875ab0794b701dc35181929879e2d2206bc469270db1",
+      "bytes": 37338
+    },
+    {
+      "path": "provider_validation/results/pools-original-20261004/3-factory.py.bin",
+      "sha256": "b12059360c1bdde6033d46f96cc0ebb203f5456b015d9f2aa31408e6c30c027a",
+      "bytes": 19699
+    },
+    {
+      "path": "provider_validation/results/pools-original-20261004/4-providers.yaml.bin",
+      "sha256": "48e663776fd6b416367de1b0ceac38fea8e128e1b6261c71f71a24ad26f00ba2",
+      "bytes": 73751
+    },
+    {
+      "path": "provider_validation/results/pools-original-20261004/5-board_fund_flow.yaml.bin",
+      "sha256": "fb7c6f1f2d425181b189e25152e465306982e10c7c6ee06b2917dfa00b891baa",
+      "bytes": 1395
+    },
+    {
+      "path": "provider_validation/results/pools-original-20261004/6-test_input_collection.py.bin",
+      "sha256": "628d4064cc054760efc5b7e7198c34ba2019da2403707884ac7cef69c921dea1",
+      "bytes": 82138
+    },
+    {
+      "path": "provider_validation/results/pools-original-20261004/7-replay_input_capabilities.py.bin",
+      "sha256": "4e5c638fcdbee90b079787b0709d0b3e2d062138da38268ea0928920350cfe8d",
+      "bytes": 24782
+    },
+    {
+      "path": "provider_validation/results/pools-original-20261004/ASTOCK-023-sdk.py.bin",
+      "sha256": "b7425e018c31d9bde9269886169ab922bd4a71e5e5dc2527621f3c0993caabdb",
+      "bytes": 4373
+    },
+    {
+      "path": "provider_validation/results/pools-original-20261004/ASTOCK-046-sdk.py.bin",
+      "sha256": "96967820fce70b5cad84d0f68bad48cb1934ee661face8ba2b4027d42716e409",
+      "bytes": 2418
+    },
+    {
+      "path": "provider_validation/results/pools-original-20261004/ASTOCK-047-sdk.py.bin",
+      "sha256": "a49bcead2a59b83638956220364436a24246bca36d9ae12d34bf74221e97c6da",
+      "bytes": 3151
+    },
+    {
+      "path": "provider_validation/results/pools-original-20261004/ASTOCK-048-sdk.py.bin",
+      "sha256": "6450d8da7e2a690ae293983e471ce64261a57ee4765942be074c04d9b2f10f4e",
+      "bytes": 2195
+    },
+    {
+      "path": "provider_validation/results/pools-original-20261004/ASTOCK-050-sdk.py.bin",
+      "sha256": "656b65ab1e963ffe6ecde7246be4ca09c8ba41793f0d674a06090efc2e4c9fa5",
+      "bytes": 3085
+    },
+    {
+      "path": "provider_validation/results/pools-original-20261004/manifest.json",
+      "sha256": "813f1336146a640b20e4dffd14f98d7e883fbb5c111c0796c42671bfe78d771e",
+      "bytes": 24982
+    },
+    {
+      "path": "provider_validation/results/pools-original-20261004/sdk-source-manifest.json",
+      "sha256": "ec13aaa4f8cdc8af04836e1fe1b0c1851d81eb566e60669c6028aa8c1495926e",
+      "bytes": 1523
+    },
+    {
+      "path": "provider_validation/tests/replay_input_capabilities.py",
+      "sha256": "129d5e566e25b5c3083d8dcdd66e6f47a44a54bd35d2b6fed8b02b855437aebd",
+      "bytes": 27102
+    },
+    {
+      "path": "src/stock_data_manage/cli.py",
+      "sha256": "582f5caedfc538a012d7a2f6e8cd7af3fe8b6fc9152e5b9e0a3fa2cb8810ae19",
+      "bytes": 14323
+    },
+    {
+      "path": "src/stock_data_manage/config/loader.py",
+      "sha256": "93bb55ab150c88751fe9a58a2b75737878c1b0f07233b8ec47009c4901bb11e9",
+      "bytes": 26090
+    },
+    {
+      "path": "src/stock_data_manage/pipeline/inputs.py",
+      "sha256": "9802f0083ea315558d0cc24871051f7249fbf927085fb98fac9565897b73f16e",
+      "bytes": 38828
+    },
+    {
+      "path": "src/stock_data_manage/providers/akshare/boards.py",
+      "sha256": "2060f150831cebaf707ed5becedc35428bc41d4428bab31555ed1d2bf817d122",
+      "bytes": 12416
+    },
+    {
+      "path": "src/stock_data_manage/providers/baostock/industry.py",
+      "sha256": "16c41b379eecbd87f082bd042e27fad7f3d8d77b5bfc6a3e8a286209b068494a",
+      "bytes": 10837
+    },
+    {
+      "path": "src/stock_data_manage/providers/baostock/session.py",
+      "sha256": "70ce19cdde1d6a8ed0c3d3db29caa28d1d8069826136ab6dd7fb6a2ef8c7b832",
+      "bytes": 15771
+    },
+    {
+      "path": "src/stock_data_manage/providers/contracts.py",
+      "sha256": "a4b16abc7e3686a4eb2791dcd4545fb2404e0214bf32e20db19d2582d39ea447",
+      "bytes": 5153
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/dividend.py",
+      "sha256": "5706a8cdb37eeeb8f66cb033a3091dd1b6ec1ed83d72d0f9fbeb8f5c75d9649b",
+      "bytes": 6407
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/fund_flow.py",
+      "sha256": "0cf655efa0854d18651bb4f04f985f0f210b81a6d9eff065604d235ed8f75280",
+      "bytes": 5046
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/limit_pool.py",
+      "sha256": "2fbdfe3da3129545dfe8d2e457be7c42225696ddd74270567ae765e4b413f5ae",
+      "bytes": 5663
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/realtime.py",
+      "sha256": "6e09d2a5014cf316c4d1e26e913a44d5c2fbad95fb44d95cba159ef881f03bca",
+      "bytes": 16746
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/shareholder.py",
+      "sha256": "4c9d80f4d51845ac5541c42275f44f2a18643db5e9ccb705a3e16168f8db44c1",
+      "bytes": 4865
+    },
+    {
+      "path": "src/stock_data_manage/providers/sina/calendar.py",
+      "sha256": "3d114045f960bfcc94ade1ee03e4d25ebdf6980ba68aa2d0a2236bed78aaef05",
+      "bytes": 1388
+    },
+    {
+      "path": "src/stock_data_manage/providers/tencent/daily.py",
+      "sha256": "487a14fcbfc47146d6d5fd291fbf41667aba435e5fed22ea1ef61ded513fcaa7",
+      "bytes": 9941
+    },
+    {
+      "path": "src/stock_data_manage/providers/tencent/minute.py",
+      "sha256": "ff5cf1e91327bcab2e072bcfae9f1f77dca71a84ba26e456c26580a4d59d9cc1",
+      "bytes": 4709
+    },
+    {
+      "path": "src/stock_data_manage/providers/tencent/snapshot.py",
+      "sha256": "3278cadac776fe8cfe5d02775a5bf8f53bc1cb96c595a5f418172f53047434bf",
+      "bytes": 5160
+    },
+    {
+      "path": "src/stock_data_manage/providers/transport.py",
+      "sha256": "7cf1c5f1f9b526e54e7d82e60b95b35e1f8f91e60effc31d74052f9273988b03",
+      "bytes": 16593
+    },
+    {
+      "path": "src/stock_data_manage/quality/normalization.py",
+      "sha256": "406a9374f921a367b8cab3e09905d9524f406582510e95feaf8ee7218fd015e1",
+      "bytes": 14340
+    },
+    {
+      "path": "src/stock_data_manage/routing/factory.py",
+      "sha256": "824919b319a1f86de05c67f38c8c4a41fc329aa86eb9e9a1246ab841b977380c",
+      "bytes": 20037
+    },
+    {
+      "path": "src/stock_data_manage/storage/raw.py",
+      "sha256": "564c940feb99b358c41c5456c3142e7501b21505b5c2d8d88d811c53e145b752",
+      "bytes": 8487
+    },
+    {
+      "path": "tests/test_input_collection.py",
+      "sha256": "ac975f1c8349fdacdd2b9a6d71e8f14eb9389c720e6cd81339a6a75ad9b81321",
+      "bytes": 98290
+    }
+  ]
+}

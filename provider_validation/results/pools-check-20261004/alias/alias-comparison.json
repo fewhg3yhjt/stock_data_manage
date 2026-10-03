@@ -1,0 +1,11 @@
+{
+  "alias": "ASTOCK-023",
+  "canonical_input": "SDA-BOARD-003",
+  "source_rows_compared": 90,
+  "source_csv": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\21_板块资金流向\\data.csv",
+  "source_csv_sha256": "ee58891b1c7403cb187501b002f9cdb9a257ebef1802f357a83c6acf0387c12a",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\pools-check-20261004\\alias\\SDA-BOARD-003-148ca732f01b\\2026-10-03\\input_report\\ths\\industry_fund_flow\\report.json",
+  "report_sha256": "9b6cd831337fa7c7cf8c116034809515cf64254b94880c4f06c15a9408dc0813",
+  "limitations": "successful THS variant only; failed EastMoney rank variant is not inherited",
+  "result": "passed"
+}

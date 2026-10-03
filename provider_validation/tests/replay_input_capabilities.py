@@ -22,8 +22,9 @@ def main():
     parser.add_argument("--verify-bao-inputs", action="store_true", help="verify only the two existing BaoStock snapshot inputs")
     parser.add_argument("--verify-tencent-snapshot", action="store_true", help="verify snapshot migration and existing Tencent Kline inputs")
     parser.add_argument("--verify-em-inputs", action="store_true", help="verify only the three existing EastMoney history inputs")
+    parser.add_argument("--verify-stock-pools", action="store_true", help="verify four stock pools and the existing THS flow alias")
     args = parser.parse_args()
-    if sum((args.verify_ths_inputs, args.verify_bao_inputs, args.verify_scheduling, args.verify_tencent_snapshot, args.verify_em_inputs)) > 1:
+    if sum((args.verify_ths_inputs, args.verify_bao_inputs, args.verify_scheduling, args.verify_tencent_snapshot, args.verify_em_inputs, args.verify_stock_pools)) > 1:
         parser.error("THS, BaoStock, Tencent snapshot and scheduling verification are separate scopes")
     args.output_root = args.output_root.resolve()
     if not args.output_root.is_relative_to(ROOT / "provider_validation/results"):
@@ -56,7 +57,7 @@ def main():
         forbidden_network()
 
     with patch("requests.adapters.HTTPAdapter.send", forbidden_network), patch("socket.socket.connect", guarded_connect):
-        cases = (checks.EM_CASES if args.verify_em_inputs else [("ASTOCK-001", checks.QUOTE_CONTEXT, checks.QUOTE_ARCHIVE, 1)] + checks.CASES[:2]
+        cases = (checks.POOL_CASES if args.verify_stock_pools else checks.EM_CASES if args.verify_em_inputs else [("ASTOCK-001", checks.QUOTE_CONTEXT, checks.QUOTE_ARCHIVE, 1)] + checks.CASES[:2]
                  if args.verify_tencent_snapshot else checks.BAO_CASES if args.verify_bao_inputs else
                  checks.THS_CASES if args.verify_ths_inputs else checks.CASES)
         for index, (input_id, context, manifest, count) in enumerate(cases):
@@ -64,7 +65,9 @@ def main():
             validator = (checks.test_bao_archived_inputs_preserve_sdk_rows_and_coverage if args.verify_bao_inputs else
                          checks.test_ths_archived_inputs_execute_source_yaml if args.verify_ths_inputs else
                          checks.test_archived_inputs_execute_yaml_and_preserve_evidence)
-            if args.verify_em_inputs:
+            if args.verify_stock_pools:
+                summary["original_vs_provider"].append(checks.compare_pool_original(directory, input_id, context, manifest, count))
+            elif args.verify_em_inputs:
                 summary["original_vs_provider"].append(checks.compare_em_original(directory, input_id, context, manifest, count))
             elif input_id == "ASTOCK-001":
                 summary["original_vs_provider"].append(checks.compare_quote_original(directory))
@@ -124,6 +127,24 @@ def main():
                 summary["negative_checks"].append({"input_id": input_id, "mutation": mutation,
                     "failure_class": expected, "report_path": path.relative_to(ROOT).as_posix(),
                     "report_sha256": hashlib.sha256(path.read_bytes()).hexdigest(), "result":"passed"})
+        if args.verify_stock_pools:
+            summary["known_differences"] = ["扩展原limit_pool.py，原涨停池默认调用保持；四个新端点分别定义必要字段模板。",
+                "来源qdate须等于请求交易日，tc须等于来源池和SDK行数；不把请求日或采集时间冒充其他来源日期。",
+                "昨日涨停池归属来源qdate，不推断昨日交易日；强势股池不当作官方重点监控名单。",
+                "SDK最新30天限制保持，只有回放时使用原响应采集时钟，实时调用仍用原SDK时钟。",
+                "ASTOCK-023与SDA-BOARD-003成功THS分支归并；失败EastMoney变体不继承来源资格。",
+                "金额/市值保留来源原值，标准字段为空；本批为归档回放，未新增实时探针、自动调度或生产发布。"]
+            checks.test_sector_flow_alias_uses_successful_ths_scope(args.output_root/"alias",None)
+            checks.test_existing_limit_up_provider_default_contract_unchanged(args.output_root/"legacy",None)
+            checks.test_pool_injected_live_session_and_cache_preserve_sdk(args.output_root/"session",None)
+            checks.test_pool_mapping_selection_clock_and_replay_miss(args.output_root/"y",None)
+            summary["negative_checks"] = []
+            for index,(mutation,expected) in enumerate(checks.POOL_FAILURES):
+                directory=args.output_root/("f"+str(index+1))
+                checks.test_pool_invalid_response_keeps_evidence_and_rejects_output(directory,None,mutation,expected)
+                path=next(directory.rglob("report.json"))
+                summary["negative_checks"].append({"mutation":mutation,"failure_class":expected,
+                    "report_path":path.relative_to(ROOT).as_posix(),"report_sha256":hashlib.sha256(path.read_bytes()).hexdigest(),"result":"passed"})
         if args.verify_bao_inputs:
             summary["known_differences"] = ["SDK解码载荷已精确归档；TCP帧、URL、HTTP头和SDK内部物理请求不可见。",
                 "证券快照保留原筛选的5223只证券；行业归属5221行、缺失2只，不能宣称全量分类。",
@@ -163,7 +184,7 @@ def main():
             summary["negative_checks"] = {"strict_replay_miss": "passed", "immediate_period_only": "passed",
                 "report_path": failure_path.relative_to(ROOT).as_posix(), "report_sha256": hashlib.sha256(failure_path.read_bytes()).hexdigest(),
                 "failure_class": failure["failure_class"], "production_writes": failure["production_writes"]}
-        for input_id, context, manifest, count in ([] if args.verify_ths_inputs or args.verify_bao_inputs or args.verify_em_inputs else checks.CASES[:2]):
+        for input_id, context, manifest, count in ([] if args.verify_ths_inputs or args.verify_bao_inputs or args.verify_em_inputs or args.verify_stock_pools else checks.CASES[:2]):
             directory = args.output_root / ("d" if input_id.endswith("daily") else "m")
             checks.test_tencent_matches_original_shipped_script(directory, None, input_id, context, manifest, count)
             original = [json.loads(line) for line in (directory / "original/manifest.ndjson").read_text(encoding="utf-8").splitlines()]
@@ -175,7 +196,7 @@ def main():
                                        for left, right in zip(original, report["responses"])],
                 "original_manifest": (directory / "original/manifest.ndjson").relative_to(ROOT).as_posix(),
                 "provider_report": next((directory / "adapter").rglob("report.json")).relative_to(ROOT).as_posix()})
-        for input_id, filename in ([] if args.verify_ths_inputs or args.verify_bao_inputs or args.verify_tencent_snapshot or args.verify_em_inputs else [("ASTOCK-045", "43_东财涨停池"), ("ASTOCK-070", "68_交易日历")]):
+        for input_id, filename in ([] if args.verify_ths_inputs or args.verify_bao_inputs or args.verify_tencent_snapshot or args.verify_em_inputs or args.verify_stock_pools else [("ASTOCK-045", "43_东财涨停池"), ("ASTOCK-070", "68_交易日历")]):
             csv_path = ROOT / "provider_validation/results/live-probes/rate-limited-all-20261003" / filename / "data.csv"
             summary["original_vs_provider"].append({"input_id": input_id, "original_parsed_csv": csv_path.relative_to(ROOT).as_posix(),
                 "original_parsed_sha256": hashlib.sha256(csv_path.read_bytes()).hexdigest(),

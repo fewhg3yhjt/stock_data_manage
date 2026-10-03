@@ -113,3 +113,18 @@
 /CODE_STRUCTURE.md text eol=lf
 /PROJECT_PROGRESS.md text eol=lf
 /provider_validation/docs/2026-10-04-eastmoney-input-collection.md text eol=lf
+
+# Stock-pool migration investigation and response evidence are immutable byte archives.
+/provider_validation/results/pools-*-20261004/** -text whitespace=cr-at-eol
+/provider_validation/results/pools-*-20261004/**/*.bin binary
+/provider_validation/results/pools-*-20261004-*.xml -text whitespace=-blank-at-eol,cr-at-eol
+/provider_validation/results/pools-*-20261004-*.json -text whitespace=cr-at-eol
+/provider_validation/docs/2026-10-04-stock-pool-input-collection.md text eol=lf
+/config/datasets/broken_limit_pool.yaml text eol=lf
+/config/normalization/broken_limit_pool.yaml text eol=lf
+/config/datasets/limit_down_pool.yaml text eol=lf
+/config/normalization/limit_down_pool.yaml text eol=lf
+/config/datasets/previous_limit_pool.yaml text eol=lf
+/config/normalization/previous_limit_pool.yaml text eol=lf
+/config/datasets/strong_stock_pool.yaml text eol=lf
+/config/normalization/strong_stock_pool.yaml text eol=lf

@@ -1,0 +1,80 @@
+def stock_zt_pool_zbgc_em(date: str = "20241011") -> pd.DataFrame:
+    """
+    东方财富网-行情中心-涨停板行情-炸板股池
+    https://quote.eastmoney.com/ztb/detail#type=zbgc
+    :param date: 交易日
+    :type date: str
+    :return: 炸板股池
+    :rtype: pandas.DataFrame
+    """
+    thirty_days_ago = datetime.now() - timedelta(days=30)
+    thirty_days_ago_str = thirty_days_ago.strftime("%Y%m%d")
+    if int(date) < int(thirty_days_ago_str):
+        raise ValueError("炸板股池只能获取最近 30 个交易日的数据")
+
+    url = "https://push2ex.eastmoney.com/getTopicZBPool"
+    params = {
+        "ut": "7eea3edcaed734bea9cbfc24409ed989",
+        "dpt": "wz.ztzt",
+        "Pageindex": "0",
+        "pagesize": "5000",
+        "sort": "fbt:asc",
+        "date": date,
+    }
+    r = requests.get(url, params=params)
+    data_json = r.json()
+    if data_json["data"] is None:
+        return pd.DataFrame()
+    if len(data_json["data"]["pool"]) == 0:
+        return pd.DataFrame()
+    temp_df = pd.DataFrame(data_json["data"]["pool"])
+    temp_df.reset_index(inplace=True)
+    temp_df["index"] = range(1, len(temp_df) + 1)
+    temp_df.columns = [
+        "序号",
+        "代码",
+        "_",
+        "名称",
+        "最新价",
+        "涨停价",
+        "涨跌幅",
+        "成交额",
+        "流通市值",
+        "总市值",
+        "换手率",
+        "首次封板时间",
+        "炸板次数",
+        "振幅",
+        "涨速",
+        "涨停统计",
+        "所属行业",
+    ]
+    temp_df["涨停统计"] = (
+        temp_df["涨停统计"].apply(lambda x: dict(x)["days"]).astype(str)
+        + "/"
+        + temp_df["涨停统计"].apply(lambda x: dict(x)["ct"]).astype(str)
+    )
+    temp_df = temp_df[
+        [
+            "序号",
+            "代码",
+            "名称",
+            "涨跌幅",
+            "最新价",
+            "涨停价",
+            "成交额",
+            "流通市值",
+            "总市值",
+            "换手率",
+            "涨速",
+            "首次封板时间",
+            "炸板次数",
+            "涨停统计",
+            "振幅",
+            "所属行业",
+        ]
+    ]
+    temp_df["最新价"] = temp_df["最新价"] / 1000
+    temp_df["涨停价"] = temp_df["涨停价"] / 1000
+    temp_df["首次封板时间"] = temp_df["首次封板时间"].astype(str).str.zfill(6)
+    return temp_df

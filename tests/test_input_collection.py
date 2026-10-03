@@ -44,6 +44,226 @@ QUOTE_CONTEXT = {"request": {"symbols": ["sh600519"], "as_of": "2026-09-30T15:10
 EM_CONTEXT = {"request": {"symbol": "600519"}}
 EM_CASES = [("ASTOCK-026", EM_CONTEXT, SDK_ARCHIVE, 63), ("ASTOCK-027", EM_CONTEXT, SDK_ARCHIVE, 27),
             ("ASTOCK-028", EM_CONTEXT, SDK_ARCHIVE, 120)]
+POOL_CONTEXT = {"request": {"trade_date": date(2026, 9, 30)}, "calendar": {"trading_dates": [date(2026, 9, 30)]}}
+POOL_CASES = [("ASTOCK-046", POOL_CONTEXT, SDK_ARCHIVE, 12), ("ASTOCK-047", POOL_CONTEXT, SDK_ARCHIVE, 9),
+              ("ASTOCK-048", POOL_CONTEXT, SDK_ARCHIVE, 57), ("ASTOCK-050", POOL_CONTEXT, SDK_ARCHIVE, 199)]
+POOL_SOURCE = {"ASTOCK-046": ("fetch_broken_board_pool", "stock_zt_pool_zbgc_em", "getTopicZBPool"),
+               "ASTOCK-047": ("fetch_limit_down_pool", "stock_zt_pool_dtgc_em", "getTopicDTPool"),
+               "ASTOCK-048": ("fetch_previous_limit_pool", "stock_zt_pool_previous_em", "getYesterdayZTPool"),
+               "ASTOCK-050": ("fetch_strong_pool", "stock_zt_pool_strong_em", "getTopicQSPool")}
+
+
+def compare_pool_original(tmp_path, input_id, context, manifest, count):
+    import ast
+    import inspect
+    import types
+    import pandas as pd
+    import akshare as ak
+    from typing import Any, Callable
+    from stock_data_manage.providers.eastmoney.limit_pool import pool_replay_clock
+    method, sdk_name, endpoint = POOL_SOURCE[input_id]
+    probe = ROOT / "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py"
+    nodes = [n for n in ast.parse(probe.read_text(encoding="utf-8")).body
+             if isinstance(n, ast.FunctionDef) and n.name in {"ak_function", "call_ak", method}]
+    namespace = dict(inspect=inspect, Any=Any, Callable=Callable, Config=types.SimpleNamespace, pd=pd, ensure_ak=lambda: ak)
+    exec(compile(ast.Module(body=nodes, type_ignores=[]), str(probe), "exec"), namespace)
+    store = RawObjectStore(tmp_path / "original")
+    with captured_requests(store, provider="eastmoney", endpoint=endpoint, scope=context, code_version="original-probe",
+                           pacer=RequestPacer(), replay_manifest=manifest, sdk_retry_policy=True) as events:
+        with pool_replay_clock(getattr(ak, sdk_name), manifest, endpoint):
+            frame = namespace[method](types.SimpleNamespace(trade_date="20260930"))
+    report = collect_input(input_id=input_id, context=context, config_root=ROOT / "config",
+                           output_root=tmp_path / "candidate", replay_manifest=manifest)
+    assert report["status"] == "candidate_complete", report
+    source = read_artifact(report, "source_rows")
+    original_rows = [{k: None if pd.isna(v) else v for k, v in row.items()} for row in frame.to_dict(orient="records")]
+    assert source == original_rows and len(source) == report["row_count"] == report["coverage_denominator"] == count
+    record_path = ROOT / f"provider_validation/results/interface-records/{input_id}.json"
+    record = json.loads(record_path.read_text(encoding="utf-8"))
+    csv_path = ROOT / record["parsed_output_ref"]
+    golden = pd.read_csv(csv_path, dtype=str, keep_default_na=False)
+    assert list(golden.columns) == list(frame.columns) and len(golden) == count
+    for index, row in enumerate(source):
+        for column, value in row.items():
+            expected = golden.iloc[index][column]
+            if value is None: assert expected == ""
+            elif isinstance(value, (int, float)): assert float(value) == pytest.approx(float(expected), rel=1e-14, abs=1e-12)
+            else: assert str(value) == expected
+    keys = ("url", "method", "outcome", "status_code", "body_sha256", "request_headers", "request_options")
+    assert len(events) == len(report["responses"]) == 1
+    assert {k: events[0].get(k) for k in keys} == {k: report["responses"][0].get(k) for k in keys}
+    mapped = read_artifact(report, "output")
+    assert report["source_quote_date"] == "2026-09-30" and report["source_total_count"] == count
+    assert all(row["trade_date"] == "2026-09-30" and row["snapshot_at"] == report["source_capture_window"]["last"] for row in mapped)
+    assert [r["source_security_code"] for r in mapped] == [r["代码"] for r in source]
+    assert [float(r["price"]) for r in mapped] == [r["最新价"] for r in source]
+    assert all(r[field] is None for r in mapped for field in report["unverified_fields"])
+    specific = {"ASTOCK-046": ("broken_count", "炸板次数"), "ASTOCK-047": ("consecutive_limit_down_count", "连续跌停"),
+                "ASTOCK-048": ("previous_consecutive_limit_count", "昨日连板数"), "ASTOCK-050": ("selection_reason", "入选理由")}
+    left, right = specific[input_id]
+    assert [r[left] for r in mapped] == [r[right] for r in source]
+    assert report["live_http_calls"] == report["production_writes"] == 0 and not report["eligible_for_production_routing"]
+    comparison = dict(input_id=input_id, original_csv=str(csv_path.resolve()), original_csv_sha256=hashlib.sha256(csv_path.read_bytes()).hexdigest(),
+        original_probe_sha256=hashlib.sha256(probe.read_bytes()).hexdigest(), original_manifest=str((store.root/"manifest.ndjson").resolve()),
+        original_manifest_sha256=hashlib.sha256((store.root/"manifest.ndjson").read_bytes()).hexdigest(),
+        report_path=report["report_path"], report_sha256=hashlib.sha256(Path(report["report_path"]).read_bytes()).hexdigest(),
+        rows_compared=count, all_sdk_source_columns_equal=True, all_csv_columns_equal=True,
+        request_comparison=[{label:{k:event.get(k) for k in keys} for label,event in (("original",events[0]),("provider",report["responses"][0]))}],
+        returned_date_equal=True, standard_numeric_units_unverified=report["unverified_fields"], result="passed")
+    (tmp_path/"comparison.json").write_text(json.dumps(comparison,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    return comparison
+
+
+@pytest.mark.parametrize("input_id,context,manifest,count", POOL_CASES)
+def test_pool_original_script_csv_and_yaml_candidate_agree(tmp_path, no_network, input_id, context, manifest, count):
+    compare_pool_original(tmp_path, input_id, context, manifest, count)
+
+
+def pool_fixture(tmp_path, mutation):
+    from urllib.parse import urlsplit
+    original = next(json.loads(line) for line in SDK_ARCHIVE.read_text(encoding="utf-8").splitlines()
+                    if urlsplit(json.loads(line).get("url", "")).path == "/getTopicZBPool")
+    body = json.loads(RawObjectStore.read_response(SDK_ARCHIVE, original))
+    if mutation == "date": body["data"]["qdate"] = 20260929
+    elif mutation == "count": body["data"]["tc"] += 1
+    elif mutation == "duplicate": body["data"]["pool"][1]["c"] = body["data"]["pool"][0]["c"]
+    elif mutation == "code": body["data"]["pool"][0]["c"] = "262"
+    elif mutation == "numeric": body["data"]["pool"][0]["p"] = None
+    elif mutation == "zero": body["data"]["pool"][0]["p"] = 0
+    elif mutation == "business": body["rc"] = 1
+    elif mutation == "empty": body["data"].update(tc=0,pool=[])
+    elif mutation == "null": body["data"] = None
+    response = requests.Response()
+    response.status_code, response.encoding = (429 if mutation=="http_429" else 200), "utf-8"
+    response._content = b"<html>login</html>" if mutation=="html" else json.dumps(body).encode("utf-8")
+    store = RawObjectStore(tmp_path/"fixture")
+    event = store.record_response(response=response,url=original["url"],method="GET",request_headers=original["request_headers"],
+        scope={"mutation":mutation,"synthetic":True,"source_sha256":original["body_sha256"]},provider="eastmoney",endpoint="broken_limit_pool",code_version="offline-fixture")
+    if mutation=="transport":
+        event.update(outcome="transport_error",error_type="ConnectionError")
+        (store.root/"manifest.ndjson").write_text(json.dumps(event)+"\n",encoding="utf-8")
+    return store.root/"manifest.ndjson"
+
+
+POOL_FAILURES = [("date","schema_changed"),("count","truncated"),("duplicate","NormalizationError"),
+                 ("code","schema_changed"),("numeric","NormalizationError"),("zero","NormalizationError"),
+                 ("business","schema_changed"),("empty","temporary_empty"),("null","temporary_empty"),
+                 ("http_429","rate_limited"),("html","JSONDecodeError"),("transport","ConnectionError")]
+
+
+@pytest.mark.parametrize("mutation,expected", POOL_FAILURES)
+def test_pool_invalid_response_keeps_evidence_and_rejects_output(tmp_path, no_network, mutation, expected):
+    manifest = pool_fixture(tmp_path,mutation)
+    report = collect_input(input_id="ASTOCK-046",context=POOL_CONTEXT,config_root=ROOT/"config",output_root=tmp_path/"out",replay_manifest=manifest)
+    assert report["status"]=="failed" and report["failure_class"]==expected,report
+    assert "output" not in report and report["production_writes"]==report["live_http_calls"]==0
+    original=json.loads(manifest.read_text(encoding="utf-8").splitlines()[0]);saved=report["responses"][0]
+    if mutation=="transport": assert saved["outcome"]=="transport_error"
+    else:
+        assert saved["body_sha256"]==original["body_sha256"]
+        assert RawObjectStore.read_response(Path(report["run_directory"])/report["raw_manifest"]["path"],saved)==RawObjectStore.read_response(manifest,original)
+
+
+def test_pool_mapping_selection_clock_and_replay_miss(tmp_path, no_network):
+    import akshare as ak
+    from unittest.mock import patch
+    config = tmp_path/"config"; shutil.copytree(ROOT/"config",config)
+    path=config/"normalization/broken_limit_pool.yaml";document=yaml.safe_load(path.read_text(encoding="utf-8"))
+    document["rules"][0]["field_mapping"]["price"]="涨停价"
+    path.write_text(yaml.safe_dump(document,allow_unicode=True),encoding="utf-8")
+    fields=yaml.safe_load((config/"datasets/broken_limit_pool.yaml").read_text(encoding="utf-8"))["fields"]
+    required=[name for name,definition in fields.items() if definition.get("required")]
+    namespace=ak.stock_zt_pool_zbgc_em.__globals__
+    class FutureDateTime(datetime):
+        @classmethod
+        def now(cls,tz=None): return datetime(2030,1,1,tzinfo=tz)
+    with patch.dict(namespace,{"datetime":FutureDateTime}):
+        report=collect_input(input_id="ASTOCK-046",context=POOL_CONTEXT,config_root=config,output_root=tmp_path/"out",
+                             replay_manifest=SDK_ARCHIVE,fields=required)
+        assert namespace["datetime"] is FutureDateTime
+    assert report["status"]=="candidate_complete"
+    source,mapped=read_artifact(report,"source_rows"),read_artifact(report,"output")
+    assert set(mapped[0])==set(required) and [float(r["price"]) for r in mapped]==[r["涨停价"] for r in source]
+    failed=collect_input(input_id="ASTOCK-046",context={"request":{"trade_date":date(2026,9,29)},"calendar":{"trading_dates":[date(2026,9,29)]}},
+        config_root=config,output_root=tmp_path/"out",replay_manifest=SDK_ARCHIVE)
+    assert failed["status"]=="failed" and failed["failure_class"]=="ValueError" and "never falls back" in failed["error"]
+    with pytest.raises(ValueError,match="does not support"):
+        collect_input(input_id="ASTOCK-046",context={**POOL_CONTEXT,"request":{**POOL_CONTEXT["request"],"symbol":"600519"}},
+            config_root=config,output_root=tmp_path/"out",replay_manifest=SDK_ARCHIVE)
+
+
+def test_sector_flow_alias_uses_successful_ths_scope(tmp_path,no_network):
+    import pandas as pd
+    from stock_data_manage.config.loader import load_input_capabilities
+    contracts={c.input_id:c for c in load_input_capabilities(ROOT/"config/providers.yaml")}
+    assert contracts["ASTOCK-023"].implementation_status=="alias" and contracts["ASTOCK-023"].canonical_input=="SDA-BOARD-003"
+    report=collect_input(input_id="SDA-BOARD-003",context={},config_root=ROOT/"config",output_root=tmp_path,
+        replay_manifest=SDK_ARCHIVE)
+    assert report["status"]=="candidate_complete" and report["row_count"]==90
+    source=read_artifact(report,"source_rows")
+    csv_path=SDK_ARCHIVE.parents[2]/"21_板块资金流向/data.csv"
+    golden=pd.read_csv(csv_path,keep_default_na=False)
+    assert set(golden.columns)==set(source[0]) and len(golden)==len(source)
+    for actual,expected in zip(source,golden.to_dict(orient="records")):
+        for key,value in actual.items():
+            if isinstance(value,(float,int)):assert float(value)==pytest.approx(float(expected[key]),rel=1e-14,abs=1e-12)
+            else:assert value==expected[key]
+    assert all("10jqka.com.cn" in event["url"] for event in report["responses"])
+    result=dict(alias="ASTOCK-023",canonical_input="SDA-BOARD-003",source_rows_compared=90,
+        source_csv=str(csv_path.resolve()),source_csv_sha256=hashlib.sha256(csv_path.read_bytes()).hexdigest(),
+        report_path=report["report_path"],report_sha256=hashlib.sha256(Path(report["report_path"]).read_bytes()).hexdigest(),
+        limitations="successful THS variant only; failed EastMoney rank variant is not inherited",result="passed")
+    (tmp_path/"alias-comparison.json").write_text(json.dumps(result,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+
+
+def test_existing_limit_up_provider_default_contract_unchanged(tmp_path,no_network):
+    import types
+    import sys
+    import akshare as ak
+    from stock_data_manage.providers.eastmoney.limit_pool import EastMoneyLimitUpProvider
+    snapshot=ROOT/"provider_validation/results/pools-original-20261004/1-limit_pool.py.bin"
+    module=types.ModuleType("stock_data_manage.providers.eastmoney.original_limit_pool")
+    module.__package__="stock_data_manage.providers.eastmoney"
+    sys.modules[module.__name__]=module
+    try: exec(compile(snapshot.read_bytes(),str(snapshot),"exec"),module.__dict__)
+    finally: del sys.modules[module.__name__]
+    results,requests_made=[],[]
+    for label,adapter in (("original",module.EastMoneyLimitUpProvider),("provider",EastMoneyLimitUpProvider)):
+        store=RawObjectStore(tmp_path/label)
+        with captured_requests(store,provider="eastmoney",endpoint="limit_up_pool",scope=POOL_CONTEXT,
+            code_version="legacy-default-check",pacer=RequestPacer(),replay_manifest=SDK_ARCHIVE,sdk_retry_policy=True) as events:
+            results.append(adapter(client=ak).fetch(date(2026,9,30)))
+        requests_made.append(events)
+    assert results[0]==results[1] and len(results[1].rows)==52
+    keys=("url","method","request_headers","status_code","body_sha256","request_options")
+    assert [{k:r.get(k) for k in keys} for r in requests_made[0]]==[{k:r.get(k) for k in keys} for r in requests_made[1]]
+    (tmp_path/"legacy-comparison.json").write_text(json.dumps(dict(rows_compared=52,all_fields_equal=True,
+        requests_equal=True,original_snapshot_sha256=hashlib.sha256(snapshot.read_bytes()).hexdigest(),result="passed"),indent=2),encoding="utf-8")
+
+
+def test_pool_injected_live_session_and_cache_preserve_sdk(tmp_path,monkeypatch):
+    from urllib.parse import urlsplit
+    original=next(json.loads(line) for line in SDK_ARCHIVE.read_text(encoding="utf-8").splitlines()
+        if urlsplit(json.loads(line).get("url","")).path=="/getTopicZBPool")
+    body=RawObjectStore.read_response(SDK_ARCHIVE,original)
+    calls=[]
+    def send(session,request,**kwargs):
+        policy=session.adapters["https://"].max_retries
+        calls.append(dict(timeout=kwargs.get("timeout"),trust_env=session.trust_env,retry_total=policy.total))
+        assert policy.total==2 and not policy.is_retry("GET",429,True)
+        response=requests.Response();response._content=body;response.status_code=200;response.encoding="utf-8"
+        response.url,response.request=request.url,request
+        return response
+    from unittest.mock import patch
+    with patch.object(requests.Session,"send",send):
+        kwargs=dict(input_id="ASTOCK-046",context=POOL_CONTEXT,config_root=ROOT/"config",output_root=tmp_path/"out",
+                    mode="live",evidence_root=tmp_path)
+        first=collect_input(**kwargs);second=collect_input(**kwargs)
+    assert first["status"]==second["status"]=="candidate_complete"
+    assert calls==[{"timeout":None,"trust_env":True,"retry_total":2}]
+    assert first["live_http_calls"]==1 and second["live_http_calls"]==0 and second["responses"][0]["mode"]=="cached"
+    (tmp_path/"session-comparison.json").write_text(json.dumps(dict(mode="injected Session fixture; no network",
+        calls=calls,cache_reused=True,report_paths=[first["report_path"],second["report_path"]],result="passed"),indent=2),encoding="utf-8")
 
 
 def compare_em_original(tmp_path, input_id, context, manifest, count):

@@ -1,0 +1,64 @@
+{
+  "input_id": "ASTOCK-048",
+  "original_csv": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\46_东财昨日涨停池\\data.csv",
+  "original_csv_sha256": "5141681d9a06948832d4b9e05ebb9a0f1a9ec8b16caa98a00293c10ea06f95a7",
+  "original_probe_sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0",
+  "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\pools-check-20261004\\ASTOCK-048\\original\\manifest.ndjson",
+  "original_manifest_sha256": "44c10af460bb797eec063a164b258ccb6eb2c83dc444b4e0b650cf768f56be18",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\pools-check-20261004\\ASTOCK-048\\candidate\\ASTOCK-048-63add54934f5\\2026-10-03\\input_report\\eastmoney\\previous_limit_pool\\report.json",
+  "report_sha256": "898b4297517d21de1a2e115cc8af57bfbbbfc9b2ab7f258029749a52d2e714ea",
+  "rows_compared": 57,
+  "all_sdk_source_columns_equal": true,
+  "all_csv_columns_equal": true,
+  "request_comparison": [
+    {
+      "original": {
+        "url": "https://push2ex.eastmoney.com/getYesterdayZTPool?Pageindex=0&date=20260930&dpt=wz.ztzt&pagesize=5000&sort=zs%3Adesc&ut=%3Credacted%3E",
+        "method": "GET",
+        "outcome": "response",
+        "status_code": 200,
+        "body_sha256": "d4f6ab36119677ee909f1444490a4ddf233bd69e53f497ba6392030d6253328e",
+        "request_headers": {
+          "User-Agent": "python-requests/2.32.5",
+          "Accept-Encoding": "gzip, deflate, br, zstd",
+          "Accept": "*/*",
+          "Connection": "keep-alive"
+        },
+        "request_options": {
+          "timeout": null,
+          "allow_redirects": true,
+          "trust_env": true,
+          "proxies": {},
+          "sdk_retry_policy": true
+        }
+      },
+      "provider": {
+        "url": "https://push2ex.eastmoney.com/getYesterdayZTPool?Pageindex=0&date=20260930&dpt=wz.ztzt&pagesize=5000&sort=zs%3Adesc&ut=%3Credacted%3E",
+        "method": "GET",
+        "outcome": "response",
+        "status_code": 200,
+        "body_sha256": "d4f6ab36119677ee909f1444490a4ddf233bd69e53f497ba6392030d6253328e",
+        "request_headers": {
+          "User-Agent": "python-requests/2.32.5",
+          "Accept-Encoding": "gzip, deflate, br, zstd",
+          "Accept": "*/*",
+          "Connection": "keep-alive"
+        },
+        "request_options": {
+          "timeout": null,
+          "allow_redirects": true,
+          "trust_env": true,
+          "proxies": {},
+          "sdk_retry_policy": true
+        }
+      }
+    }
+  ],
+  "returned_date_equal": true,
+  "standard_numeric_units_unverified": [
+    "amount",
+    "float_market_cap",
+    "total_market_cap"
+  ],
+  "result": "passed"
+}

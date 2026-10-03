@@ -1,0 +1,87 @@
+def stock_zt_pool_strong_em(date: str = "20241231") -> pd.DataFrame:
+    """
+    东方财富网-行情中心-涨停板行情-强势股池
+    https://quote.eastmoney.com/ztb/detail#type=qsgc
+    :param date: 交易日
+    :type date: str
+    :return: 强势股池
+    :rtype: pandas.DataFrame
+    """
+    url = "https://push2ex.eastmoney.com/getTopicQSPool"
+    params = {
+        "ut": "7eea3edcaed734bea9cbfc24409ed989",
+        "dpt": "wz.ztzt",
+        "Pageindex": "0",
+        "pagesize": "5000",
+        "sort": "zdp:desc",
+        "date": date,
+    }
+    r = requests.get(url, params=params)
+    data_json = r.json()
+    if data_json["data"] is None:
+        return pd.DataFrame()
+    if len(data_json["data"]["pool"]) == 0:
+        return pd.DataFrame()
+    temp_df = pd.DataFrame(data_json["data"]["pool"])
+    temp_df.reset_index(inplace=True)
+    temp_df["index"] = range(1, len(temp_df) + 1)
+    temp_df.columns = [
+        "序号",
+        "代码",
+        "_",
+        "名称",
+        "最新价",
+        "涨停价",
+        "_",
+        "涨跌幅",
+        "成交额",
+        "流通市值",
+        "总市值",
+        "换手率",
+        "是否新高",
+        "入选理由",
+        "量比",
+        "涨速",
+        "涨停统计",
+        "所属行业",
+    ]
+    temp_df["涨停统计"] = (
+        temp_df["涨停统计"].apply(lambda x: dict(x)["days"]).astype(str)
+        + "/"
+        + temp_df["涨停统计"].apply(lambda x: dict(x)["ct"]).astype(str)
+    )
+    temp_df = temp_df[
+        [
+            "序号",
+            "代码",
+            "名称",
+            "涨跌幅",
+            "最新价",
+            "涨停价",
+            "成交额",
+            "流通市值",
+            "总市值",
+            "换手率",
+            "涨速",
+            "是否新高",
+            "量比",
+            "涨停统计",
+            "入选理由",
+            "所属行业",
+        ]
+    ]
+    temp_df["最新价"] = temp_df["最新价"] / 1000
+    temp_df["涨停价"] = temp_df["涨停价"] / 1000
+    explained_map = {1: "60日新高", 2: "近期多次涨停", 3: "60日新高且近期多次涨停"}
+    temp_df["入选理由"] = temp_df["入选理由"].apply(lambda x: explained_map[x])
+    temp_df["是否新高"] = temp_df["是否新高"].apply(lambda x: "是" if x == 1 else "否")
+    temp_df["涨跌幅"] = pd.to_numeric(temp_df["涨跌幅"], errors="coerce")
+    temp_df["最新价"] = pd.to_numeric(temp_df["最新价"], errors="coerce")
+    temp_df["涨停价"] = pd.to_numeric(temp_df["涨停价"], errors="coerce")
+    temp_df["成交额"] = pd.to_numeric(temp_df["成交额"], errors="coerce")
+    temp_df["流通市值"] = pd.to_numeric(temp_df["流通市值"], errors="coerce")
+    temp_df["总市值"] = pd.to_numeric(temp_df["总市值"], errors="coerce")
+    temp_df["换手率"] = pd.to_numeric(temp_df["换手率"], errors="coerce")
+    temp_df["涨速"] = pd.to_numeric(temp_df["涨速"], errors="coerce")
+    temp_df["量比"] = pd.to_numeric(temp_df["量比"], errors="coerce")
+    return temp_df

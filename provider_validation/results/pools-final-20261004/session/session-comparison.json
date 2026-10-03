@@ -1,0 +1,16 @@
+{
+  "mode": "injected Session fixture; no network",
+  "calls": [
+    {
+      "timeout": null,
+      "trust_env": true,
+      "retry_total": 2
+    }
+  ],
+  "cache_reused": true,
+  "report_paths": [
+    "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\pools-final-20261004\\session\\out\\ASTOCK-046-f518cb0957a5\\2026-10-03\\input_report\\eastmoney\\broken_limit_pool\\report.json",
+    "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\pools-final-20261004\\session\\out\\ASTOCK-046-a0693e8378d4\\2026-10-03\\input_report\\eastmoney\\broken_limit_pool\\report.json"
+  ],
+  "result": "passed"
+}

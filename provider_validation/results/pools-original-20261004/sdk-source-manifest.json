@@ -1,0 +1,36 @@
+{
+  "sdk_version": "1.18.83",
+  "selector_semantics": "SDK ut literals are public client selectors; candidate source-code snapshots redact them",
+  "snapshots": [
+    {
+      "input_id": "ASTOCK-046",
+      "function": "stock_zt_pool_zbgc_em",
+      "path": "provider_validation/results/pools-original-20261004/ASTOCK-046-sdk.py.bin",
+      "sha256": "96967820fce70b5cad84d0f68bad48cb1934ee661face8ba2b4027d42716e409"
+    },
+    {
+      "input_id": "ASTOCK-047",
+      "function": "stock_zt_pool_dtgc_em",
+      "path": "provider_validation/results/pools-original-20261004/ASTOCK-047-sdk.py.bin",
+      "sha256": "a49bcead2a59b83638956220364436a24246bca36d9ae12d34bf74221e97c6da"
+    },
+    {
+      "input_id": "ASTOCK-048",
+      "function": "stock_zt_pool_previous_em",
+      "path": "provider_validation/results/pools-original-20261004/ASTOCK-048-sdk.py.bin",
+      "sha256": "6450d8da7e2a690ae293983e471ce64261a57ee4765942be074c04d9b2f10f4e"
+    },
+    {
+      "input_id": "ASTOCK-050",
+      "function": "stock_zt_pool_strong_em",
+      "path": "provider_validation/results/pools-original-20261004/ASTOCK-050-sdk.py.bin",
+      "sha256": "656b65ab1e963ffe6ecde7246be4ca09c8ba41793f0d674a06090efc2e4c9fa5"
+    },
+    {
+      "input_id": "ASTOCK-023",
+      "function": "stock_fund_flow_industry",
+      "path": "provider_validation/results/pools-original-20261004/ASTOCK-023-sdk.py.bin",
+      "sha256": "b7425e018c31d9bde9269886169ab922bd4a71e5e5dc2527621f3c0993caabdb"
+    }
+  ]
+}

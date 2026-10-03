@@ -1,0 +1,153 @@
+capabilities:
+  daily_bar:
+    routes:
+      - provider: tencent
+        endpoint: forward_history
+        priority: 10
+        adjustments: [forward]
+      - provider: sina
+        endpoint: full_history
+        priority: 20
+        adjustments: [none]
+      - provider: baostock
+        endpoint: daily_history
+        priority: 30
+        adjustments: [none, forward, backward]
+        role: validation_only
+      - provider: akshare
+        endpoint: stock_daily
+        priority: 40
+        adjustments: [none, forward, backward]
+        role: validation_only
+      - provider: akshare
+        endpoint: etf_daily
+        priority: 40
+        adjustments: [none, forward, backward]
+        role: validation_only
+      - provider: akshare
+        endpoint: lof_daily
+        priority: 40
+        adjustments: [none, forward, backward]
+        role: validation_only
+      - provider: akshare
+        endpoint: index_daily
+        priority: 40
+        adjustments: [none]
+        role: validation_only
+  snapshot:
+    routes:
+      - provider: tencent
+        endpoint: bulk_snapshot
+        priority: 10
+        adjustments: [none]
+  minute_bar_1m:
+    routes:
+      - provider: tencent
+        endpoint: native_1m
+        priority: 10
+        adjustments: [none]
+  minute_bar_5m:
+    routes:
+      - provider: sina
+        endpoint: native_5m
+        priority: 20
+        adjustments: [none]
+      - provider: baostock
+        endpoint: minute_5m
+        priority: 30
+        adjustments: [none]
+        role: validation_only
+  dividend_event:
+    routes:
+      - provider: eastmoney
+        endpoint: dividend_event
+        priority: 10
+        adjustments: [none]
+        role: discovery
+  security_master:
+    routes:
+      - provider: eastmoney
+        endpoint: security_list
+        priority: 20
+        adjustments: [none]
+        role: validation_only
+  realtime_quote:
+    routes:
+      - provider: eastmoney
+        endpoint: single_quote
+        priority: 20
+        adjustments: [none]
+        role: validation_only
+      - provider: eastmoney
+        endpoint: batch_quote
+        priority: 30
+        adjustments: [none]
+        role: validation_only
+  intraday_trend:
+    routes:
+      - provider: eastmoney
+        endpoint: intraday_trend
+        priority: 20
+        adjustments: [none]
+        role: validation_only
+  stock_fund_flow:
+    routes:
+      - provider: eastmoney
+        endpoint: stock_fund_flow
+        priority: 20
+        adjustments: [none]
+        role: validation_only
+  financial_main:
+    routes:
+      - provider: eastmoney
+        endpoint: financial_main
+        priority: 20
+        adjustments: [none]
+        role: validation_only
+  shareholder_count:
+    routes:
+      - provider: eastmoney
+        endpoint: shareholder_count
+        priority: 20
+        adjustments: [none]
+        role: validation_only
+  industry_board:
+    routes:
+      - provider: ths
+        endpoint: industry_board
+        priority: 20
+        adjustments: [none]
+        role: validation_only
+  concept_board:
+    routes:
+      - provider: ths
+        endpoint: concept_board
+        priority: 20
+        adjustments: [none]
+        role: validation_only
+  industry_membership:
+    routes:
+      - provider: baostock
+        endpoint: industry_membership
+        priority: 20
+        adjustments: [none]
+        role: validation_only
+  industry_index_daily:
+    routes:
+      - provider: akshare
+        endpoint: industry_index_daily
+        priority: 30
+        adjustments: [none]
+        role: validation_only
+  board_fund_flow:
+    routes:
+      - provider: akshare
+        endpoint: industry_fund_flow
+        priority: 30
+        adjustments: [none]
+        role: validation_only
+      - provider: akshare
+        endpoint: concept_fund_flow
+        priority: 40
+        adjustments: [none]
+        role: validation_only

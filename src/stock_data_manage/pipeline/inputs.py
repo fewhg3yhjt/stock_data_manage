@@ -108,6 +108,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
     is_baostock = input_id in {"SDA-BOARD-005", "SDA-BOARD-006"}
     is_tencent_snapshot = input_id == "ASTOCK-001"
     is_em_history = input_id in {"ASTOCK-026", "ASTOCK-027", "ASTOCK-028"}
+    is_stock_pool = input_id in {"ASTOCK-045", "ASTOCK-046", "ASTOCK-047", "ASTOCK-048", "ASTOCK-050"}
     if is_tencent_snapshot:
         report.update(coverage_denominator=len(parameters["symbols"]), requested_symbols=list(parameters["symbols"]),
                       universe_completeness_verified=False, online_batch_validation=False,
@@ -167,6 +168,8 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             report["evidence_representation"] = "SDK-decoded ResultSet fields and rows; BaoStock TCP wire bytes are not exposed"
             report["request_limit_enforcement"] = "sdk_query_boundary_only"
         sdk_functions = {"ASTOCK-045": "stock_zt_pool_em", "ASTOCK-070": "tool_trade_date_hist_sina",
+                         "ASTOCK-046": "stock_zt_pool_zbgc_em", "ASTOCK-047": "stock_zt_pool_dtgc_em",
+                         "ASTOCK-048": "stock_zt_pool_previous_em", "ASTOCK-050": "stock_zt_pool_strong_em",
                          "ASTOCK-026": "stock_zh_a_gdhs_detail_em", "ASTOCK-027": "stock_fhps_detail_em",
                          "ASTOCK-028": "stock_individual_fund_flow",
                          "SDA-BOARD-001": "stock_board_industry_name_ths", "SDA-BOARD-002": "stock_board_industry_index_ths",
@@ -236,8 +239,8 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                     scope={"input_id": input_id, "parameters": normalized_context}, code_version=code_version, pacer=pacer,
                     replay_manifest=replay_manifest if mode == "replay" else None,
                     evidence_roots=(evidence_root, output_root), max_age_seconds=profile.refresh_interval_seconds or 86400,
-                    sdk_retry_policy=input_id in {"ASTOCK-001", "ASTOCK-045", "ASTOCK-070", "ASTOCK-026", "ASTOCK-027", "ASTOCK-028"}))
-            if is_em_history:
+                    sdk_retry_policy=is_stock_pool or input_id in {"ASTOCK-001", "ASTOCK-045", "ASTOCK-070", "ASTOCK-026", "ASTOCK-027", "ASTOCK-028"}))
+            if is_em_history or is_stock_pool:
                 from ..providers.contracts import EndpointContract, HttpResponse
                 def retained_payloads():
                     for event in response_events:
@@ -246,6 +249,12 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                             yield EndpointContract(frozenset()).parse_json(HttpResponse(
                                 event["status_code"], event.get("response_headers", {}), body))
                 runtime_parameters["source_payloads"] = retained_payloads
+                if mode == "replay" and is_stock_pool:
+                    from ..providers.eastmoney.limit_pool import pool_replay_clock
+                    endpoint = {"ASTOCK-045": "getTopicZTPool", "ASTOCK-046": "getTopicZBPool", "ASTOCK-047": "getTopicDTPool",
+                                "ASTOCK-048": "getYesterdayZTPool", "ASTOCK-050": "getTopicQSPool"}[input_id]
+                    stack.enter_context(pool_replay_clock(function, replay_manifest, endpoint))
+                    report["replay_clock_semantics"] = "original capture clock for SDK recency guard only; live clock unchanged"
                 if mode == "replay" and input_id == "ASTOCK-028":
                     from ..providers.eastmoney.realtime import history_replay_clock
                     stack.enter_context(history_replay_clock(function, replay_manifest, parameters["code"]))
@@ -271,6 +280,12 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="source-rows")
         report["source_rows"] = {"path": source_ref.path.relative_to(directory).as_posix(),
                                  "sha256": source_ref.content_hash, "row_count": len(source_rows)}
+        if is_stock_pool:
+            report.update(source_quote_date=fetched.mapping_context["source_quote_date"].isoformat(),
+                source_total_count=fetched.mapping_context["source_total_count"],
+                returned_window={"first": parameters["date"].isoformat(), "last": parameters["date"].isoformat()},
+                coverage_basis="source tc and returned SDK rows for requested qdate; not independent whole-market proof",
+                universe_completeness_verified=False)
         mapping_rows = fetched.rows if is_em_history else source_rows
         if is_em_history:
             excluded_ref = result_store.write_json(_json_value(fetched.excluded_rows), dataset="excluded_rows",
@@ -309,7 +324,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             raise NormalizationError("temporary empty input; not certified as a valid empty dataset")
         mapping_context = {"provider": contract.provider}
         mapping_context.update(getattr(fetched, "mapping_context", {}))
-        if input_id.startswith("SDA-BOARD-") or is_tencent_snapshot or is_em_history:
+        if input_id.startswith("SDA-BOARD-") or is_tencent_snapshot or is_em_history or is_stock_pool:
             successful = [event for event in response_events if event.get("outcome") == "response"]
             if not successful:
                 raise NormalizationError("source response evidence is required; an SDK memory cache alone is insufficient")
@@ -325,7 +340,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             mapping_context["source_snapshot_at"] = max(source_times)
             report["source_capture_window"] = {"first": min(source_times).isoformat(), "last": max(source_times).isoformat(),
                                                "meaning": "source response capture times; not row-level market timestamps"}
-            if not is_tencent_snapshot and not is_em_history:
+            if not is_tencent_snapshot and not is_em_history and not is_stock_pool:
                 report["returned_window"] = {"first": fetched.returned_first_key, "last": fetched.returned_last_key}
                 report["source_units"] = list(fetched.units)
                 report["coverage_basis"] = "returned SDK rows; not an independently verified market universe"

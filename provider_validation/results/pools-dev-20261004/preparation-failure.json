@@ -1,0 +1,6 @@
+{
+  "stage": "configuration preparation",
+  "failure": "isolated YAML block has unresolved shared id004 alias",
+  "resolution": "read endpoint metadata from the complete YAML document",
+  "runtime_config_changed_before_failure": false
+}

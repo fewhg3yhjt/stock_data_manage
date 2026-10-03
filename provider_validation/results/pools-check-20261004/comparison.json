@@ -1,0 +1,423 @@
+{
+  "validation_time_utc": "2026-10-03T22:37:35.909180+00:00",
+  "mode": "offline_replay",
+  "network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "verification_code": {
+    "path": "tests/test_input_collection.py",
+    "sha256": "ac975f1c8349fdacdd2b9a6d71e8f14eb9389c720e6cd81339a6a75ad9b81321"
+  },
+  "runner": {
+    "path": "provider_validation/tests/replay_input_capabilities.py",
+    "sha256": "129d5e566e25b5c3083d8dcdd66e6f47a44a54bd35d2b6fed8b02b855437aebd"
+  },
+  "inputs": [
+    {
+      "input_id": "ASTOCK-046",
+      "report_path": "provider_validation/results/pools-check-20261004/ASTOCK-046/candidate/ASTOCK-046-d908ab07a695/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "report_sha256": "29cdb875596dc01eb775ae4f449a1a3360c73f53263ba22c62af2d31fbd527b4",
+      "source_manifest": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+      "source_manifest_sha256": "885abd6bf1c4b809b9029759f61b75c7d6a297755fd76ca6c545720db38a6767",
+      "row_count": 12,
+      "scope": {
+        "date": "2026-09-30"
+      },
+      "code_version": "81604edd6c81b0ad45d0bb7442521801fc92811c441013a66c7e1a71483ab45f",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-047",
+      "report_path": "provider_validation/results/pools-check-20261004/ASTOCK-047/candidate/ASTOCK-047-ac62f9816bfd/2026-10-03/input_report/eastmoney/limit_down_pool/report.json",
+      "report_sha256": "46fe5f0bf2bf2c9a4f599ed94dee84c96e0a0790a7d5b8785228c2c281a852d7",
+      "source_manifest": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+      "source_manifest_sha256": "885abd6bf1c4b809b9029759f61b75c7d6a297755fd76ca6c545720db38a6767",
+      "row_count": 9,
+      "scope": {
+        "date": "2026-09-30"
+      },
+      "code_version": "5cb1e329ab8042f92cf1cc59d6844901ad8a5c2c387fcf5534987ccf883f44c7",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-048",
+      "report_path": "provider_validation/results/pools-check-20261004/ASTOCK-048/candidate/ASTOCK-048-63add54934f5/2026-10-03/input_report/eastmoney/previous_limit_pool/report.json",
+      "report_sha256": "898b4297517d21de1a2e115cc8af57bfbbbfc9b2ab7f258029749a52d2e714ea",
+      "source_manifest": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+      "source_manifest_sha256": "885abd6bf1c4b809b9029759f61b75c7d6a297755fd76ca6c545720db38a6767",
+      "row_count": 57,
+      "scope": {
+        "date": "2026-09-30"
+      },
+      "code_version": "d1a5096b949ae89e7cd20ff549cb2605ab27f51118ac5f68c73c9097cfb51e7f",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-050",
+      "report_path": "provider_validation/results/pools-check-20261004/ASTOCK-050/candidate/ASTOCK-050-2679c729b018/2026-10-03/input_report/eastmoney/strong_stock_pool/report.json",
+      "report_sha256": "111bab3d2446c994a8dabf47f35f18a2bbe7e265daeccb0030d166c9ebcb3402",
+      "source_manifest": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+      "source_manifest_sha256": "885abd6bf1c4b809b9029759f61b75c7d6a297755fd76ca6c545720db38a6767",
+      "row_count": 199,
+      "scope": {
+        "date": "2026-09-30"
+      },
+      "code_version": "9c6d85566d86859a65035bb20b98e996de5990ad507970e4078bdc21fef4d045",
+      "result": "passed"
+    }
+  ],
+  "original_vs_provider": [
+    {
+      "input_id": "ASTOCK-046",
+      "original_csv": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\44_东财炸板池\\data.csv",
+      "original_csv_sha256": "a655b7abf2edac2375cc8e91f6ed0634bee9260ee78ad5a10b51fa17ad95f387",
+      "original_probe_sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0",
+      "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\pools-check-20261004\\ASTOCK-046\\original\\manifest.ndjson",
+      "original_manifest_sha256": "ecfa60a3e0a73913d91063e89a8d9575dc0c362805d737c408fff295db755578",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\pools-check-20261004\\ASTOCK-046\\candidate\\ASTOCK-046-d908ab07a695\\2026-10-03\\input_report\\eastmoney\\broken_limit_pool\\report.json",
+      "report_sha256": "29cdb875596dc01eb775ae4f449a1a3360c73f53263ba22c62af2d31fbd527b4",
+      "rows_compared": 12,
+      "all_sdk_source_columns_equal": true,
+      "all_csv_columns_equal": true,
+      "request_comparison": [
+        {
+          "original": {
+            "url": "https://push2ex.eastmoney.com/getTopicZBPool?Pageindex=0&date=20260930&dpt=wz.ztzt&pagesize=5000&sort=fbt%3Aasc&ut=%3Credacted%3E",
+            "method": "GET",
+            "outcome": "response",
+            "status_code": 200,
+            "body_sha256": "b4bd1938d591fc3cffd09746e501ac3c9e8717c3bd7bfe7f39f78785a5e334b8",
+            "request_headers": {
+              "User-Agent": "python-requests/2.32.5",
+              "Accept-Encoding": "gzip, deflate, br, zstd",
+              "Accept": "*/*",
+              "Connection": "keep-alive"
+            },
+            "request_options": {
+              "timeout": null,
+              "allow_redirects": true,
+              "trust_env": true,
+              "proxies": {},
+              "sdk_retry_policy": true
+            }
+          },
+          "provider": {
+            "url": "https://push2ex.eastmoney.com/getTopicZBPool?Pageindex=0&date=20260930&dpt=wz.ztzt&pagesize=5000&sort=fbt%3Aasc&ut=%3Credacted%3E",
+            "method": "GET",
+            "outcome": "response",
+            "status_code": 200,
+            "body_sha256": "b4bd1938d591fc3cffd09746e501ac3c9e8717c3bd7bfe7f39f78785a5e334b8",
+            "request_headers": {
+              "User-Agent": "python-requests/2.32.5",
+              "Accept-Encoding": "gzip, deflate, br, zstd",
+              "Accept": "*/*",
+              "Connection": "keep-alive"
+            },
+            "request_options": {
+              "timeout": null,
+              "allow_redirects": true,
+              "trust_env": true,
+              "proxies": {},
+              "sdk_retry_policy": true
+            }
+          }
+        }
+      ],
+      "returned_date_equal": true,
+      "standard_numeric_units_unverified": [
+        "amount",
+        "float_market_cap",
+        "total_market_cap"
+      ],
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-047",
+      "original_csv": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\45_东财跌停池\\data.csv",
+      "original_csv_sha256": "f52aaa4045fd8fe773109a8074b90255d6292ae033abc9bb2aae04849711bad5",
+      "original_probe_sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0",
+      "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\pools-check-20261004\\ASTOCK-047\\original\\manifest.ndjson",
+      "original_manifest_sha256": "6c4538a548089d2143ffd5039beb7eeba71a85494d3acb73c4b8d0175339ebba",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\pools-check-20261004\\ASTOCK-047\\candidate\\ASTOCK-047-ac62f9816bfd\\2026-10-03\\input_report\\eastmoney\\limit_down_pool\\report.json",
+      "report_sha256": "46fe5f0bf2bf2c9a4f599ed94dee84c96e0a0790a7d5b8785228c2c281a852d7",
+      "rows_compared": 9,
+      "all_sdk_source_columns_equal": true,
+      "all_csv_columns_equal": true,
+      "request_comparison": [
+        {
+          "original": {
+            "url": "https://push2ex.eastmoney.com/getTopicDTPool?Pageindex=0&date=20260930&dpt=wz.ztzt&pagesize=10000&sort=fund%3Aasc&ut=%3Credacted%3E",
+            "method": "GET",
+            "outcome": "response",
+            "status_code": 200,
+            "body_sha256": "a4e93dfbb6aab53efa0722528f3c200bb03ed48477a73faf854cd1c72530557f",
+            "request_headers": {
+              "User-Agent": "python-requests/2.32.5",
+              "Accept-Encoding": "gzip, deflate, br, zstd",
+              "Accept": "*/*",
+              "Connection": "keep-alive"
+            },
+            "request_options": {
+              "timeout": null,
+              "allow_redirects": true,
+              "trust_env": true,
+              "proxies": {},
+              "sdk_retry_policy": true
+            }
+          },
+          "provider": {
+            "url": "https://push2ex.eastmoney.com/getTopicDTPool?Pageindex=0&date=20260930&dpt=wz.ztzt&pagesize=10000&sort=fund%3Aasc&ut=%3Credacted%3E",
+            "method": "GET",
+            "outcome": "response",
+            "status_code": 200,
+            "body_sha256": "a4e93dfbb6aab53efa0722528f3c200bb03ed48477a73faf854cd1c72530557f",
+            "request_headers": {
+              "User-Agent": "python-requests/2.32.5",
+              "Accept-Encoding": "gzip, deflate, br, zstd",
+              "Accept": "*/*",
+              "Connection": "keep-alive"
+            },
+            "request_options": {
+              "timeout": null,
+              "allow_redirects": true,
+              "trust_env": true,
+              "proxies": {},
+              "sdk_retry_policy": true
+            }
+          }
+        }
+      ],
+      "returned_date_equal": true,
+      "standard_numeric_units_unverified": [
+        "amount",
+        "float_market_cap",
+        "total_market_cap",
+        "limit_capital",
+        "limit_board_amount"
+      ],
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-048",
+      "original_csv": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\46_东财昨日涨停池\\data.csv",
+      "original_csv_sha256": "5141681d9a06948832d4b9e05ebb9a0f1a9ec8b16caa98a00293c10ea06f95a7",
+      "original_probe_sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0",
+      "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\pools-check-20261004\\ASTOCK-048\\original\\manifest.ndjson",
+      "original_manifest_sha256": "44c10af460bb797eec063a164b258ccb6eb2c83dc444b4e0b650cf768f56be18",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\pools-check-20261004\\ASTOCK-048\\candidate\\ASTOCK-048-63add54934f5\\2026-10-03\\input_report\\eastmoney\\previous_limit_pool\\report.json",
+      "report_sha256": "898b4297517d21de1a2e115cc8af57bfbbbfc9b2ab7f258029749a52d2e714ea",
+      "rows_compared": 57,
+      "all_sdk_source_columns_equal": true,
+      "all_csv_columns_equal": true,
+      "request_comparison": [
+        {
+          "original": {
+            "url": "https://push2ex.eastmoney.com/getYesterdayZTPool?Pageindex=0&date=20260930&dpt=wz.ztzt&pagesize=5000&sort=zs%3Adesc&ut=%3Credacted%3E",
+            "method": "GET",
+            "outcome": "response",
+            "status_code": 200,
+            "body_sha256": "d4f6ab36119677ee909f1444490a4ddf233bd69e53f497ba6392030d6253328e",
+            "request_headers": {
+              "User-Agent": "python-requests/2.32.5",
+              "Accept-Encoding": "gzip, deflate, br, zstd",
+              "Accept": "*/*",
+              "Connection": "keep-alive"
+            },
+            "request_options": {
+              "timeout": null,
+              "allow_redirects": true,
+              "trust_env": true,
+              "proxies": {},
+              "sdk_retry_policy": true
+            }
+          },
+          "provider": {
+            "url": "https://push2ex.eastmoney.com/getYesterdayZTPool?Pageindex=0&date=20260930&dpt=wz.ztzt&pagesize=5000&sort=zs%3Adesc&ut=%3Credacted%3E",
+            "method": "GET",
+            "outcome": "response",
+            "status_code": 200,
+            "body_sha256": "d4f6ab36119677ee909f1444490a4ddf233bd69e53f497ba6392030d6253328e",
+            "request_headers": {
+              "User-Agent": "python-requests/2.32.5",
+              "Accept-Encoding": "gzip, deflate, br, zstd",
+              "Accept": "*/*",
+              "Connection": "keep-alive"
+            },
+            "request_options": {
+              "timeout": null,
+              "allow_redirects": true,
+              "trust_env": true,
+              "proxies": {},
+              "sdk_retry_policy": true
+            }
+          }
+        }
+      ],
+      "returned_date_equal": true,
+      "standard_numeric_units_unverified": [
+        "amount",
+        "float_market_cap",
+        "total_market_cap"
+      ],
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-050",
+      "original_csv": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\48_东财强势_重点监控替代池\\data.csv",
+      "original_csv_sha256": "69e90f34f18d92346382673792347c369df5f2d0ddca0f753a151878f5fec3a0",
+      "original_probe_sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0",
+      "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\pools-check-20261004\\ASTOCK-050\\original\\manifest.ndjson",
+      "original_manifest_sha256": "348632e7568aa3eb01a485e4c4259f521f1ad059378e57790f12a4139e4b25cd",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\pools-check-20261004\\ASTOCK-050\\candidate\\ASTOCK-050-2679c729b018\\2026-10-03\\input_report\\eastmoney\\strong_stock_pool\\report.json",
+      "report_sha256": "111bab3d2446c994a8dabf47f35f18a2bbe7e265daeccb0030d166c9ebcb3402",
+      "rows_compared": 199,
+      "all_sdk_source_columns_equal": true,
+      "all_csv_columns_equal": true,
+      "request_comparison": [
+        {
+          "original": {
+            "url": "https://push2ex.eastmoney.com/getTopicQSPool?Pageindex=0&date=20260930&dpt=wz.ztzt&pagesize=5000&sort=zdp%3Adesc&ut=%3Credacted%3E",
+            "method": "GET",
+            "outcome": "response",
+            "status_code": 200,
+            "body_sha256": "4f9d16d10f9bfd7fd6a9ba0190b9ff362a62aa9dcdfc557a5b11cf5345bc51a8",
+            "request_headers": {
+              "User-Agent": "python-requests/2.32.5",
+              "Accept-Encoding": "gzip, deflate, br, zstd",
+              "Accept": "*/*",
+              "Connection": "keep-alive"
+            },
+            "request_options": {
+              "timeout": null,
+              "allow_redirects": true,
+              "trust_env": true,
+              "proxies": {},
+              "sdk_retry_policy": true
+            }
+          },
+          "provider": {
+            "url": "https://push2ex.eastmoney.com/getTopicQSPool?Pageindex=0&date=20260930&dpt=wz.ztzt&pagesize=5000&sort=zdp%3Adesc&ut=%3Credacted%3E",
+            "method": "GET",
+            "outcome": "response",
+            "status_code": 200,
+            "body_sha256": "4f9d16d10f9bfd7fd6a9ba0190b9ff362a62aa9dcdfc557a5b11cf5345bc51a8",
+            "request_headers": {
+              "User-Agent": "python-requests/2.32.5",
+              "Accept-Encoding": "gzip, deflate, br, zstd",
+              "Accept": "*/*",
+              "Connection": "keep-alive"
+            },
+            "request_options": {
+              "timeout": null,
+              "allow_redirects": true,
+              "trust_env": true,
+              "proxies": {},
+              "sdk_retry_policy": true
+            }
+          }
+        }
+      ],
+      "returned_date_equal": true,
+      "standard_numeric_units_unverified": [
+        "amount",
+        "float_market_cap",
+        "total_market_cap"
+      ],
+      "result": "passed"
+    }
+  ],
+  "known_differences": [
+    "扩展原limit_pool.py，原涨停池默认调用保持；四个新端点分别定义必要字段模板。",
+    "来源qdate须等于请求交易日，tc须等于来源池和SDK行数；不把请求日或采集时间冒充其他来源日期。",
+    "昨日涨停池归属来源qdate，不推断昨日交易日；强势股池不当作官方重点监控名单。",
+    "SDK最新30天限制保持，只有回放时使用原响应采集时钟，实时调用仍用原SDK时钟。",
+    "ASTOCK-023与SDA-BOARD-003成功THS分支归并；失败EastMoney变体不继承来源资格。",
+    "金额/市值保留来源原值，标准字段为空；本批为归档回放，未新增实时探针、自动调度或生产发布。"
+  ],
+  "negative_checks": [
+    {
+      "mutation": "date",
+      "failure_class": "schema_changed",
+      "report_path": "provider_validation/results/pools-check-20261004/f1/out/ASTOCK-046-844661a9670f/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "report_sha256": "d248f5a5000bf8a72f58cf8c373a08d515373a4f61cc21cfa6ab70e32c938739",
+      "result": "passed"
+    },
+    {
+      "mutation": "count",
+      "failure_class": "truncated",
+      "report_path": "provider_validation/results/pools-check-20261004/f2/out/ASTOCK-046-e6eaa30f1c4b/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "report_sha256": "3aa9e0f20f7acfdf935a0acf9c04dd110e2851444cb9bc5b1fe8b14c7b38d3b0",
+      "result": "passed"
+    },
+    {
+      "mutation": "duplicate",
+      "failure_class": "NormalizationError",
+      "report_path": "provider_validation/results/pools-check-20261004/f3/out/ASTOCK-046-662de0c7cb82/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "report_sha256": "91ddb9ddd2ab4621af0a3a97c5b91132f3149d5044adbd84dec96cb718d39795",
+      "result": "passed"
+    },
+    {
+      "mutation": "code",
+      "failure_class": "schema_changed",
+      "report_path": "provider_validation/results/pools-check-20261004/f4/out/ASTOCK-046-82d519ecdfc2/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "report_sha256": "1897ba948e264b60fcd6bcd54630b220e47b0df7194ddcbbfd85998739b7b4cc",
+      "result": "passed"
+    },
+    {
+      "mutation": "numeric",
+      "failure_class": "NormalizationError",
+      "report_path": "provider_validation/results/pools-check-20261004/f5/out/ASTOCK-046-3bc4e2d8fdb5/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "report_sha256": "efe199240ddf34ab9ea3476f7dd13c238e2e8d1da33085fd556af4231a1e6df7",
+      "result": "passed"
+    },
+    {
+      "mutation": "zero",
+      "failure_class": "NormalizationError",
+      "report_path": "provider_validation/results/pools-check-20261004/f6/out/ASTOCK-046-6a1813cfbea6/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "report_sha256": "b5baec9cfc1567433867c250bf9694159f59da8e8365da25eb7de2d34aa8953c",
+      "result": "passed"
+    },
+    {
+      "mutation": "business",
+      "failure_class": "schema_changed",
+      "report_path": "provider_validation/results/pools-check-20261004/f7/out/ASTOCK-046-43edec021edb/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "report_sha256": "1c80e6099e2e928169b4ff6883aa73a665c2e4fc0f69168c964262c254f29294",
+      "result": "passed"
+    },
+    {
+      "mutation": "empty",
+      "failure_class": "temporary_empty",
+      "report_path": "provider_validation/results/pools-check-20261004/f8/out/ASTOCK-046-26befc202c24/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "report_sha256": "f3b9622203f5d77322c053587d9ca95ba814bba050027f2ce94aea80fa2875b8",
+      "result": "passed"
+    },
+    {
+      "mutation": "null",
+      "failure_class": "temporary_empty",
+      "report_path": "provider_validation/results/pools-check-20261004/f9/out/ASTOCK-046-a33e68c349ce/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "report_sha256": "7104572fa66906348a8fd2e5225af9b81fbef5aec4f9eabf9997276913f0a445",
+      "result": "passed"
+    },
+    {
+      "mutation": "http_429",
+      "failure_class": "rate_limited",
+      "report_path": "provider_validation/results/pools-check-20261004/f10/out/ASTOCK-046-b2793a28d838/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "report_sha256": "80a75e6994b3583590a150bd2c64e4733c4a56876f2665a4d3297cb534c71bc5",
+      "result": "passed"
+    },
+    {
+      "mutation": "html",
+      "failure_class": "JSONDecodeError",
+      "report_path": "provider_validation/results/pools-check-20261004/f11/out/ASTOCK-046-401d6faa103c/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "report_sha256": "3e1e264f4ee34e9c01f3355f27b72c4126fbe9aec0ae4826798fa7894893b621",
+      "result": "passed"
+    },
+    {
+      "mutation": "transport",
+      "failure_class": "ConnectionError",
+      "report_path": "provider_validation/results/pools-check-20261004/f12/out/ASTOCK-046-2d9407fd465d/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
+      "report_sha256": "d7a6b9157b8437da3a24d1f20e48b8fb36e6e15e5b04c3ac4afe7963208e6f32",
+      "result": "passed"
+    }
+  ]
+}
