@@ -13,7 +13,7 @@
 
 ## 覆盖表字段和判定
 
-旧版87项能力审计清单为 `coverage/a-stock-data-capability-inventory.csv`。逐接口完整报告为 `coverage/interface-coverage.csv`，阅读版工作簿为 `coverage/interface-coverage.xlsx`。完整报告有95行：87项上游能力、2条不计入分母的说明/参数变体，以及6条 `stock-data-analyse` 板块接口补充项。每行记录来源、类别、接口说明、调用方式、代码/测试代码、验证结果、返回样例及原始响应/解析结果引用。字段口径、状态统计和证据限制见 [接口测试覆盖度表说明](docs/interface-coverage-method.md)。
+旧版87项能力审计清单为 `coverage/a-stock-data-capability-inventory.csv`。逐接口完整报告为 `coverage/interface-coverage.csv`，阅读版工作簿为 `coverage/interface-coverage.xlsx`。完整报告有95行：87项上游能力、2条不计入分母的说明/参数变体，以及6条 `stock-data-analyse` 板块接口补充项。每行记录来源、能力声明、实测范围、代码/测试代码、验证结果、返回样例及原始响应/解析结果引用；证据状态代码旁附中文解释。阅读版另有“状态释义”工作表。字段口径、状态统计和证据限制见 [接口测试覆盖度表说明](docs/interface-coverage-method.md)。
 
 ## 结果与原始响应
 

@@ -3,6 +3,8 @@
   "source": "a-stock-data",
   "validation_result": "通过",
   "current_missing_probe_status": "not_run",
+  "evidence_status": "live_raw",
+  "evidence_status_description": "实时原始响应已归档；仅代表本行注明的实测范围",
   "evidence_level": "此前实时验证已保存原始响应；本轮补抓脚本结果另列，测试范围不自动视为相同。",
   "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:231 (上游内嵌接口说明/实现快照)",
   "source_code_artifacts": [
@@ -29,11 +31,11 @@
   "coverage_denominator": 87,
   "scope": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。",
   "finding": "通过。本轮测了2026-09-18全市场盘后包。 文档边界：未逐日验证",
-  "sample": "PK\u0003\u0004\u0014\u0000\u0002\u0000\b\u0000�|2]��v\u0017�u\u000e\u0000\u0000:�\u0000 \u0000\u0000\u0000sh260918.md1�\u0007X����A\u0011T,���\u0002\u0016�\u000e���\u0005\u000f\u0005\u0004E@Ć�\u0010\u0010�(\u0016\u0010\u0014D�I���ޤJ�\u0001�^Q� b��e7Q\u0003! ����o��g�����/3;3;;{X���8��Is\u0012��Y�^<[�\b�o���\u0017�\b�^ x��0\u0011X\b\u000e�*pM\u0004� ;�\u0010ǞU�\u0003y~9��/ ��Ly�ĳ���}����\u0013\u000f�qo�P]e ��W�\u000e�+�H�?m��F��n�V �����am�r�D��W\u0005:4��V>o��>����U�\u0018�����D@\\.� -_�r\u0000�2� >��������\u0007߮u:ԯ f�\u0017I�soja\u0012�5��}�{I@����[ݓ���ߵ�'\u0001�j�Kѝ��;��?bV� ��A�T��{��̔=6�=�qߨ�� ����i�X��;�l��x�� |�%�ϵ�y�\u0011\u00166\u001a\u000e��I y{�\u000fNn\u0003�����F���� �7\u001a��߸\u0017\u000fϨ\u0017� �wn\u0005<�l�ʶn\u0005�����㣕i�����/�%-�H�cdd4�-?B���9�\u000f s \u0017˅ңc\u000f�����=\u0012��\u001a�_!����?�(�������H�����3|g\"�]'���믟W��Q\u0016~^�xi��M.\u0012j�\u0017�\u00162�j\u0013�\\h<\\r����m�/�?i�u'�p¦�����\b͖��?�����O�������ܩ���jھЏ\u0007�}�U�z�\u0003�!o�v\\�\u0007�o��8 �����*�'���R���9���o\u0019ce�?����B������g�1��|�j>S���\u0012���\u0012�i��\bPP�O�st\u0004P��…",
+  "sample": "PK �|2]��v �u :� sh260918.md1� X����A T,��� � ��� E@Ć� �( D�I���ޤJ� �^Q� b��e7Q ! ���� o��g�����/3;3;;{X���8��Is ��Y�^<[� �o��� � �^ x��0 X �*pM � ;� ǞU� y~9��/ ��Ly�ĳ���}���� �qo�P ]e ��W� �+�H�?m��F��n�V �����am�r�D��W :4��V>o��>����U� �����D@\\.� -_�r �2� >�������� ߮u:ԯ f� I�soja �5��}�{I@����[ݓ���ߵ�' �j�Kѝ��;��?bV� � �A�T��{��̔=6�=�qߨ�� ����i�X��;�l��x� � |�%�ϵ�y� 6 ��I y{� Nn �����F���� �7 ��߸ Ϩ � �wn <�l�ʶn ����� 㣕i�����/�%-�H�cdd4�-?B���9� s ˅ңc �����= �� �_!����?�(�������H�����3|g\"�]'���믟W��Q ~^�xi��M. j� � 2�j �\\h<\\r����m�/�?i�u'�p¦����� ͖��?�����O�������ܩ���jھЏ �}�U�z� �!o�v\\� �o�� 8 �����*�'���R���9��� o ce�?����B������g�1��|�j>S��� ��� �i�� PP�O�st P���_vE XX �R* ��r �� ��*[A��m …",
   "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
   "transformation_code_version": {
     "path": "provider_validation/tests/build_interface_coverage.py",
-    "sha256": "3e4ae63e410fa129a4efc2cce8e79973fd41959ef8fd709fcd3b9bfb137d3260"
+    "sha256": "7e094251e9efdf1d355f8c8b853630456f7a1778b3ce928df578283152145ef0"
   },
-  "validation_time_utc": "2026-10-03T08:37:11.130166+00:00"
+  "validation_time_utc": "2026-10-03T08:58:03.433432+00:00"
 }

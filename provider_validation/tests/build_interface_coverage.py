@@ -27,12 +27,24 @@ RECORDS_DIR = VALIDATION / "results" / "interface-records"
 
 FIELDS = [
     "接口ID", "清单范围", "是否计入87项", "项目/来源", "类别", "接口/能力名称", "接口地址/协议",
-    "接口/调用符号", "接口说明", "接口内容/主要字段", "调用方式/参数范围",
+    "接口/调用符号", "接口说明", "能力说明（文档声明）/返回字段", "调用方式/参数范围",
     "来源代码文件/行号", "代码SHA-256", "测试代码文件/行号", "项目Provider对照代码",
-    "接口取数结果", "本轮补抓脚本结果", "证据完整度", "验证范围/日期", "验证备注/数据核验结论",
+    "接口取数结果", "本轮补抓脚本结果", "证据完整度", "实测范围/日期/结果", "验证备注/数据核验结论",
     "原始响应Manifest", "原始响应文件/哈希", "解析结果/输出文件", "结果文件SHA-256/行数", "返回示例",
-    "逐接口结果记录", "来源版本/提交", "证据状态"
+    "逐接口结果记录", "来源版本/提交", "证据状态代码", "证据状态说明"
 ]
+
+EVIDENCE_STATUS_LABELS = {
+    "live_raw": "实时原始响应已归档；仅代表本行注明的实测范围",
+    "parsed_only": "仅保存解析结果；没有对应的原始响应",
+    "historical_parsed_only": "仅有历史解析/合并结果；未做本轮实时验证",
+    "local_cache_unverified": "存在本地缓存；未验证实时接口",
+    "failed": "本轮探针或数据校验失败",
+    "unavailable": "接口当前不可用或受到访问阻断",
+    "credential_required": "需要凭据；本轮未能验证",
+    "shared_endpoint_variant_not_separately_live_verified": "共用接口的该参数变体未单独实时验证",
+    "undetermined": "证据状态未能判定",
+}
 
 
 def read_csv(path: Path) -> list[dict[str, str]]:
@@ -53,7 +65,8 @@ def rel(path: Path | str | None) -> str:
 
 
 def short(text: Any, n: int = 600) -> str:
-    s = re.sub(r"\s+", " ", str(text or "")).strip()
+    cleaned = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", " ", str(text or ""))
+    s = re.sub(r"\s+", " ", cleaned).strip()
     return s if len(s) <= n else s[: n - 1] + "…"
 
 
@@ -302,6 +315,29 @@ def example_from_raw(path_text: str) -> str:
     return ""
 
 
+def kline_period_samples(path_text: str) -> str:
+    """Summarize the retained daily and minute K-line responses independently."""
+    samples = []
+    for token in path_text.split(";"):
+        p = ROOT / token.strip()
+        if not p.is_file():
+            continue
+        try:
+            raw = gzip.open(p, "rb").read() if p.suffix == ".gz" else p.read_bytes()
+            payload = json.loads(raw.decode("utf-8"))
+            for symbol, item in payload.get("data", {}).items():
+                if not isinstance(item, dict):
+                    continue
+                for period in ("qfqday", "day", "m5"):
+                    bars = item.get(period)
+                    if isinstance(bars, list) and bars:
+                        label = {"qfqday": "日线（前复权）", "day": "日线", "m5": "5分钟"}[period]
+                        samples.append(f"{label} {symbol}: {len(bars)}条；首条={json.dumps(bars[0], ensure_ascii=False)}")
+        except Exception as e:
+            samples.append(f"样例读取失败 {p.name}: {type(e).__name__}: {e}")
+    return "；".join(samples) or "无可解析K线样例；查看原始响应文件/哈希"
+
+
 def raw_refs(row: dict[str, str]) -> tuple[str, str]:
     manifest = []
     bodies = []
@@ -426,10 +462,29 @@ def main() -> None:
             output_ref = inv.get("派生解析数据文件", "") or ""
         output_ref = "; ".join(rel(p) for p in output_ref.split(";") if p.strip()) if output_ref else ""
         sample = examples_for_file(output_ref.split(";")[0] if output_ref else "") or example_from_raw(body_ref)
+        if name == "腾讯 K 线":
+            sample = kline_period_samples(body_ref)
         if not sample and result:
             sample = short(result.get("message", ""), 500)
         if not function:
             function = "未在本轮脚本中独立映射；参见上游调用代码快照"
+        declared_content = short(inv.get("claimed_data", "") or inv.get("数据内容", ""), 800)
+        validation_scope = short((inv.get("本轮备注", "") + " " + inv.get("本轮文件行数结构检查", "")).strip() or inv.get("证据说明", ""), 500)
+        validation_finding = notes
+        if name == "腾讯 K 线":
+            declared_content = "上游声明支持：沪深日/周/月K（前/后复权）及1/5/15/30/60分钟K；上游文档注明不含北交所。此处是能力声明，不代表各周期均已实测。"
+            validation_scope = (
+                "日线：sh600519，qfq，2026-09-01至2026-09-18，HTTP 200、code=0，返回14条日线。"
+                "5分钟：sz300750，未传日期窗口、请求最近96条；直连web3.ifzq.gtimg.cn发生2次TLS EOF，"
+                "使用备用域名proxy.finance.qq.com回退后HTTP 200、code=0，返回96条，样例日期为2026-09-29。"
+                "未单独验证：周线、月线、1/15/30/60分钟线；不含北交所。"
+            )
+            validation_finding = (
+                "实测样本的日线直连和5分钟备用域名回退均取得有效K线数据；直连5分钟请求失败已作为传输失败事件留档。"
+                "5分钟请求未限制日期窗口，响应日期与清单requested_data_date不同，因此不能将其视为2026-09-18历史5分钟数据验证。"
+                "通过结论仅覆盖上述日线及未限定日期的最近96条5分钟样本，不能代表其他周期或北交所。"
+            )
+        evidence_status = "live_raw" if original_status == "verified_live_raw_saved" else ("parsed_only" if result and probe_status in ("success", "partial") else (probe_status or original_status or "undetermined"))
         raw_digests = [Path(x.strip()).name.split(".")[0] for x in body_ref.split(";") if x.strip()]
         manifest_events = [manifest_body_index[d] for d in raw_digests if d in manifest_body_index]
         endpoint_parts = list(dict.fromkeys(f"{e['method']} {e['url']}".strip() for e in manifest_events if e.get("url")))
@@ -452,8 +507,8 @@ def main() -> None:
             "接口/能力名称": name,
             "接口地址/协议": endpoint_info,
             "接口/调用符号": api_symbol or function,
-            "接口说明": short(name + "；上游能力声明，调用细节见代码快照和接口内容列。", 500),
-            "接口内容/主要字段": short(inv.get("claimed_data", "") or inv.get("数据内容", ""), 800),
+            "接口说明": short(name + "；上游能力声明，调用细节见代码快照和能力说明/返回字段列。", 500),
+            "能力说明（文档声明）/返回字段": declared_content,
             "调用方式/参数范围": (f"探针入口：a_stock_missing_capabilities.py --run {probe_id} → {function}(cfg)；上游API：{UPSTREAM_API_SYMBOLS.get(name, function)}" if result else f"上游API：{UPSTREAM_API_SYMBOLS.get(name, function)}；本轮无独立执行入口或未单独探测。"),
             "来源代码文件/行号": code_ref,
             "代码SHA-256": "; ".join(f"{a['path']}={a['sha256']}" for a in code_artifacts) or "见来源快照路径/固定提交",
@@ -462,8 +517,8 @@ def main() -> None:
             "接口取数结果": verdict,
             "本轮补抓脚本结果": ("未执行" if not result else {"success": "成功（解析输出非空）", "partial": "部分成功（有空/错项）", "failed": "失败", "unavailable": "不可用/受阻", "credential_required": "凭据缺失"}.get(probe_status, probe_status)),
             "证据完整度": evidence,
-            "验证范围/日期": short((inv.get("本轮备注", "") + " " + inv.get("本轮文件行数结构检查", "")).strip() or inv.get("证据说明", ""), 500),
-            "验证备注/数据核验结论": short(notes, 1200),
+            "实测范围/日期/结果": validation_scope,
+            "验证备注/数据核验结论": short(validation_finding, 1200),
             "原始响应Manifest": manifest_ref,
             "原始响应文件/哈希": body_ref or ("无原始响应；" + evidence if result else ("无；" + evidence if not manifest_ref else "见 Manifest 与归档 body 文件；SHA-256 文件名")),
             "解析结果/输出文件": output_ref or ("无解析数据文件" if not result else "本次失败，无解析数据"),
@@ -471,10 +526,11 @@ def main() -> None:
             "返回示例": sample or "无样例响应；本轮没有成功可复查的接口数据。",
             "逐接口结果记录": f"provider_validation/results/interface-records/{source_id}.json",
             "来源版本/提交": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
-            "证据状态": "live_raw" if original_status == "verified_live_raw_saved" else ("parsed_only" if result and probe_status in ("success", "partial") else (probe_status or original_status or "undetermined")),
+            "证据状态代码": evidence_status,
+            "证据状态说明": EVIDENCE_STATUS_LABELS.get(evidence_status, f"未配置状态说明（{evidence_status}）"),
         }
         rows.append(row)
-        result_payloads.append({"interface_id": source_id, "source": "a-stock-data", "validation_result": verdict, "current_missing_probe_status": probe_status or "not_run", "evidence_level": evidence, "source_code_ref": code_ref, "source_code_artifacts": code_artifacts, "test_code_ref": test_ref, "manifest_ref": manifest_ref, "response_artifacts": raw_artifacts, "parsed_output_ref": output_ref, "derived_artifacts": artifacts, "coverage_denominator": 87, "scope": row["验证范围/日期"], "finding": row["验证备注/数据核验结论"], "sample": sample, "source_version": row["来源版本/提交"], "transformation_code_version": {"path": rel(Path(__file__)), "sha256": sha256(Path(__file__))}, "validation_time_utc": datetime.now(timezone.utc).isoformat()})
+        result_payloads.append({"interface_id": source_id, "source": "a-stock-data", "validation_result": verdict, "current_missing_probe_status": probe_status or "not_run", "evidence_status": evidence_status, "evidence_status_description": row["证据状态说明"], "evidence_level": evidence, "source_code_ref": code_ref, "source_code_artifacts": code_artifacts, "test_code_ref": test_ref, "manifest_ref": manifest_ref, "response_artifacts": raw_artifacts, "parsed_output_ref": output_ref, "derived_artifacts": artifacts, "coverage_denominator": 87, "scope": row["实测范围/日期/结果"], "finding": row["验证备注/数据核验结论"], "sample": sample, "source_version": row["来源版本/提交"], "transformation_code_version": {"path": rel(Path(__file__)), "sha256": sha256(Path(__file__))}, "validation_time_utc": datetime.now(timezone.utc).isoformat()})
 
     # Six separately listed board interfaces discussed in the migration review.
     board_rows = [
@@ -502,22 +558,23 @@ def main() -> None:
             "接口ID": ident, "清单范围": "stock-data-analyse 板块接口补充，不计入87项", "是否计入87项": "否",
             "项目/来源": "stock-data-analyse → 本项目 Provider", "类别": category, "接口/能力名称": symbol,
             "接口地址/协议": "HTTPS/HTTP，精确URL见Manifest；BaoStock为SDK/TCP，原始帧不可见" if manifest else "BaoStock SDK over TCP（底层原始帧不可见）",
-            "接口/调用符号": symbol, "接口说明": content, "接口内容/主要字段": content,
+            "接口/调用符号": symbol, "接口说明": content, "能力说明（文档声明）/返回字段": content,
             "调用方式/参数范围": symbol, "来源代码文件/行号": code_ref, "测试代码文件/行号": board_test_by_id[ident],
             "项目Provider对照代码": provider_ref, "接口取数结果": verdict, "本轮补抓脚本结果": "不适用", "证据完整度": evidence,
-            "验证范围/日期": scope, "验证备注/数据核验结论": limitation,
+            "实测范围/日期/结果": scope, "验证备注/数据核验结论": limitation,
             "原始响应Manifest": manifest, "原始响应文件/哈希": "见对应Manifest下的body文件；BaoStock无原始body" if manifest else "未保存：SDK没有暴露原始TCP帧/原始SDK行",
             "解析结果/输出文件": output, "返回示例": sample,
             "逐接口结果记录": f"provider_validation/results/interface-records/{ident}.json",
             "来源版本/提交": "stock-data-analyse c26cabcf89443ec8f1445d0e5af86bf3d6dacf3; 本项目代码以当前工作树为准",
-            "证据状态": "live_raw" if manifest else "historical_parsed_only",
+            "证据状态代码": "live_raw" if manifest else "historical_parsed_only",
+            "证据状态说明": EVIDENCE_STATUS_LABELS["live_raw" if manifest else "historical_parsed_only"],
         }
         board_artifacts = output_artifacts(output)
         board_code_artifacts = code_hashes(code_ref, board_test_by_id[ident], provider_ref)
         row["代码SHA-256"] = "; ".join(f"{a['path']}={a['sha256']}" for a in board_code_artifacts)
         row["结果文件SHA-256/行数"] = "; ".join(f"{a['path']} (rows={a.get('row_count', 'n/a')}; sha256={a['sha256']})" for a in board_artifacts)
         rows.append(row)
-        result_payloads.append({"interface_id": ident, "source": "stock-data-analyse / local Provider", "validation_result": verdict, "evidence_level": evidence, "source_code_ref": code_ref, "source_code_artifacts": board_code_artifacts, "test_code_ref": board_test_by_id[ident], "manifest_ref": manifest, "response_artifacts": [], "parsed_output_ref": output, "derived_artifacts": board_artifacts, "coverage_denominator": None, "scope": scope, "finding": limitation, "sample": sample, "source_version": row["来源版本/提交"], "transformation_code_version": {"path": rel(Path(__file__)), "sha256": sha256(Path(__file__))}, "validation_time_utc": datetime.now(timezone.utc).isoformat()})
+        result_payloads.append({"interface_id": ident, "source": "stock-data-analyse / local Provider", "validation_result": verdict, "evidence_status": row["证据状态代码"], "evidence_status_description": row["证据状态说明"], "evidence_level": evidence, "source_code_ref": code_ref, "source_code_artifacts": board_code_artifacts, "test_code_ref": board_test_by_id[ident], "manifest_ref": manifest, "response_artifacts": [], "parsed_output_ref": output, "derived_artifacts": board_artifacts, "coverage_denominator": None, "scope": scope, "finding": limitation, "sample": sample, "source_version": row["来源版本/提交"], "transformation_code_version": {"path": rel(Path(__file__)), "sha256": sha256(Path(__file__))}, "validation_time_utc": datetime.now(timezone.utc).isoformat()})
 
     if counted != 87:
         raise SystemExit(f"Expected 87 counted capabilities; found {counted}")

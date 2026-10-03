@@ -2,6 +2,8 @@
   "interface_id": "SDA-BOARD-005",
   "source": "stock-data-analyse / local Provider",
   "validation_result": "部分通过",
+  "evidence_status": "historical_parsed_only",
+  "evidence_status_description": "仅有历史解析/合并结果；未做本轮实时验证",
   "evidence_level": "旧派生/合并结果可复核；BaoStock SDK原始行不可见，未保存原始返回帧。",
   "source_code_ref": "provider_validation/tests/source_snapshots/stock-data-analyse/warehouse/industry.py; provider_validation/tests/source_snapshots/stock-data-analyse/fundflow/sources.py; 上游 warehouse/industry.py:125；本项目 src/stock_data_manage/providers/baostock/industry.py:32 fetch_snapshot",
   "source_code_artifacts": [
@@ -45,7 +47,7 @@
   "source_version": "stock-data-analyse c26cabcf89443ec8f1445d0e5af86bf3d6dacf3; 本项目代码以当前工作树为准",
   "transformation_code_version": {
     "path": "provider_validation/tests/build_interface_coverage.py",
-    "sha256": "3e4ae63e410fa129a4efc2cce8e79973fd41959ef8fd709fcd3b9bfb137d3260"
+    "sha256": "7e094251e9efdf1d355f8c8b853630456f7a1778b3ce928df578283152145ef0"
   },
-  "validation_time_utc": "2026-10-03T08:37:13.458814+00:00"
+  "validation_time_utc": "2026-10-03T08:58:06.463171+00:00"
 }

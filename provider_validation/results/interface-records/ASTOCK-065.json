@@ -3,6 +3,8 @@
   "source": "a-stock-data",
   "validation_result": "通过",
   "current_missing_probe_status": "not_run",
+  "evidence_status": "live_raw",
+  "evidence_status_description": "实时原始响应已归档；仅代表本行注明的实测范围",
   "evidence_level": "此前实时验证已保存原始响应；本轮补抓脚本结果另列，测试范围不自动视为相同。",
   "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:285 (上游内嵌接口说明/实现快照)",
   "source_code_artifacts": [
@@ -48,7 +50,7 @@
   "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
   "transformation_code_version": {
     "path": "provider_validation/tests/build_interface_coverage.py",
-    "sha256": "3e4ae63e410fa129a4efc2cce8e79973fd41959ef8fd709fcd3b9bfb137d3260"
+    "sha256": "7e094251e9efdf1d355f8c8b853630456f7a1778b3ce928df578283152145ef0"
   },
-  "validation_time_utc": "2026-10-03T08:37:12.767441+00:00"
+  "validation_time_utc": "2026-10-03T08:58:05.584272+00:00"
 }

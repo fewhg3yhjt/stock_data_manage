@@ -3,6 +3,8 @@
   "source": "a-stock-data",
   "validation_result": "部分通过",
   "current_missing_probe_status": "success",
+  "evidence_status": "parsed_only",
+  "evidence_status_description": "仅保存解析结果；没有对应的原始响应",
   "evidence_level": "解析后输出已保存；本批未保存精确原始HTTP响应。",
   "source_code_ref": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py:766 (fetch_stock_news); provider_validation/tests/source_snapshots/a-stock-data/SKILL.md:257 (eastmoney_stock_news(code))",
   "source_code_artifacts": [
@@ -42,7 +44,7 @@
   "source_version": "a-stock-data V3.10.0 / f814dcfe209dd7958f4858f9d878d591ee85fb56",
   "transformation_code_version": {
     "path": "provider_validation/tests/build_interface_coverage.py",
-    "sha256": "3e4ae63e410fa129a4efc2cce8e79973fd41959ef8fd709fcd3b9bfb137d3260"
+    "sha256": "7e094251e9efdf1d355f8c8b853630456f7a1778b3ce928df578283152145ef0"
   },
-  "validation_time_utc": "2026-10-03T08:37:11.851115+00:00"
+  "validation_time_utc": "2026-10-03T08:58:04.384168+00:00"
 }
