@@ -701,6 +701,17 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
             ],
         )
 
+    def capability_evidence(self, *, provider: str, endpoint: str, capability_version: str) -> tuple[dict[str, object], ...]:
+        """Read the existing evidence rows without manufacturing validation dates."""
+        cursor = self.connection.execute(
+            """SELECT * FROM capability_registry
+               WHERE provider=? AND endpoint=? AND capability_version=?
+               ORDER BY dataset, market, asset_type, frequency, adjustment, code_prefix""",
+            [provider, endpoint, capability_version],
+        )
+        columns = [column[0] for column in cursor.description]
+        return tuple(dict(zip(columns, row)) for row in cursor.fetchall())
+
     def latest_probe(
         self,
         *,

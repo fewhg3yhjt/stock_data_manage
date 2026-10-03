@@ -1,0 +1,111 @@
+{
+  "record_type": "input_capability_framework_offline_verification",
+  "validation_time_utc": "2026-10-03T12:14:22.5664023Z",
+  "baseline_tests_passed": 137,
+  "tests_passed": 163,
+  "tests_failed": 0,
+  "tests_errors": 0,
+  "tests_skipped": 0,
+  "duration_seconds": 41.361,
+  "focused_contract_recheck_passed": 7,
+  "input_count": 74,
+  "successful_interfaces": 73,
+  "coverage_denominator": 73,
+  "hash_checked_artifacts": 330,
+  "live_provider_requests": 0,
+  "production_data_writes": 0,
+  "routing_eligibility_granted": 0,
+  "source_files": [
+    {
+      "path": "config/providers.yaml",
+      "sha256": "88960f2b7905127cc59f10417b810e36dde595afa742f03ebb2810002251609a"
+    },
+    {
+      "path": "config/collection.yaml",
+      "sha256": "9645732392d6b535bfef7d64026d3c7af6767682e9b1a0cee6bf8011386714b9"
+    },
+    {
+      "path": "src/stock_data_manage/config/loader.py",
+      "sha256": "cd0c3e999bb8a26c5d0da413e400e6194bb55148b414d48c6025277bf3916b91"
+    },
+    {
+      "path": "src/stock_data_manage/routing/capabilities.py",
+      "sha256": "9658259b0a584359fe0cafe8570019dd47992c34eae9315d59eb35e13c2137b8"
+    },
+    {
+      "path": "src/stock_data_manage/routing/factory.py",
+      "sha256": "f29239ecc9b22dd16ae7d22c8bf2c92bb48bc16d998c897766934a03ecbc034b"
+    },
+    {
+      "path": "src/stock_data_manage/providers/transport.py",
+      "sha256": "37220fe8107f7b9293735a33cd10cca2c56eb0504045f4caed442fbad3e5ca20"
+    },
+    {
+      "path": "src/stock_data_manage/storage/metadata.py",
+      "sha256": "4ea0212529f7cf584d6688386923cc1802d8046b54157887fc359f156ee23259"
+    },
+    {
+      "path": "provider_validation/tests/prepare_capability_results.py",
+      "sha256": "11cbc4a1c91ebb3e5ee2f5b9f1c46a4f669777997e2d9abe4bd66d4d27077b49"
+    },
+    {
+      "path": "tests/test_config_contract.py",
+      "sha256": "aa8f21ad8e95bade3e58e7914252079209219893bbb2f8145877a75d73e630f5"
+    },
+    {
+      "path": "tests/test_config_provider_factory.py",
+      "sha256": "0c08ea18a0132fc1e2a633e649b336888febfb484764cd0338eeeb14d2982fd7"
+    },
+    {
+      "path": "tests/test_planner_capability.py",
+      "sha256": "cd2141c0a035edc3999dc2213f1785fe12f903c8a7548dc61b6e61aeb2951599"
+    },
+    {
+      "path": "tests/test_provider_contract_adapters.py",
+      "sha256": "7f2746454a9de4bcd4e9b4dd1150d520b1459d05b8a1694abb209c9abacc6486"
+    },
+    {
+      "path": "CODE_STRUCTURE.md",
+      "sha256": "197209a133c0d7adc67ea98e5d9d317cdf011fe20961a81e2ae27fef50b05d15"
+    },
+    {
+      "path": "provider_validation/README.md",
+      "sha256": "dddfddf07097e81072bcc796411f7dc796dc2ac1aaa0df81a1063fdabb3e335d"
+    },
+    {
+      "path": "provider_validation/docs/2026-10-03-input-capability-framework.md",
+      "sha256": "9772ebd5147e714d906d69b95b4c57ca42526879d54c3e7b74ef9fc7f54cc7ce"
+    },
+    {
+      "path": "provider_validation/coverage/interface-coverage.csv",
+      "sha256": "c89d947d06ec9b42e5e03a134bd72d7f3e4898d9b5235dd2c30ac09b6cde2cb5"
+    },
+    {
+      "path": "provider_validation/coverage/successful-input-capabilities.csv",
+      "sha256": "67c8fc0d604feb3fdda786ed56df62989a20dceb59ec9b6c105efb13f0974fa9"
+    },
+    {
+      "path": "provider_validation/coverage/successful-input-capabilities.json",
+      "sha256": "af264f68d8307ad59bab91e80ee873e83eeb28162690c3da31882523e0e23ab3"
+    },
+    {
+      "path": "provider_validation/results/2026-10-03-input-capability-framework-tests.xml",
+      "sha256": "ad1ad7df8b09e70c254187c7f48795be18ca9d0cdc915cc01ba87497eedc8cbf"
+    },
+    {
+      "path": "provider_validation/coverage/interface-coverage.xlsx",
+      "sha256": "1d594aa682144cceb3155752973206c01b9876bdec53d08dac26c27fa01d0623"
+    }
+  ],
+  "limitations": [
+    "Offline configuration/framework verification only; original provider validation scopes remain unchanged.",
+    "No new live probes, provider migrations, production data flows or coverage scheduler.",
+    "SDK internal calls and Requests internal retries are not claimed to have per-request shared pacing."
+  ],
+  "unrelated_changes_preserved": [
+    "AGENTS.md",
+    "provider_validation/coverage/~$interface-coverage.xlsx",
+    "开发记录.md"
+  ],
+  "workbook_unchanged_since_read_only_audit": true
+}

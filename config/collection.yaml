@@ -31,3 +31,36 @@ markets:
     expected_regular_minutes: 240
     include_opening_auction: false
     include_closing_auction: true
+
+# 采集意图；覆盖范围及调度执行另行设计。
+collection_profiles:
+  market_intraday:
+    mode: intraday
+    refresh_interval_seconds: 60
+    business_day: trading_day
+    scheduling_enabled: false
+  news_intraday:
+    mode: intraday
+    refresh_interval_seconds: 300
+    business_day: calendar_day
+    scheduling_enabled: false
+  market_after_close:
+    mode: after_close
+    business_day: trading_day
+    scheduling_enabled: false
+  reference_daily:
+    mode: daily
+    business_day: trading_day
+    scheduling_enabled: false
+  event_daily:
+    mode: daily
+    business_day: calendar_day
+    scheduling_enabled: false
+  macro_daily:
+    mode: daily
+    business_day: calendar_day
+    scheduling_enabled: false
+  source_market_daily:
+    mode: daily
+    business_day: source_calendar
+    scheduling_enabled: false

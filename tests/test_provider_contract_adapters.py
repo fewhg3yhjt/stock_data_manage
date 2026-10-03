@@ -9,7 +9,10 @@ from stock_data_manage.providers.probes import probe_daily_capability, probe_min
 from stock_data_manage.providers.sina import SinaDailyProvider, SinaMinuteProvider, SinaSnapshotProvider
 from stock_data_manage.providers.tdx import TdxMinuteProvider
 from stock_data_manage.providers.tencent import TencentDailyProvider, TencentMinuteProvider, TencentSnapshotProvider
-from stock_data_manage.providers.transport import UrlLibTransport
+from stock_data_manage.providers.transport import UrlLibTransport, RequestPacer, PacedTransport
+from stock_data_manage.config.loader import load_provider_configs
+from stock_data_manage.routing.factory import build_provider
+from pathlib import Path
 from stock_data_manage.routing.capabilities import ProviderCapability
 from stock_data_manage.domain import Adjustment, AssetType, Dataset, Exchange
 from stock_data_manage.storage.metadata import MetadataStore
@@ -30,6 +33,65 @@ class FakeTransport:
     def get(self, url: str, *, params: Mapping[str, str], timeout_seconds: float) -> HttpResponse:
         self.calls.append((url, params, timeout_seconds))
         return self.responses.pop(0)
+
+
+def test_shared_pacer_preserves_request_response_and_releases_after_failure():
+    time = [0.0]
+    waits = []
+    def advance(seconds):
+        waits.append(seconds)
+        time[0] += seconds
+    pacer = RequestPacer(clock=lambda: time[0], wait=advance)
+    pacer.configure("shared", 0.5, 2)
+    pacer.configure("shared", 3, 1)
+    response = HttpResponse(200, {"x-source": "unchanged"}, b"exact response bytes")
+    first = FakeTransport([response])
+    second = FakeTransport([response])
+    params = {"param": "sh600519,m1,,120"}
+    assert PacedTransport(first, pacer, "shared").get("https://source/path", params=params, timeout_seconds=7) is response
+    assert first.calls == [("https://source/path", params, 7)]
+    assert first.calls[0][1] is params
+    with pytest.raises(RuntimeError):
+        with pacer.request("shared"):
+            raise RuntimeError("offline transport failure")
+    assert PacedTransport(second, pacer, "shared").get("https://source/path", params=params, timeout_seconds=7) is response
+    assert waits == [3, 3]
+    with pytest.raises(ValueError, match="before issuing"):
+        pacer.configure("shared", 4)
+
+
+def test_factory_paces_each_tencent_single_symbol_minute_request():
+    configs = load_provider_configs(Path(__file__).resolve().parents[1] / "config/providers.yaml")
+    config = next(c for c in configs if c.provider == "tencent" and c.endpoint == "native_1m")
+    clock = [0.0]
+    starts = []
+    class Source:
+        def get(self, url, *, params, timeout_seconds):
+            starts.append((clock[0], params["param"]))
+            symbol = params["param"].split(",")[0]
+            payload = {"code": 0, "data": {symbol: {"m1": [["202609301000", "1", "1", "1", "1", "10"]]}}}
+            return HttpResponse(200, {}, json.dumps(payload).encode())
+    def advance(seconds):
+        clock[0] += seconds
+    pacer = RequestPacer(clock=lambda: clock[0], wait=advance)
+    source = Source()
+    provider = build_provider(config, source, pacer=pacer)
+    result = provider.fetch_realtime_minute(["sh600519", "sz000001"], datetime(2026, 9, 30, 10, tzinfo=timezone.utc))
+    assert len(result.rows) == 2
+    assert starts == [(0, "sh600519,m1,,120"), (1, "sz000001,m1,,120")]
+    assert provider.transport.transport is source
+    assert config.max_symbols_per_request == 1
+
+
+def test_factory_keeps_eastmoney_source_transport(monkeypatch):
+    from stock_data_manage.routing import factory
+    configs = load_provider_configs(Path(__file__).resolve().parents[1] / "config/providers.yaml")
+    config = next(c for c in configs if c.provider == "eastmoney" and c.endpoint == "financial_main")
+    source = FakeTransport([])
+    monkeypatch.setattr(factory, "EastMoneyRequestsTransport", lambda: source)
+    provider = build_provider(config)
+    assert provider.transport.transport is source
+    assert config.request_limit_enforcement == "call_boundary_only"
 
 
 def response(payload: object, status: int = 200, content_type: str = "application/json") -> HttpResponse:

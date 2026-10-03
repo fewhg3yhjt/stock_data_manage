@@ -34,6 +34,8 @@ python provider_validation/tests/replay_sector_capability_archives.py
 
 探针结果说明见 [验证运行手册](docs/a-stock-data-validation-runbook.md)。逐接口结果另有 `results/interface-records/` 下的 JSON 记录及 `results/interface-coverage-summary.json` 总结。主表可由 `python provider_validation/tests/build_interface_coverage.py` 从已留存证据重建；该脚本不请求网络。
 
+成功输入的第一阶段契约见 [输入能力框架说明](docs/2026-10-03-input-capability-framework.md)，阅读清单位于 `coverage/successful-input-capabilities.csv`，证据关联位于同名 JSON。可用 `python provider_validation/tests/prepare_capability_results.py --input-catalog` 离线重建；该模式校验已存响应/派生表/源码哈希，不改写原覆盖表、不自动授予生产路由资格。
+
 本次低频真实验证使用 `python provider_validation/tests/run_a_stock_rate_limited_probes.py --ids <显式编号列表>`。入口要求显式列出能力编号，不默认全跑；请求串行执行，同一主机最短间隔3秒，瞬时错误最多重试2次且至少退避5秒，不重试403/429；主机触发403/429或连续两次传输/服务器错误后，本轮暂停该主机。报表/PDF最多请求1页/1份。每批写入独立 `results/live-probes/<run-id>/`，原始HTTP返回在 `_raw/`，策略文件、摘要CSV和解析输出与原始证据同批保存。
 
 BaoStock行业快照使用 `python provider_validation/tests/run_baostock_industry_live_probe.py --date YYYY-MM-DD --output results/live-probes/<unique-run-id>`。只执行证券清单与行业快照各一次，查询间最少等待3秒；持久化SDK解码字段和行（不包含SDK未暴露的TCP线缆帧），再保存派生交叉核验表。

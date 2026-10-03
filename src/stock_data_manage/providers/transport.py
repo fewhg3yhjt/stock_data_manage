@@ -5,6 +5,10 @@ import socket
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Mapping, Protocol, Sequence
+from threading import Lock, BoundedSemaphore
+from time import monotonic, sleep
+from contextlib import contextmanager
+from math import isfinite
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
@@ -14,6 +18,55 @@ from .contracts import EndpointContract, FailureClass, HttpResponse, ProviderCon
 
 class HttpTransport(Protocol):
     def get(self, url: str, *, params: Mapping[str, str], timeout_seconds: float) -> HttpResponse: ...
+
+
+class RequestPacer:
+    """Pace physical calls without changing the delegated transport/session/retries."""
+
+    def __init__(self, *, clock=monotonic, wait=sleep):
+        self.clock = clock
+        self.wait = wait
+        self._groups = {}
+
+    def configure(self, group: str, interval_seconds: float, concurrency: int = 1) -> None:
+        if not group or not isfinite(interval_seconds) or interval_seconds < 0 or concurrency < 1:
+            raise ValueError("invalid request pacing policy")
+        if group in self._groups:
+            current = self._groups[group]
+            if current["started"]:
+                if interval_seconds > current["interval"] or concurrency < current["concurrency"]:
+                    raise ValueError("configure shared request policies before issuing requests")
+                return
+            interval_seconds = max(interval_seconds, current["interval"])
+            concurrency = min(concurrency, current["concurrency"])
+        self._groups[group] = {
+            "interval": interval_seconds, "concurrency": concurrency,
+            "lock": Lock(), "semaphore": BoundedSemaphore(concurrency), "last_start": None, "started": False,
+        }
+
+    @contextmanager
+    def request(self, group: str):
+        policy = self._groups[group]
+        with policy["semaphore"]:
+            with policy["lock"]:
+                if policy["last_start"] is not None:
+                    remaining = policy["interval"] - (self.clock() - policy["last_start"])
+                    if remaining > 0:
+                        self.wait(remaining)
+                policy["last_start"] = self.clock()
+                policy["started"] = True
+            yield
+
+
+@dataclass(slots=True)
+class PacedTransport:
+    transport: HttpTransport
+    pacer: RequestPacer
+    group: str
+
+    def get(self, url: str, *, params: Mapping[str, str], timeout_seconds: float) -> HttpResponse:
+        with self.pacer.request(self.group):
+            return self.transport.get(url, params=params, timeout_seconds=timeout_seconds)
 
 
 @dataclass(slots=True)

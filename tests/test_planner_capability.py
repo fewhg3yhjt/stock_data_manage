@@ -128,3 +128,15 @@ def test_watchlist_capacity_and_universe_guard() -> None:
             max_watchlist_symbols=200,
             cycle_deadline_seconds=50,
         )
+
+
+def test_cost_uses_physical_request_shape_and_unknown_pagination():
+    single = capability(request_shape="single_symbol", max_symbols_per_request=100)
+    assert single.estimated_cycle_seconds(200) == 200
+    snapshot = capability(request_shape="full_snapshot", base_requests_per_fetch=2)
+    assert snapshot.estimated_cycle_seconds(1) == snapshot.estimated_cycle_seconds(5000) == 2
+    paged = capability(request_shape="paged_list", supports_pagination=True)
+    assert paged.estimated_cycle_seconds(1) == float("inf")
+    assert capability(request_shape="paged_list", supports_pagination=True, max_pages_per_request=3).estimated_cycle_seconds(5000) == 3
+    # A host's minimum request-start interval is shared even with overlapping calls.
+    assert capability(request_shape="single_symbol", effective_concurrency=10).estimated_cycle_seconds(5) == 5

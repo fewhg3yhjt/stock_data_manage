@@ -2,6 +2,10 @@
 
 import csv
 import json
+import gzip
+import hashlib
+import sys
+from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
@@ -10,6 +14,103 @@ CAPABILITY_DIR = ROOT / "provider_validation" / "coverage"
 RESULTS_DIR = ROOT / "provider_validation" / "results"
 INVENTORY = CAPABILITY_DIR / "a-stock-data-capability-inventory.csv"
 OUTPUT = CAPABILITY_DIR / "capability-results-data.json"
+
+
+def build_input_catalog():
+    """Project reviewed contracts onto saved evidence; no provider calls or production writes."""
+    sys.path.insert(0, str(ROOT / "src"))
+    from stock_data_manage.config.loader import load_input_capabilities, load_collection_profiles
+    from dataclasses import asdict
+
+    def digest(path):
+        return hashlib.sha256(path.read_bytes()).hexdigest()
+
+    config_path = ROOT / "config/providers.yaml"
+    collection_path = ROOT / "config/collection.yaml"
+    source_path = CAPABILITY_DIR / "interface-coverage.csv"
+    contracts = load_input_capabilities(config_path)
+    profiles = {profile.name: profile for profile in load_collection_profiles(collection_path)}
+    with source_path.open(encoding="utf-8-sig", newline="") as stream:
+        interfaces = {row["接口ID"]: row for row in csv.DictReader(stream)}
+    successes = {ident for ident, row in interfaces.items() if row["接口取数结果"] in {"通过", "部分通过"}}
+    covered = {ref for contract in contracts for ref in contract.evidence_refs}
+    if covered != successes:
+        raise ValueError(f"input coverage mismatch: missing={successes-covered}; extra={covered-successes}")
+    checked = {}
+    catalog = []
+    csv_rows = []
+    for contract in contracts:
+        if contract.collection_profile not in profiles:
+            raise ValueError(f"unknown collection profile: {contract.collection_profile}")
+        records = []
+        for ref in contract.evidence_refs:
+            record_path = RESULTS_DIR / "interface-records" / f"{ref}.json"
+            record = json.loads(record_path.read_text(encoding="utf-8"))
+            if record["interface_id"] != ref or record["validation_result"] != interfaces[ref]["接口取数结果"]:
+                raise ValueError(f"interface record mismatch: {ref}")
+            for key in ("response_artifacts", "derived_artifacts", "source_code_artifacts"):
+                for artifact in record.get(key, ()):
+                    name = artifact["path"]
+                    path = (ROOT / name).resolve()
+                    if not path.is_relative_to(ROOT.resolve()):
+                        raise ValueError("evidence must remain inside the validation workspace")
+                    if name not in checked:
+                        body = gzip.decompress(path.read_bytes()) if key == "response_artifacts" else path.read_bytes()
+                        checked[name] = {"path": name, "sha256": hashlib.sha256(body).hexdigest(), "kind": key}
+                    if checked[name]["sha256"] != artifact["sha256"]:
+                        raise ValueError(f"evidence hash mismatch: {name}")
+            records.append({
+                "interface_id": ref, "path": record_path.relative_to(ROOT).as_posix(), "sha256": digest(record_path),
+                "validation_result": record["validation_result"], "evidence_status": record["evidence_status"],
+                "tested_scope": record["scope"], "coverage_denominator": record["coverage_denominator"],
+                "original_note": record["finding"], "manifest_ref": record["manifest_ref"],
+                "response_artifacts": record.get("response_artifacts", []),
+                "derived_artifacts": record.get("derived_artifacts", []),
+                "source_code_artifacts": record.get("source_code_artifacts", []),
+                "validation_time_utc": record["validation_time_utc"],
+                "original_transformation": record["transformation_code_version"],
+            })
+        catalog.append({"contract": asdict(contract), "collection_profile": asdict(profiles[contract.collection_profile]),
+                        "evidence": records, "eligible_for_production_routing": False})
+        csv_rows.append({
+            "输入ID": contract.input_id, "验证接口ID": "; ".join(contract.evidence_refs),
+            "正式能力名称": contract.display_name, "实际来源": contract.provider, "端点": contract.endpoint,
+            "数据形态": contract.data_kind, "数据周期": contract.data_frequency, "请求形态": contract.request_shape,
+            "参数来源": "; ".join(f"{p.name}<-{p.source} ({p.value_type}; {'必填' if p.required else '可选'})" for p in contract.parameters),
+            "采集意图": contract.collection_profile, "刷新间隔秒": profiles[contract.collection_profile].refresh_interval_seconds,
+            "请求间隔秒": contract.request_interval_seconds, "并发": contract.effective_concurrency,
+            "限速实现状态": contract.request_limit_enforcement, "实现状态": contract.implementation_status,
+            "对应现有适配器": contract.runtime_endpoint or "", "归并到": contract.canonical_input or "",
+            "证据范围": "; ".join(r["tested_scope"] for r in records), "限制": "; ".join(contract.limitations),
+            "证据记录": "; ".join(r["path"] for r in records), "生产路由资格": "未授予",
+        })
+    summary = {
+        "record_type": "successful_input_capability_catalog", "validation_time_utc": datetime.now(timezone.utc).isoformat(),
+        "input_count": len(contracts), "successful_interface_count": len(covered), "coverage_denominator": len(successes),
+        "original_inventory_denominator": 87, "network_requests": 0, "production_writes": 0,
+        "inputs": [{"path": p.relative_to(ROOT).as_posix(), "sha256": digest(p)} for p in (config_path, collection_path, source_path)],
+        "transformation_code": {"path": Path(__file__).relative_to(ROOT).as_posix(), "sha256": digest(Path(__file__))},
+        "hash_checked_files": list(checked.values()), "catalog": catalog,
+    }
+    # Only references/scopes are copied, never raw request headers or response samples.
+    # Strip token-like values should an existing scope/note include them.
+    import re
+    def redact_reference(value):
+        return re.sub(r'(?i)([?&](?:ut|token|access_token)=)[^&\s;"\\]+', r'\1[REDACTED]', value)
+
+    summary["reference_redaction_policy"] = "Token-like query values in copied references are redacted; original archives are unchanged."
+    serialized = json.dumps(summary, ensure_ascii=False, indent=2)
+    serialized = redact_reference(serialized)
+    json_output = CAPABILITY_DIR / "successful-input-capabilities.json"
+    csv_output = CAPABILITY_DIR / "successful-input-capabilities.csv"
+    json_output.write_text(serialized + "\n", encoding="utf-8")
+    with csv_output.open("w", encoding="utf-8-sig", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=list(csv_rows[0]))
+        writer.writeheader()
+        writer.writerows({key: redact_reference(value) if isinstance(value, str) else value
+                          for key, value in row.items()} for row in csv_rows)
+    print(json.dumps({"input_count": len(contracts), "successful_interfaces": len(covered), "hash_checked_files": len(checked),
+                      "network_requests": 0, "output": json_output.relative_to(ROOT).as_posix()}, ensure_ascii=False))
 
 
 def clean_name(value):
@@ -101,100 +202,113 @@ def explanation(row):
     return "未通过（未验证）。只有 README/SKILL 文档说明；未找到本轮可复查的真实返回，不能据此认定当前可用。"
 
 
-with INVENTORY.open(encoding="utf-8-sig", newline="") as f:
-    source_rows = list(csv.DictReader(f))
-rows = []
-for i, source in enumerate(source_rows, 1):
-    name = clean_name(source.get("name") or source.get("能力项", ""))
-    audit_status = source.get("audit_status") or source.get("原审计状态", "")
-    endpoint_flag = source.get("counts_as_published_endpoint")
-    if endpoint_flag is None:
-        endpoint_flag = "yes" if source.get("是否计入87项") == "是" else "no"
-    result = "通过" if audit_status == "verified_live_raw_saved" else "未通过"
-    rows.append({
-        "序号": i,
-        "是否计入87项": "是" if endpoint_flag == "yes" else "否（说明行）",
-        "分类": source.get("category") or source.get("分类", ""),
-        "能力项": name,
-        "验证结果": result,
-        "备注": explanation(source),
-        "原始返回文件": "待映射",
-        "清单原始行": source.get("readme_line", source.get("清单原始行", "")),
-        "原审计状态": audit_status,
-        "证据说明": source.get("evidence_ref") or source.get("证据说明", ""),
-    })
 
-index_rows = []
-for run in ("2026-10-01-v39-live-escalated", "2026-10-01-v310-live"):
-    manifest = RESULTS_DIR / "raw" / run / "manifest.ndjson"
-    for line_no, line in enumerate(manifest.read_text(encoding="utf-8").splitlines(), 1):
-        record = json.loads(line)
-        evidence_id = ("V39" if "v39" in run else "V310") + f"-{line_no:03d}"
-        mapped = map_capability(record)
-        index_rows.append({
-            "证据编号": evidence_id,
-            "能力项": mapped,
-            "运行批次": run,
-            "抓取时间UTC": record.get("fetched_at_utc", ""),
-            "HTTP状态": record.get("status_code", ""),
-            "结果": record.get("outcome", ""),
-            "原始响应文件": (str((RESULTS_DIR / "raw" / run / record["body_storage"]).resolve())
-                          if record.get("body_storage") else "无响应体；错误见同批次manifest.ndjson"),
-            "SHA256": record.get("body_sha256", ""),
-            "原始请求URL": record.get("url", ""),
+def prepare_legacy_results():
+    with INVENTORY.open(encoding="utf-8-sig", newline="") as f:
+        source_rows = list(csv.DictReader(f))
+    rows = []
+    for i, source in enumerate(source_rows, 1):
+        name = clean_name(source.get("name") or source.get("能力项", ""))
+        audit_status = source.get("audit_status") or source.get("原审计状态", "")
+        endpoint_flag = source.get("counts_as_published_endpoint")
+        if endpoint_flag is None:
+            endpoint_flag = "yes" if source.get("是否计入87项") == "是" else "no"
+        result = "通过" if audit_status == "verified_live_raw_saved" else "未通过"
+        rows.append({
+            "序号": i,
+            "是否计入87项": "是" if endpoint_flag == "yes" else "否（说明行）",
+            "分类": source.get("category") or source.get("分类", ""),
+            "能力项": name,
+            "验证结果": result,
+            "备注": explanation(source),
+            "原始返回文件": "待映射",
+            "清单原始行": source.get("readme_line", source.get("清单原始行", "")),
+            "原审计状态": audit_status,
+            "证据说明": source.get("evidence_ref") or source.get("证据说明", ""),
         })
 
-ids_by_name = {}
-for record in index_rows:
-    ids_by_name.setdefault(record["能力项"], []).append(record["证据编号"])
-events_by_name = {}
-for record in index_rows:
-    events_by_name.setdefault(record["能力项"], []).append(record)
+    index_rows = []
+    for run in ("2026-10-01-v39-live-escalated", "2026-10-01-v310-live"):
+        manifest = RESULTS_DIR / "raw" / run / "manifest.ndjson"
+        for line_no, line in enumerate(manifest.read_text(encoding="utf-8").splitlines(), 1):
+            record = json.loads(line)
+            evidence_id = ("V39" if "v39" in run else "V310") + f"-{line_no:03d}"
+            mapped = map_capability(record)
+            index_rows.append({
+                "证据编号": evidence_id,
+                "能力项": mapped,
+                "运行批次": run,
+                "抓取时间UTC": record.get("fetched_at_utc", ""),
+                "HTTP状态": record.get("status_code", ""),
+                "结果": record.get("outcome", ""),
+                "原始响应文件": (str((RESULTS_DIR / "raw" / run / record["body_storage"]).resolve())
+                              if record.get("body_storage") else "无响应体；错误见同批次manifest.ndjson"),
+                "SHA256": record.get("body_sha256", ""),
+                "原始请求URL": record.get("url", ""),
+            })
 
-for row in rows:
-    events = events_by_name.get(row["能力项"], [])
-    ids = ids_by_name.get(row["能力项"], [])
-    files = [event["原始响应文件"] for event in events if event["原始响应文件"].startswith("D:")]
-    errors = [event["证据编号"] for event in events if not event["原始响应文件"].startswith("D:")]
-    if files:
-        row["原始返回文件"] = "; ".join(files)
-        if errors:
-            row["原始返回文件"] += "; 传输失败记录见对应批次 manifest.ndjson：" + ", ".join(errors)
-    elif events:
-        row["原始返回文件"] = "无响应体；错误见对应批次 manifest.ndjson：" + ", ".join(errors)
-    elif not ids:
-        if row["验证结果"] == "通过":
-            row["原始返回文件"] = "未找到逐项映射（需复核）"
-        elif row["原审计状态"] == "historical_live_raw_missing":
-            row["原始返回文件"] = "无：历史调用未留存原文；见备注"
-        elif row["原审计状态"] == "historical_or_documented_only":
-            row["原始返回文件"] = "无：本轮未请求；见备注"
-        else:
-            row["原始返回文件"] = "无：本轮没有该项的原始响应"
+    ids_by_name = {}
+    for record in index_rows:
+        ids_by_name.setdefault(record["能力项"], []).append(record["证据编号"])
+    events_by_name = {}
+    for record in index_rows:
+        events_by_name.setdefault(record["能力项"], []).append(record)
 
-# Put the decision-facing fields first so a CSV opened directly is readable.
-front = ["序号", "是否计入87项", "分类", "能力项", "验证结果", "备注", "原始返回文件"]
-metadata = ["claimed_data", "relation", "audit_status", "evidence_ref", "raw_evidence_ref",
-            "readme_line", "documented_limitations", "preliminary_evidence_state"]
-tail = ["清单原始行", "原审计状态", "证据说明"] + metadata
-with INVENTORY.open("w", encoding="utf-8-sig", newline="") as f:
-    writer = csv.DictWriter(f, fieldnames=front + tail, extrasaction="ignore")
-    writer.writeheader()
-    for row, source in zip(rows, source_rows):
-        combined = dict(row)
-        combined.update({"清单原始行": source.get("readme_line", row["清单原始行"]),
-                         "原审计状态": source.get("audit_status", row["原审计状态"]),
-                         "证据说明": source.get("evidence_ref", row["证据说明"])})
-        for key in metadata:
-            combined[key] = source.get(key, "")
-        writer.writerow(combined)
+    for row in rows:
+        events = events_by_name.get(row["能力项"], [])
+        ids = ids_by_name.get(row["能力项"], [])
+        files = [event["原始响应文件"] for event in events if event["原始响应文件"].startswith("D:")]
+        errors = [event["证据编号"] for event in events if not event["原始响应文件"].startswith("D:")]
+        if files:
+            row["原始返回文件"] = "; ".join(files)
+            if errors:
+                row["原始返回文件"] += "; 传输失败记录见对应批次 manifest.ndjson：" + ", ".join(errors)
+        elif events:
+            row["原始返回文件"] = "无响应体；错误见对应批次 manifest.ndjson：" + ", ".join(errors)
+        elif not ids:
+            if row["验证结果"] == "通过":
+                row["原始返回文件"] = "未找到逐项映射（需复核）"
+            elif row["原审计状态"] == "historical_live_raw_missing":
+                row["原始返回文件"] = "无：历史调用未留存原文；见备注"
+            elif row["原审计状态"] == "historical_or_documented_only":
+                row["原始返回文件"] = "无：本轮未请求；见备注"
+            else:
+                row["原始返回文件"] = "无：本轮没有该项的原始响应"
 
-OUTPUT.write_text(
-    json.dumps({"capabilities": rows, "raw_events": index_rows}, ensure_ascii=False, indent=2) + "\n",
-    encoding="utf-8",
-)
-print(json.dumps({"capability_rows": len(rows), "counted": sum(r["是否计入87项"] == "是" for r in rows),
-                  "pass": sum(r["验证结果"] == "通过" and r["是否计入87项"] == "是" for r in rows),
-                  "fail": sum(r["验证结果"] == "未通过" and r["是否计入87项"] == "是" for r in rows),
-                  "raw_events": len(index_rows), "mapped": sum(not r["能力项"].startswith("未映射") for r in index_rows)},
-                 ensure_ascii=False, indent=2))
+    # Put the decision-facing fields first so a CSV opened directly is readable.
+    front = ["序号", "是否计入87项", "分类", "能力项", "验证结果", "备注", "原始返回文件"]
+    metadata = ["claimed_data", "relation", "audit_status", "evidence_ref", "raw_evidence_ref",
+                "readme_line", "documented_limitations", "preliminary_evidence_state"]
+    tail = ["清单原始行", "原审计状态", "证据说明"] + metadata
+    with INVENTORY.open("w", encoding="utf-8-sig", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=front + tail, extrasaction="ignore")
+        writer.writeheader()
+        for row, source in zip(rows, source_rows):
+            combined = dict(row)
+            combined.update({"清单原始行": source.get("readme_line", row["清单原始行"]),
+                             "原审计状态": source.get("audit_status", row["原审计状态"]),
+                             "证据说明": source.get("evidence_ref", row["证据说明"])})
+            for key in metadata:
+                combined[key] = source.get(key, "")
+            writer.writerow(combined)
+
+    OUTPUT.write_text(
+        json.dumps({"capabilities": rows, "raw_events": index_rows}, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    print(json.dumps({"capability_rows": len(rows), "counted": sum(r["是否计入87项"] == "是" for r in rows),
+                      "pass": sum(r["验证结果"] == "通过" and r["是否计入87项"] == "是" for r in rows),
+                      "fail": sum(r["验证结果"] == "未通过" and r["是否计入87项"] == "是" for r in rows),
+                      "raw_events": len(index_rows), "mapped": sum(not r["能力项"].startswith("未映射") for r in index_rows)},
+                     ensure_ascii=False, indent=2))
+
+
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser(description='Prepare saved provider evidence without network requests')
+    parser.add_argument('--input-catalog', action='store_true')
+    args = parser.parse_args()
+    if args.input_catalog:
+        build_input_catalog()
+    else:
+        prepare_legacy_results()

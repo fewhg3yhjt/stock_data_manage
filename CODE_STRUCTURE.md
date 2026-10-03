@@ -15,13 +15,15 @@
 | 数据访问服务 | `src/stock_data_manage/service/` | Security Master、Trading Calendar 和统一分钟查询 |
 | Worker | `src/stock_data_manage/worker/` | 调度、执行记录、恢复和离线验收 |
 
-配置文件仍位于仓库根目录的 `config/`：`providers.yaml` 保存来源公共配置，`capabilities.yaml` 保存路由顺序，`datasets/` 保存数据集标准定义，`normalization/` 保存按数据集拆分的来源归一化规则；命令行入口仍位于 `src/stock_data_manage/cli.py`。
+配置文件仍位于仓库根目录的 `config/`：`providers.yaml` 保存来源配置和有证据引用的输入能力契约，`collection.yaml` 保存采集意图与刷新节奏，`capabilities.yaml` 保存路由顺序，`datasets/` 保存数据集标准定义，`normalization/` 保存按数据集拆分的来源归一化规则；命令行入口仍位于 `src/stock_data_manage/cli.py`。
 EastMoney 各数据域的范围和实现状态见 `eastmoney-data-domain-coverage.md`，不以单个分红事件 Endpoint 代表整个来源。
 项目当前实现、验证、待实现和明确不做范围见 `PROJECT_PROGRESS.md`。
 
 Provider 的离线契约、实时探针和路由资格记录见仓库根目录的 `PROVIDER_CAPABILITY_MATRIX.md`。该文档是渠道验证事实记录，不是运行时配置。
 能力采集、证据生命周期和 YAML 归一化规则见 `provider-capability-verification-and-normalization.md`；它是 Provider 接入和后续验证的专项设计。
 Provider 接口验证资料统一位于 `provider_validation/`：`tests/` 保存探针、低频实时探针入口、BaoStock SDK低频探针、离线重放及逐接口覆盖报告生成脚本；`tests/source_snapshots/` 保存固定提交的上游源码/测试快照及哈希清单；`coverage/` 保存逐接口 CSV 和阅读版 XLSX；`docs/` 保存验证方法和报告；`results/` 保存原始响应、派生结果、逐接口 JSON 结论和摘要。原始 HTTP 清单及响应体位于 `provider_validation/results/raw/<run-id>/` 或对应探针批次的 `provider_validation/results/live-probes/<run-id>/_raw/`；SDK探针保存调用边界可见的解码字段和行，同时明确标记底层TCP帧不可见。历史探针摘要位于 `provider_validation/results/legacy/`。行业迁移证据可用 `provider_validation/tests/replay_sector_capability_archives.py` 离线重放。详细入口见 [Provider 验证目录说明](provider_validation/README.md) 和 [接口测试覆盖度说明](provider_validation/docs/interface-coverage-method.md)。
+
+输入能力第一阶段的设计与实现边界见 `provider_validation/docs/2026-10-03-input-capability-framework.md`。现有 `provider_validation/tests/prepare_capability_results.py --input-catalog` 离线生成 `coverage/successful-input-capabilities.csv` 和同名 JSON，关联源记录、原响应和哈希。该阶段回归证据保存于 `results/2026-10-03-input-capability-framework-tests.xml` 与 `results/2026-10-03-input-capability-framework-verification.json`，不属于生产数据。
 
 ## 领域模型
 
@@ -37,7 +39,7 @@ Provider 接口验证资料统一位于 `provider_validation/`：`tests/` 保存
 |---|---|
 | `providers/base.py` | 日线、分钟等 Provider 协议以及 Fixture Provider 基础实现 |
 | `providers/contracts.py` | HTTP 响应、失败分类、返回窗口和 Provider Contract |
-| `providers/transport.py` | 公共 HTTP 传输、快照返回模型、来源时间和 TDX 行记录解析工具 |
+| `providers/transport.py` | 公共 HTTP 传输、共享请求组限速与委托包装、快照返回模型、来源时间和 TDX 行记录解析工具；保留来源传输会话和重试行为 |
 | `providers/tencent/daily.py` | Tencent 普通历史日线和前复权历史日线 |
 | `providers/tencent/snapshot.py` | Tencent 批量收盘快照 |
 | `providers/tencent/minute.py` | Tencent 原生 1m 分钟线 |
@@ -71,14 +73,14 @@ Provider 接口验证资料统一位于 `provider_validation/`：`tests/` 保存
 
 | 文件 | 职责 |
 |---|---|
-| `config/loader.py` | 加载 `providers.yaml`、`capabilities.yaml` 和 `normalization.yaml` 的静态配置 |
-| `routing/factory.py` | 根据来源 Endpoint 配置创建具体 Provider，并注册静态 Capability |
+| `config/loader.py` | 加载来源、输入契约、参数来源、采集意图、路由和归一化配置；参数绑定与类型/范围校验；配置不生成验证有效期 |
+| `routing/factory.py` | 按现有端点创建 Provider，保留来源传输并共享限速；读取已有元数据证据，按实际验证范围和原有效期注册能力，并在选择时复查证据与冷却状态 |
 
 ## 能力路由器
 
 | 文件 | 职责 |
 |---|---|
-| `routing/capabilities.py` | Provider Capability 模型和有效期/范围筛选；不承载独立能力管理服务 |
+| `routing/capabilities.py` | Provider Capability 模型、有效期/样例范围筛选、按请求形态计算间隔预算及证据可用性回调；不承载独立能力管理服务 |
 | `routing/router.py` | Missing Set 计算和实时分钟采集计划 |
 | `routing/retry.py` | 重试、Fallback、冷却相关的执行策略 |
 | `routing/__init__.py` | 路由包说明，不承载业务实现 |
@@ -114,7 +116,7 @@ Provider 接口验证资料统一位于 `provider_validation/`：`tests/` 保存
 | `storage/raw.py` | 不覆盖 Raw Object Store 和原始响应引用 |
 | `storage/hot.py` | SQLite WAL Hot Minute Store 和即时查询数据 |
 | `storage/parquet.py` | Canonical Parquet 分区、Manifest、文件锁和原子发布 |
-| `storage/metadata.py` | DuckDB 元数据、Attempt、Provider 健康、Probe 验证记录和冲突记录；不新增能力管理数据库 |
+| `storage/metadata.py` | DuckDB 元数据、Attempt、Provider 健康、Probe 验证记录、既有能力证据查询和冲突记录；不新增能力管理数据库 |
 | `storage/integrity.py` | 确定性 row hash、Manifest 生成和完整性校验 |
 | `storage/__init__.py` | 存储包说明，不承载业务实现 |
 

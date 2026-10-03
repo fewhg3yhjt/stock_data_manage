@@ -32,6 +32,11 @@ class ProviderCapability:
     request_interval_seconds: float = 1.0
     effective_concurrency: int = 1
     freshness_delay_seconds: int = 0
+    request_shape: str = "symbol_batch"
+    base_requests_per_fetch: int = 1
+    max_pages_per_request: int | None = None
+    validated_symbols: frozenset[str] = frozenset()
+    evidence_hash: str | None = None
 
     @property
     def capability_id(self) -> str:
@@ -58,6 +63,8 @@ class ProviderCapability:
             return False
         if adjustment not in self.adjustments:
             return False
+        if self.validated_symbols and symbol not in self.validated_symbols:
+            return False
         if self.code_prefixes and not symbol.startswith(self.code_prefixes):
             return False
         if self.excluded_code_prefixes and symbol.startswith(self.excluded_code_prefixes):
@@ -67,14 +74,24 @@ class ProviderCapability:
     def estimated_cycle_seconds(self, symbol_count: int) -> float:
         if symbol_count < 0:
             raise ValueError("symbol_count cannot be negative")
-        batches = ceil(symbol_count / max(1, self.max_symbols_per_request))
-        waves = ceil(batches / max(1, self.effective_concurrency))
-        return waves * max(0.0, self.request_interval_seconds)
+        if symbol_count == 0:
+            return 0.0
+        if self.supports_pagination and self.max_pages_per_request is None:
+            return float("inf")
+        if self.request_shape in {"date_snapshot", "full_snapshot", "file_package", "paged_list"}:
+            batches = 1
+        else:
+            batch_size = 1 if self.request_shape == "single_symbol" else max(1, self.max_symbols_per_request)
+            batches = ceil(symbol_count / batch_size)
+        requests = batches * self.base_requests_per_fetch * (self.max_pages_per_request or 1)
+        # A group's minimum start interval still applies when requests overlap.
+        return requests * max(0.0, self.request_interval_seconds)
 
 
 class CapabilityRegistry:
-    def __init__(self, capabilities: list[ProviderCapability] | None = None) -> None:
+    def __init__(self, capabilities: list[ProviderCapability] | None = None, *, availability=None) -> None:
         self._capabilities = list(capabilities or [])
+        self._availability = availability
 
     def register(self, capability: ProviderCapability) -> None:
         self._capabilities.append(capability)
@@ -101,6 +118,8 @@ class CapabilityRegistry:
             if capability.role == "disabled":
                 continue
             if capability.role == "validation_only" and not include_validation_only:
+                continue
+            if self._availability is not None and not self._availability(capability, now):
                 continue
             if availability is not None and not availability(capability):
                 continue

@@ -1,14 +1,15 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 from dataclasses import replace
+import json
 
 from ..config.loader import ProviderConfig, load_capability_routes, load_provider_configs
-from ..domain import Adjustment
+from ..domain import Adjustment, Dataset, Exchange, AssetType
 from ..providers.sina import SinaDailyProvider, SinaMinuteProvider, SinaSnapshotProvider
 from ..providers.tencent import TencentDailyProvider, TencentMinuteProvider, TencentSnapshotProvider
-from ..providers.transport import HttpTransport, UrlLibTransport
+from ..providers.transport import HttpTransport, UrlLibTransport, RequestPacer, PacedTransport
 from ..providers.tdx import TdxMinuteProvider
 from ..providers.baostock import BaoStockDailyProvider, BaoStockIndustryMembershipProvider, BaoStockMinuteProvider
 from ..providers.eastmoney import (
@@ -25,8 +26,20 @@ from ..providers.ths import ThsBoardProvider
 from .capabilities import CapabilityRegistry
 
 
-def build_provider(config: ProviderConfig, transport: HttpTransport | None = None, *, capability=None):
-    transport = transport or UrlLibTransport()
+def build_provider(config: ProviderConfig, transport: HttpTransport | None = None, *, capability=None, pacer=None):
+    if config.implementation_status != "implemented":
+        raise ValueError(f"provider is unimplemented: {config.provider}.{config.endpoint}")
+    pacer = pacer or RequestPacer()
+    group = config.request_group or config.provider
+    pacer.configure(group, config.request_interval_seconds, config.effective_concurrency)
+    # Keep the source-specific transport; pacing only surrounds its existing call.
+    base_transport = transport or (
+        EastMoneyRequestsTransport()
+        if config.provider == "eastmoney" and config.endpoint in {
+            "single_quote", "batch_quote", "intraday_trend", "stock_fund_flow", "financial_main", "shareholder_count"
+        } else UrlLibTransport()
+    )
+    transport = PacedTransport(base_transport, pacer, group)
     if config.provider == "tencent" and config.endpoint in {"daily_history", "recent_history", "forward_history"}:
         adjustment = Adjustment.FORWARD if Adjustment.FORWARD in config.adjustments else Adjustment.NONE
         provider = TencentDailyProvider(transport, adjustment=adjustment)
@@ -34,18 +47,18 @@ def build_provider(config: ProviderConfig, transport: HttpTransport | None = Non
         provider.capability_version = config.capability_version
         return provider
     if config.provider == "tencent" and config.endpoint == "bulk_snapshot":
-        return TencentSnapshotProvider(transport, capability or config.capability(now()))
+        return TencentSnapshotProvider(transport, capability or config.capability(), max_symbols_per_request=config.max_symbols_per_request)
     if config.provider == "tencent" and config.endpoint == "native_1m":
-        return TencentMinuteProvider(transport, capability or config.capability(now()))
+        return TencentMinuteProvider(transport, capability or config.capability())
     if config.provider == "sina" and config.endpoint in {"daily_history", "full_history"}:
         provider = SinaDailyProvider(transport)
         provider.endpoint = config.endpoint
         provider.capability_version = config.capability_version
         return provider
     if config.provider == "sina" and config.endpoint == "snapshot":
-        return SinaSnapshotProvider(transport, capability or config.capability(now()))
+        return SinaSnapshotProvider(transport, capability or config.capability())
     if config.provider == "sina" and config.endpoint == "native_5m":
-        return SinaMinuteProvider(transport, capability or config.capability(now()))
+        return SinaMinuteProvider(transport, capability or config.capability())
     if config.provider == "baostock" and config.endpoint == "daily_history":
         return BaoStockDailyProvider(
             capability_priority=config.priority,
@@ -78,16 +91,16 @@ def build_provider(config: ProviderConfig, transport: HttpTransport | None = Non
         )
     if config.provider == "eastmoney" and config.endpoint in {"single_quote", "batch_quote", "intraday_trend"}:
         return EastMoneyRealtimeQuoteProvider(
-            EastMoneyRequestsTransport(),
+            transport,
             endpoint=config.endpoint,
             capability_version=config.capability_version,
         )
     if config.provider == "eastmoney" and config.endpoint == "stock_fund_flow":
-        return EastMoneyStockFundFlowProvider(capability_version=config.capability_version)
+        return EastMoneyStockFundFlowProvider(transport=transport, capability_version=config.capability_version)
     if config.provider == "eastmoney" and config.endpoint == "financial_main":
-        return EastMoneyFinancialMainProvider(capability_version=config.capability_version)
+        return EastMoneyFinancialMainProvider(transport=transport, capability_version=config.capability_version)
     if config.provider == "eastmoney" and config.endpoint == "shareholder_count":
-        return EastMoneyShareholderCountProvider(capability_version=config.capability_version)
+        return EastMoneyShareholderCountProvider(transport=transport, capability_version=config.capability_version)
     if config.provider == "akshare" and config.endpoint in {
         "stock_daily", "etf_daily", "lof_daily", "index_daily"
     }:
@@ -117,45 +130,133 @@ def build_provider(config: ProviderConfig, transport: HttpTransport | None = Non
     raise ValueError(f"no provider factory for {config.provider}.{config.endpoint}")
 
 
+def _evidence_capability(config, evidence, *, now, priority, role, metadata):
+    try:
+        dataset, exchange, asset_type = Dataset(evidence["dataset"]), Exchange(evidence["market"]), AssetType(evidence["asset_type"])
+        adjustment = Adjustment(evidence["adjustment"])
+        if dataset not in config.datasets or exchange not in config.exchanges or asset_type not in config.asset_types or adjustment not in config.adjustments:
+            return None
+        if role in {"primary", "fallback", "discovery"} and config.request_limit_enforcement != "physical_request":
+            return None
+        if evidence["status"] not in {"complete", "truncated"} or not evidence["eligible_for_selection"] or not evidence["evidence_hash"] or evidence["row_count"] <= 0:
+            return None
+        validated, expires = evidence["validated_at"], evidence["validation_expires_at"]
+        if validated.tzinfo is None or expires.tzinfo is None or not validated <= now < expires:
+            return None
+        scope = json.loads(evidence["request_scope_json"])
+        units = json.loads(evidence["units_json"])
+        fields = json.loads(evidence["field_semantics_json"])
+        if not isinstance(scope, list) or not scope or not all(isinstance(s, str) and s.strip() for s in scope):
+            return None
+        if not isinstance(fields, list) or not fields or not all(isinstance(f, str) and f.strip() for f in fields):
+            return None
+        if not isinstance(units, list) or not units:
+            return None
+        if any(not isinstance(u, str) or not u.strip() or any(word in u.lower() for word in ("unverified", "unconfirmed", "unknown")) for u in units):
+            return None
+        if evidence.get("response_status") is not None and evidence["response_status"] >= 400:
+            return None
+        frequency = str(evidence["frequency"])
+        if dataset == Dataset.DAILY_BAR and frequency != "daily":
+            return None
+        frequencies = frozenset() if frequency in {"daily", "snapshot"} else frozenset({int(frequency.removesuffix("m"))})
+        if config.frequencies and not frequencies <= config.frequencies:
+            return None
+        if dataset in {Dataset.MINUTE_BAR_1M, Dataset.MINUTE_BAR_5M} and not frequencies:
+            return None
+        if (dataset == Dataset.MINUTE_BAR_1M and frequencies != frozenset({1})) or (dataset == Dataset.MINUTE_BAR_5M and frequencies != frozenset({5})):
+            return None
+        health = metadata.provider_health(
+            provider=config.provider, endpoint=config.endpoint, capability_version=config.capability_version,
+            market=exchange.value, asset_type=asset_type.value, dataset=dataset.value,
+        )
+        if not metadata.provider_available(health, now):
+            return None
+        return replace(
+            config.capability(validated_at=validated, validation_expires_at=expires),
+            datasets=frozenset({dataset}), exchanges=frozenset({exchange}), asset_types=frozenset({asset_type}),
+            adjustments=frozenset({adjustment}), frequencies=frequencies,
+            validated_symbols=frozenset(scope), evidence_hash=str(evidence["evidence_hash"]),
+            priority=priority, role=role,
+        )
+    except (ValueError, KeyError, TypeError, AttributeError):
+        # Malformed/unknown evidence cannot widen the declared scope.
+        return None
+
+
 def load_provider_registry(
     path: str | Path,
     capabilities_path: str | Path | None = None,
     *,
     now: datetime | None = None,
+    metadata=None,
+    include_unverified: bool = False,
 ):
     configs = load_provider_configs(path)
+    # Capacity estimates must use the same strictest shared policy as the pacer.
+    shared_policies = {}
+    for config in configs:
+        if config.enabled and config.implementation_status == "implemented":
+            group = config.request_group or config.provider
+            previous = shared_policies.get(group, (0.0, config.effective_concurrency))
+            shared_policies[group] = (
+                max(previous[0], config.request_interval_seconds),
+                min(previous[1], config.effective_concurrency),
+            )
+    configs = tuple(
+        replace(config, request_interval_seconds=shared_policies[config.request_group or config.provider][0],
+                effective_concurrency=shared_policies[config.request_group or config.provider][1])
+        if config.enabled and config.implementation_status == "implemented" else config
+        for config in configs
+    )
     routes = load_capability_routes(capabilities_path) if capabilities_path else {}
     now = now or datetime.now(timezone.utc)
-    registry = CapabilityRegistry()
+    def available(capability, selection_time):
+        if metadata is None:
+            return True
+        config = next(c for c in configs if c.provider == capability.provider and c.endpoint == capability.endpoint)
+        for evidence in metadata.capability_evidence(provider=capability.provider, endpoint=capability.endpoint, capability_version=capability.version):
+            if evidence.get("evidence_hash") != capability.evidence_hash:
+                continue
+            current = _evidence_capability(config, evidence, now=selection_time, priority=capability.priority,
+                                           role=capability.role, metadata=metadata)
+            if current is not None and (current.datasets, current.exchanges, current.asset_types, current.adjustments, current.frequencies, current.validated_symbols) == (
+                capability.datasets, capability.exchanges, capability.asset_types, capability.adjustments, capability.frequencies, capability.validated_symbols
+            ):
+                return True
+        return False
+
+    registry = CapabilityRegistry(availability=available)
     providers = []
+    pacer = RequestPacer()
     for config in configs:
-        if not config.enabled:
+        if config.enabled and config.implementation_status == "implemented":
+            pacer.configure(config.request_group or config.provider, config.request_interval_seconds, config.effective_concurrency)
+    for config in configs:
+        if not config.enabled or config.implementation_status != "implemented":
             continue
         priority = config.priority
-        for route in routes.get(next(iter(config.datasets), None), ()):
-            if route.get("provider") == config.provider and route.get("endpoint") == config.endpoint:
-                priority = int(route.get("priority", priority))
-        capability = replace(
-            config.capability(validated_at=now - timedelta(days=1), validation_expires_at=now + timedelta(days=1)),
-            priority=priority,
-        )
-        registry.register(capability)
-        if config.endpoint in {
-            "daily_history", "recent_history", "forward_history",
-            "stock_daily", "etf_daily", "lof_daily", "index_daily",
-        }:
+        eligible = []
+        if metadata is not None:
+            for evidence in metadata.capability_evidence(provider=config.provider, endpoint=config.endpoint, capability_version=config.capability_version):
+                try:
+                    dataset = Dataset(evidence["dataset"])
+                except (ValueError, KeyError):
+                    continue
+                route = next((r for r in routes.get(dataset, ()) if r.get("provider") == config.provider and r.get("endpoint") == config.endpoint), {})
+                route_config = replace(config, adjustments=config.adjustments & frozenset(Adjustment(v) for v in route.get("adjustments", config.adjustments)))
+                capability = _evidence_capability(route_config, evidence, now=now, priority=int(route.get("priority", priority)), role=str(route.get("role", config.role)), metadata=metadata)
+                if capability is not None:
+                    eligible.append(capability)
+        if not eligible and not include_unverified:
+            continue
+        for capability in eligible or [config.capability()]:
             try:
-                providers.append(build_provider(config))
+                provider_config = replace(config, adjustments=capability.adjustments)
+                provider = build_provider(provider_config, capability=capability, pacer=pacer)
             except ValueError:
                 # Configured but unimplemented providers remain explicitly unavailable.
                 continue
-        elif config.endpoint in {
-            "dividend_event", "security_list", "single_quote", "batch_quote", "intraday_trend",
-            "stock_fund_flow", "financial_main", "shareholder_count", "industry_board", "concept_board",
-            "industry_membership", "industry_index_daily", "industry_fund_flow", "concept_fund_flow",
-        }:
-            try:
-                providers.append(build_provider(config))
-            except ValueError:
-                continue
+            registry.register(capability)
+            providers.append(provider)
     return registry, tuple(providers)
