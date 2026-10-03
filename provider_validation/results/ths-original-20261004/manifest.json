@@ -1,0 +1,8 @@
+{
+  "source_path": "src/stock_data_manage/providers/akshare/boards.py",
+  "snapshot_path": "boards.py.bin",
+  "sha256": "2f8e988d652ecb2a5ecaeff665938be1a9aa6bf1d33e58628df66f706f99b5f4",
+  "byte_length": 11306,
+  "captured_at_utc": "2026-10-03T17:45:20.343153+00:00",
+  "purpose": "Confirmed scope: immutable original Provider contract for migration comparison; historical evidence remains unchanged."
+}

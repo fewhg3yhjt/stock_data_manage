@@ -70,6 +70,7 @@ def main(argv: list[str] | None = None) -> int:
     collect.add_argument("--count", type=int)
     collect.add_argument("--fields", help="comma-separated declared output fields, including required fields")
     collect.add_argument("--calendar-file", type=Path, help="explicit saved calendar rows for date-snapshot validation")
+    collect.add_argument("--context-file", type=Path, help="JSON parameter namespaces; explicit CLI flags override matching values")
 
     due = subcommands.add_parser("collect-due-inputs", help="plan one scheduler tick, or explicitly execute candidate collection")
     due.add_argument("--config-root", type=Path, default=Path("config"))
@@ -123,13 +124,22 @@ def main(argv: list[str] | None = None) -> int:
         request_context = {k: v for k, v in {"symbol": args.symbol, "start_date": args.start_date,
                            "end_date": args.end_date, "trade_date": args.trade_date}.items() if v is not None}
         try:
-            context = {"request": request_context, "config": {"count": args.count} if args.count is not None else {}}
+            context = json.loads(args.context_file.read_text(encoding="utf-8")) if args.context_file else {}
+            if (not isinstance(context, dict) or set(context) - {"request", "config", "dependency", "metadata", "calendar", "credential_ref"}
+                    or any(not isinstance(value, dict) for value in context.values())):
+                raise ValueError("context file must contain supported parameter namespace objects")
+            context.setdefault("request", {}).update(request_context)
+            context.setdefault("config", {}).update({"count": args.count} if args.count is not None else {})
+            if args.context_file:
+                context.setdefault("metadata", {})["context_path"] = str(args.context_file.resolve())
+            if "trading_dates" in context.get("calendar", {}):
+                context["calendar"]["trading_dates"] = [date.fromisoformat(str(day)) for day in context["calendar"]["trading_dates"]]
             if args.calendar_file:
                 saved_days = json.loads(args.calendar_file.read_text(encoding="utf-8"))
                 if not isinstance(saved_days, list):
                     raise ValueError("calendar file must contain an explicit date-row array")
                 context["calendar"] = {"trading_dates": [date.fromisoformat(str(row["trade_date"])) for row in saved_days]}
-                context["metadata"] = {"calendar_path": str(args.calendar_file.resolve())}
+                context.setdefault("metadata", {})["calendar_path"] = str(args.calendar_file.resolve())
             report = collect_input(input_id=args.input, context=context,
                 config_root=args.config_root, output_root=args.output_root, mode=args.mode,
                 replay_manifest=args.replay_manifest, evidence_root=args.evidence_root,

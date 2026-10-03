@@ -67,7 +67,7 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
             response = requests.Response()
             response.status_code = int(record["status_code"])
             response.headers.update(record.get("response_headers", {}))
-            response.encoding = record.get("encoding") or "utf-8"
+            response.encoding = record.get("encoding") or record.get("response_encoding") or "utf-8"
             response._content = body
             response._content_consumed = True
             response.url, response.request = request.url, request
@@ -84,7 +84,8 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                     raise ValueError("no exact archived request match; replay never falls back to network")
                 number, record = matching
                 used.add(number)
-                source_ref = {"manifest": str(replay_manifest.resolve()), "line": number}
+                source_ref = {"manifest": str(replay_manifest.resolve()), "line": number,
+                              "fetched_at_utc": record.get("fetched_at_utc")}
                 if record.get("outcome") == "transport_error":
                     store.append_event({"event": "http_response", "mode": "replay", "outcome": "transport_error",
                                         "url": sanitized_url(request.url), "method": request.method,
@@ -102,7 +103,8 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                 if cached:
                     manifest, record, body = cached
                     response = make_response(request, record, body)
-                    source_ref, mode = {"manifest": str(manifest.resolve()), "sha256": record["body_sha256"]}, "cached"
+                    source_ref, mode = {"manifest": str(manifest.resolve()), "sha256": record["body_sha256"],
+                                        "fetched_at_utc": record.get("fetched_at_utc")}, "cached"
                 else:
                     host = urlsplit(request.url).hostname or "unknown"
                     pacer.configure(host, 3, 1)

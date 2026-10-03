@@ -1,10 +1,12 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, datetime, timezone
+from pathlib import Path
 from typing import Any, Mapping
 
 from ..contracts import FailureClass, ProviderContractError
+from ...quality.normalization import Normalizer
 from .session import load_client
 
 
@@ -17,6 +19,9 @@ class AkShareBoardResult:
     snapshot_at: datetime | None = None
     returned_first_key: str | None = None
     returned_last_key: str | None = None
+    source_rows: tuple[Mapping[str, Any], ...] = ()
+    mapping_context: Mapping[str, Any] = field(default_factory=dict)
+    source_url: str | None = None
 
 
 @dataclass(slots=True)
@@ -25,13 +30,22 @@ class AkShareBoardProvider:
 
     client: Any | None = None
     name: str = "akshare"
-    capability_version: str = "akshare-ths-board-v1"
+    capability_version: str = "akshare-ths-board-input-v2"
     endpoint: str = "industry_index_daily"
+    normalization_root: Path | None = None
+    input_hosts: tuple[str, ...] = ("https://q.10jqka.com.cn", "https://d.10jqka.com.cn", "http://data.10jqka.com.cn")
+
+    def _mapping(self, dataset: str, input_id: str) -> Mapping[str, str]:
+        from ...config.loader import load_normalization_document
+        document = load_normalization_document(self.normalization_root or Path(__file__).resolve().parents[4] / "config/normalization", dataset)
+        return next(rule["field_mapping"] for rule in document["rules"] if rule["input_id"] == input_id)
 
     def fetch_industry_list(self) -> AkShareBoardResult:
         ak = self.client or load_client()
         try:
             frame = ak.stock_board_industry_name_ths()
+        except (ValueError, FileNotFoundError, FileExistsError, PermissionError):
+            raise
         except Exception as exc:
             raise ProviderContractError(
                 "AkShare THS industry list request failed",
@@ -45,11 +59,12 @@ class AkShareBoardProvider:
                 FailureClass.SCHEMA_CHANGED,
                 retryable=False,
             )
-        rows = tuple(
-            {"board_type": "industry", "board_name": str(row[0]).strip(), "board_code": str(row[1]).strip(), "source": "ths"}
-            for row in _values(frame)
-            if len(row) >= 2 and str(row[0]).strip() and str(row[1]).strip()
-        )
+        source_rows = tuple(dict(zip(columns, row)) for row in _values(frame)
+                            if len(row) >= 2 and str(row[0]).strip() and str(row[1]).strip())
+        mapping = self._mapping("industry_directory", "SDA-BOARD-001")
+        rows = tuple({"board_type": "industry", **{key: str(value).strip()
+                      for key, value in Normalizer.map_fields(row, mapping).items()}, "source": "ths"}
+                     for row in source_rows)
         if not rows:
             raise ProviderContractError(
                 "AkShare THS industry list returned no rows",
@@ -61,6 +76,8 @@ class AkShareBoardProvider:
             field_semantics=("board_name", "board_code"),
             returned_first_key=str(rows[0]["board_code"]),
             returned_last_key=str(rows[-1]["board_code"]),
+            source_rows=source_rows,
+            mapping_context={"board_type": "industry", "source": "ths"},
         )
 
     def fetch_industry_daily(
@@ -87,6 +104,8 @@ class AkShareBoardProvider:
                 start_date=start_date.strftime("%Y%m%d"),
                 end_date=end_date.strftime("%Y%m%d"),
             )
+        except (ValueError, FileNotFoundError, FileExistsError, PermissionError):
+            raise
         except Exception as exc:
             raise ProviderContractError(
                 f"AkShare THS industry index request failed for {board_name}",
@@ -102,6 +121,8 @@ class AkShareBoardProvider:
                 retryable=False,
             )
         rows: list[Mapping[str, Any]] = []
+        source_rows = []
+        mapping = self._mapping("industry_index_daily", "SDA-BOARD-002")
         for values in _values(frame):
             if len(values) < 7:
                 raise ProviderContractError(
@@ -112,18 +133,15 @@ class AkShareBoardProvider:
             trade_date = _date(values[0])
             if not start_date.isoformat() <= trade_date <= end_date.isoformat():
                 continue
+            raw = dict(zip(columns, values))
+            source_rows.append(raw)
             rows.append(
                 {
+                    **Normalizer.map_fields(raw, mapping),
                     "board_type": "industry",
                     "board_code": board_code,
                     "board_name": board_name,
                     "trade_date": trade_date,
-                    "open": values[1],
-                    "high": values[2],
-                    "low": values[3],
-                    "close": values[4],
-                    "volume": values[5],
-                    "amount": values[6],
                     "source": "ths",
                 }
             )
@@ -139,6 +157,8 @@ class AkShareBoardProvider:
             units=("volume:source_unit_unconfirmed", "amount:source_unit_unconfirmed"),
             returned_first_key=str(rows[0]["trade_date"]),
             returned_last_key=str(rows[-1]["trade_date"]),
+            source_rows=tuple(source_rows),
+            mapping_context={"board_type": "industry", "board_code": board_code, "board_name": board_name, "source": "ths"},
         )
 
     def fetch_fund_flow(
@@ -149,6 +169,8 @@ class AkShareBoardProvider:
         function_name = "stock_fund_flow_industry" if normalized == "industry" else "stock_fund_flow_concept"
         try:
             frame = getattr(ak, function_name)(symbol=period)
+        except (ValueError, FileNotFoundError, FileExistsError, PermissionError):
+            raise
         except Exception as exc:
             raise ProviderContractError(
                 f"AkShare THS {normalized} fund-flow request failed for {period}",
@@ -171,24 +193,6 @@ class AkShareBoardProvider:
                     FailureClass.SCHEMA_CHANGED,
                     retryable=False,
                 )
-            rows = tuple(
-                {
-                    "board_type": normalized,
-                    "period": period,
-                    "rank": row[0],
-                    "board_name": row[1],
-                    "index_value": row[2],
-                    "change_pct": row[3],
-                    "money_inflow": row[4],
-                    "money_outflow": row[5],
-                    "net_inflow": row[6],
-                    "company_count": row[7],
-                    "leader_stock_name": row[8],
-                    "leader_change_pct": row[9],
-                    "leader_price": row[10],
-                }
-                for row in values
-            )
             semantics = ("rank", "board_name", "index_value", "change_pct", "money_inflow", "money_outflow", "net_inflow", "company_count", "leader_stock_name", "leader_change_pct", "leader_price")
         else:
             expected = ("序号", "行业", "公司家数", "行业指数", "阶段涨跌幅", "流入资金", "流出资金", "净额")
@@ -205,22 +209,15 @@ class AkShareBoardProvider:
                     FailureClass.SCHEMA_CHANGED,
                     retryable=False,
                 )
-            rows = tuple(
-                {
-                    "board_type": normalized,
-                    "period": period,
-                    "rank": row[0],
-                    "board_name": row[1],
-                    "company_count": row[2],
-                    "index_value": row[3],
-                    "change_pct": row[4],
-                    "money_inflow": row[5],
-                    "money_outflow": row[6],
-                    "net_inflow": row[7],
-                }
-                for row in values
-            )
             semantics = ("rank", "board_name", "company_count", "index_value", "change_pct", "money_inflow", "money_outflow", "net_inflow")
+        source_rows = tuple(dict(zip(columns, row)) for row in values)
+        mapping = dict(self._mapping("board_fund_flow", "SDA-BOARD-003" if normalized == "industry" else "SDA-BOARD-004"))
+        if period != "即时":
+            # Preserve the existing period-method return contract; only immediate inputs are bound in YAML.
+            mapping = {key: value for key, value in mapping.items() if key in semantics}
+            mapping["change_pct"] = "阶段涨跌幅"
+        rows = tuple({"board_type": normalized, "period": period, **Normalizer.map_fields(row, mapping)}
+                     for row in source_rows)
         if not rows:
             raise ProviderContractError(
                 f"AkShare THS {normalized} fund-flow returned no rows",
@@ -236,6 +233,8 @@ class AkShareBoardProvider:
             snapshot_at=captured_at,
             returned_first_key=str(rows[0]["rank"]),
             returned_last_key=str(rows[-1]["rank"]),
+            source_rows=source_rows,
+            mapping_context={"board_type": normalized, "period": period, "source": "ths"},
         )
 
 

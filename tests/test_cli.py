@@ -1,6 +1,34 @@
 from stock_data_manage.cli import main
 
 
+def test_collect_input_context_file_merges_explicit_flags_and_preserves_dependency(tmp_path, monkeypatch, capsys):
+    import json
+    from datetime import date
+    saved = tmp_path / "context.json"
+    saved.write_text(json.dumps({"request": {"board_name": "半导体", "start_date": "2026-09-01"},
+                                 "dependency": {"board_code": "881121"}, "config": {"period": "即时"}}), encoding="utf-8")
+    calls = []
+    def collector(**kwargs):
+        calls.append(kwargs)
+        return {"status": "candidate_complete"}
+    monkeypatch.setattr("stock_data_manage.pipeline.inputs.collect_input", collector)
+    assert main(["collect-input", "--input", "SDA-BOARD-002", "--context-file", str(saved),
+                 "--start-date", "2026-09-02", "--end-date", "2026-10-02", "--output-root", str(tmp_path / "out")]) == 0
+    context = calls[0]["context"]
+    assert context["request"] == {"board_name": "半导体", "start_date": date(2026, 9, 2), "end_date": date(2026, 10, 2)}
+    assert context["dependency"]["board_code"] == "881121"
+    assert context["metadata"]["context_path"] == str(saved.resolve())
+
+
+def test_collect_input_rejects_malformed_context_before_execution(tmp_path):
+    import pytest
+    saved = tmp_path / "context.json"
+    saved.write_text('{"request": ["半导体"]}', encoding="utf-8")
+    with pytest.raises(SystemExit) as exc:
+        main(["collect-input", "--input", "SDA-BOARD-002", "--context-file", str(saved), "--output-root", str(tmp_path / "out")])
+    assert exc.value.code == 2
+
+
 def test_recover_cli_returns_success_for_empty_store(tmp_path, capsys) -> None:
     code = main(
         [

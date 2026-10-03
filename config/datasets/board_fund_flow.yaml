@@ -4,11 +4,11 @@ dataset:
   primary_key: [board_type, board_name, period, snapshot_at]
 
 fields:
-  board_type: {type: string, required: true}
+  board_type: {type: enum, values: [industry, concept], required: true}
   period: {type: string, required: true}
   rank: {type: integer, required: true}
   board_name: {type: string, required: true}
-  snapshot_at: {type: datetime, required: true}
+  snapshot_at: {type: datetime, required: true, description: 原响应批次最后采集时间，非逐行行情日期}
   index_value: {type: decimal, required: false}
   change_pct: {type: decimal, unit: percent, required: false}
   money_inflow: {type: decimal, unit: source_display_unit_unconfirmed, required: false}

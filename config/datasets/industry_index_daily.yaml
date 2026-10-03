@@ -4,7 +4,7 @@ dataset:
   primary_key: [board_code, trade_date]
 
 fields:
-  board_type: {type: string, required: true}
+  board_type: {type: enum, values: [industry], required: true}
   board_code: {type: string, required: true}
   board_name: {type: string, required: true}
   trade_date: {type: date, required: true}

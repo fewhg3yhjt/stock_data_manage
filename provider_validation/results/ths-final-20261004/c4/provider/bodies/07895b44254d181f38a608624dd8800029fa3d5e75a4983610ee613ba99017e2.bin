@@ -1,0 +1,680 @@
+			<div id="charts1" style="width: 1120px;height: 400px;"></div>
+	    <div class="page-loading" style="display: none;">
+        <div class="mask"></div>
+        <div class="loading-img"></div>
+    </div>
+    <table class="m-table J-ajax-table">
+     <thead>
+       		<tr>
+			<th width="40">序号</th>
+			<th width="90" ><a href="###" class="J-ajax-a" field="tradename" >行业<i class="arr-down"></i></a></th>
+			<th width="100" ><a href="###" field="price" class="J-ajax-a" >行业指数<i class="arr-down"></i></a></th>
+			<th width="100" class="cur"><a href="###" field="tradezdf" class="J-ajax-a" order="asc">涨跌幅<i class="arr-down"></i></a></th>
+			<th width="110" ><a href="###" field="buy" class="J-ajax-a" >流入资金(亿)<i class="arr-down"></i></a></th>
+			<th width="110" ><a href="###" field="sell" class="J-ajax-a" >流出资金(亿)<i class="arr-down"></i></a></th>
+			<th width="110" ><a href="###" field="je" class="J-ajax-a" >净额(亿)<i class="arr-down"></i></a></th>
+			<th width="90" ><a href="###" field="total" class="J-ajax-a" >公司家数<i class="arr-down"></i></a></th>
+			<th width="110" ><a href="###" field="name" class="J-ajax-a" >领涨股<i class="arr-down"></i></a></th>
+			<th width="90" ><a href="###" field="zdf" class="J-ajax-a" >涨跌幅<i class="arr-down"></i></a></th>
+			<th width="110" ><a href="###" field="new" class="J-ajax-a" >当前价(元)<i class="arr-down"></i></a></th>
+		</tr>
+	  	</thead>
+	<tbody>
+	  							<tr class="even">
+					<td class="first tc">1</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/308822/" target="_blank">重组蛋白</a></td>
+					<td class=" c-rise">851.771</td>
+					<td class="tr cur c-rise">3.78%</td>
+					<td class="tr c-rise">95.52</td>
+					<td class="tr c-fall">75.58</td>
+					<td class="tr c-rise">19.94</td>
+					<td class="tr">128</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/688806/" target="_blank">泰诺麦博</a></td>
+					<td class="tr c-rise">19.99%</td>
+					<td class="tr c-rise">30.67</td>
+	 			</tr>
+	 						<tr >
+					<td class="first tc">2</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/301543/" target="_blank">细胞免疫治疗</a></td>
+					<td class=" c-rise">1273.78</td>
+					<td class="tr cur c-rise">3.45%</td>
+					<td class="tr c-rise">126.44</td>
+					<td class="tr c-fall">97.04</td>
+					<td class="tr c-rise">29.40</td>
+					<td class="tr">66</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/920344/" target="_blank">三元基因</a></td>
+					<td class="tr c-rise">15.79%</td>
+					<td class="tr c-rise">24.35</td>
+	 			</tr>
+	 						<tr class="even">
+					<td class="first tc">3</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/308734/" target="_blank">CRO概念</a></td>
+					<td class=" c-rise">1058.78</td>
+					<td class="tr cur c-rise">3.40%</td>
+					<td class="tr c-rise">162.89</td>
+					<td class="tr c-fall">136.26</td>
+					<td class="tr c-rise">26.63</td>
+					<td class="tr">77</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/688185/" target="_blank">康希诺</a></td>
+					<td class="tr c-rise">20.00%</td>
+					<td class="tr c-rise">102.64</td>
+	 			</tr>
+	 						<tr >
+					<td class="first tc">4</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/308941/" target="_blank">猴痘概念</a></td>
+					<td class=" c-rise">930.699</td>
+					<td class="tr cur c-rise">2.96%</td>
+					<td class="tr c-rise">85.13</td>
+					<td class="tr c-fall">70.36</td>
+					<td class="tr c-rise">14.77</td>
+					<td class="tr">75</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/688185/" target="_blank">康希诺</a></td>
+					<td class="tr c-rise">20.00%</td>
+					<td class="tr c-rise">102.64</td>
+	 			</tr>
+	 						<tr class="even">
+					<td class="first tc">5</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/300106/" target="_blank">生物疫苗</a></td>
+					<td class=" c-rise">1698.52</td>
+					<td class="tr cur c-rise">2.95%</td>
+					<td class="tr c-rise">66.86</td>
+					<td class="tr c-fall">52.94</td>
+					<td class="tr c-rise">13.93</td>
+					<td class="tr">62</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/688185/" target="_blank">康希诺</a></td>
+					<td class="tr c-rise">20.00%</td>
+					<td class="tr c-rise">102.64</td>
+	 			</tr>
+	 						<tr >
+					<td class="first tc">6</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/300435/" target="_blank">转基因</a></td>
+					<td class=" c-rise">1831.3</td>
+					<td class="tr cur c-rise">2.69%</td>
+					<td class="tr c-rise">15.83</td>
+					<td class="tr c-fall">11.15</td>
+					<td class="tr c-rise">4.67</td>
+					<td class="tr">21</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/002041/" target="_blank">登海种业</a></td>
+					<td class="tr c-rise">10.00%</td>
+					<td class="tr c-rise">10.23</td>
+	 			</tr>
+	 						<tr class="even">
+					<td class="first tc">7</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/309081/" target="_blank">减肥药</a></td>
+					<td class=" c-rise">1457.99</td>
+					<td class="tr cur c-rise">2.59%</td>
+					<td class="tr c-rise">120.94</td>
+					<td class="tr c-fall">92.71</td>
+					<td class="tr c-rise">28.22</td>
+					<td class="tr">67</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/603538/" target="_blank">美诺华</a></td>
+					<td class="tr c-rise">10.00%</td>
+					<td class="tr c-rise">28.59</td>
+	 			</tr>
+	 						<tr >
+					<td class="first tc">8</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/300075/" target="_blank">禽流感</a></td>
+					<td class=" c-rise">2152.19</td>
+					<td class="tr cur c-rise">2.58%</td>
+					<td class="tr c-rise">10.31</td>
+					<td class="tr c-fall">7.75</td>
+					<td class="tr c-rise">2.56</td>
+					<td class="tr">23</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/603739/" target="_blank">蔚蓝生物</a></td>
+					<td class="tr c-rise">10.03%</td>
+					<td class="tr c-rise">14.04</td>
+	 			</tr>
+	 						<tr class="even">
+					<td class="first tc">9</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/308818/" target="_blank">幽门螺杆菌概念</a></td>
+					<td class=" c-rise">1057.58</td>
+					<td class="tr cur c-rise">2.48%</td>
+					<td class="tr c-rise">43.27</td>
+					<td class="tr c-fall">37.75</td>
+					<td class="tr c-rise">5.52</td>
+					<td class="tr">74</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/301190/" target="_blank">善水科技</a></td>
+					<td class="tr c-rise">20.01%</td>
+					<td class="tr c-rise">35.93</td>
+	 			</tr>
+	 						<tr >
+					<td class="first tc">10</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/308014/" target="_blank">创新药</a></td>
+					<td class=" c-rise">1309.73</td>
+					<td class="tr cur c-rise">2.46%</td>
+					<td class="tr c-rise">336.83</td>
+					<td class="tr c-fall">267.47</td>
+					<td class="tr c-rise">69.36</td>
+					<td class="tr">277</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/688806/" target="_blank">泰诺麦博</a></td>
+					<td class="tr c-rise">19.99%</td>
+					<td class="tr c-rise">30.67</td>
+	 			</tr>
+	 						<tr class="even">
+					<td class="first tc">11</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/308915/" target="_blank">肝炎概念</a></td>
+					<td class=" c-rise">1152.03</td>
+					<td class="tr cur c-rise">2.44%</td>
+					<td class="tr c-rise">122.74</td>
+					<td class="tr c-fall">96.98</td>
+					<td class="tr c-rise">25.77</td>
+					<td class="tr">140</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/920344/" target="_blank">三元基因</a></td>
+					<td class="tr c-rise">15.79%</td>
+					<td class="tr c-rise">24.35</td>
+	 			</tr>
+	 						<tr >
+					<td class="first tc">12</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/308708/" target="_blank">辅助生殖</a></td>
+					<td class=" c-rise">1278.85</td>
+					<td class="tr cur c-rise">2.43%</td>
+					<td class="tr c-rise">90.86</td>
+					<td class="tr c-fall">69.94</td>
+					<td class="tr c-rise">20.91</td>
+					<td class="tr">74</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/688265/" target="_blank">南模生物</a></td>
+					<td class="tr c-rise">19.87%</td>
+					<td class="tr c-rise">64.98</td>
+	 			</tr>
+	 						<tr class="even">
+					<td class="first tc">13</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/308438/" target="_blank">芬太尼</a></td>
+					<td class=" c-rise">2150.61</td>
+					<td class="tr cur c-rise">2.11%</td>
+					<td class="tr c-rise">4.26</td>
+					<td class="tr c-fall">4.09</td>
+					<td class="tr c-rise">0.17</td>
+					<td class="tr">8</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/002262/" target="_blank">恩华药业</a></td>
+					<td class="tr c-rise">5.72%</td>
+					<td class="tr c-rise">22.73</td>
+	 			</tr>
+	 						<tr >
+					<td class="first tc">14</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/301794/" target="_blank">青蒿素</a></td>
+					<td class=" c-rise">2006.52</td>
+					<td class="tr cur c-rise">2.10%</td>
+					<td class="tr c-rise">14.75</td>
+					<td class="tr c-fall">11.44</td>
+					<td class="tr c-rise">3.31</td>
+					<td class="tr">11</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/000999/" target="_blank">华润三九</a></td>
+					<td class="tr c-rise">3.20%</td>
+					<td class="tr c-rise">24.19</td>
+	 			</tr>
+	 						<tr class="even">
+					<td class="first tc">15</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/300038/" target="_blank">流感</a></td>
+					<td class=" c-rise">1494.85</td>
+					<td class="tr cur c-rise">2.09%</td>
+					<td class="tr c-rise">132.65</td>
+					<td class="tr c-fall">109.01</td>
+					<td class="tr c-rise">23.64</td>
+					<td class="tr">163</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/688185/" target="_blank">康希诺</a></td>
+					<td class="tr c-rise">20.00%</td>
+					<td class="tr c-rise">102.64</td>
+	 			</tr>
+	 						<tr >
+					<td class="first tc">16</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/301496/" target="_blank">白酒概念</a></td>
+					<td class=" c-rise">6163.34</td>
+					<td class="tr cur c-rise">2.07%</td>
+					<td class="tr c-rise">70.53</td>
+					<td class="tr c-fall">59.78</td>
+					<td class="tr c-rise">10.75</td>
+					<td class="tr">48</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/600059/" target="_blank">古越龙山</a></td>
+					<td class="tr c-rise">10.04%</td>
+					<td class="tr c-rise">12.27</td>
+	 			</tr>
+	 						<tr class="even">
+					<td class="first tc">17</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/301572/" target="_blank">玉米</a></td>
+					<td class=" c-rise">2525.66</td>
+					<td class="tr cur c-rise">2.07%</td>
+					<td class="tr c-rise">30.27</td>
+					<td class="tr c-fall">24.66</td>
+					<td class="tr c-rise">5.61</td>
+					<td class="tr">34</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/002041/" target="_blank">登海种业</a></td>
+					<td class="tr c-rise">10.00%</td>
+					<td class="tr c-rise">10.23</td>
+	 			</tr>
+	 						<tr >
+					<td class="first tc">18</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/308956/" target="_blank">粮食概念</a></td>
+					<td class=" c-rise">894.061</td>
+					<td class="tr cur c-rise">2.06%</td>
+					<td class="tr c-rise">40.20</td>
+					<td class="tr c-fall">37.09</td>
+					<td class="tr c-rise">3.11</td>
+					<td class="tr">49</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/002316/" target="_blank">亚联发展</a></td>
+					<td class="tr c-rise">10.00%</td>
+					<td class="tr c-rise">4.95</td>
+	 			</tr>
+	 						<tr class="even">
+					<td class="first tc">19</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/308572/" target="_blank">仿制药一致性评价</a></td>
+					<td class=" c-rise">1669</td>
+					<td class="tr cur c-rise">1.97%</td>
+					<td class="tr c-rise">137.31</td>
+					<td class="tr c-fall">112.36</td>
+					<td class="tr c-rise">24.95</td>
+					<td class="tr">145</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/002755/" target="_blank">奥赛康</a></td>
+					<td class="tr c-rise">9.98%</td>
+					<td class="tr c-rise">13.55</td>
+	 			</tr>
+	 						<tr >
+					<td class="first tc">20</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/308614/" target="_blank">阿尔茨海默概念</a></td>
+					<td class=" c-rise">1316.57</td>
+					<td class="tr cur c-rise">1.95%</td>
+					<td class="tr c-rise">45.50</td>
+					<td class="tr c-fall">37.00</td>
+					<td class="tr c-rise">8.51</td>
+					<td class="tr">90</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/688105/" target="_blank">诺唯赞</a></td>
+					<td class="tr c-rise">6.87%</td>
+					<td class="tr c-rise">27.24</td>
+	 			</tr>
+	 						<tr class="even">
+					<td class="first tc">21</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/300983/" target="_blank">乳业</a></td>
+					<td class=" c-rise">2016.79</td>
+					<td class="tr cur c-rise">1.92%</td>
+					<td class="tr c-rise">20.02</td>
+					<td class="tr c-fall">18.52</td>
+					<td class="tr c-rise">1.50</td>
+					<td class="tr">36</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/001318/" target="_blank">阳光乳业</a></td>
+					<td class="tr c-rise">10.04%</td>
+					<td class="tr c-rise">13.04</td>
+	 			</tr>
+	 						<tr >
+					<td class="first tc">22</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/301292/" target="_blank">染料</a></td>
+					<td class=" c-rise">1562.87</td>
+					<td class="tr cur c-rise">1.90%</td>
+					<td class="tr c-rise">20.44</td>
+					<td class="tr c-fall">22.09</td>
+					<td class="tr c-fall">-1.66</td>
+					<td class="tr">40</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/301190/" target="_blank">善水科技</a></td>
+					<td class="tr c-rise">20.01%</td>
+					<td class="tr c-rise">35.93</td>
+	 			</tr>
+	 						<tr class="even">
+					<td class="first tc">23</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/301146/" target="_blank">基因测序</a></td>
+					<td class=" c-rise">2110.83</td>
+					<td class="tr cur c-rise">1.90%</td>
+					<td class="tr c-rise">69.10</td>
+					<td class="tr c-fall">61.42</td>
+					<td class="tr c-rise">7.69</td>
+					<td class="tr">71</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/000710/" target="_blank">贝瑞基因</a></td>
+					<td class="tr c-rise">10.02%</td>
+					<td class="tr c-rise">10.87</td>
+	 			</tr>
+	 						<tr >
+					<td class="first tc">24</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/308696/" target="_blank">代糖概念</a></td>
+					<td class=" c-rise">921.369</td>
+					<td class="tr cur c-rise">1.88%</td>
+					<td class="tr c-rise">11.34</td>
+					<td class="tr c-fall">10.04</td>
+					<td class="tr c-rise">1.30</td>
+					<td class="tr">25</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/603739/" target="_blank">蔚蓝生物</a></td>
+					<td class="tr c-rise">10.03%</td>
+					<td class="tr c-rise">14.04</td>
+	 			</tr>
+	 						<tr class="even">
+					<td class="first tc">25</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/309135/" target="_blank">维生素</a></td>
+					<td class=" c-rise">1360.71</td>
+					<td class="tr cur c-rise">1.87%</td>
+					<td class="tr c-rise">54.54</td>
+					<td class="tr c-fall">46.17</td>
+					<td class="tr c-rise">8.36</td>
+					<td class="tr">77</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/688639/" target="_blank">华恒生物</a></td>
+					<td class="tr c-rise">7.60%</td>
+					<td class="tr c-rise">19.11</td>
+	 			</tr>
+	 						<tr >
+					<td class="first tc">26</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/309129/" target="_blank">合成生物</a></td>
+					<td class=" c-rise">1608.5</td>
+					<td class="tr cur c-rise">1.83%</td>
+					<td class="tr c-rise">159.53</td>
+					<td class="tr c-fall">141.73</td>
+					<td class="tr c-rise">17.79</td>
+					<td class="tr">170</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/688185/" target="_blank">康希诺</a></td>
+					<td class="tr c-rise">20.00%</td>
+					<td class="tr c-rise">102.64</td>
+	 			</tr>
+	 						<tr class="even">
+					<td class="first tc">27</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/300157/" target="_blank">草甘膦</a></td>
+					<td class=" c-rise">1424.35</td>
+					<td class="tr cur c-rise">1.80%</td>
+					<td class="tr c-rise">6.81</td>
+					<td class="tr c-fall">6.43</td>
+					<td class="tr c-rise">0.39</td>
+					<td class="tr">19</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/002513/" target="_blank">蓝丰生化</a></td>
+					<td class="tr c-rise">7.13%</td>
+					<td class="tr c-rise">5.86</td>
+	 			</tr>
+	 						<tr >
+					<td class="first tc">28</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/301497/" target="_blank">啤酒概念</a></td>
+					<td class=" c-rise">1452.46</td>
+					<td class="tr cur c-rise">1.74%</td>
+					<td class="tr c-rise">14.70</td>
+					<td class="tr c-fall">11.58</td>
+					<td class="tr c-rise">3.12</td>
+					<td class="tr">29</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/603919/" target="_blank">金徽酒</a></td>
+					<td class="tr c-rise">9.99%</td>
+					<td class="tr c-rise">17.40</td>
+	 			</tr>
+	 						<tr class="even">
+					<td class="first tc">29</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/301565/" target="_blank">医药电商</a></td>
+					<td class=" c-rise">1010.38</td>
+					<td class="tr cur c-rise">1.59%</td>
+					<td class="tr c-rise">123.44</td>
+					<td class="tr c-fall">99.85</td>
+					<td class="tr c-rise">23.59</td>
+					<td class="tr">186</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/920344/" target="_blank">三元基因</a></td>
+					<td class="tr c-rise">15.79%</td>
+					<td class="tr c-rise">24.35</td>
+	 			</tr>
+	 						<tr >
+					<td class="first tc">30</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/301123/" target="_blank">大豆</a></td>
+					<td class=" c-rise">1648.87</td>
+					<td class="tr cur c-rise">1.57%</td>
+					<td class="tr c-rise">4.63</td>
+					<td class="tr c-fall">3.48</td>
+					<td class="tr c-rise">1.15</td>
+					<td class="tr">14</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/600313/" target="_blank">农发种业</a></td>
+					<td class="tr c-rise">4.34%</td>
+					<td class="tr c-rise">6.73</td>
+	 			</tr>
+	 						<tr class="even">
+					<td class="first tc">31</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/308016/" target="_blank">农业种植</a></td>
+					<td class=" c-rise">2419.5</td>
+					<td class="tr cur c-rise">1.49%</td>
+					<td class="tr c-rise">44.06</td>
+					<td class="tr c-fall">37.96</td>
+					<td class="tr c-rise">6.10</td>
+					<td class="tr">96</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/601118/" target="_blank">海南橡胶</a></td>
+					<td class="tr c-rise">10.02%</td>
+					<td class="tr c-rise">6.37</td>
+	 			</tr>
+	 						<tr >
+					<td class="first tc">32</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/306750/" target="_blank">超级品牌</a></td>
+					<td class=" c-rise">1433.79</td>
+					<td class="tr cur c-rise">1.48%</td>
+					<td class="tr c-rise">119.18</td>
+					<td class="tr c-fall">98.19</td>
+					<td class="tr c-rise">20.99</td>
+					<td class="tr">49</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/600059/" target="_blank">古越龙山</a></td>
+					<td class="tr c-rise">10.04%</td>
+					<td class="tr c-rise">12.27</td>
+	 			</tr>
+	 						<tr class="even">
+					<td class="first tc">33</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/308893/" target="_blank">毛发医疗</a></td>
+					<td class=" c-rise">1133.22</td>
+					<td class="tr cur c-rise">1.46%</td>
+					<td class="tr c-rise">18.68</td>
+					<td class="tr c-fall">16.03</td>
+					<td class="tr c-rise">2.65</td>
+					<td class="tr">27</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/301096/" target="_blank">百诚医药</a></td>
+					<td class="tr c-rise">4.69%</td>
+					<td class="tr c-rise">49.30</td>
+	 			</tr>
+	 						<tr >
+					<td class="first tc">34</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/308537/" target="_blank">动物疫苗</a></td>
+					<td class=" c-rise">1470.9</td>
+					<td class="tr cur c-rise">1.25%</td>
+					<td class="tr c-rise">6.88</td>
+					<td class="tr c-fall">8.72</td>
+					<td class="tr c-fall">-1.84</td>
+					<td class="tr">20</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/603739/" target="_blank">蔚蓝生物</a></td>
+					<td class="tr c-rise">10.03%</td>
+					<td class="tr c-rise">14.04</td>
+	 			</tr>
+	 						<tr class="even">
+					<td class="first tc">35</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/308692/" target="_blank">NMN概念</a></td>
+					<td class=" c-rise">1255.86</td>
+					<td class="tr cur c-rise">1.23%</td>
+					<td class="tr c-rise">9.11</td>
+					<td class="tr c-fall">6.80</td>
+					<td class="tr c-rise">2.30</td>
+					<td class="tr">25</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/002317/" target="_blank">众生药业</a></td>
+					<td class="tr c-rise">5.44%</td>
+					<td class="tr c-rise">24.03</td>
+	 			</tr>
+	 						<tr >
+					<td class="first tc">36</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/301252/" target="_blank">眼科医疗</a></td>
+					<td class=" c-rise">1710.92</td>
+					<td class="tr cur c-rise">1.22%</td>
+					<td class="tr c-rise">60.87</td>
+					<td class="tr c-fall">48.14</td>
+					<td class="tr c-rise">12.73</td>
+					<td class="tr">64</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/002317/" target="_blank">众生药业</a></td>
+					<td class="tr c-rise">5.44%</td>
+					<td class="tr c-rise">24.03</td>
+	 			</tr>
+	 						<tr class="even">
+					<td class="first tc">37</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/308712/" target="_blank">医美概念</a></td>
+					<td class=" c-rise">1286</td>
+					<td class="tr cur c-rise">1.13%</td>
+					<td class="tr c-rise">67.59</td>
+					<td class="tr c-fall">58.90</td>
+					<td class="tr c-rise">8.69</td>
+					<td class="tr">96</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/688356/" target="_blank">键凯科技</a></td>
+					<td class="tr c-rise">11.09%</td>
+					<td class="tr c-rise">106.41</td>
+	 			</tr>
+	 						<tr >
+					<td class="first tc">38</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/308718/" target="_blank">同花顺漂亮100</a></td>
+					<td class=" c-rise">787.212</td>
+					<td class="tr cur c-rise">1.13%</td>
+					<td class="tr c-rise">522.18</td>
+					<td class="tr c-fall">448.38</td>
+					<td class="tr c-rise">73.80</td>
+					<td class="tr">100</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/300122/" target="_blank">智飞生物</a></td>
+					<td class="tr c-rise">6.88%</td>
+					<td class="tr c-rise">13.98</td>
+	 			</tr>
+	 						<tr class="even">
+					<td class="first tc">39</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/301715/" target="_blank">证金持股</a></td>
+					<td class=" c-rise">1121.81</td>
+					<td class="tr cur c-rise">1.09%</td>
+					<td class="tr c-rise">122.54</td>
+					<td class="tr c-fall">86.88</td>
+					<td class="tr c-rise">35.65</td>
+					<td class="tr">33</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/000568/" target="_blank">泸州老窖</a></td>
+					<td class="tr c-rise">4.18%</td>
+					<td class="tr c-rise">72.28</td>
+	 			</tr>
+	 						<tr >
+					<td class="first tc">40</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/309124/" target="_blank">高股息精选</a></td>
+					<td class=" c-rise">1494.44</td>
+					<td class="tr cur c-rise">1.08%</td>
+					<td class="tr c-rise">296.39</td>
+					<td class="tr c-fall">215.26</td>
+					<td class="tr c-rise">81.13</td>
+					<td class="tr">285</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/603948/" target="_blank">建业股份</a></td>
+					<td class="tr c-rise">9.99%</td>
+					<td class="tr c-rise">21.36</td>
+	 			</tr>
+	 						<tr class="even">
+					<td class="first tc">41</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/307512/" target="_blank">石墨电极</a></td>
+					<td class=" c-rise">997.437</td>
+					<td class="tr cur c-rise">1.08%</td>
+					<td class="tr c-rise">12.73</td>
+					<td class="tr c-fall">13.66</td>
+					<td class="tr c-fall">-0.93</td>
+					<td class="tr">26</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/300890/" target="_blank">翔丰华</a></td>
+					<td class="tr c-rise">6.29%</td>
+					<td class="tr c-rise">28.88</td>
+	 			</tr>
+	 						<tr >
+					<td class="first tc">42</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/300858/" target="_blank">土地流转</a></td>
+					<td class=" c-rise">1951.8</td>
+					<td class="tr cur c-rise">1.07%</td>
+					<td class="tr c-rise">25.12</td>
+					<td class="tr c-fall">23.52</td>
+					<td class="tr c-rise">1.60</td>
+					<td class="tr">44</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/601118/" target="_blank">海南橡胶</a></td>
+					<td class="tr c-rise">10.02%</td>
+					<td class="tr c-rise">6.37</td>
+	 			</tr>
+	 						<tr class="even">
+					<td class="first tc">43</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/301104/" target="_blank">化肥</a></td>
+					<td class=" c-rise">971.045</td>
+					<td class="tr cur c-rise">1.04%</td>
+					<td class="tr c-rise">46.46</td>
+					<td class="tr c-fall">46.31</td>
+					<td class="tr c-rise">0.15</td>
+					<td class="tr">75</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/603739/" target="_blank">蔚蓝生物</a></td>
+					<td class="tr c-rise">10.03%</td>
+					<td class="tr c-rise">14.04</td>
+	 			</tr>
+	 						<tr >
+					<td class="first tc">44</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/308547/" target="_blank">黑龙江自贸区</a></td>
+					<td class=" c-rise">1764.66</td>
+					<td class="tr cur c-rise">0.96%</td>
+					<td class="tr c-rise">29.29</td>
+					<td class="tr c-fall">29.19</td>
+					<td class="tr c-rise">0.10</td>
+					<td class="tr">36</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/605577/" target="_blank">龙版传媒</a></td>
+					<td class="tr c-rise">10.00%</td>
+					<td class="tr c-rise">16.28</td>
+	 			</tr>
+	 						<tr class="even">
+					<td class="first tc">45</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/307826/" target="_blank">水泥概念</a></td>
+					<td class=" c-rise">1155.76</td>
+					<td class="tr cur c-rise">0.94%</td>
+					<td class="tr c-rise">19.22</td>
+					<td class="tr c-fall">14.36</td>
+					<td class="tr c-rise">4.86</td>
+					<td class="tr">46</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/600802/" target="_blank">福建水泥</a></td>
+					<td class="tr c-rise">4.32%</td>
+					<td class="tr c-rise">7.24</td>
+	 			</tr>
+	 						<tr >
+					<td class="first tc">46</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/309062/" target="_blank">同花顺中特估100</a></td>
+					<td class=" c-rise">1160.36</td>
+					<td class="tr cur c-rise">0.91%</td>
+					<td class="tr c-rise">243.48</td>
+					<td class="tr c-fall">205.65</td>
+					<td class="tr c-rise">37.83</td>
+					<td class="tr">100</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/600072/" target="_blank">中船科技</a></td>
+					<td class="tr c-rise">9.98%</td>
+					<td class="tr c-rise">9.70</td>
+	 			</tr>
+	 						<tr class="even">
+					<td class="first tc">47</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/308588/" target="_blank">宠物经济</a></td>
+					<td class=" c-rise">1438.88</td>
+					<td class="tr cur c-rise">0.89%</td>
+					<td class="tr c-rise">61.16</td>
+					<td class="tr c-fall">54.41</td>
+					<td class="tr c-rise">6.75</td>
+					<td class="tr">127</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/300981/" target="_blank">中红医疗</a></td>
+					<td class="tr c-rise">13.41%</td>
+					<td class="tr c-rise">20.30</td>
+	 			</tr>
+	 						<tr >
+					<td class="first tc">48</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/300923/" target="_blank">生态农业</a></td>
+					<td class=" c-rise">1584.71</td>
+					<td class="tr cur c-rise">0.89%</td>
+					<td class="tr c-rise">29.03</td>
+					<td class="tr c-fall">24.07</td>
+					<td class="tr c-rise">4.96</td>
+					<td class="tr">66</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/002041/" target="_blank">登海种业</a></td>
+					<td class="tr c-rise">10.00%</td>
+					<td class="tr c-rise">10.23</td>
+	 			</tr>
+	 						<tr class="even">
+					<td class="first tc">49</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/305376/" target="_blank">丙烯酸</a></td>
+					<td class=" c-rise">1981.29</td>
+					<td class="tr cur c-rise">0.85%</td>
+					<td class="tr c-rise">14.75</td>
+					<td class="tr c-fall">13.56</td>
+					<td class="tr c-rise">1.18</td>
+					<td class="tr">20</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/603928/" target="_blank">兴业股份</a></td>
+					<td class="tr c-rise">10.02%</td>
+					<td class="tr c-rise">13.07</td>
+	 			</tr>
+	 						<tr >
+					<td class="first tc">50</td>
+					<td class="tl"><a href="http://q.10jqka.com.cn/gn/detail/code/300351/" target="_blank">钛白粉概念</a></td>
+					<td class=" c-rise">1792.57</td>
+					<td class="tr cur c-rise">0.84%</td>
+					<td class="tr c-rise">7.32</td>
+					<td class="tr c-fall">7.24</td>
+					<td class="tr c-rise">0.08</td>
+					<td class="tr">15</td>
+					<td class="tc"><a href="http://stockpage.10jqka.com.cn/603389/" target="_blank">亚振家居</a></td>
+					<td class="tr c-rise">2.27%</td>
+					<td class="tr c-rise">44.57</td>
+	 			</tr>
+	 			 		</tbody>
+  </table>
+    <div class="m-page J-ajax-page">
+		&nbsp;<a class="cur" href="javascript:void(0)">1</a>&nbsp;&nbsp;<a class="changePage" page="2" href="javascript:void(0);">2</a>&nbsp;&nbsp;<a class="changePage" page="3" href="javascript:void(0);">3</a>&nbsp;&nbsp;<a class="changePage" page="4" href="javascript:void(0);">4</a>&nbsp;&nbsp;<a class="changePage" page="5" href="javascript:void(0);">5</a>&nbsp;&nbsp;<a class="changePage" page="2" href="javascript:void(0);">下一页</a><a class="changePage" page="8" href="javascript:void(0);">尾页</a><span class="page_info">1/8</span>
+	</div>
+	<script type="text/javascript" src="//s.thsi.cn/js/chameleon/chameleon.1.7.min.1790955.js"></script> <script type="text/javascript">
+			var JS_DATA = [{"name":"\u9ad8\u80a1\u606f\u7cbe\u9009","amount":81.13,"addr":"http:\/\/q.10jqka.com.cn\/gn\/detail\/code\/309124\/"},{"name":"\u540c\u82b1\u987a\u6f02\u4eae100","amount":73.8,"addr":"http:\/\/q.10jqka.com.cn\/gn\/detail\/code\/308718\/"},{"name":"\u521b\u65b0\u836f","amount":69.36,"addr":"http:\/\/q.10jqka.com.cn\/gn\/detail\/code\/308014\/"},{"name":"\u540c\u82b1\u987a\u4e2d\u7279\u4f30100","amount":37.83,"addr":"http:\/\/q.10jqka.com.cn\/gn\/detail\/code\/309062\/"},{"name":"\u8bc1\u91d1\u6301\u80a1","amount":35.65,"addr":"http:\/\/q.10jqka.com.cn\/gn\/detail\/code\/301715\/"},{"name":"\u7ec6\u80de\u514d\u75ab\u6cbb\u7597","amount":29.4,"addr":"http:\/\/q.10jqka.com.cn\/gn\/detail\/code\/301543\/"},{"name":"\u51cf\u80a5\u836f","amount":28.22,"addr":"http:\/\/q.10jqka.com.cn\/gn\/detail\/code\/309081\/"},{"name":"CRO\u6982\u5ff5","amount":26.63,"addr":"http:\/\/q.10jqka.com.cn\/gn\/detail\/code\/308734\/"},{"name":"\u809d\u708e\u6982\u5ff5","amount":25.77,"addr":"http:\/\/q.10jqka.com.cn\/gn\/detail\/code\/308915\/"},{"name":"\u7269\u4e1a\u7ba1\u7406","amount":25.23,"addr":"http:\/\/q.10jqka.com.cn\/gn\/detail\/code\/308717\/"},{"name":"\u6df1\u80a1\u901a","amount":-123.31,"addr":"http:\/\/q.10jqka.com.cn\/gn\/detail\/code\/301636\/"},{"name":"2026\u4e2d\u62a5\u9884\u589e","amount":-125.4,"addr":"http:\/\/q.10jqka.com.cn\/gn\/detail\/code\/309267\/"},{"name":"\u878d\u8d44\u878d\u5238","amount":-127.13,"addr":"http:\/\/q.10jqka.com.cn\/gn\/detail\/code\/300900\/"},{"name":"\u6d88\u8d39\u7535\u5b50\u6982\u5ff5","amount":-129.97,"addr":"http:\/\/q.10jqka.com.cn\/gn\/detail\/code\/308384\/"},{"name":"\u5b58\u50a8\u82af\u7247","amount":-142.3,"addr":"http:\/\/q.10jqka.com.cn\/gn\/detail\/code\/307940\/"},{"name":"5G","amount":-145.59,"addr":"http:\/\/q.10jqka.com.cn\/gn\/detail\/code\/300843\/"},{"name":"\u534e\u4e3a\u6982\u5ff5","amount":-146.3,"addr":"http:\/\/q.10jqka.com.cn\/gn\/detail\/code\/301459\/"},{"name":"\u6570\u636e\u4e2d\u5fc3(AIDC)","amount":-149.23,"addr":"http:\/\/q.10jqka.com.cn\/gn\/detail\/code\/308642\/"},{"name":"\u6c7d\u8f66\u7535\u5b50","amount":-151.48,"addr":"http:\/\/q.10jqka.com.cn\/gn\/detail\/code\/301471\/"},{"name":"\u82af\u7247\u6982\u5ff5","amount":-291.96,"addr":"http:\/\/q.10jqka.com.cn\/gn\/detail\/code\/301085\/"}];
+		</script>

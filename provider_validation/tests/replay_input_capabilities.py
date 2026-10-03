@@ -18,7 +18,10 @@ def main():
     parser = argparse.ArgumentParser(description="保存四项输入的离线回放与原实现比较证据")
     parser.add_argument("--output-root", type=Path, required=True)
     parser.add_argument("--verify-scheduling", action="store_true", help="also preserve scheduler and quote batch offline evidence")
+    parser.add_argument("--verify-ths-inputs", action="store_true", help="verify only the four existing THS board inputs")
     args = parser.parse_args()
+    if args.verify_ths_inputs and args.verify_scheduling:
+        parser.error("THS migration and scheduling verification are separate scopes")
     args.output_root = args.output_root.resolve()
     if not args.output_root.is_relative_to(ROOT / "provider_validation/results"):
         parser.error("verification outputs must be under provider_validation/results")
@@ -43,16 +46,37 @@ def main():
         raise AssertionError("offline replay cannot access network")
 
     with patch("requests.adapters.HTTPAdapter.send", forbidden_network):
-        for input_id, context, manifest, count in checks.CASES:
-            directory = args.output_root / input_id
-            checks.test_archived_inputs_execute_yaml_and_preserve_evidence(directory, None, input_id, context, manifest, count)
+        cases = checks.THS_CASES if args.verify_ths_inputs else checks.CASES
+        for index, (input_id, context, manifest, count) in enumerate(cases):
+            directory = args.output_root / (str(index + 1) if args.verify_ths_inputs else input_id)
+            validator = checks.test_ths_archived_inputs_execute_source_yaml if args.verify_ths_inputs else checks.test_archived_inputs_execute_yaml_and_preserve_evidence
+            validator(directory, None, input_id, context, manifest, count)
             report_path = next(directory.rglob("report.json"))
             report = json.loads(report_path.read_text(encoding="utf-8"))
             summary["inputs"].append({"input_id": input_id, "report_path": report_path.relative_to(ROOT).as_posix(),
                 "report_sha256": hashlib.sha256(report_path.read_bytes()).hexdigest(), "source_manifest": manifest.relative_to(ROOT).as_posix(),
                 "source_manifest_sha256": hashlib.sha256(manifest.read_bytes()).hexdigest(), "row_count": count,
                 "scope": report["parameters"], "code_version": report["code_version"], "result": "passed"})
-        for input_id, context, manifest, count in checks.CASES[:2]:
+        if args.verify_ths_inputs:
+            summary["known_differences"] = ["原Provider所有旧字段、行数和窗口均对照；候选标准字段按YAML映射。",
+                "行业量额、资金流金额单位未确认，来源值保留、标准列置空。快照时间来自原响应采集批次。",
+                "SDK动态Cookie/hexin-v继续由原SDK生成；离线对照不认证当前来源接受度。",
+                "回放匹配或留证错误归为迁移失败，不作为来源不可用；HTTP连接失败仍使用原失败类别。",
+                "仅回放隔离SDK目录内存缓存，在线SDK缓存/Session/代理/重试不变；没有捕获SDK内部物理重试。"]
+            for index, (input_id, context, manifest, count) in enumerate(cases):
+                directory = args.output_root / ("c" + str(index + 1))
+                comparison = checks.compare_ths_original(directory, input_id, context, manifest, count)
+                summary["original_vs_provider"].append({**comparison, "comparison_path": (directory / "comparison.json").relative_to(ROOT).as_posix(),
+                    "comparison_sha256": hashlib.sha256((directory / "comparison.json").read_bytes()).hexdigest()})
+            failure_directory = args.output_root / "f"
+            failure_directory.mkdir()
+            checks.test_ths_replay_miss_is_migration_failure_and_period_is_bounded(failure_directory, None)
+            failure_path = next(failure_directory.rglob("report.json"))
+            failure = json.loads(failure_path.read_text(encoding="utf-8"))
+            summary["negative_checks"] = {"strict_replay_miss": "passed", "immediate_period_only": "passed",
+                "report_path": failure_path.relative_to(ROOT).as_posix(), "report_sha256": hashlib.sha256(failure_path.read_bytes()).hexdigest(),
+                "failure_class": failure["failure_class"], "production_writes": failure["production_writes"]}
+        for input_id, context, manifest, count in ([] if args.verify_ths_inputs else checks.CASES[:2]):
             directory = args.output_root / ("d" if input_id.endswith("daily") else "m")
             checks.test_tencent_matches_original_shipped_script(directory, None, input_id, context, manifest, count)
             original = [json.loads(line) for line in (directory / "original/manifest.ndjson").read_text(encoding="utf-8").splitlines()]
@@ -64,7 +88,7 @@ def main():
                                        for left, right in zip(original, report["responses"])],
                 "original_manifest": (directory / "original/manifest.ndjson").relative_to(ROOT).as_posix(),
                 "provider_report": next((directory / "adapter").rglob("report.json")).relative_to(ROOT).as_posix()})
-        for input_id, filename in [("ASTOCK-045", "43_东财涨停池"), ("ASTOCK-070", "68_交易日历")]:
+        for input_id, filename in ([] if args.verify_ths_inputs else [("ASTOCK-045", "43_东财涨停池"), ("ASTOCK-070", "68_交易日历")]):
             csv_path = ROOT / "provider_validation/results/live-probes/rate-limited-all-20261003" / filename / "data.csv"
             summary["original_vs_provider"].append({"input_id": input_id, "original_parsed_csv": csv_path.relative_to(ROOT).as_posix(),
                 "original_parsed_sha256": hashlib.sha256(csv_path.read_bytes()).hexdigest(),
@@ -74,7 +98,7 @@ def main():
         summary["scheduling"] = verify_scheduling(args.output_root)
     target = args.output_root / "comparison.json"
     target.write_text(json.dumps(summary, ensure_ascii=False, indent=2, default=str) + "\n", encoding="utf-8")
-    print(json.dumps({"result": "passed", "inputs": 4, "row_counts": [14, 96, 52, 8797], "comparison": str(target)}, ensure_ascii=False))
+    print(json.dumps({"result": "passed", "inputs": len(cases), "row_counts": [case[3] for case in cases], "comparison": str(target)}, ensure_ascii=False))
 
 
 def verify_scheduling(output_root):

@@ -71,7 +71,8 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                   Path(__file__).parents[1] / "providers/tencent/daily.py",
                   Path(__file__).parents[1] / "providers/tencent/minute.py",
                   Path(__file__).parents[1] / "providers/eastmoney/limit_pool.py",
-                  Path(__file__).parents[1] / "providers/sina/calendar.py"]
+                  Path(__file__).parents[1] / "providers/sina/calendar.py",
+                  Path(__file__).parents[1] / "providers/akshare/boards.py"]
     code_version = hashlib.sha256(b"".join(path.read_bytes() for path in code_files)).hexdigest()
     # Response filenames contain a full SHA-256 plus a temporary suffix. Keep the
     # run component short for Windows paths; UTC times remain in every evidence record.
@@ -97,6 +98,9 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
         "eligible_for_production_routing": False, "production_writes": 0,
         "validation_time_utc": datetime.now(timezone.utc).isoformat(), "status": "started"}
     report["response_freshness_seconds"] = profile.refresh_interval_seconds or 86400
+    if input_id == "SDA-BOARD-002":
+        report["config_files"].extend({"path": str(path.resolve()), "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+            for path in (config_root / "datasets/industry_directory.yaml", config_root / "normalization/industry_directory.yaml"))
     if context.get("calendar", {}).get("trading_dates") is not None:
         import json
         days = sorted(day.isoformat() for day in context["calendar"]["trading_dates"])
@@ -105,6 +109,9 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
     calendar_path = context.get("metadata", {}).get("calendar_path")
     if calendar_path:
         report["calendar_dependency"] = {"path": calendar_path, "sha256": hashlib.sha256(Path(calendar_path).read_bytes()).hexdigest()}
+    context_path = context.get("metadata", {}).get("context_path")
+    if context_path:
+        report["context_dependency"] = {"path": context_path, "sha256": hashlib.sha256(Path(context_path).read_bytes()).hexdigest()}
     report["field_units"] = {name: ("unverified; source value retained separately" if name in rule.get("unverified_fields", ()) else unit)
                               for name, unit in report["field_units"].items()}
     pacer = pacer or RequestPacer()
@@ -114,11 +121,14 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
         pacer.configure(urlsplit(host).hostname, max(3, contract.request_interval_seconds), 1)
     evidence_root = Path(evidence_root) if evidence_root else project_root / "provider_validation/results"
     try:
-        if input_id in {"ASTOCK-045", "ASTOCK-070"}:
+        sdk_functions = {"ASTOCK-045": "stock_zt_pool_em", "ASTOCK-070": "tool_trade_date_hist_sina",
+                         "SDA-BOARD-001": "stock_board_industry_name_ths", "SDA-BOARD-002": "stock_board_industry_index_ths",
+                         "SDA-BOARD-003": "stock_fund_flow_industry", "SDA-BOARD-004": "stock_fund_flow_concept"}
+        if input_id in sdk_functions:
             import inspect
             from ..providers.akshare.session import load_client
             provider.client = provider.client or load_client()
-            function = getattr(provider.client, "stock_zt_pool_em" if input_id == "ASTOCK-045" else "tool_trade_date_hist_sina")
+            function = getattr(provider.client, sdk_functions[input_id])
             try:
                 sdk_source = inspect.getsource(function).encode("utf-8")
             except (TypeError, OSError):
@@ -134,23 +144,82 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                 "function": function.__name__, "source_path": sdk_ref.path.relative_to(directory).as_posix(), "sha256": sdk_ref.content_hash,
                 "original_source_sha256": sdk_source_hash, "redacted": sdk_snapshot != sdk_source}
             code_version = hashlib.sha256((code_version + sdk_source_hash + report["sdk_dependency"]["version"]).encode()).hexdigest()
+            if input_id.startswith("SDA-BOARD-"):
+                namespace = getattr(function, "__globals__", {})
+                dependencies = []
+                for name in ("_get_stock_board_industry_name_ths", "_get_file_content_ths", "get_ths_js"):
+                    dependency = namespace.get(name)
+                    if dependency is not None:
+                        dependencies.append((name, inspect.getsource(dependency).encode("utf-8")))
+                if namespace.get("get_ths_js"):
+                    dependencies.append(("ths.js", Path(namespace["get_ths_js"]("ths.js")).read_bytes()))
+                report["sdk_dependency"]["dependencies"] = []
+                for name, body in dependencies:
+                    digest = hashlib.sha256(body).hexdigest()
+                    snapshot = re.sub(rb'''(?i)(["'](?:ut|token|access_token|api_key|password|secret)["']\s*:\s*["'])[^"']*(["'])''',
+                                      rb'\1<redacted>\2', body)
+                    ref = raw_store.write_bytes(snapshot, dataset="source_code", provider=contract.provider, endpoint=contract.endpoint,
+                                               fetched_at=datetime.now(timezone.utc), attempt_id="sdk-dependency", content_addressed=True)
+                    report["sdk_dependency"]["dependencies"].append({"name": name, "path": ref.path.relative_to(directory).as_posix(),
+                        "sha256": ref.content_hash, "original_source_sha256": digest, "redacted": snapshot != body})
+                    code_version = hashlib.sha256((code_version + name + digest).encode()).hexdigest()
             report["code_version"] = code_version
-        with captured_requests(raw_store, provider=contract.provider, endpoint=contract.endpoint,
-             scope={"input_id": input_id, "parameters": normalized_context}, code_version=code_version, pacer=pacer,
-             replay_manifest=replay_manifest if mode == "replay" else None,
-             evidence_roots=(evidence_root, output_root), max_age_seconds=profile.refresh_interval_seconds or 86400,
-             sdk_retry_policy=input_id in {"ASTOCK-045", "ASTOCK-070"}) as response_events:
+        from contextlib import ExitStack
+        actual_code = None
+        with ExitStack() as stack:
+            response_events = stack.enter_context(captured_requests(raw_store, provider=contract.provider, endpoint=contract.endpoint,
+                scope={"input_id": input_id, "parameters": normalized_context}, code_version=code_version, pacer=pacer,
+                replay_manifest=replay_manifest if mode == "replay" else None,
+                evidence_roots=(evidence_root, output_root), max_age_seconds=profile.refresh_interval_seconds or 86400,
+                sdk_retry_policy=input_id in {"ASTOCK-045", "ASTOCK-070"}))
+            # Isolate only replay's directory cache; live SDK Session/cache policy stays intact.
+            if mode == "replay" and input_id in {"SDA-BOARD-001", "SDA-BOARD-002"}:
+                from functools import lru_cache
+                from unittest.mock import patch
+                namespace = getattr(function, "__globals__", {})
+                helper = namespace.get("_get_stock_board_industry_name_ths")
+                if helper is not None and hasattr(helper, "__wrapped__"):
+                    stack.enter_context(patch.dict(namespace, {"_get_stock_board_industry_name_ths": lru_cache()(helper.__wrapped__)}))
+                    report["replay_cache_isolated"] = True
             fetched = getattr(provider, contract.runtime_method)(**parameters)
+            if input_id == "SDA-BOARD-002":
+                helper = getattr(function, "__globals__", {}).get("_get_stock_board_industry_name_ths")
+                if helper is not None:
+                    actual_code = helper()[parameters["board_name"]]
         report["responses"] = response_events
         report["live_http_calls"] = sum(event["mode"] == "live" for event in response_events)
-        source_ref = result_store.write_json(_json_value(fetched.rows), dataset="source_rows", provider=contract.provider,
+        source_rows = getattr(fetched, "source_rows", fetched.rows)
+        source_ref = result_store.write_json(_json_value(source_rows), dataset="source_rows", provider=contract.provider,
             endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="source-rows")
         report["source_rows"] = {"path": source_ref.path.relative_to(directory).as_posix(),
-                                 "sha256": source_ref.content_hash, "row_count": len(fetched.rows)}
+                                 "sha256": source_ref.content_hash, "row_count": len(source_rows)}
+        if actual_code is not None and fetched.mapping_context["board_code"] != actual_code:
+            raise NormalizationError("board code dependency disagrees with source directory")
         report["source_url"] = fetched.source_url
-        if not fetched.rows:
+        report["source_urls"] = list(dict.fromkeys(event["url"] for event in response_events))
+        if not source_rows:
             raise NormalizationError("temporary empty input; not certified as a valid empty dataset")
         mapping_context = {"provider": contract.provider}
+        mapping_context.update(getattr(fetched, "mapping_context", {}))
+        if input_id.startswith("SDA-BOARD-"):
+            successful = [event for event in response_events if event.get("outcome") == "response"]
+            if not successful:
+                raise NormalizationError("source response evidence is required; an SDK memory cache alone is insufficient")
+            source_times = []
+            for event in successful:
+                stamp = ((event.get("source_ref") or {}).get("fetched_at_utc")
+                         if event["mode"] in {"replay", "cached"} else event["fetched_at_utc"])
+                if not stamp:
+                    raise NormalizationError("original source capture time is missing")
+                source_times.append(datetime.fromisoformat(stamp))
+            if any(stamp.tzinfo is None for stamp in source_times):
+                raise NormalizationError("source capture time must be timezone-aware")
+            mapping_context["source_snapshot_at"] = max(source_times)
+            report["source_capture_window"] = {"first": min(source_times).isoformat(), "last": max(source_times).isoformat(),
+                                               "meaning": "HTTP response capture times; not row-level market timestamps"}
+            report["returned_window"] = {"first": fetched.returned_first_key, "last": fetched.returned_last_key}
+            report["source_units"] = list(fetched.units)
+            report["coverage_basis"] = "returned SDK rows; not an independently verified market universe"
         if "date" in parameters:
             mapping_context["trade_date"] = parameters["date"]
         if input_id.startswith("ASTOCK-002"):
@@ -159,11 +228,11 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             mapping_context.update(instrument_id=f"{'XSHG' if symbol.startswith('sh') else 'XSHE'}:{symbol[2:]}",
                                    adjustment="forward" if input_id.endswith("daily") else "none")
         rows = [Normalizer.normalize_fields(row, rule=rule, fields=schema_fields,
-                                            context=mapping_context, allow_pending=True) for row in fetched.rows]
+                                            context=mapping_context, allow_pending=True) for row in source_rows]
         keys = [tuple(row[name] for name in dataset["dataset"]["primary_key"]) for row in rows]
         if len(set(keys)) != len(keys):
             raise NormalizationError("duplicate dataset primary key")
-        if contract.dataset in {"daily_bar", "minute_bar_5m"}:
+        if contract.dataset in {"daily_bar", "minute_bar_5m", "industry_index_daily"}:
             if any(not (row["low"] <= min(row["open"], row["close"]) <= max(row["open"], row["close"]) <= row["high"]) for row in rows):
                 raise NormalizationError("invalid OHLC ordering")
         projected = [{name: value for name, value in row.items() if name in selected} for row in rows]
@@ -172,7 +241,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
         report["output"] = {"path": normalized_ref.path.relative_to(directory).as_posix(),
                             "sha256": normalized_ref.content_hash, "row_count": len(projected),
                             "source_response_hashes": [event["body_sha256"] for event in response_events]}
-        report.update(status="candidate_complete", row_count=len(projected), coverage_denominator=len(fetched.rows),
+        report.update(status="candidate_complete", row_count=len(projected), coverage_denominator=len(source_rows),
                       first_key=_json_value(keys[0]), last_key=_json_value(keys[-1]))
     except Exception as exc:
         report.update(status="failed", failure_class=getattr(getattr(exc, "failure_class", None), "value", type(exc).__name__),

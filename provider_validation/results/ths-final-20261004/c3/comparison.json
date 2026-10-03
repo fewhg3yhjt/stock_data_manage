@@ -1,0 +1,195 @@
+{
+  "input_id": "SDA-BOARD-003",
+  "original_source_sha256": "2f8e988d652ecb2a5ecaeff665938be1a9aa6bf1d33e58628df66f706f99b5f4",
+  "rows_compared": 90,
+  "all_legacy_fields_equal": true,
+  "returned_window_equal": true,
+  "original_parsed_csv": "provider_validation/results/2026-10-02-sector-derived/ths-industry-fund-flow-now.csv",
+  "original_parsed_csv_sha256": "64b31beaefc814c00a06eb81c8dd3f3671bd20fae8148fed8674d748624e7d95",
+  "all_archived_source_values_equal": true,
+  "first_key": "1",
+  "last_key": "90",
+  "request_comparison": [
+    {
+      "original": {
+        "url": "http://data.10jqka.com.cn/funds/hyzjl/field/tradezdf/order/desc/ajax/1/free/1/",
+        "method": "GET",
+        "outcome": "response",
+        "status_code": 200,
+        "body_sha256": "c41ab37e510b833dcf2ac2304125463b900c333c74b33d96ed87006d2c853de9",
+        "error_type": null,
+        "request_options": {
+          "timeout": null,
+          "allow_redirects": true,
+          "trust_env": true,
+          "proxies": {},
+          "sdk_retry_policy": false
+        },
+        "request_headers": {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36",
+          "Accept-Encoding": "gzip, deflate",
+          "Accept": "text/html, */*; q=0.01",
+          "Connection": "keep-alive",
+          "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+          "Cache-Control": "no-cache",
+          "hexin-v": "<dynamic-anti-bot-value>",
+          "Host": "data.10jqka.com.cn",
+          "Pragma": "no-cache",
+          "Referer": "http://data.10jqka.com.cn/funds/hyzjl/",
+          "X-Requested-With": "XMLHttpRequest"
+        }
+      },
+      "provider": {
+        "url": "http://data.10jqka.com.cn/funds/hyzjl/field/tradezdf/order/desc/ajax/1/free/1/",
+        "method": "GET",
+        "outcome": "response",
+        "status_code": 200,
+        "body_sha256": "c41ab37e510b833dcf2ac2304125463b900c333c74b33d96ed87006d2c853de9",
+        "error_type": null,
+        "request_options": {
+          "timeout": null,
+          "allow_redirects": true,
+          "trust_env": true,
+          "proxies": {},
+          "sdk_retry_policy": false
+        },
+        "request_headers": {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36",
+          "Accept-Encoding": "gzip, deflate",
+          "Accept": "text/html, */*; q=0.01",
+          "Connection": "keep-alive",
+          "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+          "Cache-Control": "no-cache",
+          "hexin-v": "<dynamic-anti-bot-value>",
+          "Host": "data.10jqka.com.cn",
+          "Pragma": "no-cache",
+          "Referer": "http://data.10jqka.com.cn/funds/hyzjl/",
+          "X-Requested-With": "XMLHttpRequest"
+        }
+      },
+      "equal_except_dynamic_value": true
+    },
+    {
+      "original": {
+        "url": "http://data.10jqka.com.cn/funds/hyzjl/field/tradezdf/order/desc/page/1/ajax/1/free/1/",
+        "method": "GET",
+        "outcome": "response",
+        "status_code": 200,
+        "body_sha256": "c41ab37e510b833dcf2ac2304125463b900c333c74b33d96ed87006d2c853de9",
+        "error_type": null,
+        "request_options": {
+          "timeout": null,
+          "allow_redirects": true,
+          "trust_env": true,
+          "proxies": {},
+          "sdk_retry_policy": false
+        },
+        "request_headers": {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36",
+          "Accept-Encoding": "gzip, deflate",
+          "Accept": "text/html, */*; q=0.01",
+          "Connection": "keep-alive",
+          "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+          "Cache-Control": "no-cache",
+          "hexin-v": "<dynamic-anti-bot-value>",
+          "Host": "data.10jqka.com.cn",
+          "Pragma": "no-cache",
+          "Referer": "http://data.10jqka.com.cn/funds/hyzjl/",
+          "X-Requested-With": "XMLHttpRequest"
+        }
+      },
+      "provider": {
+        "url": "http://data.10jqka.com.cn/funds/hyzjl/field/tradezdf/order/desc/page/1/ajax/1/free/1/",
+        "method": "GET",
+        "outcome": "response",
+        "status_code": 200,
+        "body_sha256": "c41ab37e510b833dcf2ac2304125463b900c333c74b33d96ed87006d2c853de9",
+        "error_type": null,
+        "request_options": {
+          "timeout": null,
+          "allow_redirects": true,
+          "trust_env": true,
+          "proxies": {},
+          "sdk_retry_policy": false
+        },
+        "request_headers": {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36",
+          "Accept-Encoding": "gzip, deflate",
+          "Accept": "text/html, */*; q=0.01",
+          "Connection": "keep-alive",
+          "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+          "Cache-Control": "no-cache",
+          "hexin-v": "<dynamic-anti-bot-value>",
+          "Host": "data.10jqka.com.cn",
+          "Pragma": "no-cache",
+          "Referer": "http://data.10jqka.com.cn/funds/hyzjl/",
+          "X-Requested-With": "XMLHttpRequest"
+        }
+      },
+      "equal_except_dynamic_value": true
+    },
+    {
+      "original": {
+        "url": "http://data.10jqka.com.cn/funds/hyzjl/field/tradezdf/order/desc/page/2/ajax/1/free/1/",
+        "method": "GET",
+        "outcome": "response",
+        "status_code": 200,
+        "body_sha256": "97e32aa1430a70559fb2d17f6de67b456afb209cf6aab443c35ca8b636396e26",
+        "error_type": null,
+        "request_options": {
+          "timeout": null,
+          "allow_redirects": true,
+          "trust_env": true,
+          "proxies": {},
+          "sdk_retry_policy": false
+        },
+        "request_headers": {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36",
+          "Accept-Encoding": "gzip, deflate",
+          "Accept": "text/html, */*; q=0.01",
+          "Connection": "keep-alive",
+          "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+          "Cache-Control": "no-cache",
+          "hexin-v": "<dynamic-anti-bot-value>",
+          "Host": "data.10jqka.com.cn",
+          "Pragma": "no-cache",
+          "Referer": "http://data.10jqka.com.cn/funds/hyzjl/",
+          "X-Requested-With": "XMLHttpRequest"
+        }
+      },
+      "provider": {
+        "url": "http://data.10jqka.com.cn/funds/hyzjl/field/tradezdf/order/desc/page/2/ajax/1/free/1/",
+        "method": "GET",
+        "outcome": "response",
+        "status_code": 200,
+        "body_sha256": "97e32aa1430a70559fb2d17f6de67b456afb209cf6aab443c35ca8b636396e26",
+        "error_type": null,
+        "request_options": {
+          "timeout": null,
+          "allow_redirects": true,
+          "trust_env": true,
+          "proxies": {},
+          "sdk_retry_policy": false
+        },
+        "request_headers": {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36",
+          "Accept-Encoding": "gzip, deflate",
+          "Accept": "text/html, */*; q=0.01",
+          "Connection": "keep-alive",
+          "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+          "Cache-Control": "no-cache",
+          "hexin-v": "<dynamic-anti-bot-value>",
+          "Host": "data.10jqka.com.cn",
+          "Pragma": "no-cache",
+          "Referer": "http://data.10jqka.com.cn/funds/hyzjl/",
+          "X-Requested-With": "XMLHttpRequest"
+        }
+      },
+      "equal_except_dynamic_value": true
+    }
+  ],
+  "failure_class": null,
+  "limitations": [
+    "离线原响应；动态反爬值只比较头名称和生成方式，不证明当前可用性。"
+  ]
+}

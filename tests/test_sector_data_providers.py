@@ -83,6 +83,24 @@ def test_akshare_board_fund_flow_is_timestamped_and_keeps_source_units():
     assert client.calls == [("stock_fund_flow_industry", {"symbol": "即时"})]
 
 
+def test_existing_board_method_resolves_directory_and_keeps_period_return_contract():
+    client = FakeAkShare()
+    provider = AkShareBoardProvider(client=client)
+    daily = provider.fetch_industry_daily("半导体", date(2026, 9, 1), date(2026, 10, 2))
+    assert daily.rows[0]["board_code"] == "881121"
+    assert "日期" in daily.source_rows[0]
+    def period_frame(**kwargs):
+        assert kwargs == {"symbol": "5日排行"}
+        return Frame(["序号", "行业", "公司家数", "行业指数", "阶段涨跌幅", "流入资金", "流出资金", "净额"],
+                     [(1, "半导体", 100, 120, 1.5, 20, 15, 5)])
+    client.stock_fund_flow_industry = period_frame
+    stamp = datetime(2026, 10, 2, tzinfo=timezone.utc)
+    result = provider.fetch_fund_flow("industry", period="5日排行", snapshot_at=stamp)
+    assert result.rows == ({"board_type": "industry", "period": "5日排行", "rank": 1, "board_name": "半导体",
+                            "company_count": 100, "index_value": 120, "change_pct": 1.5, "money_inflow": 20,
+                            "money_outflow": 15, "net_inflow": 5, "snapshot_at": stamp.isoformat(), "source": "ths"},)
+
+
 class FakeResult:
     error_code = "0"
     error_msg = ""

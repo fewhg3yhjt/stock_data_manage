@@ -33,6 +33,8 @@ Provider 接口验证资料统一位于 `provider_validation/`：`tests/` 保存
 
 其他接口转换现状与建议下一批范围见 `provider_validation/docs/2026-10-04-input-transition-review.md`；离线调查代码和逐项引用哈希保存于 `results/input-transition-review-20261004/audit.py`、`review.json`。调查不改变现有Provider、运行时配置或正式路由资格。
 
+同花顺四项既有接口的后续实施见 `provider_validation/docs/2026-10-04-ths-input-collection.md`。原 `providers/akshare/boards.py` 通过现有 YAML 映射保留旧返回，同时提供 SDK 原列给通用候选流程；`industry_directory.yaml` 为新增目录字段模板，行业日线/资金流复用原模板，三个同名归一化文件补来源映射。原 CLI 通过 `--context-file` 接收板块与依赖参数。修改前源码存于 `results/ths-original-20261004/`，最终对照、回归和索引存于 `results/ths-final-20261004/` 及同前缀测试/验证文件，均不属于生产数据。
+
 `.gitattributes` 对本次新证据目录禁用 Git 换行转换，并固定新增实现/模板的 LF 格式，避免提交和检出改变证据字节及其 SHA-256 引用；不更改旧证据属性。
 
 ## 领域模型
@@ -71,7 +73,7 @@ Provider 接口验证资料统一位于 `provider_validation/`：`tests/` 保存
 | `providers/eastmoney/__init__.py` | EastMoney 适配器导出 |
 | `providers/akshare/session.py` | AkShare 可选依赖加载和代码转换 |
 | `providers/akshare/daily.py` | AkShare 股票、ETF、LOF、指数函数级历史日线 |
-| `providers/akshare/boards.py` | AkShare 同花顺行业目录、行业指数日线和行业/概念资金流快照 |
+| `providers/akshare/boards.py` | 原 AkShare 同花顺行业目录、行业指数日线和行业/概念资金流快照；YAML 名称映射、保留旧返回并提供 SDK 原列与身份上下文 |
 | `providers/akshare/__init__.py` | AkShare 适配器导出 |
 | `providers/ths/boards.py` | 同花顺行业/概念板块列表、分页和成分页面适配器；输出可写入 Raw 的关系快照，不伪装成行情 Bar |
 | `providers/ths/__init__.py` | THS 适配器导出 |
@@ -153,7 +155,7 @@ Provider 接口验证资料统一位于 `provider_validation/`：`tests/` 保存
 | `worker/scheduler.py` | 既有 Phase 1 固定任务时间表；输入配置的天/分钟周期、交易日/交易时段槽位、证券范围绑定及容量门禁 |
 | `worker/acceptance.py` | 离线验收回放和容量/恢复验收证据 |
 | `worker/__init__.py` | Worker 包说明，不承载业务实现 |
-| `cli.py` | `collect-due-inputs`（默认保存计划）、`collect-input`、`probe-*`、`recover`、`acceptance-offline` 等入口，负责参数解析和现有流程组装 |
+| `cli.py` | `collect-due-inputs`（默认保存计划）、`collect-input`（支持 JSON 参数上下文）、`probe-*`、`recover`、`acceptance-offline` 等入口，负责参数解析和现有流程组装 |
 | `__init__.py` | 包级公共领域模型导出 |
 
 ## 迁移约束

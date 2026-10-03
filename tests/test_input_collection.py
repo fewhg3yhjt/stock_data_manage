@@ -27,6 +27,163 @@ CASES = [
     ("ASTOCK-045", {"request": {"trade_date": date(2026, 9, 30)}, "calendar": {"trading_dates": [date(2026, 9, 30)]}}, SDK_ARCHIVE, 52),
     ("ASTOCK-070", {}, SDK_ARCHIVE, 8797),
 ]
+THS_ARCHIVE = ROOT / "provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson"
+THS_CASES = [
+    ("SDA-BOARD-001", {}, THS_ARCHIVE, 90),
+    ("SDA-BOARD-002", {"request": {"board_name": "半导体", "start_date": "2026-09-01", "end_date": "2026-10-02"},
+                       "dependency": {"board_code": "881121"}}, THS_ARCHIVE, 21),
+    ("SDA-BOARD-003", {}, THS_ARCHIVE, 90),
+    ("SDA-BOARD-004", {}, THS_ARCHIVE, 387),
+]
+
+
+@pytest.mark.parametrize("input_id,context,manifest,count", THS_CASES)
+def test_ths_archived_inputs_execute_source_yaml(tmp_path, no_network, input_id, context, manifest, count):
+    pytest.importorskip("akshare")
+    report = collect_input(input_id=input_id, context=context, config_root=ROOT / "config",
+                           output_root=tmp_path, replay_manifest=manifest)
+    assert report["status"] == "candidate_complete", report
+    assert report["row_count"] == report["coverage_denominator"] == count
+    assert report["production_writes"] == report["live_http_calls"] == 0
+    assert not report["eligible_for_production_routing"]
+    source, mapped = read_artifact(report, "source_rows"), read_artifact(report, "output")
+    assert len(source) == len(mapped) == count
+    assert report["source_capture_window"]["last"].startswith("2026-10-02")
+    assert all(not event["request_options"]["sdk_retry_policy"] for event in report["responses"])
+    raw_manifest = Path(report["run_directory"]) / report["raw_manifest"]["path"]
+    for event in report["responses"]:
+        assert event["mode"] == "replay"
+        assert hashlib.sha256(RawObjectStore.read_response(raw_manifest, event)).hexdigest() == event["body_sha256"]
+    if input_id == "SDA-BOARD-001":
+        assert set(source[0]) == {"name", "code"}
+        assert mapped[0]["board_code"] == source[0]["code"]
+        assert mapped[0]["board_type"] == "industry"
+    elif input_id == "SDA-BOARD-002":
+        assert mapped[0]["board_code"] == "881121"
+        assert all(row["volume"] is None and row["amount"] is None for row in mapped)
+        assert all(Decimal(row["close"]) == Decimal(str(raw["收盘价"])) for row, raw in zip(mapped, source))
+    else:
+        assert "行业" in source[0] and "snapshot_at" not in source[0]
+        assert all(row["snapshot_at"] == report["source_capture_window"]["last"] for row in mapped)
+        assert all(row["money_inflow"] is None and row["money_outflow"] is None and row["net_inflow"] is None for row in mapped)
+        assert all(row["board_type"] == ("industry" if input_id.endswith("003") else "concept") for row in mapped)
+
+
+def compare_ths_original(tmp_path, input_id, context, manifest, count):
+    """Save original and modified legacy returns plus an explicit request/row comparison."""
+    import sys
+    import types
+    from functools import lru_cache
+    from unittest.mock import patch
+    import akshare
+    from stock_data_manage.config.loader import load_input_capabilities
+    from stock_data_manage.routing.factory import build_input_provider
+    snapshot_root = ROOT / "provider_validation/results/ths-original-20261004"
+    snapshot = snapshot_root / "boards.py.bin"
+    metadata = json.loads((snapshot_root / "manifest.json").read_text(encoding="utf-8"))
+    assert hashlib.sha256(snapshot.read_bytes()).hexdigest() == metadata["sha256"]
+    module = types.ModuleType("stock_data_manage.providers.akshare.original_board_contract")
+    module.__package__ = "stock_data_manage.providers.akshare"
+    sys.modules[module.__name__] = module
+    exec(compile(snapshot.read_bytes(), str(snapshot), "exec"), module.__dict__)
+    contract = next(c for c in load_input_capabilities(ROOT / "config/providers.yaml") if c.input_id == input_id)
+    parameters = contract.bind_parameters(context)
+    if input_id in {"SDA-BOARD-003", "SDA-BOARD-004"}:
+        parameters["snapshot_at"] = datetime(2026, 10, 2, 16, tzinfo=timezone.utc)
+    providers = (module.AkShareBoardProvider(client=akshare), build_input_provider(contract, providers_path=ROOT / "config/providers.yaml", client=akshare))
+    outputs, events = [], []
+    namespace = akshare.stock_board_industry_index_ths.__globals__
+    helper = namespace["_get_stock_board_industry_name_ths"]
+    for label, provider in zip(("original", "provider"), providers):
+        store = RawObjectStore(tmp_path / label)
+        with patch.dict(namespace, {"_get_stock_board_industry_name_ths": lru_cache()(helper.__wrapped__)}):
+            with captured_requests(store, provider="ths", endpoint=contract.endpoint, scope=context, code_version="original-contract-comparison",
+                                   pacer=RequestPacer(), replay_manifest=manifest):
+                result = getattr(provider, contract.runtime_method)(**parameters)
+        saved = store.write_json(list(result.rows), dataset="legacy_rows", provider="ths", endpoint=contract.endpoint,
+                                 fetched_at=datetime.now(timezone.utc), attempt_id="parsed")
+        outputs.append(result)
+        events.append([json.loads(line) for line in (store.root / "manifest.ndjson").read_text(encoding="utf-8").splitlines()])
+    assert outputs[0].rows == outputs[1].rows
+    assert len(outputs[0].rows) == count
+    assert outputs[0].returned_first_key == outputs[1].returned_first_key
+    assert outputs[0].returned_last_key == outputs[1].returned_last_key
+    import csv
+    filenames = {"SDA-BOARD-001": "ths-industry-directory.csv", "SDA-BOARD-002": "ths-semiconductor-index-daily.csv",
+                 "SDA-BOARD-003": "ths-industry-fund-flow-now.csv", "SDA-BOARD-004": "ths-concept-fund-flow-now.csv"}
+    csv_path = ROOT / "provider_validation/results/2026-10-02-sector-derived" / filenames[input_id]
+    with csv_path.open(encoding="utf-8-sig", newline="") as stream:
+        golden_rows = list(csv.DictReader(stream))
+    assert len(golden_rows) == count
+    for golden, actual in zip(golden_rows, outputs[1].rows):
+        assert set(golden) == set(actual)
+        for key in golden:
+            if key == "snapshot_at":
+                continue  # Explicit legacy caller timestamp above; actual archive time is checked on candidate outputs.
+            if isinstance(actual[key], (int, float)):
+                assert Decimal(golden[key]) == Decimal(str(actual[key]))
+            else:
+                assert golden[key] == str(actual[key])
+    # SDK's dynamic anti-bot value varies per invocation. Compare redacted header shape,
+    # and record the known difference without claiming replay proves current acceptance.
+    keys = ("url", "method", "outcome", "status_code", "body_sha256", "error_type", "request_options")
+    requests_compared = []
+    assert len(events[0]) == len(events[1])
+    for left, right in zip(*events):
+        assert all(left.get(key) == right.get(key) for key in keys)
+        left_headers, right_headers = left["request_headers"].copy(), right["request_headers"].copy()
+        for headers in (left_headers, right_headers):
+            if "hexin-v" in headers:
+                headers["hexin-v"] = "<dynamic-anti-bot-value>"
+        assert left_headers == right_headers
+        requests_compared.append({"original": {**{key: left.get(key) for key in keys}, "request_headers": left_headers},
+                                  "provider": {**{key: right.get(key) for key in keys}, "request_headers": right_headers}, "equal_except_dynamic_value": True})
+    comparison = {"input_id": input_id, "original_source_sha256": metadata["sha256"], "rows_compared": count,
+                  "all_legacy_fields_equal": True, "returned_window_equal": True,
+                  "original_parsed_csv": csv_path.relative_to(ROOT).as_posix(),
+                  "original_parsed_csv_sha256": hashlib.sha256(csv_path.read_bytes()).hexdigest(),
+                  "all_archived_source_values_equal": True,
+                  "first_key": outputs[1].returned_first_key, "last_key": outputs[1].returned_last_key,
+                  "request_comparison": requests_compared, "failure_class": None,
+                  "limitations": ["离线原响应；动态反爬值只比较头名称和生成方式，不证明当前可用性。"]}
+    tmp_path.mkdir(parents=True, exist_ok=True)
+    (tmp_path / "comparison.json").write_text(json.dumps(comparison, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return comparison
+
+
+@pytest.mark.parametrize("input_id,context,manifest,count", THS_CASES)
+def test_ths_matches_original_provider(tmp_path, no_network, input_id, context, manifest, count):
+    pytest.importorskip("akshare")
+    compare_ths_original(tmp_path, input_id, context, manifest, count)
+
+
+def test_ths_mapping_uses_source_columns_and_rejects_identity_mismatch(tmp_path, no_network):
+    pytest.importorskip("akshare")
+    config = tmp_path / "config"
+    shutil.copytree(ROOT / "config", config)
+    input_id, context, manifest, _ = THS_CASES[1]
+    path = config / "normalization/industry_index_daily.yaml"
+    document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    document["rules"][0]["field_mapping"]["open"] = "收盘价"
+    path.write_text(yaml.safe_dump(document, allow_unicode=True), encoding="utf-8")
+    report = collect_input(input_id=input_id, context=context, config_root=config, output_root=tmp_path / "out", replay_manifest=manifest)
+    assert report["status"] == "candidate_complete", report
+    assert all(row["open"] == row["close"] for row in read_artifact(report, "output"))
+    failed = collect_input(input_id=input_id, context={**context, "dependency": {"board_code": "wrong"}}, config_root=config,
+                           output_root=tmp_path / "out", replay_manifest=manifest)
+    assert failed["status"] == "failed" and "source directory" in failed["error"]
+
+
+def test_ths_replay_miss_is_migration_failure_and_period_is_bounded(tmp_path, no_network):
+    pytest.importorskip("akshare")
+    missing = tmp_path / "empty.ndjson"
+    missing.write_text("", encoding="utf-8")
+    failed = collect_input(input_id="SDA-BOARD-001", context={}, config_root=ROOT / "config", output_root=tmp_path, replay_manifest=missing)
+    assert failed["status"] == "failed" and failed["failure_class"] == "ValueError"
+    assert "never falls back" in failed["error"]
+    with pytest.raises(ValueError, match="period"):
+        collect_input(input_id="SDA-BOARD-003", context={"config": {"period": "5日排行"}}, config_root=ROOT / "config",
+                      output_root=tmp_path, replay_manifest=THS_ARCHIVE)
 
 
 def read_artifact(report, key):
@@ -208,7 +365,7 @@ def test_exact_response_is_saved_before_json_parser_and_secrets_are_redacted(tmp
     archive = RawObjectStore(tmp_path / "archive")
     response = requests.Response()
     response.status_code, response._content, response.encoding = 200, b"not-json\x00\xff", "utf-8"
-    request = requests.Request("GET", "https://example.test/input?token=hidden", headers={"Authorization": "hidden"}).prepare()
+    request = requests.Request("GET", "https://example.test/input?token=hidden", headers={"Authorization": "hidden", "hexin-v": "hidden"}).prepare()
     original_event = archive.record_response(response=response, url=request.url, method="GET", request_headers=request.headers,
         scope={"token": "hidden"}, provider="fixture", endpoint="input", code_version="fixture")
     destination = RawObjectStore(tmp_path / "destination")

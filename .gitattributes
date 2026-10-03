@@ -49,3 +49,20 @@
 
 # Read-only input migration review: preserve source and report hash links.
 /provider_validation/results/input-transition-review-20261004/** -text whitespace=cr-at-eol
+
+# THS input migration: immutable source/response evidence and stable implementation hashes.
+/provider_validation/results/ths-*-20261004/** -text whitespace=cr-at-eol
+/provider_validation/results/ths-*-20261004/**/*.bin binary
+/provider_validation/results/ths-*-20261004-*.xml -text whitespace=cr-at-eol
+/provider_validation/results/ths-*-20261004-*.json -text whitespace=cr-at-eol
+/src/stock_data_manage/providers/akshare/boards.py text eol=lf
+/src/stock_data_manage/providers/transport.py text eol=lf
+/src/stock_data_manage/storage/raw.py text eol=lf
+/src/stock_data_manage/routing/factory.py text eol=lf
+/tests/test_sector_data_providers.py text eol=lf
+/config/datasets/industry_directory.yaml text eol=lf
+/config/datasets/industry_index_daily.yaml text eol=lf
+/config/datasets/board_fund_flow.yaml text eol=lf
+/config/normalization/industry_directory.yaml text eol=lf
+/config/normalization/industry_index_daily.yaml text eol=lf
+/config/normalization/board_fund_flow.yaml text eol=lf

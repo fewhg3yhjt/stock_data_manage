@@ -2064,6 +2064,8 @@ input_capabilities:
     collection_profile: reference_daily
     parameters: {}
     implementation_status: implemented_validation_only
+    dataset: industry_directory
+    runtime_method: fetch_industry_list
     runtime_endpoint: akshare.industry_index_daily
     limitations:
     - 行业目录不等于证券概念归属；单位不适用
@@ -2073,7 +2075,7 @@ input_capabilities:
     - SDA-BOARD-001
     request_interval_seconds: 3
     effective_concurrency: 1
-    request_limit_enforcement: unimplemented
+    request_limit_enforcement: call_boundary_only
   SDA-BOARD-002:
     provider: ths
     endpoint: industry_index_daily
@@ -2083,13 +2085,19 @@ input_capabilities:
     request_shape: single_symbol
     collection_profile: market_after_close
     parameters:
-      symbol:
+      board_name:
         type: string
         source: request.board_name
         required: true
-      start: *id005
-      end: *id006
+      start_date: *id005
+      end_date: *id006
+      board_code:
+        type: string
+        source: dependency.board_code
+        required: false
     implementation_status: implemented_validation_only
+    dataset: industry_index_daily
+    runtime_method: fetch_industry_daily
     runtime_endpoint: akshare.industry_index_daily
     limitations:
     - 只测一个板块和窗口；成交量/成交额单位未确认
@@ -2099,7 +2107,7 @@ input_capabilities:
     - SDA-BOARD-002
     request_interval_seconds: 3
     effective_concurrency: 1
-    request_limit_enforcement: unimplemented
+    request_limit_enforcement: call_boundary_only
   SDA-BOARD-003:
     provider: ths
     endpoint: industry_fund_flow
@@ -2109,7 +2117,13 @@ input_capabilities:
     request_shape: paged_list
     collection_profile: market_intraday
     parameters:
-      symbol:
+      board_type:
+        type: string
+        source: config.board_type
+        required: true
+        default: industry
+        choices: [industry]
+      period:
         type: string
         source: config.period
         required: true
@@ -2117,6 +2131,8 @@ input_capabilities:
         choices:
         - 即时
     implementation_status: implemented_validation_only
+    dataset: board_fund_flow
+    runtime_method: fetch_fund_flow
     runtime_endpoint: akshare.industry_fund_flow
     limitations:
     - 快照无逐行日期；金额单位未确认；不是历史资金流
@@ -2126,7 +2142,7 @@ input_capabilities:
     - SDA-BOARD-003
     request_interval_seconds: 3
     effective_concurrency: 1
-    request_limit_enforcement: unimplemented
+    request_limit_enforcement: call_boundary_only
   SDA-BOARD-004:
     provider: ths
     endpoint: concept_fund_flow
@@ -2136,7 +2152,13 @@ input_capabilities:
     request_shape: paged_list
     collection_profile: market_intraday
     parameters:
-      symbol:
+      board_type:
+        type: string
+        source: config.board_type
+        required: true
+        default: concept
+        choices: [concept]
+      period:
         type: string
         source: config.period
         required: true
@@ -2144,6 +2166,8 @@ input_capabilities:
         choices:
         - 即时
     implementation_status: implemented_validation_only
+    dataset: board_fund_flow
+    runtime_method: fetch_fund_flow
     runtime_endpoint: akshare.concept_fund_flow
     limitations:
     - 不是证券-概念成员关系；无逐行日期；金额单位未确认
@@ -2153,7 +2177,7 @@ input_capabilities:
     - SDA-BOARD-004
     request_interval_seconds: 3
     effective_concurrency: 1
-    request_limit_enforcement: unimplemented
+    request_limit_enforcement: call_boundary_only
   SDA-BOARD-005:
     provider: baostock
     endpoint: security_snapshot

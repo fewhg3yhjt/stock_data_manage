@@ -13,7 +13,7 @@ from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 from datetime import timezone
 
 
-_SECRET_NAME = re.compile(r"token|secret|password|api[-_]?key|authorization|cookie|credential|signature|^ut$", re.I)
+_SECRET_NAME = re.compile(r"token|secret|password|api[-_]?key|authorization|cookie|credential|signature|^ut$|^hexin-v$", re.I)
 _SECRET_BODY = re.compile(rb'''(?i)["']?(?:access[_-]?token|refresh[_-]?token|api[_-]?key|client[_-]?secret|authorization|password|session[_-]?token)["']?\s*[:=]\s*["']''')
 
 

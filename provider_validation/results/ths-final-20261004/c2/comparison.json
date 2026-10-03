@@ -1,0 +1,116 @@
+{
+  "input_id": "SDA-BOARD-002",
+  "original_source_sha256": "2f8e988d652ecb2a5ecaeff665938be1a9aa6bf1d33e58628df66f706f99b5f4",
+  "rows_compared": 21,
+  "all_legacy_fields_equal": true,
+  "returned_window_equal": true,
+  "original_parsed_csv": "provider_validation/results/2026-10-02-sector-derived/ths-semiconductor-index-daily.csv",
+  "original_parsed_csv_sha256": "1695ca65d6026ccb6d74bc964e6b0e50508a0d35032a3b90ba0e8cfed1ef3546",
+  "all_archived_source_values_equal": true,
+  "first_key": "2026-09-01",
+  "last_key": "2026-09-30",
+  "request_comparison": [
+    {
+      "original": {
+        "url": "https://q.10jqka.com.cn/thshy/detail/code/881272/",
+        "method": "GET",
+        "outcome": "response",
+        "status_code": 200,
+        "body_sha256": "b1639d45922f7a86173529c1f809831cfbe5b71fc19bb6c66907a00e70056282",
+        "error_type": null,
+        "request_options": {
+          "timeout": null,
+          "allow_redirects": true,
+          "trust_env": true,
+          "proxies": {},
+          "sdk_retry_policy": false
+        },
+        "request_headers": {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36",
+          "Accept-Encoding": "gzip, deflate, br, zstd",
+          "Accept": "*/*",
+          "Connection": "keep-alive",
+          "Cookie": "<redacted>"
+        }
+      },
+      "provider": {
+        "url": "https://q.10jqka.com.cn/thshy/detail/code/881272/",
+        "method": "GET",
+        "outcome": "response",
+        "status_code": 200,
+        "body_sha256": "b1639d45922f7a86173529c1f809831cfbe5b71fc19bb6c66907a00e70056282",
+        "error_type": null,
+        "request_options": {
+          "timeout": null,
+          "allow_redirects": true,
+          "trust_env": true,
+          "proxies": {},
+          "sdk_retry_policy": false
+        },
+        "request_headers": {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36",
+          "Accept-Encoding": "gzip, deflate, br, zstd",
+          "Accept": "*/*",
+          "Connection": "keep-alive",
+          "Cookie": "<redacted>"
+        }
+      },
+      "equal_except_dynamic_value": true
+    },
+    {
+      "original": {
+        "url": "https://d.10jqka.com.cn/v4/line/bk_881121/01/2026.js",
+        "method": "GET",
+        "outcome": "response",
+        "status_code": 200,
+        "body_sha256": "6fbcb5f15fa5edac8ef542309c5ac39a63bfb74d5340753fecd5b675bbd251cf",
+        "error_type": null,
+        "request_options": {
+          "timeout": null,
+          "allow_redirects": true,
+          "trust_env": true,
+          "proxies": {},
+          "sdk_retry_policy": false
+        },
+        "request_headers": {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36",
+          "Accept-Encoding": "gzip, deflate, br, zstd",
+          "Accept": "*/*",
+          "Connection": "keep-alive",
+          "Referer": "http://q.10jqka.com.cn",
+          "Host": "d.10jqka.com.cn",
+          "Cookie": "<redacted>"
+        }
+      },
+      "provider": {
+        "url": "https://d.10jqka.com.cn/v4/line/bk_881121/01/2026.js",
+        "method": "GET",
+        "outcome": "response",
+        "status_code": 200,
+        "body_sha256": "6fbcb5f15fa5edac8ef542309c5ac39a63bfb74d5340753fecd5b675bbd251cf",
+        "error_type": null,
+        "request_options": {
+          "timeout": null,
+          "allow_redirects": true,
+          "trust_env": true,
+          "proxies": {},
+          "sdk_retry_policy": false
+        },
+        "request_headers": {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36",
+          "Accept-Encoding": "gzip, deflate, br, zstd",
+          "Accept": "*/*",
+          "Connection": "keep-alive",
+          "Referer": "http://q.10jqka.com.cn",
+          "Host": "d.10jqka.com.cn",
+          "Cookie": "<redacted>"
+        }
+      },
+      "equal_except_dynamic_value": true
+    }
+  ],
+  "failure_class": null,
+  "limitations": [
+    "离线原响应；动态反爬值只比较头名称和生成方式，不证明当前可用性。"
+  ]
+}

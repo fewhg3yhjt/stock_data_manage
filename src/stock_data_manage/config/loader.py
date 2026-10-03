@@ -132,6 +132,8 @@ class InputCapabilityConfig:
         values = {name: value for name, value in values.items() if value is not None}
         if "start" in values and "end" in values and values["end"] < values["start"]:
             raise ValueError("end must not precede start")
+        if "start_date" in values and "end_date" in values and values["end_date"] < values["start_date"]:
+            raise ValueError("end_date must not precede start_date")
         if self.trading_date_parameter and self.trading_date_parameter in values:
             known_dates = context.get("calendar", {}).get("trading_dates")
             if known_dates is None:
@@ -457,6 +459,8 @@ def load_input_field_contract(root: str | Path, capability: InputCapabilityConfi
         raise ValueError("dataset primary key contains undefined fields")
     if set(rule.get("field_mapping", {})) - set(fields):
         raise ValueError("mapping targets contain undefined fields")
+    if set(rule.get("context_fields", {})) - set(fields):
+        raise ValueError("context targets contain undefined fields")
     if rule.get("status") not in {"validated", "pending_validation", "disabled", "expired"}:
         raise ValueError("invalid input rule status")
     return dataset, rule

@@ -1,0 +1,65 @@
+{
+  "input_id": "SDA-BOARD-001",
+  "original_source_sha256": "2f8e988d652ecb2a5ecaeff665938be1a9aa6bf1d33e58628df66f706f99b5f4",
+  "rows_compared": 90,
+  "all_legacy_fields_equal": true,
+  "returned_window_equal": true,
+  "original_parsed_csv": "provider_validation/results/2026-10-02-sector-derived/ths-industry-directory.csv",
+  "original_parsed_csv_sha256": "ed23bd9495333d380734705a8d8268b5f47a6b2c3fa89a47e9409adba947351e",
+  "all_archived_source_values_equal": true,
+  "first_key": "881121",
+  "last_key": "881101",
+  "request_comparison": [
+    {
+      "original": {
+        "url": "https://q.10jqka.com.cn/thshy/detail/code/881272/",
+        "method": "GET",
+        "outcome": "response",
+        "status_code": 200,
+        "body_sha256": "b1639d45922f7a86173529c1f809831cfbe5b71fc19bb6c66907a00e70056282",
+        "error_type": null,
+        "request_options": {
+          "timeout": null,
+          "allow_redirects": true,
+          "trust_env": true,
+          "proxies": {},
+          "sdk_retry_policy": false
+        },
+        "request_headers": {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36",
+          "Accept-Encoding": "gzip, deflate, br, zstd",
+          "Accept": "*/*",
+          "Connection": "keep-alive",
+          "Cookie": "<redacted>"
+        }
+      },
+      "provider": {
+        "url": "https://q.10jqka.com.cn/thshy/detail/code/881272/",
+        "method": "GET",
+        "outcome": "response",
+        "status_code": 200,
+        "body_sha256": "b1639d45922f7a86173529c1f809831cfbe5b71fc19bb6c66907a00e70056282",
+        "error_type": null,
+        "request_options": {
+          "timeout": null,
+          "allow_redirects": true,
+          "trust_env": true,
+          "proxies": {},
+          "sdk_retry_policy": false
+        },
+        "request_headers": {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36",
+          "Accept-Encoding": "gzip, deflate, br, zstd",
+          "Accept": "*/*",
+          "Connection": "keep-alive",
+          "Cookie": "<redacted>"
+        }
+      },
+      "equal_except_dynamic_value": true
+    }
+  ],
+  "failure_class": null,
+  "limitations": [
+    "离线原响应；动态反爬值只比较头名称和生成方式，不证明当前可用性。"
+  ]
+}
