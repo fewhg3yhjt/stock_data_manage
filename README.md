@@ -19,12 +19,16 @@
 
 | 目录或文件 | 用途 |
 |---|---|
-| `src/stock_data_manage/` | 按 providers、routing、quality、pipeline、storage、service、worker 等职责组织的正式实现 |
+| `src/` | 按 providers、routing、quality、pipeline、storage、service、worker 等职责组织的正式实现 |
 | `config/` | 来源参数、采集频率、路由、数据集字段模板及归一化映射配置 |
 | `tests/` | 实现的自动化测试 |
 | `docs/` | 按模块职责归档的正式说明；各子目录随文档产生建立 |
 | `provider_validation/` | 来源探针、覆盖报告、原始响应及验证证据；入口见 [Provider 验证目录说明](provider_validation/README.md) |
 | `AGENTS.md` | 协作、验证及文档管理约定 |
+| `data/` | 配置指定的实际运行数据目录，按需生成，不提交 Git；当前 Raw、Canonical 和 Hot 分别为 `data/raw/`、`data/canonical/`、`data/hot/` |
+| `metadata/` | 当前配置指定的元数据库目录，按需生成；路径为 `metadata/metadata.duckdb` |
+| `tmp/` | 本地临时工作和离线验收输出；历史内容保留，新输出不作为生产数据 |
+| `tmp_test/` | 历史研究脚本及输出，保留历史引用；新来源验证统一进入 `provider_validation/` |
 | `CODE_STRUCTURE.md` | 当前代码和文档目录的职责索引 |
 
 正式文档的归属如下。当前已建立 [源头采集接口文档](docs/providers/README.md)，其他模块文档目录随实际文档建立；现有根目录设计文档保持原位，入口见本文开头。
@@ -40,6 +44,10 @@
 | `docs/worker/` | 任务调度、执行与恢复 |
 
 正式说明表引用当前代码、YAML 和验证证据；修改说明表不会修改运行配置。能力已实现、已验证的范围、生产路由资格与调度启用状态分别记录。
+
+正式代码直接放在 `src/` 下，模块按职责分目录，不再套一层项目同名目录。Python 导入名仍为 `stock_data_manage`，由 `pyproject.toml` 将该包映射到 `src/`；`stock_data_manage.providers` 对应 `src/providers/`。根目录 `config/` 保存 YAML，`src/config/` 保存读取和校验配置的代码。
+
+来源可行性证据位于 `provider_validation/results/`。通用输入入口 `collect-input` 当前仍生成候选数据，输出到显式指定的 `--output-root`，尚未发布到生产数据目录。历史报告中的旧源码路径表示报告生成时的位置，原始证据和哈希不因目录调整而改写。
 
 ## 当前开发状态
 
@@ -114,6 +122,8 @@ python -m stock_data_manage.cli acceptance-offline --root tmp/acceptance-m1 --ou
 ```powershell
 python -m pip install -e .
 ```
+
+安装登记现有源码及 `stock-data` 命令入口。执行命令、测试和来源验证脚本时使用同一个 Python 环境；不再依靠将 `src/` 添加到 `PYTHONPATH` 启动。目录迁移后，已有开发环境也需重新执行上述安装命令。需要安装测试依赖时使用 `python -m pip install -e ".[test]"`。
 
 ```powershell
 python -m pytest

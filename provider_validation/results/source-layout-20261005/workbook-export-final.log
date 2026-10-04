@@ -1,0 +1,2 @@
+Inspect result written to file: D:\Project\PythonProgram\stock_data_manage\tmp\source-layout-20261005\源头采集接口说明.xlsx.inspect.ndjson
+{"outputPath":"D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\源头采集接口说明.xlsx","counts":[{"sheet":"接口总览","value":64},{"sheet":"调用参数","value":111},{"sheet":"采集字段与映射","value":1006},{"sheet":"暂不纳入及历史","value":13}],"schedulingEnabled":0}

@@ -1,0 +1,17 @@
+node:internal/fs/promises:697
+  return new FileHandle(await PromisePrototypeThen(
+                        ^
+
+Error: EBUSY: resource busy or locked, open 'D:\Project\PythonProgram\stock_data_manage\docs\providers\源头采集接口说明.xlsx'
+    at async open (node:internal/fs/promises:697:25)
+    at async Object.writeFile (node:internal/fs/promises:1317:14)
+    at async e.save (file:///C:/Users/sp181/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/@oai/artifact-tool/dist/artifact_tool.mjs:3130:28886)
+    at async buildFormalSpecWorkbook (file:///D:/Project/PythonProgram/stock_data_manage/provider_validation/tests/build_interface_coverage_workbook.mjs:284:3)
+    at async file:///D:/Project/PythonProgram/stock_data_manage/provider_validation/tests/build_interface_coverage_workbook.mjs:14:3 {
+  errno: -4082,
+  code: 'EBUSY',
+  syscall: 'open',
+  path: 'D:\\Project\\PythonProgram\\stock_data_manage\\docs\\providers\\源头采集接口说明.xlsx'
+}
+
+Node.js v24.19.0

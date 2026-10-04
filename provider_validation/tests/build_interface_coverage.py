@@ -661,12 +661,12 @@ def main() -> None:
 
     # Six separately listed board interfaces discussed in the migration review.
     board_rows = [
-        ("SDA-BOARD-001", "板块/行业", "AkShare.stock_board_industry_name_ths()", "同花顺行业目录（全行业代码与名称）", "通过", "2026-10-02；90行、90个唯一代码", "provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson", "provider_validation/results/2026-10-02-sector-derived/ths-industry-directory.csv", "上游 stock-data-analyse/warehouse/industry.py:189；本项目 src/stock_data_manage/providers/akshare/boards.py:31 fetch_industry_list", "行业目录不等于证券概念归属；单位不适用"),
-        ("SDA-BOARD-002", "板块/行业", "AkShare.stock_board_industry_index_ths(symbol=..., start_date=..., end_date=...)", "行业指数日线", "部分通过", "半导体（881121），2026-09-01至2026-10-02请求；返回21行，实际末日09-30", "provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson", "provider_validation/results/2026-10-02-sector-derived/ths-semiconductor-index-daily.csv", "上游 warehouse/industry.py:201；本项目 src/stock_data_manage/providers/akshare/boards.py:66 fetch_industry_daily", "只测一个板块和窗口；成交量/成交额单位未确认"),
-        ("SDA-BOARD-003", "板块/行业资金流", "AkShare.stock_fund_flow_industry(symbol='即时')", "行业即时资金流排行快照", "通过", "即时；90行、90个唯一行业名", "provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson", "provider_validation/results/2026-10-02-sector-derived/ths-industry-fund-flow-now.csv", "上游 fundflow/sources.py:96；本项目 src/stock_data_manage/providers/akshare/boards.py:144 fetch_fund_flow", "快照无逐行日期；金额单位未确认；不是历史资金流"),
-        ("SDA-BOARD-004", "板块/概念资金流", "AkShare.stock_fund_flow_concept(symbol='即时')", "概念即时资金流排行快照", "通过", "即时；387行、387个唯一概念名", "provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson", "provider_validation/results/2026-10-02-sector-derived/ths-concept-fund-flow-now.csv", "上游 fundflow/sources.py:98；本项目 src/stock_data_manage/providers/akshare/boards.py:144 fetch_fund_flow", "不是证券-概念成员关系；无逐行日期；金额单位未确认"),
-        ("SDA-BOARD-005", "证券清单/行业快照", "BaoStock.query_all_stock(day='2026-09-30')", "查询当日沪深上市证券清单", "部分通过", "旧全量探针日期2026-09-30；与行业查询合并统计5,212只在市证券", "", "provider_validation/results/legacy/2026-10-01-security-board-coverage.json", "上游 warehouse/industry.py:125；本项目 src/stock_data_manage/providers/baostock/industry.py:32 fetch_snapshot", "BaoStock只保存旧合并解析结果；无原始SDK行或TCP帧；不是当前Provider独立Live Probe"),
-        ("SDA-BOARD-006", "证券-证监会行业关系", "BaoStock.query_stock_industry(date='2026-09-30')", "查询日期快照中的证券与证监会行业分类", "部分通过", "旧全量探针日期2026-09-30；5,212只中5,210只获得分类（99.9616%），缺2只", "", "provider_validation/results/legacy/2026-10-01-security-board-coverage.json", "上游 warehouse/industry.py:125；本项目 src/stock_data_manage/providers/baostock/industry.py:32 fetch_snapshot", "旧合并结果可离线重放，缺原始SDK行/TCP帧；不可标为原始返回已归档"),
+        ("SDA-BOARD-001", "板块/行业", "AkShare.stock_board_industry_name_ths()", "同花顺行业目录（全行业代码与名称）", "通过", "2026-10-02；90行、90个唯一代码", "provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson", "provider_validation/results/2026-10-02-sector-derived/ths-industry-directory.csv", "上游 stock-data-analyse/warehouse/industry.py:189；本项目 src/providers/akshare/boards.py:31 fetch_industry_list", "行业目录不等于证券概念归属；单位不适用"),
+        ("SDA-BOARD-002", "板块/行业", "AkShare.stock_board_industry_index_ths(symbol=..., start_date=..., end_date=...)", "行业指数日线", "部分通过", "半导体（881121），2026-09-01至2026-10-02请求；返回21行，实际末日09-30", "provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson", "provider_validation/results/2026-10-02-sector-derived/ths-semiconductor-index-daily.csv", "上游 warehouse/industry.py:201；本项目 src/providers/akshare/boards.py:66 fetch_industry_daily", "只测一个板块和窗口；成交量/成交额单位未确认"),
+        ("SDA-BOARD-003", "板块/行业资金流", "AkShare.stock_fund_flow_industry(symbol='即时')", "行业即时资金流排行快照", "通过", "即时；90行、90个唯一行业名", "provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson", "provider_validation/results/2026-10-02-sector-derived/ths-industry-fund-flow-now.csv", "上游 fundflow/sources.py:96；本项目 src/providers/akshare/boards.py:144 fetch_fund_flow", "快照无逐行日期；金额单位未确认；不是历史资金流"),
+        ("SDA-BOARD-004", "板块/概念资金流", "AkShare.stock_fund_flow_concept(symbol='即时')", "概念即时资金流排行快照", "通过", "即时；387行、387个唯一概念名", "provider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson", "provider_validation/results/2026-10-02-sector-derived/ths-concept-fund-flow-now.csv", "上游 fundflow/sources.py:98；本项目 src/providers/akshare/boards.py:144 fetch_fund_flow", "不是证券-概念成员关系；无逐行日期；金额单位未确认"),
+        ("SDA-BOARD-005", "证券清单/行业快照", "BaoStock.query_all_stock(day='2026-09-30')", "查询当日沪深上市证券清单", "部分通过", "旧全量探针日期2026-09-30；与行业查询合并统计5,212只在市证券", "", "provider_validation/results/legacy/2026-10-01-security-board-coverage.json", "上游 warehouse/industry.py:125；本项目 src/providers/baostock/industry.py:32 fetch_snapshot", "BaoStock只保存旧合并解析结果；无原始SDK行或TCP帧；不是当前Provider独立Live Probe"),
+        ("SDA-BOARD-006", "证券-证监会行业关系", "BaoStock.query_stock_industry(date='2026-09-30')", "查询日期快照中的证券与证监会行业分类", "部分通过", "旧全量探针日期2026-09-30；5,212只中5,210只获得分类（99.9616%），缺2只", "", "provider_validation/results/legacy/2026-10-01-security-board-coverage.json", "上游 warehouse/industry.py:125；本项目 src/providers/baostock/industry.py:32 fetch_snapshot", "旧合并结果可离线重放，缺原始SDK行/TCP帧；不可标为原始返回已归档"),
     ]
     baostock_run = VALIDATION / "results" / "live-probes" / "baostock-industry-20260930-20261003"
     baostock_result_path = baostock_run / "result.json"
@@ -699,7 +699,7 @@ def main() -> None:
             "查询当日全市场证券清单；原始SDK行已归档", "通过",
             f"{date_scope}；原始SDK返回{raw_listed_count}条记录；Provider筛得沪深A股{listed_count}只",
             manifest_ref, derived_path,
-            "本项目 src/stock_data_manage/providers/baostock/industry.py:32 fetch_snapshot；provider_validation/tests/run_baostock_industry_live_probe.py",
+            "本项目 src/providers/baostock/industry.py:32 fetch_snapshot；provider_validation/tests/run_baostock_industry_live_probe.py",
             "通过代码/交易所规则筛选得到沪深A股证券集合；BaoStock TCP原始帧不对SDK调用方开放。2026-10-02非交易日空返回已保存在 provider_validation/results/live-probes/baostock-industry-20261003/result.json。",
         )
         board_rows[5] = (
@@ -707,7 +707,7 @@ def main() -> None:
             "查询沪深证券与证监会行业分类关系", "部分通过",
             f"{date_scope}；沪深A股分母{listed_count}只，成功匹配{classified_count}只，缺失{missing_count}只：{','.join(baostock_result.get('missing_symbols', []))}",
             manifest_ref, derived_path,
-            "本项目 src/stock_data_manage/providers/baostock/industry.py:32 fetch_snapshot；provider_validation/tests/run_baostock_industry_live_probe.py",
+            "本项目 src/providers/baostock/industry.py:32 fetch_snapshot；provider_validation/tests/run_baostock_industry_live_probe.py",
             f"已归档query_stock_industry SDK解码字段与原始行；缺失{missing_count}只，因此覆盖不完整。BaoStock TCP原始帧不对SDK调用方开放。2026-10-02非交易日空返回已单独留档。",
         )
     board_test_by_id = {
@@ -831,7 +831,6 @@ def build_formal_spec() -> dict[str, Any]:
     Historical coverage exports remain unchanged when this mode is selected.
     """
     import yaml
-    sys.path.insert(0, str(ROOT / "src"))
     from stock_data_manage.config.loader import load_input_capabilities, load_input_field_contract
 
     def read_json(path: Path):
@@ -855,7 +854,7 @@ def build_formal_spec() -> dict[str, Any]:
     contracts = {c.input_id: c for c in load_input_capabilities(provider_path)}
     current = provider_doc["input_capabilities"]
     profiles = yaml.safe_load((ROOT / "config/collection.yaml").read_text(encoding="utf-8"))["collection_profiles"]
-    factory_path = ROOT / "src/stock_data_manage/routing/factory.py"
+    factory_path = ROOT / "src/routing/factory.py"
     factory = ast.parse(factory_path.read_text(encoding="utf-8"))
     expected = next(ast.literal_eval(n.value) for n in ast.walk(factory)
                     if isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and t.id == "expected_methods" for t in n.targets))

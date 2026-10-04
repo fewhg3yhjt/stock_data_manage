@@ -1,0 +1,9 @@
+Processing d:\project\pythonprogram\stock_data_manage
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: stock-data-manage
+  Building wheel for stock-data-manage (pyproject.toml): started
+  Building wheel for stock-data-manage (pyproject.toml): finished with status 'done'
+  Created wheel for stock-data-manage: filename=stock_data_manage-0.1.0-py3-none-any.whl size=223579 sha256=5344677a009cf6aab6390903de209c4d7092308461ffed5daedba3f9a0d93235
+  Stored in directory: C:\Users\sp181\AppData\Local\Temp\pip-ephem-wheel-cache-gapw_qx9\wheels\a8\b7\c9\fc52e293ef6363e35d18f3c716ede4936540e6043c7bfb16a5
+Successfully built stock-data-manage

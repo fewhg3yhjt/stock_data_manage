@@ -24,7 +24,7 @@
 
 ## 常用脚本
 
-在项目根目录运行：
+先在使用的 Python 环境中执行 `python -m pip install -e .` 安装当前项目，再在项目根目录运行。正式代码直接位于 `src/`，验证脚本通过已安装的 `stock_data_manage` 包导入，不再自行添加源码目录。历史证据中的旧源码路径及哈希保留原样。
 
 ```powershell
 python provider_validation/tests/replay_sector_capability_archives.py

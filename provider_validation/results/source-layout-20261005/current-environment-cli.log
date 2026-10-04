@@ -1,0 +1,16 @@
+usage: stock-data [-h]
+                  {probe-daily,probe-minute,recover,acceptance-offline,collect-input,collect-due-inputs} ...
+
+positional arguments:
+  {probe-daily,probe-minute,recover,acceptance-offline,collect-input,collect-due-inputs}
+    probe-daily         run one explicit provider capability probe
+    probe-minute        run one explicit minute provider capability probe
+    recover             repair canonical files and metadata after interruption
+    acceptance-offline  run deterministic offline M1 acceptance evidence
+    collect-input       collect or replay one configured input into candidate
+                        files
+    collect-due-inputs  plan one scheduler tick, or explicitly execute
+                        candidate collection
+
+options:
+  -h, --help            show this help message and exit

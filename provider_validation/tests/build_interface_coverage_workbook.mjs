@@ -279,7 +279,9 @@ async function buildFormalSpecWorkbook() {
     const preview = await workbook.render({ sheetName: data.name, range: "A1:G13", scale: 1, format: "png" });
     await fs.writeFile(path.join(visualDir, `formal-interface-spec-${index}.png`), new Uint8Array(await preview.arrayBuffer()));
   }
-  const outputPath = path.join(directory, "源头采集接口说明.xlsx");
+  const outputArgument = process.argv.indexOf("--output");
+  if (outputArgument !== -1 && !process.argv[outputArgument + 1]) throw new Error("--output requires a file path");
+  const outputPath = outputArgument === -1 ? path.join(directory, "源头采集接口说明.xlsx") : path.resolve(process.argv[outputArgument + 1]);
   const output = await SpreadsheetFile.exportXlsx(workbook);
   await output.save(outputPath);
   await fs.writeFile(path.join(visualDir, "formal-interface-spec-export-check.json"), JSON.stringify({ outputPath, counts, summaries, schedulingEnabled: main.getRange("E4").values[0][0], inspectedWithArtifactTool: true }, null, 2));

@@ -18,7 +18,6 @@ import requests
 
 
 ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "src"))
 from stock_data_manage.providers.akshare.boards import AkShareBoardProvider  # noqa: E402
 from stock_data_manage.providers.baostock import industry as baostock_industry  # noqa: E402
 from stock_data_manage.providers.baostock.industry import (  # noqa: E402
@@ -274,10 +273,10 @@ def main() -> None:
         "transformation_code_sha256": {
             "replay_script": _sha256(Path(__file__).read_bytes()),
             "akshare_boards_provider": _sha256(
-                (ROOT / "src/stock_data_manage/providers/akshare/boards.py").read_bytes()
+                (ROOT / "src/providers/akshare/boards.py").read_bytes()
             ),
             "baostock_industry_provider": _sha256(
-                (ROOT / "src/stock_data_manage/providers/baostock/industry.py").read_bytes()
+                (ROOT / "src/providers/baostock/industry.py").read_bytes()
             ),
         },
         "validated_at_utc": datetime.now(timezone.utc).isoformat(),

@@ -65,7 +65,7 @@ class AkShareBoardProvider:
 
     def _mapping(self, dataset: str, input_id: str) -> Mapping[str, str]:
         from ...config.loader import load_normalization_document
-        document = load_normalization_document(self.normalization_root or Path(__file__).resolve().parents[4] / "config/normalization", dataset)
+        document = load_normalization_document(self.normalization_root or Path(__file__).resolve().parents[3] / "config/normalization", dataset)
         return next(rule["field_mapping"] for rule in document["rules"] if rule["input_id"] == input_id)
 
     def fetch_industry_list(self) -> AkShareBoardResult:

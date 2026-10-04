@@ -27,12 +27,39 @@ akshare = [
 stock-data = "stock_data_manage.cli:main"
 
 [tool.setuptools]
-package-dir = {"" = "src"}
-
-[tool.setuptools.packages.find]
-where = ["src"]
+package-dir = {"stock_data_manage" = "src"}
+packages = [
+    "stock_data_manage",
+    "stock_data_manage.config",
+    "stock_data_manage.domain",
+    "stock_data_manage.pipeline",
+    "stock_data_manage.providers",
+    "stock_data_manage.providers.akshare",
+    "stock_data_manage.providers.baostock",
+    "stock_data_manage.providers.cctv",
+    "stock_data_manage.providers.chinabond",
+    "stock_data_manage.providers.chinamoney",
+    "stock_data_manage.providers.cls",
+    "stock_data_manage.providers.cninfo",
+    "stock_data_manage.providers.csindex",
+    "stock_data_manage.providers.eastmoney",
+    "stock_data_manage.providers.exchanges",
+    "stock_data_manage.providers.mofcom",
+    "stock_data_manage.providers.sge",
+    "stock_data_manage.providers.sina",
+    "stock_data_manage.providers.sse",
+    "stock_data_manage.providers.tdx",
+    "stock_data_manage.providers.tencent",
+    "stock_data_manage.providers.ths",
+    "stock_data_manage.providers.wallstreetcn",
+    "stock_data_manage.quality",
+    "stock_data_manage.routing",
+    "stock_data_manage.service",
+    "stock_data_manage.storage",
+    "stock_data_manage.worker",
+]
+# A new Python subpackage must be added to this explicit package list.
 
 [tool.pytest.ini_options]
 addopts = "-q"
 testpaths = ["tests"]
-pythonpath = ["src"]

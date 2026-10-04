@@ -140,7 +140,7 @@ class BaoStockIndustryMembershipProvider:
         missing_symbols: list[str] = []
         dataset = "security_snapshot" if self.endpoint == "security_snapshot" else "industry_membership"
         from ...config.loader import load_normalization_document
-        document = load_normalization_document(self.normalization_root or Path(__file__).resolve().parents[4] / "config/normalization", dataset)
+        document = load_normalization_document(self.normalization_root or Path(__file__).resolve().parents[3] / "config/normalization", dataset)
         input_id = "SDA-BOARD-005" if dataset == "security_snapshot" else "SDA-BOARD-006"
         mapping = next(rule["field_mapping"] for rule in document["rules"]
                        if rule.get("input_id") == input_id and rule.get("provider") == "baostock" and rule.get("endpoint") == dataset)

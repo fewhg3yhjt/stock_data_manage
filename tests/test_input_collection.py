@@ -210,7 +210,7 @@ def test_remaining_migration_preserves_existing_provider_methods():
              ("8-snapshot.py.bin", "tencent/snapshot.py"), ("9-minute.py.bin", "tdx/minute.py")]
     for snapshot, relative in pairs:
         old = ast.parse((before/snapshot).read_text(encoding="utf-8"))
-        new = ast.parse((ROOT/"src/stock_data_manage/providers"/relative).read_text(encoding="utf-8"))
+        new = ast.parse((ROOT/"src/providers"/relative).read_text(encoding="utf-8"))
         classes = {n.name: n for n in new.body if isinstance(n, ast.ClassDef)}
         for cls in (n for n in old.body if isinstance(n, ast.ClassDef)):
             methods = {n.name: n for n in classes[cls.name].body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))}
@@ -648,7 +648,7 @@ def test_reports_seats_yaml_projection_scope_and_old_methods(tmp_path,no_network
         cls=next(n for n in ast.parse(path.read_text(encoding="utf-8")).body if isinstance(n,ast.ClassDef) and n.name=="EastMoneyFinancialMainProvider")
         return {n.name:ast.dump(n,include_attributes=False) for n in cls.body if isinstance(n,ast.FunctionDef)}
     before=methods(ROOT/"provider_validation/results/reports-seats-original-20261004/0-financial.py.bin")
-    current=methods(ROOT/"src/stock_data_manage/providers/eastmoney/financial.py")
+    current=methods(ROOT/"src/providers/eastmoney/financial.py")
     assert all(current[name]==body for name,body in before.items())
     config=tmp_path/"config";shutil.copytree(ROOT/"config",config)
     path=config/"normalization/eastmoney_reports.yaml";rule=yaml.safe_load(path.read_text(encoding="utf-8"));rule["rules"][0]["field_mapping"]["title"]="orgName"
@@ -907,7 +907,7 @@ def test_market_event_yaml_fields_scope_and_existing_methods(tmp_path, no_networ
         tree = ast.parse(p.read_text(encoding="utf-8"))
         cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == "EastMoneyFinancialMainProvider")
         return {n.name:ast.dump(n, include_attributes=False) for n in cls.body if isinstance(n, ast.FunctionDef)}
-    old = methods(baseline); current = methods(ROOT / "src/stock_data_manage/providers/eastmoney/financial.py")
+    old = methods(baseline); current = methods(ROOT / "src/providers/eastmoney/financial.py")
     assert all(current[name] == body for name, body in old.items())
     config = tmp_path / "config"; shutil.copytree(ROOT / "config", config)
     path = config / "normalization/lockup_expiry.yaml"; rule = yaml.safe_load(path.read_text(encoding="utf-8"))

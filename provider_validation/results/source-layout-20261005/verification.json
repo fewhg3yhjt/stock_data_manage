@@ -1,0 +1,913 @@
+{
+  "status": "passed",
+  "verified_at_utc": "2026-10-04T16:57:30.712470+00:00",
+  "network_requests": 0,
+  "production_writes": 0,
+  "source_files": 104,
+  "packages": 28,
+  "unchanged_source_files": 102,
+  "changed_default_config_lookup": [
+    "src/providers/akshare/boards.py",
+    "src/providers/baostock/industry.py"
+  ],
+  "preserved_preexisting_untracked_files": 5575,
+  "removed_application_lock_files": [
+    "docs/providers/~$源头采集接口说明.xlsx",
+    "provider_validation/coverage/~$interface-coverage.xlsx"
+  ],
+  "preexisting_agents_unchanged": true,
+  "wheel": {
+    "path": "tmp/source-layout-20261005/wheels/stock_data_manage-0.1.0-py3-none-any.whl",
+    "sha256": "5344677a009cf6aab6390903de209c4d7092308461ffed5daedba3f9a0d93235",
+    "source_members_checked": 104
+  },
+  "installations": {
+    "editable": {
+      "imported_modules": {
+        "stock_data_manage": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\__init__.py",
+        "stock_data_manage.cli": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\cli.py",
+        "stock_data_manage.config": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\config\\__init__.py",
+        "stock_data_manage.config.loader": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\config\\loader.py",
+        "stock_data_manage.domain": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\domain\\__init__.py",
+        "stock_data_manage.domain.models": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\domain\\models.py",
+        "stock_data_manage.domain.sessions": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\domain\\sessions.py",
+        "stock_data_manage.pipeline": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\pipeline\\__init__.py",
+        "stock_data_manage.pipeline.daily": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\pipeline\\daily.py",
+        "stock_data_manage.pipeline.daily_reconciliation": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\pipeline\\daily_reconciliation.py",
+        "stock_data_manage.pipeline.history": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\pipeline\\history.py",
+        "stock_data_manage.pipeline.inputs": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\pipeline\\inputs.py",
+        "stock_data_manage.pipeline.minute": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\pipeline\\minute.py",
+        "stock_data_manage.pipeline.minute_reconciliation": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\pipeline\\minute_reconciliation.py",
+        "stock_data_manage.pipeline.resample": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\pipeline\\resample.py",
+        "stock_data_manage.pipeline.snapshot_aggregator": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\pipeline\\snapshot_aggregator.py",
+        "stock_data_manage.pipeline.snapshot_daily": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\pipeline\\snapshot_daily.py",
+        "stock_data_manage.providers": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\__init__.py",
+        "stock_data_manage.providers.akshare": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\akshare\\__init__.py",
+        "stock_data_manage.providers.akshare.boards": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\akshare\\boards.py",
+        "stock_data_manage.providers.akshare.daily": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\akshare\\daily.py",
+        "stock_data_manage.providers.akshare.session": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\akshare\\session.py",
+        "stock_data_manage.providers.baostock": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\baostock\\__init__.py",
+        "stock_data_manage.providers.baostock.daily": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\baostock\\daily.py",
+        "stock_data_manage.providers.baostock.industry": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\baostock\\industry.py",
+        "stock_data_manage.providers.baostock.minute": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\baostock\\minute.py",
+        "stock_data_manage.providers.baostock.session": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\baostock\\session.py",
+        "stock_data_manage.providers.base": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\base.py",
+        "stock_data_manage.providers.cctv": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\cctv\\__init__.py",
+        "stock_data_manage.providers.cctv.news": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\cctv\\news.py",
+        "stock_data_manage.providers.chinabond": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\chinabond\\__init__.py",
+        "stock_data_manage.providers.chinabond.yield_curve": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\chinabond\\yield_curve.py",
+        "stock_data_manage.providers.chinamoney": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\chinamoney\\__init__.py",
+        "stock_data_manage.providers.chinamoney.rates": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\chinamoney\\rates.py",
+        "stock_data_manage.providers.cls": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\cls\\__init__.py",
+        "stock_data_manage.providers.cls.news": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\cls\\news.py",
+        "stock_data_manage.providers.cninfo": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\cninfo\\__init__.py",
+        "stock_data_manage.providers.cninfo.profile": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\cninfo\\profile.py",
+        "stock_data_manage.providers.contracts": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\contracts.py",
+        "stock_data_manage.providers.csindex": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\csindex\\__init__.py",
+        "stock_data_manage.providers.csindex.indices": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\csindex\\indices.py",
+        "stock_data_manage.providers.eastmoney": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\eastmoney\\__init__.py",
+        "stock_data_manage.providers.eastmoney.dividend": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\eastmoney\\dividend.py",
+        "stock_data_manage.providers.eastmoney.financial": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\eastmoney\\financial.py",
+        "stock_data_manage.providers.eastmoney.fund_flow": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\eastmoney\\fund_flow.py",
+        "stock_data_manage.providers.eastmoney.limit_pool": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\eastmoney\\limit_pool.py",
+        "stock_data_manage.providers.eastmoney.news": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\eastmoney\\news.py",
+        "stock_data_manage.providers.eastmoney.realtime": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\eastmoney\\realtime.py",
+        "stock_data_manage.providers.eastmoney.security_list": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\eastmoney\\security_list.py",
+        "stock_data_manage.providers.eastmoney.shareholder": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\eastmoney\\shareholder.py",
+        "stock_data_manage.providers.exchanges": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\exchanges\\__init__.py",
+        "stock_data_manage.providers.exchanges.daily": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\exchanges\\daily.py",
+        "stock_data_manage.providers.mofcom": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\mofcom\\__init__.py",
+        "stock_data_manage.providers.mofcom.social_financing": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\mofcom\\social_financing.py",
+        "stock_data_manage.providers.probes": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\probes.py",
+        "stock_data_manage.providers.sge": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\sge\\__init__.py",
+        "stock_data_manage.providers.sge.spot": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\sge\\spot.py",
+        "stock_data_manage.providers.sina": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\sina\\__init__.py",
+        "stock_data_manage.providers.sina.calendar": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\sina\\calendar.py",
+        "stock_data_manage.providers.sina.daily": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\sina\\daily.py",
+        "stock_data_manage.providers.sina.financial": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\sina\\financial.py",
+        "stock_data_manage.providers.sina.minute": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\sina\\minute.py",
+        "stock_data_manage.providers.sina.news": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\sina\\news.py",
+        "stock_data_manage.providers.sina.snapshot": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\sina\\snapshot.py",
+        "stock_data_manage.providers.sse": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\sse\\__init__.py",
+        "stock_data_manage.providers.sse.market": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\sse\\market.py",
+        "stock_data_manage.providers.tdx": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\tdx\\__init__.py",
+        "stock_data_manage.providers.tdx.minute": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\tdx\\minute.py",
+        "stock_data_manage.providers.tencent": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\tencent\\__init__.py",
+        "stock_data_manage.providers.tencent.daily": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\tencent\\daily.py",
+        "stock_data_manage.providers.tencent.minute": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\tencent\\minute.py",
+        "stock_data_manage.providers.tencent.snapshot": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\tencent\\snapshot.py",
+        "stock_data_manage.providers.ths": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\ths\\__init__.py",
+        "stock_data_manage.providers.ths.boards": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\ths\\boards.py",
+        "stock_data_manage.providers.transport": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\transport.py",
+        "stock_data_manage.providers.wallstreetcn": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\wallstreetcn\\__init__.py",
+        "stock_data_manage.providers.wallstreetcn.news": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\providers\\wallstreetcn\\news.py",
+        "stock_data_manage.quality": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\quality\\__init__.py",
+        "stock_data_manage.quality.normalization": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\quality\\normalization.py",
+        "stock_data_manage.quality.publication": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\quality\\publication.py",
+        "stock_data_manage.quality.resolution": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\quality\\resolution.py",
+        "stock_data_manage.quality.validation": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\quality\\validation.py",
+        "stock_data_manage.routing": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\routing\\__init__.py",
+        "stock_data_manage.routing.capabilities": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\routing\\capabilities.py",
+        "stock_data_manage.routing.factory": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\routing\\factory.py",
+        "stock_data_manage.routing.retry": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\routing\\retry.py",
+        "stock_data_manage.routing.router": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\routing\\router.py",
+        "stock_data_manage.service": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\service\\__init__.py",
+        "stock_data_manage.service.calendar": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\service\\calendar.py",
+        "stock_data_manage.service.calendar_update": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\service\\calendar_update.py",
+        "stock_data_manage.service.instruments": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\service\\instruments.py",
+        "stock_data_manage.service.instruments_update": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\service\\instruments_update.py",
+        "stock_data_manage.service.market_data": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\service\\market_data.py",
+        "stock_data_manage.storage": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\storage\\__init__.py",
+        "stock_data_manage.storage.hot": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\storage\\hot.py",
+        "stock_data_manage.storage.integrity": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\storage\\integrity.py",
+        "stock_data_manage.storage.metadata": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\storage\\metadata.py",
+        "stock_data_manage.storage.parquet": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\storage\\parquet.py",
+        "stock_data_manage.storage.raw": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\storage\\raw.py",
+        "stock_data_manage.worker": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\worker\\__init__.py",
+        "stock_data_manage.worker.acceptance": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\worker\\acceptance.py",
+        "stock_data_manage.worker.attempts": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\worker\\attempts.py",
+        "stock_data_manage.worker.recovery": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\worker\\recovery.py",
+        "stock_data_manage.worker.scheduler": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\worker\\scheduler.py"
+      },
+      "module_cli": "passed",
+      "installed_command": "passed",
+      "cwd": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\editable",
+      "isolated_python": true
+    },
+    "regular": {
+      "imported_modules": {
+        "stock_data_manage": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\__init__.py",
+        "stock_data_manage.cli": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\cli.py",
+        "stock_data_manage.config": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\config\\__init__.py",
+        "stock_data_manage.config.loader": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\config\\loader.py",
+        "stock_data_manage.domain": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\domain\\__init__.py",
+        "stock_data_manage.domain.models": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\domain\\models.py",
+        "stock_data_manage.domain.sessions": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\domain\\sessions.py",
+        "stock_data_manage.pipeline": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\pipeline\\__init__.py",
+        "stock_data_manage.pipeline.daily": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\pipeline\\daily.py",
+        "stock_data_manage.pipeline.daily_reconciliation": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\pipeline\\daily_reconciliation.py",
+        "stock_data_manage.pipeline.history": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\pipeline\\history.py",
+        "stock_data_manage.pipeline.inputs": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\pipeline\\inputs.py",
+        "stock_data_manage.pipeline.minute": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\pipeline\\minute.py",
+        "stock_data_manage.pipeline.minute_reconciliation": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\pipeline\\minute_reconciliation.py",
+        "stock_data_manage.pipeline.resample": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\pipeline\\resample.py",
+        "stock_data_manage.pipeline.snapshot_aggregator": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\pipeline\\snapshot_aggregator.py",
+        "stock_data_manage.pipeline.snapshot_daily": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\pipeline\\snapshot_daily.py",
+        "stock_data_manage.providers": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\__init__.py",
+        "stock_data_manage.providers.akshare": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\akshare\\__init__.py",
+        "stock_data_manage.providers.akshare.boards": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\akshare\\boards.py",
+        "stock_data_manage.providers.akshare.daily": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\akshare\\daily.py",
+        "stock_data_manage.providers.akshare.session": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\akshare\\session.py",
+        "stock_data_manage.providers.baostock": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\baostock\\__init__.py",
+        "stock_data_manage.providers.baostock.daily": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\baostock\\daily.py",
+        "stock_data_manage.providers.baostock.industry": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\baostock\\industry.py",
+        "stock_data_manage.providers.baostock.minute": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\baostock\\minute.py",
+        "stock_data_manage.providers.baostock.session": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\baostock\\session.py",
+        "stock_data_manage.providers.base": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\base.py",
+        "stock_data_manage.providers.cctv": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\cctv\\__init__.py",
+        "stock_data_manage.providers.cctv.news": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\cctv\\news.py",
+        "stock_data_manage.providers.chinabond": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\chinabond\\__init__.py",
+        "stock_data_manage.providers.chinabond.yield_curve": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\chinabond\\yield_curve.py",
+        "stock_data_manage.providers.chinamoney": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\chinamoney\\__init__.py",
+        "stock_data_manage.providers.chinamoney.rates": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\chinamoney\\rates.py",
+        "stock_data_manage.providers.cls": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\cls\\__init__.py",
+        "stock_data_manage.providers.cls.news": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\cls\\news.py",
+        "stock_data_manage.providers.cninfo": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\cninfo\\__init__.py",
+        "stock_data_manage.providers.cninfo.profile": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\cninfo\\profile.py",
+        "stock_data_manage.providers.contracts": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\contracts.py",
+        "stock_data_manage.providers.csindex": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\csindex\\__init__.py",
+        "stock_data_manage.providers.csindex.indices": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\csindex\\indices.py",
+        "stock_data_manage.providers.eastmoney": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\eastmoney\\__init__.py",
+        "stock_data_manage.providers.eastmoney.dividend": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\eastmoney\\dividend.py",
+        "stock_data_manage.providers.eastmoney.financial": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\eastmoney\\financial.py",
+        "stock_data_manage.providers.eastmoney.fund_flow": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\eastmoney\\fund_flow.py",
+        "stock_data_manage.providers.eastmoney.limit_pool": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\eastmoney\\limit_pool.py",
+        "stock_data_manage.providers.eastmoney.news": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\eastmoney\\news.py",
+        "stock_data_manage.providers.eastmoney.realtime": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\eastmoney\\realtime.py",
+        "stock_data_manage.providers.eastmoney.security_list": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\eastmoney\\security_list.py",
+        "stock_data_manage.providers.eastmoney.shareholder": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\eastmoney\\shareholder.py",
+        "stock_data_manage.providers.exchanges": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\exchanges\\__init__.py",
+        "stock_data_manage.providers.exchanges.daily": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\exchanges\\daily.py",
+        "stock_data_manage.providers.mofcom": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\mofcom\\__init__.py",
+        "stock_data_manage.providers.mofcom.social_financing": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\mofcom\\social_financing.py",
+        "stock_data_manage.providers.probes": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\probes.py",
+        "stock_data_manage.providers.sge": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\sge\\__init__.py",
+        "stock_data_manage.providers.sge.spot": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\sge\\spot.py",
+        "stock_data_manage.providers.sina": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\sina\\__init__.py",
+        "stock_data_manage.providers.sina.calendar": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\sina\\calendar.py",
+        "stock_data_manage.providers.sina.daily": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\sina\\daily.py",
+        "stock_data_manage.providers.sina.financial": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\sina\\financial.py",
+        "stock_data_manage.providers.sina.minute": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\sina\\minute.py",
+        "stock_data_manage.providers.sina.news": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\sina\\news.py",
+        "stock_data_manage.providers.sina.snapshot": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\sina\\snapshot.py",
+        "stock_data_manage.providers.sse": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\sse\\__init__.py",
+        "stock_data_manage.providers.sse.market": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\sse\\market.py",
+        "stock_data_manage.providers.tdx": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\tdx\\__init__.py",
+        "stock_data_manage.providers.tdx.minute": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\tdx\\minute.py",
+        "stock_data_manage.providers.tencent": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\tencent\\__init__.py",
+        "stock_data_manage.providers.tencent.daily": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\tencent\\daily.py",
+        "stock_data_manage.providers.tencent.minute": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\tencent\\minute.py",
+        "stock_data_manage.providers.tencent.snapshot": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\tencent\\snapshot.py",
+        "stock_data_manage.providers.ths": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\ths\\__init__.py",
+        "stock_data_manage.providers.ths.boards": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\ths\\boards.py",
+        "stock_data_manage.providers.transport": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\transport.py",
+        "stock_data_manage.providers.wallstreetcn": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\wallstreetcn\\__init__.py",
+        "stock_data_manage.providers.wallstreetcn.news": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\providers\\wallstreetcn\\news.py",
+        "stock_data_manage.quality": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\quality\\__init__.py",
+        "stock_data_manage.quality.normalization": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\quality\\normalization.py",
+        "stock_data_manage.quality.publication": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\quality\\publication.py",
+        "stock_data_manage.quality.resolution": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\quality\\resolution.py",
+        "stock_data_manage.quality.validation": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\quality\\validation.py",
+        "stock_data_manage.routing": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\routing\\__init__.py",
+        "stock_data_manage.routing.capabilities": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\routing\\capabilities.py",
+        "stock_data_manage.routing.factory": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\routing\\factory.py",
+        "stock_data_manage.routing.retry": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\routing\\retry.py",
+        "stock_data_manage.routing.router": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\routing\\router.py",
+        "stock_data_manage.service": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\service\\__init__.py",
+        "stock_data_manage.service.calendar": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\service\\calendar.py",
+        "stock_data_manage.service.calendar_update": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\service\\calendar_update.py",
+        "stock_data_manage.service.instruments": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\service\\instruments.py",
+        "stock_data_manage.service.instruments_update": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\service\\instruments_update.py",
+        "stock_data_manage.service.market_data": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\service\\market_data.py",
+        "stock_data_manage.storage": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\storage\\__init__.py",
+        "stock_data_manage.storage.hot": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\storage\\hot.py",
+        "stock_data_manage.storage.integrity": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\storage\\integrity.py",
+        "stock_data_manage.storage.metadata": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\storage\\metadata.py",
+        "stock_data_manage.storage.parquet": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\storage\\parquet.py",
+        "stock_data_manage.storage.raw": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\storage\\raw.py",
+        "stock_data_manage.worker": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\worker\\__init__.py",
+        "stock_data_manage.worker.acceptance": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\worker\\acceptance.py",
+        "stock_data_manage.worker.attempts": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\worker\\attempts.py",
+        "stock_data_manage.worker.recovery": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\worker\\recovery.py",
+        "stock_data_manage.worker.scheduler": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular\\Lib\\site-packages\\stock_data_manage\\worker\\scheduler.py"
+      },
+      "module_cli": "passed",
+      "installed_command": "passed",
+      "cwd": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp\\source-layout-20261005\\regular",
+      "isolated_python": true
+    }
+  },
+  "source_mapping": [
+    {
+      "old_path": "src/stock_data_manage/__init__.py",
+      "new_path": "src/__init__.py",
+      "sha256": "9b3eac5d365ab370a7c1378a64e1f0235b02041920c8c15f53d1444a63764021",
+      "current_sha256": "9b3eac5d365ab370a7c1378a64e1f0235b02041920c8c15f53d1444a63764021"
+    },
+    {
+      "old_path": "src/stock_data_manage/cli.py",
+      "new_path": "src/cli.py",
+      "sha256": "582f5caedfc538a012d7a2f6e8cd7af3fe8b6fc9152e5b9e0a3fa2cb8810ae19",
+      "current_sha256": "582f5caedfc538a012d7a2f6e8cd7af3fe8b6fc9152e5b9e0a3fa2cb8810ae19"
+    },
+    {
+      "old_path": "src/stock_data_manage/config/__init__.py",
+      "new_path": "src/config/__init__.py",
+      "sha256": "7f6e294371cf500fdd579e16a3453a540378e6405dc34fc977bbcde82a32f9a0",
+      "current_sha256": "7f6e294371cf500fdd579e16a3453a540378e6405dc34fc977bbcde82a32f9a0"
+    },
+    {
+      "old_path": "src/stock_data_manage/config/loader.py",
+      "new_path": "src/config/loader.py",
+      "sha256": "93bb55ab150c88751fe9a58a2b75737878c1b0f07233b8ec47009c4901bb11e9",
+      "current_sha256": "93bb55ab150c88751fe9a58a2b75737878c1b0f07233b8ec47009c4901bb11e9"
+    },
+    {
+      "old_path": "src/stock_data_manage/domain/__init__.py",
+      "new_path": "src/domain/__init__.py",
+      "sha256": "58399c660d6a6223fb275beedc4ed3c1431c317336b03dcad3f62a9eacb9cc9c",
+      "current_sha256": "58399c660d6a6223fb275beedc4ed3c1431c317336b03dcad3f62a9eacb9cc9c"
+    },
+    {
+      "old_path": "src/stock_data_manage/domain/models.py",
+      "new_path": "src/domain/models.py",
+      "sha256": "3d2d3be6506127614660ec7b3c89044a6ce6ff6c03e9e067abd3349393d71a59",
+      "current_sha256": "3d2d3be6506127614660ec7b3c89044a6ce6ff6c03e9e067abd3349393d71a59"
+    },
+    {
+      "old_path": "src/stock_data_manage/domain/sessions.py",
+      "new_path": "src/domain/sessions.py",
+      "sha256": "f9fb433052289b19c90deee3a8e6c162aff3aa23618c464527e23f72d1b97d88",
+      "current_sha256": "f9fb433052289b19c90deee3a8e6c162aff3aa23618c464527e23f72d1b97d88"
+    },
+    {
+      "old_path": "src/stock_data_manage/pipeline/__init__.py",
+      "new_path": "src/pipeline/__init__.py",
+      "sha256": "b34cdccad43cac862b519a40f4c1c011720ce58d823688df73a9c0b24a058ff1",
+      "current_sha256": "b34cdccad43cac862b519a40f4c1c011720ce58d823688df73a9c0b24a058ff1"
+    },
+    {
+      "old_path": "src/stock_data_manage/pipeline/daily.py",
+      "new_path": "src/pipeline/daily.py",
+      "sha256": "abbb040ac2fb8e934d49b2e6694cce708b79901235742cbc14156ebe86c8da80",
+      "current_sha256": "abbb040ac2fb8e934d49b2e6694cce708b79901235742cbc14156ebe86c8da80"
+    },
+    {
+      "old_path": "src/stock_data_manage/pipeline/daily_reconciliation.py",
+      "new_path": "src/pipeline/daily_reconciliation.py",
+      "sha256": "f7905cbc98df049c99c7d032f26910dfe8dec3c4983000769a03480d2496b157",
+      "current_sha256": "f7905cbc98df049c99c7d032f26910dfe8dec3c4983000769a03480d2496b157"
+    },
+    {
+      "old_path": "src/stock_data_manage/pipeline/history.py",
+      "new_path": "src/pipeline/history.py",
+      "sha256": "647f2ce3bb6c8ebcef25f045aba580f8e9e9e3f96e388a6f10970d3430888715",
+      "current_sha256": "647f2ce3bb6c8ebcef25f045aba580f8e9e9e3f96e388a6f10970d3430888715"
+    },
+    {
+      "old_path": "src/stock_data_manage/pipeline/inputs.py",
+      "new_path": "src/pipeline/inputs.py",
+      "sha256": "800b69457ab0a6ab718ffe5c40a3b47b98529ff28fbbbb5c5630066c84317d38",
+      "current_sha256": "800b69457ab0a6ab718ffe5c40a3b47b98529ff28fbbbb5c5630066c84317d38"
+    },
+    {
+      "old_path": "src/stock_data_manage/pipeline/minute.py",
+      "new_path": "src/pipeline/minute.py",
+      "sha256": "d4a0e04cf0cca89a3c283a2b4c750eedf43cc08bdaf6e688e92683199ea357d4",
+      "current_sha256": "d4a0e04cf0cca89a3c283a2b4c750eedf43cc08bdaf6e688e92683199ea357d4"
+    },
+    {
+      "old_path": "src/stock_data_manage/pipeline/minute_reconciliation.py",
+      "new_path": "src/pipeline/minute_reconciliation.py",
+      "sha256": "49276e7c1f23a5ca2924b6e2e2a2d70b0de6f2c1ab7cfbb33270ca6c32ef077e",
+      "current_sha256": "49276e7c1f23a5ca2924b6e2e2a2d70b0de6f2c1ab7cfbb33270ca6c32ef077e"
+    },
+    {
+      "old_path": "src/stock_data_manage/pipeline/resample.py",
+      "new_path": "src/pipeline/resample.py",
+      "sha256": "0de2b2d79fe46b3fea8e9734ddb32744c5e9238e488d628c881674a1b1cac2f4",
+      "current_sha256": "0de2b2d79fe46b3fea8e9734ddb32744c5e9238e488d628c881674a1b1cac2f4"
+    },
+    {
+      "old_path": "src/stock_data_manage/pipeline/snapshot_aggregator.py",
+      "new_path": "src/pipeline/snapshot_aggregator.py",
+      "sha256": "76e46159a758c8504c0c30af67305ed6c5d02c7b765115ee026f97e260cf5d83",
+      "current_sha256": "76e46159a758c8504c0c30af67305ed6c5d02c7b765115ee026f97e260cf5d83"
+    },
+    {
+      "old_path": "src/stock_data_manage/pipeline/snapshot_daily.py",
+      "new_path": "src/pipeline/snapshot_daily.py",
+      "sha256": "a040d939e78c7d10ab91f84379f6626a66f1e03453d0882b9e0758a2b0de1228",
+      "current_sha256": "a040d939e78c7d10ab91f84379f6626a66f1e03453d0882b9e0758a2b0de1228"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/__init__.py",
+      "new_path": "src/providers/__init__.py",
+      "sha256": "c40119ca495518db8479b678af55c3ce8405964b69e201da51d2ee8ad2d33bb2",
+      "current_sha256": "c40119ca495518db8479b678af55c3ce8405964b69e201da51d2ee8ad2d33bb2"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/akshare/__init__.py",
+      "new_path": "src/providers/akshare/__init__.py",
+      "sha256": "19ae3bca8e34cdcb75299e7db14185625b0c7eaf33a1abc816fbdc3303245291",
+      "current_sha256": "19ae3bca8e34cdcb75299e7db14185625b0c7eaf33a1abc816fbdc3303245291"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/akshare/boards.py",
+      "new_path": "src/providers/akshare/boards.py",
+      "sha256": "9ed187b79fb61bb6f8d10355e4dd7e6483829e1b71f493a9107d668e9b8c0460",
+      "current_sha256": "8c71899c8bac007b604c72479d5751a3bf3a28eb9b3061b828d866c693c9aec1"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/akshare/daily.py",
+      "new_path": "src/providers/akshare/daily.py",
+      "sha256": "c08a15bdae773a57c804e82d7bcdcf20e6027d40f644e37863fa4783d2c3f9fc",
+      "current_sha256": "c08a15bdae773a57c804e82d7bcdcf20e6027d40f644e37863fa4783d2c3f9fc"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/akshare/session.py",
+      "new_path": "src/providers/akshare/session.py",
+      "sha256": "f281a7247b74efd4f8f86174f7ab8ba0bc2646e40e67a5022827fbdaf8488b95",
+      "current_sha256": "f281a7247b74efd4f8f86174f7ab8ba0bc2646e40e67a5022827fbdaf8488b95"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/baostock/__init__.py",
+      "new_path": "src/providers/baostock/__init__.py",
+      "sha256": "a850cc81e8ff4ed7184b1a2ab653cb8f11a26cabe9ea423868fcdb4c12dcaf28",
+      "current_sha256": "a850cc81e8ff4ed7184b1a2ab653cb8f11a26cabe9ea423868fcdb4c12dcaf28"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/baostock/daily.py",
+      "new_path": "src/providers/baostock/daily.py",
+      "sha256": "5eb1d7221fa76b0542eecb9ecbaebe33bd2771ad3c8f7e110a1e0fbfea5ecda3",
+      "current_sha256": "5eb1d7221fa76b0542eecb9ecbaebe33bd2771ad3c8f7e110a1e0fbfea5ecda3"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/baostock/industry.py",
+      "new_path": "src/providers/baostock/industry.py",
+      "sha256": "d3209d26579d2d47be990ea8fb47fd92c5b80a8bf3e8bf03aa553ae2c61d7f08",
+      "current_sha256": "d3d97d239567ee9cdaff1af1e7bab2fee812d362a46554f871d43e31f3d81486"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/baostock/minute.py",
+      "new_path": "src/providers/baostock/minute.py",
+      "sha256": "d3dbdef19f0145e32c8a05056dd6433b01063605baf04d173f2dbaf509ce5526",
+      "current_sha256": "d3dbdef19f0145e32c8a05056dd6433b01063605baf04d173f2dbaf509ce5526"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/baostock/session.py",
+      "new_path": "src/providers/baostock/session.py",
+      "sha256": "7060828b4ae4125de14447d62d76c6e700b9224cb27c2d645164d5e31ab2e665",
+      "current_sha256": "7060828b4ae4125de14447d62d76c6e700b9224cb27c2d645164d5e31ab2e665"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/base.py",
+      "new_path": "src/providers/base.py",
+      "sha256": "69804e1c118bd1232d1759e8d78b4e25f7c34ce8c8fca4e5001df87fab7be230",
+      "current_sha256": "69804e1c118bd1232d1759e8d78b4e25f7c34ce8c8fca4e5001df87fab7be230"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/cctv/__init__.py",
+      "new_path": "src/providers/cctv/__init__.py",
+      "sha256": "b9121d0dd84448588f48225109a2f88d9a66717477241e67b81e2c29f68aff50",
+      "current_sha256": "b9121d0dd84448588f48225109a2f88d9a66717477241e67b81e2c29f68aff50"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/cctv/news.py",
+      "new_path": "src/providers/cctv/news.py",
+      "sha256": "8839bdeed801611e8e6d11cb9441e6ede7bc94d56507eaa2c903e605c772ee7d",
+      "current_sha256": "8839bdeed801611e8e6d11cb9441e6ede7bc94d56507eaa2c903e605c772ee7d"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/chinabond/__init__.py",
+      "new_path": "src/providers/chinabond/__init__.py",
+      "sha256": "ac52b81b664bed23f531f7bce14869f8ae404a1e380f3915deccdac5de8d461b",
+      "current_sha256": "ac52b81b664bed23f531f7bce14869f8ae404a1e380f3915deccdac5de8d461b"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/chinabond/yield_curve.py",
+      "new_path": "src/providers/chinabond/yield_curve.py",
+      "sha256": "2fcb5bf39aec2e7fb893baa214036cf24bb6265b57afc01e96e1ea7201c05331",
+      "current_sha256": "2fcb5bf39aec2e7fb893baa214036cf24bb6265b57afc01e96e1ea7201c05331"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/chinamoney/__init__.py",
+      "new_path": "src/providers/chinamoney/__init__.py",
+      "sha256": "f97ae4440a40a399e81b2e5ac61c0cf9d7c50fe9328490856e18030f9cf2692e",
+      "current_sha256": "f97ae4440a40a399e81b2e5ac61c0cf9d7c50fe9328490856e18030f9cf2692e"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/chinamoney/rates.py",
+      "new_path": "src/providers/chinamoney/rates.py",
+      "sha256": "e7407f1d4272b69cb439bb0a7bad3960b65bb41328d752f541bc8ef50231f922",
+      "current_sha256": "e7407f1d4272b69cb439bb0a7bad3960b65bb41328d752f541bc8ef50231f922"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/cls/__init__.py",
+      "new_path": "src/providers/cls/__init__.py",
+      "sha256": "1609e66c332900944d1f86aa8537370984d25d76ef659616ebc2501f4da0c63c",
+      "current_sha256": "1609e66c332900944d1f86aa8537370984d25d76ef659616ebc2501f4da0c63c"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/cls/news.py",
+      "new_path": "src/providers/cls/news.py",
+      "sha256": "51da559a252b67a4a2e58171e3630ff1a5a80cd2bc23aa5df30a7e17ac02ad30",
+      "current_sha256": "51da559a252b67a4a2e58171e3630ff1a5a80cd2bc23aa5df30a7e17ac02ad30"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/cninfo/__init__.py",
+      "new_path": "src/providers/cninfo/__init__.py",
+      "sha256": "fa200baf13f4ef851faa1953053974b26746a40feddd5b3546b9125f0a53c5a0",
+      "current_sha256": "fa200baf13f4ef851faa1953053974b26746a40feddd5b3546b9125f0a53c5a0"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/cninfo/profile.py",
+      "new_path": "src/providers/cninfo/profile.py",
+      "sha256": "cb0e68bd9ae09abf9caab432f401f86798452b62080f1159d0d354f5d6978331",
+      "current_sha256": "cb0e68bd9ae09abf9caab432f401f86798452b62080f1159d0d354f5d6978331"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/contracts.py",
+      "new_path": "src/providers/contracts.py",
+      "sha256": "2e88e4875a56bbebd79154c6343af4f21e933c155ad64a24b7025263f258e391",
+      "current_sha256": "2e88e4875a56bbebd79154c6343af4f21e933c155ad64a24b7025263f258e391"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/csindex/__init__.py",
+      "new_path": "src/providers/csindex/__init__.py",
+      "sha256": "fca1b41b1c3fbd0262456031d6dd886314bccb2794cad918299382948832679a",
+      "current_sha256": "fca1b41b1c3fbd0262456031d6dd886314bccb2794cad918299382948832679a"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/csindex/indices.py",
+      "new_path": "src/providers/csindex/indices.py",
+      "sha256": "4b95f2bbda23abc28dc160a76386cc2bf5d82817747dfcbcb518ee22ea07741b",
+      "current_sha256": "4b95f2bbda23abc28dc160a76386cc2bf5d82817747dfcbcb518ee22ea07741b"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/eastmoney/__init__.py",
+      "new_path": "src/providers/eastmoney/__init__.py",
+      "sha256": "a4b6e77a1d1b321d811f0ab1b89f589ab3a48ba49b9e66ad5dd2afb38d03e637",
+      "current_sha256": "a4b6e77a1d1b321d811f0ab1b89f589ab3a48ba49b9e66ad5dd2afb38d03e637"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/eastmoney/dividend.py",
+      "new_path": "src/providers/eastmoney/dividend.py",
+      "sha256": "5706a8cdb37eeeb8f66cb033a3091dd1b6ec1ed83d72d0f9fbeb8f5c75d9649b",
+      "current_sha256": "5706a8cdb37eeeb8f66cb033a3091dd1b6ec1ed83d72d0f9fbeb8f5c75d9649b"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/eastmoney/financial.py",
+      "new_path": "src/providers/eastmoney/financial.py",
+      "sha256": "bba51b00d8d879327bef6338633c406f2405683d2ecf84d7d151063259b6663b",
+      "current_sha256": "bba51b00d8d879327bef6338633c406f2405683d2ecf84d7d151063259b6663b"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/eastmoney/fund_flow.py",
+      "new_path": "src/providers/eastmoney/fund_flow.py",
+      "sha256": "0cf655efa0854d18651bb4f04f985f0f210b81a6d9eff065604d235ed8f75280",
+      "current_sha256": "0cf655efa0854d18651bb4f04f985f0f210b81a6d9eff065604d235ed8f75280"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/eastmoney/limit_pool.py",
+      "new_path": "src/providers/eastmoney/limit_pool.py",
+      "sha256": "2fbdfe3da3129545dfe8d2e457be7c42225696ddd74270567ae765e4b413f5ae",
+      "current_sha256": "2fbdfe3da3129545dfe8d2e457be7c42225696ddd74270567ae765e4b413f5ae"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/eastmoney/news.py",
+      "new_path": "src/providers/eastmoney/news.py",
+      "sha256": "89912d67f040541e13c9953f05a7594eb0d85f608cef5b5679802defd61cb1ed",
+      "current_sha256": "89912d67f040541e13c9953f05a7594eb0d85f608cef5b5679802defd61cb1ed"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/eastmoney/realtime.py",
+      "new_path": "src/providers/eastmoney/realtime.py",
+      "sha256": "6e09d2a5014cf316c4d1e26e913a44d5c2fbad95fb44d95cba159ef881f03bca",
+      "current_sha256": "6e09d2a5014cf316c4d1e26e913a44d5c2fbad95fb44d95cba159ef881f03bca"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/eastmoney/security_list.py",
+      "new_path": "src/providers/eastmoney/security_list.py",
+      "sha256": "b3564c12953e2dc37932d9075a526cfc33b25753b4749d6e58eec1d3908466f1",
+      "current_sha256": "b3564c12953e2dc37932d9075a526cfc33b25753b4749d6e58eec1d3908466f1"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/eastmoney/shareholder.py",
+      "new_path": "src/providers/eastmoney/shareholder.py",
+      "sha256": "4c9d80f4d51845ac5541c42275f44f2a18643db5e9ccb705a3e16168f8db44c1",
+      "current_sha256": "4c9d80f4d51845ac5541c42275f44f2a18643db5e9ccb705a3e16168f8db44c1"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/exchanges/__init__.py",
+      "new_path": "src/providers/exchanges/__init__.py",
+      "sha256": "ac52b81b664bed23f531f7bce14869f8ae404a1e380f3915deccdac5de8d461b",
+      "current_sha256": "ac52b81b664bed23f531f7bce14869f8ae404a1e380f3915deccdac5de8d461b"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/exchanges/daily.py",
+      "new_path": "src/providers/exchanges/daily.py",
+      "sha256": "23685819ea2b740388b513421c0d1aa7c90aaf0198daa03bc0eca41696d8e8b5",
+      "current_sha256": "23685819ea2b740388b513421c0d1aa7c90aaf0198daa03bc0eca41696d8e8b5"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/mofcom/__init__.py",
+      "new_path": "src/providers/mofcom/__init__.py",
+      "sha256": "97464189f10fcb5e23f028ad60ca2e28bfe556845fd0b4dc1144d3ab08cb6f90",
+      "current_sha256": "97464189f10fcb5e23f028ad60ca2e28bfe556845fd0b4dc1144d3ab08cb6f90"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/mofcom/social_financing.py",
+      "new_path": "src/providers/mofcom/social_financing.py",
+      "sha256": "55d292958fb34991c56c626d5f6f61e7e6c44c8c2627b88ea735e751aa12c5ce",
+      "current_sha256": "55d292958fb34991c56c626d5f6f61e7e6c44c8c2627b88ea735e751aa12c5ce"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/probes.py",
+      "new_path": "src/providers/probes.py",
+      "sha256": "e171d73981449e37c16c2acedc45e2b8e2cf2e644cafe2f7b37efe4b80e8030f",
+      "current_sha256": "e171d73981449e37c16c2acedc45e2b8e2cf2e644cafe2f7b37efe4b80e8030f"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/sge/__init__.py",
+      "new_path": "src/providers/sge/__init__.py",
+      "sha256": "ac52b81b664bed23f531f7bce14869f8ae404a1e380f3915deccdac5de8d461b",
+      "current_sha256": "ac52b81b664bed23f531f7bce14869f8ae404a1e380f3915deccdac5de8d461b"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/sge/spot.py",
+      "new_path": "src/providers/sge/spot.py",
+      "sha256": "0801abb4eee03dada2500120b5963f5ebfb39f6f6a95f67cb4feda24dc3ec8a6",
+      "current_sha256": "0801abb4eee03dada2500120b5963f5ebfb39f6f6a95f67cb4feda24dc3ec8a6"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/sina/__init__.py",
+      "new_path": "src/providers/sina/__init__.py",
+      "sha256": "78f18f089212842879afa283e56df5b616f8975215617d6a1f89133e6a58fb84",
+      "current_sha256": "78f18f089212842879afa283e56df5b616f8975215617d6a1f89133e6a58fb84"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/sina/calendar.py",
+      "new_path": "src/providers/sina/calendar.py",
+      "sha256": "3d114045f960bfcc94ade1ee03e4d25ebdf6980ba68aa2d0a2236bed78aaef05",
+      "current_sha256": "3d114045f960bfcc94ade1ee03e4d25ebdf6980ba68aa2d0a2236bed78aaef05"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/sina/daily.py",
+      "new_path": "src/providers/sina/daily.py",
+      "sha256": "dd15e0c6b0f8ed5e6db99b5d2b9725eb7e2cc6f3e42bd5e6d392c5334922dc89",
+      "current_sha256": "dd15e0c6b0f8ed5e6db99b5d2b9725eb7e2cc6f3e42bd5e6d392c5334922dc89"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/sina/financial.py",
+      "new_path": "src/providers/sina/financial.py",
+      "sha256": "699475f190f9864a5f7edafc23a5a85734f22a299f187a62819b4ebb5cb6e247",
+      "current_sha256": "699475f190f9864a5f7edafc23a5a85734f22a299f187a62819b4ebb5cb6e247"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/sina/minute.py",
+      "new_path": "src/providers/sina/minute.py",
+      "sha256": "62f69b05f5ebfae6fbf7b9cb88146ed204f533d4f63420cc7eff7e1ab6f30407",
+      "current_sha256": "62f69b05f5ebfae6fbf7b9cb88146ed204f533d4f63420cc7eff7e1ab6f30407"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/sina/news.py",
+      "new_path": "src/providers/sina/news.py",
+      "sha256": "0392f60b5a2ab83eaec1b4b05fda39906b7be223b5cc8fc95cb0c814ed63481e",
+      "current_sha256": "0392f60b5a2ab83eaec1b4b05fda39906b7be223b5cc8fc95cb0c814ed63481e"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/sina/snapshot.py",
+      "new_path": "src/providers/sina/snapshot.py",
+      "sha256": "cfa0b823b2fa8053ce899157e9b6078b94516d3fabd5d303480824111f62d136",
+      "current_sha256": "cfa0b823b2fa8053ce899157e9b6078b94516d3fabd5d303480824111f62d136"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/sse/__init__.py",
+      "new_path": "src/providers/sse/__init__.py",
+      "sha256": "f886a28a35e30e8947b4bcdecb36a34f4ecb0148db6c0c8a65463b7e0aaf8434",
+      "current_sha256": "f886a28a35e30e8947b4bcdecb36a34f4ecb0148db6c0c8a65463b7e0aaf8434"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/sse/market.py",
+      "new_path": "src/providers/sse/market.py",
+      "sha256": "472ffdf622937612d9780f2192bf9e3943edd727fc405af0c474bb9e29d08124",
+      "current_sha256": "472ffdf622937612d9780f2192bf9e3943edd727fc405af0c474bb9e29d08124"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/tdx/__init__.py",
+      "new_path": "src/providers/tdx/__init__.py",
+      "sha256": "a3bacd04deeae00fdfd5df0f78c57d51d2aac26b32d76b75d479dc2d3c50aa4b",
+      "current_sha256": "a3bacd04deeae00fdfd5df0f78c57d51d2aac26b32d76b75d479dc2d3c50aa4b"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/tdx/minute.py",
+      "new_path": "src/providers/tdx/minute.py",
+      "sha256": "690b2db863d35e781bdea2451b5732b08a1b54d222a8b126e73091bf5d4930da",
+      "current_sha256": "690b2db863d35e781bdea2451b5732b08a1b54d222a8b126e73091bf5d4930da"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/tencent/__init__.py",
+      "new_path": "src/providers/tencent/__init__.py",
+      "sha256": "80af3d883f2fd4de6167698d5047538c76b78babcf5f7fce809a6e985a0c1b3b",
+      "current_sha256": "80af3d883f2fd4de6167698d5047538c76b78babcf5f7fce809a6e985a0c1b3b"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/tencent/daily.py",
+      "new_path": "src/providers/tencent/daily.py",
+      "sha256": "487a14fcbfc47146d6d5fd291fbf41667aba435e5fed22ea1ef61ded513fcaa7",
+      "current_sha256": "487a14fcbfc47146d6d5fd291fbf41667aba435e5fed22ea1ef61ded513fcaa7"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/tencent/minute.py",
+      "new_path": "src/providers/tencent/minute.py",
+      "sha256": "ff5cf1e91327bcab2e072bcfae9f1f77dca71a84ba26e456c26580a4d59d9cc1",
+      "current_sha256": "ff5cf1e91327bcab2e072bcfae9f1f77dca71a84ba26e456c26580a4d59d9cc1"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/tencent/snapshot.py",
+      "new_path": "src/providers/tencent/snapshot.py",
+      "sha256": "56f37a638ad921cc028da499288e62df403fa70eb25433f3cc11617fd19ce42e",
+      "current_sha256": "56f37a638ad921cc028da499288e62df403fa70eb25433f3cc11617fd19ce42e"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/ths/__init__.py",
+      "new_path": "src/providers/ths/__init__.py",
+      "sha256": "30e7508aa462cbc510c1d9ac99016bc70cb0048f3630251e711b1d7ba17630f6",
+      "current_sha256": "30e7508aa462cbc510c1d9ac99016bc70cb0048f3630251e711b1d7ba17630f6"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/ths/boards.py",
+      "new_path": "src/providers/ths/boards.py",
+      "sha256": "431ed695ad38025e61e322cdc1e358aa8e93b656f02de20dcb4649432ef6e05b",
+      "current_sha256": "431ed695ad38025e61e322cdc1e358aa8e93b656f02de20dcb4649432ef6e05b"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/transport.py",
+      "new_path": "src/providers/transport.py",
+      "sha256": "1e164987c1465e3333f7ff0fe0091a16e62e7e4da0f25ea20beb66600c4ea024",
+      "current_sha256": "1e164987c1465e3333f7ff0fe0091a16e62e7e4da0f25ea20beb66600c4ea024"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/wallstreetcn/__init__.py",
+      "new_path": "src/providers/wallstreetcn/__init__.py",
+      "sha256": "aa623eb9c3094c1c1d27dd0ba39decfcc6d5bc28981c4e711ae65c86f02536cd",
+      "current_sha256": "aa623eb9c3094c1c1d27dd0ba39decfcc6d5bc28981c4e711ae65c86f02536cd"
+    },
+    {
+      "old_path": "src/stock_data_manage/providers/wallstreetcn/news.py",
+      "new_path": "src/providers/wallstreetcn/news.py",
+      "sha256": "fb870197a111ecad42d47e7e81315c7d59c3c6a8bd7cadb72b84cc537bc91fda",
+      "current_sha256": "fb870197a111ecad42d47e7e81315c7d59c3c6a8bd7cadb72b84cc537bc91fda"
+    },
+    {
+      "old_path": "src/stock_data_manage/quality/__init__.py",
+      "new_path": "src/quality/__init__.py",
+      "sha256": "683cb78dbec4394d79bba5f4ee570f35c68eecd9cf11be6d9053b1653aea0f66",
+      "current_sha256": "683cb78dbec4394d79bba5f4ee570f35c68eecd9cf11be6d9053b1653aea0f66"
+    },
+    {
+      "old_path": "src/stock_data_manage/quality/normalization.py",
+      "new_path": "src/quality/normalization.py",
+      "sha256": "3ed0d663b7fda9ac6cdf7f1252435f2351c783af3244ccba2c2b0f3891e29b3e",
+      "current_sha256": "3ed0d663b7fda9ac6cdf7f1252435f2351c783af3244ccba2c2b0f3891e29b3e"
+    },
+    {
+      "old_path": "src/stock_data_manage/quality/publication.py",
+      "new_path": "src/quality/publication.py",
+      "sha256": "59aefe0657bc77ca81230dbe2e61792e5dc6ba93b4dfe0d50513d749b7ca4b2d",
+      "current_sha256": "59aefe0657bc77ca81230dbe2e61792e5dc6ba93b4dfe0d50513d749b7ca4b2d"
+    },
+    {
+      "old_path": "src/stock_data_manage/quality/resolution.py",
+      "new_path": "src/quality/resolution.py",
+      "sha256": "b1b0c1dd6e49ae65a6cea665bea5e001e8e67d2d397e4560b155408684d87b4a",
+      "current_sha256": "b1b0c1dd6e49ae65a6cea665bea5e001e8e67d2d397e4560b155408684d87b4a"
+    },
+    {
+      "old_path": "src/stock_data_manage/quality/validation.py",
+      "new_path": "src/quality/validation.py",
+      "sha256": "199ff62942098b53b813e94a102ec9576e9c8a90f383badadc85b27696df8271",
+      "current_sha256": "199ff62942098b53b813e94a102ec9576e9c8a90f383badadc85b27696df8271"
+    },
+    {
+      "old_path": "src/stock_data_manage/routing/__init__.py",
+      "new_path": "src/routing/__init__.py",
+      "sha256": "e723cb1beca56c155e3d254c7a9d05b9b0b002b497b6cb09f792f1e50a7b1506",
+      "current_sha256": "e723cb1beca56c155e3d254c7a9d05b9b0b002b497b6cb09f792f1e50a7b1506"
+    },
+    {
+      "old_path": "src/stock_data_manage/routing/capabilities.py",
+      "new_path": "src/routing/capabilities.py",
+      "sha256": "9658259b0a584359fe0cafe8570019dd47992c34eae9315d59eb35e13c2137b8",
+      "current_sha256": "9658259b0a584359fe0cafe8570019dd47992c34eae9315d59eb35e13c2137b8"
+    },
+    {
+      "old_path": "src/stock_data_manage/routing/factory.py",
+      "new_path": "src/routing/factory.py",
+      "sha256": "91b80e626acb7779f2836f0486d4918e85956e0bdbb28e1fa4dd2485bb3ec85a",
+      "current_sha256": "91b80e626acb7779f2836f0486d4918e85956e0bdbb28e1fa4dd2485bb3ec85a"
+    },
+    {
+      "old_path": "src/stock_data_manage/routing/retry.py",
+      "new_path": "src/routing/retry.py",
+      "sha256": "09fb704824dae54a12049a75ceb6242a6ec70b3df7ec5af58f512473cea22b78",
+      "current_sha256": "09fb704824dae54a12049a75ceb6242a6ec70b3df7ec5af58f512473cea22b78"
+    },
+    {
+      "old_path": "src/stock_data_manage/routing/router.py",
+      "new_path": "src/routing/router.py",
+      "sha256": "e7dd4d8af3949db9a7c8a783ef9631e8ca63aeacf282bf5dbf865423a7c91302",
+      "current_sha256": "e7dd4d8af3949db9a7c8a783ef9631e8ca63aeacf282bf5dbf865423a7c91302"
+    },
+    {
+      "old_path": "src/stock_data_manage/service/__init__.py",
+      "new_path": "src/service/__init__.py",
+      "sha256": "b8585faa02461732b30aa3e67b4d1de33c5b3becec60e76240f63cb83a4b73d1",
+      "current_sha256": "b8585faa02461732b30aa3e67b4d1de33c5b3becec60e76240f63cb83a4b73d1"
+    },
+    {
+      "old_path": "src/stock_data_manage/service/calendar.py",
+      "new_path": "src/service/calendar.py",
+      "sha256": "36af0f3371ac7dffd7a628b896b72f01bba7424fa3022db51979b2c42417e865",
+      "current_sha256": "36af0f3371ac7dffd7a628b896b72f01bba7424fa3022db51979b2c42417e865"
+    },
+    {
+      "old_path": "src/stock_data_manage/service/calendar_update.py",
+      "new_path": "src/service/calendar_update.py",
+      "sha256": "dcbb2f38b059c2bbc56fa10825c68dd9860c21c4a3206b17749b34b30e97cf1e",
+      "current_sha256": "dcbb2f38b059c2bbc56fa10825c68dd9860c21c4a3206b17749b34b30e97cf1e"
+    },
+    {
+      "old_path": "src/stock_data_manage/service/instruments.py",
+      "new_path": "src/service/instruments.py",
+      "sha256": "902f3ba9c3d61b2810d365412d6a8b4da543de388ab7e034fb416b352cfff570",
+      "current_sha256": "902f3ba9c3d61b2810d365412d6a8b4da543de388ab7e034fb416b352cfff570"
+    },
+    {
+      "old_path": "src/stock_data_manage/service/instruments_update.py",
+      "new_path": "src/service/instruments_update.py",
+      "sha256": "a621d9109cae3eb391072d3a13c83a044b967a70c6aa8a61fc6d083648da7e20",
+      "current_sha256": "a621d9109cae3eb391072d3a13c83a044b967a70c6aa8a61fc6d083648da7e20"
+    },
+    {
+      "old_path": "src/stock_data_manage/service/market_data.py",
+      "new_path": "src/service/market_data.py",
+      "sha256": "d5a31bf9423ae208b9572b834823f0962167001aa359c15fa8ad547b6f2cfe9c",
+      "current_sha256": "d5a31bf9423ae208b9572b834823f0962167001aa359c15fa8ad547b6f2cfe9c"
+    },
+    {
+      "old_path": "src/stock_data_manage/storage/__init__.py",
+      "new_path": "src/storage/__init__.py",
+      "sha256": "4f52ac746c3ddab4e4a2ad31665e6b1a203322a961f183e78f1b93cf4aa7869a",
+      "current_sha256": "4f52ac746c3ddab4e4a2ad31665e6b1a203322a961f183e78f1b93cf4aa7869a"
+    },
+    {
+      "old_path": "src/stock_data_manage/storage/hot.py",
+      "new_path": "src/storage/hot.py",
+      "sha256": "c4a17f64729b166b5b6dca5929ce3317656a473ab327a9785a4b6eb39b520da4",
+      "current_sha256": "c4a17f64729b166b5b6dca5929ce3317656a473ab327a9785a4b6eb39b520da4"
+    },
+    {
+      "old_path": "src/stock_data_manage/storage/integrity.py",
+      "new_path": "src/storage/integrity.py",
+      "sha256": "7260b81081d6502f5a95ea90c2c71f4da7fe1ca46d092850b71a0d3278fc55e7",
+      "current_sha256": "7260b81081d6502f5a95ea90c2c71f4da7fe1ca46d092850b71a0d3278fc55e7"
+    },
+    {
+      "old_path": "src/stock_data_manage/storage/metadata.py",
+      "new_path": "src/storage/metadata.py",
+      "sha256": "d835815edf39919223a445403022790ea06a68290a13ef9038d40769d04d9a23",
+      "current_sha256": "d835815edf39919223a445403022790ea06a68290a13ef9038d40769d04d9a23"
+    },
+    {
+      "old_path": "src/stock_data_manage/storage/parquet.py",
+      "new_path": "src/storage/parquet.py",
+      "sha256": "c21d0e423e645c1d123ad91a64dcca013fbcf87890829c4c78c527d12bb7f1a9",
+      "current_sha256": "c21d0e423e645c1d123ad91a64dcca013fbcf87890829c4c78c527d12bb7f1a9"
+    },
+    {
+      "old_path": "src/stock_data_manage/storage/raw.py",
+      "new_path": "src/storage/raw.py",
+      "sha256": "16e1905b7f84e3fd49c0e38241e90f4b0d42786d92ea93f604c200cfd361bc46",
+      "current_sha256": "16e1905b7f84e3fd49c0e38241e90f4b0d42786d92ea93f604c200cfd361bc46"
+    },
+    {
+      "old_path": "src/stock_data_manage/worker/__init__.py",
+      "new_path": "src/worker/__init__.py",
+      "sha256": "4719505882fe3da8b562fdf4e64aa05be1e68316b1d2cad2e7dbd562799cfb84",
+      "current_sha256": "4719505882fe3da8b562fdf4e64aa05be1e68316b1d2cad2e7dbd562799cfb84"
+    },
+    {
+      "old_path": "src/stock_data_manage/worker/acceptance.py",
+      "new_path": "src/worker/acceptance.py",
+      "sha256": "fc11a26937317c6b2082006fa5c58449add0ad6465b0aa92e3431dccc0b75c4e",
+      "current_sha256": "fc11a26937317c6b2082006fa5c58449add0ad6465b0aa92e3431dccc0b75c4e"
+    },
+    {
+      "old_path": "src/stock_data_manage/worker/attempts.py",
+      "new_path": "src/worker/attempts.py",
+      "sha256": "b163b3d951c47b778188d38c7120e292a5e9f1b3a582b62a7dcac033a645412e",
+      "current_sha256": "b163b3d951c47b778188d38c7120e292a5e9f1b3a582b62a7dcac033a645412e"
+    },
+    {
+      "old_path": "src/stock_data_manage/worker/recovery.py",
+      "new_path": "src/worker/recovery.py",
+      "sha256": "cd1f54d3d00fa261ea72b6b36ae27b12f1e05849909db2e11e5168c9ae0dc308",
+      "current_sha256": "cd1f54d3d00fa261ea72b6b36ae27b12f1e05849909db2e11e5168c9ae0dc308"
+    },
+    {
+      "old_path": "src/stock_data_manage/worker/scheduler.py",
+      "new_path": "src/worker/scheduler.py",
+      "sha256": "f908a4054779f584715078858b3df3c42a75a1c9b206078788307817c4c52b31",
+      "current_sha256": "f908a4054779f584715078858b3df3c42a75a1c9b206078788307817c4c52b31"
+    }
+  ],
+  "tests": {
+    "tests": {
+      "tests": 645,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "provider_validation/results/source-layout-20261005/tests.xml",
+      "sha256": "3e8b8d7f5b9e7e616a5fcb9b52396f9d145212c2403eaa0458d1fe1318dd4719"
+    },
+    "regular-tests": {
+      "tests": 59,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "provider_validation/results/source-layout-20261005/regular-tests.xml",
+      "sha256": "3b39fd79dddc864e99d603d0b29ef6ed4d36f962329da01e960558b0d0e68b5b"
+    },
+    "current-environment-tests": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "provider_validation/results/source-layout-20261005/current-environment-tests.xml",
+      "sha256": "1a3a1e65a441edd71a7412ec7888433c834f2af1d08b33663fa7418fd23a0ef4"
+    }
+  },
+  "verification_script": {
+    "path": "provider_validation/results/source-layout-20261005/verify.py",
+    "sha256": "334c59e9d43b7c27edb32992459e7b0222ee38fc0ac59f18fab056939e3ed231"
+  },
+  "formal_workbook": {
+    "candidate_path": "tmp/source-layout-20261005/源头采集接口说明.xlsx",
+    "sha256": "f39b2736b3ce3d6a9217d09f5a7a02ecf024015616bd05dc633cae171bc85a4a",
+    "published_path": "docs/providers/源头采集接口说明.xlsx",
+    "published_matches_candidate": true,
+    "verification": "provider_validation/results/source-layout-20261005/formal/verification.json"
+  }
+}

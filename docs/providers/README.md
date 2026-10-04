@@ -23,16 +23,19 @@
 | [collection.yaml](../../config/collection.yaml) | 刷新频率、执行日历和调度覆盖配置 |
 | `config/datasets/` | 标准字段、类型、单位和主键 |
 | `config/normalization/` | 每项输入的来源字段映射与转换规则 |
-| [现有输入工厂](../../src/stock_data_manage/routing/factory.py) | 已实现输入与调用方法的绑定 |
+| [现有输入工厂](../../src/routing/factory.py) | 已实现输入与调用方法的绑定 |
 | [Provider 验证目录](../../provider_validation/README.md) | 原始响应、执行报告与原实现对照记录 |
 
 Excel 是派生说明，修改它不会修改采集配置。表内证据、代码和YAML路径以仓库根目录为基准，保存为可检索的文本路径；本文提供主要文件的可点击入口。后续来源选择、回退、质量规则、数据构建、发布和业务查询文档分别归入对应模块目录，本文只记录采集输入及其当前字段映射。
+
+正式源码现已直接位于 `src/`；当前代码入口使用新路径，已归档报告中的 `historical_code_files` 保留报告生成时的路径及哈希。目录迁移不改变原验证范围，也不重新授予生产路由资格。
 
 ## 刷新方法
 
 在仓库根目录使用项目Python环境执行现有报告生成器的正式说明模式：
 
 ```powershell
+python -m pip install -e .
 python provider_validation/tests/build_interface_coverage.py --formal-spec
 ```
 
@@ -44,4 +47,4 @@ node provider_validation/tests/build_interface_coverage_workbook.mjs --formal-sp
 
 两步分别刷新配套JSON和XLSX。它们仅复用已提交审计索引中有哈希关联的成功执行报告，不采集新数据。原测试覆盖报告的默认导出模式及存放位置保持不变；旧证据哈希不匹配时不授予新的验证结论。
 
-本次导出核对记录见 [正式接口说明核对结果](../../provider_validation/results/formal-interface-spec-20261004/verification.json)。
+本次目录迁移后的导出核对记录见 [正式接口说明核对结果](../../provider_validation/results/source-layout-20261005/formal/verification.json)，迁移与安装验证见 [目录整理核对结果](../../provider_validation/results/source-layout-20261005/verification.json)。2026-10-04 的原导出核对记录保留原样。

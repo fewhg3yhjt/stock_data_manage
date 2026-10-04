@@ -1,0 +1,9 @@
+usage: run_baostock_industry_live_probe.py [-h] --date DATE --output OUTPUT
+
+Probe BaoStock's two industry-snapshot queries with persisted SDK-row
+evidence.
+
+options:
+  -h, --help       show this help message and exit
+  --date DATE      Explicit BaoStock snapshot date: YYYY-MM-DD
+  --output OUTPUT  New evidence directory inside the project

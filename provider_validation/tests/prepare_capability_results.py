@@ -18,7 +18,6 @@ OUTPUT = CAPABILITY_DIR / "capability-results-data.json"
 
 def build_input_catalog(output_name="successful-input-capabilities"):
     """Project reviewed contracts onto saved evidence; no provider calls or production writes."""
-    sys.path.insert(0, str(ROOT / "src"))
     from stock_data_manage.config.loader import load_input_capabilities, load_collection_profiles
     from dataclasses import asdict
 

@@ -12,20 +12,30 @@
 
 本文记录当前代码实现与市场数据中心设计文档的对应关系。目录按设计文档第 21 节的模块划分组织，不为新功能额外建立平行实现。
 
+## 当前目录约定
+
+- 正式代码直接位于 `src/`，不再建立 `src/stock_data_manage/` 或 `src/stockdata/`。现有104个源码文件整体迁移，各模块职责不变。
+- `src/__init__.py` 是逻辑包 `stock_data_manage` 的初始化文件，`src/cli.py` 是命令入口。`pyproject.toml` 显式将逻辑包映射到 `src/`，列出当前28个 Python 包；新增含 `__init__.py` 的子包时同步更新该清单。
+- 根目录 `config/` 保存 YAML 参数、调度意图、字段模板和字段映射；`src/config/` 保存配置读取与校验代码。
+- `tests/` 保存实现测试；`provider_validation/` 保存来源可行性验证、原响应与派生证据；`docs/` 保存按职责归档的正式说明。
+- `data/` 为配置指定、按需生成的运行数据目录，目前配置 Raw、Canonical 和 Hot；元数据库仍位于配置指定的 `metadata/metadata.duckdb`。通用输入入口当前只向显式指定的候选输出目录写入，目录整理不代表生产发布已接通。
+- `tmp/` 用于本地临时工作与离线验收，`tmp_test/` 保留历史研究脚本和结果；不删除已有内容，新来源验证归入 `provider_validation/`。
+- 测试、命令及验证脚本在安装当前项目的同一环境中运行，不再通过 `PYTHONPATH=src` 暴露顶层 `providers`、`config` 等包。历史证据中的旧路径及哈希保留原样。
+
 ## 设计模块映射
 
 | 设计模块 | 当前目录 | 职责边界 |
 |---|---|---|
-| 领域模型 | `src/stock_data_manage/domain/` | 数据集、证券类型、状态、标准 Bar 记录和交易时段模型 |
-| 数据源适配器 | `src/stock_data_manage/providers/` | Provider 接口、Fixture/HTTP 适配器、响应契约和能力探针 |
-| 能力路由器 | `src/stock_data_manage/routing/` | 来源能力注册、缺失集合、实时采集计划和重试策略 |
-| 数据质量 | `src/stock_data_manage/quality/` | 标准化、基础校验、冲突解决和发布门槛 |
-| 数据生产与发布 | `src/stock_data_manage/pipeline/` | 日线、分钟、快照、重采样和盘后校准流程 |
-| 数据存储 | `src/stock_data_manage/storage/` | Raw、Hot、Canonical、Metadata 和完整性证据 |
-| 数据访问服务 | `src/stock_data_manage/service/` | Security Master、Trading Calendar 和统一分钟查询 |
-| Worker | `src/stock_data_manage/worker/` | 调度、执行记录、恢复和离线验收 |
+| 领域模型 | `src/domain/` | 数据集、证券类型、状态、标准 Bar 记录和交易时段模型 |
+| 数据源适配器 | `src/providers/` | Provider 接口、Fixture/HTTP 适配器、响应契约和能力探针 |
+| 能力路由器 | `src/routing/` | 来源能力注册、缺失集合、实时采集计划和重试策略 |
+| 数据质量 | `src/quality/` | 标准化、基础校验、冲突解决和发布门槛 |
+| 数据生产与发布 | `src/pipeline/` | 日线、分钟、快照、重采样和盘后校准流程 |
+| 数据存储 | `src/storage/` | Raw、Hot、Canonical、Metadata 和完整性证据 |
+| 数据访问服务 | `src/service/` | Security Master、Trading Calendar 和统一分钟查询 |
+| Worker | `src/worker/` | 调度、执行记录、恢复和离线验收 |
 
-配置文件仍位于仓库根目录的 `config/`：`providers.yaml` 保存来源配置和有证据引用的输入能力契约，`collection.yaml` 保存采集意图与刷新节奏，`capabilities.yaml` 保存路由顺序，`datasets/` 保存数据集标准定义，`normalization/` 保存按数据集拆分的来源归一化规则；命令行入口仍位于 `src/stock_data_manage/cli.py`。
+配置文件仍位于仓库根目录的 `config/`：`providers.yaml` 保存来源配置和有证据引用的输入能力契约，`collection.yaml` 保存采集意图与刷新节奏，`capabilities.yaml` 保存路由顺序，`datasets/` 保存数据集标准定义，`normalization/` 保存按数据集拆分的来源归一化规则；命令行入口仍位于 `src/cli.py`。
 EastMoney 各数据域的范围和实现状态见 `eastmoney-data-domain-coverage.md`，不以单个分红事件 Endpoint 代表整个来源。
 项目当前实现、验证、待实现和明确不做范围见 `PROJECT_PROGRESS.md`。
 

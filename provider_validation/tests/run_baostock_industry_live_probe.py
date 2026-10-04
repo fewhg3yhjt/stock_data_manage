@@ -17,7 +17,6 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "provider_validation" / "tests"))
 
 from raw_response_archive import RawResponseArchive  # noqa: E402

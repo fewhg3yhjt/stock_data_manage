@@ -1,0 +1,62 @@
+usage: replay_input_capabilities.py [-h] --output-root OUTPUT_ROOT
+                                    [--verify-scheduling]
+                                    [--verify-ths-inputs]
+                                    [--verify-bao-inputs]
+                                    [--verify-tencent-snapshot]
+                                    [--verify-em-inputs]
+                                    [--verify-stock-pools]
+                                    [--verify-em-events] [--verify-em-actions]
+                                    [--verify-lpr] [--verify-news]
+                                    [--verify-rates-bonds]
+                                    [--verify-sina-futures]
+                                    [--verify-sdk-news] [--verify-macro]
+                                    [--verify-reports-calendar]
+                                    [--verify-factors]
+                                    [--verify-market-events]
+                                    [--verify-reports-seats]
+                                    [--verify-remaining]
+                                    [--verify-actual-data]
+
+����������������߻ط���ԭʵ�ֱȽ�֤��
+
+options:
+  -h, --help            show this help message and exit
+  --output-root OUTPUT_ROOT
+  --verify-scheduling   also preserve scheduler and quote batch offline
+                        evidence
+  --verify-ths-inputs   verify only the four existing THS board inputs
+  --verify-bao-inputs   verify only the two existing BaoStock snapshot inputs
+  --verify-tencent-snapshot
+                        verify snapshot migration and existing Tencent Kline
+                        inputs
+  --verify-em-inputs    verify only the three existing EastMoney history
+                        inputs
+  --verify-stock-pools  verify four stock pools and the existing THS flow
+                        alias
+  --verify-em-events    verify forecast and survey event inputs
+  --verify-em-actions   verify holder trades, buybacks, pledges and IPO
+                        calendar inputs
+  --verify-lpr          verify the existing source LPR history contract
+  --verify-news         verify WallStreetCN flash news and CCTV day-page index
+  --verify-rates-bonds  verify fixing CSV and convertible-bond list contracts
+  --verify-sina-futures
+                        verify existing Sina futures snapshot, Kline and A50
+                        methods
+  --verify-sdk-news     verify original CLS telegraph and Sina global-news SDK
+                        contracts
+  --verify-macro        verify original monthly PMI and social-financing SDK
+                        inputs
+  --verify-reports-calendar
+                        verify original Sina report-list and WallStreetCN
+                        calendar contracts
+  --verify-factors      verify both original Sina adjustment-factor series
+  --verify-market-events
+                        verify independent EastMoney daily billboard and
+                        market release-window endpoints
+  --verify-reports-seats
+                        verify report lists and independent explicit-date
+                        stock seats
+  --verify-remaining    verify remaining original SDK, package and exchange
+                        input contracts
+  --verify-actual-data  verify source scopes corrected from actual returned
+                        data
