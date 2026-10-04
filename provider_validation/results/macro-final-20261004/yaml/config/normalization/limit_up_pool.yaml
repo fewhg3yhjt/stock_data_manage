@@ -1,0 +1,29 @@
+dataset: limit_up_pool
+rules:
+  - id: eastmoney-limit-up-input-v1
+    input_id: ASTOCK-045
+    provider: eastmoney
+    endpoint: limit_up_pool
+    field_mapping:
+      source_security_code: 代码
+      name: 名称
+      change_pct: 涨跌幅
+      price: 最新价
+      amount: 成交额
+      float_market_cap: 流通市值
+      total_market_cap: 总市值
+      turnover_rate: 换手率
+      limit_capital: 封板资金
+      first_limit_time: 首次封板时间
+      last_limit_time: 最后封板时间
+      broken_count: 炸板次数
+      limit_statistics: 涨停统计
+      consecutive_limit_count: 连板数
+      industry: 所属行业
+    context_fields: {trade_date: trade_date}
+    positive_fields: [price]
+    unverified_fields: [amount, float_market_cap, total_market_cap, limit_capital]
+    status: pending_validation
+    version: eastmoney-limit-up-input-v1
+    evidence_refs: [ASTOCK-045]
+    notes: 保留已验证SDK的列名与解析行为；金额/市值尚未独立核验，标准化输出置空并保留来源值。不能作为涨停原因输入。

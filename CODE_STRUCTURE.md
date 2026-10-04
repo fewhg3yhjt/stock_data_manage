@@ -164,6 +164,9 @@ BaoStock 后续两项转换见 `provider_validation/docs/2026-10-04-baostock-inp
 
 ## 迁移约束
 
+- 原 `providers/eastmoney/financial.py` 增加 PMI 月历史方法与注入 SDK 字段；`providers/mofcom/{__init__,social_financing}.py` 为必要商务部社融适配器，沿用原 SDK/TLS。`config/{datasets,normalization}/{social_financing,pmi_history}.yaml` 定义统计月、来源映射及待认证单位。
+- `pipeline/inputs.py` 扩展宏观来源/解析/月窗口/TLS依赖留证，`providers/transport.py` 仅对社融合同启用空 POST 身份核对；原验证入口增加 `--verify-macro`。`provider_validation/docs/2026-10-04-macro-input-collection.md`、`results/macro-*-20261004*` 保存原脚本对照、失败/语义/会话模拟、实际入口、回归和哈希审计。当前36项候选、28项待转换、7项阻断、3项别名。
+
 - `providers/cls/{__init__,news}.py` 与 `providers/sina/news.py`：必要新闻适配器，沿用原成功 SDK 请求与解析；财联社的回放查询时钟仅用于归档重放。
 - `config/{datasets,normalization}/{cls_telegraph,sina_global_news}.yaml`：两新闻输入的标准字段及来源映射；现有 `providers/transport.py` 显式补原探测主机暂停，默认不影响其他输入，`storage/raw.py` 将 `sign` 纳入脱敏。
 - 原验证入口增加 `--verify-sdk-news`；`provider_validation/docs/2026-10-04-sdk-news-input-collection.md` 和 `results/sdk-news-*-20261004*` 保存修改前快照、原结果对照、异常/暂停/缓存夹具、实际入口、回归及最终哈希审计。当前34项候选、30项待转换、7项阻断、3项别名。

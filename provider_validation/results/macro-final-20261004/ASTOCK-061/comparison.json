@@ -1,0 +1,14 @@
+{
+  "input_id": "ASTOCK-061",
+  "row_count": 136,
+  "mode": "offline_replay",
+  "all_business_fields_equal": true,
+  "all_retained_source_fields_equal": true,
+  "request_comparison_equal": true,
+  "original_csv_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\59_人民银行社融\\data.csv",
+  "original_csv_sha256": "a79d04f3b132be4054869c12185198bb6080158e7d1b88372f5bd1c3cdb917ad",
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\macro-final-20261004\\ASTOCK-061\\original-parsed.json",
+  "original_parsed_sha256": "09fd7c8d1d82de125be207622e40016345a3f506871a564a1af21f9834a25072",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\macro-final-20261004\\ASTOCK-061\\candidate\\ASTOCK-061-2e73bd0d70b2\\2026-10-04\\input_report\\mofcom\\social_financing\\report.json",
+  "report_sha256": "0a97a7f4ee5f8f6918b3ca6fb96f9fa07e915586e9700b79aa0ca22648edae77"
+}

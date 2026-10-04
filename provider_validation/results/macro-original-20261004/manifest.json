@@ -1,0 +1,61 @@
+{
+  "source_code": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+  "source_code_sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0",
+  "probe_code": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+  "probe_code_sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c",
+  "raw_manifest": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+  "raw_manifest_sha256": "885abd6bf1c4b809b9029759f61b75c7d6a297755fd76ca6c545720db38a6767",
+  "base_commit": "aaaabfc1bd29281d670fbaf759f8cb028b070260",
+  "original_files": [
+    {
+      "path": ".gitattributes",
+      "snapshot": "provider_validation/results/macro-original-20261004/1-.gitattributes.bin",
+      "sha256": "9e8c9d15c176a27219982759c4b23179f337ccd025e5a2c1e955776b09a24043"
+    },
+    {
+      "path": "CODE_STRUCTURE.md",
+      "snapshot": "provider_validation/results/macro-original-20261004/2-CODE_STRUCTURE.md.bin",
+      "sha256": "aca00aa7b428c5dedff797b36fba47de0913d53e688c91c786e9c92398d715e7"
+    },
+    {
+      "path": "PROJECT_PROGRESS.md",
+      "snapshot": "provider_validation/results/macro-original-20261004/3-PROJECT_PROGRESS.md.bin",
+      "sha256": "a8fabaae7aebda57befdefc8af68264c28afac03116991e56885e01f87b2fbe0"
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/financial.py",
+      "snapshot": "provider_validation/results/macro-original-20261004/4-financial.py.bin",
+      "sha256": "6a8b8ae6d5740c78a7456697964ec07f3728f870d51f5237d2b409199081971b"
+    },
+    {
+      "path": "src/stock_data_manage/providers/transport.py",
+      "snapshot": "provider_validation/results/macro-original-20261004/5-transport.py.bin",
+      "sha256": "58eeb29069ace26ab1868ada39bea73dd64e0e678163a861c90b904658f6513a"
+    },
+    {
+      "path": "src/stock_data_manage/pipeline/inputs.py",
+      "snapshot": "provider_validation/results/macro-original-20261004/6-inputs.py.bin",
+      "sha256": "4edf6e164f10f6260b2f794dfc35f38130cc12bc6dec1b9ce581fd3e509ea1ee"
+    },
+    {
+      "path": "src/stock_data_manage/routing/factory.py",
+      "snapshot": "provider_validation/results/macro-original-20261004/7-factory.py.bin",
+      "sha256": "1c1907fc47037375b5f2c87316df25b9d399c20c383951311e27c52d587ceefd"
+    },
+    {
+      "path": "config/providers.yaml",
+      "snapshot": "provider_validation/results/macro-original-20261004/8-providers.yaml.bin",
+      "sha256": "525141790ced92c40375dddf4ddf71b34d0a41c37e67be0a103daaf191afb166"
+    },
+    {
+      "path": "tests/test_input_collection.py",
+      "snapshot": "provider_validation/results/macro-original-20261004/9-test_input_collection.py.bin",
+      "sha256": "c2ac41d102c67ebafe8040f34ce69b01c0acbdab6cfb1340d82d07901b0af4ae"
+    },
+    {
+      "path": "provider_validation/tests/replay_input_capabilities.py",
+      "snapshot": "provider_validation/results/macro-original-20261004/10-replay_input_capabilities.py.bin",
+      "sha256": "b8b3c8c61aa19ff96093a5ca16bf006192d641b7f1cd8c78b980809feb95aeb7"
+    }
+  ]
+}

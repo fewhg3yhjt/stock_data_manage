@@ -39,6 +39,7 @@ def build_input_provider(contract, *, providers_path, client=None):
                         "ASTOCK-065": "fetch_lpr_history",
                         "ASTOCK-032": "fetch", "ASTOCK-033": "fetch", "ASTOCK-034": "fetch", "ASTOCK-035": "fetch",
                         "ASTOCK-064": "fetch", "ASTOCK-084": "fetch_convertible_bonds",
+                        "ASTOCK-061": "fetch", "ASTOCK-062": "fetch_pmi",
                         "ASTOCK-074": "fetch_futures", "ASTOCK-075": "fetch_futures_kline", "ASTOCK-076": "fetch_a50",
                         "SDA-BOARD-001": "fetch_industry_list", "SDA-BOARD-002": "fetch_industry_daily",
                         "SDA-BOARD-003": "fetch_fund_flow", "SDA-BOARD-004": "fetch_fund_flow",
@@ -86,6 +87,11 @@ def build_input_provider(contract, *, providers_path, client=None):
     if contract.input_id == "ASTOCK-064":
         from ..providers.chinamoney.rates import ChinamoneyRepoRateProvider
         return ChinamoneyRepoRateProvider()
+    if contract.input_id == "ASTOCK-061":
+        from ..providers.mofcom.social_financing import MofcomSocialFinancingProvider
+        return MofcomSocialFinancingProvider(client=client)
+    if contract.input_id == "ASTOCK-062":
+        return EastMoneyFinancialMainProvider(endpoint=contract.endpoint,client=client,capability_version="eastmoney-pmi-input-v1")
     if contract.input_id == "ASTOCK-084":
         return EastMoneyFinancialMainProvider(endpoint=contract.endpoint, capability_version="eastmoney-cb-input-v1")
     if contract.input_id == "ASTOCK-075":

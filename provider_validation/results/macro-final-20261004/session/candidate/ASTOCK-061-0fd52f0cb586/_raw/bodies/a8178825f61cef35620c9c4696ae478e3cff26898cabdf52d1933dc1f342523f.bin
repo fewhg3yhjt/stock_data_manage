@@ -1,0 +1,58 @@
+def macro_china_shrzgm() -> pd.DataFrame:
+    """
+    商务数据中心-国内贸易-社会融资规模增量统计
+    https://data.mofcom.gov.cn/gnmy/shrzgm.shtml
+    :return: 社会融资规模增量统计
+    :rtype: pandas.DataFrame
+    """
+    session = requests.Session()
+    session.mount(prefix="https://", adapter=TLSAdapter())
+    url = "https://data.mofcom.gov.cn/datamofcom/front/gnmy/shrzgmQuery"
+    r = session.post(url)
+    data_json = r.json()
+    temp_df = pd.DataFrame(data_json)
+    temp_df.columns = [
+        "月份",
+        "其中-未贴现银行承兑汇票",
+        "其中-委托贷款",
+        "其中-委托贷款外币贷款",
+        "其中-人民币贷款",
+        "其中-企业债券",
+        "社会融资规模增量",
+        "其中-非金融企业境内股票融资",
+        "其中-信托贷款",
+    ]
+    temp_df = temp_df[
+        [
+            "月份",
+            "社会融资规模增量",
+            "其中-人民币贷款",
+            "其中-委托贷款外币贷款",
+            "其中-委托贷款",
+            "其中-信托贷款",
+            "其中-未贴现银行承兑汇票",
+            "其中-企业债券",
+            "其中-非金融企业境内股票融资",
+        ]
+    ]
+    temp_df["社会融资规模增量"] = pd.to_numeric(
+        temp_df["社会融资规模增量"], errors="coerce"
+    )
+    temp_df["其中-人民币贷款"] = pd.to_numeric(
+        temp_df["其中-人民币贷款"], errors="coerce"
+    )
+    temp_df["其中-委托贷款外币贷款"] = pd.to_numeric(
+        temp_df["其中-委托贷款外币贷款"], errors="coerce"
+    )
+    temp_df["其中-委托贷款"] = pd.to_numeric(temp_df["其中-委托贷款"], errors="coerce")
+    temp_df["其中-信托贷款"] = pd.to_numeric(temp_df["其中-信托贷款"], errors="coerce")
+    temp_df["其中-未贴现银行承兑汇票"] = pd.to_numeric(
+        temp_df["其中-未贴现银行承兑汇票"], errors="coerce"
+    )
+    temp_df["其中-企业债券"] = pd.to_numeric(temp_df["其中-企业债券"], errors="coerce")
+    temp_df["其中-非金融企业境内股票融资"] = pd.to_numeric(
+        temp_df["其中-非金融企业境内股票融资"], errors="coerce"
+    )
+    temp_df.sort_values(["月份"], inplace=True)
+    temp_df.reset_index(drop=True, inplace=True)
+    return temp_df

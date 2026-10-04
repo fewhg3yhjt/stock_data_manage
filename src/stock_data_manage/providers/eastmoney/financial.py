@@ -44,6 +44,47 @@ class EastMoneyFinancialMainProvider:
     _event_last_call: float = field(default=0.0, init=False, repr=False)
     _event_total: int | None = field(default=None, init=False, repr=False)
     _event_pages: int | None = field(default=None, init=False, repr=False)
+    client: Any | None = field(default=None, repr=False)
+
+    def fetch_pmi(self, *, source_payloads):
+        """Original successful PMI SDK, separate from the legacy financial requests."""
+        from datetime import datetime
+        from ..akshare.session import load_client
+        from ..contracts import InputFetchResult
+        self.client = self.client or load_client()
+        frame = self.client.macro_china_pmi()
+        payloads = list(source_payloads())
+        if len(payloads) != 1:
+            raise RuntimeError("one successful PMI response is required")
+        payload=payloads[0]
+        result=payload.get("result") if isinstance(payload,dict) else None
+        if not isinstance(payload,dict) or payload.get("success") is not True or payload.get("code") != 0 or not isinstance(result,dict):
+            raise RuntimeError("PMI business response changed")
+        items=result.get("data")
+        fields=("REPORT_DATE","TIME","MAKE_INDEX","MAKE_SAME","NMAKE_INDEX","NMAKE_SAME")
+        if not isinstance(items,list) or not items or any(not isinstance(row,dict) or tuple(row)!=fields for row in items):
+            raise RuntimeError("PMI positional source schema changed")
+        if len(items)!=len(frame) or result.get("count")!=len(items) or result.get("pages")!=1:
+            raise RuntimeError("PMI one-page source coverage changed")
+        expected=("月份","制造业-指数","制造业-同比增长","非制造业-指数","非制造业-同比增长")
+        if tuple(frame.columns)!=expected:
+            raise RuntimeError("PMI SDK fields changed")
+        periods=[]
+        for row in items:
+            period=datetime.strptime(row["TIME"],"%Y年%m月份").strftime("%Y-%m")
+            if datetime.strptime(row["REPORT_DATE"],"%Y-%m-%d %H:%M:%S").strftime("%Y-%m")!=period:
+                raise RuntimeError("PMI source period disagrees with reference date")
+            periods.append(period)
+            for key in fields[2:]:
+                value=row[key]
+                if value is not None and (isinstance(value,bool) or not math.isfinite(float(value))):
+                    raise RuntimeError("PMI source number changed")
+        if len(set(periods))!=len(periods):
+            raise RuntimeError("duplicate PMI month")
+        import pandas as pd
+        frame=frame.astype(object).where(pd.notna(frame),None)
+        rows=tuple({**row,"statistical_month":period} for row,period in zip(frame.to_dict(orient="records"),periods))
+        return InputFetchResult(rows,source_rows=tuple(items),source_url=self.url)
 
     def close_event_session(self):
         if self._event_session is not None:

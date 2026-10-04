@@ -1,0 +1,2099 @@
+{
+  "validation_time_utc": "2026-10-04T05:08:50.066543+00:00",
+  "result": "passed",
+  "tests": 472,
+  "counts": {
+    "implemented_validation_only": 36,
+    "unimplemented": 28,
+    "blocked": 7,
+    "alias": 3
+  },
+  "real_network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "audited_reports": [
+    {
+      "path": "provider_validation/results/macro-final-20261004/ASTOCK-061/candidate/ASTOCK-061-2e73bd0d70b2/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "sha256": "0a97a7f4ee5f8f6918b3ca6fb96f9fa07e915586e9700b79aa0ca22648edae77",
+      "status": "candidate_complete",
+      "row_count": 136,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/ASTOCK-062/candidate/ASTOCK-062-a09ff533759e/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "bfd4f317fccf872119e0cfe5e8b46eb49fa2694a14694b541211ad7d52400e64",
+      "status": "candidate_complete",
+      "row_count": 225,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f0/candidate/ASTOCK-061-dcbf5adaec1a/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "sha256": "cf1bbe62712de3610574161ee419e891d97ed831300729558f7d0727a74b1e0a",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f1/candidate/ASTOCK-061-b058cb1bb3d0/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "sha256": "ca7a53f7362a7e2a45373844e74bbb66f156e3e6acde2038bdc74bc526909dbb",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f10/candidate/ASTOCK-062-73dbfa175c7d/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "fc1464decce15547f1fe5002f1a0ed17b53fd402f754de346d45424ec6debf90",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f11/candidate/ASTOCK-062-1fd688447028/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "1f80646f8f39418682ba05be291fb841022c8e49e67705a8a6e14557c0fd0f97",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f12/candidate/ASTOCK-062-73e38633f45f/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "00df5e23579e0efbf1befbcfeca8aed88960caaec42b9b17d5cd542afe1b5785",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f13/candidate/ASTOCK-062-2ceb80818976/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "eb10a8fe9556dcebbfa85dc9ec32c5428047d29dd139c7091569309886d2b37f",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f14/candidate/ASTOCK-062-2a145e3aaa81/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "3b2231056921fb2e94bf8bf927c6e7d23506628947142e87a2fe926d2f4151c0",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f15/candidate/ASTOCK-062-f1f0c0f80b31/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "b5b0be3d25c1a7a6d432c2368656c45ec38f495be4fb879fe55744795d5cb6b1",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f16/candidate/ASTOCK-062-21cc6b6a89f0/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "bae6cdcea8d03f3ecb9ae2f35fad8cf6be778c10507301f5e9036beeb0773a89",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f2/candidate/ASTOCK-061-5df213eb365f/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "sha256": "ab444f376c8aa15e65cd0ecd69d4132ae4fc998bd90e7de4d3242c9ac8e77334",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f3/candidate/ASTOCK-061-181502324b8a/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "sha256": "ac59b59b62bd67b57a55aeb2627ba31d6a458a762f2f35dcc79ce7a139aff218",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f4/candidate/ASTOCK-061-b2c340a6ef86/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "sha256": "8e366b619a40617b1f73f909a8f43fc266de5991938ed5802ce9cb20edfffcbf",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f5/candidate/ASTOCK-061-ea4da007f9a9/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "sha256": "35b1b477f2297a390653ab122e3c4e6391e404b698998c9ab9d1e92aed42087b",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f6/candidate/ASTOCK-061-0ef848f4de15/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "sha256": "31dfc223cd03a8b9b4efa80033326631558d8feae8eacb37766b1fed01306b6b",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f7/candidate/ASTOCK-062-e949b1780992/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "36e4ab7ed596066e558bd0a9fcde770c00cd404cfcbc854f537b87e75aea0e1c",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f8/candidate/ASTOCK-062-89aad8668aeb/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "a4a91fd8bc1d129bfa76c99723fe1569b8b336800ebc7027063195286df70221",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f9/candidate/ASTOCK-062-9b9ca7508657/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "3aacaece9eb908bf3799b1119e09fb15f018862965d031dcf24ff2d29ee785d8",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/nullASTOCK-061/candidate/ASTOCK-061-584f58b162ec/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "sha256": "5b600b6494b5ae947dcf4c05bf58ec878762c68d2f66cec64d69d952d9519162",
+      "status": "candidate_complete",
+      "row_count": 136,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/nullASTOCK-062/candidate/ASTOCK-062-3839c153899c/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "b40b560537064295d3689fa50e6728c5e71a42e3ada6faddf087e9ad4f76373e",
+      "status": "candidate_complete",
+      "row_count": 225,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/post/candidate/ASTOCK-061-6afea657d9aa/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "sha256": "a3e79d444e3558106a00f3680fd7af4ac78043eef355f61d3b4258bfb959f853",
+      "status": "failed-before-request",
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/semantic/candidate/ASTOCK-061-18874969e2e3/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "sha256": "9b8337a999811b188e74dfa58ce633a653c4d39de068a78ebe5e2e40b4ece995",
+      "status": "candidate_complete",
+      "row_count": 136,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/semantic/candidate/ASTOCK-062-0a4c924a1aab/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "46a3fd406a336b2a42fa2a750b54d00c73f93288681dda7e842d2a40986de6a1",
+      "status": "candidate_complete",
+      "row_count": 225,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-061-0fd52f0cb586/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "sha256": "8dbe54fff6016abfdede678c385a64678c2843b3c4be0baab96789e213b33c43",
+      "status": "candidate_complete",
+      "row_count": 136,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-061-1d7a0261dd45/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "sha256": "1bd85cc710ca0c8f25d420470738aa502fcf5de6d377d18e2f9f923352e1e497",
+      "status": "candidate_complete",
+      "row_count": 136,
+      "live_http_calls": 1
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-062-11252bcdae4d/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "de8908b87e7140db05d057b60901e3bc10576584e9cd3997f0117746b6b731bb",
+      "status": "candidate_complete",
+      "row_count": 225,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-062-8c91865712f5/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "35463764620df00a13188b7bf16ca825cd44fa4b09b7d9bb500f862857b6e320",
+      "status": "candidate_complete",
+      "row_count": 225,
+      "live_http_calls": 1
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/candidate/ASTOCK-062-4df33a401557/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "816f8e2221d1bc0c996c8a33242c6e72b6b6ff950ce3ff5f2875d67a62c730ef",
+      "status": "candidate_complete",
+      "row_count": 225,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/macro-cli-20261004/candidate/ASTOCK-061-1bb8f5ce5c0f/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "sha256": "c2ce89a1c56a68c33109e99b69d697a8d1d5c8bd83773bb012e48426f1d9b343",
+      "status": "candidate_complete",
+      "row_count": 136,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/macro-cli-20261004/candidate/ASTOCK-062-fcb2a7535118/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "cb717730ba4baf7780602f6cc0c8808dfa9b90cfe3ed37b46feafdfcbe9dcbb0",
+      "status": "candidate_complete",
+      "row_count": 225,
+      "live_http_calls": 0
+    }
+  ],
+  "files": [
+    {
+      "path": ".gitattributes",
+      "sha256": "eb90cc566abeeebe580ba4152169e18657a6ae55a932e2f15b57dabe5646500c",
+      "bytes": 14189
+    },
+    {
+      "path": "CODE_STRUCTURE.md",
+      "sha256": "5b5535cd5c143f5d49c0a6fd3e1c5253f432dc6c6e430e5b85414bac224d2b40",
+      "bytes": 24951
+    },
+    {
+      "path": "config/datasets/pmi_history.yaml",
+      "sha256": "7c877511d1860472b43ba7be149a009e330462c8198ce3810dce259e71383edf",
+      "bytes": 630
+    },
+    {
+      "path": "config/datasets/social_financing.yaml",
+      "sha256": "c1b1ff0cb118dd094c364b42939034b92aa04f7f77b31f1c477f94a182300cb9",
+      "bytes": 959
+    },
+    {
+      "path": "config/normalization/pmi_history.yaml",
+      "sha256": "5e9e93163114a9e265af1bd2e10dc587835b4745aff844310d273d8d873ebe47",
+      "bytes": 924
+    },
+    {
+      "path": "config/normalization/social_financing.yaml",
+      "sha256": "86b691b8e26d88b42bae76aff769ac01ca33cbf109135f6c75dc00764d7ac59c",
+      "bytes": 1261
+    },
+    {
+      "path": "config/providers.yaml",
+      "sha256": "96770d8d00a4f33a68bd0a0f57a100df5d359d4bb5c035194c5bd5c6248a3bf4",
+      "bytes": 83839
+    },
+    {
+      "path": "PROJECT_PROGRESS.md",
+      "sha256": "9f4cba228a6874e4ec54ee724a6bc9640aece6ee2dc543ad480e2fc5a87747b3",
+      "bytes": 13856
+    },
+    {
+      "path": "provider_validation/docs/2026-10-04-macro-input-collection.md",
+      "sha256": "ca09cc2811ad19f8a7542614a358d394d9507e79923e71d40fb00afb757a46dd",
+      "bytes": 3519
+    },
+    {
+      "path": "provider_validation/results/macro-cli-20261004/ASTOCK-061-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "provider_validation/results/macro-cli-20261004/ASTOCK-061-stdout.json",
+      "sha256": "65842798beb23a4f7d246395b0a4f5eeeec4d0da02effba00d1fe52c61a1cab2",
+      "bytes": 15387
+    },
+    {
+      "path": "provider_validation/results/macro-cli-20261004/ASTOCK-062-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "provider_validation/results/macro-cli-20261004/ASTOCK-062-stdout.json",
+      "sha256": "a39aff303e5612812db9b3a6be922ad4632b843c0ce5c3855aa41b9861a32887",
+      "bytes": 15325
+    },
+    {
+      "path": "provider_validation/results/macro-cli-20261004/candidate/ASTOCK-061-1bb8f5ce5c0f/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "sha256": "c2ce89a1c56a68c33109e99b69d697a8d1d5c8bd83773bb012e48426f1d9b343",
+      "bytes": 12550
+    },
+    {
+      "path": "provider_validation/results/macro-cli-20261004/candidate/ASTOCK-061-1bb8f5ce5c0f/2026-10-04/parsed_rows/mofcom/social_financing/parsed-rows.json",
+      "sha256": "e8e7b9f15d821241564940fb9c339994bd9573254e715d331aba1679b5526606",
+      "bytes": 44002
+    },
+    {
+      "path": "provider_validation/results/macro-cli-20261004/candidate/ASTOCK-061-1bb8f5ce5c0f/2026-10-04/social_financing/mofcom/social_financing/mapped-rows.json",
+      "sha256": "b547f6e14719fc48874e6d3462d71f37344dc45b4fa44c3c05e54aa9b3e3c6cd",
+      "bytes": 42977
+    },
+    {
+      "path": "provider_validation/results/macro-cli-20261004/candidate/ASTOCK-061-1bb8f5ce5c0f/2026-10-04/source_rows/mofcom/social_financing/source-rows.json",
+      "sha256": "27e48d3c5884d79f82b9da0ac1380169d29292191bdb8308bb3b4c263355b153",
+      "bytes": 18844
+    },
+    {
+      "path": "provider_validation/results/macro-cli-20261004/candidate/ASTOCK-061-1bb8f5ce5c0f/_raw/bodies/411c2c89889dcc6643498d215317a93334a97a839b09c11c1b223720c7f8348b.bin",
+      "sha256": "411c2c89889dcc6643498d215317a93334a97a839b09c11c1b223720c7f8348b",
+      "bytes": 18844
+    },
+    {
+      "path": "provider_validation/results/macro-cli-20261004/candidate/ASTOCK-061-1bb8f5ce5c0f/_raw/bodies/a8178825f61cef35620c9c4696ae478e3cff26898cabdf52d1933dc1f342523f.bin",
+      "sha256": "a8178825f61cef35620c9c4696ae478e3cff26898cabdf52d1933dc1f342523f",
+      "bytes": 2360
+    },
+    {
+      "path": "provider_validation/results/macro-cli-20261004/candidate/ASTOCK-061-1bb8f5ce5c0f/_raw/bodies/b3276b0b3c9d4579aa7e2369b2f39a4809f2f7688c20a9243f637a830ae735f0.bin",
+      "sha256": "b3276b0b3c9d4579aa7e2369b2f39a4809f2f7688c20a9243f637a830ae735f0",
+      "bytes": 595
+    },
+    {
+      "path": "provider_validation/results/macro-cli-20261004/candidate/ASTOCK-061-1bb8f5ce5c0f/_raw/manifest.ndjson",
+      "sha256": "89162b434402f57dad2ea3dea25d9b87db097f93528e7dff7fb59dbdc6f4f6f6",
+      "bytes": 1652
+    },
+    {
+      "path": "provider_validation/results/macro-cli-20261004/candidate/ASTOCK-062-fcb2a7535118/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "cb717730ba4baf7780602f6cc0c8808dfa9b90cfe3ed37b46feafdfcbe9dcbb0",
+      "bytes": 12552
+    },
+    {
+      "path": "provider_validation/results/macro-cli-20261004/candidate/ASTOCK-062-fcb2a7535118/2026-10-04/parsed_rows/eastmoney/pmi/parsed-rows.json",
+      "sha256": "844476a29c77a5fa49fa735e9b5c55c53b8fabebaa9109f6a5b567863b2504a9",
+      "bytes": 41659
+    },
+    {
+      "path": "provider_validation/results/macro-cli-20261004/candidate/ASTOCK-062-fcb2a7535118/2026-10-04/pmi_history/eastmoney/pmi/mapped-rows.json",
+      "sha256": "38cc39703a3dd42da39d91fda91a572004c46e63a5bbc4c34d0300c4271542a7",
+      "bytes": 48376
+    },
+    {
+      "path": "provider_validation/results/macro-cli-20261004/candidate/ASTOCK-062-fcb2a7535118/2026-10-04/source_rows/eastmoney/pmi/source-rows.json",
+      "sha256": "da62926e9af832581b5c9163d87a673a1afffff5d35bb9db55b076c18e2e5bf4",
+      "bytes": 32969
+    },
+    {
+      "path": "provider_validation/results/macro-cli-20261004/candidate/ASTOCK-062-fcb2a7535118/_raw/bodies/206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f.bin",
+      "sha256": "206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f",
+      "bytes": 1661
+    },
+    {
+      "path": "provider_validation/results/macro-cli-20261004/candidate/ASTOCK-062-fcb2a7535118/_raw/bodies/6b1c8f1b20e9334d6bb1ba6ecc7f982d3cf0ff18bdb4b0ff3c08db308b6b245b.bin",
+      "sha256": "6b1c8f1b20e9334d6bb1ba6ecc7f982d3cf0ff18bdb4b0ff3c08db308b6b245b",
+      "bytes": 33095
+    },
+    {
+      "path": "provider_validation/results/macro-cli-20261004/candidate/ASTOCK-062-fcb2a7535118/_raw/manifest.ndjson",
+      "sha256": "ca1f96ae2547fa8c248d696a60cc41107283597e736737216d0698d9cba18bfa",
+      "bytes": 2144
+    },
+    {
+      "path": "provider_validation/results/macro-cli-20261004/verification.json",
+      "sha256": "b0fee130a48396a932bd439e1bf936157274d91030648ef1bbb3045d4416b961",
+      "bytes": 2900
+    },
+    {
+      "path": "provider_validation/results/macro-cli-20261004/verify.py",
+      "sha256": "f2e942955d6b787dcb3932bb3105a551bfcef1d80512312c47071040333ffc33",
+      "bytes": 1839
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/ASTOCK-061/candidate/ASTOCK-061-2e73bd0d70b2/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "sha256": "0a97a7f4ee5f8f6918b3ca6fb96f9fa07e915586e9700b79aa0ca22648edae77",
+      "bytes": 12550
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/ASTOCK-061/candidate/ASTOCK-061-2e73bd0d70b2/2026-10-04/parsed_rows/mofcom/social_financing/parsed-rows.json",
+      "sha256": "e8e7b9f15d821241564940fb9c339994bd9573254e715d331aba1679b5526606",
+      "bytes": 44002
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/ASTOCK-061/candidate/ASTOCK-061-2e73bd0d70b2/2026-10-04/social_financing/mofcom/social_financing/mapped-rows.json",
+      "sha256": "b547f6e14719fc48874e6d3462d71f37344dc45b4fa44c3c05e54aa9b3e3c6cd",
+      "bytes": 42977
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/ASTOCK-061/candidate/ASTOCK-061-2e73bd0d70b2/2026-10-04/source_rows/mofcom/social_financing/source-rows.json",
+      "sha256": "27e48d3c5884d79f82b9da0ac1380169d29292191bdb8308bb3b4c263355b153",
+      "bytes": 18844
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/ASTOCK-061/candidate/ASTOCK-061-2e73bd0d70b2/_raw/bodies/411c2c89889dcc6643498d215317a93334a97a839b09c11c1b223720c7f8348b.bin",
+      "sha256": "411c2c89889dcc6643498d215317a93334a97a839b09c11c1b223720c7f8348b",
+      "bytes": 18844
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/ASTOCK-061/candidate/ASTOCK-061-2e73bd0d70b2/_raw/bodies/a8178825f61cef35620c9c4696ae478e3cff26898cabdf52d1933dc1f342523f.bin",
+      "sha256": "a8178825f61cef35620c9c4696ae478e3cff26898cabdf52d1933dc1f342523f",
+      "bytes": 2360
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/ASTOCK-061/candidate/ASTOCK-061-2e73bd0d70b2/_raw/bodies/b3276b0b3c9d4579aa7e2369b2f39a4809f2f7688c20a9243f637a830ae735f0.bin",
+      "sha256": "b3276b0b3c9d4579aa7e2369b2f39a4809f2f7688c20a9243f637a830ae735f0",
+      "bytes": 595
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/ASTOCK-061/candidate/ASTOCK-061-2e73bd0d70b2/_raw/manifest.ndjson",
+      "sha256": "836cd9924e6c8abda511e7b2fa8ef9c30020a614844d4cd07daff381fd56908b",
+      "bytes": 1652
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/ASTOCK-061/comparison.json",
+      "sha256": "7a632787563b2e916885db4b3261385dc75cd0ca6d29e06f4845544fcb4b0178",
+      "bytes": 1053
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/ASTOCK-061/original/bodies/411c2c89889dcc6643498d215317a93334a97a839b09c11c1b223720c7f8348b.bin",
+      "sha256": "411c2c89889dcc6643498d215317a93334a97a839b09c11c1b223720c7f8348b",
+      "bytes": 18844
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/ASTOCK-061/original/manifest.ndjson",
+      "sha256": "47ca13dae6459486b1d45456fc0b321bba039686b9bd4c165bdceb30286a3885",
+      "bytes": 1553
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/ASTOCK-061/original-parsed.json",
+      "sha256": "09fd7c8d1d82de125be207622e40016345a3f506871a564a1af21f9834a25072",
+      "bytes": 49582
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/ASTOCK-062/candidate/ASTOCK-062-a09ff533759e/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "bfd4f317fccf872119e0cfe5e8b46eb49fa2694a14694b541211ad7d52400e64",
+      "bytes": 12552
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/ASTOCK-062/candidate/ASTOCK-062-a09ff533759e/2026-10-04/parsed_rows/eastmoney/pmi/parsed-rows.json",
+      "sha256": "844476a29c77a5fa49fa735e9b5c55c53b8fabebaa9109f6a5b567863b2504a9",
+      "bytes": 41659
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/ASTOCK-062/candidate/ASTOCK-062-a09ff533759e/2026-10-04/pmi_history/eastmoney/pmi/mapped-rows.json",
+      "sha256": "38cc39703a3dd42da39d91fda91a572004c46e63a5bbc4c34d0300c4271542a7",
+      "bytes": 48376
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/ASTOCK-062/candidate/ASTOCK-062-a09ff533759e/2026-10-04/source_rows/eastmoney/pmi/source-rows.json",
+      "sha256": "da62926e9af832581b5c9163d87a673a1afffff5d35bb9db55b076c18e2e5bf4",
+      "bytes": 32969
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/ASTOCK-062/candidate/ASTOCK-062-a09ff533759e/_raw/bodies/206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f.bin",
+      "sha256": "206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f",
+      "bytes": 1661
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/ASTOCK-062/candidate/ASTOCK-062-a09ff533759e/_raw/bodies/6b1c8f1b20e9334d6bb1ba6ecc7f982d3cf0ff18bdb4b0ff3c08db308b6b245b.bin",
+      "sha256": "6b1c8f1b20e9334d6bb1ba6ecc7f982d3cf0ff18bdb4b0ff3c08db308b6b245b",
+      "bytes": 33095
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/ASTOCK-062/candidate/ASTOCK-062-a09ff533759e/_raw/manifest.ndjson",
+      "sha256": "c7481d3cb7afb930ff79a327ae54613f76633efe807b954ac860b804d09856d3",
+      "bytes": 2144
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/ASTOCK-062/comparison.json",
+      "sha256": "6504f6f77f23cb38a171d02376da6f1fb431cc633172315b996880a0080f9178",
+      "bytes": 1028
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/ASTOCK-062/original/bodies/6b1c8f1b20e9334d6bb1ba6ecc7f982d3cf0ff18bdb4b0ff3c08db308b6b245b.bin",
+      "sha256": "6b1c8f1b20e9334d6bb1ba6ecc7f982d3cf0ff18bdb4b0ff3c08db308b6b245b",
+      "bytes": 33095
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/ASTOCK-062/original/manifest.ndjson",
+      "sha256": "97e437bde2cedbf0c46b493495eafdb0877284f8758a0ef1ce1f49b4b82a3b61",
+      "bytes": 2058
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/ASTOCK-062/original-parsed.json",
+      "sha256": "c63e3f06305106b0b19952de42fe093f192027cf1ee7d368c77c4738359af49f",
+      "bytes": 44588
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/comparison.json",
+      "sha256": "d3bacc5aabc04e6c37612e8b4b51bfcf892c16b8993ef8802e7ef7d96c9e9c8c",
+      "bytes": 11757
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f0/candidate/ASTOCK-061-dcbf5adaec1a/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "sha256": "cf1bbe62712de3610574161ee419e891d97ed831300729558f7d0727a74b1e0a",
+      "bytes": 10810
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f0/candidate/ASTOCK-061-dcbf5adaec1a/_raw/bodies/4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945.bin",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f0/candidate/ASTOCK-061-dcbf5adaec1a/_raw/bodies/a8178825f61cef35620c9c4696ae478e3cff26898cabdf52d1933dc1f342523f.bin",
+      "sha256": "a8178825f61cef35620c9c4696ae478e3cff26898cabdf52d1933dc1f342523f",
+      "bytes": 2360
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f0/candidate/ASTOCK-061-dcbf5adaec1a/_raw/bodies/b3276b0b3c9d4579aa7e2369b2f39a4809f2f7688c20a9243f637a830ae735f0.bin",
+      "sha256": "b3276b0b3c9d4579aa7e2369b2f39a4809f2f7688c20a9243f637a830ae735f0",
+      "bytes": 595
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f0/candidate/ASTOCK-061-dcbf5adaec1a/_raw/manifest.ndjson",
+      "sha256": "a76e1c1551e1f7526ab0ef4289294020278939444848ddcc9728d2d390254211",
+      "bytes": 1408
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f0/fixture/bodies/4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945.bin",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f0/fixture/manifest.ndjson",
+      "sha256": "00f4581f1ae3319246f3de5c675b3990ff01952f54524c8ee0466d9bcdd9cd9b",
+      "bytes": 999
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f1/candidate/ASTOCK-061-b058cb1bb3d0/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "sha256": "ca7a53f7362a7e2a45373844e74bbb66f156e3e6acde2038bdc74bc526909dbb",
+      "bytes": 10755
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f1/candidate/ASTOCK-061-b058cb1bb3d0/_raw/bodies/a8178825f61cef35620c9c4696ae478e3cff26898cabdf52d1933dc1f342523f.bin",
+      "sha256": "a8178825f61cef35620c9c4696ae478e3cff26898cabdf52d1933dc1f342523f",
+      "bytes": 2360
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f1/candidate/ASTOCK-061-b058cb1bb3d0/_raw/bodies/b3276b0b3c9d4579aa7e2369b2f39a4809f2f7688c20a9243f637a830ae735f0.bin",
+      "sha256": "b3276b0b3c9d4579aa7e2369b2f39a4809f2f7688c20a9243f637a830ae735f0",
+      "bytes": 595
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f1/candidate/ASTOCK-061-b058cb1bb3d0/_raw/bodies/fe529d92c92a4711fca9c2936730abf1d5a973888b78cb4e63c3b1cf9bc5a572.bin",
+      "sha256": "fe529d92c92a4711fca9c2936730abf1d5a973888b78cb4e63c3b1cf9bc5a572",
+      "bytes": 21275
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f1/candidate/ASTOCK-061-b058cb1bb3d0/_raw/manifest.ndjson",
+      "sha256": "63ece5b08b3708f267bf7c232c2765cbeac63a8019f00007ee48d2d41f646ec6",
+      "bytes": 1412
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f1/fixture/bodies/fe529d92c92a4711fca9c2936730abf1d5a973888b78cb4e63c3b1cf9bc5a572.bin",
+      "sha256": "fe529d92c92a4711fca9c2936730abf1d5a973888b78cb4e63c3b1cf9bc5a572",
+      "bytes": 21275
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f1/fixture/manifest.ndjson",
+      "sha256": "cf882a3fbe954e2e49d14c379739537f526e61d4e6f702f7c749290b46e3dfad",
+      "bytes": 1003
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f10/candidate/ASTOCK-062-73dbfa175c7d/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "fc1464decce15547f1fe5002f1a0ed17b53fd402f754de346d45424ec6debf90",
+      "bytes": 10205
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f10/candidate/ASTOCK-062-73dbfa175c7d/_raw/bodies/206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f.bin",
+      "sha256": "206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f",
+      "bytes": 1661
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f10/candidate/ASTOCK-062-73dbfa175c7d/_raw/bodies/b1b11ab2d0d8749fd15bb2c267b914e5ced456e38d458ac0e9e4d262b98a9e1c.bin",
+      "sha256": "b1b11ab2d0d8749fd15bb2c267b914e5ced456e38d458ac0e9e4d262b98a9e1c",
+      "bytes": 35809
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f10/candidate/ASTOCK-062-73dbfa175c7d/_raw/manifest.ndjson",
+      "sha256": "80e23a43f70e11ceeec98852d557de986513677f1114b55d85173247c375b1b2",
+      "bytes": 1470
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f10/fixture/bodies/b1b11ab2d0d8749fd15bb2c267b914e5ced456e38d458ac0e9e4d262b98a9e1c.bin",
+      "sha256": "b1b11ab2d0d8749fd15bb2c267b914e5ced456e38d458ac0e9e4d262b98a9e1c",
+      "bytes": 35809
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f10/fixture/manifest.ndjson",
+      "sha256": "05fff26f58a62fdccbcefc2430653f0775b4cf90c30c06f657eca4785f73c9f5",
+      "bytes": 1186
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f11/candidate/ASTOCK-062-1fd688447028/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "1f80646f8f39418682ba05be291fb841022c8e49e67705a8a6e14557c0fd0f97",
+      "bytes": 10222
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f11/candidate/ASTOCK-062-1fd688447028/_raw/bodies/206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f.bin",
+      "sha256": "206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f",
+      "bytes": 1661
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f11/candidate/ASTOCK-062-1fd688447028/_raw/bodies/6b82c262d76f29067f87b0c70fea0c92b9681735b7172e387dc573731748362d.bin",
+      "sha256": "6b82c262d76f29067f87b0c70fea0c92b9681735b7172e387dc573731748362d",
+      "bytes": 35800
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f11/candidate/ASTOCK-062-1fd688447028/_raw/manifest.ndjson",
+      "sha256": "e766a7a7299356211226d14b794a8417704220c21e16d55a3da0842c8283ca08",
+      "bytes": 1470
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f11/fixture/bodies/6b82c262d76f29067f87b0c70fea0c92b9681735b7172e387dc573731748362d.bin",
+      "sha256": "6b82c262d76f29067f87b0c70fea0c92b9681735b7172e387dc573731748362d",
+      "bytes": 35800
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f11/fixture/manifest.ndjson",
+      "sha256": "3bad0cfca1f221edcb27a52d1ff29b04a6588987b795beaf96c84f8ea7646920",
+      "bytes": 1186
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f12/candidate/ASTOCK-062-73e38633f45f/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "00df5e23579e0efbf1befbcfeca8aed88960caaec42b9b17d5cd542afe1b5785",
+      "bytes": 10179
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f12/candidate/ASTOCK-062-73e38633f45f/_raw/bodies/206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f.bin",
+      "sha256": "206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f",
+      "bytes": 1661
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f12/candidate/ASTOCK-062-73e38633f45f/_raw/bodies/a3689c4dcbaee2e1ca9c05fe48c177eb88e35d474acc2ac5ab1b26165509e077.bin",
+      "sha256": "a3689c4dcbaee2e1ca9c05fe48c177eb88e35d474acc2ac5ab1b26165509e077",
+      "bytes": 35803
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f12/candidate/ASTOCK-062-73e38633f45f/_raw/manifest.ndjson",
+      "sha256": "d4cfef6bf91c5da7583a6d55b37779a6e824f7cc724f463473c4049afc95677c",
+      "bytes": 1470
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f12/fixture/bodies/a3689c4dcbaee2e1ca9c05fe48c177eb88e35d474acc2ac5ab1b26165509e077.bin",
+      "sha256": "a3689c4dcbaee2e1ca9c05fe48c177eb88e35d474acc2ac5ab1b26165509e077",
+      "bytes": 35803
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f12/fixture/manifest.ndjson",
+      "sha256": "79c5665615f6aabe974faec7437fbf48b18af5a4d6ba54661a0a9994587f7bbc",
+      "bytes": 1186
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f13/candidate/ASTOCK-062-2ceb80818976/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "eb10a8fe9556dcebbfa85dc9ec32c5428047d29dd139c7091569309886d2b37f",
+      "bytes": 10179
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f13/candidate/ASTOCK-062-2ceb80818976/_raw/bodies/206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f.bin",
+      "sha256": "206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f",
+      "bytes": 1661
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f13/candidate/ASTOCK-062-2ceb80818976/_raw/bodies/b05b490c68f3e1d4c65c88e32f71db6f947464a83b57be9d057a7ec07fe3dd85.bin",
+      "sha256": "b05b490c68f3e1d4c65c88e32f71db6f947464a83b57be9d057a7ec07fe3dd85",
+      "bytes": 35808
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f13/candidate/ASTOCK-062-2ceb80818976/_raw/manifest.ndjson",
+      "sha256": "f0faaa252dedd60faca91a3142f2a4923d5ef2b5c9b7917c19968989ee07643e",
+      "bytes": 1470
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f13/fixture/bodies/b05b490c68f3e1d4c65c88e32f71db6f947464a83b57be9d057a7ec07fe3dd85.bin",
+      "sha256": "b05b490c68f3e1d4c65c88e32f71db6f947464a83b57be9d057a7ec07fe3dd85",
+      "bytes": 35808
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f13/fixture/manifest.ndjson",
+      "sha256": "6976ae87edcbb31da02f414166725f5829d65cb1686ff0a1d40c1dfedbb29498",
+      "bytes": 1186
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f14/candidate/ASTOCK-062-2a145e3aaa81/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "3b2231056921fb2e94bf8bf927c6e7d23506628947142e87a2fe926d2f4151c0",
+      "bytes": 10179
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f14/candidate/ASTOCK-062-2a145e3aaa81/_raw/bodies/206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f.bin",
+      "sha256": "206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f",
+      "bytes": 1661
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f14/candidate/ASTOCK-062-2a145e3aaa81/_raw/bodies/43cf7714fd4f8caf42fa72bcf3963b9262d1d6e7004f72391465184d44f0314b.bin",
+      "sha256": "43cf7714fd4f8caf42fa72bcf3963b9262d1d6e7004f72391465184d44f0314b",
+      "bytes": 35809
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f14/candidate/ASTOCK-062-2a145e3aaa81/_raw/manifest.ndjson",
+      "sha256": "e22b0cbab828cdc5d743cfe41f982193327e16b2784918519768e9580c321e9d",
+      "bytes": 1470
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f14/fixture/bodies/43cf7714fd4f8caf42fa72bcf3963b9262d1d6e7004f72391465184d44f0314b.bin",
+      "sha256": "43cf7714fd4f8caf42fa72bcf3963b9262d1d6e7004f72391465184d44f0314b",
+      "bytes": 35809
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f14/fixture/manifest.ndjson",
+      "sha256": "17b2732bdc837f4b41dacaf8379aa6de097595df1ad8acfd90b3bfeff11ff67f",
+      "bytes": 1186
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f15/candidate/ASTOCK-062-f1f0c0f80b31/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "b5b0be3d25c1a7a6d432c2368656c45ec38f495be4fb879fe55744795d5cb6b1",
+      "bytes": 10179
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f15/candidate/ASTOCK-062-f1f0c0f80b31/_raw/bodies/142d35bfaa493a540d8c4ed1652c2fd92130504bfc0cb1325abbf4910387fa78.bin",
+      "sha256": "142d35bfaa493a540d8c4ed1652c2fd92130504bfc0cb1325abbf4910387fa78",
+      "bytes": 35808
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f15/candidate/ASTOCK-062-f1f0c0f80b31/_raw/bodies/206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f.bin",
+      "sha256": "206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f",
+      "bytes": 1661
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f15/candidate/ASTOCK-062-f1f0c0f80b31/_raw/manifest.ndjson",
+      "sha256": "996d548256e882b95d37233b6794fdc925ac716073e15c7af8e08a3cb91555f6",
+      "bytes": 1470
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f15/fixture/bodies/142d35bfaa493a540d8c4ed1652c2fd92130504bfc0cb1325abbf4910387fa78.bin",
+      "sha256": "142d35bfaa493a540d8c4ed1652c2fd92130504bfc0cb1325abbf4910387fa78",
+      "bytes": 35808
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f15/fixture/manifest.ndjson",
+      "sha256": "c062efcaf10a2681c18b189534e715eb85eb835655555dd92fa0eca87978bb2e",
+      "bytes": 1186
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f16/candidate/ASTOCK-062-21cc6b6a89f0/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "bae6cdcea8d03f3ecb9ae2f35fad8cf6be778c10507301f5e9036beeb0773a89",
+      "bytes": 10179
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f16/candidate/ASTOCK-062-21cc6b6a89f0/_raw/bodies/206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f.bin",
+      "sha256": "206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f",
+      "bytes": 1661
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f16/candidate/ASTOCK-062-21cc6b6a89f0/_raw/bodies/dd1830d69d21a3d93ce310de6cc613849b63d2f5b20431cebd186cdb55c2bb61.bin",
+      "sha256": "dd1830d69d21a3d93ce310de6cc613849b63d2f5b20431cebd186cdb55c2bb61",
+      "bytes": 35808
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f16/candidate/ASTOCK-062-21cc6b6a89f0/_raw/manifest.ndjson",
+      "sha256": "6bcff3cdb7d199eb724cd2294733e445a2ae6ced700fba6ea7e4cebb9bec5e31",
+      "bytes": 1470
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f16/fixture/bodies/dd1830d69d21a3d93ce310de6cc613849b63d2f5b20431cebd186cdb55c2bb61.bin",
+      "sha256": "dd1830d69d21a3d93ce310de6cc613849b63d2f5b20431cebd186cdb55c2bb61",
+      "bytes": 35808
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f16/fixture/manifest.ndjson",
+      "sha256": "9a0db02b27a9372eba404ddf4b559c992bd0de4af3ac0b8b0e4eea39de6b69ae",
+      "bytes": 1186
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f2/candidate/ASTOCK-061-5df213eb365f/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "sha256": "ab444f376c8aa15e65cd0ecd69d4132ae4fc998bd90e7de4d3242c9ac8e77334",
+      "bytes": 10755
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f2/candidate/ASTOCK-061-5df213eb365f/_raw/bodies/0916f17ae27ccd9171cf5e35970029885d8a8a5762b23235422fd46f3a4965f5.bin",
+      "sha256": "0916f17ae27ccd9171cf5e35970029885d8a8a5762b23235422fd46f3a4965f5",
+      "bytes": 21291
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f2/candidate/ASTOCK-061-5df213eb365f/_raw/bodies/a8178825f61cef35620c9c4696ae478e3cff26898cabdf52d1933dc1f342523f.bin",
+      "sha256": "a8178825f61cef35620c9c4696ae478e3cff26898cabdf52d1933dc1f342523f",
+      "bytes": 2360
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f2/candidate/ASTOCK-061-5df213eb365f/_raw/bodies/b3276b0b3c9d4579aa7e2369b2f39a4809f2f7688c20a9243f637a830ae735f0.bin",
+      "sha256": "b3276b0b3c9d4579aa7e2369b2f39a4809f2f7688c20a9243f637a830ae735f0",
+      "bytes": 595
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f2/candidate/ASTOCK-061-5df213eb365f/_raw/manifest.ndjson",
+      "sha256": "2d47aa5444cc6942245c7fa7bbe3fefce5b81898e40398b4fe0e3981661ea6cd",
+      "bytes": 1412
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f2/fixture/bodies/0916f17ae27ccd9171cf5e35970029885d8a8a5762b23235422fd46f3a4965f5.bin",
+      "sha256": "0916f17ae27ccd9171cf5e35970029885d8a8a5762b23235422fd46f3a4965f5",
+      "bytes": 21291
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f2/fixture/manifest.ndjson",
+      "sha256": "58d1196fd4779b540683c5d64702b72cc07cfb0280e35ed0e5dc14b71fb04aef",
+      "bytes": 1003
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f3/candidate/ASTOCK-061-181502324b8a/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "sha256": "ac59b59b62bd67b57a55aeb2627ba31d6a458a762f2f35dcc79ce7a139aff218",
+      "bytes": 10781
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f3/candidate/ASTOCK-061-181502324b8a/_raw/bodies/a8178825f61cef35620c9c4696ae478e3cff26898cabdf52d1933dc1f342523f.bin",
+      "sha256": "a8178825f61cef35620c9c4696ae478e3cff26898cabdf52d1933dc1f342523f",
+      "bytes": 2360
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f3/candidate/ASTOCK-061-181502324b8a/_raw/bodies/b3276b0b3c9d4579aa7e2369b2f39a4809f2f7688c20a9243f637a830ae735f0.bin",
+      "sha256": "b3276b0b3c9d4579aa7e2369b2f39a4809f2f7688c20a9243f637a830ae735f0",
+      "bytes": 595
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f3/candidate/ASTOCK-061-181502324b8a/_raw/bodies/cfa35607a898551592f1b7ff88f3db5f6704288a03edac768004824039920fa1.bin",
+      "sha256": "cfa35607a898551592f1b7ff88f3db5f6704288a03edac768004824039920fa1",
+      "bytes": 21292
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f3/candidate/ASTOCK-061-181502324b8a/_raw/manifest.ndjson",
+      "sha256": "985321a5c3ddf60224cc5ff627ebdeb05ec6384add438219161932aeaaaf6315",
+      "bytes": 1412
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f3/fixture/bodies/cfa35607a898551592f1b7ff88f3db5f6704288a03edac768004824039920fa1.bin",
+      "sha256": "cfa35607a898551592f1b7ff88f3db5f6704288a03edac768004824039920fa1",
+      "bytes": 21292
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f3/fixture/manifest.ndjson",
+      "sha256": "58fc756b1b6b5a18b6ebf0f24bce809d9741c7e845641dc6907664077e431068",
+      "bytes": 1003
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f4/candidate/ASTOCK-061-b2c340a6ef86/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "sha256": "8e366b619a40617b1f73f909a8f43fc266de5991938ed5802ce9cb20edfffcbf",
+      "bytes": 10755
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f4/candidate/ASTOCK-061-b2c340a6ef86/_raw/bodies/30623e3ab0011769e3276bf95960bbe40c974bfc8ad12949430abff7cd1cd151.bin",
+      "sha256": "30623e3ab0011769e3276bf95960bbe40c974bfc8ad12949430abff7cd1cd151",
+      "bytes": 21292
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f4/candidate/ASTOCK-061-b2c340a6ef86/_raw/bodies/a8178825f61cef35620c9c4696ae478e3cff26898cabdf52d1933dc1f342523f.bin",
+      "sha256": "a8178825f61cef35620c9c4696ae478e3cff26898cabdf52d1933dc1f342523f",
+      "bytes": 2360
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f4/candidate/ASTOCK-061-b2c340a6ef86/_raw/bodies/b3276b0b3c9d4579aa7e2369b2f39a4809f2f7688c20a9243f637a830ae735f0.bin",
+      "sha256": "b3276b0b3c9d4579aa7e2369b2f39a4809f2f7688c20a9243f637a830ae735f0",
+      "bytes": 595
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f4/candidate/ASTOCK-061-b2c340a6ef86/_raw/manifest.ndjson",
+      "sha256": "213deedc1b2417a11e55bc2b8d4dcc0de7afbae3e757f4d7d0d767f91b65c8fc",
+      "bytes": 1412
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f4/fixture/bodies/30623e3ab0011769e3276bf95960bbe40c974bfc8ad12949430abff7cd1cd151.bin",
+      "sha256": "30623e3ab0011769e3276bf95960bbe40c974bfc8ad12949430abff7cd1cd151",
+      "bytes": 21292
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f4/fixture/manifest.ndjson",
+      "sha256": "ee210b452bb494bf454638c0191b92560132c0dd2d6da520c3e3c913542498d9",
+      "bytes": 1003
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f5/candidate/ASTOCK-061-ea4da007f9a9/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "sha256": "35b1b477f2297a390653ab122e3c4e6391e404b698998c9ab9d1e92aed42087b",
+      "bytes": 10755
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f5/candidate/ASTOCK-061-ea4da007f9a9/_raw/bodies/0f2a17563dc7d4895aaec5383defcb399c166351b9e75487c54f9fdc742fd437.bin",
+      "sha256": "0f2a17563dc7d4895aaec5383defcb399c166351b9e75487c54f9fdc742fd437",
+      "bytes": 21291
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f5/candidate/ASTOCK-061-ea4da007f9a9/_raw/bodies/a8178825f61cef35620c9c4696ae478e3cff26898cabdf52d1933dc1f342523f.bin",
+      "sha256": "a8178825f61cef35620c9c4696ae478e3cff26898cabdf52d1933dc1f342523f",
+      "bytes": 2360
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f5/candidate/ASTOCK-061-ea4da007f9a9/_raw/bodies/b3276b0b3c9d4579aa7e2369b2f39a4809f2f7688c20a9243f637a830ae735f0.bin",
+      "sha256": "b3276b0b3c9d4579aa7e2369b2f39a4809f2f7688c20a9243f637a830ae735f0",
+      "bytes": 595
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f5/candidate/ASTOCK-061-ea4da007f9a9/_raw/manifest.ndjson",
+      "sha256": "34e1fe68f1623a435d10fd865a6878bc244eb610b6d40160c3b3471b1007f20d",
+      "bytes": 1412
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f5/fixture/bodies/0f2a17563dc7d4895aaec5383defcb399c166351b9e75487c54f9fdc742fd437.bin",
+      "sha256": "0f2a17563dc7d4895aaec5383defcb399c166351b9e75487c54f9fdc742fd437",
+      "bytes": 21291
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f5/fixture/manifest.ndjson",
+      "sha256": "e2a84092cd045497ebf2f4542756f36f2ba95fae4f54745ca2bb9e9cb332993a",
+      "bytes": 1003
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f6/candidate/ASTOCK-061-0ef848f4de15/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "sha256": "31dfc223cd03a8b9b4efa80033326631558d8feae8eacb37766b1fed01306b6b",
+      "bytes": 10755
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f6/candidate/ASTOCK-061-0ef848f4de15/_raw/bodies/59a046225161e85ca2a56041237ea86400fdb28b7046a36c247df49efffb0f6d.bin",
+      "sha256": "59a046225161e85ca2a56041237ea86400fdb28b7046a36c247df49efffb0f6d",
+      "bytes": 21291
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f6/candidate/ASTOCK-061-0ef848f4de15/_raw/bodies/a8178825f61cef35620c9c4696ae478e3cff26898cabdf52d1933dc1f342523f.bin",
+      "sha256": "a8178825f61cef35620c9c4696ae478e3cff26898cabdf52d1933dc1f342523f",
+      "bytes": 2360
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f6/candidate/ASTOCK-061-0ef848f4de15/_raw/bodies/b3276b0b3c9d4579aa7e2369b2f39a4809f2f7688c20a9243f637a830ae735f0.bin",
+      "sha256": "b3276b0b3c9d4579aa7e2369b2f39a4809f2f7688c20a9243f637a830ae735f0",
+      "bytes": 595
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f6/candidate/ASTOCK-061-0ef848f4de15/_raw/manifest.ndjson",
+      "sha256": "3dd920ca11a2828a2bdda05a5865749395ffd01d3d321ebe63d23bc33aaa6d01",
+      "bytes": 1412
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f6/fixture/bodies/59a046225161e85ca2a56041237ea86400fdb28b7046a36c247df49efffb0f6d.bin",
+      "sha256": "59a046225161e85ca2a56041237ea86400fdb28b7046a36c247df49efffb0f6d",
+      "bytes": 21291
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f6/fixture/manifest.ndjson",
+      "sha256": "6bbbe6d4d72a1cdb529a3341ae81e01f32985243b37801333c024936b0d5e5d3",
+      "bytes": 1003
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f7/candidate/ASTOCK-062-e949b1780992/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "36e4ab7ed596066e558bd0a9fcde770c00cd404cfcbc854f537b87e75aea0e1c",
+      "bytes": 10235
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f7/candidate/ASTOCK-062-e949b1780992/_raw/bodies/1c38cc068c274fa596f5bc63adf8116bd9a9fbcc82a46dfb8d67db0a8fddf7a7.bin",
+      "sha256": "1c38cc068c274fa596f5bc63adf8116bd9a9fbcc82a46dfb8d67db0a8fddf7a7",
+      "bytes": 142
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f7/candidate/ASTOCK-062-e949b1780992/_raw/bodies/206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f.bin",
+      "sha256": "206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f",
+      "bytes": 1661
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f7/candidate/ASTOCK-062-e949b1780992/_raw/manifest.ndjson",
+      "sha256": "4c52d8696244479bfa58125f1bd5d0fe058cbbce02da26778acdcc96893b7a40",
+      "bytes": 1467
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f7/fixture/bodies/1c38cc068c274fa596f5bc63adf8116bd9a9fbcc82a46dfb8d67db0a8fddf7a7.bin",
+      "sha256": "1c38cc068c274fa596f5bc63adf8116bd9a9fbcc82a46dfb8d67db0a8fddf7a7",
+      "bytes": 142
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f7/fixture/manifest.ndjson",
+      "sha256": "ef0624f5b0c5982f495173d0a580ba2ebf2f7b9215845e129f023807fb4f79bd",
+      "bytes": 1184
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f8/candidate/ASTOCK-062-89aad8668aeb/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "a4a91fd8bc1d129bfa76c99723fe1569b8b336800ebc7027063195286df70221",
+      "bytes": 10178
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f8/candidate/ASTOCK-062-89aad8668aeb/_raw/bodies/14f08256f019ac9387826ef9a8c37dc24be230cbb4640f1b06cae79225470704.bin",
+      "sha256": "14f08256f019ac9387826ef9a8c37dc24be230cbb4640f1b06cae79225470704",
+      "bytes": 35788
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f8/candidate/ASTOCK-062-89aad8668aeb/_raw/bodies/206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f.bin",
+      "sha256": "206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f",
+      "bytes": 1661
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f8/candidate/ASTOCK-062-89aad8668aeb/_raw/manifest.ndjson",
+      "sha256": "bb42c207cf361fea6b8610c8277bec091cc2be7b2e1c08788c07c2536e6e1480",
+      "bytes": 1469
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f8/fixture/bodies/14f08256f019ac9387826ef9a8c37dc24be230cbb4640f1b06cae79225470704.bin",
+      "sha256": "14f08256f019ac9387826ef9a8c37dc24be230cbb4640f1b06cae79225470704",
+      "bytes": 35788
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f8/fixture/manifest.ndjson",
+      "sha256": "a4ea267a6cb220d29fea1733ee0515391bea282831509e0149a1753b271caf14",
+      "bytes": 1186
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f9/candidate/ASTOCK-062-9b9ca7508657/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "3aacaece9eb908bf3799b1119e09fb15f018862965d031dcf24ff2d29ee785d8",
+      "bytes": 10178
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f9/candidate/ASTOCK-062-9b9ca7508657/_raw/bodies/206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f.bin",
+      "sha256": "206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f",
+      "bytes": 1661
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f9/candidate/ASTOCK-062-9b9ca7508657/_raw/bodies/903d6a8d09a87e3fed51e50ba9b48bfaf0ee2f859f43d34edfbff1db1d35724e.bin",
+      "sha256": "903d6a8d09a87e3fed51e50ba9b48bfaf0ee2f859f43d34edfbff1db1d35724e",
+      "bytes": 35808
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f9/candidate/ASTOCK-062-9b9ca7508657/_raw/manifest.ndjson",
+      "sha256": "54b0eaa323139f346f2838bc1f99c69f643d3736e927874c9b090a5e710b4445",
+      "bytes": 1469
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f9/fixture/bodies/903d6a8d09a87e3fed51e50ba9b48bfaf0ee2f859f43d34edfbff1db1d35724e.bin",
+      "sha256": "903d6a8d09a87e3fed51e50ba9b48bfaf0ee2f859f43d34edfbff1db1d35724e",
+      "bytes": 35808
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/f9/fixture/manifest.ndjson",
+      "sha256": "d97e972bc68ac8a23a338950be2c8386c3049ab9d6d970253185378478b53747",
+      "bytes": 1186
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/legacy/legacy-comparison.json",
+      "sha256": "968cc357532c0fdff0d215cd276709bdd143df8350acf4c66b6b8e3ff7074759",
+      "bytes": 164
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/nullASTOCK-061/candidate/ASTOCK-061-584f58b162ec/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "sha256": "5b600b6494b5ae947dcf4c05bf58ec878762c68d2f66cec64d69d952d9519162",
+      "bytes": 12331
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/nullASTOCK-061/candidate/ASTOCK-061-584f58b162ec/2026-10-04/parsed_rows/mofcom/social_financing/parsed-rows.json",
+      "sha256": "4d31fe0e27166052aa616213a0bbae0a305c55f84374645dc45d5f04e1efb1af",
+      "bytes": 44272
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/nullASTOCK-061/candidate/ASTOCK-061-584f58b162ec/2026-10-04/social_financing/mofcom/social_financing/mapped-rows.json",
+      "sha256": "48a5b4b11a5c8d5cad38ce5cd35d530a081902c204137adc01daef6ea8acf683",
+      "bytes": 42977
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/nullASTOCK-061/candidate/ASTOCK-061-584f58b162ec/2026-10-04/source_rows/mofcom/social_financing/source-rows.json",
+      "sha256": "6551006a09f1b16384d125e1645f4adebf7fa74cad4d0e46728ac7626ea5390c",
+      "bytes": 18844
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/nullASTOCK-061/candidate/ASTOCK-061-584f58b162ec/_raw/bodies/4566dd5abfc1ec9f4bc6deebcb091158d3258622998acebcc1180d5a03834949.bin",
+      "sha256": "4566dd5abfc1ec9f4bc6deebcb091158d3258622998acebcc1180d5a03834949",
+      "bytes": 21291
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/nullASTOCK-061/candidate/ASTOCK-061-584f58b162ec/_raw/bodies/a8178825f61cef35620c9c4696ae478e3cff26898cabdf52d1933dc1f342523f.bin",
+      "sha256": "a8178825f61cef35620c9c4696ae478e3cff26898cabdf52d1933dc1f342523f",
+      "bytes": 2360
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/nullASTOCK-061/candidate/ASTOCK-061-584f58b162ec/_raw/bodies/b3276b0b3c9d4579aa7e2369b2f39a4809f2f7688c20a9243f637a830ae735f0.bin",
+      "sha256": "b3276b0b3c9d4579aa7e2369b2f39a4809f2f7688c20a9243f637a830ae735f0",
+      "bytes": 595
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/nullASTOCK-061/candidate/ASTOCK-061-584f58b162ec/_raw/manifest.ndjson",
+      "sha256": "bfe1da946b1b3fb02b20401450580b1724629e5eb9c6433c775c12c3c54cadc2",
+      "bytes": 1424
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/nullASTOCK-061/fixture/bodies/4566dd5abfc1ec9f4bc6deebcb091158d3258622998acebcc1180d5a03834949.bin",
+      "sha256": "4566dd5abfc1ec9f4bc6deebcb091158d3258622998acebcc1180d5a03834949",
+      "bytes": 21291
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/nullASTOCK-061/fixture/manifest.ndjson",
+      "sha256": "c66b9b9c5674616c51c3e63aea52314816608e7f27d0006b8352e4d11a0564c2",
+      "bytes": 1003
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/nullASTOCK-062/candidate/ASTOCK-062-3839c153899c/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "b40b560537064295d3689fa50e6728c5e71a42e3ada6faddf087e9ad4f76373e",
+      "bytes": 11918
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/nullASTOCK-062/candidate/ASTOCK-062-3839c153899c/2026-10-04/parsed_rows/eastmoney/pmi/parsed-rows.json",
+      "sha256": "4e69359d089c1905b9b8215a1c4ba6dc5d4c2ed31a73494b454dbe7530905cbb",
+      "bytes": 41659
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/nullASTOCK-062/candidate/ASTOCK-062-3839c153899c/2026-10-04/pmi_history/eastmoney/pmi/mapped-rows.json",
+      "sha256": "4c2cdbded738a12a2fffec4d57ea0916173713b49692614d0b452dcec2925dba",
+      "bytes": 48376
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/nullASTOCK-062/candidate/ASTOCK-062-3839c153899c/2026-10-04/source_rows/eastmoney/pmi/source-rows.json",
+      "sha256": "061a808b4b067f3996af3e4886d97b4c751c2f65df5779d4cfc2fe99e7c4e75d",
+      "bytes": 32969
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/nullASTOCK-062/candidate/ASTOCK-062-3839c153899c/_raw/bodies/206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f.bin",
+      "sha256": "206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f",
+      "bytes": 1661
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/nullASTOCK-062/candidate/ASTOCK-062-3839c153899c/_raw/bodies/a904530019f44898a9815c49a2967532b3fd6807dfb73b05fff936200e3e5653.bin",
+      "sha256": "a904530019f44898a9815c49a2967532b3fd6807dfb73b05fff936200e3e5653",
+      "bytes": 35808
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/nullASTOCK-062/candidate/ASTOCK-062-3839c153899c/_raw/manifest.ndjson",
+      "sha256": "c50fd5b7988ea02f123f8a5a225f3b23a23c4500ff14ec8a4a9cc2a95b08b4c6",
+      "bytes": 1481
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/nullASTOCK-062/fixture/bodies/a904530019f44898a9815c49a2967532b3fd6807dfb73b05fff936200e3e5653.bin",
+      "sha256": "a904530019f44898a9815c49a2967532b3fd6807dfb73b05fff936200e3e5653",
+      "bytes": 35808
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/nullASTOCK-062/fixture/manifest.ndjson",
+      "sha256": "9f27ea3e24ca7d2e523d598b113c033b77353dc49a6e583fb60e27362f63a3d7",
+      "bytes": 1186
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/post/candidate/ASTOCK-061-6afea657d9aa/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "sha256": "a3e79d444e3558106a00f3680fd7af4ac78043eef355f61d3b4258bfb959f853",
+      "bytes": 9310
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/post/candidate/ASTOCK-061-6afea657d9aa/_raw/bodies/a8178825f61cef35620c9c4696ae478e3cff26898cabdf52d1933dc1f342523f.bin",
+      "sha256": "a8178825f61cef35620c9c4696ae478e3cff26898cabdf52d1933dc1f342523f",
+      "bytes": 2360
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/post/candidate/ASTOCK-061-6afea657d9aa/_raw/bodies/b3276b0b3c9d4579aa7e2369b2f39a4809f2f7688c20a9243f637a830ae735f0.bin",
+      "sha256": "b3276b0b3c9d4579aa7e2369b2f39a4809f2f7688c20a9243f637a830ae735f0",
+      "bytes": 595
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/post/fixture/bodies/59a046225161e85ca2a56041237ea86400fdb28b7046a36c247df49efffb0f6d.bin",
+      "sha256": "59a046225161e85ca2a56041237ea86400fdb28b7046a36c247df49efffb0f6d",
+      "bytes": 21291
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/post/fixture/manifest.ndjson",
+      "sha256": "7c6f2e203ba86f7dd01dfa0d94874549c254345c6ef48361514b5056a034c15d",
+      "bytes": 1003
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/semantic/ASTOCK-061/fixture/bodies/61c0ffd01e31bb31db826599c0f1c33427f27302ccf1fb8a7a43fa1ee8d688f1.bin",
+      "sha256": "61c0ffd01e31bb31db826599c0f1c33427f27302ccf1fb8a7a43fa1ee8d688f1",
+      "bytes": 21285
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/semantic/ASTOCK-061/fixture/manifest.ndjson",
+      "sha256": "dac67c1ff6e42ee78a7264bc6746adb6745e1ee5eeaa171de2dcb030cd44b7f8",
+      "bytes": 1003
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/semantic/ASTOCK-062/fixture/bodies/f71d8506793cb32b31c8122f7617356fc69eb2519d08e70c19c56d73ec3708c1.bin",
+      "sha256": "f71d8506793cb32b31c8122f7617356fc69eb2519d08e70c19c56d73ec3708c1",
+      "bytes": 35803
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/semantic/ASTOCK-062/fixture/manifest.ndjson",
+      "sha256": "49d558155f492d5037331a8fd4a9f10181e8cfc2de5ab125f7acce6ef4c467cb",
+      "bytes": 1186
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/semantic/candidate/ASTOCK-061-18874969e2e3/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "sha256": "9b8337a999811b188e74dfa58ce633a653c4d39de068a78ebe5e2e40b4ece995",
+      "bytes": 12337
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/semantic/candidate/ASTOCK-061-18874969e2e3/2026-10-04/parsed_rows/mofcom/social_financing/parsed-rows.json",
+      "sha256": "6fb7c5bbd5be0426b1ab480ee18efaac4d3a0217bab2328538482dd6a3de7255",
+      "bytes": 43996
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/semantic/candidate/ASTOCK-061-18874969e2e3/2026-10-04/social_financing/mofcom/social_financing/mapped-rows.json",
+      "sha256": "926c600adccfeba3da39a96b797dd841c66d9adaa1cdf325e6732f730a76dc59",
+      "bytes": 42977
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/semantic/candidate/ASTOCK-061-18874969e2e3/2026-10-04/source_rows/mofcom/social_financing/source-rows.json",
+      "sha256": "599b5203539bb1bca2cdcc494f24b83773c506015dcc9826998a73af09141fe8",
+      "bytes": 18838
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/semantic/candidate/ASTOCK-061-18874969e2e3/_raw/bodies/61c0ffd01e31bb31db826599c0f1c33427f27302ccf1fb8a7a43fa1ee8d688f1.bin",
+      "sha256": "61c0ffd01e31bb31db826599c0f1c33427f27302ccf1fb8a7a43fa1ee8d688f1",
+      "bytes": 21285
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/semantic/candidate/ASTOCK-061-18874969e2e3/_raw/bodies/a8178825f61cef35620c9c4696ae478e3cff26898cabdf52d1933dc1f342523f.bin",
+      "sha256": "a8178825f61cef35620c9c4696ae478e3cff26898cabdf52d1933dc1f342523f",
+      "bytes": 2360
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/semantic/candidate/ASTOCK-061-18874969e2e3/_raw/bodies/b3276b0b3c9d4579aa7e2369b2f39a4809f2f7688c20a9243f637a830ae735f0.bin",
+      "sha256": "b3276b0b3c9d4579aa7e2369b2f39a4809f2f7688c20a9243f637a830ae735f0",
+      "bytes": 595
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/semantic/candidate/ASTOCK-061-18874969e2e3/_raw/manifest.ndjson",
+      "sha256": "13e859897bcccec6b97940c44f1912749fb258f9872db80ac6286067ea835736",
+      "bytes": 1430
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/semantic/candidate/ASTOCK-062-0a4c924a1aab/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "46a3fd406a336b2a42fa2a750b54d00c73f93288681dda7e842d2a40986de6a1",
+      "bytes": 11924
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/semantic/candidate/ASTOCK-062-0a4c924a1aab/2026-10-04/parsed_rows/eastmoney/pmi/parsed-rows.json",
+      "sha256": "db6da51ea2689b2fd840c5be101a33817e5d79bd6296319227ec88aba65221f4",
+      "bytes": 41658
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/semantic/candidate/ASTOCK-062-0a4c924a1aab/2026-10-04/pmi_history/eastmoney/pmi/mapped-rows.json",
+      "sha256": "982a929ecde6d700021ffca7e9b791de4f05cfde86c040ba9968fedbd753eb61",
+      "bytes": 48376
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/semantic/candidate/ASTOCK-062-0a4c924a1aab/2026-10-04/source_rows/eastmoney/pmi/source-rows.json",
+      "sha256": "9af14f368427b7bff8c718dbe6ff4f24fed1d5342767f878cc4deb90d9e69197",
+      "bytes": 32964
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/semantic/candidate/ASTOCK-062-0a4c924a1aab/_raw/bodies/206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f.bin",
+      "sha256": "206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f",
+      "bytes": 1661
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/semantic/candidate/ASTOCK-062-0a4c924a1aab/_raw/bodies/f71d8506793cb32b31c8122f7617356fc69eb2519d08e70c19c56d73ec3708c1.bin",
+      "sha256": "f71d8506793cb32b31c8122f7617356fc69eb2519d08e70c19c56d73ec3708c1",
+      "bytes": 35803
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/semantic/candidate/ASTOCK-062-0a4c924a1aab/_raw/manifest.ndjson",
+      "sha256": "d075017d8d1b71f6c5846e7255819872e745017787a766b6cbeed452f486fd86",
+      "bytes": 1487
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-061-0fd52f0cb586/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "sha256": "8dbe54fff6016abfdede678c385a64678c2843b3c4be0baab96789e213b33c43",
+      "bytes": 12422
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-061-0fd52f0cb586/2026-10-04/parsed_rows/mofcom/social_financing/parsed-rows.json",
+      "sha256": "e8e7b9f15d821241564940fb9c339994bd9573254e715d331aba1679b5526606",
+      "bytes": 44002
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-061-0fd52f0cb586/2026-10-04/social_financing/mofcom/social_financing/mapped-rows.json",
+      "sha256": "334cdbf9b09adbb54ac2ac2ddd034adf7e1def7dbea3f54ce0004691b022ef9a",
+      "bytes": 42977
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-061-0fd52f0cb586/2026-10-04/source_rows/mofcom/social_financing/source-rows.json",
+      "sha256": "27e48d3c5884d79f82b9da0ac1380169d29292191bdb8308bb3b4c263355b153",
+      "bytes": 18844
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-061-0fd52f0cb586/_raw/bodies/411c2c89889dcc6643498d215317a93334a97a839b09c11c1b223720c7f8348b.bin",
+      "sha256": "411c2c89889dcc6643498d215317a93334a97a839b09c11c1b223720c7f8348b",
+      "bytes": 18844
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-061-0fd52f0cb586/_raw/bodies/a8178825f61cef35620c9c4696ae478e3cff26898cabdf52d1933dc1f342523f.bin",
+      "sha256": "a8178825f61cef35620c9c4696ae478e3cff26898cabdf52d1933dc1f342523f",
+      "bytes": 2360
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-061-0fd52f0cb586/_raw/bodies/b3276b0b3c9d4579aa7e2369b2f39a4809f2f7688c20a9243f637a830ae735f0.bin",
+      "sha256": "b3276b0b3c9d4579aa7e2369b2f39a4809f2f7688c20a9243f637a830ae735f0",
+      "bytes": 595
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-061-0fd52f0cb586/_raw/manifest.ndjson",
+      "sha256": "5b137618ae53a1915e6149dbb1718b9fd5ab8b9f30547fa0bc1f20485179e745",
+      "bytes": 1517
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-061-1d7a0261dd45/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "sha256": "1bd85cc710ca0c8f25d420470738aa502fcf5de6d377d18e2f9f923352e1e497",
+      "bytes": 12116
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-061-1d7a0261dd45/2026-10-04/parsed_rows/mofcom/social_financing/parsed-rows.json",
+      "sha256": "e8e7b9f15d821241564940fb9c339994bd9573254e715d331aba1679b5526606",
+      "bytes": 44002
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-061-1d7a0261dd45/2026-10-04/social_financing/mofcom/social_financing/mapped-rows.json",
+      "sha256": "334cdbf9b09adbb54ac2ac2ddd034adf7e1def7dbea3f54ce0004691b022ef9a",
+      "bytes": 42977
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-061-1d7a0261dd45/2026-10-04/source_rows/mofcom/social_financing/source-rows.json",
+      "sha256": "27e48d3c5884d79f82b9da0ac1380169d29292191bdb8308bb3b4c263355b153",
+      "bytes": 18844
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-061-1d7a0261dd45/_raw/bodies/411c2c89889dcc6643498d215317a93334a97a839b09c11c1b223720c7f8348b.bin",
+      "sha256": "411c2c89889dcc6643498d215317a93334a97a839b09c11c1b223720c7f8348b",
+      "bytes": 18844
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-061-1d7a0261dd45/_raw/bodies/a8178825f61cef35620c9c4696ae478e3cff26898cabdf52d1933dc1f342523f.bin",
+      "sha256": "a8178825f61cef35620c9c4696ae478e3cff26898cabdf52d1933dc1f342523f",
+      "bytes": 2360
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-061-1d7a0261dd45/_raw/bodies/b3276b0b3c9d4579aa7e2369b2f39a4809f2f7688c20a9243f637a830ae735f0.bin",
+      "sha256": "b3276b0b3c9d4579aa7e2369b2f39a4809f2f7688c20a9243f637a830ae735f0",
+      "bytes": 595
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-061-1d7a0261dd45/_raw/manifest.ndjson",
+      "sha256": "e8f2e8128ba08e1b40c52f1f36c1edf00e8d842292a3ade4bd997817a0c5d790",
+      "bytes": 1206
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-062-11252bcdae4d/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "de8908b87e7140db05d057b60901e3bc10576584e9cd3997f0117746b6b731bb",
+      "bytes": 12009
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-062-11252bcdae4d/2026-10-04/parsed_rows/eastmoney/pmi/parsed-rows.json",
+      "sha256": "844476a29c77a5fa49fa735e9b5c55c53b8fabebaa9109f6a5b567863b2504a9",
+      "bytes": 41659
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-062-11252bcdae4d/2026-10-04/pmi_history/eastmoney/pmi/mapped-rows.json",
+      "sha256": "fc20a393b700d1f500ce97eea163431bebf18c8b82d8b0a683887c80938eb1ec",
+      "bytes": 48376
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-062-11252bcdae4d/2026-10-04/source_rows/eastmoney/pmi/source-rows.json",
+      "sha256": "da62926e9af832581b5c9163d87a673a1afffff5d35bb9db55b076c18e2e5bf4",
+      "bytes": 32969
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-062-11252bcdae4d/_raw/bodies/206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f.bin",
+      "sha256": "206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f",
+      "bytes": 1661
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-062-11252bcdae4d/_raw/bodies/6b1c8f1b20e9334d6bb1ba6ecc7f982d3cf0ff18bdb4b0ff3c08db308b6b245b.bin",
+      "sha256": "6b1c8f1b20e9334d6bb1ba6ecc7f982d3cf0ff18bdb4b0ff3c08db308b6b245b",
+      "bytes": 33095
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-062-11252bcdae4d/_raw/manifest.ndjson",
+      "sha256": "cbdc936493783d75fa9c1eb339e16af6ce200cd4f7e30ef77e494c807f4d2bbb",
+      "bytes": 1574
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-062-8c91865712f5/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "35463764620df00a13188b7bf16ca825cd44fa4b09b7d9bb500f862857b6e320",
+      "bytes": 11703
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-062-8c91865712f5/2026-10-04/parsed_rows/eastmoney/pmi/parsed-rows.json",
+      "sha256": "844476a29c77a5fa49fa735e9b5c55c53b8fabebaa9109f6a5b567863b2504a9",
+      "bytes": 41659
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-062-8c91865712f5/2026-10-04/pmi_history/eastmoney/pmi/mapped-rows.json",
+      "sha256": "fc20a393b700d1f500ce97eea163431bebf18c8b82d8b0a683887c80938eb1ec",
+      "bytes": 48376
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-062-8c91865712f5/2026-10-04/source_rows/eastmoney/pmi/source-rows.json",
+      "sha256": "da62926e9af832581b5c9163d87a673a1afffff5d35bb9db55b076c18e2e5bf4",
+      "bytes": 32969
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-062-8c91865712f5/_raw/bodies/206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f.bin",
+      "sha256": "206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f",
+      "bytes": 1661
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-062-8c91865712f5/_raw/bodies/6b1c8f1b20e9334d6bb1ba6ecc7f982d3cf0ff18bdb4b0ff3c08db308b6b245b.bin",
+      "sha256": "6b1c8f1b20e9334d6bb1ba6ecc7f982d3cf0ff18bdb4b0ff3c08db308b6b245b",
+      "bytes": 33095
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/candidate/ASTOCK-062-8c91865712f5/_raw/manifest.ndjson",
+      "sha256": "19244028f54db81c7a8cde57455029dabe9b5092d938a160796a3ebb92751b44",
+      "bytes": 1263
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/session/fixture-mode.json",
+      "sha256": "c75a9122cfe125d2b22f4fba82e302f84e81613d35a56dc81cc635dd835b8966",
+      "bytes": 104
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/verify.py",
+      "sha256": "580152fc44aa64e7dcc9d9eb2580b0db25840a7e001f7bfb9acd481339bacbf0",
+      "bytes": 9248
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/candidate/ASTOCK-062-4df33a401557/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "sha256": "816f8e2221d1bc0c996c8a33242c6e72b6b6ff950ce3ff5f2875d67a62c730ef",
+      "bytes": 12389
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/candidate/ASTOCK-062-4df33a401557/2026-10-04/parsed_rows/eastmoney/pmi/parsed-rows.json",
+      "sha256": "844476a29c77a5fa49fa735e9b5c55c53b8fabebaa9109f6a5b567863b2504a9",
+      "bytes": 41659
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/candidate/ASTOCK-062-4df33a401557/2026-10-04/pmi_history/eastmoney/pmi/mapped-rows.json",
+      "sha256": "76cbe5ddd737ffda1562c8d087971e05d0109a86a33964e82d3d507bb5c7ad7f",
+      "bytes": 20026
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/candidate/ASTOCK-062-4df33a401557/2026-10-04/source_rows/eastmoney/pmi/source-rows.json",
+      "sha256": "da62926e9af832581b5c9163d87a673a1afffff5d35bb9db55b076c18e2e5bf4",
+      "bytes": 32969
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/candidate/ASTOCK-062-4df33a401557/_raw/bodies/206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f.bin",
+      "sha256": "206a68e96e782bf7e6042128ba4078dee632ea2d07661279239306d3c44a9d5f",
+      "bytes": 1661
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/candidate/ASTOCK-062-4df33a401557/_raw/bodies/6b1c8f1b20e9334d6bb1ba6ecc7f982d3cf0ff18bdb4b0ff3c08db308b6b245b.bin",
+      "sha256": "6b1c8f1b20e9334d6bb1ba6ecc7f982d3cf0ff18bdb4b0ff3c08db308b6b245b",
+      "bytes": 33095
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/candidate/ASTOCK-062-4df33a401557/_raw/manifest.ndjson",
+      "sha256": "80fd78530298a4a11ffc3cbeeb182716fbafd1815624636bf2699cbf4a1a4e73",
+      "bytes": 2144
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/capabilities.yaml",
+      "sha256": "7b7ce0da1d33b333165c6081a3ed788f85cb05d5f6945c745eec97d73e24f6e2",
+      "bytes": 4009
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/collection.yaml",
+      "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d",
+      "bytes": 2934
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/a50_quote.yaml",
+      "sha256": "d9b990dfe46e7b500890da82723dee287c4e2be29e009ab91ceadd8099a02fd2",
+      "bytes": 907
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/board_fund_flow.yaml",
+      "sha256": "08f3566d0cf2787186e6106e4915d0d89b70232d737898480eda03785ea3c53a",
+      "bytes": 1110
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/broken_limit_pool.yaml",
+      "sha256": "60b3790eae896c968093c8d26a818c9dab325aca620510b4ec1dde061af7f65e",
+      "bytes": 1162
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/buyback.yaml",
+      "sha256": "807490acc8affc7dde3502ef62c2b80ad32923fe4c5ff6a6b4fd9d403b50d4f6",
+      "bytes": 1439
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/cctv_news_index.yaml",
+      "sha256": "a876cfcb7dfa79b79423cb3ae8044dab1bb43515f12fc090158228dbf95b6d33",
+      "bytes": 317
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/cls_telegraph.yaml",
+      "sha256": "80c414933f4ee26e2475403ceda50fc2f2b98141c18d0fd0c3f719dae3572f02",
+      "bytes": 331
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/concept_board.yaml",
+      "sha256": "eef0b07c9a41bfd5ef1a52f4f39516cb26d42b088d63a15783af0f94985fd76f",
+      "bytes": 379
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/convertible_bonds.yaml",
+      "sha256": "11723522544165617f1141aa08921252ca99447eba5cf507c574a887dd6748b9",
+      "bytes": 1362
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/daily_bar.yaml",
+      "sha256": "0a8c1dcae7e1c062ae70c224defc1362adc1d58bc196bbeb2f1edd61d6fd39e7",
+      "bytes": 995
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/dividend_event.yaml",
+      "sha256": "67a2b02063cb9a891e3fb388048407cbc08b05ce8ae97deea6976d3904340d2e",
+      "bytes": 759
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/earnings_forecast.yaml",
+      "sha256": "ded845c047fcefdbeb163f27620d4e67f2bc78e62a0bcfea5678d6df8758f8fd",
+      "bytes": 1060
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/financial_main.yaml",
+      "sha256": "23d8b55356620439d5c1b507601b782b31aa965fe24eaf194e869466bb271ab0",
+      "bytes": 766
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/futures_daily.yaml",
+      "sha256": "3c923f6d637e1409ec1be5733897ba267a8025169b36b6874aefd0b8181834d5",
+      "bytes": 938
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/futures_quote.yaml",
+      "sha256": "0fb3866f0cdfacfe6fe9dbe7d5396947b16514751639275db40352ff5655a33b",
+      "bytes": 1557
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/holder_trades.yaml",
+      "sha256": "44b0ecfc09c6e39823c50e83077354f25bc8026fc70272d92046ba3a51d09b92",
+      "bytes": 1246
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/industry_board.yaml",
+      "sha256": "c6930c70b55e171dee94b74b80f3c37df1466d4a10dadc3016975004b8b47ba4",
+      "bytes": 380
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/industry_directory.yaml",
+      "sha256": "9325d485bf7a1bc2b075c2d920b43b17caa039916536bedd8163be0f972bfe5b",
+      "bytes": 346
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/industry_index_daily.yaml",
+      "sha256": "5d542c72443410747f2ac643589bfd8160cdea07d01d6d0dd9c5e4753096043b",
+      "bytes": 676
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/industry_membership.yaml",
+      "sha256": "dff512c9b7f00330bbe408ba1e1eb74d99b49bc0b38ee419d4c463047c6fe69d",
+      "bytes": 709
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/institution_survey.yaml",
+      "sha256": "470fd4503d45cf0839e887fd276a0c3c82cdcae7cae8f52001006464c212733e",
+      "bytes": 703
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/intraday_trend.yaml",
+      "sha256": "5983e0eb29c1cd7a781fbad0be7332dda14e887ccd744e55ad4b8664c7a0c38a",
+      "bytes": 665
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/ipo_calendar.yaml",
+      "sha256": "7579b9174fd3554a92bc50865cabe7ac20604579403f748d09bcd4e8760bcac9",
+      "bytes": 1331
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/limit_down_pool.yaml",
+      "sha256": "67b3ca1ae9edf0f863d2b2d5257a315fe721f042086d4b5966653c0f2758d806",
+      "bytes": 1177
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/limit_up_pool.yaml",
+      "sha256": "73c1fa4ed6d7281d1857208a2ec9696a3637214bb256661ce943313c75772a69",
+      "bytes": 982
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/lpr_history.yaml",
+      "sha256": "b40bb3000aa8db8b84aeaad6383c3dd7da1afb3c3bfb6ed6fc69343476ca7650",
+      "bytes": 330
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/minute_bar_5m.yaml",
+      "sha256": "fb6f822ed42479422a0b4c227577d8e559bb6b2238562af566af0464304bd873",
+      "bytes": 708
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/pledge.yaml",
+      "sha256": "40b46e96e55d8b1061c98ec979094b4f98ef4800e513cfa7a9c2c5f2152b2fb1",
+      "bytes": 878
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/pmi_history.yaml",
+      "sha256": "7c877511d1860472b43ba7be149a009e330462c8198ce3810dce259e71383edf",
+      "bytes": 630
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/previous_limit_pool.yaml",
+      "sha256": "5234397a7b87ed3e03c11431de1f00c012e135ba5ef57bf63a2f431f659703bc",
+      "bytes": 1199
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/realtime_quote.yaml",
+      "sha256": "ebc3e97bb7469eb4c7c80daf50991ebe38f0eb5b2476a9a579d22236d416378b",
+      "bytes": 1121
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/repo_fixing.yaml",
+      "sha256": "6908c6c805e15a153dc567d58c81daecb66026bdd0f48d8865e296a1ba883935",
+      "bytes": 506
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/security_snapshot.yaml",
+      "sha256": "255115893f64837a3b95ea9fe44551948eefa9604aca9d59214de87a580300be",
+      "bytes": 519
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/shareholder_count.yaml",
+      "sha256": "d325df1784c873bea73a1d907e9964e06c26e4d6b356dd6c16148837b57feccf",
+      "bytes": 923
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/sina_global_news.yaml",
+      "sha256": "688eeb3b698bb8fdb3fb33bc296869b6caca47bd9ff427a97ae989f74c595350",
+      "bytes": 297
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/social_financing.yaml",
+      "sha256": "c1b1ff0cb118dd094c364b42939034b92aa04f7f77b31f1c477f94a182300cb9",
+      "bytes": 959
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/stock_fund_flow.yaml",
+      "sha256": "df3f21341463f3538a1f855ef19b7bbdb683405aaa65d5418c255023c18a429f",
+      "bytes": 736
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/strong_stock_pool.yaml",
+      "sha256": "264c9d759405d37733cf4daf29996240cb46fed46c3eb8835405a4311e1c1131",
+      "bytes": 1194
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/trading_calendar.yaml",
+      "sha256": "924b17a5be104252e85a377e4579432c6725bab99cbaa0ad70e71102149a1f49",
+      "bytes": 192
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets/wallstreetcn_news.yaml",
+      "sha256": "1bdecf169c6ea357cbb53787bd0a9a659d1f4a96e77e42996556b55df97bbd49",
+      "bytes": 534
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/datasets.yaml",
+      "sha256": "e992d13297e1f9a8f64acabc25f65f138b21ce12dca16689cc3f17bf1385a6eb",
+      "bytes": 587
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/a50_quote.yaml",
+      "sha256": "c984450a923a5655cdd60e1e35a9c8981fca80f9c4f996f5dcce790f10f08b9f",
+      "bytes": 886
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/board_fund_flow.yaml",
+      "sha256": "fb7c6f1f2d425181b189e25152e465306982e10c7c6ee06b2917dfa00b891baa",
+      "bytes": 1395
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/broken_limit_pool.yaml",
+      "sha256": "8bd046757fc9fb3e7d144a0e9d41106267e828a60bc5a099280158c15459a84d",
+      "bytes": 1238
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/buyback.yaml",
+      "sha256": "70e6ee88258842e76509208c6d9df379478df717837489869ff1e9f72f82d1b3",
+      "bytes": 2520
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/cctv_news_index.yaml",
+      "sha256": "4de0d3f1b61694e5c6ab7450a38a7c85f583fadd64d48e52bd737545eb04e42b",
+      "bytes": 573
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/cls_telegraph.yaml",
+      "sha256": "7c64e6a2aad86a294ea4da3e99239fdadbef2f48c9cc40bcfd4685aaf753c372",
+      "bytes": 661
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/concept_board.yaml",
+      "sha256": "2b7e7f57d189541d6a232cd5391d2dab4289f9f3438f397d9fefd82bb1d996b7",
+      "bytes": 206
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/convertible_bonds.yaml",
+      "sha256": "147b800777f7042f9e4a7907841e038034db65a80f263fcb04628ea34943dd56",
+      "bytes": 1289
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/daily_bar.yaml",
+      "sha256": "41f9bbd0824e20d70f7ed276758b286094c33c79180befca4d8985afc3c8ad0b",
+      "bytes": 2913
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/dividend_event.yaml",
+      "sha256": "188df2f7f075b92e993136aef3f977eea419f9c6957404bd2f7071c76ed24a71",
+      "bytes": 1532
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/earnings_forecast.yaml",
+      "sha256": "5b323a3c3c6577527701985248bb13b54102463a167ba04c749f4908e2b401c4",
+      "bytes": 1633
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/financial_main.yaml",
+      "sha256": "eeeb2e7418aab430168f0c7e16c69f1b24a9e49ec8d156a28390cae0e7a69bda",
+      "bytes": 603
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/futures_daily.yaml",
+      "sha256": "94760152dd79821d2ed775f64924d84546e85194c44b3baa782b113a040f659b",
+      "bytes": 858
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/futures_quote.yaml",
+      "sha256": "21ef8cc411dc481644a1529846814a29aef0f86c38aa86fede5da7ebb52a1c8f",
+      "bytes": 1204
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/holder_trades.yaml",
+      "sha256": "2deca39ea7c1a57254b4ee31390587f39d640559181cd1ceae7968a4684e5f40",
+      "bytes": 1959
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/industry_board.yaml",
+      "sha256": "f3ff8bbe7fc4e8d4e5af1c36b9312e8db1c8c9cb09a09aadb472b22ae09de152",
+      "bytes": 210
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/industry_directory.yaml",
+      "sha256": "823d97db8afe4adb3f963faaa04b42b8f151e93f2e75f3eb18f8c678a68bae37",
+      "bytes": 478
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/industry_index_daily.yaml",
+      "sha256": "953087294fd2c3a3cb1b46f204d0a0f606f9060f0f89676fb3a189222a68dab1",
+      "bytes": 805
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/industry_membership.yaml",
+      "sha256": "7eb72a1b8ce7aff27aa1ad62534af2bf7183f3d78c6392208035396a11e21ccb",
+      "bytes": 765
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/institution_survey.yaml",
+      "sha256": "e33c639f75da6a7a1d699936d0624084ed3488ef773aa9fcf3eaefc66e829423",
+      "bytes": 1118
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/intraday_trend.yaml",
+      "sha256": "14b0b22ad1308c70b65152e711c4248d3c8bf1c28d842fba36309194ed38870a",
+      "bytes": 440
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/ipo_calendar.yaml",
+      "sha256": "d72db539afed6e890e81d6e1c4680fcb09ad4285551748f3c9e12ba124e6059c",
+      "bytes": 2338
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/limit_down_pool.yaml",
+      "sha256": "456b0a779929bb6ff71ed70e07cd420d42596068f142879926b86972e3704f7b",
+      "bytes": 1314
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/limit_up_pool.yaml",
+      "sha256": "411e6e6ead10a4d2cbff7ecf4de9bee26f411a66d005a33bc640865ef4b6e7ba",
+      "bytes": 1079
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/lpr_history.yaml",
+      "sha256": "2a12cd26c069d8be0eb68e121eef7930f97f602ffe80e459b649c6cbc5a4c217",
+      "bytes": 682
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/minute_bar_5m.yaml",
+      "sha256": "f3e9abaededc01a15c651a99a22131a80067133deb89548dd12b17278e0e55b7",
+      "bytes": 1134
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/pledge.yaml",
+      "sha256": "4c8f7636e0b20e5923adbbf4c5e696247da67869d90ed19f0aee62f2e5612710",
+      "bytes": 1589
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/pmi_history.yaml",
+      "sha256": "d09fb57961ce52b5b2c0b3ede903eaca319c20ea7493abe52981e71072b984c9",
+      "bytes": 939
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/previous_limit_pool.yaml",
+      "sha256": "4c14b9ad1f0497e2d6f13a72978f1ddda74039b7c0d182c5a5a98ac01a678443",
+      "bytes": 1276
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/realtime_quote.yaml",
+      "sha256": "e9141547fbb85cb71c8e2336c20a2ebc948e3926f4b2a09e4f59505adea91b94",
+      "bytes": 1308
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/repo_fixing.yaml",
+      "sha256": "0d6b2b5b39a92c6f3d2629f3f805f0b12d609ea9b3f691a50c896c12d81b4681",
+      "bytes": 762
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/security_snapshot.yaml",
+      "sha256": "474ab0397cb1aad33abcd070942586a8460c468b1d3f7af97c2d152eee5a6537",
+      "bytes": 621
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/shareholder_count.yaml",
+      "sha256": "f8801367f055e0b1d419e648c9bd3e1d72984ffe2823c2d464770403c1b7c9e4",
+      "bytes": 1702
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/sina_global_news.yaml",
+      "sha256": "22b2caa83fecb10728649e033cf8b8fbbd4fa8c7928de1b8d8961e1516263b0f",
+      "bytes": 649
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/social_financing.yaml",
+      "sha256": "86b691b8e26d88b42bae76aff769ac01ca33cbf109135f6c75dc00764d7ac59c",
+      "bytes": 1261
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/stock_fund_flow.yaml",
+      "sha256": "3d99bacf48ba3438c90d2d544f7223ffcb0a464f69f95841affe3e99a503bbe1",
+      "bytes": 1741
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/strong_stock_pool.yaml",
+      "sha256": "41733f419a6dd9d3a25edf361294a973df76d878d01bbf46b9f25f53a38f2304",
+      "bytes": 1234
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/trading_calendar.yaml",
+      "sha256": "4be7571914129769aeca321d892b8aa2fbd068db1c7c0b691ae0d5cefe7f69e0",
+      "bytes": 476
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/normalization/wallstreetcn_news.yaml",
+      "sha256": "cdca43fb9ef1d825fe75358ea6c828fec02b892e344505d484d302123079fca9",
+      "bytes": 770
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/providers.yaml",
+      "sha256": "96770d8d00a4f33a68bd0a0f57a100df5d359d4bb5c035194c5bd5c6248a3bf4",
+      "bytes": 83839
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004/yaml/config/schedules.yaml",
+      "sha256": "01b7e269ea4231024bf1c520f78fa571c2909986aad5573006bd80e186119113",
+      "bytes": 525
+    },
+    {
+      "path": "provider_validation/results/macro-final-20261004-tests.xml",
+      "sha256": "a5d068a65321d1a0610da7fab7aa8214f3a25e5182bd51c37157d2f4e0a5e894",
+      "bytes": 66092
+    },
+    {
+      "path": "provider_validation/results/macro-original-20261004/1-.gitattributes.bin",
+      "sha256": "9e8c9d15c176a27219982759c4b23179f337ccd025e5a2c1e955776b09a24043",
+      "bytes": 13468
+    },
+    {
+      "path": "provider_validation/results/macro-original-20261004/10-replay_input_capabilities.py.bin",
+      "sha256": "b8b3c8c61aa19ff96093a5ca16bf006192d641b7f1cd8c78b980809feb95aeb7",
+      "bytes": 44441
+    },
+    {
+      "path": "provider_validation/results/macro-original-20261004/2-CODE_STRUCTURE.md.bin",
+      "sha256": "aca00aa7b428c5dedff797b36fba47de0913d53e688c91c786e9c92398d715e7",
+      "bytes": 24191
+    },
+    {
+      "path": "provider_validation/results/macro-original-20261004/3-PROJECT_PROGRESS.md.bin",
+      "sha256": "a8fabaae7aebda57befdefc8af68264c28afac03116991e56885e01f87b2fbe0",
+      "bytes": 13321
+    },
+    {
+      "path": "provider_validation/results/macro-original-20261004/4-financial.py.bin",
+      "sha256": "6a8b8ae6d5740c78a7456697964ec07f3728f870d51f5237d2b409199081971b",
+      "bytes": 29705
+    },
+    {
+      "path": "provider_validation/results/macro-original-20261004/5-transport.py.bin",
+      "sha256": "58eeb29069ace26ab1868ada39bea73dd64e0e678163a861c90b904658f6513a",
+      "bytes": 18337
+    },
+    {
+      "path": "provider_validation/results/macro-original-20261004/6-inputs.py.bin",
+      "sha256": "4edf6e164f10f6260b2f794dfc35f38130cc12bc6dec1b9ce581fd3e509ea1ee",
+      "bytes": 53520
+    },
+    {
+      "path": "provider_validation/results/macro-original-20261004/7-factory.py.bin",
+      "sha256": "1c1907fc47037375b5f2c87316df25b9d399c20c383951311e27c52d587ceefd",
+      "bytes": 22566
+    },
+    {
+      "path": "provider_validation/results/macro-original-20261004/8-providers.yaml.bin",
+      "sha256": "525141790ced92c40375dddf4ddf71b34d0a41c37e67be0a103daaf191afb166",
+      "bytes": 83142
+    },
+    {
+      "path": "provider_validation/results/macro-original-20261004/9-test_input_collection.py.bin",
+      "sha256": "c2ac41d102c67ebafe8040f34ce69b01c0acbdab6cfb1340d82d07901b0af4ae",
+      "bytes": 194757
+    },
+    {
+      "path": "provider_validation/results/macro-original-20261004/manifest.json",
+      "sha256": "b3e99fd0ddf0e62b5c4ba4466babfbd38f712feb66ffc9e2381b519bbcba74a6",
+      "bytes": 3193
+    },
+    {
+      "path": "provider_validation/tests/replay_input_capabilities.py",
+      "sha256": "fef40d0c97166024e523bad4395654a1702eee3cd1197c5124bc33d36335cd2b",
+      "bytes": 46943
+    },
+    {
+      "path": "src/stock_data_manage/cli.py",
+      "sha256": "582f5caedfc538a012d7a2f6e8cd7af3fe8b6fc9152e5b9e0a3fa2cb8810ae19",
+      "bytes": 14323
+    },
+    {
+      "path": "src/stock_data_manage/config/loader.py",
+      "sha256": "93bb55ab150c88751fe9a58a2b75737878c1b0f07233b8ec47009c4901bb11e9",
+      "bytes": 26090
+    },
+    {
+      "path": "src/stock_data_manage/pipeline/inputs.py",
+      "sha256": "c2924a52715239689df35b8c4722d218f29f2a26675456da1025cf79b4e24102",
+      "bytes": 56025
+    },
+    {
+      "path": "src/stock_data_manage/providers/akshare/boards.py",
+      "sha256": "2060f150831cebaf707ed5becedc35428bc41d4428bab31555ed1d2bf817d122",
+      "bytes": 12416
+    },
+    {
+      "path": "src/stock_data_manage/providers/baostock/industry.py",
+      "sha256": "16c41b379eecbd87f082bd042e27fad7f3d8d77b5bfc6a3e8a286209b068494a",
+      "bytes": 10837
+    },
+    {
+      "path": "src/stock_data_manage/providers/baostock/session.py",
+      "sha256": "70ce19cdde1d6a8ed0c3d3db29caa28d1d8069826136ab6dd7fb6a2ef8c7b832",
+      "bytes": 15771
+    },
+    {
+      "path": "src/stock_data_manage/providers/cctv/news.py",
+      "sha256": "8839bdeed801611e8e6d11cb9441e6ede7bc94d56507eaa2c903e605c772ee7d",
+      "bytes": 2538
+    },
+    {
+      "path": "src/stock_data_manage/providers/chinamoney/rates.py",
+      "sha256": "e7407f1d4272b69cb439bb0a7bad3960b65bb41328d752f541bc8ef50231f922",
+      "bytes": 2716
+    },
+    {
+      "path": "src/stock_data_manage/providers/cls/news.py",
+      "sha256": "51da559a252b67a4a2e58171e3630ff1a5a80cd2bc23aa5df30a7e17ac02ad30",
+      "bytes": 3013
+    },
+    {
+      "path": "src/stock_data_manage/providers/contracts.py",
+      "sha256": "a4b16abc7e3686a4eb2791dcd4545fb2404e0214bf32e20db19d2582d39ea447",
+      "bytes": 5153
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/dividend.py",
+      "sha256": "5706a8cdb37eeeb8f66cb033a3091dd1b6ec1ed83d72d0f9fbeb8f5c75d9649b",
+      "bytes": 6407
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/financial.py",
+      "sha256": "02a4b6f0dc09aefe064a2655ab596ec84f94e32a79f070f0136df4e51cd30ba1",
+      "bytes": 32266
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/fund_flow.py",
+      "sha256": "0cf655efa0854d18651bb4f04f985f0f210b81a6d9eff065604d235ed8f75280",
+      "bytes": 5046
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/limit_pool.py",
+      "sha256": "2fbdfe3da3129545dfe8d2e457be7c42225696ddd74270567ae765e4b413f5ae",
+      "bytes": 5663
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/realtime.py",
+      "sha256": "6e09d2a5014cf316c4d1e26e913a44d5c2fbad95fb44d95cba159ef881f03bca",
+      "bytes": 16746
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/shareholder.py",
+      "sha256": "4c9d80f4d51845ac5541c42275f44f2a18643db5e9ccb705a3e16168f8db44c1",
+      "bytes": 4865
+    },
+    {
+      "path": "src/stock_data_manage/providers/mofcom/__init__.py",
+      "sha256": "97464189f10fcb5e23f028ad60ca2e28bfe556845fd0b4dc1144d3ab08cb6f90",
+      "bytes": 58
+    },
+    {
+      "path": "src/stock_data_manage/providers/mofcom/social_financing.py",
+      "sha256": "55d292958fb34991c56c626d5f6f61e7e6c44c8c2627b88ea735e751aa12c5ce",
+      "bytes": 2567
+    },
+    {
+      "path": "src/stock_data_manage/providers/sina/calendar.py",
+      "sha256": "3d114045f960bfcc94ade1ee03e4d25ebdf6980ba68aa2d0a2236bed78aaef05",
+      "bytes": 1388
+    },
+    {
+      "path": "src/stock_data_manage/providers/sina/daily.py",
+      "sha256": "f9793bf9f5b8d77411abe459b285fc25892c840ff0962133e6b7c3ef628b2c92",
+      "bytes": 6059
+    },
+    {
+      "path": "src/stock_data_manage/providers/sina/news.py",
+      "sha256": "822454e50d8ed60eef2b90d6ad6c0a8ff417eaa4ae2dee556d8137a58fab46a0",
+      "bytes": 2056
+    },
+    {
+      "path": "src/stock_data_manage/providers/sina/snapshot.py",
+      "sha256": "cfa0b823b2fa8053ce899157e9b6078b94516d3fabd5d303480824111f62d136",
+      "bytes": 7778
+    },
+    {
+      "path": "src/stock_data_manage/providers/tencent/daily.py",
+      "sha256": "487a14fcbfc47146d6d5fd291fbf41667aba435e5fed22ea1ef61ded513fcaa7",
+      "bytes": 9941
+    },
+    {
+      "path": "src/stock_data_manage/providers/tencent/minute.py",
+      "sha256": "ff5cf1e91327bcab2e072bcfae9f1f77dca71a84ba26e456c26580a4d59d9cc1",
+      "bytes": 4709
+    },
+    {
+      "path": "src/stock_data_manage/providers/tencent/snapshot.py",
+      "sha256": "3278cadac776fe8cfe5d02775a5bf8f53bc1cb96c595a5f418172f53047434bf",
+      "bytes": 5160
+    },
+    {
+      "path": "src/stock_data_manage/providers/transport.py",
+      "sha256": "4f4fb06ffe10f82f1cba6a3e2c5cb5e55e6bfa40601b99eb40e2b241f6870d97",
+      "bytes": 19183
+    },
+    {
+      "path": "src/stock_data_manage/providers/wallstreetcn/news.py",
+      "sha256": "705de425d8526ced4e866d9beaf4c571c443c4955117c0cccada30ee06e07eea",
+      "bytes": 3203
+    },
+    {
+      "path": "src/stock_data_manage/quality/normalization.py",
+      "sha256": "3ed0d663b7fda9ac6cdf7f1252435f2351c783af3244ccba2c2b0f3891e29b3e",
+      "bytes": 14958
+    },
+    {
+      "path": "src/stock_data_manage/routing/factory.py",
+      "sha256": "4f682f0d222c720368d5a7635ce1488a7ec80b4069c9844cda96ccb9af9b5058",
+      "bytes": 23002
+    },
+    {
+      "path": "src/stock_data_manage/storage/raw.py",
+      "sha256": "3b803525f5b275119ca7af3b05d151fedaeecbe12abf484efe1de3af8994793d",
+      "bytes": 8494
+    },
+    {
+      "path": "tests/test_input_collection.py",
+      "sha256": "8ee1e83a51ce99736947dccb226af783bafe3ca9a277c8de152934317d6f85e3",
+      "bytes": 207481
+    }
+  ]
+}

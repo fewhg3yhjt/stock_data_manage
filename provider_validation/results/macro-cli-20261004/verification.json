@@ -1,0 +1,58 @@
+{
+  "validation_time_utc": "2026-10-04T02:01:35.199930+00:00",
+  "results": [
+    {
+      "input_id": "ASTOCK-061",
+      "command": [
+        "D:\\Program Files\\Python\\python.exe",
+        "-m",
+        "stock_data_manage.cli",
+        "collect-input",
+        "--input",
+        "ASTOCK-061",
+        "--config-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\config",
+        "--output-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\macro-cli-20261004\\candidate",
+        "--mode",
+        "replay",
+        "--replay-manifest",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\_raw\\missing-capabilities-20261003T174623\\manifest.ndjson"
+      ],
+      "exit_code": 0,
+      "count": 136,
+      "stdout": "provider_validation/results/macro-cli-20261004/ASTOCK-061-stdout.json",
+      "stderr": "provider_validation/results/macro-cli-20261004/ASTOCK-061-stderr.bin",
+      "stdout_sha256": "65842798beb23a4f7d246395b0a4f5eeeec4d0da02effba00d1fe52c61a1cab2",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\macro-cli-20261004\\candidate\\ASTOCK-061-1bb8f5ce5c0f\\2026-10-04\\input_report\\mofcom\\social_financing\\report.json"
+    },
+    {
+      "input_id": "ASTOCK-062",
+      "command": [
+        "D:\\Program Files\\Python\\python.exe",
+        "-m",
+        "stock_data_manage.cli",
+        "collect-input",
+        "--input",
+        "ASTOCK-062",
+        "--config-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\config",
+        "--output-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\macro-cli-20261004\\candidate",
+        "--mode",
+        "replay",
+        "--replay-manifest",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\_raw\\missing-capabilities-20261003T174623\\manifest.ndjson"
+      ],
+      "exit_code": 0,
+      "count": 225,
+      "stdout": "provider_validation/results/macro-cli-20261004/ASTOCK-062-stdout.json",
+      "stderr": "provider_validation/results/macro-cli-20261004/ASTOCK-062-stderr.bin",
+      "stdout_sha256": "a39aff303e5612812db9b3a6be922ad4632b843c0ce5c3855aa41b9861a32887",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\macro-cli-20261004\\candidate\\ASTOCK-062-fcb2a7535118\\2026-10-04\\input_report\\eastmoney\\pmi\\report.json"
+    }
+  ],
+  "script_sha256": "f2e942955d6b787dcb3932bb3105a551bfcef1d80512312c47071040333ffc33"
+}

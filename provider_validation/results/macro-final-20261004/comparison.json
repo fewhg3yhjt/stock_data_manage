@@ -1,0 +1,214 @@
+{
+  "validation_time_utc": "2026-10-04T01:59:34.184661+00:00",
+  "mode": "offline_replay",
+  "network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "verification_code": {
+    "path": "tests/test_input_collection.py",
+    "sha256": "8ee1e83a51ce99736947dccb226af783bafe3ca9a277c8de152934317d6f85e3"
+  },
+  "runner": {
+    "path": "provider_validation/tests/replay_input_capabilities.py",
+    "sha256": "fef40d0c97166024e523bad4395654a1702eee3cd1197c5124bc33d36335cd2b"
+  },
+  "inputs": [
+    {
+      "input_id": "ASTOCK-061",
+      "report_path": "provider_validation/results/macro-final-20261004/ASTOCK-061/candidate/ASTOCK-061-2e73bd0d70b2/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "report_sha256": "0a97a7f4ee5f8f6918b3ca6fb96f9fa07e915586e9700b79aa0ca22648edae77",
+      "source_manifest": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+      "source_manifest_sha256": "885abd6bf1c4b809b9029759f61b75c7d6a297755fd76ca6c545720db38a6767",
+      "row_count": 136,
+      "scope": {},
+      "code_version": "e883071409af60a6600a0016fe7e60c43c4d8098852f1ae9ef3716e1c096edc9",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-062",
+      "report_path": "provider_validation/results/macro-final-20261004/ASTOCK-062/candidate/ASTOCK-062-a09ff533759e/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "report_sha256": "bfd4f317fccf872119e0cfe5e8b46eb49fa2694a14694b541211ad7d52400e64",
+      "source_manifest": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+      "source_manifest_sha256": "885abd6bf1c4b809b9029759f61b75c7d6a297755fd76ca6c545720db38a6767",
+      "row_count": 225,
+      "scope": {},
+      "code_version": "b2d1d0a7acba7e7197599f9d135d4de4b9ab9a098ec12c4080647e9de32fc290",
+      "result": "passed"
+    }
+  ],
+  "original_vs_provider": [
+    {
+      "input_id": "ASTOCK-061",
+      "row_count": 136,
+      "mode": "offline_replay",
+      "all_business_fields_equal": true,
+      "all_retained_source_fields_equal": true,
+      "request_comparison_equal": true,
+      "original_csv_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\59_人民银行社融\\data.csv",
+      "original_csv_sha256": "a79d04f3b132be4054869c12185198bb6080158e7d1b88372f5bd1c3cdb917ad",
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\macro-final-20261004\\ASTOCK-061\\original-parsed.json",
+      "original_parsed_sha256": "09fd7c8d1d82de125be207622e40016345a3f506871a564a1af21f9834a25072",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\macro-final-20261004\\ASTOCK-061\\candidate\\ASTOCK-061-2e73bd0d70b2\\2026-10-04\\input_report\\mofcom\\social_financing\\report.json",
+      "report_sha256": "0a97a7f4ee5f8f6918b3ca6fb96f9fa07e915586e9700b79aa0ca22648edae77"
+    },
+    {
+      "input_id": "ASTOCK-062",
+      "row_count": 225,
+      "mode": "offline_replay",
+      "all_business_fields_equal": true,
+      "all_retained_source_fields_equal": true,
+      "request_comparison_equal": true,
+      "original_csv_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\60_PMI\\data.csv",
+      "original_csv_sha256": "9f3936bdaa38bb7d848eba3afad358cc810d456d158f94264067ddd2b1f85a71",
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\macro-final-20261004\\ASTOCK-062\\original-parsed.json",
+      "original_parsed_sha256": "c63e3f06305106b0b19952de42fe093f192027cf1ee7d368c77c4738359af49f",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\macro-final-20261004\\ASTOCK-062\\candidate\\ASTOCK-062-a09ff533759e\\2026-10-04\\input_report\\eastmoney\\pmi\\report.json",
+      "report_sha256": "bfd4f317fccf872119e0cfe5e8b46eb49fa2694a14694b541211ad7d52400e64"
+    }
+  ],
+  "known_differences": [
+    "社融136月和PMI225月原SDK、CSV、原始字段及原数字逐项对照。",
+    "PMI扩展原财务Provider；社融仅必要新增商务部来源适配器，保持原SDK TLSAdapter与无请求体POST。",
+    "保留原请求、SDK、代理、无显式超时、探测节奏/主机暂停及适配器重试；社融SDK自带HTTPS适配器重试为0。",
+    "统计月份明确YYYY-MM，未虚构发布时间；未独立确认数值单位，标准数值为空、完整原数值留证。",
+    "会话/cache、NULL/零值/负值及失败检查为注入或合成；无新真实请求、生产写入、正式路由或自动调度。"
+  ],
+  "negative_checks": [
+    {
+      "input_id": "ASTOCK-061",
+      "mutation": "empty",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/macro-final-20261004/f0/candidate/ASTOCK-061-dcbf5adaec1a/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "report_sha256": "cf1bbe62712de3610574161ee419e891d97ed831300729558f7d0727a74b1e0a",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-061",
+      "mutation": "schema",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/macro-final-20261004/f1/candidate/ASTOCK-061-b058cb1bb3d0/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "report_sha256": "ca7a53f7362a7e2a45373844e74bbb66f156e3e6acde2038bdc74bc526909dbb",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-061",
+      "mutation": "order",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/macro-final-20261004/f2/candidate/ASTOCK-061-5df213eb365f/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "report_sha256": "ab444f376c8aa15e65cd0ecd69d4132ae4fc998bd90e7de4d3242c9ac8e77334",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-061",
+      "mutation": "numeric",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/macro-final-20261004/f3/candidate/ASTOCK-061-181502324b8a/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "report_sha256": "ac59b59b62bd67b57a55aeb2627ba31d6a458a762f2f35dcc79ce7a139aff218",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-061",
+      "mutation": "month",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/macro-final-20261004/f4/candidate/ASTOCK-061-b2c340a6ef86/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "report_sha256": "8e366b619a40617b1f73f909a8f43fc266de5991938ed5802ce9cb20edfffcbf",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-061",
+      "mutation": "duplicate",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/macro-final-20261004/f5/candidate/ASTOCK-061-ea4da007f9a9/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "report_sha256": "35b1b477f2297a390653ab122e3c4e6391e404b698998c9ab9d1e92aed42087b",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-061",
+      "mutation": "http403",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/macro-final-20261004/f6/candidate/ASTOCK-061-0ef848f4de15/2026-10-04/input_report/mofcom/social_financing/report.json",
+      "report_sha256": "31dfc223cd03a8b9b4efa80033326631558d8feae8eacb37766b1fed01306b6b",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-062",
+      "mutation": "empty",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/macro-final-20261004/f7/candidate/ASTOCK-062-e949b1780992/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "report_sha256": "36e4ab7ed596066e558bd0a9fcde770c00cd404cfcbc854f537b87e75aea0e1c",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-062",
+      "mutation": "schema",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/macro-final-20261004/f8/candidate/ASTOCK-062-89aad8668aeb/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "report_sha256": "a4a91fd8bc1d129bfa76c99723fe1569b8b336800ebc7027063195286df70221",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-062",
+      "mutation": "order",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/macro-final-20261004/f9/candidate/ASTOCK-062-9b9ca7508657/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "report_sha256": "3aacaece9eb908bf3799b1119e09fb15f018862965d031dcf24ff2d29ee785d8",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-062",
+      "mutation": "numeric",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/macro-final-20261004/f10/candidate/ASTOCK-062-73dbfa175c7d/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "report_sha256": "fc1464decce15547f1fe5002f1a0ed17b53fd402f754de346d45424ec6debf90",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-062",
+      "mutation": "month",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/macro-final-20261004/f11/candidate/ASTOCK-062-1fd688447028/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "report_sha256": "1f80646f8f39418682ba05be291fb841022c8e49e67705a8a6e14557c0fd0f97",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-062",
+      "mutation": "duplicate",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/macro-final-20261004/f12/candidate/ASTOCK-062-73e38633f45f/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "report_sha256": "00df5e23579e0efbf1befbcfeca8aed88960caaec42b9b17d5cd542afe1b5785",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-062",
+      "mutation": "http403",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/macro-final-20261004/f13/candidate/ASTOCK-062-2ceb80818976/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "report_sha256": "eb10a8fe9556dcebbfa85dc9ec32c5428047d29dd139c7091569309886d2b37f",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-062",
+      "mutation": "business",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/macro-final-20261004/f14/candidate/ASTOCK-062-2a145e3aaa81/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "report_sha256": "3b2231056921fb2e94bf8bf927c6e7d23506628947142e87a2fe926d2f4151c0",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-062",
+      "mutation": "count",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/macro-final-20261004/f15/candidate/ASTOCK-062-f1f0c0f80b31/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "report_sha256": "b5b0be3d25c1a7a6d432c2368656c45ec38f495be4fb879fe55744795d5cb6b1",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-062",
+      "mutation": "period_mismatch",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/macro-final-20261004/f16/candidate/ASTOCK-062-21cc6b6a89f0/2026-10-04/input_report/eastmoney/pmi/report.json",
+      "report_sha256": "bae6cdcea8d03f3ecb9ae2f35fad8cf6be778c10507301f5e9036beeb0773a89",
+      "result": "passed"
+    }
+  ]
+}

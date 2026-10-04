@@ -60,7 +60,7 @@ class HostPausedError(ConnectionError):
 @contextmanager
 def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                       replay_manifest=None, evidence_roots=(), max_age_seconds=0, sdk_retry_policy=False,
-                      probe_host_pause=False):
+                      probe_host_pause=False, require_empty_post_body=False):
     """Serialized single-input capture/replay. Session identity, proxies and request arguments are retained.
 
     SDK session policy matches the saved conservative probe. Internal urllib3 retries
@@ -94,6 +94,9 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
             return response
 
         def send(session, request, **kwargs):
+            # The observed social-financing SDK uses a bodyless POST, not an arbitrary POST query.
+            if require_empty_post_body and (request.method != "POST" or request.body not in (None, b"", "")):
+                raise ValueError("source contract requires a bodyless POST")
             host = (urlsplit(request.url).hostname or "unknown").lower()
             if probe_host_pause and host in paused_hosts:
                 store.append_event({"event": "host_paused", "provider": provider, "endpoint": endpoint,
@@ -110,7 +113,10 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
             if replay_manifest:
                 matching = next(((n, r) for n, r in replay_records if n not in used
                                  and r.get("method") == request.method
-                                 and sanitized_url(r["url"]) == sanitized_url(request.url)), None)
+                                 and sanitized_url(r["url"]) == sanitized_url(request.url)
+                                 and (not require_empty_post_body or
+                                      (r.get("request_body_sha256") or r.get("request_options", {}).get("request_body_sha256")) ==
+                                      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")), None)
                 if matching is None:
                     raise ValueError("no exact archived request match; replay never falls back to network")
                 number, record = matching
@@ -158,7 +164,9 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                 request_options={"timeout": kwargs.get("timeout"), "allow_redirects": kwargs.get("allow_redirects", True),
                                  "trust_env": session.trust_env, "proxies": kwargs.get("proxies", {}),
                                  "sdk_retry_policy": sdk_retry_policy,
-                                 "probe_host_pause": probe_host_pause})
+                                 "probe_host_pause": probe_host_pause,
+                                 **({"request_body_bytes":0,"request_body_sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"}
+                                    if require_empty_post_body else {})})
             events.append(event)
             if probe_host_pause:
                 status = int(response.status_code or 0)

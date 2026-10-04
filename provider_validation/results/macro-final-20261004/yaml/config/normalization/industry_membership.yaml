@@ -1,0 +1,19 @@
+dataset: industry_membership
+rules:
+  - id: baostock-industry-membership-input-v1
+    input_id: SDA-BOARD-006
+    provider: baostock
+    endpoint: industry_membership
+    field_mapping:
+      stock_code: canonical_stock_code
+      stock_name: code_name
+      exchange: exchange
+      status: status
+      industry_name: industry
+      classification: industryClassification
+      classification_update_date: updateDate
+    context_fields: {trade_date: trade_date, source: source}
+    status: pending_validation
+    version: baostock-industry-membership-input-v1
+    evidence_refs: [SDA-BOARD-006]
+    notes: 原SDK证券列表与行业结果按代码合并；分类更新时间不等于查询日期。缺失行业的证券单独报告，禁止当作全量匹配。

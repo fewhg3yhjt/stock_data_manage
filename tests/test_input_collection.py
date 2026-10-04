@@ -22,6 +22,164 @@ ROOT = Path(__file__).resolve().parents[1]
 TENCENT_ARCHIVE = ROOT / "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson"
 SDK_ARCHIVE = ROOT / "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson"
 SDK_NEWS_CASES = [("ASTOCK-032", {}, SDK_ARCHIVE, 20), ("ASTOCK-033", {}, SDK_ARCHIVE, 20)]
+MACRO_CASES = [("ASTOCK-061", {}, SDK_ARCHIVE, 136), ("ASTOCK-062", {}, SDK_ARCHIVE, 225)]
+
+
+def macro_record(input_id):
+    needle="shrzgmQuery" if input_id=="ASTOCK-061" else "reportName=RPT_ECONOMY_PMI"
+    return next(json.loads(line) for line in SDK_ARCHIVE.read_text(encoding="utf-8").splitlines() if needle in json.loads(line).get("url",""))
+
+
+def compare_macro_original(tmp_path,input_id,context,manifest,count):
+    import ast,inspect,csv
+    import akshare as sdk
+    import pandas as pd
+    from typing import Any,Callable,List,Tuple,Dict
+    from types import SimpleNamespace
+    from stock_data_manage.pipeline.inputs import _json_value
+    source=ROOT/"provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py"
+    method="fetch_social_financing" if input_id=="ASTOCK-061" else "fetch_pmi"
+    nodes=[n for n in ast.parse(source.read_text(encoding="utf-8")).body if isinstance(n,ast.FunctionDef)
+        and n.name in {"ak_function","call_ak","try_ak_variants",method}]
+    namespace=dict(inspect=inspect,Any=Any,Callable=Callable,List=List,Tuple=Tuple,Dict=Dict,Config=SimpleNamespace,pd=pd,ensure_ak=lambda:sdk)
+    exec(compile(ast.Module(body=nodes,type_ignores=[]),str(source),"exec"),namespace)
+    store=RawObjectStore(tmp_path/"original")
+    with captured_requests(store,provider="mofcom" if input_id=="ASTOCK-061" else "eastmoney",endpoint="macro",scope={},
+        code_version="original-sdk-macro",pacer=RequestPacer(),replay_manifest=manifest,sdk_retry_policy=True,
+        probe_host_pause=True,require_empty_post_body=input_id=="ASTOCK-061") as events:
+        frame=namespace[method](None)
+    parsed=_json_value(frame.to_dict(orient="records"))
+    parsed_path=tmp_path/"original-parsed.json";parsed_path.write_text(json.dumps(parsed,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    csv_path=ROOT/"provider_validation/results/live-probes/rate-limited-all-20261003"/("59_人民银行社融" if input_id=="ASTOCK-061" else "60_PMI")/"data.csv"
+    with csv_path.open(encoding="utf-8-sig",newline="") as stream:golden=list(csv.DictReader(stream))
+    assert len(golden)==len(parsed)==count
+    for old,row in zip(parsed,golden):
+        assert list(old)==list(row)
+        for key,value in old.items():
+            if key=="月份":assert str(value)==row[key]
+            else:assert float(value)==float(row[key])
+    report=collect_input(input_id=input_id,context={},config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=manifest)
+    assert report["status"]=="candidate_complete" and report["row_count"]==count,report
+    raw=json.loads(RawObjectStore.read_response(manifest,macro_record(input_id)));raw=raw if input_id=="ASTOCK-061" else raw["result"]["data"]
+    assert read_artifact(report,"source_rows")==raw
+    candidate=read_artifact(report,"parsed_rows");assert [{k:v for k,v in row.items() if k!="statistical_month"} for row in candidate]==parsed
+    keys=("url","method","status_code","body_sha256","request_headers","request_options")
+    assert [{k:r.get(k) for k in keys} for r in events]==[{k:r.get(k) for k in keys} for r in report["responses"]]
+    source_keys={"社会融资规模增量":"tiosfs","其中-人民币贷款":"rmblaon","其中-委托贷款外币贷款":"forcloan","其中-委托贷款":"entrustloan",
+        "其中-信托贷款":"trustloan","其中-未贴现银行承兑汇票":"ndbab","其中-企业债券":"bibae","其中-非金融企业境内股票融资":"sfinfe"} if input_id=="ASTOCK-061" else {"制造业-指数":"MAKE_INDEX","制造业-同比增长":"MAKE_SAME","非制造业-指数":"NMAKE_INDEX","非制造业-同比增长":"NMAKE_SAME"}
+    by_period={row["date"] if input_id=="ASTOCK-061" else row["TIME"]:row for row in raw}
+    for row in parsed:
+        for key,raw_key in source_keys.items():assert float(row[key])==float(by_period[row["月份"]][raw_key])
+    for row,old in zip(read_artifact(report,"output"),parsed):
+        expected=datetime.strptime(old["月份"],"%Y%m" if input_id=="ASTOCK-061" else "%Y年%m月份").strftime("%Y-%m")
+        assert row["statistical_month"]==expected and row["snapshot_at"]==report["source_capture_window"]["last"] and row["publication_time"] is None
+        assert all(row[key] is None for key in report["unverified_fields"])
+    comparison=dict(input_id=input_id,row_count=count,mode="offline_replay",all_business_fields_equal=True,
+        all_retained_source_fields_equal=True,request_comparison_equal=True,original_csv_path=str(csv_path),original_csv_sha256=hashlib.sha256(csv_path.read_bytes()).hexdigest(),
+        original_parsed_path=str(parsed_path.resolve()),original_parsed_sha256=hashlib.sha256(parsed_path.read_bytes()).hexdigest(),
+        report_path=report["report_path"],report_sha256=hashlib.sha256(Path(report["report_path"]).read_bytes()).hexdigest())
+    (tmp_path/"comparison.json").write_text(json.dumps(comparison,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    return comparison
+
+
+@pytest.mark.parametrize("input_id,context,manifest,count",MACRO_CASES)
+def test_macro_original_sdk_csv_numeric_and_months(tmp_path,no_network,input_id,context,manifest,count):
+    compare_macro_original(tmp_path,input_id,context,manifest,count)
+
+
+MACRO_FAILURES=[(id,mutation) for id in ("ASTOCK-061","ASTOCK-062")
+    for mutation in ("empty","schema","order","numeric","month","duplicate","http403")]+[("ASTOCK-062","business"),("ASTOCK-062","count"),("ASTOCK-062","period_mismatch")]
+
+
+def macro_fixture(tmp_path,input_id,mutation):
+    record=macro_record(input_id);payload=json.loads(RawObjectStore.read_response(SDK_ARCHIVE,record))
+    items=payload if input_id=="ASTOCK-061" else payload["result"]["data"]
+    month_key="date" if input_id=="ASTOCK-061" else "TIME";numeric_key="tiosfs" if input_id=="ASTOCK-061" else "MAKE_INDEX"
+    if mutation=="empty":items.clear()
+    elif mutation=="schema":items[0].pop(numeric_key)
+    elif mutation=="order":items[0]={k:items[0][k] for k in reversed(items[0])}
+    elif mutation=="numeric":items[0][numeric_key]="bad"
+    elif mutation=="null":items[0][numeric_key]=None
+    elif mutation=="month":items[0][month_key]="invalid"
+    elif mutation=="duplicate":items[1]=items[0].copy()
+    elif mutation=="business":payload["success"]=False
+    elif mutation=="count":payload["result"]["count"]+=1
+    elif mutation=="period_mismatch":items[0]["REPORT_DATE"]="2025-01-01 00:00:00"
+    elif mutation=="post_body":record=dict(record,request_body_sha256="a"*64)
+    elif mutation=="zero_negative":items[0][numeric_key]=-1;items[1][numeric_key]=0
+    store=RawObjectStore(tmp_path/"fixture");response=requests.Response();response.status_code=403 if mutation=="http403" else 200;response.encoding="utf-8"
+    response._content=json.dumps(payload,ensure_ascii=False).encode()
+    store.record_response(response=response,url=record["url"],method=record["method"],request_headers=record["request_headers"],
+        provider="fixture",endpoint="macro",scope={"fixture":"synthetic mutation"},code_version="fixture",mode="fixture",
+        request_options={"request_body_bytes":record["request_body_bytes"],"request_body_sha256":record["request_body_sha256"]})
+    return store.root/"manifest.ndjson"
+
+
+@pytest.mark.parametrize("input_id,mutation",MACRO_FAILURES)
+def test_macro_invalid_source_never_publishes_and_keeps_raw(tmp_path,no_network,input_id,mutation):
+    report=collect_input(input_id=input_id,context={},config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=macro_fixture(tmp_path,input_id,mutation))
+    assert report["status"]=="failed" and "output" not in report and report["responses"],report
+    assert report["production_writes"]==report["live_http_calls"]==0
+
+
+def test_macro_negative_and_zero_values_remain_in_parsed_evidence(tmp_path,no_network):
+    for id in ("ASTOCK-061","ASTOCK-062"):
+        report=collect_input(input_id=id,context={},config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=macro_fixture(tmp_path/id,id,"zero_negative"))
+        assert report["status"]=="candidate_complete",report
+        key="社会融资规模增量" if id=="ASTOCK-061" else "制造业-指数"
+        assert {-1,0}<={row[key] for row in read_artifact(report,"parsed_rows")}
+
+
+@pytest.mark.parametrize("input_id",["ASTOCK-061","ASTOCK-062"])
+def test_macro_optional_null_numeric_preserved(tmp_path,no_network,input_id):
+    report=collect_input(input_id=input_id,context={},config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=macro_fixture(tmp_path,input_id,"null"))
+    assert report["status"]=="candidate_complete",report
+    key="社会融资规模增量" if input_id=="ASTOCK-061" else "制造业-指数"
+    assert any(row[key] is None for row in read_artifact(report,"parsed_rows"))
+
+
+def test_macro_bodyless_post_matching_is_strict(tmp_path,no_network):
+    report=collect_input(input_id="ASTOCK-061",context={},config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=macro_fixture(tmp_path,"ASTOCK-061","post_body"))
+    assert report["status"]=="failed" and report["failure_class"]=="ValueError" and not report.get("responses") and report["live_http_calls"]==0
+    store=RawObjectStore(tmp_path/"guard")
+    with captured_requests(store,provider="fixture",endpoint="macro",scope={},code_version="fixture",pacer=RequestPacer(),require_empty_post_body=True):
+        with pytest.raises(ValueError):requests.post("https://data.mofcom.gov.cn/datamofcom/front/gnmy/shrzgmQuery",data="unexpected")
+        with pytest.raises(ValueError):requests.get("https://data.mofcom.gov.cn/datamofcom/front/gnmy/shrzgmQuery")
+
+
+def test_macro_yaml_projection_mapping_and_forbidden_parameters(tmp_path,no_network):
+    config=tmp_path/"config";shutil.copytree(ROOT/"config",config)
+    path=config/"normalization/pmi_history.yaml";rule=yaml.safe_load(path.read_text(encoding="utf-8"));rule["rules"][0]["field_mapping"]["statistical_month"]="月份"
+    path.write_text(yaml.safe_dump(rule,allow_unicode=True),encoding="utf-8")
+    report=collect_input(input_id="ASTOCK-062",context={},config_root=config,output_root=tmp_path/"candidate",replay_manifest=SDK_ARCHIVE,fields=["snapshot_at","statistical_month"])
+    assert report["status"]=="candidate_complete" and read_artifact(report,"output")[0]["statistical_month"]=="2026年09月份",report
+    for id in ("ASTOCK-061","ASTOCK-062"):
+        for bad in ({"request":{"symbol":"600519"}},{"request":{"start_date":"2026-01-01"}},{"request":{"end_date":"2026-10-01"}}):
+            with pytest.raises(ValueError):collect_input(input_id=id,context=bad,config_root=ROOT/"config",output_root=tmp_path/"bad",replay_manifest=SDK_ARCHIVE)
+
+
+def test_macro_original_sdk_adapter_timeout_headers_and_cache(tmp_path,monkeypatch):
+    from unittest.mock import patch
+    from stock_data_manage.storage.raw import sanitized_url
+    seen=[]
+    def send(session,request,**kwargs):
+        id="ASTOCK-061" if request.method=="POST" else "ASTOCK-062";record=macro_record(id);seen.append(request.url)
+        assert sanitized_url(request.url)==sanitized_url(record["url"]) and session.trust_env is True
+        assert kwargs["timeout"] is None and kwargs["allow_redirects"] is True and request.headers["User-Agent"]==record["request_headers"]["User-Agent"]
+        adapter=session.get_adapter(request.url)
+        if id=="ASTOCK-061":
+            assert type(adapter).__name__=="TLSAdapter" and adapter.max_retries.total==0 and request.body is None
+            assert adapter.poolmanager.connection_pool_kw["ssl_context"] is not None
+        else:assert adapter.max_retries.total==2 and adapter.max_retries.backoff_factor==5
+        response=requests.Response();response.status_code=200;response.encoding="utf-8";response._content=RawObjectStore.read_response(SDK_ARCHIVE,record);response.url=request.url;return response
+    with patch("requests.Session.send",send):
+        for id in ("ASTOCK-061","ASTOCK-062"):
+            first=collect_input(input_id=id,context={},config_root=ROOT/"config",output_root=tmp_path/"candidate",mode="live",evidence_root=tmp_path/"unused")
+            second=collect_input(input_id=id,context={},config_root=ROOT/"config",output_root=tmp_path/"candidate",mode="live",evidence_root=tmp_path/"candidate")
+            assert first["status"]==second["status"]=="candidate_complete",(first,second)
+            assert first["live_http_calls"]==1 and second["live_http_calls"]==0 and read_artifact(first,"output")==read_artifact(second,"output")
+    assert len(seen)==2
+    (tmp_path/"fixture-mode.json").write_text(json.dumps(dict(mode="injected SDK Session; no real live validation",real_http_calls=0,fixture_send_calls=2)),encoding="utf-8")
 
 
 def sdk_news_record(input_id):
