@@ -1,0 +1,50 @@
+dataset:
+  name: futures_daily
+  display_name: 期货日线输入
+  primary_key:
+  - source_contract
+  - bar_date
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  source_contract:
+    type: string
+    required: true
+  bar_date:
+    type: date
+    required: true
+  series_identity:
+    type: enum
+    values:
+    - main_continuous
+    - contract
+    required: true
+  open:
+    type: decimal
+    required: false
+    unit: source_contract_quote_unit
+  high:
+    type: decimal
+    required: false
+    unit: source_contract_quote_unit
+  low:
+    type: decimal
+    required: false
+    unit: source_contract_quote_unit
+  close:
+    type: decimal
+    required: false
+    unit: source_contract_quote_unit
+  settle:
+    type: decimal
+    required: false
+    unit: source_contract_quote_unit
+  volume:
+    type: decimal
+    required: false
+    unit: contracts
+  open_interest:
+    type: decimal
+    required: false
+    unit: contracts

@@ -1,0 +1,19 @@
+dataset:
+  name: cctv_news_index
+  display_name: 新闻联播目录输入
+  primary_key:
+  - broadcast_date
+  - url
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  broadcast_date:
+    type: date
+    required: true
+  title:
+    type: string
+    required: true
+  url:
+    type: string
+    required: true

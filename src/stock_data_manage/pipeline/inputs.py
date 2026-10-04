@@ -81,6 +81,8 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                   Path(__file__).parents[1] / "providers/eastmoney/fund_flow.py",
                   Path(__file__).parents[1] / "providers/eastmoney/realtime.py",
                   Path(__file__).parents[1] / "providers/sina/calendar.py",
+                  Path(__file__).parents[1] / "providers/sina/snapshot.py",
+                  Path(__file__).parents[1] / "providers/sina/daily.py",
                   Path(__file__).parents[1] / "providers/akshare/boards.py",
                   Path(__file__).parents[1] / "providers/baostock/industry.py",
                   Path(__file__).parents[1] / "providers/baostock/session.py"]
@@ -117,14 +119,16 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
     is_news = input_id in {"ASTOCK-034", "ASTOCK-035"}
     is_repo_rate = input_id == "ASTOCK-064"
     is_cb = input_id == "ASTOCK-084"
-    if is_news or is_repo_rate:
+    is_sina_futures = input_id in {"ASTOCK-074", "ASTOCK-075", "ASTOCK-076"}
+    if is_news or is_repo_rate or is_sina_futures:
         import requests
         import urllib3
         report["transport_dependency"] = {"requests": requests.__version__, "urllib3": urllib3.__version__}
         code_version = hashlib.sha256((code_version + requests.__version__ + urllib3.__version__).encode()).hexdigest()
         report["code_version"] = code_version
-        report["fixing_transport_policy" if is_repo_rate else "news_transport_policy"] = {"source_contract": "successful runnable V3.9 source",
-            "headers": "original Chrome/126 User-Agent and Chinamoney bkfrr Referer" if is_repo_rate else "original Chrome/126 User-Agent; requests defaults otherwise", "trust_env": True,
+        policy_key = "sina_futures_transport_policy" if is_sina_futures else "fixing_transport_policy" if is_repo_rate else "news_transport_policy"
+        report[policy_key] = {"source_contract": "successful runnable original source",
+            "headers": "original Chrome/126 User-Agent and finance.sina.com.cn Referer" if is_sina_futures else "original Chrome/126 User-Agent and Chinamoney bkfrr Referer" if is_repo_rate else "original Chrome/126 User-Agent; requests defaults otherwise", "trust_env": True,
             "timeout_seconds": [10, 40], "allow_redirects": True, "retry_total": 0,
             "outer_capture_interval_seconds": 3}
     if is_em_events or is_lpr or is_cb:
@@ -329,13 +333,20 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                 returned_window={"first": parameters["date"].isoformat(), "last": parameters["date"].isoformat()},
                 coverage_basis="source tc and returned SDK rows for requested qdate; not independent whole-market proof",
                 universe_completeness_verified=False)
-        mapping_rows = fetched.rows if is_em_history or is_lpr or is_news or is_repo_rate or is_cb else source_rows
-        if is_news or is_repo_rate or is_cb:
+        mapping_rows = fetched.rows if is_em_history or is_lpr or is_news or is_repo_rate or is_cb or is_sina_futures else source_rows
+        if is_news or is_repo_rate or is_cb or is_sina_futures:
             parsed_ref = result_store.write_json(_json_value(mapping_rows), dataset="parsed_rows", provider=contract.provider,
                 endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="parsed-rows")
             report["parsed_rows"] = {"path":parsed_ref.path.relative_to(directory).as_posix(),
                 "sha256":parsed_ref.content_hash,"row_count":len(mapping_rows),"code_version":code_version,
                 "source_response_hashes":[event["body_sha256"] for event in response_events]}
+        if input_id == "ASTOCK-075":
+            excluded_ref = result_store.write_json(_json_value(fetched.excluded_rows), dataset="excluded_rows",
+                provider=contract.provider, endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="excluded-rows")
+            report["excluded_rows"] = {"path":excluded_ref.path.relative_to(directory).as_posix(),"sha256":excluded_ref.content_hash,"row_count":len(fetched.excluded_rows)}
+            report.update(original_row_count=len(source_rows),selected_row_count=len(mapping_rows),
+                selection_policy="original local date-window filter; complete returned source rows retained",
+                series_identity=fetched.mapping_context["series_identity"],source_contract=fetched.mapping_context["source_contract"])
         if is_cb:
             excluded_ref = result_store.write_json(_json_value(fetched.excluded_rows), dataset="excluded_rows",
                 provider=contract.provider, endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="excluded-rows")
@@ -388,7 +399,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             raise NormalizationError("temporary empty input; not certified as a valid empty dataset")
         mapping_context = {"provider": contract.provider}
         mapping_context.update(getattr(fetched, "mapping_context", {}))
-        if input_id.startswith("SDA-BOARD-") or is_tencent_snapshot or is_em_history or is_stock_pool or is_em_events or is_lpr or is_news or is_repo_rate or is_cb:
+        if input_id.startswith("SDA-BOARD-") or is_tencent_snapshot or is_em_history or is_stock_pool or is_em_events or is_lpr or is_news or is_repo_rate or is_cb or is_sina_futures:
             successful = [event for event in response_events if event.get("outcome") == "response"]
             if not successful:
                 raise NormalizationError("source response evidence is required; an SDK memory cache alone is insufficient")
@@ -404,7 +415,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             mapping_context["source_snapshot_at"] = max(source_times)
             report["source_capture_window"] = {"first": min(source_times).isoformat(), "last": max(source_times).isoformat(),
                                                "meaning": "source response capture times; not row-level market timestamps"}
-            if not is_tencent_snapshot and not is_em_history and not is_stock_pool and not is_em_events and not is_lpr and not is_news and not is_repo_rate and not is_cb:
+            if not is_tencent_snapshot and not is_em_history and not is_stock_pool and not is_em_events and not is_lpr and not is_news and not is_repo_rate and not is_cb and not is_sina_futures:
                 report["returned_window"] = {"first": fetched.returned_first_key, "last": fetched.returned_last_key}
                 report["source_units"] = list(fetched.units)
                 report["coverage_basis"] = "returned SDK rows; not an independently verified market universe"
@@ -440,6 +451,15 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             report.update(rate_kind=parameters["kind"], returned_window={"first":min(dates),"last":max(dates)},
                 coverage_basis="returned fixing CSV dates; not independently complete history",
                 universe_completeness_verified=False)
+        if is_sina_futures:
+            dates = [row["date"] if input_id == "ASTOCK-075" else row["datetime"] for row in mapping_rows]
+            report.update(returned_window={"first":min(dates),"last":max(dates)},
+                coverage_basis="returned source contracts and local date window; not independent exchange or market coverage",
+                universe_completeness_verified=False,quote_freshness_verified=False)
+            if input_id == "ASTOCK-074":
+                report["requested_contracts"] = fetched.mapping_context["requested_contracts"]
+            elif input_id == "ASTOCK-076":
+                report["source_contract"] = fetched.mapping_context["source_contract"]
         if "date" in parameters:
             mapping_context["trade_date"] = parameters["date"]
         if input_id.startswith("ASTOCK-002"):

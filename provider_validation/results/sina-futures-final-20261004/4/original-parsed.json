@@ -1,0 +1,16 @@
+[
+  {
+    "name": "富时中国A50期货",
+    "datetime": "2026-10-01 20:56:00",
+    "last": 13895.2,
+    "open": 13862.0,
+    "high": 13913.0,
+    "low": 13855.0,
+    "bid": 13892.0,
+    "ask": 13894.0,
+    "pre_settle": 13861.0,
+    "source": "sina",
+    "source_url": "https://hq.sinajs.cn/list=hf_CHA50CFD",
+    "fetched_at": "2026-10-04T01:05:45.167308+00:00"
+  }
+]

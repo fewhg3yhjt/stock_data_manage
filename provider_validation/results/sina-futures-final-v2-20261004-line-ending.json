@@ -1,0 +1,22 @@
+{
+  "validation_time_utc": "2026-10-04T01:07:38.942709+00:00",
+  "reason": "Existing Sina source files had CRLF; normalize to repository LF before staged-byte audit. Executable AST unchanged.",
+  "files": [
+    {
+      "path": "src/stock_data_manage/providers/sina/snapshot.py",
+      "prior_snapshot": "provider_validation/results/sina-futures-original-20261004/intermediate-v1-snapshot.py.bin",
+      "prior_sha256": "eaeeb2df5ad16cdec6f327cedecc0198b66959009017d6bb486c7fe37398424b",
+      "final_sha256": "cfa0b823b2fa8053ce899157e9b6078b94516d3fabd5d303480824111f62d136",
+      "ast_equal": true
+    },
+    {
+      "path": "src/stock_data_manage/providers/sina/daily.py",
+      "prior_snapshot": "provider_validation/results/sina-futures-original-20261004/intermediate-v1-daily.py.bin",
+      "prior_sha256": "81429a30db880e76289cc1100ef61b469be9391db1d66262958f50c99c1344c9",
+      "final_sha256": "f9793bf9f5b8d77411abe459b285fc25892c840ff0962133e6b7c3ef628b2c92",
+      "ast_equal": true
+    }
+  ],
+  "regression_xml": "provider_validation/results/sina-futures-final-20261004-tests.xml",
+  "regression_semantic_equivalence": true
+}

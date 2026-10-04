@@ -1,0 +1,244 @@
+{
+  "validation_time_utc": "2026-10-04T01:05:44.108066+00:00",
+  "mode": "offline_replay",
+  "network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "verification_code": {
+    "path": "tests/test_input_collection.py",
+    "sha256": "a46108f172a2fe2816b77d59f981c5643142ab40d2b93760a55b3b6288a04302"
+  },
+  "runner": {
+    "path": "provider_validation/tests/replay_input_capabilities.py",
+    "sha256": "3ac9cf660cc7d03a59b4f7e01037f866a413d644e82d4709377e1e97c773fcc2"
+  },
+  "inputs": [
+    {
+      "input_id": "ASTOCK-074",
+      "report_path": "provider_validation/results/sina-futures-final-20261004/1/candidate/ASTOCK-074-2e4f9bc5e200/2026-10-04/input_report/sina/futures_quote/report.json",
+      "report_sha256": "8703f22e9d2f439985f4f5ba752d08b3e4a8b00e08011920082394061dd4c8b8",
+      "source_manifest": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+      "source_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+      "row_count": 3,
+      "scope": {
+        "symbols": [
+          "RB0",
+          "M0",
+          "IF0"
+        ]
+      },
+      "code_version": "ebe2b14c76ed23d15cabf89ffc995211927c3ac6a63a96dceb8f89277693c579",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-075",
+      "report_path": "provider_validation/results/sina-futures-final-20261004/2/candidate/ASTOCK-075-ba9d2d3a8fa7/2026-10-04/input_report/sina/futures_kline/report.json",
+      "report_sha256": "c5691155ec8f37a8e233ce1fe5d2ce6270a146ef5f67f436623a51d4ed555560",
+      "source_manifest": "provider_validation/results/raw/2026-10-01-v310-live/manifest.ndjson",
+      "source_manifest_sha256": "838ec387b767e0cb375a8fe88358ed244350f14486c2930dc6b9878732ce208a",
+      "row_count": 181,
+      "scope": {
+        "end": "2026-09-30",
+        "start": "2026-01-01",
+        "symbol": "RB0"
+      },
+      "code_version": "ebe2b14c76ed23d15cabf89ffc995211927c3ac6a63a96dceb8f89277693c579",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-075",
+      "report_path": "provider_validation/results/sina-futures-final-20261004/3/candidate/ASTOCK-075-f39ea1ce971f/2026-10-04/input_report/sina/futures_kline/report.json",
+      "report_sha256": "ddf8ccd6e571d2b0c3554d967d6f4bb9ae79f99ca8f2fce3d6a75be46e8ed096",
+      "source_manifest": "provider_validation/results/raw/2026-10-01-v310-live/manifest.ndjson",
+      "source_manifest_sha256": "838ec387b767e0cb375a8fe88358ed244350f14486c2930dc6b9878732ce208a",
+      "row_count": 181,
+      "scope": {
+        "end": "2026-09-30",
+        "start": "2026-01-01",
+        "symbol": "M0"
+      },
+      "code_version": "ebe2b14c76ed23d15cabf89ffc995211927c3ac6a63a96dceb8f89277693c579",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-076",
+      "report_path": "provider_validation/results/sina-futures-final-20261004/4/candidate/ASTOCK-076-c4bd3268f5c5/2026-10-04/input_report/sina/a50_quote/report.json",
+      "report_sha256": "6233af37839e3dae907d280c8beef61644f7c04c2602b00ee9d373706c5503ad",
+      "source_manifest": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+      "source_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+      "row_count": 1,
+      "scope": {},
+      "code_version": "ebe2b14c76ed23d15cabf89ffc995211927c3ac6a63a96dceb8f89277693c579",
+      "result": "passed"
+    }
+  ],
+  "original_vs_provider": [
+    {
+      "input_id": "ASTOCK-074",
+      "mode": "offline_replay",
+      "row_count": 3,
+      "all_business_fields_equal": true,
+      "all_retained_source_fields_equal": true,
+      "request_comparison_equal": true,
+      "source_response_hashes": [
+        "2990f9cbcb96e04bd520870b1bb097f94de7d41ec908ee032d73f4c91c155a59"
+      ],
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sina-futures-final-20261004\\1\\candidate\\ASTOCK-074-2e4f9bc5e200\\2026-10-04\\input_report\\sina\\futures_quote\\report.json",
+      "report_sha256": "8703f22e9d2f439985f4f5ba752d08b3e4a8b00e08011920082394061dd4c8b8",
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sina-futures-final-20261004\\1\\original-parsed.json",
+      "original_parsed_sha256": "fef39b8999a67fec68ff8e8429f890c1e6380c506aaaa9c1b07da7cd655bc6ae"
+    },
+    {
+      "input_id": "ASTOCK-075",
+      "mode": "offline_replay",
+      "row_count": 181,
+      "all_business_fields_equal": true,
+      "all_retained_source_fields_equal": true,
+      "request_comparison_equal": true,
+      "source_response_hashes": [
+        "e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998"
+      ],
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sina-futures-final-20261004\\2\\candidate\\ASTOCK-075-ba9d2d3a8fa7\\2026-10-04\\input_report\\sina\\futures_kline\\report.json",
+      "report_sha256": "c5691155ec8f37a8e233ce1fe5d2ce6270a146ef5f67f436623a51d4ed555560",
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sina-futures-final-20261004\\2\\original-parsed.json",
+      "original_parsed_sha256": "e167bac836386215729cdaaa8bea29d856c44f465c2c221369cc2b828a7d6442"
+    },
+    {
+      "input_id": "ASTOCK-075",
+      "mode": "offline_replay",
+      "row_count": 181,
+      "all_business_fields_equal": true,
+      "all_retained_source_fields_equal": true,
+      "request_comparison_equal": true,
+      "source_response_hashes": [
+        "ecd7f264230e49f3ace244fee9ae7155093fbac8b61e7e9d0926d674c6d9d7f7"
+      ],
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sina-futures-final-20261004\\3\\candidate\\ASTOCK-075-f39ea1ce971f\\2026-10-04\\input_report\\sina\\futures_kline\\report.json",
+      "report_sha256": "ddf8ccd6e571d2b0c3554d967d6f4bb9ae79f99ca8f2fce3d6a75be46e8ed096",
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sina-futures-final-20261004\\3\\original-parsed.json",
+      "original_parsed_sha256": "e3d0ba87de9f9868235d6486e4bd0fa9db07b7fad2298c13a5908625cf418b3a"
+    },
+    {
+      "input_id": "ASTOCK-076",
+      "mode": "offline_replay",
+      "row_count": 1,
+      "all_business_fields_equal": true,
+      "all_retained_source_fields_equal": true,
+      "request_comparison_equal": true,
+      "source_response_hashes": [
+        "a67d6e37ab7d31388fe32710b0c521363473fa65b2c64439917a54d6bfb4388b"
+      ],
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sina-futures-final-20261004\\4\\candidate\\ASTOCK-076-c4bd3268f5c5\\2026-10-04\\input_report\\sina\\a50_quote\\report.json",
+      "report_sha256": "6233af37839e3dae907d280c8beef61644f7c04c2602b00ee9d373706c5503ad",
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sina-futures-final-20261004\\4\\original-parsed.json",
+      "original_parsed_sha256": "a4e8c969c7a84e5ccd0cff9206486fda934b2c2acbfc82869aeb65d1a06c0232"
+    }
+  ],
+  "known_differences": [
+    "扩展原新浪快照和日线类，没有新增Provider；原股票方法与修改前请求/结果对照。",
+    "请求保留原requests.request、UA/Referer、环境代理、重定向、10/40秒超时与零重试，GBK原字节保留。",
+    "国内快照仅RB0/M0/IF0三合约，A50仅hf_CHA50CFD；来源时间保留，当前行情新鲜度与全市场覆盖未认证。",
+    "RB0/M0两响应分别4254/5293行，2026-01-01至09-30各181行；本地日期筛选，排除行全部留证。",
+    "主力连续代码与真实合约代码不混合，RB2610等以0结尾的月份合约仍是contract；零价格为空、零数量仍为0。",
+    "价格/数量单位待独立认证；原完整解析数值逐字段对照，标准未认证数值为空。",
+    "没有新真实网络或生产写入；注入会话/cache与真实合约代码检查是模拟，不认证未实测合约在线能力。"
+  ],
+  "negative_checks": [
+    {
+      "input_id": "ASTOCK-074",
+      "mutation": "structure",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/sina-futures-final-20261004/f0/candidate/ASTOCK-074-8d1d201df179/2026-10-04/input_report/sina/futures_quote/report.json",
+      "report_sha256": "d7ab70501690d956ba2f35faee6f33b8cbf86eba3b0e05557661eddb70955193",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-074",
+      "mutation": "short",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/sina-futures-final-20261004/f1/candidate/ASTOCK-074-be47fd02dda3/2026-10-04/input_report/sina/futures_quote/report.json",
+      "report_sha256": "dff534596f5df21a1cc2e30588aef5a2e3392d850537f88e3ff2955fafd595ec",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-074",
+      "mutation": "missing",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/sina-futures-final-20261004/f2/candidate/ASTOCK-074-7e80690bd241/2026-10-04/input_report/sina/futures_quote/report.json",
+      "report_sha256": "138f70184560acb17a51aba1cdbe4495c6ee7e36e9d1c3b9a30dc86ae172c85d",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-074",
+      "mutation": "numeric",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/sina-futures-final-20261004/f3/candidate/ASTOCK-074-1b17d60a262e/2026-10-04/input_report/sina/futures_quote/report.json",
+      "report_sha256": "cd1feb5f534977b67916619d4b9eb63e0d6f43f5c27c4efafd3a3adf0ac24923",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-074",
+      "mutation": "time",
+      "failure_class": "NormalizationError",
+      "report_path": "provider_validation/results/sina-futures-final-20261004/f4/candidate/ASTOCK-074-39525eb8ffad/2026-10-04/input_report/sina/futures_quote/report.json",
+      "report_sha256": "fae7b6d13b8000eb4c8ee751e4b1d98ae7ba4bf13eef0ac6ac866758241a12ae",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-076",
+      "mutation": "zero",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/sina-futures-final-20261004/f5/candidate/ASTOCK-076-23c66e65d715/2026-10-04/input_report/sina/a50_quote/report.json",
+      "report_sha256": "d8bb6650a6392a1f60cc2b9081e65eb50a476437120327f0cc3ef35963cc07c6",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-075",
+      "mutation": "wrapper",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/sina-futures-final-20261004/f6/candidate/ASTOCK-075-236f7425a483/2026-10-04/input_report/sina/futures_kline/report.json",
+      "report_sha256": "5d542ad1226cf56607ab3f09bf293438f19723898a64354b500b98f6d5400209",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-075",
+      "mutation": "null",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/sina-futures-final-20261004/f7/candidate/ASTOCK-075-8f1203459ba2/2026-10-04/input_report/sina/futures_kline/report.json",
+      "report_sha256": "84bee86ebef8fb69adaa34bd235b933f49e1a1c6fa7194529fb6c2ec88da025e",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-075",
+      "mutation": "duplicate",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/sina-futures-final-20261004/f8/candidate/ASTOCK-075-929deac94959/2026-10-04/input_report/sina/futures_kline/report.json",
+      "report_sha256": "b0d705663f502c9be0c9e6267832c6e5e3c332eeb7899cedafbd5b21cdae5925",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-075",
+      "mutation": "date",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/sina-futures-final-20261004/f9/candidate/ASTOCK-075-e4240b818a3f/2026-10-04/input_report/sina/futures_kline/report.json",
+      "report_sha256": "766c0e60813507e2117f41dcdcac535ab6ca27c79a42212db7674610e0ea08cf",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-075",
+      "mutation": "numeric",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/sina-futures-final-20261004/f10/candidate/ASTOCK-075-a352de9a3b76/2026-10-04/input_report/sina/futures_kline/report.json",
+      "report_sha256": "19b848988f6d41969fc578b673a0a5f9d0dd0eb9cf2259f915048c9d6ee3f041",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-075",
+      "mutation": "settle_field",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/sina-futures-final-20261004/f11/candidate/ASTOCK-075-cead03044d2d/2026-10-04/input_report/sina/futures_kline/report.json",
+      "report_sha256": "d17ae38ae7d4de703439cbc2182a458fa9a637192aa76e8565024abb903c94f6",
+      "result": "passed"
+    }
+  ]
+}

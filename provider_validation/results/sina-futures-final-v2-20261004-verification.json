@@ -1,0 +1,3415 @@
+{
+  "validation_time_utc": "2026-10-04T01:12:34.249952+00:00",
+  "result": "passed",
+  "tests": 421,
+  "counts": {
+    "implemented_validation_only": 32,
+    "unimplemented": 32,
+    "blocked": 7,
+    "alias": 3
+  },
+  "real_network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "audited_reports": [
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/1/candidate/ASTOCK-074-0a7165c72a2b/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "ba4579b7d5d1ef82215a2308b1b76e7769e936ed7f83159599fa96ffb3ca94d7",
+      "status": "candidate_complete",
+      "row_count": 3,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/2/candidate/ASTOCK-075-d9b22b0009d1/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "43eb1f0a619c6a3e36717a8f62341c3e2c8976cc4fff2462b4e6365e2a8ab406",
+      "status": "candidate_complete",
+      "row_count": 181,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/3/candidate/ASTOCK-075-d7a46faab44c/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "77b541914a362ea960e84a48d1d622c00f5a047f9620318e7add2dfaf2aebdc1",
+      "status": "candidate_complete",
+      "row_count": 181,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/4/candidate/ASTOCK-076-db0429c63c60/2026-10-04/input_report/sina/a50_quote/report.json",
+      "sha256": "7fd885c9defa6238306e78bd768d1d6d4fd07ff26be9e386214805ecade23e02",
+      "status": "candidate_complete",
+      "row_count": 1,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f0/candidate/ASTOCK-074-a0da39df9691/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "1d83c2eb88c6f01c25b765d21c3b05744ddf0103546ed3413880a62e7fd6dd15",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f1/candidate/ASTOCK-074-a766506454e4/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "5e372f161625440e7475aaf8d96accca51e43710a801cfb9b5cbfd41b257933d",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f10/candidate/ASTOCK-075-cbb26b2fd92e/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "524518373ef30b39d98d4ea7977d93fc9f25249059f29fa1abe4a0cd12f241ea",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f11/candidate/ASTOCK-075-c4aeb77edf6c/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "a7469ddc417bd1dd132022d9d6e7c71530a9fd609223fdaa025f62eb3d790511",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f2/candidate/ASTOCK-074-216ebea038a3/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "0e8d4e31ab52e3a4f3833009bcce1184ddf4908987d644552bfe4741c7428196",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f3/candidate/ASTOCK-074-8f22636cf83f/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "da5d16a6dfd574f6199ad912881380a54153c08da0708974efb279cbf6b4b144",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f4/candidate/ASTOCK-074-015260e0c196/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "cde9f99429ce9d9bd4bf08b8736376c315d37d5b5b670983799963a078bab194",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f5/candidate/ASTOCK-076-14b5732a0ca1/2026-10-04/input_report/sina/a50_quote/report.json",
+      "sha256": "6ab62002572c6671b12dffda68a04b888c12f61c50f5533dea96435519fab352",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f6/candidate/ASTOCK-075-0e0d7abc8a67/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "1c1bc9c31dc4233326d9125b567a36c57b1afd1aa48e19eeee4b102a38cac9e1",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f7/candidate/ASTOCK-075-0638d1306968/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "135f12fcf57dfd8adf7c449308288d12efaaec5602f03ce1f3b84657e51bc256",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f8/candidate/ASTOCK-075-7b77c3898264/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "eb0bd75bc326d7368acb6fc2c919466f4f688bd5efc9123a2f5433ea1d2eeff2",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f9/candidate/ASTOCK-075-17bcb8342009/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "55103d7862aaa989dfa029dbc08fbdea160ae391bbadec66522a5bbfd15b0e19",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/semantic/actual_contract/candidate/ASTOCK-075-d9755c85bcc8/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "9ab219f2f873233cf29095f3537a16f58fca915c7c6821ce1aecb23f2ea2c461",
+      "status": "candidate_complete",
+      "row_count": 1,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/semantic/zero/candidate/ASTOCK-075-d21d3a8fbdd2/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "a77363b1495d4bd1bcad1e1e8226bac1031868662f4a5dd246530241ede426bb",
+      "status": "candidate_complete",
+      "row_count": 181,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/semantic/zero_fields/candidate/ASTOCK-074-b01b9dbb6fde/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "9c7d371796eaf8ed838f67f0aedfe986f9e845f77b17cd651b9c2d3297c784b5",
+      "status": "candidate_complete",
+      "row_count": 3,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-074-16103580cb19/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "365729a6df7f88a18383a185e0d7b200976bd231427470885d2c86a41dc50b29",
+      "status": "candidate_complete",
+      "row_count": 3,
+      "live_http_calls": 1
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-074-de724d22cfe5/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "a39af717aa3acb453d30723c4cdb52ba0c99d1e027d65038a49e7408c940caa7",
+      "status": "candidate_complete",
+      "row_count": 3,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-3405f6503a44/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "a676f3b153abea41d00d67d26a06162e88afc78ca5d90c1db09e8ddcdbbb05a0",
+      "status": "candidate_complete",
+      "row_count": 181,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-85d135ca26de/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "0d05800cf32b71ad694f3896e2faab9e894c7b726eccb39060a83da4bf71c672",
+      "status": "candidate_complete",
+      "row_count": 181,
+      "live_http_calls": 1
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-f4e5fe37bb68/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "ae6e3b5323376a66814e492147f0390a17ac61e55d7f49130e7438cf5a830677",
+      "status": "candidate_complete",
+      "row_count": 181,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-fc347b39e199/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "e5712235209a4697551641f00faeed0f6d842bd741c6c36edab6ab75c9922993",
+      "status": "candidate_complete",
+      "row_count": 181,
+      "live_http_calls": 1
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-076-86b398d7616b/2026-10-04/input_report/sina/a50_quote/report.json",
+      "sha256": "ab94a70e9f587a330125498ae802fecc1f590541a1d34debeff8da0ab1acadbf",
+      "status": "candidate_complete",
+      "row_count": 1,
+      "live_http_calls": 1
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-076-ddad2e5cebdb/2026-10-04/input_report/sina/a50_quote/report.json",
+      "sha256": "ceda381bf5fe29e3bf4937ca4e83b0097407816ede8188464ed6d87bea92fea9",
+      "status": "candidate_complete",
+      "row_count": 1,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/bad/ASTOCK-074-3f9d2fa29485/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "c0dddeaa8e1e07eda025c9908c5bdf40e2de4c1aced220e35e7435d6a1d61032",
+      "status": "failed-before-request",
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/candidate/ASTOCK-074-36580b0a97e3/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "a9aee163ea66507fb5d82e07de0d08f4ef1e34885ac00ffb3a09020dd661b9f9",
+      "status": "candidate_complete",
+      "row_count": 3,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/empty/ASTOCK-075-e4287699accf/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "ff8e13cb21607ad140486359d50038b60fb7edf9b9f717b94ea3c4892c43fb1b",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/candidate/ASTOCK-074-768076bad595/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "14c10f7cb139c159e2ccf8e71df54e520c919d2309eed0f5a0614c2c9c08eb9b",
+      "status": "candidate_complete",
+      "row_count": 3,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/candidate/ASTOCK-075-5188f3758723/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "0ea32b1349c440c95d904e18a463751156f49a371045aeec66f43875382a2b3f",
+      "status": "candidate_complete",
+      "row_count": 181,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/candidate/ASTOCK-075-f2d76caeb099/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "c5a6a59510c873f0161ca8ff1f663d210f2ab2b51eca95a707b8da43a9790240",
+      "status": "candidate_complete",
+      "row_count": 181,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/candidate/ASTOCK-076-245c0881c73c/2026-10-04/input_report/sina/a50_quote/report.json",
+      "sha256": "4072fee12dbdf069d0b7fb5af31a37d618080ff777a9d0fca2d1f8cccfff5374",
+      "status": "candidate_complete",
+      "row_count": 1,
+      "live_http_calls": 0
+    }
+  ],
+  "files": [
+    {
+      "path": ".gitattributes",
+      "sha256": "d7bdd2f92a63941cfc46d93e5f7f513e70bc2575fbb049c2d79bb16cafd721ee",
+      "bytes": 12702
+    },
+    {
+      "path": "CODE_STRUCTURE.md",
+      "sha256": "835aa5eb2ae21aab233600975a4e1d60f60658fe15288d3831cb1412b76a467a",
+      "bytes": 23414
+    },
+    {
+      "path": "config/datasets/a50_quote.yaml",
+      "sha256": "d9b990dfe46e7b500890da82723dee287c4e2be29e009ab91ceadd8099a02fd2",
+      "bytes": 907
+    },
+    {
+      "path": "config/datasets/futures_daily.yaml",
+      "sha256": "3c923f6d637e1409ec1be5733897ba267a8025169b36b6874aefd0b8181834d5",
+      "bytes": 938
+    },
+    {
+      "path": "config/datasets/futures_quote.yaml",
+      "sha256": "0fb3866f0cdfacfe6fe9dbe7d5396947b16514751639275db40352ff5655a33b",
+      "bytes": 1557
+    },
+    {
+      "path": "config/normalization/a50_quote.yaml",
+      "sha256": "c984450a923a5655cdd60e1e35a9c8981fca80f9c4f996f5dcce790f10f08b9f",
+      "bytes": 886
+    },
+    {
+      "path": "config/normalization/futures_daily.yaml",
+      "sha256": "94760152dd79821d2ed775f64924d84546e85194c44b3baa782b113a040f659b",
+      "bytes": 858
+    },
+    {
+      "path": "config/normalization/futures_quote.yaml",
+      "sha256": "21ef8cc411dc481644a1529846814a29aef0f86c38aa86fede5da7ebb52a1c8f",
+      "bytes": 1204
+    },
+    {
+      "path": "config/providers.yaml",
+      "sha256": "3441064a76ea456240cb368441643ba6d6eabb3ce9a63c99e1b0a67e65ca660a",
+      "bytes": 82441
+    },
+    {
+      "path": "PROJECT_PROGRESS.md",
+      "sha256": "47f791ea14fe62c10443b2712b3cf5e0dd9b18b141ab4ede302e20e7901cbf3f",
+      "bytes": 12690
+    },
+    {
+      "path": "provider_validation/docs/2026-10-04-sina-futures-input-collection.md",
+      "sha256": "2785726c96ea36eb2b8aa6b29bf0999e64e913c14d7ba3c86c8a6f921726bc4c",
+      "bytes": 2572
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/1-context.json",
+      "sha256": "2b0b76cdbd646c8eab99dc23b2042859bbaaa562e9f177f9a123278ddbc12136",
+      "bytes": 94
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/1-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/1-stdout.json",
+      "sha256": "9458d8edcb298f0961715bb04048ff5f0cdb6ee1e5e24e2d3fbb3cd362eaec15",
+      "bytes": 14605
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/2-context.json",
+      "sha256": "1a86aed348127d8f23172f8625fe4b5993328bd8b76ee697f4c8a77ddc7aa8f2",
+      "bytes": 114
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/2-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/2-stdout.json",
+      "sha256": "9355ce9d6b70e193cf532503ef01764b3d5ed62d95ca52bdaacb4a611c8c9ff9",
+      "bytes": 14615
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/3-context.json",
+      "sha256": "22c0eb6b62aa5350227e8bae4c547a18b06cc0b026217c8c02192ea68b4e37de",
+      "bytes": 113
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/3-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/3-stdout.json",
+      "sha256": "9fe7035cfd1f9ac2ceecac916d44649ea5d132eaa915b6ca6f2a9b3b0bde0428",
+      "bytes": 14604
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/4-context.json",
+      "sha256": "e3566b3a06430868d71e9287dfd6c6c520a3da027aabea01951d407ee131dc2f",
+      "bytes": 4
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/4-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/4-stdout.json",
+      "sha256": "72e1cae932bfd1ae144d4fdbd93887dddc644228e6315bc402578dad5aa6fc67",
+      "bytes": 13533
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/candidate/ASTOCK-074-768076bad595/2026-10-04/futures_quote/sina/futures_quote/mapped-rows.json",
+      "sha256": "7007435c3b9d73a028c88e2d3c72942df367a50e80361a3e66f840d14c47073a",
+      "bytes": 1104
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/candidate/ASTOCK-074-768076bad595/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "14c10f7cb139c159e2ccf8e71df54e520c919d2309eed0f5a0614c2c9c08eb9b",
+      "bytes": 11659
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/candidate/ASTOCK-074-768076bad595/2026-10-04/parsed_rows/sina/futures_quote/parsed-rows.json",
+      "sha256": "c48abf2fa2137c0e662fa3daab40063f826afc156315400cd7ce2a6f36486e2d",
+      "bytes": 989
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/candidate/ASTOCK-074-768076bad595/2026-10-04/source_rows/sina/futures_quote/source-rows.json",
+      "sha256": "14bb8a1efcfcb50d3654c508279251e6b9274c4d1e5e9772ede9dc9a915ea81f",
+      "bytes": 1205
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/candidate/ASTOCK-074-768076bad595/_raw/bodies/2990f9cbcb96e04bd520870b1bb097f94de7d41ec908ee032d73f4c91c155a59.bin",
+      "sha256": "2990f9cbcb96e04bd520870b1bb097f94de7d41ec908ee032d73f4c91c155a59",
+      "bytes": 847
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/candidate/ASTOCK-074-768076bad595/_raw/manifest.ndjson",
+      "sha256": "29d32d447a2cc99f05e38cd0e6105713f5a7da3011cb94cf7ccac7ce51630211",
+      "bytes": 1599
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/candidate/ASTOCK-075-5188f3758723/2026-10-04/excluded_rows/sina/futures_kline/excluded-rows.json",
+      "sha256": "4af67a9c50f10df66def12d5b508eb32da64ab82f1da763bcdc9d0d1f3ce1434",
+      "bytes": 494400
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/candidate/ASTOCK-075-5188f3758723/2026-10-04/futures_daily/sina/futures_kline/mapped-rows.json",
+      "sha256": "3af7e4d646168dac8fddb300d00d3a435afab5b74bc544a7a508dd2be742b6a5",
+      "bytes": 41993
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/candidate/ASTOCK-075-5188f3758723/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "0ea32b1349c440c95d904e18a463751156f49a371045aeec66f43875382a2b3f",
+      "bytes": 11782
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/candidate/ASTOCK-075-5188f3758723/2026-10-04/parsed_rows/sina/futures_kline/parsed-rows.json",
+      "sha256": "2ef5b6b86b4930b58e65ef99b6947d55a8c680df76cfdf22f23c60af750e4639",
+      "bytes": 27706
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/candidate/ASTOCK-075-5188f3758723/2026-10-04/source_rows/sina/futures_kline/source-rows.json",
+      "sha256": "de139498810b52e5b68819d0c9e9c34495555dfa894b2e603f3527f6df86f3c7",
+      "bytes": 516313
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/candidate/ASTOCK-075-5188f3758723/_raw/bodies/e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998.bin",
+      "sha256": "e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998",
+      "bytes": 516374
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/candidate/ASTOCK-075-5188f3758723/_raw/manifest.ndjson",
+      "sha256": "261c3c6e3a77cdc5f4c108fed40177b12413c1a1b8ea40749935308e70d14410",
+      "bytes": 1888
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/candidate/ASTOCK-075-f2d76caeb099/2026-10-04/excluded_rows/sina/futures_kline/excluded-rows.json",
+      "sha256": "24f66832d48cf4ba5bea7e4a793184290909c6dfca691124b3e407bc94500555",
+      "bytes": 614031
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/candidate/ASTOCK-075-f2d76caeb099/2026-10-04/futures_daily/sina/futures_kline/mapped-rows.json",
+      "sha256": "b3531a1856901704904105c01c20d029ab596b07043f99e9633feebc1afd5680",
+      "bytes": 41812
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/candidate/ASTOCK-075-f2d76caeb099/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "c5a6a59510c873f0161ca8ff1f663d210f2ab2b51eca95a707b8da43a9790240",
+      "bytes": 11771
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/candidate/ASTOCK-075-f2d76caeb099/2026-10-04/parsed_rows/sina/futures_kline/parsed-rows.json",
+      "sha256": "c50340634b0c4322f0ca7d2a6683c86628c01d7132ba85e0c40cc8ceb082c207",
+      "bytes": 27604
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/candidate/ASTOCK-075-f2d76caeb099/2026-10-04/source_rows/sina/futures_kline/source-rows.json",
+      "sha256": "fd85d677f8cc6ff922e8f74a9b728a674f77ba00969d1871fd257fe0f12400d2",
+      "bytes": 636023
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/candidate/ASTOCK-075-f2d76caeb099/_raw/bodies/ecd7f264230e49f3ace244fee9ae7155093fbac8b61e7e9d0926d674c6d9d7f7.bin",
+      "sha256": "ecd7f264230e49f3ace244fee9ae7155093fbac8b61e7e9d0926d674c6d9d7f7",
+      "bytes": 636083
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/candidate/ASTOCK-075-f2d76caeb099/_raw/manifest.ndjson",
+      "sha256": "e6b86138a483d501406a36072dd0d7421e7bbe7efe39144eafc42c09fa746691",
+      "bytes": 1885
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/candidate/ASTOCK-076-245c0881c73c/2026-10-04/a50_quote/sina/a50_quote/mapped-rows.json",
+      "sha256": "2c8e1a8e5d4a71877d1de2f84ae5d3e241ab7f8c9c0752fc758f95186e0bb351",
+      "bytes": 243
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/candidate/ASTOCK-076-245c0881c73c/2026-10-04/input_report/sina/a50_quote/report.json",
+      "sha256": "4072fee12dbdf069d0b7fb5af31a37d618080ff777a9d0fca2d1f8cccfff5374",
+      "bytes": 10883
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/candidate/ASTOCK-076-245c0881c73c/2026-10-04/parsed_rows/sina/a50_quote/parsed-rows.json",
+      "sha256": "df456063471b7866b06e75f4f4276dc42359c49b05f13c8a7b2d91c39d8011b2",
+      "bytes": 175
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/candidate/ASTOCK-076-245c0881c73c/2026-10-04/source_rows/sina/a50_quote/source-rows.json",
+      "sha256": "9071ca63503a94389027e0099eba656834e09e1ea638334c77854ec587dc1fc8",
+      "bytes": 208
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/candidate/ASTOCK-076-245c0881c73c/_raw/bodies/a67d6e37ab7d31388fe32710b0c521363473fa65b2c64439917a54d6bfb4388b.bin",
+      "sha256": "a67d6e37ab7d31388fe32710b0c521363473fa65b2c64439917a54d6bfb4388b",
+      "bytes": 152
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/candidate/ASTOCK-076-245c0881c73c/_raw/manifest.ndjson",
+      "sha256": "759397bb21c8d990febd2cb9431cc41b647feb62d549cbc9116b90141f39f030",
+      "bytes": 1556
+    },
+    {
+      "path": "provider_validation/results/sina-futures-cli-v2-20261004/verification.json",
+      "sha256": "ec5c8fc51c1d69ef6a1c9dd4f13d165445e601b1de731982a29c2c5eb814a0ed",
+      "bytes": 5775
+    },
+    {
+      "path": "provider_validation/results/sina-futures-dev-20261004-tests.xml",
+      "sha256": "45944886eb8ad7d01436f0922ddb232de172d02be39a34fed84f6baf9e60e32d",
+      "bytes": 3180
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/1/candidate/ASTOCK-074-2e4f9bc5e200/2026-10-04/futures_quote/sina/futures_quote/mapped-rows.json",
+      "sha256": "7007435c3b9d73a028c88e2d3c72942df367a50e80361a3e66f840d14c47073a",
+      "bytes": 1104
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/1/candidate/ASTOCK-074-2e4f9bc5e200/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "8703f22e9d2f439985f4f5ba752d08b3e4a8b00e08011920082394061dd4c8b8",
+      "bytes": 11429
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/1/candidate/ASTOCK-074-2e4f9bc5e200/2026-10-04/parsed_rows/sina/futures_quote/parsed-rows.json",
+      "sha256": "c48abf2fa2137c0e662fa3daab40063f826afc156315400cd7ce2a6f36486e2d",
+      "bytes": 989
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/1/candidate/ASTOCK-074-2e4f9bc5e200/2026-10-04/source_rows/sina/futures_quote/source-rows.json",
+      "sha256": "14bb8a1efcfcb50d3654c508279251e6b9274c4d1e5e9772ede9dc9a915ea81f",
+      "bytes": 1205
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/1/candidate/ASTOCK-074-2e4f9bc5e200/_raw/bodies/2990f9cbcb96e04bd520870b1bb097f94de7d41ec908ee032d73f4c91c155a59.bin",
+      "sha256": "2990f9cbcb96e04bd520870b1bb097f94de7d41ec908ee032d73f4c91c155a59",
+      "bytes": 847
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/1/candidate/ASTOCK-074-2e4f9bc5e200/_raw/manifest.ndjson",
+      "sha256": "e7ea9ba39f69b9d7b46a154cdeab877a0f1b869ccae7dc7d17fff25f59249547",
+      "bytes": 1599
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/1/comparison.json",
+      "sha256": "381fecb8a1833732a0c141dd5884bb6fcb0030162dfee1aab92e89298d8011e8",
+      "bytes": 881
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/1/original/bodies/2990f9cbcb96e04bd520870b1bb097f94de7d41ec908ee032d73f4c91c155a59.bin",
+      "sha256": "2990f9cbcb96e04bd520870b1bb097f94de7d41ec908ee032d73f4c91c155a59",
+      "bytes": 847
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/1/original/manifest.ndjson",
+      "sha256": "f2c8e03c0fdee91b2645f89fc1898e15fb070a0c58a5aeed005a36a425fd3570",
+      "bytes": 1523
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/1/original-parsed.json",
+      "sha256": "fef39b8999a67fec68ff8e8429f890c1e6380c506aaaa9c1b07da7cd655bc6ae",
+      "bytes": 1833
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/2/candidate/ASTOCK-075-ba9d2d3a8fa7/2026-10-04/excluded_rows/sina/futures_kline/excluded-rows.json",
+      "sha256": "4af67a9c50f10df66def12d5b508eb32da64ab82f1da763bcdc9d0d1f3ce1434",
+      "bytes": 494400
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/2/candidate/ASTOCK-075-ba9d2d3a8fa7/2026-10-04/futures_daily/sina/futures_kline/mapped-rows.json",
+      "sha256": "3af7e4d646168dac8fddb300d00d3a435afab5b74bc544a7a508dd2be742b6a5",
+      "bytes": 41993
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/2/candidate/ASTOCK-075-ba9d2d3a8fa7/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "c5691155ec8f37a8e233ce1fe5d2ce6270a146ef5f67f436623a51d4ed555560",
+      "bytes": 11552
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/2/candidate/ASTOCK-075-ba9d2d3a8fa7/2026-10-04/parsed_rows/sina/futures_kline/parsed-rows.json",
+      "sha256": "2ef5b6b86b4930b58e65ef99b6947d55a8c680df76cfdf22f23c60af750e4639",
+      "bytes": 27706
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/2/candidate/ASTOCK-075-ba9d2d3a8fa7/2026-10-04/source_rows/sina/futures_kline/source-rows.json",
+      "sha256": "de139498810b52e5b68819d0c9e9c34495555dfa894b2e603f3527f6df86f3c7",
+      "bytes": 516313
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/2/candidate/ASTOCK-075-ba9d2d3a8fa7/_raw/bodies/e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998.bin",
+      "sha256": "e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998",
+      "bytes": 516374
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/2/candidate/ASTOCK-075-ba9d2d3a8fa7/_raw/manifest.ndjson",
+      "sha256": "ff3ef00ef6158d8e61256d8961529f0dab48434273514801881cc9f0b50d3c58",
+      "bytes": 1888
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/2/comparison.json",
+      "sha256": "a6701224a7f315701c60dd4e70c3c083654e5edcf86df90103df13768bc7eb88",
+      "bytes": 883
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/2/original/bodies/e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998.bin",
+      "sha256": "e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998",
+      "bytes": 516374
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/2/original/manifest.ndjson",
+      "sha256": "8e4b4175caae3c1943185ccfeafd0dd6d94ab93d85fa8994157929e199a5eb01",
+      "bytes": 1822
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/2/original-parsed.json",
+      "sha256": "e167bac836386215729cdaaa8bea29d856c44f465c2c221369cc2b828a7d6442",
+      "bytes": 79838
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/3/candidate/ASTOCK-075-f39ea1ce971f/2026-10-04/excluded_rows/sina/futures_kline/excluded-rows.json",
+      "sha256": "24f66832d48cf4ba5bea7e4a793184290909c6dfca691124b3e407bc94500555",
+      "bytes": 614031
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/3/candidate/ASTOCK-075-f39ea1ce971f/2026-10-04/futures_daily/sina/futures_kline/mapped-rows.json",
+      "sha256": "b3531a1856901704904105c01c20d029ab596b07043f99e9633feebc1afd5680",
+      "bytes": 41812
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/3/candidate/ASTOCK-075-f39ea1ce971f/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "ddf8ccd6e571d2b0c3554d967d6f4bb9ae79f99ca8f2fce3d6a75be46e8ed096",
+      "bytes": 11541
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/3/candidate/ASTOCK-075-f39ea1ce971f/2026-10-04/parsed_rows/sina/futures_kline/parsed-rows.json",
+      "sha256": "c50340634b0c4322f0ca7d2a6683c86628c01d7132ba85e0c40cc8ceb082c207",
+      "bytes": 27604
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/3/candidate/ASTOCK-075-f39ea1ce971f/2026-10-04/source_rows/sina/futures_kline/source-rows.json",
+      "sha256": "fd85d677f8cc6ff922e8f74a9b728a674f77ba00969d1871fd257fe0f12400d2",
+      "bytes": 636023
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/3/candidate/ASTOCK-075-f39ea1ce971f/_raw/bodies/ecd7f264230e49f3ace244fee9ae7155093fbac8b61e7e9d0926d674c6d9d7f7.bin",
+      "sha256": "ecd7f264230e49f3ace244fee9ae7155093fbac8b61e7e9d0926d674c6d9d7f7",
+      "bytes": 636083
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/3/candidate/ASTOCK-075-f39ea1ce971f/_raw/manifest.ndjson",
+      "sha256": "e10c0bdb48a5491854b43e463914b24bb4abb2161418d1b8d991b0fab5b1478f",
+      "bytes": 1885
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/3/comparison.json",
+      "sha256": "83554aa63b293c1e8056c17c6b00724878534ebbee7655699dd113c4c1cba449",
+      "bytes": 883
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/3/original/bodies/ecd7f264230e49f3ace244fee9ae7155093fbac8b61e7e9d0926d674c6d9d7f7.bin",
+      "sha256": "ecd7f264230e49f3ace244fee9ae7155093fbac8b61e7e9d0926d674c6d9d7f7",
+      "bytes": 636083
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/3/original/manifest.ndjson",
+      "sha256": "d0c4fcb2065375f3501b1844d215e26d3dc88a7d9d2830fd4d99bf25e4337086",
+      "bytes": 1819
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/3/original-parsed.json",
+      "sha256": "e3d0ba87de9f9868235d6486e4bd0fa9db07b7fad2298c13a5908625cf418b3a",
+      "bytes": 79374
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/4/candidate/ASTOCK-076-c4bd3268f5c5/2026-10-04/a50_quote/sina/a50_quote/mapped-rows.json",
+      "sha256": "2c8e1a8e5d4a71877d1de2f84ae5d3e241ab7f8c9c0752fc758f95186e0bb351",
+      "bytes": 243
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/4/candidate/ASTOCK-076-c4bd3268f5c5/2026-10-04/input_report/sina/a50_quote/report.json",
+      "sha256": "6233af37839e3dae907d280c8beef61644f7c04c2602b00ee9d373706c5503ad",
+      "bytes": 10653
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/4/candidate/ASTOCK-076-c4bd3268f5c5/2026-10-04/parsed_rows/sina/a50_quote/parsed-rows.json",
+      "sha256": "df456063471b7866b06e75f4f4276dc42359c49b05f13c8a7b2d91c39d8011b2",
+      "bytes": 175
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/4/candidate/ASTOCK-076-c4bd3268f5c5/2026-10-04/source_rows/sina/a50_quote/source-rows.json",
+      "sha256": "9071ca63503a94389027e0099eba656834e09e1ea638334c77854ec587dc1fc8",
+      "bytes": 208
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/4/candidate/ASTOCK-076-c4bd3268f5c5/_raw/bodies/a67d6e37ab7d31388fe32710b0c521363473fa65b2c64439917a54d6bfb4388b.bin",
+      "sha256": "a67d6e37ab7d31388fe32710b0c521363473fa65b2c64439917a54d6bfb4388b",
+      "bytes": 152
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/4/candidate/ASTOCK-076-c4bd3268f5c5/_raw/manifest.ndjson",
+      "sha256": "117f0927c59e49a7bb021cc9c5479a92f32e74637b95008235f4b05fb9398e8f",
+      "bytes": 1556
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/4/comparison.json",
+      "sha256": "39c0ac7bb6b75fbf6ba8b2340efee3a98207b91782e6e934cce83ecc43e135e2",
+      "bytes": 877
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/4/original/bodies/a67d6e37ab7d31388fe32710b0c521363473fa65b2c64439917a54d6bfb4388b.bin",
+      "sha256": "a67d6e37ab7d31388fe32710b0c521363473fa65b2c64439917a54d6bfb4388b",
+      "bytes": 152
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/4/original/manifest.ndjson",
+      "sha256": "eea609a60d5cf2e46d362a4ee3620bb2f8497715abe97788a893f45da7ab39a7",
+      "bytes": 1469
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/4/original-parsed.json",
+      "sha256": "a4e8c969c7a84e5ccd0cff9206486fda934b2c2acbfc82869aeb65d1a06c0232",
+      "bytes": 388
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/comparison.json",
+      "sha256": "928c5911b3745cce58fcfff3663a11b66524afbb878fbf21a14f4803ac11829b",
+      "bytes": 13213
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f0/candidate/ASTOCK-074-8d1d201df179/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "d7ab70501690d956ba2f35faee6f33b8cbf86eba3b0e05557661eddb70955193",
+      "bytes": 9727
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f0/candidate/ASTOCK-074-8d1d201df179/_raw/bodies/a4d2a04461a1ba1df0b5bf30459a623a4999054450a355d8cae1cae99d9e1a44.bin",
+      "sha256": "a4d2a04461a1ba1df0b5bf30459a623a4999054450a355d8cae1cae99d9e1a44",
+      "bytes": 20
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f0/candidate/ASTOCK-074-8d1d201df179/_raw/manifest.ndjson",
+      "sha256": "960881d73dfb114b6b48316262aac5d7f54a049e2fb60e500a24b2f984278fba",
+      "bytes": 1398
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f0/fixture/bodies/a4d2a04461a1ba1df0b5bf30459a623a4999054450a355d8cae1cae99d9e1a44.bin",
+      "sha256": "a4d2a04461a1ba1df0b5bf30459a623a4999054450a355d8cae1cae99d9e1a44",
+      "bytes": 20
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f0/fixture/manifest.ndjson",
+      "sha256": "959409408d58a6c8c0c6049b2219ba2ddbdec5c7d4def76200a4bf92e3159150",
+      "bytes": 1079
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f1/candidate/ASTOCK-074-be47fd02dda3/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "dff534596f5df21a1cc2e30588aef5a2e3392d850537f88e3ff2955fafd595ec",
+      "bytes": 9728
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f1/candidate/ASTOCK-074-be47fd02dda3/_raw/bodies/e81fe429135c67e6543312d5d9604d47b17c6c0cbce632957bedfda001ba79e9.bin",
+      "sha256": "e81fe429135c67e6543312d5d9604d47b17c6c0cbce632957bedfda001ba79e9",
+      "bytes": 664
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f1/candidate/ASTOCK-074-be47fd02dda3/_raw/manifest.ndjson",
+      "sha256": "3934ab4fa8edde061e2b3f2247f19b0b37217859bc76e1bc2824a7fc63e678c8",
+      "bytes": 1399
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f1/fixture/bodies/e81fe429135c67e6543312d5d9604d47b17c6c0cbce632957bedfda001ba79e9.bin",
+      "sha256": "e81fe429135c67e6543312d5d9604d47b17c6c0cbce632957bedfda001ba79e9",
+      "bytes": 664
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f1/fixture/manifest.ndjson",
+      "sha256": "bfdc4f9184b0016e3c6a821821fe62d8a9456d4ff343e4bc156799bb0afdce5b",
+      "bytes": 1076
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f10/candidate/ASTOCK-075-a352de9a3b76/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "19b848988f6d41969fc578b673a0a5f9d0dd0eb9cf2259f915048c9d6ee3f041",
+      "bytes": 9236
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f10/candidate/ASTOCK-075-a352de9a3b76/_raw/bodies/fdad12a774ce77ad34cfbd7214ddc75c1ec37f0cc81c1816ab39e148cb78d6a6.bin",
+      "sha256": "fdad12a774ce77ad34cfbd7214ddc75c1ec37f0cc81c1816ab39e148cb78d6a6",
+      "bytes": 584383
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f10/candidate/ASTOCK-075-a352de9a3b76/_raw/manifest.ndjson",
+      "sha256": "fd624e4fb41894493cde3db31f06404b8b2049141a1dd2d534f0a767f73bcbf2",
+      "bytes": 1502
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f10/fixture/bodies/fdad12a774ce77ad34cfbd7214ddc75c1ec37f0cc81c1816ab39e148cb78d6a6.bin",
+      "sha256": "fdad12a774ce77ad34cfbd7214ddc75c1ec37f0cc81c1816ab39e148cb78d6a6",
+      "bytes": 584383
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f10/fixture/manifest.ndjson",
+      "sha256": "07e7ae83faa1653d07f7b5f02218428f6896518c15c95f362de16d99b456b8c8",
+      "bytes": 1152
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f11/candidate/ASTOCK-075-cead03044d2d/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "d17ae38ae7d4de703439cbc2182a458fa9a637192aa76e8565024abb903c94f6",
+      "bytes": 9236
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f11/candidate/ASTOCK-075-cead03044d2d/_raw/bodies/4b658ffff5944125bdc0fc72a6ae3336b38a2326a295f1acb376bb5952d39219.bin",
+      "sha256": "4b658ffff5944125bdc0fc72a6ae3336b38a2326a295f1acb376bb5952d39219",
+      "bytes": 584371
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f11/candidate/ASTOCK-075-cead03044d2d/_raw/manifest.ndjson",
+      "sha256": "2f70829950a68ed628684b4f0503661fadc3260b7811054029e0e85564b55cff",
+      "bytes": 1502
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f11/fixture/bodies/4b658ffff5944125bdc0fc72a6ae3336b38a2326a295f1acb376bb5952d39219.bin",
+      "sha256": "4b658ffff5944125bdc0fc72a6ae3336b38a2326a295f1acb376bb5952d39219",
+      "bytes": 584371
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f11/fixture/manifest.ndjson",
+      "sha256": "79be9f02a4e502ce6d50b006be7508d0090f51e79d1d729654280919414c4b92",
+      "bytes": 1157
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f2/candidate/ASTOCK-074-7e80690bd241/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "138f70184560acb17a51aba1cdbe4495c6ee7e36e9d1c3b9a30dc86ae172c85d",
+      "bytes": 9752
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f2/candidate/ASTOCK-074-7e80690bd241/_raw/bodies/408b8fa3b22aee5ff61ba24562975fe1c1facab57d40f181a8b98d533eb4a4e4.bin",
+      "sha256": "408b8fa3b22aee5ff61ba24562975fe1c1facab57d40f181a8b98d533eb4a4e4",
+      "bytes": 575
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f2/candidate/ASTOCK-074-7e80690bd241/_raw/manifest.ndjson",
+      "sha256": "496c85717c57edfac3614a5fa230ed52fdb4e556ace9020e3ce9ff6a9dae03ee",
+      "bytes": 1399
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f2/fixture/bodies/408b8fa3b22aee5ff61ba24562975fe1c1facab57d40f181a8b98d533eb4a4e4.bin",
+      "sha256": "408b8fa3b22aee5ff61ba24562975fe1c1facab57d40f181a8b98d533eb4a4e4",
+      "bytes": 575
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f2/fixture/manifest.ndjson",
+      "sha256": "ed959d885a3e24e9442ac0e9c2682828c9a15fe5e4cd482b7a59f34a162fed8d",
+      "bytes": 1078
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f3/candidate/ASTOCK-074-1b17d60a262e/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "cd1feb5f534977b67916619d4b9eb63e0d6f43f5c27c4efafd3a3adf0ac24923",
+      "bytes": 9728
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f3/candidate/ASTOCK-074-1b17d60a262e/_raw/bodies/0d983fbdf2cab06eadd73c13e1099545192da1fd2237527a5032accc67461b1e.bin",
+      "sha256": "0d983fbdf2cab06eadd73c13e1099545192da1fd2237527a5032accc67461b1e",
+      "bytes": 841
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f3/candidate/ASTOCK-074-1b17d60a262e/_raw/manifest.ndjson",
+      "sha256": "85e9e508fa0e85c18a447695a1dd6dfb66c01dce01461a6304f814b6a83f22ca",
+      "bytes": 1399
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f3/fixture/bodies/0d983fbdf2cab06eadd73c13e1099545192da1fd2237527a5032accc67461b1e.bin",
+      "sha256": "0d983fbdf2cab06eadd73c13e1099545192da1fd2237527a5032accc67461b1e",
+      "bytes": 841
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f3/fixture/manifest.ndjson",
+      "sha256": "cd87dfd3723b369428f0ec909134f42f4df4817e13a4c5ee3e10c20c80dd636d",
+      "bytes": 1078
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f4/candidate/ASTOCK-074-39525eb8ffad/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "fae7b6d13b8000eb4c8ee751e4b1d98ae7ba4bf13eef0ac6ac866758241a12ae",
+      "bytes": 10946
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f4/candidate/ASTOCK-074-39525eb8ffad/2026-10-04/parsed_rows/sina/futures_quote/parsed-rows.json",
+      "sha256": "bd022beb02293590e7b8871220628e23a03957627bbc45a0ca075e3f8eeea6b7",
+      "bytes": 982
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f4/candidate/ASTOCK-074-39525eb8ffad/2026-10-04/source_rows/sina/futures_quote/source-rows.json",
+      "sha256": "07c67bce7595e5761ed73d9091da82e5a2c33f3f3d62164b6ad2acd872618a4b",
+      "bytes": 1198
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f4/candidate/ASTOCK-074-39525eb8ffad/_raw/bodies/ee1b09b134be085bbfea0fdde25c557e0095a732d657259d28ec90bc6628e573.bin",
+      "sha256": "ee1b09b134be085bbfea0fdde25c557e0095a732d657259d28ec90bc6628e573",
+      "bytes": 839
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f4/candidate/ASTOCK-074-39525eb8ffad/_raw/manifest.ndjson",
+      "sha256": "310db917842c336bd0d4680d099eb8facb822e33fbc67c7b024a45d39b920777",
+      "bytes": 1399
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f4/fixture/bodies/ee1b09b134be085bbfea0fdde25c557e0095a732d657259d28ec90bc6628e573.bin",
+      "sha256": "ee1b09b134be085bbfea0fdde25c557e0095a732d657259d28ec90bc6628e573",
+      "bytes": 839
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f4/fixture/manifest.ndjson",
+      "sha256": "61d845a7d94b11490146924826c710f86b0b885ced58cd4afb4e8f1435268142",
+      "bytes": 1075
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f5/candidate/ASTOCK-076-23c66e65d715/2026-10-04/input_report/sina/a50_quote/report.json",
+      "sha256": "d8bb6650a6392a1f60cc2b9081e65eb50a476437120327f0cc3ef35963cc07c6",
+      "bytes": 8977
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f5/candidate/ASTOCK-076-23c66e65d715/_raw/bodies/7c291ca435fe59d144a81745bc4bbcc09304f90d0b311ce71081e5be81e23341.bin",
+      "sha256": "7c291ca435fe59d144a81745bc4bbcc09304f90d0b311ce71081e5be81e23341",
+      "bytes": 143
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f5/candidate/ASTOCK-076-23c66e65d715/_raw/manifest.ndjson",
+      "sha256": "e3a6d3dad0f7f264605698e3e844a8966bbac122953be78793c6cb6a7d691d0c",
+      "bytes": 1356
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f5/fixture/bodies/7c291ca435fe59d144a81745bc4bbcc09304f90d0b311ce71081e5be81e23341.bin",
+      "sha256": "7c291ca435fe59d144a81745bc4bbcc09304f90d0b311ce71081e5be81e23341",
+      "bytes": 143
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f5/fixture/manifest.ndjson",
+      "sha256": "a3632b53999aefa255d12fc596df417c33bf2446acc259399f8fb367c3d2120e",
+      "bytes": 1067
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f6/candidate/ASTOCK-075-236f7425a483/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "5d542ad1226cf56607ab3f09bf293438f19723898a64354b500b98f6d5400209",
+      "bytes": 9235
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f6/candidate/ASTOCK-075-236f7425a483/_raw/bodies/f7f2d66be910b51938b63c1c12791d4f4239079543717a5647233b87ecc5875b.bin",
+      "sha256": "f7f2d66be910b51938b63c1c12791d4f4239079543717a5647233b87ecc5875b",
+      "bytes": 584390
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f6/candidate/ASTOCK-075-236f7425a483/_raw/manifest.ndjson",
+      "sha256": "002c55d439236a022465510ea0d369cb6c6814e761ea9115d5d1be93369f9fde",
+      "bytes": 1501
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f6/fixture/bodies/f7f2d66be910b51938b63c1c12791d4f4239079543717a5647233b87ecc5875b.bin",
+      "sha256": "f7f2d66be910b51938b63c1c12791d4f4239079543717a5647233b87ecc5875b",
+      "bytes": 584390
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f6/fixture/manifest.ndjson",
+      "sha256": "a0a3b6ee090a6478433933b728b63180135e7c65233a62aa9700030421b76cb3",
+      "bytes": 1152
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f7/candidate/ASTOCK-075-8f1203459ba2/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "84bee86ebef8fb69adaa34bd235b933f49e1a1c6fa7194529fb6c2ec88da025e",
+      "bytes": 9265
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f7/candidate/ASTOCK-075-8f1203459ba2/_raw/bodies/a16c811f399ae4aa78ffb47f955bf2071887eb5335c18f8e06eae1f7b38664c8.bin",
+      "sha256": "a16c811f399ae4aa78ffb47f955bf2071887eb5335c18f8e06eae1f7b38664c8",
+      "bytes": 16
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f7/candidate/ASTOCK-075-8f1203459ba2/_raw/manifest.ndjson",
+      "sha256": "13d2d8576b2e94a434917ab7cd25047a50eac2b899632459b1fb54718c79ce55",
+      "bytes": 1497
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f7/fixture/bodies/a16c811f399ae4aa78ffb47f955bf2071887eb5335c18f8e06eae1f7b38664c8.bin",
+      "sha256": "a16c811f399ae4aa78ffb47f955bf2071887eb5335c18f8e06eae1f7b38664c8",
+      "bytes": 16
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f7/fixture/manifest.ndjson",
+      "sha256": "103c8e6e951d2ff985cf889d58ca4bbb636f33f32d3c3c781e2d87c879892262",
+      "bytes": 1145
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f8/candidate/ASTOCK-075-929deac94959/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "b0d705663f502c9be0c9e6267832c6e5e3c332eeb7899cedafbd5b21cdae5925",
+      "bytes": 9235
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f8/candidate/ASTOCK-075-929deac94959/_raw/bodies/74e04381b3146dff762dabaa10db75a7ea240487be1b4b259ce3607147380fdc.bin",
+      "sha256": "74e04381b3146dff762dabaa10db75a7ea240487be1b4b259ce3607147380fdc",
+      "bytes": 584520
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f8/candidate/ASTOCK-075-929deac94959/_raw/manifest.ndjson",
+      "sha256": "b76341426a9df1e211e2ec1887b11b1d8f92c7348d4fb7cf47de1ee9645bcf6c",
+      "bytes": 1501
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f8/fixture/bodies/74e04381b3146dff762dabaa10db75a7ea240487be1b4b259ce3607147380fdc.bin",
+      "sha256": "74e04381b3146dff762dabaa10db75a7ea240487be1b4b259ce3607147380fdc",
+      "bytes": 584520
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f8/fixture/manifest.ndjson",
+      "sha256": "09d2f2f3c4df253da085eef6a0b9e98579b2ef0363251564f763468198d0e973",
+      "bytes": 1154
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f9/candidate/ASTOCK-075-e4240b818a3f/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "766c0e60813507e2117f41dcdcac535ab6ca27c79a42212db7674610e0ea08cf",
+      "bytes": 9235
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f9/candidate/ASTOCK-075-e4240b818a3f/_raw/bodies/9096cb521f283403f3d2f45ee055926f0254e1610ddbf8e8136813ee21e8bda3.bin",
+      "sha256": "9096cb521f283403f3d2f45ee055926f0254e1610ddbf8e8136813ee21e8bda3",
+      "bytes": 584381
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f9/candidate/ASTOCK-075-e4240b818a3f/_raw/manifest.ndjson",
+      "sha256": "280c4ea35c651bd2efb9ddb83242b68a3df320f0151076e5a9298ec98be3640e",
+      "bytes": 1501
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f9/fixture/bodies/9096cb521f283403f3d2f45ee055926f0254e1610ddbf8e8136813ee21e8bda3.bin",
+      "sha256": "9096cb521f283403f3d2f45ee055926f0254e1610ddbf8e8136813ee21e8bda3",
+      "bytes": 584381
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/f9/fixture/manifest.ndjson",
+      "sha256": "792719c63ff67ec691bfc9db376103c0a0912a8389dd1d1ebdb3d913d88d7466",
+      "bytes": 1149
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/legacy/legacy-comparison.json",
+      "sha256": "320431e69973c6130cb2cc8bfa355936469dc538ab4c3aefd30e273491478e7e",
+      "bytes": 358
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/semantic/actual_contract/candidate/ASTOCK-075-08dc8a6a3ac9/2026-10-04/excluded_rows/sina/futures_kline/excluded-rows.json",
+      "sha256": "dc8ff6c7d4d5d1675b5420cda924b7db9a09509c706d70eea593ab3e302a19b4",
+      "bytes": 516192
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/semantic/actual_contract/candidate/ASTOCK-075-08dc8a6a3ac9/2026-10-04/futures_daily/sina/futures_kline/mapped-rows.json",
+      "sha256": "92fd0a2bb8194784726b99ae9ef96daebbc5a8c71f1e12ed3dd789cf72a44c62",
+      "bytes": 229
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/semantic/actual_contract/candidate/ASTOCK-075-08dc8a6a3ac9/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "404aa70ca3078e3e56165a598f472417c215cb0e9f0b8b6307c4f8a08d56d496",
+      "bytes": 11223
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/semantic/actual_contract/candidate/ASTOCK-075-08dc8a6a3ac9/2026-10-04/parsed_rows/sina/futures_kline/parsed-rows.json",
+      "sha256": "becc4acd1148a52c3d7983cbe741f8328ff10cbbeca60a2a179eddb0ac46238e",
+      "bytes": 157
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/semantic/actual_contract/candidate/ASTOCK-075-08dc8a6a3ac9/2026-10-04/source_rows/sina/futures_kline/source-rows.json",
+      "sha256": "de139498810b52e5b68819d0c9e9c34495555dfa894b2e603f3527f6df86f3c7",
+      "bytes": 516313
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/semantic/actual_contract/candidate/ASTOCK-075-08dc8a6a3ac9/_raw/bodies/1ac216fcfe17a5a6976eb1d49d83976161c7f76725182ec87be49e9ab63e1b84.bin",
+      "sha256": "1ac216fcfe17a5a6976eb1d49d83976161c7f76725182ec87be49e9ab63e1b84",
+      "bytes": 584391
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/semantic/actual_contract/candidate/ASTOCK-075-08dc8a6a3ac9/_raw/manifest.ndjson",
+      "sha256": "15101c309d7eb403aadbfd830a95a7148bb094f5ad61635aace351bf6ea90b7f",
+      "bytes": 1533
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/semantic/actual_contract/fixture/bodies/1ac216fcfe17a5a6976eb1d49d83976161c7f76725182ec87be49e9ab63e1b84.bin",
+      "sha256": "1ac216fcfe17a5a6976eb1d49d83976161c7f76725182ec87be49e9ab63e1b84",
+      "bytes": 584391
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/semantic/actual_contract/fixture/manifest.ndjson",
+      "sha256": "ffd4e4d33061eaa35e3e4c7dc337776fa29e7443bd9cdc090578d9a1c28f0f01",
+      "bytes": 1166
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/semantic/zero/candidate/ASTOCK-075-bd54f102208f/2026-10-04/excluded_rows/sina/futures_kline/excluded-rows.json",
+      "sha256": "4af67a9c50f10df66def12d5b508eb32da64ab82f1da763bcdc9d0d1f3ce1434",
+      "bytes": 494400
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/semantic/zero/candidate/ASTOCK-075-bd54f102208f/2026-10-04/futures_daily/sina/futures_kline/mapped-rows.json",
+      "sha256": "db274ad20865cf1760417947a51297c47506a80dad4e1358d6894dace966b6a2",
+      "bytes": 41993
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/semantic/zero/candidate/ASTOCK-075-bd54f102208f/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "3dd7859eeeb31ee32f451720fec0ab5a6adc6961abb4ab3b3db00647836fc766",
+      "bytes": 11196
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/semantic/zero/candidate/ASTOCK-075-bd54f102208f/2026-10-04/parsed_rows/sina/futures_kline/parsed-rows.json",
+      "sha256": "da697f2e6ab6c3c928c0f2b293dc66bee9d9dd2b517af57ef9a5c54f0ad57945",
+      "bytes": 27704
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/semantic/zero/candidate/ASTOCK-075-bd54f102208f/2026-10-04/source_rows/sina/futures_kline/source-rows.json",
+      "sha256": "b663d56f389a339ec1fb2b03e99605450b4a6efc0b8349929b45e7d67a7141c8",
+      "bytes": 516306
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/semantic/zero/candidate/ASTOCK-075-bd54f102208f/_raw/bodies/45798b7af4fc5c2393ada3a1da8467e4db523243a378d08c2d89523f4f90af84.bin",
+      "sha256": "45798b7af4fc5c2393ada3a1da8467e4db523243a378d08c2d89523f4f90af84",
+      "bytes": 584381
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/semantic/zero/candidate/ASTOCK-075-bd54f102208f/_raw/manifest.ndjson",
+      "sha256": "273eadcf19816e5dbc09298c65854f26b19b5843272b94784a07b30cdcd12d4a",
+      "bytes": 1513
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/semantic/zero/fixture/bodies/45798b7af4fc5c2393ada3a1da8467e4db523243a378d08c2d89523f4f90af84.bin",
+      "sha256": "45798b7af4fc5c2393ada3a1da8467e4db523243a378d08c2d89523f4f90af84",
+      "bytes": 584381
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/semantic/zero/fixture/manifest.ndjson",
+      "sha256": "feb0c6a4eb10344fdd7777a30305e22763b79a7f434caf311ac3b27fb3e43bc1",
+      "bytes": 1149
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/semantic/zero_fields/candidate/ASTOCK-074-281f68025808/2026-10-04/futures_quote/sina/futures_quote/mapped-rows.json",
+      "sha256": "dda29f1a54ab399748813354f2c6b8c38739c1c207053fce7ae3b91fe2ebf306",
+      "bytes": 1104
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/semantic/zero_fields/candidate/ASTOCK-074-281f68025808/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "879cd11c69d5ce978dc21c43f66908132dccef023d44e08c8fbc1ce2d8569130",
+      "bytes": 11257
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/semantic/zero_fields/candidate/ASTOCK-074-281f68025808/2026-10-04/parsed_rows/sina/futures_quote/parsed-rows.json",
+      "sha256": "bc4dcd76a66a0bea742a509e2fb731369726605132aa3e78b341c8347a9b20a4",
+      "bytes": 982
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/semantic/zero_fields/candidate/ASTOCK-074-281f68025808/2026-10-04/source_rows/sina/futures_quote/source-rows.json",
+      "sha256": "a50839cca3caf76fc1f3066c1d031c0b92c5f2969b8b0827acb8ab4d1346f710",
+      "bytes": 1193
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/semantic/zero_fields/candidate/ASTOCK-074-281f68025808/_raw/bodies/a73a79628d9eb27705ce4c0a993327cbda4672f2d32767da9633b8fccbbe1a80.bin",
+      "sha256": "a73a79628d9eb27705ce4c0a993327cbda4672f2d32767da9633b8fccbbe1a80",
+      "bytes": 834
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/semantic/zero_fields/candidate/ASTOCK-074-281f68025808/_raw/manifest.ndjson",
+      "sha256": "e88cb01051ac70515ba2b121ebfbef307af2943e9e89d746efad27896a6990ec",
+      "bytes": 1418
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/semantic/zero_fields/fixture/bodies/a73a79628d9eb27705ce4c0a993327cbda4672f2d32767da9633b8fccbbe1a80.bin",
+      "sha256": "a73a79628d9eb27705ce4c0a993327cbda4672f2d32767da9633b8fccbbe1a80",
+      "bytes": 834
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/semantic/zero_fields/fixture/manifest.ndjson",
+      "sha256": "d3b8560c9551e975cf56bf70b24076e051dea1e919535dec936f76d3ab5a7e34",
+      "bytes": 1082
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-074-919a2cebed75/2026-10-04/futures_quote/sina/futures_quote/mapped-rows.json",
+      "sha256": "3d77464fd6439fbf2e06fa91b161c3e6b312b223c0c29985aa0a0d5f3f3bae05",
+      "bytes": 1104
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-074-919a2cebed75/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "cddc5ee2d149b9688c05b77d3b5216317736084f318c7e0954c4b7de2d2bd5bd",
+      "bytes": 11121
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-074-919a2cebed75/2026-10-04/parsed_rows/sina/futures_quote/parsed-rows.json",
+      "sha256": "c48abf2fa2137c0e662fa3daab40063f826afc156315400cd7ce2a6f36486e2d",
+      "bytes": 989
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-074-919a2cebed75/2026-10-04/source_rows/sina/futures_quote/source-rows.json",
+      "sha256": "14bb8a1efcfcb50d3654c508279251e6b9274c4d1e5e9772ede9dc9a915ea81f",
+      "bytes": 1205
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-074-919a2cebed75/_raw/bodies/2990f9cbcb96e04bd520870b1bb097f94de7d41ec908ee032d73f4c91c155a59.bin",
+      "sha256": "2990f9cbcb96e04bd520870b1bb097f94de7d41ec908ee032d73f4c91c155a59",
+      "bytes": 847
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-074-919a2cebed75/_raw/manifest.ndjson",
+      "sha256": "3c32f21f9741e707051369fe4d2763751ef6fa27038dad2e64d906ebb2a4c7fa",
+      "bytes": 1280
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-074-ee61918c634d/2026-10-04/futures_quote/sina/futures_quote/mapped-rows.json",
+      "sha256": "3d77464fd6439fbf2e06fa91b161c3e6b312b223c0c29985aa0a0d5f3f3bae05",
+      "bytes": 1104
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-074-ee61918c634d/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "7de562fd5dc9ec5c94a6b3091c999162237ccc0acf94fc0522e6b8f191c8fdab",
+      "bytes": 11434
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-074-ee61918c634d/2026-10-04/parsed_rows/sina/futures_quote/parsed-rows.json",
+      "sha256": "c48abf2fa2137c0e662fa3daab40063f826afc156315400cd7ce2a6f36486e2d",
+      "bytes": 989
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-074-ee61918c634d/2026-10-04/source_rows/sina/futures_quote/source-rows.json",
+      "sha256": "14bb8a1efcfcb50d3654c508279251e6b9274c4d1e5e9772ede9dc9a915ea81f",
+      "bytes": 1205
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-074-ee61918c634d/_raw/bodies/2990f9cbcb96e04bd520870b1bb097f94de7d41ec908ee032d73f4c91c155a59.bin",
+      "sha256": "2990f9cbcb96e04bd520870b1bb097f94de7d41ec908ee032d73f4c91c155a59",
+      "bytes": 847
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-074-ee61918c634d/_raw/manifest.ndjson",
+      "sha256": "dec987829cff8f9420676b981033f17a691238225f6af763ba8b2237f892426d",
+      "bytes": 1598
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-075-2e70dea3604f/2026-10-04/excluded_rows/sina/futures_kline/excluded-rows.json",
+      "sha256": "24f66832d48cf4ba5bea7e4a793184290909c6dfca691124b3e407bc94500555",
+      "bytes": 614031
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-075-2e70dea3604f/2026-10-04/futures_daily/sina/futures_kline/mapped-rows.json",
+      "sha256": "fbe6126bec7c7b6efa03bb960d55590184337e2192c5eeffa288aab86c689177",
+      "bytes": 41812
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-075-2e70dea3604f/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "b2a208049e8e6bf1b1688e0ac406175e5aa0b29805ebb3d53bf13a2279667211",
+      "bytes": 11048
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-075-2e70dea3604f/2026-10-04/parsed_rows/sina/futures_kline/parsed-rows.json",
+      "sha256": "c50340634b0c4322f0ca7d2a6683c86628c01d7132ba85e0c40cc8ceb082c207",
+      "bytes": 27604
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-075-2e70dea3604f/2026-10-04/source_rows/sina/futures_kline/source-rows.json",
+      "sha256": "fd85d677f8cc6ff922e8f74a9b728a674f77ba00969d1871fd257fe0f12400d2",
+      "bytes": 636023
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-075-2e70dea3604f/_raw/bodies/ecd7f264230e49f3ace244fee9ae7155093fbac8b61e7e9d0926d674c6d9d7f7.bin",
+      "sha256": "ecd7f264230e49f3ace244fee9ae7155093fbac8b61e7e9d0926d674c6d9d7f7",
+      "bytes": 636083
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-075-2e70dea3604f/_raw/manifest.ndjson",
+      "sha256": "2c3ea0b478f1f1e0d33b6a7ce9a3739bf1c8409a154d1468af9974075ba3f876",
+      "bytes": 1371
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-075-45120e71c5a0/2026-10-04/excluded_rows/sina/futures_kline/excluded-rows.json",
+      "sha256": "4af67a9c50f10df66def12d5b508eb32da64ab82f1da763bcdc9d0d1f3ce1434",
+      "bytes": 494400
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-075-45120e71c5a0/2026-10-04/futures_daily/sina/futures_kline/mapped-rows.json",
+      "sha256": "11f9d88e7d2c7d04ffb859bd436bd9f2e1b7eedf6660dae438dc9f33da780108",
+      "bytes": 41993
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-075-45120e71c5a0/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "f320efa46083cd626286bbf72889c341a26dab105929be28a5705b1fa8ba2fe6",
+      "bytes": 11372
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-075-45120e71c5a0/2026-10-04/parsed_rows/sina/futures_kline/parsed-rows.json",
+      "sha256": "2ef5b6b86b4930b58e65ef99b6947d55a8c680df76cfdf22f23c60af750e4639",
+      "bytes": 27706
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-075-45120e71c5a0/2026-10-04/source_rows/sina/futures_kline/source-rows.json",
+      "sha256": "de139498810b52e5b68819d0c9e9c34495555dfa894b2e603f3527f6df86f3c7",
+      "bytes": 516313
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-075-45120e71c5a0/_raw/bodies/e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998.bin",
+      "sha256": "e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998",
+      "bytes": 516374
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-075-45120e71c5a0/_raw/manifest.ndjson",
+      "sha256": "a87334347eaf1cd15c6dac93202af89f02b892e9b4a5630b08a6471cb7cabfc0",
+      "bytes": 1692
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-075-c24b6abfcdc8/2026-10-04/excluded_rows/sina/futures_kline/excluded-rows.json",
+      "sha256": "4af67a9c50f10df66def12d5b508eb32da64ab82f1da763bcdc9d0d1f3ce1434",
+      "bytes": 494400
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-075-c24b6abfcdc8/2026-10-04/futures_daily/sina/futures_kline/mapped-rows.json",
+      "sha256": "11f9d88e7d2c7d04ffb859bd436bd9f2e1b7eedf6660dae438dc9f33da780108",
+      "bytes": 41993
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-075-c24b6abfcdc8/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "9d1df989267cc413209fff60df718a0db37a0b0f99cbabd8af7b6312877f71b8",
+      "bytes": 11059
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-075-c24b6abfcdc8/2026-10-04/parsed_rows/sina/futures_kline/parsed-rows.json",
+      "sha256": "2ef5b6b86b4930b58e65ef99b6947d55a8c680df76cfdf22f23c60af750e4639",
+      "bytes": 27706
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-075-c24b6abfcdc8/2026-10-04/source_rows/sina/futures_kline/source-rows.json",
+      "sha256": "de139498810b52e5b68819d0c9e9c34495555dfa894b2e603f3527f6df86f3c7",
+      "bytes": 516313
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-075-c24b6abfcdc8/_raw/bodies/e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998.bin",
+      "sha256": "e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998",
+      "bytes": 516374
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-075-c24b6abfcdc8/_raw/manifest.ndjson",
+      "sha256": "7ec92e95a8d8037fe10617d05e8ea8668b7cbc6347c374b19b08156df2faa268",
+      "bytes": 1374
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-075-e9224d660c73/2026-10-04/excluded_rows/sina/futures_kline/excluded-rows.json",
+      "sha256": "24f66832d48cf4ba5bea7e4a793184290909c6dfca691124b3e407bc94500555",
+      "bytes": 614031
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-075-e9224d660c73/2026-10-04/futures_daily/sina/futures_kline/mapped-rows.json",
+      "sha256": "fbe6126bec7c7b6efa03bb960d55590184337e2192c5eeffa288aab86c689177",
+      "bytes": 41812
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-075-e9224d660c73/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "9ede9405354cb1e218ba0625e2908077646e05f19ff03d56f47c175e389b1b90",
+      "bytes": 11361
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-075-e9224d660c73/2026-10-04/parsed_rows/sina/futures_kline/parsed-rows.json",
+      "sha256": "c50340634b0c4322f0ca7d2a6683c86628c01d7132ba85e0c40cc8ceb082c207",
+      "bytes": 27604
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-075-e9224d660c73/2026-10-04/source_rows/sina/futures_kline/source-rows.json",
+      "sha256": "fd85d677f8cc6ff922e8f74a9b728a674f77ba00969d1871fd257fe0f12400d2",
+      "bytes": 636023
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-075-e9224d660c73/_raw/bodies/ecd7f264230e49f3ace244fee9ae7155093fbac8b61e7e9d0926d674c6d9d7f7.bin",
+      "sha256": "ecd7f264230e49f3ace244fee9ae7155093fbac8b61e7e9d0926d674c6d9d7f7",
+      "bytes": 636083
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-075-e9224d660c73/_raw/manifest.ndjson",
+      "sha256": "476fab27fc7fc75a9a912d33bed6e90a593d2902c5cd3b081a4eb4616f8d0574",
+      "bytes": 1689
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-076-7cb3274d1e48/2026-10-04/a50_quote/sina/a50_quote/mapped-rows.json",
+      "sha256": "de08cf463f1bd7437463e58964ca93ae9737a028b874dd2704d25cc4a14501aa",
+      "bytes": 243
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-076-7cb3274d1e48/2026-10-04/input_report/sina/a50_quote/report.json",
+      "sha256": "dd0300d5022e9cca16d81699915701ea137e60a1bc2b566c3a861136c1fd2b9e",
+      "bytes": 10345
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-076-7cb3274d1e48/2026-10-04/parsed_rows/sina/a50_quote/parsed-rows.json",
+      "sha256": "df456063471b7866b06e75f4f4276dc42359c49b05f13c8a7b2d91c39d8011b2",
+      "bytes": 175
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-076-7cb3274d1e48/2026-10-04/source_rows/sina/a50_quote/source-rows.json",
+      "sha256": "9071ca63503a94389027e0099eba656834e09e1ea638334c77854ec587dc1fc8",
+      "bytes": 208
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-076-7cb3274d1e48/_raw/bodies/a67d6e37ab7d31388fe32710b0c521363473fa65b2c64439917a54d6bfb4388b.bin",
+      "sha256": "a67d6e37ab7d31388fe32710b0c521363473fa65b2c64439917a54d6bfb4388b",
+      "bytes": 152
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-076-7cb3274d1e48/_raw/manifest.ndjson",
+      "sha256": "eccb8fd8d17dc5e7dbdc2081b3d8bb5d88883b7f93eea1cc3fa04e737a1509f1",
+      "bytes": 1237
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-076-af82737213b9/2026-10-04/a50_quote/sina/a50_quote/mapped-rows.json",
+      "sha256": "de08cf463f1bd7437463e58964ca93ae9737a028b874dd2704d25cc4a14501aa",
+      "bytes": 243
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-076-af82737213b9/2026-10-04/input_report/sina/a50_quote/report.json",
+      "sha256": "807744f839e09d8a8f69627312396a210e33495666e12d22544b783ed440c1b8",
+      "bytes": 10658
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-076-af82737213b9/2026-10-04/parsed_rows/sina/a50_quote/parsed-rows.json",
+      "sha256": "df456063471b7866b06e75f4f4276dc42359c49b05f13c8a7b2d91c39d8011b2",
+      "bytes": 175
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-076-af82737213b9/2026-10-04/source_rows/sina/a50_quote/source-rows.json",
+      "sha256": "9071ca63503a94389027e0099eba656834e09e1ea638334c77854ec587dc1fc8",
+      "bytes": 208
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-076-af82737213b9/_raw/bodies/a67d6e37ab7d31388fe32710b0c521363473fa65b2c64439917a54d6bfb4388b.bin",
+      "sha256": "a67d6e37ab7d31388fe32710b0c521363473fa65b2c64439917a54d6bfb4388b",
+      "bytes": 152
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/candidate/ASTOCK-076-af82737213b9/_raw/manifest.ndjson",
+      "sha256": "61173734e2eab21b00bab5f21d3b9d16605ea4672f636492b483355c51b81d0f",
+      "bytes": 1555
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/session/fixture-mode.json",
+      "sha256": "8ddb83ee30c97c1a49e84df4ba40596600416e5af4047388858b88fa81ab123a",
+      "bytes": 108
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/bad/ASTOCK-074-c940f451c1ee/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "870600075c5a629ce4c364c1daa8986d5dad4d13803055f5d169b015069a37c2",
+      "bytes": 8268
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/candidate/ASTOCK-074-2cbc0e78b7cb/2026-10-04/futures_quote/sina/futures_quote/mapped-rows.json",
+      "sha256": "262341e06b490f2eb15ba136bf93453469dc957ddfc2d724b85fdd0576cdb9d7",
+      "bytes": 386
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/candidate/ASTOCK-074-2cbc0e78b7cb/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "a842a4421244c6514df875130548894439aa28a8aec866ddfc7a364cb22ee285",
+      "bytes": 10686
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/candidate/ASTOCK-074-2cbc0e78b7cb/2026-10-04/parsed_rows/sina/futures_quote/parsed-rows.json",
+      "sha256": "c48abf2fa2137c0e662fa3daab40063f826afc156315400cd7ce2a6f36486e2d",
+      "bytes": 989
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/candidate/ASTOCK-074-2cbc0e78b7cb/2026-10-04/source_rows/sina/futures_quote/source-rows.json",
+      "sha256": "14bb8a1efcfcb50d3654c508279251e6b9274c4d1e5e9772ede9dc9a915ea81f",
+      "bytes": 1205
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/candidate/ASTOCK-074-2cbc0e78b7cb/_raw/bodies/2990f9cbcb96e04bd520870b1bb097f94de7d41ec908ee032d73f4c91c155a59.bin",
+      "sha256": "2990f9cbcb96e04bd520870b1bb097f94de7d41ec908ee032d73f4c91c155a59",
+      "bytes": 847
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/candidate/ASTOCK-074-2cbc0e78b7cb/_raw/manifest.ndjson",
+      "sha256": "74934ae5b8dcd19b9bf7c4890fd7d5430c68902755d44ea501d61609e3162917",
+      "bytes": 1599
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/capabilities.yaml",
+      "sha256": "7b7ce0da1d33b333165c6081a3ed788f85cb05d5f6945c745eec97d73e24f6e2",
+      "bytes": 4009
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/collection.yaml",
+      "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d",
+      "bytes": 2934
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/a50_quote.yaml",
+      "sha256": "d9b990dfe46e7b500890da82723dee287c4e2be29e009ab91ceadd8099a02fd2",
+      "bytes": 907
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/board_fund_flow.yaml",
+      "sha256": "08f3566d0cf2787186e6106e4915d0d89b70232d737898480eda03785ea3c53a",
+      "bytes": 1110
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/broken_limit_pool.yaml",
+      "sha256": "60b3790eae896c968093c8d26a818c9dab325aca620510b4ec1dde061af7f65e",
+      "bytes": 1162
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/buyback.yaml",
+      "sha256": "807490acc8affc7dde3502ef62c2b80ad32923fe4c5ff6a6b4fd9d403b50d4f6",
+      "bytes": 1439
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/cctv_news_index.yaml",
+      "sha256": "a876cfcb7dfa79b79423cb3ae8044dab1bb43515f12fc090158228dbf95b6d33",
+      "bytes": 317
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/concept_board.yaml",
+      "sha256": "eef0b07c9a41bfd5ef1a52f4f39516cb26d42b088d63a15783af0f94985fd76f",
+      "bytes": 379
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/convertible_bonds.yaml",
+      "sha256": "11723522544165617f1141aa08921252ca99447eba5cf507c574a887dd6748b9",
+      "bytes": 1362
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/daily_bar.yaml",
+      "sha256": "0a8c1dcae7e1c062ae70c224defc1362adc1d58bc196bbeb2f1edd61d6fd39e7",
+      "bytes": 995
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/dividend_event.yaml",
+      "sha256": "67a2b02063cb9a891e3fb388048407cbc08b05ce8ae97deea6976d3904340d2e",
+      "bytes": 759
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/earnings_forecast.yaml",
+      "sha256": "ded845c047fcefdbeb163f27620d4e67f2bc78e62a0bcfea5678d6df8758f8fd",
+      "bytes": 1060
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/financial_main.yaml",
+      "sha256": "23d8b55356620439d5c1b507601b782b31aa965fe24eaf194e869466bb271ab0",
+      "bytes": 766
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/futures_daily.yaml",
+      "sha256": "3c923f6d637e1409ec1be5733897ba267a8025169b36b6874aefd0b8181834d5",
+      "bytes": 938
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/futures_quote.yaml",
+      "sha256": "0fb3866f0cdfacfe6fe9dbe7d5396947b16514751639275db40352ff5655a33b",
+      "bytes": 1557
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/holder_trades.yaml",
+      "sha256": "44b0ecfc09c6e39823c50e83077354f25bc8026fc70272d92046ba3a51d09b92",
+      "bytes": 1246
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/industry_board.yaml",
+      "sha256": "c6930c70b55e171dee94b74b80f3c37df1466d4a10dadc3016975004b8b47ba4",
+      "bytes": 380
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/industry_directory.yaml",
+      "sha256": "9325d485bf7a1bc2b075c2d920b43b17caa039916536bedd8163be0f972bfe5b",
+      "bytes": 346
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/industry_index_daily.yaml",
+      "sha256": "5d542c72443410747f2ac643589bfd8160cdea07d01d6d0dd9c5e4753096043b",
+      "bytes": 676
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/industry_membership.yaml",
+      "sha256": "dff512c9b7f00330bbe408ba1e1eb74d99b49bc0b38ee419d4c463047c6fe69d",
+      "bytes": 709
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/institution_survey.yaml",
+      "sha256": "470fd4503d45cf0839e887fd276a0c3c82cdcae7cae8f52001006464c212733e",
+      "bytes": 703
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/intraday_trend.yaml",
+      "sha256": "5983e0eb29c1cd7a781fbad0be7332dda14e887ccd744e55ad4b8664c7a0c38a",
+      "bytes": 665
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/ipo_calendar.yaml",
+      "sha256": "7579b9174fd3554a92bc50865cabe7ac20604579403f748d09bcd4e8760bcac9",
+      "bytes": 1331
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/limit_down_pool.yaml",
+      "sha256": "67b3ca1ae9edf0f863d2b2d5257a315fe721f042086d4b5966653c0f2758d806",
+      "bytes": 1177
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/limit_up_pool.yaml",
+      "sha256": "73c1fa4ed6d7281d1857208a2ec9696a3637214bb256661ce943313c75772a69",
+      "bytes": 982
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/lpr_history.yaml",
+      "sha256": "b40bb3000aa8db8b84aeaad6383c3dd7da1afb3c3bfb6ed6fc69343476ca7650",
+      "bytes": 330
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/minute_bar_5m.yaml",
+      "sha256": "fb6f822ed42479422a0b4c227577d8e559bb6b2238562af566af0464304bd873",
+      "bytes": 708
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/pledge.yaml",
+      "sha256": "40b46e96e55d8b1061c98ec979094b4f98ef4800e513cfa7a9c2c5f2152b2fb1",
+      "bytes": 878
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/previous_limit_pool.yaml",
+      "sha256": "5234397a7b87ed3e03c11431de1f00c012e135ba5ef57bf63a2f431f659703bc",
+      "bytes": 1199
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/realtime_quote.yaml",
+      "sha256": "ebc3e97bb7469eb4c7c80daf50991ebe38f0eb5b2476a9a579d22236d416378b",
+      "bytes": 1121
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/repo_fixing.yaml",
+      "sha256": "6908c6c805e15a153dc567d58c81daecb66026bdd0f48d8865e296a1ba883935",
+      "bytes": 506
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/security_snapshot.yaml",
+      "sha256": "255115893f64837a3b95ea9fe44551948eefa9604aca9d59214de87a580300be",
+      "bytes": 519
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/shareholder_count.yaml",
+      "sha256": "d325df1784c873bea73a1d907e9964e06c26e4d6b356dd6c16148837b57feccf",
+      "bytes": 923
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/stock_fund_flow.yaml",
+      "sha256": "df3f21341463f3538a1f855ef19b7bbdb683405aaa65d5418c255023c18a429f",
+      "bytes": 736
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/strong_stock_pool.yaml",
+      "sha256": "264c9d759405d37733cf4daf29996240cb46fed46c3eb8835405a4311e1c1131",
+      "bytes": 1194
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/trading_calendar.yaml",
+      "sha256": "924b17a5be104252e85a377e4579432c6725bab99cbaa0ad70e71102149a1f49",
+      "bytes": 192
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets/wallstreetcn_news.yaml",
+      "sha256": "1bdecf169c6ea357cbb53787bd0a9a659d1f4a96e77e42996556b55df97bbd49",
+      "bytes": 534
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/datasets.yaml",
+      "sha256": "e992d13297e1f9a8f64acabc25f65f138b21ce12dca16689cc3f17bf1385a6eb",
+      "bytes": 587
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/a50_quote.yaml",
+      "sha256": "c984450a923a5655cdd60e1e35a9c8981fca80f9c4f996f5dcce790f10f08b9f",
+      "bytes": 886
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/board_fund_flow.yaml",
+      "sha256": "fb7c6f1f2d425181b189e25152e465306982e10c7c6ee06b2917dfa00b891baa",
+      "bytes": 1395
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/broken_limit_pool.yaml",
+      "sha256": "8bd046757fc9fb3e7d144a0e9d41106267e828a60bc5a099280158c15459a84d",
+      "bytes": 1238
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/buyback.yaml",
+      "sha256": "70e6ee88258842e76509208c6d9df379478df717837489869ff1e9f72f82d1b3",
+      "bytes": 2520
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/cctv_news_index.yaml",
+      "sha256": "4de0d3f1b61694e5c6ab7450a38a7c85f583fadd64d48e52bd737545eb04e42b",
+      "bytes": 573
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/concept_board.yaml",
+      "sha256": "2b7e7f57d189541d6a232cd5391d2dab4289f9f3438f397d9fefd82bb1d996b7",
+      "bytes": 206
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/convertible_bonds.yaml",
+      "sha256": "147b800777f7042f9e4a7907841e038034db65a80f263fcb04628ea34943dd56",
+      "bytes": 1289
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/daily_bar.yaml",
+      "sha256": "41f9bbd0824e20d70f7ed276758b286094c33c79180befca4d8985afc3c8ad0b",
+      "bytes": 2913
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/dividend_event.yaml",
+      "sha256": "188df2f7f075b92e993136aef3f977eea419f9c6957404bd2f7071c76ed24a71",
+      "bytes": 1532
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/earnings_forecast.yaml",
+      "sha256": "5b323a3c3c6577527701985248bb13b54102463a167ba04c749f4908e2b401c4",
+      "bytes": 1633
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/financial_main.yaml",
+      "sha256": "eeeb2e7418aab430168f0c7e16c69f1b24a9e49ec8d156a28390cae0e7a69bda",
+      "bytes": 603
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/futures_daily.yaml",
+      "sha256": "94760152dd79821d2ed775f64924d84546e85194c44b3baa782b113a040f659b",
+      "bytes": 858
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/futures_quote.yaml",
+      "sha256": "ebbda4c0a4a47c16d4bc4d3e293d0c1b1e95db5649b8f02d73c04d559acd591b",
+      "bytes": 1260
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/holder_trades.yaml",
+      "sha256": "2deca39ea7c1a57254b4ee31390587f39d640559181cd1ceae7968a4684e5f40",
+      "bytes": 1959
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/industry_board.yaml",
+      "sha256": "f3ff8bbe7fc4e8d4e5af1c36b9312e8db1c8c9cb09a09aadb472b22ae09de152",
+      "bytes": 210
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/industry_directory.yaml",
+      "sha256": "823d97db8afe4adb3f963faaa04b42b8f151e93f2e75f3eb18f8c678a68bae37",
+      "bytes": 478
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/industry_index_daily.yaml",
+      "sha256": "953087294fd2c3a3cb1b46f204d0a0f606f9060f0f89676fb3a189222a68dab1",
+      "bytes": 805
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/industry_membership.yaml",
+      "sha256": "7eb72a1b8ce7aff27aa1ad62534af2bf7183f3d78c6392208035396a11e21ccb",
+      "bytes": 765
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/institution_survey.yaml",
+      "sha256": "e33c639f75da6a7a1d699936d0624084ed3488ef773aa9fcf3eaefc66e829423",
+      "bytes": 1118
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/intraday_trend.yaml",
+      "sha256": "14b0b22ad1308c70b65152e711c4248d3c8bf1c28d842fba36309194ed38870a",
+      "bytes": 440
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/ipo_calendar.yaml",
+      "sha256": "d72db539afed6e890e81d6e1c4680fcb09ad4285551748f3c9e12ba124e6059c",
+      "bytes": 2338
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/limit_down_pool.yaml",
+      "sha256": "456b0a779929bb6ff71ed70e07cd420d42596068f142879926b86972e3704f7b",
+      "bytes": 1314
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/limit_up_pool.yaml",
+      "sha256": "411e6e6ead10a4d2cbff7ecf4de9bee26f411a66d005a33bc640865ef4b6e7ba",
+      "bytes": 1079
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/lpr_history.yaml",
+      "sha256": "2a12cd26c069d8be0eb68e121eef7930f97f602ffe80e459b649c6cbc5a4c217",
+      "bytes": 682
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/minute_bar_5m.yaml",
+      "sha256": "f3e9abaededc01a15c651a99a22131a80067133deb89548dd12b17278e0e55b7",
+      "bytes": 1134
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/pledge.yaml",
+      "sha256": "4c8f7636e0b20e5923adbbf4c5e696247da67869d90ed19f0aee62f2e5612710",
+      "bytes": 1589
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/previous_limit_pool.yaml",
+      "sha256": "4c14b9ad1f0497e2d6f13a72978f1ddda74039b7c0d182c5a5a98ac01a678443",
+      "bytes": 1276
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/realtime_quote.yaml",
+      "sha256": "e9141547fbb85cb71c8e2336c20a2ebc948e3926f4b2a09e4f59505adea91b94",
+      "bytes": 1308
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/repo_fixing.yaml",
+      "sha256": "0d6b2b5b39a92c6f3d2629f3f805f0b12d609ea9b3f691a50c896c12d81b4681",
+      "bytes": 762
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/security_snapshot.yaml",
+      "sha256": "474ab0397cb1aad33abcd070942586a8460c468b1d3f7af97c2d152eee5a6537",
+      "bytes": 621
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/shareholder_count.yaml",
+      "sha256": "f8801367f055e0b1d419e648c9bd3e1d72984ffe2823c2d464770403c1b7c9e4",
+      "bytes": 1702
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/stock_fund_flow.yaml",
+      "sha256": "3d99bacf48ba3438c90d2d544f7223ffcb0a464f69f95841affe3e99a503bbe1",
+      "bytes": 1741
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/strong_stock_pool.yaml",
+      "sha256": "41733f419a6dd9d3a25edf361294a973df76d878d01bbf46b9f25f53a38f2304",
+      "bytes": 1234
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/trading_calendar.yaml",
+      "sha256": "4be7571914129769aeca321d892b8aa2fbd068db1c7c0b691ae0d5cefe7f69e0",
+      "bytes": 476
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/normalization/wallstreetcn_news.yaml",
+      "sha256": "cdca43fb9ef1d825fe75358ea6c828fec02b892e344505d484d302123079fca9",
+      "bytes": 770
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/providers.yaml",
+      "sha256": "3441064a76ea456240cb368441643ba6d6eabb3ce9a63c99e1b0a67e65ca660a",
+      "bytes": 82441
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/config/schedules.yaml",
+      "sha256": "01b7e269ea4231024bf1c520f78fa571c2909986aad5573006bd80e186119113",
+      "bytes": 525
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/empty/ASTOCK-075-3fa2b1ea69e5/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "5027f847d47b242c405f46d2303cd83d3533678e5c92f8687d80eb0358d1ad8d",
+      "bytes": 9597
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/empty/ASTOCK-075-3fa2b1ea69e5/_raw/bodies/e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998.bin",
+      "sha256": "e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998",
+      "bytes": 516374
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004/yaml/empty/ASTOCK-075-3fa2b1ea69e5/_raw/manifest.ndjson",
+      "sha256": "7e69d0e39a727926bf75f5c3db3cff1af6b4ffc6cd436405996a660dbf3a1082",
+      "bytes": 1867
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-20261004-tests.xml",
+      "sha256": "c078f6a0690da3e273004b27bd20001bcad31e07e67c37bfec3c4aea09ae1759",
+      "bytes": 58931
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/1/candidate/ASTOCK-074-0a7165c72a2b/2026-10-04/futures_quote/sina/futures_quote/mapped-rows.json",
+      "sha256": "7007435c3b9d73a028c88e2d3c72942df367a50e80361a3e66f840d14c47073a",
+      "bytes": 1104
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/1/candidate/ASTOCK-074-0a7165c72a2b/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "ba4579b7d5d1ef82215a2308b1b76e7769e936ed7f83159599fa96ffb3ca94d7",
+      "bytes": 11429
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/1/candidate/ASTOCK-074-0a7165c72a2b/2026-10-04/parsed_rows/sina/futures_quote/parsed-rows.json",
+      "sha256": "c48abf2fa2137c0e662fa3daab40063f826afc156315400cd7ce2a6f36486e2d",
+      "bytes": 989
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/1/candidate/ASTOCK-074-0a7165c72a2b/2026-10-04/source_rows/sina/futures_quote/source-rows.json",
+      "sha256": "14bb8a1efcfcb50d3654c508279251e6b9274c4d1e5e9772ede9dc9a915ea81f",
+      "bytes": 1205
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/1/candidate/ASTOCK-074-0a7165c72a2b/_raw/bodies/2990f9cbcb96e04bd520870b1bb097f94de7d41ec908ee032d73f4c91c155a59.bin",
+      "sha256": "2990f9cbcb96e04bd520870b1bb097f94de7d41ec908ee032d73f4c91c155a59",
+      "bytes": 847
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/1/candidate/ASTOCK-074-0a7165c72a2b/_raw/manifest.ndjson",
+      "sha256": "bf8025aa970c86c5fb613860f864cfc962f7db25a03966f8c4021da889bc6f1d",
+      "bytes": 1599
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/1/comparison.json",
+      "sha256": "b9c93d018cb0c3d950dd3124d6506f3dcf67a7f1b4500998e1ebb848da73ee43",
+      "bytes": 887
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/1/original/bodies/2990f9cbcb96e04bd520870b1bb097f94de7d41ec908ee032d73f4c91c155a59.bin",
+      "sha256": "2990f9cbcb96e04bd520870b1bb097f94de7d41ec908ee032d73f4c91c155a59",
+      "bytes": 847
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/1/original/manifest.ndjson",
+      "sha256": "4e8b3f2af2c396ac47633fdc8095a7d6cfab01f6c89548828a431b826337caa8",
+      "bytes": 1523
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/1/original-parsed.json",
+      "sha256": "894b7600b55d3108a0f48840f88dec49f3b1161afa0e2a04b8b1ff41eddafe52",
+      "bytes": 1833
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/2/candidate/ASTOCK-075-d9b22b0009d1/2026-10-04/excluded_rows/sina/futures_kline/excluded-rows.json",
+      "sha256": "4af67a9c50f10df66def12d5b508eb32da64ab82f1da763bcdc9d0d1f3ce1434",
+      "bytes": 494400
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/2/candidate/ASTOCK-075-d9b22b0009d1/2026-10-04/futures_daily/sina/futures_kline/mapped-rows.json",
+      "sha256": "3af7e4d646168dac8fddb300d00d3a435afab5b74bc544a7a508dd2be742b6a5",
+      "bytes": 41993
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/2/candidate/ASTOCK-075-d9b22b0009d1/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "43eb1f0a619c6a3e36717a8f62341c3e2c8976cc4fff2462b4e6365e2a8ab406",
+      "bytes": 11552
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/2/candidate/ASTOCK-075-d9b22b0009d1/2026-10-04/parsed_rows/sina/futures_kline/parsed-rows.json",
+      "sha256": "2ef5b6b86b4930b58e65ef99b6947d55a8c680df76cfdf22f23c60af750e4639",
+      "bytes": 27706
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/2/candidate/ASTOCK-075-d9b22b0009d1/2026-10-04/source_rows/sina/futures_kline/source-rows.json",
+      "sha256": "de139498810b52e5b68819d0c9e9c34495555dfa894b2e603f3527f6df86f3c7",
+      "bytes": 516313
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/2/candidate/ASTOCK-075-d9b22b0009d1/_raw/bodies/e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998.bin",
+      "sha256": "e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998",
+      "bytes": 516374
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/2/candidate/ASTOCK-075-d9b22b0009d1/_raw/manifest.ndjson",
+      "sha256": "9934daacabacbee1c9973b7599195bfbbc331bf8b0f68b5fd2a407be85b96da9",
+      "bytes": 1888
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/2/comparison.json",
+      "sha256": "5c53d7468d4fdf40cfbbb74e161c0f5ec06f4f4baa6f30cc2035105d4f501ea3",
+      "bytes": 889
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/2/original/bodies/e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998.bin",
+      "sha256": "e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998",
+      "bytes": 516374
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/2/original/manifest.ndjson",
+      "sha256": "b3baf4b79b3ec001fa21c8953344f8d4cda4f567f8e4cc62605b63ccee6f86eb",
+      "bytes": 1822
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/2/original-parsed.json",
+      "sha256": "ed284d70052db45ec6f6fc2cd0e5fe54fe2a2bac806a27337a1058e46c55683e",
+      "bytes": 79838
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/3/candidate/ASTOCK-075-d7a46faab44c/2026-10-04/excluded_rows/sina/futures_kline/excluded-rows.json",
+      "sha256": "24f66832d48cf4ba5bea7e4a793184290909c6dfca691124b3e407bc94500555",
+      "bytes": 614031
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/3/candidate/ASTOCK-075-d7a46faab44c/2026-10-04/futures_daily/sina/futures_kline/mapped-rows.json",
+      "sha256": "b3531a1856901704904105c01c20d029ab596b07043f99e9633feebc1afd5680",
+      "bytes": 41812
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/3/candidate/ASTOCK-075-d7a46faab44c/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "77b541914a362ea960e84a48d1d622c00f5a047f9620318e7add2dfaf2aebdc1",
+      "bytes": 11541
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/3/candidate/ASTOCK-075-d7a46faab44c/2026-10-04/parsed_rows/sina/futures_kline/parsed-rows.json",
+      "sha256": "c50340634b0c4322f0ca7d2a6683c86628c01d7132ba85e0c40cc8ceb082c207",
+      "bytes": 27604
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/3/candidate/ASTOCK-075-d7a46faab44c/2026-10-04/source_rows/sina/futures_kline/source-rows.json",
+      "sha256": "fd85d677f8cc6ff922e8f74a9b728a674f77ba00969d1871fd257fe0f12400d2",
+      "bytes": 636023
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/3/candidate/ASTOCK-075-d7a46faab44c/_raw/bodies/ecd7f264230e49f3ace244fee9ae7155093fbac8b61e7e9d0926d674c6d9d7f7.bin",
+      "sha256": "ecd7f264230e49f3ace244fee9ae7155093fbac8b61e7e9d0926d674c6d9d7f7",
+      "bytes": 636083
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/3/candidate/ASTOCK-075-d7a46faab44c/_raw/manifest.ndjson",
+      "sha256": "df639288dfa878a6c90b7be620c49e87a5c6d70134481af0f792a136b5d6a7fc",
+      "bytes": 1885
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/3/comparison.json",
+      "sha256": "6aea0df61bf787499f694d3a493062c20318a401fdbe2fd9eaa954e4dab2632d",
+      "bytes": 889
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/3/original/bodies/ecd7f264230e49f3ace244fee9ae7155093fbac8b61e7e9d0926d674c6d9d7f7.bin",
+      "sha256": "ecd7f264230e49f3ace244fee9ae7155093fbac8b61e7e9d0926d674c6d9d7f7",
+      "bytes": 636083
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/3/original/manifest.ndjson",
+      "sha256": "87637ee1e842e56331db985c740074314db1450f308f42759a8ecff2b2d33d15",
+      "bytes": 1819
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/3/original-parsed.json",
+      "sha256": "7159a76a358c9f6bfd6e63028d69a95c8f7711bab060ddfc3d486b5e4d96a524",
+      "bytes": 79374
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/4/candidate/ASTOCK-076-db0429c63c60/2026-10-04/a50_quote/sina/a50_quote/mapped-rows.json",
+      "sha256": "2c8e1a8e5d4a71877d1de2f84ae5d3e241ab7f8c9c0752fc758f95186e0bb351",
+      "bytes": 243
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/4/candidate/ASTOCK-076-db0429c63c60/2026-10-04/input_report/sina/a50_quote/report.json",
+      "sha256": "7fd885c9defa6238306e78bd768d1d6d4fd07ff26be9e386214805ecade23e02",
+      "bytes": 10653
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/4/candidate/ASTOCK-076-db0429c63c60/2026-10-04/parsed_rows/sina/a50_quote/parsed-rows.json",
+      "sha256": "df456063471b7866b06e75f4f4276dc42359c49b05f13c8a7b2d91c39d8011b2",
+      "bytes": 175
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/4/candidate/ASTOCK-076-db0429c63c60/2026-10-04/source_rows/sina/a50_quote/source-rows.json",
+      "sha256": "9071ca63503a94389027e0099eba656834e09e1ea638334c77854ec587dc1fc8",
+      "bytes": 208
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/4/candidate/ASTOCK-076-db0429c63c60/_raw/bodies/a67d6e37ab7d31388fe32710b0c521363473fa65b2c64439917a54d6bfb4388b.bin",
+      "sha256": "a67d6e37ab7d31388fe32710b0c521363473fa65b2c64439917a54d6bfb4388b",
+      "bytes": 152
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/4/candidate/ASTOCK-076-db0429c63c60/_raw/manifest.ndjson",
+      "sha256": "89e613a0c5e28f1022b01f58a845466d6a07c65615700d0208aaea767220dfd1",
+      "bytes": 1556
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/4/comparison.json",
+      "sha256": "2335edc501c475c52d167fe03300bd0adacaabdb1a01a2ee1873b4988908f401",
+      "bytes": 883
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/4/original/bodies/a67d6e37ab7d31388fe32710b0c521363473fa65b2c64439917a54d6bfb4388b.bin",
+      "sha256": "a67d6e37ab7d31388fe32710b0c521363473fa65b2c64439917a54d6bfb4388b",
+      "bytes": 152
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/4/original/manifest.ndjson",
+      "sha256": "ab5fe5b5c3a52e59b7ef98faa660c732a632e0262fd36d0c687662cb75b77ae1",
+      "bytes": 1469
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/4/original-parsed.json",
+      "sha256": "7206c643a7b0c88a29a88783fe1973403ab96a52714c6537e3bb75f472625b35",
+      "bytes": 388
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/comparison.json",
+      "sha256": "b64bdd7d31b7e2722dd0af9b1305aa296b859e54a5bab416d4cbe843d3a37a92",
+      "bytes": 13285
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f0/candidate/ASTOCK-074-a0da39df9691/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "1d83c2eb88c6f01c25b765d21c3b05744ddf0103546ed3413880a62e7fd6dd15",
+      "bytes": 9730
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f0/candidate/ASTOCK-074-a0da39df9691/_raw/bodies/a4d2a04461a1ba1df0b5bf30459a623a4999054450a355d8cae1cae99d9e1a44.bin",
+      "sha256": "a4d2a04461a1ba1df0b5bf30459a623a4999054450a355d8cae1cae99d9e1a44",
+      "bytes": 20
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f0/candidate/ASTOCK-074-a0da39df9691/_raw/manifest.ndjson",
+      "sha256": "d956c6390b174d2a05e3237781a61abc8f7bbd2ce7043ebac7812e009004f6c7",
+      "bytes": 1401
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f0/fixture/bodies/a4d2a04461a1ba1df0b5bf30459a623a4999054450a355d8cae1cae99d9e1a44.bin",
+      "sha256": "a4d2a04461a1ba1df0b5bf30459a623a4999054450a355d8cae1cae99d9e1a44",
+      "bytes": 20
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f0/fixture/manifest.ndjson",
+      "sha256": "eb005914c56c207b41f7e9c95bf8536b9416c0be4f63dbf6e6a09ed111a9ff92",
+      "bytes": 1079
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f1/candidate/ASTOCK-074-a766506454e4/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "5e372f161625440e7475aaf8d96accca51e43710a801cfb9b5cbfd41b257933d",
+      "bytes": 9731
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f1/candidate/ASTOCK-074-a766506454e4/_raw/bodies/e81fe429135c67e6543312d5d9604d47b17c6c0cbce632957bedfda001ba79e9.bin",
+      "sha256": "e81fe429135c67e6543312d5d9604d47b17c6c0cbce632957bedfda001ba79e9",
+      "bytes": 664
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f1/candidate/ASTOCK-074-a766506454e4/_raw/manifest.ndjson",
+      "sha256": "4e60c1b114fc0b37167d68baebeea62aab5ef2b2e173b00f55995ed6d8dcd627",
+      "bytes": 1402
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f1/fixture/bodies/e81fe429135c67e6543312d5d9604d47b17c6c0cbce632957bedfda001ba79e9.bin",
+      "sha256": "e81fe429135c67e6543312d5d9604d47b17c6c0cbce632957bedfda001ba79e9",
+      "bytes": 664
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f1/fixture/manifest.ndjson",
+      "sha256": "0f49ebd4aebd164958059295fd2bd265f6504fa879a412e3dbe791c36a6ba054",
+      "bytes": 1076
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f10/candidate/ASTOCK-075-cbb26b2fd92e/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "524518373ef30b39d98d4ea7977d93fc9f25249059f29fa1abe4a0cd12f241ea",
+      "bytes": 9239
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f10/candidate/ASTOCK-075-cbb26b2fd92e/_raw/bodies/fdad12a774ce77ad34cfbd7214ddc75c1ec37f0cc81c1816ab39e148cb78d6a6.bin",
+      "sha256": "fdad12a774ce77ad34cfbd7214ddc75c1ec37f0cc81c1816ab39e148cb78d6a6",
+      "bytes": 584383
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f10/candidate/ASTOCK-075-cbb26b2fd92e/_raw/manifest.ndjson",
+      "sha256": "0d7b0f6ee3baa3c825bc6e1e864e09e018a6e549e30f332a1fd991e1105bb291",
+      "bytes": 1505
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f10/fixture/bodies/fdad12a774ce77ad34cfbd7214ddc75c1ec37f0cc81c1816ab39e148cb78d6a6.bin",
+      "sha256": "fdad12a774ce77ad34cfbd7214ddc75c1ec37f0cc81c1816ab39e148cb78d6a6",
+      "bytes": 584383
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f10/fixture/manifest.ndjson",
+      "sha256": "40fb111d051dacd446f75d877eab1048fb4dea8b7b04c27928650b5e2b172f3d",
+      "bytes": 1152
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f11/candidate/ASTOCK-075-c4aeb77edf6c/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "a7469ddc417bd1dd132022d9d6e7c71530a9fd609223fdaa025f62eb3d790511",
+      "bytes": 9239
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f11/candidate/ASTOCK-075-c4aeb77edf6c/_raw/bodies/4b658ffff5944125bdc0fc72a6ae3336b38a2326a295f1acb376bb5952d39219.bin",
+      "sha256": "4b658ffff5944125bdc0fc72a6ae3336b38a2326a295f1acb376bb5952d39219",
+      "bytes": 584371
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f11/candidate/ASTOCK-075-c4aeb77edf6c/_raw/manifest.ndjson",
+      "sha256": "a06564dfbbeedca08a4cf7385741a243d33a225b153af16243b1feb982e21ffe",
+      "bytes": 1505
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f11/fixture/bodies/4b658ffff5944125bdc0fc72a6ae3336b38a2326a295f1acb376bb5952d39219.bin",
+      "sha256": "4b658ffff5944125bdc0fc72a6ae3336b38a2326a295f1acb376bb5952d39219",
+      "bytes": 584371
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f11/fixture/manifest.ndjson",
+      "sha256": "3b216b244d359a68d5778d9e1fbd45ad51be53fb7dae85373f4281bf91d695f2",
+      "bytes": 1157
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f2/candidate/ASTOCK-074-216ebea038a3/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "0e8d4e31ab52e3a4f3833009bcce1184ddf4908987d644552bfe4741c7428196",
+      "bytes": 9755
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f2/candidate/ASTOCK-074-216ebea038a3/_raw/bodies/408b8fa3b22aee5ff61ba24562975fe1c1facab57d40f181a8b98d533eb4a4e4.bin",
+      "sha256": "408b8fa3b22aee5ff61ba24562975fe1c1facab57d40f181a8b98d533eb4a4e4",
+      "bytes": 575
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f2/candidate/ASTOCK-074-216ebea038a3/_raw/manifest.ndjson",
+      "sha256": "d178c4a4c84b8e75a8287898166470459d5057abc5ed5bdaad988adb856e8d50",
+      "bytes": 1402
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f2/fixture/bodies/408b8fa3b22aee5ff61ba24562975fe1c1facab57d40f181a8b98d533eb4a4e4.bin",
+      "sha256": "408b8fa3b22aee5ff61ba24562975fe1c1facab57d40f181a8b98d533eb4a4e4",
+      "bytes": 575
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f2/fixture/manifest.ndjson",
+      "sha256": "e0d2e51a630056306ca258ae524c0802569e03351b8039cd3ae6b820e9b66e28",
+      "bytes": 1078
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f3/candidate/ASTOCK-074-8f22636cf83f/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "da5d16a6dfd574f6199ad912881380a54153c08da0708974efb279cbf6b4b144",
+      "bytes": 9731
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f3/candidate/ASTOCK-074-8f22636cf83f/_raw/bodies/0d983fbdf2cab06eadd73c13e1099545192da1fd2237527a5032accc67461b1e.bin",
+      "sha256": "0d983fbdf2cab06eadd73c13e1099545192da1fd2237527a5032accc67461b1e",
+      "bytes": 841
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f3/candidate/ASTOCK-074-8f22636cf83f/_raw/manifest.ndjson",
+      "sha256": "e45c471da69cf097c0dbbdb6b86a0c03fefac90ea06cee1d908b7efc48344e22",
+      "bytes": 1402
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f3/fixture/bodies/0d983fbdf2cab06eadd73c13e1099545192da1fd2237527a5032accc67461b1e.bin",
+      "sha256": "0d983fbdf2cab06eadd73c13e1099545192da1fd2237527a5032accc67461b1e",
+      "bytes": 841
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f3/fixture/manifest.ndjson",
+      "sha256": "f661236fd5ee96146a491d977ce3592cd6a907db2de87457fbcb05459842c37a",
+      "bytes": 1078
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f4/candidate/ASTOCK-074-015260e0c196/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "cde9f99429ce9d9bd4bf08b8736376c315d37d5b5b670983799963a078bab194",
+      "bytes": 10949
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f4/candidate/ASTOCK-074-015260e0c196/2026-10-04/parsed_rows/sina/futures_quote/parsed-rows.json",
+      "sha256": "bd022beb02293590e7b8871220628e23a03957627bbc45a0ca075e3f8eeea6b7",
+      "bytes": 982
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f4/candidate/ASTOCK-074-015260e0c196/2026-10-04/source_rows/sina/futures_quote/source-rows.json",
+      "sha256": "07c67bce7595e5761ed73d9091da82e5a2c33f3f3d62164b6ad2acd872618a4b",
+      "bytes": 1198
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f4/candidate/ASTOCK-074-015260e0c196/_raw/bodies/ee1b09b134be085bbfea0fdde25c557e0095a732d657259d28ec90bc6628e573.bin",
+      "sha256": "ee1b09b134be085bbfea0fdde25c557e0095a732d657259d28ec90bc6628e573",
+      "bytes": 839
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f4/candidate/ASTOCK-074-015260e0c196/_raw/manifest.ndjson",
+      "sha256": "a345a3ca11ce235b96095ff950e29e685159d373b534b4d5e478f2774cae5b4a",
+      "bytes": 1402
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f4/fixture/bodies/ee1b09b134be085bbfea0fdde25c557e0095a732d657259d28ec90bc6628e573.bin",
+      "sha256": "ee1b09b134be085bbfea0fdde25c557e0095a732d657259d28ec90bc6628e573",
+      "bytes": 839
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f4/fixture/manifest.ndjson",
+      "sha256": "504527adccf367ff02cedbab0bf58d672aa215b480b1571993ce176b3b70d74a",
+      "bytes": 1075
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f5/candidate/ASTOCK-076-14b5732a0ca1/2026-10-04/input_report/sina/a50_quote/report.json",
+      "sha256": "6ab62002572c6671b12dffda68a04b888c12f61c50f5533dea96435519fab352",
+      "bytes": 8980
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f5/candidate/ASTOCK-076-14b5732a0ca1/_raw/bodies/7c291ca435fe59d144a81745bc4bbcc09304f90d0b311ce71081e5be81e23341.bin",
+      "sha256": "7c291ca435fe59d144a81745bc4bbcc09304f90d0b311ce71081e5be81e23341",
+      "bytes": 143
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f5/candidate/ASTOCK-076-14b5732a0ca1/_raw/manifest.ndjson",
+      "sha256": "d46d05319b00e82a6fa7af420c282ea4ed91e06d60c1e2b419c8ff7752382a52",
+      "bytes": 1359
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f5/fixture/bodies/7c291ca435fe59d144a81745bc4bbcc09304f90d0b311ce71081e5be81e23341.bin",
+      "sha256": "7c291ca435fe59d144a81745bc4bbcc09304f90d0b311ce71081e5be81e23341",
+      "bytes": 143
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f5/fixture/manifest.ndjson",
+      "sha256": "798564aa1e31be721ba629e1958432ee483ca6a44516837fd506ec87ef0cffa8",
+      "bytes": 1067
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f6/candidate/ASTOCK-075-0e0d7abc8a67/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "1c1bc9c31dc4233326d9125b567a36c57b1afd1aa48e19eeee4b102a38cac9e1",
+      "bytes": 9238
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f6/candidate/ASTOCK-075-0e0d7abc8a67/_raw/bodies/f7f2d66be910b51938b63c1c12791d4f4239079543717a5647233b87ecc5875b.bin",
+      "sha256": "f7f2d66be910b51938b63c1c12791d4f4239079543717a5647233b87ecc5875b",
+      "bytes": 584390
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f6/candidate/ASTOCK-075-0e0d7abc8a67/_raw/manifest.ndjson",
+      "sha256": "3e6404ad9edc74031512c69bd3404cc8f66b2bbf1d698962506716ef068df0e0",
+      "bytes": 1504
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f6/fixture/bodies/f7f2d66be910b51938b63c1c12791d4f4239079543717a5647233b87ecc5875b.bin",
+      "sha256": "f7f2d66be910b51938b63c1c12791d4f4239079543717a5647233b87ecc5875b",
+      "bytes": 584390
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f6/fixture/manifest.ndjson",
+      "sha256": "dbe7fbe695cb15a17964610da7ff588fe23caa85a0b5a9b70c677d447c1c06bb",
+      "bytes": 1152
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f7/candidate/ASTOCK-075-0638d1306968/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "135f12fcf57dfd8adf7c449308288d12efaaec5602f03ce1f3b84657e51bc256",
+      "bytes": 9268
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f7/candidate/ASTOCK-075-0638d1306968/_raw/bodies/a16c811f399ae4aa78ffb47f955bf2071887eb5335c18f8e06eae1f7b38664c8.bin",
+      "sha256": "a16c811f399ae4aa78ffb47f955bf2071887eb5335c18f8e06eae1f7b38664c8",
+      "bytes": 16
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f7/candidate/ASTOCK-075-0638d1306968/_raw/manifest.ndjson",
+      "sha256": "4cc9369dce5d79cf3ea027c3de6b0cac3f99c4afb10fa2a3b6d897d5a928e338",
+      "bytes": 1500
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f7/fixture/bodies/a16c811f399ae4aa78ffb47f955bf2071887eb5335c18f8e06eae1f7b38664c8.bin",
+      "sha256": "a16c811f399ae4aa78ffb47f955bf2071887eb5335c18f8e06eae1f7b38664c8",
+      "bytes": 16
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f7/fixture/manifest.ndjson",
+      "sha256": "05e716f649f0607e1c64c3b720f2ca9c1cba8d817af752f6e462ff5968c47ca4",
+      "bytes": 1145
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f8/candidate/ASTOCK-075-7b77c3898264/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "eb0bd75bc326d7368acb6fc2c919466f4f688bd5efc9123a2f5433ea1d2eeff2",
+      "bytes": 9238
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f8/candidate/ASTOCK-075-7b77c3898264/_raw/bodies/74e04381b3146dff762dabaa10db75a7ea240487be1b4b259ce3607147380fdc.bin",
+      "sha256": "74e04381b3146dff762dabaa10db75a7ea240487be1b4b259ce3607147380fdc",
+      "bytes": 584520
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f8/candidate/ASTOCK-075-7b77c3898264/_raw/manifest.ndjson",
+      "sha256": "2e91bff904fc1bff29b9f3181944529bee3c7839811d92456f919e0d58d82965",
+      "bytes": 1504
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f8/fixture/bodies/74e04381b3146dff762dabaa10db75a7ea240487be1b4b259ce3607147380fdc.bin",
+      "sha256": "74e04381b3146dff762dabaa10db75a7ea240487be1b4b259ce3607147380fdc",
+      "bytes": 584520
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f8/fixture/manifest.ndjson",
+      "sha256": "b98e996ea5490bee11d4a71453512e3787ef09692107f00715627f973e00653f",
+      "bytes": 1154
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f9/candidate/ASTOCK-075-17bcb8342009/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "55103d7862aaa989dfa029dbc08fbdea160ae391bbadec66522a5bbfd15b0e19",
+      "bytes": 9238
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f9/candidate/ASTOCK-075-17bcb8342009/_raw/bodies/9096cb521f283403f3d2f45ee055926f0254e1610ddbf8e8136813ee21e8bda3.bin",
+      "sha256": "9096cb521f283403f3d2f45ee055926f0254e1610ddbf8e8136813ee21e8bda3",
+      "bytes": 584381
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f9/candidate/ASTOCK-075-17bcb8342009/_raw/manifest.ndjson",
+      "sha256": "709022ab3359a82c4d667a2a64cac53f7e3651a133ea971bdddb45d80ec340f2",
+      "bytes": 1504
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f9/fixture/bodies/9096cb521f283403f3d2f45ee055926f0254e1610ddbf8e8136813ee21e8bda3.bin",
+      "sha256": "9096cb521f283403f3d2f45ee055926f0254e1610ddbf8e8136813ee21e8bda3",
+      "bytes": 584381
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/f9/fixture/manifest.ndjson",
+      "sha256": "d63d0054f2e632dd57d933d7ec880c9e3abb329e39b744b595cf4a89e316d2ba",
+      "bytes": 1149
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/legacy/legacy-comparison.json",
+      "sha256": "320431e69973c6130cb2cc8bfa355936469dc538ab4c3aefd30e273491478e7e",
+      "bytes": 358
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/semantic/actual_contract/candidate/ASTOCK-075-d9755c85bcc8/2026-10-04/excluded_rows/sina/futures_kline/excluded-rows.json",
+      "sha256": "dc8ff6c7d4d5d1675b5420cda924b7db9a09509c706d70eea593ab3e302a19b4",
+      "bytes": 516192
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/semantic/actual_contract/candidate/ASTOCK-075-d9755c85bcc8/2026-10-04/futures_daily/sina/futures_kline/mapped-rows.json",
+      "sha256": "c8b0902a7b41d4e823b10e9b194e0986a81a04c61d410bb2365de8a6d31d5be2",
+      "bytes": 229
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/semantic/actual_contract/candidate/ASTOCK-075-d9755c85bcc8/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "9ab219f2f873233cf29095f3537a16f58fca915c7c6821ce1aecb23f2ea2c461",
+      "bytes": 11226
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/semantic/actual_contract/candidate/ASTOCK-075-d9755c85bcc8/2026-10-04/parsed_rows/sina/futures_kline/parsed-rows.json",
+      "sha256": "becc4acd1148a52c3d7983cbe741f8328ff10cbbeca60a2a179eddb0ac46238e",
+      "bytes": 157
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/semantic/actual_contract/candidate/ASTOCK-075-d9755c85bcc8/2026-10-04/source_rows/sina/futures_kline/source-rows.json",
+      "sha256": "de139498810b52e5b68819d0c9e9c34495555dfa894b2e603f3527f6df86f3c7",
+      "bytes": 516313
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/semantic/actual_contract/candidate/ASTOCK-075-d9755c85bcc8/_raw/bodies/1ac216fcfe17a5a6976eb1d49d83976161c7f76725182ec87be49e9ab63e1b84.bin",
+      "sha256": "1ac216fcfe17a5a6976eb1d49d83976161c7f76725182ec87be49e9ab63e1b84",
+      "bytes": 584391
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/semantic/actual_contract/candidate/ASTOCK-075-d9755c85bcc8/_raw/manifest.ndjson",
+      "sha256": "6e7e543cb0a650ab911de89c4499606f7c574261e50669bba8c02582d62c65b8",
+      "bytes": 1536
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/semantic/actual_contract/fixture/bodies/1ac216fcfe17a5a6976eb1d49d83976161c7f76725182ec87be49e9ab63e1b84.bin",
+      "sha256": "1ac216fcfe17a5a6976eb1d49d83976161c7f76725182ec87be49e9ab63e1b84",
+      "bytes": 584391
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/semantic/actual_contract/fixture/manifest.ndjson",
+      "sha256": "552b0273e4cafca5150a3f92d8ca93d9c1a403abbbfb1f89e787dd2e993eee90",
+      "bytes": 1166
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/semantic/zero/candidate/ASTOCK-075-d21d3a8fbdd2/2026-10-04/excluded_rows/sina/futures_kline/excluded-rows.json",
+      "sha256": "4af67a9c50f10df66def12d5b508eb32da64ab82f1da763bcdc9d0d1f3ce1434",
+      "bytes": 494400
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/semantic/zero/candidate/ASTOCK-075-d21d3a8fbdd2/2026-10-04/futures_daily/sina/futures_kline/mapped-rows.json",
+      "sha256": "25887c6678a0519518112fd5c4f6a221aa10bb6df4e8ccfaeaa2c1ac25d22344",
+      "bytes": 41993
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/semantic/zero/candidate/ASTOCK-075-d21d3a8fbdd2/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "a77363b1495d4bd1bcad1e1e8226bac1031868662f4a5dd246530241ede426bb",
+      "bytes": 11199
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/semantic/zero/candidate/ASTOCK-075-d21d3a8fbdd2/2026-10-04/parsed_rows/sina/futures_kline/parsed-rows.json",
+      "sha256": "da697f2e6ab6c3c928c0f2b293dc66bee9d9dd2b517af57ef9a5c54f0ad57945",
+      "bytes": 27704
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/semantic/zero/candidate/ASTOCK-075-d21d3a8fbdd2/2026-10-04/source_rows/sina/futures_kline/source-rows.json",
+      "sha256": "b663d56f389a339ec1fb2b03e99605450b4a6efc0b8349929b45e7d67a7141c8",
+      "bytes": 516306
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/semantic/zero/candidate/ASTOCK-075-d21d3a8fbdd2/_raw/bodies/45798b7af4fc5c2393ada3a1da8467e4db523243a378d08c2d89523f4f90af84.bin",
+      "sha256": "45798b7af4fc5c2393ada3a1da8467e4db523243a378d08c2d89523f4f90af84",
+      "bytes": 584381
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/semantic/zero/candidate/ASTOCK-075-d21d3a8fbdd2/_raw/manifest.ndjson",
+      "sha256": "ad27e49a9f2d5b92e7eda7ef58bebd7f675c04b90b277f5000c7b7fcef081c9d",
+      "bytes": 1516
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/semantic/zero/fixture/bodies/45798b7af4fc5c2393ada3a1da8467e4db523243a378d08c2d89523f4f90af84.bin",
+      "sha256": "45798b7af4fc5c2393ada3a1da8467e4db523243a378d08c2d89523f4f90af84",
+      "bytes": 584381
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/semantic/zero/fixture/manifest.ndjson",
+      "sha256": "12b5354fac06203beb35b97760b9b5174307ae6bd8812e78b35564f9438b92da",
+      "bytes": 1149
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/semantic/zero_fields/candidate/ASTOCK-074-b01b9dbb6fde/2026-10-04/futures_quote/sina/futures_quote/mapped-rows.json",
+      "sha256": "3a95b43ac1b6dfc201409376e0f787f1cdbe666e054f1d09affe2f123940e158",
+      "bytes": 1104
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/semantic/zero_fields/candidate/ASTOCK-074-b01b9dbb6fde/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "9c7d371796eaf8ed838f67f0aedfe986f9e845f77b17cd651b9c2d3297c784b5",
+      "bytes": 11260
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/semantic/zero_fields/candidate/ASTOCK-074-b01b9dbb6fde/2026-10-04/parsed_rows/sina/futures_quote/parsed-rows.json",
+      "sha256": "bc4dcd76a66a0bea742a509e2fb731369726605132aa3e78b341c8347a9b20a4",
+      "bytes": 982
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/semantic/zero_fields/candidate/ASTOCK-074-b01b9dbb6fde/2026-10-04/source_rows/sina/futures_quote/source-rows.json",
+      "sha256": "a50839cca3caf76fc1f3066c1d031c0b92c5f2969b8b0827acb8ab4d1346f710",
+      "bytes": 1193
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/semantic/zero_fields/candidate/ASTOCK-074-b01b9dbb6fde/_raw/bodies/a73a79628d9eb27705ce4c0a993327cbda4672f2d32767da9633b8fccbbe1a80.bin",
+      "sha256": "a73a79628d9eb27705ce4c0a993327cbda4672f2d32767da9633b8fccbbe1a80",
+      "bytes": 834
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/semantic/zero_fields/candidate/ASTOCK-074-b01b9dbb6fde/_raw/manifest.ndjson",
+      "sha256": "8e239858333f479a17212e9c7766a530dd2a4744fd97a851cd09af9d8dc2307b",
+      "bytes": 1421
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/semantic/zero_fields/fixture/bodies/a73a79628d9eb27705ce4c0a993327cbda4672f2d32767da9633b8fccbbe1a80.bin",
+      "sha256": "a73a79628d9eb27705ce4c0a993327cbda4672f2d32767da9633b8fccbbe1a80",
+      "bytes": 834
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/semantic/zero_fields/fixture/manifest.ndjson",
+      "sha256": "fc87d93eb0f8307afc105cef96fa2bda577c713360d296d99b0efee52d06103a",
+      "bytes": 1082
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-074-16103580cb19/2026-10-04/futures_quote/sina/futures_quote/mapped-rows.json",
+      "sha256": "5733c6719dfa216c6d3b36948300b66f27c91536eb5779781a1481cf63dfa191",
+      "bytes": 1104
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-074-16103580cb19/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "365729a6df7f88a18383a185e0d7b200976bd231427470885d2c86a41dc50b29",
+      "bytes": 11121
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-074-16103580cb19/2026-10-04/parsed_rows/sina/futures_quote/parsed-rows.json",
+      "sha256": "c48abf2fa2137c0e662fa3daab40063f826afc156315400cd7ce2a6f36486e2d",
+      "bytes": 989
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-074-16103580cb19/2026-10-04/source_rows/sina/futures_quote/source-rows.json",
+      "sha256": "14bb8a1efcfcb50d3654c508279251e6b9274c4d1e5e9772ede9dc9a915ea81f",
+      "bytes": 1205
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-074-16103580cb19/_raw/bodies/2990f9cbcb96e04bd520870b1bb097f94de7d41ec908ee032d73f4c91c155a59.bin",
+      "sha256": "2990f9cbcb96e04bd520870b1bb097f94de7d41ec908ee032d73f4c91c155a59",
+      "bytes": 847
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-074-16103580cb19/_raw/manifest.ndjson",
+      "sha256": "86b473b280712bcd4e4a390ecacaf9f203cb0ecf16ea820caf4606246bed1534",
+      "bytes": 1280
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-074-de724d22cfe5/2026-10-04/futures_quote/sina/futures_quote/mapped-rows.json",
+      "sha256": "5733c6719dfa216c6d3b36948300b66f27c91536eb5779781a1481cf63dfa191",
+      "bytes": 1104
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-074-de724d22cfe5/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "a39af717aa3acb453d30723c4cdb52ba0c99d1e027d65038a49e7408c940caa7",
+      "bytes": 11437
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-074-de724d22cfe5/2026-10-04/parsed_rows/sina/futures_quote/parsed-rows.json",
+      "sha256": "c48abf2fa2137c0e662fa3daab40063f826afc156315400cd7ce2a6f36486e2d",
+      "bytes": 989
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-074-de724d22cfe5/2026-10-04/source_rows/sina/futures_quote/source-rows.json",
+      "sha256": "14bb8a1efcfcb50d3654c508279251e6b9274c4d1e5e9772ede9dc9a915ea81f",
+      "bytes": 1205
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-074-de724d22cfe5/_raw/bodies/2990f9cbcb96e04bd520870b1bb097f94de7d41ec908ee032d73f4c91c155a59.bin",
+      "sha256": "2990f9cbcb96e04bd520870b1bb097f94de7d41ec908ee032d73f4c91c155a59",
+      "bytes": 847
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-074-de724d22cfe5/_raw/manifest.ndjson",
+      "sha256": "d41fcb710419f0599e49b6cff06eeebb19cc4b6e3914b9674edbb81a6fbbaf9f",
+      "bytes": 1601
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-3405f6503a44/2026-10-04/excluded_rows/sina/futures_kline/excluded-rows.json",
+      "sha256": "4af67a9c50f10df66def12d5b508eb32da64ab82f1da763bcdc9d0d1f3ce1434",
+      "bytes": 494400
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-3405f6503a44/2026-10-04/futures_daily/sina/futures_kline/mapped-rows.json",
+      "sha256": "20c6bbc17325edbab0ec968badb5ad9641150d38bfe85862a4d87470843d240e",
+      "bytes": 41993
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-3405f6503a44/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "a676f3b153abea41d00d67d26a06162e88afc78ca5d90c1db09e8ddcdbbb05a0",
+      "bytes": 11375
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-3405f6503a44/2026-10-04/parsed_rows/sina/futures_kline/parsed-rows.json",
+      "sha256": "2ef5b6b86b4930b58e65ef99b6947d55a8c680df76cfdf22f23c60af750e4639",
+      "bytes": 27706
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-3405f6503a44/2026-10-04/source_rows/sina/futures_kline/source-rows.json",
+      "sha256": "de139498810b52e5b68819d0c9e9c34495555dfa894b2e603f3527f6df86f3c7",
+      "bytes": 516313
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-3405f6503a44/_raw/bodies/e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998.bin",
+      "sha256": "e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998",
+      "bytes": 516374
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-3405f6503a44/_raw/manifest.ndjson",
+      "sha256": "0b79d1e665f6c424e1c5a08ea2c59d74cdced537e5de9583daa93b74849bd584",
+      "bytes": 1695
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-85d135ca26de/2026-10-04/excluded_rows/sina/futures_kline/excluded-rows.json",
+      "sha256": "4af67a9c50f10df66def12d5b508eb32da64ab82f1da763bcdc9d0d1f3ce1434",
+      "bytes": 494400
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-85d135ca26de/2026-10-04/futures_daily/sina/futures_kline/mapped-rows.json",
+      "sha256": "20c6bbc17325edbab0ec968badb5ad9641150d38bfe85862a4d87470843d240e",
+      "bytes": 41993
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-85d135ca26de/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "0d05800cf32b71ad694f3896e2faab9e894c7b726eccb39060a83da4bf71c672",
+      "bytes": 11059
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-85d135ca26de/2026-10-04/parsed_rows/sina/futures_kline/parsed-rows.json",
+      "sha256": "2ef5b6b86b4930b58e65ef99b6947d55a8c680df76cfdf22f23c60af750e4639",
+      "bytes": 27706
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-85d135ca26de/2026-10-04/source_rows/sina/futures_kline/source-rows.json",
+      "sha256": "de139498810b52e5b68819d0c9e9c34495555dfa894b2e603f3527f6df86f3c7",
+      "bytes": 516313
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-85d135ca26de/_raw/bodies/e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998.bin",
+      "sha256": "e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998",
+      "bytes": 516374
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-85d135ca26de/_raw/manifest.ndjson",
+      "sha256": "50a00734e76a5212364b960b4e07dbd7f878e54bb6a5528722ce8b648de61c60",
+      "bytes": 1374
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-f4e5fe37bb68/2026-10-04/excluded_rows/sina/futures_kline/excluded-rows.json",
+      "sha256": "24f66832d48cf4ba5bea7e4a793184290909c6dfca691124b3e407bc94500555",
+      "bytes": 614031
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-f4e5fe37bb68/2026-10-04/futures_daily/sina/futures_kline/mapped-rows.json",
+      "sha256": "54750404619692c0d3fe9a32fb20fad73ebdc2be1cb9d664dcf9974745afe21c",
+      "bytes": 41812
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-f4e5fe37bb68/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "ae6e3b5323376a66814e492147f0390a17ac61e55d7f49130e7438cf5a830677",
+      "bytes": 11364
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-f4e5fe37bb68/2026-10-04/parsed_rows/sina/futures_kline/parsed-rows.json",
+      "sha256": "c50340634b0c4322f0ca7d2a6683c86628c01d7132ba85e0c40cc8ceb082c207",
+      "bytes": 27604
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-f4e5fe37bb68/2026-10-04/source_rows/sina/futures_kline/source-rows.json",
+      "sha256": "fd85d677f8cc6ff922e8f74a9b728a674f77ba00969d1871fd257fe0f12400d2",
+      "bytes": 636023
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-f4e5fe37bb68/_raw/bodies/ecd7f264230e49f3ace244fee9ae7155093fbac8b61e7e9d0926d674c6d9d7f7.bin",
+      "sha256": "ecd7f264230e49f3ace244fee9ae7155093fbac8b61e7e9d0926d674c6d9d7f7",
+      "bytes": 636083
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-f4e5fe37bb68/_raw/manifest.ndjson",
+      "sha256": "a853d8f583a2b78f3f0fe7ac48ebec399bd95db8b0b7b4f74a02f04df3d9ad97",
+      "bytes": 1692
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-fc347b39e199/2026-10-04/excluded_rows/sina/futures_kline/excluded-rows.json",
+      "sha256": "24f66832d48cf4ba5bea7e4a793184290909c6dfca691124b3e407bc94500555",
+      "bytes": 614031
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-fc347b39e199/2026-10-04/futures_daily/sina/futures_kline/mapped-rows.json",
+      "sha256": "54750404619692c0d3fe9a32fb20fad73ebdc2be1cb9d664dcf9974745afe21c",
+      "bytes": 41812
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-fc347b39e199/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "e5712235209a4697551641f00faeed0f6d842bd741c6c36edab6ab75c9922993",
+      "bytes": 11048
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-fc347b39e199/2026-10-04/parsed_rows/sina/futures_kline/parsed-rows.json",
+      "sha256": "c50340634b0c4322f0ca7d2a6683c86628c01d7132ba85e0c40cc8ceb082c207",
+      "bytes": 27604
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-fc347b39e199/2026-10-04/source_rows/sina/futures_kline/source-rows.json",
+      "sha256": "fd85d677f8cc6ff922e8f74a9b728a674f77ba00969d1871fd257fe0f12400d2",
+      "bytes": 636023
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-fc347b39e199/_raw/bodies/ecd7f264230e49f3ace244fee9ae7155093fbac8b61e7e9d0926d674c6d9d7f7.bin",
+      "sha256": "ecd7f264230e49f3ace244fee9ae7155093fbac8b61e7e9d0926d674c6d9d7f7",
+      "bytes": 636083
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-075-fc347b39e199/_raw/manifest.ndjson",
+      "sha256": "ed97be1e8d3003bd723aa168c4be89c16b2e4a1d5d7456fe40c12dc6dd23cdd7",
+      "bytes": 1371
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-076-86b398d7616b/2026-10-04/a50_quote/sina/a50_quote/mapped-rows.json",
+      "sha256": "f527978805fc4ce6e196a4066948b86d1f837f442dd61f577d1f5c25492e71e2",
+      "bytes": 243
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-076-86b398d7616b/2026-10-04/input_report/sina/a50_quote/report.json",
+      "sha256": "ab94a70e9f587a330125498ae802fecc1f590541a1d34debeff8da0ab1acadbf",
+      "bytes": 10345
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-076-86b398d7616b/2026-10-04/parsed_rows/sina/a50_quote/parsed-rows.json",
+      "sha256": "df456063471b7866b06e75f4f4276dc42359c49b05f13c8a7b2d91c39d8011b2",
+      "bytes": 175
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-076-86b398d7616b/2026-10-04/source_rows/sina/a50_quote/source-rows.json",
+      "sha256": "9071ca63503a94389027e0099eba656834e09e1ea638334c77854ec587dc1fc8",
+      "bytes": 208
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-076-86b398d7616b/_raw/bodies/a67d6e37ab7d31388fe32710b0c521363473fa65b2c64439917a54d6bfb4388b.bin",
+      "sha256": "a67d6e37ab7d31388fe32710b0c521363473fa65b2c64439917a54d6bfb4388b",
+      "bytes": 152
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-076-86b398d7616b/_raw/manifest.ndjson",
+      "sha256": "bd3f88097c65d132dbb2e85089284bffdcf64f4ccaca7a309ce6dd251f13d4fa",
+      "bytes": 1237
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-076-ddad2e5cebdb/2026-10-04/a50_quote/sina/a50_quote/mapped-rows.json",
+      "sha256": "f527978805fc4ce6e196a4066948b86d1f837f442dd61f577d1f5c25492e71e2",
+      "bytes": 243
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-076-ddad2e5cebdb/2026-10-04/input_report/sina/a50_quote/report.json",
+      "sha256": "ceda381bf5fe29e3bf4937ca4e83b0097407816ede8188464ed6d87bea92fea9",
+      "bytes": 10661
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-076-ddad2e5cebdb/2026-10-04/parsed_rows/sina/a50_quote/parsed-rows.json",
+      "sha256": "df456063471b7866b06e75f4f4276dc42359c49b05f13c8a7b2d91c39d8011b2",
+      "bytes": 175
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-076-ddad2e5cebdb/2026-10-04/source_rows/sina/a50_quote/source-rows.json",
+      "sha256": "9071ca63503a94389027e0099eba656834e09e1ea638334c77854ec587dc1fc8",
+      "bytes": 208
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-076-ddad2e5cebdb/_raw/bodies/a67d6e37ab7d31388fe32710b0c521363473fa65b2c64439917a54d6bfb4388b.bin",
+      "sha256": "a67d6e37ab7d31388fe32710b0c521363473fa65b2c64439917a54d6bfb4388b",
+      "bytes": 152
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/candidate/ASTOCK-076-ddad2e5cebdb/_raw/manifest.ndjson",
+      "sha256": "00b145838441f6903ab366273a41423e45194ddf9b84dc00a334b673dffb50a5",
+      "bytes": 1558
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/session/fixture-mode.json",
+      "sha256": "8ddb83ee30c97c1a49e84df4ba40596600416e5af4047388858b88fa81ab123a",
+      "bytes": 108
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/verify.py",
+      "sha256": "2806d4028fdb119ffa6f5fe704f4d7abf53922a6978ecf7661580d9f4fa932d2",
+      "bytes": 9321
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/bad/ASTOCK-074-3f9d2fa29485/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "c0dddeaa8e1e07eda025c9908c5bdf40e2de4c1aced220e35e7435d6a1d61032",
+      "bytes": 8268
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/candidate/ASTOCK-074-36580b0a97e3/2026-10-04/futures_quote/sina/futures_quote/mapped-rows.json",
+      "sha256": "262341e06b490f2eb15ba136bf93453469dc957ddfc2d724b85fdd0576cdb9d7",
+      "bytes": 386
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/candidate/ASTOCK-074-36580b0a97e3/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "a9aee163ea66507fb5d82e07de0d08f4ef1e34885ac00ffb3a09020dd661b9f9",
+      "bytes": 10698
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/candidate/ASTOCK-074-36580b0a97e3/2026-10-04/parsed_rows/sina/futures_quote/parsed-rows.json",
+      "sha256": "c48abf2fa2137c0e662fa3daab40063f826afc156315400cd7ce2a6f36486e2d",
+      "bytes": 989
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/candidate/ASTOCK-074-36580b0a97e3/2026-10-04/source_rows/sina/futures_quote/source-rows.json",
+      "sha256": "14bb8a1efcfcb50d3654c508279251e6b9274c4d1e5e9772ede9dc9a915ea81f",
+      "bytes": 1205
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/candidate/ASTOCK-074-36580b0a97e3/_raw/bodies/2990f9cbcb96e04bd520870b1bb097f94de7d41ec908ee032d73f4c91c155a59.bin",
+      "sha256": "2990f9cbcb96e04bd520870b1bb097f94de7d41ec908ee032d73f4c91c155a59",
+      "bytes": 847
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/candidate/ASTOCK-074-36580b0a97e3/_raw/manifest.ndjson",
+      "sha256": "736c65296b3cc959b1cca36b83905713a262effe42fd44462ee553ab1e8dd84c",
+      "bytes": 1599
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/capabilities.yaml",
+      "sha256": "7b7ce0da1d33b333165c6081a3ed788f85cb05d5f6945c745eec97d73e24f6e2",
+      "bytes": 4009
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/collection.yaml",
+      "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d",
+      "bytes": 2934
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/a50_quote.yaml",
+      "sha256": "d9b990dfe46e7b500890da82723dee287c4e2be29e009ab91ceadd8099a02fd2",
+      "bytes": 907
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/board_fund_flow.yaml",
+      "sha256": "08f3566d0cf2787186e6106e4915d0d89b70232d737898480eda03785ea3c53a",
+      "bytes": 1110
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/broken_limit_pool.yaml",
+      "sha256": "60b3790eae896c968093c8d26a818c9dab325aca620510b4ec1dde061af7f65e",
+      "bytes": 1162
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/buyback.yaml",
+      "sha256": "807490acc8affc7dde3502ef62c2b80ad32923fe4c5ff6a6b4fd9d403b50d4f6",
+      "bytes": 1439
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/cctv_news_index.yaml",
+      "sha256": "a876cfcb7dfa79b79423cb3ae8044dab1bb43515f12fc090158228dbf95b6d33",
+      "bytes": 317
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/concept_board.yaml",
+      "sha256": "eef0b07c9a41bfd5ef1a52f4f39516cb26d42b088d63a15783af0f94985fd76f",
+      "bytes": 379
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/convertible_bonds.yaml",
+      "sha256": "11723522544165617f1141aa08921252ca99447eba5cf507c574a887dd6748b9",
+      "bytes": 1362
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/daily_bar.yaml",
+      "sha256": "0a8c1dcae7e1c062ae70c224defc1362adc1d58bc196bbeb2f1edd61d6fd39e7",
+      "bytes": 995
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/dividend_event.yaml",
+      "sha256": "67a2b02063cb9a891e3fb388048407cbc08b05ce8ae97deea6976d3904340d2e",
+      "bytes": 759
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/earnings_forecast.yaml",
+      "sha256": "ded845c047fcefdbeb163f27620d4e67f2bc78e62a0bcfea5678d6df8758f8fd",
+      "bytes": 1060
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/financial_main.yaml",
+      "sha256": "23d8b55356620439d5c1b507601b782b31aa965fe24eaf194e869466bb271ab0",
+      "bytes": 766
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/futures_daily.yaml",
+      "sha256": "3c923f6d637e1409ec1be5733897ba267a8025169b36b6874aefd0b8181834d5",
+      "bytes": 938
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/futures_quote.yaml",
+      "sha256": "0fb3866f0cdfacfe6fe9dbe7d5396947b16514751639275db40352ff5655a33b",
+      "bytes": 1557
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/holder_trades.yaml",
+      "sha256": "44b0ecfc09c6e39823c50e83077354f25bc8026fc70272d92046ba3a51d09b92",
+      "bytes": 1246
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/industry_board.yaml",
+      "sha256": "c6930c70b55e171dee94b74b80f3c37df1466d4a10dadc3016975004b8b47ba4",
+      "bytes": 380
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/industry_directory.yaml",
+      "sha256": "9325d485bf7a1bc2b075c2d920b43b17caa039916536bedd8163be0f972bfe5b",
+      "bytes": 346
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/industry_index_daily.yaml",
+      "sha256": "5d542c72443410747f2ac643589bfd8160cdea07d01d6d0dd9c5e4753096043b",
+      "bytes": 676
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/industry_membership.yaml",
+      "sha256": "dff512c9b7f00330bbe408ba1e1eb74d99b49bc0b38ee419d4c463047c6fe69d",
+      "bytes": 709
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/institution_survey.yaml",
+      "sha256": "470fd4503d45cf0839e887fd276a0c3c82cdcae7cae8f52001006464c212733e",
+      "bytes": 703
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/intraday_trend.yaml",
+      "sha256": "5983e0eb29c1cd7a781fbad0be7332dda14e887ccd744e55ad4b8664c7a0c38a",
+      "bytes": 665
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/ipo_calendar.yaml",
+      "sha256": "7579b9174fd3554a92bc50865cabe7ac20604579403f748d09bcd4e8760bcac9",
+      "bytes": 1331
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/limit_down_pool.yaml",
+      "sha256": "67b3ca1ae9edf0f863d2b2d5257a315fe721f042086d4b5966653c0f2758d806",
+      "bytes": 1177
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/limit_up_pool.yaml",
+      "sha256": "73c1fa4ed6d7281d1857208a2ec9696a3637214bb256661ce943313c75772a69",
+      "bytes": 982
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/lpr_history.yaml",
+      "sha256": "b40bb3000aa8db8b84aeaad6383c3dd7da1afb3c3bfb6ed6fc69343476ca7650",
+      "bytes": 330
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/minute_bar_5m.yaml",
+      "sha256": "fb6f822ed42479422a0b4c227577d8e559bb6b2238562af566af0464304bd873",
+      "bytes": 708
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/pledge.yaml",
+      "sha256": "40b46e96e55d8b1061c98ec979094b4f98ef4800e513cfa7a9c2c5f2152b2fb1",
+      "bytes": 878
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/previous_limit_pool.yaml",
+      "sha256": "5234397a7b87ed3e03c11431de1f00c012e135ba5ef57bf63a2f431f659703bc",
+      "bytes": 1199
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/realtime_quote.yaml",
+      "sha256": "ebc3e97bb7469eb4c7c80daf50991ebe38f0eb5b2476a9a579d22236d416378b",
+      "bytes": 1121
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/repo_fixing.yaml",
+      "sha256": "6908c6c805e15a153dc567d58c81daecb66026bdd0f48d8865e296a1ba883935",
+      "bytes": 506
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/security_snapshot.yaml",
+      "sha256": "255115893f64837a3b95ea9fe44551948eefa9604aca9d59214de87a580300be",
+      "bytes": 519
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/shareholder_count.yaml",
+      "sha256": "d325df1784c873bea73a1d907e9964e06c26e4d6b356dd6c16148837b57feccf",
+      "bytes": 923
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/stock_fund_flow.yaml",
+      "sha256": "df3f21341463f3538a1f855ef19b7bbdb683405aaa65d5418c255023c18a429f",
+      "bytes": 736
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/strong_stock_pool.yaml",
+      "sha256": "264c9d759405d37733cf4daf29996240cb46fed46c3eb8835405a4311e1c1131",
+      "bytes": 1194
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/trading_calendar.yaml",
+      "sha256": "924b17a5be104252e85a377e4579432c6725bab99cbaa0ad70e71102149a1f49",
+      "bytes": 192
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets/wallstreetcn_news.yaml",
+      "sha256": "1bdecf169c6ea357cbb53787bd0a9a659d1f4a96e77e42996556b55df97bbd49",
+      "bytes": 534
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/datasets.yaml",
+      "sha256": "e992d13297e1f9a8f64acabc25f65f138b21ce12dca16689cc3f17bf1385a6eb",
+      "bytes": 587
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/a50_quote.yaml",
+      "sha256": "c984450a923a5655cdd60e1e35a9c8981fca80f9c4f996f5dcce790f10f08b9f",
+      "bytes": 886
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/board_fund_flow.yaml",
+      "sha256": "fb7c6f1f2d425181b189e25152e465306982e10c7c6ee06b2917dfa00b891baa",
+      "bytes": 1395
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/broken_limit_pool.yaml",
+      "sha256": "8bd046757fc9fb3e7d144a0e9d41106267e828a60bc5a099280158c15459a84d",
+      "bytes": 1238
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/buyback.yaml",
+      "sha256": "70e6ee88258842e76509208c6d9df379478df717837489869ff1e9f72f82d1b3",
+      "bytes": 2520
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/cctv_news_index.yaml",
+      "sha256": "4de0d3f1b61694e5c6ab7450a38a7c85f583fadd64d48e52bd737545eb04e42b",
+      "bytes": 573
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/concept_board.yaml",
+      "sha256": "2b7e7f57d189541d6a232cd5391d2dab4289f9f3438f397d9fefd82bb1d996b7",
+      "bytes": 206
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/convertible_bonds.yaml",
+      "sha256": "147b800777f7042f9e4a7907841e038034db65a80f263fcb04628ea34943dd56",
+      "bytes": 1289
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/daily_bar.yaml",
+      "sha256": "41f9bbd0824e20d70f7ed276758b286094c33c79180befca4d8985afc3c8ad0b",
+      "bytes": 2913
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/dividend_event.yaml",
+      "sha256": "188df2f7f075b92e993136aef3f977eea419f9c6957404bd2f7071c76ed24a71",
+      "bytes": 1532
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/earnings_forecast.yaml",
+      "sha256": "5b323a3c3c6577527701985248bb13b54102463a167ba04c749f4908e2b401c4",
+      "bytes": 1633
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/financial_main.yaml",
+      "sha256": "eeeb2e7418aab430168f0c7e16c69f1b24a9e49ec8d156a28390cae0e7a69bda",
+      "bytes": 603
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/futures_daily.yaml",
+      "sha256": "94760152dd79821d2ed775f64924d84546e85194c44b3baa782b113a040f659b",
+      "bytes": 858
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/futures_quote.yaml",
+      "sha256": "ebbda4c0a4a47c16d4bc4d3e293d0c1b1e95db5649b8f02d73c04d559acd591b",
+      "bytes": 1260
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/holder_trades.yaml",
+      "sha256": "2deca39ea7c1a57254b4ee31390587f39d640559181cd1ceae7968a4684e5f40",
+      "bytes": 1959
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/industry_board.yaml",
+      "sha256": "f3ff8bbe7fc4e8d4e5af1c36b9312e8db1c8c9cb09a09aadb472b22ae09de152",
+      "bytes": 210
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/industry_directory.yaml",
+      "sha256": "823d97db8afe4adb3f963faaa04b42b8f151e93f2e75f3eb18f8c678a68bae37",
+      "bytes": 478
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/industry_index_daily.yaml",
+      "sha256": "953087294fd2c3a3cb1b46f204d0a0f606f9060f0f89676fb3a189222a68dab1",
+      "bytes": 805
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/industry_membership.yaml",
+      "sha256": "7eb72a1b8ce7aff27aa1ad62534af2bf7183f3d78c6392208035396a11e21ccb",
+      "bytes": 765
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/institution_survey.yaml",
+      "sha256": "e33c639f75da6a7a1d699936d0624084ed3488ef773aa9fcf3eaefc66e829423",
+      "bytes": 1118
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/intraday_trend.yaml",
+      "sha256": "14b0b22ad1308c70b65152e711c4248d3c8bf1c28d842fba36309194ed38870a",
+      "bytes": 440
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/ipo_calendar.yaml",
+      "sha256": "d72db539afed6e890e81d6e1c4680fcb09ad4285551748f3c9e12ba124e6059c",
+      "bytes": 2338
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/limit_down_pool.yaml",
+      "sha256": "456b0a779929bb6ff71ed70e07cd420d42596068f142879926b86972e3704f7b",
+      "bytes": 1314
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/limit_up_pool.yaml",
+      "sha256": "411e6e6ead10a4d2cbff7ecf4de9bee26f411a66d005a33bc640865ef4b6e7ba",
+      "bytes": 1079
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/lpr_history.yaml",
+      "sha256": "2a12cd26c069d8be0eb68e121eef7930f97f602ffe80e459b649c6cbc5a4c217",
+      "bytes": 682
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/minute_bar_5m.yaml",
+      "sha256": "f3e9abaededc01a15c651a99a22131a80067133deb89548dd12b17278e0e55b7",
+      "bytes": 1134
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/pledge.yaml",
+      "sha256": "4c8f7636e0b20e5923adbbf4c5e696247da67869d90ed19f0aee62f2e5612710",
+      "bytes": 1589
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/previous_limit_pool.yaml",
+      "sha256": "4c14b9ad1f0497e2d6f13a72978f1ddda74039b7c0d182c5a5a98ac01a678443",
+      "bytes": 1276
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/realtime_quote.yaml",
+      "sha256": "e9141547fbb85cb71c8e2336c20a2ebc948e3926f4b2a09e4f59505adea91b94",
+      "bytes": 1308
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/repo_fixing.yaml",
+      "sha256": "0d6b2b5b39a92c6f3d2629f3f805f0b12d609ea9b3f691a50c896c12d81b4681",
+      "bytes": 762
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/security_snapshot.yaml",
+      "sha256": "474ab0397cb1aad33abcd070942586a8460c468b1d3f7af97c2d152eee5a6537",
+      "bytes": 621
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/shareholder_count.yaml",
+      "sha256": "f8801367f055e0b1d419e648c9bd3e1d72984ffe2823c2d464770403c1b7c9e4",
+      "bytes": 1702
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/stock_fund_flow.yaml",
+      "sha256": "3d99bacf48ba3438c90d2d544f7223ffcb0a464f69f95841affe3e99a503bbe1",
+      "bytes": 1741
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/strong_stock_pool.yaml",
+      "sha256": "41733f419a6dd9d3a25edf361294a973df76d878d01bbf46b9f25f53a38f2304",
+      "bytes": 1234
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/trading_calendar.yaml",
+      "sha256": "4be7571914129769aeca321d892b8aa2fbd068db1c7c0b691ae0d5cefe7f69e0",
+      "bytes": 476
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/normalization/wallstreetcn_news.yaml",
+      "sha256": "cdca43fb9ef1d825fe75358ea6c828fec02b892e344505d484d302123079fca9",
+      "bytes": 770
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/providers.yaml",
+      "sha256": "3441064a76ea456240cb368441643ba6d6eabb3ce9a63c99e1b0a67e65ca660a",
+      "bytes": 82441
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/config/schedules.yaml",
+      "sha256": "01b7e269ea4231024bf1c520f78fa571c2909986aad5573006bd80e186119113",
+      "bytes": 525
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/empty/ASTOCK-075-e4287699accf/2026-10-04/input_report/sina/futures_kline/report.json",
+      "sha256": "ff8e13cb21607ad140486359d50038b60fb7edf9b9f717b94ea3c4892c43fb1b",
+      "bytes": 9597
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/empty/ASTOCK-075-e4287699accf/_raw/bodies/e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998.bin",
+      "sha256": "e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998",
+      "bytes": 516374
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004/yaml/empty/ASTOCK-075-e4287699accf/_raw/manifest.ndjson",
+      "sha256": "4a075125c2ebf6cd7389850d122b8a1dd47e69cb0ce452a03bd6f01e0eb5b8f9",
+      "bytes": 1867
+    },
+    {
+      "path": "provider_validation/results/sina-futures-final-v2-20261004-line-ending.json",
+      "sha256": "b078defc30ba2c1aec0000bf68488c2e7eee738a457fb54d65ec059f8e619a45",
+      "bytes": 1162
+    },
+    {
+      "path": "provider_validation/results/sina-futures-original-20261004/1-snapshot.py.bin",
+      "sha256": "8eecd0e9e98ded9137f45f6fac9750a92d6edd1f053d9794cf23556027b963c8",
+      "bytes": 2274
+    },
+    {
+      "path": "provider_validation/results/sina-futures-original-20261004/2-daily.py.bin",
+      "sha256": "fa9d7429b946d4269788c405eea15be9129a0144d855862d260b5559f994fe3a",
+      "bytes": 3486
+    },
+    {
+      "path": "provider_validation/results/sina-futures-original-20261004/3-inputs.py.bin",
+      "sha256": "cebd897df7455996bf41f5f00a0d8ba660c84539c1ef568f955bd43918f718f0",
+      "bytes": 47322
+    },
+    {
+      "path": "provider_validation/results/sina-futures-original-20261004/4-factory.py.bin",
+      "sha256": "1775bcf2613ad5224d9055b67316c90874f1f33811a3bab35ed1cd56f63069fc",
+      "bytes": 21455
+    },
+    {
+      "path": "provider_validation/results/sina-futures-original-20261004/5-providers.yaml.bin",
+      "sha256": "b19618e86c2ed5483bc7d9edefed1288a3c785cf49704967a2d8772607fecbeb",
+      "bytes": 80757
+    },
+    {
+      "path": "provider_validation/results/sina-futures-original-20261004/6-test_input_collection.py.bin",
+      "sha256": "6b00e42588536d69be3c2112efb92ef3c2875fdafbc48162bf58736a3aa3c5aa",
+      "bytes": 163723
+    },
+    {
+      "path": "provider_validation/results/sina-futures-original-20261004/7-replay_input_capabilities.py.bin",
+      "sha256": "70f383e330e6f7b93f6eac03f72eba7b91f23fe45e08f7617865ebf9ef2f3d95",
+      "bytes": 39109
+    },
+    {
+      "path": "provider_validation/results/sina-futures-original-20261004/intermediate-v1-daily.py.bin",
+      "sha256": "81429a30db880e76289cc1100ef61b469be9391db1d66262958f50c99c1344c9",
+      "bytes": 6181
+    },
+    {
+      "path": "provider_validation/results/sina-futures-original-20261004/intermediate-v1-snapshot.py.bin",
+      "sha256": "eaeeb2df5ad16cdec6f327cedecc0198b66959009017d6bb486c7fe37398424b",
+      "bytes": 7949
+    },
+    {
+      "path": "provider_validation/results/sina-futures-original-20261004/manifest.json",
+      "sha256": "05e7fd6d7388a6e077404a2362b3570a6080769af79db4d5c0a0d92b2e242824",
+      "bytes": 3088
+    },
+    {
+      "path": "provider_validation/tests/replay_input_capabilities.py",
+      "sha256": "3ac9cf660cc7d03a59b4f7e01037f866a413d644e82d4709377e1e97c773fcc2",
+      "bytes": 41674
+    },
+    {
+      "path": "src/stock_data_manage/cli.py",
+      "sha256": "582f5caedfc538a012d7a2f6e8cd7af3fe8b6fc9152e5b9e0a3fa2cb8810ae19",
+      "bytes": 14323
+    },
+    {
+      "path": "src/stock_data_manage/config/loader.py",
+      "sha256": "93bb55ab150c88751fe9a58a2b75737878c1b0f07233b8ec47009c4901bb11e9",
+      "bytes": 26090
+    },
+    {
+      "path": "src/stock_data_manage/pipeline/inputs.py",
+      "sha256": "2fad9092f94d28d6172c0744b1c903d7d5638369787e9e48693f078fc6571d22",
+      "bytes": 49330
+    },
+    {
+      "path": "src/stock_data_manage/providers/akshare/boards.py",
+      "sha256": "2060f150831cebaf707ed5becedc35428bc41d4428bab31555ed1d2bf817d122",
+      "bytes": 12416
+    },
+    {
+      "path": "src/stock_data_manage/providers/baostock/industry.py",
+      "sha256": "16c41b379eecbd87f082bd042e27fad7f3d8d77b5bfc6a3e8a286209b068494a",
+      "bytes": 10837
+    },
+    {
+      "path": "src/stock_data_manage/providers/baostock/session.py",
+      "sha256": "70ce19cdde1d6a8ed0c3d3db29caa28d1d8069826136ab6dd7fb6a2ef8c7b832",
+      "bytes": 15771
+    },
+    {
+      "path": "src/stock_data_manage/providers/cctv/news.py",
+      "sha256": "8839bdeed801611e8e6d11cb9441e6ede7bc94d56507eaa2c903e605c772ee7d",
+      "bytes": 2538
+    },
+    {
+      "path": "src/stock_data_manage/providers/chinamoney/rates.py",
+      "sha256": "e7407f1d4272b69cb439bb0a7bad3960b65bb41328d752f541bc8ef50231f922",
+      "bytes": 2716
+    },
+    {
+      "path": "src/stock_data_manage/providers/contracts.py",
+      "sha256": "a4b16abc7e3686a4eb2791dcd4545fb2404e0214bf32e20db19d2582d39ea447",
+      "bytes": 5153
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/dividend.py",
+      "sha256": "5706a8cdb37eeeb8f66cb033a3091dd1b6ec1ed83d72d0f9fbeb8f5c75d9649b",
+      "bytes": 6407
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/financial.py",
+      "sha256": "6a8b8ae6d5740c78a7456697964ec07f3728f870d51f5237d2b409199081971b",
+      "bytes": 29705
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/fund_flow.py",
+      "sha256": "0cf655efa0854d18651bb4f04f985f0f210b81a6d9eff065604d235ed8f75280",
+      "bytes": 5046
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/limit_pool.py",
+      "sha256": "2fbdfe3da3129545dfe8d2e457be7c42225696ddd74270567ae765e4b413f5ae",
+      "bytes": 5663
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/realtime.py",
+      "sha256": "6e09d2a5014cf316c4d1e26e913a44d5c2fbad95fb44d95cba159ef881f03bca",
+      "bytes": 16746
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/shareholder.py",
+      "sha256": "4c9d80f4d51845ac5541c42275f44f2a18643db5e9ccb705a3e16168f8db44c1",
+      "bytes": 4865
+    },
+    {
+      "path": "src/stock_data_manage/providers/sina/calendar.py",
+      "sha256": "3d114045f960bfcc94ade1ee03e4d25ebdf6980ba68aa2d0a2236bed78aaef05",
+      "bytes": 1388
+    },
+    {
+      "path": "src/stock_data_manage/providers/sina/daily.py",
+      "sha256": "f9793bf9f5b8d77411abe459b285fc25892c840ff0962133e6b7c3ef628b2c92",
+      "bytes": 6059
+    },
+    {
+      "path": "src/stock_data_manage/providers/sina/snapshot.py",
+      "sha256": "cfa0b823b2fa8053ce899157e9b6078b94516d3fabd5d303480824111f62d136",
+      "bytes": 7778
+    },
+    {
+      "path": "src/stock_data_manage/providers/tencent/daily.py",
+      "sha256": "487a14fcbfc47146d6d5fd291fbf41667aba435e5fed22ea1ef61ded513fcaa7",
+      "bytes": 9941
+    },
+    {
+      "path": "src/stock_data_manage/providers/tencent/minute.py",
+      "sha256": "ff5cf1e91327bcab2e072bcfae9f1f77dca71a84ba26e456c26580a4d59d9cc1",
+      "bytes": 4709
+    },
+    {
+      "path": "src/stock_data_manage/providers/tencent/snapshot.py",
+      "sha256": "3278cadac776fe8cfe5d02775a5bf8f53bc1cb96c595a5f418172f53047434bf",
+      "bytes": 5160
+    },
+    {
+      "path": "src/stock_data_manage/providers/transport.py",
+      "sha256": "7cf1c5f1f9b526e54e7d82e60b95b35e1f8f91e60effc31d74052f9273988b03",
+      "bytes": 16593
+    },
+    {
+      "path": "src/stock_data_manage/providers/wallstreetcn/news.py",
+      "sha256": "705de425d8526ced4e866d9beaf4c571c443c4955117c0cccada30ee06e07eea",
+      "bytes": 3203
+    },
+    {
+      "path": "src/stock_data_manage/quality/normalization.py",
+      "sha256": "3ed0d663b7fda9ac6cdf7f1252435f2351c783af3244ccba2c2b0f3891e29b3e",
+      "bytes": 14958
+    },
+    {
+      "path": "src/stock_data_manage/routing/factory.py",
+      "sha256": "151afd201b2728a38052956a07f7f5a1f0e49584dd25665672f5db7c56a1ccfd",
+      "bytes": 22205
+    },
+    {
+      "path": "src/stock_data_manage/storage/raw.py",
+      "sha256": "564c940feb99b358c41c5456c3142e7501b21505b5c2d8d88d811c53e145b752",
+      "bytes": 8487
+    },
+    {
+      "path": "tests/test_input_collection.py",
+      "sha256": "a46108f172a2fe2816b77d59f981c5643142ab40d2b93760a55b3b6288a04302",
+      "bytes": 179342
+    }
+  ]
+}

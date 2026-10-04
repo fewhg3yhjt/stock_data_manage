@@ -53,6 +53,193 @@ POOL_SOURCE = {"ASTOCK-046": ("fetch_broken_board_pool", "stock_zt_pool_zbgc_em"
                "ASTOCK-050": ("fetch_strong_pool", "stock_zt_pool_strong_em", "getTopicQSPool")}
 
 EVENT_ARCHIVE = ROOT / "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson"
+FUTURES_ARCHIVE = ROOT / "provider_validation/results/raw/2026-10-01-v310-live/manifest.ndjson"
+SINA_FUTURES_CASES = [("ASTOCK-074",{"request":{"contracts":["RB0","M0","IF0"]}},EVENT_ARCHIVE,3),
+    ("ASTOCK-075",{"request":{"contract":"RB0","start_date":"2026-01-01","end_date":"2026-09-30"}},FUTURES_ARCHIVE,181),
+    ("ASTOCK-075",{"request":{"contract":"M0","start_date":"2026-01-01","end_date":"2026-09-30"}},FUTURES_ARCHIVE,181),
+    ("ASTOCK-076",{},EVENT_ARCHIVE,1)]
+
+
+def sina_futures_record(input_id,symbol="RB0"):
+    manifest=FUTURES_ARCHIVE if input_id=="ASTOCK-075" else EVENT_ARCHIVE
+    needle="getDailyKLine?symbol="+symbol if input_id=="ASTOCK-075" else "list=nf_RB0,nf_M0,nf_IF0" if input_id=="ASTOCK-074" else "list=hf_CHA50CFD"
+    return manifest,next(json.loads(line) for line in manifest.read_text(encoding="utf-8").splitlines() if needle in json.loads(line).get("url",""))
+
+
+def compare_sina_futures_original(tmp_path,input_id,context,manifest,count):
+    import pandas as pd
+    spec=importlib.util.spec_from_file_location("sina_futures_original",ROOT/"provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py")
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);ns=module.load_shipped_code();store=RawObjectStore(tmp_path/"original")
+    try:
+        with captured_requests(store,provider="sina",endpoint="futures",scope=context,code_version="original-sina-futures",pacer=RequestPacer(),replay_manifest=manifest) as events:
+            request=context.get("request",{})
+            frame=ns["futures_realtime"](request["contracts"]) if input_id=="ASTOCK-074" else ns["a50_futures"]() if input_id=="ASTOCK-076" else ns["futures_kline"](request["contract"],start=request.get("start_date"),end=request.get("end_date"))
+    finally:ns["EM_SESSION"].close()
+    parsed=[{k:None if pd.isna(v) else v for k,v in row.items()} for row in frame.to_dict(orient="records")]
+    original_path=tmp_path/"original-parsed.json";original_path.write_text(json.dumps(parsed,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    report=collect_input(input_id=input_id,context=context,config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=manifest)
+    assert report["status"]=="candidate_complete" and report["row_count"]==len(parsed)==count,report
+    keys=("url","method","outcome","status_code","body_sha256","request_headers","request_options")
+    assert [{k:r.get(k) for k in keys} for r in events]==[{k:r.get(k) for k in keys} for r in report["responses"]]
+    candidate=read_artifact(report,"parsed_rows");assert len(candidate)==len(parsed)
+    assert candidate==[{k:old[k] for k in row} for row,old in zip(candidate,parsed)]
+    rows=read_artifact(report,"output")
+    for row,old in zip(rows,parsed):
+        assert row["snapshot_at"]==report["source_capture_window"]["last"]
+        for name,value in row.items():
+            if name=="snapshot_at":continue
+            if name in report["unverified_fields"]:assert value is None;continue
+            if name=="series_identity":assert value=="main_continuous";continue
+            if name=="source_contract" and input_id=="ASTOCK-076":assert value=="hf_CHA50CFD";continue
+            expected=old[{"source_contract":"symbol","bar_date":"date","quote_time":"datetime"}.get(name,name)]
+            if name=="quote_time":expected=expected.replace(" ","T")+"+08:00"
+            assert value==expected
+    source=read_artifact(report,"source_rows")
+    if input_id=="ASTOCK-075":
+        import re
+        _,record=sina_futures_record(input_id,context["request"]["contract"])
+        text=RawObjectStore.read_response(manifest,record).decode("gbk","replace")
+        raw=json.loads(re.search(r'var _[A-Z0-9]+=\((.*)\);?\s*$',text,re.S).group(1));assert raw==source
+        assert len(raw)==(4254 if context["request"]["contract"]=="RB0" else 5293)
+        assert read_artifact(report,"excluded_rows")==[r for r in raw if not "2026-01-01"<=r["d"]<="2026-09-30"]
+    else:
+        import re
+        _,record=sina_futures_record(input_id)
+        text=RawObjectStore.read_response(manifest,record).decode("gbk","replace")
+        assert source==[{"source_variable":key,"fields":body.split(",") if body else []} for key,body in re.findall(r'var hq_str_([^=]+)="([^"]*)"',text)]
+    comparison={"input_id":input_id,"mode":"offline_replay","row_count":count,"all_business_fields_equal":True,"all_retained_source_fields_equal":True,
+        "request_comparison_equal":True,"source_response_hashes":[r["body_sha256"] for r in events],"report_path":report["report_path"],
+        "report_sha256":hashlib.sha256(Path(report["report_path"]).read_bytes()).hexdigest(),"original_parsed_path":str(original_path.resolve()),
+        "original_parsed_sha256":hashlib.sha256(original_path.read_bytes()).hexdigest()}
+    (tmp_path/"comparison.json").write_text(json.dumps(comparison,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    return comparison
+
+
+@pytest.mark.parametrize("input_id,context,manifest,count",SINA_FUTURES_CASES)
+def test_sina_futures_original_contract(tmp_path,no_network,input_id,context,manifest,count):
+    compare_sina_futures_original(tmp_path,input_id,context,manifest,count)
+
+
+SINA_FUTURES_FAILURES=[("ASTOCK-074","structure","RuntimeError"),("ASTOCK-074","short","RuntimeError"),("ASTOCK-074","missing","ValueError"),
+    ("ASTOCK-074","numeric","RuntimeError"),("ASTOCK-074","time","NormalizationError"),("ASTOCK-076","zero","RuntimeError"),
+    ("ASTOCK-075","wrapper","RuntimeError"),("ASTOCK-075","null","ValueError"),("ASTOCK-075","duplicate","RuntimeError"),
+    ("ASTOCK-075","date","RuntimeError"),("ASTOCK-075","numeric","RuntimeError"),("ASTOCK-075","settle_field","RuntimeError")]
+
+
+def sina_futures_fixture(tmp_path,input_id,mutation):
+    import re
+    archive,record=sina_futures_record(input_id);text=RawObjectStore.read_response(archive,record).decode("gbk","replace");url=record["url"]
+    if input_id=="ASTOCK-075":
+        rows=json.loads(re.search(r'var _RB0=\((.*)\);?\s*$',text,re.S).group(1))
+        row=next(r for r in rows if r["d"]=="2026-09-18")
+        if mutation=="duplicate":rows.append(rows[0].copy())
+        elif mutation=="date":rows[0]["d"]="bad"
+        elif mutation=="numeric":row["o"]="bad"
+        elif mutation=="settle_field":row.pop("s")
+        elif mutation=="zero":row["s"]="0"
+        elif mutation=="actual_contract":url=url.replace("RB0","RB2610")
+        elif mutation=="empty_window":pass
+        text="var _"+("RB2610" if mutation=="actual_contract" else "WRONG" if mutation=="wrapper" else "RB0")+"=("+("null" if mutation=="null" else json.dumps(rows))+");"
+    else:
+        data={key:body.split(",") if body else [] for key,body in re.findall(r'var hq_str_([^=]+)="([^"]*)"',text)}
+        key="hf_CHA50CFD" if input_id=="ASTOCK-076" else "nf_RB0";fields=data[key]
+        if mutation=="short":data[key]=fields[:10]
+        elif mutation=="missing":data[key]=[]
+        elif mutation=="numeric":fields[8]="bad"
+        elif mutation=="time":fields[17]="bad"
+        elif mutation=="zero":fields[0]="0"
+        elif mutation=="zero_fields":fields[2]="0";fields[14]="0"
+        text="<html>changed</html>" if mutation=="structure" else "\n".join(f'var hq_str_{key}="{",".join(values)}";' for key,values in data.items())
+    response=requests.Response();response.status_code=200;response.encoding="gbk";response._content=text.encode("gbk")
+    store=RawObjectStore(tmp_path/"fixture");store.record_response(response=response,url=url,method="GET",request_headers=record["request_headers"],provider="sina",endpoint="futures",code_version="offline-fixture",
+        scope={"synthetic":True,"mutation":mutation,"parent_sha256":record["body_sha256"]})
+    return store.root/"manifest.ndjson"
+
+
+@pytest.mark.parametrize("input_id,mutation,expected",SINA_FUTURES_FAILURES)
+def test_sina_futures_invalid_response_retains_evidence(tmp_path,no_network,input_id,mutation,expected):
+    manifest=sina_futures_fixture(tmp_path,input_id,mutation);case=next(c for c in SINA_FUTURES_CASES if c[0]==input_id)
+    report=collect_input(input_id=input_id,context=case[1],config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=manifest)
+    assert report["status"]=="failed" and report["failure_class"]==expected and "output" not in report,report
+    assert report["responses"] and report["production_writes"]==report["live_http_calls"]==0
+
+
+def test_sina_futures_zero_price_quantity_and_contract_identity(tmp_path,no_network):
+    for input_id,mutation in [("ASTOCK-074","zero_fields"),("ASTOCK-075","zero"),("ASTOCK-075","actual_contract")]:
+        manifest=sina_futures_fixture(tmp_path/mutation,input_id,mutation);case=next(c for c in SINA_FUTURES_CASES if c[0]==input_id);context=case[1]
+        if mutation=="actual_contract":context={"request":{"contract":"RB2610","start_date":"2026-09-18","end_date":"2026-09-18"}}
+        report=collect_input(input_id=input_id,context=context,config_root=ROOT/"config",output_root=tmp_path/mutation/"candidate",replay_manifest=manifest)
+        assert report["status"]=="candidate_complete",report
+        parsed=read_artifact(report,"parsed_rows")
+        if mutation=="zero_fields":assert parsed[0]["open"] is None and parsed[0]["volume"]==0
+        elif mutation=="zero":assert next(r for r in parsed if r["date"]=="2026-09-18")["settle"] is None
+        else:assert report["series_identity"]=="contract" and read_artifact(report,"output")[0]["source_contract"]=="RB2610"
+
+
+def test_sina_futures_yaml_and_date_window_scope(tmp_path,no_network):
+    config=tmp_path/"config";shutil.copytree(ROOT/"config",config)
+    path=config/"normalization/futures_quote.yaml";rule=yaml.safe_load(path.read_text(encoding="utf-8"));rule["rules"][0]["field_mapping"]["name"]="symbol"
+    path.write_text(yaml.safe_dump(rule,allow_unicode=True),encoding="utf-8")
+    report=collect_input(input_id="ASTOCK-074",context=SINA_FUTURES_CASES[0][1],config_root=config,output_root=tmp_path/"candidate",replay_manifest=EVENT_ARCHIVE,
+        fields=["snapshot_at","source_contract","quote_time","name"])
+    assert report["status"]=="candidate_complete" and read_artifact(report,"output")[0]["name"]=="RB0",report
+    empty=collect_input(input_id="ASTOCK-075",context={"request":{"contract":"RB0","start_date":"2030-01-01"}},config_root=ROOT/"config",output_root=tmp_path/"empty",replay_manifest=FUTURES_ARCHIVE)
+    assert empty["status"]=="failed" and empty["failure_class"]=="ValueError" and "output" not in empty,empty
+    for input_id,context in [("ASTOCK-074",{"request":{"contracts":["bad" ]}}),("ASTOCK-076",{"request":{"as_of":"2026-09-30"}})]:
+        try:
+            report=collect_input(input_id=input_id,context=context,config_root=ROOT/"config",output_root=tmp_path/"bad",replay_manifest=EVENT_ARCHIVE)
+        except ValueError:continue
+        assert report["status"]=="failed" and report["failure_class"]=="ValueError" and not report.get("responses"),report
+
+
+def test_sina_futures_original_http_and_cache(tmp_path,monkeypatch):
+    from unittest.mock import patch
+    from stock_data_manage.storage.raw import sanitized_url
+    seen=[]
+    def send(session,request,**kwargs):
+        pair=next((sina_futures_record(case[0],case[1].get("request",{}).get("contract","RB0")) for case in SINA_FUTURES_CASES
+            if sanitized_url(sina_futures_record(case[0],case[1].get("request",{}).get("contract","RB0"))[1]["url"])==sanitized_url(request.url)))
+        archive,record=pair;seen.append(request.url)
+        assert session.trust_env and kwargs["timeout"]==(10,40) and kwargs["allow_redirects"] is True
+        assert session.get_adapter(request.url).max_retries.total==0 and request.headers["Referer"]=="https://finance.sina.com.cn/"
+        assert request.headers["User-Agent"]==record["request_headers"]["User-Agent"]
+        response=requests.Response();response.status_code=200;response.encoding="gbk";response.headers["Content-Type"]=record["content_type"]
+        response._content=RawObjectStore.read_response(archive,record);response.url=request.url;return response
+    with patch("requests.Session.send",send):
+        for input_id,context,_,count in SINA_FUTURES_CASES:
+            first=collect_input(input_id=input_id,context=context,config_root=ROOT/"config",output_root=tmp_path/"candidate",mode="live",evidence_root=tmp_path/"unused")
+            second=collect_input(input_id=input_id,context=context,config_root=ROOT/"config",output_root=tmp_path/"candidate",mode="live",evidence_root=tmp_path/"candidate")
+            assert first["status"]==second["status"]=="candidate_complete" and first["row_count"]==count,(first,second)
+            assert first["live_http_calls"]==1 and second["live_http_calls"]==0 and read_artifact(first,"output")==read_artifact(second,"output")
+    assert len(seen)==4
+    (tmp_path/"fixture-mode.json").write_text(json.dumps({"mode":"injected Session; not real live source validation","real_http_calls":0,"fixture_send_calls":4}),encoding="utf-8")
+
+
+def test_sina_existing_stock_methods_unchanged(tmp_path,no_network):
+    import sys,types
+    from dataclasses import asdict
+    from stock_data_manage.providers.sina import SinaDailyProvider,SinaSnapshotProvider
+    from stock_data_manage.config.loader import load_provider_configs
+    from stock_data_manage.providers.contracts import HttpResponse
+    capability=next(c.capability() for c in load_provider_configs(ROOT/"config/providers.yaml") if c.provider=="sina")
+    class Transport:
+        def __init__(self,snapshot):self.snapshot=snapshot;self.calls=[]
+        def get(self,url,params,timeout_seconds):
+            self.calls.append({"url":url,"params":params,"timeout":timeout_seconds})
+            body='var hq_str_sh600519="样本,10,9,11,12,8,0,0,100,200,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2026-09-18,15:00:00";' if self.snapshot else json.dumps([{"day":"2026-09-18","open":"10","high":"12","low":"8","close":"11","volume":"100","amount":"200"}])
+            return HttpResponse(200,{"Content-Type":"text/plain" if self.snapshot else "application/json"},body.encode())
+    proof=[]
+    for index,(cls,filename,snapshot) in enumerate([(SinaSnapshotProvider,"1-snapshot.py.bin",True),(SinaDailyProvider,"2-daily.py.bin",False)]):
+        path=ROOT/"provider_validation/results/sina-futures-original-20261004"/filename;name="stock_data_manage.providers.sina.old_fixture"+str(index);module=types.ModuleType(name);module.__package__="stock_data_manage.providers.sina";sys.modules[name]=module
+        try:exec(compile(path.read_bytes(),str(path),"exec"),module.__dict__)
+        finally:sys.modules.pop(name,None)
+        old_transport,new_transport=Transport(snapshot),Transport(snapshot)
+        old_cls=getattr(module,cls.__name__);old=old_cls(old_transport,capability) if snapshot else old_cls(old_transport);new=cls(new_transport,capability) if snapshot else cls(new_transport)
+        before=old.fetch_snapshot(["sh600519"],datetime(2026,9,18)) if snapshot else old.fetch_daily(["sh600519"],date(2026,9,18))
+        after=new.fetch_snapshot(["sh600519"],datetime(2026,9,18)) if snapshot else new.fetch_daily(["sh600519"],date(2026,9,18))
+        assert asdict(before)==asdict(after) and old_transport.calls==new_transport.calls
+        proof.append({"method":"stock snapshot" if snapshot else "stock daily","original_code_sha256":hashlib.sha256(path.read_bytes()).hexdigest(),"request_and_result_equal":True})
+    tmp_path.mkdir(parents=True,exist_ok=True);(tmp_path/"legacy-comparison.json").write_text(json.dumps(proof,indent=2),encoding="utf-8")
 NEWS_CASES = [("ASTOCK-034", {"config":{"channel":"a-stock-channel","limit":50}}, EVENT_ARCHIVE, 50),
               ("ASTOCK-035", {"request":{"trade_date":"2026-09-18"},"config":{"with_content":False}}, EVENT_ARCHIVE, 14)]
 RATES_BONDS_CASES = [("ASTOCK-064",{},EVENT_ARCHIVE,747),("ASTOCK-084",{},EVENT_ARCHIVE,322)]

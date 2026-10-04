@@ -187,3 +187,5 @@ LPR转换见 `provider_validation/docs/2026-10-04-lpr-input-collection.md`：原
 
 - `providers/chinamoney/{__init__,rates}.py`：必要新增原中国货币网定盘CSV适配器；原`providers/eastmoney/financial.py`扩展可转债三页查询、日期状态和摘牌筛选，不新增财务Provider。
 - `config/{datasets,normalization}/{repo_fixing,convertible_bonds}.yaml`：定盘和可转债字段模板与映射；`pipeline/inputs.py`保存完整解析行、排除证据和实际匹配响应的原分类日，新闻输入沿用解析行留证。现验证入口扩展`--verify-rates-bonds`；`provider_validation/docs/2026-10-04-rates-bonds-input-collection.md`和`results/rates-bonds-*-20261004*`保存调查/原脚本对照/失败语义夹具/入口/回归/哈希审计。
+
+- 原`providers/sina/snapshot.py`扩展国内期货/A50输入及原直连/GBK/数值/日期辅助；原`providers/sina/daily.py`扩展期货JSONP日线及本地日期筛选，股票方法保持请求和输出一致。`config/{datasets,normalization}/{futures_quote,futures_daily,a50_quote}.yaml`为三输入字段模板和映射。`pipeline/inputs.py`扩展完整解析/排除/来源时间和合约身份留证，原验证入口新增`--verify-sina-futures`；`provider_validation/docs/2026-10-04-sina-futures-input-collection.md`和`results/sina-futures-*-20261004*`保存调查、原方法对照、合成/注入夹具、真实入口、回归、LF语法等价和最终哈希审计。

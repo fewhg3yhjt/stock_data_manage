@@ -1,0 +1,15 @@
+{
+  "input_id": "ASTOCK-075",
+  "mode": "offline_replay",
+  "row_count": 181,
+  "all_business_fields_equal": true,
+  "all_retained_source_fields_equal": true,
+  "request_comparison_equal": true,
+  "source_response_hashes": [
+    "e07dd10bed7398163872431f8b873895b6dd42634cbfebcc5ad2ece9925f2998"
+  ],
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sina-futures-final-v2-20261004\\2\\candidate\\ASTOCK-075-d9b22b0009d1\\2026-10-04\\input_report\\sina\\futures_kline\\report.json",
+  "report_sha256": "43eb1f0a619c6a3e36717a8f62341c3e2c8976cc4fff2462b4e6365e2a8ab406",
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sina-futures-final-v2-20261004\\2\\original-parsed.json",
+  "original_parsed_sha256": "ed284d70052db45ec6f6fc2cd0e5fe54fe2a2bac806a27337a1058e46c55683e"
+}

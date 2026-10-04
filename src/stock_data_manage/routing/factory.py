@@ -39,6 +39,7 @@ def build_input_provider(contract, *, providers_path, client=None):
                         "ASTOCK-065": "fetch_lpr_history",
                         "ASTOCK-034": "fetch", "ASTOCK-035": "fetch",
                         "ASTOCK-064": "fetch", "ASTOCK-084": "fetch_convertible_bonds",
+                        "ASTOCK-074": "fetch_futures", "ASTOCK-075": "fetch_futures_kline", "ASTOCK-076": "fetch_a50",
                         "SDA-BOARD-001": "fetch_industry_list", "SDA-BOARD-002": "fetch_industry_daily",
                         "SDA-BOARD-003": "fetch_fund_flow", "SDA-BOARD-004": "fetch_fund_flow",
                         "SDA-BOARD-005": "fetch_snapshot", "SDA-BOARD-006": "fetch_snapshot"}
@@ -81,6 +82,14 @@ def build_input_provider(contract, *, providers_path, client=None):
         return ChinamoneyRepoRateProvider()
     if contract.input_id == "ASTOCK-084":
         return EastMoneyFinancialMainProvider(endpoint=contract.endpoint, capability_version="eastmoney-cb-input-v1")
+    if contract.input_id == "ASTOCK-075":
+        provider = SinaDailyProvider(RequestsTransport({}))
+        provider.endpoint, provider.capability_version = contract.endpoint, "sina-futures-kline-input-v1"
+        return provider
+    if contract.input_id in {"ASTOCK-074", "ASTOCK-076"}:
+        config = next(c for c in load_provider_configs(providers_path) if c.provider == "sina" and c.endpoint == "full_history")
+        capability = replace(config.capability(),endpoint=contract.endpoint,version="sina-futures-quote-input-v1")
+        return SinaSnapshotProvider(RequestsTransport({}),capability,endpoint=contract.endpoint)
     if contract.input_id in {"ASTOCK-065", "ASTOCK-078", "ASTOCK-079", "ASTOCK-080", "ASTOCK-081", "ASTOCK-082", "ASTOCK-083"}:
         return EastMoneyFinancialMainProvider(endpoint=contract.endpoint,
             capability_version="eastmoney-lpr-input-v1" if contract.input_id == "ASTOCK-065" else "eastmoney-events-input-v1")

@@ -53,3 +53,119 @@ class SinaSnapshotProvider:
         response = self.fetch_snapshot(symbols, datetime(trade_date.year, trade_date.month, trade_date.day, 15, 16))
         rows = tuple(row for row in response.rows if row.get("trade_date") == trade_date.isoformat())
         return FetchResult(rows, response.requested_symbols)
+
+    def fetch_futures(self, *, symbols):
+        """Original domestic-futures quote contract, outside stock production routing."""
+        from ..contracts import InputFetchResult
+        import re
+        if isinstance(symbols,str):
+            symbols = [symbols]
+        if not isinstance(symbols,(list,tuple,set)) or not symbols:
+            raise ValueError("explicit futures contracts are required")
+        codes = [_sina_futures_code(symbol) for symbol in symbols]
+        if not codes:
+            raise ValueError("explicit futures contracts are required")
+        data, url = _sina_input_quotes(["nf_"+code for code in codes])
+        rows = []
+        for code in codes:
+            fields = data.get("nf_"+code)
+            if not fields:
+                raise ValueError("futures contract is absent or delisted")
+            product = re.match(r"[A-Za-z]+", code).group(0)
+            if product in ("IF", "IH", "IC", "IM", "TS", "TF", "T", "TL"):
+                if len(fields) < 50:
+                    raise RuntimeError("CFFEX quote field layout changed")
+                row = {"symbol":code,"name":fields[49],"datetime":f"{fields[36]} {fields[37]}"}
+                price_fields = {"open":0,"high":1,"low":2,"last":3,"bid":16,"ask":26,"pre_settle":14,
+                    "pre_close":13,"upper_limit":9,"lower_limit":10,"avg_price":48}
+                number_fields = {"bid_vol":17,"ask_vol":27,"volume":4,"open_interest":6}
+            else:
+                if len(fields) < 28:
+                    raise RuntimeError("commodity quote field layout changed")
+                clock = fields[1].zfill(6)
+                row = {"symbol":code,"name":fields[0],"datetime":f"{fields[17]} {clock[:2]}:{clock[2:4]}:{clock[4:]}",
+                    "pre_close":None,"upper_limit":None,"lower_limit":None}
+                price_fields = {"open":2,"high":3,"low":4,"last":8,"bid":6,"ask":7,"pre_settle":10,"avg_price":27}
+                number_fields = {"bid_vol":11,"ask_vol":12,"volume":14,"open_interest":13}
+            row.update({name:_sina_price(fields[index]) for name,index in price_fields.items()})
+            row.update({name:_sina_number(fields[index]) for name,index in number_fields.items()})
+            rows.append(row)
+        return InputFetchResult(tuple(rows), source_url=url,
+            source_rows=tuple({"source_variable":key,"fields":fields} for key,fields in data.items()),
+            mapping_context={"requested_contracts":codes})
+
+    def fetch_a50(self):
+        from ..contracts import InputFetchResult
+        data, url = _sina_input_quotes(["hf_CHA50CFD"])
+        fields = data.get("hf_CHA50CFD")
+        if not fields or len(fields) < 14:
+            raise RuntimeError("A50 quote is empty or its layout changed")
+        row = {"name":fields[13],"datetime":f"{fields[12]} {fields[6]}"}
+        row.update({name:_sina_price(fields[index]) for name,index in {"last":0,"open":8,"high":4,"low":5,"bid":2,"ask":3,"pre_settle":7}.items()})
+        if row["last"] is None:
+            raise RuntimeError("A50 latest price is missing")
+        return InputFetchResult((row,), source_url=url,
+            source_rows=tuple({"source_variable":key,"fields":values} for key,values in data.items()),
+            mapping_context={"source_contract":"hf_CHA50CFD"})
+
+
+def _sina_input_http(url, *, params=None):
+    """Keep original V3.9 direct requests; do not replace the legacy stock transport."""
+    import requests
+    headers = {"User-Agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+        "Referer":"https://finance.sina.com.cn/"}
+    try:
+        response = requests.request("GET", url, params=params, data=None, headers=headers, timeout=(10,40), allow_redirects=True)
+        response.raise_for_status()
+    except requests.RequestException as exc:
+        raise RuntimeError(f"Sina input request failed: {type(exc).__name__}") from exc
+    return response
+
+
+def _sina_input_quotes(codes):
+    import re
+    response = _sina_input_http("https://hq.sinajs.cn/list="+",".join(codes))
+    data = {key:body.split(",") if body else [] for key,body in re.findall(r'var hq_str_([^=]+)="([^"]*)"',response.content.decode("gbk","replace"))}
+    if not data:
+        raise RuntimeError("Sina quote response contains no hq_str variables")
+    return data, response.url
+
+
+def _sina_futures_code(raw):
+    import re
+    code = str(raw).strip()
+    code = code[3:] if code.lower().startswith("nf_") else code
+    if not re.fullmatch(r"[A-Za-z]{1,2}\d{1,4}",code):
+        raise ValueError("invalid futures contract code")
+    return code.upper()
+
+
+def _sina_number(value):
+    import math
+    if value is None:
+        return None
+    if isinstance(value,bool):
+        raise RuntimeError("source numeric field contains a boolean")
+    text = str(value).replace(",","").strip()
+    if text in ("","-","--","None","null"):
+        return None
+    try:
+        number = float(text)
+    except ValueError as exc:
+        raise RuntimeError("source numeric field changed") from exc
+    return number if math.isfinite(number) else None
+
+
+def _sina_price(value):
+    number = _sina_number(value)
+    return None if number == 0 else number
+
+
+def _sina_date(value):
+    import re
+    if isinstance(value,datetime):
+        return value.date().isoformat()
+    if isinstance(value,date):
+        return value.isoformat()
+    text = str(value).strip()
+    return datetime.strptime(text,"%Y%m%d" if re.fullmatch(r"[0-9]{8}",text) else "%Y-%m-%d").date().isoformat()

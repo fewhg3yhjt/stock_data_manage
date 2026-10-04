@@ -1,0 +1,44 @@
+dataset: convertible_bonds
+rules:
+- id: eastmoney-convertible_bonds-input-v1
+  input_id: ASTOCK-084
+  provider: eastmoney
+  endpoint: convertible_bonds
+  field_mapping:
+    name: name
+    status: status
+    stock_code: stock_code
+    stock_name: stock_name
+    rating: rating
+    apply_code: apply_code
+    apply_date: apply_date
+    listing_date: listing_date
+    delist_date: delist_date
+    expire_date: expire_date
+    convert_start: convert_start
+    issue_size_100m: issue_size_100m
+    initial_convert_price: initial_convert_price
+    convert_price: convert_price
+    bond_price: bond_price
+    stock_price: stock_price
+    convert_value: convert_value
+    premium_pct: premium_pct
+    source_bond_code: code
+  context_fields:
+    snapshot_at: source_snapshot_at
+  transforms: {}
+  null_values:
+  - null
+  unverified_fields:
+  - issue_size_100m
+  - initial_convert_price
+  - convert_price
+  - bond_price
+  - stock_price
+  - convert_value
+  - premium_pct
+  status: pending_validation
+  version: eastmoney-convertible_bonds-input-v1
+  evidence_refs:
+  - ASTOCK-084
+  notes: 保留原请求、解析、排序与筛选；snapshot_at取原捕获时间。原数字保留，标准单位未独立认证字段为空。可转债日期分类使用原响应捕获日，非历史报价查询。

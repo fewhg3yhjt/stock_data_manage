@@ -1,0 +1,345 @@
+{
+  "input_id": "ASTOCK-075",
+  "dataset": "futures_daily",
+  "mode": "replay",
+  "parameters": {
+    "symbol": "M0",
+    "start": "2026-01-01",
+    "end": "2026-09-30"
+  },
+  "provider": "sina",
+  "endpoint": "futures_kline",
+  "collection_profile": {
+    "name": "source_market_daily",
+    "mode": "daily",
+    "refresh_interval_seconds": null,
+    "business_day": "source_calendar",
+    "scheduling_enabled": false,
+    "frequency_unit": null,
+    "frequency_interval": 1,
+    "at_time": null,
+    "anchor_date": null,
+    "settle_delay_seconds": 0,
+    "trigger_grace_seconds": 30,
+    "universe": "static",
+    "max_symbols": null
+  },
+  "request_interval_seconds": 3,
+  "effective_concurrency": 1,
+  "request_limit_enforcement": "call_boundary_only",
+  "adapter_version": "sina-futures-kline-input-v1",
+  "code_version": "80e28db02adae47dd24f7770eea846c59a8e451577322680ac7678017747437d",
+  "code_files": [
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\pipeline\\inputs.py",
+      "sha256": "2fad9092f94d28d6172c0744b1c903d7d5638369787e9e48693f078fc6571d22"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\cli.py",
+      "sha256": "582f5caedfc538a012d7a2f6e8cd7af3fe8b6fc9152e5b9e0a3fa2cb8810ae19"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\config\\loader.py",
+      "sha256": "93bb55ab150c88751fe9a58a2b75737878c1b0f07233b8ec47009c4901bb11e9"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\contracts.py",
+      "sha256": "a4b16abc7e3686a4eb2791dcd4545fb2404e0214bf32e20db19d2582d39ea447"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\quality\\normalization.py",
+      "sha256": "3ed0d663b7fda9ac6cdf7f1252435f2351c783af3244ccba2c2b0f3891e29b3e"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\transport.py",
+      "sha256": "7cf1c5f1f9b526e54e7d82e60b95b35e1f8f91e60effc31d74052f9273988b03"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\storage\\raw.py",
+      "sha256": "564c940feb99b358c41c5456c3142e7501b21505b5c2d8d88d811c53e145b752"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\routing\\factory.py",
+      "sha256": "151afd201b2728a38052956a07f7f5a1f0e49584dd25665672f5db7c56a1ccfd"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\daily.py",
+      "sha256": "487a14fcbfc47146d6d5fd291fbf41667aba435e5fed22ea1ef61ded513fcaa7"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\minute.py",
+      "sha256": "ff5cf1e91327bcab2e072bcfae9f1f77dca71a84ba26e456c26580a4d59d9cc1"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\snapshot.py",
+      "sha256": "3278cadac776fe8cfe5d02775a5bf8f53bc1cb96c595a5f418172f53047434bf"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\limit_pool.py",
+      "sha256": "2fbdfe3da3129545dfe8d2e457be7c42225696ddd74270567ae765e4b413f5ae"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\shareholder.py",
+      "sha256": "4c9d80f4d51845ac5541c42275f44f2a18643db5e9ccb705a3e16168f8db44c1"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\financial.py",
+      "sha256": "6a8b8ae6d5740c78a7456697964ec07f3728f870d51f5237d2b409199081971b"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\wallstreetcn\\news.py",
+      "sha256": "705de425d8526ced4e866d9beaf4c571c443c4955117c0cccada30ee06e07eea"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\cctv\\news.py",
+      "sha256": "8839bdeed801611e8e6d11cb9441e6ede7bc94d56507eaa2c903e605c772ee7d"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\chinamoney\\rates.py",
+      "sha256": "e7407f1d4272b69cb439bb0a7bad3960b65bb41328d752f541bc8ef50231f922"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\dividend.py",
+      "sha256": "5706a8cdb37eeeb8f66cb033a3091dd1b6ec1ed83d72d0f9fbeb8f5c75d9649b"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\fund_flow.py",
+      "sha256": "0cf655efa0854d18651bb4f04f985f0f210b81a6d9eff065604d235ed8f75280"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\realtime.py",
+      "sha256": "6e09d2a5014cf316c4d1e26e913a44d5c2fbad95fb44d95cba159ef881f03bca"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\calendar.py",
+      "sha256": "3d114045f960bfcc94ade1ee03e4d25ebdf6980ba68aa2d0a2236bed78aaef05"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\snapshot.py",
+      "sha256": "cfa0b823b2fa8053ce899157e9b6078b94516d3fabd5d303480824111f62d136"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\daily.py",
+      "sha256": "f9793bf9f5b8d77411abe459b285fc25892c840ff0962133e6b7c3ef628b2c92"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\akshare\\boards.py",
+      "sha256": "2060f150831cebaf707ed5becedc35428bc41d4428bab31555ed1d2bf817d122"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\baostock\\industry.py",
+      "sha256": "16c41b379eecbd87f082bd042e27fad7f3d8d77b5bfc6a3e8a286209b068494a"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\baostock\\session.py",
+      "sha256": "70ce19cdde1d6a8ed0c3d3db29caa28d1d8069826136ab6dd7fb6a2ef8c7b832"
+    }
+  ],
+  "config_files": [
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\providers.yaml",
+      "sha256": "3441064a76ea456240cb368441643ba6d6eabb3ce9a63c99e1b0a67e65ca660a"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\collection.yaml",
+      "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\datasets\\futures_daily.yaml",
+      "sha256": "3c923f6d637e1409ec1be5733897ba267a8025169b36b6874aefd0b8181834d5"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\normalization\\futures_daily.yaml",
+      "sha256": "94760152dd79821d2ed775f64924d84546e85194c44b3baa782b113a040f659b"
+    }
+  ],
+  "normalization_version": "sina-futures-input-v1",
+  "normalization_status": "pending_validation",
+  "field_units": {
+    "snapshot_at": null,
+    "source_contract": null,
+    "bar_date": null,
+    "series_identity": null,
+    "open": "unverified; source value retained separately",
+    "high": "unverified; source value retained separately",
+    "low": "unverified; source value retained separately",
+    "close": "unverified; source value retained separately",
+    "settle": "unverified; source value retained separately",
+    "volume": "unverified; source value retained separately",
+    "open_interest": "unverified; source value retained separately"
+  },
+  "unverified_fields": [
+    "open",
+    "high",
+    "low",
+    "close",
+    "settle",
+    "volume",
+    "open_interest"
+  ],
+  "selected_fields": [
+    "bar_date",
+    "close",
+    "high",
+    "low",
+    "open",
+    "open_interest",
+    "series_identity",
+    "settle",
+    "snapshot_at",
+    "source_contract",
+    "volume"
+  ],
+  "eligible_for_production_routing": false,
+  "production_writes": 0,
+  "live_http_calls": 0,
+  "validation_time_utc": "2026-10-04T01:10:48.620515+00:00",
+  "status": "candidate_complete",
+  "response_freshness_seconds": 86400,
+  "transport_dependency": {
+    "requests": "2.32.5",
+    "urllib3": "2.3.0"
+  },
+  "sina_futures_transport_policy": {
+    "source_contract": "successful runnable original source",
+    "headers": "original Chrome/126 User-Agent and finance.sina.com.cn Referer",
+    "trust_env": true,
+    "timeout_seconds": [
+      10,
+      40
+    ],
+    "allow_redirects": true,
+    "retry_total": 0,
+    "outer_capture_interval_seconds": 3
+  },
+  "context_dependency": {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sina-futures-cli-v2-20261004\\3-context.json",
+    "sha256": "22c0eb6b62aa5350227e8bae4c547a18b06cc0b026217c8c02192ea68b4e37de"
+  },
+  "responses": [
+    {
+      "event": "http_response",
+      "method": "GET",
+      "url": "https://stock2.finance.sina.com.cn/futures/api/jsonp.php/var%20_M0=/InnerFuturesNewService.getDailyKLine?symbol=M0",
+      "request_headers": {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept": "*/*",
+        "Connection": "keep-alive",
+        "Referer": "https://finance.sina.com.cn/"
+      },
+      "scope": {
+        "input_id": "ASTOCK-075",
+        "parameters": {
+          "symbol": "M0",
+          "start": "2026-01-01",
+          "end": "2026-09-30"
+        }
+      },
+      "request_options": {
+        "timeout": [
+          10,
+          40
+        ],
+        "allow_redirects": true,
+        "trust_env": true,
+        "proxies": {},
+        "sdk_retry_policy": false
+      },
+      "provider": "sina",
+      "endpoint": "futures_kline",
+      "code_version": "80e28db02adae47dd24f7770eea846c59a8e451577322680ac7678017747437d",
+      "fetched_at_utc": "2026-10-04T01:10:48.626042+00:00",
+      "mode": "replay",
+      "source_ref": {
+        "manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\manifest.ndjson",
+        "line": 69,
+        "fetched_at_utc": "2026-10-01T12:58:21.462+00:00"
+      },
+      "outcome": "response",
+      "status_code": 200,
+      "response_headers": {
+        "Cache-Control": "max-age=10",
+        "Connection": "keep-alive",
+        "Content-Encoding": "gzip",
+        "Content-Type": "application/javascript; charset=gbk",
+        "DPOOL_HEADER": "stock7-finance-sina-com-cn-74d7dbb4c7-g2cnl",
+        "Date": "Thu, 01 Oct 2026 12:58:26 GMT",
+        "Server": "nginx",
+        "Transfer-Encoding": "chunked",
+        "Vary": "Accept-Encoding",
+        "X-Via-SSL": "ssl.29.sinag1.yf.lb.sinanode.com"
+      },
+      "content_type": "application/javascript; charset=gbk",
+      "encoding": "gbk",
+      "body_bytes": 636083,
+      "body_sha256": "ecd7f264230e49f3ace244fee9ae7155093fbac8b61e7e9d0926d674c6d9d7f7",
+      "body_storage": "bodies/ecd7f264230e49f3ace244fee9ae7155093fbac8b61e7e9d0926d674c6d9d7f7.bin",
+      "persistence_status": "exact_application_payload_saved"
+    }
+  ],
+  "source_rows": {
+    "path": "2026-10-04/source_rows/sina/futures_kline/source-rows.json",
+    "sha256": "fd85d677f8cc6ff922e8f74a9b728a674f77ba00969d1871fd257fe0f12400d2",
+    "row_count": 5293
+  },
+  "parsed_rows": {
+    "path": "2026-10-04/parsed_rows/sina/futures_kline/parsed-rows.json",
+    "sha256": "c50340634b0c4322f0ca7d2a6683c86628c01d7132ba85e0c40cc8ceb082c207",
+    "row_count": 181,
+    "code_version": "80e28db02adae47dd24f7770eea846c59a8e451577322680ac7678017747437d",
+    "source_response_hashes": [
+      "ecd7f264230e49f3ace244fee9ae7155093fbac8b61e7e9d0926d674c6d9d7f7"
+    ]
+  },
+  "excluded_rows": {
+    "path": "2026-10-04/excluded_rows/sina/futures_kline/excluded-rows.json",
+    "sha256": "24f66832d48cf4ba5bea7e4a793184290909c6dfca691124b3e407bc94500555",
+    "row_count": 5112
+  },
+  "original_row_count": 5293,
+  "selected_row_count": 181,
+  "selection_policy": "original local date-window filter; complete returned source rows retained",
+  "series_identity": "main_continuous",
+  "source_contract": "M0",
+  "source_url": "https://stock2.finance.sina.com.cn/futures/api/jsonp.php/var%20_M0=/InnerFuturesNewService.getDailyKLine?symbol=M0",
+  "source_urls": [
+    "https://stock2.finance.sina.com.cn/futures/api/jsonp.php/var%20_M0=/InnerFuturesNewService.getDailyKLine?symbol=M0"
+  ],
+  "source_capture_window": {
+    "first": "2026-10-01T12:58:21.462000+00:00",
+    "last": "2026-10-01T12:58:21.462000+00:00",
+    "meaning": "source response capture times; not row-level market timestamps"
+  },
+  "returned_window": {
+    "first": "2026-01-05",
+    "last": "2026-09-30"
+  },
+  "coverage_basis": "returned source contracts and local date window; not independent exchange or market coverage",
+  "universe_completeness_verified": false,
+  "quote_freshness_verified": false,
+  "output": {
+    "path": "2026-10-04/futures_daily/sina/futures_kline/mapped-rows.json",
+    "sha256": "b3531a1856901704904105c01c20d029ab596b07043f99e9633feebc1afd5680",
+    "row_count": 181,
+    "source_response_hashes": [
+      "ecd7f264230e49f3ace244fee9ae7155093fbac8b61e7e9d0926d674c6d9d7f7"
+    ]
+  },
+  "row_count": 181,
+  "coverage_denominator": 181,
+  "first_key": [
+    "M0",
+    "2026-01-05"
+  ],
+  "last_key": [
+    "M0",
+    "2026-09-30"
+  ],
+  "raw_manifest": {
+    "path": "_raw/manifest.ndjson",
+    "sha256": "e6b86138a483d501406a36072dd0d7421e7bbe7efe39144eafc42c09fa746691"
+  },
+  "run_directory": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sina-futures-cli-v2-20261004\\candidate\\ASTOCK-075-f2d76caeb099",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sina-futures-cli-v2-20261004\\candidate\\ASTOCK-075-f2d76caeb099\\2026-10-04\\input_report\\sina\\futures_kline\\report.json"
+}

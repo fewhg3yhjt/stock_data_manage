@@ -1,0 +1,58 @@
+{
+  "validation_time_utc": "2026-10-04T00:48:00.329030+00:00",
+  "authorization": "confirmed continuous remaining-input conversion",
+  "scope": [
+    "ASTOCK-074",
+    "ASTOCK-075",
+    "ASTOCK-076"
+  ],
+  "original_files": [
+    {
+      "path": "src/stock_data_manage/providers/sina/snapshot.py",
+      "snapshot": "provider_validation/results/sina-futures-original-20261004/1-snapshot.py.bin",
+      "sha256": "8eecd0e9e98ded9137f45f6fac9750a92d6edd1f053d9794cf23556027b963c8"
+    },
+    {
+      "path": "src/stock_data_manage/providers/sina/daily.py",
+      "snapshot": "provider_validation/results/sina-futures-original-20261004/2-daily.py.bin",
+      "sha256": "fa9d7429b946d4269788c405eea15be9129a0144d855862d260b5559f994fe3a"
+    },
+    {
+      "path": "src/stock_data_manage/pipeline/inputs.py",
+      "snapshot": "provider_validation/results/sina-futures-original-20261004/3-inputs.py.bin",
+      "sha256": "cebd897df7455996bf41f5f00a0d8ba660c84539c1ef568f955bd43918f718f0"
+    },
+    {
+      "path": "src/stock_data_manage/routing/factory.py",
+      "snapshot": "provider_validation/results/sina-futures-original-20261004/4-factory.py.bin",
+      "sha256": "1775bcf2613ad5224d9055b67316c90874f1f33811a3bab35ed1cd56f63069fc"
+    },
+    {
+      "path": "config/providers.yaml",
+      "snapshot": "provider_validation/results/sina-futures-original-20261004/5-providers.yaml.bin",
+      "sha256": "b19618e86c2ed5483bc7d9edefed1288a3c785cf49704967a2d8772607fecbeb"
+    },
+    {
+      "path": "tests/test_input_collection.py",
+      "snapshot": "provider_validation/results/sina-futures-original-20261004/6-test_input_collection.py.bin",
+      "sha256": "6b00e42588536d69be3c2112efb92ef3c2875fdafbc48162bf58736a3aa3c5aa"
+    },
+    {
+      "path": "provider_validation/tests/replay_input_capabilities.py",
+      "snapshot": "provider_validation/results/sina-futures-original-20261004/7-replay_input_capabilities.py.bin",
+      "sha256": "70f383e330e6f7b93f6eac03f72eba7b91f23fe45e08f7617865ebf9ef2f3d95"
+    }
+  ],
+  "source_code": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+  "source_code_sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03",
+  "raw_manifest": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+  "raw_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+  "kline_manifest": "provider_validation/results/raw/2026-10-01-v310-live/manifest.ndjson",
+  "kline_manifest_sha256": "838ec387b767e0cb375a8fe88358ed244350f14486c2930dc6b9878732ce208a",
+  "findings": [
+    "Modify existing SinaSnapshotProvider and SinaDailyProvider; no new Provider.",
+    "Preserve original direct requests.request browser UA/Referer, timeout and environment behavior; legacy stock transport unchanged.",
+    "Three domestic contracts and one A50 quote archived in V39; RB0/M0 Kline in V310 archive.",
+    "Continuous symbol identity remains source symbol; no stock instrument conversion or adjusted futures series."
+  ]
+}

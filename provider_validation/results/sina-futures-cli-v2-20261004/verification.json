@@ -1,0 +1,112 @@
+{
+  "validation_time_utc": "2026-10-04T01:10:49.642395+00:00",
+  "mode": "actual CLI offline replay",
+  "network_requests": 0,
+  "production_writes": 0,
+  "results": [
+    {
+      "input_id": "ASTOCK-074",
+      "count": 3,
+      "command": [
+        "D:\\Program Files\\Python\\python.exe",
+        "-m",
+        "stock_data_manage.cli",
+        "collect-input",
+        "--input",
+        "ASTOCK-074",
+        "--mode",
+        "replay",
+        "--replay-manifest",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\manifest.ndjson",
+        "--output-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sina-futures-cli-v2-20261004\\candidate",
+        "--context-file",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sina-futures-cli-v2-20261004\\1-context.json"
+      ],
+      "exit_code": 0,
+      "stdout": "provider_validation/results/sina-futures-cli-v2-20261004/1-stdout.json",
+      "stdout_sha256": "9458d8edcb298f0961715bb04048ff5f0cdb6ee1e5e24e2d3fbb3cd362eaec15",
+      "stderr": "provider_validation/results/sina-futures-cli-v2-20261004/1-stderr.bin",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sina-futures-cli-v2-20261004\\candidate\\ASTOCK-074-768076bad595\\2026-10-04\\input_report\\sina\\futures_quote\\report.json"
+    },
+    {
+      "input_id": "ASTOCK-075",
+      "count": 181,
+      "command": [
+        "D:\\Program Files\\Python\\python.exe",
+        "-m",
+        "stock_data_manage.cli",
+        "collect-input",
+        "--input",
+        "ASTOCK-075",
+        "--mode",
+        "replay",
+        "--replay-manifest",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\manifest.ndjson",
+        "--output-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sina-futures-cli-v2-20261004\\candidate",
+        "--context-file",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sina-futures-cli-v2-20261004\\2-context.json"
+      ],
+      "exit_code": 0,
+      "stdout": "provider_validation/results/sina-futures-cli-v2-20261004/2-stdout.json",
+      "stdout_sha256": "9355ce9d6b70e193cf532503ef01764b3d5ed62d95ca52bdaacb4a611c8c9ff9",
+      "stderr": "provider_validation/results/sina-futures-cli-v2-20261004/2-stderr.bin",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sina-futures-cli-v2-20261004\\candidate\\ASTOCK-075-5188f3758723\\2026-10-04\\input_report\\sina\\futures_kline\\report.json"
+    },
+    {
+      "input_id": "ASTOCK-075",
+      "count": 181,
+      "command": [
+        "D:\\Program Files\\Python\\python.exe",
+        "-m",
+        "stock_data_manage.cli",
+        "collect-input",
+        "--input",
+        "ASTOCK-075",
+        "--mode",
+        "replay",
+        "--replay-manifest",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v310-live\\manifest.ndjson",
+        "--output-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sina-futures-cli-v2-20261004\\candidate",
+        "--context-file",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sina-futures-cli-v2-20261004\\3-context.json"
+      ],
+      "exit_code": 0,
+      "stdout": "provider_validation/results/sina-futures-cli-v2-20261004/3-stdout.json",
+      "stdout_sha256": "9fe7035cfd1f9ac2ceecac916d44649ea5d132eaa915b6ca6f2a9b3b0bde0428",
+      "stderr": "provider_validation/results/sina-futures-cli-v2-20261004/3-stderr.bin",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sina-futures-cli-v2-20261004\\candidate\\ASTOCK-075-f2d76caeb099\\2026-10-04\\input_report\\sina\\futures_kline\\report.json"
+    },
+    {
+      "input_id": "ASTOCK-076",
+      "count": 1,
+      "command": [
+        "D:\\Program Files\\Python\\python.exe",
+        "-m",
+        "stock_data_manage.cli",
+        "collect-input",
+        "--input",
+        "ASTOCK-076",
+        "--mode",
+        "replay",
+        "--replay-manifest",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\manifest.ndjson",
+        "--output-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sina-futures-cli-v2-20261004\\candidate",
+        "--context-file",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sina-futures-cli-v2-20261004\\4-context.json"
+      ],
+      "exit_code": 0,
+      "stdout": "provider_validation/results/sina-futures-cli-v2-20261004/4-stdout.json",
+      "stdout_sha256": "72e1cae932bfd1ae144d4fdbd93887dddc644228e6315bc402578dad5aa6fc67",
+      "stderr": "provider_validation/results/sina-futures-cli-v2-20261004/4-stderr.bin",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sina-futures-cli-v2-20261004\\candidate\\ASTOCK-076-245c0881c73c\\2026-10-04\\input_report\\sina\\a50_quote\\report.json"
+    }
+  ]
+}
