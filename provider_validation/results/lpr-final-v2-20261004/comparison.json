@@ -1,0 +1,101 @@
+{
+  "validation_time_utc": "2026-10-04T00:05:30.033270+00:00",
+  "mode": "offline_replay",
+  "network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "verification_code": {
+    "path": "tests/test_input_collection.py",
+    "sha256": "b3490ebfc52ca5bb7c10928224b7d827d019bbd5cad1c462fa273577599d2e43"
+  },
+  "runner": {
+    "path": "provider_validation/tests/replay_input_capabilities.py",
+    "sha256": "67cc1babe0ba59025ef19291f87649627f7be50f6d994062091470c282c3eae4"
+  },
+  "inputs": [
+    {
+      "input_id": "ASTOCK-065",
+      "report_path": "provider_validation/results/lpr-final-v2-20261004/ASTOCK-065/candidate/ASTOCK-065-435f1df4d747/2026-10-04/input_report/eastmoney/lpr/report.json",
+      "report_sha256": "ed6676fbd71d35d6b052a4658b92add054c3680c0488ee2c0db11279b616071a",
+      "source_manifest": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+      "source_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+      "row_count": 1538,
+      "scope": {},
+      "code_version": "91443a62a1b87d0fe585820ad516e0a329bd44228b6b67cd2b27adcbbacfe32a",
+      "result": "passed"
+    }
+  ],
+  "original_vs_provider": [
+    {
+      "input_id": "ASTOCK-065",
+      "mode": "offline_replay",
+      "source_row_count": 1576,
+      "row_count": 1538,
+      "excluded_row_count": 38,
+      "all_business_fields_equal": true,
+      "all_retained_source_fields_equal": true,
+      "request_comparison_equal": true,
+      "source_response_hashes": [
+        "f6c7281468bbc966247b0d97e221c7b310abbb6727953195aef701643b165542",
+        "dbadf321af90a750a1e435b4c37e77c0b2a97a452bed04a949324b41a1341199",
+        "f08cebac096169d3177eb4f1b8ee7d9e4ca37e85bb05592cabadfac813647aba",
+        "0ec24737c1be4a30209750eb7f4bb55c97578ee2f960057c687414f5bffc0cbc"
+      ],
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\lpr-final-v2-20261004\\ASTOCK-065\\candidate\\ASTOCK-065-435f1df4d747\\2026-10-04\\input_report\\eastmoney\\lpr\\report.json",
+      "report_sha256": "ed6676fbd71d35d6b052a4658b92add054c3680c0488ee2c0db11279b616071a",
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\lpr-final-v2-20261004\\ASTOCK-065\\original-parsed.json",
+      "original_parsed_sha256": "37220c07e290b369990b91812ac00d05dcd1b830cfc6e0976d278c45c776935f"
+    }
+  ],
+  "known_differences": [
+    "扩展原财务Provider，保留原会话与四页查询。",
+    "来源1576行，原脚本选LPR1Y非空1538行，排除38行单独留证；不新过滤或重采样。",
+    "历史每日机制、月度报价及不存在的5年期均保持原日期和空值。",
+    "单位未独立认证，标准利率为空、来源数值保留；未新增实时或生产调用。",
+    "会话四页复用及缓存仅为注入夹具；当前可用性和独立历史完整性仍待验证。"
+  ],
+  "negative_checks": [
+    {
+      "mutation": "numeric",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/lpr-final-v2-20261004/f0/candidate/ASTOCK-065-60197685e2e2/2026-10-04/input_report/eastmoney/lpr/report.json",
+      "report_sha256": "5c5ec35468708f277bdbe18c86d11e852aff90168bfca22a0e5bf56d790d8655",
+      "result": "passed"
+    },
+    {
+      "mutation": "missing_required",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/lpr-final-v2-20261004/f1/candidate/ASTOCK-065-cd6d170698f7/2026-10-04/input_report/eastmoney/lpr/report.json",
+      "report_sha256": "68ec82fa13d0ae514f679d2250af3bdaee658efd6d9a923ba133ac170600fd72",
+      "result": "passed"
+    },
+    {
+      "mutation": "date",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/lpr-final-v2-20261004/f2/candidate/ASTOCK-065-a5cf145ff65d/2026-10-04/input_report/eastmoney/lpr/report.json",
+      "report_sha256": "be2475a4c2e1160b63d8abea0db54485baa6c2d63e609e5727c3c4a80da06af8",
+      "result": "passed"
+    },
+    {
+      "mutation": "duplicate",
+      "failure_class": "NormalizationError",
+      "report_path": "provider_validation/results/lpr-final-v2-20261004/f3/candidate/ASTOCK-065-8e4a3ff17087/2026-10-04/input_report/eastmoney/lpr/report.json",
+      "report_sha256": "d629f30ec7c150f6a180037cb6913feb3561eec5c062c4cf51d58eda596a7338",
+      "result": "passed"
+    },
+    {
+      "mutation": "short_page",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/lpr-final-v2-20261004/f4/candidate/ASTOCK-065-b46fc4b20c6e/2026-10-04/input_report/eastmoney/lpr/report.json",
+      "report_sha256": "f2b506e7af1a2dfda40e6fb99dcc431f5c3703edded059ada34f63b19d83086b",
+      "result": "passed"
+    },
+    {
+      "mutation": "count_changed",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/lpr-final-v2-20261004/f5/candidate/ASTOCK-065-40ce3b1c3572/2026-10-04/input_report/eastmoney/lpr/report.json",
+      "report_sha256": "f1744a269215295bf916331a6e2a79ea781486aba59ef9bf6c883761d0c01e73",
+      "result": "passed"
+    }
+  ]
+}

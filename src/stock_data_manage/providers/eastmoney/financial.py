@@ -141,6 +141,25 @@ class EastMoneyFinancialMainProvider:
             empty_is_valid=not rows and narrowed, mapping_context={"source_total_count": self._event_total,
                 "source_page_count": self._event_pages, "requested_limit": limit, "source_report": report})
 
+    def fetch_lpr_history(self):
+        """Preserve the source script's four-page history and baseline-row exclusion."""
+        from ..contracts import InputFetchResult
+        self._event_total = self._event_pages = None
+        source = self._event_rows("RPTA_WEB_RATE", sort_columns="TRADE_DATE", sort_types="1",
+                                  columns="TRADE_DATE,LPR1Y,LPR5Y")
+        selected = [row for row in source if row.get("LPR1Y") is not None]
+        excluded = [row for row in source if row.get("LPR1Y") is None]
+        if not selected:
+            raise RuntimeError("LPR report contains no LPR data")
+        for row in selected:
+            if _event_num(row["LPR1Y"]) is None or _event_day(row.get("TRADE_DATE")) is None:
+                raise RuntimeError("required LPR date or one-year value is missing")
+            _event_num(row.get("LPR5Y"))
+        return InputFetchResult(tuple(selected), source_url=self.url+"?reportName=RPTA_WEB_RATE",
+            source_rows=tuple(source), excluded_rows=tuple(excluded), mapping_context={
+                "source_total_count":self._event_total,"source_page_count":self._event_pages,
+                "requested_limit":5000,"source_report":"RPTA_WEB_RATE"})
+
     def fetch_action_list(self, *, code=None, start=None, end=None, direction=None, progress=None, date=None, limit=100):
         """Source financial actions, preserving the successful V3.9 query contracts."""
         import json

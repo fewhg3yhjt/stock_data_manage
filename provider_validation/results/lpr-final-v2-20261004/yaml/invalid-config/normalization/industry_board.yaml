@@ -1,0 +1,8 @@
+dataset: industry_board
+rules:
+  - id: ths-industry-members-v1
+    provider: ths
+    endpoint: board_members
+    board_type: industry
+    status: pending_validation
+    version: ths-industry-members-v1

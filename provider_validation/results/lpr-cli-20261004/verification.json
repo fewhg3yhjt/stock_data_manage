@@ -1,0 +1,32 @@
+{
+  "validation_time_utc": "2026-10-04T00:06:21.578058+00:00",
+  "mode": "actual CLI offline replay",
+  "network_requests": 0,
+  "production_writes": 0,
+  "results": [
+    {
+      "input_id": "ASTOCK-065",
+      "count": 1538,
+      "command": [
+        "D:\\Program Files\\Python\\python.exe",
+        "-m",
+        "stock_data_manage.cli",
+        "collect-input",
+        "--input",
+        "ASTOCK-065",
+        "--mode",
+        "replay",
+        "--replay-manifest",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\manifest.ndjson",
+        "--output-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\lpr-cli-20261004\\candidate"
+      ],
+      "exit_code": 0,
+      "stdout": "provider_validation/results/lpr-cli-20261004/ASTOCK-065-stdout.json",
+      "stdout_sha256": "ca5dba5e8408c97151fdc59978c61153f52ac5a0e912203334ddbb144fd652f6",
+      "stderr": "provider_validation/results/lpr-cli-20261004/ASTOCK-065-stderr.bin",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\lpr-cli-20261004\\candidate\\ASTOCK-065-1fe4a773b494\\2026-10-04\\input_report\\eastmoney\\lpr\\report.json"
+    }
+  ]
+}

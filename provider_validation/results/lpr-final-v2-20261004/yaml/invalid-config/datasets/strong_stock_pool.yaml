@@ -1,0 +1,70 @@
+dataset:
+  name: strong_stock_pool
+  display_name: 强势股池输入
+  primary_key:
+  - trade_date
+  - source_security_code
+fields:
+  trade_date:
+    type: date
+    required: true
+  snapshot_at:
+    type: datetime
+    required: true
+  source_security_code:
+    type: string
+    required: true
+  name:
+    type: string
+    required: true
+  change_pct:
+    type: decimal
+    unit: percent
+    required: true
+  price:
+    type: decimal
+    unit: CNY
+    required: true
+  amount:
+    type: decimal
+    unit: CNY
+    required: false
+  float_market_cap:
+    type: decimal
+    unit: CNY
+    required: false
+  total_market_cap:
+    type: decimal
+    unit: CNY
+    required: false
+  turnover_rate:
+    type: decimal
+    unit: percent
+    required: false
+  industry:
+    type: string
+    required: false
+  limit_price:
+    type: decimal
+    required: true
+    unit: CNY
+  change_speed:
+    type: decimal
+    required: true
+    unit: percent
+  is_new_high:
+    type: enum
+    required: true
+    values:
+    - 是
+    - 否
+  volume_ratio:
+    type: decimal
+    required: true
+    unit: ratio
+  limit_statistics:
+    type: string
+    required: true
+  selection_reason:
+    type: string
+    required: true

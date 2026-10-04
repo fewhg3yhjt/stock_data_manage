@@ -1,0 +1,44 @@
+{
+  "validation_time_utc": "2026-10-03T23:53:34.275774+00:00",
+  "authorization": "confirmed continuous remaining-input conversion",
+  "scope": [
+    "ASTOCK-065"
+  ],
+  "original_files": [
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/financial.py",
+      "snapshot": "provider_validation/results/lpr-original-20261004/1-financial.py.bin",
+      "sha256": "ff9e8f647711208d57fdcd157d9dce52d6b6bc10c5421b1a667b465466c50ea2"
+    },
+    {
+      "path": "src/stock_data_manage/pipeline/inputs.py",
+      "snapshot": "provider_validation/results/lpr-original-20261004/2-inputs.py.bin",
+      "sha256": "a8a775a8ed568e622032b766d0ae666ab7a22aa67ba7e104c8c694fa1f3948f2"
+    },
+    {
+      "path": "src/stock_data_manage/routing/factory.py",
+      "snapshot": "provider_validation/results/lpr-original-20261004/3-factory.py.bin",
+      "sha256": "e0e572c72c2f72d50931414b6b5be4e83691fdd38fce43f33701065139a6aa1f"
+    },
+    {
+      "path": "config/providers.yaml",
+      "snapshot": "provider_validation/results/lpr-original-20261004/4-providers.yaml.bin",
+      "sha256": "5e86c03754724cb2ac78aa788c1149b20cf67a8aaafaba73c61138946ebd2b79"
+    },
+    {
+      "path": "tests/test_input_collection.py",
+      "snapshot": "provider_validation/results/lpr-original-20261004/5-test_input_collection.py.bin",
+      "sha256": "6316fe425211d28cf5a79a8a647fb73eb323d9e69e771c112c82e7c7450c587e"
+    },
+    {
+      "path": "provider_validation/tests/replay_input_capabilities.py",
+      "snapshot": "provider_validation/results/lpr-original-20261004/6-replay_input_capabilities.py.bin",
+      "sha256": "5b12eb4c5519b716ffd88a080211ab89429416bffd11ab283c24808ae0338fe3"
+    }
+  ],
+  "source_code": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+  "source_code_sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03",
+  "raw_manifest": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+  "raw_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+  "selection_policy": "preserve original lpr_history exclusion of LPR1Y None rows; retain all raw and excluded rows"
+}

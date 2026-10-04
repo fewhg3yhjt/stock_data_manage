@@ -1,0 +1,57 @@
+dataset: pledge
+rules:
+- id: eastmoney-pledge-input-v1
+  input_id: ASTOCK-082
+  provider: eastmoney
+  endpoint: pledge
+  field_mapping:
+    source_security_code: SECURITY_CODE
+    name: SECURITY_NAME_ABBR
+    statistic_date: TRADE_DATE
+    industry: INDUSTRY
+    pledge_ratio_pct: PLEDGE_RATIO
+    pledged_shares_10k: REPURCHASE_BALANCE
+    pledged_mktcap_10k: PLEDGE_MARKET_CAP
+    pledge_count: PLEDGE_DEAL_NUM
+    unrestricted_pledged_10k: REPURCHASE_UNLIMITED_BALANCE
+    restricted_pledged_10k: REPURCHASE_LIMITED_BALANCE
+  context_fields:
+    snapshot_at: source_snapshot_at
+  transforms:
+    statistic_date:
+      format: '%Y-%m-%d %H:%M:%S'
+    pledge_ratio_pct:
+      remove_commas: true
+      nonfinite_is_null: true
+    pledged_shares_10k:
+      remove_commas: true
+      nonfinite_is_null: true
+    pledged_mktcap_10k:
+      remove_commas: true
+      nonfinite_is_null: true
+    pledge_count:
+      remove_commas: true
+      nonfinite_is_null: true
+    unrestricted_pledged_10k:
+      remove_commas: true
+      nonfinite_is_null: true
+    restricted_pledged_10k:
+      remove_commas: true
+      nonfinite_is_null: true
+  null_values:
+  - null
+  - ''
+  - '-'
+  - --
+  - None
+  - 'null'
+  unverified_fields:
+  - pledged_shares_10k
+  - pledged_mktcap_10k
+  - unrestricted_pledged_10k
+  - restricted_pledged_10k
+  status: pending_validation
+  version: eastmoney-actions-input-v1
+  evidence_refs:
+  - ASTOCK-082
+  notes: 保留原脚本数据含义与全部原字段；进度标签和板块备用字段在YAML管理。量额单位未独立核验，标准值为空；原值保留。

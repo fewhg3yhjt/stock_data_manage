@@ -65,6 +65,118 @@ ACTION_REPORTS = {"ASTOCK-080":"RPT_SHARE_HOLDER_INCREASE", "ASTOCK-081":"RPTA_W
 ACTION_FUNCTIONS = {"ASTOCK-080":"holder_trades", "ASTOCK-081":"share_buyback", "ASTOCK-082":"equity_pledge", "ASTOCK-083":"ipo_calendar"}
 
 
+def lpr_source_records():
+    from urllib.parse import parse_qs,urlsplit
+    return [json.loads(line) for line in EVENT_ARCHIVE.read_text(encoding="utf-8").splitlines()
+            if parse_qs(urlsplit(json.loads(line)["url"]).query).get("reportName")==["RPTA_WEB_RATE"]]
+
+
+def compare_lpr_original(tmp_path):
+    import pandas as pd
+    spec=importlib.util.spec_from_file_location("lpr_original",ROOT/"provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py")
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);ns=module.load_shipped_code()
+    store=RawObjectStore(tmp_path/"original")
+    try:
+        with captured_requests(store,provider="eastmoney",endpoint="lpr",scope={},code_version="original-v39-lpr",pacer=RequestPacer(),replay_manifest=EVENT_ARCHIVE) as events:
+            frame=ns["lpr_history"]()
+    finally:ns["EM_SESSION"].close()
+    parsed=[{k:None if pd.isna(v) else v for k,v in row.items()} for row in frame.to_dict(orient="records")]
+    original_path=tmp_path/"original-parsed.json";original_path.write_text(json.dumps(parsed,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    report=collect_input(input_id="ASTOCK-065",context={},config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=EVENT_ARCHIVE)
+    assert report["status"]=="candidate_complete",report
+    source=[]
+    for record in lpr_source_records():source.extend(json.loads(RawObjectStore.read_response(EVENT_ARCHIVE,record))["result"]["data"])
+    assert read_artifact(report,"source_rows")==source and len(source)==report["original_row_count"]==1576
+    selected=[r for r in source if r.get("LPR1Y") is not None];excluded=[r for r in source if r.get("LPR1Y") is None]
+    assert len(selected)==len(parsed)==report["row_count"]==1538 and len(excluded)==38
+    assert read_artifact(report,"excluded_rows")==excluded and report["source_total_count"]==1576 and not report["result_limited"]
+    for row,old in zip(selected,parsed):
+        assert row["TRADE_DATE"][:10]==old["date"] and float(row["LPR1Y"])==old["lpr_1y"]
+        assert row.get("LPR5Y")==old["lpr_5y"]
+    keys=("url","method","outcome","status_code","body_sha256","request_headers","request_options")
+    assert [{k:r.get(k) for k in keys} for r in events]==[{k:r.get(k) for k in keys} for r in report["responses"]]
+    output=read_artifact(report,"output")
+    assert [r["rate_date"] for r in output]==[r["date"] for r in parsed]
+    assert all(r["snapshot_at"]==report["source_capture_window"]["last"] and r["lpr_1y"] is None and r["lpr_5y"] is None for r in output)
+    comparison={"input_id":"ASTOCK-065","mode":"offline_replay","source_row_count":1576,"row_count":1538,"excluded_row_count":38,
+        "all_business_fields_equal":True,"all_retained_source_fields_equal":True,"request_comparison_equal":True,
+        "source_response_hashes":[r["body_sha256"] for r in events],"report_path":report["report_path"],
+        "report_sha256":hashlib.sha256(Path(report["report_path"]).read_bytes()).hexdigest(),
+        "original_parsed_path":str(original_path.resolve()),"original_parsed_sha256":hashlib.sha256(original_path.read_bytes()).hexdigest()}
+    (tmp_path/"comparison.json").write_text(json.dumps(comparison,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    return comparison
+
+
+def test_lpr_preserves_original_history_and_exclusions(tmp_path,no_network):
+    compare_lpr_original(tmp_path)
+
+
+def lpr_fixture(tmp_path,mutation):
+    store=RawObjectStore(tmp_path/"fixture")
+    for page,record in enumerate(lpr_source_records(),1):
+        body=json.loads(RawObjectStore.read_response(EVENT_ARCHIVE,record));data=body["result"]["data"]
+        target=next((r for r in data if r.get("LPR1Y") is not None),None)
+        if page==1:
+            if mutation=="numeric":target["LPR1Y"]="broken"
+            elif mutation=="missing_required":target["LPR1Y"]="--"
+            elif mutation=="date":target["TRADE_DATE"]="bad"
+            elif mutation=="duplicate":data[-1]=data[-2].copy()
+            elif mutation=="short_page":data.pop()
+        if page==2 and mutation=="count_changed":body["result"]["count"]+=1
+        response=requests.Response();response.status_code=200;response.encoding="utf-8";response._content=json.dumps(body).encode()
+        store.record_response(response=response,url=record["url"],method="GET",request_headers=record["request_headers"],provider="eastmoney",endpoint="lpr",code_version="offline-fixture",
+            scope={"synthetic":True,"mutation":mutation,"parent_sha256":record["body_sha256"]})
+    return store.root/"manifest.ndjson"
+
+
+LPR_FAILURES=[("numeric","RuntimeError"),("missing_required","RuntimeError"),("date","RuntimeError"),("duplicate","NormalizationError"),("short_page","RuntimeError"),("count_changed","RuntimeError")]
+
+
+@pytest.mark.parametrize("mutation,expected",LPR_FAILURES)
+def test_lpr_invalid_history_is_not_published(tmp_path,no_network,mutation,expected):
+    manifest=lpr_fixture(tmp_path,mutation)
+    report=collect_input(input_id="ASTOCK-065",context={},config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=manifest)
+    assert report["status"]=="failed" and report["failure_class"]==expected and "output" not in report,report
+    assert report["responses"] and report["production_writes"]==report["live_http_calls"]==0
+    for record in report["responses"]:
+        assert hashlib.sha256(RawObjectStore.read_response(Path(report["run_directory"])/report["raw_manifest"]["path"],record)).hexdigest()==record["body_sha256"]
+
+
+def test_lpr_yaml_projection_and_forbidden_window(tmp_path,no_network):
+    config=tmp_path/"config";shutil.copytree(ROOT/"config",config)
+    path=config/"normalization/lpr_history.yaml";rule=yaml.safe_load(path.read_text(encoding="utf-8"));rule["rules"][0]["field_mapping"]["lpr_1y"]="LPR5Y"
+    path.write_text(yaml.safe_dump(rule,allow_unicode=True),encoding="utf-8")
+    report=collect_input(input_id="ASTOCK-065",context={},config_root=config,output_root=tmp_path/"candidate",replay_manifest=EVENT_ARCHIVE,fields=["rate_date","snapshot_at"])
+    assert report["status"]=="candidate_complete" and all(set(r)=={"rate_date","snapshot_at"} for r in read_artifact(report,"output")),report
+    invalid_config=tmp_path/"invalid-config";shutil.copytree(config,invalid_config)
+    rule["rules"][0]["field_mapping"]["rate_date"]="LPR1Y"
+    (invalid_config/"normalization/lpr_history.yaml").write_text(yaml.safe_dump(rule,allow_unicode=True),encoding="utf-8")
+    invalid=collect_input(input_id="ASTOCK-065",context={},config_root=invalid_config,output_root=tmp_path/"invalid",replay_manifest=EVENT_ARCHIVE)
+    assert invalid["status"]=="failed" and invalid["failure_class"]=="NormalizationError" and "output" not in invalid,invalid
+    for context in [{"request":{"symbol":"600519"}},{"request":{"start_date":"2026-09-01"}},{"config":{"limit":50}}]:
+        with pytest.raises(ValueError):collect_input(input_id="ASTOCK-065",context=context,config_root=config,output_root=tmp_path/"bad",replay_manifest=EVENT_ARCHIVE)
+
+
+def test_lpr_four_page_session_and_cache(tmp_path,monkeypatch):
+    from unittest.mock import patch
+    from stock_data_manage.storage.raw import sanitized_url
+    originals=lpr_source_records();seen=[]
+    def send(session,request,**kwargs):
+        seen.append(session);record=next(r for r in originals if sanitized_url(r["url"])==sanitized_url(request.url))
+        assert session.trust_env is True and kwargs["timeout"]==20 and session.get_adapter(request.url).max_retries.total==3
+        response=requests.Response();response.status_code=200;response.encoding="utf-8";response.headers["Content-Type"]="application/json"
+        response._content=RawObjectStore.read_response(EVENT_ARCHIVE,record);return response
+    with patch("requests.Session.send",send):
+        first=collect_input(input_id="ASTOCK-065",context={},config_root=ROOT/"config",output_root=tmp_path/"candidate",mode="live",evidence_root=tmp_path/"unused")
+        second=collect_input(input_id="ASTOCK-065",context={},config_root=ROOT/"config",output_root=tmp_path/"candidate",mode="live",evidence_root=tmp_path/"candidate")
+    assert first["status"]==second["status"]=="candidate_complete",(first,second)
+    assert len(seen)==4 and len({id(session) for session in seen})==1
+    assert first["live_http_calls"]==4 and second["live_http_calls"]==0 and len(second["responses"])==4
+    assert read_artifact(first,"output")==read_artifact(second,"output")
+    (tmp_path/"fixture-mode.json").write_text(json.dumps({"mode":"injected Session; not real live source validation",
+        "real_http_calls":0,"fixture_send_calls":4,"cached_send_calls":0}),encoding="utf-8")
+
+
 def action_source_records(input_id):
     from urllib.parse import parse_qs,urlsplit
     return [json.loads(line) for line in EVENT_ARCHIVE.read_text(encoding="utf-8").splitlines()

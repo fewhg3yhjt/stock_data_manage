@@ -1,0 +1,20 @@
+{
+  "input_id": "ASTOCK-065",
+  "mode": "offline_replay",
+  "source_row_count": 1576,
+  "row_count": 1538,
+  "excluded_row_count": 38,
+  "all_business_fields_equal": true,
+  "all_retained_source_fields_equal": true,
+  "request_comparison_equal": true,
+  "source_response_hashes": [
+    "f6c7281468bbc966247b0d97e221c7b310abbb6727953195aef701643b165542",
+    "dbadf321af90a750a1e435b4c37e77c0b2a97a452bed04a949324b41a1341199",
+    "f08cebac096169d3177eb4f1b8ee7d9e4ca37e85bb05592cabadfac813647aba",
+    "0ec24737c1be4a30209750eb7f4bb55c97578ee2f960057c687414f5bffc0cbc"
+  ],
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\lpr-final-v2-20261004\\ASTOCK-065\\candidate\\ASTOCK-065-435f1df4d747\\2026-10-04\\input_report\\eastmoney\\lpr\\report.json",
+  "report_sha256": "ed6676fbd71d35d6b052a4658b92add054c3680c0488ee2c0db11279b616071a",
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\lpr-final-v2-20261004\\ASTOCK-065\\original-parsed.json",
+  "original_parsed_sha256": "37220c07e290b369990b91812ac00d05dcd1b830cfc6e0976d278c45c776935f"
+}

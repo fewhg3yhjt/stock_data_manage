@@ -1,0 +1,99 @@
+dataset: buyback
+rules:
+- id: eastmoney-buyback-input-v1
+  input_id: ASTOCK-081
+  provider: eastmoney
+  endpoint: buyback
+  field_mapping:
+    source_security_code: DIM_SCODE
+    name: SECURITYSHORTNAME
+    source_plan_code: REPURCODE
+    progress: REPURPROGRESS
+    progress_code: REPURPROGRESS
+    plan_start: REPURSTARTDATE
+    plan_end: REPURENDDATE
+    price_cap: REPURPRICECAP
+    shares_lower: REPURNUMLOWER
+    shares_upper: REPURNUMCAP
+    amount_lower: REPURAMOUNTLOWER
+    amount_upper: REPURAMOUNTLIMIT
+    pct_total_lower: ZSZXX
+    pct_total_upper: ZSZSX
+    done_shares: REPURNUM
+    done_amount: REPURAMOUNT
+    done_price_low: REPURPRICELOWER1
+    done_price_high: REPURPRICECAP1
+    latest_notice: UPDATEDATE
+    objective: REPUROBJECTIVE
+  context_fields:
+    snapshot_at: source_snapshot_at
+  transforms:
+    plan_start:
+      format: '%Y-%m-%d %H:%M:%S'
+    plan_end:
+      format: '%Y-%m-%d %H:%M:%S'
+    price_cap:
+      remove_commas: true
+      nonfinite_is_null: true
+    shares_lower:
+      remove_commas: true
+      nonfinite_is_null: true
+    shares_upper:
+      remove_commas: true
+      nonfinite_is_null: true
+    amount_lower:
+      remove_commas: true
+      nonfinite_is_null: true
+    amount_upper:
+      remove_commas: true
+      nonfinite_is_null: true
+    pct_total_lower:
+      remove_commas: true
+      nonfinite_is_null: true
+    pct_total_upper:
+      remove_commas: true
+      nonfinite_is_null: true
+    done_shares:
+      remove_commas: true
+      nonfinite_is_null: true
+    done_amount:
+      remove_commas: true
+      nonfinite_is_null: true
+    done_price_low:
+      remove_commas: true
+      nonfinite_is_null: true
+    done_price_high:
+      remove_commas: true
+      nonfinite_is_null: true
+    latest_notice:
+      format: '%Y-%m-%d %H:%M:%S'
+    progress:
+      value_mapping:
+        '001': 董事会预案
+        '002': 股东大会通过
+        '003': 股东大会否决
+        '004': 实施中
+        '005': 停止实施
+        '006': 完成实施
+  null_values:
+  - null
+  - ''
+  - '-'
+  - --
+  - None
+  - 'null'
+  unverified_fields:
+  - price_cap
+  - shares_lower
+  - shares_upper
+  - amount_lower
+  - amount_upper
+  - done_shares
+  - done_amount
+  - done_price_low
+  - done_price_high
+  status: pending_validation
+  version: eastmoney-actions-input-v1
+  evidence_refs:
+  - ASTOCK-081
+  notes: 保留原脚本数据含义与全部原字段；进度标签和板块备用字段在YAML管理。量额单位未独立核验，标准值为空；原值保留。
