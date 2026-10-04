@@ -1,0 +1,10 @@
+{
+  "result": "passed",
+  "validation_time_utc": "2026-10-04T11:04:37.564012+00:00",
+  "staged_files_verified": 1525,
+  "artifact_index_sha256": "a528ee22be122a74f55cc57636bc06163abe6eb2182bbb83c83481ba75f5635f",
+  "unrelated_user_files_staged": false,
+  "bytes_equal": true,
+  "production_writes": 0,
+  "scope": "all indexed files plus index itself; this staged-check record is added after the check"
+}

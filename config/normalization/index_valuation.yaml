@@ -1,0 +1,29 @@
+dataset: index_valuation
+rules:
+- id: index_valuation-input-v1
+  input_id: ASTOCK-069
+  provider: csindex
+  endpoint: index_valuation
+  field_mapping:
+    trade_date: 日期
+    name: 指数中文全称
+    pe_1: 市盈率1
+    pe_2: 市盈率2
+    dividend_yield_1: 股息率1
+    dividend_yield_2: 股息率2
+  context_fields:
+    snapshot_at: source_snapshot_at
+    index_code: index_code
+  null_values:
+  - null
+  - ''
+  unverified_fields:
+  - pe_1
+  - pe_2
+  - dividend_yield_1
+  - dividend_yield_2
+  status: pending_validation
+  version: remaining-native-sdk-input-v1
+  evidence_refs:
+  - ASTOCK-069
+  notes: 原SDK传输保持；精确响应先保存，全部来源字段另存。新闻仅关键词首页10条，不认证发行人归属；估值两种口径不合并。

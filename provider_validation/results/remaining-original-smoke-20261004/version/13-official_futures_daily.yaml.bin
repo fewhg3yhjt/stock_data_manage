@@ -1,0 +1,42 @@
+dataset: official_futures_daily
+rules:
+- id: official_futures_daily-input-v1
+  input_id: ASTOCK-071
+  provider: exchange_composite
+  endpoint: futures_daily
+  field_mapping:
+    trade_date: date
+    exchange: exchange
+    contract_code: symbol
+    product: product
+    open: open
+    high: high
+    low: low
+    close: close
+    settle: settle
+    pre_settle: pre_settle
+    volume: volume
+    open_interest: open_interest
+    oi_change: oi_change
+    turnover_10k: turnover_10k
+  context_fields:
+    snapshot_at: source_snapshot_at
+  null_values:
+  - null
+  - ''
+  unverified_fields:
+  - open
+  - high
+  - low
+  - close
+  - settle
+  - pre_settle
+  - volume
+  - open_interest
+  - oi_change
+  - turnover_10k
+  status: pending_validation
+  version: remaining-original-input-v1
+  evidence_refs:
+  - ASTOCK-071
+  notes: 保留原独立接口及原解析。原数字单独留证，标准数字单位未认证；无来源或日期回退，生产关闭。

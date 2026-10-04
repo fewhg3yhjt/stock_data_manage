@@ -1,0 +1,574 @@
+[
+  {
+    "url": "https://push2ex.eastmoney.com/getAllStockChanges?type=8201&pageindex=0&pagesize=5000&ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wzchanges",
+    "sha256": "b29f298faa3998b897db395251f08b636e2687a4a3132d5779df9569b02782b0",
+    "keys": [
+      "rc",
+      "rt",
+      "svr",
+      "lt",
+      "full",
+      "data"
+    ],
+    "data_keys": [
+      "tc",
+      "allstock"
+    ],
+    "count": 1529,
+    "source_total": 1529,
+    "first": {
+      "tm": 145547,
+      "c": "600289",
+      "m": 1,
+      "n": "ST信通",
+      "t": 8201,
+      "i": "0.042254,4.44000,0.042254"
+    }
+  },
+  {
+    "url": "https://push2ex.eastmoney.com/getAllStockChanges?type=8202&pageindex=0&pagesize=5000&ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wzchanges",
+    "sha256": "596cf9ef47367a192f6f1af7ed898925fa749056f584756e8a8e12ddcb59fd9f",
+    "keys": [
+      "rc",
+      "rt",
+      "svr",
+      "lt",
+      "full",
+      "data"
+    ],
+    "data_keys": [
+      "tc",
+      "allstock"
+    ],
+    "count": 697,
+    "source_total": 697,
+    "first": {
+      "tm": 144506,
+      "c": "002630",
+      "m": 0,
+      "n": "*ST华西",
+      "t": 8202,
+      "i": "-0.006849,1.45000,-0.006849"
+    }
+  },
+  {
+    "url": "https://push2ex.eastmoney.com/getAllStockChanges?type=8193&pageindex=0&pagesize=5000&ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wzchanges",
+    "sha256": "249f89e882224beb6684f076653c87de3cdbd7178d31a6d440aec4653843e1d4",
+    "keys": [
+      "rc",
+      "rt",
+      "svr",
+      "lt",
+      "full",
+      "data"
+    ],
+    "data_keys": [
+      "tc",
+      "allstock"
+    ],
+    "count": 1218,
+    "source_total": 1218,
+    "first": {
+      "tm": 145552,
+      "c": "301041",
+      "m": 0,
+      "n": "金百泽",
+      "t": 8193,
+      "i": "88000,37.29000,-0.056976,3281520.00"
+    }
+  },
+  {
+    "url": "https://push2ex.eastmoney.com/getAllStockChanges?type=4&pageindex=0&pagesize=5000&ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wzchanges",
+    "sha256": "af23a14951d65d8f68e33add6176ad32b5f18687c4f0e0c5d0f2a445be964637",
+    "keys": [
+      "rc",
+      "rt",
+      "svr",
+      "lt",
+      "full",
+      "data"
+    ],
+    "data_keys": [
+      "tc",
+      "allstock"
+    ],
+    "count": 113,
+    "source_total": 113,
+    "first": {
+      "tm": 145454,
+      "c": "002694",
+      "m": 0,
+      "n": "*ST顾地",
+      "t": 4,
+      "i": "2.760000,39900,2.76000,0.099602"
+    }
+  },
+  {
+    "url": "https://push2ex.eastmoney.com/getAllStockChanges?type=32&pageindex=0&pagesize=5000&ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wzchanges",
+    "sha256": "e81096a1bd339bdd14020153417dc3b1766378239117e13e3d626b2e3928b38f",
+    "keys": [
+      "rc",
+      "rt",
+      "svr",
+      "lt",
+      "full",
+      "data"
+    ],
+    "data_keys": [
+      "tc",
+      "allstock"
+    ],
+    "count": 117,
+    "source_total": 117,
+    "first": {
+      "tm": 150000,
+      "c": "000850",
+      "m": 0,
+      "n": "华茂股份",
+      "t": 32,
+      "i": "4.170000,-0.099352"
+    }
+  },
+  {
+    "url": "https://push2ex.eastmoney.com/getAllStockChanges?type=64&pageindex=0&pagesize=5000&ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wzchanges",
+    "sha256": "a39989243d3104aaa0a592921af6b16182661b44001a4b906062b31fcd6290c9",
+    "keys": [
+      "rc",
+      "rt",
+      "svr",
+      "lt",
+      "full",
+      "data"
+    ],
+    "data_keys": [
+      "tc",
+      "allstock"
+    ],
+    "count": 832,
+    "source_total": 832,
+    "first": {
+      "tm": 145558,
+      "c": "601375",
+      "m": 1,
+      "n": "中原证券",
+      "t": 64,
+      "i": "9488800,3.95000,0.002538,37118021.00"
+    }
+  },
+  {
+    "url": "https://push2ex.eastmoney.com/getAllStockChanges?type=8207&pageindex=0&pagesize=5000&ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wzchanges",
+    "sha256": "c125d09f654caf5996d7d5188c938c83c0d2aa57393349d1207bd055fb94a39e",
+    "keys": [
+      "rc",
+      "rt",
+      "svr",
+      "lt",
+      "full",
+      "data"
+    ],
+    "data_keys": [
+      "tc",
+      "allstock"
+    ],
+    "count": 39,
+    "source_total": 39,
+    "first": {
+      "tm": 92430,
+      "c": "001325",
+      "m": 0,
+      "n": "元创股份",
+      "t": 8207,
+      "i": "0.013282,36.62000,0.013282"
+    }
+  },
+  {
+    "url": "https://push2ex.eastmoney.com/getAllStockChanges?type=8209&pageindex=0&pagesize=5000&ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wzchanges",
+    "sha256": "321f16a2a080b7bb53657a3204d2ee6346c657fecaad4e97301d821187f0dae0",
+    "keys": [
+      "rc",
+      "rt",
+      "svr",
+      "lt",
+      "full",
+      "data"
+    ],
+    "data_keys": [
+      "tc",
+      "allstock"
+    ],
+    "count": 77,
+    "source_total": 77,
+    "first": {
+      "tm": 92502,
+      "c": "688788",
+      "m": 1,
+      "n": "科思科技",
+      "t": 8209,
+      "i": "0.038151,28.30000,0.038151"
+    }
+  },
+  {
+    "url": "https://push2ex.eastmoney.com/getAllStockChanges?type=8211&pageindex=0&pagesize=5000&ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wzchanges",
+    "sha256": "9cf6b6f5e23beb466fc8f78a660cb0edad8ff62f1fe30d0b87bdad0b76baf658",
+    "keys": [
+      "rc",
+      "rt",
+      "svr",
+      "lt",
+      "full",
+      "data"
+    ],
+    "data_keys": [
+      "tc",
+      "allstock"
+    ],
+    "count": 40,
+    "source_total": 40,
+    "first": {
+      "tm": 144503,
+      "c": "002978",
+      "m": 0,
+      "n": "安宁股份",
+      "t": 8211,
+      "i": "0.018256,25.10000,0.018256"
+    }
+  },
+  {
+    "url": "https://push2ex.eastmoney.com/getAllStockChanges?type=8213&pageindex=0&pagesize=5000&ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wzchanges",
+    "sha256": "0c36bef5b1413480c56381670473c748aedaae6c1f47e0f1cff058b8025f39a9",
+    "keys": [
+      "rc",
+      "rt",
+      "svr",
+      "lt",
+      "full",
+      "data"
+    ],
+    "data_keys": [
+      "tc",
+      "allstock"
+    ],
+    "count": 185,
+    "source_total": 185,
+    "first": {
+      "tm": 143604,
+      "c": "601398",
+      "m": 1,
+      "n": "工商银行",
+      "t": 8213,
+      "i": "8.300000,8.29000,0.015931"
+    }
+  },
+  {
+    "url": "https://push2ex.eastmoney.com/getAllStockChanges?type=8215&pageindex=0&pagesize=5000&ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wzchanges",
+    "sha256": "1cd7fbe74b6457eaabff9b44822b6f3fec7bd8b08bfcd44bf2971cd7760dc7c0",
+    "keys": [
+      "rc",
+      "rt",
+      "svr",
+      "lt",
+      "full",
+      "data"
+    ],
+    "data_keys": [
+      "tc",
+      "allstock"
+    ],
+    "count": 180,
+    "source_total": 180,
+    "first": {
+      "tm": 144841,
+      "c": "600872",
+      "m": 1,
+      "n": "中炬高新",
+      "t": 8215,
+      "i": "0.030285,17.28000,0.026128"
+    }
+  },
+  {
+    "url": "https://push2ex.eastmoney.com/getAllStockChanges?type=8204&pageindex=0&pagesize=5000&ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wzchanges",
+    "sha256": "66f1e0cf797b6a9f519378da7c94b092e32d04786bf9ea771be1aa2e135f981d",
+    "keys": [
+      "rc",
+      "rt",
+      "svr",
+      "lt",
+      "full",
+      "data"
+    ],
+    "data_keys": [
+      "tc",
+      "allstock"
+    ],
+    "count": 162,
+    "source_total": 162,
+    "first": {
+      "tm": 145531,
+      "c": "300192",
+      "m": 0,
+      "n": "科德教育",
+      "t": 8204,
+      "i": "-0.021241,23.50000,-0.021241"
+    }
+  },
+  {
+    "url": "https://push2ex.eastmoney.com/getAllStockChanges?type=8203&pageindex=0&pagesize=5000&ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wzchanges",
+    "sha256": "4fc927d304ac8d576c34f59116a5031b6c3d2409675095b227f157e672d77e43",
+    "keys": [
+      "rc",
+      "rt",
+      "svr",
+      "lt",
+      "full",
+      "data"
+    ],
+    "data_keys": [
+      "tc",
+      "allstock"
+    ],
+    "count": 695,
+    "source_total": 695,
+    "first": {
+      "tm": 145456,
+      "c": "600802",
+      "m": 1,
+      "n": "福建水泥",
+      "t": 8203,
+      "i": "0.044669,7.25000,0.044669"
+    }
+  },
+  {
+    "url": "https://push2ex.eastmoney.com/getAllStockChanges?type=8194&pageindex=0&pagesize=5000&ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wzchanges",
+    "sha256": "bdb7cdaad4729d324b8d8ed93c101ed8693ff85f549db4fb9b73deebdf65f25c",
+    "keys": [
+      "rc",
+      "rt",
+      "svr",
+      "lt",
+      "full",
+      "data"
+    ],
+    "data_keys": [
+      "tc",
+      "allstock"
+    ],
+    "count": 943,
+    "source_total": 943,
+    "first": {
+      "tm": 145443,
+      "c": "301141",
+      "m": 0,
+      "n": "中科磁业",
+      "t": 8194,
+      "i": "45600,35.45000,-0.008378,1616520.00"
+    }
+  },
+  {
+    "url": "https://push2ex.eastmoney.com/getAllStockChanges?type=8&pageindex=0&pagesize=5000&ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wzchanges",
+    "sha256": "a3b6bc1e34c513bf08b3a2da2a39cc686f49a6df6cafeba394eae62ac221f5e1",
+    "keys": [
+      "rc",
+      "rt",
+      "svr",
+      "lt",
+      "full",
+      "data"
+    ],
+    "data_keys": [
+      "tc",
+      "allstock"
+    ],
+    "count": 129,
+    "source_total": 129,
+    "first": {
+      "tm": 145621,
+      "c": "000850",
+      "m": 0,
+      "n": "华茂股份",
+      "t": 8,
+      "i": "4.170000,49300,4.17000,-0.099352"
+    }
+  },
+  {
+    "url": "https://push2ex.eastmoney.com/getAllStockChanges?type=16&pageindex=0&pagesize=5000&ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wzchanges",
+    "sha256": "7bfe5cd05abf2c07bc01a1f5c3572725ee6064d1d77954e20b3765d16a8786ae",
+    "keys": [
+      "rc",
+      "rt",
+      "svr",
+      "lt",
+      "full",
+      "data"
+    ],
+    "data_keys": [
+      "tc",
+      "allstock"
+    ],
+    "count": 57,
+    "source_total": 57,
+    "first": {
+      "tm": 150000,
+      "c": "000668",
+      "m": 0,
+      "n": "荣丰控股",
+      "t": 16,
+      "i": "18.690000,0.099412"
+    }
+  },
+  {
+    "url": "https://push2ex.eastmoney.com/getAllStockChanges?type=128&pageindex=0&pagesize=5000&ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wzchanges",
+    "sha256": "1a05e2f07a6e2eeaac6d24297a67af3b07e2283b8c4935f55331932bd9b77aa1",
+    "keys": [
+      "rc",
+      "rt",
+      "svr",
+      "lt",
+      "full",
+      "data"
+    ],
+    "data_keys": [
+      "tc",
+      "allstock"
+    ],
+    "count": 521,
+    "source_total": 521,
+    "first": {
+      "tm": 145543,
+      "c": "605499",
+      "m": 1,
+      "n": "东鹏饮料",
+      "t": 128,
+      "i": "103330,112.28000,0.018967,11603894.70"
+    }
+  },
+  {
+    "url": "https://push2ex.eastmoney.com/getAllStockChanges?type=8208&pageindex=0&pagesize=5000&ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wzchanges",
+    "sha256": "97c10fbb438fd3c8a268ff30bb60c2e2ac2e4e14ed0d8066d61a32628a9f372d",
+    "keys": [
+      "rc",
+      "rt",
+      "svr",
+      "lt",
+      "full",
+      "data"
+    ],
+    "data_keys": [
+      "tc",
+      "allstock"
+    ],
+    "count": 51,
+    "source_total": 51,
+    "first": {
+      "tm": 92422,
+      "c": "301456",
+      "m": 0,
+      "n": "盘古智能",
+      "t": 8208,
+      "i": "-0.014835,25.90000,-0.014835"
+    }
+  },
+  {
+    "url": "https://push2ex.eastmoney.com/getAllStockChanges?type=8210&pageindex=0&pagesize=5000&ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wzchanges",
+    "sha256": "da5006c097cde288796152d8e630fe2c2cb9a5a549e78fc2553a1a1eb1b34b98",
+    "keys": [
+      "rc",
+      "rt",
+      "svr",
+      "lt",
+      "full",
+      "data"
+    ],
+    "data_keys": [
+      "tc",
+      "allstock"
+    ],
+    "count": 20,
+    "source_total": 20,
+    "first": {
+      "tm": 92502,
+      "c": "601155",
+      "m": 1,
+      "n": "新城控股",
+      "t": 8210,
+      "i": "-0.024596,12.69000,-0.024596"
+    }
+  },
+  {
+    "url": "https://push2ex.eastmoney.com/getAllStockChanges?type=8212&pageindex=0&pagesize=5000&ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wzchanges",
+    "sha256": "c4aaa1d068702ff03ebb1af06916759e3b580d2c3cca85f3c9c88ae844531d3f",
+    "keys": [
+      "rc",
+      "rt",
+      "svr",
+      "lt",
+      "full",
+      "data"
+    ],
+    "data_keys": [
+      "tc",
+      "allstock"
+    ],
+    "count": 13,
+    "source_total": 13,
+    "first": {
+      "tm": 144507,
+      "c": "301139",
+      "m": 0,
+      "n": "元道退",
+      "t": 8212,
+      "i": "-0.706949,0.97000,-0.706949"
+    }
+  },
+  {
+    "url": "https://push2ex.eastmoney.com/getAllStockChanges?type=8214&pageindex=0&pagesize=5000&ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wzchanges",
+    "sha256": "bfd8a6df9d6d47ec77adb06ce7c51ffee9b39d0c1f3738b812d55e636c9acb66",
+    "keys": [
+      "rc",
+      "rt",
+      "svr",
+      "lt",
+      "full",
+      "data"
+    ],
+    "data_keys": [
+      "tc",
+      "allstock"
+    ],
+    "count": 128,
+    "source_total": 128,
+    "first": {
+      "tm": 141925,
+      "c": "301613",
+      "m": 0,
+      "n": "新铝时代",
+      "t": 8214,
+      "i": "33.880000,33.88000,-0.013108"
+    }
+  },
+  {
+    "url": "https://push2ex.eastmoney.com/getAllStockChanges?type=8216&pageindex=0&pagesize=5000&ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wzchanges",
+    "sha256": "024a282e3047cee8faf60c48d4afc0d02eda20dd64600d82c6b5ff03cbab7ef5",
+    "keys": [
+      "rc",
+      "rt",
+      "svr",
+      "lt",
+      "full",
+      "data"
+    ],
+    "data_keys": [
+      "tc",
+      "allstock"
+    ],
+    "count": 85,
+    "source_total": 85,
+    "first": {
+      "tm": 145040,
+      "c": "300756",
+      "m": 0,
+      "n": "金马游乐",
+      "t": 8216,
+      "i": "-0.075133,27.82000,-0.075133"
+    }
+  }
+]

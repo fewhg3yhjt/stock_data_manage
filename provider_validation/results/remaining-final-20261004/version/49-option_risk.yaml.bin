@@ -1,0 +1,34 @@
+dataset: option_risk
+rules:
+- id: option_risk-input-v1
+  input_id: ASTOCK-055
+  provider: sse
+  endpoint: option_risk
+  field_mapping:
+    trade_date: TRADE_DATE
+    security_id: SECURITY_ID
+    contract_code: CONTRACT_ID
+    name: CONTRACT_SYMBOL
+    delta: DELTA_VALUE
+    theta: THETA_VALUE
+    gamma: GAMMA_VALUE
+    vega: VEGA_VALUE
+    rho: RHO_VALUE
+    implied_volatility: IMPLC_VOLATLTY
+  context_fields:
+    snapshot_at: source_snapshot_at
+  null_values:
+  - null
+  - ''
+  unverified_fields:
+  - delta
+  - theta
+  - gamma
+  - vega
+  - rho
+  - implied_volatility
+  status: pending_validation
+  version: remaining-sdk-input-v1
+  evidence_refs:
+  - ASTOCK-055
+  notes: 原始响应与SDK所有字段单独保留；标准数字列不认证单位。快照时间沿用原响应时间；明确来源和日期，无适配器内部回退。

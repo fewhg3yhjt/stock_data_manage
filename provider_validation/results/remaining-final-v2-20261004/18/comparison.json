@@ -1,0 +1,21 @@
+{
+  "input_id": "ASTOCK-071",
+  "scope": {
+    "date": "2026-09-18",
+    "exchange": "GFEX"
+  },
+  "row_count": 48,
+  "mode": "offline_replay",
+  "all_business_fields_equal": true,
+  "request_comparison_equal": true,
+  "production_writes": 0,
+  "network_requests": 0,
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\18\\original-parsed.json",
+  "original_parsed_sha256": "a0aa8d6b6d458a40fd670df31a0e6559697171e3e8efd841444af334bdcd7c55",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\18\\candidate\\ASTOCK-071-39b0078f61fa\\2026-10-04\\input_report\\exchange_composite\\futures_daily\\report.json",
+  "report_sha256": "e8b5a6d42f67fba8dbf724dd92c03885c24c8c7cafccf436ead54b1b950f7c4d",
+  "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\18\\original\\manifest.ndjson",
+  "source_response_hashes": [
+    "e699e8e97d7f0e9e797caa2944c87a0cf286149eb4845cbe9019c6d5111e8076"
+  ]
+}

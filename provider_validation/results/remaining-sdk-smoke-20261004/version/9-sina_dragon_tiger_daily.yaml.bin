@@ -1,0 +1,31 @@
+dataset: sina_dragon_tiger_daily
+rules:
+- id: sina_dragon_tiger_daily-input-v1
+  input_id: ASTOCK-085
+  provider: sina
+  endpoint: dragon_tiger_daily
+  field_mapping:
+    trade_date: trade_date
+    source_security_code: 股票代码
+    source_row_number: source_row_number
+    name: 股票名称
+    listing_reason: 指标
+    close_price: 收盘价
+    reference_value: 对应值
+    volume: 成交量
+    amount: 成交额
+  context_fields:
+    snapshot_at: source_snapshot_at
+  null_values:
+  - null
+  - ''
+  unverified_fields:
+  - close_price
+  - reference_value
+  - volume
+  - amount
+  status: pending_validation
+  version: remaining-sdk-input-v1
+  evidence_refs:
+  - ASTOCK-085
+  notes: 原始响应与SDK所有字段单独保留；标准数字列不认证单位。快照时间沿用原响应时间；明确来源和日期，无适配器内部回退。

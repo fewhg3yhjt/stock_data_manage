@@ -1,0 +1,25 @@
+dataset: stock_news
+rules:
+- id: stock_news-input-v1
+  input_id: ASTOCK-031
+  provider: eastmoney
+  endpoint: stock_news
+  field_mapping:
+    source_article_code: source_article_code
+    keyword: 关键词
+    title: 文章来源
+    content: 新闻内容
+    published_text: 发布时间
+    media: 文章来源
+    url: 新闻链接
+  context_fields:
+    snapshot_at: source_snapshot_at
+  null_values:
+  - null
+  - ''
+  unverified_fields: []
+  status: pending_validation
+  version: remaining-native-sdk-input-v1
+  evidence_refs:
+  - ASTOCK-031
+  notes: 原SDK传输保持；精确响应先保存，全部来源字段另存。新闻仅关键词首页10条，不认证发行人归属；估值两种口径不合并。

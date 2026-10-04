@@ -1,0 +1,37 @@
+from datetime import date
+import math
+
+from ..akshare.session import load_client
+from ..contracts import InputFetchResult
+
+
+class SseMarketProvider:
+    input_hosts = ('http://query.sse.com.cn','https://query.sse.com.cn')
+    capability_version = 'sse-risk-input-v1'
+
+    def __init__(self, client=None):
+        self.client = client
+
+    def fetch_risk(self, *, date, source_responses):
+        import json
+        self.client = self.client or load_client()
+        frame = self.client.option_risk_indicator_sse(date=date.strftime('%Y%m%d'))
+        responses = list(source_responses())
+        if len(responses) != 1:
+            raise ValueError('one explicit-date SSE risk response is required')
+        payload=json.loads(responses[0]['body'])
+        items=payload.get('result')
+        columns=('TRADE_DATE','SECURITY_ID','CONTRACT_ID','CONTRACT_SYMBOL','DELTA_VALUE','THETA_VALUE','GAMMA_VALUE','VEGA_VALUE','RHO_VALUE','IMPLC_VOLATLTY')
+        if not isinstance(items,list) or not items or len(items)!=len(frame) or tuple(frame.columns)!=columns:
+            raise ValueError('SSE risk fields or count changed')
+        for row in items:
+            if not set(columns)<=set(row) or str(row['TRADE_DATE']).replace('-','') != date.strftime('%Y%m%d'):
+                raise ValueError('SSE risk response ignored explicit day or fields changed')
+            for key in columns[4:]:
+                value=row[key]
+                if value not in (None,'','-','--') and (isinstance(value,bool) or not math.isfinite(float(value))):
+                    raise ValueError('SSE risk source number changed')
+        if frame.duplicated(['SECURITY_ID']).any():
+            raise ValueError('duplicate SSE risk contract')
+        rows=tuple(frame.astype(object).where(frame.notna(),None).to_dict(orient='records'))
+        return InputFetchResult(rows,source_rows=tuple(items),source_url=responses[0]['url'],mapping_context={'source_total_count':len(items)})

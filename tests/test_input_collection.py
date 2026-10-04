@@ -21,6 +21,286 @@ from stock_data_manage.storage.raw import RawObjectStore
 ROOT = Path(__file__).resolve().parents[1]
 TENCENT_ARCHIVE = ROOT / "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson"
 SDK_ARCHIVE = ROOT / "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson"
+V310_ARCHIVE = ROOT / "provider_validation/results/raw/2026-10-01-v310-live/manifest.ndjson"
+NEWS_NATIVE_ARCHIVE = ROOT / "provider_validation/results/remaining-evidence-direct-20261004/ASTOCK-031/_raw/manifest.ndjson"
+VALUE_NATIVE_ARCHIVE = ROOT / "provider_validation/results/remaining-evidence-direct-20261004/ASTOCK-069/_raw/manifest.ndjson"
+
+
+def remaining_day(day, **parameters):
+    return {"request": {"trade_date": day, **parameters}, "calendar": {"trading_dates": [date.fromisoformat(day)]}}
+
+
+REMAINING_CASES = [
+    ("ASTOCK-031", {"request": {"symbol": "600519"}}, NEWS_NATIVE_ARCHIVE, 10),
+    ("ASTOCK-069", {"request": {"index_code": "000300"}}, VALUE_NATIVE_ARCHIVE, 20),
+    ("ASTOCK-039", {"request": {"symbol": "600519"}}, SDK_ARCHIVE, 305),
+    ("ASTOCK-055", remaining_day("2026-09-30"), SDK_ARCHIVE, 580),
+    ("ASTOCK-067", {"request": {"index_code": "000300"}}, SDK_ARCHIVE, 300),
+    ("ASTOCK-068", {"request": {"index_code": "000300"}}, SDK_ARCHIVE, 300),
+    ("ASTOCK-085", remaining_day("2026-09-30"), SDK_ARCHIVE, 83),
+    ("ASTOCK-003", remaining_day("2026-09-18"), TENCENT_ARCHIVE, 52314),
+    ("ASTOCK-004", {"request": {"symbol": "000001"}}, V310_ARCHIVE, 4445),
+    ("ASTOCK-030", remaining_day("2026-09-18", exchange="SH"), TENCENT_ARCHIVE, 912),
+    ("ASTOCK-063", {"request": {"start_date": "2026-09-01", "end_date": "2026-09-18", "curve": "all"}}, TENCENT_ARCHIVE, 42),
+    ("ASTOCK-077", {"request": {"instrument": "Au99.99"}}, TENCENT_ARCHIVE, 2375),
+    ("ASTOCK-051", {}, SDK_ARCHIVE, 7831),
+] + [("ASTOCK-071", remaining_day("2026-09-18", exchange=exchange), TENCENT_ARCHIVE, count)
+     for exchange, count in (("SHFE", 238), ("INE", 63), ("CZCE", 243), ("CFFEX", 28), ("GFEX", 48))] + [
+    ("ASTOCK-072", remaining_day("2026-09-18", exchange="SHFE"), TENCENT_ARCHIVE, 6546),
+    ("ASTOCK-072", remaining_day("2026-09-18", exchange="CFFEX"), TENCENT_ARCHIVE, 692),
+    ("ASTOCK-073", remaining_day("2026-09-18", exchange="CFFEX"), TENCENT_ARCHIVE, 440)]
+
+
+def compare_remaining_original(tmp_path, input_id, context, manifest, count):
+    """Run independent shipped functions before comparing every candidate business field."""
+    import sys
+    import pandas as pd
+    import akshare as sdk
+    from stock_data_manage.pipeline.inputs import _json_value
+    is_sdk = input_id in {"ASTOCK-031", "ASTOCK-039", "ASTOCK-055", "ASTOCK-067", "ASTOCK-068", "ASTOCK-069", "ASTOCK-085", "ASTOCK-051"}
+    request = context.get("request", {})
+    ns = None
+    source = ROOT / "provider_validation/tests/source_snapshots/a-stock-data"
+    if not is_sdk:
+        tests = source / "tests"
+        sys.path.insert(0, str(tests))
+        name = "test_v310_sources" if input_id == "ASTOCK-004" else "test_v39_sources"
+        spec = importlib.util.spec_from_file_location(name, tests / (name + ".py"))
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        ns = module.load_v310() if input_id == "ASTOCK-004" else module.load_shipped_code()
+    store = RawObjectStore(tmp_path / "original")
+    frames = []
+    try:
+        with captured_requests(store, provider="original", endpoint=input_id, scope=context,
+                code_version=hashlib.sha256((source / "SKILL.md").read_bytes()).hexdigest(),
+                pacer=RequestPacer(wait=lambda _: None), replay_manifest=manifest,
+                sdk_retry_policy=is_sdk and input_id not in {'ASTOCK-031','ASTOCK-069'}, probe_host_pause=is_sdk,
+                native_transport='curl_cffi' if input_id=='ASTOCK-031' else 'pandas_urllib' if input_id=='ASTOCK-069' else None) as events:
+            if input_id == 'ASTOCK-031':
+                f=sdk.stock_news_em(symbol='600519')
+                body=RawObjectStore.read_response(store.root/'manifest.ndjson',events[0]).decode('utf-8')
+                items=json.loads(body[body.index('(')+1:body.rindex(')')])['result']['cmsArticleWebOld']
+                frames=[f.assign(source_article_code=[item['code'] for item in items])]
+            elif input_id == 'ASTOCK-069': frames=[sdk.stock_zh_index_value_csindex(symbol='000300')]
+            elif input_id == "ASTOCK-039":
+                for table in ("资产负债表", "利润表", "现金流量表"):
+                    f = sdk.stock_financial_report_sina(stock="sh600519", symbol=table)
+                    frames.append(f.assign(report_type=table, source_security_code="600519"))
+            elif input_id == "ASTOCK-055": frames = [sdk.option_risk_indicator_sse(date="20260930")]
+            elif input_id == "ASTOCK-067": frames = [sdk.index_stock_cons_csindex(symbol="000300")]
+            elif input_id == "ASTOCK-068": frames = [sdk.index_stock_cons_weight_csindex(symbol="000300")]
+            elif input_id == "ASTOCK-085":
+                f = sdk.stock_lhb_detail_daily_sina(date="20260930")
+                frames = [f.assign(trade_date="2026-09-30", source_row_number=range(1, len(f)+1))]
+            elif input_id == "ASTOCK-051":
+                kinds = ("火箭发射", "快速反弹", "大笔买入", "封涨停板", "打开跌停板", "有大买盘", "竞价上涨", "高开5日线", "向上缺口", "60日新高", "60日大幅上涨", "加速下跌", "高台跳水", "大笔卖出", "封跌停板", "打开涨停板", "有大卖盘", "竞价下跌", "低开5日线", "向下缺口", "60日新低", "60日大幅下跌")
+                offset = 0
+                for kind in kinds:
+                    f = sdk.stock_changes_em(symbol=kind)
+                    frames.append(f.assign(异动类型=kind, source_row_number=range(offset+1, offset+len(f)+1)))
+                    offset += len(f)
+            elif input_id == "ASTOCK-003": frames = [ns["tdx_daily_package"]("2026-09-18")]
+            elif input_id == "ASTOCK-004": frames = [ns["tencent_ticks"]("sz000001")]
+            elif input_id == "ASTOCK-030": frames = [ns["etf_shares"]("2026-09-18", "SH")]
+            elif input_id == "ASTOCK-063": frames = [ns["chinabond_yield_curve"]("2026-09-01", "2026-09-18", "all")]
+            elif input_id == "ASTOCK-077": frames = [ns["sge_spot"]("Au99.99")]
+            else:
+                function = {"ASTOCK-071": "futures_daily", "ASTOCK-072": "options_daily", "ASTOCK-073": "futures_position_rank"}[input_id]
+                frames = [ns[function]("2026-09-18", request["exchange"])]
+    finally:
+        if ns is not None: ns["EM_SESSION"].close()
+    parsed = [r for f in frames for r in _json_value(f.astype(object).where(f.notna(), None).to_dict(orient="records"))]
+    path = tmp_path / "original-parsed.json"
+    path.write_bytes((json.dumps(parsed, ensure_ascii=False, indent=2) + "\n").encode())
+    report = collect_input(input_id=input_id, context=context, config_root=ROOT / "config", output_root=tmp_path / "candidate", replay_manifest=manifest)
+    assert report["status"] == "candidate_complete", {k: report.get(k) for k in ("status", "failure_class", "failure_message")}
+    assert report["row_count"] == len(parsed)
+    if count: assert len(parsed) == count
+    candidate = read_artifact(report, "parsed_rows")
+    assert len(candidate) == len(parsed)
+    for row, old in zip(candidate, parsed):
+        assert row == {key: old[key] for key in row}
+        assert set(old) - set(row) <= {"source", "source_url", "fetched_at"}
+    keys = ("url", "method", "outcome", "status_code", "body_sha256", "request_headers", "request_options")
+    assert [{k: r.get(k) for k in keys} for r in events] == [{k: r.get(k) for k in keys} for r in report["responses"]]
+    assert report["production_writes"] == report["live_http_calls"] == 0
+    assert not report["eligible_for_production_routing"] and not report["source_fallback_enabled"]
+    for row in read_artifact(report, "output"):
+        assert row["snapshot_at"] == report["source_capture_window"]["last"]
+        assert all(row[field] is None for field in report["unverified_fields"])
+        if input_id=='ASTOCK-069':assert row['index_code']=='000300'
+    if input_id in {'ASTOCK-031','ASTOCK-069'}:
+        golden=ROOT/'provider_validation/results/remaining-evidence-direct-20261004'/input_id/'parsed.json'
+        assert [{k:v for k,v in row.items() if k!='source_article_code'} for row in parsed]==json.loads(golden.read_text(encoding='utf-8'))
+    comparison = dict(input_id=input_id, scope=report["parameters"], row_count=len(parsed), mode="offline_replay",
+        all_business_fields_equal=True, request_comparison_equal=True, production_writes=0, network_requests=0,
+        original_parsed_path=str(path.resolve()), original_parsed_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
+        report_path=report["report_path"], report_sha256=hashlib.sha256(Path(report["report_path"]).read_bytes()).hexdigest(),
+        original_manifest=str(store.root / "manifest.ndjson"), source_response_hashes=[r.get("body_sha256") for r in events])
+    (tmp_path / "comparison.json").write_bytes((json.dumps(comparison, ensure_ascii=False, indent=2)+"\n").encode())
+    return comparison
+
+
+@pytest.mark.parametrize("input_id,context,manifest,count", REMAINING_CASES)
+def test_remaining_original_requests_business_fields_and_yaml(tmp_path, no_network, input_id, context, manifest, count):
+    compare_remaining_original(tmp_path, input_id, context, manifest, count)
+
+
+REMAINING_FAILURES = [("ASTOCK-055", m) for m in ("empty", "date", "numeric", "duplicate", "http403")] + [
+    ("ASTOCK-030", "count"), ("ASTOCK-030", "date"), ("ASTOCK-039", "numeric"), ("ASTOCK-039", "date")]
+
+
+def remaining_invalid_fixture(tmp_path, input_id, mutation):
+    """Derived response fixtures retain their parent response hash and mutation description."""
+    sdk = input_id != "ASTOCK-030"
+    summary = ROOT / ("provider_validation/results/remaining-sdk-smoke-20261004/summary.json" if sdk
+        else "provider_validation/results/remaining-original-smoke-20261004/summary.json")
+    original = next(r for r in json.loads(summary.read_text(encoding="utf-8")) if r["input_id"] == input_id)
+    manifest = SDK_ARCHIVE if sdk else TENCENT_ARCHIVE
+    records = [json.loads(line) for line in manifest.read_text(encoding="utf-8").splitlines()]
+    store = RawObjectStore(tmp_path / "fixture")
+    for i, response in enumerate(original["responses"]):
+        parent = records[response["source_ref"]["line"]-1]
+        body = RawObjectStore.read_response(manifest, parent)
+        payload = json.loads(body)
+        if i == 0 and mutation != "http403":
+            if input_id == "ASTOCK-055":
+                rows = payload["result"]
+                if mutation == "empty": payload["result"] = []
+                elif mutation == "date": rows[0]["TRADE_DATE"] = "1999-01-01"
+                elif mutation == "numeric": rows[0]["DELTA_VALUE"] = "not-a-number"
+                elif mutation == "duplicate": rows[1] = dict(rows[0])
+            elif input_id == "ASTOCK-030":
+                if mutation == "count": payload["pageHelp"]["total"] = len(payload["result"])+1
+                else: payload["result"][0]["STAT_DATE"] = "1999-01-01"
+            else:
+                data = payload["result"]["data"]
+                if mutation == "date": data["report_date"][0]["date_value"] = "20261350"
+                else:
+                    key = str(data["report_date"][0]["date_value"])
+                    data["report_list"][key]["data"][0]["item_value"] = "not-a-number"
+            body = json.dumps(payload, ensure_ascii=False).encode()
+        ref = store.write_bytes(body, dataset="fixture", provider="source", endpoint=input_id,
+            fetched_at=datetime.now(timezone.utc), attempt_id=str(i), content_addressed=True)
+        store.append_event({**parent, "body_storage": ref.path.relative_to(store.root).as_posix(),
+            "body_sha256": ref.content_hash, "body_bytes": len(body), "mode": "offline_mutation_fixture",
+            "status_code": 403 if mutation=="http403" and i==0 else parent["status_code"],
+            "derived_from_sha256": parent["body_sha256"], "mutation": mutation,
+            "transformation_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest()})
+    return store.root / "manifest.ndjson"
+
+
+@pytest.mark.parametrize("input_id,mutation", REMAINING_FAILURES)
+def test_remaining_invalid_response_retains_evidence_without_fallback(tmp_path, no_network, input_id, mutation):
+    manifest = remaining_invalid_fixture(tmp_path, input_id, mutation)
+    context = next(c[1] for c in REMAINING_CASES if c[0]==input_id)
+    report = collect_input(input_id=input_id, context=context, config_root=ROOT / "config", output_root=tmp_path / "candidate", replay_manifest=manifest)
+    assert report["status"] == "failed" and report["responses"]
+    assert "output" not in report and report["production_writes"] == report["live_http_calls"] == 0
+    for response in report["responses"]:
+        assert hashlib.sha256(RawObjectStore.read_response(Path(report["run_directory"])/"_raw/manifest.ndjson", response)).hexdigest()==response["body_sha256"]
+    assert not any("eastmoney.com" in r["url"] for r in report["responses"])
+
+
+def test_remaining_migration_preserves_existing_provider_methods():
+    import ast
+    before = ROOT / "provider_validation/results/remaining-original-20261004"
+    pairs = [("3-financial.py.bin", "eastmoney/financial.py"), ("4-news.py.bin", "sina/news.py"),
+             ("8-snapshot.py.bin", "tencent/snapshot.py"), ("9-minute.py.bin", "tdx/minute.py")]
+    for snapshot, relative in pairs:
+        old = ast.parse((before/snapshot).read_text(encoding="utf-8"))
+        new = ast.parse((ROOT/"src/stock_data_manage/providers"/relative).read_text(encoding="utf-8"))
+        classes = {n.name: n for n in new.body if isinstance(n, ast.ClassDef)}
+        for cls in (n for n in old.body if isinstance(n, ast.ClassDef)):
+            methods = {n.name: n for n in classes[cls.name].body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))}
+            for method in (n for n in cls.body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))):
+                assert ast.dump(method, include_attributes=False) == ast.dump(methods[method.name], include_attributes=False)
+
+
+def test_remaining_unsupported_exchange_and_calendar_rejected_before_requests(tmp_path, no_network):
+    for i, (id, exchange) in enumerate((("ASTOCK-030", "SZ"), ("ASTOCK-071", "DCE"), ("ASTOCK-072", "GFEX"), ("ASTOCK-073", "SHFE"))):
+        report = collect_input(input_id=id, context=remaining_day("2026-09-18", exchange=exchange), config_root=ROOT/"config", output_root=tmp_path/str(i), replay_manifest=TENCENT_ARCHIVE)
+        assert report["status"] == "failed" and not report.get("responses", []) and "output" not in report
+    with pytest.raises(ValueError, match="known trading day"):
+        collect_input(input_id="ASTOCK-071", context={"request": {"trade_date": "2026-09-18", "exchange": "SHFE"}, "calendar": {"trading_dates": []}}, config_root=ROOT/"config", output_root=tmp_path/"calendar", replay_manifest=TENCENT_ARCHIVE)
+
+
+@pytest.mark.parametrize('id,mutation',[('ASTOCK-031','empty'),('ASTOCK-031','business'),('ASTOCK-031','duplicate'),('ASTOCK-069','index'),('ASTOCK-069','inconsistent')])
+def test_remaining_native_invalid_payload_rejects_candidate(tmp_path,no_network,id,mutation):
+    import io
+    import pandas as pd
+    archive=NEWS_NATIVE_ARCHIVE if id=='ASTOCK-031' else VALUE_NATIVE_ARCHIVE
+    store=RawObjectStore(tmp_path/'fixture')
+    for i,line in enumerate(archive.read_text(encoding='utf-8').splitlines()):
+        parent=json.loads(line);body=RawObjectStore.read_response(archive,parent)
+        if id=='ASTOCK-031':
+            text=body.decode();payload=json.loads(text[text.index('(')+1:text.rindex(')')])
+            if mutation=='empty':payload['result']['cmsArticleWebOld']=[]
+            elif mutation=='business':payload['code']=1
+            else:payload['result']['cmsArticleWebOld'][1]=dict(payload['result']['cmsArticleWebOld'][0])
+            body=(text[:text.index('(')+1]+json.dumps(payload,ensure_ascii=False)+')').encode()
+        elif mutation=='index' or (mutation=='inconsistent' and i==1):
+            frame=pd.read_excel(io.BytesIO(body));frame.iloc[0,1]=905
+            buffer=io.BytesIO();frame.to_excel(buffer,index=False);body=buffer.getvalue()
+        ref=store.write_bytes(body,dataset='fixture',provider='native',endpoint=id,fetched_at=datetime.now(timezone.utc),attempt_id=str(i),content_addressed=True)
+        store.append_event({**parent,'body_storage':ref.path.relative_to(store.root).as_posix(),'body_sha256':ref.content_hash,'body_bytes':len(body),
+            'derived_from_sha256':parent['body_sha256'],'mutation':mutation,'transformation_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest()})
+    context=next(c[1] for c in REMAINING_CASES if c[0]==id)
+    report=collect_input(input_id=id,context=context,config_root=ROOT/'config',output_root=tmp_path/'candidate',replay_manifest=store.root/'manifest.ndjson')
+    assert report['status']=='failed' and report['responses'] and 'output' not in report
+    assert report['production_writes']==report['live_http_calls']==0
+
+
+def test_remaining_native_transport_delegation_and_restoration(tmp_path,monkeypatch):
+    import io
+    from types import SimpleNamespace
+    import curl_cffi.requests as curl_requests
+    import pandas.io.common as common
+    body=b'{"ok":true}'
+    calls=[]
+    def curl_original(session,method,url,*args,**kwargs):
+        calls.append((session,method,url,kwargs))
+        return SimpleNamespace(content=body,status_code=200,headers={'Content-Type':'application/json'},encoding='utf-8')
+    monkeypatch.setattr(curl_requests.Session,'request',curl_original)
+    session=curl_requests.Session()
+    arguments=dict(params={'keyword':'600519'},headers={'Cookie':'test-only-private-value','Referer':'https://example.invalid/news'},timeout=17)
+    with captured_requests(RawObjectStore(tmp_path/'curl'),provider='fixture',endpoint='news',scope={},code_version='test',pacer=RequestPacer(),native_transport='curl_cffi') as events:
+        response=session.request('GET','https://example.invalid/api',**arguments)
+        assert response.content==body and len(events)==1
+        assert events[0]['request_headers']['Cookie']=='<redacted>'
+        assert RawObjectStore.read_response(tmp_path/'curl/manifest.ndjson',events[0])==body
+    assert calls==[(session,'GET','https://example.invalid/api',arguments)] and curl_requests.Session.request is curl_original
+    session.close()
+    def urllib_original(request):
+        calls.append(request)
+        stream=io.BytesIO(body);stream.status=200;stream.headers={'Content-Type':'application/octet-stream'}
+        return stream
+    monkeypatch.setattr(common,'urlopen',urllib_original)
+    from urllib.request import Request
+    request=Request('https://example.invalid/book.xls',headers={'User-Agent':'pandas-fixture'})
+    with pytest.raises(RuntimeError,match='after-save'):
+        with captured_requests(RawObjectStore(tmp_path/'urllib'),provider='fixture',endpoint='valuation',scope={},code_version='test',pacer=RequestPacer(),native_transport='pandas_urllib') as events:
+            assert common.urlopen(request).read()==body and len(events)==1
+            assert RawObjectStore.read_response(tmp_path/'urllib/manifest.ndjson',events[0])==body
+            raise RuntimeError('after-save')
+    assert calls[-1] is request and common.urlopen is urllib_original
+
+
+def test_remaining_news_yaml_projection_mapping_and_scope(tmp_path,no_network):
+    config=tmp_path/'config'
+    for name in ['providers.yaml','collection.yaml','datasets/stock_news.yaml','normalization/stock_news.yaml']:
+        target=config/name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(ROOT/'config'/name,target)
+    path=config/'normalization/stock_news.yaml';document=yaml.safe_load(path.read_text(encoding='utf-8'))
+    document['rules'][0]['field_mapping']['title']='文章来源'
+    path.write_bytes(yaml.safe_dump(document,allow_unicode=True,sort_keys=False).encode())
+    fields=['snapshot_at','source_article_code','title']
+    report=collect_input(input_id='ASTOCK-031',context={'request':{'symbol':'600519'}},config_root=config,output_root=tmp_path/'candidate',replay_manifest=NEWS_NATIVE_ARCHIVE,fields=fields)
+    assert report['status']=='candidate_complete'
+    rows=read_artifact(report,'output');source=read_artifact(report,'parsed_rows')
+    assert all(set(row)==set(fields) and row['title']==old['文章来源'] for row,old in zip(rows,source))
+    with pytest.raises(ValueError,match='does not support'):
+        collect_input(input_id='ASTOCK-031',context={'request':{'symbol':'600519','start_date':'2026-01-01'}},config_root=config,output_root=tmp_path/'bad',replay_manifest=NEWS_NATIVE_ARCHIVE)
 SDK_NEWS_CASES = [("ASTOCK-032", {}, SDK_ARCHIVE, 20), ("ASTOCK-033", {}, SDK_ARCHIVE, 20)]
 MACRO_CASES = [("ASTOCK-061", {}, SDK_ARCHIVE, 136), ("ASTOCK-062", {}, SDK_ARCHIVE, 225)]
 
@@ -3377,6 +3657,14 @@ def no_network(monkeypatch):
     def fail(*args, **kwargs):
         raise AssertionError("offline validation must never issue a network request")
     monkeypatch.setattr(requests.adapters.HTTPAdapter, "send", fail)
+    try:
+        import curl_cffi.requests as curl_requests
+        import pandas.io.common as common
+    except ImportError:
+        pass
+    else:
+        monkeypatch.setattr(curl_requests.Session, 'request', fail)
+        monkeypatch.setattr(common, 'urlopen', fail)
     import socket
     original_connect = socket.socket.connect
     def guard_connect(sock, address):

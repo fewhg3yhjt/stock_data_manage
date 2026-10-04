@@ -1,0 +1,62 @@
+dataset:
+  name: position_rank
+  display_name: 会员持仓排名候选输入
+  primary_key:
+  - snapshot_at
+  - trade_date
+  - exchange
+  - level
+  - contract_code
+  - rank
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  trade_date:
+    type: date
+    required: true
+  exchange:
+    type: string
+    required: true
+  contract_code:
+    type: string
+    required: true
+  level:
+    type: string
+    required: true
+  rank:
+    type: integer
+    required: true
+  volume_member:
+    type: string
+    required: false
+  long_member:
+    type: string
+    required: false
+  short_member:
+    type: string
+    required: false
+  volume:
+    type: decimal
+    required: false
+    unit: unverified
+  volume_chg:
+    type: decimal
+    required: false
+    unit: unverified
+  long_oi:
+    type: decimal
+    required: false
+    unit: unverified
+  long_chg:
+    type: decimal
+    required: false
+    unit: unverified
+  short_oi:
+    type: decimal
+    required: false
+    unit: unverified
+  short_chg:
+    type: decimal
+    required: false
+    unit: unverified

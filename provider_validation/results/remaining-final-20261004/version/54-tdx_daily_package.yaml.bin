@@ -1,0 +1,52 @@
+dataset:
+  name: tdx_daily_package
+  display_name: 通达信盘后包候选输入
+  primary_key:
+  - snapshot_at
+  - trade_date
+  - market
+  - source_security_code
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  trade_date:
+    type: date
+    required: true
+  source_security_code:
+    type: string
+    required: true
+  market:
+    type: string
+    required: true
+  name:
+    type: string
+    required: false
+  prev_close:
+    type: decimal
+    required: false
+    unit: unverified
+  open:
+    type: decimal
+    required: false
+    unit: unverified
+  high:
+    type: decimal
+    required: false
+    unit: unverified
+  low:
+    type: decimal
+    required: false
+    unit: unverified
+  close:
+    type: decimal
+    required: false
+    unit: unverified
+  volume:
+    type: decimal
+    required: false
+    unit: unverified
+  amount:
+    type: decimal
+    required: false
+    unit: unverified

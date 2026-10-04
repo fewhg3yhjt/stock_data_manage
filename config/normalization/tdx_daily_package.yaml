@@ -1,0 +1,36 @@
+dataset: tdx_daily_package
+rules:
+- id: tdx_daily_package-input-v1
+  input_id: ASTOCK-003
+  provider: tdx
+  endpoint: daily_package
+  field_mapping:
+    trade_date: date
+    source_security_code: code
+    market: market
+    name: name
+    prev_close: prev_close
+    open: open
+    high: high
+    low: low
+    close: close
+    volume: volume
+    amount: amount
+  context_fields:
+    snapshot_at: source_snapshot_at
+  null_values:
+  - null
+  - ''
+  unverified_fields:
+  - prev_close
+  - open
+  - high
+  - low
+  - close
+  - volume
+  - amount
+  status: pending_validation
+  version: remaining-original-input-v1
+  evidence_refs:
+  - ASTOCK-003
+  notes: 保留原独立接口及原解析。原数字单独留证，标准数字单位未认证；无来源或日期回退，生产关闭。

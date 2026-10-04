@@ -1,0 +1,24 @@
+dataset: index_constituents
+rules:
+- id: index_constituents-input-v1
+  input_id: ASTOCK-067
+  provider: csindex
+  endpoint: constituents
+  field_mapping:
+    index_code: 指数代码
+    trade_date: 日期
+    source_security_code: 成分券代码
+    name: 成分券名称
+    index_name: 指数名称
+    exchange_name: 交易所
+  context_fields:
+    snapshot_at: source_snapshot_at
+  null_values:
+  - null
+  - ''
+  unverified_fields: []
+  status: pending_validation
+  version: remaining-sdk-input-v1
+  evidence_refs:
+  - ASTOCK-067
+  notes: 原始响应与SDK所有字段单独保留；标准数字列不认证单位。快照时间沿用原响应时间；明确来源和日期，无适配器内部回退。

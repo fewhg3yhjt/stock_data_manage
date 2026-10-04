@@ -1,0 +1,585 @@
+{
+  "result": "passed",
+  "validation_time_utc": "2026-10-04T10:55:46.290097+00:00",
+  "counts": {
+    "implemented_validation_only": 59,
+    "unimplemented": 5,
+    "blocked": 7,
+    "alias": 3
+  },
+  "changed_inputs": [
+    "ASTOCK-003",
+    "ASTOCK-004",
+    "ASTOCK-030",
+    "ASTOCK-031",
+    "ASTOCK-039",
+    "ASTOCK-051",
+    "ASTOCK-055",
+    "ASTOCK-063",
+    "ASTOCK-067",
+    "ASTOCK-068",
+    "ASTOCK-069",
+    "ASTOCK-071",
+    "ASTOCK-072",
+    "ASTOCK-073",
+    "ASTOCK-077",
+    "ASTOCK-085"
+  ],
+  "current_reports": [
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\y\\candidate\\ASTOCK-031-2c13bb53fda2\\2026-10-04\\input_report\\eastmoney\\stock_news\\report.json",
+      "sha256": "1dc5fc447963112e6092ab65176b412c0ea7d88805224ea467780690e0a31cc8",
+      "status": "candidate_complete",
+      "row_count": 10
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\n5\\candidate\\ASTOCK-069-0c13b8036149\\2026-10-04\\input_report\\csindex\\index_valuation\\report.json",
+      "sha256": "6bfea00f1a21518782748853b038298cbe0e70045361ab40c53ac64932f0eb81",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\n4\\candidate\\ASTOCK-069-a27546c672af\\2026-10-04\\input_report\\csindex\\index_valuation\\report.json",
+      "sha256": "57bb0937cffae8436dc713551256195751eded18dd0828231b1e9f0993917a0f",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\n3\\candidate\\ASTOCK-031-1ad83a22fd40\\2026-10-04\\input_report\\eastmoney\\stock_news\\report.json",
+      "sha256": "e5dde02c1b1f32db9317eb61515c8ee4a4a0c18d61fa8fa4fc4f39f6e7b3a419",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\n2\\candidate\\ASTOCK-031-2d10ab3685f3\\2026-10-04\\input_report\\eastmoney\\stock_news\\report.json",
+      "sha256": "a7539103eee6ab11a80653a0ee6209fc03b4236ecf14509130c2e5745003a80a",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\n1\\candidate\\ASTOCK-031-826351e17570\\2026-10-04\\input_report\\eastmoney\\stock_news\\report.json",
+      "sha256": "8f2ab0ae159f2ec828c05151f991936a01fbc2b0f009c25e2f43040572de9017",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\g\\3\\ASTOCK-073-b122ec9c3690\\2026-10-04\\input_report\\cffex\\position_rank\\report.json",
+      "status": "failed",
+      "scope": "before-request"
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\g\\2\\ASTOCK-072-ef5c606b5308\\2026-10-04\\input_report\\exchange_composite\\options_daily\\report.json",
+      "status": "failed",
+      "scope": "before-request"
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\g\\1\\ASTOCK-071-956d8c990859\\2026-10-04\\input_report\\exchange_composite\\futures_daily\\report.json",
+      "status": "failed",
+      "scope": "before-request"
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\g\\0\\ASTOCK-030-0f61320f93c2\\2026-10-04\\input_report\\sse\\etf_shares\\report.json",
+      "status": "failed",
+      "scope": "before-request"
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\f9\\candidate\\ASTOCK-039-960ee7d396b6\\2026-10-04\\input_report\\sina\\financial_statements\\report.json",
+      "sha256": "dabc257c0f2210303118892dd00ee419fed4ecab5c696f79c1fb8699458f8153",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\f8\\candidate\\ASTOCK-039-75dce9060ea3\\2026-10-04\\input_report\\sina\\financial_statements\\report.json",
+      "sha256": "46e8a727d211ede5ee1c1837330e23796a1abcc8c4bca1dd9bde7efb81fb1522",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\f7\\candidate\\ASTOCK-030-50af09206405\\2026-10-04\\input_report\\sse\\etf_shares\\report.json",
+      "sha256": "710bc4b56e6afcabcd8a4e7ccac1c82d2d57a04806902b093fcda5b31532cdd9",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\f6\\candidate\\ASTOCK-030-68545a75e37d\\2026-10-04\\input_report\\sse\\etf_shares\\report.json",
+      "sha256": "9f6c1820ffdc6480b2ea7d7d0420d64babd5d9c0ffc56d2e6573527c6aa95e45",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\f5\\candidate\\ASTOCK-055-b72fc103d746\\2026-10-04\\input_report\\sse\\option_risk\\report.json",
+      "sha256": "7407893257a21c614ffa1f637e0353c28954d2af5db31801465265e8af533468",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\f4\\candidate\\ASTOCK-055-1e5dced67042\\2026-10-04\\input_report\\sse\\option_risk\\report.json",
+      "sha256": "ccd8c6b85465d88ba81af07c0de0f6a0f06b780781264107c0c7f2ec6803a9fa",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\f3\\candidate\\ASTOCK-055-575223587aba\\2026-10-04\\input_report\\sse\\option_risk\\report.json",
+      "sha256": "2e03964ed8391276c7baa097a6ab30fc8456be0744b3ccda467bd98dfe4713c4",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\f2\\candidate\\ASTOCK-055-cadf4f68c65e\\2026-10-04\\input_report\\sse\\option_risk\\report.json",
+      "sha256": "026424acd0205c1327198d76e2964d43faf6187a2171ad659ef98e6b8facc87c",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\f1\\candidate\\ASTOCK-055-5a7b63652e23\\2026-10-04\\input_report\\sse\\option_risk\\report.json",
+      "sha256": "58f4b5a7521e8c13b8e1fab5e05b6bb9d7ce005cb7241442b9200ad2aad3e263",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\9\\candidate\\ASTOCK-004-f4ad3f5702b0\\2026-10-04\\input_report\\tencent\\ticks\\report.json",
+      "sha256": "61dd44216f0d0eba9f323a53dd0de6ed3aaf2863bdd6323f27dc17d798c56699",
+      "status": "candidate_complete",
+      "row_count": 4445
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\8\\candidate\\ASTOCK-003-d411a1975df3\\2026-10-04\\input_report\\tdx\\daily_package\\report.json",
+      "sha256": "3e624f92db9ed480e81387f925a5a715728130891753f7f7a42e548adee0f41d",
+      "status": "candidate_complete",
+      "row_count": 52314
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\7\\candidate\\ASTOCK-085-c7558ae45d4e\\2026-10-04\\input_report\\sina\\dragon_tiger_daily\\report.json",
+      "sha256": "54fb0e5ed857c55d4b343257215893bb8f7d20737b4df07fdbf26bfbf0657b1a",
+      "status": "candidate_complete",
+      "row_count": 83
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\6\\candidate\\ASTOCK-068-2bfd0244e6dc\\2026-10-04\\input_report\\csindex\\weights\\report.json",
+      "sha256": "1db7eaeddbe412fc22f9a4f0c18ded267ed76f9fceaa9b0a39a6fcdb6d7f9650",
+      "status": "candidate_complete",
+      "row_count": 300
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\5\\candidate\\ASTOCK-067-f1b7dbaa2b01\\2026-10-04\\input_report\\csindex\\constituents\\report.json",
+      "sha256": "db2583647b8b91e060bdc1d14f54f534dfd425547b0d43717b7f82d39df812ef",
+      "status": "candidate_complete",
+      "row_count": 300
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\4\\candidate\\ASTOCK-055-a326ca32b9cd\\2026-10-04\\input_report\\sse\\option_risk\\report.json",
+      "sha256": "32a85126e0c5bbc078f3ea92137f5ffe3ea2d68f7316baf01b7408b40f6e0713",
+      "status": "candidate_complete",
+      "row_count": 580
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\3\\candidate\\ASTOCK-039-9844d7b62a3d\\2026-10-04\\input_report\\sina\\financial_statements\\report.json",
+      "sha256": "57d07b147c793fbff3cf799da49369ebab9b955d1e16e806ea948d6324738fc2",
+      "status": "candidate_complete",
+      "row_count": 305
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\21\\candidate\\ASTOCK-073-8df60da7f996\\2026-10-04\\input_report\\cffex\\position_rank\\report.json",
+      "sha256": "c30f4f5349529bb9c945b5bb928485b9b05039520e46fcdd625f3ed9fa7b8896",
+      "status": "candidate_complete",
+      "row_count": 440
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\20\\candidate\\ASTOCK-072-56d6cbacefbd\\2026-10-04\\input_report\\exchange_composite\\options_daily\\report.json",
+      "sha256": "4be190d9f208d9da2190a80ac9c180e9938d63f8c558b0550be4bf7caf3432d5",
+      "status": "candidate_complete",
+      "row_count": 692
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\2\\candidate\\ASTOCK-069-8e97c95a0c27\\2026-10-04\\input_report\\csindex\\index_valuation\\report.json",
+      "sha256": "39b67e901719e631b3c99e9633ef3f2f105eb970349b735b5029923dcd6f0985",
+      "status": "candidate_complete",
+      "row_count": 20
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\19\\candidate\\ASTOCK-072-7d05c0d9a5e2\\2026-10-04\\input_report\\exchange_composite\\options_daily\\report.json",
+      "sha256": "37766104873403abab854a5b6ab496989d19bc4384802675485fc41bc6066434",
+      "status": "candidate_complete",
+      "row_count": 6546
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\18\\candidate\\ASTOCK-071-39b0078f61fa\\2026-10-04\\input_report\\exchange_composite\\futures_daily\\report.json",
+      "sha256": "e8b5a6d42f67fba8dbf724dd92c03885c24c8c7cafccf436ead54b1b950f7c4d",
+      "status": "candidate_complete",
+      "row_count": 48
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\17\\candidate\\ASTOCK-071-b3b4638d167d\\2026-10-04\\input_report\\exchange_composite\\futures_daily\\report.json",
+      "sha256": "0baf670cd4f712df92b2bd1e7705ec7e290ff2360a0d8705817cf7b1617ef672",
+      "status": "candidate_complete",
+      "row_count": 28
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\16\\candidate\\ASTOCK-071-07ff98a7afda\\2026-10-04\\input_report\\exchange_composite\\futures_daily\\report.json",
+      "sha256": "1cd5bbf7e4a9e6906fbe0e63238181d0eb8f60bdb1895aaefa99001e4079639b",
+      "status": "candidate_complete",
+      "row_count": 243
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\15\\candidate\\ASTOCK-071-d24b96dfb571\\2026-10-04\\input_report\\exchange_composite\\futures_daily\\report.json",
+      "sha256": "832f6cfc96561e597431c52da7d854ea450f5346cfcb3aebf272dcaf8d21eb0c",
+      "status": "candidate_complete",
+      "row_count": 63
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\14\\candidate\\ASTOCK-071-5058a86937e2\\2026-10-04\\input_report\\exchange_composite\\futures_daily\\report.json",
+      "sha256": "e0898f5167c3dc1d4ea13ff2b4e893c82668d687b195eda157cfcdf202c53f3e",
+      "status": "candidate_complete",
+      "row_count": 238
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\13\\candidate\\ASTOCK-051-cdeaf651c3d4\\2026-10-04\\input_report\\eastmoney\\intraday_changes\\report.json",
+      "sha256": "100a333e7f059e17976a211457ee70f4a1e39c941344a81eb5e67fa480728238",
+      "status": "candidate_complete",
+      "row_count": 7831
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\12\\candidate\\ASTOCK-077-c8ac604c41ea\\2026-10-04\\input_report\\sge\\spot\\report.json",
+      "sha256": "1b7f0bac3981aeff27e35e16f634885e074b66954959d0d7221950e10364bb7f",
+      "status": "candidate_complete",
+      "row_count": 2375
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\11\\candidate\\ASTOCK-063-670f07245fd0\\2026-10-04\\input_report\\chinabond\\yield_curve\\report.json",
+      "sha256": "9f2814414f751a0c9e479c89522cdb6fccc6cbba62c3f475059515cf62eee550",
+      "status": "candidate_complete",
+      "row_count": 42
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\10\\candidate\\ASTOCK-030-87cb250d9a0b\\2026-10-04\\input_report\\sse\\etf_shares\\report.json",
+      "sha256": "ab8cb074f65c872be3145eeba20e979f03aec10ba30ae1a5de9964439ec514c1",
+      "status": "candidate_complete",
+      "row_count": 912
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-v2-20261004\\1\\candidate\\ASTOCK-031-fde95924309d\\2026-10-04\\input_report\\eastmoney\\stock_news\\report.json",
+      "sha256": "98f3d0844271d71043df5bba88b11d16a613a04d9ef5aab5fc66b7906f09caba",
+      "status": "candidate_complete",
+      "row_count": 10
+    }
+  ],
+  "historical_reports": [
+    {
+      "path": "provider_validation\\results\\remaining-sdk-smoke-20261004\\ASTOCK-085\\ASTOCK-085-ac3a8f59f63e\\2026-10-04\\input_report\\sina\\dragon_tiger_daily\\report.json",
+      "sha256": "0e53d993f11d78d06aef2bd8726f966debcdfe60492dd31f49353f3d304b5e95",
+      "status": "candidate_complete",
+      "row_count": 83
+    },
+    {
+      "path": "provider_validation\\results\\remaining-sdk-smoke-20261004\\ASTOCK-068\\ASTOCK-068-80cb289a599c\\2026-10-04\\input_report\\csindex\\weights\\report.json",
+      "sha256": "96beee42473a34bc9f9a170b8456791993956e80c6f6b7d6abe337bfba204cfe",
+      "status": "candidate_complete",
+      "row_count": 300
+    },
+    {
+      "path": "provider_validation\\results\\remaining-sdk-smoke-20261004\\ASTOCK-067\\ASTOCK-067-4ff1b515f6a5\\2026-10-04\\input_report\\csindex\\constituents\\report.json",
+      "sha256": "692e083dbb736035afc6d64fcf792010202e7cd700d6c4649cb79a14e2211606",
+      "status": "candidate_complete",
+      "row_count": 300
+    },
+    {
+      "path": "provider_validation\\results\\remaining-sdk-smoke-20261004\\ASTOCK-055\\ASTOCK-055-6c298f3766dc\\2026-10-04\\input_report\\sse\\option_risk\\report.json",
+      "sha256": "8e6e09e7eeda9b5c4fff0f4c976395a3a436e742cb809dafe4e8f918e251d267",
+      "status": "candidate_complete",
+      "row_count": 580
+    },
+    {
+      "path": "provider_validation\\results\\remaining-sdk-smoke-20261004\\ASTOCK-039\\ASTOCK-039-e08865b27f85\\2026-10-04\\input_report\\sina\\financial_statements\\report.json",
+      "sha256": "029736241965ef4ca446f2d040af8e343ce574954d2da48d3e424a272433f32a",
+      "status": "candidate_complete",
+      "row_count": 305
+    },
+    {
+      "path": "provider_validation\\results\\remaining-original-smoke-20261004\\9\\ASTOCK-071-405c0f36e864\\2026-10-04\\input_report\\exchange_composite\\futures_daily\\report.json",
+      "sha256": "0689b1005afe819e671cc83bb6b4f8d347c47a03070ee0135b43ed69e1a92bca",
+      "status": "candidate_complete",
+      "row_count": 28
+    },
+    {
+      "path": "provider_validation\\results\\remaining-original-smoke-20261004\\8\\ASTOCK-071-684e8e6ecb63\\2026-10-04\\input_report\\exchange_composite\\futures_daily\\report.json",
+      "sha256": "6626fecfa4e558fe2274cff2f8d594df35292ebb81a7fdc63bc1979e1d6dec93",
+      "status": "candidate_complete",
+      "row_count": 243
+    },
+    {
+      "path": "provider_validation\\results\\remaining-original-smoke-20261004\\7\\ASTOCK-071-8aa4d0fab422\\2026-10-04\\input_report\\exchange_composite\\futures_daily\\report.json",
+      "sha256": "75fe040f47a14eada861010587622f7c9ab148bb8465f400f1da7c56e6d74f8b",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation\\results\\remaining-original-smoke-20261004\\6\\ASTOCK-071-f127cf0fba50\\2026-10-04\\input_report\\exchange_composite\\futures_daily\\report.json",
+      "sha256": "7c9f965ce277fd55006fd6c769a2aab539ad01072a70e3c27a119747b9949f59",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation\\results\\remaining-original-smoke-20261004\\5\\ASTOCK-051-3ffbb6116bec\\2026-10-04\\input_report\\eastmoney\\intraday_changes\\report.json",
+      "sha256": "0fedaba076f2acf095f90a982e62cebde67671e234e0e051d6bea523451059d1",
+      "status": "candidate_complete",
+      "row_count": 7831
+    },
+    {
+      "path": "provider_validation\\results\\remaining-original-smoke-20261004\\4\\ASTOCK-077-e0efa3e0ab34\\2026-10-04\\input_report\\sge\\spot\\report.json",
+      "sha256": "1ba0144d65f3643b13f00e472fa47e77b2f7b4a96821dc81ece10f781146bffd",
+      "status": "candidate_complete",
+      "row_count": 2375
+    },
+    {
+      "path": "provider_validation\\results\\remaining-original-smoke-20261004\\3\\ASTOCK-063-c9b745a399f9\\2026-10-04\\input_report\\chinabond\\yield_curve\\report.json",
+      "sha256": "c82c6bf34123ec32bb6cd50f663868f65c9019f4da7d6e3987519b15812267a4",
+      "status": "candidate_complete",
+      "row_count": 42
+    },
+    {
+      "path": "provider_validation\\results\\remaining-original-smoke-20261004\\2\\ASTOCK-030-14b92bcc148d\\2026-10-04\\input_report\\sse\\etf_shares\\report.json",
+      "sha256": "c0f767fcff46f388e4e5321d8abc8de4b18733b17a599ec48f7f6fe58c20cd17",
+      "status": "candidate_complete",
+      "row_count": 912
+    },
+    {
+      "path": "provider_validation\\results\\remaining-original-smoke-20261004\\13\\ASTOCK-073-5cc511e4cda8\\2026-10-04\\input_report\\cffex\\position_rank\\report.json",
+      "sha256": "f919d1a20383f1f3acbf5f4671a1dc54605fbe2097ecdab1665935691a4f3b8f",
+      "status": "candidate_complete",
+      "row_count": 440
+    },
+    {
+      "path": "provider_validation\\results\\remaining-original-smoke-20261004\\12\\ASTOCK-072-19002d810619\\2026-10-04\\input_report\\exchange_composite\\options_daily\\report.json",
+      "sha256": "11a06441d306af3763aa2ef7b3d36f0a947bf59d45c15bcbaea66846b9928034",
+      "status": "candidate_complete",
+      "row_count": 692
+    },
+    {
+      "path": "provider_validation\\results\\remaining-original-smoke-20261004\\11\\ASTOCK-072-2aba72450930\\2026-10-04\\input_report\\exchange_composite\\options_daily\\report.json",
+      "sha256": "d3d92053bd42332978498df32368928e6d3835aaa477172429a29abd8edb6e28",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation\\results\\remaining-original-smoke-20261004\\10\\ASTOCK-071-52e26d47ab97\\2026-10-04\\input_report\\exchange_composite\\futures_daily\\report.json",
+      "sha256": "bcba09a3c2d162cb2552326c9784ec6e02189fda5b72f86233a754dda278f5fe",
+      "status": "candidate_complete",
+      "row_count": 48
+    },
+    {
+      "path": "provider_validation\\results\\remaining-original-smoke-20261004\\1\\ASTOCK-004-f069458774a3\\2026-10-04\\input_report\\tencent\\ticks\\report.json",
+      "sha256": "3e0086e0d636be017223bb37b55a53a85edd2d8fae1f1aef197bae6af0374209",
+      "status": "candidate_complete",
+      "row_count": 4445
+    },
+    {
+      "path": "provider_validation\\results\\remaining-original-smoke-20261004\\0\\ASTOCK-003-b92682591cd4\\2026-10-04\\input_report\\tdx\\daily_package\\report.json",
+      "sha256": "03846e0aecbfc33db9493af831da84293631f27def67a8b2f76443ad500a2128",
+      "status": "candidate_complete",
+      "row_count": 52314
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\g\\3\\ASTOCK-073-f894be1ac12e\\2026-10-04\\input_report\\cffex\\position_rank\\report.json",
+      "status": "failed",
+      "scope": "before-request"
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\g\\2\\ASTOCK-072-c6a310e2faa4\\2026-10-04\\input_report\\exchange_composite\\options_daily\\report.json",
+      "status": "failed",
+      "scope": "before-request"
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\g\\1\\ASTOCK-071-b252db6ab817\\2026-10-04\\input_report\\exchange_composite\\futures_daily\\report.json",
+      "status": "failed",
+      "scope": "before-request"
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\g\\0\\ASTOCK-030-0eecb5cd66f8\\2026-10-04\\input_report\\sse\\etf_shares\\report.json",
+      "status": "failed",
+      "scope": "before-request"
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\f9\\candidate\\ASTOCK-039-4dc781e8e46b\\2026-10-04\\input_report\\sina\\financial_statements\\report.json",
+      "sha256": "5885ff752b5dac44716814bf29b8b173e05513ff6d4c165b115cb9c1df43eb0e",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\f8\\candidate\\ASTOCK-039-7b37e05ff937\\2026-10-04\\input_report\\sina\\financial_statements\\report.json",
+      "sha256": "94ad71dd4aa28d1b058d03934f8282aed54df1fe925fb48730946c90868e1d8a",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\f7\\candidate\\ASTOCK-030-66616233e79b\\2026-10-04\\input_report\\sse\\etf_shares\\report.json",
+      "sha256": "f64e7d72f3e8c534f81bfb52b609749ec21086edff9b963943317fc291f626d3",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\f6\\candidate\\ASTOCK-030-85edbf58862b\\2026-10-04\\input_report\\sse\\etf_shares\\report.json",
+      "sha256": "4da0b2e8dd87565b6b3b817236d6fee99756543b10f40a15dbaf0f69aab7f580",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\f5\\candidate\\ASTOCK-055-542c022af942\\2026-10-04\\input_report\\sse\\option_risk\\report.json",
+      "sha256": "c90134fc0f4097403bca73b09d92d66b9673484d97c885b6cf93ae21044c3694",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\f4\\candidate\\ASTOCK-055-95171e275ae6\\2026-10-04\\input_report\\sse\\option_risk\\report.json",
+      "sha256": "7c27ea1208886aaea0ffee8e6f68b9cac02b476c0d719b4cb57bad76448979df",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\f3\\candidate\\ASTOCK-055-2a159520831a\\2026-10-04\\input_report\\sse\\option_risk\\report.json",
+      "sha256": "6c55ec30e1faa67a48d246d070116f014aadd4cd9798fb44ecdc785c788112a1",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\f2\\candidate\\ASTOCK-055-33ebd76800a1\\2026-10-04\\input_report\\sse\\option_risk\\report.json",
+      "sha256": "8975de2209265df2fc09e7d23acffebbd5a89725716df17f7817b95ae2938402",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\f1\\candidate\\ASTOCK-055-04c17d3fbd93\\2026-10-04\\input_report\\sse\\option_risk\\report.json",
+      "sha256": "aceb0d6049a412f50e7939192261cc90a85e9d76e2da407fe6d23516c3dc72ff",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\9\\candidate\\ASTOCK-063-b9167cccdb0d\\2026-10-04\\input_report\\chinabond\\yield_curve\\report.json",
+      "sha256": "f1fc02d7eaddce8eabea9cab7351ff4004d999371e4a6acdf641c4ded388b6a3",
+      "status": "candidate_complete",
+      "row_count": 42
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\8\\candidate\\ASTOCK-030-323ae1751485\\2026-10-04\\input_report\\sse\\etf_shares\\report.json",
+      "sha256": "aafe76d49f186584a45bd7e54166215d286ee4b8ea2ec6eaebd456d530aafcf2",
+      "status": "candidate_complete",
+      "row_count": 912
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\7\\candidate\\ASTOCK-004-e1e6b8a1999b\\2026-10-04\\input_report\\tencent\\ticks\\report.json",
+      "sha256": "866e8ff5e68372be7e4894a79bda250879cdba1807399f9a4ec794767bfcfb1d",
+      "status": "candidate_complete",
+      "row_count": 4445
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\6\\candidate\\ASTOCK-003-a86ac1eee791\\2026-10-04\\input_report\\tdx\\daily_package\\report.json",
+      "sha256": "686eec01807b924abe8efe12fef15804df98821714e3c82f7a5cb1b0e86c031a",
+      "status": "candidate_complete",
+      "row_count": 52314
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\5\\candidate\\ASTOCK-085-dddbe6d4ee62\\2026-10-04\\input_report\\sina\\dragon_tiger_daily\\report.json",
+      "sha256": "3d0a76c2668581f8bc422311288913bb037bb2c692bc3ffca1c2b87039a1ec23",
+      "status": "candidate_complete",
+      "row_count": 83
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\4\\candidate\\ASTOCK-068-18ad1cae175c\\2026-10-04\\input_report\\csindex\\weights\\report.json",
+      "sha256": "dffe8464861c405a91385cc23f62b52217f85c698fe38b2f84bbc92244ad8ee9",
+      "status": "candidate_complete",
+      "row_count": 300
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\3\\candidate\\ASTOCK-067-f364d0509fb2\\2026-10-04\\input_report\\csindex\\constituents\\report.json",
+      "sha256": "60b5d74da133c041c6c4d4ae4b907e74539a65153f621e7678b89d22528061a8",
+      "status": "candidate_complete",
+      "row_count": 300
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\2\\candidate\\ASTOCK-055-e7a6ce5a33c1\\2026-10-04\\input_report\\sse\\option_risk\\report.json",
+      "sha256": "afedb1f9b0ffb77dd51d0043634cccdfb824a2e1600c705b59748d9a61691fde",
+      "status": "candidate_complete",
+      "row_count": 580
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\19\\candidate\\ASTOCK-073-40ddbdf4f867\\2026-10-04\\input_report\\cffex\\position_rank\\report.json",
+      "sha256": "4bc4422f9eed5f870f5aa86c1864d970ac56def3f975502fd8686ec9bd61a0dc",
+      "status": "candidate_complete",
+      "row_count": 440
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\18\\candidate\\ASTOCK-072-1e36ec3ddaa7\\2026-10-04\\input_report\\exchange_composite\\options_daily\\report.json",
+      "sha256": "13205f317212b2122c90038b290b2614fce4836891417aac2238fb830a12e4e7",
+      "status": "candidate_complete",
+      "row_count": 692
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\17\\candidate\\ASTOCK-072-c734fe55fdcb\\2026-10-04\\input_report\\exchange_composite\\options_daily\\report.json",
+      "sha256": "3da74d5762cb1b9071444195a3188a88961ad0c1837affd06c2083a9cb6f7ebc",
+      "status": "candidate_complete",
+      "row_count": 6546
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\16\\candidate\\ASTOCK-071-7550aff4bd49\\2026-10-04\\input_report\\exchange_composite\\futures_daily\\report.json",
+      "sha256": "b1bc9e0ba36b7aca8c8b0117bcd9001bb136f8d61cbad7deea1ff6330761ec3d",
+      "status": "candidate_complete",
+      "row_count": 48
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\15\\candidate\\ASTOCK-071-d36593ff5c1b\\2026-10-04\\input_report\\exchange_composite\\futures_daily\\report.json",
+      "sha256": "838eac6fe6535c0c66c1d6ee47681c3ae34ecaffd9453cfef91a120b864c7964",
+      "status": "candidate_complete",
+      "row_count": 28
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\14\\candidate\\ASTOCK-071-357a8ca4a3bf\\2026-10-04\\input_report\\exchange_composite\\futures_daily\\report.json",
+      "sha256": "4a6e3389ba66a91b5991d1493cb5024ad0c0d8e60f138bf52b2c166847c480f7",
+      "status": "candidate_complete",
+      "row_count": 243
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\13\\candidate\\ASTOCK-071-15b38870c7cd\\2026-10-04\\input_report\\exchange_composite\\futures_daily\\report.json",
+      "sha256": "491ed3b7d44493f4f43c011b6e7746a90f492433fa07169dd931fa2d4658df60",
+      "status": "candidate_complete",
+      "row_count": 63
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\12\\candidate\\ASTOCK-071-fcc58b8f3fdf\\2026-10-04\\input_report\\exchange_composite\\futures_daily\\report.json",
+      "sha256": "59570431d5c3633af34060861afe86175a5fa498c41b86d83093561bab701fec",
+      "status": "candidate_complete",
+      "row_count": 238
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\11\\candidate\\ASTOCK-051-b94e3d769270\\2026-10-04\\input_report\\eastmoney\\intraday_changes\\report.json",
+      "sha256": "dad8f4ff25edea8effc0e26dfd12ebbc8499318e79ca819dd041db94ba067f72",
+      "status": "candidate_complete",
+      "row_count": 7831
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\10\\candidate\\ASTOCK-077-2aa612c5b58b\\2026-10-04\\input_report\\sge\\spot\\report.json",
+      "sha256": "dd05796798e1c60e2d4b3175f0f61a78c05afb0f5bee84b399106a40b376ebf8",
+      "status": "candidate_complete",
+      "row_count": 2375
+    },
+    {
+      "path": "provider_validation\\results\\remaining-final-20261004\\1\\candidate\\ASTOCK-039-1891bc27b8e7\\2026-10-04\\input_report\\sina\\financial_statements\\report.json",
+      "sha256": "616cdf109df02e451496dc38dedb41feca23171b32a4b26159ec66e9c123fe03",
+      "status": "candidate_complete",
+      "row_count": 305
+    }
+  ],
+  "full_tests": 617,
+  "live_probe_scopes": [
+    "news 600519 keyword page 1:10",
+    "CSIndex 000300:20 dates",
+    "BaoStock ST-name query:317 -> 198 SDK rows; still unimplemented"
+  ],
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "remaining_unimplemented": [
+    "ASTOCK-011",
+    "ASTOCK-014",
+    "ASTOCK-037",
+    "ASTOCK-044",
+    "ASTOCK-087"
+  ]
+}

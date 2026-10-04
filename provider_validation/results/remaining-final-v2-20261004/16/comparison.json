@@ -1,0 +1,21 @@
+{
+  "input_id": "ASTOCK-071",
+  "scope": {
+    "date": "2026-09-18",
+    "exchange": "CZCE"
+  },
+  "row_count": 243,
+  "mode": "offline_replay",
+  "all_business_fields_equal": true,
+  "request_comparison_equal": true,
+  "production_writes": 0,
+  "network_requests": 0,
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\16\\original-parsed.json",
+  "original_parsed_sha256": "a497bf2c5b5fad4c573eced779781ebd48ace2fd669b21d7493906016ab4966b",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\16\\candidate\\ASTOCK-071-07ff98a7afda\\2026-10-04\\input_report\\exchange_composite\\futures_daily\\report.json",
+  "report_sha256": "1cd5bbf7e4a9e6906fbe0e63238181d0eb8f60bdb1895aaefa99001e4079639b",
+  "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\16\\original\\manifest.ndjson",
+  "source_response_hashes": [
+    "595f24d939400c97bc4b64bdd43a1873ab58bf3bfa654143e9460eaf51d4ab60"
+  ]
+}

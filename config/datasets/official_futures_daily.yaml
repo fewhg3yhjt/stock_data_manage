@@ -1,0 +1,64 @@
+dataset:
+  name: official_futures_daily
+  display_name: 期货日行情候选输入
+  primary_key:
+  - snapshot_at
+  - trade_date
+  - exchange
+  - contract_code
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  trade_date:
+    type: date
+    required: true
+  exchange:
+    type: string
+    required: true
+  contract_code:
+    type: string
+    required: true
+  product:
+    type: string
+    required: false
+  open:
+    type: decimal
+    required: false
+    unit: unverified
+  high:
+    type: decimal
+    required: false
+    unit: unverified
+  low:
+    type: decimal
+    required: false
+    unit: unverified
+  close:
+    type: decimal
+    required: false
+    unit: unverified
+  settle:
+    type: decimal
+    required: false
+    unit: unverified
+  pre_settle:
+    type: decimal
+    required: false
+    unit: unverified
+  volume:
+    type: decimal
+    required: false
+    unit: unverified
+  open_interest:
+    type: decimal
+    required: false
+    unit: unverified
+  oi_change:
+    type: decimal
+    required: false
+    unit: unverified
+  turnover_10k:
+    type: decimal
+    required: false
+    unit: unverified

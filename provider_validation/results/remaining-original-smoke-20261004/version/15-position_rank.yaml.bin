@@ -1,0 +1,38 @@
+dataset: position_rank
+rules:
+- id: position_rank-input-v1
+  input_id: ASTOCK-073
+  provider: cffex
+  endpoint: position_rank
+  field_mapping:
+    trade_date: date
+    exchange: exchange
+    contract_code: symbol
+    level: level
+    rank: rank
+    volume_member: volume_member
+    long_member: long_member
+    short_member: short_member
+    volume: volume
+    volume_chg: volume_chg
+    long_oi: long_oi
+    long_chg: long_chg
+    short_oi: short_oi
+    short_chg: short_chg
+  context_fields:
+    snapshot_at: source_snapshot_at
+  null_values:
+  - null
+  - ''
+  unverified_fields:
+  - volume
+  - volume_chg
+  - long_oi
+  - long_chg
+  - short_oi
+  - short_chg
+  status: pending_validation
+  version: remaining-original-input-v1
+  evidence_refs:
+  - ASTOCK-073
+  notes: 保留原独立接口及原解析。原数字单独留证，标准数字单位未认证；无来源或日期回退，生产关闭。

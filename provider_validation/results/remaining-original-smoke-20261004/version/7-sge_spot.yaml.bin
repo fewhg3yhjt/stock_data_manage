@@ -1,0 +1,33 @@
+dataset:
+  name: sge_spot
+  display_name: 上海金现货候选输入
+  primary_key:
+  - snapshot_at
+  - trade_date
+  - instrument
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  trade_date:
+    type: date
+    required: true
+  instrument:
+    type: string
+    required: true
+  open:
+    type: decimal
+    required: false
+    unit: unverified
+  high:
+    type: decimal
+    required: false
+    unit: unverified
+  low:
+    type: decimal
+    required: false
+    unit: unverified
+  close:
+    type: decimal
+    required: false
+    unit: unverified

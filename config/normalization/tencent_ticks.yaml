@@ -1,0 +1,31 @@
+dataset: tencent_ticks
+rules:
+- id: tencent_ticks-input-v1
+  input_id: ASTOCK-004
+  provider: tencent
+  endpoint: ticks
+  field_mapping:
+    trade_date: date
+    source_security_code: code
+    time: time
+    source_sequence: seq
+    side: side
+    price: price
+    change: change
+    volume: volume
+    amount: amount
+  context_fields:
+    snapshot_at: source_snapshot_at
+  null_values:
+  - null
+  - ''
+  unverified_fields:
+  - price
+  - change
+  - volume
+  - amount
+  status: pending_validation
+  version: remaining-original-input-v1
+  evidence_refs:
+  - ASTOCK-004
+  notes: 保留原独立接口及原解析。原数字单独留证，标准数字单位未认证；无来源或日期回退，生产关闭。

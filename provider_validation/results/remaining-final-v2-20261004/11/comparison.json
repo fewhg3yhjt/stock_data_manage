@@ -1,0 +1,22 @@
+{
+  "input_id": "ASTOCK-063",
+  "scope": {
+    "start": "2026-09-01",
+    "end": "2026-09-18",
+    "curve": "all"
+  },
+  "row_count": 42,
+  "mode": "offline_replay",
+  "all_business_fields_equal": true,
+  "request_comparison_equal": true,
+  "production_writes": 0,
+  "network_requests": 0,
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\11\\original-parsed.json",
+  "original_parsed_sha256": "d99a7417f0f60a0fef775b57af5b2d6c48c548efe080e97659ecb5f89c8ed98c",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\11\\candidate\\ASTOCK-063-670f07245fd0\\2026-10-04\\input_report\\chinabond\\yield_curve\\report.json",
+  "report_sha256": "9f2814414f751a0c9e479c89522cdb6fccc6cbba62c3f475059515cf62eee550",
+  "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\11\\original\\manifest.ndjson",
+  "source_response_hashes": [
+    "64b832cbb8482882526554b51e1b33f9f9c82eab0737f11f8fa5044ca95bda7e"
+  ]
+}

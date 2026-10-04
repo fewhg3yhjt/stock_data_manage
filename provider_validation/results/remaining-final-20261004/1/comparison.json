@@ -1,0 +1,22 @@
+{
+  "input_id": "ASTOCK-039",
+  "scope": {
+    "code": "600519"
+  },
+  "row_count": 305,
+  "mode": "offline_replay",
+  "all_business_fields_equal": true,
+  "request_comparison_equal": true,
+  "production_writes": 0,
+  "network_requests": 0,
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-20261004\\1\\original-parsed.json",
+  "original_parsed_sha256": "0ec7a76902e8b2669e80ebe2d47f5503f20fcb0b4a7aa1b45fff6e6379b58676",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-20261004\\1\\candidate\\ASTOCK-039-1891bc27b8e7\\2026-10-04\\input_report\\sina\\financial_statements\\report.json",
+  "report_sha256": "616cdf109df02e451496dc38dedb41feca23171b32a4b26159ec66e9c123fe03",
+  "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-20261004\\1\\original\\manifest.ndjson",
+  "source_response_hashes": [
+    "3c00915108233b0c7727831ffdeec6ddced5a088bfc53a329d991110fc48c77c",
+    "e2f52c5a261901d8825555b0f6e353018633b30447e9e74da7f15372383735db",
+    "fdfd259b762555afd43a1f0cf378bc031d1b54c910f0868cf9c304657e1bb883"
+  ]
+}

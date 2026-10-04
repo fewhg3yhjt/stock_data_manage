@@ -1,0 +1,22 @@
+{
+  "input_id": "ASTOCK-072",
+  "scope": {
+    "date": "2026-09-18",
+    "exchange": "SHFE"
+  },
+  "row_count": 6546,
+  "mode": "offline_replay",
+  "all_business_fields_equal": true,
+  "request_comparison_equal": true,
+  "production_writes": 0,
+  "network_requests": 0,
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\19\\original-parsed.json",
+  "original_parsed_sha256": "69d13f6cadf011d7981c43de411f06cd9ab6f4092c5fac41953018563a1802b7",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\19\\candidate\\ASTOCK-072-7d05c0d9a5e2\\2026-10-04\\input_report\\exchange_composite\\options_daily\\report.json",
+  "report_sha256": "37766104873403abab854a5b6ab496989d19bc4384802675485fc41bc6066434",
+  "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\19\\original\\manifest.ndjson",
+  "source_response_hashes": [
+    "d6b346d216f06855953e7661197571eeacef6f074e2f4ea2587835b9ae6b5288",
+    "bc1d0223e198d4748504e36b89a0a2ef777e8dbc4cccffeeb42d5574db63db96"
+  ]
+}

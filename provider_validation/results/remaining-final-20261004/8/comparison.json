@@ -1,0 +1,21 @@
+{
+  "input_id": "ASTOCK-030",
+  "scope": {
+    "date": "2026-09-18",
+    "exchange": "SH"
+  },
+  "row_count": 912,
+  "mode": "offline_replay",
+  "all_business_fields_equal": true,
+  "request_comparison_equal": true,
+  "production_writes": 0,
+  "network_requests": 0,
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-20261004\\8\\original-parsed.json",
+  "original_parsed_sha256": "8b546f20ecb165eaff5d7528250006928df30d6ef48902ae62c8d2d87485b0a3",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-20261004\\8\\candidate\\ASTOCK-030-323ae1751485\\2026-10-04\\input_report\\sse\\etf_shares\\report.json",
+  "report_sha256": "aafe76d49f186584a45bd7e54166215d286ee4b8ea2ec6eaebd456d530aafcf2",
+  "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-20261004\\8\\original\\manifest.ndjson",
+  "source_response_hashes": [
+    "30a88d08c745cd399972cea86c49065b279c7965aa726bbfc4796a4bc6309478"
+  ]
+}

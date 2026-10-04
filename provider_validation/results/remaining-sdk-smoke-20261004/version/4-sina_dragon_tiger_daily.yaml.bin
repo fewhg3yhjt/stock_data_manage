@@ -1,0 +1,42 @@
+dataset:
+  name: sina_dragon_tiger_daily
+  display_name: 新浪龙虎榜备用（实测来源）候选输入
+  primary_key:
+  - snapshot_at
+  - trade_date
+  - source_row_number
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  trade_date:
+    type: date
+    required: true
+  source_security_code:
+    type: string
+    required: false
+  source_row_number:
+    type: integer
+    required: true
+  name:
+    type: string
+    required: false
+  listing_reason:
+    type: string
+    required: false
+  close_price:
+    type: decimal
+    required: false
+    unit: unverified
+  reference_value:
+    type: decimal
+    required: false
+    unit: unverified
+  volume:
+    type: decimal
+    required: false
+    unit: unverified
+  amount:
+    type: decimal
+    required: false
+    unit: unverified

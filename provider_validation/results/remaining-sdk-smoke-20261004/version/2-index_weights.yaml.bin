@@ -1,0 +1,34 @@
+dataset:
+  name: index_weights
+  display_name: 指数权重候选输入
+  primary_key:
+  - snapshot_at
+  - index_code
+  - trade_date
+  - source_security_code
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  index_code:
+    type: string
+    required: true
+  trade_date:
+    type: date
+    required: true
+  source_security_code:
+    type: string
+    required: true
+  name:
+    type: string
+    required: false
+  index_name:
+    type: string
+    required: false
+  exchange_name:
+    type: string
+    required: false
+  weight:
+    type: decimal
+    required: false
+    unit: unverified

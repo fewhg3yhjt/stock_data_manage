@@ -1,0 +1,8 @@
+[
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\pipeline\\inputs.py",
+    "snapshot": "provider_validation\\results\\remaining-final-20261004\\version\\recovered-inputs.py.bin",
+    "sha256": "16f38d1b6b5a7db8d9394fdf4915cb258dcee20cdfeb2e6665a5997b2f39f7f5",
+    "restoration": "prior frozen execution plus exact saved source-window meaning change; verified by report hash"
+  }
+]

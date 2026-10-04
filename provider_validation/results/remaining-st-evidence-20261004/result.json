@@ -1,0 +1,20 @@
+{
+  "provider": "baostock",
+  "endpoint": "query_stock_basic",
+  "parameters": {
+    "code_name": "ST"
+  },
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "representation": "SDK-decoded fields and rows; exact TCP frames not exposed",
+  "source_sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03",
+  "source_payload_path": "provider_validation\\results\\remaining-st-evidence-20261004\\sdk-payload.json",
+  "source_payload_sha256": "93891b70d9360fda6a0ed99264934e0c6f46414feca604acca94351f74c6b9e8",
+  "source_row_count": 317,
+  "status": "parsed",
+  "row_count": 198,
+  "coverage": "沪深（东财不可达，baostock 不含北交所）",
+  "parsed_path": "provider_validation\\results\\remaining-st-evidence-20261004\\parsed.json",
+  "parsed_sha256": "f0848db5d37ac00c724880f5525f2f66932d41d4d84b46c902f9dcb31b49afca",
+  "validation_time_utc": "2026-10-04T10:37:07.199365+00:00"
+}

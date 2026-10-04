@@ -1,0 +1,3928 @@
+{
+  "time_utc": "2026-10-04T09:08:14.672176+00:00",
+  "pending": {
+    "ASTOCK-003": {
+      "provider": "tdx",
+      "endpoint": "daily_package",
+      "parameters": {
+        "date": {
+          "type": "date",
+          "source": "request.trade_date",
+          "required": true
+        }
+      },
+      "data_kind": "file_package",
+      "data_frequency": "daily",
+      "request_shape": "file_package",
+      "collection_profile": "market_after_close",
+      "implementation_status": "unimplemented",
+      "display_name": "通达信盘后包",
+      "limitations": [
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ],
+      "trading_date_parameter": "date",
+      "evidence_refs": [
+        "ASTOCK-003"
+      ],
+      "request_interval_seconds": 3,
+      "effective_concurrency": 1,
+      "request_limit_enforcement": "unimplemented"
+    },
+    "ASTOCK-004": {
+      "provider": "tencent",
+      "endpoint": "ticks",
+      "parameters": {
+        "code": {
+          "type": "string",
+          "source": "request.symbol",
+          "required": true
+        }
+      },
+      "data_kind": "ticks",
+      "data_frequency": "tick",
+      "request_shape": "single_symbol",
+      "collection_profile": "market_intraday",
+      "implementation_status": "unimplemented",
+      "display_name": "腾讯逐笔成交",
+      "limitations": [
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ],
+      "evidence_refs": [
+        "ASTOCK-004"
+      ],
+      "request_interval_seconds": 3,
+      "effective_concurrency": 1,
+      "request_limit_enforcement": "unimplemented"
+    },
+    "ASTOCK-011": {
+      "provider": "ths",
+      "endpoint": "earnings_consensus",
+      "parameters": {
+        "code": {
+          "type": "string",
+          "source": "request.symbol",
+          "required": true
+        }
+      },
+      "data_kind": "forecast",
+      "data_frequency": "snapshot",
+      "request_shape": "single_symbol",
+      "collection_profile": "event_daily",
+      "implementation_status": "unimplemented",
+      "display_name": "同花顺一致预期",
+      "limitations": [
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ],
+      "evidence_refs": [
+        "ASTOCK-011"
+      ],
+      "request_interval_seconds": 3,
+      "effective_concurrency": 1,
+      "request_limit_enforcement": "unimplemented"
+    },
+    "ASTOCK-014": {
+      "provider": "ths",
+      "endpoint": "hot_reason",
+      "parameters": {},
+      "data_kind": "snapshot",
+      "data_frequency": "snapshot",
+      "request_shape": "full_snapshot",
+      "collection_profile": "market_intraday",
+      "implementation_status": "unimplemented",
+      "display_name": "同花顺热点",
+      "limitations": [
+        "记录内含401响应，不能由部分非空返回推断完整性",
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ],
+      "evidence_refs": [
+        "ASTOCK-014"
+      ],
+      "request_interval_seconds": 3,
+      "effective_concurrency": 1,
+      "request_limit_enforcement": "unimplemented"
+    },
+    "ASTOCK-030": {
+      "provider": "sse",
+      "endpoint": "etf_shares",
+      "parameters": {
+        "date": {
+          "type": "date",
+          "source": "request.trade_date",
+          "required": true
+        },
+        "exchange": {
+          "type": "string",
+          "source": "request.exchange",
+          "required": true
+        }
+      },
+      "data_kind": "time_series",
+      "data_frequency": "daily",
+      "request_shape": "date_snapshot",
+      "collection_profile": "market_after_close",
+      "implementation_status": "unimplemented",
+      "display_name": "ETF 份额",
+      "limitations": [
+        "已测上交所日期数据，深交所当前快照未测",
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ],
+      "trading_date_parameter": "date",
+      "evidence_refs": [
+        "ASTOCK-030"
+      ],
+      "request_interval_seconds": 3,
+      "effective_concurrency": 1,
+      "request_limit_enforcement": "unimplemented"
+    },
+    "ASTOCK-031": {
+      "provider": "eastmoney",
+      "endpoint": "stock_news",
+      "parameters": {
+        "code": {
+          "type": "string",
+          "source": "request.symbol",
+          "required": true
+        }
+      },
+      "data_kind": "document_index",
+      "data_frequency": "snapshot",
+      "request_shape": "single_symbol",
+      "collection_profile": "news_intraday",
+      "implementation_status": "unimplemented",
+      "display_name": "个股新闻",
+      "limitations": [
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ],
+      "evidence_refs": [
+        "ASTOCK-031"
+      ],
+      "request_interval_seconds": 3,
+      "effective_concurrency": 1,
+      "request_limit_enforcement": "unimplemented"
+    },
+    "ASTOCK-037": {
+      "provider": "script_composite",
+      "endpoint": "company_profile",
+      "parameters": {
+        "code": {
+          "type": "string",
+          "source": "request.symbol",
+          "required": true
+        }
+      },
+      "data_kind": "composite",
+      "data_frequency": "snapshot",
+      "request_shape": "single_symbol",
+      "collection_profile": "event_daily",
+      "implementation_status": "unimplemented",
+      "display_name": "F10 文本",
+      "limitations": [
+        "复合输出必须拆分成功子接口；不能标为通达信F10完整能力",
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ],
+      "evidence_refs": [
+        "ASTOCK-037"
+      ],
+      "request_interval_seconds": 3,
+      "effective_concurrency": 1,
+      "request_limit_enforcement": "unimplemented"
+    },
+    "ASTOCK-039": {
+      "provider": "sina",
+      "endpoint": "financial_statements",
+      "parameters": {
+        "code": {
+          "type": "string",
+          "source": "request.symbol",
+          "required": true
+        }
+      },
+      "data_kind": "table",
+      "data_frequency": "report_period",
+      "request_shape": "single_symbol",
+      "collection_profile": "event_daily",
+      "implementation_status": "unimplemented",
+      "display_name": "新浪财报三表",
+      "limitations": [
+        "三张报表分别保留报告期、披露时间和来源字段，尚未定义生产标准表",
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ],
+      "evidence_refs": [
+        "ASTOCK-039"
+      ],
+      "request_interval_seconds": 3,
+      "effective_concurrency": 1,
+      "request_limit_enforcement": "unimplemented"
+    },
+    "ASTOCK-044": {
+      "provider": "eastmoney",
+      "endpoint": "st_list",
+      "parameters": {},
+      "data_kind": "snapshot",
+      "data_frequency": "snapshot",
+      "request_shape": "full_snapshot",
+      "collection_profile": "reference_daily",
+      "implementation_status": "unimplemented",
+      "display_name": "ST 名单",
+      "limitations": [
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ],
+      "evidence_refs": [
+        "ASTOCK-044"
+      ],
+      "request_interval_seconds": 3,
+      "effective_concurrency": 1,
+      "request_limit_enforcement": "unimplemented"
+    },
+    "ASTOCK-051": {
+      "provider": "eastmoney",
+      "endpoint": "intraday_changes",
+      "parameters": {},
+      "data_kind": "event",
+      "data_frequency": "snapshot",
+      "request_shape": "full_snapshot",
+      "collection_profile": "market_intraday",
+      "implementation_status": "unimplemented",
+      "display_name": "东财日内异动池（明细接口）",
+      "limitations": [
+        "逐异动类型展开请求；日期和完整性待迁移核验",
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ],
+      "evidence_refs": [
+        "ASTOCK-051"
+      ],
+      "request_interval_seconds": 3,
+      "effective_concurrency": 1,
+      "request_limit_enforcement": "unimplemented"
+    },
+    "ASTOCK-055": {
+      "provider": "sse",
+      "endpoint": "option_risk",
+      "parameters": {
+        "date": {
+          "type": "date",
+          "source": "request.trade_date",
+          "required": true
+        }
+      },
+      "data_kind": "table",
+      "data_frequency": "daily",
+      "request_shape": "date_snapshot",
+      "collection_profile": "market_after_close",
+      "implementation_status": "unimplemented",
+      "display_name": "上交所期权风险指标",
+      "limitations": [
+        "实际调用option_risk_indicator_sse；日期回退、希腊值和IV口径待核验",
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ],
+      "trading_date_parameter": "date",
+      "evidence_refs": [
+        "ASTOCK-055"
+      ],
+      "request_interval_seconds": 3,
+      "effective_concurrency": 1,
+      "request_limit_enforcement": "unimplemented"
+    },
+    "ASTOCK-063": {
+      "provider": "chinabond",
+      "endpoint": "yield_curve",
+      "parameters": {
+        "start": {
+          "type": "date",
+          "source": "request.start_date",
+          "required": true
+        },
+        "end": {
+          "type": "date",
+          "source": "request.end_date",
+          "required": true
+        },
+        "curve": {
+          "type": "string",
+          "source": "config.curve",
+          "required": true
+        }
+      },
+      "data_kind": "time_series",
+      "data_frequency": "daily",
+      "request_shape": "date_snapshot",
+      "collection_profile": "macro_daily",
+      "implementation_status": "unimplemented",
+      "display_name": "中债收益率曲线",
+      "limitations": [
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ],
+      "evidence_refs": [
+        "ASTOCK-063"
+      ],
+      "request_interval_seconds": 3,
+      "effective_concurrency": 1,
+      "request_limit_enforcement": "unimplemented"
+    },
+    "ASTOCK-067": {
+      "provider": "csindex",
+      "endpoint": "constituents",
+      "parameters": {
+        "index_code": {
+          "type": "string",
+          "source": "request.index_code",
+          "required": true
+        }
+      },
+      "data_kind": "snapshot",
+      "data_frequency": "snapshot",
+      "request_shape": "single_symbol",
+      "collection_profile": "reference_daily",
+      "implementation_status": "unimplemented",
+      "display_name": "指数成分",
+      "limitations": [
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ],
+      "evidence_refs": [
+        "ASTOCK-067"
+      ],
+      "request_interval_seconds": 3,
+      "effective_concurrency": 1,
+      "request_limit_enforcement": "unimplemented"
+    },
+    "ASTOCK-068": {
+      "provider": "csindex",
+      "endpoint": "weights",
+      "parameters": {
+        "index_code": {
+          "type": "string",
+          "source": "request.index_code",
+          "required": true
+        }
+      },
+      "data_kind": "snapshot",
+      "data_frequency": "snapshot",
+      "request_shape": "single_symbol",
+      "collection_profile": "reference_daily",
+      "implementation_status": "unimplemented",
+      "display_name": "指数权重",
+      "limitations": [
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ],
+      "evidence_refs": [
+        "ASTOCK-068"
+      ],
+      "request_interval_seconds": 3,
+      "effective_concurrency": 1,
+      "request_limit_enforcement": "unimplemented"
+    },
+    "ASTOCK-069": {
+      "provider": "script_composite",
+      "endpoint": "index_valuation",
+      "parameters": {
+        "index_code": {
+          "type": "string",
+          "source": "request.index_code",
+          "required": true
+        }
+      },
+      "data_kind": "time_series",
+      "data_frequency": "daily",
+      "request_shape": "single_symbol",
+      "collection_profile": "market_after_close",
+      "implementation_status": "unimplemented",
+      "display_name": "指数估值",
+      "limitations": [
+        "来源变体及股本口径未核准，仅保留候选契约",
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ],
+      "evidence_refs": [
+        "ASTOCK-069"
+      ],
+      "request_interval_seconds": 3,
+      "effective_concurrency": 1,
+      "request_limit_enforcement": "unimplemented"
+    },
+    "ASTOCK-071": {
+      "provider": "exchange_composite",
+      "endpoint": "futures_daily",
+      "parameters": {
+        "date": {
+          "type": "date",
+          "source": "request.trade_date",
+          "required": true
+        },
+        "exchange": {
+          "type": "string",
+          "source": "request.exchange",
+          "required": true
+        }
+      },
+      "data_kind": "time_series",
+      "data_frequency": "daily",
+      "request_shape": "date_snapshot",
+      "collection_profile": "source_market_daily",
+      "implementation_status": "unimplemented",
+      "display_name": "期货日行情",
+      "limitations": [
+        "使用各交易所自己的日历；只按原始证据授予交易所范围",
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ],
+      "evidence_refs": [
+        "ASTOCK-071"
+      ],
+      "request_interval_seconds": 3,
+      "effective_concurrency": 1,
+      "request_limit_enforcement": "unimplemented"
+    },
+    "ASTOCK-072": {
+      "provider": "exchange_composite",
+      "endpoint": "options_daily",
+      "parameters": {
+        "date": {
+          "type": "date",
+          "source": "request.trade_date",
+          "required": true
+        },
+        "exchange": {
+          "type": "string",
+          "source": "request.exchange",
+          "required": true
+        }
+      },
+      "data_kind": "time_series",
+      "data_frequency": "daily",
+      "request_shape": "date_snapshot",
+      "collection_profile": "source_market_daily",
+      "implementation_status": "unimplemented",
+      "display_name": "期权日行情",
+      "limitations": [
+        "使用各交易所自己的日历；只按原始证据授予交易所范围",
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ],
+      "evidence_refs": [
+        "ASTOCK-072"
+      ],
+      "request_interval_seconds": 3,
+      "effective_concurrency": 1,
+      "request_limit_enforcement": "unimplemented"
+    },
+    "ASTOCK-073": {
+      "provider": "cffex",
+      "endpoint": "position_rank",
+      "parameters": {
+        "date": {
+          "type": "date",
+          "source": "request.trade_date",
+          "required": true
+        },
+        "exchange": {
+          "type": "string",
+          "source": "request.exchange",
+          "required": true
+        },
+        "symbol": {
+          "type": "string",
+          "source": "request.contract",
+          "required": false
+        }
+      },
+      "data_kind": "table",
+      "data_frequency": "daily",
+      "request_shape": "date_snapshot",
+      "collection_profile": "source_market_daily",
+      "implementation_status": "unimplemented",
+      "display_name": "会员持仓排名",
+      "limitations": [
+        "本轮只测试CFFEX",
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ],
+      "evidence_refs": [
+        "ASTOCK-073"
+      ],
+      "request_interval_seconds": 3,
+      "effective_concurrency": 1,
+      "request_limit_enforcement": "unimplemented"
+    },
+    "ASTOCK-077": {
+      "provider": "sge",
+      "endpoint": "spot",
+      "parameters": {
+        "instrument": {
+          "type": "string",
+          "source": "request.instrument",
+          "required": true
+        }
+      },
+      "data_kind": "quote",
+      "data_frequency": "snapshot",
+      "request_shape": "single_symbol",
+      "collection_profile": "source_market_daily",
+      "implementation_status": "unimplemented",
+      "display_name": "上海金现货",
+      "limitations": [
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ],
+      "evidence_refs": [
+        "ASTOCK-077"
+      ],
+      "request_interval_seconds": 3,
+      "effective_concurrency": 1,
+      "request_limit_enforcement": "unimplemented"
+    },
+    "ASTOCK-085": {
+      "provider": "sina",
+      "endpoint": "dragon_tiger_daily",
+      "parameters": {
+        "date": {
+          "type": "date",
+          "source": "request.trade_date",
+          "required": true
+        }
+      },
+      "data_kind": "event",
+      "data_frequency": "daily",
+      "request_shape": "date_snapshot",
+      "collection_profile": "market_after_close",
+      "implementation_status": "unimplemented",
+      "display_name": "新浪龙虎榜备用（实测来源）",
+      "limitations": [
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ],
+      "trading_date_parameter": "date",
+      "evidence_refs": [
+        "ASTOCK-085"
+      ],
+      "request_interval_seconds": 3,
+      "effective_concurrency": 1,
+      "request_limit_enforcement": "unimplemented"
+    },
+    "ASTOCK-087": {
+      "provider": "eastmoney",
+      "endpoint": "announcements",
+      "parameters": {
+        "code": {
+          "type": "string",
+          "source": "request.symbol",
+          "required": true
+        },
+        "start": {
+          "type": "date",
+          "source": "request.start_date",
+          "required": true
+        },
+        "end": {
+          "type": "date",
+          "source": "request.end_date",
+          "required": true
+        }
+      },
+      "data_kind": "document_index",
+      "data_frequency": "snapshot",
+      "request_shape": "single_symbol",
+      "collection_profile": "event_daily",
+      "implementation_status": "unimplemented",
+      "display_name": "公告备胎",
+      "limitations": [
+        "仅解析输出，缺精确原始响应；回退的全市场公告不能标成单票接口",
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ],
+      "evidence_refs": [
+        "ASTOCK-087"
+      ],
+      "request_interval_seconds": 3,
+      "effective_concurrency": 1,
+      "request_limit_enforcement": "unimplemented"
+    }
+  },
+  "catalog": [
+    {
+      "contract": {
+        "input_id": "ASTOCK-003",
+        "provider": "tdx",
+        "endpoint": "daily_package",
+        "display_name": "通达信盘后包",
+        "data_kind": "file_package",
+        "data_frequency": "daily",
+        "request_shape": "file_package",
+        "collection_profile": "market_after_close",
+        "implementation_status": "unimplemented",
+        "evidence_refs": [
+          "ASTOCK-003"
+        ],
+        "parameters": [
+          {
+            "name": "date",
+            "source": "request.trade_date",
+            "value_type": "date",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          }
+        ],
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "canonical_input": null,
+        "runtime_endpoint": null,
+        "forbidden_sources": [],
+        "trading_date_parameter": "date",
+        "request_interval_seconds": 3.0,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented",
+        "base_requests_per_fetch": 1
+      },
+      "collection_profile": {
+        "name": "market_after_close",
+        "mode": "after_close",
+        "refresh_interval_seconds": null,
+        "business_day": "trading_day",
+        "scheduling_enabled": false
+      },
+      "evidence": [
+        {
+          "interface_id": "ASTOCK-003",
+          "path": "provider_validation/results/interface-records/ASTOCK-003.json",
+          "sha256": "96e30ebcfdab10c575548e53cb86199ec24373f0bc1fc91f7491f851d147d9fe",
+          "validation_result": "通过",
+          "evidence_status": "live_raw",
+          "tested_scope": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。",
+          "coverage_denominator": 87,
+          "original_note": "通过。本轮测了2026-09-18全市场盘后包。 文档边界：未逐日验证",
+          "manifest_ref": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+          "response_artifacts": [
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/613cbca9817cde6c5f86de7659ee86d4224b29341265b2ceaf8960ed83677ca6.body.gz",
+              "sha256": "613cbca9817cde6c5f86de7659ee86d4224b29341265b2ceaf8960ed83677ca6",
+              "matches_filename": true
+            }
+          ],
+          "derived_artifacts": [],
+          "source_code_artifacts": [
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+              "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+            },
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py",
+              "sha256": "ec18390ee2be31b5f72f4a0ff7c85ef3753a086ee9c43693bea00b08cab0ce09"
+            }
+          ],
+          "validation_time_utc": "2026-10-03T10:20:06.666484+00:00",
+          "original_transformation": {
+            "path": "provider_validation/tests/build_interface_coverage.py",
+            "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
+          }
+        }
+      ],
+      "eligible_for_production_routing": false
+    },
+    {
+      "contract": {
+        "input_id": "ASTOCK-004",
+        "provider": "tencent",
+        "endpoint": "ticks",
+        "display_name": "腾讯逐笔成交",
+        "data_kind": "ticks",
+        "data_frequency": "tick",
+        "request_shape": "single_symbol",
+        "collection_profile": "market_intraday",
+        "implementation_status": "unimplemented",
+        "evidence_refs": [
+          "ASTOCK-004"
+        ],
+        "parameters": [
+          {
+            "name": "code",
+            "source": "request.symbol",
+            "value_type": "string",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          }
+        ],
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "canonical_input": null,
+        "runtime_endpoint": null,
+        "forbidden_sources": [],
+        "trading_date_parameter": null,
+        "request_interval_seconds": 3.0,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented",
+        "base_requests_per_fetch": 1
+      },
+      "collection_profile": {
+        "name": "market_intraday",
+        "mode": "intraday",
+        "refresh_interval_seconds": 60,
+        "business_day": "trading_day",
+        "scheduling_enabled": false
+      },
+      "evidence": [
+        {
+          "interface_id": "ASTOCK-004",
+          "path": "provider_validation/results/interface-records/ASTOCK-004.json",
+          "sha256": "68b1f480d2e904799dfe9bcb9a31266ce736c54bdae4ab64e0a0bdfcae368602",
+          "validation_result": "通过",
+          "evidence_status": "live_raw",
+          "tested_scope": "SKILL.md §1.4；V3.10 联网测试 26 项全通过。",
+          "coverage_denominator": 87,
+          "original_note": "通过。本轮用深市000001样例，获取并核验成交序号、日期和成交额。 文档边界：不含北交所",
+          "manifest_ref": "provider_validation/results/raw/2026-10-01-v310-live/manifest.ndjson",
+          "response_artifacts": [
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/ca6d11102c80e68faeb699a30b243bd695481005c3f37cb69ead5db7237f6f02.body.gz",
+              "sha256": "ca6d11102c80e68faeb699a30b243bd695481005c3f37cb69ead5db7237f6f02",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/30e321e11e64f6a77fa8ae832ebe3f467a1584cbe5fea42d0539d5a759e5c29c.body.gz",
+              "sha256": "30e321e11e64f6a77fa8ae832ebe3f467a1584cbe5fea42d0539d5a759e5c29c",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/1d44479b5f0f16309a99042ed4d6d444b1c2ae51d68a069c95b4e6e7ce9c4c3e.body.gz",
+              "sha256": "1d44479b5f0f16309a99042ed4d6d444b1c2ae51d68a069c95b4e6e7ce9c4c3e",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/4a9e825355940a58fc737bf920fbb6545278eaf371d950cfffed5ddcb3b017ef.body.gz",
+              "sha256": "4a9e825355940a58fc737bf920fbb6545278eaf371d950cfffed5ddcb3b017ef",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/f188072f6ab4731f75bc8edf4e6fd414488da71dffd2d716b9069f02f1263226.body.gz",
+              "sha256": "f188072f6ab4731f75bc8edf4e6fd414488da71dffd2d716b9069f02f1263226",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/dff2ebcc516f4aa069f4c46f6e85c4daf396013426fe61b21788cb2b63e4aa94.body.gz",
+              "sha256": "dff2ebcc516f4aa069f4c46f6e85c4daf396013426fe61b21788cb2b63e4aa94",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/583148dc5ca04fdc2c999e740880c2a39347781c2a749b705419457daeba3031.body.gz",
+              "sha256": "583148dc5ca04fdc2c999e740880c2a39347781c2a749b705419457daeba3031",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/5007eaf2aea55b0b77925f94775ae8923634fc77298a43623c1a73d628a24670.body.gz",
+              "sha256": "5007eaf2aea55b0b77925f94775ae8923634fc77298a43623c1a73d628a24670",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/760457fb29509e9144371ebfe179cbc75d4ae9028316820d677bd3011ebb5e13.body.gz",
+              "sha256": "760457fb29509e9144371ebfe179cbc75d4ae9028316820d677bd3011ebb5e13",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/1d5be94190d97c268c862cfed50593f609a688c679e76343940ca83c93083f3d.body.gz",
+              "sha256": "1d5be94190d97c268c862cfed50593f609a688c679e76343940ca83c93083f3d",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/6fa8af075913401fd3ec79b61f91a378c701e0a4b027dc94fdcc54d32b7c5055.body.gz",
+              "sha256": "6fa8af075913401fd3ec79b61f91a378c701e0a4b027dc94fdcc54d32b7c5055",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/e7c0bd06cd73763c4aca0a2b481f2593eb94599f33820c4a87be51c30e45c62a.body.gz",
+              "sha256": "e7c0bd06cd73763c4aca0a2b481f2593eb94599f33820c4a87be51c30e45c62a",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/7404da868fc7770299d35debcefcd204415c092dd6099dce28861cb4374ea2ee.body.gz",
+              "sha256": "7404da868fc7770299d35debcefcd204415c092dd6099dce28861cb4374ea2ee",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/f51c0d60b6c8020ad2a7a25e463d33feec8d4768834e7f257feb9bf4c5b156a4.body.gz",
+              "sha256": "f51c0d60b6c8020ad2a7a25e463d33feec8d4768834e7f257feb9bf4c5b156a4",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/5e553e13393393df0a08b302cdffe42ffa3fe26cbb11828eecb484625d17a4d6.body.gz",
+              "sha256": "5e553e13393393df0a08b302cdffe42ffa3fe26cbb11828eecb484625d17a4d6",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/14118a5a27ff1d761e6cd1de36fd3da566e9adfd702ee77ee060369887586deb.body.gz",
+              "sha256": "14118a5a27ff1d761e6cd1de36fd3da566e9adfd702ee77ee060369887586deb",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/977cf7da28ff4086b4edcb19b2d234866c1af579d4a057f04a4445ab4c67c259.body.gz",
+              "sha256": "977cf7da28ff4086b4edcb19b2d234866c1af579d4a057f04a4445ab4c67c259",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/0c7999a8fc67d3f9008e70f4c9057a638cb74fd8a70c2b6551d92ea458732343.body.gz",
+              "sha256": "0c7999a8fc67d3f9008e70f4c9057a638cb74fd8a70c2b6551d92ea458732343",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/33416f3de323391b85b59ab45bed131d017bd7bc4a705a8cf4929b2958d4d876.body.gz",
+              "sha256": "33416f3de323391b85b59ab45bed131d017bd7bc4a705a8cf4929b2958d4d876",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/96a8672b35ca3d7323e5430d29dd7408aae08e2104af4c0ec76929f2e2de895d.body.gz",
+              "sha256": "96a8672b35ca3d7323e5430d29dd7408aae08e2104af4c0ec76929f2e2de895d",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/d6aca7cefba3516acc9ce366ddea43ecf55bfac5a19cc2927ba7b5ca97d83f82.body.gz",
+              "sha256": "d6aca7cefba3516acc9ce366ddea43ecf55bfac5a19cc2927ba7b5ca97d83f82",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/657fd92e5d2e2a95497a1fd20a6c4364268c6f4cc9645a0a85e274cfd70cb9df.body.gz",
+              "sha256": "657fd92e5d2e2a95497a1fd20a6c4364268c6f4cc9645a0a85e274cfd70cb9df",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/ab3ffaefde713afc654fb467fd73a77ce384ed5fc3b3652a7d20a5267a2aa944.body.gz",
+              "sha256": "ab3ffaefde713afc654fb467fd73a77ce384ed5fc3b3652a7d20a5267a2aa944",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/2d92a58047eab79a09c13108f501d0721929857b52bb2237c05f235300d1d909.body.gz",
+              "sha256": "2d92a58047eab79a09c13108f501d0721929857b52bb2237c05f235300d1d909",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/0d6d428603f275df9d8d0e4405528843662f3971f245f7a1d133f2e6fa1b23a4.body.gz",
+              "sha256": "0d6d428603f275df9d8d0e4405528843662f3971f245f7a1d133f2e6fa1b23a4",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/5199586b7bbf1fb94ec1e574b44671c706beee7e9f5d7874e87da96f4dad7734.body.gz",
+              "sha256": "5199586b7bbf1fb94ec1e574b44671c706beee7e9f5d7874e87da96f4dad7734",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/e484b70e5f5464cc52a28f8280b79062f7bb43168dcd88b624d8ffa62f586d51.body.gz",
+              "sha256": "e484b70e5f5464cc52a28f8280b79062f7bb43168dcd88b624d8ffa62f586d51",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/3f5f14fb11ad1c41da50693788aeff04fdcbdf73254a3d091237f37db8887ca6.body.gz",
+              "sha256": "3f5f14fb11ad1c41da50693788aeff04fdcbdf73254a3d091237f37db8887ca6",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/31dd3c4b056341b3f8b1610c05d380a92d8761db55bddf9fb9241492f599f938.body.gz",
+              "sha256": "31dd3c4b056341b3f8b1610c05d380a92d8761db55bddf9fb9241492f599f938",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/c0f846df4e87c65da21a2fe8a9fc9af3a3e8b55dd090e11b8338406852e1959f.body.gz",
+              "sha256": "c0f846df4e87c65da21a2fe8a9fc9af3a3e8b55dd090e11b8338406852e1959f",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/5ad917c7cf43ef1df7b74f786392ba0fee18761f575a6ef84d5b07981b934fda.body.gz",
+              "sha256": "5ad917c7cf43ef1df7b74f786392ba0fee18761f575a6ef84d5b07981b934fda",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/770b912084d9cc76cf8f93f71b77f5e10044422722d4ddfed3d3a800390214dc.body.gz",
+              "sha256": "770b912084d9cc76cf8f93f71b77f5e10044422722d4ddfed3d3a800390214dc",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/30426ea5f39f47dc230c419d157e6514d894177972363e3c3a59cbf8891edab3.body.gz",
+              "sha256": "30426ea5f39f47dc230c419d157e6514d894177972363e3c3a59cbf8891edab3",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/cb10c5359b4d3f944640f7d4c867c8ed88ce59c037e7ce12bae611b16875a612.body.gz",
+              "sha256": "cb10c5359b4d3f944640f7d4c867c8ed88ce59c037e7ce12bae611b16875a612",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/3447b8c8078811902d403e0b1fbf00d4ed8d5e31b9dd7079065dbdbadf2696f8.body.gz",
+              "sha256": "3447b8c8078811902d403e0b1fbf00d4ed8d5e31b9dd7079065dbdbadf2696f8",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/f4033a77c5f51db640d48cc5b8de2050d64a7c89201bd8567de93b6911541d5a.body.gz",
+              "sha256": "f4033a77c5f51db640d48cc5b8de2050d64a7c89201bd8567de93b6911541d5a",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/b162f7f051e69ae43b49d23d1ebef083c0dd9e5a61062a4dbe1976fbf649b8ad.body.gz",
+              "sha256": "b162f7f051e69ae43b49d23d1ebef083c0dd9e5a61062a4dbe1976fbf649b8ad",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/a935019a208b987b8f124fe7cfad7201b502ae5af4bd89c8d733cc74d145221a.body.gz",
+              "sha256": "a935019a208b987b8f124fe7cfad7201b502ae5af4bd89c8d733cc74d145221a",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/dc2a025b3b0f8eb874fbf181350670ebcb7466a939237d28d823ff2bb78316c6.body.gz",
+              "sha256": "dc2a025b3b0f8eb874fbf181350670ebcb7466a939237d28d823ff2bb78316c6",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/e5f46d6ad3d48f48226eb0699fd10d8a8256fd7e4e6a8bad5a5c62a6a211dc4e.body.gz",
+              "sha256": "e5f46d6ad3d48f48226eb0699fd10d8a8256fd7e4e6a8bad5a5c62a6a211dc4e",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/a6faf8cbd8b1cc53521d9a363c266cab1423b28bd6ce9e0f6e39d42edbde6a31.body.gz",
+              "sha256": "a6faf8cbd8b1cc53521d9a363c266cab1423b28bd6ce9e0f6e39d42edbde6a31",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/cb94fa072088820fc01078322cb56ba545d113ded7e3e5eaad89ea3f3dd1e436.body.gz",
+              "sha256": "cb94fa072088820fc01078322cb56ba545d113ded7e3e5eaad89ea3f3dd1e436",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/77ed874b2a738dddd474d3b25107d0e7254a611d68fbdb19b4c53599175a326f.body.gz",
+              "sha256": "77ed874b2a738dddd474d3b25107d0e7254a611d68fbdb19b4c53599175a326f",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/de2436855748b816db0459e5adba82581d8372ffc7417dcc5a85d88f80273c4e.body.gz",
+              "sha256": "de2436855748b816db0459e5adba82581d8372ffc7417dcc5a85d88f80273c4e",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/cfe02b1c90d08a1123001f68c1938c5828404f63d9b48117aac89e2b9207360a.body.gz",
+              "sha256": "cfe02b1c90d08a1123001f68c1938c5828404f63d9b48117aac89e2b9207360a",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/acaae2d3a337b1753b89d4788c083c07964b58a52efc9929ccac67580e32da90.body.gz",
+              "sha256": "acaae2d3a337b1753b89d4788c083c07964b58a52efc9929ccac67580e32da90",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/9f06c56bee1c07db4236f7a07764b329372ff4a1987bd31f61ba9867a5f575c3.body.gz",
+              "sha256": "9f06c56bee1c07db4236f7a07764b329372ff4a1987bd31f61ba9867a5f575c3",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/35288d9b3bf6ce040184145e6a15e9a77313d5eebd4e57de654b3ead7495e518.body.gz",
+              "sha256": "35288d9b3bf6ce040184145e6a15e9a77313d5eebd4e57de654b3ead7495e518",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/3680646f910521cddb61509f2a74f9050cf37ab401dcd354e46bc1d3f97daa74.body.gz",
+              "sha256": "3680646f910521cddb61509f2a74f9050cf37ab401dcd354e46bc1d3f97daa74",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/e7ba4f3e172efbdd8a641267833e5a13090190d4cd59bd34ce1742acdf721bf8.body.gz",
+              "sha256": "e7ba4f3e172efbdd8a641267833e5a13090190d4cd59bd34ce1742acdf721bf8",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/dd0ad602fd6df8a67fa58bcc3061213352e8fa07b3b0b1cdc37b41b4b8eaabe8.body.gz",
+              "sha256": "dd0ad602fd6df8a67fa58bcc3061213352e8fa07b3b0b1cdc37b41b4b8eaabe8",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/57d547b12b2deb36e1c20a7873aa2379c188f7ad53d975b72cd0f1a1ecc4afef.body.gz",
+              "sha256": "57d547b12b2deb36e1c20a7873aa2379c188f7ad53d975b72cd0f1a1ecc4afef",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/1d93790f4476b9235c3a24bcc0e0cfe1bbc8a8be16346700b369d68d57c2b4f5.body.gz",
+              "sha256": "1d93790f4476b9235c3a24bcc0e0cfe1bbc8a8be16346700b369d68d57c2b4f5",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/61ecdef31e82086c589107dc0436c0c2b9938d0186d28fe0ba59a3dde678c59b.body.gz",
+              "sha256": "61ecdef31e82086c589107dc0436c0c2b9938d0186d28fe0ba59a3dde678c59b",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/fa418a16d036b482e5c3ecf0a23c0a58327ce4614b4a9201bcd8efba8945aeff.body.gz",
+              "sha256": "fa418a16d036b482e5c3ecf0a23c0a58327ce4614b4a9201bcd8efba8945aeff",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/f6221aec901e70a14c808fc5a0ebd4e016ab281cd963d3372426a92b6ae6b7f5.body.gz",
+              "sha256": "f6221aec901e70a14c808fc5a0ebd4e016ab281cd963d3372426a92b6ae6b7f5",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/b63bc5e5427af61c25c7caa46876e66a43842082b9fa2d3ead67838a04247aad.body.gz",
+              "sha256": "b63bc5e5427af61c25c7caa46876e66a43842082b9fa2d3ead67838a04247aad",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/651b321600f66f77f185e1158b3159ead0b1f9ee6232070daea46d8e8fe4cc0e.body.gz",
+              "sha256": "651b321600f66f77f185e1158b3159ead0b1f9ee6232070daea46d8e8fe4cc0e",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/dc609470faac96eb8ace2a15957120a80f8ac6aad67a554b32336ca3850112e6.body.gz",
+              "sha256": "dc609470faac96eb8ace2a15957120a80f8ac6aad67a554b32336ca3850112e6",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/98f6d8bf85f710e6e5773c0bf9c4d608c2c4d3699d0cbbf60362c572e57358aa.body.gz",
+              "sha256": "98f6d8bf85f710e6e5773c0bf9c4d608c2c4d3699d0cbbf60362c572e57358aa",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/640f383bde2e1c5415a0774a740e67e911d39e72aa7b1afae2a2bdf9267d8dcf.body.gz",
+              "sha256": "640f383bde2e1c5415a0774a740e67e911d39e72aa7b1afae2a2bdf9267d8dcf",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/d087b8eb09611bd50956f530c3ae789f60d1c952af86072190e30ea2a510e5a5.body.gz",
+              "sha256": "d087b8eb09611bd50956f530c3ae789f60d1c952af86072190e30ea2a510e5a5",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/927095aa55a5a74c092b89925c031b653886724b84c0fee449a813bc647b3239.body.gz",
+              "sha256": "927095aa55a5a74c092b89925c031b653886724b84c0fee449a813bc647b3239",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/71217ac518a67fcee5bc91b83916c981aa134f3f1fa840ec728dbb041f4ec6b4.body.gz",
+              "sha256": "71217ac518a67fcee5bc91b83916c981aa134f3f1fa840ec728dbb041f4ec6b4",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/d9271d5a8610e8b7ab572cc267f07821722019627127e80478974a60235e9d9f.body.gz",
+              "sha256": "d9271d5a8610e8b7ab572cc267f07821722019627127e80478974a60235e9d9f",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v310-live/bodies/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.body.gz",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "matches_filename": true
+            }
+          ],
+          "derived_artifacts": [],
+          "source_code_artifacts": [
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+              "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+            },
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/tests/test_v310_sources.py",
+              "sha256": "afd8fe187e1d91c14553a407ee62f371efd23e449133c33e0d6e689cafa26410"
+            }
+          ],
+          "validation_time_utc": "2026-10-03T10:20:06.708694+00:00",
+          "original_transformation": {
+            "path": "provider_validation/tests/build_interface_coverage.py",
+            "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
+          }
+        }
+      ],
+      "eligible_for_production_routing": false
+    },
+    {
+      "contract": {
+        "input_id": "ASTOCK-011",
+        "provider": "ths",
+        "endpoint": "earnings_consensus",
+        "display_name": "同花顺一致预期",
+        "data_kind": "forecast",
+        "data_frequency": "snapshot",
+        "request_shape": "single_symbol",
+        "collection_profile": "event_daily",
+        "implementation_status": "unimplemented",
+        "evidence_refs": [
+          "ASTOCK-011"
+        ],
+        "parameters": [
+          {
+            "name": "code",
+            "source": "request.symbol",
+            "value_type": "string",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          }
+        ],
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "canonical_input": null,
+        "runtime_endpoint": null,
+        "forbidden_sources": [],
+        "trading_date_parameter": null,
+        "request_interval_seconds": 3.0,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented",
+        "base_requests_per_fetch": 1
+      },
+      "collection_profile": {
+        "name": "event_daily",
+        "mode": "daily",
+        "refresh_interval_seconds": null,
+        "business_day": "calendar_day",
+        "scheduling_enabled": false
+      },
+      "evidence": [
+        {
+          "interface_id": "ASTOCK-011",
+          "path": "provider_validation/results/interface-records/ASTOCK-011.json",
+          "sha256": "5f2881d811d3b4faf1154bde2618eeb8ce21565fffcbc8fe816b903038dcc041",
+          "validation_result": "部分通过",
+          "evidence_status": "parsed_only",
+          "tested_scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×2；主机：basic.10jqka.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+          "coverage_denominator": 87,
+          "original_note": "通过：解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。；本轮低频真实探测 success：saved 1 file(s); usable=1。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×2；主机：basic.10jqka.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+          "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+          "response_artifacts": [],
+          "derived_artifacts": [
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/10_同花顺一致预期/data.csv",
+              "sha256": "f50f053e14d554367b2be6a11ac8e4780b397bef3aa2a02d543ed982c9f5a0ba",
+              "bytes": 165,
+              "field_names": [
+                "年度",
+                "预测机构数",
+                "最小值",
+                "均值",
+                "最大值",
+                "行业平均数"
+              ],
+              "row_count": 3
+            }
+          ],
+          "source_code_artifacts": [
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+              "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+            },
+            {
+              "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+              "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
+            }
+          ],
+          "validation_time_utc": "2026-10-03T10:20:06.803549+00:00",
+          "original_transformation": {
+            "path": "provider_validation/tests/build_interface_coverage.py",
+            "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
+          }
+        }
+      ],
+      "eligible_for_production_routing": false
+    },
+    {
+      "contract": {
+        "input_id": "ASTOCK-014",
+        "provider": "ths",
+        "endpoint": "hot_reason",
+        "display_name": "同花顺热点",
+        "data_kind": "snapshot",
+        "data_frequency": "snapshot",
+        "request_shape": "full_snapshot",
+        "collection_profile": "market_intraday",
+        "implementation_status": "unimplemented",
+        "evidence_refs": [
+          "ASTOCK-014"
+        ],
+        "parameters": [],
+        "limitations": [
+          "记录内含401响应，不能由部分非空返回推断完整性",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "canonical_input": null,
+        "runtime_endpoint": null,
+        "forbidden_sources": [],
+        "trading_date_parameter": null,
+        "request_interval_seconds": 3.0,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented",
+        "base_requests_per_fetch": 1
+      },
+      "collection_profile": {
+        "name": "market_intraday",
+        "mode": "intraday",
+        "refresh_interval_seconds": 60,
+        "business_day": "trading_day",
+        "scheduling_enabled": false
+      },
+      "evidence": [
+        {
+          "interface_id": "ASTOCK-014",
+          "path": "provider_validation/results/interface-records/ASTOCK-014.json",
+          "sha256": "8092b25fe173e4735331321487dd3990e86610624093bfac42ede366289bb62f",
+          "validation_result": "部分通过",
+          "evidence_status": "live_raw",
+          "tested_scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×17, HTTP401×29；主机：q.10jqka.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+          "coverage_denominator": 87,
+          "original_note": "通过：解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。；本轮低频真实探测 success：saved 1 file(s); usable=1。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×17, HTTP401×29；主机：q.10jqka.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+          "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+          "response_artifacts": [
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/f5fbebef7f2a4cab00055428994ef01dea3b90235b61f5867e396da1dcf4aa2c.body.gz",
+              "sha256": "f5fbebef7f2a4cab00055428994ef01dea3b90235b61f5867e396da1dcf4aa2c",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/ebc22898fe4f2fbd9494ea27b83c3ab5bee920ff2362c6866a28062a419e2291.body.gz",
+              "sha256": "ebc22898fe4f2fbd9494ea27b83c3ab5bee920ff2362c6866a28062a419e2291",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/ea5dd7ee4123a6f6b94b6d2b49e17059c4abd15784c3466b95f8d84e8f057230.body.gz",
+              "sha256": "ea5dd7ee4123a6f6b94b6d2b49e17059c4abd15784c3466b95f8d84e8f057230",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/4de8e47a4cef7116d72ceae6e2aaeca98d25c09737f4e68a0e571430cdeaeef3.body.gz",
+              "sha256": "4de8e47a4cef7116d72ceae6e2aaeca98d25c09737f4e68a0e571430cdeaeef3",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/fa1366efc8cd30b25e4b6bb4d18bc1d5f270412f09b110f9d1d4d2af5c5ee68e.body.gz",
+              "sha256": "fa1366efc8cd30b25e4b6bb4d18bc1d5f270412f09b110f9d1d4d2af5c5ee68e",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/3e69d8ba74c41ea6c1a1f7f6c227de4c003709179e3f29ee12980aad758aa54a.body.gz",
+              "sha256": "3e69d8ba74c41ea6c1a1f7f6c227de4c003709179e3f29ee12980aad758aa54a",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/c8c256b2497f437fd785998b947fd820d2f4561326059b7447d583f2a46c3f15.body.gz",
+              "sha256": "c8c256b2497f437fd785998b947fd820d2f4561326059b7447d583f2a46c3f15",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/aca325e8c737c2296851988d0640fd31e02c461a383ac77c6f8b90b7581deb94.body.gz",
+              "sha256": "aca325e8c737c2296851988d0640fd31e02c461a383ac77c6f8b90b7581deb94",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/64af3acc01ff3b87b53482be496cfa5598feea0e54b509a14ba06e611cea31b0.body.gz",
+              "sha256": "64af3acc01ff3b87b53482be496cfa5598feea0e54b509a14ba06e611cea31b0",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/9b4843ee52f24322414262bb9fbb6afb53a5ea8b182735299067d3b189521d06.body.gz",
+              "sha256": "9b4843ee52f24322414262bb9fbb6afb53a5ea8b182735299067d3b189521d06",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/ce97cd6d3e302215efe94aebc1bfbf3becdece4b88c1cb6a77c4988a29f87705.body.gz",
+              "sha256": "ce97cd6d3e302215efe94aebc1bfbf3becdece4b88c1cb6a77c4988a29f87705",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/9f2ecf02070ecd332f2177648476c4fa7bb52ae00322b464aec8cccff2ae66f9.body.gz",
+              "sha256": "9f2ecf02070ecd332f2177648476c4fa7bb52ae00322b464aec8cccff2ae66f9",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/292ae09f4f76a5ea9f1e4e22c4df6e81c3851985a7c713f9b985bd3ef8b29308.body.gz",
+              "sha256": "292ae09f4f76a5ea9f1e4e22c4df6e81c3851985a7c713f9b985bd3ef8b29308",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/5ec41e413e7e8776e0650847eda2b3d3486fd67bc9ccb1e5f79467de35da8898.body.gz",
+              "sha256": "5ec41e413e7e8776e0650847eda2b3d3486fd67bc9ccb1e5f79467de35da8898",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/fa781a0ba8428c2561343048a65f9cb6e61aafb998cea3d4ed2815ef40e702d0.body.gz",
+              "sha256": "fa781a0ba8428c2561343048a65f9cb6e61aafb998cea3d4ed2815ef40e702d0",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/d71109424ab0ea47e2747a04ad6d468a57b15e2c9b58c3b404fa5d5080010ebe.body.gz",
+              "sha256": "d71109424ab0ea47e2747a04ad6d468a57b15e2c9b58c3b404fa5d5080010ebe",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/12703a5fe0d0abe9886337c12cc1060bea8913ca19d85b72fd2c824dd96f5479.body.gz",
+              "sha256": "12703a5fe0d0abe9886337c12cc1060bea8913ca19d85b72fd2c824dd96f5479",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/d2b71285eb4984e3808b6cc8b74713c96f6d5567adb04b939b82d7b83a3a9222.body.gz",
+              "sha256": "d2b71285eb4984e3808b6cc8b74713c96f6d5567adb04b939b82d7b83a3a9222",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/1e2a8d4d14a6b7da4b59ac0847423c73a7d1a92455e3641118df1c92affaebfb.body.gz",
+              "sha256": "1e2a8d4d14a6b7da4b59ac0847423c73a7d1a92455e3641118df1c92affaebfb",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/1fcca9efcfef1969e25557df8ee815c226434d003986c64effc9aae381b90416.body.gz",
+              "sha256": "1fcca9efcfef1969e25557df8ee815c226434d003986c64effc9aae381b90416",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/f204b2b69017abf9273f74bd814ec822514df9dfd8c5ca7e98988b7acd997103.body.gz",
+              "sha256": "f204b2b69017abf9273f74bd814ec822514df9dfd8c5ca7e98988b7acd997103",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/a33b46e7d6b580069c7729e11da8c27a336655ceb386e3dbc0f79526187e17ed.body.gz",
+              "sha256": "a33b46e7d6b580069c7729e11da8c27a336655ceb386e3dbc0f79526187e17ed",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/1610e7cad59a8ea4a356fffa651648af07ec25c2e591c3d57e6c91ab227678d0.body.gz",
+              "sha256": "1610e7cad59a8ea4a356fffa651648af07ec25c2e591c3d57e6c91ab227678d0",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/969a9bb97f7283f22a5feb6460d24328ac76e14a64534561d51cfcb6c416113c.body.gz",
+              "sha256": "969a9bb97f7283f22a5feb6460d24328ac76e14a64534561d51cfcb6c416113c",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/899ad6b471ac207efa1d24b4cebc97e9fcc5f56e55188f9621140e9d67beaecc.body.gz",
+              "sha256": "899ad6b471ac207efa1d24b4cebc97e9fcc5f56e55188f9621140e9d67beaecc",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/f0a9f15f07b5bd58de823f3d6b70553c522c8b8fec803519c11d4fc6c5d77bda.body.gz",
+              "sha256": "f0a9f15f07b5bd58de823f3d6b70553c522c8b8fec803519c11d4fc6c5d77bda",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/1f273fbeffb95d2e60e67aa95b10dade4df4bba039a75d070e30c9f0d403bd23.body.gz",
+              "sha256": "1f273fbeffb95d2e60e67aa95b10dade4df4bba039a75d070e30c9f0d403bd23",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/2f36b3351799fdc85b44623de5780ef033fd7cc58b04a99d20c051283a40b155.body.gz",
+              "sha256": "2f36b3351799fdc85b44623de5780ef033fd7cc58b04a99d20c051283a40b155",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/9d1f93302d7a0c527613ebf38a67d2155b3fa557ddd9b113e73d8587abe0ad15.body.gz",
+              "sha256": "9d1f93302d7a0c527613ebf38a67d2155b3fa557ddd9b113e73d8587abe0ad15",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/6e3df060cf8aee27cb38d760d8afc430e101797f617deefd167ce57fba5fe5f8.body.gz",
+              "sha256": "6e3df060cf8aee27cb38d760d8afc430e101797f617deefd167ce57fba5fe5f8",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/626ade9667c40bd47061b16cdd1ef3a74a5226b0a5cb584186820189fe64012e.body.gz",
+              "sha256": "626ade9667c40bd47061b16cdd1ef3a74a5226b0a5cb584186820189fe64012e",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/0ce76b1ef40144180b15468cd9a506bf32b3e6e7dd8a1b721ea139bdfe312dc8.body.gz",
+              "sha256": "0ce76b1ef40144180b15468cd9a506bf32b3e6e7dd8a1b721ea139bdfe312dc8",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/7cb9e5c352f98c128e719b827c17f4e98b8c14607f53e7652d160e4859a4462e.body.gz",
+              "sha256": "7cb9e5c352f98c128e719b827c17f4e98b8c14607f53e7652d160e4859a4462e",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/09775a3bb5d1e629f6d5ad6eb00f3268e8510142d6400e2d74fb37ff2f4b882e.body.gz",
+              "sha256": "09775a3bb5d1e629f6d5ad6eb00f3268e8510142d6400e2d74fb37ff2f4b882e",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/6904ef850d2ef790ef89fc774a0dcee30c2e08bc1c29c324fefc172bd21e9d8f.body.gz",
+              "sha256": "6904ef850d2ef790ef89fc774a0dcee30c2e08bc1c29c324fefc172bd21e9d8f",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/b925cdc85f4ce4ef71aa70699809f0506544039ae202583afbce32fe9777cb50.body.gz",
+              "sha256": "b925cdc85f4ce4ef71aa70699809f0506544039ae202583afbce32fe9777cb50",
+              "matches_filename": true
+            }
+          ],
+          "derived_artifacts": [
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/13_同花顺热点/data.csv",
+              "sha256": "c96f7815d5a23a0e78011dc93f02209a6ac1227340274e5bed29f598a292d97c",
+              "bytes": 8032,
+              "field_names": [
+                "name",
+                "code"
+              ],
+              "row_count": 375
+            }
+          ],
+          "source_code_artifacts": [
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+              "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+            },
+            {
+              "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+              "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
+            }
+          ],
+          "validation_time_utc": "2026-10-03T10:20:06.873920+00:00",
+          "original_transformation": {
+            "path": "provider_validation/tests/build_interface_coverage.py",
+            "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
+          }
+        }
+      ],
+      "eligible_for_production_routing": false
+    },
+    {
+      "contract": {
+        "input_id": "ASTOCK-030",
+        "provider": "sse",
+        "endpoint": "etf_shares",
+        "display_name": "ETF 份额",
+        "data_kind": "time_series",
+        "data_frequency": "daily",
+        "request_shape": "date_snapshot",
+        "collection_profile": "market_after_close",
+        "implementation_status": "unimplemented",
+        "evidence_refs": [
+          "ASTOCK-030"
+        ],
+        "parameters": [
+          {
+            "name": "date",
+            "source": "request.trade_date",
+            "value_type": "date",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          },
+          {
+            "name": "exchange",
+            "source": "request.exchange",
+            "value_type": "string",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          }
+        ],
+        "limitations": [
+          "已测上交所日期数据，深交所当前快照未测",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "canonical_input": null,
+        "runtime_endpoint": null,
+        "forbidden_sources": [],
+        "trading_date_parameter": "date",
+        "request_interval_seconds": 3.0,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented",
+        "base_requests_per_fetch": 1
+      },
+      "collection_profile": {
+        "name": "market_after_close",
+        "mode": "after_close",
+        "refresh_interval_seconds": null,
+        "business_day": "trading_day",
+        "scheduling_enabled": false
+      },
+      "evidence": [
+        {
+          "interface_id": "ASTOCK-030",
+          "path": "provider_validation/results/interface-records/ASTOCK-030.json",
+          "sha256": "99e0b778d15bd69aae845b8d4dc0d70a9763c86ee13c8bdb80c470304840a0aa",
+          "validation_result": "通过",
+          "evidence_status": "live_raw",
+          "tested_scope": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。",
+          "coverage_denominator": 87,
+          "original_note": "通过。本轮联网样例仅覆盖上交所日期数据，未测深交所当前快照。",
+          "manifest_ref": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+          "response_artifacts": [
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/30a88d08c745cd399972cea86c49065b279c7965aa726bbfc4796a4bc6309478.body.gz",
+              "sha256": "30a88d08c745cd399972cea86c49065b279c7965aa726bbfc4796a4bc6309478",
+              "matches_filename": true
+            }
+          ],
+          "derived_artifacts": [],
+          "source_code_artifacts": [
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+              "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+            },
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py",
+              "sha256": "ec18390ee2be31b5f72f4a0ff7c85ef3753a086ee9c43693bea00b08cab0ce09"
+            }
+          ],
+          "validation_time_utc": "2026-10-03T10:20:07.047824+00:00",
+          "original_transformation": {
+            "path": "provider_validation/tests/build_interface_coverage.py",
+            "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
+          }
+        }
+      ],
+      "eligible_for_production_routing": false
+    },
+    {
+      "contract": {
+        "input_id": "ASTOCK-031",
+        "provider": "eastmoney",
+        "endpoint": "stock_news",
+        "display_name": "个股新闻",
+        "data_kind": "document_index",
+        "data_frequency": "snapshot",
+        "request_shape": "single_symbol",
+        "collection_profile": "news_intraday",
+        "implementation_status": "unimplemented",
+        "evidence_refs": [
+          "ASTOCK-031"
+        ],
+        "parameters": [
+          {
+            "name": "code",
+            "source": "request.symbol",
+            "value_type": "string",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          }
+        ],
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "canonical_input": null,
+        "runtime_endpoint": null,
+        "forbidden_sources": [],
+        "trading_date_parameter": null,
+        "request_interval_seconds": 3.0,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented",
+        "base_requests_per_fetch": 1
+      },
+      "collection_profile": {
+        "name": "news_intraday",
+        "mode": "intraday",
+        "refresh_interval_seconds": 300,
+        "business_day": "calendar_day",
+        "scheduling_enabled": false
+      },
+      "evidence": [
+        {
+          "interface_id": "ASTOCK-031",
+          "path": "provider_validation/results/interface-records/ASTOCK-031.json",
+          "sha256": "ab4897b2e85474f342250b50cd4a1e0f537d01599df56e8707fb7cf83eb6b6b1",
+          "validation_result": "部分通过",
+          "evidence_status": "parsed_only",
+          "tested_scope": "低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+          "coverage_denominator": 87,
+          "original_note": "通过：解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。；本轮低频真实探测 success：saved 1 file(s); usable=1。低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+          "manifest_ref": "",
+          "response_artifacts": [],
+          "derived_artifacts": [
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/29_个股新闻/data.csv",
+              "sha256": "ce0cdf968cc84c05d891da7c6b1b6cacea67bd4ddb187b7d2a500142b69c81bb",
+              "bytes": 4293,
+              "field_names": [
+                "关键词",
+                "新闻标题",
+                "新闻内容",
+                "发布时间",
+                "文章来源",
+                "新闻链接"
+              ],
+              "row_count": 10
+            }
+          ],
+          "source_code_artifacts": [
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+              "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+            },
+            {
+              "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+              "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
+            }
+          ],
+          "validation_time_utc": "2026-10-03T10:20:07.083585+00:00",
+          "original_transformation": {
+            "path": "provider_validation/tests/build_interface_coverage.py",
+            "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
+          }
+        }
+      ],
+      "eligible_for_production_routing": false
+    },
+    {
+      "contract": {
+        "input_id": "ASTOCK-037",
+        "provider": "script_composite",
+        "endpoint": "company_profile",
+        "display_name": "F10 文本",
+        "data_kind": "composite",
+        "data_frequency": "snapshot",
+        "request_shape": "single_symbol",
+        "collection_profile": "event_daily",
+        "implementation_status": "unimplemented",
+        "evidence_refs": [
+          "ASTOCK-037"
+        ],
+        "parameters": [
+          {
+            "name": "code",
+            "source": "request.symbol",
+            "value_type": "string",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          }
+        ],
+        "limitations": [
+          "复合输出必须拆分成功子接口；不能标为通达信F10完整能力",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "canonical_input": null,
+        "runtime_endpoint": null,
+        "forbidden_sources": [],
+        "trading_date_parameter": null,
+        "request_interval_seconds": 3.0,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented",
+        "base_requests_per_fetch": 1
+      },
+      "collection_profile": {
+        "name": "event_daily",
+        "mode": "daily",
+        "refresh_interval_seconds": null,
+        "business_day": "calendar_day",
+        "scheduling_enabled": false
+      },
+      "evidence": [
+        {
+          "interface_id": "ASTOCK-037",
+          "path": "provider_validation/results/interface-records/ASTOCK-037.json",
+          "sha256": "2a15406a4fbe6e9261e07395046c86f96631bc04aeb3d1ad7a57b746afd91248",
+          "validation_result": "部分通过",
+          "evidence_status": "live_raw",
+          "tested_scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×5, transport_error×1；主机：basic.10jqka.com.cn, datacenter-web.eastmoney.com, emweb.securities.eastmoney.com, push2.eastmoney.com, webapi.cninfo.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+          "coverage_denominator": 87,
+          "original_note": "部分：5个子结果中个股信息文件内是ProxyError；其余4个子文件有数据，因此仅部分返回。；本轮低频真实探测 partial：5 outputs: usable=3, errors=2。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×5, transport_error×1；主机：basic.10jqka.com.cn, datacenter-web.eastmoney.com, emweb.securities.eastmoney.com, push2.eastmoney.com, webapi.cninfo.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+          "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+          "response_artifacts": [
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/ef8be25eebd4b5ebe01f92930bcbc59ff6abdc9b2411fb03002ee05628025241.body.gz",
+              "sha256": "ef8be25eebd4b5ebe01f92930bcbc59ff6abdc9b2411fb03002ee05628025241",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/9f6f270d58fe87dfb6a6c3df35de7475d95ee83750105cfa653144e38f2a0b81.body.gz",
+              "sha256": "9f6f270d58fe87dfb6a6c3df35de7475d95ee83750105cfa653144e38f2a0b81",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/235673dbe4d79fec9eed2a592e05d5232fbed11481c9e0b74993722e88fb9eea.body.gz",
+              "sha256": "235673dbe4d79fec9eed2a592e05d5232fbed11481c9e0b74993722e88fb9eea",
+              "matches_filename": true
+            }
+          ],
+          "derived_artifacts": [
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/business_composition_em.json",
+              "sha256": "dfc831d7a5134fe93e2265d3585e2b307944bedfb0b523f45f718e0fd4365791",
+              "bytes": 37,
+              "row_count": null
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/company_events_em.csv",
+              "sha256": "8592ae85c936e3948cd0f99ec1740d856dbac866955005e8861a3ee7dcd195a9",
+              "bytes": 35749,
+              "field_names": [
+                "序号",
+                "代码",
+                "简称",
+                "事件类型",
+                "具体事项",
+                "交易日"
+              ],
+              "row_count": 75
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/individual_info_em.json",
+              "sha256": "e09489a5fbe1f663b8a63bc2cab06280cf50ba4508a10fc957a5b1e73ee04f3c",
+              "bytes": 108,
+              "row_count": null
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/main_business_ths.csv",
+              "sha256": "4a3eb62c1cf920f5791fb7980b455fb1911fa2549ee133784ec5f02a57fe9c17",
+              "bytes": 504,
+              "field_names": [
+                "股票代码",
+                "主营业务",
+                "产品类型",
+                "产品名称",
+                "经营范围"
+              ],
+              "row_count": 1
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/profile_cninfo.csv",
+              "sha256": "d150bfd361991954244e845181f46997a5389412d3a037e9a9f3ea6b81004600",
+              "bytes": 1999,
+              "field_names": [
+                "公司名称",
+                "英文名称",
+                "曾用简称",
+                "A股代码",
+                "A股简称",
+                "B股代码",
+                "B股简称",
+                "H股代码",
+                "H股简称",
+                "入选指数",
+                "所属市场",
+                "所属行业",
+                "法人代表",
+                "注册资金",
+                "成立日期",
+                "上市日期",
+                "官方网站",
+                "电子邮箱",
+                "联系电话",
+                "传真",
+                "注册地址",
+                "办公地址",
+                "邮政编码",
+                "主营业务",
+                "经营范围",
+                "机构简介"
+              ],
+              "row_count": 1
+            }
+          ],
+          "source_code_artifacts": [
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+              "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+            },
+            {
+              "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+              "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
+            }
+          ],
+          "validation_time_utc": "2026-10-03T10:20:07.147050+00:00",
+          "original_transformation": {
+            "path": "provider_validation/tests/build_interface_coverage.py",
+            "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
+          }
+        }
+      ],
+      "eligible_for_production_routing": false
+    },
+    {
+      "contract": {
+        "input_id": "ASTOCK-039",
+        "provider": "sina",
+        "endpoint": "financial_statements",
+        "display_name": "新浪财报三表",
+        "data_kind": "table",
+        "data_frequency": "report_period",
+        "request_shape": "single_symbol",
+        "collection_profile": "event_daily",
+        "implementation_status": "unimplemented",
+        "evidence_refs": [
+          "ASTOCK-039"
+        ],
+        "parameters": [
+          {
+            "name": "code",
+            "source": "request.symbol",
+            "value_type": "string",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          }
+        ],
+        "limitations": [
+          "三张报表分别保留报告期、披露时间和来源字段，尚未定义生产标准表",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "canonical_input": null,
+        "runtime_endpoint": null,
+        "forbidden_sources": [],
+        "trading_date_parameter": null,
+        "request_interval_seconds": 3.0,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented",
+        "base_requests_per_fetch": 1
+      },
+      "collection_profile": {
+        "name": "event_daily",
+        "mode": "daily",
+        "refresh_interval_seconds": null,
+        "business_day": "calendar_day",
+        "scheduling_enabled": false
+      },
+      "evidence": [
+        {
+          "interface_id": "ASTOCK-039",
+          "path": "provider_validation/results/interface-records/ASTOCK-039.json",
+          "sha256": "fb3f14fa54d9b7fbed6be8ee7081ad0c06e4357d1a2a9ba742c023379e03a8b8",
+          "validation_result": "部分通过",
+          "evidence_status": "live_raw",
+          "tested_scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×3；主机：quotes.sina.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+          "coverage_denominator": 87,
+          "original_note": "通过：解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。；本轮低频真实探测 success：saved 3 files; usable=3。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×3；主机：quotes.sina.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+          "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+          "response_artifacts": [
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/3c00915108233b0c7727831ffdeec6ddced5a088bfc53a329d991110fc48c77c.body.gz",
+              "sha256": "3c00915108233b0c7727831ffdeec6ddced5a088bfc53a329d991110fc48c77c",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/e2f52c5a261901d8825555b0f6e353018633b30447e9e74da7f15372383735db.body.gz",
+              "sha256": "e2f52c5a261901d8825555b0f6e353018633b30447e9e74da7f15372383735db",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/fdfd259b762555afd43a1f0cf378bc031d1b54c910f0868cf9c304657e1bb883.body.gz",
+              "sha256": "fdfd259b762555afd43a1f0cf378bc031d1b54c910f0868cf9c304657e1bb883",
+              "matches_filename": true
+            }
+          ],
+          "derived_artifacts": [
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/37_新浪财报三表/data/利润表.csv",
+              "sha256": "9cc4f84bdf67b88834cae7112edd8dbdc765053d1a9575beae7c75ab690dc59a",
+              "bytes": 48837,
+              "field_names": [
+                "报告日",
+                "营业总收入",
+                "营业收入",
+                "利息收入",
+                "已赚保费",
+                "手续费及佣金收入",
+                "房地产销售收入",
+                "其他业务收入",
+                "营业总成本",
+                "营业成本",
+                "手续费及佣金支出",
+                "房地产销售成本",
+                "退保金",
+                "赔付支出净额",
+                "提取保险合同准备金净额",
+                "保单红利支出",
+                "分保费用",
+                "其他业务成本",
+                "营业税金及附加",
+                "研发费用",
+                "销售费用",
+                "管理费用",
+                "财务费用",
+                "利息费用",
+                "利息支出",
+                "投资收益",
+                "对联营企业和合营企业的投资收益",
+                "以摊余成本计量的金融资产终止确认产生的收益",
+                "汇兑收益",
+                "净敞口套期收益",
+                "公允价值变动收益",
+                "期货损益",
+                "托管收益",
+                "补贴收入",
+                "其他收益",
+                "资产减值损失",
+                "信用减值损失",
+                "其他业务利润",
+                "资产处置收益",
+                "营业利润",
+                "营业外收入",
+                "非流动资产处置利得",
+                "营业外支出",
+                "非流动资产处置损失",
+                "利润总额",
+                "所得税费用",
+                "未确认投资损失",
+                "净利润",
+                "持续经营净利润",
+                "终止经营净利润",
+                "归属于母公司所有者的净利润",
+                "被合并方在合并前实现净利润",
+                "少数股东损益",
+                "其他综合收益",
+                "归属于母公司所有者的其他综合收益",
+                "（一）以后不能重分类进损益的其他综合收益",
+                "重新计量设定受益计划变动额",
+                "权益法下不能转损益的其他综合收益",
+                "其他权益工具投资公允价值变动",
+                "企业自身信用风险公允价值变动",
+                "（二）以后将重分类进损益的其他综合收益",
+                "权益法下可转损益的其他综合收益",
+                "可供出售金融资产公允价值变动损益",
+                "其他债权投资公允价值变动",
+                "金融资产重分类计入其他综合收益的金额",
+                "其他债权投资信用减值准备",
+                "持有至到期投资重分类为可供出售金融资产损益",
+                "现金流量套期储备",
+                "现金流量套期损益的有效部分",
+                "外币财务报表折算差额",
+                "其他",
+                "归属于少数股东的其他综合收益",
+                "综合收益总额",
+                "归属于母公司所有者的综合收益总额",
+                "归属于少数股东的综合收益总额",
+                "基本每股收益",
+                "稀释每股收益",
+                "数据源",
+                "是否审计",
+                "公告日期",
+                "币种",
+                "类型",
+                "更新日期"
+              ],
+              "row_count": 103
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/37_新浪财报三表/data/现金流量表.csv",
+              "sha256": "9a32c874339ab1d12dfb47cd0e5afdf1349660a900d83e0383943ba4a1fb0553",
+              "bytes": 50722,
+              "field_names": [
+                "报告日",
+                "经营活动产生的现金流量",
+                "销售商品、提供劳务收到的现金",
+                "客户存款和同业存放款项净增加额",
+                "向中央银行借款净增加额",
+                "向其他金融机构拆入资金净增加额",
+                "收到原保险合同保费取得的现金",
+                "收到再保险业务现金净额",
+                "保户储金及投资款净增加额",
+                "处置交易性金融资产净增加额",
+                "收取利息、手续费及佣金的现金",
+                "拆入资金净增加额",
+                "回购业务资金净增加额",
+                "收到的税费返还",
+                "收到的其他与经营活动有关的现金",
+                "经营活动现金流入小计",
+                "购买商品、接受劳务支付的现金",
+                "客户贷款及垫款净增加额",
+                "存放中央银行和同业款项净增加额",
+                "支付原保险合同赔付款项的现金",
+                "支付利息、手续费及佣金的现金",
+                "支付保单红利的现金",
+                "支付给职工以及为职工支付的现金",
+                "支付的各项税费",
+                "支付的其他与经营活动有关的现金",
+                "经营活动现金流出小计",
+                "经营活动产生的现金流量净额",
+                "投资活动产生的现金流量",
+                "收回投资所收到的现金",
+                "取得投资收益收到的现金",
+                "处置固定资产、无形资产和其他长期资产所收回的现金净额",
+                "处置子公司及其他营业单位收到的现金净额",
+                "收到的其他与投资活动有关的现金",
+                "减少质押和定期存款所收到的现金",
+                "处置可供出售金融资产净增加额",
+                "投资活动现金流入小计",
+                "购建固定资产、无形资产和其他长期资产所支付的现金",
+                "投资所支付的现金",
+                "质押贷款净增加额",
+                "取得子公司及其他营业单位支付的现金净额",
+                "增加质押和定期存款所支付的现金",
+                "支付的其他与投资活动有关的现金",
+                "投资活动现金流出小计",
+                "投资活动产生的现金流量净额",
+                "筹资活动产生的现金流量",
+                "吸收投资收到的现金",
+                "子公司吸收少数股东投资收到的现金",
+                "取得借款收到的现金",
+                "发行债券收到的现金",
+                "收到其他与筹资活动有关的现金",
+                "筹资活动现金流入小计",
+                "偿还债务支付的现金",
+                "分配股利、利润或偿付利息所支付的现金",
+                "子公司支付给少数股东的股利、利润",
+                "支付其他与筹资活动有关的现金",
+                "筹资活动现金流出小计",
+                "筹资活动产生的现金流量净额",
+                "汇率变动对现金及现金等价物的影响",
+                "现金及现金等价物净增加额",
+                "期初现金及现金等价物余额",
+                "现金的期末余额",
+                "现金的期初余额",
+                "现金等价物的期末余额",
+                "现金等价物的期初余额",
+                "期末现金及现金等价物余额",
+                "数据源",
+                "是否审计",
+                "公告日期",
+                "币种",
+                "类型",
+                "更新日期"
+              ],
+              "row_count": 99
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/37_新浪财报三表/data/资产负债表.csv",
+              "sha256": "ef606d8d009ad5f053cfbd9502ac7360b4657d68b3ea475b9f3d9adc9b8dffa2",
+              "bytes": 84191,
+              "field_names": [
+                "报告日",
+                "流动资产",
+                "货币资金",
+                "结算备付金",
+                "拆出资金",
+                "交易性金融资产",
+                "买入返售金融资产",
+                "衍生金融资产",
+                "应收票据及应收账款",
+                "应收票据",
+                "应收账款",
+                "应收款项融资",
+                "预付款项",
+                "应收股利",
+                "应收利息",
+                "应收保费",
+                "应收分保账款",
+                "应收分保合同准备金",
+                "应收出口退税",
+                "应收补贴款",
+                "应收保证金",
+                "内部应收款",
+                "其他应收款",
+                "其他应收款(合计)",
+                "存货",
+                "划分为持有待售的资产",
+                "待摊费用",
+                "待处理流动资产损益",
+                "一年内到期的非流动资产",
+                "其他流动资产",
+                "流动资产合计",
+                "非流动资产",
+                "发放贷款及垫款",
+                "债权投资",
+                "其他债权投资",
+                "以公允价值计量且其变动计入其他综合收益的金融资产",
+                "以摊余成本计量的金融资产",
+                "可供出售金融资产",
+                "长期股权投资",
+                "投资性房地产",
+                "长期应收款",
+                "其他权益工具投资",
+                "其他非流动金融资产",
+                "其他长期投资",
+                "固定资产原值",
+                "累计折旧",
+                "固定资产净值",
+                "固定资产减值准备",
+                "在建工程合计",
+                "在建工程",
+                "工程物资",
+                "固定资产净额",
+                "固定资产清理",
+                "固定资产及清理合计",
+                "生产性生物资产",
+                "公益性生物资产",
+                "油气资产",
+                "合同资产",
+                "使用权资产",
+                "无形资产",
+                "开发支出",
+                "商誉",
+                "长期待摊费用",
+                "股权分置流通权",
+                "递延所得税资产",
+                "其他非流动资产",
+                "非流动资产合计",
+                "资产总计",
+                "流动负债",
+                "短期借款",
+                "向中央银行借款",
+                "吸收存款及同业存放",
+                "拆入资金",
+                "交易性金融负债",
+                "衍生金融负债",
+                "应付票据及应付账款",
+                "应付票据",
+                "应付账款",
+                "预收款项",
+                "合同负债",
+                "卖出回购金融资产款",
+                "应付手续费及佣金",
+                "应付职工薪酬",
+                "应交税费",
+                "应付利息",
+                "应付股利",
+                "应付保证金",
+                "内部应付款",
+                "其他应付款",
+                "其他应付款合计",
+                "其他应交款",
+                "担保责任赔偿准备金",
+                "应付分保账款",
+                "保险合同准备金",
+                "代理买卖证券款",
+                "代理承销证券款",
+                "国际票证结算",
+                "国内票证结算",
+                "预提费用",
+                "预计流动负债",
+                "应付短期债券",
+                "划分为持有待售的负债",
+                "一年内的递延收益",
+                "一年内到期的非流动负债",
+                "其他流动负债",
+                "流动负债合计",
+                "非流动负债",
+                "长期借款",
+                "应付债券",
+                "应付债券：优先股",
+                "应付债券：永续债",
+                "租赁负债",
+                "长期应付职工薪酬",
+                "长期应付款",
+                "长期应付款合计",
+                "专项应付款",
+                "预计非流动负债",
+                "长期递延收益",
+                "递延所得税负债",
+                "其他非流动负债",
+                "非流动负债合计",
+                "负债合计",
+                "所有者权益",
+                "实收资本(或股本)",
+                "其他权益工具",
+                "优先股",
+                "永续债",
+                "资本公积",
+                "减:库存股",
+                "其他综合收益",
+                "专项储备",
+                "盈余公积",
+                "一般风险准备",
+                "未确定的投资损失",
+                "未分配利润",
+                "拟分配现金股利",
+                "外币报表折算差额",
+                "归属于母公司股东权益合计",
+                "少数股东权益",
+                "所有者权益(或股东权益)合计",
+                "负债和所有者权益(或股东权益)总计",
+                "数据源",
+                "是否审计",
+                "公告日期",
+                "币种",
+                "类型",
+                "更新日期"
+              ],
+              "row_count": 103
+            }
+          ],
+          "source_code_artifacts": [
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+              "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+            },
+            {
+              "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+              "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
+            }
+          ],
+          "validation_time_utc": "2026-10-03T10:20:07.213064+00:00",
+          "original_transformation": {
+            "path": "provider_validation/tests/build_interface_coverage.py",
+            "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
+          }
+        }
+      ],
+      "eligible_for_production_routing": false
+    },
+    {
+      "contract": {
+        "input_id": "ASTOCK-044",
+        "provider": "eastmoney",
+        "endpoint": "st_list",
+        "display_name": "ST 名单",
+        "data_kind": "snapshot",
+        "data_frequency": "snapshot",
+        "request_shape": "full_snapshot",
+        "collection_profile": "reference_daily",
+        "implementation_status": "unimplemented",
+        "evidence_refs": [
+          "ASTOCK-044"
+        ],
+        "parameters": [],
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "canonical_input": null,
+        "runtime_endpoint": null,
+        "forbidden_sources": [],
+        "trading_date_parameter": null,
+        "request_interval_seconds": 3.0,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented",
+        "base_requests_per_fetch": 1
+      },
+      "collection_profile": {
+        "name": "reference_daily",
+        "mode": "daily",
+        "refresh_interval_seconds": null,
+        "business_day": "trading_day",
+        "scheduling_enabled": false
+      },
+      "evidence": [
+        {
+          "interface_id": "ASTOCK-044",
+          "path": "provider_validation/results/interface-records/ASTOCK-044.json",
+          "sha256": "22da10e101139934a264849b60812b10731dbfbbe41222c9ecde3539d4f48685",
+          "validation_result": "通过",
+          "evidence_status": "live_raw",
+          "tested_scope": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。",
+          "coverage_denominator": 87,
+          "original_note": "通过。对应联网测试返回非空数据并通过字段/来源检查；范围见原始请求清单。",
+          "manifest_ref": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+          "response_artifacts": [],
+          "derived_artifacts": [],
+          "source_code_artifacts": [
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+              "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+            },
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py",
+              "sha256": "ec18390ee2be31b5f72f4a0ff7c85ef3753a086ee9c43693bea00b08cab0ce09"
+            }
+          ],
+          "validation_time_utc": "2026-10-03T10:20:07.255894+00:00",
+          "original_transformation": {
+            "path": "provider_validation/tests/build_interface_coverage.py",
+            "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
+          }
+        }
+      ],
+      "eligible_for_production_routing": false
+    },
+    {
+      "contract": {
+        "input_id": "ASTOCK-051",
+        "provider": "eastmoney",
+        "endpoint": "intraday_changes",
+        "display_name": "东财日内异动池（明细接口）",
+        "data_kind": "event",
+        "data_frequency": "snapshot",
+        "request_shape": "full_snapshot",
+        "collection_profile": "market_intraday",
+        "implementation_status": "unimplemented",
+        "evidence_refs": [
+          "ASTOCK-051"
+        ],
+        "parameters": [],
+        "limitations": [
+          "逐异动类型展开请求；日期和完整性待迁移核验",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "canonical_input": null,
+        "runtime_endpoint": null,
+        "forbidden_sources": [],
+        "trading_date_parameter": null,
+        "request_interval_seconds": 3.0,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented",
+        "base_requests_per_fetch": 1
+      },
+      "collection_profile": {
+        "name": "market_intraday",
+        "mode": "intraday",
+        "refresh_interval_seconds": 60,
+        "business_day": "trading_day",
+        "scheduling_enabled": false
+      },
+      "evidence": [
+        {
+          "interface_id": "ASTOCK-051",
+          "path": "provider_validation/results/interface-records/ASTOCK-051.json",
+          "sha256": "e95d4f651f151fda31ee2765affe0d1c3feddb757b275b6265e59ee1c92ff637",
+          "validation_result": "部分通过",
+          "evidence_status": "live_raw",
+          "tested_scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×22；主机：push2ex.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+          "coverage_denominator": 87,
+          "original_note": "部分：7831行异动明细，但输出无请求日期字段，原始返回未留存。；本轮低频真实探测 success：saved 1 file(s); usable=1。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×22；主机：push2ex.eastmoney.com；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+          "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+          "response_artifacts": [
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/b29f298faa3998b897db395251f08b636e2687a4a3132d5779df9569b02782b0.body.gz",
+              "sha256": "b29f298faa3998b897db395251f08b636e2687a4a3132d5779df9569b02782b0",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/596cf9ef47367a192f6f1af7ed898925fa749056f584756e8a8e12ddcb59fd9f.body.gz",
+              "sha256": "596cf9ef47367a192f6f1af7ed898925fa749056f584756e8a8e12ddcb59fd9f",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/249f89e882224beb6684f076653c87de3cdbd7178d31a6d440aec4653843e1d4.body.gz",
+              "sha256": "249f89e882224beb6684f076653c87de3cdbd7178d31a6d440aec4653843e1d4",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/af23a14951d65d8f68e33add6176ad32b5f18687c4f0e0c5d0f2a445be964637.body.gz",
+              "sha256": "af23a14951d65d8f68e33add6176ad32b5f18687c4f0e0c5d0f2a445be964637",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/e81096a1bd339bdd14020153417dc3b1766378239117e13e3d626b2e3928b38f.body.gz",
+              "sha256": "e81096a1bd339bdd14020153417dc3b1766378239117e13e3d626b2e3928b38f",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/a39989243d3104aaa0a592921af6b16182661b44001a4b906062b31fcd6290c9.body.gz",
+              "sha256": "a39989243d3104aaa0a592921af6b16182661b44001a4b906062b31fcd6290c9",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/c125d09f654caf5996d7d5188c938c83c0d2aa57393349d1207bd055fb94a39e.body.gz",
+              "sha256": "c125d09f654caf5996d7d5188c938c83c0d2aa57393349d1207bd055fb94a39e",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/321f16a2a080b7bb53657a3204d2ee6346c657fecaad4e97301d821187f0dae0.body.gz",
+              "sha256": "321f16a2a080b7bb53657a3204d2ee6346c657fecaad4e97301d821187f0dae0",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/9cf6b6f5e23beb466fc8f78a660cb0edad8ff62f1fe30d0b87bdad0b76baf658.body.gz",
+              "sha256": "9cf6b6f5e23beb466fc8f78a660cb0edad8ff62f1fe30d0b87bdad0b76baf658",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/0c36bef5b1413480c56381670473c748aedaae6c1f47e0f1cff058b8025f39a9.body.gz",
+              "sha256": "0c36bef5b1413480c56381670473c748aedaae6c1f47e0f1cff058b8025f39a9",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/1cd7fbe74b6457eaabff9b44822b6f3fec7bd8b08bfcd44bf2971cd7760dc7c0.body.gz",
+              "sha256": "1cd7fbe74b6457eaabff9b44822b6f3fec7bd8b08bfcd44bf2971cd7760dc7c0",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/66f1e0cf797b6a9f519378da7c94b092e32d04786bf9ea771be1aa2e135f981d.body.gz",
+              "sha256": "66f1e0cf797b6a9f519378da7c94b092e32d04786bf9ea771be1aa2e135f981d",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/4fc927d304ac8d576c34f59116a5031b6c3d2409675095b227f157e672d77e43.body.gz",
+              "sha256": "4fc927d304ac8d576c34f59116a5031b6c3d2409675095b227f157e672d77e43",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/bdb7cdaad4729d324b8d8ed93c101ed8693ff85f549db4fb9b73deebdf65f25c.body.gz",
+              "sha256": "bdb7cdaad4729d324b8d8ed93c101ed8693ff85f549db4fb9b73deebdf65f25c",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/a3b6bc1e34c513bf08b3a2da2a39cc686f49a6df6cafeba394eae62ac221f5e1.body.gz",
+              "sha256": "a3b6bc1e34c513bf08b3a2da2a39cc686f49a6df6cafeba394eae62ac221f5e1",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/7bfe5cd05abf2c07bc01a1f5c3572725ee6064d1d77954e20b3765d16a8786ae.body.gz",
+              "sha256": "7bfe5cd05abf2c07bc01a1f5c3572725ee6064d1d77954e20b3765d16a8786ae",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/1a05e2f07a6e2eeaac6d24297a67af3b07e2283b8c4935f55331932bd9b77aa1.body.gz",
+              "sha256": "1a05e2f07a6e2eeaac6d24297a67af3b07e2283b8c4935f55331932bd9b77aa1",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/97c10fbb438fd3c8a268ff30bb60c2e2ac2e4e14ed0d8066d61a32628a9f372d.body.gz",
+              "sha256": "97c10fbb438fd3c8a268ff30bb60c2e2ac2e4e14ed0d8066d61a32628a9f372d",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/da5006c097cde288796152d8e630fe2c2cb9a5a549e78fc2553a1a1eb1b34b98.body.gz",
+              "sha256": "da5006c097cde288796152d8e630fe2c2cb9a5a549e78fc2553a1a1eb1b34b98",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/c4aaa1d068702ff03ebb1af06916759e3b580d2c3cca85f3c9c88ae844531d3f.body.gz",
+              "sha256": "c4aaa1d068702ff03ebb1af06916759e3b580d2c3cca85f3c9c88ae844531d3f",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/bfd8a6df9d6d47ec77adb06ce7c51ffee9b39d0c1f3738b812d55e636c9acb66.body.gz",
+              "sha256": "bfd8a6df9d6d47ec77adb06ce7c51ffee9b39d0c1f3738b812d55e636c9acb66",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/024a282e3047cee8faf60c48d4afc0d02eda20dd64600d82c6b5ff03cbab7ef5.body.gz",
+              "sha256": "024a282e3047cee8faf60c48d4afc0d02eda20dd64600d82c6b5ff03cbab7ef5",
+              "matches_filename": true
+            }
+          ],
+          "derived_artifacts": [
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/49_东财日内异动池明细/data.csv",
+              "sha256": "9c8483a90a1f97fce49844d0c228ff2c2e708cde97dccc305cfde2752df38cbe",
+              "bytes": 701291,
+              "field_names": [
+                "时间",
+                "代码",
+                "名称",
+                "板块",
+                "相关信息",
+                "异动类型"
+              ],
+              "row_count": 7831
+            }
+          ],
+          "source_code_artifacts": [
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+              "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+            },
+            {
+              "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+              "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
+            }
+          ],
+          "validation_time_utc": "2026-10-03T10:20:07.368257+00:00",
+          "original_transformation": {
+            "path": "provider_validation/tests/build_interface_coverage.py",
+            "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
+          }
+        }
+      ],
+      "eligible_for_production_routing": false
+    },
+    {
+      "contract": {
+        "input_id": "ASTOCK-055",
+        "provider": "sse",
+        "endpoint": "option_risk",
+        "display_name": "上交所期权风险指标",
+        "data_kind": "table",
+        "data_frequency": "daily",
+        "request_shape": "date_snapshot",
+        "collection_profile": "market_after_close",
+        "implementation_status": "unimplemented",
+        "evidence_refs": [
+          "ASTOCK-055"
+        ],
+        "parameters": [
+          {
+            "name": "date",
+            "source": "request.trade_date",
+            "value_type": "date",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          }
+        ],
+        "limitations": [
+          "实际调用option_risk_indicator_sse；日期回退、希腊值和IV口径待核验",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "canonical_input": null,
+        "runtime_endpoint": null,
+        "forbidden_sources": [],
+        "trading_date_parameter": "date",
+        "request_interval_seconds": 3.0,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented",
+        "base_requests_per_fetch": 1
+      },
+      "collection_profile": {
+        "name": "market_after_close",
+        "mode": "after_close",
+        "refresh_interval_seconds": null,
+        "business_day": "trading_day",
+        "scheduling_enabled": false
+      },
+      "evidence": [
+        {
+          "interface_id": "ASTOCK-055",
+          "path": "provider_validation/results/interface-records/ASTOCK-055.json",
+          "sha256": "2bab1fa0cfe1428c3fc0c011bb39569253ad8d508caa8310c238f530b3243490",
+          "validation_result": "部分通过",
+          "evidence_status": "live_raw",
+          "tested_scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：query.sse.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+          "coverage_denominator": 87,
+          "original_note": "部分：580行且字段齐全，日期2026-09-30；希腊值和波动率口径未独立核验。；本轮低频真实探测 success：saved 1 file(s); usable=1。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：query.sse.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+          "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+          "response_artifacts": [
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/a856900558c9920b9d1f6ee645baf05f5f4d8582df57e2d1184a14a937a594a1.body.gz",
+              "sha256": "a856900558c9920b9d1f6ee645baf05f5f4d8582df57e2d1184a14a937a594a1",
+              "matches_filename": true
+            }
+          ],
+          "derived_artifacts": [
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/53_期权Greeks_风险指标/data.csv",
+              "sha256": "9e9633078e9a962321d26c2523369cd129dd659f6c488d104bfc6fe6782904af",
+              "bytes": 55857,
+              "field_names": [
+                "TRADE_DATE",
+                "SECURITY_ID",
+                "CONTRACT_ID",
+                "CONTRACT_SYMBOL",
+                "DELTA_VALUE",
+                "THETA_VALUE",
+                "GAMMA_VALUE",
+                "VEGA_VALUE",
+                "RHO_VALUE",
+                "IMPLC_VOLATLTY"
+              ],
+              "row_count": 580
+            }
+          ],
+          "source_code_artifacts": [
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+              "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+            },
+            {
+              "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+              "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
+            }
+          ],
+          "validation_time_utc": "2026-10-03T10:20:07.425628+00:00",
+          "original_transformation": {
+            "path": "provider_validation/tests/build_interface_coverage.py",
+            "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
+          }
+        }
+      ],
+      "eligible_for_production_routing": false
+    },
+    {
+      "contract": {
+        "input_id": "ASTOCK-063",
+        "provider": "chinabond",
+        "endpoint": "yield_curve",
+        "display_name": "中债收益率曲线",
+        "data_kind": "time_series",
+        "data_frequency": "daily",
+        "request_shape": "date_snapshot",
+        "collection_profile": "macro_daily",
+        "implementation_status": "unimplemented",
+        "evidence_refs": [
+          "ASTOCK-063"
+        ],
+        "parameters": [
+          {
+            "name": "start",
+            "source": "request.start_date",
+            "value_type": "date",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          },
+          {
+            "name": "end",
+            "source": "request.end_date",
+            "value_type": "date",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          },
+          {
+            "name": "curve",
+            "source": "config.curve",
+            "value_type": "string",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          }
+        ],
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "canonical_input": null,
+        "runtime_endpoint": null,
+        "forbidden_sources": [],
+        "trading_date_parameter": null,
+        "request_interval_seconds": 3.0,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented",
+        "base_requests_per_fetch": 1
+      },
+      "collection_profile": {
+        "name": "macro_daily",
+        "mode": "daily",
+        "refresh_interval_seconds": null,
+        "business_day": "calendar_day",
+        "scheduling_enabled": false
+      },
+      "evidence": [
+        {
+          "interface_id": "ASTOCK-063",
+          "path": "provider_validation/results/interface-records/ASTOCK-063.json",
+          "sha256": "9d6a8571bbc96fee44412a618f1870fad4ce436920ee1e6d1238e67e059fea27",
+          "validation_result": "通过",
+          "evidence_status": "live_raw",
+          "tested_scope": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。",
+          "coverage_denominator": 87,
+          "original_note": "通过。对应联网测试返回非空数据并通过字段/来源检查；范围见原始请求清单。",
+          "manifest_ref": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+          "response_artifacts": [
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/64b832cbb8482882526554b51e1b33f9f9c82eab0737f11f8fa5044ca95bda7e.body.gz",
+              "sha256": "64b832cbb8482882526554b51e1b33f9f9c82eab0737f11f8fa5044ca95bda7e",
+              "matches_filename": true
+            }
+          ],
+          "derived_artifacts": [],
+          "source_code_artifacts": [
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+              "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+            },
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py",
+              "sha256": "ec18390ee2be31b5f72f4a0ff7c85ef3753a086ee9c43693bea00b08cab0ce09"
+            }
+          ],
+          "validation_time_utc": "2026-10-03T10:20:07.563646+00:00",
+          "original_transformation": {
+            "path": "provider_validation/tests/build_interface_coverage.py",
+            "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
+          }
+        }
+      ],
+      "eligible_for_production_routing": false
+    },
+    {
+      "contract": {
+        "input_id": "ASTOCK-067",
+        "provider": "csindex",
+        "endpoint": "constituents",
+        "display_name": "指数成分",
+        "data_kind": "snapshot",
+        "data_frequency": "snapshot",
+        "request_shape": "single_symbol",
+        "collection_profile": "reference_daily",
+        "implementation_status": "unimplemented",
+        "evidence_refs": [
+          "ASTOCK-067"
+        ],
+        "parameters": [
+          {
+            "name": "index_code",
+            "source": "request.index_code",
+            "value_type": "string",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          }
+        ],
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "canonical_input": null,
+        "runtime_endpoint": null,
+        "forbidden_sources": [],
+        "trading_date_parameter": null,
+        "request_interval_seconds": 3.0,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented",
+        "base_requests_per_fetch": 1
+      },
+      "collection_profile": {
+        "name": "reference_daily",
+        "mode": "daily",
+        "refresh_interval_seconds": null,
+        "business_day": "trading_day",
+        "scheduling_enabled": false
+      },
+      "evidence": [
+        {
+          "interface_id": "ASTOCK-067",
+          "path": "provider_validation/results/interface-records/ASTOCK-067.json",
+          "sha256": "c02c87f8a3e86e242a8a7894eefe22768c66f7142c92c152a5c78fcb1cbdf7c7",
+          "validation_result": "部分通过",
+          "evidence_status": "live_raw",
+          "tested_scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：oss-ch.csindex.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+          "coverage_denominator": 87,
+          "original_note": "通过：解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。；本轮低频真实探测 success：saved 1 file(s); usable=1。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：oss-ch.csindex.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+          "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+          "response_artifacts": [
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/0f9fde0e470ba81bddd0d3e6db05269e1b5077aca778879f3833d04e027fa25d.body.gz",
+              "sha256": "0f9fde0e470ba81bddd0d3e6db05269e1b5077aca778879f3833d04e027fa25d",
+              "matches_filename": true
+            }
+          ],
+          "derived_artifacts": [
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/65_指数成分/data.csv",
+              "sha256": "4367aac70744f3a433d36c1d3eb76248f2d323960a4351447e73a2901d02fad0",
+              "bytes": 41434,
+              "field_names": [
+                "日期",
+                "指数代码",
+                "指数名称",
+                "指数英文名称",
+                "成分券代码",
+                "成分券名称",
+                "成分券英文名称",
+                "交易所",
+                "交易所英文名称"
+              ],
+              "row_count": 300
+            }
+          ],
+          "source_code_artifacts": [
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+              "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+            },
+            {
+              "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+              "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
+            }
+          ],
+          "validation_time_utc": "2026-10-03T10:20:07.597770+00:00",
+          "original_transformation": {
+            "path": "provider_validation/tests/build_interface_coverage.py",
+            "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
+          }
+        }
+      ],
+      "eligible_for_production_routing": false
+    },
+    {
+      "contract": {
+        "input_id": "ASTOCK-068",
+        "provider": "csindex",
+        "endpoint": "weights",
+        "display_name": "指数权重",
+        "data_kind": "snapshot",
+        "data_frequency": "snapshot",
+        "request_shape": "single_symbol",
+        "collection_profile": "reference_daily",
+        "implementation_status": "unimplemented",
+        "evidence_refs": [
+          "ASTOCK-068"
+        ],
+        "parameters": [
+          {
+            "name": "index_code",
+            "source": "request.index_code",
+            "value_type": "string",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          }
+        ],
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "canonical_input": null,
+        "runtime_endpoint": null,
+        "forbidden_sources": [],
+        "trading_date_parameter": null,
+        "request_interval_seconds": 3.0,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented",
+        "base_requests_per_fetch": 1
+      },
+      "collection_profile": {
+        "name": "reference_daily",
+        "mode": "daily",
+        "refresh_interval_seconds": null,
+        "business_day": "trading_day",
+        "scheduling_enabled": false
+      },
+      "evidence": [
+        {
+          "interface_id": "ASTOCK-068",
+          "path": "provider_validation/results/interface-records/ASTOCK-068.json",
+          "sha256": "adde5e03a76b285e2440e979ecebdc5405dae8e38944e9429aaf344e3e87c51c",
+          "validation_result": "部分通过",
+          "evidence_status": "live_raw",
+          "tested_scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：oss-ch.csindex.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+          "coverage_denominator": 87,
+          "original_note": "通过：解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。；本轮低频真实探测 success：saved 1 file(s); usable=1。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：oss-ch.csindex.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+          "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+          "response_artifacts": [
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/72bc4c9bd1be88f7d2c16e5a54f74777f4f43a768629699d22698a83f86c8e71.body.gz",
+              "sha256": "72bc4c9bd1be88f7d2c16e5a54f74777f4f43a768629699d22698a83f86c8e71",
+              "matches_filename": true
+            }
+          ],
+          "derived_artifacts": [
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/66_指数权重/data.csv",
+              "sha256": "4b1ed6cb8b5e426dfa27829503eca18c99e756ba0fae8bbebea177adcc5b2dd4",
+              "bytes": 43206,
+              "field_names": [
+                "日期",
+                "指数代码",
+                "指数名称",
+                "指数英文名称",
+                "成分券代码",
+                "成分券名称",
+                "成分券英文名称",
+                "交易所",
+                "交易所英文名称",
+                "权重"
+              ],
+              "row_count": 300
+            }
+          ],
+          "source_code_artifacts": [
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+              "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+            },
+            {
+              "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+              "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
+            }
+          ],
+          "validation_time_utc": "2026-10-03T10:20:07.607909+00:00",
+          "original_transformation": {
+            "path": "provider_validation/tests/build_interface_coverage.py",
+            "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
+          }
+        }
+      ],
+      "eligible_for_production_routing": false
+    },
+    {
+      "contract": {
+        "input_id": "ASTOCK-069",
+        "provider": "script_composite",
+        "endpoint": "index_valuation",
+        "display_name": "指数估值",
+        "data_kind": "time_series",
+        "data_frequency": "daily",
+        "request_shape": "single_symbol",
+        "collection_profile": "market_after_close",
+        "implementation_status": "unimplemented",
+        "evidence_refs": [
+          "ASTOCK-069"
+        ],
+        "parameters": [
+          {
+            "name": "index_code",
+            "source": "request.index_code",
+            "value_type": "string",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          }
+        ],
+        "limitations": [
+          "来源变体及股本口径未核准，仅保留候选契约",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "canonical_input": null,
+        "runtime_endpoint": null,
+        "forbidden_sources": [],
+        "trading_date_parameter": null,
+        "request_interval_seconds": 3.0,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented",
+        "base_requests_per_fetch": 1
+      },
+      "collection_profile": {
+        "name": "market_after_close",
+        "mode": "after_close",
+        "refresh_interval_seconds": null,
+        "business_day": "trading_day",
+        "scheduling_enabled": false
+      },
+      "evidence": [
+        {
+          "interface_id": "ASTOCK-069",
+          "path": "provider_validation/results/interface-records/ASTOCK-069.json",
+          "sha256": "7ff8380555b8a4af80687f717dbdf50e3a1ee516de77393688028dd66a0c59b7",
+          "validation_result": "部分通过",
+          "evidence_status": "parsed_only",
+          "tested_scope": "低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+          "coverage_denominator": 87,
+          "original_note": "部分：20行估值字段可读；指数日期和股本口径未与源数据独立核对。；本轮低频真实探测 success：saved 1 file(s); usable=1。低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+          "manifest_ref": "",
+          "response_artifacts": [],
+          "derived_artifacts": [
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/67_指数估值/data.csv",
+              "sha256": "d147285486e18d205670f80e974de2f6aa3b3695dcdc5625a3542f329c585af6",
+              "bytes": 1857,
+              "field_names": [
+                "日期",
+                "指数代码",
+                "指数中文全称",
+                "指数中文简称",
+                "指数英文全称",
+                "指数英文简称",
+                "市盈率1",
+                "市盈率2",
+                "股息率1",
+                "股息率2"
+              ],
+              "row_count": 20
+            }
+          ],
+          "source_code_artifacts": [
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+              "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+            },
+            {
+              "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+              "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
+            }
+          ],
+          "validation_time_utc": "2026-10-03T10:20:07.643825+00:00",
+          "original_transformation": {
+            "path": "provider_validation/tests/build_interface_coverage.py",
+            "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
+          }
+        }
+      ],
+      "eligible_for_production_routing": false
+    },
+    {
+      "contract": {
+        "input_id": "ASTOCK-071",
+        "provider": "exchange_composite",
+        "endpoint": "futures_daily",
+        "display_name": "期货日行情",
+        "data_kind": "time_series",
+        "data_frequency": "daily",
+        "request_shape": "date_snapshot",
+        "collection_profile": "source_market_daily",
+        "implementation_status": "unimplemented",
+        "evidence_refs": [
+          "ASTOCK-071"
+        ],
+        "parameters": [
+          {
+            "name": "date",
+            "source": "request.trade_date",
+            "value_type": "date",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          },
+          {
+            "name": "exchange",
+            "source": "request.exchange",
+            "value_type": "string",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          }
+        ],
+        "limitations": [
+          "使用各交易所自己的日历；只按原始证据授予交易所范围",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "canonical_input": null,
+        "runtime_endpoint": null,
+        "forbidden_sources": [],
+        "trading_date_parameter": null,
+        "request_interval_seconds": 3.0,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented",
+        "base_requests_per_fetch": 1
+      },
+      "collection_profile": {
+        "name": "source_market_daily",
+        "mode": "daily",
+        "refresh_interval_seconds": null,
+        "business_day": "source_calendar",
+        "scheduling_enabled": false
+      },
+      "evidence": [
+        {
+          "interface_id": "ASTOCK-071",
+          "path": "provider_validation/results/interface-records/ASTOCK-071.json",
+          "sha256": "ddc5ae347a016084845996ccf0bc0b17fbc81ac604240979a66a9fed84d16441",
+          "validation_result": "通过",
+          "evidence_status": "live_raw",
+          "tested_scope": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。",
+          "coverage_denominator": 87,
+          "original_note": "通过。本轮测了 SHFE、INE、CZCE、CFFEX、GFEX，日期2026-09-18。",
+          "manifest_ref": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+          "response_artifacts": [
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/224819fc35027afc7019db9652d42bd37cf2f768e97f59df1f1eb68f3d82b123.body.gz",
+              "sha256": "224819fc35027afc7019db9652d42bd37cf2f768e97f59df1f1eb68f3d82b123",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/8acc40cb2e802e9159ce70819788fe12b0b4f58ae7154e12cb5567d557213c79.body.gz",
+              "sha256": "8acc40cb2e802e9159ce70819788fe12b0b4f58ae7154e12cb5567d557213c79",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/595f24d939400c97bc4b64bdd43a1873ab58bf3bfa654143e9460eaf51d4ab60.body.gz",
+              "sha256": "595f24d939400c97bc4b64bdd43a1873ab58bf3bfa654143e9460eaf51d4ab60",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/5904fe9891a2b6d262d0fbbaedb8d219de709e44184d95e883c743a7ccb0bd27.body.gz",
+              "sha256": "5904fe9891a2b6d262d0fbbaedb8d219de709e44184d95e883c743a7ccb0bd27",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/012a8807c89c08c7b546cc102d35247d10e93356e488457e79e06cba9d4cee49.body.gz",
+              "sha256": "012a8807c89c08c7b546cc102d35247d10e93356e488457e79e06cba9d4cee49",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/e699e8e97d7f0e9e797caa2944c87a0cf286149eb4845cbe9019c6d5111e8076.body.gz",
+              "sha256": "e699e8e97d7f0e9e797caa2944c87a0cf286149eb4845cbe9019c6d5111e8076",
+              "matches_filename": true
+            }
+          ],
+          "derived_artifacts": [],
+          "source_code_artifacts": [
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+              "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+            },
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py",
+              "sha256": "ec18390ee2be31b5f72f4a0ff7c85ef3753a086ee9c43693bea00b08cab0ce09"
+            }
+          ],
+          "validation_time_utc": "2026-10-03T10:20:07.674254+00:00",
+          "original_transformation": {
+            "path": "provider_validation/tests/build_interface_coverage.py",
+            "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
+          }
+        }
+      ],
+      "eligible_for_production_routing": false
+    },
+    {
+      "contract": {
+        "input_id": "ASTOCK-072",
+        "provider": "exchange_composite",
+        "endpoint": "options_daily",
+        "display_name": "期权日行情",
+        "data_kind": "time_series",
+        "data_frequency": "daily",
+        "request_shape": "date_snapshot",
+        "collection_profile": "source_market_daily",
+        "implementation_status": "unimplemented",
+        "evidence_refs": [
+          "ASTOCK-072"
+        ],
+        "parameters": [
+          {
+            "name": "date",
+            "source": "request.trade_date",
+            "value_type": "date",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          },
+          {
+            "name": "exchange",
+            "source": "request.exchange",
+            "value_type": "string",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          }
+        ],
+        "limitations": [
+          "使用各交易所自己的日历；只按原始证据授予交易所范围",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "canonical_input": null,
+        "runtime_endpoint": null,
+        "forbidden_sources": [],
+        "trading_date_parameter": null,
+        "request_interval_seconds": 3.0,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented",
+        "base_requests_per_fetch": 1
+      },
+      "collection_profile": {
+        "name": "source_market_daily",
+        "mode": "daily",
+        "refresh_interval_seconds": null,
+        "business_day": "source_calendar",
+        "scheduling_enabled": false
+      },
+      "evidence": [
+        {
+          "interface_id": "ASTOCK-072",
+          "path": "provider_validation/results/interface-records/ASTOCK-072.json",
+          "sha256": "95352f1515a3c22fae4378af3c90973095ebc73921c831b03d135a4564a5120c",
+          "validation_result": "通过",
+          "evidence_status": "live_raw",
+          "tested_scope": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。",
+          "coverage_denominator": 87,
+          "original_note": "通过。本轮样例覆盖 SHFE 与 CFFEX，其他交易所未在本轮实测。",
+          "manifest_ref": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+          "response_artifacts": [
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/d6b346d216f06855953e7661197571eeacef6f074e2f4ea2587835b9ae6b5288.body.gz",
+              "sha256": "d6b346d216f06855953e7661197571eeacef6f074e2f4ea2587835b9ae6b5288",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/bc1d0223e198d4748504e36b89a0a2ef777e8dbc4cccffeeb42d5574db63db96.body.gz",
+              "sha256": "bc1d0223e198d4748504e36b89a0a2ef777e8dbc4cccffeeb42d5574db63db96",
+              "matches_filename": true
+            }
+          ],
+          "derived_artifacts": [],
+          "source_code_artifacts": [
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+              "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+            },
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py",
+              "sha256": "ec18390ee2be31b5f72f4a0ff7c85ef3753a086ee9c43693bea00b08cab0ce09"
+            }
+          ],
+          "validation_time_utc": "2026-10-03T10:20:07.703931+00:00",
+          "original_transformation": {
+            "path": "provider_validation/tests/build_interface_coverage.py",
+            "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
+          }
+        }
+      ],
+      "eligible_for_production_routing": false
+    },
+    {
+      "contract": {
+        "input_id": "ASTOCK-073",
+        "provider": "cffex",
+        "endpoint": "position_rank",
+        "display_name": "会员持仓排名",
+        "data_kind": "table",
+        "data_frequency": "daily",
+        "request_shape": "date_snapshot",
+        "collection_profile": "source_market_daily",
+        "implementation_status": "unimplemented",
+        "evidence_refs": [
+          "ASTOCK-073"
+        ],
+        "parameters": [
+          {
+            "name": "date",
+            "source": "request.trade_date",
+            "value_type": "date",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          },
+          {
+            "name": "exchange",
+            "source": "request.exchange",
+            "value_type": "string",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          },
+          {
+            "name": "symbol",
+            "source": "request.contract",
+            "value_type": "string",
+            "required": false,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          }
+        ],
+        "limitations": [
+          "本轮只测试CFFEX",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "canonical_input": null,
+        "runtime_endpoint": null,
+        "forbidden_sources": [],
+        "trading_date_parameter": null,
+        "request_interval_seconds": 3.0,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented",
+        "base_requests_per_fetch": 1
+      },
+      "collection_profile": {
+        "name": "source_market_daily",
+        "mode": "daily",
+        "refresh_interval_seconds": null,
+        "business_day": "source_calendar",
+        "scheduling_enabled": false
+      },
+      "evidence": [
+        {
+          "interface_id": "ASTOCK-073",
+          "path": "provider_validation/results/interface-records/ASTOCK-073.json",
+          "sha256": "a423fd6b7d145ea4e72f4564ca83e936fc5221e9817d3b2141f78dd6dc689f4b",
+          "validation_result": "通过",
+          "evidence_status": "live_raw",
+          "tested_scope": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。",
+          "coverage_denominator": 87,
+          "original_note": "通过。本轮样例覆盖 CFFEX；其他交易所未在本轮实测。",
+          "manifest_ref": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+          "response_artifacts": [
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/12a4fb33d7f2d791a0682f31d1187f3a67072025d893e0424e1e181c9d6500cd.body.gz",
+              "sha256": "12a4fb33d7f2d791a0682f31d1187f3a67072025d893e0424e1e181c9d6500cd",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/b2a8a352f5ca9ca1e58c44a41207fdc963dc8ad28def06971948f7f752a7bfe8.body.gz",
+              "sha256": "b2a8a352f5ca9ca1e58c44a41207fdc963dc8ad28def06971948f7f752a7bfe8",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/999e4fc5b309131a3e9fcaa25021e79a70587ebc3aa04dff95bd4eb56b0f16f6.body.gz",
+              "sha256": "999e4fc5b309131a3e9fcaa25021e79a70587ebc3aa04dff95bd4eb56b0f16f6",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/ce529e08ad42cfd9f05a93cfea3bc95dcf446991793c37c41b9bc64bcbed6f70.body.gz",
+              "sha256": "ce529e08ad42cfd9f05a93cfea3bc95dcf446991793c37c41b9bc64bcbed6f70",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/a76e541a37f29c1af2716918bac6c7e0b6e41653b4f1658dc53fb7e837db610b.body.gz",
+              "sha256": "a76e541a37f29c1af2716918bac6c7e0b6e41653b4f1658dc53fb7e837db610b",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/f48862db5bbc3679ceec6ce9b52c7d17a6c59059aa45ccf7b497c548916d804a.body.gz",
+              "sha256": "f48862db5bbc3679ceec6ce9b52c7d17a6c59059aa45ccf7b497c548916d804a",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/73800e28486efba4cb11553f4b9a9fd9957f5031c8828f7c155c21ed018fdfe9.body.gz",
+              "sha256": "73800e28486efba4cb11553f4b9a9fd9957f5031c8828f7c155c21ed018fdfe9",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/13d298283faca25501a2d6fa991240b66f46157a8c6eaecf2cb595d7d9d01dac.body.gz",
+              "sha256": "13d298283faca25501a2d6fa991240b66f46157a8c6eaecf2cb595d7d9d01dac",
+              "matches_filename": true
+            }
+          ],
+          "derived_artifacts": [],
+          "source_code_artifacts": [
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+              "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+            },
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py",
+              "sha256": "ec18390ee2be31b5f72f4a0ff7c85ef3753a086ee9c43693bea00b08cab0ce09"
+            }
+          ],
+          "validation_time_utc": "2026-10-03T10:20:07.716255+00:00",
+          "original_transformation": {
+            "path": "provider_validation/tests/build_interface_coverage.py",
+            "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
+          }
+        }
+      ],
+      "eligible_for_production_routing": false
+    },
+    {
+      "contract": {
+        "input_id": "ASTOCK-077",
+        "provider": "sge",
+        "endpoint": "spot",
+        "display_name": "上海金现货",
+        "data_kind": "quote",
+        "data_frequency": "snapshot",
+        "request_shape": "single_symbol",
+        "collection_profile": "source_market_daily",
+        "implementation_status": "unimplemented",
+        "evidence_refs": [
+          "ASTOCK-077"
+        ],
+        "parameters": [
+          {
+            "name": "instrument",
+            "source": "request.instrument",
+            "value_type": "string",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          }
+        ],
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "canonical_input": null,
+        "runtime_endpoint": null,
+        "forbidden_sources": [],
+        "trading_date_parameter": null,
+        "request_interval_seconds": 3.0,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented",
+        "base_requests_per_fetch": 1
+      },
+      "collection_profile": {
+        "name": "source_market_daily",
+        "mode": "daily",
+        "refresh_interval_seconds": null,
+        "business_day": "source_calendar",
+        "scheduling_enabled": false
+      },
+      "evidence": [
+        {
+          "interface_id": "ASTOCK-077",
+          "path": "provider_validation/results/interface-records/ASTOCK-077.json",
+          "sha256": "49b9143eda6187c3bddba01d19e0d5bb22cbe956eb8cd827455bb82c8d4baac3",
+          "validation_result": "通过",
+          "evidence_status": "live_raw",
+          "tested_scope": "V3.9 live suite：对应新能力的真实返回检查通过；原始 HTTP 报文已存。",
+          "coverage_denominator": 87,
+          "original_note": "通过。对应联网测试返回非空数据并通过字段/来源检查；范围见原始请求清单。",
+          "manifest_ref": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+          "response_artifacts": [
+            {
+              "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/bodies/79788cd1e6502e3c31e4cceaf05596f4d903f82650ac80f971a5771c869ea655.body.gz",
+              "sha256": "79788cd1e6502e3c31e4cceaf05596f4d903f82650ac80f971a5771c869ea655",
+              "matches_filename": true
+            }
+          ],
+          "derived_artifacts": [],
+          "source_code_artifacts": [
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+              "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+            },
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py",
+              "sha256": "ec18390ee2be31b5f72f4a0ff7c85ef3753a086ee9c43693bea00b08cab0ce09"
+            }
+          ],
+          "validation_time_utc": "2026-10-03T10:20:07.757275+00:00",
+          "original_transformation": {
+            "path": "provider_validation/tests/build_interface_coverage.py",
+            "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
+          }
+        }
+      ],
+      "eligible_for_production_routing": false
+    },
+    {
+      "contract": {
+        "input_id": "ASTOCK-085",
+        "provider": "sina",
+        "endpoint": "dragon_tiger_daily",
+        "display_name": "新浪龙虎榜备用（实测来源）",
+        "data_kind": "event",
+        "data_frequency": "daily",
+        "request_shape": "date_snapshot",
+        "collection_profile": "market_after_close",
+        "implementation_status": "unimplemented",
+        "evidence_refs": [
+          "ASTOCK-085"
+        ],
+        "parameters": [
+          {
+            "name": "date",
+            "source": "request.trade_date",
+            "value_type": "date",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          }
+        ],
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "canonical_input": null,
+        "runtime_endpoint": null,
+        "forbidden_sources": [],
+        "trading_date_parameter": "date",
+        "request_interval_seconds": 3.0,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented",
+        "base_requests_per_fetch": 1
+      },
+      "collection_profile": {
+        "name": "market_after_close",
+        "mode": "after_close",
+        "refresh_interval_seconds": null,
+        "business_day": "trading_day",
+        "scheduling_enabled": false
+      },
+      "evidence": [
+        {
+          "interface_id": "ASTOCK-085",
+          "path": "provider_validation/results/interface-records/ASTOCK-085.json",
+          "sha256": "486825be62af955e8e55bf942f92c32077236825f0497f7ca421139eb58ca3ad",
+          "validation_result": "部分通过",
+          "evidence_status": "live_raw",
+          "tested_scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：vip.stock.finance.sina.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+          "coverage_denominator": 87,
+          "original_note": "未通过：RuntimeError: stock_lhb_detail_daily_sina: KeyError: '股票代码' | stock_lhb_detail_em: TypeError: 'NoneType' object is not subscriptable；本轮低频真实探测 success：saved 1 file(s); usable=1。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×1；主机：vip.stock.finance.sina.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+          "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+          "response_artifacts": [
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/68efc750f99a13f660b6bd4d288488a5aee983a8b7c60e48553ce03c7467d336.body.gz",
+              "sha256": "68efc750f99a13f660b6bd4d288488a5aee983a8b7c60e48553ce03c7467d336",
+              "matches_filename": true
+            }
+          ],
+          "derived_artifacts": [
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/83_龙虎榜备胎/data.csv",
+              "sha256": "4a85966111f11dac0e71b38bea12ba5b16caf942b55598ccc8f8a5051efa648f",
+              "bytes": 6894,
+              "field_names": [
+                "序号",
+                "股票代码",
+                "股票名称",
+                "收盘价",
+                "对应值",
+                "成交量",
+                "成交额",
+                "指标"
+              ],
+              "row_count": 83
+            }
+          ],
+          "source_code_artifacts": [
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+              "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+            },
+            {
+              "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+              "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
+            }
+          ],
+          "validation_time_utc": "2026-10-03T10:20:07.849203+00:00",
+          "original_transformation": {
+            "path": "provider_validation/tests/build_interface_coverage.py",
+            "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
+          }
+        }
+      ],
+      "eligible_for_production_routing": false
+    },
+    {
+      "contract": {
+        "input_id": "ASTOCK-087",
+        "provider": "eastmoney",
+        "endpoint": "announcements",
+        "display_name": "公告备胎",
+        "data_kind": "document_index",
+        "data_frequency": "snapshot",
+        "request_shape": "single_symbol",
+        "collection_profile": "event_daily",
+        "implementation_status": "unimplemented",
+        "evidence_refs": [
+          "ASTOCK-087"
+        ],
+        "parameters": [
+          {
+            "name": "code",
+            "source": "request.symbol",
+            "value_type": "string",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          },
+          {
+            "name": "start",
+            "source": "request.start_date",
+            "value_type": "date",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          },
+          {
+            "name": "end",
+            "source": "request.end_date",
+            "value_type": "date",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          }
+        ],
+        "limitations": [
+          "仅解析输出，缺精确原始响应；回退的全市场公告不能标成单票接口",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "canonical_input": null,
+        "runtime_endpoint": null,
+        "forbidden_sources": [],
+        "trading_date_parameter": null,
+        "request_interval_seconds": 3.0,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented",
+        "base_requests_per_fetch": 1
+      },
+      "collection_profile": {
+        "name": "event_daily",
+        "mode": "daily",
+        "refresh_interval_seconds": null,
+        "business_day": "calendar_day",
+        "scheduling_enabled": false
+      },
+      "evidence": [
+        {
+          "interface_id": "ASTOCK-087",
+          "path": "provider_validation/results/interface-records/ASTOCK-087.json",
+          "sha256": "8bd03ebf882e3143f76328fbea91d4b90c73b3f992099cbf0f93e65254f898e8",
+          "validation_result": "部分通过",
+          "evidence_status": "parsed_only",
+          "tested_scope": "解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。 本次只核验了本行注明的样例范围。 a_stock_missing_output\\85_公告备胎\\data.csv [CSV行数=718]",
+          "coverage_denominator": 87,
+          "original_note": "通过：解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。；脚本结果 success：saved 1 file(s)。解析结果非空；未留精确原始响应。",
+          "manifest_ref": "",
+          "response_artifacts": [],
+          "derived_artifacts": [
+            {
+              "path": "provider_validation/results/a-stock-data-missing-output/85_公告备胎/data.csv",
+              "sha256": "ad52f242ef2634e23eda0fedc5dbff4b638afa9565b402dfcbd42be6cc5f902c",
+              "bytes": 158266,
+              "field_names": [
+                "代码",
+                "名称",
+                "公告标题",
+                "公告类型",
+                "公告日期",
+                "网址"
+              ],
+              "row_count": 718
+            }
+          ],
+          "source_code_artifacts": [
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+              "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+            },
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+              "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+            }
+          ],
+          "validation_time_utc": "2026-10-03T10:20:07.920111+00:00",
+          "original_transformation": {
+            "path": "provider_validation/tests/build_interface_coverage.py",
+            "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
+          }
+        }
+      ],
+      "eligible_for_production_routing": false
+    }
+  ],
+  "before": [
+    {
+      "path": "config/providers.yaml",
+      "snapshot": "provider_validation/results/remaining-original-20261004/0-providers.yaml.bin",
+      "sha256": "4811dfb113893cf7c37796aa198744d992638b84fa6e754c94efeafe62c7dbac"
+    },
+    {
+      "path": "src/stock_data_manage/pipeline/inputs.py",
+      "snapshot": "provider_validation/results/remaining-original-20261004/1-inputs.py.bin",
+      "sha256": "f604af6e2200f0336ddc75bd2cd3f8a1e3c95ba2412b051a57bebc8502d9caa8"
+    },
+    {
+      "path": "src/stock_data_manage/routing/factory.py",
+      "snapshot": "provider_validation/results/remaining-original-20261004/2-factory.py.bin",
+      "sha256": "2e50aba8c7faf45c4a81bb2010c1ed2b2355cbef83f2fc5f9739f3a8e9e60e11"
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/financial.py",
+      "snapshot": "provider_validation/results/remaining-original-20261004/3-financial.py.bin",
+      "sha256": "b88fd28013942d1815d04eaf25521bd00dc0d44329ee411dbff48585bb1529a7"
+    },
+    {
+      "path": "src/stock_data_manage/providers/sina/news.py",
+      "snapshot": "provider_validation/results/remaining-original-20261004/4-news.py.bin",
+      "sha256": "565774907b8f1c146eb729c5af12caef352d87e43e1e15719fe2a3928673e68f"
+    },
+    {
+      "path": "src/stock_data_manage/providers/ths/boards.py",
+      "snapshot": "provider_validation/results/remaining-original-20261004/5-boards.py.bin",
+      "sha256": "431ed695ad38025e61e322cdc1e358aa8e93b656f02de20dcb4649432ef6e05b"
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/realtime.py",
+      "snapshot": "provider_validation/results/remaining-original-20261004/6-realtime.py.bin",
+      "sha256": "6e09d2a5014cf316c4d1e26e913a44d5c2fbad95fb44d95cba159ef881f03bca"
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/security_list.py",
+      "snapshot": "provider_validation/results/remaining-original-20261004/7-security_list.py.bin",
+      "sha256": "b3564c12953e2dc37932d9075a526cfc33b25753b4749d6e58eec1d3908466f1"
+    },
+    {
+      "path": "src/stock_data_manage/providers/tencent/snapshot.py",
+      "snapshot": "provider_validation/results/remaining-original-20261004/8-snapshot.py.bin",
+      "sha256": "3278cadac776fe8cfe5d02775a5bf8f53bc1cb96c595a5f418172f53047434bf"
+    },
+    {
+      "path": "src/stock_data_manage/providers/tdx/minute.py",
+      "snapshot": "provider_validation/results/remaining-original-20261004/9-minute.py.bin",
+      "sha256": "6d925e5c47bbd3fe3bb6b0c6b8141619d8fffee693c101b837bcb56a2a39f2ae"
+    },
+    {
+      "path": "tests/test_input_collection.py",
+      "snapshot": "provider_validation/results/remaining-original-20261004/10-test_input_collection.py.bin",
+      "sha256": "77a1e52846a0189721abb75105a722164adc309289b5203b5cf76b2ab719cac0"
+    },
+    {
+      "path": "CODE_STRUCTURE.md",
+      "snapshot": "provider_validation/results/remaining-original-20261004/11-CODE_STRUCTURE.md.bin",
+      "sha256": "94545de49b127af5701ae8d6a4b27a3ed94a1640cb1748d1ee3a2b09865e21d8"
+    },
+    {
+      "path": "PROJECT_PROGRESS.md",
+      "snapshot": "provider_validation/results/remaining-original-20261004/12-PROJECT_PROGRESS.md.bin",
+      "sha256": "d0bf10f887dc82665714934991d3869883c67e9edecc8af0a9eaa7da3f2de0d5"
+    },
+    {
+      "path": ".gitattributes",
+      "snapshot": "provider_validation/results/remaining-original-20261004/13-.gitattributes.bin",
+      "sha256": "da421775733a511f50e38d34c82372d99e2d8b1f31577fe4e052e54955239623"
+    }
+  ],
+  "source_refs": [
+    {
+      "path": "provider_validation/coverage/successful-input-capabilities.json",
+      "sha256": "dd135f2fb3164a475175017c956e2b6ce31dcc2a729b5a001122b1bad10d31a2"
+    },
+    {
+      "path": "provider_validation/results/a-stock-data-missing-output/85_公告备胎/data.csv",
+      "sha256": "ad52f242ef2634e23eda0fedc5dbff4b638afa9565b402dfcbd42be6cc5f902c"
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/10_同花顺一致预期/data.csv",
+      "sha256": "f50f053e14d554367b2be6a11ac8e4780b397bef3aa2a02d543ed982c9f5a0ba"
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/13_同花顺热点/data.csv",
+      "sha256": "c96f7815d5a23a0e78011dc93f02209a6ac1227340274e5bed29f598a292d97c"
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/29_个股新闻/data.csv",
+      "sha256": "ce0cdf968cc84c05d891da7c6b1b6cacea67bd4ddb187b7d2a500142b69c81bb"
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/business_composition_em.json",
+      "sha256": "dfc831d7a5134fe93e2265d3585e2b307944bedfb0b523f45f718e0fd4365791"
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/company_events_em.csv",
+      "sha256": "8592ae85c936e3948cd0f99ec1740d856dbac866955005e8861a3ee7dcd195a9"
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/individual_info_em.json",
+      "sha256": "e09489a5fbe1f663b8a63bc2cab06280cf50ba4508a10fc957a5b1e73ee04f3c"
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/main_business_ths.csv",
+      "sha256": "4a3eb62c1cf920f5791fb7980b455fb1911fa2549ee133784ec5f02a57fe9c17"
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/profile_cninfo.csv",
+      "sha256": "d150bfd361991954244e845181f46997a5389412d3a037e9a9f3ea6b81004600"
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/37_新浪财报三表/data/利润表.csv",
+      "sha256": "9cc4f84bdf67b88834cae7112edd8dbdc765053d1a9575beae7c75ab690dc59a"
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/37_新浪财报三表/data/现金流量表.csv",
+      "sha256": "9a32c874339ab1d12dfb47cd0e5afdf1349660a900d83e0383943ba4a1fb0553"
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/37_新浪财报三表/data/资产负债表.csv",
+      "sha256": "ef606d8d009ad5f053cfbd9502ac7360b4657d68b3ea475b9f3d9adc9b8dffa2"
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/49_东财日内异动池明细/data.csv",
+      "sha256": "9c8483a90a1f97fce49844d0c228ff2c2e708cde97dccc305cfde2752df38cbe"
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/53_期权Greeks_风险指标/data.csv",
+      "sha256": "9e9633078e9a962321d26c2523369cd129dd659f6c488d104bfc6fe6782904af"
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/65_指数成分/data.csv",
+      "sha256": "4367aac70744f3a433d36c1d3eb76248f2d323960a4351447e73a2901d02fad0"
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/66_指数权重/data.csv",
+      "sha256": "4b1ed6cb8b5e426dfa27829503eca18c99e756ba0fae8bbebea177adcc5b2dd4"
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/67_指数估值/data.csv",
+      "sha256": "d147285486e18d205670f80e974de2f6aa3b3695dcdc5625a3542f329c585af6"
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/83_龙虎榜备胎/data.csv",
+      "sha256": "4a85966111f11dac0e71b38bea12ba5b16caf942b55598ccc8f8a5051efa648f"
+    },
+    {
+      "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+      "sha256": "885abd6bf1c4b809b9029759f61b75c7d6a297755fd76ca6c545720db38a6767"
+    },
+    {
+      "path": "provider_validation/results/raw/2026-10-01-v310-live/manifest.ndjson",
+      "sha256": "838ec387b767e0cb375a8fe88358ed244350f14486c2930dc6b9878732ce208a"
+    },
+    {
+      "path": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+      "sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079"
+    },
+    {
+      "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+      "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
+    },
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+      "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+    },
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+      "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+    },
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/tests/test_v310_sources.py",
+      "sha256": "afd8fe187e1d91c14553a407ee62f371efd23e449133c33e0d6e689cafa26410"
+    },
+    {
+      "path": "provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py",
+      "sha256": "ec18390ee2be31b5f72f4a0ff7c85ef3753a086ee9c43693bea00b08cab0ce09"
+    }
+  ],
+  "network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "sdk_version": "1.18.83",
+  "sdk_sources": [
+    {
+      "function": "stock_profit_forecast_ths",
+      "path": "provider_validation/results/remaining-original-20261004/stock_profit_forecast_ths.py.bin",
+      "sha256": "15ceb3c926df6d8a2d72ee357d8159da76084dab83fbd90165526703ae18830b",
+      "original_source_sha256": "15ceb3c926df6d8a2d72ee357d8159da76084dab83fbd90165526703ae18830b",
+      "redacted": false
+    },
+    {
+      "function": "stock_news_em",
+      "path": "provider_validation/results/remaining-original-20261004/stock_news_em.py.bin",
+      "sha256": "ccd993ed9f723ed52e9e153efc4400a6afceae3189f7795c0ce8299e468c3dca",
+      "original_source_sha256": "f23960660f28d8d158587998fa307fd9b22477cac7520268f69d895d2b3e575f",
+      "redacted": true
+    },
+    {
+      "function": "stock_changes_em",
+      "path": "provider_validation/results/remaining-original-20261004/stock_changes_em.py.bin",
+      "sha256": "eeab0144c484cfdc00035ed65ac31b6b258de292895a385d4f3c20fa8fdb1b66",
+      "original_source_sha256": "982f103280f5cf868a9506ea1d657c1accd46f2707b38893af1abcb16f395fd9",
+      "redacted": true
+    },
+    {
+      "function": "option_risk_indicator_sse",
+      "path": "provider_validation/results/remaining-original-20261004/option_risk_indicator_sse.py.bin",
+      "sha256": "a199e88008a61892a6682abb87952369dc76511193a1cdef75f985f17c03a4c8",
+      "original_source_sha256": "a199e88008a61892a6682abb87952369dc76511193a1cdef75f985f17c03a4c8",
+      "redacted": false
+    },
+    {
+      "function": "index_stock_cons_csindex",
+      "path": "provider_validation/results/remaining-original-20261004/index_stock_cons_csindex.py.bin",
+      "sha256": "d94ec3837e9d07e2eaf784b4764f15368cf29bdd011539edef2d82b954aaf659",
+      "original_source_sha256": "d94ec3837e9d07e2eaf784b4764f15368cf29bdd011539edef2d82b954aaf659",
+      "redacted": false
+    },
+    {
+      "function": "index_stock_cons_weight_csindex",
+      "path": "provider_validation/results/remaining-original-20261004/index_stock_cons_weight_csindex.py.bin",
+      "sha256": "a3f66f3d462164b67ff6754c65b0535ccbb661e4542dd94ddeec02fab4eae6d5",
+      "original_source_sha256": "a3f66f3d462164b67ff6754c65b0535ccbb661e4542dd94ddeec02fab4eae6d5",
+      "redacted": false
+    },
+    {
+      "function": "stock_zh_index_value_csindex",
+      "path": "provider_validation/results/remaining-original-20261004/stock_zh_index_value_csindex.py.bin",
+      "sha256": "65af138adf9196ddc8e37e78b772e3ad4616a16a3d7e089c3f8f0b3720a4b91a",
+      "original_source_sha256": "65af138adf9196ddc8e37e78b772e3ad4616a16a3d7e089c3f8f0b3720a4b91a",
+      "redacted": false
+    },
+    {
+      "function": "stock_lhb_detail_daily_sina",
+      "path": "provider_validation/results/remaining-original-20261004/stock_lhb_detail_daily_sina.py.bin",
+      "sha256": "5bb830de095f53427bfa30f72c788f974e56984995cc84689263d5a60965abcc",
+      "original_source_sha256": "5bb830de095f53427bfa30f72c788f974e56984995cc84689263d5a60965abcc",
+      "redacted": false
+    },
+    {
+      "function": "stock_financial_report_sina",
+      "path": "provider_validation/results/remaining-original-20261004/stock_financial_report_sina.py.bin",
+      "sha256": "a1062b6ce9c36ca5d8f1055b7c2d4ab2f826a24a3d12dd51c39d1b278d4a6636",
+      "original_source_sha256": "a1062b6ce9c36ca5d8f1055b7c2d4ab2f826a24a3d12dd51c39d1b278d4a6636",
+      "redacted": false
+    },
+    {
+      "function": "stock_zyjs_ths",
+      "path": "provider_validation/results/remaining-original-20261004/stock_zyjs_ths.py.bin",
+      "sha256": "79ddf9e30b6a5837da04afb781391d4a5cee67ab5476c5941f5e70a8cf541f76",
+      "original_source_sha256": "79ddf9e30b6a5837da04afb781391d4a5cee67ab5476c5941f5e70a8cf541f76",
+      "redacted": false
+    },
+    {
+      "function": "stock_profile_cninfo",
+      "path": "provider_validation/results/remaining-original-20261004/stock_profile_cninfo.py.bin",
+      "sha256": "b1bc857d20c75f19e0a061e60ce3bd8ab4a318b7333cae057f01d5eb73a120ef",
+      "original_source_sha256": "b1bc857d20c75f19e0a061e60ce3bd8ab4a318b7333cae057f01d5eb73a120ef",
+      "redacted": false
+    },
+    {
+      "function": "stock_gsrl_gsdt_em",
+      "path": "provider_validation/results/remaining-original-20261004/stock_gsrl_gsdt_em.py.bin",
+      "sha256": "97ac127fcfecc665bf580a2cfb314f5418d608d891ab2e238b89e4aabbf20c71",
+      "original_source_sha256": "97ac127fcfecc665bf580a2cfb314f5418d608d891ab2e238b89e4aabbf20c71",
+      "redacted": false
+    }
+  ]
+}

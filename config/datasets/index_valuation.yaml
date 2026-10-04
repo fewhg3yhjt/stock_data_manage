@@ -1,0 +1,36 @@
+dataset:
+  name: index_valuation
+  display_name: 中证指数估值候选输入
+  primary_key:
+  - snapshot_at
+  - index_code
+  - trade_date
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  index_code:
+    type: string
+    required: true
+  trade_date:
+    type: date
+    required: true
+  name:
+    type: string
+    required: false
+  pe_1:
+    type: decimal
+    required: false
+    unit: unverified
+  pe_2:
+    type: decimal
+    required: false
+    unit: unverified
+  dividend_yield_1:
+    type: decimal
+    required: false
+    unit: unverified
+  dividend_yield_2:
+    type: decimal
+    required: false
+    unit: unverified

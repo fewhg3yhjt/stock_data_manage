@@ -1,0 +1,146 @@
+{
+  "source": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\tests\\source_snapshots\\a-stock-data\\SKILL.md",
+  "source_sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03",
+  "original_functions": [
+    {
+      "function": "_v39_json",
+      "ast_sha256": "9f30fef05d6c7d9a17df333899996a17685a7d5abbed7bddf5d5526391252396"
+    },
+    {
+      "function": "_v39_date",
+      "ast_sha256": "d8fb512f7120b5c08116efef234fb9e5376ba12540778d9cd3e163c1799b7ff3"
+    },
+    {
+      "function": "_v39_src_date",
+      "ast_sha256": "222b7f0b1e72c0c2e88cf75225884d9c82face112fcb8e24c990a8f077212ef6"
+    },
+    {
+      "function": "_v39_num",
+      "ast_sha256": "b1bf0f3556837707d3935670285da0a5a09e93c3a0f7f1152164b7cc42f0a2bd"
+    },
+    {
+      "function": "_v39_rows",
+      "ast_sha256": "bbc800a91df2aa1683a859519894f3085c8024ce6e199a81b3632ecce3ef1cad"
+    },
+    {
+      "function": "_v39_req_num",
+      "ast_sha256": "1e6a714a3afc4b04ef5593790f8c2b4ce29269c843bc29fe2995d6fc836fafc6"
+    },
+    {
+      "function": "_v39_contract",
+      "ast_sha256": "27dfd236bf23c701649f2c655535e30240ce7e8cb5954b45b2be23becf54bb3c"
+    },
+    {
+      "function": "_v39_count",
+      "ast_sha256": "ab60dd0d53f91dd778e0eee36d7443d39c594dd62c15efea9e9cb6082c0814e2"
+    },
+    {
+      "function": "_v39_frame",
+      "ast_sha256": "7b64f260c7de8aacae38d19a9a35d6ed61752399427937ccaf2000241450cebe"
+    },
+    {
+      "function": "chinabond_yield_curve",
+      "ast_sha256": "c93c9bdc4d27ee7516a4b1ba3e0bfbdf0594e75ebbdb1912270ab46e9b7d244f"
+    },
+    {
+      "function": "sge_spot",
+      "ast_sha256": "39d1005da9f4c071af9c1da0c40de827903429f84c9ca8e63aa2230bdb7943fd"
+    },
+    {
+      "function": "_fut_price",
+      "ast_sha256": "1ccd4215a352c1796d58f8d4c1bb63b716db8d70c0c714e5f14a5fcdde099d47"
+    },
+    {
+      "function": "_fut_product",
+      "ast_sha256": "e97be89442b9f3c1de723f576a2e4abf3c87da64457c3684f5ff1fd133421afa"
+    },
+    {
+      "function": "_fut_exchange",
+      "ast_sha256": "99cff748917034897da2109cf049f16a27940137964f21357d61d1c1688ecdb3"
+    },
+    {
+      "function": "_shfe_json",
+      "ast_sha256": "2d5c52b6f8d23869393fbcf8d819f582339592afd825e01999dc47a779d71588"
+    },
+    {
+      "function": "_czce_text",
+      "ast_sha256": "e2d6e39237bbae2b6a9e087b2cbf166b45754000c21cf3c0e3c0cb5d93c85e63"
+    },
+    {
+      "function": "_czce_table",
+      "ast_sha256": "e40175a4523e8195e892642fc6c1d2790921fe0ea0902ff6e8ceca29e47d1ebb"
+    },
+    {
+      "function": "_cffex_csv",
+      "ast_sha256": "6518cc766d49d1a15983709b960c3955430a05ce478ef0a80c3ff61bc7f4bfbe"
+    },
+    {
+      "function": "_cffex_daily_table",
+      "ast_sha256": "5f6d028702b393a2b1ae87228905b25fc9070d57748172b5f11b9377d3a98502"
+    },
+    {
+      "function": "_cffex_rank_rows",
+      "ast_sha256": "d0fc16083115a83425b41f2eae931ba8fddb7f0f75c6c1ce8d49ce629743117f"
+    },
+    {
+      "function": "_gfex_rows",
+      "ast_sha256": "4a10322edc3ed2a54aca6a1902220cb7c9be1d9bf0d1c71246adfd3112745ee3"
+    },
+    {
+      "function": "_shfe_ine_ids",
+      "ast_sha256": "39a138b3856f0384bf3bf73a50a03093a70e65b60839fabac23ac4921dcd04b6"
+    },
+    {
+      "function": "futures_daily",
+      "ast_sha256": "8c1f8a96d4441186dfa4cf0cd8e8c70f0d228be642cef5775008e31353a134c3"
+    },
+    {
+      "function": "options_daily",
+      "ast_sha256": "8191d2eff03b1a245e128299679c1f7fa61ea9f043fc810952f7f1396aabe6df"
+    },
+    {
+      "function": "_rank_member",
+      "ast_sha256": "7ceadff02848697303539d78a1f8575fc8365df4b366484f84fade9cb976a808"
+    },
+    {
+      "function": "futures_position_rank",
+      "ast_sha256": "9194a6e97395ff7e54e7c1077dbd82ae9999506ba75d8669c970b468aca0e611"
+    },
+    {
+      "function": "_tdx_parse_package",
+      "ast_sha256": "72007c589bd5b50f40bb148272386ae2e99f7feeaaa1a7972eae240fa99ec2a3"
+    },
+    {
+      "function": "tdx_daily_package",
+      "ast_sha256": "96a9c0ba88a5c244c5558ba282f27f9b1998808352d53d4da46ee14d7f2872ad"
+    },
+    {
+      "function": "_tencent_qt_snapshot",
+      "ast_sha256": "6f31d22519d438914e5307e67329ce0081719f9c00f874f321011c35c83943cc"
+    },
+    {
+      "function": "_tencent_tick_page",
+      "ast_sha256": "43c04362a2fb102b8c37693b4ac5d2aacd2f4f0bde92f6232326666c8f471d02"
+    },
+    {
+      "function": "tencent_ticks",
+      "ast_sha256": "0da4970637f5fd43226e2e11e182619d14617d0bdc840309f59800d3b65df6fc"
+    },
+    {
+      "function": "get_prefix",
+      "ast_sha256": "7a34a2ca1bfe03f185ca66385a88acf5ce20a2649ed96c8ae222c0dd1bc305f2"
+    },
+    {
+      "function": "_natural_market",
+      "ast_sha256": "e8ddc54beb0d2c184885e8391b5aef93b4d12d604f4754ff0be9883b13808a8d"
+    },
+    {
+      "function": "norm_ticker",
+      "ast_sha256": "17a3ce207de5d2635c3a5555d9260c20852f9efda58f22abdb57429f0a15b63d"
+    },
+    {
+      "function": "_etf_shares_sse",
+      "ast_sha256": "5550c59e523dc60737205fe37b6effd31b854eeeecc0b46e4a9dea2d75018f43"
+    }
+  ]
+}

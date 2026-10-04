@@ -1,0 +1,25 @@
+dataset: intraday_changes
+rules:
+- id: intraday_changes-input-v1
+  input_id: ASTOCK-051
+  provider: eastmoney
+  endpoint: intraday_changes
+  field_mapping:
+    source_row_number: source_row_number
+    source_security_code: 代码
+    event_time: 时间
+    name: 名称
+    event_type: 异动类型
+    source_type: 板块
+    source_details: 相关信息
+  context_fields:
+    snapshot_at: source_snapshot_at
+  null_values:
+  - null
+  - ''
+  unverified_fields: []
+  status: pending_validation
+  version: remaining-original-input-v1
+  evidence_refs:
+  - ASTOCK-051
+  notes: 保留原独立接口及原解析。原数字单独留证，标准数字单位未认证；无来源或日期回退，生产关闭。 来源只有日内时钟，禁止将响应采集日期推断为交易日；22类型完整覆盖按各来源tc核对。

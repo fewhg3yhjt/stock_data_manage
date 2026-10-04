@@ -1,0 +1,222 @@
+[
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\collection.yaml",
+    "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/0-collection.yaml.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\datasets\\index_constituents.yaml",
+    "sha256": "9bf6781101edd7933073a7a6aa32e3efe6a5b44217247c7e9c78355b56dba396",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/1-index_constituents.yaml.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\datasets\\index_weights.yaml",
+    "sha256": "1b8517761f8fef19d83188ee242c84080db0171f7ca07f8ad20ddb61d1c22df3",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/2-index_weights.yaml.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\datasets\\option_risk.yaml",
+    "sha256": "607ab73090a7a395ef924f084d0b0f0a423b485eac0ec18d76765618a221829c",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/3-option_risk.yaml.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\datasets\\sina_dragon_tiger_daily.yaml",
+    "sha256": "80b28f8123de8931ecae79f8becc586dd1eb39e92bc3d898d647970153dcd511",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/4-sina_dragon_tiger_daily.yaml.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\datasets\\sina_financial_statements.yaml",
+    "sha256": "cfe1dbc8e9af94e399379345837e7d2f80ab040198c8bfb82763e86152562ee2",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/5-sina_financial_statements.yaml.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\normalization\\index_constituents.yaml",
+    "sha256": "0e384f73728423284c488eefee375566579feaa5464e75919531cbd63f2caaaa",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/6-index_constituents.yaml.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\normalization\\index_weights.yaml",
+    "sha256": "057cf77aaec7e0beb424f8668fcf4e4e0dfbcc4b33e9aa9130647f45feb66829",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/7-index_weights.yaml.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\normalization\\option_risk.yaml",
+    "sha256": "f12c925293861ccae5862607a0b85d94e3f7df5f0026dac78555b2efc0dcc149",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/8-option_risk.yaml.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\normalization\\sina_dragon_tiger_daily.yaml",
+    "sha256": "210be484ad964fe8cab45c3afa23a830f4811e264aef25cda0db3334db1fb898",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/9-sina_dragon_tiger_daily.yaml.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\normalization\\sina_financial_statements.yaml",
+    "sha256": "a1dd32ed36356ea130e9b45df268c3b7d44711cb3c31b93e1d9811df10b04cbc",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/10-sina_financial_statements.yaml.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\providers.yaml",
+    "sha256": "b3117d4db08072ed6a96eb6334f712fee9a6cac66ede3b413dbebf2c0731a3a1",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/11-providers.yaml.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\cli.py",
+    "sha256": "582f5caedfc538a012d7a2f6e8cd7af3fe8b6fc9152e5b9e0a3fa2cb8810ae19",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/12-cli.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\config\\loader.py",
+    "sha256": "93bb55ab150c88751fe9a58a2b75737878c1b0f07233b8ec47009c4901bb11e9",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/13-loader.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\pipeline\\inputs.py",
+    "sha256": "69c70410d8a0b5f7525b32169cac04643423a9bde57f08e9aa6d75c0cb2f2a30",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/14-inputs.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\akshare\\boards.py",
+    "sha256": "2060f150831cebaf707ed5becedc35428bc41d4428bab31555ed1d2bf817d122",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/15-boards.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\baostock\\industry.py",
+    "sha256": "16c41b379eecbd87f082bd042e27fad7f3d8d77b5bfc6a3e8a286209b068494a",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/16-industry.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\baostock\\session.py",
+    "sha256": "70ce19cdde1d6a8ed0c3d3db29caa28d1d8069826136ab6dd7fb6a2ef8c7b832",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/17-session.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\cctv\\news.py",
+    "sha256": "8839bdeed801611e8e6d11cb9441e6ede7bc94d56507eaa2c903e605c772ee7d",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/18-news.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\chinamoney\\rates.py",
+    "sha256": "e7407f1d4272b69cb439bb0a7bad3960b65bb41328d752f541bc8ef50231f922",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/19-rates.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\cls\\news.py",
+    "sha256": "51da559a252b67a4a2e58171e3630ff1a5a80cd2bc23aa5df30a7e17ac02ad30",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/20-news.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\contracts.py",
+    "sha256": "a4b16abc7e3686a4eb2791dcd4545fb2404e0214bf32e20db19d2582d39ea447",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/21-contracts.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\csindex\\indices.py",
+    "sha256": "1edbd7b35c5b3c895ce036b96d192c7910c7510ed88ec176074966bc7b7e78e3",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/22-indices.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\dividend.py",
+    "sha256": "5706a8cdb37eeeb8f66cb033a3091dd1b6ec1ed83d72d0f9fbeb8f5c75d9649b",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/23-dividend.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\financial.py",
+    "sha256": "b88fd28013942d1815d04eaf25521bd00dc0d44329ee411dbff48585bb1529a7",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/24-financial.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\fund_flow.py",
+    "sha256": "0cf655efa0854d18651bb4f04f985f0f210b81a6d9eff065604d235ed8f75280",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/25-fund_flow.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\limit_pool.py",
+    "sha256": "2fbdfe3da3129545dfe8d2e457be7c42225696ddd74270567ae765e4b413f5ae",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/26-limit_pool.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\realtime.py",
+    "sha256": "6e09d2a5014cf316c4d1e26e913a44d5c2fbad95fb44d95cba159ef881f03bca",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/27-realtime.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\shareholder.py",
+    "sha256": "4c9d80f4d51845ac5541c42275f44f2a18643db5e9ccb705a3e16168f8db44c1",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/28-shareholder.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\mofcom\\social_financing.py",
+    "sha256": "55d292958fb34991c56c626d5f6f61e7e6c44c8c2627b88ea735e751aa12c5ce",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/29-social_financing.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\calendar.py",
+    "sha256": "3d114045f960bfcc94ade1ee03e4d25ebdf6980ba68aa2d0a2236bed78aaef05",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/30-calendar.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\daily.py",
+    "sha256": "dd15e0c6b0f8ed5e6db99b5d2b9725eb7e2cc6f3e42bd5e6d392c5334922dc89",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/31-daily.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\financial.py",
+    "sha256": "699475f190f9864a5f7edafc23a5a85734f22a299f187a62819b4ebb5cb6e247",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/32-financial.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\news.py",
+    "sha256": "6268a98ae01f37985ee6bfbfbe14653387883ed4a8ff640de7c8f88f6e15b097",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/33-news.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\snapshot.py",
+    "sha256": "cfa0b823b2fa8053ce899157e9b6078b94516d3fabd5d303480824111f62d136",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/34-snapshot.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sse\\market.py",
+    "sha256": "734c896d185e783af0d411beb4ea609e56f8b37e190d9b1bf2ff72dc22e6123a",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/35-market.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\daily.py",
+    "sha256": "487a14fcbfc47146d6d5fd291fbf41667aba435e5fed22ea1ef61ded513fcaa7",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/36-daily.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\minute.py",
+    "sha256": "ff5cf1e91327bcab2e072bcfae9f1f77dca71a84ba26e456c26580a4d59d9cc1",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/37-minute.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\snapshot.py",
+    "sha256": "3278cadac776fe8cfe5d02775a5bf8f53bc1cb96c595a5f418172f53047434bf",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/38-snapshot.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\transport.py",
+    "sha256": "cb860d0022c40ffe450694b2b4e48bff50c64ed7083d25c847a8079f2baf28b1",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/39-transport.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\wallstreetcn\\news.py",
+    "sha256": "fb870197a111ecad42d47e7e81315c7d59c3c6a8bd7cadb72b84cc537bc91fda",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/40-news.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\quality\\normalization.py",
+    "sha256": "3ed0d663b7fda9ac6cdf7f1252435f2351c783af3244ccba2c2b0f3891e29b3e",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/41-normalization.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\routing\\factory.py",
+    "sha256": "70bde5d45f76e2f7f6b3ca5f309f55cce724486a294ff975d5d2f6d9a2eb2b10",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/42-factory.py.bin"
+  },
+  {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\storage\\raw.py",
+    "sha256": "d483c614830e96d41b697709c0cde9e4cb5adee26116020428b7697f57f2c108",
+    "snapshot": "provider_validation/results/remaining-sdk-smoke-20261004/version/43-raw.py.bin"
+  }
+]

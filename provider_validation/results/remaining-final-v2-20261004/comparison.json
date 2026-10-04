@@ -1,0 +1,858 @@
+{
+  "validation_time_utc": "2026-10-04T10:41:45.962582+00:00",
+  "mode": "offline_replay",
+  "network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "verification_code": {
+    "path": "tests/test_input_collection.py",
+    "sha256": "505d201994bc226217d50b14e36640deb2b6939b4ddeab257a083c647cab8efd"
+  },
+  "runner": {
+    "path": "provider_validation/tests/replay_input_capabilities.py",
+    "sha256": "8b0b60287e1bb0eb38feae8c4dcd31550c2baaf023fcf81948442589f9f0750b"
+  },
+  "inputs": [
+    {
+      "input_id": "ASTOCK-031",
+      "scope": {
+        "code": "600519"
+      },
+      "row_count": 10,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\1\\candidate\\ASTOCK-031-fde95924309d\\2026-10-04\\input_report\\eastmoney\\stock_news\\report.json",
+      "report_sha256": "98f3d0844271d71043df5bba88b11d16a613a04d9ef5aab5fc66b7906f09caba"
+    },
+    {
+      "input_id": "ASTOCK-069",
+      "scope": {
+        "index_code": "000300"
+      },
+      "row_count": 20,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\2\\candidate\\ASTOCK-069-8e97c95a0c27\\2026-10-04\\input_report\\csindex\\index_valuation\\report.json",
+      "report_sha256": "39b67e901719e631b3c99e9633ef3f2f105eb970349b735b5029923dcd6f0985"
+    },
+    {
+      "input_id": "ASTOCK-039",
+      "scope": {
+        "code": "600519"
+      },
+      "row_count": 305,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\3\\candidate\\ASTOCK-039-9844d7b62a3d\\2026-10-04\\input_report\\sina\\financial_statements\\report.json",
+      "report_sha256": "57d07b147c793fbff3cf799da49369ebab9b955d1e16e806ea948d6324738fc2"
+    },
+    {
+      "input_id": "ASTOCK-055",
+      "scope": {
+        "date": "2026-09-30"
+      },
+      "row_count": 580,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\4\\candidate\\ASTOCK-055-a326ca32b9cd\\2026-10-04\\input_report\\sse\\option_risk\\report.json",
+      "report_sha256": "32a85126e0c5bbc078f3ea92137f5ffe3ea2d68f7316baf01b7408b40f6e0713"
+    },
+    {
+      "input_id": "ASTOCK-067",
+      "scope": {
+        "index_code": "000300"
+      },
+      "row_count": 300,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\5\\candidate\\ASTOCK-067-f1b7dbaa2b01\\2026-10-04\\input_report\\csindex\\constituents\\report.json",
+      "report_sha256": "db2583647b8b91e060bdc1d14f54f534dfd425547b0d43717b7f82d39df812ef"
+    },
+    {
+      "input_id": "ASTOCK-068",
+      "scope": {
+        "index_code": "000300"
+      },
+      "row_count": 300,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\6\\candidate\\ASTOCK-068-2bfd0244e6dc\\2026-10-04\\input_report\\csindex\\weights\\report.json",
+      "report_sha256": "1db7eaeddbe412fc22f9a4f0c18ded267ed76f9fceaa9b0a39a6fcdb6d7f9650"
+    },
+    {
+      "input_id": "ASTOCK-085",
+      "scope": {
+        "date": "2026-09-30"
+      },
+      "row_count": 83,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\7\\candidate\\ASTOCK-085-c7558ae45d4e\\2026-10-04\\input_report\\sina\\dragon_tiger_daily\\report.json",
+      "report_sha256": "54fb0e5ed857c55d4b343257215893bb8f7d20737b4df07fdbf26bfbf0657b1a"
+    },
+    {
+      "input_id": "ASTOCK-003",
+      "scope": {
+        "date": "2026-09-18"
+      },
+      "row_count": 52314,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\8\\candidate\\ASTOCK-003-d411a1975df3\\2026-10-04\\input_report\\tdx\\daily_package\\report.json",
+      "report_sha256": "3e624f92db9ed480e81387f925a5a715728130891753f7f7a42e548adee0f41d"
+    },
+    {
+      "input_id": "ASTOCK-004",
+      "scope": {
+        "code": "000001"
+      },
+      "row_count": 4445,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\9\\candidate\\ASTOCK-004-f4ad3f5702b0\\2026-10-04\\input_report\\tencent\\ticks\\report.json",
+      "report_sha256": "61dd44216f0d0eba9f323a53dd0de6ed3aaf2863bdd6323f27dc17d798c56699"
+    },
+    {
+      "input_id": "ASTOCK-030",
+      "scope": {
+        "date": "2026-09-18",
+        "exchange": "SH"
+      },
+      "row_count": 912,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\10\\candidate\\ASTOCK-030-87cb250d9a0b\\2026-10-04\\input_report\\sse\\etf_shares\\report.json",
+      "report_sha256": "ab8cb074f65c872be3145eeba20e979f03aec10ba30ae1a5de9964439ec514c1"
+    },
+    {
+      "input_id": "ASTOCK-063",
+      "scope": {
+        "start": "2026-09-01",
+        "end": "2026-09-18",
+        "curve": "all"
+      },
+      "row_count": 42,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\11\\candidate\\ASTOCK-063-670f07245fd0\\2026-10-04\\input_report\\chinabond\\yield_curve\\report.json",
+      "report_sha256": "9f2814414f751a0c9e479c89522cdb6fccc6cbba62c3f475059515cf62eee550"
+    },
+    {
+      "input_id": "ASTOCK-077",
+      "scope": {
+        "instrument": "Au99.99"
+      },
+      "row_count": 2375,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\12\\candidate\\ASTOCK-077-c8ac604c41ea\\2026-10-04\\input_report\\sge\\spot\\report.json",
+      "report_sha256": "1b7f0bac3981aeff27e35e16f634885e074b66954959d0d7221950e10364bb7f"
+    },
+    {
+      "input_id": "ASTOCK-051",
+      "scope": {},
+      "row_count": 7831,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\13\\candidate\\ASTOCK-051-cdeaf651c3d4\\2026-10-04\\input_report\\eastmoney\\intraday_changes\\report.json",
+      "report_sha256": "100a333e7f059e17976a211457ee70f4a1e39c941344a81eb5e67fa480728238"
+    },
+    {
+      "input_id": "ASTOCK-071",
+      "scope": {
+        "date": "2026-09-18",
+        "exchange": "SHFE"
+      },
+      "row_count": 238,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\14\\candidate\\ASTOCK-071-5058a86937e2\\2026-10-04\\input_report\\exchange_composite\\futures_daily\\report.json",
+      "report_sha256": "e0898f5167c3dc1d4ea13ff2b4e893c82668d687b195eda157cfcdf202c53f3e"
+    },
+    {
+      "input_id": "ASTOCK-071",
+      "scope": {
+        "date": "2026-09-18",
+        "exchange": "INE"
+      },
+      "row_count": 63,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\15\\candidate\\ASTOCK-071-d24b96dfb571\\2026-10-04\\input_report\\exchange_composite\\futures_daily\\report.json",
+      "report_sha256": "832f6cfc96561e597431c52da7d854ea450f5346cfcb3aebf272dcaf8d21eb0c"
+    },
+    {
+      "input_id": "ASTOCK-071",
+      "scope": {
+        "date": "2026-09-18",
+        "exchange": "CZCE"
+      },
+      "row_count": 243,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\16\\candidate\\ASTOCK-071-07ff98a7afda\\2026-10-04\\input_report\\exchange_composite\\futures_daily\\report.json",
+      "report_sha256": "1cd5bbf7e4a9e6906fbe0e63238181d0eb8f60bdb1895aaefa99001e4079639b"
+    },
+    {
+      "input_id": "ASTOCK-071",
+      "scope": {
+        "date": "2026-09-18",
+        "exchange": "CFFEX"
+      },
+      "row_count": 28,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\17\\candidate\\ASTOCK-071-b3b4638d167d\\2026-10-04\\input_report\\exchange_composite\\futures_daily\\report.json",
+      "report_sha256": "0baf670cd4f712df92b2bd1e7705ec7e290ff2360a0d8705817cf7b1617ef672"
+    },
+    {
+      "input_id": "ASTOCK-071",
+      "scope": {
+        "date": "2026-09-18",
+        "exchange": "GFEX"
+      },
+      "row_count": 48,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\18\\candidate\\ASTOCK-071-39b0078f61fa\\2026-10-04\\input_report\\exchange_composite\\futures_daily\\report.json",
+      "report_sha256": "e8b5a6d42f67fba8dbf724dd92c03885c24c8c7cafccf436ead54b1b950f7c4d"
+    },
+    {
+      "input_id": "ASTOCK-072",
+      "scope": {
+        "date": "2026-09-18",
+        "exchange": "SHFE"
+      },
+      "row_count": 6546,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\19\\candidate\\ASTOCK-072-7d05c0d9a5e2\\2026-10-04\\input_report\\exchange_composite\\options_daily\\report.json",
+      "report_sha256": "37766104873403abab854a5b6ab496989d19bc4384802675485fc41bc6066434"
+    },
+    {
+      "input_id": "ASTOCK-072",
+      "scope": {
+        "date": "2026-09-18",
+        "exchange": "CFFEX"
+      },
+      "row_count": 692,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\20\\candidate\\ASTOCK-072-56d6cbacefbd\\2026-10-04\\input_report\\exchange_composite\\options_daily\\report.json",
+      "report_sha256": "4be190d9f208d9da2190a80ac9c180e9938d63f8c558b0550be4bf7caf3432d5"
+    },
+    {
+      "input_id": "ASTOCK-073",
+      "scope": {
+        "date": "2026-09-18",
+        "exchange": "CFFEX"
+      },
+      "row_count": 440,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\21\\candidate\\ASTOCK-073-8df60da7f996\\2026-10-04\\input_report\\cffex\\position_rank\\report.json",
+      "report_sha256": "c30f4f5349529bb9c945b5bb928485b9b05039520e46fcdd625f3ed9fa7b8896"
+    }
+  ],
+  "original_vs_provider": [
+    {
+      "input_id": "ASTOCK-031",
+      "scope": {
+        "code": "600519"
+      },
+      "row_count": 10,
+      "mode": "offline_replay",
+      "all_business_fields_equal": true,
+      "request_comparison_equal": true,
+      "production_writes": 0,
+      "network_requests": 0,
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\1\\original-parsed.json",
+      "original_parsed_sha256": "2308f9d423e637421fe3115b46ceb1deecedcff3e49ca818ddb6961c4aafc4dd",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\1\\candidate\\ASTOCK-031-fde95924309d\\2026-10-04\\input_report\\eastmoney\\stock_news\\report.json",
+      "report_sha256": "98f3d0844271d71043df5bba88b11d16a613a04d9ef5aab5fc66b7906f09caba",
+      "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\1\\original\\manifest.ndjson",
+      "source_response_hashes": [
+        "572a3e1a92d0413b96e3288976cb1b9f20bac093ecefcaadc0807f1594225154"
+      ]
+    },
+    {
+      "input_id": "ASTOCK-069",
+      "scope": {
+        "index_code": "000300"
+      },
+      "row_count": 20,
+      "mode": "offline_replay",
+      "all_business_fields_equal": true,
+      "request_comparison_equal": true,
+      "production_writes": 0,
+      "network_requests": 0,
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\2\\original-parsed.json",
+      "original_parsed_sha256": "2dadb539f314590addab814ba536942de97d8dbc43b6eb40d2e5cfc849f8fc25",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\2\\candidate\\ASTOCK-069-8e97c95a0c27\\2026-10-04\\input_report\\csindex\\index_valuation\\report.json",
+      "report_sha256": "39b67e901719e631b3c99e9633ef3f2f105eb970349b735b5029923dcd6f0985",
+      "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\2\\original\\manifest.ndjson",
+      "source_response_hashes": [
+        "6e3db55e58791c9db7a9e4b4a45d44c0ad80763ee6b44e033c554051615c6472",
+        "6e3db55e58791c9db7a9e4b4a45d44c0ad80763ee6b44e033c554051615c6472"
+      ]
+    },
+    {
+      "input_id": "ASTOCK-039",
+      "scope": {
+        "code": "600519"
+      },
+      "row_count": 305,
+      "mode": "offline_replay",
+      "all_business_fields_equal": true,
+      "request_comparison_equal": true,
+      "production_writes": 0,
+      "network_requests": 0,
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\3\\original-parsed.json",
+      "original_parsed_sha256": "0ec7a76902e8b2669e80ebe2d47f5503f20fcb0b4a7aa1b45fff6e6379b58676",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\3\\candidate\\ASTOCK-039-9844d7b62a3d\\2026-10-04\\input_report\\sina\\financial_statements\\report.json",
+      "report_sha256": "57d07b147c793fbff3cf799da49369ebab9b955d1e16e806ea948d6324738fc2",
+      "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\3\\original\\manifest.ndjson",
+      "source_response_hashes": [
+        "3c00915108233b0c7727831ffdeec6ddced5a088bfc53a329d991110fc48c77c",
+        "e2f52c5a261901d8825555b0f6e353018633b30447e9e74da7f15372383735db",
+        "fdfd259b762555afd43a1f0cf378bc031d1b54c910f0868cf9c304657e1bb883"
+      ]
+    },
+    {
+      "input_id": "ASTOCK-055",
+      "scope": {
+        "date": "2026-09-30"
+      },
+      "row_count": 580,
+      "mode": "offline_replay",
+      "all_business_fields_equal": true,
+      "request_comparison_equal": true,
+      "production_writes": 0,
+      "network_requests": 0,
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\4\\original-parsed.json",
+      "original_parsed_sha256": "9dc3863f1443f438ee2c72263d04dfff17ab15395a4c4e4daab0cf5468fe8e08",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\4\\candidate\\ASTOCK-055-a326ca32b9cd\\2026-10-04\\input_report\\sse\\option_risk\\report.json",
+      "report_sha256": "32a85126e0c5bbc078f3ea92137f5ffe3ea2d68f7316baf01b7408b40f6e0713",
+      "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\4\\original\\manifest.ndjson",
+      "source_response_hashes": [
+        "a856900558c9920b9d1f6ee645baf05f5f4d8582df57e2d1184a14a937a594a1"
+      ]
+    },
+    {
+      "input_id": "ASTOCK-067",
+      "scope": {
+        "index_code": "000300"
+      },
+      "row_count": 300,
+      "mode": "offline_replay",
+      "all_business_fields_equal": true,
+      "request_comparison_equal": true,
+      "production_writes": 0,
+      "network_requests": 0,
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\5\\original-parsed.json",
+      "original_parsed_sha256": "fa75d010c4ab48c53b4c5d5572549461d0be42b833200225366709156984637d",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\5\\candidate\\ASTOCK-067-f1b7dbaa2b01\\2026-10-04\\input_report\\csindex\\constituents\\report.json",
+      "report_sha256": "db2583647b8b91e060bdc1d14f54f534dfd425547b0d43717b7f82d39df812ef",
+      "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\5\\original\\manifest.ndjson",
+      "source_response_hashes": [
+        "0f9fde0e470ba81bddd0d3e6db05269e1b5077aca778879f3833d04e027fa25d"
+      ]
+    },
+    {
+      "input_id": "ASTOCK-068",
+      "scope": {
+        "index_code": "000300"
+      },
+      "row_count": 300,
+      "mode": "offline_replay",
+      "all_business_fields_equal": true,
+      "request_comparison_equal": true,
+      "production_writes": 0,
+      "network_requests": 0,
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\6\\original-parsed.json",
+      "original_parsed_sha256": "8c0b9dfa5a092a5ae640e7661f4d42fcaf83aee3450db7a7f3636ac0eca32e30",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\6\\candidate\\ASTOCK-068-2bfd0244e6dc\\2026-10-04\\input_report\\csindex\\weights\\report.json",
+      "report_sha256": "1db7eaeddbe412fc22f9a4f0c18ded267ed76f9fceaa9b0a39a6fcdb6d7f9650",
+      "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\6\\original\\manifest.ndjson",
+      "source_response_hashes": [
+        "72bc4c9bd1be88f7d2c16e5a54f74777f4f43a768629699d22698a83f86c8e71"
+      ]
+    },
+    {
+      "input_id": "ASTOCK-085",
+      "scope": {
+        "date": "2026-09-30"
+      },
+      "row_count": 83,
+      "mode": "offline_replay",
+      "all_business_fields_equal": true,
+      "request_comparison_equal": true,
+      "production_writes": 0,
+      "network_requests": 0,
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\7\\original-parsed.json",
+      "original_parsed_sha256": "5e1266a73383c590bcfa2560fc3dda86223c6c7155e82799c4a5b0d9f3b7c80a",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\7\\candidate\\ASTOCK-085-c7558ae45d4e\\2026-10-04\\input_report\\sina\\dragon_tiger_daily\\report.json",
+      "report_sha256": "54fb0e5ed857c55d4b343257215893bb8f7d20737b4df07fdbf26bfbf0657b1a",
+      "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\7\\original\\manifest.ndjson",
+      "source_response_hashes": [
+        "68efc750f99a13f660b6bd4d288488a5aee983a8b7c60e48553ce03c7467d336"
+      ]
+    },
+    {
+      "input_id": "ASTOCK-003",
+      "scope": {
+        "date": "2026-09-18"
+      },
+      "row_count": 52314,
+      "mode": "offline_replay",
+      "all_business_fields_equal": true,
+      "request_comparison_equal": true,
+      "production_writes": 0,
+      "network_requests": 0,
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\8\\original-parsed.json",
+      "original_parsed_sha256": "8e80db8a57728cd0d10cd4d01c5dbe6ca1596ff657e5c7264fcf917e55eb5c3a",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\8\\candidate\\ASTOCK-003-d411a1975df3\\2026-10-04\\input_report\\tdx\\daily_package\\report.json",
+      "report_sha256": "3e624f92db9ed480e81387f925a5a715728130891753f7f7a42e548adee0f41d",
+      "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\8\\original\\manifest.ndjson",
+      "source_response_hashes": [
+        "613cbca9817cde6c5f86de7659ee86d4224b29341265b2ceaf8960ed83677ca6"
+      ]
+    },
+    {
+      "input_id": "ASTOCK-004",
+      "scope": {
+        "code": "000001"
+      },
+      "row_count": 4445,
+      "mode": "offline_replay",
+      "all_business_fields_equal": true,
+      "request_comparison_equal": true,
+      "production_writes": 0,
+      "network_requests": 0,
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\9\\original-parsed.json",
+      "original_parsed_sha256": "db89611179315089099a7cda05fbd850e432b51c7421b40f2e52f31f59c7d3b0",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\9\\candidate\\ASTOCK-004-f4ad3f5702b0\\2026-10-04\\input_report\\tencent\\ticks\\report.json",
+      "report_sha256": "61dd44216f0d0eba9f323a53dd0de6ed3aaf2863bdd6323f27dc17d798c56699",
+      "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\9\\original\\manifest.ndjson",
+      "source_response_hashes": [
+        "ca6d11102c80e68faeb699a30b243bd695481005c3f37cb69ead5db7237f6f02",
+        "30e321e11e64f6a77fa8ae832ebe3f467a1584cbe5fea42d0539d5a759e5c29c",
+        "1d44479b5f0f16309a99042ed4d6d444b1c2ae51d68a069c95b4e6e7ce9c4c3e",
+        "4a9e825355940a58fc737bf920fbb6545278eaf371d950cfffed5ddcb3b017ef",
+        "f188072f6ab4731f75bc8edf4e6fd414488da71dffd2d716b9069f02f1263226",
+        "dff2ebcc516f4aa069f4c46f6e85c4daf396013426fe61b21788cb2b63e4aa94",
+        "583148dc5ca04fdc2c999e740880c2a39347781c2a749b705419457daeba3031",
+        "5007eaf2aea55b0b77925f94775ae8923634fc77298a43623c1a73d628a24670",
+        "760457fb29509e9144371ebfe179cbc75d4ae9028316820d677bd3011ebb5e13",
+        "1d5be94190d97c268c862cfed50593f609a688c679e76343940ca83c93083f3d",
+        "6fa8af075913401fd3ec79b61f91a378c701e0a4b027dc94fdcc54d32b7c5055",
+        "e7c0bd06cd73763c4aca0a2b481f2593eb94599f33820c4a87be51c30e45c62a",
+        "7404da868fc7770299d35debcefcd204415c092dd6099dce28861cb4374ea2ee",
+        "f51c0d60b6c8020ad2a7a25e463d33feec8d4768834e7f257feb9bf4c5b156a4",
+        "5e553e13393393df0a08b302cdffe42ffa3fe26cbb11828eecb484625d17a4d6",
+        "14118a5a27ff1d761e6cd1de36fd3da566e9adfd702ee77ee060369887586deb",
+        "977cf7da28ff4086b4edcb19b2d234866c1af579d4a057f04a4445ab4c67c259",
+        "0c7999a8fc67d3f9008e70f4c9057a638cb74fd8a70c2b6551d92ea458732343",
+        "33416f3de323391b85b59ab45bed131d017bd7bc4a705a8cf4929b2958d4d876",
+        "96a8672b35ca3d7323e5430d29dd7408aae08e2104af4c0ec76929f2e2de895d",
+        "d6aca7cefba3516acc9ce366ddea43ecf55bfac5a19cc2927ba7b5ca97d83f82",
+        "657fd92e5d2e2a95497a1fd20a6c4364268c6f4cc9645a0a85e274cfd70cb9df",
+        "ab3ffaefde713afc654fb467fd73a77ce384ed5fc3b3652a7d20a5267a2aa944",
+        "2d92a58047eab79a09c13108f501d0721929857b52bb2237c05f235300d1d909",
+        "0d6d428603f275df9d8d0e4405528843662f3971f245f7a1d133f2e6fa1b23a4",
+        "5199586b7bbf1fb94ec1e574b44671c706beee7e9f5d7874e87da96f4dad7734",
+        "e484b70e5f5464cc52a28f8280b79062f7bb43168dcd88b624d8ffa62f586d51",
+        "3f5f14fb11ad1c41da50693788aeff04fdcbdf73254a3d091237f37db8887ca6",
+        "31dd3c4b056341b3f8b1610c05d380a92d8761db55bddf9fb9241492f599f938",
+        "c0f846df4e87c65da21a2fe8a9fc9af3a3e8b55dd090e11b8338406852e1959f",
+        "5ad917c7cf43ef1df7b74f786392ba0fee18761f575a6ef84d5b07981b934fda",
+        "770b912084d9cc76cf8f93f71b77f5e10044422722d4ddfed3d3a800390214dc",
+        "30426ea5f39f47dc230c419d157e6514d894177972363e3c3a59cbf8891edab3",
+        "cb10c5359b4d3f944640f7d4c867c8ed88ce59c037e7ce12bae611b16875a612",
+        "3447b8c8078811902d403e0b1fbf00d4ed8d5e31b9dd7079065dbdbadf2696f8",
+        "f4033a77c5f51db640d48cc5b8de2050d64a7c89201bd8567de93b6911541d5a",
+        "b162f7f051e69ae43b49d23d1ebef083c0dd9e5a61062a4dbe1976fbf649b8ad",
+        "a935019a208b987b8f124fe7cfad7201b502ae5af4bd89c8d733cc74d145221a",
+        "dc2a025b3b0f8eb874fbf181350670ebcb7466a939237d28d823ff2bb78316c6",
+        "e5f46d6ad3d48f48226eb0699fd10d8a8256fd7e4e6a8bad5a5c62a6a211dc4e",
+        "a6faf8cbd8b1cc53521d9a363c266cab1423b28bd6ce9e0f6e39d42edbde6a31",
+        "cb94fa072088820fc01078322cb56ba545d113ded7e3e5eaad89ea3f3dd1e436",
+        "77ed874b2a738dddd474d3b25107d0e7254a611d68fbdb19b4c53599175a326f",
+        "de2436855748b816db0459e5adba82581d8372ffc7417dcc5a85d88f80273c4e",
+        "cfe02b1c90d08a1123001f68c1938c5828404f63d9b48117aac89e2b9207360a",
+        "acaae2d3a337b1753b89d4788c083c07964b58a52efc9929ccac67580e32da90",
+        "9f06c56bee1c07db4236f7a07764b329372ff4a1987bd31f61ba9867a5f575c3",
+        "35288d9b3bf6ce040184145e6a15e9a77313d5eebd4e57de654b3ead7495e518",
+        "3680646f910521cddb61509f2a74f9050cf37ab401dcd354e46bc1d3f97daa74",
+        "e7ba4f3e172efbdd8a641267833e5a13090190d4cd59bd34ce1742acdf721bf8",
+        "dd0ad602fd6df8a67fa58bcc3061213352e8fa07b3b0b1cdc37b41b4b8eaabe8",
+        "57d547b12b2deb36e1c20a7873aa2379c188f7ad53d975b72cd0f1a1ecc4afef",
+        "1d93790f4476b9235c3a24bcc0e0cfe1bbc8a8be16346700b369d68d57c2b4f5",
+        "61ecdef31e82086c589107dc0436c0c2b9938d0186d28fe0ba59a3dde678c59b",
+        "fa418a16d036b482e5c3ecf0a23c0a58327ce4614b4a9201bcd8efba8945aeff",
+        "f6221aec901e70a14c808fc5a0ebd4e016ab281cd963d3372426a92b6ae6b7f5",
+        "b63bc5e5427af61c25c7caa46876e66a43842082b9fa2d3ead67838a04247aad",
+        "651b321600f66f77f185e1158b3159ead0b1f9ee6232070daea46d8e8fe4cc0e",
+        "dc609470faac96eb8ace2a15957120a80f8ac6aad67a554b32336ca3850112e6",
+        "98f6d8bf85f710e6e5773c0bf9c4d608c2c4d3699d0cbbf60362c572e57358aa",
+        "640f383bde2e1c5415a0774a740e67e911d39e72aa7b1afae2a2bdf9267d8dcf",
+        "d087b8eb09611bd50956f530c3ae789f60d1c952af86072190e30ea2a510e5a5",
+        "927095aa55a5a74c092b89925c031b653886724b84c0fee449a813bc647b3239",
+        "71217ac518a67fcee5bc91b83916c981aa134f3f1fa840ec728dbb041f4ec6b4",
+        "d9271d5a8610e8b7ab572cc267f07821722019627127e80478974a60235e9d9f",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "ca6d11102c80e68faeb699a30b243bd695481005c3f37cb69ead5db7237f6f02"
+      ]
+    },
+    {
+      "input_id": "ASTOCK-030",
+      "scope": {
+        "date": "2026-09-18",
+        "exchange": "SH"
+      },
+      "row_count": 912,
+      "mode": "offline_replay",
+      "all_business_fields_equal": true,
+      "request_comparison_equal": true,
+      "production_writes": 0,
+      "network_requests": 0,
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\10\\original-parsed.json",
+      "original_parsed_sha256": "cfeceb4bd18b3131ae09a91ae1e319e424345101dc747917fef789f78517afb0",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\10\\candidate\\ASTOCK-030-87cb250d9a0b\\2026-10-04\\input_report\\sse\\etf_shares\\report.json",
+      "report_sha256": "ab8cb074f65c872be3145eeba20e979f03aec10ba30ae1a5de9964439ec514c1",
+      "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\10\\original\\manifest.ndjson",
+      "source_response_hashes": [
+        "30a88d08c745cd399972cea86c49065b279c7965aa726bbfc4796a4bc6309478"
+      ]
+    },
+    {
+      "input_id": "ASTOCK-063",
+      "scope": {
+        "start": "2026-09-01",
+        "end": "2026-09-18",
+        "curve": "all"
+      },
+      "row_count": 42,
+      "mode": "offline_replay",
+      "all_business_fields_equal": true,
+      "request_comparison_equal": true,
+      "production_writes": 0,
+      "network_requests": 0,
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\11\\original-parsed.json",
+      "original_parsed_sha256": "d99a7417f0f60a0fef775b57af5b2d6c48c548efe080e97659ecb5f89c8ed98c",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\11\\candidate\\ASTOCK-063-670f07245fd0\\2026-10-04\\input_report\\chinabond\\yield_curve\\report.json",
+      "report_sha256": "9f2814414f751a0c9e479c89522cdb6fccc6cbba62c3f475059515cf62eee550",
+      "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\11\\original\\manifest.ndjson",
+      "source_response_hashes": [
+        "64b832cbb8482882526554b51e1b33f9f9c82eab0737f11f8fa5044ca95bda7e"
+      ]
+    },
+    {
+      "input_id": "ASTOCK-077",
+      "scope": {
+        "instrument": "Au99.99"
+      },
+      "row_count": 2375,
+      "mode": "offline_replay",
+      "all_business_fields_equal": true,
+      "request_comparison_equal": true,
+      "production_writes": 0,
+      "network_requests": 0,
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\12\\original-parsed.json",
+      "original_parsed_sha256": "85cfb3114354ef935832d9431fd20998d80121e515a9cbc152403ddbb0a81625",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\12\\candidate\\ASTOCK-077-c8ac604c41ea\\2026-10-04\\input_report\\sge\\spot\\report.json",
+      "report_sha256": "1b7f0bac3981aeff27e35e16f634885e074b66954959d0d7221950e10364bb7f",
+      "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\12\\original\\manifest.ndjson",
+      "source_response_hashes": [
+        "79788cd1e6502e3c31e4cceaf05596f4d903f82650ac80f971a5771c869ea655"
+      ]
+    },
+    {
+      "input_id": "ASTOCK-051",
+      "scope": {},
+      "row_count": 7831,
+      "mode": "offline_replay",
+      "all_business_fields_equal": true,
+      "request_comparison_equal": true,
+      "production_writes": 0,
+      "network_requests": 0,
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\13\\original-parsed.json",
+      "original_parsed_sha256": "34d5e0f3de95260483b80784333db1778a6532c50ecd8b413724fcdfab9d2772",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\13\\candidate\\ASTOCK-051-cdeaf651c3d4\\2026-10-04\\input_report\\eastmoney\\intraday_changes\\report.json",
+      "report_sha256": "100a333e7f059e17976a211457ee70f4a1e39c941344a81eb5e67fa480728238",
+      "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\13\\original\\manifest.ndjson",
+      "source_response_hashes": [
+        "b29f298faa3998b897db395251f08b636e2687a4a3132d5779df9569b02782b0",
+        "596cf9ef47367a192f6f1af7ed898925fa749056f584756e8a8e12ddcb59fd9f",
+        "249f89e882224beb6684f076653c87de3cdbd7178d31a6d440aec4653843e1d4",
+        "af23a14951d65d8f68e33add6176ad32b5f18687c4f0e0c5d0f2a445be964637",
+        "e81096a1bd339bdd14020153417dc3b1766378239117e13e3d626b2e3928b38f",
+        "a39989243d3104aaa0a592921af6b16182661b44001a4b906062b31fcd6290c9",
+        "c125d09f654caf5996d7d5188c938c83c0d2aa57393349d1207bd055fb94a39e",
+        "321f16a2a080b7bb53657a3204d2ee6346c657fecaad4e97301d821187f0dae0",
+        "9cf6b6f5e23beb466fc8f78a660cb0edad8ff62f1fe30d0b87bdad0b76baf658",
+        "0c36bef5b1413480c56381670473c748aedaae6c1f47e0f1cff058b8025f39a9",
+        "1cd7fbe74b6457eaabff9b44822b6f3fec7bd8b08bfcd44bf2971cd7760dc7c0",
+        "66f1e0cf797b6a9f519378da7c94b092e32d04786bf9ea771be1aa2e135f981d",
+        "4fc927d304ac8d576c34f59116a5031b6c3d2409675095b227f157e672d77e43",
+        "bdb7cdaad4729d324b8d8ed93c101ed8693ff85f549db4fb9b73deebdf65f25c",
+        "a3b6bc1e34c513bf08b3a2da2a39cc686f49a6df6cafeba394eae62ac221f5e1",
+        "7bfe5cd05abf2c07bc01a1f5c3572725ee6064d1d77954e20b3765d16a8786ae",
+        "1a05e2f07a6e2eeaac6d24297a67af3b07e2283b8c4935f55331932bd9b77aa1",
+        "97c10fbb438fd3c8a268ff30bb60c2e2ac2e4e14ed0d8066d61a32628a9f372d",
+        "da5006c097cde288796152d8e630fe2c2cb9a5a549e78fc2553a1a1eb1b34b98",
+        "c4aaa1d068702ff03ebb1af06916759e3b580d2c3cca85f3c9c88ae844531d3f",
+        "bfd8a6df9d6d47ec77adb06ce7c51ffee9b39d0c1f3738b812d55e636c9acb66",
+        "024a282e3047cee8faf60c48d4afc0d02eda20dd64600d82c6b5ff03cbab7ef5"
+      ]
+    },
+    {
+      "input_id": "ASTOCK-071",
+      "scope": {
+        "date": "2026-09-18",
+        "exchange": "SHFE"
+      },
+      "row_count": 238,
+      "mode": "offline_replay",
+      "all_business_fields_equal": true,
+      "request_comparison_equal": true,
+      "production_writes": 0,
+      "network_requests": 0,
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\14\\original-parsed.json",
+      "original_parsed_sha256": "c4b604d5ed91cd8db7b55e9b9caf79caa4964bcc3c303c78568995264f12fe3a",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\14\\candidate\\ASTOCK-071-5058a86937e2\\2026-10-04\\input_report\\exchange_composite\\futures_daily\\report.json",
+      "report_sha256": "e0898f5167c3dc1d4ea13ff2b4e893c82668d687b195eda157cfcdf202c53f3e",
+      "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\14\\original\\manifest.ndjson",
+      "source_response_hashes": [
+        "224819fc35027afc7019db9652d42bd37cf2f768e97f59df1f1eb68f3d82b123",
+        "8acc40cb2e802e9159ce70819788fe12b0b4f58ae7154e12cb5567d557213c79"
+      ]
+    },
+    {
+      "input_id": "ASTOCK-071",
+      "scope": {
+        "date": "2026-09-18",
+        "exchange": "INE"
+      },
+      "row_count": 63,
+      "mode": "offline_replay",
+      "all_business_fields_equal": true,
+      "request_comparison_equal": true,
+      "production_writes": 0,
+      "network_requests": 0,
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\15\\original-parsed.json",
+      "original_parsed_sha256": "f98945d41ff0335d2c307ada46da05beaeb991578e359731c4759bfdc44e5833",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\15\\candidate\\ASTOCK-071-d24b96dfb571\\2026-10-04\\input_report\\exchange_composite\\futures_daily\\report.json",
+      "report_sha256": "832f6cfc96561e597431c52da7d854ea450f5346cfcb3aebf272dcaf8d21eb0c",
+      "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\15\\original\\manifest.ndjson",
+      "source_response_hashes": [
+        "8acc40cb2e802e9159ce70819788fe12b0b4f58ae7154e12cb5567d557213c79"
+      ]
+    },
+    {
+      "input_id": "ASTOCK-071",
+      "scope": {
+        "date": "2026-09-18",
+        "exchange": "CZCE"
+      },
+      "row_count": 243,
+      "mode": "offline_replay",
+      "all_business_fields_equal": true,
+      "request_comparison_equal": true,
+      "production_writes": 0,
+      "network_requests": 0,
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\16\\original-parsed.json",
+      "original_parsed_sha256": "a497bf2c5b5fad4c573eced779781ebd48ace2fd669b21d7493906016ab4966b",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\16\\candidate\\ASTOCK-071-07ff98a7afda\\2026-10-04\\input_report\\exchange_composite\\futures_daily\\report.json",
+      "report_sha256": "1cd5bbf7e4a9e6906fbe0e63238181d0eb8f60bdb1895aaefa99001e4079639b",
+      "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\16\\original\\manifest.ndjson",
+      "source_response_hashes": [
+        "595f24d939400c97bc4b64bdd43a1873ab58bf3bfa654143e9460eaf51d4ab60"
+      ]
+    },
+    {
+      "input_id": "ASTOCK-071",
+      "scope": {
+        "date": "2026-09-18",
+        "exchange": "CFFEX"
+      },
+      "row_count": 28,
+      "mode": "offline_replay",
+      "all_business_fields_equal": true,
+      "request_comparison_equal": true,
+      "production_writes": 0,
+      "network_requests": 0,
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\17\\original-parsed.json",
+      "original_parsed_sha256": "adf8ceac53bb0b2396b8b08c138aa92e71ac79fe2b5d19e838076d31911ac4bd",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\17\\candidate\\ASTOCK-071-b3b4638d167d\\2026-10-04\\input_report\\exchange_composite\\futures_daily\\report.json",
+      "report_sha256": "0baf670cd4f712df92b2bd1e7705ec7e290ff2360a0d8705817cf7b1617ef672",
+      "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\17\\original\\manifest.ndjson",
+      "source_response_hashes": [
+        "5904fe9891a2b6d262d0fbbaedb8d219de709e44184d95e883c743a7ccb0bd27",
+        "012a8807c89c08c7b546cc102d35247d10e93356e488457e79e06cba9d4cee49"
+      ]
+    },
+    {
+      "input_id": "ASTOCK-071",
+      "scope": {
+        "date": "2026-09-18",
+        "exchange": "GFEX"
+      },
+      "row_count": 48,
+      "mode": "offline_replay",
+      "all_business_fields_equal": true,
+      "request_comparison_equal": true,
+      "production_writes": 0,
+      "network_requests": 0,
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\18\\original-parsed.json",
+      "original_parsed_sha256": "a0aa8d6b6d458a40fd670df31a0e6559697171e3e8efd841444af334bdcd7c55",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\18\\candidate\\ASTOCK-071-39b0078f61fa\\2026-10-04\\input_report\\exchange_composite\\futures_daily\\report.json",
+      "report_sha256": "e8b5a6d42f67fba8dbf724dd92c03885c24c8c7cafccf436ead54b1b950f7c4d",
+      "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\18\\original\\manifest.ndjson",
+      "source_response_hashes": [
+        "e699e8e97d7f0e9e797caa2944c87a0cf286149eb4845cbe9019c6d5111e8076"
+      ]
+    },
+    {
+      "input_id": "ASTOCK-072",
+      "scope": {
+        "date": "2026-09-18",
+        "exchange": "SHFE"
+      },
+      "row_count": 6546,
+      "mode": "offline_replay",
+      "all_business_fields_equal": true,
+      "request_comparison_equal": true,
+      "production_writes": 0,
+      "network_requests": 0,
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\19\\original-parsed.json",
+      "original_parsed_sha256": "69d13f6cadf011d7981c43de411f06cd9ab6f4092c5fac41953018563a1802b7",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\19\\candidate\\ASTOCK-072-7d05c0d9a5e2\\2026-10-04\\input_report\\exchange_composite\\options_daily\\report.json",
+      "report_sha256": "37766104873403abab854a5b6ab496989d19bc4384802675485fc41bc6066434",
+      "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\19\\original\\manifest.ndjson",
+      "source_response_hashes": [
+        "d6b346d216f06855953e7661197571eeacef6f074e2f4ea2587835b9ae6b5288",
+        "bc1d0223e198d4748504e36b89a0a2ef777e8dbc4cccffeeb42d5574db63db96"
+      ]
+    },
+    {
+      "input_id": "ASTOCK-072",
+      "scope": {
+        "date": "2026-09-18",
+        "exchange": "CFFEX"
+      },
+      "row_count": 692,
+      "mode": "offline_replay",
+      "all_business_fields_equal": true,
+      "request_comparison_equal": true,
+      "production_writes": 0,
+      "network_requests": 0,
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\20\\original-parsed.json",
+      "original_parsed_sha256": "1b82e907ac2a14c8bdd3263c62e0f7a5874a52b6f61d868fba1b3f1d18fc5033",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\20\\candidate\\ASTOCK-072-56d6cbacefbd\\2026-10-04\\input_report\\exchange_composite\\options_daily\\report.json",
+      "report_sha256": "4be190d9f208d9da2190a80ac9c180e9938d63f8c558b0550be4bf7caf3432d5",
+      "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\20\\original\\manifest.ndjson",
+      "source_response_hashes": [
+        "5904fe9891a2b6d262d0fbbaedb8d219de709e44184d95e883c743a7ccb0bd27",
+        "012a8807c89c08c7b546cc102d35247d10e93356e488457e79e06cba9d4cee49"
+      ]
+    },
+    {
+      "input_id": "ASTOCK-073",
+      "scope": {
+        "date": "2026-09-18",
+        "exchange": "CFFEX"
+      },
+      "row_count": 440,
+      "mode": "offline_replay",
+      "all_business_fields_equal": true,
+      "request_comparison_equal": true,
+      "production_writes": 0,
+      "network_requests": 0,
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\21\\original-parsed.json",
+      "original_parsed_sha256": "645d66b52bf8c0301b478bf8c8c59123110422c1c8f147f9739c11e26c397c9f",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\21\\candidate\\ASTOCK-073-8df60da7f996\\2026-10-04\\input_report\\cffex\\position_rank\\report.json",
+      "report_sha256": "c30f4f5349529bb9c945b5bb928485b9b05039520e46fcdd625f3ed9fa7b8896",
+      "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\21\\original\\manifest.ndjson",
+      "source_response_hashes": [
+        "12a4fb33d7f2d791a0682f31d1187f3a67072025d893e0424e1e181c9d6500cd",
+        "b2a8a352f5ca9ca1e58c44a41207fdc963dc8ad28def06971948f7f752a7bfe8",
+        "999e4fc5b309131a3e9fcaa25021e79a70587ebc3aa04dff95bd4eb56b0f16f6",
+        "ce529e08ad42cfd9f05a93cfea3bc95dcf446991793c37c41b9bc64bcbed6f70",
+        "a76e541a37f29c1af2716918bac6c7e0b6e41653b4f1658dc53fb7e837db610b",
+        "f48862db5bbc3679ceec6ce9b52c7d17a6c59059aa45ccf7b497c548916d804a",
+        "73800e28486efba4cb11553f4b9a9fd9957f5031c8828f7c155c21ed018fdfe9",
+        "13d298283faca25501a2d6fa991240b66f46157a8c6eaecf2cb595d7d9d01dac"
+      ]
+    }
+  ],
+  "known_differences": [
+    "仅已归档范围的离线回放；不证明当前来源可用或全市场覆盖。",
+    "原脚本HTTP库应用载荷、参数、请求头、代理和重试边界对照；未认证物理重试和线缆帧。",
+    "保留原来源数值；标准数值单位未认证时置空；JSON缺失值明确为null。",
+    "交易所多文件包含同来源完整性/分类校验见证，未加入其他来源或日期回退。",
+    "异动仅保留原盘中时钟，无来源交易日；财报日期为报告期，不当作披露日期。"
+  ],
+  "negative_checks": [
+    {
+      "input_id": "ASTOCK-055",
+      "mutation": "empty",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\f1\\candidate\\ASTOCK-055-5a7b63652e23\\2026-10-04\\input_report\\sse\\option_risk\\report.json",
+      "report_sha256": "58f4b5a7521e8c13b8e1fab5e05b6bb9d7ce005cb7241442b9200ad2aad3e263"
+    },
+    {
+      "input_id": "ASTOCK-055",
+      "mutation": "date",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\f2\\candidate\\ASTOCK-055-cadf4f68c65e\\2026-10-04\\input_report\\sse\\option_risk\\report.json",
+      "report_sha256": "026424acd0205c1327198d76e2964d43faf6187a2171ad659ef98e6b8facc87c"
+    },
+    {
+      "input_id": "ASTOCK-055",
+      "mutation": "numeric",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\f3\\candidate\\ASTOCK-055-575223587aba\\2026-10-04\\input_report\\sse\\option_risk\\report.json",
+      "report_sha256": "2e03964ed8391276c7baa097a6ab30fc8456be0744b3ccda467bd98dfe4713c4"
+    },
+    {
+      "input_id": "ASTOCK-055",
+      "mutation": "duplicate",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\f4\\candidate\\ASTOCK-055-1e5dced67042\\2026-10-04\\input_report\\sse\\option_risk\\report.json",
+      "report_sha256": "ccd8c6b85465d88ba81af07c0de0f6a0f06b780781264107c0c7f2ec6803a9fa"
+    },
+    {
+      "input_id": "ASTOCK-055",
+      "mutation": "http403",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\f5\\candidate\\ASTOCK-055-b72fc103d746\\2026-10-04\\input_report\\sse\\option_risk\\report.json",
+      "report_sha256": "7407893257a21c614ffa1f637e0353c28954d2af5db31801465265e8af533468"
+    },
+    {
+      "input_id": "ASTOCK-030",
+      "mutation": "count",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\f6\\candidate\\ASTOCK-030-68545a75e37d\\2026-10-04\\input_report\\sse\\etf_shares\\report.json",
+      "report_sha256": "9f6c1820ffdc6480b2ea7d7d0420d64babd5d9c0ffc56d2e6573527c6aa95e45"
+    },
+    {
+      "input_id": "ASTOCK-030",
+      "mutation": "date",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\f7\\candidate\\ASTOCK-030-50af09206405\\2026-10-04\\input_report\\sse\\etf_shares\\report.json",
+      "report_sha256": "710bc4b56e6afcabcd8a4e7ccac1c82d2d57a04806902b093fcda5b31532cdd9"
+    },
+    {
+      "input_id": "ASTOCK-039",
+      "mutation": "numeric",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\f8\\candidate\\ASTOCK-039-75dce9060ea3\\2026-10-04\\input_report\\sina\\financial_statements\\report.json",
+      "report_sha256": "46e8a727d211ede5ee1c1837330e23796a1abcc8c4bca1dd9bde7efb81fb1522"
+    },
+    {
+      "input_id": "ASTOCK-039",
+      "mutation": "date",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\f9\\candidate\\ASTOCK-039-960ee7d396b6\\2026-10-04\\input_report\\sina\\financial_statements\\report.json",
+      "report_sha256": "dabc257c0f2210303118892dd00ee419fed4ecab5c696f79c1fb8699458f8153"
+    },
+    {
+      "input_id": "ASTOCK-031",
+      "mutation": "empty",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\n1\\candidate\\ASTOCK-031-826351e17570\\2026-10-04\\input_report\\eastmoney\\stock_news\\report.json",
+      "report_sha256": "8f2ab0ae159f2ec828c05151f991936a01fbc2b0f009c25e2f43040572de9017"
+    },
+    {
+      "input_id": "ASTOCK-031",
+      "mutation": "business",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\n2\\candidate\\ASTOCK-031-2d10ab3685f3\\2026-10-04\\input_report\\eastmoney\\stock_news\\report.json",
+      "report_sha256": "a7539103eee6ab11a80653a0ee6209fc03b4236ecf14509130c2e5745003a80a"
+    },
+    {
+      "input_id": "ASTOCK-031",
+      "mutation": "duplicate",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\n3\\candidate\\ASTOCK-031-1ad83a22fd40\\2026-10-04\\input_report\\eastmoney\\stock_news\\report.json",
+      "report_sha256": "e5dde02c1b1f32db9317eb61515c8ee4a4a0c18d61fa8fa4fc4f39f6e7b3a419"
+    },
+    {
+      "input_id": "ASTOCK-069",
+      "mutation": "index",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\n4\\candidate\\ASTOCK-069-a27546c672af\\2026-10-04\\input_report\\csindex\\index_valuation\\report.json",
+      "report_sha256": "57bb0937cffae8436dc713551256195751eded18dd0828231b1e9f0993917a0f"
+    },
+    {
+      "input_id": "ASTOCK-069",
+      "mutation": "inconsistent",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\n5\\candidate\\ASTOCK-069-0c13b8036149\\2026-10-04\\input_report\\csindex\\index_valuation\\report.json",
+      "report_sha256": "6bfea00f1a21518782748853b038298cbe0e70045361ab40c53ac64932f0eb81"
+    }
+  ],
+  "native_delegation_check": "injected responses; original callable, arguments, bytes and restoration verified; no live calls",
+  "yaml_projection_mapping_and_scope": "passed",
+  "legacy_methods_unchanged": true,
+  "unsupported_scope_rejected_before_requests": true
+}

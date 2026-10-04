@@ -35,8 +35,9 @@ def main():
     parser.add_argument("--verify-factors", action="store_true", help="verify both original Sina adjustment-factor series")
     parser.add_argument("--verify-market-events", action="store_true", help="verify independent EastMoney daily billboard and market release-window endpoints")
     parser.add_argument("--verify-reports-seats", action="store_true", help="verify report lists and independent explicit-date stock seats")
+    parser.add_argument("--verify-remaining", action="store_true", help="verify remaining original SDK, package and exchange input contracts")
     args = parser.parse_args()
-    if sum((args.verify_ths_inputs, args.verify_bao_inputs, args.verify_scheduling, args.verify_tencent_snapshot, args.verify_em_inputs, args.verify_stock_pools, args.verify_em_events, args.verify_em_actions, args.verify_lpr, args.verify_news, args.verify_rates_bonds, args.verify_sina_futures, args.verify_sdk_news, args.verify_macro, args.verify_reports_calendar, args.verify_factors, args.verify_market_events, args.verify_reports_seats)) > 1:
+    if sum((args.verify_ths_inputs, args.verify_bao_inputs, args.verify_scheduling, args.verify_tencent_snapshot, args.verify_em_inputs, args.verify_stock_pools, args.verify_em_events, args.verify_em_actions, args.verify_lpr, args.verify_news, args.verify_rates_bonds, args.verify_sina_futures, args.verify_sdk_news, args.verify_macro, args.verify_reports_calendar, args.verify_factors, args.verify_market_events, args.verify_reports_seats, args.verify_remaining)) > 1:
         parser.error("THS, BaoStock, Tencent snapshot and scheduling verification are separate scopes")
     args.output_root = args.output_root.resolve()
     if not args.output_root.is_relative_to(ROOT / "provider_validation/results"):
@@ -68,7 +69,52 @@ def main():
             return original_connect(sock, address)
         forbidden_network()
 
-    with patch("requests.adapters.HTTPAdapter.send", forbidden_network), patch("socket.socket.connect", guarded_connect):
+    from contextlib import ExitStack
+    with ExitStack() as network_guard:
+        network_guard.enter_context(patch("requests.adapters.HTTPAdapter.send", forbidden_network))
+        network_guard.enter_context(patch("socket.socket.connect", guarded_connect))
+        if args.verify_remaining:
+            import curl_cffi.requests as curl_requests
+            import pandas.io.common as common
+            network_guard.enter_context(patch.object(curl_requests.Session,'request',forbidden_network))
+            network_guard.enter_context(patch.object(common,'urlopen',forbidden_network))
+        if args.verify_remaining:
+            summary["known_differences"] = ["仅已归档范围的离线回放；不证明当前来源可用或全市场覆盖。",
+                "原脚本HTTP库应用载荷、参数、请求头、代理和重试边界对照；未认证物理重试和线缆帧。",
+                "保留原来源数值；标准数值单位未认证时置空；JSON缺失值明确为null。",
+                "交易所多文件包含同来源完整性/分类校验见证，未加入其他来源或日期回退。",
+                "异动仅保留原盘中时钟，无来源交易日；财报日期为报告期，不当作披露日期。"]
+            for index, (input_id, context, manifest, count) in enumerate(checks.REMAINING_CASES):
+                comparison = checks.compare_remaining_original(args.output_root/str(index+1), input_id, context, manifest, count)
+                summary["original_vs_provider"].append(comparison)
+                summary["inputs"].append({"input_id":input_id,"scope":comparison["scope"],"row_count":comparison["row_count"],
+                    "report_path":comparison["report_path"],"report_sha256":comparison["report_sha256"]})
+            summary["negative_checks"] = []
+            for index, (input_id, mutation) in enumerate(checks.REMAINING_FAILURES):
+                directory=args.output_root/('f'+str(index+1))
+                checks.test_remaining_invalid_response_retains_evidence_without_fallback(directory,None,input_id,mutation)
+                path=next((directory/'candidate').rglob('report.json'))
+                summary["negative_checks"].append(dict(input_id=input_id,mutation=mutation,result='passed',
+                    report_path=str(path),report_sha256=hashlib.sha256(path.read_bytes()).hexdigest()))
+            checks.test_remaining_migration_preserves_existing_provider_methods()
+            checks.test_remaining_unsupported_exchange_and_calendar_rejected_before_requests(args.output_root/'g',None)
+            for index,(input_id,mutation) in enumerate([('ASTOCK-031','empty'),('ASTOCK-031','business'),('ASTOCK-031','duplicate'),('ASTOCK-069','index'),('ASTOCK-069','inconsistent')]):
+                directory=args.output_root/('n'+str(index+1))
+                checks.test_remaining_native_invalid_payload_rejects_candidate(directory,None,input_id,mutation)
+                path=next((directory/'candidate').rglob('report.json'))
+                summary['negative_checks'].append(dict(input_id=input_id,mutation=mutation,result='passed',report_path=str(path),report_sha256=hashlib.sha256(path.read_bytes()).hexdigest()))
+            checks.test_remaining_news_yaml_projection_mapping_and_scope(args.output_root/'y',None)
+            from pytest import MonkeyPatch
+            with MonkeyPatch.context() as monkeypatch:
+                checks.test_remaining_native_transport_delegation_and_restoration(args.output_root/'t',monkeypatch)
+            summary['native_delegation_check']='injected responses; original callable, arguments, bytes and restoration verified; no live calls'
+            summary['yaml_projection_mapping_and_scope']='passed'
+            summary['legacy_methods_unchanged']=True
+            summary['unsupported_scope_rejected_before_requests']=True
+            target=args.output_root/'comparison.json'
+            target.write_bytes((json.dumps(summary,ensure_ascii=False,indent=2)+'\n').encode())
+            print(json.dumps(dict(result='passed',inputs=len(summary['inputs']),comparison=str(target)),ensure_ascii=False))
+            return
         cases = (checks.REPORTS_SEATS_CASES if args.verify_reports_seats else checks.MARKET_EVENT_CASES if args.verify_market_events else checks.FACTOR_CASES if args.verify_factors else checks.REPORTS_CALENDAR_CASES if args.verify_reports_calendar else checks.MACRO_CASES if args.verify_macro else checks.SDK_NEWS_CASES if args.verify_sdk_news else checks.SINA_FUTURES_CASES if args.verify_sina_futures else checks.RATES_BONDS_CASES if args.verify_rates_bonds else checks.NEWS_CASES if args.verify_news else [("ASTOCK-065",{},checks.EVENT_ARCHIVE,1538)] if args.verify_lpr else checks.ACTION_CASES if args.verify_em_actions else checks.EVENT_CASES if args.verify_em_events else checks.POOL_CASES if args.verify_stock_pools else checks.EM_CASES if args.verify_em_inputs else [("ASTOCK-001", checks.QUOTE_CONTEXT, checks.QUOTE_ARCHIVE, 1)] + checks.CASES[:2]
                  if args.verify_tencent_snapshot else checks.BAO_CASES if args.verify_bao_inputs else
                  checks.THS_CASES if args.verify_ths_inputs else checks.CASES)

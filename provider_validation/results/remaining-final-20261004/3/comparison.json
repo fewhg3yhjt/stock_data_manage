@@ -1,0 +1,20 @@
+{
+  "input_id": "ASTOCK-067",
+  "scope": {
+    "index_code": "000300"
+  },
+  "row_count": 300,
+  "mode": "offline_replay",
+  "all_business_fields_equal": true,
+  "request_comparison_equal": true,
+  "production_writes": 0,
+  "network_requests": 0,
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-20261004\\3\\original-parsed.json",
+  "original_parsed_sha256": "fa75d010c4ab48c53b4c5d5572549461d0be42b833200225366709156984637d",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-20261004\\3\\candidate\\ASTOCK-067-f364d0509fb2\\2026-10-04\\input_report\\csindex\\constituents\\report.json",
+  "report_sha256": "60b5d74da133c041c6c4d4ae4b907e74539a65153f621e7678b89d22528061a8",
+  "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-20261004\\3\\original\\manifest.ndjson",
+  "source_response_hashes": [
+    "0f9fde0e470ba81bddd0d3e6db05269e1b5077aca778879f3833d04e027fa25d"
+  ]
+}

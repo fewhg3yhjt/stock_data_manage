@@ -1,0 +1,31 @@
+dataset:
+  name: stock_news
+  display_name: 个股关键词新闻候选输入
+  primary_key:
+  - snapshot_at
+  - source_article_code
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  source_article_code:
+    type: string
+    required: true
+  keyword:
+    type: string
+    required: false
+  title:
+    type: string
+    required: false
+  content:
+    type: string
+    required: false
+  published_text:
+    type: string
+    required: false
+  media:
+    type: string
+    required: false
+  url:
+    type: string
+    required: false

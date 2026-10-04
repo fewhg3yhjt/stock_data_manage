@@ -1,0 +1,28 @@
+{
+  "input_id": "ASTOCK-073",
+  "scope": {
+    "date": "2026-09-18",
+    "exchange": "CFFEX"
+  },
+  "row_count": 440,
+  "mode": "offline_replay",
+  "all_business_fields_equal": true,
+  "request_comparison_equal": true,
+  "production_writes": 0,
+  "network_requests": 0,
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\21\\original-parsed.json",
+  "original_parsed_sha256": "645d66b52bf8c0301b478bf8c8c59123110422c1c8f147f9739c11e26c397c9f",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\21\\candidate\\ASTOCK-073-8df60da7f996\\2026-10-04\\input_report\\cffex\\position_rank\\report.json",
+  "report_sha256": "c30f4f5349529bb9c945b5bb928485b9b05039520e46fcdd625f3ed9fa7b8896",
+  "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\21\\original\\manifest.ndjson",
+  "source_response_hashes": [
+    "12a4fb33d7f2d791a0682f31d1187f3a67072025d893e0424e1e181c9d6500cd",
+    "b2a8a352f5ca9ca1e58c44a41207fdc963dc8ad28def06971948f7f752a7bfe8",
+    "999e4fc5b309131a3e9fcaa25021e79a70587ebc3aa04dff95bd4eb56b0f16f6",
+    "ce529e08ad42cfd9f05a93cfea3bc95dcf446991793c37c41b9bc64bcbed6f70",
+    "a76e541a37f29c1af2716918bac6c7e0b6e41653b4f1658dc53fb7e837db610b",
+    "f48862db5bbc3679ceec6ce9b52c7d17a6c59059aa45ccf7b497c548916d804a",
+    "73800e28486efba4cb11553f4b9a9fd9957f5031c8828f7c155c21ed018fdfe9",
+    "13d298283faca25501a2d6fa991240b66f46157a8c6eaecf2cb595d7d9d01dac"
+  ]
+}

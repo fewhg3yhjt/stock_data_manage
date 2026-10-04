@@ -1,0 +1,58 @@
+[
+  {
+    "input_id": "ASTOCK-031",
+    "function": "stock_news_em",
+    "parameters": {
+      "symbol": "600519"
+    },
+    "archive_search_inventory": "provider_validation\\results\\remaining-original-20261004\\inventory.json",
+    "archive_search_sha256": "01ea3869249c11d33a8d256c8971737e80fae3ffeb23872ed230b62bc84386a5",
+    "scope": "one original symbol; manual evidence only",
+    "production_writes": 0,
+    "eligible_for_production_routing": false,
+    "status": "parsed",
+    "row_count": 10,
+    "fields": [
+      "关键词",
+      "新闻标题",
+      "新闻内容",
+      "发布时间",
+      "文章来源",
+      "新闻链接"
+    ],
+    "parsed_path": "provider_validation\\results\\remaining-evidence-direct-20261004\\ASTOCK-031\\parsed.json",
+    "parsed_sha256": "d5890e19487aa6f363652809eb99489e4a2d8ee82f9df5b3d3c911f9c85f1eaf",
+    "manifest": "provider_validation\\results\\remaining-evidence-direct-20261004\\ASTOCK-031\\_raw\\manifest.ndjson",
+    "manifest_sha256": "e400d1b3bfd0de50219a34b2d6e268cd58470cd6d43ca2df029e7fd1a68670b8"
+  },
+  {
+    "input_id": "ASTOCK-069",
+    "function": "stock_zh_index_value_csindex",
+    "parameters": {
+      "symbol": "000300"
+    },
+    "archive_search_inventory": "provider_validation\\results\\remaining-original-20261004\\inventory.json",
+    "archive_search_sha256": "01ea3869249c11d33a8d256c8971737e80fae3ffeb23872ed230b62bc84386a5",
+    "scope": "one original symbol; manual evidence only",
+    "production_writes": 0,
+    "eligible_for_production_routing": false,
+    "status": "parsed",
+    "row_count": 20,
+    "fields": [
+      "日期",
+      "指数代码",
+      "指数中文全称",
+      "指数中文简称",
+      "指数英文全称",
+      "指数英文简称",
+      "市盈率1",
+      "市盈率2",
+      "股息率1",
+      "股息率2"
+    ],
+    "parsed_path": "provider_validation\\results\\remaining-evidence-direct-20261004\\ASTOCK-069\\parsed.json",
+    "parsed_sha256": "2dadb539f314590addab814ba536942de97d8dbc43b6eb40d2e5cfc849f8fc25",
+    "manifest": "provider_validation\\results\\remaining-evidence-direct-20261004\\ASTOCK-069\\_raw\\manifest.ndjson",
+    "manifest_sha256": "dad3a35e701c415f4deffb566c4b00e0128d54a6e946be5690094121057b5d21"
+  }
+]

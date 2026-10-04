@@ -1,0 +1,25 @@
+dataset: etf_shares
+rules:
+- id: etf_shares-input-v1
+  input_id: ASTOCK-030
+  provider: sse
+  endpoint: etf_shares
+  field_mapping:
+    trade_date: date
+    exchange: exchange
+    source_security_code: code
+    name: name
+    etf_type: etf_type
+    shares: shares_10k
+  context_fields:
+    snapshot_at: source_snapshot_at
+  null_values:
+  - null
+  - ''
+  unverified_fields:
+  - shares
+  status: pending_validation
+  version: remaining-original-input-v1
+  evidence_refs:
+  - ASTOCK-030
+  notes: 保留原独立接口及原解析。原数字单独留证，标准数字单位未认证；无来源或日期回退，生产关闭。

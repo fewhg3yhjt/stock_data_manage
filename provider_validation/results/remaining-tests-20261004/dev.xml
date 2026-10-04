@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="19" time="64.785" timestamp="2026-10-04T18:11:48.652717+08:00" hostname="WIN-O3LLBLVKP56"><testcase classname="tests.test_input_collection" name="test_remaining_original_requests_business_fields_and_yaml[ASTOCK-039-context0-manifest0-305]" time="9.435" /><testcase classname="tests.test_input_collection" name="test_remaining_original_requests_business_fields_and_yaml[ASTOCK-055-context1-manifest1-580]" time="0.726" /><testcase classname="tests.test_input_collection" name="test_remaining_original_requests_business_fields_and_yaml[ASTOCK-067-context2-manifest2-300]" time="0.696" /><testcase classname="tests.test_input_collection" name="test_remaining_original_requests_business_fields_and_yaml[ASTOCK-068-context3-manifest3-300]" time="0.562" /><testcase classname="tests.test_input_collection" name="test_remaining_original_requests_business_fields_and_yaml[ASTOCK-085-context4-manifest4-83]" time="2.352"><failure message="AssertionError: assert {'source_row_... '序号': 1, ...} == {'source_row_... '序号': 1, ...}&#10;  &#10;  Omitting 9 identical items, use -vv to show&#10;  Differing items:&#10;  {'指标': nan} != {'指标': None}&#10;  Use -v to get more diff">tmp_path = WindowsPath('D:/Project/PythonProgram/stock_data_manage/tmp/rm1/test_remaining_original_reques4')
+no_network = None, input_id = 'ASTOCK-085'
+context = {'calendar': {'trading_dates': [datetime.date(2026, 9, 30)]}, 'request': {'trade_date': '2026-09-30'}}
+manifest = WindowsPath('D:/Project/PythonProgram/stock_data_manage/provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson')
+count = 83
+
+    @pytest.mark.parametrize("input_id,context,manifest,count", REMAINING_CASES)
+    def test_remaining_original_requests_business_fields_and_yaml(tmp_path, no_network, input_id, context, manifest, count):
+&gt;       compare_remaining_original(tmp_path, input_id, context, manifest, count)
+
+tests\test_input_collection.py:132: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('D:/Project/PythonProgram/stock_data_manage/tmp/rm1/test_remaining_original_reques4')
+input_id = 'ASTOCK-085'
+context = {'calendar': {'trading_dates': [datetime.date(2026, 9, 30)]}, 'request': {'trade_date': '2026-09-30'}}
+manifest = WindowsPath('D:/Project/PythonProgram/stock_data_manage/provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson')
+count = 83
+
+    def compare_remaining_original(tmp_path, input_id, context, manifest, count):
+        """Run independent shipped functions before comparing every candidate business field."""
+        import sys
+        import pandas as pd
+        import akshare as sdk
+        from stock_data_manage.pipeline.inputs import _json_value
+        is_sdk = input_id in {"ASTOCK-039", "ASTOCK-055", "ASTOCK-067", "ASTOCK-068", "ASTOCK-085", "ASTOCK-051"}
+        request = context.get("request", {})
+        ns = None
+        source = ROOT / "provider_validation/tests/source_snapshots/a-stock-data"
+        if not is_sdk:
+            tests = source / "tests"
+            sys.path.insert(0, str(tests))
+            name = "test_v310_sources" if input_id == "ASTOCK-004" else "test_v39_sources"
+            spec = importlib.util.spec_from_file_location(name, tests / (name + ".py"))
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            ns = module.load_v310() if input_id == "ASTOCK-004" else module.load_shipped_code()
+        store = RawObjectStore(tmp_path / "original")
+        frames = []
+        try:
+            with captured_requests(store, provider="original", endpoint=input_id, scope=context,
+                    code_version=hashlib.sha256((source / "SKILL.md").read_bytes()).hexdigest(),
+                    pacer=RequestPacer(wait=lambda _: None), replay_manifest=manifest,
+                    sdk_retry_policy=is_sdk, probe_host_pause=is_sdk) as events:
+                if input_id == "ASTOCK-039":
+                    for table in ("资产负债表", "利润表", "现金流量表"):
+                        f = sdk.stock_financial_report_sina(stock="sh600519", symbol=table)
+                        frames.append(f.assign(report_type=table, source_security_code="600519"))
+                elif input_id == "ASTOCK-055": frames = [sdk.option_risk_indicator_sse(date="20260930")]
+                elif input_id == "ASTOCK-067": frames = [sdk.index_stock_cons_csindex(symbol="000300")]
+                elif input_id == "ASTOCK-068": frames = [sdk.index_stock_cons_weight_csindex(symbol="000300")]
+                elif input_id == "ASTOCK-085":
+                    f = sdk.stock_lhb_detail_daily_sina(date="20260930")
+                    frames = [f.assign(trade_date="2026-09-30", source_row_number=range(1, len(f)+1))]
+                elif input_id == "ASTOCK-051":
+                    kinds = ("火箭发射", "快速反弹", "大笔买入", "封涨停板", "打开跌停板", "有大买盘", "竞价上涨", "高开5日线", "向上缺口", "60日新高", "60日大幅上涨", "加速下跌", "高台跳水", "大笔卖出", "封跌停板", "打开涨停板", "有大卖盘", "竞价下跌", "低开5日线", "向下缺口", "60日新低", "60日大幅下跌")
+                    offset = 0
+                    for kind in kinds:
+                        f = sdk.stock_changes_em(symbol=kind)
+                        frames.append(f.assign(异动类型=kind, source_row_number=range(offset+1, offset+len(f)+1)))
+                        offset += len(f)
+                elif input_id == "ASTOCK-003": frames = [ns["tdx_daily_package"]("2026-09-18")]
+                elif input_id == "ASTOCK-004": frames = [ns["tencent_ticks"]("sz000001")]
+                elif input_id == "ASTOCK-030": frames = [ns["etf_shares"]("2026-09-18", "SH")]
+                elif input_id == "ASTOCK-063": frames = [ns["chinabond_yield_curve"]("2026-09-01", "2026-09-18", "all")]
+                elif input_id == "ASTOCK-077": frames = [ns["sge_spot"]("Au99.99")]
+                else:
+                    function = {"ASTOCK-071": "futures_daily", "ASTOCK-072": "options_daily", "ASTOCK-073": "futures_position_rank"}[input_id]
+                    frames = [ns[function]("2026-09-18", request["exchange"])]
+        finally:
+            if ns is not None: ns["EM_SESSION"].close()
+        parsed = [r for f in frames for r in _json_value(f.astype(object).where(f.notna(), None).to_dict(orient="records"))]
+        path = tmp_path / "original-parsed.json"
+        path.write_bytes((json.dumps(parsed, ensure_ascii=False, indent=2) + "\n").encode())
+        report = collect_input(input_id=input_id, context=context, config_root=ROOT / "config", output_root=tmp_path / "candidate", replay_manifest=manifest)
+        assert report["status"] == "candidate_complete", {k: report.get(k) for k in ("status", "failure_class", "failure_message")}
+        assert report["row_count"] == len(parsed)
+        if count: assert len(parsed) == count
+        candidate = read_artifact(report, "parsed_rows")
+        assert len(candidate) == len(parsed)
+        for row, old in zip(candidate, parsed):
+&gt;           assert row == {key: old[key] for key in row}
+E           AssertionError: assert {'source_row_... '序号': 1, ...} == {'source_row_... '序号': 1, ...}
+E             
+E             Omitting 9 identical items, use -vv to show
+E             Differing items:
+E             {'指标': nan} != {'指标': None}
+E             Use -v to get more diff
+
+tests\test_input_collection.py:112: AssertionError</failure></testcase><testcase classname="tests.test_input_collection" name="test_remaining_original_requests_business_fields_and_yaml[ASTOCK-003-context5-manifest5-52314]" time="12.375" /><testcase classname="tests.test_input_collection" name="test_remaining_original_requests_business_fields_and_yaml[ASTOCK-004-context6-manifest6-4445]" time="16.471" /><testcase classname="tests.test_input_collection" name="test_remaining_original_requests_business_fields_and_yaml[ASTOCK-030-context7-manifest7-912]" time="0.709" /><testcase classname="tests.test_input_collection" name="test_remaining_original_requests_business_fields_and_yaml[ASTOCK-063-context8-manifest8-42]" time="0.552"><failure message="AssertionError: assert {'10y': 2.079...m': 1.48, ...} == {'10y': 2.079...m': 1.48, ...}&#10;  &#10;  Omitting 9 identical items, use -vv to show&#10;  Differing items:&#10;  {'30y': nan} != {'30y': None}&#10;  Use -v to get more diff">tmp_path = WindowsPath('D:/Project/PythonProgram/stock_data_manage/tmp/rm1/test_remaining_original_reques8')
+no_network = None, input_id = 'ASTOCK-063'
+context = {'request': {'curve': 'all', 'end_date': '2026-09-18', 'start_date': '2026-09-01'}}
+manifest = WindowsPath('D:/Project/PythonProgram/stock_data_manage/provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson')
+count = 42
+
+    @pytest.mark.parametrize("input_id,context,manifest,count", REMAINING_CASES)
+    def test_remaining_original_requests_business_fields_and_yaml(tmp_path, no_network, input_id, context, manifest, count):
+&gt;       compare_remaining_original(tmp_path, input_id, context, manifest, count)
+
+tests\test_input_collection.py:132: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('D:/Project/PythonProgram/stock_data_manage/tmp/rm1/test_remaining_original_reques8')
+input_id = 'ASTOCK-063'
+context = {'request': {'curve': 'all', 'end_date': '2026-09-18', 'start_date': '2026-09-01'}}
+manifest = WindowsPath('D:/Project/PythonProgram/stock_data_manage/provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson')
+count = 42
+
+    def compare_remaining_original(tmp_path, input_id, context, manifest, count):
+        """Run independent shipped functions before comparing every candidate business field."""
+        import sys
+        import pandas as pd
+        import akshare as sdk
+        from stock_data_manage.pipeline.inputs import _json_value
+        is_sdk = input_id in {"ASTOCK-039", "ASTOCK-055", "ASTOCK-067", "ASTOCK-068", "ASTOCK-085", "ASTOCK-051"}
+        request = context.get("request", {})
+        ns = None
+        source = ROOT / "provider_validation/tests/source_snapshots/a-stock-data"
+        if not is_sdk:
+            tests = source / "tests"
+            sys.path.insert(0, str(tests))
+            name = "test_v310_sources" if input_id == "ASTOCK-004" else "test_v39_sources"
+            spec = importlib.util.spec_from_file_location(name, tests / (name + ".py"))
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            ns = module.load_v310() if input_id == "ASTOCK-004" else module.load_shipped_code()
+        store = RawObjectStore(tmp_path / "original")
+        frames = []
+        try:
+            with captured_requests(store, provider="original", endpoint=input_id, scope=context,
+                    code_version=hashlib.sha256((source / "SKILL.md").read_bytes()).hexdigest(),
+                    pacer=RequestPacer(wait=lambda _: None), replay_manifest=manifest,
+                    sdk_retry_policy=is_sdk, probe_host_pause=is_sdk) as events:
+                if input_id == "ASTOCK-039":
+                    for table in ("资产负债表", "利润表", "现金流量表"):
+                        f = sdk.stock_financial_report_sina(stock="sh600519", symbol=table)
+                        frames.append(f.assign(report_type=table, source_security_code="600519"))
+                elif input_id == "ASTOCK-055": frames = [sdk.option_risk_indicator_sse(date="20260930")]
+                elif input_id == "ASTOCK-067": frames = [sdk.index_stock_cons_csindex(symbol="000300")]
+                elif input_id == "ASTOCK-068": frames = [sdk.index_stock_cons_weight_csindex(symbol="000300")]
+                elif input_id == "ASTOCK-085":
+                    f = sdk.stock_lhb_detail_daily_sina(date="20260930")
+                    frames = [f.assign(trade_date="2026-09-30", source_row_number=range(1, len(f)+1))]
+                elif input_id == "ASTOCK-051":
+                    kinds = ("火箭发射", "快速反弹", "大笔买入", "封涨停板", "打开跌停板", "有大买盘", "竞价上涨", "高开5日线", "向上缺口", "60日新高", "60日大幅上涨", "加速下跌", "高台跳水", "大笔卖出", "封跌停板", "打开涨停板", "有大卖盘", "竞价下跌", "低开5日线", "向下缺口", "60日新低", "60日大幅下跌")
+                    offset = 0
+                    for kind in kinds:
+                        f = sdk.stock_changes_em(symbol=kind)
+                        frames.append(f.assign(异动类型=kind, source_row_number=range(offset+1, offset+len(f)+1)))
+                        offset += len(f)
+                elif input_id == "ASTOCK-003": frames = [ns["tdx_daily_package"]("2026-09-18")]
+                elif input_id == "ASTOCK-004": frames = [ns["tencent_ticks"]("sz000001")]
+                elif input_id == "ASTOCK-030": frames = [ns["etf_shares"]("2026-09-18", "SH")]
+                elif input_id == "ASTOCK-063": frames = [ns["chinabond_yield_curve"]("2026-09-01", "2026-09-18", "all")]
+                elif input_id == "ASTOCK-077": frames = [ns["sge_spot"]("Au99.99")]
+                else:
+                    function = {"ASTOCK-071": "futures_daily", "ASTOCK-072": "options_daily", "ASTOCK-073": "futures_position_rank"}[input_id]
+                    frames = [ns[function]("2026-09-18", request["exchange"])]
+        finally:
+            if ns is not None: ns["EM_SESSION"].close()
+        parsed = [r for f in frames for r in _json_value(f.astype(object).where(f.notna(), None).to_dict(orient="records"))]
+        path = tmp_path / "original-parsed.json"
+        path.write_bytes((json.dumps(parsed, ensure_ascii=False, indent=2) + "\n").encode())
+        report = collect_input(input_id=input_id, context=context, config_root=ROOT / "config", output_root=tmp_path / "candidate", replay_manifest=manifest)
+        assert report["status"] == "candidate_complete", {k: report.get(k) for k in ("status", "failure_class", "failure_message")}
+        assert report["row_count"] == len(parsed)
+        if count: assert len(parsed) == count
+        candidate = read_artifact(report, "parsed_rows")
+        assert len(candidate) == len(parsed)
+        for row, old in zip(candidate, parsed):
+&gt;           assert row == {key: old[key] for key in row}
+E           AssertionError: assert {'10y': 2.079...m': 1.48, ...} == {'10y': 2.079...m': 1.48, ...}
+E             
+E             Omitting 9 identical items, use -vv to show
+E             Differing items:
+E             {'30y': nan} != {'30y': None}
+E             Use -v to get more diff
+
+tests\test_input_collection.py:112: AssertionError</failure></testcase><testcase classname="tests.test_input_collection" name="test_remaining_original_requests_business_fields_and_yaml[ASTOCK-077-context9-manifest9-2375]" time="0.814" /><testcase classname="tests.test_input_collection" name="test_remaining_original_requests_business_fields_and_yaml[ASTOCK-051-context10-manifest10-7831]" time="6.152" /><testcase classname="tests.test_input_collection" name="test_remaining_original_requests_business_fields_and_yaml[ASTOCK-071-context11-manifest11-0]" time="0.669" /><testcase classname="tests.test_input_collection" name="test_remaining_original_requests_business_fields_and_yaml[ASTOCK-071-context12-manifest12-0]" time="0.564" /><testcase classname="tests.test_input_collection" name="test_remaining_original_requests_business_fields_and_yaml[ASTOCK-071-context13-manifest13-243]" time="0.726" /><testcase classname="tests.test_input_collection" name="test_remaining_original_requests_business_fields_and_yaml[ASTOCK-071-context14-manifest14-28]" time="0.859" /><testcase classname="tests.test_input_collection" name="test_remaining_original_requests_business_fields_and_yaml[ASTOCK-071-context15-manifest15-48]" time="0.616" /><testcase classname="tests.test_input_collection" name="test_remaining_original_requests_business_fields_and_yaml[ASTOCK-072-context16-manifest16-0]" time="4.086" /><testcase classname="tests.test_input_collection" name="test_remaining_original_requests_business_fields_and_yaml[ASTOCK-072-context17-manifest17-692]" time="1.348" /><testcase classname="tests.test_input_collection" name="test_remaining_original_requests_business_fields_and_yaml[ASTOCK-073-context18-manifest18-440]" time="0.979" /></testsuite></testsuites>

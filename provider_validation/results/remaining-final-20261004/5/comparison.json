@@ -1,0 +1,20 @@
+{
+  "input_id": "ASTOCK-085",
+  "scope": {
+    "date": "2026-09-30"
+  },
+  "row_count": 83,
+  "mode": "offline_replay",
+  "all_business_fields_equal": true,
+  "request_comparison_equal": true,
+  "production_writes": 0,
+  "network_requests": 0,
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-20261004\\5\\original-parsed.json",
+  "original_parsed_sha256": "5e1266a73383c590bcfa2560fc3dda86223c6c7155e82799c4a5b0d9f3b7c80a",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-20261004\\5\\candidate\\ASTOCK-085-dddbe6d4ee62\\2026-10-04\\input_report\\sina\\dragon_tiger_daily\\report.json",
+  "report_sha256": "3d0a76c2668581f8bc422311288913bb037bb2c692bc3ffca1c2b87039a1ec23",
+  "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-20261004\\5\\original\\manifest.ndjson",
+  "source_response_hashes": [
+    "68efc750f99a13f660b6bd4d288488a5aee983a8b7c60e48553ce03c7467d336"
+  ]
+}

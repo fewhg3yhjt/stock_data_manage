@@ -1,0 +1,11 @@
+{
+  "script_sha256": "043d05dda14da961394cd7e757d744b213587ad7e631c3053d2a5f01540b63a7",
+  "production_writes": 0,
+  "cancelled_at": "2026-10-04T10:28:51.2078639Z",
+  "source_unavailable": false,
+  "started_at": "2026-10-04T10:17:16.0518910Z",
+  "process_id": 36544,
+  "scope": "ASTOCK-011 single original SDK symbol",
+  "outcome": "probe_cancelled_after_unbounded_wait",
+  "reason": "Original SDK request has no timeout; preserve transport and stop the validation process after more than ten minutes without a response"
+}

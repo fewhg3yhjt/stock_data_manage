@@ -74,10 +74,18 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                   Path(__file__).parents[1] / "providers/eastmoney/limit_pool.py",
                   Path(__file__).parents[1] / "providers/eastmoney/shareholder.py",
                   Path(__file__).parents[1] / "providers/eastmoney/financial.py",
+                  Path(__file__).parents[1] / "providers/eastmoney/news.py",
                   Path(__file__).parents[1] / "providers/wallstreetcn/news.py",
                   Path(__file__).parents[1] / "providers/cctv/news.py",
                   Path(__file__).parents[1] / "providers/cls/news.py",
                   Path(__file__).parents[1] / "providers/sina/news.py",
+                  Path(__file__).parents[1] / "providers/sina/financial.py",
+                  Path(__file__).parents[1] / "providers/sse/market.py",
+                  Path(__file__).parents[1] / "providers/csindex/indices.py",
+                  Path(__file__).parents[1] / "providers/tdx/minute.py",
+                  Path(__file__).parents[1] / "providers/chinabond/yield_curve.py",
+                  Path(__file__).parents[1] / "providers/exchanges/daily.py",
+                  Path(__file__).parents[1] / "providers/sge/spot.py",
                   Path(__file__).parents[1] / "providers/mofcom/social_financing.py",
                   Path(__file__).parents[1] / "providers/chinamoney/rates.py",
                   Path(__file__).parents[1] / "providers/eastmoney/dividend.py",
@@ -128,6 +136,9 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
     is_reportapi = input_id == "ASTOCK-008"
     is_seats = input_id == "ASTOCK-019"
     is_reports_seats = is_reportapi or is_seats
+    is_source_sdk = input_id in {"ASTOCK-031","ASTOCK-039","ASTOCK-051","ASTOCK-055","ASTOCK-067","ASTOCK-068","ASTOCK-069","ASTOCK-085"}
+    is_original_source = input_id in {"ASTOCK-003","ASTOCK-004","ASTOCK-030","ASTOCK-063","ASTOCK-071","ASTOCK-072","ASTOCK-073","ASTOCK-077"}
+    is_source_extension = is_source_sdk or is_original_source
     is_repo_rate = input_id == "ASTOCK-064"
     is_cb = input_id == "ASTOCK-084"
     is_sina_futures = input_id in {"ASTOCK-074", "ASTOCK-075", "ASTOCK-076"}
@@ -228,7 +239,9 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             report["code_version"] = code_version
             report["evidence_representation"] = "SDK-decoded ResultSet fields and rows; BaoStock TCP wire bytes are not exposed"
             report["request_limit_enforcement"] = "sdk_query_boundary_only"
-        sdk_functions = {"ASTOCK-019": "stock_lhb_stock_detail_em", "ASTOCK-020": "stock_lhb_detail_em", "ASTOCK-021": "stock_restricted_release_detail_em",
+        sdk_functions = {"ASTOCK-031":"stock_news_em", "ASTOCK-069":"stock_zh_index_value_csindex", "ASTOCK-039":"stock_financial_report_sina", "ASTOCK-051":"stock_changes_em", "ASTOCK-055":"option_risk_indicator_sse",
+                         "ASTOCK-067":"index_stock_cons_csindex", "ASTOCK-068":"index_stock_cons_weight_csindex", "ASTOCK-085":"stock_lhb_detail_daily_sina",
+                         "ASTOCK-019": "stock_lhb_stock_detail_em", "ASTOCK-020": "stock_lhb_detail_em", "ASTOCK-021": "stock_restricted_release_detail_em",
                          "ASTOCK-006": "stock_zh_a_daily", "ASTOCK-045": "stock_zt_pool_em", "ASTOCK-070": "tool_trade_date_hist_sina",
                          "ASTOCK-032": "stock_info_global_cls", "ASTOCK-033": "stock_info_global_sina",
                          "ASTOCK-061": "macro_china_shrzgm", "ASTOCK-062": "macro_china_pmi",
@@ -250,7 +263,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             sdk_source_hash = hashlib.sha256(sdk_source).hexdigest()
             # The SDK embeds a public client selector; keep its hash, redact token-like literals in the snapshot.
             import re
-            sdk_snapshot = re.sub(rb'''(?i)(["'](?:ut|token|access_token|api_key|password|secret)["']\s*:\s*["'])[^"']*(["'])''',
+            sdk_snapshot = re.sub(rb'''(?i)(["'](?:ut|token|access_token|api_key|password|secret|cookie)["']\s*:\s*["'])[^"']*(["'])''',
                                   rb'\1<redacted>\2', sdk_source)
             sdk_ref = raw_store.write_bytes(sdk_snapshot, dataset="source_code", provider=contract.provider,
                 endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="sdk-function", content_addressed=True)
@@ -258,10 +271,18 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                 "function": function.__name__, "source_path": sdk_ref.path.relative_to(directory).as_posix(), "sha256": sdk_ref.content_hash,
                 "original_source_sha256": sdk_source_hash, "redacted": sdk_snapshot != sdk_source}
             code_version = hashlib.sha256((code_version + sdk_source_hash + report["sdk_dependency"]["version"]).encode()).hexdigest()
-            if is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_seats:
+            if is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_seats or is_source_sdk:
                 import requests
                 import urllib3
                 report["transport_dependency"] = {"requests": requests.__version__, "urllib3": urllib3.__version__}
+                if input_id in {'ASTOCK-031','ASTOCK-069'}:
+                    import pandas
+                    report['transport_dependency']['pandas']=pandas.__version__
+                    if input_id=='ASTOCK-031':
+                        import curl_cffi
+                        report['transport_dependency']['curl_cffi']=curl_cffi.__version__
+                    import json
+                    code_version=hashlib.sha256((code_version+json.dumps(report['transport_dependency'],sort_keys=True)).encode()).hexdigest()
                 code_version = hashlib.sha256((code_version + requests.__version__ + urllib3.__version__).encode()).hexdigest()
                 namespace = getattr(function, "__globals__", {})
                 report["sdk_dependency"]["dependencies"] = []
@@ -301,6 +322,15 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                 if is_seats:
                     report["seats_sdk_transport_policy"] = report.pop("sdk_news_transport_policy")
                     report["seats_sdk_transport_policy"].update(response_guard="after exact retention, before SDK positional parsing", source_fallback=False, implicit_date_selection=False)
+                if is_source_sdk:
+                    report["source_sdk_transport_policy"] = report.pop("sdk_news_transport_policy")
+                    if input_id in {'ASTOCK-031','ASTOCK-069'}:
+                        report['source_sdk_transport_policy']={'source_contract':'original native SDK transport',
+                            'transport':'curl_cffi' if input_id=='ASTOCK-031' else 'pandas urllib',
+                            'capture_boundary':'SDK application response before parsing; native transport delegated unchanged',
+                            'requests_retry_policy_applies':False,'source_fallback_enabled':False,'implicit_date_selection':False}
+                    report["source_sdk_transport_policy"].update(source_fallback=False,implicit_date_selection=False,
+                        source_scope="explicit source SDK and parameters; exact original response retained before parsing")
                 if is_sdk_macro:
                     del report["sdk_news_transport_policy"]
                     report["macro_sdk_transport_policy"] = {"source_contract":"successful rate-limited original SDK probe",
@@ -385,9 +415,16 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                     scope={"input_id": input_id, "parameters": normalized_context}, code_version=code_version, pacer=pacer,
                     replay_manifest=replay_manifest if mode == "replay" else None,
                     evidence_roots=(evidence_root, output_root), max_age_seconds=profile.refresh_interval_seconds or 86400,
-                    sdk_retry_policy=is_stock_pool or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or input_id in {"ASTOCK-001", "ASTOCK-045", "ASTOCK-070", "ASTOCK-026", "ASTOCK-027", "ASTOCK-028"},
-                    probe_host_pause=is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats,require_empty_post_body=input_id=="ASTOCK-061",response_validator=response_validator,
-                    cache_ignored_query_parameters=("_",) if is_reportapi else ()))
+                    sdk_retry_policy=is_stock_pool or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_sdk or input_id in {"ASTOCK-001", "ASTOCK-045", "ASTOCK-070", "ASTOCK-026", "ASTOCK-027", "ASTOCK-028"},
+                    probe_host_pause=is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_sdk,require_empty_post_body=input_id=="ASTOCK-061",response_validator=response_validator,
+                    cache_ignored_query_parameters=("_",) if is_reportapi else (),
+                    native_transport='curl_cffi' if input_id=='ASTOCK-031' else 'pandas_urllib' if input_id=='ASTOCK-069' else None))
+            if is_source_sdk:
+                def retained_responses():
+                    for event in response_events:
+                        if event.get("outcome")=="response" and event["status_code"]==200:
+                            yield {"url":event["url"],"body":RawObjectStore.read_response(raw_store.root/"manifest.ndjson",event)}
+                runtime_parameters["source_responses"]=retained_responses
             if is_reportapi and mode == "replay":
                 from ..providers.eastmoney.financial import reportapi_replay_clock
                 from ..providers.eastmoney.realtime import history_stock_identity
@@ -463,8 +500,8 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                 returned_window={"first": parameters["date"].isoformat(), "last": parameters["date"].isoformat()},
                 coverage_basis="source tc and returned SDK rows for requested qdate; not independent whole-market proof",
                 universe_completeness_verified=False)
-        mapping_rows = fetched.rows if is_em_history or is_lpr or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_repo_rate or is_cb or is_sina_futures else source_rows
-        if is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_repo_rate or is_cb or is_sina_futures:
+        mapping_rows = fetched.rows if is_em_history or is_lpr or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_extension or is_repo_rate or is_cb or is_sina_futures else source_rows
+        if is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_extension or is_repo_rate or is_cb or is_sina_futures:
             parsed_ref = result_store.write_json(_json_value(mapping_rows), dataset="parsed_rows", provider=contract.provider,
                 endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="parsed-rows")
             report["parsed_rows"] = {"path":parsed_ref.path.relative_to(directory).as_posix(),
@@ -541,7 +578,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             raise NormalizationError("temporary empty input; not certified as a valid empty dataset")
         mapping_context = {"provider": contract.provider}
         mapping_context.update(getattr(fetched, "mapping_context", {}))
-        if input_id.startswith("SDA-BOARD-") or is_tencent_snapshot or is_em_history or is_stock_pool or is_em_events or is_lpr or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_repo_rate or is_cb or is_sina_futures:
+        if input_id.startswith("SDA-BOARD-") or is_tencent_snapshot or is_em_history or is_stock_pool or is_em_events or is_lpr or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_extension or is_repo_rate or is_cb or is_sina_futures:
             successful = [event for event in response_events if event.get("outcome") == "response" and (not (is_sdk_news or is_sdk_macro or is_market_events or is_reports_seats) or event["status_code"] == 200)]
             if not successful:
                 raise NormalizationError("source response evidence is required; an SDK memory cache alone is insufficient")
@@ -557,7 +594,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             mapping_context["source_snapshot_at"] = max(source_times)
             report["source_capture_window"] = {"first": min(source_times).isoformat(), "last": max(source_times).isoformat(),
                                                "meaning": "source response capture times; not row-level market timestamps"}
-            if not is_tencent_snapshot and not is_em_history and not is_stock_pool and not is_em_events and not is_lpr and not is_news and not is_reports_calendar and not is_sdk_news and not is_sdk_macro and not is_factor and not is_market_events and not is_reports_seats and not is_repo_rate and not is_cb and not is_sina_futures:
+            if not is_tencent_snapshot and not is_em_history and not is_stock_pool and not is_em_events and not is_lpr and not is_news and not is_reports_calendar and not is_sdk_news and not is_sdk_macro and not is_factor and not is_market_events and not is_reports_seats and not is_source_extension and not is_repo_rate and not is_cb and not is_sina_futures:
                 report["returned_window"] = {"first": fetched.returned_first_key, "last": fetched.returned_last_key}
                 report["source_units"] = list(fetched.units)
                 report["coverage_basis"] = "returned SDK rows; not an independently verified market universe"
@@ -623,6 +660,17 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                     source_symbol=fetched.mapping_context["source_symbol"], coverage_complete=True, date_discovery_requests=0,
                     source_row_number_semantics="original SDK row order after type sort; not monetary rank or permanent department identity",
                     coverage_basis="two source-reported nonempty single pages for explicit stock/day; no independent seat census")
+        if is_source_extension:
+            key = '发布时间' if input_id=='ASTOCK-031' else '报告日' if input_id=='ASTOCK-039' else '时间' if input_id=='ASTOCK-051' else 'TRADE_DATE' if input_id=='ASTOCK-055' else '日期' if input_id in {'ASTOCK-067','ASTOCK-068','ASTOCK-069'} else 'trade_date' if input_id=='ASTOCK-085' else 'date'
+            days=[str(row[key]) for row in mapping_rows]
+            window_meaning = ('source intraday clock labels; source date unavailable' if input_id=='ASTOCK-051'
+                else 'financial report periods, not publication dates' if input_id=='ASTOCK-039'
+                else 'source date labels within explicit request scope')
+            report.update(returned_window={'first':min(days),'last':max(days),'meaning':window_meaning},source_fallback_enabled=False,
+                implicit_date_selection=False,universe_completeness_verified=False,
+                coverage_basis='returned original source records within explicit source scope; no independent universe proof',
+                source_rows_representation='retained source fields or original parser rows; exact complete HTTP bytes are separate',
+                source_metadata=_json_value(fetched.mapping_context))
         if is_reports_calendar:
             times=[row["date"] if input_id=="ASTOCK-013" else row["time"] for row in mapping_rows]
             report.update(returned_window={"first":min(times) if times else None,"last":max(times) if times else None},
@@ -681,7 +729,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
         import json
         all_events = [json.loads(line) for line in raw_manifest.read_text(encoding="utf-8").splitlines()]
         report["responses"] = [event for event in all_events if event.get("event") in {"http_response", "source_payload", "sdk_query_failure"}]
-        if is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats:
+        if is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_sdk:
             report["host_pause_events"] = [event for event in all_events if event.get("event") == "host_paused"]
         if is_baostock:
             report["sdk_session"] = [event for event in all_events if event.get("event") == "sdk_session"]

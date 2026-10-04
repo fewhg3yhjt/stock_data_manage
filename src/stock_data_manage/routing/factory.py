@@ -43,6 +43,12 @@ def build_input_provider(contract, *, providers_path, client=None):
                         "ASTOCK-013": "fetch_reports", "ASTOCK-066": "fetch_macro_calendar", "ASTOCK-006": "fetch_adjustment_factors",
                         "ASTOCK-020": "fetch_dragon_tiger_daily", "ASTOCK-021": "fetch_lockup_expiry",
                         "ASTOCK-008": "fetch_report_list", "ASTOCK-019": "fetch_dragon_tiger_seats",
+                            "ASTOCK-031": "fetch", "ASTOCK-069": "fetch", "ASTOCK-039": "fetch", "ASTOCK-055": "fetch_risk", "ASTOCK-067": "fetch", "ASTOCK-068": "fetch",
+                        "ASTOCK-085": "fetch_dragon_tiger_daily",
+                        "ASTOCK-003":"fetch_daily_package", "ASTOCK-004":"fetch_ticks", "ASTOCK-030":"fetch_etf",
+                        "ASTOCK-063":"fetch", "ASTOCK-071":"fetch_futures", "ASTOCK-072":"fetch_options",
+                        "ASTOCK-073":"fetch_rank", "ASTOCK-077":"fetch",
+                        "ASTOCK-051":"fetch_intraday_changes",
                         "ASTOCK-074": "fetch_futures", "ASTOCK-075": "fetch_futures_kline", "ASTOCK-076": "fetch_a50",
                         "SDA-BOARD-001": "fetch_industry_list", "SDA-BOARD-002": "fetch_industry_daily",
                         "SDA-BOARD-003": "fetch_fund_flow", "SDA-BOARD-004": "fetch_fund_flow",
@@ -95,6 +101,52 @@ def build_input_provider(contract, *, providers_path, client=None):
         provider=WallStreetCNNewsProvider()
         provider.capability_version="wallstreetcn-calendar-input-v1"
         provider.input_hosts=("https://api-one-wscn.awtmt.com",)
+        return provider
+    if contract.input_id == "ASTOCK-039":
+        from ..providers.sina.financial import SinaFinancialReportProvider
+        return SinaFinancialReportProvider(client=client)
+    if contract.input_id == "ASTOCK-031":
+        from ..providers.eastmoney.news import EastMoneyStockNewsProvider
+        return EastMoneyStockNewsProvider(client=client)
+    if contract.input_id == "ASTOCK-069":
+        from ..providers.csindex.indices import CsindexConstituentProvider
+        provider=CsindexConstituentProvider(endpoint='index_valuation',client=client)
+        provider.capability_version='csindex-valuation-input-v1'
+        return provider
+    if contract.input_id == "ASTOCK-051":
+        provider=EastMoneyFinancialMainProvider(client=client,endpoint=contract.endpoint,capability_version='eastmoney-changes-input-v1')
+        return provider
+    if contract.input_id == "ASTOCK-003":
+        config=next(c for c in load_provider_configs(providers_path) if c.provider=='tdx')
+        return TdxMinuteProvider(lambda:None,replace(config.capability(),version='tdx-package-input-v1'),endpoint=contract.endpoint)
+    if contract.input_id == "ASTOCK-004":
+        config=next(c for c in load_provider_configs(providers_path) if c.provider=='tencent' and c.endpoint=='bulk_snapshot')
+        return TencentSnapshotProvider(RequestsTransport({}),replace(config.capability(),version='tencent-ticks-input-v1'),endpoint=contract.endpoint)
+    if contract.input_id == "ASTOCK-030":
+        from ..providers.sse.market import SseMarketProvider
+        provider=SseMarketProvider()
+        provider.capability_version='sse-etf-input-v1'
+        return provider
+    if contract.input_id == "ASTOCK-063":
+        from ..providers.chinabond.yield_curve import ChinaBondYieldProvider
+        return ChinaBondYieldProvider()
+    if contract.input_id in {'ASTOCK-071','ASTOCK-072','ASTOCK-073'}:
+        from ..providers.exchanges.daily import ExchangeDailyProvider
+        return ExchangeDailyProvider()
+    if contract.input_id == "ASTOCK-077":
+        from ..providers.sge.spot import SgeSpotProvider
+        return SgeSpotProvider()
+    if contract.input_id == "ASTOCK-055":
+        from ..providers.sse.market import SseMarketProvider
+        return SseMarketProvider(client=client)
+    if contract.input_id in {"ASTOCK-067","ASTOCK-068"}:
+        from ..providers.csindex.indices import CsindexConstituentProvider
+        return CsindexConstituentProvider(contract.endpoint,client=client)
+    if contract.input_id == "ASTOCK-085":
+        from ..providers.sina.news import SinaGlobalNewsProvider
+        provider=SinaGlobalNewsProvider(client=client)
+        provider.capability_version="sina-billboard-input-v1"
+        provider.input_hosts=("https://vip.stock.finance.sina.com.cn",)
         return provider
     if contract.input_id == "ASTOCK-035":
         from ..providers.cctv.news import CCTVNewsProvider

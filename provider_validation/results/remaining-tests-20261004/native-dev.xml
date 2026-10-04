@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="10.658" timestamp="2026-10-04T18:29:39.140079+08:00" hostname="WIN-O3LLBLVKP56"><testcase classname="tests.test_input_collection" name="test_remaining_original_requests_business_fields_and_yaml[ASTOCK-031-context0-manifest0-10]" time="1.730"><failure message="ValueError: input runtime method does not match its verified adapter">tmp_path = WindowsPath('D:/Project/PythonProgram/stock_data_manage/tmp/rm4/test_remaining_original_reques0')
+no_network = None, input_id = 'ASTOCK-031'
+context = {'request': {'symbol': '600519'}}
+manifest = WindowsPath('D:/Project/PythonProgram/stock_data_manage/provider_validation/results/remaining-evidence-direct-20261004/ASTOCK-031/_raw/manifest.ndjson')
+count = 10
+
+    @pytest.mark.parametrize("input_id,context,manifest,count", REMAINING_CASES)
+    def test_remaining_original_requests_business_fields_and_yaml(tmp_path, no_network, input_id, context, manifest, count):
+&gt;       compare_remaining_original(tmp_path, input_id, context, manifest, count)
+
+tests\test_input_collection.py:147: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_input_collection.py:116: in compare_remaining_original
+    report = collect_input(input_id=input_id, context=context, config_root=ROOT / "config", output_root=tmp_path / "candidate", replay_manifest=manifest)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\stock_data_manage\pipeline\inputs.py:64: in collect_input
+    provider = build_input_provider(contract, providers_path=config_root / "providers.yaml", client=client)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+contract = InputCapabilityConfig(input_id='ASTOCK-031', provider='eastmoney', endpoint='stock_news', display_name='个股新闻', data_ki...equest_limit_enforcement='call_boundary_only', base_requests_per_fetch=1, dataset='stock_news', runtime_method='fetch')
+
+    def build_input_provider(contract, *, providers_path, client=None):
+        """Bind explicit validation inputs to existing adapters, outside production routing."""
+        if contract.implementation_status != "implemented_validation_only":
+            raise ValueError("input adapter is not implemented for validation")
+        expected_methods = {"ASTOCK-001": "fetch_snapshot", "ASTOCK-002-daily": "fetch_window", "ASTOCK-002-5m": "fetch_recent",
+                            "ASTOCK-045": "fetch", "ASTOCK-070": "fetch",
+                            "ASTOCK-026": "fetch_history", "ASTOCK-027": "fetch_history", "ASTOCK-028": "fetch_history",
+                            "ASTOCK-046": "fetch", "ASTOCK-047": "fetch", "ASTOCK-048": "fetch", "ASTOCK-050": "fetch",
+                            "ASTOCK-078": "fetch_event_list", "ASTOCK-079": "fetch_event_list",
+                            "ASTOCK-080": "fetch_action_list", "ASTOCK-081": "fetch_action_list", "ASTOCK-082": "fetch_action_list", "ASTOCK-083": "fetch_action_list",
+                            "ASTOCK-065": "fetch_lpr_history",
+                            "ASTOCK-032": "fetch", "ASTOCK-033": "fetch", "ASTOCK-034": "fetch", "ASTOCK-035": "fetch",
+                            "ASTOCK-064": "fetch", "ASTOCK-084": "fetch_convertible_bonds",
+                            "ASTOCK-061": "fetch", "ASTOCK-062": "fetch_pmi",
+                            "ASTOCK-013": "fetch_reports", "ASTOCK-066": "fetch_macro_calendar", "ASTOCK-006": "fetch_adjustment_factors",
+                            "ASTOCK-020": "fetch_dragon_tiger_daily", "ASTOCK-021": "fetch_lockup_expiry",
+                            "ASTOCK-008": "fetch_report_list", "ASTOCK-019": "fetch_dragon_tiger_seats",
+                            "ASTOCK-039": "fetch", "ASTOCK-055": "fetch_risk", "ASTOCK-067": "fetch", "ASTOCK-068": "fetch",
+                            "ASTOCK-085": "fetch_dragon_tiger_daily",
+                            "ASTOCK-003":"fetch_daily_package", "ASTOCK-004":"fetch_ticks", "ASTOCK-030":"fetch_etf",
+                            "ASTOCK-063":"fetch", "ASTOCK-071":"fetch_futures", "ASTOCK-072":"fetch_options",
+                            "ASTOCK-073":"fetch_rank", "ASTOCK-077":"fetch",
+                            "ASTOCK-051":"fetch_intraday_changes",
+                            "ASTOCK-074": "fetch_futures", "ASTOCK-075": "fetch_futures_kline", "ASTOCK-076": "fetch_a50",
+                            "SDA-BOARD-001": "fetch_industry_list", "SDA-BOARD-002": "fetch_industry_daily",
+                            "SDA-BOARD-003": "fetch_fund_flow", "SDA-BOARD-004": "fetch_fund_flow",
+                            "SDA-BOARD-005": "fetch_snapshot", "SDA-BOARD-006": "fetch_snapshot"}
+        if contract.input_id not in expected_methods or contract.runtime_method != expected_methods[contract.input_id]:
+&gt;           raise ValueError("input runtime method does not match its verified adapter")
+E           ValueError: input runtime method does not match its verified adapter
+
+src\stock_data_manage\routing\factory.py:57: ValueError</failure></testcase><testcase classname="tests.test_input_collection" name="test_remaining_original_requests_business_fields_and_yaml[ASTOCK-069-context1-manifest1-20]" time="0.404"><failure message="ValueError: input runtime method does not match its verified adapter">tmp_path = WindowsPath('D:/Project/PythonProgram/stock_data_manage/tmp/rm4/test_remaining_original_reques1')
+no_network = None, input_id = 'ASTOCK-069'
+context = {'request': {'index_code': '000300'}}
+manifest = WindowsPath('D:/Project/PythonProgram/stock_data_manage/provider_validation/results/remaining-evidence-direct-20261004/ASTOCK-069/_raw/manifest.ndjson')
+count = 20
+
+    @pytest.mark.parametrize("input_id,context,manifest,count", REMAINING_CASES)
+    def test_remaining_original_requests_business_fields_and_yaml(tmp_path, no_network, input_id, context, manifest, count):
+&gt;       compare_remaining_original(tmp_path, input_id, context, manifest, count)
+
+tests\test_input_collection.py:147: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_input_collection.py:116: in compare_remaining_original
+    report = collect_input(input_id=input_id, context=context, config_root=ROOT / "config", output_root=tmp_path / "candidate", replay_manifest=manifest)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\stock_data_manage\pipeline\inputs.py:64: in collect_input
+    provider = build_input_provider(contract, providers_path=config_root / "providers.yaml", client=client)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+contract = InputCapabilityConfig(input_id='ASTOCK-069', provider='csindex', endpoint='index_valuation', display_name='指数估值', data...t_limit_enforcement='call_boundary_only', base_requests_per_fetch=1, dataset='index_valuation', runtime_method='fetch')
+
+    def build_input_provider(contract, *, providers_path, client=None):
+        """Bind explicit validation inputs to existing adapters, outside production routing."""
+        if contract.implementation_status != "implemented_validation_only":
+            raise ValueError("input adapter is not implemented for validation")
+        expected_methods = {"ASTOCK-001": "fetch_snapshot", "ASTOCK-002-daily": "fetch_window", "ASTOCK-002-5m": "fetch_recent",
+                            "ASTOCK-045": "fetch", "ASTOCK-070": "fetch",
+                            "ASTOCK-026": "fetch_history", "ASTOCK-027": "fetch_history", "ASTOCK-028": "fetch_history",
+                            "ASTOCK-046": "fetch", "ASTOCK-047": "fetch", "ASTOCK-048": "fetch", "ASTOCK-050": "fetch",
+                            "ASTOCK-078": "fetch_event_list", "ASTOCK-079": "fetch_event_list",
+                            "ASTOCK-080": "fetch_action_list", "ASTOCK-081": "fetch_action_list", "ASTOCK-082": "fetch_action_list", "ASTOCK-083": "fetch_action_list",
+                            "ASTOCK-065": "fetch_lpr_history",
+                            "ASTOCK-032": "fetch", "ASTOCK-033": "fetch", "ASTOCK-034": "fetch", "ASTOCK-035": "fetch",
+                            "ASTOCK-064": "fetch", "ASTOCK-084": "fetch_convertible_bonds",
+                            "ASTOCK-061": "fetch", "ASTOCK-062": "fetch_pmi",
+                            "ASTOCK-013": "fetch_reports", "ASTOCK-066": "fetch_macro_calendar", "ASTOCK-006": "fetch_adjustment_factors",
+                            "ASTOCK-020": "fetch_dragon_tiger_daily", "ASTOCK-021": "fetch_lockup_expiry",
+                            "ASTOCK-008": "fetch_report_list", "ASTOCK-019": "fetch_dragon_tiger_seats",
+                            "ASTOCK-039": "fetch", "ASTOCK-055": "fetch_risk", "ASTOCK-067": "fetch", "ASTOCK-068": "fetch",
+                            "ASTOCK-085": "fetch_dragon_tiger_daily",
+                            "ASTOCK-003":"fetch_daily_package", "ASTOCK-004":"fetch_ticks", "ASTOCK-030":"fetch_etf",
+                            "ASTOCK-063":"fetch", "ASTOCK-071":"fetch_futures", "ASTOCK-072":"fetch_options",
+                            "ASTOCK-073":"fetch_rank", "ASTOCK-077":"fetch",
+                            "ASTOCK-051":"fetch_intraday_changes",
+                            "ASTOCK-074": "fetch_futures", "ASTOCK-075": "fetch_futures_kline", "ASTOCK-076": "fetch_a50",
+                            "SDA-BOARD-001": "fetch_industry_list", "SDA-BOARD-002": "fetch_industry_daily",
+                            "SDA-BOARD-003": "fetch_fund_flow", "SDA-BOARD-004": "fetch_fund_flow",
+                            "SDA-BOARD-005": "fetch_snapshot", "SDA-BOARD-006": "fetch_snapshot"}
+        if contract.input_id not in expected_methods or contract.runtime_method != expected_methods[contract.input_id]:
+&gt;           raise ValueError("input runtime method does not match its verified adapter")
+E           ValueError: input runtime method does not match its verified adapter
+
+src\stock_data_manage\routing\factory.py:57: ValueError</failure></testcase></testsuite></testsuites>

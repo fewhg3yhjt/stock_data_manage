@@ -1,0 +1,10 @@
+{
+  "recovered": 65,
+  "missing": [
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\pipeline\\inputs.py",
+      "sha256": "16f38d1b6b5a7db8d9394fdf4915cb258dcee20cdfeb2e6665a5997b2f39f7f5"
+    }
+  ],
+  "validation_result": "failed guard assertion; partial development evidence only"
+}

@@ -1,0 +1,31 @@
+dataset:
+  name: etf_shares
+  display_name: ETF 份额候选输入
+  primary_key:
+  - snapshot_at
+  - trade_date
+  - exchange
+  - source_security_code
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  trade_date:
+    type: date
+    required: true
+  exchange:
+    type: string
+    required: true
+  source_security_code:
+    type: string
+    required: true
+  name:
+    type: string
+    required: false
+  etf_type:
+    type: string
+    required: false
+  shares:
+    type: decimal
+    required: false
+    unit: unverified

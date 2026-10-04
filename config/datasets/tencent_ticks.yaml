@@ -1,0 +1,43 @@
+dataset:
+  name: tencent_ticks
+  display_name: 腾讯逐笔成交候选输入
+  primary_key:
+  - snapshot_at
+  - trade_date
+  - source_security_code
+  - source_sequence
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  trade_date:
+    type: date
+    required: true
+  source_security_code:
+    type: string
+    required: true
+  time:
+    type: string
+    required: false
+  source_sequence:
+    type: integer
+    required: true
+  side:
+    type: string
+    required: false
+  price:
+    type: decimal
+    required: false
+    unit: unverified
+  change:
+    type: decimal
+    required: false
+    unit: unverified
+  volume:
+    type: decimal
+    required: false
+    unit: unverified
+  amount:
+    type: decimal
+    required: false
+    unit: unverified

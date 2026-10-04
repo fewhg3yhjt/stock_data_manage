@@ -1,0 +1,47 @@
+dataset:
+  name: option_risk
+  display_name: 上交所期权风险指标候选输入
+  primary_key:
+  - snapshot_at
+  - trade_date
+  - security_id
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  trade_date:
+    type: date
+    required: true
+  security_id:
+    type: string
+    required: true
+  contract_code:
+    type: string
+    required: false
+  name:
+    type: string
+    required: false
+  delta:
+    type: decimal
+    required: false
+    unit: unverified
+  theta:
+    type: decimal
+    required: false
+    unit: unverified
+  gamma:
+    type: decimal
+    required: false
+    unit: unverified
+  vega:
+    type: decimal
+    required: false
+    unit: unverified
+  rho:
+    type: decimal
+    required: false
+    unit: unverified
+  implied_volatility:
+    type: decimal
+    required: false
+    unit: unverified

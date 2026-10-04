@@ -60,7 +60,8 @@ class HostPausedError(ConnectionError):
 @contextmanager
 def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                       replay_manifest=None, evidence_roots=(), max_age_seconds=0, sdk_retry_policy=False,
-                      probe_host_pause=False, require_empty_post_body=False, response_validator=None, cache_ignored_query_parameters=()):
+                      probe_host_pause=False, require_empty_post_body=False, response_validator=None, cache_ignored_query_parameters=(),
+                      native_transport=None):
     """Serialized single-input capture/replay. Session identity, proxies and request arguments are retained.
 
     SDK session policy matches the saved conservative probe. Internal urllib3 retries
@@ -94,6 +95,8 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
             return response
 
         def send(session, request, **kwargs):
+            native_call = kwargs.pop('_native_call', None)
+            native_options = kwargs.pop('_native_options', None)
             # The observed social-financing SDK uses a bodyless POST, not an arbitrary POST query.
             if require_empty_post_body and (request.method != "POST" or request.body not in (None, b"", "")):
                 raise ValueError("source contract requires a bodyless POST")
@@ -149,7 +152,7 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                     pacer.configure(host, 3, 1)
                     try:
                         with pacer.request(host):
-                            response = original_send(session, request, **kwargs)
+                            response = native_call() if native_call is not None else original_send(session, request, **kwargs)
                     except Exception as exc:
                         transport_error()
                         store.append_event({"event": "http_response", "mode": "live", "outcome": "transport_error",
@@ -162,7 +165,7 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
             event = store.record_response(response=response, url=request.url, method=request.method,
                 request_headers=request.headers, scope=scope, provider=provider, endpoint=endpoint,
                 code_version=code_version, mode=mode, source_ref=source_ref,
-                request_options={"timeout": kwargs.get("timeout"), "allow_redirects": kwargs.get("allow_redirects", True),
+                request_options=native_options if native_options is not None else {"timeout": kwargs.get("timeout"), "allow_redirects": kwargs.get("allow_redirects", True),
                                  "trust_env": session.trust_env, "proxies": kwargs.get("proxies", {}),
                                  "sdk_retry_policy": sdk_retry_policy,
                                  "probe_host_pause": probe_host_pause,
@@ -199,11 +202,44 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                     respect_retry_after_header=True, raise_on_status=False)
                 session.mount("https://", HTTPAdapter(max_retries=policy))
                 session.mount("http://", HTTPAdapter(max_retries=policy))
+        native_restore = None
+        if native_transport == 'curl_cffi':
+            import curl_cffi.requests as curl_requests
+            from types import SimpleNamespace
+            original_native = curl_requests.Session.request
+            def curl_request(session, method, url, *args, **kwargs):
+                if args: raise ValueError('unexpected positional curl SDK arguments')
+                prepared=requests.Request(method,url,params=kwargs.get('params'),headers=kwargs.get('headers')).prepare()
+                return send(SimpleNamespace(trust_env=getattr(session,'trust_env',True)),prepared,
+                    _native_call=lambda:original_native(session,method,url,**kwargs),
+                    _native_options=dict(transport='original curl_cffi SDK request boundary',**sanitized_metadata(kwargs)))
+            curl_requests.Session.request = curl_request
+            native_restore = lambda: setattr(curl_requests.Session,'request',original_native)
+        elif native_transport == 'pandas_urllib':
+            import io
+            import pandas.io.common as common
+            from types import SimpleNamespace
+            original_native = common.urlopen
+            def excel_urlopen(request):
+                prepared=SimpleNamespace(url=request.full_url,method=request.get_method(),headers=dict(request.header_items()),body=None)
+                def delegate():
+                    with original_native(request) as response:
+                        return SimpleNamespace(content=response.read(),status_code=response.status,headers=dict(response.headers),encoding=None)
+                response=send(SimpleNamespace(trust_env=True),prepared,_native_call=delegate,
+                    _native_options={'transport':'original pandas urllib request boundary'})
+                if response.status_code>=400:raise HTTPError(request.full_url,response.status_code,'archived HTTP failure',response.headers,None)
+                buffered=io.BytesIO(response.content);buffered.headers=response.headers
+                return buffered
+            common.urlopen = excel_urlopen
+            native_restore = lambda: setattr(common,'urlopen',original_native)
+        elif native_transport is not None:
+            raise ValueError('unsupported original SDK transport')
         requests.Session.send = send
         requests.Session.__init__ = init
         try:
             yield events
         finally:
+            if native_restore is not None: native_restore()
             requests.Session.send, requests.Session.__init__ = original_send, original_init
 
 
@@ -409,3 +445,19 @@ def tdx_value(item: object, *names: str) -> object:
         if hasattr(item, name):
             return getattr(item, name)
     return None
+
+V39_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36'
+
+def _v39_http(url, params=None, data=None, headers=None, method='GET', timeout=(10, 40), allow_status=(), allow_redirects=True):
+    """非东财的 HTTP 请求：带浏览器 UA。网络错误、非 2xx 一律抛 RuntimeError（不把错误页当数据）；
+    allow_status 里的状态码（源用 404 表示「当天没发布」时）原样返回，由调用方判断。"""
+    import requests
+    merged = {'User-Agent': V39_UA}
+    merged.update(headers or {})
+    try:
+        response = requests.request(method, url, params=params, data=data, headers=merged, timeout=timeout, allow_redirects=allow_redirects)
+        if response.status_code not in allow_status:
+            response.raise_for_status()
+    except requests.RequestException as exc:
+        raise RuntimeError(f'请求 {url} 失败: {type(exc).__name__}: {exc}') from exc
+    return response

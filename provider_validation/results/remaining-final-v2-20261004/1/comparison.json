@@ -1,0 +1,20 @@
+{
+  "input_id": "ASTOCK-031",
+  "scope": {
+    "code": "600519"
+  },
+  "row_count": 10,
+  "mode": "offline_replay",
+  "all_business_fields_equal": true,
+  "request_comparison_equal": true,
+  "production_writes": 0,
+  "network_requests": 0,
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\1\\original-parsed.json",
+  "original_parsed_sha256": "2308f9d423e637421fe3115b46ceb1deecedcff3e49ca818ddb6961c4aafc4dd",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\1\\candidate\\ASTOCK-031-fde95924309d\\2026-10-04\\input_report\\eastmoney\\stock_news\\report.json",
+  "report_sha256": "98f3d0844271d71043df5bba88b11d16a613a04d9ef5aab5fc66b7906f09caba",
+  "original_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-final-v2-20261004\\1\\original\\manifest.ndjson",
+  "source_response_hashes": [
+    "572a3e1a92d0413b96e3288976cb1b9f20bac093ecefcaadc0807f1594225154"
+  ]
+}

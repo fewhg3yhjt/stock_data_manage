@@ -1,0 +1,28 @@
+dataset: sge_spot
+rules:
+- id: sge_spot-input-v1
+  input_id: ASTOCK-077
+  provider: sge
+  endpoint: spot
+  field_mapping:
+    trade_date: date
+    instrument: instrument
+    open: open
+    high: high
+    low: low
+    close: close
+  context_fields:
+    snapshot_at: source_snapshot_at
+  null_values:
+  - null
+  - ''
+  unverified_fields:
+  - open
+  - high
+  - low
+  - close
+  status: pending_validation
+  version: remaining-original-input-v1
+  evidence_refs:
+  - ASTOCK-077
+  notes: 保留原独立接口及原解析。原数字单独留证，标准数字单位未认证；无来源或日期回退，生产关闭。

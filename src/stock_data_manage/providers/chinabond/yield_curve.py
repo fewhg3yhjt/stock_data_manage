@@ -1,0 +1,93 @@
+import math, re, io, csv, time, struct, zipfile, zlib
+from xml.etree import ElementTree
+from datetime import date, datetime, timedelta
+import pandas as pd
+from ..contracts import InputFetchResult, _v39_contract, _v39_count, _v39_date, _v39_frame, _v39_json, _v39_num, _v39_req_num, _v39_rows, _v39_src_date
+from ..transport import _v39_http
+
+CHINABOND_HISTORY_URL = 'https://yield.chinabond.com.cn/cbweb-pbc-web/pbc/historyQuery'
+
+CHINABOND_CURVES = {'all': 'ycqx', 'treasury': 'hzsylqx', 'bank_aaa': 'syyhsylqx', 'mtn_aaa': 'zdqpjsylqx'}
+
+_CHINABOND_HEADER = ['曲线名称', '日期', '3月', '6月', '1年', '3年', '5年', '7年', '10年', '30年']
+
+_CHINABOND_TENORS = ['3m', '6m', '1y', '3y', '5y', '7y', '10y', '30y']
+
+CHINABOND_CURVE_NAMES = {'treasury': '中债国债收益率曲线', 'bank_aaa': '中债商业银行普通债收益率曲线(AAA)', 'mtn_aaa': '中债中短期票据收益率曲线(AAA)'}
+
+CHINABOND_FIRST_DAY = {'treasury': '2006-03-01', 'mtn_aaa': '2006-12-25', 'bank_aaa': '2009-12-24'}
+
+@_v39_contract
+def chinabond_yield_curve(start, end=None, curve='all'):
+    """中债收益率曲线（中央结算公司官方）— 国债 / 商业银行普通债 AAA / 中短期票据 AAA。
+
+    curve: 'all' / 'treasury'（国债）/ 'bank_aaa' / 'mtn_aaa'。收益率单位为 %。
+    期限 3 月到 30 年共 8 档；中短期票据曲线没有 30 年，该列为 None。
+    官网单次查询超过 1 年会静默返回 0 行，本函数按 360 天切片。
+    各曲线起点：国债 2006-03-01、中短期票据 2006-12-25、商业银行 2009-12-24；
+    start 早于起点时从起点开始取。all 模式下 2006-03-01 至 2006-12-24 每天只有国债一条，
+    2006-12-25 至 2009-12-23 每天两条（国债 + 中短期票据），2009-12-24 起三条；
+    返回的每一天都按这个规则核对曲线是否齐全，缺一条抛 RuntimeError。
+    中债不公布债券市场交易日历，页面也没有总条数，所以整天缺失（某个交易日一条都没返回）
+    无法判定，只有整段切片 7 天以上 0 行才报错；需要严格逐日核对请自备交易日历比对 date 列。
+    """
+    if curve not in CHINABOND_CURVES:
+        raise ValueError('curve 只能是 ' + ' / '.join(CHINABOND_CURVES))
+    first = datetime.strptime(_v39_date(start), '%Y-%m-%d').date()
+    last = datetime.strptime(_v39_date(end), '%Y-%m-%d').date() if end else date.today()
+    if first > last:
+        raise ValueError('start 不能晚于 end')
+    wanted = [k for k in CHINABOND_CURVE_NAMES if curve in ('all', k)]
+    begin = datetime.strptime(min((CHINABOND_FIRST_DAY[k] for k in wanted)), '%Y-%m-%d').date()
+    if last < begin:
+        raise ValueError(f'中债 {curve} 曲线从 {begin} 起才有数据')
+    first = max(first, begin)
+    by_name = {CHINABOND_CURVE_NAMES[k]: k for k in wanted}
+    rows, cursor, url, seen = ([], first, CHINABOND_HISTORY_URL, {})
+    while cursor <= last:
+        stop = min(cursor + timedelta(days=359), last)
+        response = _v39_http(CHINABOND_HISTORY_URL, params={'startDate': cursor.isoformat(), 'endDate': stop.isoformat(), 'gjqx': 0, 'qxId': CHINABOND_CURVES[curve], 'locale': 'cn_ZH'})
+        text = re.sub('<!--.*?-->', '', response.content.decode('utf-8', 'replace'), flags=re.S)
+        tables = text.split('<table')
+        table_rows = re.findall('<tr[^>]*>(.*?)</tr>', tables[-1], re.S) if len(tables) > 2 else []
+        cells = [[re.sub('<[^>]+>|\\s+', '', c) for c in re.findall('<t[dh][^>]*>(.*?)</t[dh]>', r, re.S)] for r in table_rows]
+        if not cells or cells[0] != _CHINABOND_HEADER:
+            raise RuntimeError('中债收益率页面表头改变，不能按原列序解析')
+        chunk = 0
+        for rec in cells[1:]:
+            if len(rec) != len(_CHINABOND_HEADER):
+                raise RuntimeError(f'中债收益率行列数不对: {rec}')
+            day = _v39_src_date(rec[1])
+            if not cursor.isoformat() <= day <= stop.isoformat():
+                raise RuntimeError(f'中债 请求 {cursor}~{stop} 却返回了 {day} 的曲线，结果不可信')
+            if rec[0] not in by_name:
+                raise RuntimeError(f'中债 返回了未请求的曲线「{rec[0]}」（请求的是 {curve}）')
+            seen.setdefault(day, set()).add(by_name[rec[0]])
+            row = {'date': day, 'curve': rec[0]}
+            row.update({k: _v39_num(v) for k, v in zip(_CHINABOND_TENORS, rec[2:])})
+            rows.append(row)
+            chunk += 1
+        if chunk == 0 and (stop - cursor).days >= 6:
+            raise RuntimeError(f'中债 {cursor}~{stop} 一周以上却 0 行，接口口径可能变了')
+        url = response.url
+        cursor = stop + timedelta(days=1)
+    if not rows:
+        raise ValueError(f'{first}~{last} 没有中债收益率（区间内无交易日）')
+    for day, keys in seen.items():
+        expected = {k for k in wanted if CHINABOND_FIRST_DAY[k] <= day}
+        if keys != expected:
+            raise RuntimeError(f'中债 {day} 缺少曲线 {sorted(expected - keys)}，结果不完整')
+    frame = _v39_frame(rows, 'chinabond', url)
+    frame = frame.sort_values(['date', 'curve']).reset_index(drop=True)
+    if frame.duplicated(['date', 'curve']).any():
+        raise RuntimeError('中债收益率出现重复的 日期+曲线')
+    return frame
+
+class ChinaBondYieldProvider:
+    capability_version='chinabond-yield-input-v1'
+    input_hosts=('https://yield.chinabond.com.cn',)
+    def fetch(self,*,start,end,curve):
+        frame=chinabond_yield_curve(start,end,curve)
+        business=frame.drop(columns=['source','source_url','fetched_at'])
+        rows=tuple(business.astype(object).where(business.notna(),None).to_dict(orient='records'))
+        return InputFetchResult(rows,source_rows=rows,source_url=frame['source_url'].iloc[0])

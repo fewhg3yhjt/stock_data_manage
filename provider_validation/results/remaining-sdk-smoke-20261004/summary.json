@@ -1,0 +1,2758 @@
+[
+  {
+    "input_id": "ASTOCK-039",
+    "dataset": "sina_financial_statements",
+    "mode": "replay",
+    "parameters": {
+      "code": "600519"
+    },
+    "provider": "sina",
+    "endpoint": "financial_statements",
+    "collection_profile": {
+      "name": "event_daily",
+      "mode": "daily",
+      "refresh_interval_seconds": null,
+      "business_day": "calendar_day",
+      "scheduling_enabled": false,
+      "frequency_unit": null,
+      "frequency_interval": 1,
+      "at_time": null,
+      "anchor_date": null,
+      "settle_delay_seconds": 0,
+      "trigger_grace_seconds": 30,
+      "universe": "static",
+      "max_symbols": null
+    },
+    "request_interval_seconds": 3,
+    "effective_concurrency": 1,
+    "request_limit_enforcement": "call_boundary_only",
+    "adapter_version": "sina-statements-input-v1",
+    "code_version": "71b2c47549f6f0f349408945258a38f6d9c2620f1c2873ef875a23f557af5715",
+    "code_files": [
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\pipeline\\inputs.py",
+        "sha256": "69c70410d8a0b5f7525b32169cac04643423a9bde57f08e9aa6d75c0cb2f2a30"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\cli.py",
+        "sha256": "582f5caedfc538a012d7a2f6e8cd7af3fe8b6fc9152e5b9e0a3fa2cb8810ae19"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\config\\loader.py",
+        "sha256": "93bb55ab150c88751fe9a58a2b75737878c1b0f07233b8ec47009c4901bb11e9"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\contracts.py",
+        "sha256": "a4b16abc7e3686a4eb2791dcd4545fb2404e0214bf32e20db19d2582d39ea447"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\quality\\normalization.py",
+        "sha256": "3ed0d663b7fda9ac6cdf7f1252435f2351c783af3244ccba2c2b0f3891e29b3e"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\transport.py",
+        "sha256": "cb860d0022c40ffe450694b2b4e48bff50c64ed7083d25c847a8079f2baf28b1"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\storage\\raw.py",
+        "sha256": "d483c614830e96d41b697709c0cde9e4cb5adee26116020428b7697f57f2c108"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\routing\\factory.py",
+        "sha256": "70bde5d45f76e2f7f6b3ca5f309f55cce724486a294ff975d5d2f6d9a2eb2b10"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\daily.py",
+        "sha256": "487a14fcbfc47146d6d5fd291fbf41667aba435e5fed22ea1ef61ded513fcaa7"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\minute.py",
+        "sha256": "ff5cf1e91327bcab2e072bcfae9f1f77dca71a84ba26e456c26580a4d59d9cc1"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\snapshot.py",
+        "sha256": "3278cadac776fe8cfe5d02775a5bf8f53bc1cb96c595a5f418172f53047434bf"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\limit_pool.py",
+        "sha256": "2fbdfe3da3129545dfe8d2e457be7c42225696ddd74270567ae765e4b413f5ae"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\shareholder.py",
+        "sha256": "4c9d80f4d51845ac5541c42275f44f2a18643db5e9ccb705a3e16168f8db44c1"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\financial.py",
+        "sha256": "b88fd28013942d1815d04eaf25521bd00dc0d44329ee411dbff48585bb1529a7"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\wallstreetcn\\news.py",
+        "sha256": "fb870197a111ecad42d47e7e81315c7d59c3c6a8bd7cadb72b84cc537bc91fda"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\cctv\\news.py",
+        "sha256": "8839bdeed801611e8e6d11cb9441e6ede7bc94d56507eaa2c903e605c772ee7d"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\cls\\news.py",
+        "sha256": "51da559a252b67a4a2e58171e3630ff1a5a80cd2bc23aa5df30a7e17ac02ad30"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\news.py",
+        "sha256": "6268a98ae01f37985ee6bfbfbe14653387883ed4a8ff640de7c8f88f6e15b097"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\financial.py",
+        "sha256": "699475f190f9864a5f7edafc23a5a85734f22a299f187a62819b4ebb5cb6e247"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sse\\market.py",
+        "sha256": "734c896d185e783af0d411beb4ea609e56f8b37e190d9b1bf2ff72dc22e6123a"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\csindex\\indices.py",
+        "sha256": "1edbd7b35c5b3c895ce036b96d192c7910c7510ed88ec176074966bc7b7e78e3"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\mofcom\\social_financing.py",
+        "sha256": "55d292958fb34991c56c626d5f6f61e7e6c44c8c2627b88ea735e751aa12c5ce"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\chinamoney\\rates.py",
+        "sha256": "e7407f1d4272b69cb439bb0a7bad3960b65bb41328d752f541bc8ef50231f922"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\dividend.py",
+        "sha256": "5706a8cdb37eeeb8f66cb033a3091dd1b6ec1ed83d72d0f9fbeb8f5c75d9649b"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\fund_flow.py",
+        "sha256": "0cf655efa0854d18651bb4f04f985f0f210b81a6d9eff065604d235ed8f75280"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\realtime.py",
+        "sha256": "6e09d2a5014cf316c4d1e26e913a44d5c2fbad95fb44d95cba159ef881f03bca"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\calendar.py",
+        "sha256": "3d114045f960bfcc94ade1ee03e4d25ebdf6980ba68aa2d0a2236bed78aaef05"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\snapshot.py",
+        "sha256": "cfa0b823b2fa8053ce899157e9b6078b94516d3fabd5d303480824111f62d136"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\daily.py",
+        "sha256": "dd15e0c6b0f8ed5e6db99b5d2b9725eb7e2cc6f3e42bd5e6d392c5334922dc89"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\akshare\\boards.py",
+        "sha256": "2060f150831cebaf707ed5becedc35428bc41d4428bab31555ed1d2bf817d122"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\baostock\\industry.py",
+        "sha256": "16c41b379eecbd87f082bd042e27fad7f3d8d77b5bfc6a3e8a286209b068494a"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\baostock\\session.py",
+        "sha256": "70ce19cdde1d6a8ed0c3d3db29caa28d1d8069826136ab6dd7fb6a2ef8c7b832"
+      }
+    ],
+    "config_files": [
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\providers.yaml",
+        "sha256": "b3117d4db08072ed6a96eb6334f712fee9a6cac66ede3b413dbebf2c0731a3a1"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\collection.yaml",
+        "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\datasets\\sina_financial_statements.yaml",
+        "sha256": "cfe1dbc8e9af94e399379345837e7d2f80ab040198c8bfb82763e86152562ee2"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\normalization\\sina_financial_statements.yaml",
+        "sha256": "a1dd32ed36356ea130e9b45df268c3b7d44711cb3c31b93e1d9811df10b04cbc"
+      }
+    ],
+    "normalization_version": "remaining-sdk-input-v1",
+    "normalization_status": "pending_validation",
+    "field_units": {
+      "snapshot_at": null,
+      "source_security_code": null,
+      "report_type": null,
+      "report_date": null,
+      "source_publish_text": null,
+      "source_update_text": null,
+      "currency_text": null,
+      "audit_text": null,
+      "source_type_text": null,
+      "source_text": null,
+      "流动资产": "unverified; source value retained separately",
+      "货币资金": "unverified; source value retained separately",
+      "结算备付金": "unverified; source value retained separately",
+      "拆出资金": "unverified; source value retained separately",
+      "交易性金融资产": "unverified; source value retained separately",
+      "买入返售金融资产": "unverified; source value retained separately",
+      "衍生金融资产": "unverified; source value retained separately",
+      "应收票据及应收账款": "unverified; source value retained separately",
+      "应收票据": "unverified; source value retained separately",
+      "应收账款": "unverified; source value retained separately",
+      "应收款项融资": "unverified; source value retained separately",
+      "预付款项": "unverified; source value retained separately",
+      "应收股利": "unverified; source value retained separately",
+      "应收利息": "unverified; source value retained separately",
+      "应收保费": "unverified; source value retained separately",
+      "应收分保账款": "unverified; source value retained separately",
+      "应收分保合同准备金": "unverified; source value retained separately",
+      "应收出口退税": "unverified; source value retained separately",
+      "应收补贴款": "unverified; source value retained separately",
+      "应收保证金": "unverified; source value retained separately",
+      "内部应收款": "unverified; source value retained separately",
+      "其他应收款": "unverified; source value retained separately",
+      "其他应收款(合计)": "unverified; source value retained separately",
+      "存货": "unverified; source value retained separately",
+      "划分为持有待售的资产": "unverified; source value retained separately",
+      "待摊费用": "unverified; source value retained separately",
+      "待处理流动资产损益": "unverified; source value retained separately",
+      "一年内到期的非流动资产": "unverified; source value retained separately",
+      "其他流动资产": "unverified; source value retained separately",
+      "流动资产合计": "unverified; source value retained separately",
+      "非流动资产": "unverified; source value retained separately",
+      "发放贷款及垫款": "unverified; source value retained separately",
+      "债权投资": "unverified; source value retained separately",
+      "其他债权投资": "unverified; source value retained separately",
+      "以公允价值计量且其变动计入其他综合收益的金融资产": "unverified; source value retained separately",
+      "以摊余成本计量的金融资产": "unverified; source value retained separately",
+      "可供出售金融资产": "unverified; source value retained separately",
+      "长期股权投资": "unverified; source value retained separately",
+      "投资性房地产": "unverified; source value retained separately",
+      "长期应收款": "unverified; source value retained separately",
+      "其他权益工具投资": "unverified; source value retained separately",
+      "其他非流动金融资产": "unverified; source value retained separately",
+      "其他长期投资": "unverified; source value retained separately",
+      "固定资产原值": "unverified; source value retained separately",
+      "累计折旧": "unverified; source value retained separately",
+      "固定资产净值": "unverified; source value retained separately",
+      "固定资产减值准备": "unverified; source value retained separately",
+      "在建工程合计": "unverified; source value retained separately",
+      "在建工程": "unverified; source value retained separately",
+      "工程物资": "unverified; source value retained separately",
+      "固定资产净额": "unverified; source value retained separately",
+      "固定资产清理": "unverified; source value retained separately",
+      "固定资产及清理合计": "unverified; source value retained separately",
+      "生产性生物资产": "unverified; source value retained separately",
+      "公益性生物资产": "unverified; source value retained separately",
+      "油气资产": "unverified; source value retained separately",
+      "合同资产": "unverified; source value retained separately",
+      "使用权资产": "unverified; source value retained separately",
+      "无形资产": "unverified; source value retained separately",
+      "开发支出": "unverified; source value retained separately",
+      "商誉": "unverified; source value retained separately",
+      "长期待摊费用": "unverified; source value retained separately",
+      "股权分置流通权": "unverified; source value retained separately",
+      "递延所得税资产": "unverified; source value retained separately",
+      "其他非流动资产": "unverified; source value retained separately",
+      "非流动资产合计": "unverified; source value retained separately",
+      "资产总计": "unverified; source value retained separately",
+      "流动负债": "unverified; source value retained separately",
+      "短期借款": "unverified; source value retained separately",
+      "向中央银行借款": "unverified; source value retained separately",
+      "吸收存款及同业存放": "unverified; source value retained separately",
+      "拆入资金": "unverified; source value retained separately",
+      "交易性金融负债": "unverified; source value retained separately",
+      "衍生金融负债": "unverified; source value retained separately",
+      "应付票据及应付账款": "unverified; source value retained separately",
+      "应付票据": "unverified; source value retained separately",
+      "应付账款": "unverified; source value retained separately",
+      "预收款项": "unverified; source value retained separately",
+      "合同负债": "unverified; source value retained separately",
+      "卖出回购金融资产款": "unverified; source value retained separately",
+      "应付手续费及佣金": "unverified; source value retained separately",
+      "应付职工薪酬": "unverified; source value retained separately",
+      "应交税费": "unverified; source value retained separately",
+      "应付利息": "unverified; source value retained separately",
+      "应付股利": "unverified; source value retained separately",
+      "应付保证金": "unverified; source value retained separately",
+      "内部应付款": "unverified; source value retained separately",
+      "其他应付款": "unverified; source value retained separately",
+      "其他应付款合计": "unverified; source value retained separately",
+      "其他应交款": "unverified; source value retained separately",
+      "担保责任赔偿准备金": "unverified; source value retained separately",
+      "应付分保账款": "unverified; source value retained separately",
+      "保险合同准备金": "unverified; source value retained separately",
+      "代理买卖证券款": "unverified; source value retained separately",
+      "代理承销证券款": "unverified; source value retained separately",
+      "国际票证结算": "unverified; source value retained separately",
+      "国内票证结算": "unverified; source value retained separately",
+      "预提费用": "unverified; source value retained separately",
+      "预计流动负债": "unverified; source value retained separately",
+      "应付短期债券": "unverified; source value retained separately",
+      "划分为持有待售的负债": "unverified; source value retained separately",
+      "一年内的递延收益": "unverified; source value retained separately",
+      "一年内到期的非流动负债": "unverified; source value retained separately",
+      "其他流动负债": "unverified; source value retained separately",
+      "流动负债合计": "unverified; source value retained separately",
+      "非流动负债": "unverified; source value retained separately",
+      "长期借款": "unverified; source value retained separately",
+      "应付债券": "unverified; source value retained separately",
+      "应付债券：优先股": "unverified; source value retained separately",
+      "应付债券：永续债": "unverified; source value retained separately",
+      "租赁负债": "unverified; source value retained separately",
+      "长期应付职工薪酬": "unverified; source value retained separately",
+      "长期应付款": "unverified; source value retained separately",
+      "长期应付款合计": "unverified; source value retained separately",
+      "专项应付款": "unverified; source value retained separately",
+      "预计非流动负债": "unverified; source value retained separately",
+      "长期递延收益": "unverified; source value retained separately",
+      "递延所得税负债": "unverified; source value retained separately",
+      "其他非流动负债": "unverified; source value retained separately",
+      "非流动负债合计": "unverified; source value retained separately",
+      "负债合计": "unverified; source value retained separately",
+      "所有者权益": "unverified; source value retained separately",
+      "实收资本(或股本)": "unverified; source value retained separately",
+      "其他权益工具": "unverified; source value retained separately",
+      "优先股": "unverified; source value retained separately",
+      "永续债": "unverified; source value retained separately",
+      "资本公积": "unverified; source value retained separately",
+      "减:库存股": "unverified; source value retained separately",
+      "其他综合收益": "unverified; source value retained separately",
+      "专项储备": "unverified; source value retained separately",
+      "盈余公积": "unverified; source value retained separately",
+      "一般风险准备": "unverified; source value retained separately",
+      "未确定的投资损失": "unverified; source value retained separately",
+      "未分配利润": "unverified; source value retained separately",
+      "拟分配现金股利": "unverified; source value retained separately",
+      "外币报表折算差额": "unverified; source value retained separately",
+      "归属于母公司股东权益合计": "unverified; source value retained separately",
+      "少数股东权益": "unverified; source value retained separately",
+      "所有者权益(或股东权益)合计": "unverified; source value retained separately",
+      "负债和所有者权益(或股东权益)总计": "unverified; source value retained separately",
+      "营业总收入": "unverified; source value retained separately",
+      "营业收入": "unverified; source value retained separately",
+      "利息收入": "unverified; source value retained separately",
+      "已赚保费": "unverified; source value retained separately",
+      "手续费及佣金收入": "unverified; source value retained separately",
+      "房地产销售收入": "unverified; source value retained separately",
+      "其他业务收入": "unverified; source value retained separately",
+      "营业总成本": "unverified; source value retained separately",
+      "营业成本": "unverified; source value retained separately",
+      "手续费及佣金支出": "unverified; source value retained separately",
+      "房地产销售成本": "unverified; source value retained separately",
+      "退保金": "unverified; source value retained separately",
+      "赔付支出净额": "unverified; source value retained separately",
+      "提取保险合同准备金净额": "unverified; source value retained separately",
+      "保单红利支出": "unverified; source value retained separately",
+      "分保费用": "unverified; source value retained separately",
+      "其他业务成本": "unverified; source value retained separately",
+      "营业税金及附加": "unverified; source value retained separately",
+      "研发费用": "unverified; source value retained separately",
+      "销售费用": "unverified; source value retained separately",
+      "管理费用": "unverified; source value retained separately",
+      "财务费用": "unverified; source value retained separately",
+      "利息费用": "unverified; source value retained separately",
+      "利息支出": "unverified; source value retained separately",
+      "投资收益": "unverified; source value retained separately",
+      "对联营企业和合营企业的投资收益": "unverified; source value retained separately",
+      "以摊余成本计量的金融资产终止确认产生的收益": "unverified; source value retained separately",
+      "汇兑收益": "unverified; source value retained separately",
+      "净敞口套期收益": "unverified; source value retained separately",
+      "公允价值变动收益": "unverified; source value retained separately",
+      "期货损益": "unverified; source value retained separately",
+      "托管收益": "unverified; source value retained separately",
+      "补贴收入": "unverified; source value retained separately",
+      "其他收益": "unverified; source value retained separately",
+      "资产减值损失": "unverified; source value retained separately",
+      "信用减值损失": "unverified; source value retained separately",
+      "其他业务利润": "unverified; source value retained separately",
+      "资产处置收益": "unverified; source value retained separately",
+      "营业利润": "unverified; source value retained separately",
+      "营业外收入": "unverified; source value retained separately",
+      "非流动资产处置利得": "unverified; source value retained separately",
+      "营业外支出": "unverified; source value retained separately",
+      "非流动资产处置损失": "unverified; source value retained separately",
+      "利润总额": "unverified; source value retained separately",
+      "所得税费用": "unverified; source value retained separately",
+      "未确认投资损失": "unverified; source value retained separately",
+      "净利润": "unverified; source value retained separately",
+      "持续经营净利润": "unverified; source value retained separately",
+      "终止经营净利润": "unverified; source value retained separately",
+      "归属于母公司所有者的净利润": "unverified; source value retained separately",
+      "被合并方在合并前实现净利润": "unverified; source value retained separately",
+      "少数股东损益": "unverified; source value retained separately",
+      "归属于母公司所有者的其他综合收益": "unverified; source value retained separately",
+      "（一）以后不能重分类进损益的其他综合收益": "unverified; source value retained separately",
+      "重新计量设定受益计划变动额": "unverified; source value retained separately",
+      "权益法下不能转损益的其他综合收益": "unverified; source value retained separately",
+      "其他权益工具投资公允价值变动": "unverified; source value retained separately",
+      "企业自身信用风险公允价值变动": "unverified; source value retained separately",
+      "（二）以后将重分类进损益的其他综合收益": "unverified; source value retained separately",
+      "权益法下可转损益的其他综合收益": "unverified; source value retained separately",
+      "可供出售金融资产公允价值变动损益": "unverified; source value retained separately",
+      "其他债权投资公允价值变动": "unverified; source value retained separately",
+      "金融资产重分类计入其他综合收益的金额": "unverified; source value retained separately",
+      "其他债权投资信用减值准备": "unverified; source value retained separately",
+      "持有至到期投资重分类为可供出售金融资产损益": "unverified; source value retained separately",
+      "现金流量套期储备": "unverified; source value retained separately",
+      "现金流量套期损益的有效部分": "unverified; source value retained separately",
+      "外币财务报表折算差额": "unverified; source value retained separately",
+      "其他": "unverified; source value retained separately",
+      "归属于少数股东的其他综合收益": "unverified; source value retained separately",
+      "综合收益总额": "unverified; source value retained separately",
+      "归属于母公司所有者的综合收益总额": "unverified; source value retained separately",
+      "归属于少数股东的综合收益总额": "unverified; source value retained separately",
+      "基本每股收益": "unverified; source value retained separately",
+      "稀释每股收益": "unverified; source value retained separately",
+      "经营活动产生的现金流量": "unverified; source value retained separately",
+      "销售商品、提供劳务收到的现金": "unverified; source value retained separately",
+      "客户存款和同业存放款项净增加额": "unverified; source value retained separately",
+      "向中央银行借款净增加额": "unverified; source value retained separately",
+      "向其他金融机构拆入资金净增加额": "unverified; source value retained separately",
+      "收到原保险合同保费取得的现金": "unverified; source value retained separately",
+      "收到再保险业务现金净额": "unverified; source value retained separately",
+      "保户储金及投资款净增加额": "unverified; source value retained separately",
+      "处置交易性金融资产净增加额": "unverified; source value retained separately",
+      "收取利息、手续费及佣金的现金": "unverified; source value retained separately",
+      "拆入资金净增加额": "unverified; source value retained separately",
+      "回购业务资金净增加额": "unverified; source value retained separately",
+      "收到的税费返还": "unverified; source value retained separately",
+      "收到的其他与经营活动有关的现金": "unverified; source value retained separately",
+      "经营活动现金流入小计": "unverified; source value retained separately",
+      "购买商品、接受劳务支付的现金": "unverified; source value retained separately",
+      "客户贷款及垫款净增加额": "unverified; source value retained separately",
+      "存放中央银行和同业款项净增加额": "unverified; source value retained separately",
+      "支付原保险合同赔付款项的现金": "unverified; source value retained separately",
+      "支付利息、手续费及佣金的现金": "unverified; source value retained separately",
+      "支付保单红利的现金": "unverified; source value retained separately",
+      "支付给职工以及为职工支付的现金": "unverified; source value retained separately",
+      "支付的各项税费": "unverified; source value retained separately",
+      "支付的其他与经营活动有关的现金": "unverified; source value retained separately",
+      "经营活动现金流出小计": "unverified; source value retained separately",
+      "经营活动产生的现金流量净额": "unverified; source value retained separately",
+      "投资活动产生的现金流量": "unverified; source value retained separately",
+      "收回投资所收到的现金": "unverified; source value retained separately",
+      "取得投资收益收到的现金": "unverified; source value retained separately",
+      "处置固定资产、无形资产和其他长期资产所收回的现金净额": "unverified; source value retained separately",
+      "处置子公司及其他营业单位收到的现金净额": "unverified; source value retained separately",
+      "收到的其他与投资活动有关的现金": "unverified; source value retained separately",
+      "减少质押和定期存款所收到的现金": "unverified; source value retained separately",
+      "处置可供出售金融资产净增加额": "unverified; source value retained separately",
+      "投资活动现金流入小计": "unverified; source value retained separately",
+      "购建固定资产、无形资产和其他长期资产所支付的现金": "unverified; source value retained separately",
+      "投资所支付的现金": "unverified; source value retained separately",
+      "质押贷款净增加额": "unverified; source value retained separately",
+      "取得子公司及其他营业单位支付的现金净额": "unverified; source value retained separately",
+      "增加质押和定期存款所支付的现金": "unverified; source value retained separately",
+      "支付的其他与投资活动有关的现金": "unverified; source value retained separately",
+      "投资活动现金流出小计": "unverified; source value retained separately",
+      "投资活动产生的现金流量净额": "unverified; source value retained separately",
+      "筹资活动产生的现金流量": "unverified; source value retained separately",
+      "吸收投资收到的现金": "unverified; source value retained separately",
+      "子公司吸收少数股东投资收到的现金": "unverified; source value retained separately",
+      "取得借款收到的现金": "unverified; source value retained separately",
+      "发行债券收到的现金": "unverified; source value retained separately",
+      "收到其他与筹资活动有关的现金": "unverified; source value retained separately",
+      "筹资活动现金流入小计": "unverified; source value retained separately",
+      "偿还债务支付的现金": "unverified; source value retained separately",
+      "分配股利、利润或偿付利息所支付的现金": "unverified; source value retained separately",
+      "子公司支付给少数股东的股利、利润": "unverified; source value retained separately",
+      "支付其他与筹资活动有关的现金": "unverified; source value retained separately",
+      "筹资活动现金流出小计": "unverified; source value retained separately",
+      "筹资活动产生的现金流量净额": "unverified; source value retained separately",
+      "汇率变动对现金及现金等价物的影响": "unverified; source value retained separately",
+      "现金及现金等价物净增加额": "unverified; source value retained separately",
+      "期初现金及现金等价物余额": "unverified; source value retained separately",
+      "现金的期末余额": "unverified; source value retained separately",
+      "现金的期初余额": "unverified; source value retained separately",
+      "现金等价物的期末余额": "unverified; source value retained separately",
+      "现金等价物的期初余额": "unverified; source value retained separately",
+      "期末现金及现金等价物余额": "unverified; source value retained separately"
+    },
+    "unverified_fields": [
+      "流动资产",
+      "货币资金",
+      "结算备付金",
+      "拆出资金",
+      "交易性金融资产",
+      "买入返售金融资产",
+      "衍生金融资产",
+      "应收票据及应收账款",
+      "应收票据",
+      "应收账款",
+      "应收款项融资",
+      "预付款项",
+      "应收股利",
+      "应收利息",
+      "应收保费",
+      "应收分保账款",
+      "应收分保合同准备金",
+      "应收出口退税",
+      "应收补贴款",
+      "应收保证金",
+      "内部应收款",
+      "其他应收款",
+      "其他应收款(合计)",
+      "存货",
+      "划分为持有待售的资产",
+      "待摊费用",
+      "待处理流动资产损益",
+      "一年内到期的非流动资产",
+      "其他流动资产",
+      "流动资产合计",
+      "非流动资产",
+      "发放贷款及垫款",
+      "债权投资",
+      "其他债权投资",
+      "以公允价值计量且其变动计入其他综合收益的金融资产",
+      "以摊余成本计量的金融资产",
+      "可供出售金融资产",
+      "长期股权投资",
+      "投资性房地产",
+      "长期应收款",
+      "其他权益工具投资",
+      "其他非流动金融资产",
+      "其他长期投资",
+      "固定资产原值",
+      "累计折旧",
+      "固定资产净值",
+      "固定资产减值准备",
+      "在建工程合计",
+      "在建工程",
+      "工程物资",
+      "固定资产净额",
+      "固定资产清理",
+      "固定资产及清理合计",
+      "生产性生物资产",
+      "公益性生物资产",
+      "油气资产",
+      "合同资产",
+      "使用权资产",
+      "无形资产",
+      "开发支出",
+      "商誉",
+      "长期待摊费用",
+      "股权分置流通权",
+      "递延所得税资产",
+      "其他非流动资产",
+      "非流动资产合计",
+      "资产总计",
+      "流动负债",
+      "短期借款",
+      "向中央银行借款",
+      "吸收存款及同业存放",
+      "拆入资金",
+      "交易性金融负债",
+      "衍生金融负债",
+      "应付票据及应付账款",
+      "应付票据",
+      "应付账款",
+      "预收款项",
+      "合同负债",
+      "卖出回购金融资产款",
+      "应付手续费及佣金",
+      "应付职工薪酬",
+      "应交税费",
+      "应付利息",
+      "应付股利",
+      "应付保证金",
+      "内部应付款",
+      "其他应付款",
+      "其他应付款合计",
+      "其他应交款",
+      "担保责任赔偿准备金",
+      "应付分保账款",
+      "保险合同准备金",
+      "代理买卖证券款",
+      "代理承销证券款",
+      "国际票证结算",
+      "国内票证结算",
+      "预提费用",
+      "预计流动负债",
+      "应付短期债券",
+      "划分为持有待售的负债",
+      "一年内的递延收益",
+      "一年内到期的非流动负债",
+      "其他流动负债",
+      "流动负债合计",
+      "非流动负债",
+      "长期借款",
+      "应付债券",
+      "应付债券：优先股",
+      "应付债券：永续债",
+      "租赁负债",
+      "长期应付职工薪酬",
+      "长期应付款",
+      "长期应付款合计",
+      "专项应付款",
+      "预计非流动负债",
+      "长期递延收益",
+      "递延所得税负债",
+      "其他非流动负债",
+      "非流动负债合计",
+      "负债合计",
+      "所有者权益",
+      "实收资本(或股本)",
+      "其他权益工具",
+      "优先股",
+      "永续债",
+      "资本公积",
+      "减:库存股",
+      "其他综合收益",
+      "专项储备",
+      "盈余公积",
+      "一般风险准备",
+      "未确定的投资损失",
+      "未分配利润",
+      "拟分配现金股利",
+      "外币报表折算差额",
+      "归属于母公司股东权益合计",
+      "少数股东权益",
+      "所有者权益(或股东权益)合计",
+      "负债和所有者权益(或股东权益)总计",
+      "营业总收入",
+      "营业收入",
+      "利息收入",
+      "已赚保费",
+      "手续费及佣金收入",
+      "房地产销售收入",
+      "其他业务收入",
+      "营业总成本",
+      "营业成本",
+      "手续费及佣金支出",
+      "房地产销售成本",
+      "退保金",
+      "赔付支出净额",
+      "提取保险合同准备金净额",
+      "保单红利支出",
+      "分保费用",
+      "其他业务成本",
+      "营业税金及附加",
+      "研发费用",
+      "销售费用",
+      "管理费用",
+      "财务费用",
+      "利息费用",
+      "利息支出",
+      "投资收益",
+      "对联营企业和合营企业的投资收益",
+      "以摊余成本计量的金融资产终止确认产生的收益",
+      "汇兑收益",
+      "净敞口套期收益",
+      "公允价值变动收益",
+      "期货损益",
+      "托管收益",
+      "补贴收入",
+      "其他收益",
+      "资产减值损失",
+      "信用减值损失",
+      "其他业务利润",
+      "资产处置收益",
+      "营业利润",
+      "营业外收入",
+      "非流动资产处置利得",
+      "营业外支出",
+      "非流动资产处置损失",
+      "利润总额",
+      "所得税费用",
+      "未确认投资损失",
+      "净利润",
+      "持续经营净利润",
+      "终止经营净利润",
+      "归属于母公司所有者的净利润",
+      "被合并方在合并前实现净利润",
+      "少数股东损益",
+      "归属于母公司所有者的其他综合收益",
+      "（一）以后不能重分类进损益的其他综合收益",
+      "重新计量设定受益计划变动额",
+      "权益法下不能转损益的其他综合收益",
+      "其他权益工具投资公允价值变动",
+      "企业自身信用风险公允价值变动",
+      "（二）以后将重分类进损益的其他综合收益",
+      "权益法下可转损益的其他综合收益",
+      "可供出售金融资产公允价值变动损益",
+      "其他债权投资公允价值变动",
+      "金融资产重分类计入其他综合收益的金额",
+      "其他债权投资信用减值准备",
+      "持有至到期投资重分类为可供出售金融资产损益",
+      "现金流量套期储备",
+      "现金流量套期损益的有效部分",
+      "外币财务报表折算差额",
+      "其他",
+      "归属于少数股东的其他综合收益",
+      "综合收益总额",
+      "归属于母公司所有者的综合收益总额",
+      "归属于少数股东的综合收益总额",
+      "基本每股收益",
+      "稀释每股收益",
+      "经营活动产生的现金流量",
+      "销售商品、提供劳务收到的现金",
+      "客户存款和同业存放款项净增加额",
+      "向中央银行借款净增加额",
+      "向其他金融机构拆入资金净增加额",
+      "收到原保险合同保费取得的现金",
+      "收到再保险业务现金净额",
+      "保户储金及投资款净增加额",
+      "处置交易性金融资产净增加额",
+      "收取利息、手续费及佣金的现金",
+      "拆入资金净增加额",
+      "回购业务资金净增加额",
+      "收到的税费返还",
+      "收到的其他与经营活动有关的现金",
+      "经营活动现金流入小计",
+      "购买商品、接受劳务支付的现金",
+      "客户贷款及垫款净增加额",
+      "存放中央银行和同业款项净增加额",
+      "支付原保险合同赔付款项的现金",
+      "支付利息、手续费及佣金的现金",
+      "支付保单红利的现金",
+      "支付给职工以及为职工支付的现金",
+      "支付的各项税费",
+      "支付的其他与经营活动有关的现金",
+      "经营活动现金流出小计",
+      "经营活动产生的现金流量净额",
+      "投资活动产生的现金流量",
+      "收回投资所收到的现金",
+      "取得投资收益收到的现金",
+      "处置固定资产、无形资产和其他长期资产所收回的现金净额",
+      "处置子公司及其他营业单位收到的现金净额",
+      "收到的其他与投资活动有关的现金",
+      "减少质押和定期存款所收到的现金",
+      "处置可供出售金融资产净增加额",
+      "投资活动现金流入小计",
+      "购建固定资产、无形资产和其他长期资产所支付的现金",
+      "投资所支付的现金",
+      "质押贷款净增加额",
+      "取得子公司及其他营业单位支付的现金净额",
+      "增加质押和定期存款所支付的现金",
+      "支付的其他与投资活动有关的现金",
+      "投资活动现金流出小计",
+      "投资活动产生的现金流量净额",
+      "筹资活动产生的现金流量",
+      "吸收投资收到的现金",
+      "子公司吸收少数股东投资收到的现金",
+      "取得借款收到的现金",
+      "发行债券收到的现金",
+      "收到其他与筹资活动有关的现金",
+      "筹资活动现金流入小计",
+      "偿还债务支付的现金",
+      "分配股利、利润或偿付利息所支付的现金",
+      "子公司支付给少数股东的股利、利润",
+      "支付其他与筹资活动有关的现金",
+      "筹资活动现金流出小计",
+      "筹资活动产生的现金流量净额",
+      "汇率变动对现金及现金等价物的影响",
+      "现金及现金等价物净增加额",
+      "期初现金及现金等价物余额",
+      "现金的期末余额",
+      "现金的期初余额",
+      "现金等价物的期末余额",
+      "现金等价物的期初余额",
+      "期末现金及现金等价物余额"
+    ],
+    "selected_fields": [
+      "audit_text",
+      "currency_text",
+      "report_date",
+      "report_type",
+      "snapshot_at",
+      "source_publish_text",
+      "source_security_code",
+      "source_text",
+      "source_type_text",
+      "source_update_text",
+      "一年内到期的非流动负债",
+      "一年内到期的非流动资产",
+      "一年内的递延收益",
+      "一般风险准备",
+      "专项储备",
+      "专项应付款",
+      "买入返售金融资产",
+      "交易性金融负债",
+      "交易性金融资产",
+      "代理买卖证券款",
+      "代理承销证券款",
+      "以公允价值计量且其变动计入其他综合收益的金融资产",
+      "以摊余成本计量的金融资产",
+      "以摊余成本计量的金融资产终止确认产生的收益",
+      "企业自身信用风险公允价值变动",
+      "优先股",
+      "使用权资产",
+      "保单红利支出",
+      "保户储金及投资款净增加额",
+      "保险合同准备金",
+      "信用减值损失",
+      "债权投资",
+      "偿还债务支付的现金",
+      "公允价值变动收益",
+      "公益性生物资产",
+      "其他",
+      "其他业务利润",
+      "其他业务成本",
+      "其他业务收入",
+      "其他债权投资",
+      "其他债权投资信用减值准备",
+      "其他债权投资公允价值变动",
+      "其他应交款",
+      "其他应付款",
+      "其他应付款合计",
+      "其他应收款",
+      "其他应收款(合计)",
+      "其他收益",
+      "其他权益工具",
+      "其他权益工具投资",
+      "其他权益工具投资公允价值变动",
+      "其他流动负债",
+      "其他流动资产",
+      "其他综合收益",
+      "其他长期投资",
+      "其他非流动负债",
+      "其他非流动资产",
+      "其他非流动金融资产",
+      "内部应付款",
+      "内部应收款",
+      "净利润",
+      "净敞口套期收益",
+      "减:库存股",
+      "减少质押和定期存款所收到的现金",
+      "分保费用",
+      "分配股利、利润或偿付利息所支付的现金",
+      "划分为持有待售的负债",
+      "划分为持有待售的资产",
+      "利息支出",
+      "利息收入",
+      "利息费用",
+      "利润总额",
+      "卖出回购金融资产款",
+      "发放贷款及垫款",
+      "发行债券收到的现金",
+      "取得借款收到的现金",
+      "取得子公司及其他营业单位支付的现金净额",
+      "取得投资收益收到的现金",
+      "可供出售金融资产",
+      "可供出售金融资产公允价值变动损益",
+      "合同负债",
+      "合同资产",
+      "向中央银行借款",
+      "向中央银行借款净增加额",
+      "向其他金融机构拆入资金净增加额",
+      "吸收存款及同业存放",
+      "吸收投资收到的现金",
+      "商誉",
+      "回购业务资金净增加额",
+      "固定资产净值",
+      "固定资产净额",
+      "固定资产减值准备",
+      "固定资产原值",
+      "固定资产及清理合计",
+      "固定资产清理",
+      "国内票证结算",
+      "国际票证结算",
+      "在建工程",
+      "在建工程合计",
+      "基本每股收益",
+      "增加质押和定期存款所支付的现金",
+      "处置交易性金融资产净增加额",
+      "处置可供出售金融资产净增加额",
+      "处置固定资产、无形资产和其他长期资产所收回的现金净额",
+      "处置子公司及其他营业单位收到的现金净额",
+      "外币报表折算差额",
+      "外币财务报表折算差额",
+      "子公司吸收少数股东投资收到的现金",
+      "子公司支付给少数股东的股利、利润",
+      "存放中央银行和同业款项净增加额",
+      "存货",
+      "实收资本(或股本)",
+      "客户存款和同业存放款项净增加额",
+      "客户贷款及垫款净增加额",
+      "对联营企业和合营企业的投资收益",
+      "少数股东损益",
+      "少数股东权益",
+      "工程物资",
+      "已赚保费",
+      "应交税费",
+      "应付保证金",
+      "应付债券",
+      "应付债券：优先股",
+      "应付债券：永续债",
+      "应付分保账款",
+      "应付利息",
+      "应付手续费及佣金",
+      "应付短期债券",
+      "应付票据",
+      "应付票据及应付账款",
+      "应付职工薪酬",
+      "应付股利",
+      "应付账款",
+      "应收保证金",
+      "应收保费",
+      "应收出口退税",
+      "应收分保合同准备金",
+      "应收分保账款",
+      "应收利息",
+      "应收款项融资",
+      "应收票据",
+      "应收票据及应收账款",
+      "应收股利",
+      "应收补贴款",
+      "应收账款",
+      "开发支出",
+      "归属于少数股东的其他综合收益",
+      "归属于少数股东的综合收益总额",
+      "归属于母公司所有者的其他综合收益",
+      "归属于母公司所有者的净利润",
+      "归属于母公司所有者的综合收益总额",
+      "归属于母公司股东权益合计",
+      "待处理流动资产损益",
+      "待摊费用",
+      "房地产销售成本",
+      "房地产销售收入",
+      "所得税费用",
+      "所有者权益",
+      "所有者权益(或股东权益)合计",
+      "手续费及佣金支出",
+      "手续费及佣金收入",
+      "托管收益",
+      "投资性房地产",
+      "投资所支付的现金",
+      "投资收益",
+      "投资活动产生的现金流量",
+      "投资活动产生的现金流量净额",
+      "投资活动现金流入小计",
+      "投资活动现金流出小计",
+      "担保责任赔偿准备金",
+      "拆入资金",
+      "拆入资金净增加额",
+      "拆出资金",
+      "拟分配现金股利",
+      "持有至到期投资重分类为可供出售金融资产损益",
+      "持续经营净利润",
+      "提取保险合同准备金净额",
+      "支付保单红利的现金",
+      "支付其他与筹资活动有关的现金",
+      "支付利息、手续费及佣金的现金",
+      "支付原保险合同赔付款项的现金",
+      "支付的其他与投资活动有关的现金",
+      "支付的其他与经营活动有关的现金",
+      "支付的各项税费",
+      "支付给职工以及为职工支付的现金",
+      "收到其他与筹资活动有关的现金",
+      "收到再保险业务现金净额",
+      "收到原保险合同保费取得的现金",
+      "收到的其他与投资活动有关的现金",
+      "收到的其他与经营活动有关的现金",
+      "收到的税费返还",
+      "收取利息、手续费及佣金的现金",
+      "收回投资所收到的现金",
+      "无形资产",
+      "期初现金及现金等价物余额",
+      "期末现金及现金等价物余额",
+      "期货损益",
+      "未分配利润",
+      "未确定的投资损失",
+      "未确认投资损失",
+      "权益法下不能转损益的其他综合收益",
+      "权益法下可转损益的其他综合收益",
+      "永续债",
+      "汇兑收益",
+      "汇率变动对现金及现金等价物的影响",
+      "油气资产",
+      "流动负债",
+      "流动负债合计",
+      "流动资产",
+      "流动资产合计",
+      "现金及现金等价物净增加额",
+      "现金流量套期储备",
+      "现金流量套期损益的有效部分",
+      "现金的期初余额",
+      "现金的期末余额",
+      "现金等价物的期初余额",
+      "现金等价物的期末余额",
+      "生产性生物资产",
+      "盈余公积",
+      "短期借款",
+      "研发费用",
+      "租赁负债",
+      "稀释每股收益",
+      "筹资活动产生的现金流量",
+      "筹资活动产生的现金流量净额",
+      "筹资活动现金流入小计",
+      "筹资活动现金流出小计",
+      "管理费用",
+      "累计折旧",
+      "终止经营净利润",
+      "经营活动产生的现金流量",
+      "经营活动产生的现金流量净额",
+      "经营活动现金流入小计",
+      "经营活动现金流出小计",
+      "结算备付金",
+      "综合收益总额",
+      "股权分置流通权",
+      "营业利润",
+      "营业外支出",
+      "营业外收入",
+      "营业总成本",
+      "营业总收入",
+      "营业成本",
+      "营业收入",
+      "营业税金及附加",
+      "衍生金融负债",
+      "衍生金融资产",
+      "补贴收入",
+      "被合并方在合并前实现净利润",
+      "负债合计",
+      "负债和所有者权益(或股东权益)总计",
+      "财务费用",
+      "货币资金",
+      "质押贷款净增加额",
+      "购买商品、接受劳务支付的现金",
+      "购建固定资产、无形资产和其他长期资产所支付的现金",
+      "资产减值损失",
+      "资产处置收益",
+      "资产总计",
+      "资本公积",
+      "赔付支出净额",
+      "退保金",
+      "递延所得税负债",
+      "递延所得税资产",
+      "重新计量设定受益计划变动额",
+      "金融资产重分类计入其他综合收益的金额",
+      "销售商品、提供劳务收到的现金",
+      "销售费用",
+      "长期借款",
+      "长期应付款",
+      "长期应付款合计",
+      "长期应付职工薪酬",
+      "长期应收款",
+      "长期待摊费用",
+      "长期股权投资",
+      "长期递延收益",
+      "非流动负债",
+      "非流动负债合计",
+      "非流动资产",
+      "非流动资产合计",
+      "非流动资产处置利得",
+      "非流动资产处置损失",
+      "预付款项",
+      "预提费用",
+      "预收款项",
+      "预计流动负债",
+      "预计非流动负债",
+      "（一）以后不能重分类进损益的其他综合收益",
+      "（二）以后将重分类进损益的其他综合收益"
+    ],
+    "eligible_for_production_routing": false,
+    "production_writes": 0,
+    "live_http_calls": 0,
+    "validation_time_utc": "2026-10-04T09:21:34.780934+00:00",
+    "status": "candidate_complete",
+    "response_freshness_seconds": 86400,
+    "sdk_dependency": {
+      "version": "1.18.83",
+      "function": "stock_financial_report_sina",
+      "source_path": "_raw/bodies/a1062b6ce9c36ca5d8f1055b7c2d4ab2f826a24a3d12dd51c39d1b278d4a6636.bin",
+      "sha256": "a1062b6ce9c36ca5d8f1055b7c2d4ab2f826a24a3d12dd51c39d1b278d4a6636",
+      "original_source_sha256": "a1062b6ce9c36ca5d8f1055b7c2d4ab2f826a24a3d12dd51c39d1b278d4a6636",
+      "redacted": false,
+      "dependencies": []
+    },
+    "transport_dependency": {
+      "requests": "2.32.5",
+      "urllib3": "2.3.0"
+    },
+    "source_sdk_transport_policy": {
+      "source_contract": "successful rate-limited original SDK probe",
+      "timeout_seconds": null,
+      "trust_env": true,
+      "allow_redirects": true,
+      "headers": "requests defaults",
+      "adapter_retry_total": 2,
+      "adapter_backoff_min_seconds": 5,
+      "status_forcelist": [
+        500,
+        502,
+        503,
+        504
+      ],
+      "outer_capture_interval_seconds": 3,
+      "sdk_outer_attempts": 1,
+      "sdk_outer_delays_seconds": [],
+      "host_pause": "403/429 immediately; two consecutive transport or server errors",
+      "physical_retry_count_observable": false,
+      "source_fallback": false,
+      "implicit_date_selection": false,
+      "source_scope": "explicit source SDK and parameters; exact original response retained before parsing"
+    },
+    "responses": [
+      {
+        "event": "http_response",
+        "method": "GET",
+        "url": "https://quotes.sina.cn/cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?num=1000&page=1&paperCode=sh600519&source=fzb&type=0",
+        "request_headers": {
+          "User-Agent": "python-requests/2.32.5",
+          "Accept-Encoding": "gzip, deflate, br, zstd",
+          "Accept": "*/*",
+          "Connection": "keep-alive"
+        },
+        "scope": {
+          "input_id": "ASTOCK-039",
+          "parameters": {
+            "code": "600519"
+          }
+        },
+        "request_options": {
+          "timeout": null,
+          "allow_redirects": true,
+          "trust_env": true,
+          "proxies": {},
+          "sdk_retry_policy": true,
+          "probe_host_pause": true
+        },
+        "provider": "sina",
+        "endpoint": "financial_statements",
+        "code_version": "71b2c47549f6f0f349408945258a38f6d9c2620f1c2873ef875a23f557af5715",
+        "fetched_at_utc": "2026-10-04T09:21:35.608161+00:00",
+        "mode": "replay",
+        "source_ref": {
+          "manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\_raw\\missing-capabilities-20261003T174623\\manifest.ndjson",
+          "line": 94,
+          "fetched_at_utc": "2026-10-03T09:52:30.911+00:00"
+        },
+        "outcome": "response",
+        "status_code": 200,
+        "response_headers": {
+          "Connection": "keep-alive",
+          "Content-Encoding": "gzip",
+          "Content-Type": "application/json; charset=utf-8",
+          "DPOOL_HEADER": "cn-quotes-sina-cn-796fc5ffdf-s96dr",
+          "Date": "Sat, 03 Oct 2026 09:52:34 GMT",
+          "Server": "nginx",
+          "Transfer-Encoding": "chunked",
+          "Vary": "Accept-Encoding",
+          "X-Via-SSL": "ssl.25.sinag1.yf.lb.sinanode.com"
+        },
+        "content_type": "application/json; charset=utf-8",
+        "encoding": "utf-8",
+        "body_bytes": 3438664,
+        "body_sha256": "3c00915108233b0c7727831ffdeec6ddced5a088bfc53a329d991110fc48c77c",
+        "body_storage": "bodies/3c00915108233b0c7727831ffdeec6ddced5a088bfc53a329d991110fc48c77c.bin",
+        "persistence_status": "exact_application_payload_saved"
+      },
+      {
+        "event": "http_response",
+        "method": "GET",
+        "url": "https://quotes.sina.cn/cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?num=1000&page=1&paperCode=sh600519&source=lrb&type=0",
+        "request_headers": {
+          "User-Agent": "python-requests/2.32.5",
+          "Accept-Encoding": "gzip, deflate, br, zstd",
+          "Accept": "*/*",
+          "Connection": "keep-alive"
+        },
+        "scope": {
+          "input_id": "ASTOCK-039",
+          "parameters": {
+            "code": "600519"
+          }
+        },
+        "request_options": {
+          "timeout": null,
+          "allow_redirects": true,
+          "trust_env": true,
+          "proxies": {},
+          "sdk_retry_policy": true,
+          "probe_host_pause": true
+        },
+        "provider": "sina",
+        "endpoint": "financial_statements",
+        "code_version": "71b2c47549f6f0f349408945258a38f6d9c2620f1c2873ef875a23f557af5715",
+        "fetched_at_utc": "2026-10-04T09:21:37.019748+00:00",
+        "mode": "replay",
+        "source_ref": {
+          "manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\_raw\\missing-capabilities-20261003T174623\\manifest.ndjson",
+          "line": 95,
+          "fetched_at_utc": "2026-10-03T09:52:33.796+00:00"
+        },
+        "outcome": "response",
+        "status_code": 200,
+        "response_headers": {
+          "Connection": "keep-alive",
+          "Content-Encoding": "gzip",
+          "Content-Type": "application/json; charset=utf-8",
+          "DPOOL_HEADER": "cn-quotes-sina-cn-796fc5ffdf-jwk77",
+          "Date": "Sat, 03 Oct 2026 09:52:36 GMT",
+          "Server": "nginx",
+          "Transfer-Encoding": "chunked",
+          "Vary": "Accept-Encoding",
+          "X-Via-SSL": "ssl.27.sinag1.yf.lb.sinanode.com"
+        },
+        "content_type": "application/json; charset=utf-8",
+        "encoding": "utf-8",
+        "body_bytes": 2002959,
+        "body_sha256": "e2f52c5a261901d8825555b0f6e353018633b30447e9e74da7f15372383735db",
+        "body_storage": "bodies/e2f52c5a261901d8825555b0f6e353018633b30447e9e74da7f15372383735db.bin",
+        "persistence_status": "exact_application_payload_saved"
+      },
+      {
+        "event": "http_response",
+        "method": "GET",
+        "url": "https://quotes.sina.cn/cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?num=1000&page=1&paperCode=sh600519&source=llb&type=0",
+        "request_headers": {
+          "User-Agent": "python-requests/2.32.5",
+          "Accept-Encoding": "gzip, deflate, br, zstd",
+          "Accept": "*/*",
+          "Connection": "keep-alive"
+        },
+        "scope": {
+          "input_id": "ASTOCK-039",
+          "parameters": {
+            "code": "600519"
+          }
+        },
+        "request_options": {
+          "timeout": null,
+          "allow_redirects": true,
+          "trust_env": true,
+          "proxies": {},
+          "sdk_retry_policy": true,
+          "probe_host_pause": true
+        },
+        "provider": "sina",
+        "endpoint": "financial_statements",
+        "code_version": "71b2c47549f6f0f349408945258a38f6d9c2620f1c2873ef875a23f557af5715",
+        "fetched_at_utc": "2026-10-04T09:21:38.289921+00:00",
+        "mode": "replay",
+        "source_ref": {
+          "manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\_raw\\missing-capabilities-20261003T174623\\manifest.ndjson",
+          "line": 96,
+          "fetched_at_utc": "2026-10-03T09:52:35.521+00:00"
+        },
+        "outcome": "response",
+        "status_code": 200,
+        "response_headers": {
+          "Connection": "keep-alive",
+          "Content-Encoding": "gzip",
+          "Content-Type": "application/json; charset=utf-8",
+          "DPOOL_HEADER": "cn-quotes-sina-cn-796fc5ffdf-h8xv2",
+          "Date": "Sat, 03 Oct 2026 09:52:40 GMT",
+          "Server": "nginx",
+          "Transfer-Encoding": "chunked",
+          "Vary": "Accept-Encoding",
+          "X-Via-SSL": "ssl.27.sinag1.yf.lb.sinanode.com"
+        },
+        "content_type": "application/json; charset=utf-8",
+        "encoding": "utf-8",
+        "body_bytes": 1782517,
+        "body_sha256": "fdfd259b762555afd43a1f0cf378bc031d1b54c910f0868cf9c304657e1bb883",
+        "body_storage": "bodies/fdfd259b762555afd43a1f0cf378bc031d1b54c910f0868cf9c304657e1bb883.bin",
+        "persistence_status": "exact_application_payload_saved"
+      }
+    ],
+    "source_rows": {
+      "path": "2026-10-04/source_rows/sina/financial_statements/source-rows.json",
+      "sha256": "858c65984d4bb51077606cdaac534b09f9e720a3c9243f62eaada8203629c157",
+      "row_count": 305
+    },
+    "parsed_rows": {
+      "path": "2026-10-04/parsed_rows/sina/financial_statements/parsed-rows.json",
+      "sha256": "237545b1ddc708be720549bb30acafee1962df98595ffc5b18c677f50372bc04",
+      "row_count": 305,
+      "code_version": "71b2c47549f6f0f349408945258a38f6d9c2620f1c2873ef875a23f557af5715",
+      "source_response_hashes": [
+        "3c00915108233b0c7727831ffdeec6ddced5a088bfc53a329d991110fc48c77c",
+        "e2f52c5a261901d8825555b0f6e353018633b30447e9e74da7f15372383735db",
+        "fdfd259b762555afd43a1f0cf378bc031d1b54c910f0868cf9c304657e1bb883"
+      ]
+    },
+    "source_url": "https://quotes.sina.cn/cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?num=1000&page=1&paperCode=sh600519&source=fzb&type=0",
+    "source_urls": [
+      "https://quotes.sina.cn/cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?num=1000&page=1&paperCode=sh600519&source=fzb&type=0",
+      "https://quotes.sina.cn/cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?num=1000&page=1&paperCode=sh600519&source=lrb&type=0",
+      "https://quotes.sina.cn/cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?num=1000&page=1&paperCode=sh600519&source=llb&type=0"
+    ],
+    "source_capture_window": {
+      "first": "2026-10-03T09:52:30.911000+00:00",
+      "last": "2026-10-03T09:52:35.521000+00:00",
+      "meaning": "source response capture times; not row-level market timestamps"
+    },
+    "output": {
+      "path": "2026-10-04/sina_financial_statements/sina/financial_statements/mapped-rows.json",
+      "sha256": "4b939f9e4baa0f262a2198f8b54353fd7a8b0a353480c8cfd65a02f4ab22649a",
+      "row_count": 305,
+      "source_response_hashes": [
+        "3c00915108233b0c7727831ffdeec6ddced5a088bfc53a329d991110fc48c77c",
+        "e2f52c5a261901d8825555b0f6e353018633b30447e9e74da7f15372383735db",
+        "fdfd259b762555afd43a1f0cf378bc031d1b54c910f0868cf9c304657e1bb883"
+      ]
+    },
+    "row_count": 305,
+    "coverage_denominator": 305,
+    "first_key": [
+      "2026-10-03T09:52:35.521000+00:00",
+      "600519",
+      "资产负债表",
+      "2026-06-30"
+    ],
+    "last_key": [
+      "2026-10-03T09:52:35.521000+00:00",
+      "600519",
+      "现金流量表",
+      "2000-12-31"
+    ],
+    "host_pause_events": [],
+    "raw_manifest": {
+      "path": "_raw/manifest.ndjson",
+      "sha256": "0e2f448dc7f82ea818a16ab3667beb9d6387305b0d81c4efbe692a204a7dcd69"
+    },
+    "run_directory": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-sdk-smoke-20261004\\ASTOCK-039\\ASTOCK-039-e08865b27f85",
+    "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-sdk-smoke-20261004\\ASTOCK-039\\ASTOCK-039-e08865b27f85\\2026-10-04\\input_report\\sina\\financial_statements\\report.json"
+  },
+  {
+    "input_id": "ASTOCK-055",
+    "dataset": "option_risk",
+    "mode": "replay",
+    "parameters": {
+      "date": "2026-09-30"
+    },
+    "provider": "sse",
+    "endpoint": "option_risk",
+    "collection_profile": {
+      "name": "market_after_close",
+      "mode": "after_close",
+      "refresh_interval_seconds": null,
+      "business_day": "trading_day",
+      "scheduling_enabled": false,
+      "frequency_unit": null,
+      "frequency_interval": 1,
+      "at_time": null,
+      "anchor_date": null,
+      "settle_delay_seconds": 0,
+      "trigger_grace_seconds": 30,
+      "universe": "static",
+      "max_symbols": null
+    },
+    "request_interval_seconds": 3,
+    "effective_concurrency": 1,
+    "request_limit_enforcement": "call_boundary_only",
+    "adapter_version": "sse-risk-input-v1",
+    "code_version": "9224b2af448bbacae068acee90f677c89099cf5d28ca1ed5627d81ddb53150e6",
+    "code_files": [
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\pipeline\\inputs.py",
+        "sha256": "69c70410d8a0b5f7525b32169cac04643423a9bde57f08e9aa6d75c0cb2f2a30"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\cli.py",
+        "sha256": "582f5caedfc538a012d7a2f6e8cd7af3fe8b6fc9152e5b9e0a3fa2cb8810ae19"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\config\\loader.py",
+        "sha256": "93bb55ab150c88751fe9a58a2b75737878c1b0f07233b8ec47009c4901bb11e9"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\contracts.py",
+        "sha256": "a4b16abc7e3686a4eb2791dcd4545fb2404e0214bf32e20db19d2582d39ea447"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\quality\\normalization.py",
+        "sha256": "3ed0d663b7fda9ac6cdf7f1252435f2351c783af3244ccba2c2b0f3891e29b3e"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\transport.py",
+        "sha256": "cb860d0022c40ffe450694b2b4e48bff50c64ed7083d25c847a8079f2baf28b1"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\storage\\raw.py",
+        "sha256": "d483c614830e96d41b697709c0cde9e4cb5adee26116020428b7697f57f2c108"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\routing\\factory.py",
+        "sha256": "70bde5d45f76e2f7f6b3ca5f309f55cce724486a294ff975d5d2f6d9a2eb2b10"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\daily.py",
+        "sha256": "487a14fcbfc47146d6d5fd291fbf41667aba435e5fed22ea1ef61ded513fcaa7"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\minute.py",
+        "sha256": "ff5cf1e91327bcab2e072bcfae9f1f77dca71a84ba26e456c26580a4d59d9cc1"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\snapshot.py",
+        "sha256": "3278cadac776fe8cfe5d02775a5bf8f53bc1cb96c595a5f418172f53047434bf"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\limit_pool.py",
+        "sha256": "2fbdfe3da3129545dfe8d2e457be7c42225696ddd74270567ae765e4b413f5ae"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\shareholder.py",
+        "sha256": "4c9d80f4d51845ac5541c42275f44f2a18643db5e9ccb705a3e16168f8db44c1"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\financial.py",
+        "sha256": "b88fd28013942d1815d04eaf25521bd00dc0d44329ee411dbff48585bb1529a7"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\wallstreetcn\\news.py",
+        "sha256": "fb870197a111ecad42d47e7e81315c7d59c3c6a8bd7cadb72b84cc537bc91fda"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\cctv\\news.py",
+        "sha256": "8839bdeed801611e8e6d11cb9441e6ede7bc94d56507eaa2c903e605c772ee7d"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\cls\\news.py",
+        "sha256": "51da559a252b67a4a2e58171e3630ff1a5a80cd2bc23aa5df30a7e17ac02ad30"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\news.py",
+        "sha256": "6268a98ae01f37985ee6bfbfbe14653387883ed4a8ff640de7c8f88f6e15b097"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\financial.py",
+        "sha256": "699475f190f9864a5f7edafc23a5a85734f22a299f187a62819b4ebb5cb6e247"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sse\\market.py",
+        "sha256": "734c896d185e783af0d411beb4ea609e56f8b37e190d9b1bf2ff72dc22e6123a"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\csindex\\indices.py",
+        "sha256": "1edbd7b35c5b3c895ce036b96d192c7910c7510ed88ec176074966bc7b7e78e3"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\mofcom\\social_financing.py",
+        "sha256": "55d292958fb34991c56c626d5f6f61e7e6c44c8c2627b88ea735e751aa12c5ce"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\chinamoney\\rates.py",
+        "sha256": "e7407f1d4272b69cb439bb0a7bad3960b65bb41328d752f541bc8ef50231f922"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\dividend.py",
+        "sha256": "5706a8cdb37eeeb8f66cb033a3091dd1b6ec1ed83d72d0f9fbeb8f5c75d9649b"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\fund_flow.py",
+        "sha256": "0cf655efa0854d18651bb4f04f985f0f210b81a6d9eff065604d235ed8f75280"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\realtime.py",
+        "sha256": "6e09d2a5014cf316c4d1e26e913a44d5c2fbad95fb44d95cba159ef881f03bca"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\calendar.py",
+        "sha256": "3d114045f960bfcc94ade1ee03e4d25ebdf6980ba68aa2d0a2236bed78aaef05"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\snapshot.py",
+        "sha256": "cfa0b823b2fa8053ce899157e9b6078b94516d3fabd5d303480824111f62d136"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\daily.py",
+        "sha256": "dd15e0c6b0f8ed5e6db99b5d2b9725eb7e2cc6f3e42bd5e6d392c5334922dc89"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\akshare\\boards.py",
+        "sha256": "2060f150831cebaf707ed5becedc35428bc41d4428bab31555ed1d2bf817d122"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\baostock\\industry.py",
+        "sha256": "16c41b379eecbd87f082bd042e27fad7f3d8d77b5bfc6a3e8a286209b068494a"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\baostock\\session.py",
+        "sha256": "70ce19cdde1d6a8ed0c3d3db29caa28d1d8069826136ab6dd7fb6a2ef8c7b832"
+      }
+    ],
+    "config_files": [
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\providers.yaml",
+        "sha256": "b3117d4db08072ed6a96eb6334f712fee9a6cac66ede3b413dbebf2c0731a3a1"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\collection.yaml",
+        "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\datasets\\option_risk.yaml",
+        "sha256": "607ab73090a7a395ef924f084d0b0f0a423b485eac0ec18d76765618a221829c"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\normalization\\option_risk.yaml",
+        "sha256": "f12c925293861ccae5862607a0b85d94e3f7df5f0026dac78555b2efc0dcc149"
+      }
+    ],
+    "normalization_version": "remaining-sdk-input-v1",
+    "normalization_status": "pending_validation",
+    "field_units": {
+      "snapshot_at": null,
+      "trade_date": null,
+      "security_id": null,
+      "contract_code": null,
+      "name": null,
+      "delta": "unverified; source value retained separately",
+      "theta": "unverified; source value retained separately",
+      "gamma": "unverified; source value retained separately",
+      "vega": "unverified; source value retained separately",
+      "rho": "unverified; source value retained separately",
+      "implied_volatility": "unverified; source value retained separately"
+    },
+    "unverified_fields": [
+      "delta",
+      "theta",
+      "gamma",
+      "vega",
+      "rho",
+      "implied_volatility"
+    ],
+    "selected_fields": [
+      "contract_code",
+      "delta",
+      "gamma",
+      "implied_volatility",
+      "name",
+      "rho",
+      "security_id",
+      "snapshot_at",
+      "theta",
+      "trade_date",
+      "vega"
+    ],
+    "eligible_for_production_routing": false,
+    "production_writes": 0,
+    "live_http_calls": 0,
+    "validation_time_utc": "2026-10-04T09:21:41.613686+00:00",
+    "status": "candidate_complete",
+    "response_freshness_seconds": 86400,
+    "calendar_context": {
+      "positive_date_count": 1,
+      "sha256": "c57c8e102441fe7da73806c4d5f92b275f3e9bd85e5007b7675e084c279bc3d9"
+    },
+    "sdk_dependency": {
+      "version": "1.18.83",
+      "function": "option_risk_indicator_sse",
+      "source_path": "_raw/bodies/a199e88008a61892a6682abb87952369dc76511193a1cdef75f985f17c03a4c8.bin",
+      "sha256": "a199e88008a61892a6682abb87952369dc76511193a1cdef75f985f17c03a4c8",
+      "original_source_sha256": "a199e88008a61892a6682abb87952369dc76511193a1cdef75f985f17c03a4c8",
+      "redacted": false,
+      "dependencies": []
+    },
+    "transport_dependency": {
+      "requests": "2.32.5",
+      "urllib3": "2.3.0"
+    },
+    "source_sdk_transport_policy": {
+      "source_contract": "successful rate-limited original SDK probe",
+      "timeout_seconds": null,
+      "trust_env": true,
+      "allow_redirects": true,
+      "headers": "requests defaults",
+      "adapter_retry_total": 2,
+      "adapter_backoff_min_seconds": 5,
+      "status_forcelist": [
+        500,
+        502,
+        503,
+        504
+      ],
+      "outer_capture_interval_seconds": 3,
+      "sdk_outer_attempts": 1,
+      "sdk_outer_delays_seconds": [],
+      "host_pause": "403/429 immediately; two consecutive transport or server errors",
+      "physical_retry_count_observable": false,
+      "source_fallback": false,
+      "implicit_date_selection": false,
+      "source_scope": "explicit source SDK and parameters; exact original response retained before parsing"
+    },
+    "responses": [
+      {
+        "event": "http_response",
+        "method": "GET",
+        "url": "http://query.sse.com.cn/commonQuery.do?contractSymbol=&isPagination=false&sqlId=SSE_ZQPZ_YSP_GGQQZSXT_YSHQ_QQFXZB_DATE_L&trade_date=20260930",
+        "request_headers": {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.67 Safari/537.36",
+          "Accept-Encoding": "gzip, deflate",
+          "Accept": "*/*",
+          "Connection": "keep-alive",
+          "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+          "Cache-Control": "no-cache",
+          "Host": "query.sse.com.cn",
+          "Pragma": "no-cache",
+          "Referer": "http://www.sse.com.cn/"
+        },
+        "scope": {
+          "input_id": "ASTOCK-055",
+          "parameters": {
+            "date": "2026-09-30"
+          }
+        },
+        "request_options": {
+          "timeout": null,
+          "allow_redirects": true,
+          "trust_env": true,
+          "proxies": {},
+          "sdk_retry_policy": true,
+          "probe_host_pause": true
+        },
+        "provider": "sse",
+        "endpoint": "option_risk",
+        "code_version": "9224b2af448bbacae068acee90f677c89099cf5d28ca1ed5627d81ddb53150e6",
+        "fetched_at_utc": "2026-10-04T09:21:41.655012+00:00",
+        "mode": "replay",
+        "source_ref": {
+          "manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\_raw\\missing-capabilities-20261003T174623\\manifest.ndjson",
+          "line": 159,
+          "fetched_at_utc": "2026-10-03T09:56:34.145+00:00"
+        },
+        "outcome": "response",
+        "status_code": 200,
+        "response_headers": {
+          "Connection": "keep-alive",
+          "Content-Language": "zh-CN",
+          "Content-Length": "166520",
+          "Content-Security-Policy": "style-src 'self' http://*.sseinfo.com http://*.sse.com.cn http://yunhq.sse.com.cn:32041 'unsafe-inline'; script-src 'self' http://*.sseinfo.com http://*.sse.com.cn http://yunhq.sse.com.cn:32041 'unsafe-inline' 'unsafe-eval'; frame-ancestors *.sse.com.cn *.sseinfo.com",
+          "Content-Type": "application/json;charset=UTF-8",
+          "Date": "Sat, 03 Oct 2026 09:56:36 GMT",
+          "Keep-Alive": "timeout=60",
+          "Proxy-Connection": "keep-alive",
+          "Referrer-Policy": "origin-when-cross-origin",
+          "Server": "nginx",
+          "X-Download-Options": "noopen",
+          "X-Frame-Options": "SAMEORIGIN,ALLOW-FROM  *.sse.com.cn  *.sseinfo.com",
+          "X-Permitted-Cross-Domain-Policies": "none",
+          "X-Xss-Protection": "1"
+        },
+        "content_type": "application/json;charset=UTF-8",
+        "encoding": "UTF-8",
+        "body_bytes": 166520,
+        "body_sha256": "a856900558c9920b9d1f6ee645baf05f5f4d8582df57e2d1184a14a937a594a1",
+        "body_storage": "bodies/a856900558c9920b9d1f6ee645baf05f5f4d8582df57e2d1184a14a937a594a1.bin",
+        "persistence_status": "exact_application_payload_saved"
+      }
+    ],
+    "source_rows": {
+      "path": "2026-10-04/source_rows/sse/option_risk/source-rows.json",
+      "sha256": "14a7955cb91ae331d3ef87434262cd6a19f08592818cffb304583317e65fa9b1",
+      "row_count": 580
+    },
+    "parsed_rows": {
+      "path": "2026-10-04/parsed_rows/sse/option_risk/parsed-rows.json",
+      "sha256": "ec5af2cdd1799bdb8eb985b0443dbff09a2e51149e6d5253daca3f3ec7f6ab6c",
+      "row_count": 580,
+      "code_version": "9224b2af448bbacae068acee90f677c89099cf5d28ca1ed5627d81ddb53150e6",
+      "source_response_hashes": [
+        "a856900558c9920b9d1f6ee645baf05f5f4d8582df57e2d1184a14a937a594a1"
+      ]
+    },
+    "source_url": "http://query.sse.com.cn/commonQuery.do?contractSymbol=&isPagination=false&sqlId=SSE_ZQPZ_YSP_GGQQZSXT_YSHQ_QQFXZB_DATE_L&trade_date=20260930",
+    "source_urls": [
+      "http://query.sse.com.cn/commonQuery.do?contractSymbol=&isPagination=false&sqlId=SSE_ZQPZ_YSP_GGQQZSXT_YSHQ_QQFXZB_DATE_L&trade_date=20260930"
+    ],
+    "source_capture_window": {
+      "first": "2026-10-03T09:56:34.145000+00:00",
+      "last": "2026-10-03T09:56:34.145000+00:00",
+      "meaning": "source response capture times; not row-level market timestamps"
+    },
+    "output": {
+      "path": "2026-10-04/option_risk/sse/option_risk/mapped-rows.json",
+      "sha256": "54cb23bde8d4fc1a0c245e39f83c5fd1f99556ccd85b631475fdff92622caad9",
+      "row_count": 580,
+      "source_response_hashes": [
+        "a856900558c9920b9d1f6ee645baf05f5f4d8582df57e2d1184a14a937a594a1"
+      ]
+    },
+    "row_count": 580,
+    "coverage_denominator": 580,
+    "first_key": [
+      "2026-10-03T09:56:34.145000+00:00",
+      "2026-09-30",
+      "10012535"
+    ],
+    "last_key": [
+      "2026-10-03T09:56:34.145000+00:00",
+      "2026-09-30",
+      "10012252"
+    ],
+    "host_pause_events": [],
+    "raw_manifest": {
+      "path": "_raw/manifest.ndjson",
+      "sha256": "c588728cb22c58557bf57979e1f58836b600ee91ca68ee92717bf09ceb0e99e7"
+    },
+    "run_directory": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-sdk-smoke-20261004\\ASTOCK-055\\ASTOCK-055-6c298f3766dc",
+    "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-sdk-smoke-20261004\\ASTOCK-055\\ASTOCK-055-6c298f3766dc\\2026-10-04\\input_report\\sse\\option_risk\\report.json"
+  },
+  {
+    "input_id": "ASTOCK-067",
+    "dataset": "index_constituents",
+    "mode": "replay",
+    "parameters": {
+      "index_code": "000300"
+    },
+    "provider": "csindex",
+    "endpoint": "constituents",
+    "collection_profile": {
+      "name": "reference_daily",
+      "mode": "daily",
+      "refresh_interval_seconds": null,
+      "business_day": "trading_day",
+      "scheduling_enabled": false,
+      "frequency_unit": null,
+      "frequency_interval": 1,
+      "at_time": null,
+      "anchor_date": null,
+      "settle_delay_seconds": 0,
+      "trigger_grace_seconds": 30,
+      "universe": "static",
+      "max_symbols": null
+    },
+    "request_interval_seconds": 3,
+    "effective_concurrency": 1,
+    "request_limit_enforcement": "call_boundary_only",
+    "adapter_version": "csindex-constituents-input-v1",
+    "code_version": "ae63ab8fa2b20ca53a2f692652f1e510eb6aef3bed8bcde8edcdd89a4256250c",
+    "code_files": [
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\pipeline\\inputs.py",
+        "sha256": "69c70410d8a0b5f7525b32169cac04643423a9bde57f08e9aa6d75c0cb2f2a30"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\cli.py",
+        "sha256": "582f5caedfc538a012d7a2f6e8cd7af3fe8b6fc9152e5b9e0a3fa2cb8810ae19"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\config\\loader.py",
+        "sha256": "93bb55ab150c88751fe9a58a2b75737878c1b0f07233b8ec47009c4901bb11e9"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\contracts.py",
+        "sha256": "a4b16abc7e3686a4eb2791dcd4545fb2404e0214bf32e20db19d2582d39ea447"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\quality\\normalization.py",
+        "sha256": "3ed0d663b7fda9ac6cdf7f1252435f2351c783af3244ccba2c2b0f3891e29b3e"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\transport.py",
+        "sha256": "cb860d0022c40ffe450694b2b4e48bff50c64ed7083d25c847a8079f2baf28b1"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\storage\\raw.py",
+        "sha256": "d483c614830e96d41b697709c0cde9e4cb5adee26116020428b7697f57f2c108"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\routing\\factory.py",
+        "sha256": "70bde5d45f76e2f7f6b3ca5f309f55cce724486a294ff975d5d2f6d9a2eb2b10"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\daily.py",
+        "sha256": "487a14fcbfc47146d6d5fd291fbf41667aba435e5fed22ea1ef61ded513fcaa7"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\minute.py",
+        "sha256": "ff5cf1e91327bcab2e072bcfae9f1f77dca71a84ba26e456c26580a4d59d9cc1"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\snapshot.py",
+        "sha256": "3278cadac776fe8cfe5d02775a5bf8f53bc1cb96c595a5f418172f53047434bf"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\limit_pool.py",
+        "sha256": "2fbdfe3da3129545dfe8d2e457be7c42225696ddd74270567ae765e4b413f5ae"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\shareholder.py",
+        "sha256": "4c9d80f4d51845ac5541c42275f44f2a18643db5e9ccb705a3e16168f8db44c1"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\financial.py",
+        "sha256": "b88fd28013942d1815d04eaf25521bd00dc0d44329ee411dbff48585bb1529a7"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\wallstreetcn\\news.py",
+        "sha256": "fb870197a111ecad42d47e7e81315c7d59c3c6a8bd7cadb72b84cc537bc91fda"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\cctv\\news.py",
+        "sha256": "8839bdeed801611e8e6d11cb9441e6ede7bc94d56507eaa2c903e605c772ee7d"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\cls\\news.py",
+        "sha256": "51da559a252b67a4a2e58171e3630ff1a5a80cd2bc23aa5df30a7e17ac02ad30"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\news.py",
+        "sha256": "6268a98ae01f37985ee6bfbfbe14653387883ed4a8ff640de7c8f88f6e15b097"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\financial.py",
+        "sha256": "699475f190f9864a5f7edafc23a5a85734f22a299f187a62819b4ebb5cb6e247"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sse\\market.py",
+        "sha256": "734c896d185e783af0d411beb4ea609e56f8b37e190d9b1bf2ff72dc22e6123a"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\csindex\\indices.py",
+        "sha256": "1edbd7b35c5b3c895ce036b96d192c7910c7510ed88ec176074966bc7b7e78e3"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\mofcom\\social_financing.py",
+        "sha256": "55d292958fb34991c56c626d5f6f61e7e6c44c8c2627b88ea735e751aa12c5ce"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\chinamoney\\rates.py",
+        "sha256": "e7407f1d4272b69cb439bb0a7bad3960b65bb41328d752f541bc8ef50231f922"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\dividend.py",
+        "sha256": "5706a8cdb37eeeb8f66cb033a3091dd1b6ec1ed83d72d0f9fbeb8f5c75d9649b"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\fund_flow.py",
+        "sha256": "0cf655efa0854d18651bb4f04f985f0f210b81a6d9eff065604d235ed8f75280"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\realtime.py",
+        "sha256": "6e09d2a5014cf316c4d1e26e913a44d5c2fbad95fb44d95cba159ef881f03bca"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\calendar.py",
+        "sha256": "3d114045f960bfcc94ade1ee03e4d25ebdf6980ba68aa2d0a2236bed78aaef05"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\snapshot.py",
+        "sha256": "cfa0b823b2fa8053ce899157e9b6078b94516d3fabd5d303480824111f62d136"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\daily.py",
+        "sha256": "dd15e0c6b0f8ed5e6db99b5d2b9725eb7e2cc6f3e42bd5e6d392c5334922dc89"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\akshare\\boards.py",
+        "sha256": "2060f150831cebaf707ed5becedc35428bc41d4428bab31555ed1d2bf817d122"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\baostock\\industry.py",
+        "sha256": "16c41b379eecbd87f082bd042e27fad7f3d8d77b5bfc6a3e8a286209b068494a"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\baostock\\session.py",
+        "sha256": "70ce19cdde1d6a8ed0c3d3db29caa28d1d8069826136ab6dd7fb6a2ef8c7b832"
+      }
+    ],
+    "config_files": [
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\providers.yaml",
+        "sha256": "b3117d4db08072ed6a96eb6334f712fee9a6cac66ede3b413dbebf2c0731a3a1"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\collection.yaml",
+        "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\datasets\\index_constituents.yaml",
+        "sha256": "9bf6781101edd7933073a7a6aa32e3efe6a5b44217247c7e9c78355b56dba396"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\normalization\\index_constituents.yaml",
+        "sha256": "0e384f73728423284c488eefee375566579feaa5464e75919531cbd63f2caaaa"
+      }
+    ],
+    "normalization_version": "remaining-sdk-input-v1",
+    "normalization_status": "pending_validation",
+    "field_units": {
+      "snapshot_at": null,
+      "index_code": null,
+      "trade_date": null,
+      "source_security_code": null,
+      "name": null,
+      "index_name": null,
+      "exchange_name": null
+    },
+    "unverified_fields": [],
+    "selected_fields": [
+      "exchange_name",
+      "index_code",
+      "index_name",
+      "name",
+      "snapshot_at",
+      "source_security_code",
+      "trade_date"
+    ],
+    "eligible_for_production_routing": false,
+    "production_writes": 0,
+    "live_http_calls": 0,
+    "validation_time_utc": "2026-10-04T09:21:42.272280+00:00",
+    "status": "candidate_complete",
+    "response_freshness_seconds": 86400,
+    "sdk_dependency": {
+      "version": "1.18.83",
+      "function": "index_stock_cons_csindex",
+      "source_path": "_raw/bodies/d94ec3837e9d07e2eaf784b4764f15368cf29bdd011539edef2d82b954aaf659.bin",
+      "sha256": "d94ec3837e9d07e2eaf784b4764f15368cf29bdd011539edef2d82b954aaf659",
+      "original_source_sha256": "d94ec3837e9d07e2eaf784b4764f15368cf29bdd011539edef2d82b954aaf659",
+      "redacted": false,
+      "dependencies": []
+    },
+    "transport_dependency": {
+      "requests": "2.32.5",
+      "urllib3": "2.3.0"
+    },
+    "source_sdk_transport_policy": {
+      "source_contract": "successful rate-limited original SDK probe",
+      "timeout_seconds": null,
+      "trust_env": true,
+      "allow_redirects": true,
+      "headers": "requests defaults",
+      "adapter_retry_total": 2,
+      "adapter_backoff_min_seconds": 5,
+      "status_forcelist": [
+        500,
+        502,
+        503,
+        504
+      ],
+      "outer_capture_interval_seconds": 3,
+      "sdk_outer_attempts": 1,
+      "sdk_outer_delays_seconds": [],
+      "host_pause": "403/429 immediately; two consecutive transport or server errors",
+      "physical_retry_count_observable": false,
+      "source_fallback": false,
+      "implicit_date_selection": false,
+      "source_scope": "explicit source SDK and parameters; exact original response retained before parsing"
+    },
+    "responses": [
+      {
+        "event": "http_response",
+        "method": "GET",
+        "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/file/autofile/cons/000300cons.xls",
+        "request_headers": {
+          "User-Agent": "python-requests/2.32.5",
+          "Accept-Encoding": "gzip, deflate, br, zstd",
+          "Accept": "*/*",
+          "Connection": "keep-alive"
+        },
+        "scope": {
+          "input_id": "ASTOCK-067",
+          "parameters": {
+            "index_code": "000300"
+          }
+        },
+        "request_options": {
+          "timeout": null,
+          "allow_redirects": true,
+          "trust_env": true,
+          "proxies": {},
+          "sdk_retry_policy": true,
+          "probe_host_pause": true
+        },
+        "provider": "csindex",
+        "endpoint": "constituents",
+        "code_version": "ae63ab8fa2b20ca53a2f692652f1e510eb6aef3bed8bcde8edcdd89a4256250c",
+        "fetched_at_utc": "2026-10-04T09:21:42.296999+00:00",
+        "mode": "replay",
+        "source_ref": {
+          "manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\_raw\\missing-capabilities-20261003T174623\\manifest.ndjson",
+          "line": 240,
+          "fetched_at_utc": "2026-10-03T10:00:50.290+00:00"
+        },
+        "outcome": "response",
+        "status_code": 200,
+        "response_headers": {
+          "Accept-Ranges": "bytes",
+          "Connection": "keep-alive",
+          "Content-Length": "67072",
+          "Content-MD5": "bT87ss5lAyYcAk4dWhNq3Q==",
+          "Content-Type": "application/vnd.ms-excel",
+          "Date": "Sat, 03 Oct 2026 10:01:09 GMT",
+          "ETag": "\"6D3F3BB2CE6503261C024E1D5A136ADD\"",
+          "Last-Modified": "Sat, 03 Oct 2026 09:35:14 GMT",
+          "x-oss-hash-crc64ecma": "17320802505870635070",
+          "x-oss-object-type": "Normal",
+          "x-oss-request-id": "6AC0D256A14DC5313417ECE7",
+          "x-oss-server-time": "1",
+          "x-oss-storage-class": "Standard"
+        },
+        "content_type": "application/vnd.ms-excel",
+        "encoding": "utf-8",
+        "body_bytes": 67072,
+        "body_sha256": "0f9fde0e470ba81bddd0d3e6db05269e1b5077aca778879f3833d04e027fa25d",
+        "body_storage": "bodies/0f9fde0e470ba81bddd0d3e6db05269e1b5077aca778879f3833d04e027fa25d.bin",
+        "persistence_status": "exact_application_payload_saved"
+      }
+    ],
+    "source_rows": {
+      "path": "2026-10-04/source_rows/csindex/constituents/source-rows.json",
+      "sha256": "bd2efb07414099765ece99ee5c64312840a87eedbfc56296ece977a521742395",
+      "row_count": 300
+    },
+    "parsed_rows": {
+      "path": "2026-10-04/parsed_rows/csindex/constituents/parsed-rows.json",
+      "sha256": "73d742bd552185c34cabaf0a6f0250379d97cde54a4aaa5dc6095c19b100ba6d",
+      "row_count": 300,
+      "code_version": "ae63ab8fa2b20ca53a2f692652f1e510eb6aef3bed8bcde8edcdd89a4256250c",
+      "source_response_hashes": [
+        "0f9fde0e470ba81bddd0d3e6db05269e1b5077aca778879f3833d04e027fa25d"
+      ]
+    },
+    "source_url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/file/autofile/cons/000300cons.xls",
+    "source_urls": [
+      "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/file/autofile/cons/000300cons.xls"
+    ],
+    "source_capture_window": {
+      "first": "2026-10-03T10:00:50.290000+00:00",
+      "last": "2026-10-03T10:00:50.290000+00:00",
+      "meaning": "source response capture times; not row-level market timestamps"
+    },
+    "output": {
+      "path": "2026-10-04/index_constituents/csindex/constituents/mapped-rows.json",
+      "sha256": "0a6fa3556484ac2d6ea52a8bfa82cb8b29e5b26b5a678c38adb243528e4426ea",
+      "row_count": 300,
+      "source_response_hashes": [
+        "0f9fde0e470ba81bddd0d3e6db05269e1b5077aca778879f3833d04e027fa25d"
+      ]
+    },
+    "row_count": 300,
+    "coverage_denominator": 300,
+    "first_key": [
+      "2026-10-03T10:00:50.290000+00:00",
+      "000300",
+      "2026-09-30",
+      "000001"
+    ],
+    "last_key": [
+      "2026-10-03T10:00:50.290000+00:00",
+      "000300",
+      "2026-09-30",
+      "688981"
+    ],
+    "host_pause_events": [],
+    "raw_manifest": {
+      "path": "_raw/manifest.ndjson",
+      "sha256": "a01b5cf2f4a2fb1552b88531491fd41b2e200126d5693d2d54533a8abe611212"
+    },
+    "run_directory": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-sdk-smoke-20261004\\ASTOCK-067\\ASTOCK-067-4ff1b515f6a5",
+    "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-sdk-smoke-20261004\\ASTOCK-067\\ASTOCK-067-4ff1b515f6a5\\2026-10-04\\input_report\\csindex\\constituents\\report.json"
+  },
+  {
+    "input_id": "ASTOCK-068",
+    "dataset": "index_weights",
+    "mode": "replay",
+    "parameters": {
+      "index_code": "000300"
+    },
+    "provider": "csindex",
+    "endpoint": "weights",
+    "collection_profile": {
+      "name": "reference_daily",
+      "mode": "daily",
+      "refresh_interval_seconds": null,
+      "business_day": "trading_day",
+      "scheduling_enabled": false,
+      "frequency_unit": null,
+      "frequency_interval": 1,
+      "at_time": null,
+      "anchor_date": null,
+      "settle_delay_seconds": 0,
+      "trigger_grace_seconds": 30,
+      "universe": "static",
+      "max_symbols": null
+    },
+    "request_interval_seconds": 3,
+    "effective_concurrency": 1,
+    "request_limit_enforcement": "call_boundary_only",
+    "adapter_version": "csindex-constituents-input-v1",
+    "code_version": "4405837f7f365767d972affc9cd11fc26763dba8a480a2361a679c4a8a7b0d26",
+    "code_files": [
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\pipeline\\inputs.py",
+        "sha256": "69c70410d8a0b5f7525b32169cac04643423a9bde57f08e9aa6d75c0cb2f2a30"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\cli.py",
+        "sha256": "582f5caedfc538a012d7a2f6e8cd7af3fe8b6fc9152e5b9e0a3fa2cb8810ae19"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\config\\loader.py",
+        "sha256": "93bb55ab150c88751fe9a58a2b75737878c1b0f07233b8ec47009c4901bb11e9"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\contracts.py",
+        "sha256": "a4b16abc7e3686a4eb2791dcd4545fb2404e0214bf32e20db19d2582d39ea447"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\quality\\normalization.py",
+        "sha256": "3ed0d663b7fda9ac6cdf7f1252435f2351c783af3244ccba2c2b0f3891e29b3e"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\transport.py",
+        "sha256": "cb860d0022c40ffe450694b2b4e48bff50c64ed7083d25c847a8079f2baf28b1"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\storage\\raw.py",
+        "sha256": "d483c614830e96d41b697709c0cde9e4cb5adee26116020428b7697f57f2c108"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\routing\\factory.py",
+        "sha256": "70bde5d45f76e2f7f6b3ca5f309f55cce724486a294ff975d5d2f6d9a2eb2b10"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\daily.py",
+        "sha256": "487a14fcbfc47146d6d5fd291fbf41667aba435e5fed22ea1ef61ded513fcaa7"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\minute.py",
+        "sha256": "ff5cf1e91327bcab2e072bcfae9f1f77dca71a84ba26e456c26580a4d59d9cc1"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\snapshot.py",
+        "sha256": "3278cadac776fe8cfe5d02775a5bf8f53bc1cb96c595a5f418172f53047434bf"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\limit_pool.py",
+        "sha256": "2fbdfe3da3129545dfe8d2e457be7c42225696ddd74270567ae765e4b413f5ae"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\shareholder.py",
+        "sha256": "4c9d80f4d51845ac5541c42275f44f2a18643db5e9ccb705a3e16168f8db44c1"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\financial.py",
+        "sha256": "b88fd28013942d1815d04eaf25521bd00dc0d44329ee411dbff48585bb1529a7"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\wallstreetcn\\news.py",
+        "sha256": "fb870197a111ecad42d47e7e81315c7d59c3c6a8bd7cadb72b84cc537bc91fda"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\cctv\\news.py",
+        "sha256": "8839bdeed801611e8e6d11cb9441e6ede7bc94d56507eaa2c903e605c772ee7d"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\cls\\news.py",
+        "sha256": "51da559a252b67a4a2e58171e3630ff1a5a80cd2bc23aa5df30a7e17ac02ad30"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\news.py",
+        "sha256": "6268a98ae01f37985ee6bfbfbe14653387883ed4a8ff640de7c8f88f6e15b097"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\financial.py",
+        "sha256": "699475f190f9864a5f7edafc23a5a85734f22a299f187a62819b4ebb5cb6e247"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sse\\market.py",
+        "sha256": "734c896d185e783af0d411beb4ea609e56f8b37e190d9b1bf2ff72dc22e6123a"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\csindex\\indices.py",
+        "sha256": "1edbd7b35c5b3c895ce036b96d192c7910c7510ed88ec176074966bc7b7e78e3"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\mofcom\\social_financing.py",
+        "sha256": "55d292958fb34991c56c626d5f6f61e7e6c44c8c2627b88ea735e751aa12c5ce"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\chinamoney\\rates.py",
+        "sha256": "e7407f1d4272b69cb439bb0a7bad3960b65bb41328d752f541bc8ef50231f922"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\dividend.py",
+        "sha256": "5706a8cdb37eeeb8f66cb033a3091dd1b6ec1ed83d72d0f9fbeb8f5c75d9649b"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\fund_flow.py",
+        "sha256": "0cf655efa0854d18651bb4f04f985f0f210b81a6d9eff065604d235ed8f75280"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\realtime.py",
+        "sha256": "6e09d2a5014cf316c4d1e26e913a44d5c2fbad95fb44d95cba159ef881f03bca"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\calendar.py",
+        "sha256": "3d114045f960bfcc94ade1ee03e4d25ebdf6980ba68aa2d0a2236bed78aaef05"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\snapshot.py",
+        "sha256": "cfa0b823b2fa8053ce899157e9b6078b94516d3fabd5d303480824111f62d136"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\daily.py",
+        "sha256": "dd15e0c6b0f8ed5e6db99b5d2b9725eb7e2cc6f3e42bd5e6d392c5334922dc89"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\akshare\\boards.py",
+        "sha256": "2060f150831cebaf707ed5becedc35428bc41d4428bab31555ed1d2bf817d122"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\baostock\\industry.py",
+        "sha256": "16c41b379eecbd87f082bd042e27fad7f3d8d77b5bfc6a3e8a286209b068494a"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\baostock\\session.py",
+        "sha256": "70ce19cdde1d6a8ed0c3d3db29caa28d1d8069826136ab6dd7fb6a2ef8c7b832"
+      }
+    ],
+    "config_files": [
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\providers.yaml",
+        "sha256": "b3117d4db08072ed6a96eb6334f712fee9a6cac66ede3b413dbebf2c0731a3a1"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\collection.yaml",
+        "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\datasets\\index_weights.yaml",
+        "sha256": "1b8517761f8fef19d83188ee242c84080db0171f7ca07f8ad20ddb61d1c22df3"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\normalization\\index_weights.yaml",
+        "sha256": "057cf77aaec7e0beb424f8668fcf4e4e0dfbcc4b33e9aa9130647f45feb66829"
+      }
+    ],
+    "normalization_version": "remaining-sdk-input-v1",
+    "normalization_status": "pending_validation",
+    "field_units": {
+      "snapshot_at": null,
+      "index_code": null,
+      "trade_date": null,
+      "source_security_code": null,
+      "name": null,
+      "index_name": null,
+      "exchange_name": null,
+      "weight": "unverified; source value retained separately"
+    },
+    "unverified_fields": [
+      "weight"
+    ],
+    "selected_fields": [
+      "exchange_name",
+      "index_code",
+      "index_name",
+      "name",
+      "snapshot_at",
+      "source_security_code",
+      "trade_date",
+      "weight"
+    ],
+    "eligible_for_production_routing": false,
+    "production_writes": 0,
+    "live_http_calls": 0,
+    "validation_time_utc": "2026-10-04T09:21:42.909583+00:00",
+    "status": "candidate_complete",
+    "response_freshness_seconds": 86400,
+    "sdk_dependency": {
+      "version": "1.18.83",
+      "function": "index_stock_cons_weight_csindex",
+      "source_path": "_raw/bodies/a3f66f3d462164b67ff6754c65b0535ccbb661e4542dd94ddeec02fab4eae6d5.bin",
+      "sha256": "a3f66f3d462164b67ff6754c65b0535ccbb661e4542dd94ddeec02fab4eae6d5",
+      "original_source_sha256": "a3f66f3d462164b67ff6754c65b0535ccbb661e4542dd94ddeec02fab4eae6d5",
+      "redacted": false,
+      "dependencies": []
+    },
+    "transport_dependency": {
+      "requests": "2.32.5",
+      "urllib3": "2.3.0"
+    },
+    "source_sdk_transport_policy": {
+      "source_contract": "successful rate-limited original SDK probe",
+      "timeout_seconds": null,
+      "trust_env": true,
+      "allow_redirects": true,
+      "headers": "requests defaults",
+      "adapter_retry_total": 2,
+      "adapter_backoff_min_seconds": 5,
+      "status_forcelist": [
+        500,
+        502,
+        503,
+        504
+      ],
+      "outer_capture_interval_seconds": 3,
+      "sdk_outer_attempts": 1,
+      "sdk_outer_delays_seconds": [],
+      "host_pause": "403/429 immediately; two consecutive transport or server errors",
+      "physical_retry_count_observable": false,
+      "source_fallback": false,
+      "implicit_date_selection": false,
+      "source_scope": "explicit source SDK and parameters; exact original response retained before parsing"
+    },
+    "responses": [
+      {
+        "event": "http_response",
+        "method": "GET",
+        "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/file/autofile/closeweight/000300closeweight.xls",
+        "request_headers": {
+          "User-Agent": "python-requests/2.32.5",
+          "Accept-Encoding": "gzip, deflate, br, zstd",
+          "Accept": "*/*",
+          "Connection": "keep-alive"
+        },
+        "scope": {
+          "input_id": "ASTOCK-068",
+          "parameters": {
+            "index_code": "000300"
+          }
+        },
+        "request_options": {
+          "timeout": null,
+          "allow_redirects": true,
+          "trust_env": true,
+          "proxies": {},
+          "sdk_retry_policy": true,
+          "probe_host_pause": true
+        },
+        "provider": "csindex",
+        "endpoint": "weights",
+        "code_version": "4405837f7f365767d972affc9cd11fc26763dba8a480a2361a679c4a8a7b0d26",
+        "fetched_at_utc": "2026-10-04T09:21:42.940420+00:00",
+        "mode": "replay",
+        "source_ref": {
+          "manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\_raw\\missing-capabilities-20261003T174623\\manifest.ndjson",
+          "line": 241,
+          "fetched_at_utc": "2026-10-03T10:01:10.203+00:00"
+        },
+        "outcome": "response",
+        "status_code": 200,
+        "response_headers": {
+          "Accept-Ranges": "bytes",
+          "Connection": "keep-alive",
+          "Content-Length": "72192",
+          "Content-MD5": "Y8LRwGXlZDzYOvTHjEEJfQ==",
+          "Content-Type": "application/vnd.ms-excel",
+          "Date": "Sat, 03 Oct 2026 10:01:15 GMT",
+          "ETag": "\"63C2D1C065E5643CD83AF4C78C41097D\"",
+          "Last-Modified": "Tue, 01 Sep 2026 12:31:37 GMT",
+          "x-oss-hash-crc64ecma": "1454774626454277232",
+          "x-oss-object-type": "Normal",
+          "x-oss-request-id": "6AC0D26971969C3632746BD2",
+          "x-oss-server-time": "2",
+          "x-oss-storage-class": "Standard"
+        },
+        "content_type": "application/vnd.ms-excel",
+        "encoding": "utf-8",
+        "body_bytes": 72192,
+        "body_sha256": "72bc4c9bd1be88f7d2c16e5a54f74777f4f43a768629699d22698a83f86c8e71",
+        "body_storage": "bodies/72bc4c9bd1be88f7d2c16e5a54f74777f4f43a768629699d22698a83f86c8e71.bin",
+        "persistence_status": "exact_application_payload_saved"
+      }
+    ],
+    "source_rows": {
+      "path": "2026-10-04/source_rows/csindex/weights/source-rows.json",
+      "sha256": "6ef184b704be8029659880c0ba1720deaabf6b60b49eb653ff3d7c82e0d2e398",
+      "row_count": 300
+    },
+    "parsed_rows": {
+      "path": "2026-10-04/parsed_rows/csindex/weights/parsed-rows.json",
+      "sha256": "07e127421677269eb36ae5446eacc472f854db713fc98c24ebc9dfcb88a6da6e",
+      "row_count": 300,
+      "code_version": "4405837f7f365767d972affc9cd11fc26763dba8a480a2361a679c4a8a7b0d26",
+      "source_response_hashes": [
+        "72bc4c9bd1be88f7d2c16e5a54f74777f4f43a768629699d22698a83f86c8e71"
+      ]
+    },
+    "source_url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/file/autofile/closeweight/000300closeweight.xls",
+    "source_urls": [
+      "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/file/autofile/closeweight/000300closeweight.xls"
+    ],
+    "source_capture_window": {
+      "first": "2026-10-03T10:01:10.203000+00:00",
+      "last": "2026-10-03T10:01:10.203000+00:00",
+      "meaning": "source response capture times; not row-level market timestamps"
+    },
+    "output": {
+      "path": "2026-10-04/index_weights/csindex/weights/mapped-rows.json",
+      "sha256": "779a80cda2590a78205af14d4a8fc9c9a5ec9316e98a0b2079c0cc0db5769fc1",
+      "row_count": 300,
+      "source_response_hashes": [
+        "72bc4c9bd1be88f7d2c16e5a54f74777f4f43a768629699d22698a83f86c8e71"
+      ]
+    },
+    "row_count": 300,
+    "coverage_denominator": 300,
+    "first_key": [
+      "2026-10-03T10:01:10.203000+00:00",
+      "000300",
+      "2026-08-31",
+      "000001"
+    ],
+    "last_key": [
+      "2026-10-03T10:01:10.203000+00:00",
+      "000300",
+      "2026-08-31",
+      "688981"
+    ],
+    "host_pause_events": [],
+    "raw_manifest": {
+      "path": "_raw/manifest.ndjson",
+      "sha256": "73e24697c8aa636350f110e627c1030820a04f3b0d33fe8889959c6a0c6a329f"
+    },
+    "run_directory": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-sdk-smoke-20261004\\ASTOCK-068\\ASTOCK-068-80cb289a599c",
+    "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-sdk-smoke-20261004\\ASTOCK-068\\ASTOCK-068-80cb289a599c\\2026-10-04\\input_report\\csindex\\weights\\report.json"
+  },
+  {
+    "input_id": "ASTOCK-085",
+    "dataset": "sina_dragon_tiger_daily",
+    "mode": "replay",
+    "parameters": {
+      "date": "2026-09-30"
+    },
+    "provider": "sina",
+    "endpoint": "dragon_tiger_daily",
+    "collection_profile": {
+      "name": "market_after_close",
+      "mode": "after_close",
+      "refresh_interval_seconds": null,
+      "business_day": "trading_day",
+      "scheduling_enabled": false,
+      "frequency_unit": null,
+      "frequency_interval": 1,
+      "at_time": null,
+      "anchor_date": null,
+      "settle_delay_seconds": 0,
+      "trigger_grace_seconds": 30,
+      "universe": "static",
+      "max_symbols": null
+    },
+    "request_interval_seconds": 3,
+    "effective_concurrency": 1,
+    "request_limit_enforcement": "call_boundary_only",
+    "adapter_version": "sina-billboard-input-v1",
+    "code_version": "cdaf9794b21aba3a08d8f00dbc1104c00d6f3093901b664e1e2b7e1e772ae4d7",
+    "code_files": [
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\pipeline\\inputs.py",
+        "sha256": "69c70410d8a0b5f7525b32169cac04643423a9bde57f08e9aa6d75c0cb2f2a30"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\cli.py",
+        "sha256": "582f5caedfc538a012d7a2f6e8cd7af3fe8b6fc9152e5b9e0a3fa2cb8810ae19"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\config\\loader.py",
+        "sha256": "93bb55ab150c88751fe9a58a2b75737878c1b0f07233b8ec47009c4901bb11e9"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\contracts.py",
+        "sha256": "a4b16abc7e3686a4eb2791dcd4545fb2404e0214bf32e20db19d2582d39ea447"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\quality\\normalization.py",
+        "sha256": "3ed0d663b7fda9ac6cdf7f1252435f2351c783af3244ccba2c2b0f3891e29b3e"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\transport.py",
+        "sha256": "cb860d0022c40ffe450694b2b4e48bff50c64ed7083d25c847a8079f2baf28b1"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\storage\\raw.py",
+        "sha256": "d483c614830e96d41b697709c0cde9e4cb5adee26116020428b7697f57f2c108"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\routing\\factory.py",
+        "sha256": "70bde5d45f76e2f7f6b3ca5f309f55cce724486a294ff975d5d2f6d9a2eb2b10"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\daily.py",
+        "sha256": "487a14fcbfc47146d6d5fd291fbf41667aba435e5fed22ea1ef61ded513fcaa7"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\minute.py",
+        "sha256": "ff5cf1e91327bcab2e072bcfae9f1f77dca71a84ba26e456c26580a4d59d9cc1"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\snapshot.py",
+        "sha256": "3278cadac776fe8cfe5d02775a5bf8f53bc1cb96c595a5f418172f53047434bf"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\limit_pool.py",
+        "sha256": "2fbdfe3da3129545dfe8d2e457be7c42225696ddd74270567ae765e4b413f5ae"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\shareholder.py",
+        "sha256": "4c9d80f4d51845ac5541c42275f44f2a18643db5e9ccb705a3e16168f8db44c1"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\financial.py",
+        "sha256": "b88fd28013942d1815d04eaf25521bd00dc0d44329ee411dbff48585bb1529a7"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\wallstreetcn\\news.py",
+        "sha256": "fb870197a111ecad42d47e7e81315c7d59c3c6a8bd7cadb72b84cc537bc91fda"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\cctv\\news.py",
+        "sha256": "8839bdeed801611e8e6d11cb9441e6ede7bc94d56507eaa2c903e605c772ee7d"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\cls\\news.py",
+        "sha256": "51da559a252b67a4a2e58171e3630ff1a5a80cd2bc23aa5df30a7e17ac02ad30"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\news.py",
+        "sha256": "6268a98ae01f37985ee6bfbfbe14653387883ed4a8ff640de7c8f88f6e15b097"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\financial.py",
+        "sha256": "699475f190f9864a5f7edafc23a5a85734f22a299f187a62819b4ebb5cb6e247"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sse\\market.py",
+        "sha256": "734c896d185e783af0d411beb4ea609e56f8b37e190d9b1bf2ff72dc22e6123a"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\csindex\\indices.py",
+        "sha256": "1edbd7b35c5b3c895ce036b96d192c7910c7510ed88ec176074966bc7b7e78e3"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\mofcom\\social_financing.py",
+        "sha256": "55d292958fb34991c56c626d5f6f61e7e6c44c8c2627b88ea735e751aa12c5ce"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\chinamoney\\rates.py",
+        "sha256": "e7407f1d4272b69cb439bb0a7bad3960b65bb41328d752f541bc8ef50231f922"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\dividend.py",
+        "sha256": "5706a8cdb37eeeb8f66cb033a3091dd1b6ec1ed83d72d0f9fbeb8f5c75d9649b"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\fund_flow.py",
+        "sha256": "0cf655efa0854d18651bb4f04f985f0f210b81a6d9eff065604d235ed8f75280"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\realtime.py",
+        "sha256": "6e09d2a5014cf316c4d1e26e913a44d5c2fbad95fb44d95cba159ef881f03bca"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\calendar.py",
+        "sha256": "3d114045f960bfcc94ade1ee03e4d25ebdf6980ba68aa2d0a2236bed78aaef05"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\snapshot.py",
+        "sha256": "cfa0b823b2fa8053ce899157e9b6078b94516d3fabd5d303480824111f62d136"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\daily.py",
+        "sha256": "dd15e0c6b0f8ed5e6db99b5d2b9725eb7e2cc6f3e42bd5e6d392c5334922dc89"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\akshare\\boards.py",
+        "sha256": "2060f150831cebaf707ed5becedc35428bc41d4428bab31555ed1d2bf817d122"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\baostock\\industry.py",
+        "sha256": "16c41b379eecbd87f082bd042e27fad7f3d8d77b5bfc6a3e8a286209b068494a"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\baostock\\session.py",
+        "sha256": "70ce19cdde1d6a8ed0c3d3db29caa28d1d8069826136ab6dd7fb6a2ef8c7b832"
+      }
+    ],
+    "config_files": [
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\providers.yaml",
+        "sha256": "b3117d4db08072ed6a96eb6334f712fee9a6cac66ede3b413dbebf2c0731a3a1"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\collection.yaml",
+        "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\datasets\\sina_dragon_tiger_daily.yaml",
+        "sha256": "80b28f8123de8931ecae79f8becc586dd1eb39e92bc3d898d647970153dcd511"
+      },
+      {
+        "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\normalization\\sina_dragon_tiger_daily.yaml",
+        "sha256": "210be484ad964fe8cab45c3afa23a830f4811e264aef25cda0db3334db1fb898"
+      }
+    ],
+    "normalization_version": "remaining-sdk-input-v1",
+    "normalization_status": "pending_validation",
+    "field_units": {
+      "snapshot_at": null,
+      "trade_date": null,
+      "source_security_code": null,
+      "source_row_number": null,
+      "name": null,
+      "listing_reason": null,
+      "close_price": "unverified; source value retained separately",
+      "reference_value": "unverified; source value retained separately",
+      "volume": "unverified; source value retained separately",
+      "amount": "unverified; source value retained separately"
+    },
+    "unverified_fields": [
+      "close_price",
+      "reference_value",
+      "volume",
+      "amount"
+    ],
+    "selected_fields": [
+      "amount",
+      "close_price",
+      "listing_reason",
+      "name",
+      "reference_value",
+      "snapshot_at",
+      "source_row_number",
+      "source_security_code",
+      "trade_date",
+      "volume"
+    ],
+    "eligible_for_production_routing": false,
+    "production_writes": 0,
+    "live_http_calls": 0,
+    "validation_time_utc": "2026-10-04T09:21:43.547126+00:00",
+    "status": "candidate_complete",
+    "response_freshness_seconds": 86400,
+    "calendar_context": {
+      "positive_date_count": 1,
+      "sha256": "c57c8e102441fe7da73806c4d5f92b275f3e9bd85e5007b7675e084c279bc3d9"
+    },
+    "sdk_dependency": {
+      "version": "1.18.83",
+      "function": "stock_lhb_detail_daily_sina",
+      "source_path": "_raw/bodies/5bb830de095f53427bfa30f72c788f974e56984995cc84689263d5a60965abcc.bin",
+      "sha256": "5bb830de095f53427bfa30f72c788f974e56984995cc84689263d5a60965abcc",
+      "original_source_sha256": "5bb830de095f53427bfa30f72c788f974e56984995cc84689263d5a60965abcc",
+      "redacted": false,
+      "dependencies": []
+    },
+    "transport_dependency": {
+      "requests": "2.32.5",
+      "urllib3": "2.3.0"
+    },
+    "source_sdk_transport_policy": {
+      "source_contract": "successful rate-limited original SDK probe",
+      "timeout_seconds": null,
+      "trust_env": true,
+      "allow_redirects": true,
+      "headers": "requests defaults",
+      "adapter_retry_total": 2,
+      "adapter_backoff_min_seconds": 5,
+      "status_forcelist": [
+        500,
+        502,
+        503,
+        504
+      ],
+      "outer_capture_interval_seconds": 3,
+      "sdk_outer_attempts": 1,
+      "sdk_outer_delays_seconds": [],
+      "host_pause": "403/429 immediately; two consecutive transport or server errors",
+      "physical_retry_count_observable": false,
+      "source_fallback": false,
+      "implicit_date_selection": false,
+      "source_scope": "explicit source SDK and parameters; exact original response retained before parsing"
+    },
+    "responses": [
+      {
+        "event": "http_response",
+        "method": "GET",
+        "url": "https://vip.stock.finance.sina.com.cn/q/go.php/vInvestConsult/kind/lhb/index.phtml?tradedate=2026-09-30",
+        "request_headers": {
+          "User-Agent": "python-requests/2.32.5",
+          "Accept-Encoding": "gzip, deflate, br, zstd",
+          "Accept": "*/*",
+          "Connection": "keep-alive"
+        },
+        "scope": {
+          "input_id": "ASTOCK-085",
+          "parameters": {
+            "date": "2026-09-30"
+          }
+        },
+        "request_options": {
+          "timeout": null,
+          "allow_redirects": true,
+          "trust_env": true,
+          "proxies": {},
+          "sdk_retry_policy": true,
+          "probe_host_pause": true
+        },
+        "provider": "sina",
+        "endpoint": "dragon_tiger_daily",
+        "code_version": "cdaf9794b21aba3a08d8f00dbc1104c00d6f3093901b664e1e2b7e1e772ae4d7",
+        "fetched_at_utc": "2026-10-04T09:21:43.584896+00:00",
+        "mode": "replay",
+        "source_ref": {
+          "manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\_raw\\missing-capabilities-20261003T174623\\manifest.ndjson",
+          "line": 243,
+          "fetched_at_utc": "2026-10-03T10:01:23.890+00:00"
+        },
+        "outcome": "response",
+        "status_code": 200,
+        "response_headers": {
+          "Cache-Control": "max-age=10",
+          "Connection": "keep-alive",
+          "Content-Encoding": "gzip",
+          "Content-Type": "text/html; charset=gbk",
+          "DPOOL_HEADER": "money-finance-sina-com-cn-6988cc4f54-8wk7t",
+          "Date": "Sat, 03 Oct 2026 10:01:26 GMT",
+          "Server": "nginx",
+          "Transfer-Encoding": "chunked",
+          "Vary": "Accept-Encoding",
+          "X-Via-SSL": "ssl.21.sinag1.wq.lb.sinanode.com"
+        },
+        "content_type": "text/html; charset=gbk",
+        "encoding": "gbk",
+        "body_bytes": 330967,
+        "body_sha256": "68efc750f99a13f660b6bd4d288488a5aee983a8b7c60e48553ce03c7467d336",
+        "body_storage": "bodies/68efc750f99a13f660b6bd4d288488a5aee983a8b7c60e48553ce03c7467d336.bin",
+        "persistence_status": "exact_application_payload_saved"
+      }
+    ],
+    "source_rows": {
+      "path": "2026-10-04/source_rows/sina/dragon_tiger_daily/source-rows.json",
+      "sha256": "367d50b9386b65f3755608f78eab5fb26a1b4d9d50def8bbf3bc6fae415c998b",
+      "row_count": 83
+    },
+    "parsed_rows": {
+      "path": "2026-10-04/parsed_rows/sina/dragon_tiger_daily/parsed-rows.json",
+      "sha256": "367d50b9386b65f3755608f78eab5fb26a1b4d9d50def8bbf3bc6fae415c998b",
+      "row_count": 83,
+      "code_version": "cdaf9794b21aba3a08d8f00dbc1104c00d6f3093901b664e1e2b7e1e772ae4d7",
+      "source_response_hashes": [
+        "68efc750f99a13f660b6bd4d288488a5aee983a8b7c60e48553ce03c7467d336"
+      ]
+    },
+    "source_url": "https://vip.stock.finance.sina.com.cn/q/go.php/vInvestConsult/kind/lhb/index.phtml?tradedate=2026-09-30",
+    "source_urls": [
+      "https://vip.stock.finance.sina.com.cn/q/go.php/vInvestConsult/kind/lhb/index.phtml?tradedate=2026-09-30"
+    ],
+    "source_capture_window": {
+      "first": "2026-10-03T10:01:23.890000+00:00",
+      "last": "2026-10-03T10:01:23.890000+00:00",
+      "meaning": "source response capture times; not row-level market timestamps"
+    },
+    "output": {
+      "path": "2026-10-04/sina_dragon_tiger_daily/sina/dragon_tiger_daily/mapped-rows.json",
+      "sha256": "dd072b31f3d8c86a520213038f8382363c572f5aba3befd07043618c19115734",
+      "row_count": 83,
+      "source_response_hashes": [
+        "68efc750f99a13f660b6bd4d288488a5aee983a8b7c60e48553ce03c7467d336"
+      ]
+    },
+    "row_count": 83,
+    "coverage_denominator": 83,
+    "first_key": [
+      "2026-10-03T10:01:23.890000+00:00",
+      "2026-09-30",
+      1
+    ],
+    "last_key": [
+      "2026-10-03T10:01:23.890000+00:00",
+      "2026-09-30",
+      83
+    ],
+    "host_pause_events": [],
+    "raw_manifest": {
+      "path": "_raw/manifest.ndjson",
+      "sha256": "165919239bef15d8c957aee8bfd781a0646674a9c300ed348b05696c9d0f4c48"
+    },
+    "run_directory": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-sdk-smoke-20261004\\ASTOCK-085\\ASTOCK-085-ac3a8f59f63e",
+    "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-sdk-smoke-20261004\\ASTOCK-085\\ASTOCK-085-ac3a8f59f63e\\2026-10-04\\input_report\\sina\\dragon_tiger_daily\\report.json"
+  }
+]

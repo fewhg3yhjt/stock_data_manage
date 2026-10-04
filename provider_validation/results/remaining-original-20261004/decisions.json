@@ -1,0 +1,22 @@
+{
+  "document": "provider_validation/docs/2026-10-04-remaining-input-decisions.md",
+  "source_catalog_sha256": "dd135f2fb3164a475175017c956e2b6ce31dcc2a729b5a001122b1bad10d31a2",
+  "decisions": [
+    {
+      "input_id": "ASTOCK-014",
+      "old": "hot reason",
+      "observed": "concept names/codes",
+      "proposed": "concept directory; retain failed pages and explicit partial coverage"
+    },
+    {
+      "input_id": "ASTOCK-037",
+      "old": "composite F10",
+      "observed": [
+        "main business THS",
+        "profile CNInfo",
+        "company events EastMoney"
+      ],
+      "proposed": "independent child contracts and dataset mappings, no generic complete F10 claim"
+    }
+  ]
+}

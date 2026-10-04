@@ -1,0 +1,68 @@
+def stock_financial_report_sina(
+    stock: str = "sh600600", symbol: str = "资产负债表"
+) -> pd.DataFrame:
+    """
+    新浪财经-财务报表-三大报表
+    https://vip.stock.finance.sina.com.cn/corp/go.php/vFD_FinanceSummary/stockid/600600/displaytype/4.phtml?source=fzb&qq-pf-to=pcqq.group
+    :param stock: 股票代码
+    :type stock: str
+    :param symbol: choice of {"资产负债表", "利润表", "现金流量表"}
+    :type symbol: str
+    :return: 新浪财经-财务报表-三大报表
+    :rtype: pandas.DataFrame
+    """
+    symbol_map = {"资产负债表": "fzb", "利润表": "lrb", "现金流量表": "llb"}
+    url = "https://quotes.sina.cn/cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022"
+    params = {
+        "paperCode": f"{stock}",
+        "source": symbol_map[symbol],
+        "type": "0",
+        "page": "1",
+        "num": "1000",
+    }
+    r = requests.get(url, params=params)
+    data_json = r.json()
+    df_columns = [
+        item["date_value"] for item in data_json["result"]["data"]["report_date"]
+    ]
+    big_df = pd.DataFrame()
+    temp_df = pd.DataFrame()
+    for date_str in df_columns:
+        temp_df = pd.DataFrame(
+            data_json["result"]["data"]["report_list"][date_str]["data"]
+        )
+        temp_df = temp_df[["item_title", "item_value"]]
+        temp_df["item_value"] = pd.to_numeric(temp_df["item_value"], errors="coerce")
+        temp_tail_df = pd.DataFrame.from_dict(
+            data={
+                "数据源": data_json["result"]["data"]["report_list"][date_str][
+                    "data_source"
+                ],
+                "是否审计": data_json["result"]["data"]["report_list"][date_str][
+                    "is_audit"
+                ],
+                "公告日期": data_json["result"]["data"]["report_list"][date_str][
+                    "publish_date"
+                ],
+                "币种": data_json["result"]["data"]["report_list"][date_str][
+                    "rCurrency"
+                ],
+                "类型": data_json["result"]["data"]["report_list"][date_str]["rType"],
+                "更新日期": datetime.fromtimestamp(
+                    data_json["result"]["data"]["report_list"][date_str]["update_time"]
+                ).isoformat(),
+            },
+            orient="index",
+        )
+        temp_tail_df.reset_index(inplace=True)
+        temp_tail_df.columns = ["item_title", "item_value"]
+        temp_df = pd.concat(objs=[temp_df, temp_tail_df], ignore_index=True)
+        temp_df.columns = ["项目", date_str]
+        big_df = pd.concat(objs=[big_df, temp_df[date_str]], axis=1, ignore_index=True)
+
+    big_df = big_df.T
+    big_df.columns = temp_df["项目"]
+    big_df = pd.concat(objs=[pd.DataFrame({"报告日": df_columns}), big_df], axis=1)
+    # 此处有 '国内票证结算' 和 '内部应收款'字段重复
+    big_df = big_df.loc[:, ~big_df.columns.duplicated(keep="first")]
+    return big_df

@@ -1,0 +1,49 @@
+dataset:
+  name: bond_yield_curve
+  display_name: 中债收益率曲线候选输入
+  primary_key:
+  - snapshot_at
+  - trade_date
+  - curve
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  trade_date:
+    type: date
+    required: true
+  curve:
+    type: string
+    required: true
+  yield_3m:
+    type: decimal
+    required: false
+    unit: unverified
+  yield_6m:
+    type: decimal
+    required: false
+    unit: unverified
+  yield_1y:
+    type: decimal
+    required: false
+    unit: unverified
+  yield_3y:
+    type: decimal
+    required: false
+    unit: unverified
+  yield_5y:
+    type: decimal
+    required: false
+    unit: unverified
+  yield_7y:
+    type: decimal
+    required: false
+    unit: unverified
+  yield_10y:
+    type: decimal
+    required: false
+    unit: unverified
+  yield_30y:
+    type: decimal
+    required: false
+    unit: unverified

@@ -273,3 +273,41 @@
 /config/datasets/dragon_tiger_seats.yaml text eol=lf
 /config/normalization/dragon_tiger_seats.yaml text eol=lf
 /provider_validation/docs/2026-10-04-reports-seats-input-collection.md text eol=lf
+
+# Remaining original-source evidence preserves exact application payload and snapshots.
+/provider_validation/results/remaining-*-20261004/** -text whitespace=cr-at-eol
+/provider_validation/results/remaining-*-20261004/**/*.bin binary
+/provider_validation/results/remaining-*-20261004/**/*.xml -text whitespace=-blank-at-eol,cr-at-eol
+/provider_validation/docs/2026-10-04-remaining-*.md text eol=lf
+/config/datasets/bond_yield_curve.yaml text eol=lf
+/config/datasets/etf_shares.yaml text eol=lf
+/config/datasets/index_constituents.yaml text eol=lf
+/config/datasets/index_weights.yaml text eol=lf
+/config/datasets/intraday_changes.yaml text eol=lf
+/config/datasets/official_futures_daily.yaml text eol=lf
+/config/datasets/official_options_daily.yaml text eol=lf
+/config/datasets/option_risk.yaml text eol=lf
+/config/datasets/position_rank.yaml text eol=lf
+/config/datasets/sge_spot.yaml text eol=lf
+/config/datasets/sina_dragon_tiger_daily.yaml text eol=lf
+/config/datasets/sina_financial_statements.yaml text eol=lf
+/config/datasets/tdx_daily_package.yaml text eol=lf
+/config/datasets/tencent_ticks.yaml text eol=lf
+/config/datasets/stock_news.yaml text eol=lf
+/config/datasets/index_valuation.yaml text eol=lf
+/config/normalization/bond_yield_curve.yaml text eol=lf
+/config/normalization/etf_shares.yaml text eol=lf
+/config/normalization/index_constituents.yaml text eol=lf
+/config/normalization/index_weights.yaml text eol=lf
+/config/normalization/intraday_changes.yaml text eol=lf
+/config/normalization/official_futures_daily.yaml text eol=lf
+/config/normalization/official_options_daily.yaml text eol=lf
+/config/normalization/option_risk.yaml text eol=lf
+/config/normalization/position_rank.yaml text eol=lf
+/config/normalization/sge_spot.yaml text eol=lf
+/config/normalization/sina_dragon_tiger_daily.yaml text eol=lf
+/config/normalization/sina_financial_statements.yaml text eol=lf
+/config/normalization/tdx_daily_package.yaml text eol=lf
+/config/normalization/tencent_ticks.yaml text eol=lf
+/config/normalization/stock_news.yaml text eol=lf
+/config/normalization/index_valuation.yaml text eol=lf

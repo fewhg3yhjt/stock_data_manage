@@ -1,0 +1,36 @@
+dataset: bond_yield_curve
+rules:
+- id: bond_yield_curve-input-v1
+  input_id: ASTOCK-063
+  provider: chinabond
+  endpoint: yield_curve
+  field_mapping:
+    trade_date: date
+    curve: curve
+    yield_3m: 3m
+    yield_6m: 6m
+    yield_1y: 1y
+    yield_3y: 3y
+    yield_5y: 5y
+    yield_7y: 7y
+    yield_10y: 10y
+    yield_30y: 30y
+  context_fields:
+    snapshot_at: source_snapshot_at
+  null_values:
+  - null
+  - ''
+  unverified_fields:
+  - yield_3m
+  - yield_6m
+  - yield_1y
+  - yield_3y
+  - yield_5y
+  - yield_7y
+  - yield_10y
+  - yield_30y
+  status: pending_validation
+  version: remaining-original-input-v1
+  evidence_refs:
+  - ASTOCK-063
+  notes: 保留原独立接口及原解析。原数字单独留证，标准数字单位未认证；无来源或日期回退，生产关闭。
