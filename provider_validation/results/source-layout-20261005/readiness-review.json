@@ -1,0 +1,1903 @@
+{
+  "record_type": "source_collection_readiness_review",
+  "reviewed_at_utc": "2026-10-04T17:06:52.973471+00:00",
+  "source_commit": "b6305fb1c5f1c038adeab8b25ff6e3fef1d8cf9e",
+  "verification_mode": "offline_config_and_callable_adapter_inspection; no fetch methods called",
+  "network_requests": 0,
+  "production_writes": 0,
+  "counts": {
+    "implemented_validation_only": 64,
+    "unimplemented": 2,
+    "blocked": 8,
+    "alias": 3
+  },
+  "bound_inputs": 64,
+  "unique_datasets": 63,
+  "input_field_rows": 1006,
+  "frequency_units": {
+    "day": 2,
+    "minute": 1,
+    "no_executable_frequency": 61
+  },
+  "enabled_input_schedules": 0,
+  "inputs_with_unverified_fields": 46,
+  "excluded_records": [
+    {
+      "id": "ASTOCK-011",
+      "name": "同花顺年度每股收益预测",
+      "status": "unimplemented",
+      "limitations": [
+        "原成功返回 3 个年度的预测机构数及每股收益预测统计；原 HTML 仅哈希，限时补采未返回，不认证当前可用性。",
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ]
+    },
+    {
+      "id": "ASTOCK-015",
+      "name": "沪深港通汇总（实时资金有效性未证明）",
+      "status": "blocked",
+      "limitations": [
+        "净买额和净流入为0，实时资金语义未证明",
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ]
+    },
+    {
+      "id": "ASTOCK-023",
+      "name": "板块资金流向",
+      "status": "alias",
+      "limitations": [
+        "实际成功回退为同花顺行业资金流；失败的东财变体不合并授予资格",
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ]
+    },
+    {
+      "id": "ASTOCK-024",
+      "name": "融资融券明细",
+      "status": "blocked",
+      "limitations": [
+        "沪市filtered仍为全量2000行，深市为空；日期回退必须显式保留实际返回日期",
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ]
+    },
+    {
+      "id": "ASTOCK-029",
+      "name": "筹码分布 CYQ",
+      "status": "blocked",
+      "limitations": [
+        "算法派生口径未独立核准，不按外部原始输入授予资格",
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ]
+    },
+    {
+      "id": "ASTOCK-037",
+      "name": "F10 原复合验证记录（已拆分）",
+      "status": "blocked",
+      "limitations": [
+        "原复合记录不是可执行的完整 F10 接口；成功子项分别见 ASTOCK-037-profile、ASTOCK-037-events、ASTOCK-037-business。失败子项不接入。"
+      ]
+    },
+    {
+      "id": "ASTOCK-049",
+      "name": "东财涨停池替代（同花顺涨停揭秘未实现）",
+      "status": "alias",
+      "limitations": [
+        "实际响应与东财涨停池相同，缺同花顺题材/原因字段，不作为独立来源",
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ]
+    },
+    {
+      "id": "ASTOCK-052",
+      "name": "东财日内异动池（按标的统计接口）",
+      "status": "blocked",
+      "limitations": [
+        "由异动明细派生，统计口径未核准；不作为独立外部来源",
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ]
+    },
+    {
+      "id": "ASTOCK-059",
+      "name": "东财人气榜",
+      "status": "blocked",
+      "limitations": [
+        "仅10行item/value，未返回声称的股票排名字段",
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ]
+    },
+    {
+      "id": "ASTOCK-060",
+      "name": "东财个股关键词（概念归属未证明）",
+      "status": "blocked",
+      "limitations": [
+        "关键词不等于证券-概念成员关系，related子接口失败",
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ]
+    },
+    {
+      "id": "ASTOCK-086",
+      "name": "资金流备胎",
+      "status": "blocked",
+      "limitations": [
+        "105页请求仅取得16次响应后安全停止；没有完整解析结果",
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ]
+    },
+    {
+      "id": "ASTOCK-088",
+      "name": "官方两融备胎",
+      "status": "alias",
+      "limitations": [
+        "与融资融券明细复用同一脚本，不当作独立备用来源",
+        "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+      ]
+    },
+    {
+      "id": "ASTOCK-037-business",
+      "name": "同花顺主营业务",
+      "status": "unimplemented",
+      "limitations": [
+        "旧样本为 600519 的 1 条主营业务；原 HTML 未保留，仅哈希，补采原 SDK 超过 120 秒。待可回放证据，不标成来源不可用。"
+      ]
+    }
+  ],
+  "runtime_configuration": {
+    "raw_root": "data/raw",
+    "canonical_root": "data/canonical",
+    "metadata_path": "metadata/metadata.duckdb",
+    "raw_retention_days": {
+      "daily_bar": 90,
+      "snapshot": 30,
+      "minute_bar_1m": 14
+    }
+  },
+  "runtime_directories_present": {
+    "data/raw": false,
+    "data/canonical": false,
+    "data/hot": false,
+    "metadata": false
+  },
+  "evidence_scope": "64 formal report links reuse archived responses; these do not establish current full-market live readiness",
+  "inputs": [
+    {
+      "input_id": "ASTOCK-001",
+      "provider": "tencent",
+      "dataset": "realtime_quote",
+      "method": "fetch_snapshot",
+      "callable_method": true,
+      "field_count": 16,
+      "primary_key": [
+        "instrument_id",
+        "quote_time"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "volume",
+        "amount"
+      ],
+      "collection_profile": "tencent_market_snapshot",
+      "executable_frequency_unit": "day",
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-002-5m",
+      "provider": "tencent",
+      "dataset": "minute_bar_5m",
+      "method": "fetch_recent",
+      "callable_method": true,
+      "field_count": 11,
+      "primary_key": [
+        "instrument_id",
+        "bar_time",
+        "adjustment"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "volume"
+      ],
+      "collection_profile": "tencent_minute_5m",
+      "executable_frequency_unit": "minute",
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-002-daily",
+      "provider": "tencent",
+      "dataset": "daily_bar",
+      "method": "fetch_window",
+      "callable_method": true,
+      "field_count": 9,
+      "primary_key": [
+        "instrument_id",
+        "trade_date",
+        "adjustment"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "volume"
+      ],
+      "collection_profile": "tencent_daily",
+      "executable_frequency_unit": "day",
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-003",
+      "provider": "tdx",
+      "dataset": "tdx_daily_package",
+      "method": "fetch_daily_package",
+      "callable_method": true,
+      "field_count": 12,
+      "primary_key": [
+        "snapshot_at",
+        "trade_date",
+        "market",
+        "source_security_code"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "prev_close",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "amount"
+      ],
+      "collection_profile": "market_after_close",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-004",
+      "provider": "tencent",
+      "dataset": "tencent_ticks",
+      "method": "fetch_ticks",
+      "callable_method": true,
+      "field_count": 10,
+      "primary_key": [
+        "snapshot_at",
+        "trade_date",
+        "source_security_code",
+        "source_sequence"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "price",
+        "change",
+        "volume",
+        "amount"
+      ],
+      "collection_profile": "market_intraday",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-006",
+      "provider": "sina",
+      "dataset": "adjustment_factor",
+      "method": "fetch_adjustment_factors",
+      "callable_method": true,
+      "field_count": 6,
+      "primary_key": [
+        "snapshot_at",
+        "instrument_id",
+        "factor_kind",
+        "factor_date"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "factor_value"
+      ],
+      "collection_profile": "market_after_close",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-008",
+      "provider": "eastmoney",
+      "dataset": "eastmoney_reports",
+      "method": "fetch_report_list",
+      "callable_method": true,
+      "field_count": 21,
+      "primary_key": [
+        "snapshot_at",
+        "source_security_code",
+        "report_id"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "eps_this_year",
+        "pe_this_year",
+        "eps_next_year",
+        "pe_next_year",
+        "eps_next_two_year",
+        "pe_next_two_year",
+        "target_price_upper",
+        "target_price_lower"
+      ],
+      "collection_profile": "event_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-013",
+      "provider": "sina",
+      "dataset": "sina_reports",
+      "method": "fetch_reports",
+      "callable_method": true,
+      "field_count": 8,
+      "primary_key": [
+        "snapshot_at",
+        "source_report_id"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [],
+      "collection_profile": "event_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-014",
+      "provider": "ths",
+      "dataset": "concept_directory",
+      "method": "fetch_concept_list",
+      "callable_method": true,
+      "field_count": 5,
+      "primary_key": [
+        "snapshot_at",
+        "board_code"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [],
+      "collection_profile": "reference_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-019",
+      "provider": "eastmoney",
+      "dataset": "dragon_tiger_seats",
+      "method": "fetch_dragon_tiger_seats",
+      "callable_method": true,
+      "field_count": 12,
+      "primary_key": [
+        "snapshot_at",
+        "source_security_code",
+        "trade_date",
+        "side",
+        "source_row_number"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "buy_amount",
+        "sell_amount",
+        "net_amount",
+        "buy_ratio",
+        "sell_ratio"
+      ],
+      "collection_profile": "market_after_close",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-020",
+      "provider": "eastmoney",
+      "dataset": "dragon_tiger_daily",
+      "method": "fetch_dragon_tiger_daily",
+      "callable_method": true,
+      "field_count": 21,
+      "primary_key": [
+        "snapshot_at",
+        "source_security_code",
+        "trade_date",
+        "listing_reason"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "close_price",
+        "change",
+        "net_buy_amount",
+        "buy_amount",
+        "sell_amount",
+        "billboard_amount",
+        "market_amount",
+        "net_buy_ratio",
+        "billboard_ratio",
+        "turnover",
+        "free_market_cap",
+        "return_after_1d",
+        "return_after_2d",
+        "return_after_5d",
+        "return_after_10d"
+      ],
+      "collection_profile": "market_after_close",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-021",
+      "provider": "eastmoney",
+      "dataset": "lockup_expiry",
+      "method": "fetch_lockup_expiry",
+      "callable_method": true,
+      "field_count": 12,
+      "primary_key": [
+        "snapshot_at",
+        "source_security_code",
+        "release_date",
+        "restricted_share_type"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "planned_quantity",
+        "actual_quantity",
+        "actual_market_cap",
+        "free_market_cap_ratio",
+        "prior_close",
+        "return_before_20d",
+        "return_after_20d"
+      ],
+      "collection_profile": "event_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-026",
+      "provider": "eastmoney",
+      "dataset": "shareholder_count",
+      "method": "fetch_history",
+      "callable_method": true,
+      "field_count": 12,
+      "primary_key": [
+        "instrument_id",
+        "end_date"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "average_market_cap",
+        "average_hold_num",
+        "total_market_cap"
+      ],
+      "collection_profile": "event_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-027",
+      "provider": "eastmoney",
+      "dataset": "dividend_event",
+      "method": "fetch_history",
+      "callable_method": true,
+      "field_count": 8,
+      "primary_key": [
+        "source_security_code",
+        "ex_dividend_date"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "pretax_bonus_rmb",
+        "bonus_ratio",
+        "transfer_ratio"
+      ],
+      "collection_profile": "event_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-028",
+      "provider": "eastmoney",
+      "dataset": "stock_fund_flow",
+      "method": "fetch_history",
+      "callable_method": true,
+      "field_count": 9,
+      "primary_key": [
+        "instrument_id",
+        "trade_date"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "main_net_inflow",
+        "super_large_net_inflow",
+        "large_net_inflow",
+        "medium_net_inflow",
+        "small_net_inflow"
+      ],
+      "collection_profile": "market_after_close",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-030",
+      "provider": "sse",
+      "dataset": "etf_shares",
+      "method": "fetch_etf",
+      "callable_method": true,
+      "field_count": 7,
+      "primary_key": [
+        "snapshot_at",
+        "trade_date",
+        "exchange",
+        "source_security_code"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "shares"
+      ],
+      "collection_profile": "market_after_close",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-031",
+      "provider": "eastmoney",
+      "dataset": "stock_news",
+      "method": "fetch",
+      "callable_method": true,
+      "field_count": 8,
+      "primary_key": [
+        "snapshot_at",
+        "source_article_code"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [],
+      "collection_profile": "news_intraday",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-032",
+      "provider": "cls",
+      "dataset": "cls_telegraph",
+      "method": "fetch",
+      "callable_method": true,
+      "field_count": 4,
+      "primary_key": [
+        "snapshot_at",
+        "news_time",
+        "content"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [],
+      "collection_profile": "news_intraday",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-033",
+      "provider": "sina",
+      "dataset": "sina_global_news",
+      "method": "fetch",
+      "callable_method": true,
+      "field_count": 3,
+      "primary_key": [
+        "snapshot_at",
+        "news_time",
+        "content"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [],
+      "collection_profile": "news_intraday",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-034",
+      "provider": "wallstreetcn",
+      "dataset": "wallstreetcn_news",
+      "method": "fetch",
+      "callable_method": true,
+      "field_count": 8,
+      "primary_key": [
+        "snapshot_at",
+        "source_news_id"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [],
+      "collection_profile": "news_intraday",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-035",
+      "provider": "cctv",
+      "dataset": "cctv_news_index",
+      "method": "fetch",
+      "callable_method": true,
+      "field_count": 4,
+      "primary_key": [
+        "broadcast_date",
+        "url"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [],
+      "collection_profile": "event_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-039",
+      "provider": "sina",
+      "dataset": "sina_financial_statements",
+      "method": "fetch",
+      "callable_method": true,
+      "field_count": 289,
+      "primary_key": [
+        "snapshot_at",
+        "source_security_code",
+        "report_type",
+        "report_date"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "流动资产",
+        "货币资金",
+        "结算备付金",
+        "拆出资金",
+        "交易性金融资产",
+        "买入返售金融资产",
+        "衍生金融资产",
+        "应收票据及应收账款",
+        "应收票据",
+        "应收账款",
+        "应收款项融资",
+        "预付款项",
+        "应收股利",
+        "应收利息",
+        "应收保费",
+        "应收分保账款",
+        "应收分保合同准备金",
+        "应收出口退税",
+        "应收补贴款",
+        "应收保证金",
+        "内部应收款",
+        "其他应收款",
+        "其他应收款(合计)",
+        "存货",
+        "划分为持有待售的资产",
+        "待摊费用",
+        "待处理流动资产损益",
+        "一年内到期的非流动资产",
+        "其他流动资产",
+        "流动资产合计",
+        "非流动资产",
+        "发放贷款及垫款",
+        "债权投资",
+        "其他债权投资",
+        "以公允价值计量且其变动计入其他综合收益的金融资产",
+        "以摊余成本计量的金融资产",
+        "可供出售金融资产",
+        "长期股权投资",
+        "投资性房地产",
+        "长期应收款",
+        "其他权益工具投资",
+        "其他非流动金融资产",
+        "其他长期投资",
+        "固定资产原值",
+        "累计折旧",
+        "固定资产净值",
+        "固定资产减值准备",
+        "在建工程合计",
+        "在建工程",
+        "工程物资",
+        "固定资产净额",
+        "固定资产清理",
+        "固定资产及清理合计",
+        "生产性生物资产",
+        "公益性生物资产",
+        "油气资产",
+        "合同资产",
+        "使用权资产",
+        "无形资产",
+        "开发支出",
+        "商誉",
+        "长期待摊费用",
+        "股权分置流通权",
+        "递延所得税资产",
+        "其他非流动资产",
+        "非流动资产合计",
+        "资产总计",
+        "流动负债",
+        "短期借款",
+        "向中央银行借款",
+        "吸收存款及同业存放",
+        "拆入资金",
+        "交易性金融负债",
+        "衍生金融负债",
+        "应付票据及应付账款",
+        "应付票据",
+        "应付账款",
+        "预收款项",
+        "合同负债",
+        "卖出回购金融资产款",
+        "应付手续费及佣金",
+        "应付职工薪酬",
+        "应交税费",
+        "应付利息",
+        "应付股利",
+        "应付保证金",
+        "内部应付款",
+        "其他应付款",
+        "其他应付款合计",
+        "其他应交款",
+        "担保责任赔偿准备金",
+        "应付分保账款",
+        "保险合同准备金",
+        "代理买卖证券款",
+        "代理承销证券款",
+        "国际票证结算",
+        "国内票证结算",
+        "预提费用",
+        "预计流动负债",
+        "应付短期债券",
+        "划分为持有待售的负债",
+        "一年内的递延收益",
+        "一年内到期的非流动负债",
+        "其他流动负债",
+        "流动负债合计",
+        "非流动负债",
+        "长期借款",
+        "应付债券",
+        "应付债券：优先股",
+        "应付债券：永续债",
+        "租赁负债",
+        "长期应付职工薪酬",
+        "长期应付款",
+        "长期应付款合计",
+        "专项应付款",
+        "预计非流动负债",
+        "长期递延收益",
+        "递延所得税负债",
+        "其他非流动负债",
+        "非流动负债合计",
+        "负债合计",
+        "所有者权益",
+        "实收资本(或股本)",
+        "其他权益工具",
+        "优先股",
+        "永续债",
+        "资本公积",
+        "减:库存股",
+        "其他综合收益",
+        "专项储备",
+        "盈余公积",
+        "一般风险准备",
+        "未确定的投资损失",
+        "未分配利润",
+        "拟分配现金股利",
+        "外币报表折算差额",
+        "归属于母公司股东权益合计",
+        "少数股东权益",
+        "所有者权益(或股东权益)合计",
+        "负债和所有者权益(或股东权益)总计",
+        "营业总收入",
+        "营业收入",
+        "利息收入",
+        "已赚保费",
+        "手续费及佣金收入",
+        "房地产销售收入",
+        "其他业务收入",
+        "营业总成本",
+        "营业成本",
+        "手续费及佣金支出",
+        "房地产销售成本",
+        "退保金",
+        "赔付支出净额",
+        "提取保险合同准备金净额",
+        "保单红利支出",
+        "分保费用",
+        "其他业务成本",
+        "营业税金及附加",
+        "研发费用",
+        "销售费用",
+        "管理费用",
+        "财务费用",
+        "利息费用",
+        "利息支出",
+        "投资收益",
+        "对联营企业和合营企业的投资收益",
+        "以摊余成本计量的金融资产终止确认产生的收益",
+        "汇兑收益",
+        "净敞口套期收益",
+        "公允价值变动收益",
+        "期货损益",
+        "托管收益",
+        "补贴收入",
+        "其他收益",
+        "资产减值损失",
+        "信用减值损失",
+        "其他业务利润",
+        "资产处置收益",
+        "营业利润",
+        "营业外收入",
+        "非流动资产处置利得",
+        "营业外支出",
+        "非流动资产处置损失",
+        "利润总额",
+        "所得税费用",
+        "未确认投资损失",
+        "净利润",
+        "持续经营净利润",
+        "终止经营净利润",
+        "归属于母公司所有者的净利润",
+        "被合并方在合并前实现净利润",
+        "少数股东损益",
+        "归属于母公司所有者的其他综合收益",
+        "（一）以后不能重分类进损益的其他综合收益",
+        "重新计量设定受益计划变动额",
+        "权益法下不能转损益的其他综合收益",
+        "其他权益工具投资公允价值变动",
+        "企业自身信用风险公允价值变动",
+        "（二）以后将重分类进损益的其他综合收益",
+        "权益法下可转损益的其他综合收益",
+        "可供出售金融资产公允价值变动损益",
+        "其他债权投资公允价值变动",
+        "金融资产重分类计入其他综合收益的金额",
+        "其他债权投资信用减值准备",
+        "持有至到期投资重分类为可供出售金融资产损益",
+        "现金流量套期储备",
+        "现金流量套期损益的有效部分",
+        "外币财务报表折算差额",
+        "其他",
+        "归属于少数股东的其他综合收益",
+        "综合收益总额",
+        "归属于母公司所有者的综合收益总额",
+        "归属于少数股东的综合收益总额",
+        "基本每股收益",
+        "稀释每股收益",
+        "经营活动产生的现金流量",
+        "销售商品、提供劳务收到的现金",
+        "客户存款和同业存放款项净增加额",
+        "向中央银行借款净增加额",
+        "向其他金融机构拆入资金净增加额",
+        "收到原保险合同保费取得的现金",
+        "收到再保险业务现金净额",
+        "保户储金及投资款净增加额",
+        "处置交易性金融资产净增加额",
+        "收取利息、手续费及佣金的现金",
+        "拆入资金净增加额",
+        "回购业务资金净增加额",
+        "收到的税费返还",
+        "收到的其他与经营活动有关的现金",
+        "经营活动现金流入小计",
+        "购买商品、接受劳务支付的现金",
+        "客户贷款及垫款净增加额",
+        "存放中央银行和同业款项净增加额",
+        "支付原保险合同赔付款项的现金",
+        "支付利息、手续费及佣金的现金",
+        "支付保单红利的现金",
+        "支付给职工以及为职工支付的现金",
+        "支付的各项税费",
+        "支付的其他与经营活动有关的现金",
+        "经营活动现金流出小计",
+        "经营活动产生的现金流量净额",
+        "投资活动产生的现金流量",
+        "收回投资所收到的现金",
+        "取得投资收益收到的现金",
+        "处置固定资产、无形资产和其他长期资产所收回的现金净额",
+        "处置子公司及其他营业单位收到的现金净额",
+        "收到的其他与投资活动有关的现金",
+        "减少质押和定期存款所收到的现金",
+        "处置可供出售金融资产净增加额",
+        "投资活动现金流入小计",
+        "购建固定资产、无形资产和其他长期资产所支付的现金",
+        "投资所支付的现金",
+        "质押贷款净增加额",
+        "取得子公司及其他营业单位支付的现金净额",
+        "增加质押和定期存款所支付的现金",
+        "支付的其他与投资活动有关的现金",
+        "投资活动现金流出小计",
+        "投资活动产生的现金流量净额",
+        "筹资活动产生的现金流量",
+        "吸收投资收到的现金",
+        "子公司吸收少数股东投资收到的现金",
+        "取得借款收到的现金",
+        "发行债券收到的现金",
+        "收到其他与筹资活动有关的现金",
+        "筹资活动现金流入小计",
+        "偿还债务支付的现金",
+        "分配股利、利润或偿付利息所支付的现金",
+        "子公司支付给少数股东的股利、利润",
+        "支付其他与筹资活动有关的现金",
+        "筹资活动现金流出小计",
+        "筹资活动产生的现金流量净额",
+        "汇率变动对现金及现金等价物的影响",
+        "现金及现金等价物净增加额",
+        "期初现金及现金等价物余额",
+        "现金的期末余额",
+        "现金的期初余额",
+        "现金等价物的期末余额",
+        "现金等价物的期初余额",
+        "期末现金及现金等价物余额"
+      ],
+      "collection_profile": "event_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-044",
+      "provider": "baostock",
+      "dataset": "st_name_list",
+      "method": "fetch_st_list",
+      "callable_method": true,
+      "field_count": 6,
+      "primary_key": [
+        "snapshot_at",
+        "exchange",
+        "stock_code"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [],
+      "collection_profile": "reference_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-045",
+      "provider": "eastmoney",
+      "dataset": "limit_up_pool",
+      "method": "fetch",
+      "callable_method": true,
+      "field_count": 16,
+      "primary_key": [
+        "trade_date",
+        "source_security_code"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "amount",
+        "float_market_cap",
+        "total_market_cap",
+        "limit_capital"
+      ],
+      "collection_profile": "market_intraday",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-046",
+      "provider": "eastmoney",
+      "dataset": "broken_limit_pool",
+      "method": "fetch",
+      "callable_method": true,
+      "field_count": 17,
+      "primary_key": [
+        "trade_date",
+        "source_security_code"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "amount",
+        "float_market_cap",
+        "total_market_cap"
+      ],
+      "collection_profile": "market_intraday",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-047",
+      "provider": "eastmoney",
+      "dataset": "limit_down_pool",
+      "method": "fetch",
+      "callable_method": true,
+      "field_count": 17,
+      "primary_key": [
+        "trade_date",
+        "source_security_code"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "amount",
+        "float_market_cap",
+        "total_market_cap",
+        "limit_capital",
+        "limit_board_amount"
+      ],
+      "collection_profile": "market_intraday",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-048",
+      "provider": "eastmoney",
+      "dataset": "previous_limit_pool",
+      "method": "fetch",
+      "callable_method": true,
+      "field_count": 17,
+      "primary_key": [
+        "trade_date",
+        "source_security_code"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "amount",
+        "float_market_cap",
+        "total_market_cap"
+      ],
+      "collection_profile": "market_intraday",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-050",
+      "provider": "eastmoney",
+      "dataset": "strong_stock_pool",
+      "method": "fetch",
+      "callable_method": true,
+      "field_count": 17,
+      "primary_key": [
+        "trade_date",
+        "source_security_code"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "amount",
+        "float_market_cap",
+        "total_market_cap"
+      ],
+      "collection_profile": "market_intraday",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-051",
+      "provider": "eastmoney",
+      "dataset": "intraday_changes",
+      "method": "fetch_intraday_changes",
+      "callable_method": true,
+      "field_count": 8,
+      "primary_key": [
+        "snapshot_at",
+        "source_row_number"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [],
+      "collection_profile": "market_intraday",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-055",
+      "provider": "sse",
+      "dataset": "option_risk",
+      "method": "fetch_risk",
+      "callable_method": true,
+      "field_count": 11,
+      "primary_key": [
+        "snapshot_at",
+        "trade_date",
+        "security_id"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "delta",
+        "theta",
+        "gamma",
+        "vega",
+        "rho",
+        "implied_volatility"
+      ],
+      "collection_profile": "market_after_close",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-061",
+      "provider": "mofcom",
+      "dataset": "social_financing",
+      "method": "fetch",
+      "callable_method": true,
+      "field_count": 11,
+      "primary_key": [
+        "snapshot_at",
+        "statistical_month"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "financing_increment",
+        "rmb_loans",
+        "source_foreign_currency_loans",
+        "entrusted_loans",
+        "trust_loans",
+        "undiscounted_acceptances",
+        "corporate_bonds",
+        "domestic_equity_financing"
+      ],
+      "collection_profile": "macro_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-062",
+      "provider": "eastmoney",
+      "dataset": "pmi_history",
+      "method": "fetch_pmi",
+      "callable_method": true,
+      "field_count": 7,
+      "primary_key": [
+        "snapshot_at",
+        "statistical_month"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "manufacturing_index",
+        "manufacturing_yoy",
+        "nonmanufacturing_index",
+        "nonmanufacturing_yoy"
+      ],
+      "collection_profile": "macro_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-063",
+      "provider": "chinabond",
+      "dataset": "bond_yield_curve",
+      "method": "fetch",
+      "callable_method": true,
+      "field_count": 11,
+      "primary_key": [
+        "snapshot_at",
+        "trade_date",
+        "curve"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "yield_3m",
+        "yield_6m",
+        "yield_1y",
+        "yield_3y",
+        "yield_5y",
+        "yield_7y",
+        "yield_10y",
+        "yield_30y"
+      ],
+      "collection_profile": "macro_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-064",
+      "provider": "chinamoney",
+      "dataset": "repo_fixing",
+      "method": "fetch",
+      "callable_method": true,
+      "field_count": 6,
+      "primary_key": [
+        "rate_date",
+        "rate_kind"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "overnight_rate",
+        "week_rate",
+        "fortnight_rate"
+      ],
+      "collection_profile": "macro_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-065",
+      "provider": "eastmoney",
+      "dataset": "lpr_history",
+      "method": "fetch_lpr_history",
+      "callable_method": true,
+      "field_count": 4,
+      "primary_key": [
+        "rate_date"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "lpr_1y",
+        "lpr_5y"
+      ],
+      "collection_profile": "macro_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-066",
+      "provider": "wallstreetcn",
+      "dataset": "macro_calendar",
+      "method": "fetch_macro_calendar",
+      "callable_method": true,
+      "field_count": 13,
+      "primary_key": [
+        "snapshot_at",
+        "source_event_id"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [],
+      "collection_profile": "macro_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-067",
+      "provider": "csindex",
+      "dataset": "index_constituents",
+      "method": "fetch",
+      "callable_method": true,
+      "field_count": 7,
+      "primary_key": [
+        "snapshot_at",
+        "index_code",
+        "trade_date",
+        "source_security_code"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [],
+      "collection_profile": "reference_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-068",
+      "provider": "csindex",
+      "dataset": "index_weights",
+      "method": "fetch",
+      "callable_method": true,
+      "field_count": 8,
+      "primary_key": [
+        "snapshot_at",
+        "index_code",
+        "trade_date",
+        "source_security_code"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "weight"
+      ],
+      "collection_profile": "reference_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-069",
+      "provider": "csindex",
+      "dataset": "index_valuation",
+      "method": "fetch",
+      "callable_method": true,
+      "field_count": 8,
+      "primary_key": [
+        "snapshot_at",
+        "index_code",
+        "trade_date"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "pe_1",
+        "pe_2",
+        "dividend_yield_1",
+        "dividend_yield_2"
+      ],
+      "collection_profile": "market_after_close",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-070",
+      "provider": "sina",
+      "dataset": "trading_calendar",
+      "method": "fetch",
+      "callable_method": true,
+      "field_count": 2,
+      "primary_key": [
+        "trade_date"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [],
+      "collection_profile": "reference_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-071",
+      "provider": "exchange_composite",
+      "dataset": "official_futures_daily",
+      "method": "fetch_futures",
+      "callable_method": true,
+      "field_count": 15,
+      "primary_key": [
+        "snapshot_at",
+        "trade_date",
+        "exchange",
+        "contract_code"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "open",
+        "high",
+        "low",
+        "close",
+        "settle",
+        "pre_settle",
+        "volume",
+        "open_interest",
+        "oi_change",
+        "turnover_10k"
+      ],
+      "collection_profile": "source_market_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-072",
+      "provider": "exchange_composite",
+      "dataset": "official_options_daily",
+      "method": "fetch_options",
+      "callable_method": true,
+      "field_count": 20,
+      "primary_key": [
+        "snapshot_at",
+        "trade_date",
+        "exchange",
+        "contract_code"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "strike",
+        "open",
+        "high",
+        "low",
+        "close",
+        "settle",
+        "pre_settle",
+        "volume",
+        "open_interest",
+        "oi_change",
+        "turnover_10k",
+        "delta",
+        "iv_pct",
+        "series_iv_pct"
+      ],
+      "collection_profile": "source_market_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-073",
+      "provider": "cffex",
+      "dataset": "position_rank",
+      "method": "fetch_rank",
+      "callable_method": true,
+      "field_count": 15,
+      "primary_key": [
+        "snapshot_at",
+        "trade_date",
+        "exchange",
+        "level",
+        "contract_code",
+        "rank"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "volume",
+        "volume_chg",
+        "long_oi",
+        "long_chg",
+        "short_oi",
+        "short_chg"
+      ],
+      "collection_profile": "source_market_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-074",
+      "provider": "sina",
+      "dataset": "futures_quote",
+      "method": "fetch_futures",
+      "callable_method": true,
+      "field_count": 19,
+      "primary_key": [
+        "snapshot_at",
+        "source_contract"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "open",
+        "high",
+        "low",
+        "last",
+        "bid",
+        "ask",
+        "bid_vol",
+        "ask_vol",
+        "volume",
+        "open_interest",
+        "pre_settle",
+        "pre_close",
+        "upper_limit",
+        "lower_limit",
+        "avg_price"
+      ],
+      "collection_profile": "source_market_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-075",
+      "provider": "sina",
+      "dataset": "futures_daily",
+      "method": "fetch_futures_kline",
+      "callable_method": true,
+      "field_count": 11,
+      "primary_key": [
+        "source_contract",
+        "bar_date"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "open",
+        "high",
+        "low",
+        "close",
+        "settle",
+        "volume",
+        "open_interest"
+      ],
+      "collection_profile": "source_market_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-076",
+      "provider": "sina",
+      "dataset": "a50_quote",
+      "method": "fetch_a50",
+      "callable_method": true,
+      "field_count": 11,
+      "primary_key": [
+        "snapshot_at",
+        "source_contract"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "last",
+        "open",
+        "high",
+        "low",
+        "bid",
+        "ask",
+        "pre_settle"
+      ],
+      "collection_profile": "source_market_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-077",
+      "provider": "sge",
+      "dataset": "sge_spot",
+      "method": "fetch",
+      "callable_method": true,
+      "field_count": 7,
+      "primary_key": [
+        "snapshot_at",
+        "trade_date",
+        "instrument"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "open",
+        "high",
+        "low",
+        "close"
+      ],
+      "collection_profile": "source_market_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-078",
+      "provider": "eastmoney",
+      "dataset": "earnings_forecast",
+      "method": "fetch_event_list",
+      "callable_method": true,
+      "field_count": 15,
+      "primary_key": [
+        "snapshot_at",
+        "source_security_code",
+        "notice_date",
+        "report_date",
+        "indicator_code"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "amount_lower",
+        "amount_upper",
+        "prior_year_amount"
+      ],
+      "collection_profile": "event_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-079",
+      "provider": "eastmoney",
+      "dataset": "institution_survey",
+      "method": "fetch_event_list",
+      "callable_method": true,
+      "field_count": 10,
+      "primary_key": [
+        "snapshot_at",
+        "source_security_code",
+        "notice_date",
+        "survey_date"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [],
+      "collection_profile": "event_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-080",
+      "provider": "eastmoney",
+      "dataset": "holder_trades",
+      "method": "fetch_action_list",
+      "callable_method": true,
+      "field_count": 17,
+      "primary_key": [
+        "snapshot_at",
+        "source_security_code",
+        "holder",
+        "notice_date",
+        "start_date",
+        "end_date"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "change_shares_10k",
+        "after_shares_10k",
+        "after_float_shares_10k",
+        "avg_price"
+      ],
+      "collection_profile": "event_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-081",
+      "provider": "eastmoney",
+      "dataset": "buyback",
+      "method": "fetch_action_list",
+      "callable_method": true,
+      "field_count": 21,
+      "primary_key": [
+        "snapshot_at",
+        "source_security_code",
+        "source_plan_code"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "price_cap",
+        "shares_lower",
+        "shares_upper",
+        "amount_lower",
+        "amount_upper",
+        "done_shares",
+        "done_amount",
+        "done_price_low",
+        "done_price_high"
+      ],
+      "collection_profile": "event_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-082",
+      "provider": "eastmoney",
+      "dataset": "pledge",
+      "method": "fetch_action_list",
+      "callable_method": true,
+      "field_count": 11,
+      "primary_key": [
+        "snapshot_at",
+        "source_security_code",
+        "statistic_date"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "pledged_shares_10k",
+        "pledged_mktcap_10k",
+        "unrestricted_pledged_10k",
+        "restricted_pledged_10k"
+      ],
+      "collection_profile": "event_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-083",
+      "provider": "eastmoney",
+      "dataset": "ipo_calendar",
+      "method": "fetch_action_list",
+      "callable_method": true,
+      "field_count": 20,
+      "primary_key": [
+        "snapshot_at",
+        "source_security_code"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "issue_price",
+        "issue_shares_10k",
+        "online_shares",
+        "apply_upper_shares",
+        "top_apply_mktcap_10k",
+        "first_close"
+      ],
+      "collection_profile": "event_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-084",
+      "provider": "eastmoney",
+      "dataset": "convertible_bonds",
+      "method": "fetch_convertible_bonds",
+      "callable_method": true,
+      "field_count": 20,
+      "primary_key": [
+        "snapshot_at",
+        "source_bond_code"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "issue_size_100m",
+        "initial_convert_price",
+        "convert_price",
+        "bond_price",
+        "stock_price",
+        "convert_value",
+        "premium_pct"
+      ],
+      "collection_profile": "reference_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-085",
+      "provider": "sina",
+      "dataset": "sina_dragon_tiger_daily",
+      "method": "fetch_dragon_tiger_daily",
+      "callable_method": true,
+      "field_count": 10,
+      "primary_key": [
+        "snapshot_at",
+        "trade_date",
+        "source_row_number"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "close_price",
+        "reference_value",
+        "volume",
+        "amount"
+      ],
+      "collection_profile": "market_after_close",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-087",
+      "provider": "eastmoney",
+      "dataset": "dated_announcements",
+      "method": "fetch_announcements",
+      "callable_method": true,
+      "field_count": 8,
+      "primary_key": [
+        "snapshot_at",
+        "source_article_code"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [],
+      "collection_profile": "event_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "SDA-BOARD-001",
+      "provider": "ths",
+      "dataset": "industry_directory",
+      "method": "fetch_industry_list",
+      "callable_method": true,
+      "field_count": 4,
+      "primary_key": [
+        "board_type",
+        "board_code"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [],
+      "collection_profile": "reference_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "SDA-BOARD-002",
+      "provider": "ths",
+      "dataset": "industry_index_daily",
+      "method": "fetch_industry_daily",
+      "callable_method": true,
+      "field_count": 11,
+      "primary_key": [
+        "board_code",
+        "trade_date"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "volume",
+        "amount"
+      ],
+      "collection_profile": "market_after_close",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "SDA-BOARD-003",
+      "provider": "ths",
+      "dataset": "board_fund_flow",
+      "method": "fetch_fund_flow",
+      "callable_method": true,
+      "field_count": 15,
+      "primary_key": [
+        "board_type",
+        "board_name",
+        "period",
+        "snapshot_at"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "money_inflow",
+        "money_outflow",
+        "net_inflow"
+      ],
+      "collection_profile": "market_intraday",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "SDA-BOARD-004",
+      "provider": "ths",
+      "dataset": "board_fund_flow",
+      "method": "fetch_fund_flow",
+      "callable_method": true,
+      "field_count": 15,
+      "primary_key": [
+        "board_type",
+        "board_name",
+        "period",
+        "snapshot_at"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "money_inflow",
+        "money_outflow",
+        "net_inflow"
+      ],
+      "collection_profile": "market_intraday",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "SDA-BOARD-005",
+      "provider": "baostock",
+      "dataset": "security_snapshot",
+      "method": "fetch_snapshot",
+      "callable_method": true,
+      "field_count": 6,
+      "primary_key": [
+        "trade_date",
+        "exchange",
+        "stock_code"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [],
+      "collection_profile": "reference_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "SDA-BOARD-006",
+      "provider": "baostock",
+      "dataset": "industry_membership",
+      "method": "fetch_snapshot",
+      "callable_method": true,
+      "field_count": 9,
+      "primary_key": [
+        "stock_code",
+        "classification_update_date"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [],
+      "collection_profile": "reference_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-037-profile",
+      "provider": "cninfo",
+      "dataset": "company_profile",
+      "method": "fetch",
+      "callable_method": true,
+      "field_count": 28,
+      "primary_key": [
+        "snapshot_at",
+        "stock_code"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [
+        "registered_capital"
+      ],
+      "collection_profile": "event_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    },
+    {
+      "input_id": "ASTOCK-037-events",
+      "provider": "eastmoney",
+      "dataset": "company_events",
+      "method": "fetch_company_events",
+      "callable_method": true,
+      "field_count": 7,
+      "primary_key": [
+        "snapshot_at",
+        "source_row_number"
+      ],
+      "mapping_status": "pending_validation",
+      "unverified_fields": [],
+      "collection_profile": "event_daily",
+      "executable_frequency_unit": null,
+      "scheduling_enabled": false
+    }
+  ],
+  "source_files": [
+    {
+      "path": "config/providers.yaml",
+      "sha256": "11abb8bc03cb75b615539eee413983f54dbf4b28ee5b6584d90ca0824f737196"
+    },
+    {
+      "path": "config/collection.yaml",
+      "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d"
+    },
+    {
+      "path": "src/pipeline/inputs.py",
+      "sha256": "800b69457ab0a6ab718ffe5c40a3b47b98529ff28fbbbb5c5630066c84317d38"
+    },
+    {
+      "path": "src/worker/scheduler.py",
+      "sha256": "f908a4054779f584715078858b3df3c42a75a1c9b206078788307817c4c52b31"
+    },
+    {
+      "path": "src/routing/factory.py",
+      "sha256": "91b80e626acb7779f2836f0486d4918e85956e0bdbb28e1fa4dd2485bb3ec85a"
+    },
+    {
+      "path": "src/cli.py",
+      "sha256": "582f5caedfc538a012d7a2f6e8cd7af3fe8b6fc9152e5b9e0a3fa2cb8810ae19"
+    },
+    {
+      "path": "src/storage/raw.py",
+      "sha256": "16e1905b7f84e3fd49c0e38241e90f4b0d42786d92ea93f604c200cfd361bc46"
+    },
+    {
+      "path": "src/providers/tencent/daily.py",
+      "sha256": "487a14fcbfc47146d6d5fd291fbf41667aba435e5fed22ea1ef61ded513fcaa7"
+    },
+    {
+      "path": "src/providers/eastmoney/realtime.py",
+      "sha256": "6e09d2a5014cf316c4d1e26e913a44d5c2fbad95fb44d95cba159ef881f03bca"
+    },
+    {
+      "path": "docs/providers/README.md",
+      "sha256": "0f27f7fc6480a21d46d7f6cb4a87948825fa59f880963582be8cc792d63578c9"
+    },
+    {
+      "path": "docs/providers/源头采集接口说明.json",
+      "sha256": "7c02b2a95a67ec92c58e3736d662fee41a3fe74ea047721b70c84ca5b090f5f6"
+    },
+    {
+      "path": "PROJECT_PROGRESS.md",
+      "sha256": "82eeb435e6c0ca4c47a224ee155dd49e17029b4ce937dbfa4666ae271c0d4ad6"
+    }
+  ]
+}
