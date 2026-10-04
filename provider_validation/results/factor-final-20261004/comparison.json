@@ -1,0 +1,198 @@
+{
+  "validation_time_utc": "2026-10-04T06:12:09.810987+00:00",
+  "mode": "offline_replay",
+  "network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "verification_code": {
+    "path": "tests/test_input_collection.py",
+    "sha256": "5c42f4600d5414405984f5b8d537735552045fff70fb167a515738552d3c1740"
+  },
+  "runner": {
+    "path": "provider_validation/tests/replay_input_capabilities.py",
+    "sha256": "c81100899d6c7161488597676a32610da2813b70368fbe2897397741c33381aa"
+  },
+  "inputs": [
+    {
+      "input_id": "ASTOCK-006",
+      "report_path": "provider_validation/results/factor-final-20261004/1/candidate/ASTOCK-006-135a8abf957b/2026-10-04/input_report/sina/adjustment_factor/report.json",
+      "report_sha256": "1c7471277cf31f5c7187f136a7a80d3525dab234ee0814c14d6b145fc800c57b",
+      "source_manifest": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+      "source_manifest_sha256": "885abd6bf1c4b809b9029759f61b75c7d6a297755fd76ca6c545720db38a6767",
+      "row_count": 33,
+      "scope": {
+        "code": "600519",
+        "kind": "qfq"
+      },
+      "code_version": "8c13ed68d30421f0810123f87dc80b70b0cdd2f43667efe38c368021d55fc2bf",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-006",
+      "report_path": "provider_validation/results/factor-final-20261004/2/candidate/ASTOCK-006-5b8a2afbcc7f/2026-10-04/input_report/sina/adjustment_factor/report.json",
+      "report_sha256": "52a8eb297d1c4bc6bee2bef006a8947758dd2188bd0f01e12825913643d9f2b9",
+      "source_manifest": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+      "source_manifest_sha256": "885abd6bf1c4b809b9029759f61b75c7d6a297755fd76ca6c545720db38a6767",
+      "row_count": 33,
+      "scope": {
+        "code": "600519",
+        "kind": "hfq"
+      },
+      "code_version": "8c13ed68d30421f0810123f87dc80b70b0cdd2f43667efe38c368021d55fc2bf",
+      "result": "passed"
+    }
+  ],
+  "original_vs_provider": [
+    {
+      "input_id": "ASTOCK-006",
+      "kind": "qfq",
+      "row_count": 33,
+      "mode": "offline_replay",
+      "all_business_fields_equal": true,
+      "all_retained_source_fields_equal": true,
+      "request_comparison_equal": true,
+      "original_csv": [
+        {
+          "path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\06_新浪复权因子\\data\\qfq_factor.csv",
+          "sha256": "41dd62354b9a171d317da983396450adf9dbb0c38ad8cbf14b7ef21ce4ff0660"
+        },
+        {
+          "path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\06_新浪复权因子\\data\\hfq_factor.csv",
+          "sha256": "fd88e894dd6571cfa51a7b32698e23c75a9e9566892d5a189a998cd96857a4f1"
+        }
+      ],
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\factor-final-20261004\\1\\original-parsed.json",
+      "original_parsed_sha256": "540e63b05c0caab02e9d460e7b30e4aaa553872ae3741ae1011f919d874655ff",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\factor-final-20261004\\1\\candidate\\ASTOCK-006-135a8abf957b\\2026-10-04\\input_report\\sina\\adjustment_factor\\report.json",
+      "report_sha256": "1c7471277cf31f5c7187f136a7a80d3525dab234ee0814c14d6b145fc800c57b"
+    },
+    {
+      "input_id": "ASTOCK-006",
+      "kind": "hfq",
+      "row_count": 33,
+      "mode": "offline_replay",
+      "all_business_fields_equal": true,
+      "all_retained_source_fields_equal": true,
+      "request_comparison_equal": true,
+      "original_csv": [
+        {
+          "path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\06_新浪复权因子\\data\\qfq_factor.csv",
+          "sha256": "41dd62354b9a171d317da983396450adf9dbb0c38ad8cbf14b7ef21ce4ff0660"
+        },
+        {
+          "path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\06_新浪复权因子\\data\\hfq_factor.csv",
+          "sha256": "fd88e894dd6571cfa51a7b32698e23c75a9e9566892d5a189a998cd96857a4f1"
+        }
+      ],
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\factor-final-20261004\\2\\original-parsed.json",
+      "original_parsed_sha256": "540e63b05c0caab02e9d460e7b30e4aaa553872ae3741ae1011f919d874655ff",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\factor-final-20261004\\2\\candidate\\ASTOCK-006-5b8a2afbcc7f\\2026-10-04\\input_report\\sina\\adjustment_factor\\report.json",
+      "report_sha256": "52a8eb297d1c4bc6bee2bef006a8947758dd2188bd0f01e12825913643d9f2b9"
+    }
+  ],
+  "known_differences": [
+    "扩展原新浪日线Provider，前后复权各33条与原脚本、原始响应及历史CSV逐字段对照。",
+    "仍按qfq/hfq原顺序取两组完整历史，仅config.kind选择候选输出；完整66条、另一组解析33条及原系数字符串保留。",
+    "1900-01-01为来源基准标签不是交易日；系数计算口径尚未认证，标准数值为空，不重算价格。",
+    "SDK eval前先持久化响应，再进行数据字面量检查；保留请求头、默认代理、原无显式超时、探测重试和暂停行为。",
+    "会话/cache和异常响应使用合成或注入数据；零新真实请求、零生产写入、调度与正式路由关闭。"
+  ],
+  "negative_checks": [
+    {
+      "input_id": "ASTOCK-006",
+      "mutation": "empty",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/factor-final-20261004/f0/candidate/ASTOCK-006-c615d327e431/2026-10-04/input_report/sina/adjustment_factor/report.json",
+      "report_sha256": "61c3a8a0c6885b6edd1bfa7664322a947e4c356180023adeab1276a4cc444a06",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-006",
+      "mutation": "schema",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/factor-final-20261004/f1/candidate/ASTOCK-006-cbc81f9a75af/2026-10-04/input_report/sina/adjustment_factor/report.json",
+      "report_sha256": "8401e9803999505091eba80e19f2a65c0576eea1f1ee8dd5db3512c0da98b07d",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-006",
+      "mutation": "order",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/factor-final-20261004/f2/candidate/ASTOCK-006-fb3c95061215/2026-10-04/input_report/sina/adjustment_factor/report.json",
+      "report_sha256": "a511a9a02e32ab20bef3c594f2fc4b1ea953d137ce2cf2102e8dc0352d97085f",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-006",
+      "mutation": "numeric",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/factor-final-20261004/f3/candidate/ASTOCK-006-1b96763d3448/2026-10-04/input_report/sina/adjustment_factor/report.json",
+      "report_sha256": "b82c2b6be289b711c26f854f1c1f9f28bf147977a6f68c777c24dde6a8b197a5",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-006",
+      "mutation": "date",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/factor-final-20261004/f4/candidate/ASTOCK-006-e5ebc083d918/2026-10-04/input_report/sina/adjustment_factor/report.json",
+      "report_sha256": "abbe9ea2eb393dcb07c1bf3d82b50715ac9006353602e3cd3647e00d3caef4a3",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-006",
+      "mutation": "duplicate",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/factor-final-20261004/f5/candidate/ASTOCK-006-06dd79a258b3/2026-10-04/input_report/sina/adjustment_factor/report.json",
+      "report_sha256": "ec68ffa2742a576f7abd0ab42a8d76dd4c42d6c1ec70f682cd9b3ebef3b7cc24",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-006",
+      "mutation": "count",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/factor-final-20261004/f6/candidate/ASTOCK-006-986853f78933/2026-10-04/input_report/sina/adjustment_factor/report.json",
+      "report_sha256": "3eb6e097cd5211bbe1f1677ce8f28456d157c1f5f19c4d64f46581d66fef0ca1",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-006",
+      "mutation": "variable",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/factor-final-20261004/f7/candidate/ASTOCK-006-690174180d65/2026-10-04/input_report/sina/adjustment_factor/report.json",
+      "report_sha256": "894090c7e2fcb67a41c948849702e7e38831723b02ce01132de6ba960fa6f7af",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-006",
+      "mutation": "executable",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/factor-final-20261004/f8/candidate/ASTOCK-006-454a27416fa8/2026-10-04/input_report/sina/adjustment_factor/report.json",
+      "report_sha256": "508c025953709cfd57b9fb734441b67642ead732b7434b0b08a9bd7a3b1953fd",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-006",
+      "mutation": "trailing_code",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/factor-final-20261004/f9/candidate/ASTOCK-006-c88b004fb9e6/2026-10-04/input_report/sina/adjustment_factor/report.json",
+      "report_sha256": "2eae243ae02c5a0214bf14baaff54d06aeb1aa8a2b919ac396b2db4297028771",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-006",
+      "mutation": "http403",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/factor-final-20261004/f10/candidate/ASTOCK-006-2bf356667088/2026-10-04/input_report/sina/adjustment_factor/report.json",
+      "report_sha256": "ddd3ea92bd498e721eac315359986bf58a3b63b61c259a900c8640c87bb5b3ea",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-006",
+      "mutation": "missing_hfq",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/factor-final-20261004/f11/candidate/ASTOCK-006-9320ed78a8d1/2026-10-04/input_report/sina/adjustment_factor/report.json",
+      "report_sha256": "443da7f5b6016924cf5a2d4353d9006768bbb3054a0f66869d2ae66b9a668f3c",
+      "result": "passed"
+    }
+  ]
+}

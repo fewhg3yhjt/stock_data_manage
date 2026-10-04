@@ -1,0 +1,25 @@
+dataset:
+  name: daily_bar
+  display_name: 日线
+  primary_key: [instrument_id, trade_date, adjustment]
+  allowed_universes: [all_stock, all_etf, all_lof, all_index, watchlist, static]
+  allowed_asset_types: [stock, etf, lof, index]
+  allowed_exchanges: [XSHG, XSHE, BSE]
+  publication:
+    mode: atomic_replace
+    max_missing_ratio: 0.01
+    max_missing_count: 50
+
+fields:
+  instrument_id: {type: string, required: true}
+  trade_date: {type: date, required: true}
+  adjustment: {type: enum, values: [none, forward, backward], required: true}
+  open: {type: decimal, unit: CNY, required: true}
+  high: {type: decimal, unit: CNY, required: true}
+  low: {type: decimal, unit: CNY, required: true}
+  close: {type: decimal, unit: CNY, required: true}
+  volume: {type: decimal, unit: share, required: false}
+  amount: {type: decimal, unit: CNY, required: false}
+
+quality:
+  reject_if: [missing_required_ohlc, invalid_trade_date, adjustment_mismatch, duplicate_primary_key]

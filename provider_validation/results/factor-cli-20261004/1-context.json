@@ -1,0 +1,8 @@
+{
+  "request": {
+    "symbol": "600519"
+  },
+  "config": {
+    "kind": "hfq"
+  }
+}

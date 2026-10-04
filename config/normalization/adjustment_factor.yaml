@@ -1,0 +1,20 @@
+dataset: adjustment_factor
+rules:
+- id: sina-adjustment-factor-input-v1
+  input_id: ASTOCK-006
+  provider: sina
+  endpoint: adjustment_factor
+  field_mapping:
+    factor_kind: factor_kind
+    factor_date: factor_date
+    raw_factor: raw_factor
+    factor_value: raw_factor
+  context_fields:
+    snapshot_at: source_snapshot_at
+    instrument_id: instrument_id
+  unverified_fields: [factor_value]
+  null_values: [null]
+  status: pending_validation
+  version: sina-adjustment-factor-input-v1
+  evidence_refs: [ASTOCK-006]
+  notes: 原始系数字符串保留全部精度；factor_date为来源日期标签，1900基准不是交易日。计算基准尚未独立认证，标准factor_value为空；不做价格重算。

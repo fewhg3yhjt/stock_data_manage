@@ -1,0 +1,11 @@
+dataset:
+  name: adjustment_factor
+  display_name: 新浪来源复权因子历史
+  primary_key: [snapshot_at, instrument_id, factor_kind, factor_date]
+fields:
+  snapshot_at: {type: datetime, required: true}
+  instrument_id: {type: string, required: true}
+  factor_kind: {type: string, required: true}
+  factor_date: {type: date, required: true}
+  raw_factor: {type: string, required: true}
+  factor_value: {type: decimal, required: false, unit: unverified}

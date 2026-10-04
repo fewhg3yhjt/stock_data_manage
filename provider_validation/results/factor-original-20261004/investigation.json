@@ -1,0 +1,168 @@
+{
+  "before": [
+    {
+      "path": "src/stock_data_manage/providers/sina/daily.py",
+      "snapshot": "provider_validation/results/factor-original-20261004/0-daily.py.bin",
+      "sha256": "f9793bf9f5b8d77411abe459b285fc25892c840ff0962133e6b7c3ef628b2c92"
+    },
+    {
+      "path": "src/stock_data_manage/providers/transport.py",
+      "snapshot": "provider_validation/results/factor-original-20261004/1-transport.py.bin",
+      "sha256": "4f4fb06ffe10f82f1cba6a3e2c5cb5e55e6bfa40601b99eb40e2b241f6870d97"
+    },
+    {
+      "path": "src/stock_data_manage/pipeline/inputs.py",
+      "snapshot": "provider_validation/results/factor-original-20261004/2-inputs.py.bin",
+      "sha256": "0109ed74a07dcdf638267aabd26424053f9ad9442d3a33340ab2d00c5013c218"
+    },
+    {
+      "path": "src/stock_data_manage/routing/factory.py",
+      "snapshot": "provider_validation/results/factor-original-20261004/3-factory.py.bin",
+      "sha256": "5a846927e24c269fc197e48291f832a1d8fe1cf3a4d3c6e4b1ada3de3537061e"
+    },
+    {
+      "path": "config/providers.yaml",
+      "snapshot": "provider_validation/results/factor-original-20261004/4-providers.yaml.bin",
+      "sha256": "d0f1cc371bb192c7bd26b2d5280d048be165497f2ac048db58234d8cf63b5b13"
+    },
+    {
+      "path": "tests/test_input_collection.py",
+      "snapshot": "provider_validation/results/factor-original-20261004/5-test_input_collection.py.bin",
+      "sha256": "39821e0307bbd9ee72354c10db7b68e43d6cb30f7bf50b262768e14c6e03c65d"
+    },
+    {
+      "path": "provider_validation/tests/replay_input_capabilities.py",
+      "snapshot": "provider_validation/results/factor-original-20261004/6-replay_input_capabilities.py.bin",
+      "sha256": "99d93ce1193bf347e9d99a43b62c564e7d42ca4acec00b1d7caa0f95c5b553fa"
+    },
+    {
+      "path": ".gitattributes",
+      "snapshot": "provider_validation/results/factor-original-20261004/7-.gitattributes.bin",
+      "sha256": "d179233e3fd75ab2560c38c0b3ab737a1eda08e4dcc04ddd6d2db87a6c330d2c"
+    },
+    {
+      "path": "CODE_STRUCTURE.md",
+      "snapshot": "provider_validation/results/factor-original-20261004/8-CODE_STRUCTURE.md.bin",
+      "sha256": "932e89ffa6289a4dd66db2fa465365aa9587bdd73c24ef16d7da835e4447341e"
+    }
+  ],
+  "source_code": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+  "source_code_sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0",
+  "raw_manifest": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+  "raw_manifest_sha256": "885abd6bf1c4b809b9029759f61b75c7d6a297755fd76ca6c545720db38a6767",
+  "source_records": [
+    {
+      "body_sha256": "4454ae6d40546e3635f682392846a31da801e075bd6376959b6b285bbe3895ea",
+      "body_storage": "bodies\\4454ae6d40546e3635f682392846a31da801e075bd6376959b6b285bbe3895ea.body.gz",
+      "content_type": "application/x-javascript",
+      "event": "http_response",
+      "fetched_at_utc": "2026-10-03T09:46:28.072+00:00",
+      "method": "GET",
+      "outcome": "response",
+      "persistence_status": "exact_application_body_saved",
+      "request_body_bytes": 0,
+      "request_body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "request_headers": {
+        "Accept": "*/*",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Connection": "keep-alive",
+        "User-Agent": "python-requests/2.32.5"
+      },
+      "requests_decoded_body_bytes": 1801,
+      "response_encoding": null,
+      "response_headers": {
+        "Accept-Ranges": "bytes",
+        "Age": "23",
+        "Ali-Swift-Global-Savetime": "1791020768",
+        "Cache-Control": "max-age=120",
+        "Connection": "keep-alive",
+        "Content-Length": "1801",
+        "Content-Type": "application/x-javascript",
+        "Date": "Sat, 03 Oct 2026 09:46:08 GMT",
+        "ETag": "\"6a3d7df9-709\"",
+        "EagleId": "27af041d17910207915058695e",
+        "Edge-Copy-Time": "1782426406152",
+        "Expires": "Sat, 03 Oct 2026 09:46:08 GMT",
+        "Last-Modified": "Thu, 25 Jun 2026 19:14:01 GMT",
+        "Server": "Tengine",
+        "Timing-Allow-Origin": "*",
+        "Via": "http/1.1 cnc.huanan2.union.30 (ApacheTrafficServer/6.2.1 [cRs f ]), cache54.l2cn1811[0,0,304-0,H], cache46.l2cn1811[1,0], cache46.l2cn1811[1,0], vcache13.cn4431[0,0,200-0,H], vcache9.cn4431[2,0]",
+        "X-Cache": "HIT TCP_MEM_HIT dirn:-2:-2",
+        "X-Swift-CacheTime": "97",
+        "X-Swift-SaveTime": "Sat, 03 Oct 2026 09:46:31 GMT",
+        "X-Via-CDN": "f=aliyun,s=vcache9.cn4431,c=2409:8a28:d07:9300:2573:aa8d:5a23:f4d3;f=sinaedge,s=ctc.guangzhou.union.299.nb.sinaedge.com,c=36.156.105.155;f=Edge,s=cnc.huanan2.union.30,c=10.33.79.29",
+        "X-Via-Edge": "1791020768057270c090a1d4f210a4f9004b7",
+        "X-Via-SSL": "ssl.28.sinag1.hn1.lb.sinanode.com"
+      },
+      "scope": {
+        "capability": "06:新浪复权因子",
+        "code": "600519",
+        "date": "20260930",
+        "end": "20261003",
+        "min_host_interval_seconds": "3.0",
+        "probe_policy": "rate-limited-live-probe-v1",
+        "retry_policy": "max_2_retries; min_backoff_5.0s; no_retry_403_429",
+        "start": "20260901"
+      },
+      "status_code": 200,
+      "url": "https://finance.sina.com.cn/realstock/company/sh600519/qfq.js"
+    },
+    {
+      "body_sha256": "a1ad8ba257cab55bf8c3c1798d0142273660796a809136ef6f84862a3dbe5c20",
+      "body_storage": "bodies\\a1ad8ba257cab55bf8c3c1798d0142273660796a809136ef6f84862a3dbe5c20.body.gz",
+      "content_type": "application/x-javascript",
+      "event": "http_response",
+      "fetched_at_utc": "2026-10-03T09:46:29.283+00:00",
+      "method": "GET",
+      "outcome": "response",
+      "persistence_status": "exact_application_body_saved",
+      "request_body_bytes": 0,
+      "request_body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "request_headers": {
+        "Accept": "*/*",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Connection": "keep-alive",
+        "User-Agent": "python-requests/2.32.5"
+      },
+      "requests_decoded_body_bytes": 1801,
+      "response_encoding": null,
+      "response_headers": {
+        "Accept-Ranges": "bytes",
+        "Age": "0",
+        "Ali-Swift-Global-Savetime": "1791020794",
+        "Cache-Control": "max-age=120",
+        "Connection": "keep-alive",
+        "Content-Length": "1801",
+        "Content-Type": "application/x-javascript",
+        "Date": "Sat, 03 Oct 2026 09:46:34 GMT",
+        "ETag": "\"6a3d7df9-709\"",
+        "EagleId": "27af042317910207942163303e",
+        "Edge-Copy-Time": "1782415486741",
+        "Expires": "Sat, 03 Oct 2026 09:48:34 GMT",
+        "Last-Modified": "Thu, 25 Jun 2026 19:14:01 GMT",
+        "Server": "Tengine",
+        "Timing-Allow-Origin": "*",
+        "Via": "http/1.1 cnc.huanan2.union.38 (ApacheTrafficServer/6.2.1 [cSsNfU]), cache47.l2cn1811[71,71,304-0,H], cache58.l2cn1811[72,0], cache58.l2cn1811[72,0], vcache9.cn4431[83,84,200-0,H], vcache15.cn4431[88,0]",
+        "X-Cache": "HIT TCP_REFRESH_HIT dirn:10:25864601",
+        "X-Swift-CacheTime": "120",
+        "X-Swift-SaveTime": "Sat, 03 Oct 2026 09:46:34 GMT",
+        "X-Via-CDN": "f=aliyun,s=vcache15.cn4431,c=2409:8a28:d07:9300:2573:aa8d:5a23:f4d3;f=sinaedge,s=ctc.guangzhou.union.56.nb.sinaedge.com,c=36.156.105.168;f=Edge,s=cnc.huanan2.union.38,c=10.33.66.56;f=edge,s=cnc.zhangjiakou.bsd-storage.70.nb.sinaedge.com,c=10.54.255.69;",
+        "X-Via-Edge": "1791020794237250e090a3842210a0764fcbe",
+        "X-Via-SSL": "ssl.24.sinag1.hn1.lb.sinanode.com"
+      },
+      "scope": {
+        "capability": "06:新浪复权因子",
+        "code": "600519",
+        "date": "20260930",
+        "end": "20261003",
+        "min_host_interval_seconds": "3.0",
+        "probe_policy": "rate-limited-live-probe-v1",
+        "retry_policy": "max_2_retries; min_backoff_5.0s; no_retry_403_429",
+        "start": "20260901"
+      },
+      "status_code": 200,
+      "url": "https://finance.sina.com.cn/realstock/company/sh600519/hfq.js"
+    }
+  ],
+  "scope": "ASTOCK-006: both original qfq/hfq requests; selected candidate only, no price recomputation or production routing"
+}

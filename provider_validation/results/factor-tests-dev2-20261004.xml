@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="17" time="14.762" timestamp="2026-10-04T14:09:18.304593+08:00" hostname="WIN-O3LLBLVKP56"><testcase classname="tests.test_input_collection" name="test_factor_original_sdk_csv_precision_and_baseline[ASTOCK-006-context0-manifest0-33]" time="1.212" /><testcase classname="tests.test_input_collection" name="test_factor_original_sdk_csv_precision_and_baseline[ASTOCK-006-context1-manifest1-33]" time="0.619" /><testcase classname="tests.test_input_collection" name="test_factor_failures_saved_before_sdk_eval[empty]" time="0.450" /><testcase classname="tests.test_input_collection" name="test_factor_failures_saved_before_sdk_eval[schema]" time="0.508" /><testcase classname="tests.test_input_collection" name="test_factor_failures_saved_before_sdk_eval[order]" time="0.495" /><testcase classname="tests.test_input_collection" name="test_factor_failures_saved_before_sdk_eval[numeric]" time="0.490" /><testcase classname="tests.test_input_collection" name="test_factor_failures_saved_before_sdk_eval[date]" time="0.488" /><testcase classname="tests.test_input_collection" name="test_factor_failures_saved_before_sdk_eval[duplicate]" time="0.417" /><testcase classname="tests.test_input_collection" name="test_factor_failures_saved_before_sdk_eval[count]" time="0.365" /><testcase classname="tests.test_input_collection" name="test_factor_failures_saved_before_sdk_eval[variable]" time="0.336" /><testcase classname="tests.test_input_collection" name="test_factor_failures_saved_before_sdk_eval[executable]" time="0.333" /><testcase classname="tests.test_input_collection" name="test_factor_failures_saved_before_sdk_eval[trailing_code]" time="0.356" /><testcase classname="tests.test_input_collection" name="test_factor_failures_saved_before_sdk_eval[http403]" time="0.355" /><testcase classname="tests.test_input_collection" name="test_factor_failures_saved_before_sdk_eval[missing_hfq]" time="0.316" /><testcase classname="tests.test_input_collection" name="test_factor_yaml_selection_mapping_and_scope" time="1.097"><failure message="KeyError: 'responses'">tmp_path = WindowsPath('D:/Project/PythonProgram/stock_data_manage/provider_validation/results/factor-tests-dev2-20261004/test_factor_yaml_selection_map0')
+no_network = None
+
+    def test_factor_yaml_selection_mapping_and_scope(tmp_path,no_network):
+        from stock_data_manage.config.loader import load_input_capabilities
+        contract=next(c for c in load_input_capabilities(ROOT/"config/providers.yaml") if c.input_id=="ASTOCK-006")
+        assert contract.base_requests_per_fetch==2 and contract.collection_profile=="market_after_close"
+        config=tmp_path/"config";shutil.copytree(ROOT/"config",config)
+        mapping=config/"normalization/adjustment_factor.yaml";doc=yaml.safe_load(mapping.read_text(encoding="utf-8"));doc["rules"][0]["field_mapping"]["raw_factor"]="source_date";mapping.write_text(yaml.safe_dump(doc,allow_unicode=True),encoding="utf-8")
+        fields=["snapshot_at","instrument_id","factor_kind","factor_date","raw_factor"]
+        report=collect_input(input_id="ASTOCK-006",context={"request":{"symbol":"sh600519"},"config":{"kind":"hfq"}},config_root=config,
+            output_root=tmp_path/"candidate",replay_manifest=SDK_ARCHIVE,fields=fields)
+        assert report["status"]=="candidate_complete" and set(read_artifact(report,"output")[0])==set(fields),report
+        assert read_artifact(report,"output")[0]["raw_factor"]==read_artifact(report,"parsed_rows")[0]["source_date"].replace("T"," ")
+        for context in [{"request":{"symbol":"600519","start_date":"2026-01-01"}},{"request":{"symbol":"600519","end_date":"2026-09-30"}},
+                        {"request":{"symbol":"600519"},"config":{"kind":"raw"}}]:
+            with pytest.raises(ValueError):contract.bind_parameters(context)
+        for symbol in ("sh000001","sz600519","510300"):
+            report=collect_input(input_id="ASTOCK-006",context={"request":{"symbol":symbol}},config_root=ROOT/"config",output_root=tmp_path/"invalid",replay_manifest=SDK_ARCHIVE)
+&gt;           assert report["status"]=="failed" and not report["responses"],report
+                                                      ^^^^^^^^^^^^^^^^^^^
+E           KeyError: 'responses'
+
+tests\test_input_collection.py:150: KeyError</failure></testcase><testcase classname="tests.test_input_collection" name="test_factor_sdk_original_session_cache_and_guard" time="3.849" /><testcase classname="tests.test_input_collection" name="test_sina_existing_stock_methods_unchanged" time="0.374" /></testsuite></testsuites>

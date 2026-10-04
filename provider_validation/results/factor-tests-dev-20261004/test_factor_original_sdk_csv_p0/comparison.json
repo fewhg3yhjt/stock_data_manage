@@ -1,0 +1,23 @@
+{
+  "input_id": "ASTOCK-006",
+  "kind": "qfq",
+  "row_count": 33,
+  "mode": "offline_replay",
+  "all_business_fields_equal": true,
+  "all_retained_source_fields_equal": true,
+  "request_comparison_equal": true,
+  "original_csv": [
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\06_新浪复权因子\\data\\qfq_factor.csv",
+      "sha256": "41dd62354b9a171d317da983396450adf9dbb0c38ad8cbf14b7ef21ce4ff0660"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\06_新浪复权因子\\data\\hfq_factor.csv",
+      "sha256": "fd88e894dd6571cfa51a7b32698e23c75a9e9566892d5a189a998cd96857a4f1"
+    }
+  ],
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\factor-tests-dev-20261004\\test_factor_original_sdk_csv_p0\\original-parsed.json",
+  "original_parsed_sha256": "540e63b05c0caab02e9d460e7b30e4aaa553872ae3741ae1011f919d874655ff",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\factor-tests-dev-20261004\\test_factor_original_sdk_csv_p0\\candidate\\ASTOCK-006-3a3090d069a4\\2026-10-04\\input_report\\sina\\adjustment_factor\\report.json",
+  "report_sha256": "5e897b4f16313c79d609305cc8bb3d80603ceabb4365f871f7d8bca32349a3ad"
+}

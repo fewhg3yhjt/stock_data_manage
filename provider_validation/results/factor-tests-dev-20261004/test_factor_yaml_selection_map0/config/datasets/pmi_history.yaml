@@ -1,0 +1,32 @@
+dataset:
+  name: pmi_history
+  display_name: PMI统计月历史输入
+  primary_key:
+  - snapshot_at
+  - statistical_month
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  statistical_month:
+    type: string
+    required: true
+  publication_time:
+    type: datetime
+    required: false
+  manufacturing_index:
+    type: decimal
+    required: false
+    unit: unverified
+  manufacturing_yoy:
+    type: decimal
+    required: false
+    unit: unverified
+  nonmanufacturing_index:
+    type: decimal
+    required: false
+    unit: unverified
+  nonmanufacturing_yoy:
+    type: decimal
+    required: false
+    unit: unverified

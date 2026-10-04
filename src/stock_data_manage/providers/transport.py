@@ -60,7 +60,7 @@ class HostPausedError(ConnectionError):
 @contextmanager
 def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                       replay_manifest=None, evidence_roots=(), max_age_seconds=0, sdk_retry_policy=False,
-                      probe_host_pause=False, require_empty_post_body=False):
+                      probe_host_pause=False, require_empty_post_body=False, response_validator=None):
     """Serialized single-input capture/replay. Session identity, proxies and request arguments are retained.
 
     SDK session policy matches the saved conservative probe. Internal urllib3 retries
@@ -178,6 +178,8 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                         paused_hosts[host] = f"{consecutive_errors[host]} consecutive server errors"
                 else:
                     consecutive_errors[host] = 0
+            if response_validator is not None:
+                response_validator(response)
             return response
 
         class ConservativeRetry(Retry):

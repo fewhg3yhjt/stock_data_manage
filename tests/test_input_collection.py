@@ -24,6 +24,152 @@ SDK_ARCHIVE = ROOT / "provider_validation/results/live-probes/rate-limited-all-2
 SDK_NEWS_CASES = [("ASTOCK-032", {}, SDK_ARCHIVE, 20), ("ASTOCK-033", {}, SDK_ARCHIVE, 20)]
 MACRO_CASES = [("ASTOCK-061", {}, SDK_ARCHIVE, 136), ("ASTOCK-062", {}, SDK_ARCHIVE, 225)]
 
+FACTOR_CASES = [("ASTOCK-006", {"request":{"symbol":"600519"},"config":{"kind":kind}}, SDK_ARCHIVE, 33) for kind in ("qfq","hfq")]
+FACTOR_FAILURES = ["empty","schema","order","numeric","date","duplicate","count","variable","executable","trailing_code","http403","missing_hfq"]
+
+
+def factor_records():
+    return [json.loads(line) for line in SDK_ARCHIVE.read_text(encoding="utf-8").splitlines()
+            if "/sh600519/qfq.js" in line or "/sh600519/hfq.js" in line]
+
+
+def compare_factor_original(tmp_path,input_id,context,manifest,count):
+    import ast,inspect,csv,re
+    import akshare as sdk
+    import pandas as pd
+    from typing import Any,Callable,List,Tuple,Dict
+    from types import SimpleNamespace
+    from stock_data_manage.pipeline.inputs import _json_value
+    from stock_data_manage.providers.sina.daily import parse_adjustment_payload
+    source=ROOT/"provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py"
+    names={"ak_function","call_ak","fetch_sina_adjust_factor","sina_symbol","only_digits","market_of"}
+    nodes=[node for node in ast.parse(source.read_text(encoding="utf-8")).body if isinstance(node,ast.FunctionDef) and node.name in names]
+    namespace=dict(inspect=inspect,re=re,Any=Any,Callable=Callable,List=List,Tuple=Tuple,Dict=Dict,Config=SimpleNamespace,pd=pd,ensure_ak=lambda:sdk)
+    exec(compile(ast.Module(body=nodes,type_ignores=[]),str(source),"exec"),namespace)
+    with captured_requests(RawObjectStore(tmp_path/"original"),provider="sina",endpoint="factor",scope={},code_version="original-factor",
+        pacer=RequestPacer(),replay_manifest=manifest,sdk_retry_policy=True,probe_host_pause=True) as events:
+        frames=namespace["fetch_sina_adjust_factor"](SimpleNamespace(code="600519"))
+    parsed={key:_json_value(frame.to_dict(orient="records")) for key,frame in frames.items()}
+    path=tmp_path/"original-parsed.json";path.write_text(json.dumps(parsed,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    csv_refs=[]
+    for key,rows in parsed.items():
+        csv_path=SDK_ARCHIVE.parents[2]/"06_新浪复权因子/data"/(key+".csv")
+        with csv_path.open(encoding="utf-8-sig",newline="") as stream:golden=list(csv.DictReader(stream))
+        assert len(golden)==len(rows)==33
+        assert [{**row,"date":row["date"][:10]} for row in rows]==golden
+        csv_refs.append(dict(path=str(csv_path),sha256=hashlib.sha256(csv_path.read_bytes()).hexdigest()))
+    report=collect_input(input_id=input_id,context=context,config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=manifest)
+    assert report["status"]=="candidate_complete" and report["row_count"]==count,report
+    source=[]
+    for record in factor_records():
+        kind,symbol,items=parse_adjustment_payload(RawObjectStore.read_response(manifest,record),record["url"])
+        source.extend({"factor_kind":kind,**row} for row in items)
+    assert read_artifact(report,"source_rows")==source and len(source)==66
+    kind=context["config"]["kind"];candidate=read_artifact(report,"parsed_rows");excluded=read_artifact(report,"excluded_rows")
+    for name,rows in ((kind,candidate),("hfq" if kind=="qfq" else "qfq",excluded)):
+        assert [{"date":row["source_date"],name+"_factor":row["source_factor"]} for row in rows]==parsed[name+"_factor"]
+        assert all(row["raw_factor"]==row["source_factor"] and row["factor_kind"]==name for row in rows)
+    assert report["original_row_count"]==66 and report["selected_row_count"]==len(excluded)==33
+    for output,row in zip(read_artifact(report,"output"),candidate):
+        assert output["raw_factor"]==row["source_factor"] and output["factor_date"]==row["source_date"][:10]
+        assert output["snapshot_at"]==report["source_capture_window"]["last"] and output["factor_value"] is None
+        assert output["instrument_id"]=="XSHG:600519" and output["factor_kind"]==kind
+    assert read_artifact(report,"output")[-1]["factor_date"]=="1900-01-01"
+    keys=("url","method","request_headers","request_options","status_code","body_sha256")
+    assert [{k:r.get(k) for k in keys} for r in events]==[{k:r.get(k) for k in keys} for r in report["responses"]]
+    comparison=dict(input_id=input_id,kind=kind,row_count=count,mode="offline_replay",all_business_fields_equal=True,
+        all_retained_source_fields_equal=True,request_comparison_equal=True,original_csv=csv_refs,
+        original_parsed_path=str(path.resolve()),original_parsed_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
+        report_path=report["report_path"],report_sha256=hashlib.sha256(Path(report["report_path"]).read_bytes()).hexdigest())
+    (tmp_path/"comparison.json").write_text(json.dumps(comparison,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    return comparison
+
+
+@pytest.mark.parametrize("input_id,context,manifest,count",FACTOR_CASES)
+def test_factor_original_sdk_csv_precision_and_baseline(tmp_path,no_network,input_id,context,manifest,count):
+    compare_factor_original(tmp_path,input_id,context,manifest,count)
+
+
+def factor_fixture(tmp_path,mutation):
+    store=RawObjectStore(tmp_path/"fixture")
+    for index,record in enumerate(factor_records()):
+        if index==1 and mutation=="missing_hfq":continue
+        original=RawObjectStore.read_response(SDK_ARCHIVE,record)
+        body=original;status=200
+        if index==0:
+            payload=json.loads(original.decode().split("=",1)[1].split("\n")[0]);items=payload["data"]
+            if mutation=="empty":items.clear();payload["total"]=0
+            elif mutation=="schema":items[0].pop("f")
+            elif mutation=="order":items[0]={"f":items[0]["f"],"d":items[0]["d"]}
+            elif mutation=="numeric":items[0]["f"]="NaN"
+            elif mutation=="date":items[0]["d"]="2026-99-01"
+            elif mutation=="duplicate":items[1]=items[0].copy()
+            elif mutation=="count":payload["total"]+=1
+            body=("var sh600519qfq="+json.dumps(payload,ensure_ascii=False)).encode()
+            if mutation=="variable":body=body.replace(b"sh600519qfq",b"sz000001qfq")
+            elif mutation=="executable":body=b"var sh600519qfq=__import__('builtins').print('executed')"
+            elif mutation=="trailing_code":body+=b"\nprint('executed')"
+            elif mutation=="http403":body=original;status=403
+        response=requests.Response();response._content=body;response.status_code=status;response.encoding="utf-8"
+        store.record_response(response=response,url=record["url"],method="GET",request_headers=record["request_headers"],scope={"fixture":mutation},
+            provider="sina",endpoint="factor",code_version="synthetic-factor",mode="fixture",source_ref={"manifest":str(SDK_ARCHIVE),"sha256":record["body_sha256"]})
+    return store.root/"manifest.ndjson"
+
+
+@pytest.mark.parametrize("mutation",FACTOR_FAILURES)
+def test_factor_failures_saved_before_sdk_eval(tmp_path,no_network,mutation):
+    from unittest.mock import patch
+    manifest=factor_fixture(tmp_path,mutation)
+    # No response expression may execute: the original SDK cannot reach eval on invalid data.
+    with patch("builtins.eval",side_effect=AssertionError("SDK eval reached before response gate")) if mutation not in {"missing_hfq"} else patch("builtins.eval",wraps=eval):
+        report=collect_input(input_id="ASTOCK-006",context={"request":{"symbol":"600519"}},config_root=ROOT/"config",
+            output_root=tmp_path/"candidate",replay_manifest=manifest)
+    assert report["status"]=="failed" and "output" not in report and report["production_writes"]==0,report
+    assert report["failure_class"]==("ValueError" if mutation=="missing_hfq" else "RuntimeError"),report
+    assert len(report["responses"])==1 and report["responses"][0]["body_sha256"]==json.loads(manifest.read_text(encoding="utf-8").splitlines()[0])["body_sha256"]
+    body=RawObjectStore.read_response(Path(report["run_directory"])/report["raw_manifest"]["path"],report["responses"][0])
+    assert body==RawObjectStore.read_response(manifest,json.loads(manifest.read_text(encoding="utf-8").splitlines()[0]))
+
+
+def test_factor_yaml_selection_mapping_and_scope(tmp_path,no_network):
+    from stock_data_manage.config.loader import load_input_capabilities
+    contract=next(c for c in load_input_capabilities(ROOT/"config/providers.yaml") if c.input_id=="ASTOCK-006")
+    assert contract.base_requests_per_fetch==2 and contract.collection_profile=="market_after_close"
+    config=tmp_path/"config";shutil.copytree(ROOT/"config",config)
+    mapping=config/"normalization/adjustment_factor.yaml";doc=yaml.safe_load(mapping.read_text(encoding="utf-8"));doc["rules"][0]["field_mapping"]["raw_factor"]="source_date";mapping.write_text(yaml.safe_dump(doc,allow_unicode=True),encoding="utf-8")
+    fields=["snapshot_at","instrument_id","factor_kind","factor_date","raw_factor"]
+    report=collect_input(input_id="ASTOCK-006",context={"request":{"symbol":"sh600519"},"config":{"kind":"hfq"}},config_root=config,
+        output_root=tmp_path/"candidate",replay_manifest=SDK_ARCHIVE,fields=fields)
+    assert report["status"]=="candidate_complete" and set(read_artifact(report,"output")[0])==set(fields),report
+    assert read_artifact(report,"output")[0]["raw_factor"]==read_artifact(report,"parsed_rows")[0]["source_date"].replace("T"," ")
+    for context in [{"request":{"symbol":"600519","start_date":"2026-01-01"}},{"request":{"symbol":"600519","end_date":"2026-09-30"}},
+                    {"request":{"symbol":"600519"},"config":{"kind":"raw"}}]:
+        with pytest.raises(ValueError):contract.bind_parameters(context)
+    for symbol in ("sh000001","sz600519","510300"):
+        report=collect_input(input_id="ASTOCK-006",context={"request":{"symbol":symbol}},config_root=ROOT/"config",output_root=tmp_path/"invalid",replay_manifest=SDK_ARCHIVE)
+        assert report["status"]=="failed" and not report.get("responses"),report
+
+
+def test_factor_sdk_original_session_cache_and_guard(tmp_path,no_network):
+    from unittest.mock import patch
+    seen=[];records=factor_records()
+    def send(session,request,**kwargs):
+        record=next(r for r in records if r["url"]==request.url);seen.append(request.url)
+        assert request.method=="GET" and kwargs["timeout"] is None and kwargs["allow_redirects"] and session.trust_env
+        assert request.headers["User-Agent"]==record["request_headers"]["User-Agent"]
+        retry=session.get_adapter(request.url).max_retries
+        assert retry.total==retry.connect==retry.read==retry.status==2 and retry.backoff_factor==5
+        assert not retry.is_retry("GET",403) and not retry.is_retry("GET",429,True)
+        response=requests.Response();response.status_code=200;response.encoding="utf-8";response._content=RawObjectStore.read_response(SDK_ARCHIVE,record);response.url=request.url
+        return response
+    with patch("requests.Session.send",send):
+        first=collect_input(input_id="ASTOCK-006",context={"request":{"symbol":"600519"}},config_root=ROOT/"config",output_root=tmp_path/"candidate",mode="live",evidence_root=tmp_path/"unused")
+        second=collect_input(input_id="ASTOCK-006",context={"request":{"symbol":"600519"}},config_root=ROOT/"config",output_root=tmp_path/"candidate",mode="live",evidence_root=tmp_path/"candidate")
+    assert first["status"]==second["status"]=="candidate_complete",(first,second)
+    assert first["live_http_calls"]==2 and second["live_http_calls"]==0 and len(seen)==2
+    assert read_artifact(first,"output")==read_artifact(second,"output")
+    (tmp_path/"fixture-mode.json").write_text(json.dumps(dict(mode="injected Session; not real live validation",real_http_calls=0,fixture_send_calls=2)),encoding="utf-8")
+
 
 def macro_record(input_id):
     needle="shrzgmQuery" if input_id=="ASTOCK-061" else "reportName=RPT_ECONOMY_PMI"

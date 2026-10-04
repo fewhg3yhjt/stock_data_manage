@@ -1,0 +1,35 @@
+dataset: futures_daily
+rules:
+- id: sina-futures_daily-input-v1
+  input_id: ASTOCK-075
+  provider: sina
+  endpoint: futures_kline
+  field_mapping:
+    source_contract: symbol
+    bar_date: date
+    open: open
+    high: high
+    low: low
+    close: close
+    settle: settle
+    volume: volume
+    open_interest: open_interest
+  context_fields:
+    snapshot_at: source_snapshot_at
+    series_identity: series_identity
+  transforms: {}
+  null_values:
+  - null
+  unverified_fields:
+  - open
+  - high
+  - low
+  - close
+  - settle
+  - volume
+  - open_interest
+  status: pending_validation
+  version: sina-futures-input-v1
+  evidence_refs:
+  - ASTOCK-075
+  notes: 原字段、代码身份、零价为空与来源日期/时间保留；无复权或历史快照参数。价格/数量单位待独立认证，原来源与完整解析数值留证，标准数值为空。

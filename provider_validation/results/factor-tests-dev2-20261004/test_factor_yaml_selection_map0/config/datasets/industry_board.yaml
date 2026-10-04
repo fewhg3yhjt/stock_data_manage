@@ -1,0 +1,12 @@
+dataset:
+  name: industry_board
+  display_name: 行业板块成分
+  primary_key: [board_code, stock_code]
+  allowed_asset_types: [stock]
+
+fields:
+  board_type: {type: string, required: true}
+  board_code: {type: string, required: true}
+  stock_code: {type: string, required: true}
+  stock_name: {type: string, required: true}
+  source: {type: string, required: true}

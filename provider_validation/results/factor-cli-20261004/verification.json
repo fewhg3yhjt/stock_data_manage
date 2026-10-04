@@ -1,0 +1,64 @@
+{
+  "validation_time_utc": "2026-10-04T06:13:38.776894+00:00",
+  "results": [
+    {
+      "input_id": "ASTOCK-006",
+      "kind": "qfq",
+      "command": [
+        "D:\\Program Files\\Python\\python.exe",
+        "-m",
+        "stock_data_manage.cli",
+        "collect-input",
+        "--input",
+        "ASTOCK-006",
+        "--config-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\config",
+        "--output-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\factor-cli-20261004\\candidate",
+        "--mode",
+        "replay",
+        "--replay-manifest",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\_raw\\missing-capabilities-20261003T174623\\manifest.ndjson",
+        "--context-file",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\factor-cli-20261004\\0-context.json"
+      ],
+      "exit_code": 0,
+      "count": 33,
+      "stdout": "provider_validation/results/factor-cli-20261004/0-stdout.json",
+      "stderr": "provider_validation/results/factor-cli-20261004/0-stderr.bin",
+      "stdout_sha256": "b403c074fc206879ccf2d885ffa65ae94870cdb4cdaf009285930fb310a1c279",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\factor-cli-20261004\\candidate\\ASTOCK-006-ed327c9c6ff3\\2026-10-04\\input_report\\sina\\adjustment_factor\\report.json"
+    },
+    {
+      "input_id": "ASTOCK-006",
+      "kind": "hfq",
+      "command": [
+        "D:\\Program Files\\Python\\python.exe",
+        "-m",
+        "stock_data_manage.cli",
+        "collect-input",
+        "--input",
+        "ASTOCK-006",
+        "--config-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\config",
+        "--output-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\factor-cli-20261004\\candidate",
+        "--mode",
+        "replay",
+        "--replay-manifest",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\_raw\\missing-capabilities-20261003T174623\\manifest.ndjson",
+        "--context-file",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\factor-cli-20261004\\1-context.json"
+      ],
+      "exit_code": 0,
+      "count": 33,
+      "stdout": "provider_validation/results/factor-cli-20261004/1-stdout.json",
+      "stderr": "provider_validation/results/factor-cli-20261004/1-stderr.bin",
+      "stdout_sha256": "556d9d17af1b0e92ebfe3c3e4a9a5dbfa36f62af1fa5730a8c706d491272c219",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\factor-cli-20261004\\candidate\\ASTOCK-006-4396b1b5b39f\\2026-10-04\\input_report\\sina\\adjustment_factor\\report.json"
+    }
+  ],
+  "script_sha256": "9c81e977c6cf98bf4e0dee88965779d28e919cc236cc733f899a66cd0c0d3f02"
+}

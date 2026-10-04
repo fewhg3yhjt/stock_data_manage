@@ -1,0 +1,47 @@
+dataset:
+  name: a50_quote
+  display_name: A50报价输入
+  primary_key:
+  - snapshot_at
+  - source_contract
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  source_contract:
+    type: string
+    required: true
+  quote_time:
+    type: datetime
+    required: true
+  name:
+    type: string
+    required: false
+  last:
+    type: decimal
+    required: false
+    unit: source_contract_quote_unit
+  open:
+    type: decimal
+    required: false
+    unit: source_contract_quote_unit
+  high:
+    type: decimal
+    required: false
+    unit: source_contract_quote_unit
+  low:
+    type: decimal
+    required: false
+    unit: source_contract_quote_unit
+  bid:
+    type: decimal
+    required: false
+    unit: source_contract_quote_unit
+  ask:
+    type: decimal
+    required: false
+    unit: source_contract_quote_unit
+  pre_settle:
+    type: decimal
+    required: false
+    unit: source_contract_quote_unit

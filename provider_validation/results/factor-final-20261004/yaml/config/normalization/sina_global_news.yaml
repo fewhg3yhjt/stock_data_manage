@@ -1,0 +1,23 @@
+dataset: sina_global_news
+rules:
+- id: sina-global-news-input-v1
+  input_id: ASTOCK-033
+  provider: sina
+  endpoint: global_news
+  field_mapping:
+    news_time: 时间
+    content: 内容
+  context_fields:
+    snapshot_at: source_snapshot_at
+  transforms:
+    news_time:
+      format: '%Y-%m-%d %H:%M:%S'
+      timezone: Asia/Shanghai
+  null_values:
+  - null
+  unverified_fields: []
+  status: pending_validation
+  version: sina-global-news-input-v1
+  evidence_refs:
+  - ASTOCK-033
+  notes: 保留原SDK文本和北京时间，不清洗HTML、不推测标题；snapshot_at为原响应采集时间。仅最近20条候选输入，正式路由关闭。

@@ -1,0 +1,12 @@
+[
+  {
+    "method": "stock snapshot",
+    "original_code_sha256": "8eecd0e9e98ded9137f45f6fac9750a92d6edd1f053d9794cf23556027b963c8",
+    "request_and_result_equal": true
+  },
+  {
+    "method": "stock daily",
+    "original_code_sha256": "fa9d7429b946d4269788c405eea15be9129a0144d855862d260b5559f994fe3a",
+    "request_and_result_equal": true
+  }
+]

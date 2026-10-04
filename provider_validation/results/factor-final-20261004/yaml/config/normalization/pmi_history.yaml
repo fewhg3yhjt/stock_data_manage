@@ -1,0 +1,26 @@
+dataset: pmi_history
+rules:
+- id: pmi-history-input-v1
+  input_id: ASTOCK-062
+  provider: eastmoney
+  endpoint: pmi
+  field_mapping:
+    statistical_month: statistical_month
+    manufacturing_index: 制造业-指数
+    manufacturing_yoy: 制造业-同比增长
+    nonmanufacturing_index: 非制造业-指数
+    nonmanufacturing_yoy: 非制造业-同比增长
+  context_fields:
+    snapshot_at: source_snapshot_at
+  null_values:
+  - null
+  unverified_fields:
+  - manufacturing_index
+  - manufacturing_yoy
+  - nonmanufacturing_index
+  - nonmanufacturing_yoy
+  status: pending_validation
+  version: pmi-history-input-v1
+  evidence_refs:
+  - ASTOCK-062
+  notes: statistical_month明确为统计月份YYYY-MM，非发布时间；来源无发布时间时标准publication_time为空。保留原字段和原数字、SDK顺序；未独立认证单位标准数值为空。社融原SDK外币字段标签保留，不扩大解释。

@@ -1,0 +1,44 @@
+{
+  "result": "passed",
+  "failed_long_path_cases": 4,
+  "targeted_short_path_cases": 3,
+  "final_full_regression": "factor-final-v2-20261004-tests.xml",
+  "xml_refs": [
+    {
+      "path": "provider_validation/results/factor-final-20261004-tests.xml",
+      "sha256": "de4425da7752624543cd1a269b80c8f7e753181ebfca51670c2cbaaa36531047"
+    },
+    {
+      "path": "provider_validation/results/factor-path-20261004-tests.xml",
+      "sha256": "9e3e4a768f45c357ffe0be9f878eb911d72461a4721a7546221855442fe9ad5d"
+    }
+  ],
+  "local_failed_reports": [
+    {
+      "path": "provider_validation/results/factor-fulltests-20261004/test_sina_futures_zero_price_q0/zero_fields/candidate/ASTOCK-074-3b2a0bbf869f/2026-10-04/input_report/sina/futures_quote/report.json",
+      "sha256": "700c8f55afbce62cfe4fc5c9c672a92ffe089399e90fd0136b68bdd5cdb6b16c",
+      "classification": "test output path too deep; retained locally, not committed",
+      "input_id": "ASTOCK-074"
+    },
+    {
+      "path": "provider_validation/results/factor-fulltests-20261004/test_rates_bonds_include_delis0/zero_negative/candidate/ASTOCK-064-e9a88647057b/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "f9f0b13eb15e8f699405b991cbc3584cb4187088caed7f67ba99da6f3739f16f",
+      "classification": "test output path too deep; retained locally, not committed",
+      "input_id": "ASTOCK-064"
+    },
+    {
+      "path": "provider_validation/results/factor-fulltests-20261004/test_news_cursor_and_weekend_b0/cursor-candidate/ASTOCK-034-b5a5a7109c46/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "c9971999b369f55afdf6e007d1534fb91dab2aa6a8f7714227739d2350d6fb15",
+      "classification": "test output path too deep; retained locally, not committed",
+      "input_id": "ASTOCK-034"
+    },
+    {
+      "path": "provider_validation/results/factor-fulltests-20261004/test_action_pledge_unpublished0/ASTOCK-080/candidate/ASTOCK-080-8ec51aac6da1/2026-10-04/input_report/eastmoney/holder_trades/report.json",
+      "sha256": "ad11e4a568c8ac0c89fe657773f1b02835f6d12b57d37da78b54e394d9f288c2",
+      "classification": "test output path too deep; retained locally, not committed",
+      "input_id": "ASTOCK-080"
+    }
+  ],
+  "runtime_code_changed_to_fix_paths": false,
+  "script_sha256": "264bf5d7d85cd9103a3239f37162637b10d8f1986083bafcf05d2ab70c8349ff"
+}
