@@ -1,0 +1,57 @@
+dataset: stock_fund_flow
+
+rules:
+  - id: eastmoney-stock-fund-flow-v1
+    provider: eastmoney
+    endpoint: stock_fund_flow
+    exchange: XSHG
+    asset_type: stock
+    frequency: 1
+    adjustment: none
+    field_mapping:
+      trade_date: f51
+      main_net_inflow: f52
+      super_large_net_inflow: f56
+      large_net_inflow: f55
+      medium_net_inflow: f54
+      small_net_inflow: f53
+      main_net_inflow_pct: f57
+      super_large_net_inflow_pct: f61
+      large_net_inflow_pct: f60
+      medium_net_inflow_pct: f59
+      small_net_inflow_pct: f58
+      close: f62
+      change_pct: f63
+    status: pending_validation
+    version: eastmoney-stock-fund-flow-v1
+
+  - id: eastmoney-stock-fund-flow-sdk-input-v1
+    source_required_numeric: [收盘价, 涨跌幅, 主力净流入-净额, 超大单净流入-净额, 大单净流入-净额, 中单净流入-净额, 小单净流入-净额]
+    provider: eastmoney
+    endpoint: stock_fund_flow
+    input_id: ASTOCK-028
+    field_mapping:
+      trade_date: 日期
+      main_net_inflow: 主力净流入-净额
+      super_large_net_inflow: 超大单净流入-净额
+      large_net_inflow: 大单净流入-净额
+      medium_net_inflow: 中单净流入-净额
+      small_net_inflow: 小单净流入-净额
+      close: 收盘价
+      change_pct: 涨跌幅
+    context_fields:
+      instrument_id: instrument_id
+    unverified_fields:
+    - main_net_inflow
+    - super_large_net_inflow
+    - large_net_inflow
+    - medium_net_inflow
+    - small_net_inflow
+    status: pending_validation
+    version: eastmoney-history-input-v1
+    null_values:
+    - null
+    - ''
+    - '-'
+    - --
+    notes: 仅离线候选输入；未核准金额/比率单位保留于来源行，标准字段为空。

@@ -184,3 +184,6 @@ LPR转换见 `provider_validation/docs/2026-10-04-lpr-input-collection.md`：原
 
 - `providers/wallstreetcn/{__init__,news}.py`：必要新增见闻快讯适配器，保留原请求及解析策略；`providers/cctv/{__init__,news}.py`：必要新增新闻联播目录适配器，仅标题与链接，正文待认证。
 - `config/{datasets,normalization}/{wallstreetcn_news,cctv_news_index}.yaml`：两新闻输入字段模板及映射；`pipeline/inputs.py`扩展新闻原始条目/解析行、游标/播出日和捕获时间留证；原验证入口新增`--verify-news`。`provider_validation/docs/2026-10-04-news-input-collection.md`及`results/news-*-20261004*`保存调查、原实现对照、异常/语义模拟、实际入口、回归和最终哈希审计。
+
+- `providers/chinamoney/{__init__,rates}.py`：必要新增原中国货币网定盘CSV适配器；原`providers/eastmoney/financial.py`扩展可转债三页查询、日期状态和摘牌筛选，不新增财务Provider。
+- `config/{datasets,normalization}/{repo_fixing,convertible_bonds}.yaml`：定盘和可转债字段模板与映射；`pipeline/inputs.py`保存完整解析行、排除证据和实际匹配响应的原分类日，新闻输入沿用解析行留证。现验证入口扩展`--verify-rates-bonds`；`provider_validation/docs/2026-10-04-rates-bonds-input-collection.md`和`results/rates-bonds-*-20261004*`保存调查/原脚本对照/失败语义夹具/入口/回归/哈希审计。

@@ -1,0 +1,3571 @@
+{
+  "validation_time_utc": "2026-10-04T00:43:56.720835+00:00",
+  "result": "passed",
+  "tests": 401,
+  "counts": {
+    "implemented_validation_only": 29,
+    "unimplemented": 35,
+    "blocked": 7,
+    "alias": 3
+  },
+  "real_network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "audited_reports": [
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-064/candidate/ASTOCK-064-5e9f1235868d/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "fc5170bd9ab7612af6173b73b9ef1310dedce32646b0947069ab5f610b11c79a",
+      "status": "candidate_complete",
+      "row_count": 747,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-084/candidate/ASTOCK-084-cdc1ddaafda2/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "8feb4fbc723a1d8234d0eb217af5831b49663b0219d45f67b63156e667d09988",
+      "status": "candidate_complete",
+      "row_count": 322,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/clock/candidate/ASTOCK-084-8f4cf52289a4/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "a57418eb1b9ab283a05792226b5f0a029b2833279c469dd4155674c1b9f15537",
+      "status": "candidate_complete",
+      "row_count": 322,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f0/candidate/ASTOCK-064-b58ed6093a6d/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "a331abd1ec8bdfd0fea469a5b50465870800c453e31f24406a3e827dc9e3c6d1",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f1/candidate/ASTOCK-064-06dd68932c08/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "381304ce216f0a8ba3c4ae74324e40d278d02f4c66513f6254997b3cd4bced48",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f10/candidate/ASTOCK-084-ac7af77d7671/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "42840843eebdc7a7f25d224c8db0b55a5b95d7eb342ec11d98ecaa48b986809d",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f11/candidate/ASTOCK-084-06ad15e414d6/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "62ec3e4d1c46bf096cb7b51d4d44ac6a494b52134ae7cc94d61532db2d285572",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f12/candidate/ASTOCK-084-964288d7ba8c/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "1361e7a3e8ad7a06b7645cff9dadcc20bdb012e00156d9dc532fb6ece1c7040d",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f13/candidate/ASTOCK-084-9f52d8bb8d0e/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "8a9d734aa717477eac4fbc7b7c9caa7e52022bf15ef16ed85b0e3b8f5a7bfbab",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f14/candidate/ASTOCK-084-b0e34c4ef3f5/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "2d13046345fd85dd2ff36dc19204ecf7075ee10e3307cd02dc5300d608da7de4",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f2/candidate/ASTOCK-064-3782d636b389/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "a332780261054967d77aff9edb0d250ba9c73a5a5f9dd208d38683712bc0a8f3",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f3/candidate/ASTOCK-064-8c3c1b5d7c8d/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "e7d02129354522fd643a73a356d3ad99ad96439c49244e9f8310b560e72a87e8",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f4/candidate/ASTOCK-064-970a338eae72/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "be547fbcd7cca527b8cd8873d26ac9aa23d33e2a84ed3250af7bcaae04c1d8dd",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f5/candidate/ASTOCK-064-c52615bb5d46/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "307a97b65872b4bcea501b40e94de5642601b84db114f3994b42524735ca37df",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f6/candidate/ASTOCK-064-6d1d91307c4c/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "2c5143fe3727957264771c38d9eaa2a1fc63a59cd77dfa3bb879130064fdfa05",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f7/candidate/ASTOCK-064-f54cbbb93678/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "035c6c27fc8a4392f425372cdb05509fd41353dffeb7c91bbdf6473ef11b29de",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f8/candidate/ASTOCK-084-de7629b02bb7/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "677a59f5fe5b22db9b5f5f066a3273704c2e78e60de0be8b48a60d7df142731e",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f9/candidate/ASTOCK-084-333e61161563/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "ad6d94e67e18053e1becd19783afdfd43cf5334aaae98e6bc173b3ae3d7e3af3",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/all/ASTOCK-084-df9498480488/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "3fa10142e8461d2ec9d753ba768815786772dc3ce78ab12b7052aedc2e04aab7",
+      "status": "candidate_complete",
+      "row_count": 1059,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/all_delisted/candidate/ASTOCK-084-91d5ef0bb876/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "7a25b23cdddd6c77b8209e3525bdd0af920ed1dd11e25b21db2620109a5e7823",
+      "status": "candidate_complete",
+      "row_count": 0,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/statuses/candidate/ASTOCK-084-923811032f74/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "ca0490c44dd34bf48238c94f3196f1d82514ddc3de8bf431c852841eaf44f471",
+      "status": "candidate_complete",
+      "row_count": 321,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/zero_negative/candidate/ASTOCK-064-96e1497a6b2d/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "344ee3b6df044ae6cba6b4ce950c6e35ad8441179783a2398f9882b050be25eb",
+      "status": "candidate_complete",
+      "row_count": 747,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-064-9faed646615e/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "589e969954c829177969bbbcecf811682e5619042250740b5343e52d4786d2ad",
+      "status": "candidate_complete",
+      "row_count": 747,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-064-cb3736f2c522/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "8eaaf737566cc9d2a3c2933e0d00afd382c72cd5501e86179cfa2a89f06c569b",
+      "status": "candidate_complete",
+      "row_count": 747,
+      "live_http_calls": 1
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-084-0b2e077b4f46/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "391c4ba9bae11c7acb10406521ad63fa72636188952c7b308e4bc74fc5148b50",
+      "status": "candidate_complete",
+      "row_count": 322,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-084-8d6a03a2662e/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "a93697ba9d735fda0c7598c9f703efc34aa0908496cd5bbe76f24df84362a86d",
+      "status": "candidate_complete",
+      "row_count": 322,
+      "live_http_calls": 3
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/candidate/ASTOCK-084-2c90d8ba74fc/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "19c286f7652c951f258e61753f4d66bcd0a3ac2a77f7b6e3cfe4d4c224254712",
+      "status": "candidate_complete",
+      "row_count": 322,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-v2-20261004/candidate/ASTOCK-064-8bf136887968/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "4ebb1eb12a27d06874f9b68abeed32ba65331814d727ee0946fdfbad0826ceb2",
+      "status": "candidate_complete",
+      "row_count": 747,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-v2-20261004/candidate/ASTOCK-084-15ffd3ea5325/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "5fff9c89950e075a7e0c0a6d5ea73ad2a5fb47dbf1867bb3a41842d621fc1f86",
+      "status": "candidate_complete",
+      "row_count": 322,
+      "live_http_calls": 0
+    }
+  ],
+  "files": [
+    {
+      "path": ".gitattributes",
+      "sha256": "8e400ca3533b2cedb06b82b6ccb000def92aeaf6989ef6913bd9f3f870f8730b",
+      "bytes": 11786
+    },
+    {
+      "path": "CODE_STRUCTURE.md",
+      "sha256": "32c380280eb32c7e8c3717c6128f86cdc3064a2a182f980714939f3d5368d109",
+      "bytes": 22728
+    },
+    {
+      "path": "config/datasets/convertible_bonds.yaml",
+      "sha256": "11723522544165617f1141aa08921252ca99447eba5cf507c574a887dd6748b9",
+      "bytes": 1362
+    },
+    {
+      "path": "config/datasets/repo_fixing.yaml",
+      "sha256": "6908c6c805e15a153dc567d58c81daecb66026bdd0f48d8865e296a1ba883935",
+      "bytes": 506
+    },
+    {
+      "path": "config/normalization/convertible_bonds.yaml",
+      "sha256": "147b800777f7042f9e4a7907841e038034db65a80f263fcb04628ea34943dd56",
+      "bytes": 1289
+    },
+    {
+      "path": "config/normalization/repo_fixing.yaml",
+      "sha256": "0d6b2b5b39a92c6f3d2629f3f805f0b12d609ea9b3f691a50c896c12d81b4681",
+      "bytes": 762
+    },
+    {
+      "path": "config/providers.yaml",
+      "sha256": "b19618e86c2ed5483bc7d9edefed1288a3c785cf49704967a2d8772607fecbeb",
+      "bytes": 80757
+    },
+    {
+      "path": "PROJECT_PROGRESS.md",
+      "sha256": "86d2623dafdb00094874e68a1e97f48f789b54107631a40f243a48474b8c455c",
+      "bytes": 12070
+    },
+    {
+      "path": "provider_validation/docs/2026-10-04-rates-bonds-input-collection.md",
+      "sha256": "4e14fdcceb1971e4d9c866882d6cdd499bb84b2dbea10b9a476b52d4fa5b8e13",
+      "bytes": 2669
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-20261004/ASTOCK-064-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-20261004/ASTOCK-064-stdout.json",
+      "sha256": "74b06c67212a4abbe650ed4f364ca2b5f7a094d98b9e19b04068ef045e52219c",
+      "bytes": 13289
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-20261004/ASTOCK-084-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-20261004/ASTOCK-084-stdout.json",
+      "sha256": "ca14daa7b62f7afe20c5d9ae08220febc9dfcfb3b7988dd68a1adfa864bf0cd1",
+      "bytes": 22450
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-20261004/candidate/ASTOCK-064-17b41acb6d5f/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "05ff40a60ab7267b1187b57c902aab93923d451bbef2de6e21d82c161a093405",
+      "bytes": 10650
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-20261004/candidate/ASTOCK-064-17b41acb6d5f/2026-10-04/parsed_rows/chinamoney/repo_fixing/parsed-rows.json",
+      "sha256": "44818f9f29c43611ada026cc6f5b12e5082910ffb7ac915073151e54a1aeb1e6",
+      "bytes": 45080
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-20261004/candidate/ASTOCK-064-17b41acb6d5f/2026-10-04/repo_fixing/chinamoney/repo_fixing/mapped-rows.json",
+      "sha256": "41512e81908961a5325d994a6acd12b7a27425e5019f168559efcc900cbe6d0e",
+      "bytes": 115039
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-20261004/candidate/ASTOCK-064-17b41acb6d5f/2026-10-04/source_rows/chinamoney/repo_fixing/source-rows.json",
+      "sha256": "37fe74323874d783b6fff56d3d9ab993b9897c2d0e8db76065cf28a703d5316b",
+      "bytes": 49562
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-20261004/candidate/ASTOCK-064-17b41acb6d5f/_raw/bodies/f3d2ab542c2d2f7436757a878a095bb99b323912de9afd742d3aa3091ff36b19.bin",
+      "sha256": "f3d2ab542c2d2f7436757a878a095bb99b323912de9afd742d3aa3091ff36b19",
+      "bytes": 23418
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-20261004/candidate/ASTOCK-064-17b41acb6d5f/_raw/manifest.ndjson",
+      "sha256": "3514070eb3fa5380085abf9c4e60fb0fda0dc7412b0cf44f7827968bdb54d18e",
+      "bytes": 2225
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-20261004/candidate/ASTOCK-084-190369b1d7bf/2026-10-04/convertible_bonds/eastmoney/convertible_bonds/mapped-rows.json",
+      "sha256": "7b34143a6e05999fb1c9024fa051d57995f9b4dacc0f31e8975bdc251e9c9200",
+      "bytes": 155858
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-20261004/candidate/ASTOCK-084-190369b1d7bf/2026-10-04/excluded_rows/eastmoney/convertible_bonds/excluded-rows.json",
+      "sha256": "122ef002ee7d218887b331a18cb09424d92f11a85b1f04e343f6bead01f9fe8e",
+      "bytes": 4526077
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-20261004/candidate/ASTOCK-084-190369b1d7bf/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "1443846f2012aeb58b48e382d4a849cf632e3d330f8c77648e1196e840a54d2c",
+      "bytes": 18299
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-20261004/candidate/ASTOCK-084-190369b1d7bf/2026-10-04/parsed_rows/eastmoney/convertible_bonds/parsed-rows.json",
+      "sha256": "8df5b81d700b163b6c2aaf7324695b0a92965602132355222f13e701bbd792cf",
+      "bytes": 139143
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-20261004/candidate/ASTOCK-084-190369b1d7bf/2026-10-04/source_rows/eastmoney/convertible_bonds/source-rows.json",
+      "sha256": "e85e633e6cc7033d3244905963747166eff64d26bc5f6a4f3dccf30711d3f986",
+      "bytes": 6617104
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-20261004/candidate/ASTOCK-084-190369b1d7bf/_raw/bodies/23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb.bin",
+      "sha256": "23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb",
+      "bytes": 263592
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-20261004/candidate/ASTOCK-084-190369b1d7bf/_raw/bodies/2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e.bin",
+      "sha256": "2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e",
+      "bytes": 3101323
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-20261004/candidate/ASTOCK-084-190369b1d7bf/_raw/bodies/ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5.bin",
+      "sha256": "ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5",
+      "bytes": 3259457
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-20261004/candidate/ASTOCK-084-190369b1d7bf/_raw/manifest.ndjson",
+      "sha256": "52d135a3e7c8c4357888fec6bf0e6374bb441cea41b7237597fd423f9ea015ba",
+      "bytes": 6879
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-20261004/verification.json",
+      "sha256": "f7df321709f314db8c2890fcebba44ec1c477551df931226b8d3dc99c1b87874",
+      "bytes": 2686
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-v2-20261004/ASTOCK-064-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-v2-20261004/ASTOCK-064-stdout.json",
+      "sha256": "8c612725b3c1b57a9ed38828fc3851aac74ec345a622bcc1718f24399d1be79c",
+      "bytes": 13297
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-v2-20261004/ASTOCK-084-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-v2-20261004/ASTOCK-084-stdout.json",
+      "sha256": "b3de4a8ae06188f0cd8f456ca81fe1c7879399b96d90b27078680d7e0bca20b7",
+      "bytes": 22456
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-v2-20261004/candidate/ASTOCK-064-8bf136887968/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "4ebb1eb12a27d06874f9b68abeed32ba65331814d727ee0946fdfbad0826ceb2",
+      "bytes": 10652
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-v2-20261004/candidate/ASTOCK-064-8bf136887968/2026-10-04/parsed_rows/chinamoney/repo_fixing/parsed-rows.json",
+      "sha256": "44818f9f29c43611ada026cc6f5b12e5082910ffb7ac915073151e54a1aeb1e6",
+      "bytes": 45080
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-v2-20261004/candidate/ASTOCK-064-8bf136887968/2026-10-04/repo_fixing/chinamoney/repo_fixing/mapped-rows.json",
+      "sha256": "41512e81908961a5325d994a6acd12b7a27425e5019f168559efcc900cbe6d0e",
+      "bytes": 115039
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-v2-20261004/candidate/ASTOCK-064-8bf136887968/2026-10-04/source_rows/chinamoney/repo_fixing/source-rows.json",
+      "sha256": "37fe74323874d783b6fff56d3d9ab993b9897c2d0e8db76065cf28a703d5316b",
+      "bytes": 49562
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-v2-20261004/candidate/ASTOCK-064-8bf136887968/_raw/bodies/f3d2ab542c2d2f7436757a878a095bb99b323912de9afd742d3aa3091ff36b19.bin",
+      "sha256": "f3d2ab542c2d2f7436757a878a095bb99b323912de9afd742d3aa3091ff36b19",
+      "bytes": 23418
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-v2-20261004/candidate/ASTOCK-064-8bf136887968/_raw/manifest.ndjson",
+      "sha256": "03bac56ea41845cf499b7e6e42973be3392b96a0cb3e1c0322b45139b2ff68bf",
+      "bytes": 2225
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-v2-20261004/candidate/ASTOCK-084-15ffd3ea5325/2026-10-04/convertible_bonds/eastmoney/convertible_bonds/mapped-rows.json",
+      "sha256": "7b34143a6e05999fb1c9024fa051d57995f9b4dacc0f31e8975bdc251e9c9200",
+      "bytes": 155858
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-v2-20261004/candidate/ASTOCK-084-15ffd3ea5325/2026-10-04/excluded_rows/eastmoney/convertible_bonds/excluded-rows.json",
+      "sha256": "122ef002ee7d218887b331a18cb09424d92f11a85b1f04e343f6bead01f9fe8e",
+      "bytes": 4526077
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-v2-20261004/candidate/ASTOCK-084-15ffd3ea5325/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "5fff9c89950e075a7e0c0a6d5ea73ad2a5fb47dbf1867bb3a41842d621fc1f86",
+      "bytes": 18299
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-v2-20261004/candidate/ASTOCK-084-15ffd3ea5325/2026-10-04/parsed_rows/eastmoney/convertible_bonds/parsed-rows.json",
+      "sha256": "8df5b81d700b163b6c2aaf7324695b0a92965602132355222f13e701bbd792cf",
+      "bytes": 139143
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-v2-20261004/candidate/ASTOCK-084-15ffd3ea5325/2026-10-04/source_rows/eastmoney/convertible_bonds/source-rows.json",
+      "sha256": "e85e633e6cc7033d3244905963747166eff64d26bc5f6a4f3dccf30711d3f986",
+      "bytes": 6617104
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-v2-20261004/candidate/ASTOCK-084-15ffd3ea5325/_raw/bodies/23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb.bin",
+      "sha256": "23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb",
+      "bytes": 263592
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-v2-20261004/candidate/ASTOCK-084-15ffd3ea5325/_raw/bodies/2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e.bin",
+      "sha256": "2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e",
+      "bytes": 3101323
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-v2-20261004/candidate/ASTOCK-084-15ffd3ea5325/_raw/bodies/ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5.bin",
+      "sha256": "ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5",
+      "bytes": 3259457
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-v2-20261004/candidate/ASTOCK-084-15ffd3ea5325/_raw/manifest.ndjson",
+      "sha256": "f145177bd98d81037562b9d45e59b540e536d350a19bbd1c6fde965dd6aa1e7e",
+      "bytes": 6879
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-cli-v2-20261004/verification.json",
+      "sha256": "ecbdc1f2a5642001e2851b627598011ac6d05acb8b02e63022e9a9a9593e7fcd",
+      "bytes": 2710
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-dev-20261004-tests.xml",
+      "sha256": "db743d5abda95127128a48c1636e9d009a6e6de745e4102e6b89a64e5ed4d5e8",
+      "bytes": 4519
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-dev-v2-20261004-tests.xml",
+      "sha256": "2a2afca1f1dda289421e794a5371653cc76658e861aa8afbc7cbe2b41156a646",
+      "bytes": 2964
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/ASTOCK-064/candidate/ASTOCK-064-a9cd09a052a3/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "fb7e47b04fe39718772822345e037be34f6c2c51ac9fe54b679be6374ed8bfb0",
+      "bytes": 10650
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/ASTOCK-064/candidate/ASTOCK-064-a9cd09a052a3/2026-10-04/parsed_rows/chinamoney/repo_fixing/parsed-rows.json",
+      "sha256": "44818f9f29c43611ada026cc6f5b12e5082910ffb7ac915073151e54a1aeb1e6",
+      "bytes": 45080
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/ASTOCK-064/candidate/ASTOCK-064-a9cd09a052a3/2026-10-04/repo_fixing/chinamoney/repo_fixing/mapped-rows.json",
+      "sha256": "41512e81908961a5325d994a6acd12b7a27425e5019f168559efcc900cbe6d0e",
+      "bytes": 115039
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/ASTOCK-064/candidate/ASTOCK-064-a9cd09a052a3/2026-10-04/source_rows/chinamoney/repo_fixing/source-rows.json",
+      "sha256": "37fe74323874d783b6fff56d3d9ab993b9897c2d0e8db76065cf28a703d5316b",
+      "bytes": 49562
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/ASTOCK-064/candidate/ASTOCK-064-a9cd09a052a3/_raw/bodies/f3d2ab542c2d2f7436757a878a095bb99b323912de9afd742d3aa3091ff36b19.bin",
+      "sha256": "f3d2ab542c2d2f7436757a878a095bb99b323912de9afd742d3aa3091ff36b19",
+      "bytes": 23418
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/ASTOCK-064/candidate/ASTOCK-064-a9cd09a052a3/_raw/manifest.ndjson",
+      "sha256": "ca0c18ec62c10fbc7f4bcd464a25d8feb0f6c037833c110d45d186870139f59d",
+      "bytes": 2225
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/ASTOCK-064/comparison.json",
+      "sha256": "e1f9359135bd10bb84f7ac913f156e6ab9f0ae9a4f21619c0ec68149ffee161d",
+      "bytes": 903
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/ASTOCK-064/original/bodies/f3d2ab542c2d2f7436757a878a095bb99b323912de9afd742d3aa3091ff36b19.bin",
+      "sha256": "f3d2ab542c2d2f7436757a878a095bb99b323912de9afd742d3aa3091ff36b19",
+      "bytes": 23418
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/ASTOCK-064/original/manifest.ndjson",
+      "sha256": "c21ceba01f7ff903b4fd95e26db54e5628840c020f83831417e8f1936012c502",
+      "bytes": 2131
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/ASTOCK-064/original-parsed.json",
+      "sha256": "16ce86c72340d4b26388a378f29b25dc2f16ee8f0249140af1561e90cba939f1",
+      "bytes": 209424
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/ASTOCK-084/candidate/ASTOCK-084-16f9b6a76832/2026-10-04/convertible_bonds/eastmoney/convertible_bonds/mapped-rows.json",
+      "sha256": "7b34143a6e05999fb1c9024fa051d57995f9b4dacc0f31e8975bdc251e9c9200",
+      "bytes": 155858
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/ASTOCK-084/candidate/ASTOCK-084-16f9b6a76832/2026-10-04/excluded_rows/eastmoney/convertible_bonds/excluded-rows.json",
+      "sha256": "122ef002ee7d218887b331a18cb09424d92f11a85b1f04e343f6bead01f9fe8e",
+      "bytes": 4526077
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/ASTOCK-084/candidate/ASTOCK-084-16f9b6a76832/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "50dbd313cedcc06f5b5fb8a7ccadeb7458093850fa15231e1ebddbd91b16b0c9",
+      "bytes": 18299
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/ASTOCK-084/candidate/ASTOCK-084-16f9b6a76832/2026-10-04/parsed_rows/eastmoney/convertible_bonds/parsed-rows.json",
+      "sha256": "8df5b81d700b163b6c2aaf7324695b0a92965602132355222f13e701bbd792cf",
+      "bytes": 139143
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/ASTOCK-084/candidate/ASTOCK-084-16f9b6a76832/2026-10-04/source_rows/eastmoney/convertible_bonds/source-rows.json",
+      "sha256": "e85e633e6cc7033d3244905963747166eff64d26bc5f6a4f3dccf30711d3f986",
+      "bytes": 6617104
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/ASTOCK-084/candidate/ASTOCK-084-16f9b6a76832/_raw/bodies/23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb.bin",
+      "sha256": "23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb",
+      "bytes": 263592
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/ASTOCK-084/candidate/ASTOCK-084-16f9b6a76832/_raw/bodies/2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e.bin",
+      "sha256": "2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e",
+      "bytes": 3101323
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/ASTOCK-084/candidate/ASTOCK-084-16f9b6a76832/_raw/bodies/ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5.bin",
+      "sha256": "ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5",
+      "bytes": 3259457
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/ASTOCK-084/candidate/ASTOCK-084-16f9b6a76832/_raw/manifest.ndjson",
+      "sha256": "2006ff59d2815d97ed71b0c510ffc91552b01ba559fb5a9469dafb84b0115dbb",
+      "bytes": 6879
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/ASTOCK-084/comparison.json",
+      "sha256": "f8855177fad4df156f383e927d42dd23c9b9f25e3f03332d2367df621d1a483c",
+      "bytes": 1054
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/ASTOCK-084/original/bodies/23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb.bin",
+      "sha256": "23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb",
+      "bytes": 263592
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/ASTOCK-084/original/bodies/2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e.bin",
+      "sha256": "2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e",
+      "bytes": 3101323
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/ASTOCK-084/original/bodies/ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5.bin",
+      "sha256": "ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5",
+      "bytes": 3259457
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/ASTOCK-084/original/manifest.ndjson",
+      "sha256": "4cc6414b7d041f6b1d05beacd5cf410434a018a732432daea2a177ffd8fff903",
+      "bytes": 6540
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/ASTOCK-084/original-parsed.json",
+      "sha256": "02cbb92d8b595f1d21abf25d331d71f3f9382cd76383968ba6706fb540dbeaeb",
+      "bytes": 244441
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/clock/candidate/ASTOCK-084-119e2989381c/2026-10-04/convertible_bonds/eastmoney/convertible_bonds/mapped-rows.json",
+      "sha256": "7b34143a6e05999fb1c9024fa051d57995f9b4dacc0f31e8975bdc251e9c9200",
+      "bytes": 155858
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/clock/candidate/ASTOCK-084-119e2989381c/2026-10-04/excluded_rows/eastmoney/convertible_bonds/excluded-rows.json",
+      "sha256": "122ef002ee7d218887b331a18cb09424d92f11a85b1f04e343f6bead01f9fe8e",
+      "bytes": 4526077
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/clock/candidate/ASTOCK-084-119e2989381c/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "7c36da2ec6bdc04e240d8452b40ece07f1099900ce0c358a1597c7548880e2bc",
+      "bytes": 16522
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/clock/candidate/ASTOCK-084-119e2989381c/2026-10-04/parsed_rows/eastmoney/convertible_bonds/parsed-rows.json",
+      "sha256": "8df5b81d700b163b6c2aaf7324695b0a92965602132355222f13e701bbd792cf",
+      "bytes": 139143
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/clock/candidate/ASTOCK-084-119e2989381c/2026-10-04/source_rows/eastmoney/convertible_bonds/source-rows.json",
+      "sha256": "e85e633e6cc7033d3244905963747166eff64d26bc5f6a4f3dccf30711d3f986",
+      "bytes": 6617104
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/clock/candidate/ASTOCK-084-119e2989381c/_raw/bodies/23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb.bin",
+      "sha256": "23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb",
+      "bytes": 263592
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/clock/candidate/ASTOCK-084-119e2989381c/_raw/bodies/2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e.bin",
+      "sha256": "2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e",
+      "bytes": 3101323
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/clock/candidate/ASTOCK-084-119e2989381c/_raw/bodies/ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5.bin",
+      "sha256": "ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5",
+      "bytes": 3259457
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/clock/candidate/ASTOCK-084-119e2989381c/_raw/manifest.ndjson",
+      "sha256": "4f19a16648a86d0b8ae31127843be2925339cfc741486ea9674d6b6f803f3536",
+      "bytes": 5015
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/clock/fixture/bodies/23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb.bin",
+      "sha256": "23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb",
+      "bytes": 263592
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/clock/fixture/bodies/2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e.bin",
+      "sha256": "2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e",
+      "bytes": 3101323
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/clock/fixture/bodies/ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5.bin",
+      "sha256": "ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5",
+      "bytes": 3259457
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/clock/fixture/manifest.ndjson",
+      "sha256": "a0bf69a096b07a144340e6bb0852db15c0ada240d181baa31de77d9667b9103e",
+      "bytes": 8638
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/comparison.json",
+      "sha256": "2db01f5a1fd78c0d1a06bc8495e5b92dd1659281aac285daa716b0b84a474d49",
+      "bytes": 11330
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f0/candidate/ASTOCK-064-d7c5f2e2aaf7/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "c6326f1f23b7b0b2d8f38d726f8741b7c8e7f7e1326499f351269d29a7f4692e",
+      "bytes": 8451
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f0/candidate/ASTOCK-064-d7c5f2e2aaf7/_raw/bodies/f6034183a585547be30c5cab4461cba5cbf446f6f7af50e1578a4be174299a29.bin",
+      "sha256": "f6034183a585547be30c5cab4461cba5cbf446f6f7af50e1578a4be174299a29",
+      "bytes": 22667
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f0/candidate/ASTOCK-064-d7c5f2e2aaf7/_raw/manifest.ndjson",
+      "sha256": "ef9d0be426a14ac42b8c0787c2043e2ef6e9f3b0994cd1c2bff88967e4bf73ef",
+      "bytes": 1435
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f0/fixture/bodies/f6034183a585547be30c5cab4461cba5cbf446f6f7af50e1578a4be174299a29.bin",
+      "sha256": "f6034183a585547be30c5cab4461cba5cbf446f6f7af50e1578a4be174299a29",
+      "bytes": 22667
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f0/fixture/manifest.ndjson",
+      "sha256": "9ade9adcc6b8492c820dbb966a66e2232d351d075606ad4bfed2dc2d34ad5d10",
+      "bytes": 1263
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f1/candidate/ASTOCK-064-fb06d93faa78/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "2b0e156313ad68a83f38d0b294244a8c7b5d7ba5975cecdaacae49db0fcbc2db",
+      "bytes": 8451
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f1/candidate/ASTOCK-064-fb06d93faa78/_raw/bodies/4f9dc72cc83106341963604747dab4bec9c82d675d0ac8547d4aaa5df9dd7ae8.bin",
+      "sha256": "4f9dc72cc83106341963604747dab4bec9c82d675d0ac8547d4aaa5df9dd7ae8",
+      "bytes": 22679
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f1/candidate/ASTOCK-064-fb06d93faa78/_raw/manifest.ndjson",
+      "sha256": "0ee5562a4c8df84868d86a9b8761af9b4b1239603b22978b23bd343082280250",
+      "bytes": 1435
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f1/fixture/bodies/4f9dc72cc83106341963604747dab4bec9c82d675d0ac8547d4aaa5df9dd7ae8.bin",
+      "sha256": "4f9dc72cc83106341963604747dab4bec9c82d675d0ac8547d4aaa5df9dd7ae8",
+      "bytes": 22679
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f1/fixture/manifest.ndjson",
+      "sha256": "37fc33399e9b58af0c77af25fc3661cd25a54086778e0bf5fbc1bba1eb714ab3",
+      "bytes": 1263
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f10/candidate/ASTOCK-084-65d06ac9984d/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "309dd6d93079ebd18dffbc6ac10703f7f490975e8324cf0354d0c210497766ed",
+      "bytes": 12909
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f10/candidate/ASTOCK-084-65d06ac9984d/_raw/bodies/444893dc614b489f031448dd254e14ee182dd95b4e74be21f83986101349aafd.bin",
+      "sha256": "444893dc614b489f031448dd254e14ee182dd95b4e74be21f83986101349aafd",
+      "bytes": 5532876
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f10/candidate/ASTOCK-084-65d06ac9984d/_raw/bodies/e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c.bin",
+      "sha256": "e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f10/candidate/ASTOCK-084-65d06ac9984d/_raw/bodies/fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89.bin",
+      "sha256": "fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89",
+      "bytes": 416944
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f10/candidate/ASTOCK-084-65d06ac9984d/_raw/manifest.ndjson",
+      "sha256": "4de8c61f633a9e5e9e4df2a8808e1bd77bc35857c3e71c5eaa9c39eafb4b3ff6",
+      "bytes": 5009
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f10/fixture/bodies/444893dc614b489f031448dd254e14ee182dd95b4e74be21f83986101349aafd.bin",
+      "sha256": "444893dc614b489f031448dd254e14ee182dd95b4e74be21f83986101349aafd",
+      "bytes": 5532876
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f10/fixture/bodies/e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c.bin",
+      "sha256": "e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f10/fixture/bodies/fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89.bin",
+      "sha256": "fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89",
+      "bytes": 416944
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f10/fixture/manifest.ndjson",
+      "sha256": "347b2c924acbb6fe4d0c2594f8e8ba2cb1bd659a2a12face28abef9d1b7c008b",
+      "bytes": 4517
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f11/candidate/ASTOCK-084-383a282d1f36/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "89dc472377594c9308ef68cb0d5f5a16c4c2863ef0abbb7e7a023cd5c3abb1a6",
+      "bytes": 12909
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f11/candidate/ASTOCK-084-383a282d1f36/_raw/bodies/7cbc061ac4cdebf795cdfe88eaf3911010d84cfb94cd3bd6f16ee5e686526f8a.bin",
+      "sha256": "7cbc061ac4cdebf795cdfe88eaf3911010d84cfb94cd3bd6f16ee5e686526f8a",
+      "bytes": 5533748
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f11/candidate/ASTOCK-084-383a282d1f36/_raw/bodies/e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c.bin",
+      "sha256": "e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f11/candidate/ASTOCK-084-383a282d1f36/_raw/bodies/fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89.bin",
+      "sha256": "fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89",
+      "bytes": 416944
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f11/candidate/ASTOCK-084-383a282d1f36/_raw/manifest.ndjson",
+      "sha256": "8d6bafaa3022ef46003bd66d195a55b7816a42c11611e70b9f9f3ba25271e910",
+      "bytes": 5009
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f11/fixture/bodies/7cbc061ac4cdebf795cdfe88eaf3911010d84cfb94cd3bd6f16ee5e686526f8a.bin",
+      "sha256": "7cbc061ac4cdebf795cdfe88eaf3911010d84cfb94cd3bd6f16ee5e686526f8a",
+      "bytes": 5533748
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f11/fixture/bodies/e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c.bin",
+      "sha256": "e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f11/fixture/bodies/fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89.bin",
+      "sha256": "fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89",
+      "bytes": 416944
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f11/fixture/manifest.ndjson",
+      "sha256": "373e53e54705288cdb7b7d37cae7d9b2277adb792e4d6134cc92d10372c149e5",
+      "bytes": 4532
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f12/candidate/ASTOCK-084-97f9f6fd28c3/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "34ddf53a712f97653cd8540239fb2f9e6bee79d4442e29fc63f2d5c75ff15fd5",
+      "bytes": 9704
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f12/candidate/ASTOCK-084-97f9f6fd28c3/_raw/bodies/0937b9da66203c3bdb47dbfbafe822516ae6b9284f76c4064aa66dbf8d3a8869.bin",
+      "sha256": "0937b9da66203c3bdb47dbfbafe822516ae6b9284f76c4064aa66dbf8d3a8869",
+      "bytes": 5522194
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f12/candidate/ASTOCK-084-97f9f6fd28c3/_raw/manifest.ndjson",
+      "sha256": "21741345b21d419b382566843fa6bc46372389e5cd8ee420547eff863f1244e2",
+      "bytes": 1670
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f12/fixture/bodies/0937b9da66203c3bdb47dbfbafe822516ae6b9284f76c4064aa66dbf8d3a8869.bin",
+      "sha256": "0937b9da66203c3bdb47dbfbafe822516ae6b9284f76c4064aa66dbf8d3a8869",
+      "bytes": 5522194
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f12/fixture/bodies/e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c.bin",
+      "sha256": "e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f12/fixture/bodies/fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89.bin",
+      "sha256": "fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89",
+      "bytes": 416944
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f12/fixture/manifest.ndjson",
+      "sha256": "af8119dca13d4bd14e4c64413ed72af345f031dc67ae23faebf1d2a1b2266242",
+      "bytes": 4535
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f13/candidate/ASTOCK-084-dfa42ec3a7e7/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "bee08e101ed0a420858c6bcae8438f74edde6ccddd6910518c211ce34d7b82a7",
+      "bytes": 11307
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f13/candidate/ASTOCK-084-dfa42ec3a7e7/_raw/bodies/3bcfa98a5954d6e77f81f61862f314fad42841ad2814a5bdb276c4031f9fde59.bin",
+      "sha256": "3bcfa98a5954d6e77f81f61862f314fad42841ad2814a5bdb276c4031f9fde59",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f13/candidate/ASTOCK-084-dfa42ec3a7e7/_raw/bodies/5bf4ba7632eeae0249a05b7baaff8826c34fb8e23dacd3b9e6de825cc3d92fd0.bin",
+      "sha256": "5bf4ba7632eeae0249a05b7baaff8826c34fb8e23dacd3b9e6de825cc3d92fd0",
+      "bytes": 5532903
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f13/candidate/ASTOCK-084-dfa42ec3a7e7/_raw/manifest.ndjson",
+      "sha256": "3ad501dc545c5cc638e0cf0424729fb416a60f7ca59f691c16c7a1acef509115",
+      "bytes": 3340
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f13/fixture/bodies/3bcfa98a5954d6e77f81f61862f314fad42841ad2814a5bdb276c4031f9fde59.bin",
+      "sha256": "3bcfa98a5954d6e77f81f61862f314fad42841ad2814a5bdb276c4031f9fde59",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f13/fixture/bodies/5bf4ba7632eeae0249a05b7baaff8826c34fb8e23dacd3b9e6de825cc3d92fd0.bin",
+      "sha256": "5bf4ba7632eeae0249a05b7baaff8826c34fb8e23dacd3b9e6de825cc3d92fd0",
+      "bytes": 5532903
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f13/fixture/bodies/fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89.bin",
+      "sha256": "fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89",
+      "bytes": 416944
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f13/fixture/manifest.ndjson",
+      "sha256": "e46f074d7b14c11def90395b398997661319dbb50b2ed2939a3237956f3f9cd9",
+      "bytes": 4544
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f14/candidate/ASTOCK-084-28dad3092398/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "27b57a2d46738e62c0f3150ff177cf692efb3c0ca45b5e8f418fdc7f8ec46b70",
+      "bytes": 9700
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f14/candidate/ASTOCK-084-28dad3092398/_raw/bodies/006162bb985481831eaae6a0baa2f024652462305c6963c0fabac881944331f5.bin",
+      "sha256": "006162bb985481831eaae6a0baa2f024652462305c6963c0fabac881944331f5",
+      "bytes": 111
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f14/candidate/ASTOCK-084-28dad3092398/_raw/manifest.ndjson",
+      "sha256": "689dc5395515da132fcce9a6f49bd381f9defbbe7c000cc792a84e35cd9e002a",
+      "bytes": 1666
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f14/fixture/bodies/006162bb985481831eaae6a0baa2f024652462305c6963c0fabac881944331f5.bin",
+      "sha256": "006162bb985481831eaae6a0baa2f024652462305c6963c0fabac881944331f5",
+      "bytes": 111
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f14/fixture/bodies/e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c.bin",
+      "sha256": "e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f14/fixture/bodies/fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89.bin",
+      "sha256": "fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89",
+      "bytes": 416944
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f14/fixture/manifest.ndjson",
+      "sha256": "cc0996d99d9ce2157ed886bddfd07b7e6d8de6d14bb43014f81937432b179b3f",
+      "bytes": 4516
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f2/candidate/ASTOCK-064-3594a1269f85/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "96d5ffd5aed91c2faaf14c2407e33e6b3781c3d698c64c342042dffac8215ecd",
+      "bytes": 8451
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f2/candidate/ASTOCK-064-3594a1269f85/_raw/bodies/2d52281162013f3dccfbe5bedd371ff28c4330a67e7cd3d8003754c7c0bae7ee.bin",
+      "sha256": "2d52281162013f3dccfbe5bedd371ff28c4330a67e7cd3d8003754c7c0bae7ee",
+      "bytes": 22665
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f2/candidate/ASTOCK-064-3594a1269f85/_raw/manifest.ndjson",
+      "sha256": "f54fbba789f37220267ac776df4d8ab404e9e5888c2c9d87a7adec9e317fb4cf",
+      "bytes": 1435
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f2/fixture/bodies/2d52281162013f3dccfbe5bedd371ff28c4330a67e7cd3d8003754c7c0bae7ee.bin",
+      "sha256": "2d52281162013f3dccfbe5bedd371ff28c4330a67e7cd3d8003754c7c0bae7ee",
+      "bytes": 22665
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f2/fixture/manifest.ndjson",
+      "sha256": "a18be7d58292a9d1c0ce89f72e2e1984be907d16c178ab6cf5b84612312b8b29",
+      "bytes": 1261
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f3/candidate/ASTOCK-064-ef8fb065b220/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "0e218180d77f953fed00847c760c35c916c4ab79e82effdf7d8e1239e59db3b7",
+      "bytes": 8451
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f3/candidate/ASTOCK-064-ef8fb065b220/_raw/bodies/c605c11479db7aa919fee8dc2f892da279ee8b236e7f2a6085b052cef3ae4e65.bin",
+      "sha256": "c605c11479db7aa919fee8dc2f892da279ee8b236e7f2a6085b052cef3ae4e65",
+      "bytes": 22671
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f3/candidate/ASTOCK-064-ef8fb065b220/_raw/manifest.ndjson",
+      "sha256": "6ff375c82a91d50f1b6a15b95c0a7f60a8f8aca6753191eca40a56ed7576d06e",
+      "bytes": 1435
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f3/fixture/bodies/c605c11479db7aa919fee8dc2f892da279ee8b236e7f2a6085b052cef3ae4e65.bin",
+      "sha256": "c605c11479db7aa919fee8dc2f892da279ee8b236e7f2a6085b052cef3ae4e65",
+      "bytes": 22671
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f3/fixture/manifest.ndjson",
+      "sha256": "bda08e8dfeaf00fd32cabe3f5316a6869e9715a7e2bf5a228e286d49eda47321",
+      "bytes": 1264
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f4/candidate/ASTOCK-064-156a4c6bfdaf/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "a51fb06c3257056bf83262289953c460156e77b23a36e1b742d3e13dd501d1e2",
+      "bytes": 8451
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f4/candidate/ASTOCK-064-156a4c6bfdaf/_raw/bodies/c9ece192b0c56c69d7e99ed145e56f05caa050e49870c3abae593a9405a6f924.bin",
+      "sha256": "c9ece192b0c56c69d7e99ed145e56f05caa050e49870c3abae593a9405a6f924",
+      "bytes": 22668
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f4/candidate/ASTOCK-064-156a4c6bfdaf/_raw/manifest.ndjson",
+      "sha256": "f6a682204c2f0c8a5fb4c876255dec0e85d86f417ec7d801477edac3c0b68fb1",
+      "bytes": 1435
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f4/fixture/bodies/c9ece192b0c56c69d7e99ed145e56f05caa050e49870c3abae593a9405a6f924.bin",
+      "sha256": "c9ece192b0c56c69d7e99ed145e56f05caa050e49870c3abae593a9405a6f924",
+      "bytes": 22668
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f4/fixture/manifest.ndjson",
+      "sha256": "e61a19bfffa640d3b731e796fc183bd59efcc8d7a9faa7f0163e241b1212ce45",
+      "bytes": 1267
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f5/candidate/ASTOCK-064-c73ef8062479/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "f246c587ffd6ae4ca9d052816945c9484a7a3b55db6bdb76308bf37d79c38bfd",
+      "bytes": 8451
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f5/candidate/ASTOCK-064-c73ef8062479/_raw/bodies/f7bd5c7a56846c7c467d4b27c5ebd928518296b7aeb25af6bd15e2f12e86c662.bin",
+      "sha256": "f7bd5c7a56846c7c467d4b27c5ebd928518296b7aeb25af6bd15e2f12e86c662",
+      "bytes": 22671
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f5/candidate/ASTOCK-064-c73ef8062479/_raw/manifest.ndjson",
+      "sha256": "fda7872809dcf46f26574f36bfbb339af53e9bef796ac1b4ff3500f0689edf37",
+      "bytes": 1435
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f5/fixture/bodies/f7bd5c7a56846c7c467d4b27c5ebd928518296b7aeb25af6bd15e2f12e86c662.bin",
+      "sha256": "f7bd5c7a56846c7c467d4b27c5ebd928518296b7aeb25af6bd15e2f12e86c662",
+      "bytes": 22671
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f5/fixture/manifest.ndjson",
+      "sha256": "29d7691c9f8c343bf70f5d42dc6eb332bbf816f42c9831901edeec2c0c4ec096",
+      "bytes": 1266
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f6/candidate/ASTOCK-064-f93735ec293a/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "da1dc8873afec46e546050ea3662957bdc1e2c191341138aa5cc576e4fe25eaa",
+      "bytes": 8451
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f6/candidate/ASTOCK-064-f93735ec293a/_raw/bodies/db6b0b8881c8dcc938b736022bcbf1dd40872d0709de15e9d143c11b945d3e39.bin",
+      "sha256": "db6b0b8881c8dcc938b736022bcbf1dd40872d0709de15e9d143c11b945d3e39",
+      "bytes": 22673
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f6/candidate/ASTOCK-064-f93735ec293a/_raw/manifest.ndjson",
+      "sha256": "81871c3746353bda345922aed4ac7f6a5cbe48e0ca8f24c3d58597902987a28c",
+      "bytes": 1435
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f6/fixture/bodies/db6b0b8881c8dcc938b736022bcbf1dd40872d0709de15e9d143c11b945d3e39.bin",
+      "sha256": "db6b0b8881c8dcc938b736022bcbf1dd40872d0709de15e9d143c11b945d3e39",
+      "bytes": 22673
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f6/fixture/manifest.ndjson",
+      "sha256": "7ffd4b33ff45c1351228ec7bcf22a630e6b9fe4042a9ec68828fd1b003cd4ca1",
+      "bytes": 1266
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f7/candidate/ASTOCK-064-5767539105b1/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "fcb5d43dfb0b3bec5e1dc574b55edd3e6ed3704beaa188966f3cbf04459bbd77",
+      "bytes": 8447
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f7/candidate/ASTOCK-064-5767539105b1/_raw/bodies/b42f2099187886def637d6aa840022266e05cb6c987a9394e708e23cd505eb46.bin",
+      "sha256": "b42f2099187886def637d6aa840022266e05cb6c987a9394e708e23cd505eb46",
+      "bytes": 4
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f7/candidate/ASTOCK-064-5767539105b1/_raw/manifest.ndjson",
+      "sha256": "b11f8fb26b7ea94b72688408e92ffb399667206515fa174efa58d4acbbe42f3b",
+      "bytes": 1431
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f7/fixture/bodies/b42f2099187886def637d6aa840022266e05cb6c987a9394e708e23cd505eb46.bin",
+      "sha256": "b42f2099187886def637d6aa840022266e05cb6c987a9394e708e23cd505eb46",
+      "bytes": 4
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f7/fixture/manifest.ndjson",
+      "sha256": "b51701a013cdf5b3f332e335def0d392cf1be638988543ba529b116a71164c9d",
+      "bytes": 1258
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f8/candidate/ASTOCK-084-d0ba2395cc59/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "18c2d2c2d6835a1268b0d5d0efe659dece74d963ee14f48622288604c729b389",
+      "bytes": 12906
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f8/candidate/ASTOCK-084-d0ba2395cc59/_raw/bodies/114c5f9cb4fa134d5c1bd4ba0ea644fbdb68b0ed3a744f9a887d28f72bf0aaca.bin",
+      "sha256": "114c5f9cb4fa134d5c1bd4ba0ea644fbdb68b0ed3a744f9a887d28f72bf0aaca",
+      "bytes": 5532904
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f8/candidate/ASTOCK-084-d0ba2395cc59/_raw/bodies/e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c.bin",
+      "sha256": "e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f8/candidate/ASTOCK-084-d0ba2395cc59/_raw/bodies/fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89.bin",
+      "sha256": "fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89",
+      "bytes": 416944
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f8/candidate/ASTOCK-084-d0ba2395cc59/_raw/manifest.ndjson",
+      "sha256": "3d2397541361b1048723b237f08a630fe91216d55bd175d3e1538a319e0ba14e",
+      "bytes": 5006
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f8/fixture/bodies/114c5f9cb4fa134d5c1bd4ba0ea644fbdb68b0ed3a744f9a887d28f72bf0aaca.bin",
+      "sha256": "114c5f9cb4fa134d5c1bd4ba0ea644fbdb68b0ed3a744f9a887d28f72bf0aaca",
+      "bytes": 5532904
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f8/fixture/bodies/e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c.bin",
+      "sha256": "e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f8/fixture/bodies/fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89.bin",
+      "sha256": "fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89",
+      "bytes": 416944
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f8/fixture/manifest.ndjson",
+      "sha256": "2f589fe60e757ef8745e3aa64530d0cd0e9e3d3d8b72e2b87277c9cdb320ff80",
+      "bytes": 4517
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f9/candidate/ASTOCK-084-faff9e061d5b/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "8084814b48708fae4dfe16ce9d59170bbfd6f724f2b524ef7f0b2b0f7e14965c",
+      "bytes": 12906
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f9/candidate/ASTOCK-084-faff9e061d5b/_raw/bodies/1029c59bfed3da2897426c2155e941d150d3d181d0be1bb7d76787fe4fc80d79.bin",
+      "sha256": "1029c59bfed3da2897426c2155e941d150d3d181d0be1bb7d76787fe4fc80d79",
+      "bytes": 5532903
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f9/candidate/ASTOCK-084-faff9e061d5b/_raw/bodies/e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c.bin",
+      "sha256": "e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f9/candidate/ASTOCK-084-faff9e061d5b/_raw/bodies/fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89.bin",
+      "sha256": "fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89",
+      "bytes": 416944
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f9/candidate/ASTOCK-084-faff9e061d5b/_raw/manifest.ndjson",
+      "sha256": "3e47010449d1eca6232f3b8ad4c41d1618ab134167b1af7b9c48943c858c0f6a",
+      "bytes": 5006
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f9/fixture/bodies/1029c59bfed3da2897426c2155e941d150d3d181d0be1bb7d76787fe4fc80d79.bin",
+      "sha256": "1029c59bfed3da2897426c2155e941d150d3d181d0be1bb7d76787fe4fc80d79",
+      "bytes": 5532903
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f9/fixture/bodies/e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c.bin",
+      "sha256": "e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f9/fixture/bodies/fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89.bin",
+      "sha256": "fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89",
+      "bytes": 416944
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/f9/fixture/manifest.ndjson",
+      "sha256": "5e364f608f75ece9bc186608bb607ea2ea9c21bf16df238d98a3c973a23ae1f6",
+      "bytes": 4526
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/legacy/legacy-comparison.json",
+      "sha256": "968cc357532c0fdff0d215cd276709bdd143df8350acf4c66b6b8e3ff7074759",
+      "bytes": 164
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/all/ASTOCK-084-40b5f9347533/2026-10-04/convertible_bonds/eastmoney/convertible_bonds/mapped-rows.json",
+      "sha256": "3db84d5ec8da57f787fb91ec7793c59bd9773af15921b366f6f2c41e144980fa",
+      "bytes": 519692
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/all/ASTOCK-084-40b5f9347533/2026-10-04/excluded_rows/eastmoney/convertible_bonds/excluded-rows.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/all/ASTOCK-084-40b5f9347533/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "cb94f06ca740c28809197435aa7e849e7c7e17fa5b21c8f78dfeec93cbd522d7",
+      "bytes": 18298
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/all/ASTOCK-084-40b5f9347533/2026-10-04/parsed_rows/eastmoney/convertible_bonds/parsed-rows.json",
+      "sha256": "4f015a1199b63dbd030272477f72420ab8eeba8b3a12a7d11b6dfe23e49914ad",
+      "bytes": 458987
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/all/ASTOCK-084-40b5f9347533/2026-10-04/source_rows/eastmoney/convertible_bonds/source-rows.json",
+      "sha256": "e85e633e6cc7033d3244905963747166eff64d26bc5f6a4f3dccf30711d3f986",
+      "bytes": 6617104
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/all/ASTOCK-084-40b5f9347533/_raw/bodies/23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb.bin",
+      "sha256": "23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb",
+      "bytes": 263592
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/all/ASTOCK-084-40b5f9347533/_raw/bodies/2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e.bin",
+      "sha256": "2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e",
+      "bytes": 3101323
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/all/ASTOCK-084-40b5f9347533/_raw/bodies/ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5.bin",
+      "sha256": "ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5",
+      "bytes": 3259457
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/all/ASTOCK-084-40b5f9347533/_raw/manifest.ndjson",
+      "sha256": "5a95256924dc999e3bf52cdaf22952a68e455a4c227ac01442bdd6196b2526a4",
+      "bytes": 6876
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/all_delisted/candidate/ASTOCK-084-1b36cf569741/2026-10-04/convertible_bonds/eastmoney/convertible_bonds/mapped-rows.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/all_delisted/candidate/ASTOCK-084-1b36cf569741/2026-10-04/excluded_rows/eastmoney/convertible_bonds/excluded-rows.json",
+      "sha256": "ad35651362170d3c65ea98b0d83206d0ef59e3ca7aa5cd3961b0bdf523dfb165",
+      "bytes": 6617104
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/all_delisted/candidate/ASTOCK-084-1b36cf569741/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "c917593283896cba18c1eb9c120eadc84c6f89378d41a77d4f9702679409bddf",
+      "bytes": 16482
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/all_delisted/candidate/ASTOCK-084-1b36cf569741/2026-10-04/parsed_rows/eastmoney/convertible_bonds/parsed-rows.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/all_delisted/candidate/ASTOCK-084-1b36cf569741/2026-10-04/source_rows/eastmoney/convertible_bonds/source-rows.json",
+      "sha256": "ad35651362170d3c65ea98b0d83206d0ef59e3ca7aa5cd3961b0bdf523dfb165",
+      "bytes": 6617104
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/all_delisted/candidate/ASTOCK-084-1b36cf569741/_raw/bodies/7ea3c083d8429b1ebc7a6ad9257ef93ae8ec1d7381ff44b5d479509323c67f7d.bin",
+      "sha256": "7ea3c083d8429b1ebc7a6ad9257ef93ae8ec1d7381ff44b5d479509323c67f7d",
+      "bytes": 416944
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/all_delisted/candidate/ASTOCK-084-1b36cf569741/_raw/bodies/c25d7dbe15a2cb98910672c75540b03196676c6cc2c27b2bb9b25820f09513e2.bin",
+      "sha256": "c25d7dbe15a2cb98910672c75540b03196676c6cc2c27b2bb9b25820f09513e2",
+      "bytes": 5532903
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/all_delisted/candidate/ASTOCK-084-1b36cf569741/_raw/bodies/fdb98a523bd072a23101b38a48c3829b939f4689eef73982edf92ea2e2b92795.bin",
+      "sha256": "fdb98a523bd072a23101b38a48c3829b939f4689eef73982edf92ea2e2b92795",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/all_delisted/candidate/ASTOCK-084-1b36cf569741/_raw/manifest.ndjson",
+      "sha256": "0ec7df86e5d0055939a16af366ea4be888f3e0c3e2147805146dfd2e05149523",
+      "bytes": 5066
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/all_delisted/fixture/bodies/7ea3c083d8429b1ebc7a6ad9257ef93ae8ec1d7381ff44b5d479509323c67f7d.bin",
+      "sha256": "7ea3c083d8429b1ebc7a6ad9257ef93ae8ec1d7381ff44b5d479509323c67f7d",
+      "bytes": 416944
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/all_delisted/fixture/bodies/c25d7dbe15a2cb98910672c75540b03196676c6cc2c27b2bb9b25820f09513e2.bin",
+      "sha256": "c25d7dbe15a2cb98910672c75540b03196676c6cc2c27b2bb9b25820f09513e2",
+      "bytes": 5532903
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/all_delisted/fixture/bodies/fdb98a523bd072a23101b38a48c3829b939f4689eef73982edf92ea2e2b92795.bin",
+      "sha256": "fdb98a523bd072a23101b38a48c3829b939f4689eef73982edf92ea2e2b92795",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/all_delisted/fixture/manifest.ndjson",
+      "sha256": "2e24820d43f6a7bf76d5d4277db2d50fc896a35627a4a287205ced7c2afed104",
+      "bytes": 4541
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/statuses/candidate/ASTOCK-084-b86f506e9c0b/2026-10-04/convertible_bonds/eastmoney/convertible_bonds/mapped-rows.json",
+      "sha256": "88ef7b10a8ed1c8f23dd0554fce1d6d281e763997b4082c098870a52ea9a8408",
+      "bytes": 155394
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/statuses/candidate/ASTOCK-084-b86f506e9c0b/2026-10-04/excluded_rows/eastmoney/convertible_bonds/excluded-rows.json",
+      "sha256": "806ba1e9947ca10a66712892a501702811a0d5e38609e683f39cdd0a681ab659",
+      "bytes": 4532051
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/statuses/candidate/ASTOCK-084-b86f506e9c0b/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "720739d65c114e0608b1f1306100b3fd7777ec7eaf9be605fbb1748c787a8707",
+      "bytes": 16561
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/statuses/candidate/ASTOCK-084-b86f506e9c0b/2026-10-04/parsed_rows/eastmoney/convertible_bonds/parsed-rows.json",
+      "sha256": "42c604a548db78c6bde405b2b309b64ae40051ee8440f0e55b0dd25375ab5c0b",
+      "bytes": 138734
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/statuses/candidate/ASTOCK-084-b86f506e9c0b/2026-10-04/source_rows/eastmoney/convertible_bonds/source-rows.json",
+      "sha256": "ed75e6373b2c87429ced527e37cae18d80f631dc65e98dd2a91a5cb414a340f8",
+      "bytes": 6617151
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/statuses/candidate/ASTOCK-084-b86f506e9c0b/_raw/bodies/60ed683eb8a48b0bb03629bc5ada983af0b71729b7670481e5b89ddcf28d5aa7.bin",
+      "sha256": "60ed683eb8a48b0bb03629bc5ada983af0b71729b7670481e5b89ddcf28d5aa7",
+      "bytes": 5532950
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/statuses/candidate/ASTOCK-084-b86f506e9c0b/_raw/bodies/e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c.bin",
+      "sha256": "e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/statuses/candidate/ASTOCK-084-b86f506e9c0b/_raw/bodies/fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89.bin",
+      "sha256": "fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89",
+      "bytes": 416944
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/statuses/candidate/ASTOCK-084-b86f506e9c0b/_raw/manifest.ndjson",
+      "sha256": "1bf526da2715772f79076fe31dd8b3c80cc196de98d7ff30d7da462186bb407d",
+      "bytes": 5054
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/statuses/fixture/bodies/60ed683eb8a48b0bb03629bc5ada983af0b71729b7670481e5b89ddcf28d5aa7.bin",
+      "sha256": "60ed683eb8a48b0bb03629bc5ada983af0b71729b7670481e5b89ddcf28d5aa7",
+      "bytes": 5532950
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/statuses/fixture/bodies/e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c.bin",
+      "sha256": "e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/statuses/fixture/bodies/fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89.bin",
+      "sha256": "fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89",
+      "bytes": 416944
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/statuses/fixture/manifest.ndjson",
+      "sha256": "d41e7f935ccfc7cef87759c99d4fbd0e3da558f1055c71c8f35e4f45aa109b86",
+      "bytes": 4529
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/zero_negative/candidate/ASTOCK-064-76ad73b0fa85/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "0b6ed92ba51ebacd7223f73d5ade8fbf7b27f65e960be57be60640f94725f4b6",
+      "bytes": 9914
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/zero_negative/candidate/ASTOCK-064-76ad73b0fa85/2026-10-04/parsed_rows/chinamoney/repo_fixing/parsed-rows.json",
+      "sha256": "0fdc9727172ce26fe1c787d06e46c53eff3795c6ff313cd59ecba86ab5a84ea1",
+      "bytes": 45079
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/zero_negative/candidate/ASTOCK-064-76ad73b0fa85/2026-10-04/repo_fixing/chinamoney/repo_fixing/mapped-rows.json",
+      "sha256": "41512e81908961a5325d994a6acd12b7a27425e5019f168559efcc900cbe6d0e",
+      "bytes": 115039
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/zero_negative/candidate/ASTOCK-064-76ad73b0fa85/2026-10-04/source_rows/chinamoney/repo_fixing/source-rows.json",
+      "sha256": "3d4b73dfa3c7d9002423a9085a58cc558df5fd8e57b863b6e9598b33a041ec27",
+      "bytes": 49559
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/zero_negative/candidate/ASTOCK-064-76ad73b0fa85/_raw/bodies/4875351d3dd28d402b0c17ec42bd5a88d14983b37b24114c2e6d788457882e46.bin",
+      "sha256": "4875351d3dd28d402b0c17ec42bd5a88d14983b37b24114c2e6d788457882e46",
+      "bytes": 22669
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/zero_negative/candidate/ASTOCK-064-76ad73b0fa85/_raw/manifest.ndjson",
+      "sha256": "9740dc0cf9ab65b0fe9b913b4419e595c2f731ab4ad20dedc9141831f9ae475b",
+      "bytes": 1456
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/zero_negative/fixture/bodies/4875351d3dd28d402b0c17ec42bd5a88d14983b37b24114c2e6d788457882e46.bin",
+      "sha256": "4875351d3dd28d402b0c17ec42bd5a88d14983b37b24114c2e6d788457882e46",
+      "bytes": 22669
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/semantic/zero_negative/fixture/manifest.ndjson",
+      "sha256": "1535770454c8716b38e613d79b414291e2d0c564087c3227c0dfd6a1bbd0612f",
+      "bytes": 1270
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/candidate/ASTOCK-064-d6769b9c27a8/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "334af51c56d0d0c4be5c1d262b20064260a5ed95a0048044922fc2a80791f2de",
+      "bytes": 9715
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/candidate/ASTOCK-064-d6769b9c27a8/2026-10-04/parsed_rows/chinamoney/repo_fixing/parsed-rows.json",
+      "sha256": "44818f9f29c43611ada026cc6f5b12e5082910ffb7ac915073151e54a1aeb1e6",
+      "bytes": 45080
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/candidate/ASTOCK-064-d6769b9c27a8/2026-10-04/repo_fixing/chinamoney/repo_fixing/mapped-rows.json",
+      "sha256": "2cd0d8ed9b5b9498fb6587ab342fbd4441665c2569f4516dcb26c9027889bbb9",
+      "bytes": 115039
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/candidate/ASTOCK-064-d6769b9c27a8/2026-10-04/source_rows/chinamoney/repo_fixing/source-rows.json",
+      "sha256": "37fe74323874d783b6fff56d3d9ab993b9897c2d0e8db76065cf28a703d5316b",
+      "bytes": 49562
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/candidate/ASTOCK-064-d6769b9c27a8/_raw/bodies/f3d2ab542c2d2f7436757a878a095bb99b323912de9afd742d3aa3091ff36b19.bin",
+      "sha256": "f3d2ab542c2d2f7436757a878a095bb99b323912de9afd742d3aa3091ff36b19",
+      "bytes": 23418
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/candidate/ASTOCK-064-d6769b9c27a8/_raw/manifest.ndjson",
+      "sha256": "d92b11216af02c9c063d007cf506abf8c79f2fb890fc4cce07fb03c2742bfb77",
+      "bytes": 1255
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/candidate/ASTOCK-064-d7ccb40627ab/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "ccbfc341f4bd09940edc8644f155e8f17b69ac219b46ee6054476950d2bfea6f",
+      "bytes": 10027
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/candidate/ASTOCK-064-d7ccb40627ab/2026-10-04/parsed_rows/chinamoney/repo_fixing/parsed-rows.json",
+      "sha256": "44818f9f29c43611ada026cc6f5b12e5082910ffb7ac915073151e54a1aeb1e6",
+      "bytes": 45080
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/candidate/ASTOCK-064-d7ccb40627ab/2026-10-04/repo_fixing/chinamoney/repo_fixing/mapped-rows.json",
+      "sha256": "2cd0d8ed9b5b9498fb6587ab342fbd4441665c2569f4516dcb26c9027889bbb9",
+      "bytes": 115039
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/candidate/ASTOCK-064-d7ccb40627ab/2026-10-04/source_rows/chinamoney/repo_fixing/source-rows.json",
+      "sha256": "37fe74323874d783b6fff56d3d9ab993b9897c2d0e8db76065cf28a703d5316b",
+      "bytes": 49562
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/candidate/ASTOCK-064-d7ccb40627ab/_raw/bodies/f3d2ab542c2d2f7436757a878a095bb99b323912de9afd742d3aa3091ff36b19.bin",
+      "sha256": "f3d2ab542c2d2f7436757a878a095bb99b323912de9afd742d3aa3091ff36b19",
+      "bytes": 23418
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/candidate/ASTOCK-064-d7ccb40627ab/_raw/manifest.ndjson",
+      "sha256": "bf5ddf65fb6fae4d167fb231f510334546219582e444191661876a090bba966b",
+      "bytes": 1572
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/candidate/ASTOCK-084-919bdea255a1/2026-10-04/convertible_bonds/eastmoney/convertible_bonds/mapped-rows.json",
+      "sha256": "75ff6bba7d69fced563179d92eb0477b6d9d3c605ab711bed530437b437de246",
+      "bytes": 155858
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/candidate/ASTOCK-084-919bdea255a1/2026-10-04/excluded_rows/eastmoney/convertible_bonds/excluded-rows.json",
+      "sha256": "122ef002ee7d218887b331a18cb09424d92f11a85b1f04e343f6bead01f9fe8e",
+      "bytes": 4526077
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/candidate/ASTOCK-084-919bdea255a1/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "90ad9a87bc51f036e60cdea0def129c035a54c01ccf3525b7d0715916050152f",
+      "bytes": 15949
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/candidate/ASTOCK-084-919bdea255a1/2026-10-04/parsed_rows/eastmoney/convertible_bonds/parsed-rows.json",
+      "sha256": "8df5b81d700b163b6c2aaf7324695b0a92965602132355222f13e701bbd792cf",
+      "bytes": 139143
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/candidate/ASTOCK-084-919bdea255a1/2026-10-04/source_rows/eastmoney/convertible_bonds/source-rows.json",
+      "sha256": "e85e633e6cc7033d3244905963747166eff64d26bc5f6a4f3dccf30711d3f986",
+      "bytes": 6617104
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/candidate/ASTOCK-084-919bdea255a1/_raw/bodies/23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb.bin",
+      "sha256": "23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb",
+      "bytes": 263592
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/candidate/ASTOCK-084-919bdea255a1/_raw/bodies/2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e.bin",
+      "sha256": "2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e",
+      "bytes": 3101323
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/candidate/ASTOCK-084-919bdea255a1/_raw/bodies/ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5.bin",
+      "sha256": "ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5",
+      "bytes": 3259457
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/candidate/ASTOCK-084-919bdea255a1/_raw/manifest.ndjson",
+      "sha256": "971bcbce615dc29747dcc7a6ef5137c2bdf3af929423185482ceef5b165c2ad6",
+      "bytes": 4562
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/candidate/ASTOCK-084-fb89a8856ea1/2026-10-04/convertible_bonds/eastmoney/convertible_bonds/mapped-rows.json",
+      "sha256": "75ff6bba7d69fced563179d92eb0477b6d9d3c605ab711bed530437b437de246",
+      "bytes": 155858
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/candidate/ASTOCK-084-fb89a8856ea1/2026-10-04/excluded_rows/eastmoney/convertible_bonds/excluded-rows.json",
+      "sha256": "122ef002ee7d218887b331a18cb09424d92f11a85b1f04e343f6bead01f9fe8e",
+      "bytes": 4526077
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/candidate/ASTOCK-084-fb89a8856ea1/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "ac637c715f2729855103a3b2b0426efd521a1db399503d284356e00b2e0a4b45",
+      "bytes": 16885
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/candidate/ASTOCK-084-fb89a8856ea1/2026-10-04/parsed_rows/eastmoney/convertible_bonds/parsed-rows.json",
+      "sha256": "8df5b81d700b163b6c2aaf7324695b0a92965602132355222f13e701bbd792cf",
+      "bytes": 139143
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/candidate/ASTOCK-084-fb89a8856ea1/2026-10-04/source_rows/eastmoney/convertible_bonds/source-rows.json",
+      "sha256": "e85e633e6cc7033d3244905963747166eff64d26bc5f6a4f3dccf30711d3f986",
+      "bytes": 6617104
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/candidate/ASTOCK-084-fb89a8856ea1/_raw/bodies/23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb.bin",
+      "sha256": "23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb",
+      "bytes": 263592
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/candidate/ASTOCK-084-fb89a8856ea1/_raw/bodies/2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e.bin",
+      "sha256": "2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e",
+      "bytes": 3101323
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/candidate/ASTOCK-084-fb89a8856ea1/_raw/bodies/ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5.bin",
+      "sha256": "ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5",
+      "bytes": 3259457
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/candidate/ASTOCK-084-fb89a8856ea1/_raw/manifest.ndjson",
+      "sha256": "51ec148c8dbff27a36a1650a6ceb400d1ca223b105ed25b00343d328b523738a",
+      "bytes": 5513
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/session/fixture-mode.json",
+      "sha256": "8ddb83ee30c97c1a49e84df4ba40596600416e5af4047388858b88fa81ab123a",
+      "bytes": 108
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/candidate/ASTOCK-084-b429d89fc3d2/2026-10-04/convertible_bonds/eastmoney/convertible_bonds/mapped-rows.json",
+      "sha256": "4ffbdf6120dc535650f1c3149d5525a10dae50a791141db5db572344e075bc26",
+      "bytes": 38186
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/candidate/ASTOCK-084-b429d89fc3d2/2026-10-04/excluded_rows/eastmoney/convertible_bonds/excluded-rows.json",
+      "sha256": "122ef002ee7d218887b331a18cb09424d92f11a85b1f04e343f6bead01f9fe8e",
+      "bytes": 4526077
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/candidate/ASTOCK-084-b429d89fc3d2/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "dae8c832e6637879dbf4002047dfdfd976c3819863f34caf20cbc63590a47976",
+      "bytes": 17711
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/candidate/ASTOCK-084-b429d89fc3d2/2026-10-04/parsed_rows/eastmoney/convertible_bonds/parsed-rows.json",
+      "sha256": "8df5b81d700b163b6c2aaf7324695b0a92965602132355222f13e701bbd792cf",
+      "bytes": 139143
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/candidate/ASTOCK-084-b429d89fc3d2/2026-10-04/source_rows/eastmoney/convertible_bonds/source-rows.json",
+      "sha256": "e85e633e6cc7033d3244905963747166eff64d26bc5f6a4f3dccf30711d3f986",
+      "bytes": 6617104
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/candidate/ASTOCK-084-b429d89fc3d2/_raw/bodies/23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb.bin",
+      "sha256": "23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb",
+      "bytes": 263592
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/candidate/ASTOCK-084-b429d89fc3d2/_raw/bodies/2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e.bin",
+      "sha256": "2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e",
+      "bytes": 3101323
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/candidate/ASTOCK-084-b429d89fc3d2/_raw/bodies/ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5.bin",
+      "sha256": "ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5",
+      "bytes": 3259457
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/candidate/ASTOCK-084-b429d89fc3d2/_raw/manifest.ndjson",
+      "sha256": "61afb9ca0d32d8a20ede29649f0136f01a9efcd25a624f05419cac50ba10132c",
+      "bytes": 6879
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/capabilities.yaml",
+      "sha256": "7b7ce0da1d33b333165c6081a3ed788f85cb05d5f6945c745eec97d73e24f6e2",
+      "bytes": 4009
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/collection.yaml",
+      "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d",
+      "bytes": 2934
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/board_fund_flow.yaml",
+      "sha256": "08f3566d0cf2787186e6106e4915d0d89b70232d737898480eda03785ea3c53a",
+      "bytes": 1110
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/broken_limit_pool.yaml",
+      "sha256": "60b3790eae896c968093c8d26a818c9dab325aca620510b4ec1dde061af7f65e",
+      "bytes": 1162
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/buyback.yaml",
+      "sha256": "807490acc8affc7dde3502ef62c2b80ad32923fe4c5ff6a6b4fd9d403b50d4f6",
+      "bytes": 1439
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/cctv_news_index.yaml",
+      "sha256": "a876cfcb7dfa79b79423cb3ae8044dab1bb43515f12fc090158228dbf95b6d33",
+      "bytes": 317
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/concept_board.yaml",
+      "sha256": "eef0b07c9a41bfd5ef1a52f4f39516cb26d42b088d63a15783af0f94985fd76f",
+      "bytes": 379
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/convertible_bonds.yaml",
+      "sha256": "11723522544165617f1141aa08921252ca99447eba5cf507c574a887dd6748b9",
+      "bytes": 1362
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/daily_bar.yaml",
+      "sha256": "0a8c1dcae7e1c062ae70c224defc1362adc1d58bc196bbeb2f1edd61d6fd39e7",
+      "bytes": 995
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/dividend_event.yaml",
+      "sha256": "67a2b02063cb9a891e3fb388048407cbc08b05ce8ae97deea6976d3904340d2e",
+      "bytes": 759
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/earnings_forecast.yaml",
+      "sha256": "ded845c047fcefdbeb163f27620d4e67f2bc78e62a0bcfea5678d6df8758f8fd",
+      "bytes": 1060
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/financial_main.yaml",
+      "sha256": "23d8b55356620439d5c1b507601b782b31aa965fe24eaf194e869466bb271ab0",
+      "bytes": 766
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/holder_trades.yaml",
+      "sha256": "44b0ecfc09c6e39823c50e83077354f25bc8026fc70272d92046ba3a51d09b92",
+      "bytes": 1246
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/industry_board.yaml",
+      "sha256": "c6930c70b55e171dee94b74b80f3c37df1466d4a10dadc3016975004b8b47ba4",
+      "bytes": 380
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/industry_directory.yaml",
+      "sha256": "9325d485bf7a1bc2b075c2d920b43b17caa039916536bedd8163be0f972bfe5b",
+      "bytes": 346
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/industry_index_daily.yaml",
+      "sha256": "5d542c72443410747f2ac643589bfd8160cdea07d01d6d0dd9c5e4753096043b",
+      "bytes": 676
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/industry_membership.yaml",
+      "sha256": "dff512c9b7f00330bbe408ba1e1eb74d99b49bc0b38ee419d4c463047c6fe69d",
+      "bytes": 709
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/institution_survey.yaml",
+      "sha256": "470fd4503d45cf0839e887fd276a0c3c82cdcae7cae8f52001006464c212733e",
+      "bytes": 703
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/intraday_trend.yaml",
+      "sha256": "5983e0eb29c1cd7a781fbad0be7332dda14e887ccd744e55ad4b8664c7a0c38a",
+      "bytes": 665
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/ipo_calendar.yaml",
+      "sha256": "7579b9174fd3554a92bc50865cabe7ac20604579403f748d09bcd4e8760bcac9",
+      "bytes": 1331
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/limit_down_pool.yaml",
+      "sha256": "67b3ca1ae9edf0f863d2b2d5257a315fe721f042086d4b5966653c0f2758d806",
+      "bytes": 1177
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/limit_up_pool.yaml",
+      "sha256": "73c1fa4ed6d7281d1857208a2ec9696a3637214bb256661ce943313c75772a69",
+      "bytes": 982
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/lpr_history.yaml",
+      "sha256": "b40bb3000aa8db8b84aeaad6383c3dd7da1afb3c3bfb6ed6fc69343476ca7650",
+      "bytes": 330
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/minute_bar_5m.yaml",
+      "sha256": "fb6f822ed42479422a0b4c227577d8e559bb6b2238562af566af0464304bd873",
+      "bytes": 708
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/pledge.yaml",
+      "sha256": "40b46e96e55d8b1061c98ec979094b4f98ef4800e513cfa7a9c2c5f2152b2fb1",
+      "bytes": 878
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/previous_limit_pool.yaml",
+      "sha256": "5234397a7b87ed3e03c11431de1f00c012e135ba5ef57bf63a2f431f659703bc",
+      "bytes": 1199
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/realtime_quote.yaml",
+      "sha256": "ebc3e97bb7469eb4c7c80daf50991ebe38f0eb5b2476a9a579d22236d416378b",
+      "bytes": 1121
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/repo_fixing.yaml",
+      "sha256": "6908c6c805e15a153dc567d58c81daecb66026bdd0f48d8865e296a1ba883935",
+      "bytes": 506
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/security_snapshot.yaml",
+      "sha256": "255115893f64837a3b95ea9fe44551948eefa9604aca9d59214de87a580300be",
+      "bytes": 519
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/shareholder_count.yaml",
+      "sha256": "d325df1784c873bea73a1d907e9964e06c26e4d6b356dd6c16148837b57feccf",
+      "bytes": 923
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/stock_fund_flow.yaml",
+      "sha256": "df3f21341463f3538a1f855ef19b7bbdb683405aaa65d5418c255023c18a429f",
+      "bytes": 736
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/strong_stock_pool.yaml",
+      "sha256": "264c9d759405d37733cf4daf29996240cb46fed46c3eb8835405a4311e1c1131",
+      "bytes": 1194
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/trading_calendar.yaml",
+      "sha256": "924b17a5be104252e85a377e4579432c6725bab99cbaa0ad70e71102149a1f49",
+      "bytes": 192
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets/wallstreetcn_news.yaml",
+      "sha256": "1bdecf169c6ea357cbb53787bd0a9a659d1f4a96e77e42996556b55df97bbd49",
+      "bytes": 534
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/datasets.yaml",
+      "sha256": "e992d13297e1f9a8f64acabc25f65f138b21ce12dca16689cc3f17bf1385a6eb",
+      "bytes": 587
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/board_fund_flow.yaml",
+      "sha256": "fb7c6f1f2d425181b189e25152e465306982e10c7c6ee06b2917dfa00b891baa",
+      "bytes": 1395
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/broken_limit_pool.yaml",
+      "sha256": "8bd046757fc9fb3e7d144a0e9d41106267e828a60bc5a099280158c15459a84d",
+      "bytes": 1238
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/buyback.yaml",
+      "sha256": "70e6ee88258842e76509208c6d9df379478df717837489869ff1e9f72f82d1b3",
+      "bytes": 2520
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/cctv_news_index.yaml",
+      "sha256": "4de0d3f1b61694e5c6ab7450a38a7c85f583fadd64d48e52bd737545eb04e42b",
+      "bytes": 573
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/concept_board.yaml",
+      "sha256": "2b7e7f57d189541d6a232cd5391d2dab4289f9f3438f397d9fefd82bb1d996b7",
+      "bytes": 206
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/convertible_bonds.yaml",
+      "sha256": "54f7fb673c56c9a40d3541ed4c0f0258a235665e0e0806426c401ec789c5f1e9",
+      "bytes": 1339
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/daily_bar.yaml",
+      "sha256": "41f9bbd0824e20d70f7ed276758b286094c33c79180befca4d8985afc3c8ad0b",
+      "bytes": 2913
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/dividend_event.yaml",
+      "sha256": "188df2f7f075b92e993136aef3f977eea419f9c6957404bd2f7071c76ed24a71",
+      "bytes": 1532
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/earnings_forecast.yaml",
+      "sha256": "5b323a3c3c6577527701985248bb13b54102463a167ba04c749f4908e2b401c4",
+      "bytes": 1633
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/financial_main.yaml",
+      "sha256": "eeeb2e7418aab430168f0c7e16c69f1b24a9e49ec8d156a28390cae0e7a69bda",
+      "bytes": 603
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/holder_trades.yaml",
+      "sha256": "2deca39ea7c1a57254b4ee31390587f39d640559181cd1ceae7968a4684e5f40",
+      "bytes": 1959
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/industry_board.yaml",
+      "sha256": "f3ff8bbe7fc4e8d4e5af1c36b9312e8db1c8c9cb09a09aadb472b22ae09de152",
+      "bytes": 210
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/industry_directory.yaml",
+      "sha256": "823d97db8afe4adb3f963faaa04b42b8f151e93f2e75f3eb18f8c678a68bae37",
+      "bytes": 478
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/industry_index_daily.yaml",
+      "sha256": "953087294fd2c3a3cb1b46f204d0a0f606f9060f0f89676fb3a189222a68dab1",
+      "bytes": 805
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/industry_membership.yaml",
+      "sha256": "7eb72a1b8ce7aff27aa1ad62534af2bf7183f3d78c6392208035396a11e21ccb",
+      "bytes": 765
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/institution_survey.yaml",
+      "sha256": "e33c639f75da6a7a1d699936d0624084ed3488ef773aa9fcf3eaefc66e829423",
+      "bytes": 1118
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/intraday_trend.yaml",
+      "sha256": "14b0b22ad1308c70b65152e711c4248d3c8bf1c28d842fba36309194ed38870a",
+      "bytes": 440
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/ipo_calendar.yaml",
+      "sha256": "d72db539afed6e890e81d6e1c4680fcb09ad4285551748f3c9e12ba124e6059c",
+      "bytes": 2338
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/limit_down_pool.yaml",
+      "sha256": "456b0a779929bb6ff71ed70e07cd420d42596068f142879926b86972e3704f7b",
+      "bytes": 1314
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/limit_up_pool.yaml",
+      "sha256": "411e6e6ead10a4d2cbff7ecf4de9bee26f411a66d005a33bc640865ef4b6e7ba",
+      "bytes": 1079
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/lpr_history.yaml",
+      "sha256": "2a12cd26c069d8be0eb68e121eef7930f97f602ffe80e459b649c6cbc5a4c217",
+      "bytes": 682
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/minute_bar_5m.yaml",
+      "sha256": "f3e9abaededc01a15c651a99a22131a80067133deb89548dd12b17278e0e55b7",
+      "bytes": 1134
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/pledge.yaml",
+      "sha256": "4c8f7636e0b20e5923adbbf4c5e696247da67869d90ed19f0aee62f2e5612710",
+      "bytes": 1589
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/previous_limit_pool.yaml",
+      "sha256": "4c14b9ad1f0497e2d6f13a72978f1ddda74039b7c0d182c5a5a98ac01a678443",
+      "bytes": 1276
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/realtime_quote.yaml",
+      "sha256": "e9141547fbb85cb71c8e2336c20a2ebc948e3926f4b2a09e4f59505adea91b94",
+      "bytes": 1308
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/repo_fixing.yaml",
+      "sha256": "0d6b2b5b39a92c6f3d2629f3f805f0b12d609ea9b3f691a50c896c12d81b4681",
+      "bytes": 762
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/security_snapshot.yaml",
+      "sha256": "474ab0397cb1aad33abcd070942586a8460c468b1d3f7af97c2d152eee5a6537",
+      "bytes": 621
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/shareholder_count.yaml",
+      "sha256": "f8801367f055e0b1d419e648c9bd3e1d72984ffe2823c2d464770403c1b7c9e4",
+      "bytes": 1702
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/stock_fund_flow.yaml",
+      "sha256": "3d99bacf48ba3438c90d2d544f7223ffcb0a464f69f95841affe3e99a503bbe1",
+      "bytes": 1741
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/strong_stock_pool.yaml",
+      "sha256": "41733f419a6dd9d3a25edf361294a973df76d878d01bbf46b9f25f53a38f2304",
+      "bytes": 1234
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/trading_calendar.yaml",
+      "sha256": "4be7571914129769aeca321d892b8aa2fbd068db1c7c0b691ae0d5cefe7f69e0",
+      "bytes": 476
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/normalization/wallstreetcn_news.yaml",
+      "sha256": "cdca43fb9ef1d825fe75358ea6c828fec02b892e344505d484d302123079fca9",
+      "bytes": 770
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/providers.yaml",
+      "sha256": "b19618e86c2ed5483bc7d9edefed1288a3c785cf49704967a2d8772607fecbeb",
+      "bytes": 80757
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004/yaml/config/schedules.yaml",
+      "sha256": "01b7e269ea4231024bf1c520f78fa571c2909986aad5573006bd80e186119113",
+      "bytes": 525
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-20261004-tests.xml",
+      "sha256": "a0b8cd34d794e24f38d89eaba2d574bd88f64d9550efd2000aedd0e0227b56ce",
+      "bytes": 56004
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-064/candidate/ASTOCK-064-5e9f1235868d/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "fc5170bd9ab7612af6173b73b9ef1310dedce32646b0947069ab5f610b11c79a",
+      "bytes": 10652
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-064/candidate/ASTOCK-064-5e9f1235868d/2026-10-04/parsed_rows/chinamoney/repo_fixing/parsed-rows.json",
+      "sha256": "44818f9f29c43611ada026cc6f5b12e5082910ffb7ac915073151e54a1aeb1e6",
+      "bytes": 45080
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-064/candidate/ASTOCK-064-5e9f1235868d/2026-10-04/repo_fixing/chinamoney/repo_fixing/mapped-rows.json",
+      "sha256": "41512e81908961a5325d994a6acd12b7a27425e5019f168559efcc900cbe6d0e",
+      "bytes": 115039
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-064/candidate/ASTOCK-064-5e9f1235868d/2026-10-04/source_rows/chinamoney/repo_fixing/source-rows.json",
+      "sha256": "37fe74323874d783b6fff56d3d9ab993b9897c2d0e8db76065cf28a703d5316b",
+      "bytes": 49562
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-064/candidate/ASTOCK-064-5e9f1235868d/_raw/bodies/f3d2ab542c2d2f7436757a878a095bb99b323912de9afd742d3aa3091ff36b19.bin",
+      "sha256": "f3d2ab542c2d2f7436757a878a095bb99b323912de9afd742d3aa3091ff36b19",
+      "bytes": 23418
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-064/candidate/ASTOCK-064-5e9f1235868d/_raw/manifest.ndjson",
+      "sha256": "fa32780916cf7bebf54390b73dbf3536ab851330f6efa5f3d211f0b954c080a2",
+      "bytes": 2225
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-064/comparison.json",
+      "sha256": "468b78aa09f2589eb51f250b6480bcbdc4591cd87f4c207ebf963464e282057d",
+      "bytes": 909
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-064/original/bodies/f3d2ab542c2d2f7436757a878a095bb99b323912de9afd742d3aa3091ff36b19.bin",
+      "sha256": "f3d2ab542c2d2f7436757a878a095bb99b323912de9afd742d3aa3091ff36b19",
+      "bytes": 23418
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-064/original/manifest.ndjson",
+      "sha256": "620726fb88da9ab48aacd8b3df013bb124a1b1da89170faa9898caf528a14cc5",
+      "bytes": 2131
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-064/original-parsed.json",
+      "sha256": "16ce86c72340d4b26388a378f29b25dc2f16ee8f0249140af1561e90cba939f1",
+      "bytes": 209424
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-084/candidate/ASTOCK-084-cdc1ddaafda2/2026-10-04/convertible_bonds/eastmoney/convertible_bonds/mapped-rows.json",
+      "sha256": "7b34143a6e05999fb1c9024fa051d57995f9b4dacc0f31e8975bdc251e9c9200",
+      "bytes": 155858
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-084/candidate/ASTOCK-084-cdc1ddaafda2/2026-10-04/excluded_rows/eastmoney/convertible_bonds/excluded-rows.json",
+      "sha256": "122ef002ee7d218887b331a18cb09424d92f11a85b1f04e343f6bead01f9fe8e",
+      "bytes": 4526077
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-084/candidate/ASTOCK-084-cdc1ddaafda2/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "8feb4fbc723a1d8234d0eb217af5831b49663b0219d45f67b63156e667d09988",
+      "bytes": 18299
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-084/candidate/ASTOCK-084-cdc1ddaafda2/2026-10-04/parsed_rows/eastmoney/convertible_bonds/parsed-rows.json",
+      "sha256": "8df5b81d700b163b6c2aaf7324695b0a92965602132355222f13e701bbd792cf",
+      "bytes": 139143
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-084/candidate/ASTOCK-084-cdc1ddaafda2/2026-10-04/source_rows/eastmoney/convertible_bonds/source-rows.json",
+      "sha256": "e85e633e6cc7033d3244905963747166eff64d26bc5f6a4f3dccf30711d3f986",
+      "bytes": 6617104
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-084/candidate/ASTOCK-084-cdc1ddaafda2/_raw/bodies/23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb.bin",
+      "sha256": "23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb",
+      "bytes": 263592
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-084/candidate/ASTOCK-084-cdc1ddaafda2/_raw/bodies/2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e.bin",
+      "sha256": "2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e",
+      "bytes": 3101323
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-084/candidate/ASTOCK-084-cdc1ddaafda2/_raw/bodies/ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5.bin",
+      "sha256": "ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5",
+      "bytes": 3259457
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-084/candidate/ASTOCK-084-cdc1ddaafda2/_raw/manifest.ndjson",
+      "sha256": "3956a23be07ff2128ffa828d4d96ab913f51bbb2baabef729ee81e89206c2fef",
+      "bytes": 6879
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-084/comparison.json",
+      "sha256": "728b62f061a414e0a54d38f53b9d28c46b0505a051eca3372ea2ebac5e488997",
+      "bytes": 1060
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-084/original/bodies/23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb.bin",
+      "sha256": "23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb",
+      "bytes": 263592
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-084/original/bodies/2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e.bin",
+      "sha256": "2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e",
+      "bytes": 3101323
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-084/original/bodies/ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5.bin",
+      "sha256": "ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5",
+      "bytes": 3259457
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-084/original/manifest.ndjson",
+      "sha256": "85f4aa513e45d94231bd5995e400678a90475b019fb1436058ea7eb3ae000e12",
+      "bytes": 6540
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-084/original-parsed.json",
+      "sha256": "02cbb92d8b595f1d21abf25d331d71f3f9382cd76383968ba6706fb540dbeaeb",
+      "bytes": 244441
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/clock/candidate/ASTOCK-084-8f4cf52289a4/2026-10-04/convertible_bonds/eastmoney/convertible_bonds/mapped-rows.json",
+      "sha256": "7b34143a6e05999fb1c9024fa051d57995f9b4dacc0f31e8975bdc251e9c9200",
+      "bytes": 155858
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/clock/candidate/ASTOCK-084-8f4cf52289a4/2026-10-04/excluded_rows/eastmoney/convertible_bonds/excluded-rows.json",
+      "sha256": "122ef002ee7d218887b331a18cb09424d92f11a85b1f04e343f6bead01f9fe8e",
+      "bytes": 4526077
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/clock/candidate/ASTOCK-084-8f4cf52289a4/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "a57418eb1b9ab283a05792226b5f0a029b2833279c469dd4155674c1b9f15537",
+      "bytes": 16531
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/clock/candidate/ASTOCK-084-8f4cf52289a4/2026-10-04/parsed_rows/eastmoney/convertible_bonds/parsed-rows.json",
+      "sha256": "8df5b81d700b163b6c2aaf7324695b0a92965602132355222f13e701bbd792cf",
+      "bytes": 139143
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/clock/candidate/ASTOCK-084-8f4cf52289a4/2026-10-04/source_rows/eastmoney/convertible_bonds/source-rows.json",
+      "sha256": "e85e633e6cc7033d3244905963747166eff64d26bc5f6a4f3dccf30711d3f986",
+      "bytes": 6617104
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/clock/candidate/ASTOCK-084-8f4cf52289a4/_raw/bodies/23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb.bin",
+      "sha256": "23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb",
+      "bytes": 263592
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/clock/candidate/ASTOCK-084-8f4cf52289a4/_raw/bodies/2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e.bin",
+      "sha256": "2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e",
+      "bytes": 3101323
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/clock/candidate/ASTOCK-084-8f4cf52289a4/_raw/bodies/ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5.bin",
+      "sha256": "ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5",
+      "bytes": 3259457
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/clock/candidate/ASTOCK-084-8f4cf52289a4/_raw/manifest.ndjson",
+      "sha256": "0233bc003e3fe753cf4c3d994f4daf75fc0271595c3cfa1ed2bb0f2e8e47a7cf",
+      "bytes": 5024
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/clock/fixture/bodies/23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb.bin",
+      "sha256": "23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb",
+      "bytes": 263592
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/clock/fixture/bodies/2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e.bin",
+      "sha256": "2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e",
+      "bytes": 3101323
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/clock/fixture/bodies/ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5.bin",
+      "sha256": "ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5",
+      "bytes": 3259457
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/clock/fixture/manifest.ndjson",
+      "sha256": "a0bf69a096b07a144340e6bb0852db15c0ada240d181baa31de77d9667b9103e",
+      "bytes": 8638
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/comparison.json",
+      "sha256": "bd25600c258c00d03d1a90a620c034fe4912e27f6b61d53764781df0b1751aca",
+      "bytes": 11393
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f0/candidate/ASTOCK-064-b58ed6093a6d/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "a331abd1ec8bdfd0fea469a5b50465870800c453e31f24406a3e827dc9e3c6d1",
+      "bytes": 8456
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f0/candidate/ASTOCK-064-b58ed6093a6d/_raw/bodies/f6034183a585547be30c5cab4461cba5cbf446f6f7af50e1578a4be174299a29.bin",
+      "sha256": "f6034183a585547be30c5cab4461cba5cbf446f6f7af50e1578a4be174299a29",
+      "bytes": 22667
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f0/candidate/ASTOCK-064-b58ed6093a6d/_raw/manifest.ndjson",
+      "sha256": "83207e2a78bf543925eb8982f1ec5964c31b5e04affdc4b88df22635b22163df",
+      "bytes": 1438
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f0/fixture/bodies/f6034183a585547be30c5cab4461cba5cbf446f6f7af50e1578a4be174299a29.bin",
+      "sha256": "f6034183a585547be30c5cab4461cba5cbf446f6f7af50e1578a4be174299a29",
+      "bytes": 22667
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f0/fixture/manifest.ndjson",
+      "sha256": "4c58458e3b45e6c6df79260fb4ae1dbef847a7b0349c54413c4bae0c7531420f",
+      "bytes": 1263
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f1/candidate/ASTOCK-064-06dd68932c08/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "381304ce216f0a8ba3c4ae74324e40d278d02f4c66513f6254997b3cd4bced48",
+      "bytes": 8456
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f1/candidate/ASTOCK-064-06dd68932c08/_raw/bodies/4f9dc72cc83106341963604747dab4bec9c82d675d0ac8547d4aaa5df9dd7ae8.bin",
+      "sha256": "4f9dc72cc83106341963604747dab4bec9c82d675d0ac8547d4aaa5df9dd7ae8",
+      "bytes": 22679
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f1/candidate/ASTOCK-064-06dd68932c08/_raw/manifest.ndjson",
+      "sha256": "de6edeae8595f1e794db539f219710f229662c1009a82337f5f45bd56a0f0db0",
+      "bytes": 1438
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f1/fixture/bodies/4f9dc72cc83106341963604747dab4bec9c82d675d0ac8547d4aaa5df9dd7ae8.bin",
+      "sha256": "4f9dc72cc83106341963604747dab4bec9c82d675d0ac8547d4aaa5df9dd7ae8",
+      "bytes": 22679
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f1/fixture/manifest.ndjson",
+      "sha256": "9b03bf22253ace63e313203cfad98e5d98b024d4c2e87a2e9d7cce776d4b369b",
+      "bytes": 1263
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f10/candidate/ASTOCK-084-ac7af77d7671/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "42840843eebdc7a7f25d224c8db0b55a5b95d7eb342ec11d98ecaa48b986809d",
+      "bytes": 12918
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f10/candidate/ASTOCK-084-ac7af77d7671/_raw/bodies/444893dc614b489f031448dd254e14ee182dd95b4e74be21f83986101349aafd.bin",
+      "sha256": "444893dc614b489f031448dd254e14ee182dd95b4e74be21f83986101349aafd",
+      "bytes": 5532876
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f10/candidate/ASTOCK-084-ac7af77d7671/_raw/bodies/e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c.bin",
+      "sha256": "e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f10/candidate/ASTOCK-084-ac7af77d7671/_raw/bodies/fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89.bin",
+      "sha256": "fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89",
+      "bytes": 416944
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f10/candidate/ASTOCK-084-ac7af77d7671/_raw/manifest.ndjson",
+      "sha256": "c940b0d0e49c7b6331f54b1dcd8e4ed765e691ec6566a06a0b7bca2413160687",
+      "bytes": 5018
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f10/fixture/bodies/444893dc614b489f031448dd254e14ee182dd95b4e74be21f83986101349aafd.bin",
+      "sha256": "444893dc614b489f031448dd254e14ee182dd95b4e74be21f83986101349aafd",
+      "bytes": 5532876
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f10/fixture/bodies/e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c.bin",
+      "sha256": "e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f10/fixture/bodies/fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89.bin",
+      "sha256": "fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89",
+      "bytes": 416944
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f10/fixture/manifest.ndjson",
+      "sha256": "6c87e955d7135000d7e5e5704c51fafc33c0a6224ed6be6474e09fbb5bbfaf95",
+      "bytes": 4517
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f11/candidate/ASTOCK-084-06ad15e414d6/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "62ec3e4d1c46bf096cb7b51d4d44ac6a494b52134ae7cc94d61532db2d285572",
+      "bytes": 12918
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f11/candidate/ASTOCK-084-06ad15e414d6/_raw/bodies/7cbc061ac4cdebf795cdfe88eaf3911010d84cfb94cd3bd6f16ee5e686526f8a.bin",
+      "sha256": "7cbc061ac4cdebf795cdfe88eaf3911010d84cfb94cd3bd6f16ee5e686526f8a",
+      "bytes": 5533748
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f11/candidate/ASTOCK-084-06ad15e414d6/_raw/bodies/e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c.bin",
+      "sha256": "e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f11/candidate/ASTOCK-084-06ad15e414d6/_raw/bodies/fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89.bin",
+      "sha256": "fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89",
+      "bytes": 416944
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f11/candidate/ASTOCK-084-06ad15e414d6/_raw/manifest.ndjson",
+      "sha256": "7be912ddb1d3cceee7dc1f1b2a9e36f4c56776a023a1d968901d1bc4b4fc97e0",
+      "bytes": 5018
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f11/fixture/bodies/7cbc061ac4cdebf795cdfe88eaf3911010d84cfb94cd3bd6f16ee5e686526f8a.bin",
+      "sha256": "7cbc061ac4cdebf795cdfe88eaf3911010d84cfb94cd3bd6f16ee5e686526f8a",
+      "bytes": 5533748
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f11/fixture/bodies/e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c.bin",
+      "sha256": "e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f11/fixture/bodies/fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89.bin",
+      "sha256": "fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89",
+      "bytes": 416944
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f11/fixture/manifest.ndjson",
+      "sha256": "d578ca534410440eaa4db98770c521914429575214373a1147c2101a8021c54f",
+      "bytes": 4532
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f12/candidate/ASTOCK-084-964288d7ba8c/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "1361e7a3e8ad7a06b7645cff9dadcc20bdb012e00156d9dc532fb6ece1c7040d",
+      "bytes": 9707
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f12/candidate/ASTOCK-084-964288d7ba8c/_raw/bodies/0937b9da66203c3bdb47dbfbafe822516ae6b9284f76c4064aa66dbf8d3a8869.bin",
+      "sha256": "0937b9da66203c3bdb47dbfbafe822516ae6b9284f76c4064aa66dbf8d3a8869",
+      "bytes": 5522194
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f12/candidate/ASTOCK-084-964288d7ba8c/_raw/manifest.ndjson",
+      "sha256": "151749d181b00415f61595092482ce0059c04888dcacf8b755306078f1742d30",
+      "bytes": 1673
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f12/fixture/bodies/0937b9da66203c3bdb47dbfbafe822516ae6b9284f76c4064aa66dbf8d3a8869.bin",
+      "sha256": "0937b9da66203c3bdb47dbfbafe822516ae6b9284f76c4064aa66dbf8d3a8869",
+      "bytes": 5522194
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f12/fixture/bodies/e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c.bin",
+      "sha256": "e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f12/fixture/bodies/fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89.bin",
+      "sha256": "fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89",
+      "bytes": 416944
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f12/fixture/manifest.ndjson",
+      "sha256": "a242e7903afeb9266f14637d5405eee4774b889e405f69996be3eb576cbd5a01",
+      "bytes": 4535
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f13/candidate/ASTOCK-084-9f52d8bb8d0e/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "8a9d734aa717477eac4fbc7b7c9caa7e52022bf15ef16ed85b0e3b8f5a7bfbab",
+      "bytes": 11313
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f13/candidate/ASTOCK-084-9f52d8bb8d0e/_raw/bodies/3bcfa98a5954d6e77f81f61862f314fad42841ad2814a5bdb276c4031f9fde59.bin",
+      "sha256": "3bcfa98a5954d6e77f81f61862f314fad42841ad2814a5bdb276c4031f9fde59",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f13/candidate/ASTOCK-084-9f52d8bb8d0e/_raw/bodies/5bf4ba7632eeae0249a05b7baaff8826c34fb8e23dacd3b9e6de825cc3d92fd0.bin",
+      "sha256": "5bf4ba7632eeae0249a05b7baaff8826c34fb8e23dacd3b9e6de825cc3d92fd0",
+      "bytes": 5532903
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f13/candidate/ASTOCK-084-9f52d8bb8d0e/_raw/manifest.ndjson",
+      "sha256": "82d4546638b4e37079a801c0548c3fb015a850a160e79c8e54b9b08717cd67fc",
+      "bytes": 3346
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f13/fixture/bodies/3bcfa98a5954d6e77f81f61862f314fad42841ad2814a5bdb276c4031f9fde59.bin",
+      "sha256": "3bcfa98a5954d6e77f81f61862f314fad42841ad2814a5bdb276c4031f9fde59",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f13/fixture/bodies/5bf4ba7632eeae0249a05b7baaff8826c34fb8e23dacd3b9e6de825cc3d92fd0.bin",
+      "sha256": "5bf4ba7632eeae0249a05b7baaff8826c34fb8e23dacd3b9e6de825cc3d92fd0",
+      "bytes": 5532903
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f13/fixture/bodies/fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89.bin",
+      "sha256": "fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89",
+      "bytes": 416944
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f13/fixture/manifest.ndjson",
+      "sha256": "3139838f0c1d682cbc92cf5b11b7b806adf4d8d7475999abd45944d8f1380c82",
+      "bytes": 4544
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f14/candidate/ASTOCK-084-b0e34c4ef3f5/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "2d13046345fd85dd2ff36dc19204ecf7075ee10e3307cd02dc5300d608da7de4",
+      "bytes": 9703
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f14/candidate/ASTOCK-084-b0e34c4ef3f5/_raw/bodies/006162bb985481831eaae6a0baa2f024652462305c6963c0fabac881944331f5.bin",
+      "sha256": "006162bb985481831eaae6a0baa2f024652462305c6963c0fabac881944331f5",
+      "bytes": 111
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f14/candidate/ASTOCK-084-b0e34c4ef3f5/_raw/manifest.ndjson",
+      "sha256": "828784c23ed706987bd33f8f07e4d4893153e51558071d7b44ded24f96dc633d",
+      "bytes": 1669
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f14/fixture/bodies/006162bb985481831eaae6a0baa2f024652462305c6963c0fabac881944331f5.bin",
+      "sha256": "006162bb985481831eaae6a0baa2f024652462305c6963c0fabac881944331f5",
+      "bytes": 111
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f14/fixture/bodies/e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c.bin",
+      "sha256": "e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f14/fixture/bodies/fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89.bin",
+      "sha256": "fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89",
+      "bytes": 416944
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f14/fixture/manifest.ndjson",
+      "sha256": "69a7a943b10132939581bdd782cfb6c1ed7f8eb233101560b90eef0db64888d6",
+      "bytes": 4516
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f2/candidate/ASTOCK-064-3782d636b389/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "a332780261054967d77aff9edb0d250ba9c73a5a5f9dd208d38683712bc0a8f3",
+      "bytes": 8456
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f2/candidate/ASTOCK-064-3782d636b389/_raw/bodies/2d52281162013f3dccfbe5bedd371ff28c4330a67e7cd3d8003754c7c0bae7ee.bin",
+      "sha256": "2d52281162013f3dccfbe5bedd371ff28c4330a67e7cd3d8003754c7c0bae7ee",
+      "bytes": 22665
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f2/candidate/ASTOCK-064-3782d636b389/_raw/manifest.ndjson",
+      "sha256": "2886f0eb898923f2bc4acbed8930a888a84bbe9cb92d2f7076ced485c070a26c",
+      "bytes": 1438
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f2/fixture/bodies/2d52281162013f3dccfbe5bedd371ff28c4330a67e7cd3d8003754c7c0bae7ee.bin",
+      "sha256": "2d52281162013f3dccfbe5bedd371ff28c4330a67e7cd3d8003754c7c0bae7ee",
+      "bytes": 22665
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f2/fixture/manifest.ndjson",
+      "sha256": "45f6acc17aac03e4af175de3a147939de109ef807467b04b0ad61d062b62396d",
+      "bytes": 1261
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f3/candidate/ASTOCK-064-8c3c1b5d7c8d/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "e7d02129354522fd643a73a356d3ad99ad96439c49244e9f8310b560e72a87e8",
+      "bytes": 8456
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f3/candidate/ASTOCK-064-8c3c1b5d7c8d/_raw/bodies/c605c11479db7aa919fee8dc2f892da279ee8b236e7f2a6085b052cef3ae4e65.bin",
+      "sha256": "c605c11479db7aa919fee8dc2f892da279ee8b236e7f2a6085b052cef3ae4e65",
+      "bytes": 22671
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f3/candidate/ASTOCK-064-8c3c1b5d7c8d/_raw/manifest.ndjson",
+      "sha256": "881b5d2ced901193a44b1691c8ba87d9ab6dd92440b24996bc0a76985174494d",
+      "bytes": 1438
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f3/fixture/bodies/c605c11479db7aa919fee8dc2f892da279ee8b236e7f2a6085b052cef3ae4e65.bin",
+      "sha256": "c605c11479db7aa919fee8dc2f892da279ee8b236e7f2a6085b052cef3ae4e65",
+      "bytes": 22671
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f3/fixture/manifest.ndjson",
+      "sha256": "85c4e980e99e8e75ade84c1fbc7a5e1978b1fa57160400c440b02847b4539bc9",
+      "bytes": 1264
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f4/candidate/ASTOCK-064-970a338eae72/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "be547fbcd7cca527b8cd8873d26ac9aa23d33e2a84ed3250af7bcaae04c1d8dd",
+      "bytes": 8456
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f4/candidate/ASTOCK-064-970a338eae72/_raw/bodies/c9ece192b0c56c69d7e99ed145e56f05caa050e49870c3abae593a9405a6f924.bin",
+      "sha256": "c9ece192b0c56c69d7e99ed145e56f05caa050e49870c3abae593a9405a6f924",
+      "bytes": 22668
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f4/candidate/ASTOCK-064-970a338eae72/_raw/manifest.ndjson",
+      "sha256": "d76c85232a90e157aecab45d0276eda4d8dab692b1f61849890704b6e36ca195",
+      "bytes": 1438
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f4/fixture/bodies/c9ece192b0c56c69d7e99ed145e56f05caa050e49870c3abae593a9405a6f924.bin",
+      "sha256": "c9ece192b0c56c69d7e99ed145e56f05caa050e49870c3abae593a9405a6f924",
+      "bytes": 22668
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f4/fixture/manifest.ndjson",
+      "sha256": "8cd40ee6e93fde9a2bedacbcb27f047472bce5c848b3514c94b7b183e01020d5",
+      "bytes": 1267
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f5/candidate/ASTOCK-064-c52615bb5d46/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "307a97b65872b4bcea501b40e94de5642601b84db114f3994b42524735ca37df",
+      "bytes": 8456
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f5/candidate/ASTOCK-064-c52615bb5d46/_raw/bodies/f7bd5c7a56846c7c467d4b27c5ebd928518296b7aeb25af6bd15e2f12e86c662.bin",
+      "sha256": "f7bd5c7a56846c7c467d4b27c5ebd928518296b7aeb25af6bd15e2f12e86c662",
+      "bytes": 22671
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f5/candidate/ASTOCK-064-c52615bb5d46/_raw/manifest.ndjson",
+      "sha256": "d10ce34c41d150ca2b72c69e5b854c4fbdfc89454e7e5c6f9a24ee7e026b94de",
+      "bytes": 1438
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f5/fixture/bodies/f7bd5c7a56846c7c467d4b27c5ebd928518296b7aeb25af6bd15e2f12e86c662.bin",
+      "sha256": "f7bd5c7a56846c7c467d4b27c5ebd928518296b7aeb25af6bd15e2f12e86c662",
+      "bytes": 22671
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f5/fixture/manifest.ndjson",
+      "sha256": "01ac1d379f792ac916adaff547ecf7d450a6ac795efe5eebea03366d4ed61b4b",
+      "bytes": 1266
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f6/candidate/ASTOCK-064-6d1d91307c4c/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "2c5143fe3727957264771c38d9eaa2a1fc63a59cd77dfa3bb879130064fdfa05",
+      "bytes": 8456
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f6/candidate/ASTOCK-064-6d1d91307c4c/_raw/bodies/db6b0b8881c8dcc938b736022bcbf1dd40872d0709de15e9d143c11b945d3e39.bin",
+      "sha256": "db6b0b8881c8dcc938b736022bcbf1dd40872d0709de15e9d143c11b945d3e39",
+      "bytes": 22673
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f6/candidate/ASTOCK-064-6d1d91307c4c/_raw/manifest.ndjson",
+      "sha256": "daf4f017527a248b9bef13450afdae235a4664432f7d9b1cf00ad68bb7c3ecec",
+      "bytes": 1438
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f6/fixture/bodies/db6b0b8881c8dcc938b736022bcbf1dd40872d0709de15e9d143c11b945d3e39.bin",
+      "sha256": "db6b0b8881c8dcc938b736022bcbf1dd40872d0709de15e9d143c11b945d3e39",
+      "bytes": 22673
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f6/fixture/manifest.ndjson",
+      "sha256": "f0ddbc3fc2618c4804f2e5b02a79b900283a409a9a55d8848e750ba047c5b726",
+      "bytes": 1266
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f7/candidate/ASTOCK-064-f54cbbb93678/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "035c6c27fc8a4392f425372cdb05509fd41353dffeb7c91bbdf6473ef11b29de",
+      "bytes": 8452
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f7/candidate/ASTOCK-064-f54cbbb93678/_raw/bodies/b42f2099187886def637d6aa840022266e05cb6c987a9394e708e23cd505eb46.bin",
+      "sha256": "b42f2099187886def637d6aa840022266e05cb6c987a9394e708e23cd505eb46",
+      "bytes": 4
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f7/candidate/ASTOCK-064-f54cbbb93678/_raw/manifest.ndjson",
+      "sha256": "78931f4ee484dc6b0dceab870ef0e7bbc01bbccc9c9e5d44ba89db02b3e63d47",
+      "bytes": 1434
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f7/fixture/bodies/b42f2099187886def637d6aa840022266e05cb6c987a9394e708e23cd505eb46.bin",
+      "sha256": "b42f2099187886def637d6aa840022266e05cb6c987a9394e708e23cd505eb46",
+      "bytes": 4
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f7/fixture/manifest.ndjson",
+      "sha256": "8b5b974f1cb0f0c061d0b5c81118915f06356163b7e367d3a8f6b321d72fb374",
+      "bytes": 1258
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f8/candidate/ASTOCK-084-de7629b02bb7/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "677a59f5fe5b22db9b5f5f066a3273704c2e78e60de0be8b48a60d7df142731e",
+      "bytes": 12915
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f8/candidate/ASTOCK-084-de7629b02bb7/_raw/bodies/114c5f9cb4fa134d5c1bd4ba0ea644fbdb68b0ed3a744f9a887d28f72bf0aaca.bin",
+      "sha256": "114c5f9cb4fa134d5c1bd4ba0ea644fbdb68b0ed3a744f9a887d28f72bf0aaca",
+      "bytes": 5532904
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f8/candidate/ASTOCK-084-de7629b02bb7/_raw/bodies/e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c.bin",
+      "sha256": "e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f8/candidate/ASTOCK-084-de7629b02bb7/_raw/bodies/fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89.bin",
+      "sha256": "fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89",
+      "bytes": 416944
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f8/candidate/ASTOCK-084-de7629b02bb7/_raw/manifest.ndjson",
+      "sha256": "405826d60ec2016e0332c095588cc6277f6fe47ba9d9011c89f95be1b3a7c777",
+      "bytes": 5015
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f8/fixture/bodies/114c5f9cb4fa134d5c1bd4ba0ea644fbdb68b0ed3a744f9a887d28f72bf0aaca.bin",
+      "sha256": "114c5f9cb4fa134d5c1bd4ba0ea644fbdb68b0ed3a744f9a887d28f72bf0aaca",
+      "bytes": 5532904
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f8/fixture/bodies/e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c.bin",
+      "sha256": "e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f8/fixture/bodies/fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89.bin",
+      "sha256": "fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89",
+      "bytes": 416944
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f8/fixture/manifest.ndjson",
+      "sha256": "27886b674854cbfa1c2d08fdbf30d31a2129aa540a9fac0a0bf92efd02af5614",
+      "bytes": 4517
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f9/candidate/ASTOCK-084-333e61161563/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "ad6d94e67e18053e1becd19783afdfd43cf5334aaae98e6bc173b3ae3d7e3af3",
+      "bytes": 12915
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f9/candidate/ASTOCK-084-333e61161563/_raw/bodies/1029c59bfed3da2897426c2155e941d150d3d181d0be1bb7d76787fe4fc80d79.bin",
+      "sha256": "1029c59bfed3da2897426c2155e941d150d3d181d0be1bb7d76787fe4fc80d79",
+      "bytes": 5532903
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f9/candidate/ASTOCK-084-333e61161563/_raw/bodies/e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c.bin",
+      "sha256": "e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f9/candidate/ASTOCK-084-333e61161563/_raw/bodies/fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89.bin",
+      "sha256": "fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89",
+      "bytes": 416944
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f9/candidate/ASTOCK-084-333e61161563/_raw/manifest.ndjson",
+      "sha256": "3d89433d80260a105d7b7c7ef73246f82e7741ee4ab834cc99c0d4c6fa14c828",
+      "bytes": 5015
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f9/fixture/bodies/1029c59bfed3da2897426c2155e941d150d3d181d0be1bb7d76787fe4fc80d79.bin",
+      "sha256": "1029c59bfed3da2897426c2155e941d150d3d181d0be1bb7d76787fe4fc80d79",
+      "bytes": 5532903
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f9/fixture/bodies/e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c.bin",
+      "sha256": "e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f9/fixture/bodies/fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89.bin",
+      "sha256": "fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89",
+      "bytes": 416944
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/f9/fixture/manifest.ndjson",
+      "sha256": "79f6d68786672d7a56a281909a5e2d784a6d704305f0793057443bc90736d076",
+      "bytes": 4526
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/legacy/legacy-comparison.json",
+      "sha256": "968cc357532c0fdff0d215cd276709bdd143df8350acf4c66b6b8e3ff7074759",
+      "bytes": 164
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/all/ASTOCK-084-df9498480488/2026-10-04/convertible_bonds/eastmoney/convertible_bonds/mapped-rows.json",
+      "sha256": "3db84d5ec8da57f787fb91ec7793c59bd9773af15921b366f6f2c41e144980fa",
+      "bytes": 519692
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/all/ASTOCK-084-df9498480488/2026-10-04/excluded_rows/eastmoney/convertible_bonds/excluded-rows.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/all/ASTOCK-084-df9498480488/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "3fa10142e8461d2ec9d753ba768815786772dc3ce78ab12b7052aedc2e04aab7",
+      "bytes": 18298
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/all/ASTOCK-084-df9498480488/2026-10-04/parsed_rows/eastmoney/convertible_bonds/parsed-rows.json",
+      "sha256": "4f015a1199b63dbd030272477f72420ab8eeba8b3a12a7d11b6dfe23e49914ad",
+      "bytes": 458987
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/all/ASTOCK-084-df9498480488/2026-10-04/source_rows/eastmoney/convertible_bonds/source-rows.json",
+      "sha256": "e85e633e6cc7033d3244905963747166eff64d26bc5f6a4f3dccf30711d3f986",
+      "bytes": 6617104
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/all/ASTOCK-084-df9498480488/_raw/bodies/23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb.bin",
+      "sha256": "23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb",
+      "bytes": 263592
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/all/ASTOCK-084-df9498480488/_raw/bodies/2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e.bin",
+      "sha256": "2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e",
+      "bytes": 3101323
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/all/ASTOCK-084-df9498480488/_raw/bodies/ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5.bin",
+      "sha256": "ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5",
+      "bytes": 3259457
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/all/ASTOCK-084-df9498480488/_raw/manifest.ndjson",
+      "sha256": "1dab69a8aa6d7dc1f0931a2b0d8d613c86f0eaa094c841f388f22ea6d113e19a",
+      "bytes": 6876
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/all_delisted/candidate/ASTOCK-084-91d5ef0bb876/2026-10-04/convertible_bonds/eastmoney/convertible_bonds/mapped-rows.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/all_delisted/candidate/ASTOCK-084-91d5ef0bb876/2026-10-04/excluded_rows/eastmoney/convertible_bonds/excluded-rows.json",
+      "sha256": "ad35651362170d3c65ea98b0d83206d0ef59e3ca7aa5cd3961b0bdf523dfb165",
+      "bytes": 6617104
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/all_delisted/candidate/ASTOCK-084-91d5ef0bb876/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "7a25b23cdddd6c77b8209e3525bdd0af920ed1dd11e25b21db2620109a5e7823",
+      "bytes": 16491
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/all_delisted/candidate/ASTOCK-084-91d5ef0bb876/2026-10-04/parsed_rows/eastmoney/convertible_bonds/parsed-rows.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/all_delisted/candidate/ASTOCK-084-91d5ef0bb876/2026-10-04/source_rows/eastmoney/convertible_bonds/source-rows.json",
+      "sha256": "ad35651362170d3c65ea98b0d83206d0ef59e3ca7aa5cd3961b0bdf523dfb165",
+      "bytes": 6617104
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/all_delisted/candidate/ASTOCK-084-91d5ef0bb876/_raw/bodies/7ea3c083d8429b1ebc7a6ad9257ef93ae8ec1d7381ff44b5d479509323c67f7d.bin",
+      "sha256": "7ea3c083d8429b1ebc7a6ad9257ef93ae8ec1d7381ff44b5d479509323c67f7d",
+      "bytes": 416944
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/all_delisted/candidate/ASTOCK-084-91d5ef0bb876/_raw/bodies/c25d7dbe15a2cb98910672c75540b03196676c6cc2c27b2bb9b25820f09513e2.bin",
+      "sha256": "c25d7dbe15a2cb98910672c75540b03196676c6cc2c27b2bb9b25820f09513e2",
+      "bytes": 5532903
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/all_delisted/candidate/ASTOCK-084-91d5ef0bb876/_raw/bodies/fdb98a523bd072a23101b38a48c3829b939f4689eef73982edf92ea2e2b92795.bin",
+      "sha256": "fdb98a523bd072a23101b38a48c3829b939f4689eef73982edf92ea2e2b92795",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/all_delisted/candidate/ASTOCK-084-91d5ef0bb876/_raw/manifest.ndjson",
+      "sha256": "563a0d0108ed260eea2e42c056efdb1b9afbb30660580ae72754554881b1ac10",
+      "bytes": 5075
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/all_delisted/fixture/bodies/7ea3c083d8429b1ebc7a6ad9257ef93ae8ec1d7381ff44b5d479509323c67f7d.bin",
+      "sha256": "7ea3c083d8429b1ebc7a6ad9257ef93ae8ec1d7381ff44b5d479509323c67f7d",
+      "bytes": 416944
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/all_delisted/fixture/bodies/c25d7dbe15a2cb98910672c75540b03196676c6cc2c27b2bb9b25820f09513e2.bin",
+      "sha256": "c25d7dbe15a2cb98910672c75540b03196676c6cc2c27b2bb9b25820f09513e2",
+      "bytes": 5532903
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/all_delisted/fixture/bodies/fdb98a523bd072a23101b38a48c3829b939f4689eef73982edf92ea2e2b92795.bin",
+      "sha256": "fdb98a523bd072a23101b38a48c3829b939f4689eef73982edf92ea2e2b92795",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/all_delisted/fixture/manifest.ndjson",
+      "sha256": "1cd2f8597502122e27a21dea6d4433e6a182b1e937f47872513ab640a5b7bf01",
+      "bytes": 4541
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/statuses/candidate/ASTOCK-084-923811032f74/2026-10-04/convertible_bonds/eastmoney/convertible_bonds/mapped-rows.json",
+      "sha256": "88ef7b10a8ed1c8f23dd0554fce1d6d281e763997b4082c098870a52ea9a8408",
+      "bytes": 155394
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/statuses/candidate/ASTOCK-084-923811032f74/2026-10-04/excluded_rows/eastmoney/convertible_bonds/excluded-rows.json",
+      "sha256": "806ba1e9947ca10a66712892a501702811a0d5e38609e683f39cdd0a681ab659",
+      "bytes": 4532051
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/statuses/candidate/ASTOCK-084-923811032f74/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "ca0490c44dd34bf48238c94f3196f1d82514ddc3de8bf431c852841eaf44f471",
+      "bytes": 16570
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/statuses/candidate/ASTOCK-084-923811032f74/2026-10-04/parsed_rows/eastmoney/convertible_bonds/parsed-rows.json",
+      "sha256": "42c604a548db78c6bde405b2b309b64ae40051ee8440f0e55b0dd25375ab5c0b",
+      "bytes": 138734
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/statuses/candidate/ASTOCK-084-923811032f74/2026-10-04/source_rows/eastmoney/convertible_bonds/source-rows.json",
+      "sha256": "ed75e6373b2c87429ced527e37cae18d80f631dc65e98dd2a91a5cb414a340f8",
+      "bytes": 6617151
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/statuses/candidate/ASTOCK-084-923811032f74/_raw/bodies/60ed683eb8a48b0bb03629bc5ada983af0b71729b7670481e5b89ddcf28d5aa7.bin",
+      "sha256": "60ed683eb8a48b0bb03629bc5ada983af0b71729b7670481e5b89ddcf28d5aa7",
+      "bytes": 5532950
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/statuses/candidate/ASTOCK-084-923811032f74/_raw/bodies/e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c.bin",
+      "sha256": "e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/statuses/candidate/ASTOCK-084-923811032f74/_raw/bodies/fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89.bin",
+      "sha256": "fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89",
+      "bytes": 416944
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/statuses/candidate/ASTOCK-084-923811032f74/_raw/manifest.ndjson",
+      "sha256": "a2905940e4363f9654a49eeefcae11f25c8f1268e2d2e80df700e1e7eac09f32",
+      "bytes": 5063
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/statuses/fixture/bodies/60ed683eb8a48b0bb03629bc5ada983af0b71729b7670481e5b89ddcf28d5aa7.bin",
+      "sha256": "60ed683eb8a48b0bb03629bc5ada983af0b71729b7670481e5b89ddcf28d5aa7",
+      "bytes": 5532950
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/statuses/fixture/bodies/e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c.bin",
+      "sha256": "e73a617e07691b43fbcbd005793b110fb3b651730361c7abf7d120f3f9fead5c",
+      "bytes": 5228349
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/statuses/fixture/bodies/fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89.bin",
+      "sha256": "fb9251235fc4d9b8e9028befe640c506b3e38c7f24db1d7e004bf5f702bf1b89",
+      "bytes": 416944
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/statuses/fixture/manifest.ndjson",
+      "sha256": "2b826fa15769e5317d741ce2c9791f984de293611fc9582509295b73e8e3ea4b",
+      "bytes": 4529
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/zero_negative/candidate/ASTOCK-064-96e1497a6b2d/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "344ee3b6df044ae6cba6b4ce950c6e35ad8441179783a2398f9882b050be25eb",
+      "bytes": 9919
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/zero_negative/candidate/ASTOCK-064-96e1497a6b2d/2026-10-04/parsed_rows/chinamoney/repo_fixing/parsed-rows.json",
+      "sha256": "0fdc9727172ce26fe1c787d06e46c53eff3795c6ff313cd59ecba86ab5a84ea1",
+      "bytes": 45079
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/zero_negative/candidate/ASTOCK-064-96e1497a6b2d/2026-10-04/repo_fixing/chinamoney/repo_fixing/mapped-rows.json",
+      "sha256": "41512e81908961a5325d994a6acd12b7a27425e5019f168559efcc900cbe6d0e",
+      "bytes": 115039
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/zero_negative/candidate/ASTOCK-064-96e1497a6b2d/2026-10-04/source_rows/chinamoney/repo_fixing/source-rows.json",
+      "sha256": "3d4b73dfa3c7d9002423a9085a58cc558df5fd8e57b863b6e9598b33a041ec27",
+      "bytes": 49559
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/zero_negative/candidate/ASTOCK-064-96e1497a6b2d/_raw/bodies/4875351d3dd28d402b0c17ec42bd5a88d14983b37b24114c2e6d788457882e46.bin",
+      "sha256": "4875351d3dd28d402b0c17ec42bd5a88d14983b37b24114c2e6d788457882e46",
+      "bytes": 22669
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/zero_negative/candidate/ASTOCK-064-96e1497a6b2d/_raw/manifest.ndjson",
+      "sha256": "79092db4f22ae851744e0a8bf957b57a1f68b672fb0cbf75254def621ad94a05",
+      "bytes": 1459
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/zero_negative/fixture/bodies/4875351d3dd28d402b0c17ec42bd5a88d14983b37b24114c2e6d788457882e46.bin",
+      "sha256": "4875351d3dd28d402b0c17ec42bd5a88d14983b37b24114c2e6d788457882e46",
+      "bytes": 22669
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/semantic/zero_negative/fixture/manifest.ndjson",
+      "sha256": "9e09a1f7c3c068fea898ffa1b89e9bbe25a7758dd6bee34741e9a0e95f1c2e5e",
+      "bytes": 1270
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-064-9faed646615e/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "589e969954c829177969bbbcecf811682e5619042250740b5343e52d4786d2ad",
+      "bytes": 10032
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-064-9faed646615e/2026-10-04/parsed_rows/chinamoney/repo_fixing/parsed-rows.json",
+      "sha256": "44818f9f29c43611ada026cc6f5b12e5082910ffb7ac915073151e54a1aeb1e6",
+      "bytes": 45080
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-064-9faed646615e/2026-10-04/repo_fixing/chinamoney/repo_fixing/mapped-rows.json",
+      "sha256": "3b42bf083504c74eaca9e78d9718d3f503d5d6c68f9eb980daefe90a64eda312",
+      "bytes": 115039
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-064-9faed646615e/2026-10-04/source_rows/chinamoney/repo_fixing/source-rows.json",
+      "sha256": "37fe74323874d783b6fff56d3d9ab993b9897c2d0e8db76065cf28a703d5316b",
+      "bytes": 49562
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-064-9faed646615e/_raw/bodies/f3d2ab542c2d2f7436757a878a095bb99b323912de9afd742d3aa3091ff36b19.bin",
+      "sha256": "f3d2ab542c2d2f7436757a878a095bb99b323912de9afd742d3aa3091ff36b19",
+      "bytes": 23418
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-064-9faed646615e/_raw/manifest.ndjson",
+      "sha256": "9cc4a97a0ab48a40d1ddf0fd3d5d2994df0e87b5130d71558c1b39ffc1b1598d",
+      "bytes": 1575
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-064-cb3736f2c522/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "sha256": "8eaaf737566cc9d2a3c2933e0d00afd382c72cd5501e86179cfa2a89f06c569b",
+      "bytes": 9717
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-064-cb3736f2c522/2026-10-04/parsed_rows/chinamoney/repo_fixing/parsed-rows.json",
+      "sha256": "44818f9f29c43611ada026cc6f5b12e5082910ffb7ac915073151e54a1aeb1e6",
+      "bytes": 45080
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-064-cb3736f2c522/2026-10-04/repo_fixing/chinamoney/repo_fixing/mapped-rows.json",
+      "sha256": "3b42bf083504c74eaca9e78d9718d3f503d5d6c68f9eb980daefe90a64eda312",
+      "bytes": 115039
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-064-cb3736f2c522/2026-10-04/source_rows/chinamoney/repo_fixing/source-rows.json",
+      "sha256": "37fe74323874d783b6fff56d3d9ab993b9897c2d0e8db76065cf28a703d5316b",
+      "bytes": 49562
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-064-cb3736f2c522/_raw/bodies/f3d2ab542c2d2f7436757a878a095bb99b323912de9afd742d3aa3091ff36b19.bin",
+      "sha256": "f3d2ab542c2d2f7436757a878a095bb99b323912de9afd742d3aa3091ff36b19",
+      "bytes": 23418
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-064-cb3736f2c522/_raw/manifest.ndjson",
+      "sha256": "e6991e7e311425e30c54a87ecf4e16811666a33df2880d9089ad820eff3959f4",
+      "bytes": 1255
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-084-0b2e077b4f46/2026-10-04/convertible_bonds/eastmoney/convertible_bonds/mapped-rows.json",
+      "sha256": "8bb28aff383d16b5b5ef3b861adaacab295aacf28875116c16fa21985e69200f",
+      "bytes": 155858
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-084-0b2e077b4f46/2026-10-04/excluded_rows/eastmoney/convertible_bonds/excluded-rows.json",
+      "sha256": "122ef002ee7d218887b331a18cb09424d92f11a85b1f04e343f6bead01f9fe8e",
+      "bytes": 4526077
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-084-0b2e077b4f46/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "391c4ba9bae11c7acb10406521ad63fa72636188952c7b308e4bc74fc5148b50",
+      "bytes": 16894
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-084-0b2e077b4f46/2026-10-04/parsed_rows/eastmoney/convertible_bonds/parsed-rows.json",
+      "sha256": "8df5b81d700b163b6c2aaf7324695b0a92965602132355222f13e701bbd792cf",
+      "bytes": 139143
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-084-0b2e077b4f46/2026-10-04/source_rows/eastmoney/convertible_bonds/source-rows.json",
+      "sha256": "e85e633e6cc7033d3244905963747166eff64d26bc5f6a4f3dccf30711d3f986",
+      "bytes": 6617104
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-084-0b2e077b4f46/_raw/bodies/23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb.bin",
+      "sha256": "23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb",
+      "bytes": 263592
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-084-0b2e077b4f46/_raw/bodies/2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e.bin",
+      "sha256": "2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e",
+      "bytes": 3101323
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-084-0b2e077b4f46/_raw/bodies/ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5.bin",
+      "sha256": "ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5",
+      "bytes": 3259457
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-084-0b2e077b4f46/_raw/manifest.ndjson",
+      "sha256": "da4c07cb0ff563acf22d6dca372643d37e6dae3dee543cc78e63b288cfa16bf4",
+      "bytes": 5522
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-084-8d6a03a2662e/2026-10-04/convertible_bonds/eastmoney/convertible_bonds/mapped-rows.json",
+      "sha256": "8bb28aff383d16b5b5ef3b861adaacab295aacf28875116c16fa21985e69200f",
+      "bytes": 155858
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-084-8d6a03a2662e/2026-10-04/excluded_rows/eastmoney/convertible_bonds/excluded-rows.json",
+      "sha256": "122ef002ee7d218887b331a18cb09424d92f11a85b1f04e343f6bead01f9fe8e",
+      "bytes": 4526077
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-084-8d6a03a2662e/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "a93697ba9d735fda0c7598c9f703efc34aa0908496cd5bbe76f24df84362a86d",
+      "bytes": 15949
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-084-8d6a03a2662e/2026-10-04/parsed_rows/eastmoney/convertible_bonds/parsed-rows.json",
+      "sha256": "8df5b81d700b163b6c2aaf7324695b0a92965602132355222f13e701bbd792cf",
+      "bytes": 139143
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-084-8d6a03a2662e/2026-10-04/source_rows/eastmoney/convertible_bonds/source-rows.json",
+      "sha256": "e85e633e6cc7033d3244905963747166eff64d26bc5f6a4f3dccf30711d3f986",
+      "bytes": 6617104
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-084-8d6a03a2662e/_raw/bodies/23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb.bin",
+      "sha256": "23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb",
+      "bytes": 263592
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-084-8d6a03a2662e/_raw/bodies/2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e.bin",
+      "sha256": "2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e",
+      "bytes": 3101323
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-084-8d6a03a2662e/_raw/bodies/ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5.bin",
+      "sha256": "ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5",
+      "bytes": 3259457
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/candidate/ASTOCK-084-8d6a03a2662e/_raw/manifest.ndjson",
+      "sha256": "bca5d1c4bfbe4ac2a6705298b47c35d11e195e03c3a592718eee0346949ed903",
+      "bytes": 4562
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/session/fixture-mode.json",
+      "sha256": "8ddb83ee30c97c1a49e84df4ba40596600416e5af4047388858b88fa81ab123a",
+      "bytes": 108
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/verify.py",
+      "sha256": "3a192c0842ee574da66786f88becf0e1f5899900ce76bb13a70c3c82f117f42f",
+      "bytes": 9446
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/candidate/ASTOCK-084-2c90d8ba74fc/2026-10-04/convertible_bonds/eastmoney/convertible_bonds/mapped-rows.json",
+      "sha256": "4ffbdf6120dc535650f1c3149d5525a10dae50a791141db5db572344e075bc26",
+      "bytes": 38186
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/candidate/ASTOCK-084-2c90d8ba74fc/2026-10-04/excluded_rows/eastmoney/convertible_bonds/excluded-rows.json",
+      "sha256": "122ef002ee7d218887b331a18cb09424d92f11a85b1f04e343f6bead01f9fe8e",
+      "bytes": 4526077
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/candidate/ASTOCK-084-2c90d8ba74fc/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "sha256": "19c286f7652c951f258e61753f4d66bcd0a3ac2a77f7b6e3cfe4d4c224254712",
+      "bytes": 17723
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/candidate/ASTOCK-084-2c90d8ba74fc/2026-10-04/parsed_rows/eastmoney/convertible_bonds/parsed-rows.json",
+      "sha256": "8df5b81d700b163b6c2aaf7324695b0a92965602132355222f13e701bbd792cf",
+      "bytes": 139143
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/candidate/ASTOCK-084-2c90d8ba74fc/2026-10-04/source_rows/eastmoney/convertible_bonds/source-rows.json",
+      "sha256": "e85e633e6cc7033d3244905963747166eff64d26bc5f6a4f3dccf30711d3f986",
+      "bytes": 6617104
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/candidate/ASTOCK-084-2c90d8ba74fc/_raw/bodies/23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb.bin",
+      "sha256": "23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb",
+      "bytes": 263592
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/candidate/ASTOCK-084-2c90d8ba74fc/_raw/bodies/2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e.bin",
+      "sha256": "2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e",
+      "bytes": 3101323
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/candidate/ASTOCK-084-2c90d8ba74fc/_raw/bodies/ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5.bin",
+      "sha256": "ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5",
+      "bytes": 3259457
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/candidate/ASTOCK-084-2c90d8ba74fc/_raw/manifest.ndjson",
+      "sha256": "40fff98d8cd0617e24be0cc69e001609fe1f890e9ac2f6ab5eae91b00c303e80",
+      "bytes": 6879
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/capabilities.yaml",
+      "sha256": "7b7ce0da1d33b333165c6081a3ed788f85cb05d5f6945c745eec97d73e24f6e2",
+      "bytes": 4009
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/collection.yaml",
+      "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d",
+      "bytes": 2934
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/board_fund_flow.yaml",
+      "sha256": "08f3566d0cf2787186e6106e4915d0d89b70232d737898480eda03785ea3c53a",
+      "bytes": 1110
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/broken_limit_pool.yaml",
+      "sha256": "60b3790eae896c968093c8d26a818c9dab325aca620510b4ec1dde061af7f65e",
+      "bytes": 1162
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/buyback.yaml",
+      "sha256": "807490acc8affc7dde3502ef62c2b80ad32923fe4c5ff6a6b4fd9d403b50d4f6",
+      "bytes": 1439
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/cctv_news_index.yaml",
+      "sha256": "a876cfcb7dfa79b79423cb3ae8044dab1bb43515f12fc090158228dbf95b6d33",
+      "bytes": 317
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/concept_board.yaml",
+      "sha256": "eef0b07c9a41bfd5ef1a52f4f39516cb26d42b088d63a15783af0f94985fd76f",
+      "bytes": 379
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/convertible_bonds.yaml",
+      "sha256": "11723522544165617f1141aa08921252ca99447eba5cf507c574a887dd6748b9",
+      "bytes": 1362
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/daily_bar.yaml",
+      "sha256": "0a8c1dcae7e1c062ae70c224defc1362adc1d58bc196bbeb2f1edd61d6fd39e7",
+      "bytes": 995
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/dividend_event.yaml",
+      "sha256": "67a2b02063cb9a891e3fb388048407cbc08b05ce8ae97deea6976d3904340d2e",
+      "bytes": 759
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/earnings_forecast.yaml",
+      "sha256": "ded845c047fcefdbeb163f27620d4e67f2bc78e62a0bcfea5678d6df8758f8fd",
+      "bytes": 1060
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/financial_main.yaml",
+      "sha256": "23d8b55356620439d5c1b507601b782b31aa965fe24eaf194e869466bb271ab0",
+      "bytes": 766
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/holder_trades.yaml",
+      "sha256": "44b0ecfc09c6e39823c50e83077354f25bc8026fc70272d92046ba3a51d09b92",
+      "bytes": 1246
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/industry_board.yaml",
+      "sha256": "c6930c70b55e171dee94b74b80f3c37df1466d4a10dadc3016975004b8b47ba4",
+      "bytes": 380
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/industry_directory.yaml",
+      "sha256": "9325d485bf7a1bc2b075c2d920b43b17caa039916536bedd8163be0f972bfe5b",
+      "bytes": 346
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/industry_index_daily.yaml",
+      "sha256": "5d542c72443410747f2ac643589bfd8160cdea07d01d6d0dd9c5e4753096043b",
+      "bytes": 676
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/industry_membership.yaml",
+      "sha256": "dff512c9b7f00330bbe408ba1e1eb74d99b49bc0b38ee419d4c463047c6fe69d",
+      "bytes": 709
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/institution_survey.yaml",
+      "sha256": "470fd4503d45cf0839e887fd276a0c3c82cdcae7cae8f52001006464c212733e",
+      "bytes": 703
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/intraday_trend.yaml",
+      "sha256": "5983e0eb29c1cd7a781fbad0be7332dda14e887ccd744e55ad4b8664c7a0c38a",
+      "bytes": 665
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/ipo_calendar.yaml",
+      "sha256": "7579b9174fd3554a92bc50865cabe7ac20604579403f748d09bcd4e8760bcac9",
+      "bytes": 1331
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/limit_down_pool.yaml",
+      "sha256": "67b3ca1ae9edf0f863d2b2d5257a315fe721f042086d4b5966653c0f2758d806",
+      "bytes": 1177
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/limit_up_pool.yaml",
+      "sha256": "73c1fa4ed6d7281d1857208a2ec9696a3637214bb256661ce943313c75772a69",
+      "bytes": 982
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/lpr_history.yaml",
+      "sha256": "b40bb3000aa8db8b84aeaad6383c3dd7da1afb3c3bfb6ed6fc69343476ca7650",
+      "bytes": 330
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/minute_bar_5m.yaml",
+      "sha256": "fb6f822ed42479422a0b4c227577d8e559bb6b2238562af566af0464304bd873",
+      "bytes": 708
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/pledge.yaml",
+      "sha256": "40b46e96e55d8b1061c98ec979094b4f98ef4800e513cfa7a9c2c5f2152b2fb1",
+      "bytes": 878
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/previous_limit_pool.yaml",
+      "sha256": "5234397a7b87ed3e03c11431de1f00c012e135ba5ef57bf63a2f431f659703bc",
+      "bytes": 1199
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/realtime_quote.yaml",
+      "sha256": "ebc3e97bb7469eb4c7c80daf50991ebe38f0eb5b2476a9a579d22236d416378b",
+      "bytes": 1121
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/repo_fixing.yaml",
+      "sha256": "6908c6c805e15a153dc567d58c81daecb66026bdd0f48d8865e296a1ba883935",
+      "bytes": 506
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/security_snapshot.yaml",
+      "sha256": "255115893f64837a3b95ea9fe44551948eefa9604aca9d59214de87a580300be",
+      "bytes": 519
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/shareholder_count.yaml",
+      "sha256": "d325df1784c873bea73a1d907e9964e06c26e4d6b356dd6c16148837b57feccf",
+      "bytes": 923
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/stock_fund_flow.yaml",
+      "sha256": "df3f21341463f3538a1f855ef19b7bbdb683405aaa65d5418c255023c18a429f",
+      "bytes": 736
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/strong_stock_pool.yaml",
+      "sha256": "264c9d759405d37733cf4daf29996240cb46fed46c3eb8835405a4311e1c1131",
+      "bytes": 1194
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/trading_calendar.yaml",
+      "sha256": "924b17a5be104252e85a377e4579432c6725bab99cbaa0ad70e71102149a1f49",
+      "bytes": 192
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets/wallstreetcn_news.yaml",
+      "sha256": "1bdecf169c6ea357cbb53787bd0a9a659d1f4a96e77e42996556b55df97bbd49",
+      "bytes": 534
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/datasets.yaml",
+      "sha256": "e992d13297e1f9a8f64acabc25f65f138b21ce12dca16689cc3f17bf1385a6eb",
+      "bytes": 587
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/board_fund_flow.yaml",
+      "sha256": "fb7c6f1f2d425181b189e25152e465306982e10c7c6ee06b2917dfa00b891baa",
+      "bytes": 1395
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/broken_limit_pool.yaml",
+      "sha256": "8bd046757fc9fb3e7d144a0e9d41106267e828a60bc5a099280158c15459a84d",
+      "bytes": 1238
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/buyback.yaml",
+      "sha256": "70e6ee88258842e76509208c6d9df379478df717837489869ff1e9f72f82d1b3",
+      "bytes": 2520
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/cctv_news_index.yaml",
+      "sha256": "4de0d3f1b61694e5c6ab7450a38a7c85f583fadd64d48e52bd737545eb04e42b",
+      "bytes": 573
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/concept_board.yaml",
+      "sha256": "2b7e7f57d189541d6a232cd5391d2dab4289f9f3438f397d9fefd82bb1d996b7",
+      "bytes": 206
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/convertible_bonds.yaml",
+      "sha256": "54f7fb673c56c9a40d3541ed4c0f0258a235665e0e0806426c401ec789c5f1e9",
+      "bytes": 1339
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/daily_bar.yaml",
+      "sha256": "41f9bbd0824e20d70f7ed276758b286094c33c79180befca4d8985afc3c8ad0b",
+      "bytes": 2913
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/dividend_event.yaml",
+      "sha256": "188df2f7f075b92e993136aef3f977eea419f9c6957404bd2f7071c76ed24a71",
+      "bytes": 1532
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/earnings_forecast.yaml",
+      "sha256": "5b323a3c3c6577527701985248bb13b54102463a167ba04c749f4908e2b401c4",
+      "bytes": 1633
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/financial_main.yaml",
+      "sha256": "eeeb2e7418aab430168f0c7e16c69f1b24a9e49ec8d156a28390cae0e7a69bda",
+      "bytes": 603
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/holder_trades.yaml",
+      "sha256": "2deca39ea7c1a57254b4ee31390587f39d640559181cd1ceae7968a4684e5f40",
+      "bytes": 1959
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/industry_board.yaml",
+      "sha256": "f3ff8bbe7fc4e8d4e5af1c36b9312e8db1c8c9cb09a09aadb472b22ae09de152",
+      "bytes": 210
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/industry_directory.yaml",
+      "sha256": "823d97db8afe4adb3f963faaa04b42b8f151e93f2e75f3eb18f8c678a68bae37",
+      "bytes": 478
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/industry_index_daily.yaml",
+      "sha256": "953087294fd2c3a3cb1b46f204d0a0f606f9060f0f89676fb3a189222a68dab1",
+      "bytes": 805
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/industry_membership.yaml",
+      "sha256": "7eb72a1b8ce7aff27aa1ad62534af2bf7183f3d78c6392208035396a11e21ccb",
+      "bytes": 765
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/institution_survey.yaml",
+      "sha256": "e33c639f75da6a7a1d699936d0624084ed3488ef773aa9fcf3eaefc66e829423",
+      "bytes": 1118
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/intraday_trend.yaml",
+      "sha256": "14b0b22ad1308c70b65152e711c4248d3c8bf1c28d842fba36309194ed38870a",
+      "bytes": 440
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/ipo_calendar.yaml",
+      "sha256": "d72db539afed6e890e81d6e1c4680fcb09ad4285551748f3c9e12ba124e6059c",
+      "bytes": 2338
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/limit_down_pool.yaml",
+      "sha256": "456b0a779929bb6ff71ed70e07cd420d42596068f142879926b86972e3704f7b",
+      "bytes": 1314
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/limit_up_pool.yaml",
+      "sha256": "411e6e6ead10a4d2cbff7ecf4de9bee26f411a66d005a33bc640865ef4b6e7ba",
+      "bytes": 1079
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/lpr_history.yaml",
+      "sha256": "2a12cd26c069d8be0eb68e121eef7930f97f602ffe80e459b649c6cbc5a4c217",
+      "bytes": 682
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/minute_bar_5m.yaml",
+      "sha256": "f3e9abaededc01a15c651a99a22131a80067133deb89548dd12b17278e0e55b7",
+      "bytes": 1134
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/pledge.yaml",
+      "sha256": "4c8f7636e0b20e5923adbbf4c5e696247da67869d90ed19f0aee62f2e5612710",
+      "bytes": 1589
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/previous_limit_pool.yaml",
+      "sha256": "4c14b9ad1f0497e2d6f13a72978f1ddda74039b7c0d182c5a5a98ac01a678443",
+      "bytes": 1276
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/realtime_quote.yaml",
+      "sha256": "e9141547fbb85cb71c8e2336c20a2ebc948e3926f4b2a09e4f59505adea91b94",
+      "bytes": 1308
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/repo_fixing.yaml",
+      "sha256": "0d6b2b5b39a92c6f3d2629f3f805f0b12d609ea9b3f691a50c896c12d81b4681",
+      "bytes": 762
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/security_snapshot.yaml",
+      "sha256": "474ab0397cb1aad33abcd070942586a8460c468b1d3f7af97c2d152eee5a6537",
+      "bytes": 621
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/shareholder_count.yaml",
+      "sha256": "f8801367f055e0b1d419e648c9bd3e1d72984ffe2823c2d464770403c1b7c9e4",
+      "bytes": 1702
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/stock_fund_flow.yaml",
+      "sha256": "3d99bacf48ba3438c90d2d544f7223ffcb0a464f69f95841affe3e99a503bbe1",
+      "bytes": 1741
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/strong_stock_pool.yaml",
+      "sha256": "41733f419a6dd9d3a25edf361294a973df76d878d01bbf46b9f25f53a38f2304",
+      "bytes": 1234
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/trading_calendar.yaml",
+      "sha256": "4be7571914129769aeca321d892b8aa2fbd068db1c7c0b691ae0d5cefe7f69e0",
+      "bytes": 476
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/normalization/wallstreetcn_news.yaml",
+      "sha256": "cdca43fb9ef1d825fe75358ea6c828fec02b892e344505d484d302123079fca9",
+      "bytes": 770
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/providers.yaml",
+      "sha256": "b19618e86c2ed5483bc7d9edefed1288a3c785cf49704967a2d8772607fecbeb",
+      "bytes": 80757
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004/yaml/config/schedules.yaml",
+      "sha256": "01b7e269ea4231024bf1c520f78fa571c2909986aad5573006bd80e186119113",
+      "bytes": 525
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-final-v2-20261004-tests.xml",
+      "sha256": "123114211cb618238d09f8d785ac1b9e0efb9f5b478a0730a2a6cdb3890e73c6",
+      "bytes": 56004
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-original-20261004/1-financial.py.bin",
+      "sha256": "71adb28326a1c03166278f5ae374cd88b0afb532aa670d5e37d7da7984f631e8",
+      "bytes": 26162
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-original-20261004/2-inputs.py.bin",
+      "sha256": "ff7783029d26b0ff6b5e01e5096af7e06523ea438e90b696fac9b2d39c66e8d3",
+      "bytes": 43721
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-original-20261004/3-factory.py.bin",
+      "sha256": "0aca251734e568c2835d8c4eaf00f9a251bf1dbb9f1a882fffdf6da7f7df9374",
+      "bytes": 21045
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-original-20261004/4-providers.yaml.bin",
+      "sha256": "a7a42832768d9474a897ca3577d2f41613bdcaef9ef7d333d49d691475031c2e",
+      "bytes": 79564
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-original-20261004/5-test_input_collection.py.bin",
+      "sha256": "bcedb285c2c98b71032d0b694af09bba7b545d4016d166e377ee32f34bdff7cf",
+      "bytes": 147931
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-original-20261004/6-replay_input_capabilities.py.bin",
+      "sha256": "0c9a86f84437af3cc246840a38c7599489a45d8fe95c304145d95794fba6772a",
+      "bytes": 36517
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-original-20261004/intermediate-v1-inputs.py.bin",
+      "sha256": "1edbc8cd336e18bd5f5b7ed4c99183dbd3c7bf4127be5620ff2b2e9d13ce5472",
+      "bytes": 47192
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-original-20261004/manifest.json",
+      "sha256": "c2636f3da985f3bcceec3edbaf9a579f55a30a8281073614252ce4d16db4d310",
+      "bytes": 2611
+    },
+    {
+      "path": "provider_validation/results/rates-bonds-original-20261004/metadata-correction.json",
+      "sha256": "596854369ce6aa80d9a2d78d85c612a331d6a860d09d09e1ba96a6f146410b2f",
+      "bytes": 662
+    },
+    {
+      "path": "provider_validation/tests/replay_input_capabilities.py",
+      "sha256": "70f383e330e6f7b93f6eac03f72eba7b91f23fe45e08f7617865ebf9ef2f3d95",
+      "bytes": 39109
+    },
+    {
+      "path": "src/stock_data_manage/cli.py",
+      "sha256": "582f5caedfc538a012d7a2f6e8cd7af3fe8b6fc9152e5b9e0a3fa2cb8810ae19",
+      "bytes": 14323
+    },
+    {
+      "path": "src/stock_data_manage/config/loader.py",
+      "sha256": "93bb55ab150c88751fe9a58a2b75737878c1b0f07233b8ec47009c4901bb11e9",
+      "bytes": 26090
+    },
+    {
+      "path": "src/stock_data_manage/pipeline/inputs.py",
+      "sha256": "cebd897df7455996bf41f5f00a0d8ba660c84539c1ef568f955bd43918f718f0",
+      "bytes": 47322
+    },
+    {
+      "path": "src/stock_data_manage/providers/akshare/boards.py",
+      "sha256": "2060f150831cebaf707ed5becedc35428bc41d4428bab31555ed1d2bf817d122",
+      "bytes": 12416
+    },
+    {
+      "path": "src/stock_data_manage/providers/baostock/industry.py",
+      "sha256": "16c41b379eecbd87f082bd042e27fad7f3d8d77b5bfc6a3e8a286209b068494a",
+      "bytes": 10837
+    },
+    {
+      "path": "src/stock_data_manage/providers/baostock/session.py",
+      "sha256": "70ce19cdde1d6a8ed0c3d3db29caa28d1d8069826136ab6dd7fb6a2ef8c7b832",
+      "bytes": 15771
+    },
+    {
+      "path": "src/stock_data_manage/providers/cctv/news.py",
+      "sha256": "8839bdeed801611e8e6d11cb9441e6ede7bc94d56507eaa2c903e605c772ee7d",
+      "bytes": 2538
+    },
+    {
+      "path": "src/stock_data_manage/providers/chinamoney/__init__.py",
+      "sha256": "f97ae4440a40a399e81b2e5ac61c0cf9d7c50fe9328490856e18030f9cf2692e",
+      "bytes": 34
+    },
+    {
+      "path": "src/stock_data_manage/providers/chinamoney/rates.py",
+      "sha256": "e7407f1d4272b69cb439bb0a7bad3960b65bb41328d752f541bc8ef50231f922",
+      "bytes": 2716
+    },
+    {
+      "path": "src/stock_data_manage/providers/contracts.py",
+      "sha256": "a4b16abc7e3686a4eb2791dcd4545fb2404e0214bf32e20db19d2582d39ea447",
+      "bytes": 5153
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/dividend.py",
+      "sha256": "5706a8cdb37eeeb8f66cb033a3091dd1b6ec1ed83d72d0f9fbeb8f5c75d9649b",
+      "bytes": 6407
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/financial.py",
+      "sha256": "6a8b8ae6d5740c78a7456697964ec07f3728f870d51f5237d2b409199081971b",
+      "bytes": 29705
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/fund_flow.py",
+      "sha256": "0cf655efa0854d18651bb4f04f985f0f210b81a6d9eff065604d235ed8f75280",
+      "bytes": 5046
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/limit_pool.py",
+      "sha256": "2fbdfe3da3129545dfe8d2e457be7c42225696ddd74270567ae765e4b413f5ae",
+      "bytes": 5663
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/realtime.py",
+      "sha256": "6e09d2a5014cf316c4d1e26e913a44d5c2fbad95fb44d95cba159ef881f03bca",
+      "bytes": 16746
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/shareholder.py",
+      "sha256": "4c9d80f4d51845ac5541c42275f44f2a18643db5e9ccb705a3e16168f8db44c1",
+      "bytes": 4865
+    },
+    {
+      "path": "src/stock_data_manage/providers/sina/calendar.py",
+      "sha256": "3d114045f960bfcc94ade1ee03e4d25ebdf6980ba68aa2d0a2236bed78aaef05",
+      "bytes": 1388
+    },
+    {
+      "path": "src/stock_data_manage/providers/tencent/daily.py",
+      "sha256": "487a14fcbfc47146d6d5fd291fbf41667aba435e5fed22ea1ef61ded513fcaa7",
+      "bytes": 9941
+    },
+    {
+      "path": "src/stock_data_manage/providers/tencent/minute.py",
+      "sha256": "ff5cf1e91327bcab2e072bcfae9f1f77dca71a84ba26e456c26580a4d59d9cc1",
+      "bytes": 4709
+    },
+    {
+      "path": "src/stock_data_manage/providers/tencent/snapshot.py",
+      "sha256": "3278cadac776fe8cfe5d02775a5bf8f53bc1cb96c595a5f418172f53047434bf",
+      "bytes": 5160
+    },
+    {
+      "path": "src/stock_data_manage/providers/transport.py",
+      "sha256": "7cf1c5f1f9b526e54e7d82e60b95b35e1f8f91e60effc31d74052f9273988b03",
+      "bytes": 16593
+    },
+    {
+      "path": "src/stock_data_manage/providers/wallstreetcn/news.py",
+      "sha256": "705de425d8526ced4e866d9beaf4c571c443c4955117c0cccada30ee06e07eea",
+      "bytes": 3203
+    },
+    {
+      "path": "src/stock_data_manage/quality/normalization.py",
+      "sha256": "3ed0d663b7fda9ac6cdf7f1252435f2351c783af3244ccba2c2b0f3891e29b3e",
+      "bytes": 14958
+    },
+    {
+      "path": "src/stock_data_manage/routing/factory.py",
+      "sha256": "1775bcf2613ad5224d9055b67316c90874f1f33811a3bab35ed1cd56f63069fc",
+      "bytes": 21455
+    },
+    {
+      "path": "src/stock_data_manage/storage/raw.py",
+      "sha256": "564c940feb99b358c41c5456c3142e7501b21505b5c2d8d88d811c53e145b752",
+      "bytes": 8487
+    },
+    {
+      "path": "tests/test_input_collection.py",
+      "sha256": "6b00e42588536d69be3c2112efb92ef3c2875fdafbc48162bf58736a3aa3c5aa",
+      "bytes": 163723
+    }
+  ]
+}

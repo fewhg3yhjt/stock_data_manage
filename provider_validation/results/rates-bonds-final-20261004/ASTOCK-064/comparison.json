@@ -1,0 +1,15 @@
+{
+  "input_id": "ASTOCK-064",
+  "mode": "offline_replay",
+  "row_count": 747,
+  "all_business_fields_equal": true,
+  "all_retained_source_fields_equal": true,
+  "request_comparison_equal": true,
+  "source_response_hashes": [
+    "f3d2ab542c2d2f7436757a878a095bb99b323912de9afd742d3aa3091ff36b19"
+  ],
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\rates-bonds-final-20261004\\ASTOCK-064\\candidate\\ASTOCK-064-a9cd09a052a3\\2026-10-04\\input_report\\chinamoney\\repo_fixing\\report.json",
+  "report_sha256": "fb7e47b04fe39718772822345e037be34f6c2c51ac9fe54b679be6374ed8bfb0",
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\rates-bonds-final-20261004\\ASTOCK-064\\original-parsed.json",
+  "original_parsed_sha256": "16ce86c72340d4b26388a378f29b25dc2f16ee8f0249140af1561e90cba939f1"
+}

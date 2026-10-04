@@ -1,0 +1,208 @@
+{
+  "validation_time_utc": "2026-10-04T00:38:44.779291+00:00",
+  "mode": "offline_replay",
+  "network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "verification_code": {
+    "path": "tests/test_input_collection.py",
+    "sha256": "6b00e42588536d69be3c2112efb92ef3c2875fdafbc48162bf58736a3aa3c5aa"
+  },
+  "runner": {
+    "path": "provider_validation/tests/replay_input_capabilities.py",
+    "sha256": "70f383e330e6f7b93f6eac03f72eba7b91f23fe45e08f7617865ebf9ef2f3d95"
+  },
+  "inputs": [
+    {
+      "input_id": "ASTOCK-064",
+      "report_path": "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-064/candidate/ASTOCK-064-5e9f1235868d/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "report_sha256": "fc5170bd9ab7612af6173b73b9ef1310dedce32646b0947069ab5f610b11c79a",
+      "source_manifest": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+      "source_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+      "row_count": 747,
+      "scope": {
+        "kind": "FR"
+      },
+      "code_version": "2b2751671667b5d4a4138ed06a994b58f43ec286777cb16e98709ce10005bc84",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-084",
+      "report_path": "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-084/candidate/ASTOCK-084-cdc1ddaafda2/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "report_sha256": "8feb4fbc723a1d8234d0eb217af5831b49663b0219d45f67b63156e667d09988",
+      "source_manifest": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+      "source_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+      "row_count": 322,
+      "scope": {
+        "include_delisted": false
+      },
+      "code_version": "2b2751671667b5d4a4138ed06a994b58f43ec286777cb16e98709ce10005bc84",
+      "result": "passed"
+    }
+  ],
+  "original_vs_provider": [
+    {
+      "input_id": "ASTOCK-064",
+      "mode": "offline_replay",
+      "row_count": 747,
+      "all_business_fields_equal": true,
+      "all_retained_source_fields_equal": true,
+      "request_comparison_equal": true,
+      "source_response_hashes": [
+        "f3d2ab542c2d2f7436757a878a095bb99b323912de9afd742d3aa3091ff36b19"
+      ],
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\rates-bonds-final-v2-20261004\\ASTOCK-064\\candidate\\ASTOCK-064-5e9f1235868d\\2026-10-04\\input_report\\chinamoney\\repo_fixing\\report.json",
+      "report_sha256": "fc5170bd9ab7612af6173b73b9ef1310dedce32646b0947069ab5f610b11c79a",
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\rates-bonds-final-v2-20261004\\ASTOCK-064\\original-parsed.json",
+      "original_parsed_sha256": "16ce86c72340d4b26388a378f29b25dc2f16ee8f0249140af1561e90cba939f1"
+    },
+    {
+      "input_id": "ASTOCK-084",
+      "mode": "offline_replay",
+      "row_count": 322,
+      "all_business_fields_equal": true,
+      "all_retained_source_fields_equal": true,
+      "request_comparison_equal": true,
+      "source_response_hashes": [
+        "ddb9a788be80d963c25561ffaa755ca0b622a8085b00cc962fb6cacae20599d5",
+        "2e6b6f39be34b7925ccc458b9fa11eaf20b7f016809538715004494f4ea6324e",
+        "23de8cb35f29dcf9cdf2c2e8c11efecbce0ae641f328e8a7a425ef36603960eb"
+      ],
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\rates-bonds-final-v2-20261004\\ASTOCK-084\\candidate\\ASTOCK-084-cdc1ddaafda2\\2026-10-04\\input_report\\eastmoney\\convertible_bonds\\report.json",
+      "report_sha256": "8feb4fbc723a1d8234d0eb217af5831b49663b0219d45f67b63156e667d09988",
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\rates-bonds-final-v2-20261004\\ASTOCK-084\\original-parsed.json",
+      "original_parsed_sha256": "02cbb92d8b595f1d21abf25d331d71f3f9382cd76383968ba6706fb540dbeaeb"
+    }
+  ],
+  "known_differences": [
+    "回购定盘没有原Provider，仅补必要CSV适配器；可转债扩展原财务Provider。",
+    "定盘保持原UA/Referer、requests.request、10/40秒超时、环境代理与零重试；可转债沿用原会话/三页严格查询。",
+    "FR归档748行文本含空行，实际747条非空日期；FDR无匹配归档，候选禁用。",
+    "可转债来源1059条，按原捕获日2026-10-01筛选322条，排除737条全量留证；配置可包含已摘牌。",
+    "回放状态时钟仅来自实际匹配的三页捕获时间；未来上市/摘牌、STAS00、未知市场和全排除空表用模拟验证。",
+    "来源行、完整解析行、排除行与标准字段分别留证；未认证单位标准列为空，原数字与原脚本完全对照。",
+    "没有新真实网络或生产写入；注入会话/cache不代表当前源可用性，独立全量完整性仍待验证。"
+  ],
+  "negative_checks": [
+    {
+      "input_id": "ASTOCK-064",
+      "mutation": "layout",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/rates-bonds-final-v2-20261004/f0/candidate/ASTOCK-064-b58ed6093a6d/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "report_sha256": "a331abd1ec8bdfd0fea469a5b50465870800c453e31f24406a3e827dc9e3c6d1",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-064",
+      "mutation": "spacer",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/rates-bonds-final-v2-20261004/f1/candidate/ASTOCK-064-06dd68932c08/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "report_sha256": "381304ce216f0a8ba3c4ae74324e40d278d02f4c66513f6254997b3cd4bced48",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-064",
+      "mutation": "date",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/rates-bonds-final-v2-20261004/f2/candidate/ASTOCK-064-3782d636b389/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "report_sha256": "a332780261054967d77aff9edb0d250ba9c73a5a5f9dd208d38683712bc0a8f3",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-064",
+      "mutation": "numeric",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/rates-bonds-final-v2-20261004/f3/candidate/ASTOCK-064-8c3c1b5d7c8d/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "report_sha256": "e7d02129354522fd643a73a356d3ad99ad96439c49244e9f8310b560e72a87e8",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-064",
+      "mutation": "empty_rate",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/rates-bonds-final-v2-20261004/f4/candidate/ASTOCK-064-970a338eae72/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "report_sha256": "be547fbcd7cca527b8cd8873d26ac9aa23d33e2a84ed3250af7bcaae04c1d8dd",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-064",
+      "mutation": "nonfinite",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/rates-bonds-final-v2-20261004/f5/candidate/ASTOCK-064-c52615bb5d46/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "report_sha256": "307a97b65872b4bcea501b40e94de5642601b84db114f3994b42524735ca37df",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-064",
+      "mutation": "duplicate",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/rates-bonds-final-v2-20261004/f6/candidate/ASTOCK-064-6d1d91307c4c/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "report_sha256": "2c5143fe3727957264771c38d9eaa2a1fc63a59cd77dfa3bb879130064fdfa05",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-064",
+      "mutation": "empty",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/rates-bonds-final-v2-20261004/f7/candidate/ASTOCK-064-f54cbbb93678/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
+      "report_sha256": "035c6c27fc8a4392f425372cdb05509fd41353dffeb7c91bbdf6473ef11b29de",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-084",
+      "mutation": "date",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/rates-bonds-final-v2-20261004/f8/candidate/ASTOCK-084-de7629b02bb7/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "report_sha256": "677a59f5fe5b22db9b5f5f066a3273704c2e78e60de0be8b48a60d7df142731e",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-084",
+      "mutation": "numeric",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/rates-bonds-final-v2-20261004/f9/candidate/ASTOCK-084-333e61161563/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "report_sha256": "ad6d94e67e18053e1becd19783afdfd43cf5334aaae98e6bc173b3ae3d7e3af3",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-084",
+      "mutation": "code",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/rates-bonds-final-v2-20261004/f10/candidate/ASTOCK-084-ac7af77d7671/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "report_sha256": "42840843eebdc7a7f25d224c8db0b55a5b95d7eb342ec11d98ecaa48b986809d",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-084",
+      "mutation": "duplicate",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/rates-bonds-final-v2-20261004/f11/candidate/ASTOCK-084-06ad15e414d6/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "report_sha256": "62ec3e4d1c46bf096cb7b51d4d44ac6a494b52134ae7cc94d61532db2d285572",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-084",
+      "mutation": "short_page",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/rates-bonds-final-v2-20261004/f12/candidate/ASTOCK-084-964288d7ba8c/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "report_sha256": "1361e7a3e8ad7a06b7645cff9dadcc20bdb012e00156d9dc532fb6ece1c7040d",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-084",
+      "mutation": "count_changed",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/rates-bonds-final-v2-20261004/f13/candidate/ASTOCK-084-9f52d8bb8d0e/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "report_sha256": "8a9d734aa717477eac4fbc7b7c9caa7e52022bf15ef16ed85b0e3b8f5a7bfbab",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-084",
+      "mutation": "empty",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/rates-bonds-final-v2-20261004/f14/candidate/ASTOCK-084-b0e34c4ef3f5/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
+      "report_sha256": "2d13046345fd85dd2ff36dc19204ecf7075ee10e3307cd02dc5300d608da7de4",
+      "result": "passed"
+    }
+  ]
+}

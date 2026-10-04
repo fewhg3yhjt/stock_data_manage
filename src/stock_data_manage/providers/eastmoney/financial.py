@@ -160,6 +160,57 @@ class EastMoneyFinancialMainProvider:
                 "source_total_count":self._event_total,"source_page_count":self._event_pages,
                 "requested_limit":5000,"source_report":"RPTA_WEB_RATE"})
 
+    def fetch_convertible_bonds(self, *, include_delisted=False, replay_reference_date=None):
+        """Original CB query/status contract; replay clock never becomes a source query."""
+        from datetime import datetime, timedelta, timezone
+        from ..contracts import InputFetchResult
+        if type(include_delisted) is not bool:
+            raise ValueError("include_delisted must be boolean")
+        quotes = ("f2~01~CONVERT_STOCK_CODE~CONVERT_STOCK_PRICE,f235~10~SECURITY_CODE~TRANSFER_PRICE,"
+                  "f236~10~SECURITY_CODE~TRANSFER_VALUE,f2~10~SECURITY_CODE~CURRENT_BOND_PRICE,"
+                  "f237~10~SECURITY_CODE~TRANSFER_PREMIUM_RATIO")
+        self._event_total = self._event_pages = None
+        source = self._event_rows("RPT_BOND_CB_LIST", "", "PUBLIC_START_DATE,SECURITY_CODE", "-1,1",
+            page_size=500, max_rows=20000, extra={"quoteColumns": quotes, "quoteType": "0"})
+        if not source:
+            raise RuntimeError("CB source list is empty")
+        reference_day = replay_reference_date() if callable(replay_reference_date) else replay_reference_date
+        today = (reference_day or datetime.now(timezone(timedelta(hours=8))).date()).isoformat()
+        out, excluded = [], []
+        for row in source:
+            listing, delist = _event_day(row.get("LISTING_DATE")), _event_day(row.get("DELIST_DATE"))
+            market = row.get("TRADE_MARKET")
+            if delist and delist <= today or market == "STAS00":
+                status = "delisted"
+            elif market not in ("CNSESH", "CNSESZ"):
+                status = "unknown"
+            elif listing and listing <= today:
+                status = "listed"
+            elif listing or row.get("PUBLIC_START_DATE"):
+                status = "upcoming"
+            else:
+                status = "unknown"
+            if status == "delisted" and not include_delisted:
+                excluded.append(row)
+                continue
+            if "SECURITY_CODE" not in row:
+                raise RuntimeError("CB source security code is missing")
+            item = {"code":row["SECURITY_CODE"], "name":row.get("SECURITY_NAME_ABBR"), "status":status,
+                "stock_code":row.get("CONVERT_STOCK_CODE"), "stock_name":row.get("SECURITY_SHORT_NAME"),
+                "rating":row.get("RATING"), "apply_code":row.get("CORRECODE"), "listing_date":listing, "delist_date":delist}
+            for name, source_name in {"apply_date":"PUBLIC_START_DATE", "expire_date":"EXPIRE_DATE", "convert_start":"TRANSFER_START_DATE"}.items():
+                item[name] = _event_day(row.get(source_name))
+            for name, source_name in {"issue_size_100m":"ACTUAL_ISSUE_SCALE", "initial_convert_price":"INITIAL_TRANSFER_PRICE",
+                "convert_price":"TRANSFER_PRICE", "bond_price":"CURRENT_BOND_PRICE", "stock_price":"CONVERT_STOCK_PRICE",
+                "convert_value":"TRANSFER_VALUE", "premium_pct":"TRANSFER_PREMIUM_RATIO"}.items():
+                item[name] = _event_num(row.get(source_name))
+            out.append(item)
+        if len({item["code"] for item in out}) != len(out):
+            raise RuntimeError("CB source contains duplicate selected codes")
+        return InputFetchResult(tuple(out), source_rows=tuple(source), excluded_rows=tuple(excluded), empty_is_valid=not out,
+            source_url=self.url+"?reportName=RPT_BOND_CB_LIST", mapping_context={"reference_date":today,
+                "source_total_count":self._event_total,"source_page_count":self._event_pages,"requested_limit":20000})
+
     def fetch_action_list(self, *, code=None, start=None, end=None, direction=None, progress=None, date=None, limit=100):
         """Source financial actions, preserving the successful V3.9 query contracts."""
         import json

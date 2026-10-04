@@ -76,6 +76,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                   Path(__file__).parents[1] / "providers/eastmoney/financial.py",
                   Path(__file__).parents[1] / "providers/wallstreetcn/news.py",
                   Path(__file__).parents[1] / "providers/cctv/news.py",
+                  Path(__file__).parents[1] / "providers/chinamoney/rates.py",
                   Path(__file__).parents[1] / "providers/eastmoney/dividend.py",
                   Path(__file__).parents[1] / "providers/eastmoney/fund_flow.py",
                   Path(__file__).parents[1] / "providers/eastmoney/realtime.py",
@@ -114,17 +115,19 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
     is_em_events = input_id in {"ASTOCK-078", "ASTOCK-079", "ASTOCK-080", "ASTOCK-081", "ASTOCK-082", "ASTOCK-083"}
     is_lpr = input_id == "ASTOCK-065"
     is_news = input_id in {"ASTOCK-034", "ASTOCK-035"}
-    if is_news:
+    is_repo_rate = input_id == "ASTOCK-064"
+    is_cb = input_id == "ASTOCK-084"
+    if is_news or is_repo_rate:
         import requests
         import urllib3
         report["transport_dependency"] = {"requests": requests.__version__, "urllib3": urllib3.__version__}
         code_version = hashlib.sha256((code_version + requests.__version__ + urllib3.__version__).encode()).hexdigest()
         report["code_version"] = code_version
-        report["news_transport_policy"] = {"source_contract": "successful runnable V3.9 source",
-            "headers": "original Chrome/126 User-Agent; requests defaults otherwise", "trust_env": True,
+        report["fixing_transport_policy" if is_repo_rate else "news_transport_policy"] = {"source_contract": "successful runnable V3.9 source",
+            "headers": "original Chrome/126 User-Agent and Chinamoney bkfrr Referer" if is_repo_rate else "original Chrome/126 User-Agent; requests defaults otherwise", "trust_env": True,
             "timeout_seconds": [10, 40], "allow_redirects": True, "retry_total": 0,
             "outer_capture_interval_seconds": 3}
-    if is_em_events or is_lpr:
+    if is_em_events or is_lpr or is_cb:
         import requests
         import urllib3
         report["transport_dependency"] = {"requests": requests.__version__, "urllib3": urllib3.__version__}
@@ -246,7 +249,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
         actual_code = None
         with ExitStack() as stack:
             runtime_parameters = dict(parameters)
-            if is_em_events or is_lpr:
+            if is_em_events or is_lpr or is_cb:
                 stack.callback(provider.close_event_session)
             if is_tencent_snapshot:
                 stack.callback(provider.transport.close)
@@ -270,6 +273,16 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                     replay_manifest=replay_manifest if mode == "replay" else None,
                     evidence_roots=(evidence_root, output_root), max_age_seconds=profile.refresh_interval_seconds or 86400,
                     sdk_retry_policy=is_stock_pool or input_id in {"ASTOCK-001", "ASTOCK-045", "ASTOCK-070", "ASTOCK-026", "ASTOCK-027", "ASTOCK-028"}))
+            if is_cb and mode == "replay":
+                from zoneinfo import ZoneInfo
+                def original_classification_day():
+                    successful = [event for event in response_events if event.get("outcome") == "response"]
+                    if not successful:
+                        raise ValueError("CB replay requires original capture-time evidence")
+                    capture_time = max(datetime.fromisoformat(event["source_ref"]["fetched_at_utc"]) for event in successful)
+                    return capture_time.astimezone(ZoneInfo("Asia/Shanghai")).date()
+                runtime_parameters["replay_reference_date"] = original_classification_day
+                report["replay_clock_semantics"] = "actual matched response capture day in China timezone for classification; not a historical quote query"
             if is_em_history or is_stock_pool:
                 from ..providers.contracts import EndpointContract, HttpResponse
                 def retained_payloads():
@@ -316,7 +329,27 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                 returned_window={"first": parameters["date"].isoformat(), "last": parameters["date"].isoformat()},
                 coverage_basis="source tc and returned SDK rows for requested qdate; not independent whole-market proof",
                 universe_completeness_verified=False)
-        mapping_rows = fetched.rows if is_em_history or is_lpr or is_news else source_rows
+        mapping_rows = fetched.rows if is_em_history or is_lpr or is_news or is_repo_rate or is_cb else source_rows
+        if is_news or is_repo_rate or is_cb:
+            parsed_ref = result_store.write_json(_json_value(mapping_rows), dataset="parsed_rows", provider=contract.provider,
+                endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="parsed-rows")
+            report["parsed_rows"] = {"path":parsed_ref.path.relative_to(directory).as_posix(),
+                "sha256":parsed_ref.content_hash,"row_count":len(mapping_rows),"code_version":code_version,
+                "source_response_hashes":[event["body_sha256"] for event in response_events]}
+        if is_cb:
+            excluded_ref = result_store.write_json(_json_value(fetched.excluded_rows), dataset="excluded_rows",
+                provider=contract.provider, endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="excluded-rows")
+            report["excluded_rows"] = {"path": excluded_ref.path.relative_to(directory).as_posix(),
+                "sha256": excluded_ref.content_hash, "row_count": len(fetched.excluded_rows)}
+            report.update(original_row_count=len(source_rows), selected_row_count=len(mapping_rows),
+                selection_policy="original CB delisted exclusion unless include_delisted is true",
+                classification_reference_date=fetched.mapping_context["reference_date"],
+                source_total_count=fetched.mapping_context["source_total_count"],source_page_count=fetched.mapping_context["source_page_count"],
+                requested_limit=20000,result_limited=len(source_rows)<fetched.mapping_context["source_total_count"],
+                returned_window={"first":fetched.mapping_context["reference_date"],"last":fetched.mapping_context["reference_date"],
+                    "meaning":"local status classification day; quotes remain the source response snapshot"},
+                coverage_basis="selected source-reported CB list; not independent complete market coverage",
+                universe_completeness_verified=False)
         if is_em_history or is_lpr:
             excluded_ref = result_store.write_json(_json_value(fetched.excluded_rows), dataset="excluded_rows",
                 provider=contract.provider, endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="excluded-rows")
@@ -350,12 +383,12 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                           coverage_scope="explicit requested stock list; no independent whole-market completeness proof")
             if any(day != parameters["as_of"].astimezone(ZoneInfo("Asia/Shanghai")).date() for day in quote_dates):
                 raise NormalizationError("source quote date differs from requested as_of date; snapshot cannot query history")
-        valid_empty = is_em_events and fetched.empty_is_valid
+        valid_empty = (is_em_events or is_cb) and fetched.empty_is_valid
         if (not source_rows or not mapping_rows) and not valid_empty:
             raise NormalizationError("temporary empty input; not certified as a valid empty dataset")
         mapping_context = {"provider": contract.provider}
         mapping_context.update(getattr(fetched, "mapping_context", {}))
-        if input_id.startswith("SDA-BOARD-") or is_tencent_snapshot or is_em_history or is_stock_pool or is_em_events or is_lpr or is_news:
+        if input_id.startswith("SDA-BOARD-") or is_tencent_snapshot or is_em_history or is_stock_pool or is_em_events or is_lpr or is_news or is_repo_rate or is_cb:
             successful = [event for event in response_events if event.get("outcome") == "response"]
             if not successful:
                 raise NormalizationError("source response evidence is required; an SDK memory cache alone is insufficient")
@@ -371,7 +404,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             mapping_context["source_snapshot_at"] = max(source_times)
             report["source_capture_window"] = {"first": min(source_times).isoformat(), "last": max(source_times).isoformat(),
                                                "meaning": "source response capture times; not row-level market timestamps"}
-            if not is_tencent_snapshot and not is_em_history and not is_stock_pool and not is_em_events and not is_lpr and not is_news:
+            if not is_tencent_snapshot and not is_em_history and not is_stock_pool and not is_em_events and not is_lpr and not is_news and not is_repo_rate and not is_cb:
                 report["returned_window"] = {"first": fetched.returned_first_key, "last": fetched.returned_last_key}
                 report["source_units"] = list(fetched.units)
                 report["coverage_basis"] = "returned SDK rows; not an independently verified market universe"
@@ -402,6 +435,11 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             else:
                 report.update(broadcast_date=fetched.mapping_context["broadcast_date"], article_content_verified=False,
                     content_requests=0, request_date_semantics="calendar broadcast date; not an exchange trading date")
+        if is_repo_rate:
+            dates = [row["date"] for row in mapping_rows]
+            report.update(rate_kind=parameters["kind"], returned_window={"first":min(dates),"last":max(dates)},
+                coverage_basis="returned fixing CSV dates; not independently complete history",
+                universe_completeness_verified=False)
         if "date" in parameters:
             mapping_context["trade_date"] = parameters["date"]
         if input_id.startswith("ASTOCK-002"):

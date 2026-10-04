@@ -55,6 +55,207 @@ POOL_SOURCE = {"ASTOCK-046": ("fetch_broken_board_pool", "stock_zt_pool_zbgc_em"
 EVENT_ARCHIVE = ROOT / "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson"
 NEWS_CASES = [("ASTOCK-034", {"config":{"channel":"a-stock-channel","limit":50}}, EVENT_ARCHIVE, 50),
               ("ASTOCK-035", {"request":{"trade_date":"2026-09-18"},"config":{"with_content":False}}, EVENT_ARCHIVE, 14)]
+RATES_BONDS_CASES = [("ASTOCK-064",{},EVENT_ARCHIVE,747),("ASTOCK-084",{},EVENT_ARCHIVE,322)]
+
+
+def rates_bonds_records(input_id):
+    needle="frr-chrt.csv" if input_id=="ASTOCK-064" else "reportName=RPT_BOND_CB_LIST"
+    return [json.loads(line) for line in EVENT_ARCHIVE.read_text(encoding="utf-8").splitlines() if needle in json.loads(line).get("url","")]
+
+
+def compare_rates_bonds_original(tmp_path,input_id,context,manifest,count):
+    import pandas as pd
+    from unittest.mock import patch
+    spec=importlib.util.spec_from_file_location("rates_bonds_original",ROOT/"provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py")
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);ns=module.load_shipped_code()
+    stamp=datetime.fromisoformat(rates_bonds_records(input_id)[-1]["fetched_at_utc"])
+    class SourceClock(datetime):
+        @classmethod
+        def now(cls,tz=None):return stamp.astimezone(tz) if tz else stamp.replace(tzinfo=None)
+    store=RawObjectStore(tmp_path/"original")
+    try:
+        with patch.dict(ns,{"datetime":SourceClock}),captured_requests(store,provider="chinamoney" if input_id=="ASTOCK-064" else "eastmoney",endpoint="rates-bonds",scope=context,code_version="original-v39-rates-bonds",pacer=RequestPacer(),replay_manifest=manifest) as events:
+            frame=ns["repo_fixing_rates"]("FR") if input_id=="ASTOCK-064" else ns["convertible_bonds"]()
+    finally:ns["EM_SESSION"].close()
+    parsed=[{k:None if pd.isna(v) else v for k,v in row.items()} for row in frame.to_dict(orient="records")]
+    original_path=tmp_path/"original-parsed.json";original_path.write_text(json.dumps(parsed,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    report=collect_input(input_id=input_id,context=context,config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=manifest)
+    assert report["status"]=="candidate_complete" and report["row_count"]==len(parsed)==count,report
+    keys=("url","method","outcome","status_code","body_sha256","request_headers","request_options")
+    assert [{k:r.get(k) for k in keys} for r in events]==[{k:r.get(k) for k in keys} for r in report["responses"]]
+    candidate_parsed=read_artifact(report,"parsed_rows")
+    assert candidate_parsed==[{name:old[name] for name in candidate.keys()} for candidate,old in zip(candidate_parsed,parsed)]
+    assert len(candidate_parsed)==len(parsed)
+    rows=read_artifact(report,"output")
+    for row,old in zip(rows,parsed):
+        assert row["snapshot_at"]==report["source_capture_window"]["last"]
+        for name,value in row.items():
+            if name=="snapshot_at":continue
+            if name=="rate_kind":assert value=="FR";continue
+            if name in report["unverified_fields"]:assert value is None;continue
+            assert value==old[{"rate_date":"date","source_bond_code":"code"}.get(name,name)]
+    source=read_artifact(report,"source_rows")
+    if input_id=="ASTOCK-064":
+        lines=[line.split(",") for line in RawObjectStore.read_response(manifest,rates_bonds_records(input_id)[0]).decode("utf-8-sig").splitlines() if line.strip()]
+        assert len(lines)==len(source)==747
+        assert source==[{"date":parts[0],"FR001":parts[6],"FR007":parts[7],"FR014":parts[8]} for parts in lines]
+        original_by_date={row["date"]:row for row in parsed}
+        for row in source:
+            assert all(float(row[name])==original_by_date[row["date"]][name] for name in ("FR001","FR007","FR014"))
+    else:
+        raw=[]
+        for record in rates_bonds_records(input_id):raw.extend(json.loads(RawObjectStore.read_response(manifest,record))["result"]["data"])
+        assert source==raw and len(raw)==report["source_total_count"]==1059
+        assert report["classification_reference_date"]=="2026-10-01" and report["excluded_rows"]["row_count"]==737
+        by_code={row["SECURITY_CODE"]:row for row in source}
+        assert {row["SECURITY_CODE"] for row in read_artifact(report,"excluded_rows")}==set(by_code)-{row["code"] for row in parsed}
+        numeric={"issue_size_100m":"ACTUAL_ISSUE_SCALE","initial_convert_price":"INITIAL_TRANSFER_PRICE","convert_price":"TRANSFER_PRICE",
+            "bond_price":"CURRENT_BOND_PRICE","stock_price":"CONVERT_STOCK_PRICE","convert_value":"TRANSFER_VALUE","premium_pct":"TRANSFER_PREMIUM_RATIO"}
+        for old in parsed:
+            for name,key in numeric.items():
+                value=by_code[old["code"]].get(key)
+                expected=None if value in (None,"","-","--") else float(value)
+                assert old[name]==expected
+    comparison={"input_id":input_id,"mode":"offline_replay","row_count":count,"all_business_fields_equal":True,
+        "all_retained_source_fields_equal":True,"request_comparison_equal":True,
+        "source_response_hashes":[r["body_sha256"] for r in events],"report_path":report["report_path"],
+        "report_sha256":hashlib.sha256(Path(report["report_path"]).read_bytes()).hexdigest(),
+        "original_parsed_path":str(original_path.resolve()),"original_parsed_sha256":hashlib.sha256(original_path.read_bytes()).hexdigest()}
+    (tmp_path/"comparison.json").write_text(json.dumps(comparison,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    return comparison
+
+
+@pytest.mark.parametrize("input_id,context,manifest,count",RATES_BONDS_CASES)
+def test_rates_bonds_preserve_original_fields_requests_and_clock(tmp_path,no_network,input_id,context,manifest,count):
+    compare_rates_bonds_original(tmp_path,input_id,context,manifest,count)
+
+
+RATES_BONDS_FAILURES=[("ASTOCK-064","layout"),("ASTOCK-064","spacer"),("ASTOCK-064","date"),
+    ("ASTOCK-064","numeric"),("ASTOCK-064","empty_rate"),("ASTOCK-064","nonfinite"),("ASTOCK-064","duplicate"),("ASTOCK-064","empty"),
+    ("ASTOCK-084","date"),("ASTOCK-084","numeric"),("ASTOCK-084","code"),("ASTOCK-084","duplicate"),
+    ("ASTOCK-084","short_page"),("ASTOCK-084","count_changed"),("ASTOCK-084","empty")]
+
+
+def rates_bonds_fixture(tmp_path,input_id,mutation):
+    store=RawObjectStore(tmp_path/"fixture")
+    for page,record in enumerate(rates_bonds_records(input_id),1):
+        body=RawObjectStore.read_response(EVENT_ARCHIVE,record)
+        if input_id=="ASTOCK-064":
+            lines=[line for line in body.decode("utf-8-sig").splitlines() if line.strip()];parts=lines[0].split(",")
+            if mutation=="layout":parts.pop()
+            elif mutation=="spacer":parts[2]="changed"
+            elif mutation=="date":parts[0]="bad"
+            elif mutation=="numeric":parts[6]="bad"
+            elif mutation=="empty_rate":parts[6]=""
+            elif mutation=="nonfinite":parts[6]="NaN"
+            elif mutation=="zero_negative":parts[6:9]=["0","-0.25","1.5"]
+            lines[0]=",".join(parts)
+            if mutation=="duplicate":lines[-1]=lines[0]
+            if mutation=="empty":lines=[]
+            body=("\ufeff\n"+"\n".join(lines)).encode()
+        else:
+            payload=json.loads(body);rows=payload["result"]["data"]
+            if mutation=="all_delisted":
+                for row in rows:row["TRADE_MARKET"]="STAS00"
+            if page==1:
+                if mutation=="empty":payload["code"]=9201;payload["result"]=None
+                elif mutation=="date":rows[0]["LISTING_DATE"]="bad"
+                elif mutation=="numeric":rows[0]["TRANSFER_PRICE"]="bad"
+                elif mutation=="code":rows[0].pop("SECURITY_CODE")
+                elif mutation=="duplicate":rows[1]=rows[0].copy()
+                elif mutation=="short_page":rows.pop()
+                elif mutation=="statuses":
+                    rows[0]["LISTING_DATE"]="2026-10-02 00:00:00";rows[0]["DELIST_DATE"]="2026-10-20 00:00:00"
+                    rows[1]["TRADE_MARKET"]="unrecognized-market";rows[2]["TRADE_MARKET"]="STAS00"
+            if page==2 and mutation=="count_changed":payload["result"]["count"]+=1
+            body=json.dumps(payload).encode()
+        response=requests.Response();response.status_code=200;response.encoding="utf-8";response._content=body
+        store.record_response(response=response,url=record["url"],method="GET",request_headers=record["request_headers"],
+            provider="chinamoney" if input_id=="ASTOCK-064" else "eastmoney",endpoint="rates-bonds",code_version="offline-fixture",
+            fetched_at=datetime.fromisoformat(record["fetched_at_utc"]),
+            scope={"synthetic":True,"mutation":mutation,"clock":"original archive capture time for offline simulation",
+                "validation_time_utc":datetime.now(timezone.utc).isoformat(),"parent_sha256":record["body_sha256"]})
+    return store.root/"manifest.ndjson"
+
+
+@pytest.mark.parametrize("input_id,mutation",RATES_BONDS_FAILURES)
+def test_rates_bonds_failures_retain_evidence(tmp_path,no_network,input_id,mutation):
+    manifest=rates_bonds_fixture(tmp_path,input_id,mutation)
+    report=collect_input(input_id=input_id,context={},config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=manifest)
+    assert report["status"]=="failed" and report["failure_class"]=="RuntimeError" and "output" not in report,report
+    assert report["responses"] and report["production_writes"]==report["live_http_calls"]==0
+
+
+def test_rates_bonds_include_delisted_and_future_status_semantics(tmp_path,no_network):
+    rate_manifest=rates_bonds_fixture(tmp_path/"zero_negative","ASTOCK-064","zero_negative")
+    rates=collect_input(input_id="ASTOCK-064",context={},config_root=ROOT/"config",output_root=tmp_path/"zero_negative"/"candidate",replay_manifest=rate_manifest)
+    assert rates["status"]=="candidate_complete",rates
+    latest=read_artifact(rates,"parsed_rows")[-1];assert latest["FR001"]==0 and latest["FR007"]==-0.25 and latest["FR014"]==1.5
+    full=collect_input(input_id="ASTOCK-084",context={"config":{"include_delisted":True}},config_root=ROOT/"config",output_root=tmp_path/"all",replay_manifest=EVENT_ARCHIVE)
+    assert full["status"]=="candidate_complete" and full["row_count"]==1059 and full["excluded_rows"]["row_count"]==0,full
+    rows=read_artifact(full,"output");assert sum(row["status"]=="delisted" for row in rows)==737
+    for mutation in ["statuses","all_delisted"]:
+        manifest=rates_bonds_fixture(tmp_path/mutation,"ASTOCK-084",mutation)
+        report=collect_input(input_id="ASTOCK-084",context={},config_root=ROOT/"config",output_root=tmp_path/mutation/"candidate",replay_manifest=manifest)
+        assert report["status"]=="candidate_complete" and report["classification_reference_date"]=="2026-10-01",report
+        if mutation=="all_delisted":assert report["row_count"]==0 and report["excluded_rows"]["row_count"]==1059
+        else:
+            source=json.loads(RawObjectStore.read_response(manifest,json.loads(manifest.read_text().splitlines()[0])))["result"]["data"]
+            selected={r["source_bond_code"]:r for r in read_artifact(report,"output")}
+            assert selected[source[0]["SECURITY_CODE"]]["status"]=="upcoming" and selected[source[1]["SECURITY_CODE"]]["status"]=="unknown"
+            assert source[2]["SECURITY_CODE"] not in selected
+
+
+def test_rates_bonds_yaml_projection_and_scope(tmp_path,no_network):
+    config=tmp_path/"config";shutil.copytree(ROOT/"config",config)
+    path=config/"normalization/convertible_bonds.yaml";rule=yaml.safe_load(path.read_text(encoding="utf-8"));rule["rules"][0]["field_mapping"]["name"]="stock_name"
+    path.write_text(yaml.safe_dump(rule,allow_unicode=True),encoding="utf-8")
+    report=collect_input(input_id="ASTOCK-084",context={},config_root=config,output_root=tmp_path/"candidate",replay_manifest=EVENT_ARCHIVE,
+        fields=["snapshot_at","source_bond_code","status","name"])
+    assert report["status"]=="candidate_complete",report
+    rows=read_artifact(report,"output");source=read_artifact(report,"source_rows");assert rows[0]["name"]==source[0]["SECURITY_SHORT_NAME"] and len(rows[0])==4
+    with pytest.raises(ValueError):collect_input(input_id="ASTOCK-064",context={"config":{"kind":"FDR"}},config_root=ROOT/"config",output_root=tmp_path/"bad",replay_manifest=EVENT_ARCHIVE)
+    for input_id in ["ASTOCK-064","ASTOCK-084"]:
+        for context in [{"request":{"trade_date":"2026-10-01"}},{"config":{"limit":50}},{"request":{"as_of":"2026-10-01"}}]:
+            with pytest.raises(ValueError):collect_input(input_id=input_id,context=context,config_root=ROOT/"config",output_root=tmp_path/"bad",replay_manifest=EVENT_ARCHIVE)
+
+
+def test_rates_bonds_http_policy_and_cache(tmp_path,monkeypatch):
+    from unittest.mock import patch
+    from stock_data_manage.storage.raw import sanitized_url
+    originals=[r for case in RATES_BONDS_CASES for r in rates_bonds_records(case[0])];seen=[];bond_sessions=[]
+    def send(session,request,**kwargs):
+        record=next(r for r in originals if sanitized_url(r["url"])==sanitized_url(request.url));seen.append(request.url)
+        assert session.trust_env is True
+        if "frr-chrt.csv" in request.url:
+            assert kwargs["timeout"]==(10,40) and request.headers["Referer"]=="https://www.chinamoney.com.cn/chinese/bkfrr/"
+            assert session.get_adapter(request.url).max_retries.total==0
+        else:
+            bond_sessions.append(session);assert kwargs["timeout"]==20 and session.get_adapter(request.url).max_retries.total==3
+        response=requests.Response();response.status_code=200;response.encoding="utf-8";response.headers["Content-Type"]=record["content_type"]
+        response._content=RawObjectStore.read_response(EVENT_ARCHIVE,record);response.url=request.url;return response
+    with patch("requests.Session.send",send):
+        for input_id,context,_,_ in RATES_BONDS_CASES:
+            first=collect_input(input_id=input_id,context=context,config_root=ROOT/"config",output_root=tmp_path/"candidate",mode="live",evidence_root=tmp_path/"unused")
+            second=collect_input(input_id=input_id,context=context,config_root=ROOT/"config",output_root=tmp_path/"candidate",mode="live",evidence_root=tmp_path/"candidate")
+            assert first["status"]==second["status"]=="candidate_complete",(first,second)
+            assert first["live_http_calls"]==(1 if input_id=="ASTOCK-064" else 3) and second["live_http_calls"]==0
+            assert read_artifact(first,"output")==read_artifact(second,"output")
+    assert len(seen)==4 and len({id(session) for session in bond_sessions})==1
+    (tmp_path/"fixture-mode.json").write_text(json.dumps({"mode":"injected Session; not real live source validation","real_http_calls":0,"fixture_send_calls":4}),encoding="utf-8")
+
+
+def test_cb_replay_clock_uses_actual_matched_pages(tmp_path,no_network):
+    store=RawObjectStore(tmp_path/"fixture")
+    for later in (False,True):
+        for record in rates_bonds_records("ASTOCK-084"):
+            response=requests.Response();response.status_code=200;response.encoding="utf-8";response._content=RawObjectStore.read_response(EVENT_ARCHIVE,record)
+            store.record_response(response=response,url=record["url"],method="GET",request_headers=record["request_headers"],provider="eastmoney",endpoint="convertible_bonds",code_version="offline-fixture",
+                fetched_at=datetime(2027,12,31,tzinfo=timezone.utc) if later else datetime.fromisoformat(record["fetched_at_utc"]),
+                scope={"synthetic":True,"scenario":"later unrelated capture with identical query", "later":later,"parent_sha256":record["body_sha256"]})
+    report=collect_input(input_id="ASTOCK-084",context={},config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=store.root/"manifest.ndjson")
+    assert report["status"]=="candidate_complete" and report["row_count"]==322 and report["classification_reference_date"]=="2026-10-01",report
+    assert len(report["responses"])==3 and all(r["source_ref"]["line"]<=3 for r in report["responses"])
 
 
 def news_source_record(input_id):

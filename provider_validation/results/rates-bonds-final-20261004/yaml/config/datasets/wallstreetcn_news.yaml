@@ -1,0 +1,31 @@
+dataset:
+  name: wallstreetcn_news
+  display_name: 华尔街见闻快讯输入
+  primary_key:
+  - snapshot_at
+  - source_news_id
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  source_news_id:
+    type: string
+    required: true
+  news_time:
+    type: datetime
+    required: true
+  title:
+    type: string
+    required: false
+  content:
+    type: string
+    required: false
+  importance:
+    type: integer
+    required: false
+  channels:
+    type: string
+    required: false
+  url:
+    type: string
+    required: false

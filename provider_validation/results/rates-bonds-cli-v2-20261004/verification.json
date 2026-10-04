@@ -1,0 +1,56 @@
+{
+  "validation_time_utc": "2026-10-04T00:41:34.890982+00:00",
+  "mode": "actual CLI offline replay",
+  "network_requests": 0,
+  "production_writes": 0,
+  "results": [
+    {
+      "input_id": "ASTOCK-064",
+      "count": 747,
+      "command": [
+        "D:\\Program Files\\Python\\python.exe",
+        "-m",
+        "stock_data_manage.cli",
+        "collect-input",
+        "--input",
+        "ASTOCK-064",
+        "--mode",
+        "replay",
+        "--replay-manifest",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\manifest.ndjson",
+        "--output-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\rates-bonds-cli-v2-20261004\\candidate"
+      ],
+      "exit_code": 0,
+      "stdout": "provider_validation/results/rates-bonds-cli-v2-20261004/ASTOCK-064-stdout.json",
+      "stdout_sha256": "8c612725b3c1b57a9ed38828fc3851aac74ec345a622bcc1718f24399d1be79c",
+      "stderr": "provider_validation/results/rates-bonds-cli-v2-20261004/ASTOCK-064-stderr.bin",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\rates-bonds-cli-v2-20261004\\candidate\\ASTOCK-064-8bf136887968\\2026-10-04\\input_report\\chinamoney\\repo_fixing\\report.json"
+    },
+    {
+      "input_id": "ASTOCK-084",
+      "count": 322,
+      "command": [
+        "D:\\Program Files\\Python\\python.exe",
+        "-m",
+        "stock_data_manage.cli",
+        "collect-input",
+        "--input",
+        "ASTOCK-084",
+        "--mode",
+        "replay",
+        "--replay-manifest",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\manifest.ndjson",
+        "--output-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\rates-bonds-cli-v2-20261004\\candidate"
+      ],
+      "exit_code": 0,
+      "stdout": "provider_validation/results/rates-bonds-cli-v2-20261004/ASTOCK-084-stdout.json",
+      "stdout_sha256": "b3de4a8ae06188f0cd8f456ca81fe1c7879399b96d90b27078680d7e0bca20b7",
+      "stderr": "provider_validation/results/rates-bonds-cli-v2-20261004/ASTOCK-084-stderr.bin",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\rates-bonds-cli-v2-20261004\\candidate\\ASTOCK-084-15ffd3ea5325\\2026-10-04\\input_report\\eastmoney\\convertible_bonds\\report.json"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "validation_time_utc": "2026-10-04T00:22:48.562949+00:00",
+  "authorization": "confirmed continuous remaining-input conversion",
+  "scope": [
+    "ASTOCK-064",
+    "ASTOCK-084"
+  ],
+  "original_files": [
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/financial.py",
+      "snapshot": "provider_validation/results/rates-bonds-original-20261004/1-financial.py.bin",
+      "sha256": "71adb28326a1c03166278f5ae374cd88b0afb532aa670d5e37d7da7984f631e8"
+    },
+    {
+      "path": "src/stock_data_manage/pipeline/inputs.py",
+      "snapshot": "provider_validation/results/rates-bonds-original-20261004/2-inputs.py.bin",
+      "sha256": "ff7783029d26b0ff6b5e01e5096af7e06523ea438e90b696fac9b2d39c66e8d3"
+    },
+    {
+      "path": "src/stock_data_manage/routing/factory.py",
+      "snapshot": "provider_validation/results/rates-bonds-original-20261004/3-factory.py.bin",
+      "sha256": "0aca251734e568c2835d8c4eaf00f9a251bf1dbb9f1a882fffdf6da7f7df9374"
+    },
+    {
+      "path": "config/providers.yaml",
+      "snapshot": "provider_validation/results/rates-bonds-original-20261004/4-providers.yaml.bin",
+      "sha256": "a7a42832768d9474a897ca3577d2f41613bdcaef9ef7d333d49d691475031c2e"
+    },
+    {
+      "path": "tests/test_input_collection.py",
+      "snapshot": "provider_validation/results/rates-bonds-original-20261004/5-test_input_collection.py.bin",
+      "sha256": "bcedb285c2c98b71032d0b694af09bba7b545d4016d166e377ee32f34bdff7cf"
+    },
+    {
+      "path": "provider_validation/tests/replay_input_capabilities.py",
+      "snapshot": "provider_validation/results/rates-bonds-original-20261004/6-replay_input_capabilities.py.bin",
+      "sha256": "0c9a86f84437af3cc246840a38c7599489a45d8fe95c304145d95794fba6772a"
+    }
+  ],
+  "source_code": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+  "source_code_sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03",
+  "raw_manifest": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+  "raw_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+  "findings": [
+    "No Chinamoney adapter exists; add the necessary original CSV adapter, FR only archived.",
+    "Extend existing financial Provider for CB; preserve strict three-page query, quotes, status logic and delisted selection.",
+    "Original clock for offline CB classification must be the archived response capture day in China timezone.",
+    "No live network requests; rate/amount units pending independent certification."
+  ]
+}

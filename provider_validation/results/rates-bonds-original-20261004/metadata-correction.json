@@ -1,0 +1,15 @@
+{
+  "reason": "Final metadata specifies Chinamoney Referer explicitly under fixing_transport_policy; business processing unchanged.",
+  "old_code_snapshot": "provider_validation/results/rates-bonds-original-20261004/intermediate-v1-inputs.py.bin",
+  "sha256": "1edbc8cd336e18bd5f5b7ed4c99183dbd3c7bf4127be5620ff2b2e9d13ce5472",
+  "final_code_sha256": "cebd897df7455996bf41f5f00a0d8ba660c84539c1ef568f955bd43918f718f0",
+  "superseded_artifacts": [
+    "rates-bonds-final-20261004",
+    "rates-bonds-cli-20261004"
+  ],
+  "final_artifacts": [
+    "rates-bonds-final-v2-20261004",
+    "rates-bonds-cli-v2-20261004"
+  ],
+  "real_network_requests": 0
+}

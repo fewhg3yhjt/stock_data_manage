@@ -38,6 +38,7 @@ def build_input_provider(contract, *, providers_path, client=None):
                         "ASTOCK-080": "fetch_action_list", "ASTOCK-081": "fetch_action_list", "ASTOCK-082": "fetch_action_list", "ASTOCK-083": "fetch_action_list",
                         "ASTOCK-065": "fetch_lpr_history",
                         "ASTOCK-034": "fetch", "ASTOCK-035": "fetch",
+                        "ASTOCK-064": "fetch", "ASTOCK-084": "fetch_convertible_bonds",
                         "SDA-BOARD-001": "fetch_industry_list", "SDA-BOARD-002": "fetch_industry_daily",
                         "SDA-BOARD-003": "fetch_fund_flow", "SDA-BOARD-004": "fetch_fund_flow",
                         "SDA-BOARD-005": "fetch_snapshot", "SDA-BOARD-006": "fetch_snapshot"}
@@ -75,6 +76,11 @@ def build_input_provider(contract, *, providers_path, client=None):
     if contract.input_id == "ASTOCK-035":
         from ..providers.cctv.news import CCTVNewsProvider
         return CCTVNewsProvider()
+    if contract.input_id == "ASTOCK-064":
+        from ..providers.chinamoney.rates import ChinamoneyRepoRateProvider
+        return ChinamoneyRepoRateProvider()
+    if contract.input_id == "ASTOCK-084":
+        return EastMoneyFinancialMainProvider(endpoint=contract.endpoint, capability_version="eastmoney-cb-input-v1")
     if contract.input_id in {"ASTOCK-065", "ASTOCK-078", "ASTOCK-079", "ASTOCK-080", "ASTOCK-081", "ASTOCK-082", "ASTOCK-083"}:
         return EastMoneyFinancialMainProvider(endpoint=contract.endpoint,
             capability_version="eastmoney-lpr-input-v1" if contract.input_id == "ASTOCK-065" else "eastmoney-events-input-v1")
