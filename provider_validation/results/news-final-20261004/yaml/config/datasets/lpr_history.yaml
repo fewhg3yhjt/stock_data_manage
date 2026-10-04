@@ -1,0 +1,20 @@
+dataset:
+  name: lpr_history
+  display_name: LPR历史输入
+  primary_key:
+  - rate_date
+fields:
+  rate_date:
+    type: date
+    required: true
+  snapshot_at:
+    type: datetime
+    required: true
+  lpr_1y:
+    type: decimal
+    unit: percent
+    required: false
+  lpr_5y:
+    type: decimal
+    unit: percent
+    required: false

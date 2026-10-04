@@ -1,0 +1,28 @@
+dataset: wallstreetcn_news
+rules:
+- context_fields:
+    snapshot_at: source_snapshot_at
+  endpoint: news_lives
+  evidence_refs:
+  - ASTOCK-034
+  field_mapping:
+    channels: channels
+    content: content
+    importance: importance
+    news_time: time
+    source_news_id: id
+    title: content
+    url: url
+  id: wallstreetcn-news-input-v1
+  input_id: ASTOCK-034
+  notes: 保留原可执行脚本字段及北京时间；snapshot_at为原响应采集时间。原始响应和来源行留证；未认证全量覆盖及当前实时可用性。
+  null_values:
+  - null
+  provider: wallstreetcn
+  status: pending_validation
+  transforms:
+    news_time:
+      format: '%Y-%m-%d %H:%M:%S'
+      timezone: Asia/Shanghai
+  unverified_fields: []
+  version: wallstreetcn-news-input-v1

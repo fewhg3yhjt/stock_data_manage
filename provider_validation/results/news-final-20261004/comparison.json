@@ -1,0 +1,183 @@
+{
+  "validation_time_utc": "2026-10-04T00:17:00.566345+00:00",
+  "mode": "offline_replay",
+  "network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "verification_code": {
+    "path": "tests/test_input_collection.py",
+    "sha256": "bcedb285c2c98b71032d0b694af09bba7b545d4016d166e377ee32f34bdff7cf"
+  },
+  "runner": {
+    "path": "provider_validation/tests/replay_input_capabilities.py",
+    "sha256": "0c9a86f84437af3cc246840a38c7599489a45d8fe95c304145d95794fba6772a"
+  },
+  "inputs": [
+    {
+      "input_id": "ASTOCK-034",
+      "report_path": "provider_validation/results/news-final-20261004/ASTOCK-034/candidate/ASTOCK-034-9c36f6da2654/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "report_sha256": "d10dc82dc1825d53f0429aea094894d43c200aeba9516ec7aa8ddb4881bf1f17",
+      "source_manifest": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+      "source_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+      "row_count": 50,
+      "scope": {
+        "channel": "a-stock-channel",
+        "limit": 50
+      },
+      "code_version": "296f8fc6c8bb99e601d9d77d92f5e31c3f5986760b06f3a3e0927cab4df6c0a5",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-035",
+      "report_path": "provider_validation/results/news-final-20261004/ASTOCK-035/candidate/ASTOCK-035-a38ce474d9f3/2026-10-04/input_report/cctv/news/report.json",
+      "report_sha256": "baff9a3fe2544b7db5a82a7ffad2703ffca87be0fbac806e7b440d593abcdc39",
+      "source_manifest": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+      "source_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+      "row_count": 14,
+      "scope": {
+        "date": "2026-09-18",
+        "with_content": false
+      },
+      "code_version": "296f8fc6c8bb99e601d9d77d92f5e31c3f5986760b06f3a3e0927cab4df6c0a5",
+      "result": "passed"
+    }
+  ],
+  "original_vs_provider": [
+    {
+      "input_id": "ASTOCK-034",
+      "mode": "offline_replay",
+      "row_count": 50,
+      "all_business_fields_equal": true,
+      "all_retained_source_fields_equal": true,
+      "request_comparison_equal": true,
+      "source_response_hashes": [
+        "a7c874fbbe260d8b207835c57f51359e07bd92626f58f2c1ef8614592aa1dba7"
+      ],
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\news-final-20261004\\ASTOCK-034\\candidate\\ASTOCK-034-9c36f6da2654\\2026-10-04\\input_report\\wallstreetcn\\news_lives\\report.json",
+      "report_sha256": "d10dc82dc1825d53f0429aea094894d43c200aeba9516ec7aa8ddb4881bf1f17",
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\news-final-20261004\\ASTOCK-034\\original-parsed.json",
+      "original_parsed_sha256": "02d6ab940c644bfd80e0927b082f34d0e36c2c4345fa8ef9c7c90abceda33a55"
+    },
+    {
+      "input_id": "ASTOCK-035",
+      "mode": "offline_replay",
+      "row_count": 14,
+      "all_business_fields_equal": true,
+      "all_retained_source_fields_equal": true,
+      "request_comparison_equal": true,
+      "source_response_hashes": [
+        "8373a95432cfd8403af3820c0c37729dc141c778f53dacfd24fec8d9fa490a5e"
+      ],
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\news-final-20261004\\ASTOCK-035\\candidate\\ASTOCK-035-a38ce474d9f3\\2026-10-04\\input_report\\cctv\\news\\report.json",
+      "report_sha256": "baff9a3fe2544b7db5a82a7ffad2703ffca87be0fbac806e7b440d593abcdc39",
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\news-final-20261004\\ASTOCK-035\\original-parsed.json",
+      "original_parsed_sha256": "b6add9f11b07e427dccdc908f15eafa1ce30ef9d711877df5ad150bd238215ef"
+    }
+  ],
+  "known_differences": [
+    "原架构没有两来源适配器，仅新增必要Provider与字段模板，未新增管理层。",
+    "原requests.request、Chrome/126 UA、环境代理、重定向、10/40秒超时与零重试保持，原响应字节保留。",
+    "来源标题/正文/北京时间/重要性/标签/链接与原脚本对照；原脚本运行时fetched_at替换为原响应捕获时间。",
+    "见闻只验证A股频道50条归档；原无效global配置改为a-stock-channel。游标保留，跨页检查为合成夹具。",
+    "央视只验证2026-09-18的14条目录，正文禁用；播出日是日历日，周末和旧标题结构用合成夹具验证。",
+    "未新增真实实时调用或生产写入；会话、缓存检查是注入夹具，当前可用性与完整历史待验证。"
+  ],
+  "negative_checks": [
+    {
+      "input_id": "ASTOCK-034",
+      "mutation": "business",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/news-final-20261004/f0/candidate/ASTOCK-034-537d6ec77e4f/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "report_sha256": "6e3d79cd7f64f0e669cf6ec84a19a3cd6cbc965b8ebbfc8c598d24acaf7941d5",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-034",
+      "mutation": "empty",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/news-final-20261004/f1/candidate/ASTOCK-034-4bb5102502f7/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "report_sha256": "12f50afd07326824a6b25a03aa9ba6b80d0930829831ef0652fd1b012b86ec23",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-034",
+      "mutation": "json",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/news-final-20261004/f2/candidate/ASTOCK-034-48d02b830a43/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "report_sha256": "7df5a0d4178d6ead04d0fe332554204605cc5a19074825b7135248ee95bf0b91",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-034",
+      "mutation": "time",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/news-final-20261004/f3/candidate/ASTOCK-034-aec6e44de08c/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "report_sha256": "3c31b53935f34cc053b33fcc2fef9d819fe92c3d4b3a53685a85672aa969ce43",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-034",
+      "mutation": "channels",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/news-final-20261004/f4/candidate/ASTOCK-034-d430d1803fc3/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "report_sha256": "e5d3d659307c489df9d011e163295988e34119e6af16718ffdbabd8d9a177d6b",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-034",
+      "mutation": "id",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/news-final-20261004/f5/candidate/ASTOCK-034-3f7d8508d045/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "report_sha256": "975f1eda85c2b9ac365520d33e419a0b91e3d0c466220c5ea0e80ee3ce69f34f",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-034",
+      "mutation": "score",
+      "failure_class": "NormalizationError",
+      "report_path": "provider_validation/results/news-final-20261004/f6/candidate/ASTOCK-034-5e70a6adabe2/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "report_sha256": "2854fe46c0c29a54506a944cd926d89a5d0bc53d4bfe397846b8a9a57b72ebd1",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-034",
+      "mutation": "duplicate",
+      "failure_class": "NormalizationError",
+      "report_path": "provider_validation/results/news-final-20261004/f7/candidate/ASTOCK-034-59ff477210f2/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "report_sha256": "02babc43a1c3d119a0c0fabaf25e00c99d1b5ea1a0d6a5fc421754118e16c8ed",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-034",
+      "mutation": "http429",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/news-final-20261004/f8/candidate/ASTOCK-034-8aca8d03025f/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "report_sha256": "ed4c8122886cc6f608896a4e2808bc1cfe434815cab52b443e54b11081e61f93",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-035",
+      "mutation": "missing",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/news-final-20261004/f9/candidate/ASTOCK-035-b15361e6630b/2026-10-04/input_report/cctv/news/report.json",
+      "report_sha256": "11886dcd1835f0819f5159c88a9e7e6449042272576ed703b6976e5fc9d94e54",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-035",
+      "mutation": "structure",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/news-final-20261004/f10/candidate/ASTOCK-035-a978ee750ceb/2026-10-04/input_report/cctv/news/report.json",
+      "report_sha256": "df94353c793a473b352fb3781ab8b0fe91b3b30d1254c078338c66cb9802fb31",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-035",
+      "mutation": "duplicate",
+      "failure_class": "NormalizationError",
+      "report_path": "provider_validation/results/news-final-20261004/f11/candidate/ASTOCK-035-370b3fa1b25b/2026-10-04/input_report/cctv/news/report.json",
+      "report_sha256": "c4f337bf345202b80111ae33fce0879b6d070833e6e6dca4169157a9b822ff5e",
+      "result": "passed"
+    }
+  ]
+}

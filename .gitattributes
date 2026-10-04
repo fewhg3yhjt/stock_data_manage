@@ -165,3 +165,16 @@
 /config/datasets/lpr_history.yaml text eol=lf
 /config/normalization/lpr_history.yaml text eol=lf
 /provider_validation/docs/2026-10-04-lpr-input-collection.md text eol=lf
+
+# News investigation and replay evidence is immutable.
+/provider_validation/results/news-*-20261004/** -text whitespace=cr-at-eol
+/provider_validation/results/news-*-20261004/**/*.bin binary
+/provider_validation/results/news-*-20261004-*.xml -text whitespace=-blank-at-eol,cr-at-eol
+/provider_validation/results/news-*-20261004-*.json -text whitespace=cr-at-eol
+/config/datasets/wallstreetcn_news.yaml text eol=lf
+/config/normalization/wallstreetcn_news.yaml text eol=lf
+/config/datasets/cctv_news_index.yaml text eol=lf
+/config/normalization/cctv_news_index.yaml text eol=lf
+/src/stock_data_manage/providers/wallstreetcn/*.py text eol=lf
+/src/stock_data_manage/providers/cctv/*.py text eol=lf
+/provider_validation/docs/2026-10-04-news-input-collection.md text eol=lf

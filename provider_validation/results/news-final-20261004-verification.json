@@ -1,0 +1,1424 @@
+{
+  "validation_time_utc": "2026-10-04T00:21:09.295412+00:00",
+  "result": "passed",
+  "tests": 380,
+  "counts": {
+    "implemented_validation_only": 27,
+    "unimplemented": 37,
+    "blocked": 7,
+    "alias": 3
+  },
+  "real_network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "audited_reports": [
+    {
+      "path": "provider_validation/results/news-final-20261004/ASTOCK-034/candidate/ASTOCK-034-9c36f6da2654/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "d10dc82dc1825d53f0429aea094894d43c200aeba9516ec7aa8ddb4881bf1f17",
+      "status": "candidate_complete",
+      "row_count": 50,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/ASTOCK-035/candidate/ASTOCK-035-a38ce474d9f3/2026-10-04/input_report/cctv/news/report.json",
+      "sha256": "baff9a3fe2544b7db5a82a7ffad2703ffca87be0fbac806e7b440d593abcdc39",
+      "status": "candidate_complete",
+      "row_count": 14,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f0/candidate/ASTOCK-034-537d6ec77e4f/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "6e3d79cd7f64f0e669cf6ec84a19a3cd6cbc965b8ebbfc8c598d24acaf7941d5",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f1/candidate/ASTOCK-034-4bb5102502f7/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "12f50afd07326824a6b25a03aa9ba6b80d0930829831ef0652fd1b012b86ec23",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f10/candidate/ASTOCK-035-a978ee750ceb/2026-10-04/input_report/cctv/news/report.json",
+      "sha256": "df94353c793a473b352fb3781ab8b0fe91b3b30d1254c078338c66cb9802fb31",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f11/candidate/ASTOCK-035-370b3fa1b25b/2026-10-04/input_report/cctv/news/report.json",
+      "sha256": "c4f337bf345202b80111ae33fce0879b6d070833e6e6dca4169157a9b822ff5e",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f2/candidate/ASTOCK-034-48d02b830a43/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "7df5a0d4178d6ead04d0fe332554204605cc5a19074825b7135248ee95bf0b91",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f3/candidate/ASTOCK-034-aec6e44de08c/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "3c31b53935f34cc053b33fcc2fef9d819fe92c3d4b3a53685a85672aa969ce43",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f4/candidate/ASTOCK-034-d430d1803fc3/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "e5d3d659307c489df9d011e163295988e34119e6af16718ffdbabd8d9a177d6b",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f5/candidate/ASTOCK-034-3f7d8508d045/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "975f1eda85c2b9ac365520d33e419a0b91e3d0c466220c5ea0e80ee3ce69f34f",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f6/candidate/ASTOCK-034-5e70a6adabe2/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "2854fe46c0c29a54506a944cd926d89a5d0bc53d4bfe397846b8a9a57b72ebd1",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f7/candidate/ASTOCK-034-59ff477210f2/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "02babc43a1c3d119a0c0fabaf25e00c99d1b5ea1a0d6a5fc421754118e16c8ed",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f8/candidate/ASTOCK-034-8aca8d03025f/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "ed4c8122886cc6f608896a4e2808bc1cfe434815cab52b443e54b11081e61f93",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f9/candidate/ASTOCK-035-b15361e6630b/2026-10-04/input_report/cctv/news/report.json",
+      "sha256": "11886dcd1835f0819f5159c88a9e7e6449042272576ed703b6976e5fc9d94e54",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/semantic/cursor-candidate/ASTOCK-034-b916deba089a/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "780dab569acfad5a7371749756a88903b80eb92749d3cf905a5a62c97ff80693",
+      "status": "candidate_complete",
+      "row_count": 50,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/semantic/weekend-candidate/ASTOCK-035-23d12aab650b/2026-10-04/input_report/cctv/news/report.json",
+      "sha256": "b961b738e8b0da6213b1fbc66d44be0978edcacb3734407928699d16fd5b54b1",
+      "status": "candidate_complete",
+      "row_count": 1,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/session/candidate/ASTOCK-034-b2a83ad9c359/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "751c99bb153f2d1352df989e88392f93e9e314ae3a5dabc3b77c84b792eaad27",
+      "status": "candidate_complete",
+      "row_count": 50,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/session/candidate/ASTOCK-034-c6aba04f711c/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "927d5cb6d9f26cab5dd75f8e121fe3c33dc0a75e795427540b2ebe2d196e4fc7",
+      "status": "candidate_complete",
+      "row_count": 50,
+      "live_http_calls": 1
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/session/candidate/ASTOCK-035-0a19667be22c/2026-10-04/input_report/cctv/news/report.json",
+      "sha256": "e6a93046880e651deff97b259e2c78c3f5532632a4601be19ff742be1becaf0b",
+      "status": "candidate_complete",
+      "row_count": 14,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/session/candidate/ASTOCK-035-3c2285b08966/2026-10-04/input_report/cctv/news/report.json",
+      "sha256": "f1b3202e7e65a9ac6e2ce83c200fdd02a88d4b19b276204c802cf154c5ddf161",
+      "status": "candidate_complete",
+      "row_count": 14,
+      "live_http_calls": 1
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/candidate/ASTOCK-034-9c74b5b45419/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "bb0834d0a070300a182902b5594041dc44fce0ab436dc2890d7fca1529396ef5",
+      "status": "candidate_complete",
+      "row_count": 50,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/news-cli-20261004/candidate/ASTOCK-034-ac154010c57b/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "c39ea703701f9df8b7692b1d1ccfd6885c99b525fca01ab82501c43077f455aa",
+      "status": "candidate_complete",
+      "row_count": 50,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/news-cli-20261004/candidate/ASTOCK-035-e8f3cfcd3922/2026-10-04/input_report/cctv/news/report.json",
+      "sha256": "7958923748edb9d58778c6fb65b86df969b2ee561a084ec6c9eb07cc52539f02",
+      "status": "candidate_complete",
+      "row_count": 14,
+      "live_http_calls": 0
+    }
+  ],
+  "files": [
+    {
+      "path": ".gitattributes",
+      "sha256": "f3256303a9630b3ebe092c195f36733e7ceec1625e12c9458d871b4a7def38c8",
+      "bytes": 11037
+    },
+    {
+      "path": "CODE_STRUCTURE.md",
+      "sha256": "889dc104fd16ea0f7ddf8b08d953ec21b69eae8a29a59bc53be4317f676412ed",
+      "bytes": 22028
+    },
+    {
+      "path": "config/datasets/cctv_news_index.yaml",
+      "sha256": "a876cfcb7dfa79b79423cb3ae8044dab1bb43515f12fc090158228dbf95b6d33",
+      "bytes": 317
+    },
+    {
+      "path": "config/datasets/wallstreetcn_news.yaml",
+      "sha256": "1bdecf169c6ea357cbb53787bd0a9a659d1f4a96e77e42996556b55df97bbd49",
+      "bytes": 534
+    },
+    {
+      "path": "config/normalization/cctv_news_index.yaml",
+      "sha256": "4de0d3f1b61694e5c6ab7450a38a7c85f583fadd64d48e52bd737545eb04e42b",
+      "bytes": 573
+    },
+    {
+      "path": "config/normalization/wallstreetcn_news.yaml",
+      "sha256": "cdca43fb9ef1d825fe75358ea6c828fec02b892e344505d484d302123079fca9",
+      "bytes": 770
+    },
+    {
+      "path": "config/providers.yaml",
+      "sha256": "a7a42832768d9474a897ca3577d2f41613bdcaef9ef7d333d49d691475031c2e",
+      "bytes": 79564
+    },
+    {
+      "path": "PROJECT_PROGRESS.md",
+      "sha256": "0ca0aa1b118c6e89568bbd3f9630b3c111cd0af1f6f602b297d9fe398ae5fc41",
+      "bytes": 11488
+    },
+    {
+      "path": "provider_validation/docs/2026-10-04-news-input-collection.md",
+      "sha256": "82e2ec313bd6dfeda6be3d2213e6170bb96f7cbd9b1f6b0e9e2c31630ecfb81c",
+      "bytes": 2159
+    },
+    {
+      "path": "provider_validation/results/news-cli-20261004/ASTOCK-034-context.json",
+      "sha256": "1ff6f8a1a7d4a2f7bf8fd799103d3f4a7909232c3fcae0b2848857098340f1f3",
+      "bytes": 78
+    },
+    {
+      "path": "provider_validation/results/news-cli-20261004/ASTOCK-034-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "provider_validation/results/news-cli-20261004/ASTOCK-034-stdout.json",
+      "sha256": "49014734f2a52fb6da85fd61e22bdcf8d59f38994ecd9c189f2195b26a87ee23",
+      "bytes": 12571
+    },
+    {
+      "path": "provider_validation/results/news-cli-20261004/ASTOCK-035-context.json",
+      "sha256": "88e7df75949b500033fa82a0106f14fd8a8c6fc6d84527d5e78e5c0c835e512f",
+      "bytes": 107
+    },
+    {
+      "path": "provider_validation/results/news-cli-20261004/ASTOCK-035-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "provider_validation/results/news-cli-20261004/ASTOCK-035-stdout.json",
+      "sha256": "ecdc4b48a950de704ebfc23023c712e170f1dd2cb2edb36cf68e6ced888131f9",
+      "bytes": 12379
+    },
+    {
+      "path": "provider_validation/results/news-cli-20261004/candidate/ASTOCK-034-ac154010c57b/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "c39ea703701f9df8b7692b1d1ccfd6885c99b525fca01ab82501c43077f455aa",
+      "bytes": 10059
+    },
+    {
+      "path": "provider_validation/results/news-cli-20261004/candidate/ASTOCK-034-ac154010c57b/2026-10-04/source_rows/wallstreetcn/news_lives/source-rows.json",
+      "sha256": "d04ea8ef4ddc6005131738b38d2dae04a315e926c59d62292fb72506af9444e7",
+      "bytes": 70795
+    },
+    {
+      "path": "provider_validation/results/news-cli-20261004/candidate/ASTOCK-034-ac154010c57b/2026-10-04/wallstreetcn_news/wallstreetcn/news_lives/mapped-rows.json",
+      "sha256": "ee4233aa8ca68329e2f1b5c886b5354e1c46623af5a6356cd90a45b46d428188",
+      "bytes": 27778
+    },
+    {
+      "path": "provider_validation/results/news-cli-20261004/candidate/ASTOCK-034-ac154010c57b/_raw/bodies/a7c874fbbe260d8b207835c57f51359e07bd92626f58f2c1ef8614592aa1dba7.bin",
+      "sha256": "a7c874fbbe260d8b207835c57f51359e07bd92626f58f2c1ef8614592aa1dba7",
+      "bytes": 72417
+    },
+    {
+      "path": "provider_validation/results/news-cli-20261004/candidate/ASTOCK-034-ac154010c57b/_raw/manifest.ndjson",
+      "sha256": "09bd36f9a3bc6a6173e36f123beedd4415c420ad0b24e6f748fbf065b95bf145",
+      "bytes": 1815
+    },
+    {
+      "path": "provider_validation/results/news-cli-20261004/candidate/ASTOCK-035-e8f3cfcd3922/2026-10-04/cctv_news_index/cctv/news/mapped-rows.json",
+      "sha256": "785928217e06bb695bef1fdbf87bc0048b2f2606aab40a2f9998cb0b48abbd85",
+      "bytes": 3147
+    },
+    {
+      "path": "provider_validation/results/news-cli-20261004/candidate/ASTOCK-035-e8f3cfcd3922/2026-10-04/input_report/cctv/news/report.json",
+      "sha256": "7958923748edb9d58778c6fb65b86df969b2ee561a084ec6c9eb07cc52539f02",
+      "bytes": 9922
+    },
+    {
+      "path": "provider_validation/results/news-cli-20261004/candidate/ASTOCK-035-e8f3cfcd3922/2026-10-04/source_rows/cctv/news/source-rows.json",
+      "sha256": "c68d0c37463855a9e825e7158890c1c10f119d95c144d59a90d3220e158d7b30",
+      "bytes": 2321
+    },
+    {
+      "path": "provider_validation/results/news-cli-20261004/candidate/ASTOCK-035-e8f3cfcd3922/_raw/bodies/8373a95432cfd8403af3820c0c37729dc141c778f53dacfd24fec8d9fa490a5e.bin",
+      "sha256": "8373a95432cfd8403af3820c0c37729dc141c778f53dacfd24fec8d9fa490a5e",
+      "bytes": 12130
+    },
+    {
+      "path": "provider_validation/results/news-cli-20261004/candidate/ASTOCK-035-e8f3cfcd3922/_raw/manifest.ndjson",
+      "sha256": "bae259341ce9e90c0501d1c197a6c2a427a93144a75a7d11d9e6096fe1f3156a",
+      "bytes": 1820
+    },
+    {
+      "path": "provider_validation/results/news-cli-20261004/verification.json",
+      "sha256": "41881fa5e2d936cf4298583c49b2d7f924bbd07f2335141eec519de972d6f26d",
+      "bytes": 2929
+    },
+    {
+      "path": "provider_validation/results/news-dev-20261004-tests.xml",
+      "sha256": "aebb504ba51704efed3cf390ae95da7f9dc557b14465a20ef701e759f9a81db0",
+      "bytes": 8151
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/ASTOCK-034/candidate/ASTOCK-034-9c36f6da2654/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "d10dc82dc1825d53f0429aea094894d43c200aeba9516ec7aa8ddb4881bf1f17",
+      "bytes": 9831
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/ASTOCK-034/candidate/ASTOCK-034-9c36f6da2654/2026-10-04/source_rows/wallstreetcn/news_lives/source-rows.json",
+      "sha256": "d04ea8ef4ddc6005131738b38d2dae04a315e926c59d62292fb72506af9444e7",
+      "bytes": 70795
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/ASTOCK-034/candidate/ASTOCK-034-9c36f6da2654/2026-10-04/wallstreetcn_news/wallstreetcn/news_lives/mapped-rows.json",
+      "sha256": "ee4233aa8ca68329e2f1b5c886b5354e1c46623af5a6356cd90a45b46d428188",
+      "bytes": 27778
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/ASTOCK-034/candidate/ASTOCK-034-9c36f6da2654/_raw/bodies/a7c874fbbe260d8b207835c57f51359e07bd92626f58f2c1ef8614592aa1dba7.bin",
+      "sha256": "a7c874fbbe260d8b207835c57f51359e07bd92626f58f2c1ef8614592aa1dba7",
+      "bytes": 72417
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/ASTOCK-034/candidate/ASTOCK-034-9c36f6da2654/_raw/manifest.ndjson",
+      "sha256": "d3957d518e6806444b0a0a69f7faa65d43daceeb5e4ab698a07d24a4c5c17697",
+      "bytes": 1815
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/ASTOCK-034/comparison.json",
+      "sha256": "58c669dbe77c1061df217b11bd0ed2c40f85ccafca36b50f431047dd5d99cf05",
+      "bytes": 889
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/ASTOCK-034/original/bodies/a7c874fbbe260d8b207835c57f51359e07bd92626f58f2c1ef8614592aa1dba7.bin",
+      "sha256": "a7c874fbbe260d8b207835c57f51359e07bd92626f58f2c1ef8614592aa1dba7",
+      "bytes": 72417
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/ASTOCK-034/original/manifest.ndjson",
+      "sha256": "2cb07e3b9a38b1bdae57784526d74ebefba06bf4d1521175313d856b5f32bae8",
+      "bytes": 1732
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/ASTOCK-034/original-parsed.json",
+      "sha256": "02d6ab940c644bfd80e0927b082f34d0e36c2c4345fa8ef9c7c90abceda33a55",
+      "bytes": 36532
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/ASTOCK-035/candidate/ASTOCK-035-a38ce474d9f3/2026-10-04/cctv_news_index/cctv/news/mapped-rows.json",
+      "sha256": "785928217e06bb695bef1fdbf87bc0048b2f2606aab40a2f9998cb0b48abbd85",
+      "bytes": 3147
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/ASTOCK-035/candidate/ASTOCK-035-a38ce474d9f3/2026-10-04/input_report/cctv/news/report.json",
+      "sha256": "baff9a3fe2544b7db5a82a7ffad2703ffca87be0fbac806e7b440d593abcdc39",
+      "bytes": 9694
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/ASTOCK-035/candidate/ASTOCK-035-a38ce474d9f3/2026-10-04/source_rows/cctv/news/source-rows.json",
+      "sha256": "c68d0c37463855a9e825e7158890c1c10f119d95c144d59a90d3220e158d7b30",
+      "bytes": 2321
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/ASTOCK-035/candidate/ASTOCK-035-a38ce474d9f3/_raw/bodies/8373a95432cfd8403af3820c0c37729dc141c778f53dacfd24fec8d9fa490a5e.bin",
+      "sha256": "8373a95432cfd8403af3820c0c37729dc141c778f53dacfd24fec8d9fa490a5e",
+      "bytes": 12130
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/ASTOCK-035/candidate/ASTOCK-035-a38ce474d9f3/_raw/manifest.ndjson",
+      "sha256": "83d185db7f89120e2a36b53f65aebd025bf99fec054db73527da05fa72a71600",
+      "bytes": 1820
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/ASTOCK-035/comparison.json",
+      "sha256": "0c11738508da2983c21f15903c3095d48ea28ed8662d59dfee74ef1c0a9c2216",
+      "bytes": 875
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/ASTOCK-035/original/bodies/8373a95432cfd8403af3820c0c37729dc141c778f53dacfd24fec8d9fa490a5e.bin",
+      "sha256": "8373a95432cfd8403af3820c0c37729dc141c778f53dacfd24fec8d9fa490a5e",
+      "bytes": 12130
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/ASTOCK-035/original/manifest.ndjson",
+      "sha256": "809901f4c5d81f6b4df1e7a159b40181390e330eb8b9f254a07661d9d3a1c12a",
+      "bytes": 1762
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/ASTOCK-035/original-parsed.json",
+      "sha256": "b6add9f11b07e427dccdc908f15eafa1ce30ef9d711877df5ad150bd238215ef",
+      "bytes": 4789
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/comparison.json",
+      "sha256": "20fb6d1841c2a9530c33c142eeffe453a15018dca41ea687d52c10f1c719748c",
+      "bytes": 9666
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f0/candidate/ASTOCK-034-537d6ec77e4f/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "6e3d79cd7f64f0e669cf6ec84a19a3cd6cbc965b8ebbfc8c598d24acaf7941d5",
+      "bytes": 8130
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f0/candidate/ASTOCK-034-537d6ec77e4f/_raw/bodies/282e7704a51bc1ebcbed9265553890cfbd4c1731adc3debce62317fdb1b57865.bin",
+      "sha256": "282e7704a51bc1ebcbed9265553890cfbd4c1731adc3debce62317fdb1b57865",
+      "bytes": 101763
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f0/candidate/ASTOCK-034-537d6ec77e4f/_raw/manifest.ndjson",
+      "sha256": "73a590789659199b50b2bc1fb3f41921e5f52247c764f10199206fa71b523204",
+      "bytes": 1406
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f0/fixture/bodies/282e7704a51bc1ebcbed9265553890cfbd4c1731adc3debce62317fdb1b57865.bin",
+      "sha256": "282e7704a51bc1ebcbed9265553890cfbd4c1731adc3debce62317fdb1b57865",
+      "bytes": 101763
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f0/fixture/manifest.ndjson",
+      "sha256": "5540dff27da2f3139d03e18da1273ffe5eafad2a3e05f5316b9bc10c77dd8f6d",
+      "bytes": 1084
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f1/candidate/ASTOCK-034-4bb5102502f7/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "12f50afd07326824a6b25a03aa9ba6b80d0930829831ef0652fd1b012b86ec23",
+      "bytes": 8127
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f1/candidate/ASTOCK-034-4bb5102502f7/_raw/bodies/75360589aaf0a4a8a9302b45fe1c4661951ac30fee2a6c91ca2770be4fd78eef.bin",
+      "sha256": "75360589aaf0a4a8a9302b45fe1c4661951ac30fee2a6c91ca2770be4fd78eef",
+      "bytes": 113
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f1/candidate/ASTOCK-034-4bb5102502f7/_raw/manifest.ndjson",
+      "sha256": "abb85f73bb76c00ed54c5cba334b0edc02b3ac3ba3d32aff0870b2cf673b1ff4",
+      "bytes": 1403
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f1/fixture/bodies/75360589aaf0a4a8a9302b45fe1c4661951ac30fee2a6c91ca2770be4fd78eef.bin",
+      "sha256": "75360589aaf0a4a8a9302b45fe1c4661951ac30fee2a6c91ca2770be4fd78eef",
+      "bytes": 113
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f1/fixture/manifest.ndjson",
+      "sha256": "f8ca9b2244e0cc3564f7fdeed799423e39756220533c3bc912694fa2b1e4d2d6",
+      "bytes": 1078
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f10/candidate/ASTOCK-035-a978ee750ceb/2026-10-04/input_report/cctv/news/report.json",
+      "sha256": "df94353c793a473b352fb3781ab8b0fe91b3b30d1254c078338c66cb9802fb31",
+      "bytes": 7941
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f10/candidate/ASTOCK-035-a978ee750ceb/_raw/bodies/9c33c049537ca1e42d610566543ae2c927811cd6c9d852550c5f59e696c7875b.bin",
+      "sha256": "9c33c049537ca1e42d610566543ae2c927811cd6c9d852550c5f59e696c7875b",
+      "bytes": 27
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f10/candidate/ASTOCK-035-a978ee750ceb/_raw/manifest.ndjson",
+      "sha256": "07ec8a490693f9522cb647a7ac050d4be5763b28cc2595dc78f9b4502bc546b9",
+      "bytes": 1359
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f10/fixture/bodies/9c33c049537ca1e42d610566543ae2c927811cd6c9d852550c5f59e696c7875b.bin",
+      "sha256": "9c33c049537ca1e42d610566543ae2c927811cd6c9d852550c5f59e696c7875b",
+      "bytes": 27
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f10/fixture/manifest.ndjson",
+      "sha256": "7df0024b4d425cf51ea719cbca09ddb3628769482536ed49cab914fd8b3bc139",
+      "bytes": 1041
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f11/candidate/ASTOCK-035-370b3fa1b25b/2026-10-04/input_report/cctv/news/report.json",
+      "sha256": "c4f337bf345202b80111ae33fce0879b6d070833e6e6dca4169157a9b822ff5e",
+      "bytes": 8829
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f11/candidate/ASTOCK-035-370b3fa1b25b/2026-10-04/source_rows/cctv/news/source-rows.json",
+      "sha256": "ebeddaba7e483a3fc2bfb863a6b5c4ea1a1483efcc678c0f5d0a3566adb61e9d",
+      "bytes": 4641
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f11/candidate/ASTOCK-035-370b3fa1b25b/_raw/bodies/825fd4166f900db6aedb275e7485fa89b7b8bdaa22eb2345d4888d62698c77f4.bin",
+      "sha256": "825fd4166f900db6aedb275e7485fa89b7b8bdaa22eb2345d4888d62698c77f4",
+      "bytes": 24260
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f11/candidate/ASTOCK-035-370b3fa1b25b/_raw/manifest.ndjson",
+      "sha256": "fe34b0115f8d51afa8c4166a22f43f1c3ceed523bc9098d074c23838a3fa8b4d",
+      "bytes": 1362
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f11/fixture/bodies/825fd4166f900db6aedb275e7485fa89b7b8bdaa22eb2345d4888d62698c77f4.bin",
+      "sha256": "825fd4166f900db6aedb275e7485fa89b7b8bdaa22eb2345d4888d62698c77f4",
+      "bytes": 24260
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f11/fixture/manifest.ndjson",
+      "sha256": "55430b0aefac30f32e1ee3e8e428eeefde6272c5fa7d1a317804e18f64fb81c7",
+      "bytes": 1044
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f2/candidate/ASTOCK-034-48d02b830a43/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "7df5a0d4178d6ead04d0fe332554204605cc5a19074825b7135248ee95bf0b91",
+      "bytes": 8126
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f2/candidate/ASTOCK-034-48d02b830a43/_raw/bodies/e2a6b4391317750fc468f45154b2e702393013beaaae1cc7704ded2cc2dc94b5.bin",
+      "sha256": "e2a6b4391317750fc468f45154b2e702393013beaaae1cc7704ded2cc2dc94b5",
+      "bytes": 20
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f2/candidate/ASTOCK-034-48d02b830a43/_raw/manifest.ndjson",
+      "sha256": "492f53d0f10892c137edb22cc13aa900984936b74b8480ea9d295e83c186e28e",
+      "bytes": 1402
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f2/fixture/bodies/e2a6b4391317750fc468f45154b2e702393013beaaae1cc7704ded2cc2dc94b5.bin",
+      "sha256": "e2a6b4391317750fc468f45154b2e702393013beaaae1cc7704ded2cc2dc94b5",
+      "bytes": 20
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f2/fixture/manifest.ndjson",
+      "sha256": "bdb49a73692044b7079148cff76a01f738c8e8540695213a88bac28974480258",
+      "bytes": 1076
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f3/candidate/ASTOCK-034-aec6e44de08c/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "3c31b53935f34cc053b33fcc2fef9d819fe92c3d4b3a53685a85672aa969ce43",
+      "bytes": 8130
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f3/candidate/ASTOCK-034-aec6e44de08c/_raw/bodies/0ca9d69604df123fa4c3ae20fc1b9befc7e2890e61dd78ebeec0ed9448f37cc3.bin",
+      "sha256": "0ca9d69604df123fa4c3ae20fc1b9befc7e2890e61dd78ebeec0ed9448f37cc3",
+      "bytes": 101757
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f3/candidate/ASTOCK-034-aec6e44de08c/_raw/manifest.ndjson",
+      "sha256": "7fcf7b2cde17e68397b6b47b3ca14a301fd6d6b7ac656597e9cc77f6d0462e3d",
+      "bytes": 1406
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f3/fixture/bodies/0ca9d69604df123fa4c3ae20fc1b9befc7e2890e61dd78ebeec0ed9448f37cc3.bin",
+      "sha256": "0ca9d69604df123fa4c3ae20fc1b9befc7e2890e61dd78ebeec0ed9448f37cc3",
+      "bytes": 101757
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f3/fixture/manifest.ndjson",
+      "sha256": "4e7124e0b140201a8c0fd86a73ec0cd3d6c2fda78ebaba679e6e5ccdcecc5d5d",
+      "bytes": 1080
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f4/candidate/ASTOCK-034-d430d1803fc3/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "e5d3d659307c489df9d011e163295988e34119e6af16718ffdbabd8d9a177d6b",
+      "bytes": 8130
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f4/candidate/ASTOCK-034-d430d1803fc3/_raw/bodies/2634ba047820cff7f2280528cc7ce049812e47c5d8e90dace6c4c8757f2354b3.bin",
+      "sha256": "2634ba047820cff7f2280528cc7ce049812e47c5d8e90dace6c4c8757f2354b3",
+      "bytes": 101728
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f4/candidate/ASTOCK-034-d430d1803fc3/_raw/manifest.ndjson",
+      "sha256": "adc5d1013fc24450c9e446e33df7cd71e7dd9682cdc7511b49f21287c0dc80d2",
+      "bytes": 1406
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f4/fixture/bodies/2634ba047820cff7f2280528cc7ce049812e47c5d8e90dace6c4c8757f2354b3.bin",
+      "sha256": "2634ba047820cff7f2280528cc7ce049812e47c5d8e90dace6c4c8757f2354b3",
+      "bytes": 101728
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f4/fixture/manifest.ndjson",
+      "sha256": "81059150b66115c5e212cf6df49b098dd5db81d5072e3e621ce995a7b0d7b506",
+      "bytes": 1084
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f5/candidate/ASTOCK-034-3f7d8508d045/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "975f1eda85c2b9ac365520d33e419a0b91e3d0c466220c5ea0e80ee3ce69f34f",
+      "bytes": 8130
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f5/candidate/ASTOCK-034-3f7d8508d045/_raw/bodies/78ef8ae6355b07679acb7ba53913b1405854efd8960387d4bbb59f81439794c5.bin",
+      "sha256": "78ef8ae6355b07679acb7ba53913b1405854efd8960387d4bbb59f81439794c5",
+      "bytes": 101748
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f5/candidate/ASTOCK-034-3f7d8508d045/_raw/manifest.ndjson",
+      "sha256": "5852d6211487bb875e9e3c9118e55324cb6adf902c20e5fcdd4b8e23df77ca10",
+      "bytes": 1406
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f5/fixture/bodies/78ef8ae6355b07679acb7ba53913b1405854efd8960387d4bbb59f81439794c5.bin",
+      "sha256": "78ef8ae6355b07679acb7ba53913b1405854efd8960387d4bbb59f81439794c5",
+      "bytes": 101748
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f5/fixture/manifest.ndjson",
+      "sha256": "eb6b43aec42c54f3072744b3e3f41c5d9b6522ef23d2da4b5b8c029d03548ae5",
+      "bytes": 1078
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f6/candidate/ASTOCK-034-5e70a6adabe2/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "2854fe46c0c29a54506a944cd926d89a5d0bc53d4bfe397846b8a9a57b72ebd1",
+      "bytes": 9092
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f6/candidate/ASTOCK-034-5e70a6adabe2/2026-10-04/source_rows/wallstreetcn/news_lives/source-rows.json",
+      "sha256": "c2ec7c35a76220aa396171347bc9140f05444444c2e16256657a45f2d77dcf0c",
+      "bytes": 70798
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f6/candidate/ASTOCK-034-5e70a6adabe2/_raw/bodies/d7b3e1885fd2c4fc33fd4f2f823275b03f930d7c220a9aae0157a0ddb0250a02.bin",
+      "sha256": "d7b3e1885fd2c4fc33fd4f2f823275b03f930d7c220a9aae0157a0ddb0250a02",
+      "bytes": 101766
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f6/candidate/ASTOCK-034-5e70a6adabe2/_raw/manifest.ndjson",
+      "sha256": "b17e47530e9967825e037204f9fadd454d67a59b079846cf4423e17cc19fddf8",
+      "bytes": 1406
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f6/fixture/bodies/d7b3e1885fd2c4fc33fd4f2f823275b03f930d7c220a9aae0157a0ddb0250a02.bin",
+      "sha256": "d7b3e1885fd2c4fc33fd4f2f823275b03f930d7c220a9aae0157a0ddb0250a02",
+      "bytes": 101766
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f6/fixture/manifest.ndjson",
+      "sha256": "b2005a543e247d841c156b8756db868a0c0fa2c5460f93414e786a22eb1345c2",
+      "bytes": 1081
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f7/candidate/ASTOCK-034-59ff477210f2/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "02babc43a1c3d119a0c0fabaf25e00c99d1b5ea1a0d6a5fc421754118e16c8ed",
+      "bytes": 9073
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f7/candidate/ASTOCK-034-59ff477210f2/2026-10-04/source_rows/wallstreetcn/news_lives/source-rows.json",
+      "sha256": "2af26d05109ff79a23edbc3b3a20212f99523209faa2a77d0d7a76d4dd81c3fb",
+      "bytes": 70281
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f7/candidate/ASTOCK-034-59ff477210f2/_raw/bodies/af39966977e2a067376069bfa812ccab81423afa436c9722e715bbb5ab155177.bin",
+      "sha256": "af39966977e2a067376069bfa812ccab81423afa436c9722e715bbb5ab155177",
+      "bytes": 100828
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f7/candidate/ASTOCK-034-59ff477210f2/_raw/manifest.ndjson",
+      "sha256": "0ee0b8c0a1ec8a5c3712b25bd0c8b21500e2f77284347723a4a108263eb3f85a",
+      "bytes": 1406
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f7/fixture/bodies/af39966977e2a067376069bfa812ccab81423afa436c9722e715bbb5ab155177.bin",
+      "sha256": "af39966977e2a067376069bfa812ccab81423afa436c9722e715bbb5ab155177",
+      "bytes": 100828
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f7/fixture/manifest.ndjson",
+      "sha256": "09e5f15b66a166077faa45c40c81e986dad5c8e6653f5fadd0d153f1f0d862b7",
+      "bytes": 1085
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f8/candidate/ASTOCK-034-8aca8d03025f/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "ed4c8122886cc6f608896a4e2808bc1cfe434815cab52b443e54b11081e61f93",
+      "bytes": 8130
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f8/candidate/ASTOCK-034-8aca8d03025f/_raw/bodies/6f4b606deec0b303b2856344bb39ca6eb0a07cb20eaf2f6f5174920743c71982.bin",
+      "sha256": "6f4b606deec0b303b2856344bb39ca6eb0a07cb20eaf2f6f5174920743c71982",
+      "bytes": 101763
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f8/candidate/ASTOCK-034-8aca8d03025f/_raw/manifest.ndjson",
+      "sha256": "e534b15bd21021aa3f1eaa0ded5501308e5fa727efbefa8b983d86fd8cb18792",
+      "bytes": 1406
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f8/fixture/bodies/6f4b606deec0b303b2856344bb39ca6eb0a07cb20eaf2f6f5174920743c71982.bin",
+      "sha256": "6f4b606deec0b303b2856344bb39ca6eb0a07cb20eaf2f6f5174920743c71982",
+      "bytes": 101763
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f8/fixture/manifest.ndjson",
+      "sha256": "1daa85ee100a35a33a6df6ef9965b1471879c013c715af6ffa9fa7d32eb56fcc",
+      "bytes": 1083
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f9/candidate/ASTOCK-035-b15361e6630b/2026-10-04/input_report/cctv/news/report.json",
+      "sha256": "11886dcd1835f0819f5159c88a9e7e6449042272576ed703b6976e5fc9d94e54",
+      "bytes": 7980
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f9/candidate/ASTOCK-035-b15361e6630b/_raw/bodies/d694e05601006cd80c78e14ab5f56b01bb95aa7dbaa0e47f7f2d321da3aa0acb.bin",
+      "sha256": "d694e05601006cd80c78e14ab5f56b01bb95aa7dbaa0e47f7f2d321da3aa0acb",
+      "bytes": 26
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f9/candidate/ASTOCK-035-b15361e6630b/_raw/manifest.ndjson",
+      "sha256": "d0961dcffe580161a8f3d7c1846baf898b99d41b5c8adfe3a47b9ac403d58953",
+      "bytes": 1358
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f9/fixture/bodies/d694e05601006cd80c78e14ab5f56b01bb95aa7dbaa0e47f7f2d321da3aa0acb.bin",
+      "sha256": "d694e05601006cd80c78e14ab5f56b01bb95aa7dbaa0e47f7f2d321da3aa0acb",
+      "bytes": 26
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/f9/fixture/manifest.ndjson",
+      "sha256": "66ac32a64cc1a414ae13efd4b25061926a27b2da1ef3fcfd5702f410735e21ec",
+      "bytes": 1039
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/semantic/cursor/fixture/bodies/f104534e5c8df4bc30809d1aadb26e2b90a14b1c7c4ce94c3d2e6cab9fc7351a.bin",
+      "sha256": "f104534e5c8df4bc30809d1aadb26e2b90a14b1c7c4ce94c3d2e6cab9fc7351a",
+      "bytes": 101769
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/semantic/cursor/fixture/manifest.ndjson",
+      "sha256": "7d2fb3f84513656351fac2cd59d0f9f83465221e785967a42a322634348f18f8",
+      "bytes": 1106
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/semantic/cursor-candidate/ASTOCK-034-b916deba089a/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "780dab569acfad5a7371749756a88903b80eb92749d3cf905a5a62c97ff80693",
+      "bytes": 9589
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/semantic/cursor-candidate/ASTOCK-034-b916deba089a/2026-10-04/source_rows/wallstreetcn/news_lives/source-rows.json",
+      "sha256": "d04ea8ef4ddc6005131738b38d2dae04a315e926c59d62292fb72506af9444e7",
+      "bytes": 70795
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/semantic/cursor-candidate/ASTOCK-034-b916deba089a/2026-10-04/wallstreetcn_news/wallstreetcn/news_lives/mapped-rows.json",
+      "sha256": "b80f1bee6d3240dfb0e0b7518fb1f0de109c8cee63dc46029f785a9ac80e4dc4",
+      "bytes": 27778
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/semantic/cursor-candidate/ASTOCK-034-b916deba089a/_raw/bodies/f104534e5c8df4bc30809d1aadb26e2b90a14b1c7c4ce94c3d2e6cab9fc7351a.bin",
+      "sha256": "f104534e5c8df4bc30809d1aadb26e2b90a14b1c7c4ce94c3d2e6cab9fc7351a",
+      "bytes": 101769
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/semantic/cursor-candidate/ASTOCK-034-b916deba089a/_raw/manifest.ndjson",
+      "sha256": "7f4dfbdfaa4f7cbea55da843b8760ca4d87ae313de856f2813db13551c8f1439",
+      "bytes": 1474
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/semantic/weekend/fixture/bodies/7901988627fc6c0cd2e54449869bfe9561b47024d97790b758b30448d3e2da1a.bin",
+      "sha256": "7901988627fc6c0cd2e54449869bfe9561b47024d97790b758b30448d3e2da1a",
+      "bytes": 219
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/semantic/weekend/fixture/manifest.ndjson",
+      "sha256": "200c1a4cfe8cc18197d5b8f7ec1cc74cacf3501f55deb7d5dfa8a2d9335a7a78",
+      "bytes": 1042
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/semantic/weekend-candidate/ASTOCK-035-23d12aab650b/2026-10-04/cctv_news_index/cctv/news/mapped-rows.json",
+      "sha256": "259d664337f178834e42d87435cd8a737d13f0a7cfe8b67fb8f45594445eb9dc",
+      "bytes": 172
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/semantic/weekend-candidate/ASTOCK-035-23d12aab650b/2026-10-04/input_report/cctv/news/report.json",
+      "sha256": "b961b738e8b0da6213b1fbc66d44be0978edcacb3734407928699d16fd5b54b1",
+      "bytes": 9229
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/semantic/weekend-candidate/ASTOCK-035-23d12aab650b/2026-10-04/source_rows/cctv/news/source-rows.json",
+      "sha256": "7db40cdad32332d6c3ade738c7383024eba8616a59f4d2504a2b0d460281cc01",
+      "bytes": 113
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/semantic/weekend-candidate/ASTOCK-035-23d12aab650b/_raw/bodies/7901988627fc6c0cd2e54449869bfe9561b47024d97790b758b30448d3e2da1a.bin",
+      "sha256": "7901988627fc6c0cd2e54449869bfe9561b47024d97790b758b30448d3e2da1a",
+      "bytes": 219
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/semantic/weekend-candidate/ASTOCK-035-23d12aab650b/_raw/manifest.ndjson",
+      "sha256": "27693188c40ff1c1f6d72c19546c7bd00d305cde3a8c730617b8573a50a07dec",
+      "bytes": 1374
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/session/candidate/ASTOCK-034-b2a83ad9c359/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "751c99bb153f2d1352df989e88392f93e9e314ae3a5dabc3b77c84b792eaad27",
+      "bytes": 9620
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/session/candidate/ASTOCK-034-b2a83ad9c359/2026-10-04/source_rows/wallstreetcn/news_lives/source-rows.json",
+      "sha256": "d04ea8ef4ddc6005131738b38d2dae04a315e926c59d62292fb72506af9444e7",
+      "bytes": 70795
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/session/candidate/ASTOCK-034-b2a83ad9c359/2026-10-04/wallstreetcn_news/wallstreetcn/news_lives/mapped-rows.json",
+      "sha256": "67d7ea85444c947b1e4c2eeed10e98757dc914533d255de975a4a4b8593af590",
+      "bytes": 27778
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/session/candidate/ASTOCK-034-b2a83ad9c359/_raw/bodies/a7c874fbbe260d8b207835c57f51359e07bd92626f58f2c1ef8614592aa1dba7.bin",
+      "sha256": "a7c874fbbe260d8b207835c57f51359e07bd92626f58f2c1ef8614592aa1dba7",
+      "bytes": 72417
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/session/candidate/ASTOCK-034-b2a83ad9c359/_raw/manifest.ndjson",
+      "sha256": "2e8d98c3d306a493f09fb7ff627f18c94d17c34fc229dd577147b6fe753d9cc5",
+      "bytes": 1588
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/session/candidate/ASTOCK-034-c6aba04f711c/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "927d5cb6d9f26cab5dd75f8e121fe3c33dc0a75e795427540b2ebe2d196e4fc7",
+      "bytes": 9315
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/session/candidate/ASTOCK-034-c6aba04f711c/2026-10-04/source_rows/wallstreetcn/news_lives/source-rows.json",
+      "sha256": "d04ea8ef4ddc6005131738b38d2dae04a315e926c59d62292fb72506af9444e7",
+      "bytes": 70795
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/session/candidate/ASTOCK-034-c6aba04f711c/2026-10-04/wallstreetcn_news/wallstreetcn/news_lives/mapped-rows.json",
+      "sha256": "67d7ea85444c947b1e4c2eeed10e98757dc914533d255de975a4a4b8593af590",
+      "bytes": 27778
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/session/candidate/ASTOCK-034-c6aba04f711c/_raw/bodies/a7c874fbbe260d8b207835c57f51359e07bd92626f58f2c1ef8614592aa1dba7.bin",
+      "sha256": "a7c874fbbe260d8b207835c57f51359e07bd92626f58f2c1ef8614592aa1dba7",
+      "bytes": 72417
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/session/candidate/ASTOCK-034-c6aba04f711c/_raw/manifest.ndjson",
+      "sha256": "b16db7ec12695f8213fe8d77ac86b866df4d4e709d6cc2f9d175cbc0a229c9d4",
+      "bytes": 1278
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/session/candidate/ASTOCK-035-0a19667be22c/2026-10-04/cctv_news_index/cctv/news/mapped-rows.json",
+      "sha256": "625aac90f2fd9fd41dca6123757629afd900209e4055e5401bb526f45149d885",
+      "bytes": 3147
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/session/candidate/ASTOCK-035-0a19667be22c/2026-10-04/input_report/cctv/news/report.json",
+      "sha256": "e6a93046880e651deff97b259e2c78c3f5532632a4601be19ff742be1becaf0b",
+      "bytes": 9392
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/session/candidate/ASTOCK-035-0a19667be22c/2026-10-04/source_rows/cctv/news/source-rows.json",
+      "sha256": "c68d0c37463855a9e825e7158890c1c10f119d95c144d59a90d3220e158d7b30",
+      "bytes": 2321
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/session/candidate/ASTOCK-035-0a19667be22c/_raw/bodies/8373a95432cfd8403af3820c0c37729dc141c778f53dacfd24fec8d9fa490a5e.bin",
+      "sha256": "8373a95432cfd8403af3820c0c37729dc141c778f53dacfd24fec8d9fa490a5e",
+      "bytes": 12130
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/session/candidate/ASTOCK-035-0a19667be22c/_raw/manifest.ndjson",
+      "sha256": "cdc1eaad44a7fefc3b7c6d6372ca5990dfe5d7bf8d84a677134c9ed1f19bb6be",
+      "bytes": 1500
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/session/candidate/ASTOCK-035-3c2285b08966/2026-10-04/cctv_news_index/cctv/news/mapped-rows.json",
+      "sha256": "625aac90f2fd9fd41dca6123757629afd900209e4055e5401bb526f45149d885",
+      "bytes": 3147
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/session/candidate/ASTOCK-035-3c2285b08966/2026-10-04/input_report/cctv/news/report.json",
+      "sha256": "f1b3202e7e65a9ac6e2ce83c200fdd02a88d4b19b276204c802cf154c5ddf161",
+      "bytes": 9087
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/session/candidate/ASTOCK-035-3c2285b08966/2026-10-04/source_rows/cctv/news/source-rows.json",
+      "sha256": "c68d0c37463855a9e825e7158890c1c10f119d95c144d59a90d3220e158d7b30",
+      "bytes": 2321
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/session/candidate/ASTOCK-035-3c2285b08966/_raw/bodies/8373a95432cfd8403af3820c0c37729dc141c778f53dacfd24fec8d9fa490a5e.bin",
+      "sha256": "8373a95432cfd8403af3820c0c37729dc141c778f53dacfd24fec8d9fa490a5e",
+      "bytes": 12130
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/session/candidate/ASTOCK-035-3c2285b08966/_raw/manifest.ndjson",
+      "sha256": "2ba006be75c9fb66495bce089794370cce10e488e3644339aff36a8be76b197f",
+      "bytes": 1190
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/session/fixture-mode.json",
+      "sha256": "8f79b041e8fbdc412626676c7e1d6a39c167ec36b7113c8866cd0cf8d052d262",
+      "bytes": 108
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/verify.py",
+      "sha256": "3cef4de1a62827fa3044ff32cf15f15dbf43af7c636970ecbbea91e96715e39f",
+      "bytes": 8693
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/candidate/ASTOCK-034-9c74b5b45419/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
+      "sha256": "bb0834d0a070300a182902b5594041dc44fce0ab436dc2890d7fca1529396ef5",
+      "bytes": 9959
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/candidate/ASTOCK-034-9c74b5b45419/2026-10-04/source_rows/wallstreetcn/news_lives/source-rows.json",
+      "sha256": "d04ea8ef4ddc6005131738b38d2dae04a315e926c59d62292fb72506af9444e7",
+      "bytes": 70795
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/candidate/ASTOCK-034-9c74b5b45419/2026-10-04/wallstreetcn_news/wallstreetcn/news_lives/mapped-rows.json",
+      "sha256": "1f249f44b86a1f2f8700d45595c81599b5e4f94561fca24830c905fbb634d56f",
+      "bytes": 18539
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/candidate/ASTOCK-034-9c74b5b45419/_raw/bodies/a7c874fbbe260d8b207835c57f51359e07bd92626f58f2c1ef8614592aa1dba7.bin",
+      "sha256": "a7c874fbbe260d8b207835c57f51359e07bd92626f58f2c1ef8614592aa1dba7",
+      "bytes": 72417
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/candidate/ASTOCK-034-9c74b5b45419/_raw/manifest.ndjson",
+      "sha256": "d543cb5f49a10599dc21320dd994ea7d41905d4a510394f0d6ae93af73884b06",
+      "bytes": 1815
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/capabilities.yaml",
+      "sha256": "7b7ce0da1d33b333165c6081a3ed788f85cb05d5f6945c745eec97d73e24f6e2",
+      "bytes": 4009
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/collection.yaml",
+      "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d",
+      "bytes": 2934
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets/board_fund_flow.yaml",
+      "sha256": "08f3566d0cf2787186e6106e4915d0d89b70232d737898480eda03785ea3c53a",
+      "bytes": 1110
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets/broken_limit_pool.yaml",
+      "sha256": "60b3790eae896c968093c8d26a818c9dab325aca620510b4ec1dde061af7f65e",
+      "bytes": 1162
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets/buyback.yaml",
+      "sha256": "807490acc8affc7dde3502ef62c2b80ad32923fe4c5ff6a6b4fd9d403b50d4f6",
+      "bytes": 1439
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets/cctv_news_index.yaml",
+      "sha256": "a876cfcb7dfa79b79423cb3ae8044dab1bb43515f12fc090158228dbf95b6d33",
+      "bytes": 317
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets/concept_board.yaml",
+      "sha256": "eef0b07c9a41bfd5ef1a52f4f39516cb26d42b088d63a15783af0f94985fd76f",
+      "bytes": 379
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets/daily_bar.yaml",
+      "sha256": "0a8c1dcae7e1c062ae70c224defc1362adc1d58bc196bbeb2f1edd61d6fd39e7",
+      "bytes": 995
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets/dividend_event.yaml",
+      "sha256": "67a2b02063cb9a891e3fb388048407cbc08b05ce8ae97deea6976d3904340d2e",
+      "bytes": 759
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets/earnings_forecast.yaml",
+      "sha256": "ded845c047fcefdbeb163f27620d4e67f2bc78e62a0bcfea5678d6df8758f8fd",
+      "bytes": 1060
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets/financial_main.yaml",
+      "sha256": "23d8b55356620439d5c1b507601b782b31aa965fe24eaf194e869466bb271ab0",
+      "bytes": 766
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets/holder_trades.yaml",
+      "sha256": "44b0ecfc09c6e39823c50e83077354f25bc8026fc70272d92046ba3a51d09b92",
+      "bytes": 1246
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets/industry_board.yaml",
+      "sha256": "c6930c70b55e171dee94b74b80f3c37df1466d4a10dadc3016975004b8b47ba4",
+      "bytes": 380
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets/industry_directory.yaml",
+      "sha256": "9325d485bf7a1bc2b075c2d920b43b17caa039916536bedd8163be0f972bfe5b",
+      "bytes": 346
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets/industry_index_daily.yaml",
+      "sha256": "5d542c72443410747f2ac643589bfd8160cdea07d01d6d0dd9c5e4753096043b",
+      "bytes": 676
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets/industry_membership.yaml",
+      "sha256": "dff512c9b7f00330bbe408ba1e1eb74d99b49bc0b38ee419d4c463047c6fe69d",
+      "bytes": 709
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets/institution_survey.yaml",
+      "sha256": "470fd4503d45cf0839e887fd276a0c3c82cdcae7cae8f52001006464c212733e",
+      "bytes": 703
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets/intraday_trend.yaml",
+      "sha256": "5983e0eb29c1cd7a781fbad0be7332dda14e887ccd744e55ad4b8664c7a0c38a",
+      "bytes": 665
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets/ipo_calendar.yaml",
+      "sha256": "7579b9174fd3554a92bc50865cabe7ac20604579403f748d09bcd4e8760bcac9",
+      "bytes": 1331
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets/limit_down_pool.yaml",
+      "sha256": "67b3ca1ae9edf0f863d2b2d5257a315fe721f042086d4b5966653c0f2758d806",
+      "bytes": 1177
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets/limit_up_pool.yaml",
+      "sha256": "73c1fa4ed6d7281d1857208a2ec9696a3637214bb256661ce943313c75772a69",
+      "bytes": 982
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets/lpr_history.yaml",
+      "sha256": "b40bb3000aa8db8b84aeaad6383c3dd7da1afb3c3bfb6ed6fc69343476ca7650",
+      "bytes": 330
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets/minute_bar_5m.yaml",
+      "sha256": "fb6f822ed42479422a0b4c227577d8e559bb6b2238562af566af0464304bd873",
+      "bytes": 708
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets/pledge.yaml",
+      "sha256": "40b46e96e55d8b1061c98ec979094b4f98ef4800e513cfa7a9c2c5f2152b2fb1",
+      "bytes": 878
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets/previous_limit_pool.yaml",
+      "sha256": "5234397a7b87ed3e03c11431de1f00c012e135ba5ef57bf63a2f431f659703bc",
+      "bytes": 1199
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets/realtime_quote.yaml",
+      "sha256": "ebc3e97bb7469eb4c7c80daf50991ebe38f0eb5b2476a9a579d22236d416378b",
+      "bytes": 1121
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets/security_snapshot.yaml",
+      "sha256": "255115893f64837a3b95ea9fe44551948eefa9604aca9d59214de87a580300be",
+      "bytes": 519
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets/shareholder_count.yaml",
+      "sha256": "d325df1784c873bea73a1d907e9964e06c26e4d6b356dd6c16148837b57feccf",
+      "bytes": 923
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets/stock_fund_flow.yaml",
+      "sha256": "df3f21341463f3538a1f855ef19b7bbdb683405aaa65d5418c255023c18a429f",
+      "bytes": 736
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets/strong_stock_pool.yaml",
+      "sha256": "264c9d759405d37733cf4daf29996240cb46fed46c3eb8835405a4311e1c1131",
+      "bytes": 1194
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets/trading_calendar.yaml",
+      "sha256": "924b17a5be104252e85a377e4579432c6725bab99cbaa0ad70e71102149a1f49",
+      "bytes": 192
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets/wallstreetcn_news.yaml",
+      "sha256": "1bdecf169c6ea357cbb53787bd0a9a659d1f4a96e77e42996556b55df97bbd49",
+      "bytes": 534
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/datasets.yaml",
+      "sha256": "e992d13297e1f9a8f64acabc25f65f138b21ce12dca16689cc3f17bf1385a6eb",
+      "bytes": 587
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/normalization/board_fund_flow.yaml",
+      "sha256": "fb7c6f1f2d425181b189e25152e465306982e10c7c6ee06b2917dfa00b891baa",
+      "bytes": 1395
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/normalization/broken_limit_pool.yaml",
+      "sha256": "8bd046757fc9fb3e7d144a0e9d41106267e828a60bc5a099280158c15459a84d",
+      "bytes": 1238
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/normalization/buyback.yaml",
+      "sha256": "70e6ee88258842e76509208c6d9df379478df717837489869ff1e9f72f82d1b3",
+      "bytes": 2520
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/normalization/cctv_news_index.yaml",
+      "sha256": "4de0d3f1b61694e5c6ab7450a38a7c85f583fadd64d48e52bd737545eb04e42b",
+      "bytes": 573
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/normalization/concept_board.yaml",
+      "sha256": "2b7e7f57d189541d6a232cd5391d2dab4289f9f3438f397d9fefd82bb1d996b7",
+      "bytes": 206
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/normalization/daily_bar.yaml",
+      "sha256": "41f9bbd0824e20d70f7ed276758b286094c33c79180befca4d8985afc3c8ad0b",
+      "bytes": 2913
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/normalization/dividend_event.yaml",
+      "sha256": "188df2f7f075b92e993136aef3f977eea419f9c6957404bd2f7071c76ed24a71",
+      "bytes": 1532
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/normalization/earnings_forecast.yaml",
+      "sha256": "5b323a3c3c6577527701985248bb13b54102463a167ba04c749f4908e2b401c4",
+      "bytes": 1633
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/normalization/financial_main.yaml",
+      "sha256": "eeeb2e7418aab430168f0c7e16c69f1b24a9e49ec8d156a28390cae0e7a69bda",
+      "bytes": 603
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/normalization/holder_trades.yaml",
+      "sha256": "2deca39ea7c1a57254b4ee31390587f39d640559181cd1ceae7968a4684e5f40",
+      "bytes": 1959
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/normalization/industry_board.yaml",
+      "sha256": "f3ff8bbe7fc4e8d4e5af1c36b9312e8db1c8c9cb09a09aadb472b22ae09de152",
+      "bytes": 210
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/normalization/industry_directory.yaml",
+      "sha256": "823d97db8afe4adb3f963faaa04b42b8f151e93f2e75f3eb18f8c678a68bae37",
+      "bytes": 478
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/normalization/industry_index_daily.yaml",
+      "sha256": "953087294fd2c3a3cb1b46f204d0a0f606f9060f0f89676fb3a189222a68dab1",
+      "bytes": 805
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/normalization/industry_membership.yaml",
+      "sha256": "7eb72a1b8ce7aff27aa1ad62534af2bf7183f3d78c6392208035396a11e21ccb",
+      "bytes": 765
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/normalization/institution_survey.yaml",
+      "sha256": "e33c639f75da6a7a1d699936d0624084ed3488ef773aa9fcf3eaefc66e829423",
+      "bytes": 1118
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/normalization/intraday_trend.yaml",
+      "sha256": "14b0b22ad1308c70b65152e711c4248d3c8bf1c28d842fba36309194ed38870a",
+      "bytes": 440
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/normalization/ipo_calendar.yaml",
+      "sha256": "d72db539afed6e890e81d6e1c4680fcb09ad4285551748f3c9e12ba124e6059c",
+      "bytes": 2338
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/normalization/limit_down_pool.yaml",
+      "sha256": "456b0a779929bb6ff71ed70e07cd420d42596068f142879926b86972e3704f7b",
+      "bytes": 1314
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/normalization/limit_up_pool.yaml",
+      "sha256": "411e6e6ead10a4d2cbff7ecf4de9bee26f411a66d005a33bc640865ef4b6e7ba",
+      "bytes": 1079
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/normalization/lpr_history.yaml",
+      "sha256": "2a12cd26c069d8be0eb68e121eef7930f97f602ffe80e459b649c6cbc5a4c217",
+      "bytes": 682
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/normalization/minute_bar_5m.yaml",
+      "sha256": "f3e9abaededc01a15c651a99a22131a80067133deb89548dd12b17278e0e55b7",
+      "bytes": 1134
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/normalization/pledge.yaml",
+      "sha256": "4c8f7636e0b20e5923adbbf4c5e696247da67869d90ed19f0aee62f2e5612710",
+      "bytes": 1589
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/normalization/previous_limit_pool.yaml",
+      "sha256": "4c14b9ad1f0497e2d6f13a72978f1ddda74039b7c0d182c5a5a98ac01a678443",
+      "bytes": 1276
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/normalization/realtime_quote.yaml",
+      "sha256": "e9141547fbb85cb71c8e2336c20a2ebc948e3926f4b2a09e4f59505adea91b94",
+      "bytes": 1308
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/normalization/security_snapshot.yaml",
+      "sha256": "474ab0397cb1aad33abcd070942586a8460c468b1d3f7af97c2d152eee5a6537",
+      "bytes": 621
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/normalization/shareholder_count.yaml",
+      "sha256": "f8801367f055e0b1d419e648c9bd3e1d72984ffe2823c2d464770403c1b7c9e4",
+      "bytes": 1702
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/normalization/stock_fund_flow.yaml",
+      "sha256": "3d99bacf48ba3438c90d2d544f7223ffcb0a464f69f95841affe3e99a503bbe1",
+      "bytes": 1741
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/normalization/strong_stock_pool.yaml",
+      "sha256": "41733f419a6dd9d3a25edf361294a973df76d878d01bbf46b9f25f53a38f2304",
+      "bytes": 1234
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/normalization/trading_calendar.yaml",
+      "sha256": "4be7571914129769aeca321d892b8aa2fbd068db1c7c0b691ae0d5cefe7f69e0",
+      "bytes": 476
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/normalization/wallstreetcn_news.yaml",
+      "sha256": "12e2e1e23e9a95439e9ee5db21fed3759572973687baa7ebb00df3dd3ea25c55",
+      "bytes": 800
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/providers.yaml",
+      "sha256": "a7a42832768d9474a897ca3577d2f41613bdcaef9ef7d333d49d691475031c2e",
+      "bytes": 79564
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004/yaml/config/schedules.yaml",
+      "sha256": "01b7e269ea4231024bf1c520f78fa571c2909986aad5573006bd80e186119113",
+      "bytes": 525
+    },
+    {
+      "path": "provider_validation/results/news-final-20261004-tests.xml",
+      "sha256": "544a9635af4cd739ae96dfb634ca61eb26a3f1cb1309684900d0a1245256aea3",
+      "bytes": 53174
+    },
+    {
+      "path": "provider_validation/results/news-original-20261004/1-inputs.py.bin",
+      "sha256": "a96cacb2d009d18679f54bb888ffa0848e4b8b2bf133ded6ffc62dcbf6851b8f",
+      "bytes": 41874
+    },
+    {
+      "path": "provider_validation/results/news-original-20261004/2-factory.py.bin",
+      "sha256": "baef463ce255b86004d67b1e82d9293a39d62e62aa6d6ecdeeac5e226d6c04db",
+      "bytes": 20681
+    },
+    {
+      "path": "provider_validation/results/news-original-20261004/3-providers.yaml.bin",
+      "sha256": "388a0326f9590703b302b2ac7fa4dde7ec30247f135a00874ed0ff7d81cafc13",
+      "bytes": 78585
+    },
+    {
+      "path": "provider_validation/results/news-original-20261004/4-test_input_collection.py.bin",
+      "sha256": "b3490ebfc52ca5bb7c10928224b7d827d019bbd5cad1c462fa273577599d2e43",
+      "bytes": 136561
+    },
+    {
+      "path": "provider_validation/results/news-original-20261004/5-replay_input_capabilities.py.bin",
+      "sha256": "67cc1babe0ba59025ef19291f87649627f7be50f6d994062091470c282c3eae4",
+      "bytes": 34302
+    },
+    {
+      "path": "provider_validation/results/news-original-20261004/manifest.json",
+      "sha256": "05aeb8a85c22ec9d9997decad48f59f85dd5d17cabc8148bd81f55cfe72a2ec2",
+      "bytes": 4311
+    },
+    {
+      "path": "provider_validation/tests/replay_input_capabilities.py",
+      "sha256": "0c9a86f84437af3cc246840a38c7599489a45d8fe95c304145d95794fba6772a",
+      "bytes": 36517
+    },
+    {
+      "path": "src/stock_data_manage/cli.py",
+      "sha256": "582f5caedfc538a012d7a2f6e8cd7af3fe8b6fc9152e5b9e0a3fa2cb8810ae19",
+      "bytes": 14323
+    },
+    {
+      "path": "src/stock_data_manage/config/loader.py",
+      "sha256": "93bb55ab150c88751fe9a58a2b75737878c1b0f07233b8ec47009c4901bb11e9",
+      "bytes": 26090
+    },
+    {
+      "path": "src/stock_data_manage/pipeline/inputs.py",
+      "sha256": "ff7783029d26b0ff6b5e01e5096af7e06523ea438e90b696fac9b2d39c66e8d3",
+      "bytes": 43721
+    },
+    {
+      "path": "src/stock_data_manage/providers/akshare/boards.py",
+      "sha256": "2060f150831cebaf707ed5becedc35428bc41d4428bab31555ed1d2bf817d122",
+      "bytes": 12416
+    },
+    {
+      "path": "src/stock_data_manage/providers/baostock/industry.py",
+      "sha256": "16c41b379eecbd87f082bd042e27fad7f3d8d77b5bfc6a3e8a286209b068494a",
+      "bytes": 10837
+    },
+    {
+      "path": "src/stock_data_manage/providers/baostock/session.py",
+      "sha256": "70ce19cdde1d6a8ed0c3d3db29caa28d1d8069826136ab6dd7fb6a2ef8c7b832",
+      "bytes": 15771
+    },
+    {
+      "path": "src/stock_data_manage/providers/cctv/__init__.py",
+      "sha256": "b9121d0dd84448588f48225109a2f88d9a66717477241e67b81e2c29f68aff50",
+      "bytes": 28
+    },
+    {
+      "path": "src/stock_data_manage/providers/cctv/news.py",
+      "sha256": "8839bdeed801611e8e6d11cb9441e6ede7bc94d56507eaa2c903e605c772ee7d",
+      "bytes": 2538
+    },
+    {
+      "path": "src/stock_data_manage/providers/contracts.py",
+      "sha256": "a4b16abc7e3686a4eb2791dcd4545fb2404e0214bf32e20db19d2582d39ea447",
+      "bytes": 5153
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/dividend.py",
+      "sha256": "5706a8cdb37eeeb8f66cb033a3091dd1b6ec1ed83d72d0f9fbeb8f5c75d9649b",
+      "bytes": 6407
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/financial.py",
+      "sha256": "71adb28326a1c03166278f5ae374cd88b0afb532aa670d5e37d7da7984f631e8",
+      "bytes": 26162
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/fund_flow.py",
+      "sha256": "0cf655efa0854d18651bb4f04f985f0f210b81a6d9eff065604d235ed8f75280",
+      "bytes": 5046
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/limit_pool.py",
+      "sha256": "2fbdfe3da3129545dfe8d2e457be7c42225696ddd74270567ae765e4b413f5ae",
+      "bytes": 5663
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/realtime.py",
+      "sha256": "6e09d2a5014cf316c4d1e26e913a44d5c2fbad95fb44d95cba159ef881f03bca",
+      "bytes": 16746
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/shareholder.py",
+      "sha256": "4c9d80f4d51845ac5541c42275f44f2a18643db5e9ccb705a3e16168f8db44c1",
+      "bytes": 4865
+    },
+    {
+      "path": "src/stock_data_manage/providers/sina/calendar.py",
+      "sha256": "3d114045f960bfcc94ade1ee03e4d25ebdf6980ba68aa2d0a2236bed78aaef05",
+      "bytes": 1388
+    },
+    {
+      "path": "src/stock_data_manage/providers/tencent/daily.py",
+      "sha256": "487a14fcbfc47146d6d5fd291fbf41667aba435e5fed22ea1ef61ded513fcaa7",
+      "bytes": 9941
+    },
+    {
+      "path": "src/stock_data_manage/providers/tencent/minute.py",
+      "sha256": "ff5cf1e91327bcab2e072bcfae9f1f77dca71a84ba26e456c26580a4d59d9cc1",
+      "bytes": 4709
+    },
+    {
+      "path": "src/stock_data_manage/providers/tencent/snapshot.py",
+      "sha256": "3278cadac776fe8cfe5d02775a5bf8f53bc1cb96c595a5f418172f53047434bf",
+      "bytes": 5160
+    },
+    {
+      "path": "src/stock_data_manage/providers/transport.py",
+      "sha256": "7cf1c5f1f9b526e54e7d82e60b95b35e1f8f91e60effc31d74052f9273988b03",
+      "bytes": 16593
+    },
+    {
+      "path": "src/stock_data_manage/providers/wallstreetcn/__init__.py",
+      "sha256": "aa623eb9c3094c1c1d27dd0ba39decfcc6d5bc28981c4e711ae65c86f02536cd",
+      "bytes": 36
+    },
+    {
+      "path": "src/stock_data_manage/providers/wallstreetcn/news.py",
+      "sha256": "705de425d8526ced4e866d9beaf4c571c443c4955117c0cccada30ee06e07eea",
+      "bytes": 3203
+    },
+    {
+      "path": "src/stock_data_manage/quality/normalization.py",
+      "sha256": "3ed0d663b7fda9ac6cdf7f1252435f2351c783af3244ccba2c2b0f3891e29b3e",
+      "bytes": 14958
+    },
+    {
+      "path": "src/stock_data_manage/routing/factory.py",
+      "sha256": "0aca251734e568c2835d8c4eaf00f9a251bf1dbb9f1a882fffdf6da7f7df9374",
+      "bytes": 21045
+    },
+    {
+      "path": "src/stock_data_manage/storage/raw.py",
+      "sha256": "564c940feb99b358c41c5456c3142e7501b21505b5c2d8d88d811c53e145b752",
+      "bytes": 8487
+    },
+    {
+      "path": "tests/test_input_collection.py",
+      "sha256": "bcedb285c2c98b71032d0b694af09bba7b545d4016d166e377ee32f34bdff7cf",
+      "bytes": 147931
+    }
+  ]
+}

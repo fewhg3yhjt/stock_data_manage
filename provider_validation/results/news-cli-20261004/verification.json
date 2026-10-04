@@ -1,0 +1,60 @@
+{
+  "validation_time_utc": "2026-10-04T00:18:27.675493+00:00",
+  "mode": "actual CLI offline replay",
+  "network_requests": 0,
+  "production_writes": 0,
+  "results": [
+    {
+      "input_id": "ASTOCK-034",
+      "count": 50,
+      "command": [
+        "D:\\Program Files\\Python\\python.exe",
+        "-m",
+        "stock_data_manage.cli",
+        "collect-input",
+        "--input",
+        "ASTOCK-034",
+        "--mode",
+        "replay",
+        "--replay-manifest",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\manifest.ndjson",
+        "--output-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\news-cli-20261004\\candidate",
+        "--context-file",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\news-cli-20261004\\ASTOCK-034-context.json"
+      ],
+      "exit_code": 0,
+      "stdout": "provider_validation/results/news-cli-20261004/ASTOCK-034-stdout.json",
+      "stdout_sha256": "49014734f2a52fb6da85fd61e22bdcf8d59f38994ecd9c189f2195b26a87ee23",
+      "stderr": "provider_validation/results/news-cli-20261004/ASTOCK-034-stderr.bin",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\news-cli-20261004\\candidate\\ASTOCK-034-ac154010c57b\\2026-10-04\\input_report\\wallstreetcn\\news_lives\\report.json"
+    },
+    {
+      "input_id": "ASTOCK-035",
+      "count": 14,
+      "command": [
+        "D:\\Program Files\\Python\\python.exe",
+        "-m",
+        "stock_data_manage.cli",
+        "collect-input",
+        "--input",
+        "ASTOCK-035",
+        "--mode",
+        "replay",
+        "--replay-manifest",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\manifest.ndjson",
+        "--output-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\news-cli-20261004\\candidate",
+        "--context-file",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\news-cli-20261004\\ASTOCK-035-context.json"
+      ],
+      "exit_code": 0,
+      "stdout": "provider_validation/results/news-cli-20261004/ASTOCK-035-stdout.json",
+      "stdout_sha256": "ecdc4b48a950de704ebfc23023c712e170f1dd2cb2edb36cf68e6ced888131f9",
+      "stderr": "provider_validation/results/news-cli-20261004/ASTOCK-035-stderr.bin",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\news-cli-20261004\\candidate\\ASTOCK-035-e8f3cfcd3922\\2026-10-04\\input_report\\cctv\\news\\report.json"
+    }
+  ]
+}

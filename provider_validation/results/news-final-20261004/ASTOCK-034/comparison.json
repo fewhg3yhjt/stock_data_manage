@@ -1,0 +1,15 @@
+{
+  "input_id": "ASTOCK-034",
+  "mode": "offline_replay",
+  "row_count": 50,
+  "all_business_fields_equal": true,
+  "all_retained_source_fields_equal": true,
+  "request_comparison_equal": true,
+  "source_response_hashes": [
+    "a7c874fbbe260d8b207835c57f51359e07bd92626f58f2c1ef8614592aa1dba7"
+  ],
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\news-final-20261004\\ASTOCK-034\\candidate\\ASTOCK-034-9c36f6da2654\\2026-10-04\\input_report\\wallstreetcn\\news_lives\\report.json",
+  "report_sha256": "d10dc82dc1825d53f0429aea094894d43c200aeba9516ec7aa8ddb4881bf1f17",
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\news-final-20261004\\ASTOCK-034\\original-parsed.json",
+  "original_parsed_sha256": "02d6ab940c644bfd80e0927b082f34d0e36c2c4345fa8ef9c7c90abceda33a55"
+}

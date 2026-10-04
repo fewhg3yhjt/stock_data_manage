@@ -1,0 +1,15 @@
+{
+  "input_id": "ASTOCK-035",
+  "mode": "offline_replay",
+  "row_count": 14,
+  "all_business_fields_equal": true,
+  "all_retained_source_fields_equal": true,
+  "request_comparison_equal": true,
+  "source_response_hashes": [
+    "8373a95432cfd8403af3820c0c37729dc141c778f53dacfd24fec8d9fa490a5e"
+  ],
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\news-final-20261004\\ASTOCK-035\\candidate\\ASTOCK-035-a38ce474d9f3\\2026-10-04\\input_report\\cctv\\news\\report.json",
+  "report_sha256": "baff9a3fe2544b7db5a82a7ffad2703ffca87be0fbac806e7b440d593abcdc39",
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\news-final-20261004\\ASTOCK-035\\original-parsed.json",
+  "original_parsed_sha256": "b6add9f11b07e427dccdc908f15eafa1ce30ef9d711877df5ad150bd238215ef"
+}

@@ -74,6 +74,8 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                   Path(__file__).parents[1] / "providers/eastmoney/limit_pool.py",
                   Path(__file__).parents[1] / "providers/eastmoney/shareholder.py",
                   Path(__file__).parents[1] / "providers/eastmoney/financial.py",
+                  Path(__file__).parents[1] / "providers/wallstreetcn/news.py",
+                  Path(__file__).parents[1] / "providers/cctv/news.py",
                   Path(__file__).parents[1] / "providers/eastmoney/dividend.py",
                   Path(__file__).parents[1] / "providers/eastmoney/fund_flow.py",
                   Path(__file__).parents[1] / "providers/eastmoney/realtime.py",
@@ -111,6 +113,17 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
     is_em_history = input_id in {"ASTOCK-026", "ASTOCK-027", "ASTOCK-028"}
     is_em_events = input_id in {"ASTOCK-078", "ASTOCK-079", "ASTOCK-080", "ASTOCK-081", "ASTOCK-082", "ASTOCK-083"}
     is_lpr = input_id == "ASTOCK-065"
+    is_news = input_id in {"ASTOCK-034", "ASTOCK-035"}
+    if is_news:
+        import requests
+        import urllib3
+        report["transport_dependency"] = {"requests": requests.__version__, "urllib3": urllib3.__version__}
+        code_version = hashlib.sha256((code_version + requests.__version__ + urllib3.__version__).encode()).hexdigest()
+        report["code_version"] = code_version
+        report["news_transport_policy"] = {"source_contract": "successful runnable V3.9 source",
+            "headers": "original Chrome/126 User-Agent; requests defaults otherwise", "trust_env": True,
+            "timeout_seconds": [10, 40], "allow_redirects": True, "retry_total": 0,
+            "outer_capture_interval_seconds": 3}
     if is_em_events or is_lpr:
         import requests
         import urllib3
@@ -303,7 +316,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                 returned_window={"first": parameters["date"].isoformat(), "last": parameters["date"].isoformat()},
                 coverage_basis="source tc and returned SDK rows for requested qdate; not independent whole-market proof",
                 universe_completeness_verified=False)
-        mapping_rows = fetched.rows if is_em_history or is_lpr else source_rows
+        mapping_rows = fetched.rows if is_em_history or is_lpr or is_news else source_rows
         if is_em_history or is_lpr:
             excluded_ref = result_store.write_json(_json_value(fetched.excluded_rows), dataset="excluded_rows",
                 provider=contract.provider, endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="excluded-rows")
@@ -342,7 +355,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             raise NormalizationError("temporary empty input; not certified as a valid empty dataset")
         mapping_context = {"provider": contract.provider}
         mapping_context.update(getattr(fetched, "mapping_context", {}))
-        if input_id.startswith("SDA-BOARD-") or is_tencent_snapshot or is_em_history or is_stock_pool or is_em_events or is_lpr:
+        if input_id.startswith("SDA-BOARD-") or is_tencent_snapshot or is_em_history or is_stock_pool or is_em_events or is_lpr or is_news:
             successful = [event for event in response_events if event.get("outcome") == "response"]
             if not successful:
                 raise NormalizationError("source response evidence is required; an SDK memory cache alone is insufficient")
@@ -358,7 +371,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             mapping_context["source_snapshot_at"] = max(source_times)
             report["source_capture_window"] = {"first": min(source_times).isoformat(), "last": max(source_times).isoformat(),
                                                "meaning": "source response capture times; not row-level market timestamps"}
-            if not is_tencent_snapshot and not is_em_history and not is_stock_pool and not is_em_events and not is_lpr:
+            if not is_tencent_snapshot and not is_em_history and not is_stock_pool and not is_em_events and not is_lpr and not is_news:
                 report["returned_window"] = {"first": fetched.returned_first_key, "last": fetched.returned_last_key}
                 report["source_units"] = list(fetched.units)
                 report["coverage_basis"] = "returned SDK rows; not an independently verified market universe"
@@ -378,6 +391,17 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                 source_page_count=fetched.mapping_context["source_page_count"],requested_limit=5000,
                 result_limited=len(source_rows)<fetched.mapping_context["source_total_count"],
                 coverage_basis="source-reported history within 5000-row original script limit; not independent completeness")
+        if is_news:
+            dates = [row["time"] for row in mapping_rows] if input_id == "ASTOCK-034" else [row["date"] for row in mapping_rows]
+            report.update(returned_window={"first": min(dates), "last": max(dates)},
+                coverage_basis="returned news items for requested channel/page or broadcast date; not independent complete history",
+                universe_completeness_verified=False)
+            if input_id == "ASTOCK-034":
+                report.update(next_cursor=fetched.mapping_context["next_cursor"], requested_limit=parameters["limit"],
+                    channel=parameters["channel"], pagination_completeness_verified=False)
+            else:
+                report.update(broadcast_date=fetched.mapping_context["broadcast_date"], article_content_verified=False,
+                    content_requests=0, request_date_semantics="calendar broadcast date; not an exchange trading date")
         if "date" in parameters:
             mapping_context["trade_date"] = parameters["date"]
         if input_id.startswith("ASTOCK-002"):

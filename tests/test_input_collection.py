@@ -53,6 +53,142 @@ POOL_SOURCE = {"ASTOCK-046": ("fetch_broken_board_pool", "stock_zt_pool_zbgc_em"
                "ASTOCK-050": ("fetch_strong_pool", "stock_zt_pool_strong_em", "getTopicQSPool")}
 
 EVENT_ARCHIVE = ROOT / "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson"
+NEWS_CASES = [("ASTOCK-034", {"config":{"channel":"a-stock-channel","limit":50}}, EVENT_ARCHIVE, 50),
+              ("ASTOCK-035", {"request":{"trade_date":"2026-09-18"},"config":{"with_content":False}}, EVENT_ARCHIVE, 14)]
+
+
+def news_source_record(input_id):
+    needle="/content/lives?" if input_id=="ASTOCK-034" else "/lm/xwlb/day/20260918.shtml"
+    return next(json.loads(line) for line in EVENT_ARCHIVE.read_text(encoding="utf-8").splitlines() if needle in json.loads(line).get("url",""))
+
+
+def compare_news_original(tmp_path,input_id,context,manifest,count):
+    spec=importlib.util.spec_from_file_location("news_original",ROOT/"provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py")
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);ns=module.load_shipped_code()
+    store=RawObjectStore(tmp_path/"original")
+    try:
+        with captured_requests(store,provider="wallstreetcn" if input_id=="ASTOCK-034" else "cctv",endpoint="news",scope=context,code_version="original-v39-news",pacer=RequestPacer(),replay_manifest=manifest) as events:
+            frame=ns["wallstreetcn_lives"](channel="a-stock-channel",limit=50) if input_id=="ASTOCK-034" else ns["cctv_news"]("2026-09-18",with_content=False)
+    finally:ns["EM_SESSION"].close()
+    parsed=frame.to_dict(orient="records");original_path=tmp_path/"original-parsed.json"
+    original_path.write_text(json.dumps(parsed,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    report=collect_input(input_id=input_id,context=context,config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=manifest)
+    assert report["status"]=="candidate_complete" and report["row_count"]==len(parsed)==count,report
+    keys=("url","method","outcome","status_code","body_sha256","request_headers","request_options")
+    assert [{k:r.get(k) for k in keys} for r in events]==[{k:r.get(k) for k in keys} for r in report["responses"]]
+    output=read_artifact(report,"output")
+    for row,old in zip(output,parsed):
+        assert row["snapshot_at"]==report["source_capture_window"]["last"]
+        if input_id=="ASTOCK-034":
+            assert row["source_news_id"]==str(old["id"]) and row["news_time"]==old["time"].replace(" ","T")+"+08:00"
+            assert all(row[name]==old[name] for name in ("title","content","importance","channels","url"))
+        else:
+            assert row["broadcast_date"]==old["date"] and row["title"]==old["title"] and row["url"]==old["url"]
+    if input_id=="ASTOCK-034":
+        payload=json.loads(RawObjectStore.read_response(manifest,news_source_record(input_id)))
+        assert read_artifact(report,"source_rows")==payload["data"]["items"] and report["next_cursor"]==frame.attrs["next_cursor"]
+        assert not report["pagination_completeness_verified"]
+    else:
+        assert read_artifact(report,"source_rows")==[{name:row[name] for name in ("date","title","url")} for row in parsed]
+        assert report["content_requests"]==0 and report["article_content_verified"] is False
+    comparison={"input_id":input_id,"mode":"offline_replay","row_count":count,"all_business_fields_equal":True,
+        "all_retained_source_fields_equal":True,"request_comparison_equal":True,
+        "source_response_hashes":[r["body_sha256"] for r in events],"report_path":report["report_path"],
+        "report_sha256":hashlib.sha256(Path(report["report_path"]).read_bytes()).hexdigest(),
+        "original_parsed_path":str(original_path.resolve()),"original_parsed_sha256":hashlib.sha256(original_path.read_bytes()).hexdigest()}
+    (tmp_path/"comparison.json").write_text(json.dumps(comparison,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    return comparison
+
+
+@pytest.mark.parametrize("input_id,context,manifest,count",NEWS_CASES)
+def test_news_preserves_original_parser_and_request(tmp_path,no_network,input_id,context,manifest,count):
+    compare_news_original(tmp_path,input_id,context,manifest,count)
+
+
+NEWS_FAILURES=[("ASTOCK-034","business","RuntimeError"),("ASTOCK-034","empty","RuntimeError"),
+    ("ASTOCK-034","json","RuntimeError"),("ASTOCK-034","time","RuntimeError"),("ASTOCK-034","channels","RuntimeError"),
+    ("ASTOCK-034","id","RuntimeError"),("ASTOCK-034","score","NormalizationError"),("ASTOCK-034","duplicate","NormalizationError"),
+    ("ASTOCK-034","http429","RuntimeError"),("ASTOCK-035","missing","ValueError"),
+    ("ASTOCK-035","structure","RuntimeError"),("ASTOCK-035","duplicate","NormalizationError")]
+
+
+def news_fixture(tmp_path,input_id,mutation):
+    record=news_source_record(input_id);body=RawObjectStore.read_response(EVENT_ARCHIVE,record);status=200
+    if input_id=="ASTOCK-034":
+        data=json.loads(body)
+        if mutation=="business":data["code"]=50000
+        elif mutation=="empty":data["data"]["items"]=[]
+        elif mutation=="time":data["data"]["items"][0]["display_time"]=True
+        elif mutation=="channels":data["data"]["items"][0]["channels"]="a-stock-channel"
+        elif mutation=="id":data["data"]["items"][0].pop("id")
+        elif mutation=="score":data["data"]["items"][0]["score"]=True
+        elif mutation=="duplicate":data["data"]["items"][-1]=data["data"]["items"][0].copy()
+        elif mutation=="cursor":data["data"]["next_cursor"]="synthetic-cursor"
+        elif mutation=="http429":status=429
+        body=b"<html>invalid</html>" if mutation=="json" else json.dumps(data).encode()
+    elif mutation=="missing":status=404;body=b"<html>not published</html>"
+    elif mutation=="structure":body=b"<html>source changed</html>"
+    elif mutation=="duplicate":body+=body
+    elif mutation=="old_title":body='<li><a href="//tv.cctv.com/2026/09/19/VIDE-example.shtml"><div class="title">[视频]样本新闻 &amp; 提示</div></a></li><li><a href="//tv.cctv.com/2026/09/19/VIDE-full.shtml" title="新闻联播完整版"></a></li>'.encode()
+    url=record["url"]
+    if mutation=="cursor":url+="&cursor=synthetic-cursor"
+    if mutation=="old_title":url=url.replace("20260918","20260919")
+    response=requests.Response();response.status_code=status;response.encoding=record["response_encoding"];response._content=body
+    store=RawObjectStore(tmp_path/"fixture");store.record_response(response=response,url=url,method="GET",request_headers=record["request_headers"],
+        provider="wallstreetcn" if input_id=="ASTOCK-034" else "cctv",endpoint="news",code_version="offline-fixture",
+        scope={"synthetic":True,"mutation":mutation,"parent_sha256":record["body_sha256"]})
+    return store.root/"manifest.ndjson"
+
+
+@pytest.mark.parametrize("input_id,mutation,expected",NEWS_FAILURES)
+def test_news_failures_retain_evidence(tmp_path,no_network,input_id,mutation,expected):
+    case=next(case for case in NEWS_CASES if case[0]==input_id);manifest=news_fixture(tmp_path,input_id,mutation)
+    report=collect_input(input_id=input_id,context=case[1],config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=manifest)
+    assert report["status"]=="failed" and report["failure_class"]==expected and "output" not in report,report
+    assert report["responses"] and report["live_http_calls"]==report["production_writes"]==0
+
+
+def test_news_yaml_projection_scope_and_mapping(tmp_path,no_network):
+    input_id,context,manifest,_=NEWS_CASES[0];config=tmp_path/"config";shutil.copytree(ROOT/"config",config)
+    path=config/"normalization/wallstreetcn_news.yaml";rule=yaml.safe_load(path.read_text(encoding="utf-8"))
+    rule["rules"][0]["field_mapping"]["title"]="content";path.write_text(yaml.safe_dump(rule,allow_unicode=True),encoding="utf-8")
+    report=collect_input(input_id=input_id,context=context,config_root=config,output_root=tmp_path/"candidate",replay_manifest=manifest,
+        fields=["snapshot_at","source_news_id","news_time","title"])
+    assert report["status"]=="candidate_complete",report
+    source=json.loads(RawObjectStore.read_response(manifest,news_source_record(input_id)))["data"]["items"]
+    rows=read_artifact(report,"output");assert rows[0]["title"]==source[0]["content_text"].strip() and len(rows[0])==4
+    for bad in [{"config":{"channel":"global"}},{"config":{"channel":"global-channel"}},{"config":{"limit":101}},{"config":{"limit":True}},{"request":{"symbol":"600519"}}]:
+        with pytest.raises(ValueError):collect_input(input_id=input_id,context=bad,config_root=ROOT/"config",output_root=tmp_path/"bad",replay_manifest=manifest)
+    with pytest.raises(ValueError):collect_input(input_id="ASTOCK-035",context={"request":{"trade_date":"2026-09-18"},"config":{"with_content":True}},config_root=ROOT/"config",output_root=tmp_path/"bad",replay_manifest=manifest)
+
+
+def test_news_cursor_and_weekend_broadcast_preserve_source_semantics(tmp_path,no_network):
+    manifest=news_fixture(tmp_path/"cursor","ASTOCK-034","cursor")
+    report=collect_input(input_id="ASTOCK-034",context={"metadata":{"cursor":"synthetic-cursor"}},config_root=ROOT/"config",output_root=tmp_path/"cursor-candidate",replay_manifest=manifest)
+    assert report["status"]=="candidate_complete" and report["next_cursor"]=="synthetic-cursor",report
+    manifest=news_fixture(tmp_path/"weekend","ASTOCK-035","old_title")
+    report=collect_input(input_id="ASTOCK-035",context={"request":{"trade_date":"2026-09-19"}},config_root=ROOT/"config",output_root=tmp_path/"weekend-candidate",replay_manifest=manifest)
+    assert report["status"]=="candidate_complete" and report["row_count"]==1,report
+    row=read_artifact(report,"output")[0];assert row["broadcast_date"]=="2026-09-19" and row["title"]=="样本新闻 & 提示" and row["url"].startswith("https://")
+
+
+def test_news_original_http_policy_and_cache(tmp_path,monkeypatch):
+    from unittest.mock import patch
+    originals=[news_source_record(case[0]) for case in NEWS_CASES];seen=[]
+    def send(session,request,**kwargs):
+        record=next(record for record in originals if record["url"]==request.url);seen.append(request.url)
+        assert session.trust_env is True and kwargs["timeout"]==(10,40) and kwargs["allow_redirects"] is True
+        assert session.get_adapter(request.url).max_retries.total==0 and request.headers["User-Agent"]==record["request_headers"]["User-Agent"]
+        response=requests.Response();response.status_code=200;response.encoding=record["response_encoding"];response.headers["Content-Type"]=record["content_type"]
+        response._content=RawObjectStore.read_response(EVENT_ARCHIVE,record);response.url=request.url;return response
+    with patch("requests.Session.send",send):
+        for input_id,context,_,count in NEWS_CASES:
+            first=collect_input(input_id=input_id,context=context,config_root=ROOT/"config",output_root=tmp_path/"candidate",mode="live",evidence_root=tmp_path/"unused")
+            second=collect_input(input_id=input_id,context=context,config_root=ROOT/"config",output_root=tmp_path/"candidate",mode="live",evidence_root=tmp_path/"candidate")
+            assert first["status"]==second["status"]=="candidate_complete" and first["row_count"]==count,(first,second)
+            assert first["live_http_calls"]==1 and second["live_http_calls"]==0 and read_artifact(first,"output")==read_artifact(second,"output")
+    assert len(seen)==2
+    (tmp_path/"fixture-mode.json").write_text(json.dumps({"mode":"injected Session; not real live source validation","real_http_calls":0,"fixture_send_calls":2}),encoding="utf-8")
 EVENT_CASES = [("ASTOCK-078", {"config": {"limit": 50}}, EVENT_ARCHIVE, 50),
                ("ASTOCK-079", {"config": {"limit": 50}}, EVENT_ARCHIVE, 50)]
 EVENT_REPORTS = {"ASTOCK-078": "RPT_PUBLIC_OP_NEWPREDICT", "ASTOCK-079": "RPT_ORG_SURVEYNEW"}

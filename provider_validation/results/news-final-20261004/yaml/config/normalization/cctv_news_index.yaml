@@ -1,0 +1,21 @@
+dataset: cctv_news_index
+rules:
+- id: cctv-news-input-v1
+  input_id: ASTOCK-035
+  provider: cctv
+  endpoint: news
+  field_mapping:
+    broadcast_date: date
+    title: title
+    url: url
+  context_fields:
+    snapshot_at: source_snapshot_at
+  transforms: {}
+  null_values:
+  - null
+  unverified_fields: []
+  status: pending_validation
+  version: cctv-news-input-v1
+  evidence_refs:
+  - ASTOCK-035
+  notes: 保留原可执行脚本字段及北京时间；snapshot_at为原响应采集时间。原始响应和来源行留证；未认证全量覆盖及当前实时可用性。

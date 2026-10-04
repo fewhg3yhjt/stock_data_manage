@@ -1,0 +1,82 @@
+{
+  "validation_time_utc": "2026-10-04T00:12:19.121045+00:00",
+  "authorization": "confirmed continuous remaining-input conversion",
+  "scope": [
+    "ASTOCK-034",
+    "ASTOCK-035"
+  ],
+  "original_files": [
+    {
+      "path": "src/stock_data_manage/pipeline/inputs.py",
+      "snapshot": "provider_validation/results/news-original-20261004/1-inputs.py.bin",
+      "sha256": "a96cacb2d009d18679f54bb888ffa0848e4b8b2bf133ded6ffc62dcbf6851b8f"
+    },
+    {
+      "path": "src/stock_data_manage/routing/factory.py",
+      "snapshot": "provider_validation/results/news-original-20261004/2-factory.py.bin",
+      "sha256": "baef463ce255b86004d67b1e82d9293a39d62e62aa6d6ecdeeac5e226d6c04db"
+    },
+    {
+      "path": "config/providers.yaml",
+      "snapshot": "provider_validation/results/news-original-20261004/3-providers.yaml.bin",
+      "sha256": "388a0326f9590703b302b2ac7fa4dde7ec30247f135a00874ed0ff7d81cafc13"
+    },
+    {
+      "path": "tests/test_input_collection.py",
+      "snapshot": "provider_validation/results/news-original-20261004/4-test_input_collection.py.bin",
+      "sha256": "b3490ebfc52ca5bb7c10928224b7d827d019bbd5cad1c462fa273577599d2e43"
+    },
+    {
+      "path": "provider_validation/tests/replay_input_capabilities.py",
+      "snapshot": "provider_validation/results/news-original-20261004/5-replay_input_capabilities.py.bin",
+      "sha256": "67cc1babe0ba59025ef19291f87649627f7be50f6d994062091470c282c3eae4"
+    }
+  ],
+  "source_code": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+  "source_code_sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03",
+  "raw_manifest": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+  "raw_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+  "provider_inventory": [
+    "src/stock_data_manage/providers/base.py",
+    "src/stock_data_manage/providers/contracts.py",
+    "src/stock_data_manage/providers/probes.py",
+    "src/stock_data_manage/providers/transport.py",
+    "src/stock_data_manage/providers/__init__.py",
+    "src/stock_data_manage/providers/akshare/boards.py",
+    "src/stock_data_manage/providers/akshare/daily.py",
+    "src/stock_data_manage/providers/akshare/session.py",
+    "src/stock_data_manage/providers/akshare/__init__.py",
+    "src/stock_data_manage/providers/baostock/daily.py",
+    "src/stock_data_manage/providers/baostock/industry.py",
+    "src/stock_data_manage/providers/baostock/minute.py",
+    "src/stock_data_manage/providers/baostock/session.py",
+    "src/stock_data_manage/providers/baostock/__init__.py",
+    "src/stock_data_manage/providers/eastmoney/dividend.py",
+    "src/stock_data_manage/providers/eastmoney/financial.py",
+    "src/stock_data_manage/providers/eastmoney/fund_flow.py",
+    "src/stock_data_manage/providers/eastmoney/limit_pool.py",
+    "src/stock_data_manage/providers/eastmoney/realtime.py",
+    "src/stock_data_manage/providers/eastmoney/security_list.py",
+    "src/stock_data_manage/providers/eastmoney/shareholder.py",
+    "src/stock_data_manage/providers/eastmoney/__init__.py",
+    "src/stock_data_manage/providers/sina/calendar.py",
+    "src/stock_data_manage/providers/sina/daily.py",
+    "src/stock_data_manage/providers/sina/minute.py",
+    "src/stock_data_manage/providers/sina/snapshot.py",
+    "src/stock_data_manage/providers/sina/__init__.py",
+    "src/stock_data_manage/providers/tdx/minute.py",
+    "src/stock_data_manage/providers/tdx/__init__.py",
+    "src/stock_data_manage/providers/tencent/daily.py",
+    "src/stock_data_manage/providers/tencent/minute.py",
+    "src/stock_data_manage/providers/tencent/snapshot.py",
+    "src/stock_data_manage/providers/tencent/__init__.py",
+    "src/stock_data_manage/providers/ths/boards.py",
+    "src/stock_data_manage/providers/ths/__init__.py"
+  ],
+  "findings": [
+    "No existing WallStreetCN/CCTV adapters; necessary source-specific adapters only.",
+    "Archive scope: a-stock-channel limit=50, CCTV 2026-09-18 with_content=False.",
+    "Keep original requests.request, UA, environment proxies, redirects and (10,40) timeout; no added retry.",
+    "CCTV title and links only; content requests lack reusable source evidence."
+  ]
+}

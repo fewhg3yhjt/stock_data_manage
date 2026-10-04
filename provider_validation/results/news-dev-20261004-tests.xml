@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="17" time="7.941" timestamp="2026-10-04T08:15:48.974517+08:00" hostname="WIN-O3LLBLVKP56"><testcase classname="tests.test_input_collection" name="test_news_preserves_original_parser_and_request[ASTOCK-034-context0-manifest0-50]" time="0.306" /><testcase classname="tests.test_input_collection" name="test_news_preserves_original_parser_and_request[ASTOCK-035-context1-manifest1-14]" time="0.213"><failure message="AssertionError: assert ([{'date': '20....shtml'}, ...] == [{'date': '20...l', ...}, ...]&#10;  &#10;  At index 0 diff: {'date': '2026-09-18', 'title': '做大做强先进制造业 巩固壮大实体经济根基——习近平总书记就发展先进制造业作出的重要指示引发热烈反响', 'url': 'https://tv.cctv.com/2026/09/18/VIDEQIKzKkAHDPYnsOPH1pgG260918.shtml'} != {'date': '2026-09-18', 'title': '做大做强先进制造业 巩固壮大实体经济根基——习近平总书记就发展先进制造业作出的重要指示引发热烈反响', 'url': 'https://tv.cctv.com/2026/09/18/VIDEQIKzKkAHDPYnsOPH1pgG260918.shtml', 'source': 'cctv', 'source_url': 'https://tv.cctv.com/lm/xwlb/day/20260918.shtml', 'fetched_at': '2026-10-04T00:15:49.929370+00:00'}&#10;  Use -v to get more diff)">tmp_path = WindowsPath('C:/Users/sp181/AppData/Local/Temp/pytest-of-sp181/pytest-91/test_news_preserves_original_p1')
+no_network = None, input_id = 'ASTOCK-035'
+context = {'config': {'with_content': False}, 'request': {'trade_date': '2026-09-18'}}
+manifest = WindowsPath('D:/Project/PythonProgram/stock_data_manage/provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson')
+count = 14
+
+    @pytest.mark.parametrize("input_id,context,manifest,count",NEWS_CASES)
+    def test_news_preserves_original_parser_and_request(tmp_path,no_network,input_id,context,manifest,count):
+&gt;       compare_news_original(tmp_path,input_id,context,manifest,count)
+
+tests\test_input_collection.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('C:/Users/sp181/AppData/Local/Temp/pytest-of-sp181/pytest-91/test_news_preserves_original_p1')
+input_id = 'ASTOCK-035'
+context = {'config': {'with_content': False}, 'request': {'trade_date': '2026-09-18'}}
+manifest = WindowsPath('D:/Project/PythonProgram/stock_data_manage/provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson')
+count = 14
+
+    def compare_news_original(tmp_path,input_id,context,manifest,count):
+        spec=importlib.util.spec_from_file_location("news_original",ROOT/"provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py")
+        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);ns=module.load_shipped_code()
+        store=RawObjectStore(tmp_path/"original")
+        try:
+            with captured_requests(store,provider="wallstreetcn" if input_id=="ASTOCK-034" else "cctv",endpoint="news",scope=context,code_version="original-v39-news",pacer=RequestPacer(),replay_manifest=manifest) as events:
+                frame=ns["wallstreetcn_lives"](channel="a-stock-channel",limit=50) if input_id=="ASTOCK-034" else ns["cctv_news"]("2026-09-18",with_content=False)
+        finally:ns["EM_SESSION"].close()
+        parsed=frame.to_dict(orient="records");original_path=tmp_path/"original-parsed.json"
+        original_path.write_text(json.dumps(parsed,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+        report=collect_input(input_id=input_id,context=context,config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=manifest)
+        assert report["status"]=="candidate_complete" and report["row_count"]==len(parsed)==count,report
+        keys=("url","method","outcome","status_code","body_sha256","request_headers","request_options")
+        assert [{k:r.get(k) for k in keys} for r in events]==[{k:r.get(k) for k in keys} for r in report["responses"]]
+        output=read_artifact(report,"output")
+        for row,old in zip(output,parsed):
+            assert row["snapshot_at"]==report["source_capture_window"]["last"]
+            if input_id=="ASTOCK-034":
+                assert row["source_news_id"]==str(old["id"]) and row["news_time"]==old["time"].replace(" ","T")+"+08:00"
+                assert all(row[name]==old[name] for name in ("title","content","importance","channels","url"))
+            else:
+                assert row["broadcast_date"]==old["date"] and row["title"]==old["title"] and row["url"]==old["url"]
+        if input_id=="ASTOCK-034":
+            payload=json.loads(RawObjectStore.read_response(manifest,news_source_record(input_id)))
+            assert read_artifact(report,"source_rows")==payload["data"]["items"] and report["next_cursor"]==frame.attrs["next_cursor"]
+            assert not report["pagination_completeness_verified"]
+        else:
+&gt;           assert read_artifact(report,"source_rows")==parsed and report["content_requests"]==0 and report["article_content_verified"] is False
+E           AssertionError: assert ([{'date': '20....shtml'}, ...] == [{'date': '20...l', ...}, ...]
+E             
+E             At index 0 diff: {'date': '2026-09-18', 'title': '做大做强先进制造业 巩固壮大实体经济根基——习近平总书记就发展先进制造业作出的重要指示引发热烈反响', 'url': 'https://tv.cctv.com/2026/09/18/VIDEQIKzKkAHDPYnsOPH1pgG260918.shtml'} != {'date': '2026-09-18', 'title': '做大做强先进制造业 巩固壮大实体经济根基——习近平总书记就发展先进制造业作出的重要指示引发热烈反响', 'url': 'https://tv.cctv.com/2026/09/18/VIDEQIKzKkAHDPYnsOPH1pgG260918.shtml', 'source': 'cctv', 'source_url': 'https://tv.cctv.com/lm/xwlb/day/20260918.shtml', 'fetched_at': '2026-10-04T00:15:49.929370+00:00'}
+E             Use -v to get more diff)
+
+tests\test_input_collection.py:92: AssertionError</failure></testcase><testcase classname="tests.test_input_collection" name="test_news_failures_retain_evidence[ASTOCK-034-business-RuntimeError]" time="0.156" /><testcase classname="tests.test_input_collection" name="test_news_failures_retain_evidence[ASTOCK-034-empty-RuntimeError]" time="0.140" /><testcase classname="tests.test_input_collection" name="test_news_failures_retain_evidence[ASTOCK-034-json-RuntimeError]" time="0.153" /><testcase classname="tests.test_input_collection" name="test_news_failures_retain_evidence[ASTOCK-034-time-RuntimeError]" time="0.165" /><testcase classname="tests.test_input_collection" name="test_news_failures_retain_evidence[ASTOCK-034-channels-RuntimeError]" time="0.157" /><testcase classname="tests.test_input_collection" name="test_news_failures_retain_evidence[ASTOCK-034-id-RuntimeError]" time="0.149" /><testcase classname="tests.test_input_collection" name="test_news_failures_retain_evidence[ASTOCK-034-score-NormalizationError]" time="0.183" /><testcase classname="tests.test_input_collection" name="test_news_failures_retain_evidence[ASTOCK-034-duplicate-NormalizationError]" time="0.365" /><testcase classname="tests.test_input_collection" name="test_news_failures_retain_evidence[ASTOCK-034-http429-RuntimeError]" time="0.446" /><testcase classname="tests.test_input_collection" name="test_news_failures_retain_evidence[ASTOCK-035-missing-ValueError]" time="0.278" /><testcase classname="tests.test_input_collection" name="test_news_failures_retain_evidence[ASTOCK-035-structure-RuntimeError]" time="0.297" /><testcase classname="tests.test_input_collection" name="test_news_failures_retain_evidence[ASTOCK-035-duplicate-NormalizationError]" time="0.326" /><testcase classname="tests.test_input_collection" name="test_news_yaml_projection_scope_and_mapping" time="1.727" /><testcase classname="tests.test_input_collection" name="test_news_cursor_and_weekend_broadcast_preserve_source_semantics" time="0.747" /><testcase classname="tests.test_input_collection" name="test_news_original_http_policy_and_cache" time="1.394" /></testsuite></testsuites>
