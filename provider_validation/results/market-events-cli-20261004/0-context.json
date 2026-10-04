@@ -1,0 +1,10 @@
+{
+  "request": {
+    "trade_date": "2026-09-30"
+  },
+  "calendar": {
+    "trading_dates": [
+      "2026-09-30"
+    ]
+  }
+}

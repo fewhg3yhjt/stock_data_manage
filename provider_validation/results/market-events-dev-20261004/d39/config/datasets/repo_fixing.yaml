@@ -1,0 +1,30 @@
+dataset:
+  name: repo_fixing
+  display_name: 回购定盘利率输入
+  primary_key:
+  - rate_date
+  - rate_kind
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  rate_date:
+    type: date
+    required: true
+  rate_kind:
+    type: enum
+    values:
+    - FR
+    required: true
+  overnight_rate:
+    type: decimal
+    required: false
+    unit: percent
+  week_rate:
+    type: decimal
+    required: false
+    unit: percent
+  fortnight_rate:
+    type: decimal
+    required: false
+    unit: percent

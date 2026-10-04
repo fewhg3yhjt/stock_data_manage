@@ -1,0 +1,35 @@
+dataset: lockup_expiry
+rules:
+- context_fields:
+    snapshot_at: source_snapshot_at
+  endpoint: lockup_expiry
+  evidence_refs:
+  - ASTOCK-021
+  field_mapping:
+    actual_market_cap: 实际解禁市值
+    actual_quantity: 实际解禁数量
+    free_market_cap_ratio: 占解禁前流通市值比例
+    name: 限售股类型
+    planned_quantity: 解禁数量
+    prior_close: 解禁前一交易日收盘价
+    release_date: 解禁时间
+    restricted_share_type: 限售股类型
+    return_after_20d: 解禁后20日涨跌幅
+    return_before_20d: 解禁前20日涨跌幅
+    source_security_code: 股票代码
+  id: eastmoney-lockup-expiry-input-v1
+  input_id: ASTOCK-021
+  notes: 原成功全市场日期窗口明细；不代表单股票队列能力。解禁日非公告日。SDK数量和市值乘10000原行为保留在解析证据，原值完整另存，标准单位未认证。日期和限售股类型共同区分事件；冲突直接失败不合并。
+  null_values:
+  - null
+  provider: eastmoney
+  status: pending_validation
+  unverified_fields:
+  - planned_quantity
+  - actual_quantity
+  - actual_market_cap
+  - free_market_cap_ratio
+  - prior_close
+  - return_before_20d
+  - return_after_20d
+  version: eastmoney-market-events-input-v1

@@ -1,0 +1,82 @@
+dataset:
+  name: buyback
+  display_name: 回购方案与进度输入
+  primary_key:
+  - snapshot_at
+  - source_security_code
+  - source_plan_code
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  source_security_code:
+    type: string
+    required: true
+  name:
+    type: string
+    required: false
+  source_plan_code:
+    type: string
+    required: true
+  progress:
+    type: string
+    required: false
+  progress_code:
+    type: string
+    required: true
+  plan_start:
+    type: date
+    required: false
+  plan_end:
+    type: date
+    required: false
+  price_cap:
+    type: decimal
+    required: false
+    unit: CNY
+  shares_lower:
+    type: decimal
+    required: false
+    unit: shares
+  shares_upper:
+    type: decimal
+    required: false
+    unit: shares
+  amount_lower:
+    type: decimal
+    required: false
+    unit: CNY
+  amount_upper:
+    type: decimal
+    required: false
+    unit: CNY
+  pct_total_lower:
+    type: decimal
+    required: false
+    unit: percent
+  pct_total_upper:
+    type: decimal
+    required: false
+    unit: percent
+  done_shares:
+    type: decimal
+    required: false
+    unit: shares
+  done_amount:
+    type: decimal
+    required: false
+    unit: CNY
+  done_price_low:
+    type: decimal
+    required: false
+    unit: CNY
+  done_price_high:
+    type: decimal
+    required: false
+    unit: CNY
+  latest_notice:
+    type: date
+    required: false
+  objective:
+    type: string
+    required: false

@@ -1,0 +1,75 @@
+dataset:
+  name: ipo_calendar
+  display_name: 新股申购日历输入
+  primary_key:
+  - snapshot_at
+  - source_security_code
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  source_security_code:
+    type: string
+    required: true
+  name:
+    type: string
+    required: false
+  apply_code:
+    type: string
+    required: false
+  exchange:
+    type: string
+    required: false
+  board:
+    type: string
+    required: false
+  apply_date:
+    type: date
+    required: true
+  ballot_date:
+    type: date
+    required: false
+  pay_date:
+    type: date
+    required: false
+  listing_date:
+    type: date
+    required: false
+  issue_price:
+    type: decimal
+    required: false
+    unit: CNY
+  issue_pe:
+    type: decimal
+    required: false
+  industry_pe:
+    type: decimal
+    required: false
+  issue_shares_10k:
+    type: decimal
+    required: false
+    unit: 10k_shares
+  online_shares:
+    type: decimal
+    required: false
+    unit: shares
+  apply_upper_shares:
+    type: decimal
+    required: false
+    unit: shares
+  top_apply_mktcap_10k:
+    type: decimal
+    required: false
+    unit: 10k_CNY
+  win_rate_pct:
+    type: decimal
+    required: false
+    unit: percent
+  first_close:
+    type: decimal
+    required: false
+    unit: CNY
+  first_close_chg_pct:
+    type: decimal
+    required: false
+    unit: percent

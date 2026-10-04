@@ -1,0 +1,35 @@
+dataset: board_fund_flow
+rules:
+  - id: ths-industry-flow-input-v1
+    input_id: SDA-BOARD-003
+    provider: ths
+    endpoint: industry_fund_flow
+    field_mapping: &immediate_mapping
+      rank: 序号
+      board_name: 行业
+      index_value: 行业指数
+      change_pct: 行业-涨跌幅
+      money_inflow: 流入资金
+      money_outflow: 流出资金
+      net_inflow: 净额
+      company_count: 公司家数
+      leader_stock_name: 领涨股
+      leader_change_pct: 领涨股-涨跌幅
+      leader_price: 当前价
+    context_fields: &flow_context {board_type: board_type, period: period, snapshot_at: source_snapshot_at, source: source}
+    unverified_fields: &unknown_money [money_inflow, money_outflow, net_inflow]
+    status: pending_validation
+    version: ths-industry-flow-input-v1
+    evidence_refs: [SDA-BOARD-003]
+    notes: snapshot_at为原响应批次的最后采集时间，不是逐行行情日期；金额展示单位未确认。
+  - id: ths-concept-flow-input-v1
+    input_id: SDA-BOARD-004
+    provider: ths
+    endpoint: concept_fund_flow
+    field_mapping: *immediate_mapping
+    context_fields: *flow_context
+    unverified_fields: *unknown_money
+    status: pending_validation
+    version: ths-concept-flow-input-v1
+    evidence_refs: [SDA-BOARD-004]
+    notes: SDK概念名称同样返回在“行业”列；该快照不包含证券概念成员关系。

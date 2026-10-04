@@ -1,0 +1,16 @@
+{
+  "input_id": "ASTOCK-020",
+  "original_csv_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\18_全市场龙虎榜\\data.csv",
+  "original_csv_sha256": "f3f661833df59cec352bc57244830e9e83f992d86cf07bbc26276c979dcf05a8",
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\market-events-final-v2-20261004\\ASTOCK-020\\original-parsed.json",
+  "original_parsed_sha256": "43157ee48fe2254dde470df7ffe7e75723cc3c539a80b278cef969e587dbfab2",
+  "all_business_fields_equal": true,
+  "all_retained_source_fields_equal": true,
+  "request_comparison_equal": true,
+  "original_request_count": 2,
+  "selected_successful_request_count": 2,
+  "provider_request_count": 2,
+  "known_difference": "original fallback alternatives are not embedded in Provider",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\market-events-final-v2-20261004\\ASTOCK-020\\candidate\\ASTOCK-020-6b8cf95e35e2\\2026-10-04\\input_report\\eastmoney\\dragon_tiger_daily\\report.json",
+  "report_sha256": "bef36c5ac3e88ac181b64c295c72bca3707c833124cae12b1d1814a3a53777d4"
+}

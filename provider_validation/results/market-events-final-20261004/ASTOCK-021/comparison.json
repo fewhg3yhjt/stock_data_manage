@@ -1,0 +1,16 @@
+{
+  "input_id": "ASTOCK-021",
+  "original_csv_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\19_限售解禁日历\\data.csv",
+  "original_csv_sha256": "68037d3060ed350b03c9da26cb2146fc01b0c15eea7e42f0004612cb28486574",
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\market-events-final-20261004\\ASTOCK-021\\original-parsed.json",
+  "original_parsed_sha256": "44468e6a9eabd58c405d0ed611c9446b3d3f6faa7cd3a4af5f433c3ad2fdc443",
+  "all_business_fields_equal": true,
+  "all_retained_source_fields_equal": true,
+  "request_comparison_equal": true,
+  "original_request_count": 3,
+  "selected_successful_request_count": 2,
+  "provider_request_count": 2,
+  "known_difference": "failed single-stock queue retained only in original evidence; independent successful market-window detail endpoint",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\market-events-final-20261004\\ASTOCK-021\\candidate\\ASTOCK-021-811c35309320\\2026-10-04\\input_report\\eastmoney\\lockup_expiry\\report.json",
+  "report_sha256": "faaacb85f8a7c21755569b63acda43b618438194e157953d48d5cc55a4341831"
+}

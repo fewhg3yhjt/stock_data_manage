@@ -1,0 +1,20 @@
+dataset:
+  name: cls_telegraph
+  display_name: 财联社电报输入
+  primary_key:
+  - snapshot_at
+  - news_time
+  - content
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  news_time:
+    type: datetime
+    required: true
+  content:
+    type: string
+    required: true
+  title:
+    type: string
+    required: false

@@ -1,0 +1,25 @@
+dataset: sina_reports
+rules:
+- id: sina-reports-input-v1
+  input_id: ASTOCK-013
+  provider: sina
+  endpoint: report_list
+  field_mapping:
+    report_date: date
+    title: title
+    report_type: type
+    organization: org
+    author: author
+    source_report_id: report_id
+    url: url
+  context_fields:
+    snapshot_at: source_snapshot_at
+  transforms: {}
+  null_values:
+  - null
+  unverified_fields: []
+  status: pending_validation
+  version: sina-reports-input-v1
+  evidence_refs:
+  - ASTOCK-013
+  notes: snapshot_at为原响应捕获时间；原文本/日期保持，宏观值为显示文本与来源单位，并非认证数值。来源完整行和筛选排除行分别留证。

@@ -1,0 +1,17 @@
+dataset:
+  name: lockup_expiry
+  display_name: 全市场限售解禁日期窗口候选输入
+  primary_key: [snapshot_at, source_security_code, release_date, restricted_share_type]
+fields:
+  snapshot_at: {type: datetime, required: true}
+  source_security_code: {type: string, required: true}
+  name: {type: string, required: false}
+  release_date: {type: date, required: true}
+  restricted_share_type: {type: string, required: true}
+  planned_quantity: {type: decimal, required: false, unit: unverified}
+  actual_quantity: {type: decimal, required: false, unit: unverified}
+  actual_market_cap: {type: decimal, required: false, unit: unverified}
+  free_market_cap_ratio: {type: decimal, required: false, unit: unverified}
+  prior_close: {type: decimal, required: false, unit: unverified}
+  return_before_20d: {type: decimal, required: false, unit: unverified}
+  return_after_20d: {type: decimal, required: false, unit: unverified}

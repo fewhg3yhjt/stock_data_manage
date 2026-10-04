@@ -1,0 +1,403 @@
+{
+  "before": [
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/financial.py",
+      "snapshot": "provider_validation/results/market-events-original-20261004/0-financial.py.bin",
+      "sha256": "02a4b6f0dc09aefe064a2655ab596ec84f94e32a79f070f0136df4e51cd30ba1"
+    },
+    {
+      "path": "src/stock_data_manage/pipeline/inputs.py",
+      "snapshot": "provider_validation/results/market-events-original-20261004/1-inputs.py.bin",
+      "sha256": "d80e0c99b8d843cf536c51a6fde26e0f02d250f007c88447ca9697e2aadd82a4"
+    },
+    {
+      "path": "src/stock_data_manage/routing/factory.py",
+      "snapshot": "provider_validation/results/market-events-original-20261004/2-factory.py.bin",
+      "sha256": "7de94cc6f1924e939c741a3ce36498b555da78d3ebc18b06cd93dbd484469c03"
+    },
+    {
+      "path": "config/providers.yaml",
+      "snapshot": "provider_validation/results/market-events-original-20261004/3-providers.yaml.bin",
+      "sha256": "4a52984e0069a1b7c63cb7d0ac68f9247a447b84f5cf2b0d37499dc159d1d623"
+    },
+    {
+      "path": "tests/test_input_collection.py",
+      "snapshot": "provider_validation/results/market-events-original-20261004/4-test_input_collection.py.bin",
+      "sha256": "5c42f4600d5414405984f5b8d537735552045fff70fb167a515738552d3c1740"
+    },
+    {
+      "path": "provider_validation/tests/replay_input_capabilities.py",
+      "snapshot": "provider_validation/results/market-events-original-20261004/5-replay_input_capabilities.py.bin",
+      "sha256": "c81100899d6c7161488597676a32610da2813b70368fbe2897397741c33381aa"
+    },
+    {
+      "path": ".gitattributes",
+      "snapshot": "provider_validation/results/market-events-original-20261004/6-.gitattributes.bin",
+      "sha256": "8ac6f8348b124f2a9fbdfba56082d7fe9f04877b878a1de8c40c389bfc2839a2"
+    },
+    {
+      "path": "CODE_STRUCTURE.md",
+      "snapshot": "provider_validation/results/market-events-original-20261004/7-CODE_STRUCTURE.md.bin",
+      "sha256": "d4be894b9ddb88bfe951109dc2ba91291511f0b797a222c62b62f2b4250ec67b"
+    },
+    {
+      "path": "PROJECT_PROGRESS.md",
+      "snapshot": "provider_validation/results/market-events-original-20261004/8-PROJECT_PROGRESS.md.bin",
+      "sha256": "507819951d8b62bec918a1fe62d3d394e07649dcf3e3676827b1a5ab27ab77e0"
+    }
+  ],
+  "source_code": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+  "source_code_sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0",
+  "raw_manifest": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+  "raw_manifest_sha256": "885abd6bf1c4b809b9029759f61b75c7d6a297755fd76ca6c545720db38a6767",
+  "events": [
+    {
+      "query": {
+        "sortColumns": [
+          "SECURITY_CODE,TRADE_DATE"
+        ],
+        "sortTypes": [
+          "1,-1"
+        ],
+        "pageSize": [
+          "5000"
+        ],
+        "pageNumber": [
+          "1"
+        ],
+        "reportName": [
+          "RPT_DAILYBILLBOARD_DETAILSNEW"
+        ],
+        "columns": [
+          "SECURITY_CODE,SECUCODE,SECURITY_NAME_ABBR,TRADE_DATE,EXPLAIN,CLOSE_PRICE,CHANGE_RATE,BILLBOARD_NET_AMT,BILLBOARD_BUY_AMT,BILLBOARD_SELL_AMT,BILLBOARD_DEAL_AMT,ACCUM_AMOUNT,DEAL_NET_RATIO,DEAL_AMOUNT_RATIO,TURNOVERRATE,FREE_MARKET_CAP,EXPLANATION,D1_CLOSE_ADJCHRATE,D2_CLOSE_ADJCHRATE,D5_CLOSE_ADJCHRATE,D10_CLOSE_ADJCHRATE,SECURITY_TYPE_CODE"
+        ],
+        "source": [
+          "WEB"
+        ],
+        "client": [
+          "WEB"
+        ],
+        "filter": [
+          "(TRADE_DATE<='2026-09-30')(TRADE_DATE>='2026-09-30')"
+        ]
+      },
+      "sha256": "a47a8df410ed659b22beb2df415ce606b798495cbc253c49b33c5d64ceb613f1",
+      "status": 200,
+      "count": 84,
+      "pages": 1,
+      "row_count": 84,
+      "keys": [
+        "SECURITY_CODE",
+        "SECUCODE",
+        "SECURITY_NAME_ABBR",
+        "TRADE_DATE",
+        "EXPLAIN",
+        "CLOSE_PRICE",
+        "CHANGE_RATE",
+        "BILLBOARD_NET_AMT",
+        "BILLBOARD_BUY_AMT",
+        "BILLBOARD_SELL_AMT",
+        "BILLBOARD_DEAL_AMT",
+        "ACCUM_AMOUNT",
+        "DEAL_NET_RATIO",
+        "DEAL_AMOUNT_RATIO",
+        "TURNOVERRATE",
+        "FREE_MARKET_CAP",
+        "EXPLANATION",
+        "D1_CLOSE_ADJCHRATE",
+        "D2_CLOSE_ADJCHRATE",
+        "D5_CLOSE_ADJCHRATE",
+        "D10_CLOSE_ADJCHRATE",
+        "SECURITY_TYPE_CODE"
+      ],
+      "first": {
+        "SECURITY_CODE": "000002",
+        "SECUCODE": "000002.SZ",
+        "SECURITY_NAME_ABBR": "万科A",
+        "TRADE_DATE": "2026-09-30 00:00:00",
+        "EXPLAIN": "2家机构买入，成功率38.36%",
+        "CLOSE_PRICE": 4.26,
+        "CHANGE_RATE": 4.4118,
+        "BILLBOARD_NET_AMT": 71384559.48,
+        "BILLBOARD_BUY_AMT": 688964755.91,
+        "BILLBOARD_SELL_AMT": 617580196.43,
+        "BILLBOARD_DEAL_AMT": 1306544952.34,
+        "ACCUM_AMOUNT": 5158052404,
+        "DEAL_NET_RATIO": 1.383944052694,
+        "DEAL_AMOUNT_RATIO": 25.330199269143,
+        "TURNOVERRATE": 13.4784,
+        "FREE_MARKET_CAP": 41386382036.04,
+        "EXPLANATION": "日振幅值达到15%的前5只证券",
+        "D1_CLOSE_ADJCHRATE": null,
+        "D2_CLOSE_ADJCHRATE": null,
+        "D5_CLOSE_ADJCHRATE": null,
+        "D10_CLOSE_ADJCHRATE": null,
+        "SECURITY_TYPE_CODE": "058001001"
+      },
+      "duplicate_identity_count": 0
+    },
+    {
+      "query": {
+        "sortColumns": [
+          "SECURITY_CODE,TRADE_DATE"
+        ],
+        "sortTypes": [
+          "1,-1"
+        ],
+        "pageSize": [
+          "5000"
+        ],
+        "pageNumber": [
+          "1"
+        ],
+        "reportName": [
+          "RPT_DAILYBILLBOARD_DETAILSNEW"
+        ],
+        "columns": [
+          "SECURITY_CODE,SECUCODE,SECURITY_NAME_ABBR,TRADE_DATE,EXPLAIN,CLOSE_PRICE,CHANGE_RATE,BILLBOARD_NET_AMT,BILLBOARD_BUY_AMT,BILLBOARD_SELL_AMT,BILLBOARD_DEAL_AMT,ACCUM_AMOUNT,DEAL_NET_RATIO,DEAL_AMOUNT_RATIO,TURNOVERRATE,FREE_MARKET_CAP,EXPLANATION,D1_CLOSE_ADJCHRATE,D2_CLOSE_ADJCHRATE,D5_CLOSE_ADJCHRATE,D10_CLOSE_ADJCHRATE,SECURITY_TYPE_CODE"
+        ],
+        "source": [
+          "WEB"
+        ],
+        "client": [
+          "WEB"
+        ],
+        "filter": [
+          "(TRADE_DATE<='2026-09-30')(TRADE_DATE>='2026-09-30')"
+        ]
+      },
+      "sha256": "a47a8df410ed659b22beb2df415ce606b798495cbc253c49b33c5d64ceb613f1",
+      "status": 200,
+      "count": 84,
+      "pages": 1,
+      "row_count": 84,
+      "keys": [
+        "SECURITY_CODE",
+        "SECUCODE",
+        "SECURITY_NAME_ABBR",
+        "TRADE_DATE",
+        "EXPLAIN",
+        "CLOSE_PRICE",
+        "CHANGE_RATE",
+        "BILLBOARD_NET_AMT",
+        "BILLBOARD_BUY_AMT",
+        "BILLBOARD_SELL_AMT",
+        "BILLBOARD_DEAL_AMT",
+        "ACCUM_AMOUNT",
+        "DEAL_NET_RATIO",
+        "DEAL_AMOUNT_RATIO",
+        "TURNOVERRATE",
+        "FREE_MARKET_CAP",
+        "EXPLANATION",
+        "D1_CLOSE_ADJCHRATE",
+        "D2_CLOSE_ADJCHRATE",
+        "D5_CLOSE_ADJCHRATE",
+        "D10_CLOSE_ADJCHRATE",
+        "SECURITY_TYPE_CODE"
+      ],
+      "first": {
+        "SECURITY_CODE": "000002",
+        "SECUCODE": "000002.SZ",
+        "SECURITY_NAME_ABBR": "万科A",
+        "TRADE_DATE": "2026-09-30 00:00:00",
+        "EXPLAIN": "2家机构买入，成功率38.36%",
+        "CLOSE_PRICE": 4.26,
+        "CHANGE_RATE": 4.4118,
+        "BILLBOARD_NET_AMT": 71384559.48,
+        "BILLBOARD_BUY_AMT": 688964755.91,
+        "BILLBOARD_SELL_AMT": 617580196.43,
+        "BILLBOARD_DEAL_AMT": 1306544952.34,
+        "ACCUM_AMOUNT": 5158052404,
+        "DEAL_NET_RATIO": 1.383944052694,
+        "DEAL_AMOUNT_RATIO": 25.330199269143,
+        "TURNOVERRATE": 13.4784,
+        "FREE_MARKET_CAP": 41386382036.04,
+        "EXPLANATION": "日振幅值达到15%的前5只证券",
+        "D1_CLOSE_ADJCHRATE": null,
+        "D2_CLOSE_ADJCHRATE": null,
+        "D5_CLOSE_ADJCHRATE": null,
+        "D10_CLOSE_ADJCHRATE": null,
+        "SECURITY_TYPE_CODE": "058001001"
+      },
+      "duplicate_identity_count": 0
+    },
+    {
+      "query": {
+        "sortColumns": [
+          "FREE_DATE"
+        ],
+        "sortTypes": [
+          "-1"
+        ],
+        "pageSize": [
+          "500"
+        ],
+        "pageNumber": [
+          "1"
+        ],
+        "reportName": [
+          "RPT_LIFT_STAGE"
+        ],
+        "filter": [
+          "(SECURITY_CODE=\"600519\")"
+        ],
+        "columns": [
+          "SECURITY_CODE,SECURITY_NAME_ABBR,FREE_DATE,CURRENT_FREE_SHARES,ABLE_FREE_SHARES,LIFT_MARKET_CAP,FREE_RATIO,NEW,B20_ADJCHRATE,A20_ADJCHRATE,FREE_SHARES_TYPE,TOTAL_RATIO,NON_FREE_SHARES,BATCH_HOLDER_NUM"
+        ],
+        "source": [
+          "WEB"
+        ],
+        "client": [
+          "WEB"
+        ]
+      },
+      "sha256": "ea6528a2204b61a7ee34683a73ca00f8afdc86aadf3f765d4dae39bbfb19dbe7",
+      "status": 200,
+      "count": null,
+      "pages": null,
+      "row_count": 0,
+      "keys": [],
+      "first": null,
+      "duplicate_identity_count": 0
+    },
+    {
+      "query": {
+        "sortColumns": [
+          "FREE_DATE,CURRENT_FREE_SHARES"
+        ],
+        "sortTypes": [
+          "1,1"
+        ],
+        "pageSize": [
+          "500"
+        ],
+        "pageNumber": [
+          "1"
+        ],
+        "reportName": [
+          "RPT_LIFT_STAGE"
+        ],
+        "columns": [
+          "SECURITY_CODE,SECURITY_NAME_ABBR,FREE_DATE,CURRENT_FREE_SHARES,ABLE_FREE_SHARES,LIFT_MARKET_CAP,FREE_RATIO,NEW,B20_ADJCHRATE,A20_ADJCHRATE,FREE_SHARES_TYPE,TOTAL_RATIO,NON_FREE_SHARES,BATCH_HOLDER_NUM"
+        ],
+        "source": [
+          "WEB"
+        ],
+        "client": [
+          "WEB"
+        ],
+        "filter": [
+          "(FREE_DATE>='2026-09-01')(FREE_DATE<='2026-10-03')"
+        ]
+      },
+      "sha256": "084652b7c7ba2ca8df88ffbb476d7c554a29f43cfb0e30d7a51fe7ac9b69440c",
+      "status": 200,
+      "count": 167,
+      "pages": 1,
+      "row_count": 167,
+      "keys": [
+        "SECURITY_CODE",
+        "SECURITY_NAME_ABBR",
+        "FREE_DATE",
+        "CURRENT_FREE_SHARES",
+        "ABLE_FREE_SHARES",
+        "LIFT_MARKET_CAP",
+        "FREE_RATIO",
+        "NEW",
+        "B20_ADJCHRATE",
+        "A20_ADJCHRATE",
+        "FREE_SHARES_TYPE",
+        "TOTAL_RATIO",
+        "NON_FREE_SHARES",
+        "BATCH_HOLDER_NUM"
+      ],
+      "first": {
+        "SECURITY_CODE": "603028",
+        "SECURITY_NAME_ABBR": "赛福天",
+        "FREE_DATE": "2026-09-02 00:00:00",
+        "CURRENT_FREE_SHARES": 127,
+        "ABLE_FREE_SHARES": 127,
+        "LIFT_MARKET_CAP": 906.78,
+        "FREE_RATIO": 0.004448959574,
+        "NEW": 7.14,
+        "B20_ADJCHRATE": 10.4387292,
+        "A20_ADJCHRATE": -1.91780822,
+        "FREE_SHARES_TYPE": "股权激励限售股份",
+        "TOTAL_RATIO": 0.004424470457,
+        "NON_FREE_SHARES": 158,
+        "BATCH_HOLDER_NUM": 1
+      },
+      "duplicate_identity_count": 0
+    },
+    {
+      "query": {
+        "sortColumns": [
+          "FREE_DATE,CURRENT_FREE_SHARES"
+        ],
+        "sortTypes": [
+          "1,1"
+        ],
+        "pageSize": [
+          "500"
+        ],
+        "pageNumber": [
+          "1"
+        ],
+        "reportName": [
+          "RPT_LIFT_STAGE"
+        ],
+        "columns": [
+          "SECURITY_CODE,SECURITY_NAME_ABBR,FREE_DATE,CURRENT_FREE_SHARES,ABLE_FREE_SHARES,LIFT_MARKET_CAP,FREE_RATIO,NEW,B20_ADJCHRATE,A20_ADJCHRATE,FREE_SHARES_TYPE,TOTAL_RATIO,NON_FREE_SHARES,BATCH_HOLDER_NUM"
+        ],
+        "source": [
+          "WEB"
+        ],
+        "client": [
+          "WEB"
+        ],
+        "filter": [
+          "(FREE_DATE>='2026-09-01')(FREE_DATE<='2026-10-03')"
+        ]
+      },
+      "sha256": "084652b7c7ba2ca8df88ffbb476d7c554a29f43cfb0e30d7a51fe7ac9b69440c",
+      "status": 200,
+      "count": 167,
+      "pages": 1,
+      "row_count": 167,
+      "keys": [
+        "SECURITY_CODE",
+        "SECURITY_NAME_ABBR",
+        "FREE_DATE",
+        "CURRENT_FREE_SHARES",
+        "ABLE_FREE_SHARES",
+        "LIFT_MARKET_CAP",
+        "FREE_RATIO",
+        "NEW",
+        "B20_ADJCHRATE",
+        "A20_ADJCHRATE",
+        "FREE_SHARES_TYPE",
+        "TOTAL_RATIO",
+        "NON_FREE_SHARES",
+        "BATCH_HOLDER_NUM"
+      ],
+      "first": {
+        "SECURITY_CODE": "603028",
+        "SECURITY_NAME_ABBR": "赛福天",
+        "FREE_DATE": "2026-09-02 00:00:00",
+        "CURRENT_FREE_SHARES": 127,
+        "ABLE_FREE_SHARES": 127,
+        "LIFT_MARKET_CAP": 906.78,
+        "FREE_RATIO": 0.004448959574,
+        "NEW": 7.14,
+        "B20_ADJCHRATE": 10.4387292,
+        "A20_ADJCHRATE": -1.91780822,
+        "FREE_SHARES_TYPE": "股权激励限售股份",
+        "TOTAL_RATIO": 0.004424470457,
+        "NON_FREE_SHARES": 158,
+        "BATCH_HOLDER_NUM": 1
+      },
+      "duplicate_identity_count": 0
+    }
+  ],
+  "boundary": "Only selected successful EastMoney SDK endpoints; no provider source/date fallback; candidate only."
+}

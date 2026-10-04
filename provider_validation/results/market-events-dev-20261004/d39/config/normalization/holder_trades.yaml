@@ -1,0 +1,73 @@
+dataset: holder_trades
+rules:
+- id: eastmoney-holder_trades-input-v1
+  input_id: ASTOCK-080
+  provider: eastmoney
+  endpoint: holder_trades
+  field_mapping:
+    source_security_code: SECURITY_CODE
+    name: SECURITY_NAME_ABBR
+    holder: HOLDER_NAME
+    direction: DIRECTION
+    change_shares_10k: CHANGE_NUM_SYMBOL
+    change_pct_total: AFTER_CHANGE_RATE
+    change_pct_float: CHANGE_FREE_RATIO
+    after_shares_10k: AFTER_HOLDER_NUM
+    after_pct_total: HOLD_RATIO
+    after_float_shares_10k: FREE_SHARES
+    after_pct_float: FREE_SHARES_RATIO
+    avg_price: TRADE_AVERAGE_PRICE
+    channel: MARKET
+    start_date: START_DATE
+    end_date: END_DATE
+    notice_date: NOTICE_DATE
+  context_fields:
+    snapshot_at: source_snapshot_at
+  transforms:
+    change_shares_10k:
+      remove_commas: true
+      nonfinite_is_null: true
+    change_pct_total:
+      remove_commas: true
+      nonfinite_is_null: true
+    change_pct_float:
+      remove_commas: true
+      nonfinite_is_null: true
+    after_shares_10k:
+      remove_commas: true
+      nonfinite_is_null: true
+    after_pct_total:
+      remove_commas: true
+      nonfinite_is_null: true
+    after_float_shares_10k:
+      remove_commas: true
+      nonfinite_is_null: true
+    after_pct_float:
+      remove_commas: true
+      nonfinite_is_null: true
+    avg_price:
+      remove_commas: true
+      nonfinite_is_null: true
+    start_date:
+      format: '%Y-%m-%d %H:%M:%S'
+    end_date:
+      format: '%Y-%m-%d %H:%M:%S'
+    notice_date:
+      format: '%Y-%m-%d %H:%M:%S'
+  null_values:
+  - null
+  - ''
+  - '-'
+  - --
+  - None
+  - 'null'
+  unverified_fields:
+  - change_shares_10k
+  - after_shares_10k
+  - after_float_shares_10k
+  - avg_price
+  status: pending_validation
+  version: eastmoney-actions-input-v1
+  evidence_refs:
+  - ASTOCK-080
+  notes: 保留原脚本数据含义与全部原字段；进度标签和板块备用字段在YAML管理。量额单位未独立核验，标准值为空；原值保留。

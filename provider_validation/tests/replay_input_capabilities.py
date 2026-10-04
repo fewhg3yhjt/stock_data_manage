@@ -33,8 +33,9 @@ def main():
     parser.add_argument("--verify-macro", action="store_true", help="verify original monthly PMI and social-financing SDK inputs")
     parser.add_argument("--verify-reports-calendar", action="store_true", help="verify original Sina report-list and WallStreetCN calendar contracts")
     parser.add_argument("--verify-factors", action="store_true", help="verify both original Sina adjustment-factor series")
+    parser.add_argument("--verify-market-events", action="store_true", help="verify independent EastMoney daily billboard and market release-window endpoints")
     args = parser.parse_args()
-    if sum((args.verify_ths_inputs, args.verify_bao_inputs, args.verify_scheduling, args.verify_tencent_snapshot, args.verify_em_inputs, args.verify_stock_pools, args.verify_em_events, args.verify_em_actions, args.verify_lpr, args.verify_news, args.verify_rates_bonds, args.verify_sina_futures, args.verify_sdk_news, args.verify_macro, args.verify_reports_calendar, args.verify_factors)) > 1:
+    if sum((args.verify_ths_inputs, args.verify_bao_inputs, args.verify_scheduling, args.verify_tencent_snapshot, args.verify_em_inputs, args.verify_stock_pools, args.verify_em_events, args.verify_em_actions, args.verify_lpr, args.verify_news, args.verify_rates_bonds, args.verify_sina_futures, args.verify_sdk_news, args.verify_macro, args.verify_reports_calendar, args.verify_factors, args.verify_market_events)) > 1:
         parser.error("THS, BaoStock, Tencent snapshot and scheduling verification are separate scopes")
     args.output_root = args.output_root.resolve()
     if not args.output_root.is_relative_to(ROOT / "provider_validation/results"):
@@ -67,7 +68,7 @@ def main():
         forbidden_network()
 
     with patch("requests.adapters.HTTPAdapter.send", forbidden_network), patch("socket.socket.connect", guarded_connect):
-        cases = (checks.FACTOR_CASES if args.verify_factors else checks.REPORTS_CALENDAR_CASES if args.verify_reports_calendar else checks.MACRO_CASES if args.verify_macro else checks.SDK_NEWS_CASES if args.verify_sdk_news else checks.SINA_FUTURES_CASES if args.verify_sina_futures else checks.RATES_BONDS_CASES if args.verify_rates_bonds else checks.NEWS_CASES if args.verify_news else [("ASTOCK-065",{},checks.EVENT_ARCHIVE,1538)] if args.verify_lpr else checks.ACTION_CASES if args.verify_em_actions else checks.EVENT_CASES if args.verify_em_events else checks.POOL_CASES if args.verify_stock_pools else checks.EM_CASES if args.verify_em_inputs else [("ASTOCK-001", checks.QUOTE_CONTEXT, checks.QUOTE_ARCHIVE, 1)] + checks.CASES[:2]
+        cases = (checks.MARKET_EVENT_CASES if args.verify_market_events else checks.FACTOR_CASES if args.verify_factors else checks.REPORTS_CALENDAR_CASES if args.verify_reports_calendar else checks.MACRO_CASES if args.verify_macro else checks.SDK_NEWS_CASES if args.verify_sdk_news else checks.SINA_FUTURES_CASES if args.verify_sina_futures else checks.RATES_BONDS_CASES if args.verify_rates_bonds else checks.NEWS_CASES if args.verify_news else [("ASTOCK-065",{},checks.EVENT_ARCHIVE,1538)] if args.verify_lpr else checks.ACTION_CASES if args.verify_em_actions else checks.EVENT_CASES if args.verify_em_events else checks.POOL_CASES if args.verify_stock_pools else checks.EM_CASES if args.verify_em_inputs else [("ASTOCK-001", checks.QUOTE_CONTEXT, checks.QUOTE_ARCHIVE, 1)] + checks.CASES[:2]
                  if args.verify_tencent_snapshot else checks.BAO_CASES if args.verify_bao_inputs else
                  checks.THS_CASES if args.verify_ths_inputs else checks.CASES)
         for index, (input_id, context, manifest, count) in enumerate(cases):
@@ -75,7 +76,9 @@ def main():
             validator = (checks.test_bao_archived_inputs_preserve_sdk_rows_and_coverage if args.verify_bao_inputs else
                          checks.test_ths_archived_inputs_execute_source_yaml if args.verify_ths_inputs else
                          checks.test_archived_inputs_execute_yaml_and_preserve_evidence)
-            if args.verify_factors:
+            if args.verify_market_events:
+                summary["original_vs_provider"].append(checks.compare_market_event_original(directory,input_id,context,manifest,count))
+            elif args.verify_factors:
                 summary["original_vs_provider"].append(checks.compare_factor_original(directory,input_id,context,manifest,count))
             elif args.verify_reports_calendar:
                 summary["original_vs_provider"].append(checks.compare_reports_calendar_original(directory,input_id,context,manifest,count))
@@ -109,6 +112,25 @@ def main():
                 "report_sha256": hashlib.sha256(report_path.read_bytes()).hexdigest(), "source_manifest": manifest.relative_to(ROOT).as_posix(),
                 "source_manifest_sha256": hashlib.sha256(manifest.read_bytes()).hexdigest(), "row_count": count,
                 "scope": report["parameters"], "code_version": report["code_version"], "result": "passed"})
+        if args.verify_market_events:
+            summary["known_differences"] = ["扩展既有东财财务Provider两个独立方法，不增加Provider和回退层。",
+                "龙虎榜明确日期84条；解禁原单股票队列无数据，原失败请求只留证，成功全市场日期窗口167条独立接入。",
+                "原成功分支两次SDK查询及解析/原始字段逐项对照；SDK默认头、代理、无显式超时、原探测重试和暂停策略保持。",
+                "SDK解禁数量及市值乘10000保留于解析层；原值完整保存，标准数值单位未认证仍为空。",
+                "相同股票不同事件原因分别保留；分页发现/读取一致性和源报告总数核验，无法独立认证全市场普查。",
+                "额外两页、负值/零/空值及会话缓存为合成或注入验证；零新真实请求、零生产写入、调度与路由关闭。"]
+            checks.test_market_event_yaml_fields_scope_and_existing_methods(args.output_root/"yaml",None)
+            checks.test_market_event_original_session_cache_and_no_source_switch(args.output_root/"session",None)
+            checks.test_market_event_multi_page_retrieval_and_source_totals(args.output_root/"pages",None)
+            for input_id in ("ASTOCK-020","ASTOCK-021"):
+                checks.test_market_event_numeric_null_negative_zero_remain_raw_and_parsed(args.output_root/("numeric"+input_id),None,input_id)
+            summary["negative_checks"] = []
+            for index,(input_id,mutation) in enumerate(checks.MARKET_EVENT_FAILURES):
+                directory=args.output_root/("f"+str(index))
+                checks.test_market_event_invalid_response_retained_without_fallback(directory,None,input_id,mutation)
+                path=next(directory.rglob("report.json"));report=json.loads(path.read_text(encoding="utf-8"))
+                summary["negative_checks"].append(dict(input_id=input_id,mutation=mutation,failure_class=report["failure_class"],
+                    report_path=path.relative_to(ROOT).as_posix(),report_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),result="passed"))
         if args.verify_factors:
             summary["known_differences"] = ["扩展原新浪日线Provider，前后复权各33条与原脚本、原始响应及历史CSV逐字段对照。",
                 "仍按qfq/hfq原顺序取两组完整历史，仅config.kind选择候选输出；完整66条、另一组解析33条及原系数字符串保留。",
@@ -395,7 +417,7 @@ def main():
             summary["negative_checks"] = {"strict_replay_miss": "passed", "immediate_period_only": "passed",
                 "report_path": failure_path.relative_to(ROOT).as_posix(), "report_sha256": hashlib.sha256(failure_path.read_bytes()).hexdigest(),
                 "failure_class": failure["failure_class"], "production_writes": failure["production_writes"]}
-        for input_id, context, manifest, count in ([] if args.verify_factors or args.verify_reports_calendar or args.verify_macro or args.verify_sdk_news or args.verify_ths_inputs or args.verify_bao_inputs or args.verify_em_inputs or args.verify_stock_pools or args.verify_em_events or args.verify_em_actions or args.verify_lpr or args.verify_news or args.verify_rates_bonds or args.verify_sina_futures else checks.CASES[:2]):
+        for input_id, context, manifest, count in ([] if args.verify_market_events or args.verify_factors or args.verify_reports_calendar or args.verify_macro or args.verify_sdk_news or args.verify_ths_inputs or args.verify_bao_inputs or args.verify_em_inputs or args.verify_stock_pools or args.verify_em_events or args.verify_em_actions or args.verify_lpr or args.verify_news or args.verify_rates_bonds or args.verify_sina_futures else checks.CASES[:2]):
             directory = args.output_root / ("d" if input_id.endswith("daily") else "m")
             checks.test_tencent_matches_original_shipped_script(directory, None, input_id, context, manifest, count)
             original = [json.loads(line) for line in (directory / "original/manifest.ndjson").read_text(encoding="utf-8").splitlines()]
@@ -407,7 +429,7 @@ def main():
                                        for left, right in zip(original, report["responses"])],
                 "original_manifest": (directory / "original/manifest.ndjson").relative_to(ROOT).as_posix(),
                 "provider_report": next((directory / "adapter").rglob("report.json")).relative_to(ROOT).as_posix()})
-        for input_id, filename in ([] if args.verify_factors or args.verify_reports_calendar or args.verify_macro or args.verify_sdk_news or args.verify_ths_inputs or args.verify_bao_inputs or args.verify_tencent_snapshot or args.verify_em_inputs or args.verify_stock_pools or args.verify_em_events or args.verify_em_actions or args.verify_lpr or args.verify_news or args.verify_rates_bonds or args.verify_sina_futures else [("ASTOCK-045", "43_东财涨停池"), ("ASTOCK-070", "68_交易日历")]):
+        for input_id, filename in ([] if args.verify_market_events or args.verify_factors or args.verify_reports_calendar or args.verify_macro or args.verify_sdk_news or args.verify_ths_inputs or args.verify_bao_inputs or args.verify_tencent_snapshot or args.verify_em_inputs or args.verify_stock_pools or args.verify_em_events or args.verify_em_actions or args.verify_lpr or args.verify_news or args.verify_rates_bonds or args.verify_sina_futures else [("ASTOCK-045", "43_东财涨停池"), ("ASTOCK-070", "68_交易日历")]):
             csv_path = ROOT / "provider_validation/results/live-probes/rate-limited-all-20261003" / filename / "data.csv"
             summary["original_vs_provider"].append({"input_id": input_id, "original_parsed_csv": csv_path.relative_to(ROOT).as_posix(),
                 "original_parsed_sha256": hashlib.sha256(csv_path.read_bytes()).hexdigest(),

@@ -1,0 +1,35 @@
+dataset: dragon_tiger_daily
+rules:
+- id: eastmoney-dragon-tiger-daily-input-v1
+  input_id: ASTOCK-020
+  provider: eastmoney
+  endpoint: dragon_tiger_daily
+  field_mapping:
+    source_security_code: 代码
+    name: 名称
+    trade_date: 上榜日
+    listing_reason: 上榜原因
+    interpretation: 解读
+    close_price: 收盘价
+    change: 涨跌幅
+    net_buy_amount: 龙虎榜净买额
+    buy_amount: 龙虎榜买入额
+    sell_amount: 龙虎榜卖出额
+    billboard_amount: 龙虎榜成交额
+    market_amount: 市场总成交额
+    net_buy_ratio: 净买额占总成交比
+    billboard_ratio: 成交额占总成交比
+    turnover: 换手率
+    free_market_cap: 流通市值
+    return_after_1d: 上榜后1日
+    return_after_2d: 上榜后2日
+    return_after_5d: 上榜后5日
+    return_after_10d: 上榜后10日
+  context_fields:
+    snapshot_at: source_snapshot_at
+  null_values: [null]
+  unverified_fields: [close_price, change, net_buy_amount, buy_amount, sell_amount, billboard_amount, market_amount, net_buy_ratio, billboard_ratio, turnover, free_market_cap, return_after_1d, return_after_2d, return_after_5d, return_after_10d]
+  status: pending_validation
+  version: eastmoney-market-events-input-v1
+  evidence_refs: [ASTOCK-020]
+  notes: 上榜日为所请求明确日期；同一代码的多个上榜原因分别保留。snapshot_at是原响应采集时间。原数值和完整字段、SDK解析均另存，不认证标准数值单位。

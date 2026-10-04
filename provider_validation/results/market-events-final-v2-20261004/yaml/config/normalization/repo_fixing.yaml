@@ -1,0 +1,26 @@
+dataset: repo_fixing
+rules:
+- id: chinamoney-repo_fixing-input-v1
+  input_id: ASTOCK-064
+  provider: chinamoney
+  endpoint: repo_fixing
+  field_mapping:
+    rate_date: date
+    overnight_rate: FR001
+    week_rate: FR007
+    fortnight_rate: FR014
+  context_fields:
+    snapshot_at: source_snapshot_at
+    rate_kind: rate_kind
+  transforms: {}
+  null_values:
+  - null
+  unverified_fields:
+  - overnight_rate
+  - week_rate
+  - fortnight_rate
+  status: pending_validation
+  version: chinamoney-repo_fixing-input-v1
+  evidence_refs:
+  - ASTOCK-064
+  notes: 保留原请求、解析、排序与筛选；snapshot_at取原捕获时间。原数字保留，标准单位未独立认证字段为空。可转债日期分类使用原响应捕获日，非历史报价查询。

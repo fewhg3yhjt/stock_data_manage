@@ -1,0 +1,40 @@
+dataset:
+  name: institution_survey
+  display_name: 机构调研汇总输入
+  primary_key:
+  - snapshot_at
+  - source_security_code
+  - notice_date
+  - survey_date
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  source_security_code:
+    type: string
+    required: true
+  name:
+    type: string
+    required: false
+  notice_date:
+    type: date
+    required: true
+  survey_date:
+    type: date
+    required: true
+  survey_end:
+    type: date
+    required: false
+  org_count:
+    type: integer
+    required: false
+    unit: organizations
+  survey_way:
+    type: string
+    required: false
+  place:
+    type: string
+    required: false
+  receptionist:
+    type: string
+    required: false

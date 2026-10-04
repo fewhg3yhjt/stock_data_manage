@@ -1,0 +1,62 @@
+{
+  "validation_time_utc": "2026-10-04T07:36:52.288546+00:00",
+  "results": [
+    {
+      "input_id": "ASTOCK-020",
+      "command": [
+        "D:\\Program Files\\Python\\python.exe",
+        "-m",
+        "stock_data_manage.cli",
+        "collect-input",
+        "--input",
+        "ASTOCK-020",
+        "--config-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\config",
+        "--output-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\market-events-cli-20261004\\candidate",
+        "--mode",
+        "replay",
+        "--replay-manifest",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\_raw\\missing-capabilities-20261003T174623\\manifest.ndjson",
+        "--context-file",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\market-events-cli-20261004\\0-context.json"
+      ],
+      "exit_code": 0,
+      "count": 84,
+      "stdout": "provider_validation/results/market-events-cli-20261004/0-stdout.json",
+      "stderr": "provider_validation/results/market-events-cli-20261004/0-stderr.bin",
+      "stdout_sha256": "d99e97aa6b9e8dcb5364240f6ebbe74a32f732803c0ec7f7302c1aac3c2d22cc",
+      "stderr_sha256": "ff486e1b5adab7be5605864d02cc957fd0d57dd15084f33ffa82a46d336cdbcf",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\market-events-cli-20261004\\candidate\\ASTOCK-020-a7dd83125ede\\2026-10-04\\input_report\\eastmoney\\dragon_tiger_daily\\report.json"
+    },
+    {
+      "input_id": "ASTOCK-021",
+      "command": [
+        "D:\\Program Files\\Python\\python.exe",
+        "-m",
+        "stock_data_manage.cli",
+        "collect-input",
+        "--input",
+        "ASTOCK-021",
+        "--config-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\config",
+        "--output-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\market-events-cli-20261004\\candidate",
+        "--mode",
+        "replay",
+        "--replay-manifest",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\_raw\\missing-capabilities-20261003T174623\\manifest.ndjson",
+        "--context-file",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\market-events-cli-20261004\\1-context.json"
+      ],
+      "exit_code": 0,
+      "count": 167,
+      "stdout": "provider_validation/results/market-events-cli-20261004/1-stdout.json",
+      "stderr": "provider_validation/results/market-events-cli-20261004/1-stderr.bin",
+      "stdout_sha256": "ef3eb1299a7dfc7c53c9f98d28607a4e66a0d763014d9bfa6692603db145b3c7",
+      "stderr_sha256": "ff486e1b5adab7be5605864d02cc957fd0d57dd15084f33ffa82a46d336cdbcf",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\market-events-cli-20261004\\candidate\\ASTOCK-021-92e22d350389\\2026-10-04\\input_report\\eastmoney\\lockup_expiry\\report.json"
+    }
+  ],
+  "script_sha256": "238bb964aaed5703f70b26988b56d2e327c6985433feeefd3216e4aaf66829d1"
+}

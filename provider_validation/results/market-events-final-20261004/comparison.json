@@ -1,0 +1,312 @@
+{
+  "validation_time_utc": "2026-10-04T07:35:05.723568+00:00",
+  "mode": "offline_replay",
+  "network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "verification_code": {
+    "path": "tests/test_input_collection.py",
+    "sha256": "bade9de84933ee4ef5183e59180115c294ecd2ab65df0dcce90ef777eb9c6db7"
+  },
+  "runner": {
+    "path": "provider_validation/tests/replay_input_capabilities.py",
+    "sha256": "5b9dda13a404a674fd6d5292226be2fd2256252c66f9d24f4a537c4fc77914b4"
+  },
+  "inputs": [
+    {
+      "input_id": "ASTOCK-020",
+      "report_path": "provider_validation/results/market-events-final-20261004/ASTOCK-020/candidate/ASTOCK-020-04ed36912572/2026-10-04/input_report/eastmoney/dragon_tiger_daily/report.json",
+      "report_sha256": "984442f80fd010af9b6a118434c90dd62df6d21fd933ed42eaf6c30ffa95a6ec",
+      "source_manifest": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+      "source_manifest_sha256": "885abd6bf1c4b809b9029759f61b75c7d6a297755fd76ca6c545720db38a6767",
+      "row_count": 84,
+      "scope": {
+        "date": "2026-09-30"
+      },
+      "code_version": "a862f661ce74bfd9e1ff86bc8fa62466c10134cb5768489c2355dcdef2af5356",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-021",
+      "report_path": "provider_validation/results/market-events-final-20261004/ASTOCK-021/candidate/ASTOCK-021-811c35309320/2026-10-04/input_report/eastmoney/lockup_expiry/report.json",
+      "report_sha256": "faaacb85f8a7c21755569b63acda43b618438194e157953d48d5cc55a4341831",
+      "source_manifest": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+      "source_manifest_sha256": "885abd6bf1c4b809b9029759f61b75c7d6a297755fd76ca6c545720db38a6767",
+      "row_count": 167,
+      "scope": {
+        "end": "2026-10-03",
+        "start": "2026-09-01"
+      },
+      "code_version": "9af9d33b0b1b2a06abc1212c94f9ead69be1e9666068fda26e9b2985019f0bed",
+      "result": "passed"
+    }
+  ],
+  "original_vs_provider": [
+    {
+      "input_id": "ASTOCK-020",
+      "original_csv_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\18_全市场龙虎榜\\data.csv",
+      "original_csv_sha256": "f3f661833df59cec352bc57244830e9e83f992d86cf07bbc26276c979dcf05a8",
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\market-events-final-20261004\\ASTOCK-020\\original-parsed.json",
+      "original_parsed_sha256": "43157ee48fe2254dde470df7ffe7e75723cc3c539a80b278cef969e587dbfab2",
+      "all_business_fields_equal": true,
+      "all_retained_source_fields_equal": true,
+      "request_comparison_equal": true,
+      "original_request_count": 2,
+      "selected_successful_request_count": 2,
+      "provider_request_count": 2,
+      "known_difference": "original fallback alternatives are not embedded in Provider",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\market-events-final-20261004\\ASTOCK-020\\candidate\\ASTOCK-020-04ed36912572\\2026-10-04\\input_report\\eastmoney\\dragon_tiger_daily\\report.json",
+      "report_sha256": "984442f80fd010af9b6a118434c90dd62df6d21fd933ed42eaf6c30ffa95a6ec"
+    },
+    {
+      "input_id": "ASTOCK-021",
+      "original_csv_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\19_限售解禁日历\\data.csv",
+      "original_csv_sha256": "68037d3060ed350b03c9da26cb2146fc01b0c15eea7e42f0004612cb28486574",
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\market-events-final-20261004\\ASTOCK-021\\original-parsed.json",
+      "original_parsed_sha256": "44468e6a9eabd58c405d0ed611c9446b3d3f6faa7cd3a4af5f433c3ad2fdc443",
+      "all_business_fields_equal": true,
+      "all_retained_source_fields_equal": true,
+      "request_comparison_equal": true,
+      "original_request_count": 3,
+      "selected_successful_request_count": 2,
+      "provider_request_count": 2,
+      "known_difference": "failed single-stock queue retained only in original evidence; independent successful market-window detail endpoint",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\market-events-final-20261004\\ASTOCK-021\\candidate\\ASTOCK-021-811c35309320\\2026-10-04\\input_report\\eastmoney\\lockup_expiry\\report.json",
+      "report_sha256": "faaacb85f8a7c21755569b63acda43b618438194e157953d48d5cc55a4341831"
+    }
+  ],
+  "known_differences": [
+    "扩展既有东财财务Provider两个独立方法，不增加Provider和回退层。",
+    "龙虎榜明确日期84条；解禁原单股票队列无数据，原失败请求只留证，成功全市场日期窗口167条独立接入。",
+    "原成功分支两次SDK查询及解析/原始字段逐项对照；SDK默认头、代理、无显式超时、原探测重试和暂停策略保持。",
+    "SDK解禁数量及市值乘10000保留于解析层；原值完整保存，标准数值单位未认证仍为空。",
+    "相同股票不同事件原因分别保留；分页发现/读取一致性和源报告总数核验，无法独立认证全市场普查。",
+    "额外两页、负值/零/空值及会话缓存为合成或注入验证；零新真实请求、零生产写入、调度与路由关闭。"
+  ],
+  "negative_checks": [
+    {
+      "input_id": "ASTOCK-020",
+      "mutation": "business",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/market-events-final-20261004/f0/candidate/ASTOCK-020-daa7a0e6914c/2026-10-04/input_report/eastmoney/dragon_tiger_daily/report.json",
+      "report_sha256": "e17d52ff4c57ea8c9e8405a5db537ddf106702ab4047df884e6b7c89d7769ecc",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-020",
+      "mutation": "empty",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/market-events-final-20261004/f1/candidate/ASTOCK-020-d8137fa013a3/2026-10-04/input_report/eastmoney/dragon_tiger_daily/report.json",
+      "report_sha256": "ac1d2de9db33924ebfa8702cc427aa0b35c0aac853f424236df7cafdf79ea656",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-020",
+      "mutation": "schema",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/market-events-final-20261004/f2/candidate/ASTOCK-020-b97b703ad69e/2026-10-04/input_report/eastmoney/dragon_tiger_daily/report.json",
+      "report_sha256": "e526f3045c14301a686696c3a1957e78146c62fde144f86d12dd5430d0e756a2",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-020",
+      "mutation": "order",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/market-events-final-20261004/f3/candidate/ASTOCK-020-2358351d37ec/2026-10-04/input_report/eastmoney/dragon_tiger_daily/report.json",
+      "report_sha256": "1ca1b0b86787df67192256d3e1b3d6d80ff2426dc84abe668c72bafcfe986198",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-020",
+      "mutation": "numeric",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/market-events-final-20261004/f4/candidate/ASTOCK-020-4125fa9193db/2026-10-04/input_report/eastmoney/dragon_tiger_daily/report.json",
+      "report_sha256": "994971f70aa3e0b9ebfb4b4ab1e2d3c510700bb7b2a9deed863f1567e022453b",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-020",
+      "mutation": "date",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/market-events-final-20261004/f5/candidate/ASTOCK-020-f8e2a3beb168/2026-10-04/input_report/eastmoney/dragon_tiger_daily/report.json",
+      "report_sha256": "1c6b5a2b4c86b87e5578ea1456945b7b25f50edcb4ec16afc79c337c085aa7ce",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-020",
+      "mutation": "code",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/market-events-final-20261004/f6/candidate/ASTOCK-020-e88c1da078cd/2026-10-04/input_report/eastmoney/dragon_tiger_daily/report.json",
+      "report_sha256": "bf14243a7547212b86d6689eae3133d828ad2259f25890bfc392e98c2e90e4c4",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-020",
+      "mutation": "identity",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/market-events-final-20261004/f7/candidate/ASTOCK-020-4b6bbf950721/2026-10-04/input_report/eastmoney/dragon_tiger_daily/report.json",
+      "report_sha256": "61ee54b171a7ae403a5a02ed9d71f2200f4f02e848b7b0fbe0501e2c50d02d06",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-020",
+      "mutation": "duplicate",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/market-events-final-20261004/f8/candidate/ASTOCK-020-85a1f5705eda/2026-10-04/input_report/eastmoney/dragon_tiger_daily/report.json",
+      "report_sha256": "88d770644a649a26053033b0622168e2307cb49a40c82559b83825c7a151e2a8",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-020",
+      "mutation": "count",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/market-events-final-20261004/f9/candidate/ASTOCK-020-a6ed226e4eab/2026-10-04/input_report/eastmoney/dragon_tiger_daily/report.json",
+      "report_sha256": "fc2955891c1b478e2cc6cd7183d9ed1bd40e027586550985fc2ba1521f303d11",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-020",
+      "mutation": "pages",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/market-events-final-20261004/f10/candidate/ASTOCK-020-219188627223/2026-10-04/input_report/eastmoney/dragon_tiger_daily/report.json",
+      "report_sha256": "fbecd421568d912ec63cad4cac28379ec2f08dbf802ccb064f052fd597ed96c6",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-020",
+      "mutation": "http403",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/market-events-final-20261004/f11/candidate/ASTOCK-020-8027e8db6a40/2026-10-04/input_report/eastmoney/dragon_tiger_daily/report.json",
+      "report_sha256": "c4959930a5a9edbe418ccd4e60764b86f6838d11621c2b4c365ff063b2bc3359",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-020",
+      "mutation": "missing_page",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/market-events-final-20261004/f12/candidate/ASTOCK-020-9ca20fc71a63/2026-10-04/input_report/eastmoney/dragon_tiger_daily/report.json",
+      "report_sha256": "66026e6f0a495f508554857dd99e2f53bb22565471ae5bad261f947869a715ff",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-020",
+      "mutation": "changed_page",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/market-events-final-20261004/f13/candidate/ASTOCK-020-d839fb4d13a5/2026-10-04/input_report/eastmoney/dragon_tiger_daily/report.json",
+      "report_sha256": "798a2296118e7df5508b5174b29df8c14dc9c38f5c9b54ca0d53018ee714389e",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-021",
+      "mutation": "business",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/market-events-final-20261004/f14/candidate/ASTOCK-021-393b1f9b9103/2026-10-04/input_report/eastmoney/lockup_expiry/report.json",
+      "report_sha256": "f365c7a2c66d90253dcfd554f2f033b55f11a4b64898a17eb4f11cfba50cda47",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-021",
+      "mutation": "empty",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/market-events-final-20261004/f15/candidate/ASTOCK-021-a33e33e8d423/2026-10-04/input_report/eastmoney/lockup_expiry/report.json",
+      "report_sha256": "850507bdfdc7fa018198ce1c6af26772e7a86f08334795cd043edca3613b2849",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-021",
+      "mutation": "schema",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/market-events-final-20261004/f16/candidate/ASTOCK-021-96cecd0d8b4b/2026-10-04/input_report/eastmoney/lockup_expiry/report.json",
+      "report_sha256": "ad710ce4910b89425486ed4d5e11567ed7d82f241ddd70e9ba7e0c8d303db266",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-021",
+      "mutation": "order",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/market-events-final-20261004/f17/candidate/ASTOCK-021-5ae319cd0ff5/2026-10-04/input_report/eastmoney/lockup_expiry/report.json",
+      "report_sha256": "ae7c7dd1f3cf09c4cb6a764fcccaaf793e6dc602329df9fb64b9fcd04fd878bf",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-021",
+      "mutation": "numeric",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/market-events-final-20261004/f18/candidate/ASTOCK-021-28f31b15f8f4/2026-10-04/input_report/eastmoney/lockup_expiry/report.json",
+      "report_sha256": "972dae2a4bf3f39638daa32ab47eba60566ac5946a5c8c5821440ef033e5c0b9",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-021",
+      "mutation": "date",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/market-events-final-20261004/f19/candidate/ASTOCK-021-7ceb9fbc6d81/2026-10-04/input_report/eastmoney/lockup_expiry/report.json",
+      "report_sha256": "ab14b0b3809c712ac72c6eb33d7afe53ec80777cb5a4b5fe9e36d61a844a3c95",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-021",
+      "mutation": "code",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/market-events-final-20261004/f20/candidate/ASTOCK-021-db6c46f988db/2026-10-04/input_report/eastmoney/lockup_expiry/report.json",
+      "report_sha256": "45110945595a4ea76fc54881b3961b83d1228837608ffb134565397b1c464015",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-021",
+      "mutation": "identity",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/market-events-final-20261004/f21/candidate/ASTOCK-021-c2a56dcf14ee/2026-10-04/input_report/eastmoney/lockup_expiry/report.json",
+      "report_sha256": "cc839c8d9a32549781caa3ad500b9926ae0f4f026733aa1d94e8f86c240ce0ec",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-021",
+      "mutation": "duplicate",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/market-events-final-20261004/f22/candidate/ASTOCK-021-e8722fbe52af/2026-10-04/input_report/eastmoney/lockup_expiry/report.json",
+      "report_sha256": "556ed95ba51dce1e18a9967d3e3f4fe36846eab4ff1a2154991008b3d481d6ef",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-021",
+      "mutation": "count",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/market-events-final-20261004/f23/candidate/ASTOCK-021-c5ea512fa663/2026-10-04/input_report/eastmoney/lockup_expiry/report.json",
+      "report_sha256": "5a72660b271a4682d6c7e2525d8a2504ce1a4fb9d3921311b4dc3657e8ba0e06",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-021",
+      "mutation": "pages",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/market-events-final-20261004/f24/candidate/ASTOCK-021-f170afd9223d/2026-10-04/input_report/eastmoney/lockup_expiry/report.json",
+      "report_sha256": "3f670d364ffd3e2dcefd42c5f625fe8db91f2aab7e09ec2c0b44b56eae7e3ce5",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-021",
+      "mutation": "http403",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/market-events-final-20261004/f25/candidate/ASTOCK-021-95a78483d1b8/2026-10-04/input_report/eastmoney/lockup_expiry/report.json",
+      "report_sha256": "58b5494f6233382e8def83fa146a0c734cee48fe428a1614ea771ee1dc755857",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-021",
+      "mutation": "missing_page",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/market-events-final-20261004/f26/candidate/ASTOCK-021-efe5570bd93e/2026-10-04/input_report/eastmoney/lockup_expiry/report.json",
+      "report_sha256": "a1b3138f922e117ef8d902e3f5212617c137e1610995a400710b445ac2ab54d6",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-021",
+      "mutation": "changed_page",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/market-events-final-20261004/f27/candidate/ASTOCK-021-eab7456e61c0/2026-10-04/input_report/eastmoney/lockup_expiry/report.json",
+      "report_sha256": "412e99dc0370ebcab087ec7265e8a5abb8aff591f3a32c3740acd0884f0bfb0f",
+      "result": "passed"
+    }
+  ]
+}

@@ -1,6 +1,8 @@
 # 代码目录与文件职责
 
-新浪复权因子 ASTOCK-006 扩展原 `providers/sina/daily.py`，保留原股票/期货方法及两个原SDK请求。既有响应留证范围支持保存后、SDK解析前的可选格式检查；`pipeline/inputs.py` 保存两组因子来源、选中解析及另一组排除记录。新增 `config/datasets/adjustment_factor.yaml` 和同名归一化 YAML，旧验证入口增加 `--verify-factors`。实施边界见 `provider_validation/docs/2026-10-04-adjustment-factor-input-collection.md`，证据位于 `results/factor-*-20261004*`。当前39项候选、25项待转换、7项阻断、3项别名；既有后文数字为各批历史时点。
+东财市场事件 ASTOCK-020/021 扩展既有 `providers/eastmoney/financial.py` 的两个明确接口方法和响应校验，旧财务方法保持；`pipeline/inputs.py` 沿用留证/字段映射入口，SDK解析前校验及分页覆盖记录属于该入口。新增两个必要字段模板 `config/datasets/dragon_tiger_daily.yaml`、`lockup_expiry.yaml` 和 `config/normalization/` 同名映射；旧验证入口增加 `--verify-market-events`。本批调查、原实现对照、CLI、异常和回归证据在 `results/market-events-*-20261004*`；说明见 `provider_validation/docs/2026-10-04-market-events-input-collection.md`。当前41项候选、23项待转换、7项阻断、3项别名；后文旧数字表示各批历史时点。Provider没有新增自动来源/接口/日期回退，后续统一由已有主流程处理。
+
+新浪复权因子 ASTOCK-006 扩展原 `providers/sina/daily.py`，保留原股票/期货方法及两个原SDK请求。既有响应留证范围支持保存后、SDK解析前的可选格式检查；`pipeline/inputs.py` 保存两组因子来源、选中解析及另一组排除记录。新增 `config/datasets/adjustment_factor.yaml` 和同名归一化 YAML，旧验证入口增加 `--verify-factors`。实施边界见 `provider_validation/docs/2026-10-04-adjustment-factor-input-collection.md`，证据位于 `results/factor-*-20261004*`。该批为39项候选、25项待转换、7项阻断、3项别名；既有后文数字为各批历史时点。
 
 本文记录当前代码实现与市场数据中心设计文档的对应关系。目录按设计文档第 21 节的模块划分组织，不为新功能额外建立平行实现。
 

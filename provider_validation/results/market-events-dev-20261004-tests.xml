@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="7" skipped="0" tests="35" time="20.761" timestamp="2026-10-04T15:27:07.549001+08:00" hostname="WIN-O3LLBLVKP56"><testcase classname="tests.test_input_collection" name="test_market_event_original_sdk_csv_and_exact_requests[ASTOCK-020-context0-manifest0-84]" time="1.273"><failure message="AssertionError: {'adapter_version': 'eastmoney-market-events-input-v1', 'calendar_context': {'positive_date_count': 1, 'sha256': 'c57c...b0b64897f7a1e6b094a4c'}, ...], 'code_version': '7312d4e2d93176769a8b6aae3382a51c160a6d0f14accdc4cecf1bb615871583', ...}&#10;assert ('failed' == 'candidate_complete'&#10;  &#10;  - candidate_complete&#10;  + failed)">tmp_path = WindowsPath('D:/Project/PythonProgram/stock_data_manage/tmp/me1/test_market_event_original_sdk0')
+no_network = None, input_id = 'ASTOCK-020'
+context = {'calendar': {'trading_dates': [datetime.date(2026, 9, 30)]}, 'request': {'trade_date': '2026-09-30'}}
+manifest = WindowsPath('D:/Project/PythonProgram/stock_data_manage/provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson')
+count = 84
+
+    @pytest.mark.parametrize("input_id,context,manifest,count", MARKET_EVENT_CASES)
+    def test_market_event_original_sdk_csv_and_exact_requests(tmp_path, no_network, input_id, context, manifest, count):
+&gt;       compare_market_event_original(tmp_path, input_id, context, manifest, count)
+
+tests\test_input_collection.py:110: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('D:/Project/PythonProgram/stock_data_manage/tmp/me1/test_market_event_original_sdk0')
+input_id = 'ASTOCK-020'
+context = {'calendar': {'trading_dates': [datetime.date(2026, 9, 30)]}, 'request': {'trade_date': '2026-09-30'}}
+manifest = WindowsPath('D:/Project/PythonProgram/stock_data_manage/provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson')
+count = 84
+
+    def compare_market_event_original(tmp_path, input_id, context, manifest, count):
+        import ast, csv, inspect, re
+        import akshare as sdk
+        import pandas as pd
+        from types import SimpleNamespace
+        from typing import Any, Callable, List, Tuple, Dict
+        from stock_data_manage.pipeline.inputs import _json_value
+        source = ROOT / "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py"
+        method = "fetch_lhb_all" if input_id == "ASTOCK-020" else "fetch_restricted_release"
+        nodes = [n for n in ast.parse(source.read_text(encoding="utf-8")).body if isinstance(n, ast.FunctionDef)
+            and n.name in {"ak_function", "call_ak", "try_ak_variants", "only_digits", method}]
+        namespace = dict(inspect=inspect, re=re, Any=Any, Callable=Callable, List=List, Tuple=Tuple, Dict=Dict,
+            Config=SimpleNamespace, pd=pd, ensure_ak=lambda:sdk)
+        exec(compile(ast.Module(body=nodes, type_ignores=[]), str(source), "exec"), namespace)
+        with captured_requests(RawObjectStore(tmp_path / "original"), provider="eastmoney", endpoint="original-market-event",
+            scope={}, code_version="original-source-script", pacer=RequestPacer(), replay_manifest=manifest,
+            sdk_retry_policy=True, probe_host_pause=True) as events:
+            frame = namespace[method](SimpleNamespace(code="600519", trade_date="20260930", start="20260901", end="20261003"))
+        frame = frame.astype(object).where(pd.notna(frame), None)
+        parsed = _json_value(frame.to_dict(orient="records"))
+        path = tmp_path / "original-parsed.json"
+        path.write_text(json.dumps(parsed, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
+        csv_path = SDK_ARCHIVE.parents[2] / ("18_全市场龙虎榜" if input_id == "ASTOCK-020" else "19_限售解禁日历") / "data.csv"
+        with csv_path.open(encoding="utf-8-sig", newline="") as stream: golden = list(csv.DictReader(stream))
+        assert len(parsed) == len(golden) == count
+        for row, old in zip(parsed, golden):
+            assert tuple(row) == tuple(old)
+            for key, value in row.items():
+                if value is None: assert old[key] == ""
+                elif isinstance(value, (int, float)): assert float(value) == pytest.approx(float(old[key]), rel=1e-12)
+                else: assert str(value) == old[key]
+        report = collect_input(input_id=input_id, context=context, config_root=ROOT / "config",
+            output_root=tmp_path / "candidate", replay_manifest=manifest)
+&gt;       assert report["status"] == "candidate_complete" and report["row_count"] == count, report
+E       AssertionError: {'adapter_version': 'eastmoney-market-events-input-v1', 'calendar_context': {'positive_date_count': 1, 'sha256': 'c57c...b0b64897f7a1e6b094a4c'}, ...], 'code_version': '7312d4e2d93176769a8b6aae3382a51c160a6d0f14accdc4cecf1bb615871583', ...}
+E       assert ('failed' == 'candidate_complete'
+E         
+E         - candidate_complete
+E         + failed)
+
+tests\test_input_collection.py:76: AssertionError</failure></testcase><testcase classname="tests.test_input_collection" name="test_market_event_original_sdk_csv_and_exact_requests[ASTOCK-021-context1-manifest1-167]" time="0.668"><failure message="AssertionError: {'adapter_version': 'eastmoney-market-events-input-v1', 'code_files': [{'path': 'D:\\Project\\PythonProgram\\stock_dat...on_profile': {'anchor_date': None, 'at_time': None, 'business_day': 'calendar_day', 'frequency_interval': 1, ...}, ...}&#10;assert ('failed' == 'candidate_complete'&#10;  &#10;  - candidate_complete&#10;  + failed)">tmp_path = WindowsPath('D:/Project/PythonProgram/stock_data_manage/tmp/me1/test_market_event_original_sdk1')
+no_network = None, input_id = 'ASTOCK-021'
+context = {'request': {'end_date': '2026-10-03', 'start_date': '2026-09-01'}}
+manifest = WindowsPath('D:/Project/PythonProgram/stock_data_manage/provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson')
+count = 167
+
+    @pytest.mark.parametrize("input_id,context,manifest,count", MARKET_EVENT_CASES)
+    def test_market_event_original_sdk_csv_and_exact_requests(tmp_path, no_network, input_id, context, manifest, count):
+&gt;       compare_market_event_original(tmp_path, input_id, context, manifest, count)
+
+tests\test_input_collection.py:110: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('D:/Project/PythonProgram/stock_data_manage/tmp/me1/test_market_event_original_sdk1')
+input_id = 'ASTOCK-021'
+context = {'request': {'end_date': '2026-10-03', 'start_date': '2026-09-01'}}
+manifest = WindowsPath('D:/Project/PythonProgram/stock_data_manage/provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson')
+count = 167
+
+    def compare_market_event_original(tmp_path, input_id, context, manifest, count):
+        import ast, csv, inspect, re
+        import akshare as sdk
+        import pandas as pd
+        from types import SimpleNamespace
+        from typing import Any, Callable, List, Tuple, Dict
+        from stock_data_manage.pipeline.inputs import _json_value
+        source = ROOT / "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py"
+        method = "fetch_lhb_all" if input_id == "ASTOCK-020" else "fetch_restricted_release"
+        nodes = [n for n in ast.parse(source.read_text(encoding="utf-8")).body if isinstance(n, ast.FunctionDef)
+            and n.name in {"ak_function", "call_ak", "try_ak_variants", "only_digits", method}]
+        namespace = dict(inspect=inspect, re=re, Any=Any, Callable=Callable, List=List, Tuple=Tuple, Dict=Dict,
+            Config=SimpleNamespace, pd=pd, ensure_ak=lambda:sdk)
+        exec(compile(ast.Module(body=nodes, type_ignores=[]), str(source), "exec"), namespace)
+        with captured_requests(RawObjectStore(tmp_path / "original"), provider="eastmoney", endpoint="original-market-event",
+            scope={}, code_version="original-source-script", pacer=RequestPacer(), replay_manifest=manifest,
+            sdk_retry_policy=True, probe_host_pause=True) as events:
+            frame = namespace[method](SimpleNamespace(code="600519", trade_date="20260930", start="20260901", end="20261003"))
+        frame = frame.astype(object).where(pd.notna(frame), None)
+        parsed = _json_value(frame.to_dict(orient="records"))
+        path = tmp_path / "original-parsed.json"
+        path.write_text(json.dumps(parsed, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
+        csv_path = SDK_ARCHIVE.parents[2] / ("18_全市场龙虎榜" if input_id == "ASTOCK-020" else "19_限售解禁日历") / "data.csv"
+        with csv_path.open(encoding="utf-8-sig", newline="") as stream: golden = list(csv.DictReader(stream))
+        assert len(parsed) == len(golden) == count
+        for row, old in zip(parsed, golden):
+            assert tuple(row) == tuple(old)
+            for key, value in row.items():
+                if value is None: assert old[key] == ""
+                elif isinstance(value, (int, float)): assert float(value) == pytest.approx(float(old[key]), rel=1e-12)
+                else: assert str(value) == old[key]
+        report = collect_input(input_id=input_id, context=context, config_root=ROOT / "config",
+            output_root=tmp_path / "candidate", replay_manifest=manifest)
+&gt;       assert report["status"] == "candidate_complete" and report["row_count"] == count, report
+E       AssertionError: {'adapter_version': 'eastmoney-market-events-input-v1', 'code_files': [{'path': 'D:\\Project\\PythonProgram\\stock_dat...on_profile': {'anchor_date': None, 'at_time': None, 'business_day': 'calendar_day', 'frequency_interval': 1, ...}, ...}
+E       assert ('failed' == 'candidate_complete'
+E         
+E         - candidate_complete
+E         + failed)
+
+tests\test_input_collection.py:76: AssertionError</failure></testcase><testcase classname="tests.test_input_collection" name="test_market_event_invalid_response_retained_without_fallback[ASTOCK-020-business]" time="0.486" /><testcase classname="tests.test_input_collection" name="test_market_event_invalid_response_retained_without_fallback[ASTOCK-020-empty]" time="0.517" /><testcase classname="tests.test_input_collection" name="test_market_event_invalid_response_retained_without_fallback[ASTOCK-020-schema]" time="0.521" /><testcase classname="tests.test_input_collection" name="test_market_event_invalid_response_retained_without_fallback[ASTOCK-020-order]" time="0.482" /><testcase classname="tests.test_input_collection" name="test_market_event_invalid_response_retained_without_fallback[ASTOCK-020-numeric]" time="0.457" /><testcase classname="tests.test_input_collection" name="test_market_event_invalid_response_retained_without_fallback[ASTOCK-020-date]" time="0.466" /><testcase classname="tests.test_input_collection" name="test_market_event_invalid_response_retained_without_fallback[ASTOCK-020-code]" time="0.452" /><testcase classname="tests.test_input_collection" name="test_market_event_invalid_response_retained_without_fallback[ASTOCK-020-identity]" time="0.448" /><testcase classname="tests.test_input_collection" name="test_market_event_invalid_response_retained_without_fallback[ASTOCK-020-duplicate]" time="0.511" /><testcase classname="tests.test_input_collection" name="test_market_event_invalid_response_retained_without_fallback[ASTOCK-020-count]" time="0.461" /><testcase classname="tests.test_input_collection" name="test_market_event_invalid_response_retained_without_fallback[ASTOCK-020-pages]" time="0.431" /><testcase classname="tests.test_input_collection" name="test_market_event_invalid_response_retained_without_fallback[ASTOCK-020-http403]" time="0.416" /><testcase classname="tests.test_input_collection" name="test_market_event_invalid_response_retained_without_fallback[ASTOCK-020-missing_page]" time="0.393" /><testcase classname="tests.test_input_collection" name="test_market_event_invalid_response_retained_without_fallback[ASTOCK-020-changed_page]" time="0.407" /><testcase classname="tests.test_input_collection" name="test_market_event_invalid_response_retained_without_fallback[ASTOCK-021-business]" time="0.451" /><testcase classname="tests.test_input_collection" name="test_market_event_invalid_response_retained_without_fallback[ASTOCK-021-empty]" time="0.352" /><testcase classname="tests.test_input_collection" name="test_market_event_invalid_response_retained_without_fallback[ASTOCK-021-schema]" time="0.379" /><testcase classname="tests.test_input_collection" name="test_market_event_invalid_response_retained_without_fallback[ASTOCK-021-order]" time="0.319" /><testcase classname="tests.test_input_collection" name="test_market_event_invalid_response_retained_without_fallback[ASTOCK-021-numeric]" time="0.329" /><testcase classname="tests.test_input_collection" name="test_market_event_invalid_response_retained_without_fallback[ASTOCK-021-date]" time="0.403" /><testcase classname="tests.test_input_collection" name="test_market_event_invalid_response_retained_without_fallback[ASTOCK-021-code]" time="0.329" /><testcase classname="tests.test_input_collection" name="test_market_event_invalid_response_retained_without_fallback[ASTOCK-021-identity]" time="0.304" /><testcase classname="tests.test_input_collection" name="test_market_event_invalid_response_retained_without_fallback[ASTOCK-021-duplicate]" time="0.360" /><testcase classname="tests.test_input_collection" name="test_market_event_invalid_response_retained_without_fallback[ASTOCK-021-count]" time="0.339" /><testcase classname="tests.test_input_collection" name="test_market_event_invalid_response_retained_without_fallback[ASTOCK-021-pages]" time="0.335" /><testcase classname="tests.test_input_collection" name="test_market_event_invalid_response_retained_without_fallback[ASTOCK-021-http403]" time="0.354" /><testcase classname="tests.test_input_collection" name="test_market_event_invalid_response_retained_without_fallback[ASTOCK-021-missing_page]" time="0.349" /><testcase classname="tests.test_input_collection" name="test_market_event_invalid_response_retained_without_fallback[ASTOCK-021-changed_page]" time="0.413" /><testcase classname="tests.test_input_collection" name="test_market_event_numeric_null_negative_zero_remain_raw_and_parsed[ASTOCK-020]" time="0.441"><failure message="AssertionError: {'adapter_version': 'eastmoney-market-events-input-v1', 'calendar_context': {'positive_date_count': 1, 'sha256': 'c57c...b0b64897f7a1e6b094a4c'}, ...], 'code_version': '7312d4e2d93176769a8b6aae3382a51c160a6d0f14accdc4cecf1bb615871583', ...}&#10;assert 'failed' == 'candidate_complete'&#10;  &#10;  - candidate_complete&#10;  + failed">tmp_path = WindowsPath('D:/Project/PythonProgram/stock_data_manage/tmp/me1/test_market_event_numeric_null0')
+no_network = None, input_id = 'ASTOCK-020'
+
+    @pytest.mark.parametrize("input_id", ["ASTOCK-020", "ASTOCK-021"])
+    def test_market_event_numeric_null_negative_zero_remain_raw_and_parsed(tmp_path, no_network, input_id):
+        case = next(c for c in MARKET_EVENT_CASES if c[0] == input_id)
+        report = collect_input(input_id=input_id, context=case[1], config_root=ROOT / "config", output_root=tmp_path / "candidate",
+            replay_manifest=market_event_fixture(tmp_path, input_id, "zero_negative"))
+&gt;       assert report["status"] == "candidate_complete", report
+E       AssertionError: {'adapter_version': 'eastmoney-market-events-input-v1', 'calendar_context': {'positive_date_count': 1, 'sha256': 'c57c...b0b64897f7a1e6b094a4c'}, ...], 'code_version': '7312d4e2d93176769a8b6aae3382a51c160a6d0f14accdc4cecf1bb615871583', ...}
+E       assert 'failed' == 'candidate_complete'
+E         
+E         - candidate_complete
+E         + failed
+
+tests\test_input_collection.py:170: AssertionError</failure></testcase><testcase classname="tests.test_input_collection" name="test_market_event_numeric_null_negative_zero_remain_raw_and_parsed[ASTOCK-021]" time="0.473"><failure message="AssertionError: {'adapter_version': 'eastmoney-market-events-input-v1', 'code_files': [{'path': 'D:\\Project\\PythonProgram\\stock_dat...on_profile': {'anchor_date': None, 'at_time': None, 'business_day': 'calendar_day', 'frequency_interval': 1, ...}, ...}&#10;assert 'failed' == 'candidate_complete'&#10;  &#10;  - candidate_complete&#10;  + failed">tmp_path = WindowsPath('D:/Project/PythonProgram/stock_data_manage/tmp/me1/test_market_event_numeric_null1')
+no_network = None, input_id = 'ASTOCK-021'
+
+    @pytest.mark.parametrize("input_id", ["ASTOCK-020", "ASTOCK-021"])
+    def test_market_event_numeric_null_negative_zero_remain_raw_and_parsed(tmp_path, no_network, input_id):
+        case = next(c for c in MARKET_EVENT_CASES if c[0] == input_id)
+        report = collect_input(input_id=input_id, context=case[1], config_root=ROOT / "config", output_root=tmp_path / "candidate",
+            replay_manifest=market_event_fixture(tmp_path, input_id, "zero_negative"))
+&gt;       assert report["status"] == "candidate_complete", report
+E       AssertionError: {'adapter_version': 'eastmoney-market-events-input-v1', 'code_files': [{'path': 'D:\\Project\\PythonProgram\\stock_dat...on_profile': {'anchor_date': None, 'at_time': None, 'business_day': 'calendar_day', 'frequency_interval': 1, ...}, ...}
+E       assert 'failed' == 'candidate_complete'
+E         
+E         - candidate_complete
+E         + failed
+
+tests\test_input_collection.py:170: AssertionError</failure></testcase><testcase classname="tests.test_input_collection" name="test_market_event_multi_page_retrieval_and_source_totals" time="0.586"><failure message="AssertionError: {'adapter_version': 'eastmoney-market-events-input-v1', 'code_files': [{'path': 'D:\\Project\\PythonProgram\\stock_dat...on_profile': {'anchor_date': None, 'at_time': None, 'business_day': 'calendar_day', 'frequency_interval': 1, ...}, ...}&#10;assert ('failed' == 'candidate_complete'&#10;  &#10;  - candidate_complete&#10;  + failed)">tmp_path = WindowsPath('D:/Project/PythonProgram/stock_data_manage/tmp/me1/test_market_event_multi_page_r0')
+no_network = None
+
+    def test_market_event_multi_page_retrieval_and_source_totals(tmp_path, no_network):
+        report = collect_input(input_id="ASTOCK-021", context=MARKET_EVENT_CASES[1][1], config_root=ROOT / "config", output_root=tmp_path / "candidate",
+            replay_manifest=market_event_fixture(tmp_path, "ASTOCK-021", "multi_page"))
+&gt;       assert report["status"] == "candidate_complete" and report["row_count"] == report["source_total_count"] == 501, report
+E       AssertionError: {'adapter_version': 'eastmoney-market-events-input-v1', 'code_files': [{'path': 'D:\\Project\\PythonProgram\\stock_dat...on_profile': {'anchor_date': None, 'at_time': None, 'business_day': 'calendar_day', 'frequency_interval': 1, ...}, ...}
+E       assert ('failed' == 'candidate_complete'
+E         
+E         - candidate_complete
+E         + failed)
+
+tests\test_input_collection.py:179: AssertionError</failure></testcase><testcase classname="tests.test_input_collection" name="test_market_event_yaml_fields_scope_and_existing_methods" time="0.507"><failure message="AssertionError: {'adapter_version': 'eastmoney-market-events-input-v1', 'code_files': [{'path': 'D:\\Project\\PythonProgram\\stock_dat...on_profile': {'anchor_date': None, 'at_time': None, 'business_day': 'calendar_day', 'frequency_interval': 1, ...}, ...}&#10;assert 'failed' == 'candidate_complete'&#10;  &#10;  - candidate_complete&#10;  + failed">tmp_path = WindowsPath('D:/Project/PythonProgram/stock_data_manage/tmp/me1/test_market_event_yaml_fields_0')
+no_network = None
+
+    def test_market_event_yaml_fields_scope_and_existing_methods(tmp_path, no_network):
+        import ast
+        baseline = ROOT / "provider_validation/results/market-events-original-20261004/0-financial.py.bin"
+        def methods(p):
+            tree = ast.parse(p.read_text(encoding="utf-8"))
+            cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == "EastMoneyFinancialMainProvider")
+            return {n.name:ast.dump(n, include_attributes=False) for n in cls.body if isinstance(n, ast.FunctionDef)}
+        old = methods(baseline); current = methods(ROOT / "src/stock_data_manage/providers/eastmoney/financial.py")
+        assert all(current[name] == body for name, body in old.items())
+        config = tmp_path / "config"; shutil.copytree(ROOT / "config", config)
+        path = config / "normalization/lockup_expiry.yaml"; rule = yaml.safe_load(path.read_text(encoding="utf-8"))
+        rule["rules"][0]["field_mapping"]["name"] = "限售股类型"
+        path.write_text(yaml.safe_dump(rule, allow_unicode=True), encoding="utf-8")
+        fields = ["snapshot_at", "source_security_code", "release_date", "restricted_share_type", "name"]
+        report = collect_input(input_id="ASTOCK-021", context=MARKET_EVENT_CASES[1][1], config_root=config,
+            output_root=tmp_path / "candidate", replay_manifest=SDK_ARCHIVE, fields=fields)
+&gt;       assert report["status"] == "candidate_complete", report
+E       AssertionError: {'adapter_version': 'eastmoney-market-events-input-v1', 'code_files': [{'path': 'D:\\Project\\PythonProgram\\stock_dat...on_profile': {'anchor_date': None, 'at_time': None, 'business_day': 'calendar_day', 'frequency_interval': 1, ...}, ...}
+E       assert 'failed' == 'candidate_complete'
+E         
+E         - candidate_complete
+E         + failed
+
+tests\test_input_collection.py:199: AssertionError</failure></testcase><testcase classname="tests.test_input_collection" name="test_market_event_original_session_cache_and_no_source_switch" time="0.889"><failure message="AssertionError: ({'adapter_version': 'eastmoney-market-events-input-v1', 'calendar_context': {'positive_date_count': 1, 'sha256': 'c57...0b64897f7a1e6b094a4c'}, ...], 'code_version': '7312d4e2d93176769a8b6aae3382a51c160a6d0f14accdc4cecf1bb615871583', ...})&#10;assert 'failed' == 'candidate_complete'&#10;  &#10;  - candidate_complete&#10;  + failed">tmp_path = WindowsPath('D:/Project/PythonProgram/stock_data_manage/tmp/me1/test_market_event_original_ses0')
+no_network = None
+
+    def test_market_event_original_session_cache_and_no_source_switch(tmp_path, no_network):
+        from unittest.mock import patch
+        seen = []
+        def send(session, request, **kwargs):
+            record = next(r for id in ("ASTOCK-020", "ASTOCK-021") for r in market_event_records(id) if r["url"] == request.url)
+            seen.append(request.url)
+            assert request.method == "GET" and kwargs["timeout"] is None and kwargs["allow_redirects"] and session.trust_env
+            assert request.headers["User-Agent"] == record["request_headers"]["User-Agent"]
+            retry = session.get_adapter(request.url).max_retries
+            assert retry.total == retry.connect == retry.read == retry.status == 2 and retry.backoff_factor == 5
+            assert not retry.is_retry("GET", 403) and not retry.is_retry("GET", 429, True)
+            response = requests.Response(); response.status_code = 200; response.encoding = "utf-8"
+            response._content = RawObjectStore.read_response(SDK_ARCHIVE, record); response.url = request.url
+            return response
+        with patch("requests.Session.send", send):
+            for input_id, context, _, _ in MARKET_EVENT_CASES:
+                first = collect_input(input_id=input_id, context=context, config_root=ROOT / "config", output_root=tmp_path / "candidate", mode="live", evidence_root=tmp_path / "unused")
+                second = collect_input(input_id=input_id, context=context, config_root=ROOT / "config", output_root=tmp_path / "candidate", mode="live", evidence_root=tmp_path / "candidate")
+&gt;               assert first["status"] == second["status"] == "candidate_complete", (first, second)
+E               AssertionError: ({'adapter_version': 'eastmoney-market-events-input-v1', 'calendar_context': {'positive_date_count': 1, 'sha256': 'c57...0b64897f7a1e6b094a4c'}, ...], 'code_version': '7312d4e2d93176769a8b6aae3382a51c160a6d0f14accdc4cecf1bb615871583', ...})
+E               assert 'failed' == 'candidate_complete'
+E                 
+E                 - candidate_complete
+E                 + failed
+
+tests\test_input_collection.py:229: AssertionError</failure></testcase></testsuite></testsuites>

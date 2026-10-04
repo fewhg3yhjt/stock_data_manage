@@ -1,0 +1,70 @@
+dataset:
+  name: holder_trades
+  display_name: 股东增减持输入
+  primary_key:
+  - snapshot_at
+  - source_security_code
+  - holder
+  - notice_date
+  - start_date
+  - end_date
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  source_security_code:
+    type: string
+    required: true
+  name:
+    type: string
+    required: false
+  holder:
+    type: string
+    required: true
+  direction:
+    type: string
+    required: false
+  change_shares_10k:
+    type: decimal
+    required: false
+    unit: 10k_shares
+  change_pct_total:
+    type: decimal
+    required: false
+    unit: percent
+  change_pct_float:
+    type: decimal
+    required: false
+    unit: percent
+  after_shares_10k:
+    type: decimal
+    required: false
+    unit: 10k_shares
+  after_pct_total:
+    type: decimal
+    required: false
+    unit: percent
+  after_float_shares_10k:
+    type: decimal
+    required: false
+    unit: 10k_shares
+  after_pct_float:
+    type: decimal
+    required: false
+    unit: percent
+  avg_price:
+    type: decimal
+    required: false
+    unit: CNY
+  channel:
+    type: string
+    required: false
+  start_date:
+    type: date
+    required: false
+  end_date:
+    type: date
+    required: false
+  notice_date:
+    type: date
+    required: true

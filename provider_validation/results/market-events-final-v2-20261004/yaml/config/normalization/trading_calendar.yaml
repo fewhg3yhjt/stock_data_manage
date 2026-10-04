@@ -1,0 +1,12 @@
+dataset: trading_calendar
+rules:
+  - id: sina-trading-calendar-input-v1
+    input_id: ASTOCK-070
+    provider: sina
+    endpoint: trading_calendar
+    field_mapping: {trade_date: trade_date}
+    context_fields: {source: provider}
+    status: pending_validation
+    version: sina-trading-calendar-input-v1
+    evidence_refs: [ASTOCK-070]
+    notes: 返回日期仅为新浪/SDK提供的正向交易日，不能标为官方来源，也不推断缺失日期的开闭市状态。

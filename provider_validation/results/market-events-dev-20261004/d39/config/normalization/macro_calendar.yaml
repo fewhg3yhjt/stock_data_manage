@@ -1,0 +1,33 @@
+dataset: macro_calendar
+rules:
+- id: macro-calendar-input-v1
+  input_id: ASTOCK-066
+  provider: wallstreetcn
+  endpoint: macro_calendar
+  field_mapping:
+    source_event_id: source_event_id
+    event_time: time
+    country: country
+    title: title
+    kind: kind
+    importance: importance
+    actual_text: actual
+    forecast_text: forecast
+    previous_text: previous
+    revised_text: revised
+    source_unit: unit
+    source_period: period
+  context_fields:
+    snapshot_at: source_snapshot_at
+  transforms:
+    event_time:
+      format: '%Y-%m-%d %H:%M'
+      timezone: Asia/Shanghai
+  null_values:
+  - null
+  unverified_fields: []
+  status: pending_validation
+  version: macro-calendar-input-v1
+  evidence_refs:
+  - ASTOCK-066
+  notes: snapshot_at为原响应捕获时间；原文本/日期保持，宏观值为显示文本与来源单位，并非认证数值。来源完整行和筛选排除行分别留证。

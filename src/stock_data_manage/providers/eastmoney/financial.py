@@ -9,6 +9,61 @@ from ..contracts import EndpointContract, FailureClass, ProviderContractError
 from .realtime import EastMoneyRequestsTransport
 
 
+def _market_event_spec(endpoint):
+    if endpoint == "dragon_tiger_daily":
+        return dict(function="stock_lhb_detail_em", report="RPT_DAILYBILLBOARD_DETAILSNEW", date_field="TRADE_DATE",
+            identity_field="EXPLANATION", parsed_date="上榜日", page_size=5000,
+            source_fields=tuple("SECURITY_CODE,SECUCODE,SECURITY_NAME_ABBR,TRADE_DATE,EXPLAIN,CLOSE_PRICE,CHANGE_RATE,BILLBOARD_NET_AMT,BILLBOARD_BUY_AMT,BILLBOARD_SELL_AMT,BILLBOARD_DEAL_AMT,ACCUM_AMOUNT,DEAL_NET_RATIO,DEAL_AMOUNT_RATIO,TURNOVERRATE,FREE_MARKET_CAP,EXPLANATION,D1_CLOSE_ADJCHRATE,D2_CLOSE_ADJCHRATE,D5_CLOSE_ADJCHRATE,D10_CLOSE_ADJCHRATE,SECURITY_TYPE_CODE".split(",")),
+            parsed_fields=tuple("序号,代码,名称,上榜日,解读,收盘价,涨跌幅,龙虎榜净买额,龙虎榜买入额,龙虎榜卖出额,龙虎榜成交额,市场总成交额,净买额占总成交比,成交额占总成交比,换手率,流通市值,上榜原因,上榜后1日,上榜后2日,上榜后5日,上榜后10日".split(",")),
+            text_fields={"SECURITY_CODE", "SECUCODE", "SECURITY_NAME_ABBR", "TRADE_DATE", "EXPLAIN", "EXPLANATION", "SECURITY_TYPE_CODE"})
+    if endpoint == "lockup_expiry":
+        return dict(function="stock_restricted_release_detail_em", report="RPT_LIFT_STAGE", date_field="FREE_DATE",
+            identity_field="FREE_SHARES_TYPE", parsed_date="解禁时间", page_size=500,
+            source_fields=tuple("SECURITY_CODE,SECURITY_NAME_ABBR,FREE_DATE,CURRENT_FREE_SHARES,ABLE_FREE_SHARES,LIFT_MARKET_CAP,FREE_RATIO,NEW,B20_ADJCHRATE,A20_ADJCHRATE,FREE_SHARES_TYPE,TOTAL_RATIO,NON_FREE_SHARES,BATCH_HOLDER_NUM".split(",")),
+            parsed_fields=tuple("序号,股票代码,股票简称,解禁时间,限售股类型,解禁数量,实际解禁数量,实际解禁市值,占解禁前流通市值比例,解禁前一交易日收盘价,解禁前20日涨跌幅,解禁后20日涨跌幅".split(",")),
+            text_fields={"SECURITY_CODE", "SECURITY_NAME_ABBR", "FREE_DATE", "FREE_SHARES_TYPE"})
+    raise ValueError("unsupported market event endpoint")
+
+
+def validate_market_event_response(body, url, status, *, endpoint, start, end):
+    """Validate exact retained payload before the SDK's positional or numeric coercion."""
+    import json
+    import re
+    from datetime import datetime
+    from urllib.parse import parse_qs, urlsplit
+    specification = _market_event_spec(endpoint)
+    query = parse_qs(urlsplit(url).query)
+    field = specification["date_field"]
+    expected_filter = (f"({field}<='{end.isoformat()}')({field}>='{start.isoformat()}')" if endpoint == "dragon_tiger_daily"
+        else f"({field}>='{start.isoformat()}')({field}<='{end.isoformat()}')")
+    if status != 200 or query.get("reportName") != [specification["report"]] or query.get("filter") != [expected_filter]:
+        raise ValueError("market event response does not match requested endpoint and window")
+    payload = json.loads(body)
+    result = payload.get("result") if isinstance(payload, dict) else None
+    if not isinstance(payload, dict) or payload.get("success") is not True or payload.get("code") != 0 or not isinstance(result, dict):
+        raise ValueError("market event business response changed")
+    count, pages, rows = result.get("count"), result.get("pages"), result.get("data")
+    if type(count) is not int or count < 1 or type(pages) is not int or pages != (count + specification["page_size"] - 1) // specification["page_size"]:
+        raise ValueError("market event pagination totals invalid or empty")
+    page = int(query.get("pageNumber", ["0"])[0])
+    if not 1 <= page <= pages or not isinstance(rows, list) or len(rows) != min(specification["page_size"], count-(page-1)*specification["page_size"]):
+        raise ValueError("market event page row count disagrees with source total")
+    for row in rows:
+        if not isinstance(row, dict) or tuple(row) != specification["source_fields"]:
+            raise ValueError("market event source field order changed")
+        if not re.fullmatch(r"[0-9]{6}", str(row["SECURITY_CODE"])):
+            raise ValueError("market event source security code changed")
+        day = datetime.strptime(row[field], "%Y-%m-%d %H:%M:%S").date()
+        if not start <= day <= end:
+            raise ValueError("market event response ignored requested date window")
+        if not isinstance(row[specification["identity_field"]], str) or not row[specification["identity_field"]]:
+            raise ValueError("market event identity is missing")
+        for key in specification["source_fields"]:
+            value = row[key]
+            if key not in specification["text_fields"] and value is not None and (isinstance(value, bool) or not math.isfinite(float(value))):
+                raise ValueError("market event source number changed")
+
+
 @dataclass(frozen=True, slots=True)
 class FinancialMainRecord:
     symbol: str
@@ -45,6 +100,50 @@ class EastMoneyFinancialMainProvider:
     _event_total: int | None = field(default=None, init=False, repr=False)
     _event_pages: int | None = field(default=None, init=False, repr=False)
     client: Any | None = field(default=None, repr=False)
+
+    def fetch_dragon_tiger_daily(self, *, date, source_payloads):
+        """Explicit requested day; no alternate source or implicit historical day."""
+        return self._fetch_market_events(start=date, end=date, source_payloads=source_payloads)
+
+    def fetch_lockup_expiry(self, *, start, end, source_payloads):
+        """The verified market-window detail endpoint, not a per-stock queue."""
+        return self._fetch_market_events(start=start, end=end, source_payloads=source_payloads)
+
+    def _fetch_market_events(self, *, start, end, source_payloads):
+        from datetime import date
+        from ..akshare.session import load_client
+        from ..contracts import InputFetchResult
+        import pandas as pd
+        if not isinstance(start, date) or not isinstance(end, date) or start > end:
+            raise ValueError("market events require an explicit valid date window")
+        specification = _market_event_spec(self.endpoint)
+        self.client = self.client or load_client()
+        frame = getattr(self.client, specification["function"])(start_date=start.strftime("%Y%m%d"), end_date=end.strftime("%Y%m%d"))
+        payloads = list(source_payloads())
+        if not payloads:
+            raise RuntimeError("market event source response evidence is required")
+        first = payloads[0]["result"]
+        if len(payloads) != first["pages"] + 1:
+            raise RuntimeError("market event pagination response count changed")
+        if payloads[1]["result"]["data"] != first["data"]:
+            raise RuntimeError("market event first page changed between discovery and retrieval")
+        rows = []
+        for payload in payloads[1:]:
+            result = payload["result"]
+            if (result["count"], result["pages"]) != (first["count"], first["pages"]):
+                raise RuntimeError("market event pagination totals changed")
+            rows.extend(result["data"])
+        if len(rows) != first["count"] or len(frame) != len(rows):
+            raise RuntimeError("market event reported coverage differs from retrieved rows")
+        if tuple(frame.columns) != specification["parsed_fields"]:
+            raise RuntimeError("market event SDK fields changed")
+        keys = [(r["SECURITY_CODE"], r[specification["date_field"]], r[specification["identity_field"]]) for r in rows]
+        if len(set(keys)) != len(keys):
+            raise RuntimeError("duplicate market event identity; no automatic merging")
+        frame = frame.astype(object).where(pd.notna(frame), None)
+        return InputFetchResult(tuple(frame.to_dict(orient="records")), source_rows=tuple(rows), source_url=self.url,
+            mapping_context={"source_total_count": first["count"], "source_page_count": first["pages"],
+                "source_report": specification["report"], "date_field": specification["parsed_date"]})
 
     def fetch_pmi(self, *, source_payloads):
         """Original successful PMI SDK, separate from the legacy financial requests."""

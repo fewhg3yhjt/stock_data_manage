@@ -24,6 +24,214 @@ SDK_ARCHIVE = ROOT / "provider_validation/results/live-probes/rate-limited-all-2
 SDK_NEWS_CASES = [("ASTOCK-032", {}, SDK_ARCHIVE, 20), ("ASTOCK-033", {}, SDK_ARCHIVE, 20)]
 MACRO_CASES = [("ASTOCK-061", {}, SDK_ARCHIVE, 136), ("ASTOCK-062", {}, SDK_ARCHIVE, 225)]
 
+MARKET_EVENT_CASES = [
+    ("ASTOCK-020", {"request": {"trade_date": "2026-09-30"}, "calendar": {"trading_dates": [date(2026, 9, 30)]}}, SDK_ARCHIVE, 84),
+    ("ASTOCK-021", {"request": {"start_date": "2026-09-01", "end_date": "2026-10-03"}}, SDK_ARCHIVE, 167)]
+MARKET_EVENT_FAILURES = [(id, mutation) for id in ("ASTOCK-020", "ASTOCK-021")
+    for mutation in ("business", "empty", "schema", "order", "numeric", "date", "code", "identity", "duplicate", "count", "pages", "http403", "missing_page", "changed_page")]
+
+
+def market_event_records(input_id):
+    from urllib.parse import parse_qs, urlsplit
+    report = "RPT_DAILYBILLBOARD_DETAILSNEW" if input_id == "ASTOCK-020" else "RPT_LIFT_STAGE"
+    return [record for line in SDK_ARCHIVE.read_text(encoding="utf-8").splitlines()
+        if (record := json.loads(line)).get("event") == "http_response"
+        and (query := parse_qs(urlsplit(record.get("url", "")).query)).get("reportName") == [report]
+        and "SECURITY_CODE=" not in query.get("filter", [""])[0]]
+
+
+def compare_market_event_original(tmp_path, input_id, context, manifest, count):
+    import ast, csv, inspect, re
+    import akshare as sdk
+    import pandas as pd
+    from types import SimpleNamespace
+    from typing import Any, Callable, List, Tuple, Dict
+    from stock_data_manage.pipeline.inputs import _json_value
+    source = ROOT / "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py"
+    method = "fetch_lhb_all" if input_id == "ASTOCK-020" else "fetch_restricted_release"
+    nodes = [n for n in ast.parse(source.read_text(encoding="utf-8")).body if isinstance(n, ast.FunctionDef)
+        and n.name in {"ak_function", "call_ak", "try_ak_variants", "only_digits", method}]
+    namespace = dict(inspect=inspect, re=re, Any=Any, Callable=Callable, List=List, Tuple=Tuple, Dict=Dict,
+        Config=SimpleNamespace, pd=pd, ensure_ak=lambda:sdk)
+    exec(compile(ast.Module(body=nodes, type_ignores=[]), str(source), "exec"), namespace)
+    with captured_requests(RawObjectStore(tmp_path / "original"), provider="eastmoney", endpoint="original-market-event",
+        scope={}, code_version="original-source-script", pacer=RequestPacer(), replay_manifest=manifest,
+        sdk_retry_policy=True, probe_host_pause=True) as events:
+        frame = namespace[method](SimpleNamespace(code="600519", trade_date="20260930", start="20260901", end="20261003"))
+    frame = frame.astype(object).where(pd.notna(frame), None)
+    parsed = _json_value(frame.to_dict(orient="records"))
+    path = tmp_path / "original-parsed.json"
+    path.write_text(json.dumps(parsed, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
+    csv_path = SDK_ARCHIVE.parents[2] / ("18_全市场龙虎榜" if input_id == "ASTOCK-020" else "19_限售解禁日历") / "data.csv"
+    with csv_path.open(encoding="utf-8-sig", newline="") as stream: golden = list(csv.DictReader(stream))
+    assert len(parsed) == len(golden) == count
+    for row, old in zip(parsed, golden):
+        assert tuple(row) == tuple(old)
+        for key, value in row.items():
+            if value is None: assert old[key] == ""
+            elif isinstance(value, (int, float)): assert float(value) == pytest.approx(float(old[key]), rel=1e-12)
+            else: assert str(value) == old[key]
+    report = collect_input(input_id=input_id, context=context, config_root=ROOT / "config",
+        output_root=tmp_path / "candidate", replay_manifest=manifest)
+    assert report["status"] == "candidate_complete" and report["row_count"] == count, report
+    assert read_artifact(report, "parsed_rows") == parsed
+    assert read_artifact(report, "source_rows") == json.loads(RawObjectStore.read_response(manifest, market_event_records(input_id)[0]))["result"]["data"]
+    selected_events = events if input_id == "ASTOCK-020" else events[1:]
+    keys = ("url", "method", "status_code", "body_sha256", "request_headers", "request_options")
+    assert [{k:r.get(k) for k in keys} for r in selected_events] == [{k:r.get(k) for k in keys} for r in report["responses"]]
+    assert len(selected_events) == len(report["responses"]) == 2
+    assert len(events) == (2 if input_id == "ASTOCK-020" else 3)
+    outputs = read_artifact(report, "output")
+    for output, row in zip(outputs, parsed):
+        assert output["source_security_code"] == row["代码" if input_id == "ASTOCK-020" else "股票代码"]
+        assert output["trade_date" if input_id == "ASTOCK-020" else "release_date"] == row["上榜日" if input_id == "ASTOCK-020" else "解禁时间"]
+        assert all(output[key] is None for key in report["unverified_fields"])
+    if input_id == "ASTOCK-020": assert len({r["代码"] for r in parsed}) < count  # Keep distinct reasons for one stock.
+    else:
+        for raw, row in zip(read_artifact(report, "source_rows"), parsed):
+            for key, source_key in (("解禁数量", "ABLE_FREE_SHARES"), ("实际解禁数量", "CURRENT_FREE_SHARES"), ("实际解禁市值", "LIFT_MARKET_CAP")):
+                assert row[key] == pytest.approx(raw[source_key] * 10000, rel=1e-12)
+    assert report["source_total_count"] == report["coverage_denominator"] == count
+    assert not report["universe_completeness_verified"] and not report["eligible_for_production_routing"]
+    assert report["live_http_calls"] == report["production_writes"] == 0
+    assert not report["source_fallback_enabled"] and not report["implicit_date_selection"]
+    comparison = dict(input_id=input_id, original_csv_path=str(csv_path), original_csv_sha256=hashlib.sha256(csv_path.read_bytes()).hexdigest(),
+        original_parsed_path=str(path.resolve()), original_parsed_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
+        all_business_fields_equal=True, all_retained_source_fields_equal=True, request_comparison_equal=True,
+        original_request_count=len(events), selected_successful_request_count=len(selected_events), provider_request_count=2,
+        known_difference="failed single-stock queue retained only in original evidence; independent successful market-window detail endpoint" if input_id == "ASTOCK-021" else "original fallback alternatives are not embedded in Provider",
+        report_path=report["report_path"], report_sha256=hashlib.sha256(Path(report["report_path"]).read_bytes()).hexdigest())
+    (tmp_path / "comparison.json").write_text(json.dumps(comparison, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
+    return comparison
+
+
+@pytest.mark.parametrize("input_id,context,manifest,count", MARKET_EVENT_CASES)
+def test_market_event_original_sdk_csv_and_exact_requests(tmp_path, no_network, input_id, context, manifest, count):
+    compare_market_event_original(tmp_path, input_id, context, manifest, count)
+
+
+def market_event_fixture(tmp_path, input_id, mutation):
+    from copy import deepcopy
+    records = market_event_records(input_id)
+    payload = json.loads(RawObjectStore.read_response(SDK_ARCHIVE, records[0]))
+    result = payload["result"]; rows = result["data"]
+    numeric = "CLOSE_PRICE" if input_id == "ASTOCK-020" else "CURRENT_FREE_SHARES"
+    day = "TRADE_DATE" if input_id == "ASTOCK-020" else "FREE_DATE"
+    identity = "EXPLANATION" if input_id == "ASTOCK-020" else "FREE_SHARES_TYPE"
+    if mutation == "business": payload["success"] = False
+    elif mutation == "empty": rows.clear(); result["count"] = 0
+    elif mutation == "schema": rows[0].pop(numeric)
+    elif mutation == "order": rows[0] = {k:rows[0][k] for k in reversed(rows[0])}
+    elif mutation == "numeric": rows[0][numeric] = "bad"
+    elif mutation == "date": rows[0][day] = "2020-01-01 00:00:00"
+    elif mutation == "code": rows[0]["SECURITY_CODE"] = "bad"
+    elif mutation == "identity": rows[0][identity] = ""
+    elif mutation == "duplicate": rows[1] = rows[0].copy()
+    elif mutation == "count": result["count"] += 1
+    elif mutation == "pages": result["pages"] += 1
+    elif mutation == "zero_negative": rows[0][numeric] = -1; rows[1][numeric] = 0; rows[2][numeric] = None
+    payloads = [payload, deepcopy(payload)]
+    if mutation == "changed_page": payloads[1]["result"]["data"][0][numeric] += 1
+    if mutation == "missing_page": payloads = payloads[:1]
+    if mutation == "multi_page":
+        assert input_id == "ASTOCK-021"
+        new_rows = [{**deepcopy(rows[0]), "SECURITY_CODE":f"{i+1:06}"} for i in range(501)]
+        result.update(count=501, pages=2, data=new_rows[:500])
+        last = deepcopy(payload); last["result"]["data"] = new_rows[500:]
+        payloads = [payload, deepcopy(payload), last]
+    store = RawObjectStore(tmp_path / "fixture")
+    for index, item in enumerate(payloads):
+        record = records[min(index, 1)]
+        response = requests.Response(); response.status_code = 403 if mutation == "http403" else 200
+        response.encoding = "utf-8"; response._content = json.dumps(item, ensure_ascii=False).encode()
+        url = record["url"] if index < 2 else record["url"].replace("pageNumber=1", "pageNumber=2")
+        store.record_response(response=response, url=url, method="GET", request_headers=record["request_headers"],
+            provider="fixture", endpoint="market-event", scope={"fixture":"synthetic mutation"}, code_version="fixture", mode="fixture")
+    return store.root / "manifest.ndjson"
+
+
+@pytest.mark.parametrize("input_id,mutation", MARKET_EVENT_FAILURES)
+def test_market_event_invalid_response_retained_without_fallback(tmp_path, no_network, input_id, mutation):
+    case = next(c for c in MARKET_EVENT_CASES if c[0] == input_id)
+    report = collect_input(input_id=input_id, context=case[1], config_root=ROOT / "config", output_root=tmp_path / "candidate",
+        replay_manifest=market_event_fixture(tmp_path, input_id, mutation))
+    assert report["status"] == "failed" and "output" not in report and report["responses"], report
+    assert report["live_http_calls"] == report["production_writes"] == 0 and not report["eligible_for_production_routing"]
+    assert len(report["responses"]) <= 2
+    raw_manifest = Path(report["run_directory"]) / report["raw_manifest"]["path"]
+    for event in report["responses"]: assert RawObjectStore.read_response(raw_manifest, event)
+
+
+@pytest.mark.parametrize("input_id", ["ASTOCK-020", "ASTOCK-021"])
+def test_market_event_numeric_null_negative_zero_remain_raw_and_parsed(tmp_path, no_network, input_id):
+    case = next(c for c in MARKET_EVENT_CASES if c[0] == input_id)
+    report = collect_input(input_id=input_id, context=case[1], config_root=ROOT / "config", output_root=tmp_path / "candidate",
+        replay_manifest=market_event_fixture(tmp_path, input_id, "zero_negative"))
+    assert report["status"] == "candidate_complete", report
+    key = "收盘价" if input_id == "ASTOCK-020" else "实际解禁数量"
+    multiplier = 1 if input_id == "ASTOCK-020" else 10000
+    assert [r[key] for r in read_artifact(report, "parsed_rows")][:3] == [-multiplier, 0, None]
+
+
+def test_market_event_multi_page_retrieval_and_source_totals(tmp_path, no_network):
+    report = collect_input(input_id="ASTOCK-021", context=MARKET_EVENT_CASES[1][1], config_root=ROOT / "config", output_root=tmp_path / "candidate",
+        replay_manifest=market_event_fixture(tmp_path, "ASTOCK-021", "multi_page"))
+    assert report["status"] == "candidate_complete" and report["row_count"] == report["source_total_count"] == 501, report
+    assert len(report["responses"]) == 3 and report["source_page_count"] == 2
+
+
+def test_market_event_yaml_fields_scope_and_existing_methods(tmp_path, no_network):
+    import ast
+    baseline = ROOT / "provider_validation/results/market-events-original-20261004/0-financial.py.bin"
+    def methods(p):
+        tree = ast.parse(p.read_text(encoding="utf-8"))
+        cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == "EastMoneyFinancialMainProvider")
+        return {n.name:ast.dump(n, include_attributes=False) for n in cls.body if isinstance(n, ast.FunctionDef)}
+    old = methods(baseline); current = methods(ROOT / "src/stock_data_manage/providers/eastmoney/financial.py")
+    assert all(current[name] == body for name, body in old.items())
+    config = tmp_path / "config"; shutil.copytree(ROOT / "config", config)
+    path = config / "normalization/lockup_expiry.yaml"; rule = yaml.safe_load(path.read_text(encoding="utf-8"))
+    rule["rules"][0]["field_mapping"]["name"] = "限售股类型"
+    path.write_text(yaml.safe_dump(rule, allow_unicode=True), encoding="utf-8")
+    fields = ["snapshot_at", "source_security_code", "release_date", "restricted_share_type", "name"]
+    report = collect_input(input_id="ASTOCK-021", context=MARKET_EVENT_CASES[1][1], config_root=config,
+        output_root=tmp_path / "candidate", replay_manifest=SDK_ARCHIVE, fields=fields)
+    assert report["status"] == "candidate_complete", report
+    assert all(set(row) == set(fields) and row["name"] == row["restricted_share_type"] for row in read_artifact(report, "output"))
+    for input_id, context, manifest, count in MARKET_EVENT_CASES:
+        for extra in ({"symbol":"600519"}, {"symbols":["600519"]}):
+            with pytest.raises(ValueError, match="does not support"):
+                collect_input(input_id=input_id, context={**context, "request":{**context["request"], **extra}}, config_root=ROOT / "config", output_root=tmp_path / "bad", replay_manifest=manifest)
+    with pytest.raises(ValueError, match="end must not precede start"):
+        collect_input(input_id="ASTOCK-021", context={"request":{"start_date":"2026-10-03", "end_date":"2026-09-01"}}, config_root=ROOT / "config", output_root=tmp_path / "bad", replay_manifest=SDK_ARCHIVE)
+    with pytest.raises(ValueError, match="calendar"):
+        collect_input(input_id="ASTOCK-020", context={"request":{"trade_date":"2026-09-30"}}, config_root=ROOT / "config", output_root=tmp_path / "bad", replay_manifest=SDK_ARCHIVE)
+
+
+def test_market_event_original_session_cache_and_no_source_switch(tmp_path, no_network):
+    from unittest.mock import patch
+    seen = []
+    def send(session, request, **kwargs):
+        record = next(r for id in ("ASTOCK-020", "ASTOCK-021") for r in market_event_records(id) if r["url"] == request.url)
+        seen.append(request.url)
+        assert request.method == "GET" and kwargs["timeout"] is None and kwargs["allow_redirects"] and session.trust_env
+        assert request.headers["User-Agent"] == record["request_headers"]["User-Agent"]
+        retry = session.get_adapter(request.url).max_retries
+        assert retry.total == retry.connect == retry.read == retry.status == 2 and retry.backoff_factor == 5
+        assert not retry.is_retry("GET", 403) and not retry.is_retry("GET", 429, True)
+        response = requests.Response(); response.status_code = 200; response.encoding = "utf-8"
+        response._content = RawObjectStore.read_response(SDK_ARCHIVE, record); response.url = request.url
+        return response
+    with patch("requests.Session.send", send):
+        for input_id, context, _, _ in MARKET_EVENT_CASES:
+            first = collect_input(input_id=input_id, context=context, config_root=ROOT / "config", output_root=tmp_path / "candidate", mode="live", evidence_root=tmp_path / "unused")
+            second = collect_input(input_id=input_id, context=context, config_root=ROOT / "config", output_root=tmp_path / "candidate", mode="live", evidence_root=tmp_path / "candidate")
+            assert first["status"] == second["status"] == "candidate_complete", (first, second)
+            assert first["live_http_calls"] == 1 and second["live_http_calls"] == 0
+            assert read_artifact(first, "output") == read_artifact(second, "output")
+    assert len(seen) == 2
+    (tmp_path / "fixture-mode.json").write_text(json.dumps(dict(mode="injected Session, not real live validation", real_http_calls=0, fixture_send_calls=2)), encoding="utf-8")
+
 FACTOR_CASES = [("ASTOCK-006", {"request":{"symbol":"600519"},"config":{"kind":kind}}, SDK_ARCHIVE, 33) for kind in ("qfq","hfq")]
 FACTOR_FAILURES = ["empty","schema","order","numeric","date","duplicate","count","variable","executable","trailing_code","http403","missing_hfq"]
 

@@ -124,6 +124,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
     is_sdk_news = input_id in {"ASTOCK-032", "ASTOCK-033"}
     is_sdk_macro = input_id in {"ASTOCK-061", "ASTOCK-062"}
     is_factor = input_id == "ASTOCK-006"
+    is_market_events = input_id in {"ASTOCK-020", "ASTOCK-021"}
     is_repo_rate = input_id == "ASTOCK-064"
     is_cb = input_id == "ASTOCK-084"
     is_sina_futures = input_id in {"ASTOCK-074", "ASTOCK-075", "ASTOCK-076"}
@@ -212,7 +213,8 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             report["code_version"] = code_version
             report["evidence_representation"] = "SDK-decoded ResultSet fields and rows; BaoStock TCP wire bytes are not exposed"
             report["request_limit_enforcement"] = "sdk_query_boundary_only"
-        sdk_functions = {"ASTOCK-006": "stock_zh_a_daily", "ASTOCK-045": "stock_zt_pool_em", "ASTOCK-070": "tool_trade_date_hist_sina",
+        sdk_functions = {"ASTOCK-020": "stock_lhb_detail_em", "ASTOCK-021": "stock_restricted_release_detail_em",
+                         "ASTOCK-006": "stock_zh_a_daily", "ASTOCK-045": "stock_zt_pool_em", "ASTOCK-070": "tool_trade_date_hist_sina",
                          "ASTOCK-032": "stock_info_global_cls", "ASTOCK-033": "stock_info_global_sina",
                          "ASTOCK-061": "macro_china_shrzgm", "ASTOCK-062": "macro_china_pmi",
                          "ASTOCK-046": "stock_zt_pool_zbgc_em", "ASTOCK-047": "stock_zt_pool_dtgc_em",
@@ -241,7 +243,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                 "function": function.__name__, "source_path": sdk_ref.path.relative_to(directory).as_posix(), "sha256": sdk_ref.content_hash,
                 "original_source_sha256": sdk_source_hash, "redacted": sdk_snapshot != sdk_source}
             code_version = hashlib.sha256((code_version + sdk_source_hash + report["sdk_dependency"]["version"]).encode()).hexdigest()
-            if is_sdk_news or is_sdk_macro or is_factor:
+            if is_sdk_news or is_sdk_macro or is_factor or is_market_events:
                 import requests
                 import urllib3
                 report["transport_dependency"] = {"requests": requests.__version__, "urllib3": urllib3.__version__}
@@ -278,6 +280,9 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                     "sdk_outer_delays_seconds": [1,2,4,8,16,32,64,128,256] if input_id == "ASTOCK-032" else [],
                     "host_pause": "403/429 immediately; two consecutive transport or server errors",
                     "physical_retry_count_observable": False}
+                if is_market_events:
+                    report["market_event_transport_policy"] = report.pop("sdk_news_transport_policy")
+                    report["market_event_transport_policy"].update(response_guard="after exact retention, before SDK positional parsing", source_fallback=False)
                 if is_sdk_macro:
                     del report["sdk_news_transport_policy"]
                     report["macro_sdk_transport_policy"] = {"source_contract":"successful rate-limited original SDK probe",
@@ -344,12 +349,18 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                 if is_factor:
                     from ..providers.sina.daily import validate_adjustment_response
                     response_validator = validate_adjustment_response
+                if is_market_events:
+                    from ..providers.eastmoney.financial import validate_market_event_response
+                    def response_validator(response):
+                        validate_market_event_response(response.content, response.url, response.status_code,
+                            endpoint=contract.endpoint, start=parameters.get("start", parameters.get("date")),
+                            end=parameters.get("end", parameters.get("date")))
                 response_events = stack.enter_context(captured_requests(raw_store, provider=contract.provider, endpoint=contract.endpoint,
                     scope={"input_id": input_id, "parameters": normalized_context}, code_version=code_version, pacer=pacer,
                     replay_manifest=replay_manifest if mode == "replay" else None,
                     evidence_roots=(evidence_root, output_root), max_age_seconds=profile.refresh_interval_seconds or 86400,
-                    sdk_retry_policy=is_stock_pool or is_sdk_news or is_sdk_macro or is_factor or input_id in {"ASTOCK-001", "ASTOCK-045", "ASTOCK-070", "ASTOCK-026", "ASTOCK-027", "ASTOCK-028"},
-                    probe_host_pause=is_sdk_news or is_sdk_macro or is_factor,require_empty_post_body=input_id=="ASTOCK-061",response_validator=response_validator))
+                    sdk_retry_policy=is_stock_pool or is_sdk_news or is_sdk_macro or is_factor or is_market_events or input_id in {"ASTOCK-001", "ASTOCK-045", "ASTOCK-070", "ASTOCK-026", "ASTOCK-027", "ASTOCK-028"},
+                    probe_host_pause=is_sdk_news or is_sdk_macro or is_factor or is_market_events,require_empty_post_body=input_id=="ASTOCK-061",response_validator=response_validator))
             if is_factor:
                 from ..providers.sina.daily import parse_adjustment_payload
                 def factor_payloads():
@@ -367,11 +378,11 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                     return capture_time.astimezone(ZoneInfo("Asia/Shanghai")).date()
                 runtime_parameters["replay_reference_date"] = original_classification_day
                 report["replay_clock_semantics"] = "actual matched response capture day in China timezone for classification; not a historical quote query"
-            if is_em_history or is_stock_pool or is_sdk_news or is_sdk_macro:
+            if is_em_history or is_stock_pool or is_sdk_news or is_sdk_macro or is_market_events:
                 from ..providers.contracts import EndpointContract, HttpResponse
                 def retained_payloads():
                     for event in response_events:
-                        if event.get("outcome") == "response" and (not (is_sdk_news or is_sdk_macro) or event["status_code"] == 200):
+                        if event.get("outcome") == "response" and (not (is_sdk_news or is_sdk_macro or is_market_events) or event["status_code"] == 200):
                             body = RawObjectStore.read_response(raw_store.root / "manifest.ndjson", event)
                             yield EndpointContract(frozenset()).parse_json(HttpResponse(
                                 event["status_code"], event.get("response_headers", {}), body))
@@ -418,8 +429,8 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                 returned_window={"first": parameters["date"].isoformat(), "last": parameters["date"].isoformat()},
                 coverage_basis="source tc and returned SDK rows for requested qdate; not independent whole-market proof",
                 universe_completeness_verified=False)
-        mapping_rows = fetched.rows if is_em_history or is_lpr or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_repo_rate or is_cb or is_sina_futures else source_rows
-        if is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_repo_rate or is_cb or is_sina_futures:
+        mapping_rows = fetched.rows if is_em_history or is_lpr or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_repo_rate or is_cb or is_sina_futures else source_rows
+        if is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_repo_rate or is_cb or is_sina_futures:
             parsed_ref = result_store.write_json(_json_value(mapping_rows), dataset="parsed_rows", provider=contract.provider,
                 endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="parsed-rows")
             report["parsed_rows"] = {"path":parsed_ref.path.relative_to(directory).as_posix(),
@@ -496,8 +507,8 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             raise NormalizationError("temporary empty input; not certified as a valid empty dataset")
         mapping_context = {"provider": contract.provider}
         mapping_context.update(getattr(fetched, "mapping_context", {}))
-        if input_id.startswith("SDA-BOARD-") or is_tencent_snapshot or is_em_history or is_stock_pool or is_em_events or is_lpr or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_repo_rate or is_cb or is_sina_futures:
-            successful = [event for event in response_events if event.get("outcome") == "response" and (not (is_sdk_news or is_sdk_macro) or event["status_code"] == 200)]
+        if input_id.startswith("SDA-BOARD-") or is_tencent_snapshot or is_em_history or is_stock_pool or is_em_events or is_lpr or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_repo_rate or is_cb or is_sina_futures:
+            successful = [event for event in response_events if event.get("outcome") == "response" and (not (is_sdk_news or is_sdk_macro or is_market_events) or event["status_code"] == 200)]
             if not successful:
                 raise NormalizationError("source response evidence is required; an SDK memory cache alone is insufficient")
             source_times = []
@@ -512,7 +523,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             mapping_context["source_snapshot_at"] = max(source_times)
             report["source_capture_window"] = {"first": min(source_times).isoformat(), "last": max(source_times).isoformat(),
                                                "meaning": "source response capture times; not row-level market timestamps"}
-            if not is_tencent_snapshot and not is_em_history and not is_stock_pool and not is_em_events and not is_lpr and not is_news and not is_reports_calendar and not is_sdk_news and not is_sdk_macro and not is_factor and not is_repo_rate and not is_cb and not is_sina_futures:
+            if not is_tencent_snapshot and not is_em_history and not is_stock_pool and not is_em_events and not is_lpr and not is_news and not is_reports_calendar and not is_sdk_news and not is_sdk_macro and not is_factor and not is_market_events and not is_repo_rate and not is_cb and not is_sina_futures:
                 report["returned_window"] = {"first": fetched.returned_first_key, "last": fetched.returned_last_key}
                 report["source_units"] = list(fetched.units)
                 report["coverage_basis"] = "returned SDK rows; not an independently verified market universe"
@@ -553,6 +564,15 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             report.update(returned_window={"first":min(periods),"last":max(periods),"meaning":"statistical months, not publication dates"},
                 coverage_basis="returned source monthly history; no independent current or complete history certification",
                 universe_completeness_verified=False,publication_time_available=False)
+        if is_market_events:
+            dates = [row[fetched.mapping_context["date_field"]].isoformat() for row in mapping_rows]
+            report.update(returned_window={"first": min(dates), "last": max(dates)},
+                requested_window={"first": parameters.get("start", parameters.get("date")).isoformat(),
+                    "last": parameters.get("end", parameters.get("date")).isoformat()},
+                source_total_count=fetched.mapping_context["source_total_count"], source_page_count=fetched.mapping_context["source_page_count"],
+                source_report=fetched.mapping_context["source_report"], coverage_complete=True,
+                coverage_basis="all pages of the source-reported market event window; no independent market census",
+                universe_completeness_verified=False, source_fallback_enabled=False, implicit_date_selection=False)
         if is_reports_calendar:
             times=[row["date"] if input_id=="ASTOCK-013" else row["time"] for row in mapping_rows]
             report.update(returned_window={"first":min(times) if times else None,"last":max(times) if times else None},
@@ -611,7 +631,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
         import json
         all_events = [json.loads(line) for line in raw_manifest.read_text(encoding="utf-8").splitlines()]
         report["responses"] = [event for event in all_events if event.get("event") in {"http_response", "source_payload", "sdk_query_failure"}]
-        if is_sdk_news or is_sdk_macro or is_factor:
+        if is_sdk_news or is_sdk_macro or is_factor or is_market_events:
             report["host_pause_events"] = [event for event in all_events if event.get("event") == "host_paused"]
         if is_baostock:
             report["sdk_session"] = [event for event in all_events if event.get("event") == "sdk_session"]
