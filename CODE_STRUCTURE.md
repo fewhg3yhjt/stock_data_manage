@@ -1,6 +1,8 @@
 # 代码目录与文件职责
 
-东财市场事件 ASTOCK-020/021 扩展既有 `providers/eastmoney/financial.py` 的两个明确接口方法和响应校验，旧财务方法保持；`pipeline/inputs.py` 沿用留证/字段映射入口，SDK解析前校验及分页覆盖记录属于该入口。新增两个必要字段模板 `config/datasets/dragon_tiger_daily.yaml`、`lockup_expiry.yaml` 和 `config/normalization/` 同名映射；旧验证入口增加 `--verify-market-events`。本批调查、原实现对照、CLI、异常和回归证据在 `results/market-events-*-20261004*`；说明见 `provider_validation/docs/2026-10-04-market-events-input-collection.md`。当前41项候选、23项待转换、7项阻断、3项别名；后文旧数字表示各批历史时点。Provider没有新增自动来源/接口/日期回退，后续统一由已有主流程处理。
+最新东财研报/席位 ASTOCK-008/019 继续修改原 `providers/eastmoney/financial.py`：研报沿原 reportapi 会话与分页，席位只查询显式日期的买入/卖出接口。`pipeline/inputs.py` 保留原响应、SDK解析、来源时间、分页覆盖和实际席位日期；原 `providers/transport.py` 与 `storage/raw.py` 增加默认关闭的缓存查询参数忽略选项，仅研报缓存匹配忽略时间戳 `_`，严格归档回放仍匹配完整请求。新增必要字段模板及同名映射 `config/{datasets,normalization}/{eastmoney_reports,dragon_tiger_seats}.yaml`；原验证入口增加 `--verify-reports-seats`。本批说明见 `provider_validation/docs/2026-10-04-reports-seats-input-collection.md`，调查/对照/实际入口/回归及哈希索引在 `results/reports-seats-*-20261004*`。当前43项候选、21项待转换、7项阻断、3项别名；后文旧数字表示各批历史时点。没有新增 Provider、运行时模块或自动来源/日期回退。
+
+上一批东财市场事件 ASTOCK-020/021 扩展既有财务 Provider 的两个明确接口方法和响应校验，旧财务方法保持。新增必要模板与映射 `dragon_tiger_daily.yaml`、`lockup_expiry.yaml`；验证入口为 `--verify-market-events`，证据在 `results/market-events-*-20261004*`，说明见 `provider_validation/docs/2026-10-04-market-events-input-collection.md`。当时为41项候选、23项待转换。
 
 新浪复权因子 ASTOCK-006 扩展原 `providers/sina/daily.py`，保留原股票/期货方法及两个原SDK请求。既有响应留证范围支持保存后、SDK解析前的可选格式检查；`pipeline/inputs.py` 保存两组因子来源、选中解析及另一组排除记录。新增 `config/datasets/adjustment_factor.yaml` 和同名归一化 YAML，旧验证入口增加 `--verify-factors`。实施边界见 `provider_validation/docs/2026-10-04-adjustment-factor-input-collection.md`，证据位于 `results/factor-*-20261004*`。该批为39项候选、25项待转换、7项阻断、3项别名；既有后文数字为各批历史时点。
 

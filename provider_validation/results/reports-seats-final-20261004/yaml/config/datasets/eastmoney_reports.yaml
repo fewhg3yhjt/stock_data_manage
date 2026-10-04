@@ -1,0 +1,26 @@
+dataset:
+  name: eastmoney_reports
+  display_name: 东财个股研报列表候选输入
+  primary_key: [snapshot_at, source_security_code, report_id]
+fields:
+  snapshot_at: {type: datetime, required: true}
+  source_security_code: {type: string, required: true}
+  report_id: {type: string, required: true}
+  report_date: {type: date, required: true}
+  source_publish_text: {type: string, required: true}
+  title: {type: string, required: true}
+  stock_name: {type: string, required: false}
+  organization: {type: string, required: false}
+  organization_code: {type: string, required: false}
+  researcher: {type: string, required: false}
+  rating: {type: string, required: false}
+  source_report_type: {type: string, required: false}
+  source_encoded_locator: {type: string, required: false}
+  eps_this_year: {type: decimal, required: false, unit: unverified}
+  pe_this_year: {type: decimal, required: false, unit: unverified}
+  eps_next_year: {type: decimal, required: false, unit: unverified}
+  pe_next_year: {type: decimal, required: false, unit: unverified}
+  eps_next_two_year: {type: decimal, required: false, unit: unverified}
+  pe_next_two_year: {type: decimal, required: false, unit: unverified}
+  target_price_upper: {type: decimal, required: false, unit: unverified}
+  target_price_lower: {type: decimal, required: false, unit: unverified}

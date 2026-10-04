@@ -4,9 +4,74 @@ from dataclasses import dataclass, field
 from typing import Any, Mapping, Sequence
 import math
 import requests
+import time as _report_clock
 
 from ..contracts import EndpointContract, FailureClass, ProviderContractError
 from .realtime import EastMoneyRequestsTransport
+
+
+_REPORT_HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+    "Accept": "*/*", "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8"}
+
+
+def validate_seat_response(body, url, status, *, code, date):
+    import json
+    from datetime import datetime
+    from urllib.parse import parse_qs, urlsplit
+    query = parse_qs(urlsplit(url).query)
+    side = {"RPT_BILLBOARD_DAILYDETAILSBUY":"buy", "RPT_BILLBOARD_DAILYDETAILSSELL":"sell"}.get(query.get("reportName", [""])[0])
+    if status != 200 or side is None or query.get("filter") != [f'(TRADE_DATE=\'{date.isoformat()}\')(SECURITY_CODE="{code}")']:
+        raise ValueError("seat response does not match explicit code and date")
+    payload = json.loads(body)
+    result = payload.get("result") if isinstance(payload, dict) else None
+    if not isinstance(payload, dict) or payload.get("success") is not True or payload.get("code") != 0 or not isinstance(result, dict):
+        raise ValueError("seat business response changed")
+    items = result.get("data")
+    if not isinstance(items, list) or not items or result.get("pages") != 1 or result.get("count") != len(items) or len(items) > 500:
+        raise ValueError("seat one-page coverage changed or empty")
+    leading = "SECURITY_CODE,SECUCODE,TRADE_DATE" if side == "buy" else "SECURITY_CODE,TRADE_DATE,SECUCODE"
+    fields = tuple((leading+",OPERATEDEPT_CODE,OPERATEDEPT_NAME,EXPLANATION,CHANGE_RATE,CLOSE_PRICE,ACCUM_AMOUNT,ACCUM_VOLUME,BUY,SELL,NET,RISE_PROBABILITY_3DAY,TOTAL_BUYER_SALESTIMES_3DAY,CHANGE_TYPE,OPERATEDEPT_CODE_OLD,TOTAL_BUYRIO,TOTAL_SELLRIO,TRADE_ID").split(","))
+    numeric = {"CHANGE_RATE","CLOSE_PRICE","ACCUM_AMOUNT","ACCUM_VOLUME","BUY","SELL","NET","RISE_PROBABILITY_3DAY","TOTAL_BUYER_SALESTIMES_3DAY","TOTAL_BUYRIO","TOTAL_SELLRIO"}
+    for row in items:
+        if not isinstance(row, dict) or tuple(row) != fields:
+            raise ValueError("seat positional source field order changed")
+        if row["SECURITY_CODE"] != code or datetime.strptime(row["TRADE_DATE"], "%Y-%m-%d %H:%M:%S").date() != date:
+            raise ValueError("seat response ignored explicit code or date")
+        if not isinstance(row["OPERATEDEPT_NAME"], str) or not row["OPERATEDEPT_NAME"]:
+            raise ValueError("seat department name is missing")
+        for key in numeric:
+            value = row[key]
+            if value is not None and (isinstance(value, bool) or not math.isfinite(float(value))):
+                raise ValueError("seat source number changed")
+    if len({json.dumps(r, sort_keys=True) for r in items}) != len(items):
+        raise ValueError("duplicate complete seat source row")
+
+
+def reportapi_replay_clock(function, manifest, *, code, start, end, clock_name="_report_clock"):
+    """Patch only this function namespace's cache-buster clock for exact archive replay."""
+    from contextlib import contextmanager
+    from unittest.mock import patch
+    from types import SimpleNamespace
+    from urllib.parse import parse_qs, urlsplit
+    import json
+    import time
+    values = {}
+    for line in manifest.read_text(encoding="utf-8").splitlines():
+        record = json.loads(line); url = record.get("url", "")
+        query = parse_qs(urlsplit(url).query)
+        if urlsplit(url).hostname == "reportapi.eastmoney.com" and query.get("code") == [code] and query.get("beginTime") == [start.isoformat()] and query.get("endTime") == [end.isoformat()] and query.get("_"):
+            values.setdefault(int(query["pageNo"][0]), query["_"][0])
+    calls = [0]
+    def original_time():
+        calls[0] += 1
+        if calls[0] not in values:
+            raise ValueError("no exact archived report page cache-buster; replay never issues a new request")
+        return int(values[calls[0]]) / 1000
+    @contextmanager
+    def scope():
+        with patch.dict(function.__globals__, {clock_name:SimpleNamespace(time=original_time, sleep=time.sleep)}):
+            yield values
+    return scope()
 
 
 def _market_event_spec(endpoint):
@@ -88,6 +153,7 @@ class FinancialMainFetchResult:
 
 @dataclass(slots=True)
 class EastMoneyFinancialMainProvider:
+    input_hosts = ("https://datacenter-web.eastmoney.com", "https://reportapi.eastmoney.com")
     transport: Any | None = None
     endpoint: str = "financial_main"
     name: str = "eastmoney"
@@ -100,6 +166,102 @@ class EastMoneyFinancialMainProvider:
     _event_total: int | None = field(default=None, init=False, repr=False)
     _event_pages: int | None = field(default=None, init=False, repr=False)
     client: Any | None = field(default=None, repr=False)
+    _report_session: Any = field(default=None, init=False, repr=False)
+
+    def close_report_session(self):
+        if self._report_session is not None:
+            self._report_session.close()
+            self._report_session = None
+
+    def fetch_report_list(self, *, code, start, end, pages=3):
+        """Original report-list Session and query; no PDF or alternative endpoint."""
+        import json
+        from datetime import datetime
+        from decimal import Decimal
+        from ..contracts import InputFetchResult
+        from .realtime import history_stock_identity
+        bare = history_stock_identity(code)[0]
+        if start > end or type(pages) is not int or not 1 <= pages <= 3:
+            raise ValueError("report input requires an ordered explicit window and 1..3 pages")
+        if self._report_session is None:
+            # Construct inside the captured original-probe policy, retaining this script's headers.
+            self._report_session = requests.Session()
+            self._report_session.headers.update(_REPORT_HEADERS)
+        url = "https://reportapi.eastmoney.com/report/list"
+        all_rows, source_pages = [], []
+        total = total_pages = None
+        for page in range(1, pages + 1):
+            params = {"industryCode":"*", "pageSize":"100", "industry":"*", "rating":"*", "ratingChange":"*",
+                "beginTime":start.isoformat(), "endTime":end.isoformat(), "pageNo":str(page), "fields":"", "qType":"0",
+                "orgCode":"", "code":bare, "rcode":"", "p":str(page), "pageNum":str(page), "pageNumber":str(page),
+                "_":str(int(_report_clock.time()*1000))}
+            response = self._report_session.get(url, params=params,
+                headers={"User-Agent":_REPORT_HEADERS["User-Agent"], "Referer":"https://data.eastmoney.com/"}, timeout=30)
+            response.raise_for_status()
+            text = response.text.strip()
+            payload = json.loads(text[text.find("(")+1:text.rfind(")")]) if text.startswith("datatable") and "(" in text else response.json()
+            if not isinstance(payload, dict):
+                raise ValueError("report response must be an object")
+            rows = payload.get("data") or []
+            hits, available_pages = payload.get("hits"), payload.get("TotalPage")
+            if type(hits) is not int or hits < 1 or type(available_pages) is not int or available_pages != (hits+99)//100:
+                raise ValueError("report pagination totals changed or empty")
+            if payload.get("pageNo") != page or not isinstance(rows, list) or len(rows) != min(100, hits-(page-1)*100):
+                raise ValueError("report page identity or row count changed")
+            if total is not None and (hits, available_pages) != (total, total_pages):
+                raise ValueError("report totals changed between pages")
+            total, total_pages = hits, available_pages
+            for row in rows:
+                if not isinstance(row, dict) or row.get("stockCode") != bare:
+                    raise ValueError("report response ignored requested stock")
+                if not start <= datetime.fromisoformat(row["publishDate"]).date() <= end:
+                    raise ValueError("report response ignored requested date window")
+                if any(not isinstance(row.get(key), str) or not row[key] for key in ("infoCode", "title")):
+                    raise ValueError("report identity or title is missing")
+                for key in ("predictThisYearEps", "predictThisYearPe", "predictNextYearEps", "predictNextYearPe", "predictNextTwoYearEps", "predictNextTwoYearPe", "indvAimPriceT", "indvAimPriceL"):
+                    value = row.get(key)
+                    if value not in (None, "", "-", "--") and (isinstance(value, bool) or not Decimal(str(value)).is_finite()):
+                        raise ValueError("report numeric source field changed")
+            source_pages.append(page)
+            all_rows.extend(rows)
+            # Preserve original short-page break and bounded page loop, including its sleep position.
+            if len(rows) < 100:
+                break
+            _report_clock.sleep(0.25)
+        if len({r["infoCode"] for r in all_rows}) != len(all_rows):
+            raise ValueError("duplicate report identity across returned pages")
+        return InputFetchResult(tuple(all_rows), source_rows=tuple(all_rows), source_url=url,
+            mapping_context={"source_total_count":total, "source_page_count":total_pages, "retrieved_pages":source_pages,
+                "result_limited":len(all_rows) < total})
+
+    def fetch_dragon_tiger_seats(self, *, code, date, source_payloads):
+        """Explicit historical seat day and both original SDK sides; no date discovery."""
+        from ..akshare.session import load_client
+        from ..contracts import InputFetchResult
+        from .realtime import history_stock_identity
+        import pandas as pd
+        bare = history_stock_identity(code)[0]
+        self.client = self.client or load_client()
+        frames = [(side, self.client.stock_lhb_stock_detail_em(symbol=bare, date=date.strftime("%Y%m%d"), flag=flag))
+            for side, flag in (("buy", "买入"), ("sell", "卖出"))]
+        payloads = list(source_payloads())
+        if len(payloads) != 2:
+            raise ValueError("both successful explicit seat side responses are required")
+        rows, source_rows, counts = [], [], {}
+        columns = tuple("序号,交易营业部名称,买入金额,买入金额-占总成交比例,卖出金额,卖出金额-占总成交比例,净额,类型".split(","))
+        for (side, frame), payload in zip(frames, payloads):
+            data = payload["result"]["data"]
+            if tuple(frame.columns) != columns or len(frame) != len(data):
+                raise ValueError("seat SDK fields or count changed")
+            frame = frame.astype(object).where(pd.notna(frame), None)
+            parsed = frame.to_dict(orient="records")
+            if [r["序号"] for r in parsed] != list(range(1, len(parsed)+1)):
+                raise ValueError("seat SDK row numbering changed")
+            rows.extend({**r, "source_security_code":bare, "trade_date":date, "side":side} for r in parsed)
+            source_rows.extend({"side":side, **r} for r in data)
+            counts[side] = len(data)
+        return InputFetchResult(tuple(rows), source_rows=tuple(source_rows), source_url=self.url,
+            mapping_context={"side_counts":counts, "source_symbol":bare, "source_day":date.isoformat()})
 
     def fetch_dragon_tiger_daily(self, *, date, source_payloads):
         """Explicit requested day; no alternate source or implicit historical day."""

@@ -1,0 +1,20 @@
+dataset:
+  name: shareholder_count
+  display_name: 股东户数
+  primary_key: [instrument_id, end_date]
+  allowed_asset_types: [stock]
+  allowed_exchanges: [XSHG, XSHE, BSE]
+
+fields:
+  instrument_id: {type: string, required: true}
+  end_date: {type: date, required: true}
+  previous_end_date: {type: date, required: false}
+  holder_count: {type: decimal, unit: household, required: false}
+  previous_holder_count: {type: decimal, unit: household, required: false}
+  holder_count_change: {type: decimal, unit: household, required: false}
+  holder_count_change_pct: {type: decimal, unit: percent, required: false}
+  notice_date: {type: date, required: false}
+  average_market_cap: {type: decimal, unit: CNY, required: false}
+  average_hold_num: {type: decimal, unit: share, required: false}
+  total_market_cap: {type: decimal, unit: CNY, required: false}
+  change_reason: {type: string, required: false}

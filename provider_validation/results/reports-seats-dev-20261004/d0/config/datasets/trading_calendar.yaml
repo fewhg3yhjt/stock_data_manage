@@ -1,0 +1,7 @@
+dataset:
+  name: trading_calendar
+  display_name: 新浪交易日输入
+  primary_key: [trade_date]
+fields:
+  trade_date: {type: date, required: true}
+  source: {type: string, required: true}

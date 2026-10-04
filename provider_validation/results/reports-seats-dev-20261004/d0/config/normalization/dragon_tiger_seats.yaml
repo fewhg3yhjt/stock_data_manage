@@ -1,0 +1,26 @@
+dataset: dragon_tiger_seats
+rules:
+- id: eastmoney-dragon-tiger-seats-input-v1
+  input_id: ASTOCK-019
+  provider: eastmoney
+  endpoint: dragon_tiger_seats
+  field_mapping:
+    source_security_code: source_security_code
+    trade_date: trade_date
+    side: side
+    source_row_number: 序号
+    department: 交易营业部名称
+    listing_reason: 类型
+    buy_amount: 买入金额
+    sell_amount: 卖出金额
+    net_amount: 净额
+    buy_ratio: 买入金额-占总成交比例
+    sell_ratio: 卖出金额-占总成交比例
+  context_fields:
+    snapshot_at: source_snapshot_at
+  null_values: [null]
+  unverified_fields: [buy_amount, sell_amount, net_amount, buy_ratio, sell_ratio]
+  status: pending_validation
+  version: eastmoney-reports-seats-input-v1
+  evidence_refs: [ASTOCK-019]
+  notes: 只按明确股票/日期取买入和卖出两侧，不推断或自动选择历史日期。source_row_number为SDK按类型排序后的来源行序号，不是金额排名或营业部永久ID；相同机构专用名称不合并。完整20个原字段和原数值另存，标准数值单位未认证。

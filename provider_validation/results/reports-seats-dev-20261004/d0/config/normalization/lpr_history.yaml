@@ -1,0 +1,25 @@
+dataset: lpr_history
+rules:
+- id: eastmoney-lpr-input-v1
+  input_id: ASTOCK-065
+  provider: eastmoney
+  endpoint: lpr
+  field_mapping:
+    rate_date: TRADE_DATE
+    lpr_1y: LPR1Y
+    lpr_5y: LPR5Y
+  context_fields:
+    snapshot_at: source_snapshot_at
+  transforms:
+    rate_date:
+      format: '%Y-%m-%d %H:%M:%S'
+  source_required_numeric:
+  - LPR1Y
+  unverified_fields:
+  - lpr_1y
+  - lpr_5y
+  status: pending_validation
+  version: eastmoney-lpr-input-v1
+  evidence_refs:
+  - ASTOCK-065
+  notes: 按原脚本保留LPR1Y非空行，原所有字段与排除行留证；利率单位未独立认证，标准列为空，不将旧每日报价改成月末或补齐不存在的5年期。

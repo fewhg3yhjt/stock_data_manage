@@ -1,0 +1,48 @@
+dataset:
+  name: social_financing
+  display_name: 社融统计月历史输入
+  primary_key:
+  - snapshot_at
+  - statistical_month
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  statistical_month:
+    type: string
+    required: true
+  publication_time:
+    type: datetime
+    required: false
+  financing_increment:
+    type: decimal
+    required: false
+    unit: unverified
+  rmb_loans:
+    type: decimal
+    required: false
+    unit: unverified
+  source_foreign_currency_loans:
+    type: decimal
+    required: false
+    unit: unverified
+  entrusted_loans:
+    type: decimal
+    required: false
+    unit: unverified
+  trust_loans:
+    type: decimal
+    required: false
+    unit: unverified
+  undiscounted_acceptances:
+    type: decimal
+    required: false
+    unit: unverified
+  corporate_bonds:
+    type: decimal
+    required: false
+    unit: unverified
+  domestic_equity_financing:
+    type: decimal
+    required: false
+    unit: unverified

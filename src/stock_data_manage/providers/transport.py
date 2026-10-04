@@ -60,7 +60,7 @@ class HostPausedError(ConnectionError):
 @contextmanager
 def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                       replay_manifest=None, evidence_roots=(), max_age_seconds=0, sdk_retry_policy=False,
-                      probe_host_pause=False, require_empty_post_body=False, response_validator=None):
+                      probe_host_pause=False, require_empty_post_body=False, response_validator=None, cache_ignored_query_parameters=()):
     """Serialized single-input capture/replay. Session identity, proxies and request arguments are retained.
 
     SDK session policy matches the saved conservative probe. Internal urllib3 retries
@@ -137,7 +137,8 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                 mode = "replay"
             else:
                 cached = RawObjectStore.find_cached_response(evidence_roots, url=request.url, method=request.method,
-                    scope=scope, code_version=code_version, max_age_seconds=max_age_seconds)
+                    scope=scope, code_version=code_version, max_age_seconds=max_age_seconds,
+                    ignored_query_parameters=cache_ignored_query_parameters)
                 if cached:
                     manifest, record, body = cached
                     response = make_response(request, record, body)
@@ -165,6 +166,7 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                                  "trust_env": session.trust_env, "proxies": kwargs.get("proxies", {}),
                                  "sdk_retry_policy": sdk_retry_policy,
                                  "probe_host_pause": probe_host_pause,
+                                 **({"cache_ignored_query_parameters":list(cache_ignored_query_parameters)} if cache_ignored_query_parameters else {}),
                                  **({"request_body_bytes":0,"request_body_sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"}
                                     if require_empty_post_body else {})})
             events.append(event)

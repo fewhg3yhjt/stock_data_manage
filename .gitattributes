@@ -262,3 +262,14 @@
 /config/datasets/lockup_expiry.yaml text eol=lf
 /config/normalization/lockup_expiry.yaml text eol=lf
 /provider_validation/docs/2026-10-04-market-events-input-collection.md text eol=lf
+
+# Independent report lists and explicit-date seat evidence keeps exact bytes.
+/provider_validation/results/reports-seats-*-20261004/** -text whitespace=cr-at-eol
+/provider_validation/results/reports-seats-*-20261004/**/*.bin binary
+/provider_validation/results/reports-seats-*-20261004-*.xml -text whitespace=-blank-at-eol,cr-at-eol
+/provider_validation/results/reports-seats-*-20261004-*.json -text whitespace=cr-at-eol
+/config/datasets/eastmoney_reports.yaml text eol=lf
+/config/normalization/eastmoney_reports.yaml text eol=lf
+/config/datasets/dragon_tiger_seats.yaml text eol=lf
+/config/normalization/dragon_tiger_seats.yaml text eol=lf
+/provider_validation/docs/2026-10-04-reports-seats-input-collection.md text eol=lf

@@ -1,0 +1,29 @@
+{
+  "input_id": "ASTOCK-019",
+  "all_business_fields_equal": true,
+  "all_retained_source_fields_equal": true,
+  "request_comparison_equal": true,
+  "original_request_count": 3,
+  "provider_request_count": 2,
+  "original_requested_date": "20260930",
+  "actual_seat_day": "20130128",
+  "original_csv": [
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\17_龙虎榜席位\\data\\dates.csv",
+      "sha256": "8031ea97bd0c2c7695e210b54d1e7645bf52749a992953e1372e488414053a17"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\17_龙虎榜席位\\data\\buy.csv",
+      "sha256": "864bc3813a3ee7c869e72de6164cd3d8bd3fdd765d8ae927054898e40eb6ff38"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\17_龙虎榜席位\\data\\sell.csv",
+      "sha256": "9334bd54ca1dc425c09185bf1c446e71ee7ce40e76992e484ca24692c31bb338"
+    }
+  ],
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-seats-final-20261004\\ASTOCK-019\\original-parsed.json",
+  "original_parsed_sha256": "12b322ad31afc6ebd8e3f50af6e411d506db98547699dcb4fb816b84bf8b3f08",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-seats-final-20261004\\ASTOCK-019\\candidate\\ASTOCK-019-3b92f5b2ce99\\2026-10-04\\input_report\\eastmoney\\dragon_tiger_seats\\report.json",
+  "report_sha256": "1c017a345f4e6eb37a315e885fb82789001ce76184df63faf68610a998579e75",
+  "known_difference": "explicit selected historical day; original date discovery retained only as evidence, no date/source fallback"
+}

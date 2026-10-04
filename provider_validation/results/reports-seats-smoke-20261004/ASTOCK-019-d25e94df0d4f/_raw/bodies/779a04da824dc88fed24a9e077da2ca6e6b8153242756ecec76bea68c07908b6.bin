@@ -1,0 +1,136 @@
+def stock_lhb_stock_detail_em(
+    symbol: str = "000788", date: str = "20220315", flag: str = "卖出"
+) -> pd.DataFrame:
+    """
+    东方财富网-数据中心-龙虎榜单-个股龙虎榜详情
+    https://data.eastmoney.com/stock/lhb/600077.html
+    :param symbol: 股票代码
+    :type symbol: str
+    :param date: 查询日期; 需要通过 ak.stock_lhb_stock_detail_date_em(symbol="600077") 接口获取相应股票的有龙虎榜详情数据的日期
+    :type date: str
+    :param flag: choice of {"买入", "卖出"}
+    :type flag: str
+    :return: 个股龙虎榜详情
+    :rtype: pandas.DataFrame
+    """
+    flag_map = {
+        "买入": "BUY",
+        "卖出": "SELL",
+    }
+    report_map = {
+        "买入": "RPT_BILLBOARD_DAILYDETAILSBUY",
+        "卖出": "RPT_BILLBOARD_DAILYDETAILSSELL",
+    }
+    url = "https://datacenter-web.eastmoney.com/api/data/v1/get"
+    params = {
+        "reportName": report_map[flag],
+        "columns": "ALL",
+        "filter": f"""(TRADE_DATE='{"-".join([date[:4], date[4:6], date[6:]])}')(SECURITY_CODE="{symbol}")""",
+        "pageNumber": "1",
+        "pageSize": "500",
+        "sortTypes": "-1",
+        "sortColumns": flag_map[flag],
+        "source": "WEB",
+        "client": "WEB",
+    }
+    r = requests.get(url, params=params)
+    data_json = r.json()
+    temp_df = pd.DataFrame(data_json["result"]["data"])
+    temp_df.reset_index(inplace=True)
+    temp_df["index"] = temp_df.index + 1
+
+    if flag == "买入":
+        temp_df.columns = [
+            "序号",
+            "-",
+            "-",
+            "-",
+            "-",
+            "交易营业部名称",
+            "类型",
+            "-",
+            "-",
+            "-",
+            "-",
+            "买入金额",
+            "卖出金额",
+            "净额",
+            "-",
+            "-",
+            "-",
+            "-",
+            "买入金额-占总成交比例",
+            "卖出金额-占总成交比例",
+            "-",
+        ]
+        temp_df = temp_df[
+            [
+                "序号",
+                "交易营业部名称",
+                "买入金额",
+                "买入金额-占总成交比例",
+                "卖出金额",
+                "卖出金额-占总成交比例",
+                "净额",
+                "类型",
+            ]
+        ]
+        temp_df["买入金额"] = pd.to_numeric(temp_df["买入金额"], errors="coerce")
+        temp_df["买入金额-占总成交比例"] = pd.to_numeric(
+            temp_df["买入金额-占总成交比例"], errors="coerce"
+        )
+        temp_df["卖出金额"] = pd.to_numeric(temp_df["卖出金额"], errors="coerce")
+        temp_df["卖出金额-占总成交比例"] = pd.to_numeric(
+            temp_df["卖出金额-占总成交比例"], errors="coerce"
+        )
+        temp_df.sort_values("类型", inplace=True, ignore_index=True)
+        temp_df.reset_index(inplace=True, drop=True)
+        temp_df["序号"] = range(1, len(temp_df["序号"]) + 1)
+    else:
+        temp_df.columns = [
+            "序号",
+            "-",
+            "-",
+            "-",
+            "-",
+            "交易营业部名称",
+            "类型",
+            "-",
+            "-",
+            "-",
+            "-",
+            "买入金额",
+            "卖出金额",
+            "净额",
+            "-",
+            "-",
+            "-",
+            "-",
+            "买入金额-占总成交比例",
+            "卖出金额-占总成交比例",
+            "-",
+        ]
+        temp_df = temp_df[
+            [
+                "序号",
+                "交易营业部名称",
+                "买入金额",
+                "买入金额-占总成交比例",
+                "卖出金额",
+                "卖出金额-占总成交比例",
+                "净额",
+                "类型",
+            ]
+        ]
+        temp_df["买入金额"] = pd.to_numeric(temp_df["买入金额"], errors="coerce")
+        temp_df["买入金额-占总成交比例"] = pd.to_numeric(
+            temp_df["买入金额-占总成交比例"], errors="coerce"
+        )
+        temp_df["卖出金额"] = pd.to_numeric(temp_df["卖出金额"], errors="coerce")
+        temp_df["卖出金额-占总成交比例"] = pd.to_numeric(
+            temp_df["卖出金额-占总成交比例"], errors="coerce"
+        )
+        temp_df.sort_values("类型", inplace=True, ignore_index=True)
+        temp_df.reset_index(inplace=True, drop=True)
+        temp_df["序号"] = range(1, len(temp_df["序号"]) + 1)
+    return temp_df

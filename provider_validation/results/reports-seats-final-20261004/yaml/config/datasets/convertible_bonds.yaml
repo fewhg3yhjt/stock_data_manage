@@ -1,0 +1,79 @@
+dataset:
+  name: convertible_bonds
+  display_name: 可转债条款与行情输入
+  primary_key:
+  - snapshot_at
+  - source_bond_code
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  source_bond_code:
+    type: string
+    required: true
+  name:
+    type: string
+    required: false
+  status:
+    type: enum
+    values:
+    - upcoming
+    - listed
+    - delisted
+    - unknown
+    required: true
+  stock_code:
+    type: string
+    required: false
+  stock_name:
+    type: string
+    required: false
+  rating:
+    type: string
+    required: false
+  apply_code:
+    type: string
+    required: false
+  apply_date:
+    type: date
+    required: false
+  listing_date:
+    type: date
+    required: false
+  delist_date:
+    type: date
+    required: false
+  expire_date:
+    type: date
+    required: false
+  convert_start:
+    type: date
+    required: false
+  issue_size_100m:
+    type: decimal
+    required: false
+    unit: 100million_CNY
+  initial_convert_price:
+    type: decimal
+    required: false
+    unit: CNY
+  convert_price:
+    type: decimal
+    required: false
+    unit: CNY
+  bond_price:
+    type: decimal
+    required: false
+    unit: CNY
+  stock_price:
+    type: decimal
+    required: false
+    unit: CNY
+  convert_value:
+    type: decimal
+    required: false
+    unit: CNY
+  premium_pct:
+    type: decimal
+    required: false
+    unit: percent

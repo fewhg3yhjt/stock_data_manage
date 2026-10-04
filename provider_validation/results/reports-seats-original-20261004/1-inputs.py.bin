@@ -1,0 +1,758 @@
+from __future__ import annotations
+
+import hashlib
+from dataclasses import asdict, replace
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from uuid import uuid4
+
+from ..config.loader import load_input_capabilities, load_input_field_contract, load_collection_profiles
+from ..providers.transport import captured_requests, RequestPacer
+from ..quality.normalization import Normalizer, NormalizationError
+from ..routing.factory import build_input_provider
+from ..storage.raw import RawObjectStore, sanitized_metadata
+
+
+def _json_value(value):
+    if isinstance(value, dict):
+        return {key: _json_value(item) for key, item in value.items()}
+    if isinstance(value, (tuple, list)):
+        return [_json_value(item) for item in value]
+    if hasattr(value, "isoformat"):
+        return value.isoformat()
+    if value is None or type(value) in {str, int, float, bool}:
+        return value
+    # Decimals retain precision instead of being coerced through binary floating point.
+    return str(value)
+
+
+def _validate_candidate_root(config_root, output_root):
+    # Avoid accidental writes through the manual input path into configured production stores.
+    import yaml
+    collection_document = yaml.safe_load((config_root / "collection.yaml").read_text(encoding="utf-8"))
+    project_root = config_root.resolve().parent
+    for key in ("raw_root", "canonical_root", "metadata_path"):
+        protected = (project_root / collection_document["storage"][key]).resolve()
+        if output_root.resolve().is_relative_to(protected):
+            raise ValueError("manual input outputs must be outside production paths")
+    hot_path = (project_root / collection_document.get("realtime_minute", {}).get("hot_store", {}).get("path", "data/hot")).resolve()
+    if output_root.resolve().is_relative_to(hot_path.parent):
+        raise ValueError("manual input outputs must be outside production hot store")
+    return project_root
+
+
+def collect_input(*, input_id, context, config_root, output_root, mode="replay", replay_manifest=None,
+                  evidence_root=None, fields=None, client=None, pacer=None):
+    """One explicit input, candidate output only. Existing Bar publication flows are unchanged."""
+    config_root, output_root = Path(config_root), Path(output_root)
+    if mode not in {"live", "replay"} or (mode == "replay" and replay_manifest is None):
+        raise ValueError("replay requires an explicit manifest; only live/replay modes are supported")
+    project_root = _validate_candidate_root(config_root, output_root)
+    contracts = {c.input_id: c for c in load_input_capabilities(config_root / "providers.yaml")}
+    if input_id not in contracts:
+        raise ValueError("unknown input ID")
+    contract = contracts[input_id]
+    parameters = contract.bind_parameters(context)
+    dataset, rule = load_input_field_contract(config_root, contract)
+    schema_fields = dataset["fields"]
+    selected = set(schema_fields) if fields is None else set(fields)
+    required = {name for name, definition in schema_fields.items() if definition.get("required", False)}
+    if selected - set(schema_fields) or not required <= selected:
+        raise ValueError("selected fields must be declared and include all required fields")
+    profiles = {p.name: p for p in load_collection_profiles(config_root / "collection.yaml")}
+    profile = profiles[contract.collection_profile]
+    provider = build_input_provider(contract, providers_path=config_root / "providers.yaml", client=client)
+    code_files = [Path(__file__), Path(__file__).parents[1] / "cli.py", Path(__file__).parents[1] / "config/loader.py",
+                  Path(__file__).parents[1] / "providers/contracts.py",
+                  Path(__file__).parents[1] / "quality/normalization.py",
+                  Path(__file__).parents[1] / "providers/transport.py",
+                  Path(__file__).parents[1] / "storage/raw.py",
+                  Path(__file__).parents[1] / "routing/factory.py",
+                  Path(__file__).parents[1] / "providers/tencent/daily.py",
+                  Path(__file__).parents[1] / "providers/tencent/minute.py",
+                  Path(__file__).parents[1] / "providers/tencent/snapshot.py",
+                  Path(__file__).parents[1] / "providers/eastmoney/limit_pool.py",
+                  Path(__file__).parents[1] / "providers/eastmoney/shareholder.py",
+                  Path(__file__).parents[1] / "providers/eastmoney/financial.py",
+                  Path(__file__).parents[1] / "providers/wallstreetcn/news.py",
+                  Path(__file__).parents[1] / "providers/cctv/news.py",
+                  Path(__file__).parents[1] / "providers/cls/news.py",
+                  Path(__file__).parents[1] / "providers/sina/news.py",
+                  Path(__file__).parents[1] / "providers/mofcom/social_financing.py",
+                  Path(__file__).parents[1] / "providers/chinamoney/rates.py",
+                  Path(__file__).parents[1] / "providers/eastmoney/dividend.py",
+                  Path(__file__).parents[1] / "providers/eastmoney/fund_flow.py",
+                  Path(__file__).parents[1] / "providers/eastmoney/realtime.py",
+                  Path(__file__).parents[1] / "providers/sina/calendar.py",
+                  Path(__file__).parents[1] / "providers/sina/snapshot.py",
+                  Path(__file__).parents[1] / "providers/sina/daily.py",
+                  Path(__file__).parents[1] / "providers/akshare/boards.py",
+                  Path(__file__).parents[1] / "providers/baostock/industry.py",
+                  Path(__file__).parents[1] / "providers/baostock/session.py"]
+    code_version = hashlib.sha256(b"".join(path.read_bytes() for path in code_files)).hexdigest()
+    # Response filenames contain a full SHA-256 plus a temporary suffix. Keep the
+    # run component short for Windows paths; UTC times remain in every evidence record.
+    run_id = uuid4().hex[:12]
+    directory = output_root / f"{input_id}-{run_id}"
+    directory.mkdir(parents=True, exist_ok=False)
+    raw_store, result_store = RawObjectStore(directory / "_raw"), RawObjectStore(directory)
+    normalized_context = _json_value(parameters)
+    report = {"input_id": input_id, "dataset": contract.dataset, "mode": mode,
+        "parameters": sanitized_metadata(normalized_context), "provider": contract.provider, "endpoint": contract.endpoint,
+        "collection_profile": _json_value(asdict(profile)),
+        "request_interval_seconds": max(3, contract.request_interval_seconds),
+        "effective_concurrency": 1, "request_limit_enforcement": "call_boundary_only",
+        "adapter_version": provider.capability_version, "code_version": code_version,
+        "code_files": [{"path": str(path.resolve()), "sha256": hashlib.sha256(path.read_bytes()).hexdigest()} for path in code_files],
+        "config_files": [{"path": str(path.resolve()), "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+            for path in (config_root / "providers.yaml", config_root / "collection.yaml",
+                         config_root / "datasets" / f"{contract.dataset}.yaml",
+                         config_root / "normalization" / f"{contract.dataset}.yaml")],
+        "normalization_version": rule["version"], "normalization_status": rule["status"],
+        "field_units": {name: definition.get("unit") for name, definition in schema_fields.items() if name in selected},
+        "unverified_fields": rule.get("unverified_fields", []), "selected_fields": sorted(selected),
+        "eligible_for_production_routing": False, "production_writes": 0, "live_http_calls": 0,
+        "validation_time_utc": datetime.now(timezone.utc).isoformat(), "status": "started"}
+    report["response_freshness_seconds"] = profile.refresh_interval_seconds or 86400
+    is_baostock = input_id in {"SDA-BOARD-005", "SDA-BOARD-006"}
+    is_tencent_snapshot = input_id == "ASTOCK-001"
+    is_em_history = input_id in {"ASTOCK-026", "ASTOCK-027", "ASTOCK-028"}
+    is_em_events = input_id in {"ASTOCK-078", "ASTOCK-079", "ASTOCK-080", "ASTOCK-081", "ASTOCK-082", "ASTOCK-083"}
+    is_lpr = input_id == "ASTOCK-065"
+    is_news = input_id in {"ASTOCK-034", "ASTOCK-035"}
+    is_reports_calendar = input_id in {"ASTOCK-013", "ASTOCK-066"}
+    is_sdk_news = input_id in {"ASTOCK-032", "ASTOCK-033"}
+    is_sdk_macro = input_id in {"ASTOCK-061", "ASTOCK-062"}
+    is_factor = input_id == "ASTOCK-006"
+    is_market_events = input_id in {"ASTOCK-020", "ASTOCK-021"}
+    is_repo_rate = input_id == "ASTOCK-064"
+    is_cb = input_id == "ASTOCK-084"
+    is_sina_futures = input_id in {"ASTOCK-074", "ASTOCK-075", "ASTOCK-076"}
+    if is_news or is_reports_calendar or is_repo_rate or is_sina_futures:
+        import requests
+        import urllib3
+        report["transport_dependency"] = {"requests": requests.__version__, "urllib3": urllib3.__version__}
+        code_version = hashlib.sha256((code_version + requests.__version__ + urllib3.__version__).encode()).hexdigest()
+        report["code_version"] = code_version
+        policy_key = "sina_futures_transport_policy" if is_sina_futures else "fixing_transport_policy" if is_repo_rate else "news_transport_policy"
+        report[policy_key] = {"source_contract": "successful runnable original source",
+            "headers": "original Chrome/126 User-Agent and finance.sina.com.cn Referer" if is_sina_futures else "original Chrome/126 User-Agent and Chinamoney bkfrr Referer" if is_repo_rate else "original Chrome/126 User-Agent; requests defaults otherwise", "trust_env": True,
+            "timeout_seconds": [10, 40], "allow_redirects": True, "retry_total": 0,
+            "outer_capture_interval_seconds": 3}
+        if input_id=="ASTOCK-013":
+            report[policy_key].update(headers="original Chrome/126 User-Agent and finance.sina.com.cn Referer",
+                original_report_min_interval_seconds=6,empty_page_attempts=2,encoding="GBK")
+    if is_em_events or is_lpr or is_cb:
+        import requests
+        import urllib3
+        report["transport_dependency"] = {"requests": requests.__version__, "urllib3": urllib3.__version__}
+        code_version = hashlib.sha256((code_version + requests.__version__ + urllib3.__version__).encode()).hexdigest()
+        report["code_version"] = code_version
+        report["event_transport_policy"] = {"source_contract": "successful runnable V3.9 test loader",
+            "headers": "requests Session defaults", "trust_env": True, "timeout_seconds": 20,
+            "retry_total": 3, "retry_connect": 3, "backoff_factor": 0.6,
+            "status_forcelist": [429, 500, 502, 503, 504], "minimum_interval_seconds": 1,
+            "conditional_wait_jitter_seconds": [0.1, 0.5], "outer_capture_interval_seconds": 3,
+            "physical_retry_count_observable": False}
+    is_stock_pool = input_id in {"ASTOCK-045", "ASTOCK-046", "ASTOCK-047", "ASTOCK-048", "ASTOCK-050"}
+    if is_tencent_snapshot:
+        report.update(coverage_denominator=len(parameters["symbols"]), requested_symbols=list(parameters["symbols"]),
+                      universe_completeness_verified=False, online_batch_validation=False,
+                      quote_time_semantics="source quote timestamp; as_of is a local date check, not a historical query")
+    if input_id == "SDA-BOARD-002":
+        report["config_files"].extend({"path": str(path.resolve()), "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+            for path in (config_root / "datasets/industry_directory.yaml", config_root / "normalization/industry_directory.yaml"))
+    if context.get("calendar", {}).get("trading_dates") is not None:
+        import json
+        days = sorted(day.isoformat() for day in context["calendar"]["trading_dates"])
+        report["calendar_context"] = {"positive_date_count": len(days),
+                                     "sha256": hashlib.sha256(json.dumps(days).encode()).hexdigest()}
+    calendar_path = context.get("metadata", {}).get("calendar_path")
+    if calendar_path:
+        report["calendar_dependency"] = {"path": calendar_path, "sha256": hashlib.sha256(Path(calendar_path).read_bytes()).hexdigest()}
+    context_path = context.get("metadata", {}).get("context_path")
+    if context_path:
+        report["context_dependency"] = {"path": context_path, "sha256": hashlib.sha256(Path(context_path).read_bytes()).hexdigest()}
+    report["field_units"] = {name: ("unverified; source value retained separately" if name in rule.get("unverified_fields", ()) else unit)
+                              for name, unit in report["field_units"].items()}
+    pacer = pacer or RequestPacer()
+    # Host intervals configured before execution; tuple timeout and SDK retry behavior are retained.
+    from urllib.parse import urlsplit
+    for host in getattr(provider, "input_hosts", ()):
+        pacer.configure(urlsplit(host).hostname, max(3, contract.request_interval_seconds), 1)
+    evidence_root = Path(evidence_root) if evidence_root else project_root / "provider_validation/results"
+    try:
+        if is_baostock:
+            import inspect
+            import importlib.metadata
+            try:
+                import baostock as sdk_module
+            except ImportError:
+                sdk_module = None
+            sdk = client or sdk_module
+            report["sdk_dependency"] = {"version": (getattr(client, "__version__", "injected_fixture") if client is not None else
+                                                     importlib.metadata.version("baostock") if sdk_module else "unavailable_offline"),
+                                        "client_injected": client is not None, "dependencies": []}
+            for name in ("query_all_stock", "query_stock_industry", "login", "logout"):
+                function = getattr(sdk, name, None)
+                if function is None:
+                    continue
+                try:
+                    source = inspect.getsource(function).encode("utf-8")
+                except (TypeError, OSError):
+                    source = repr(type(sdk)).encode("utf-8")
+                digest = hashlib.sha256(source).hexdigest()
+                import re
+                snapshot = re.sub(rb'''(?i)((?:password|user_id|token|api_key)\s*=\s*["'])[^"']*(["'])''', rb'\1<redacted>\2', source)
+                sdk_ref = raw_store.write_bytes(snapshot, dataset="source_code", provider=contract.provider, endpoint=contract.endpoint,
+                    fetched_at=datetime.now(timezone.utc), attempt_id="sdk-function", content_addressed=True)
+                report["sdk_dependency"]["dependencies"].append({"name": name, "path": sdk_ref.path.relative_to(directory).as_posix(),
+                    "sha256": sdk_ref.content_hash, "original_source_sha256": digest, "redacted": snapshot != source})
+                code_version = hashlib.sha256((code_version + name + digest).encode()).hexdigest()
+            code_version = hashlib.sha256((code_version + report["sdk_dependency"]["version"]).encode()).hexdigest()
+            report["code_version"] = code_version
+            report["evidence_representation"] = "SDK-decoded ResultSet fields and rows; BaoStock TCP wire bytes are not exposed"
+            report["request_limit_enforcement"] = "sdk_query_boundary_only"
+        sdk_functions = {"ASTOCK-020": "stock_lhb_detail_em", "ASTOCK-021": "stock_restricted_release_detail_em",
+                         "ASTOCK-006": "stock_zh_a_daily", "ASTOCK-045": "stock_zt_pool_em", "ASTOCK-070": "tool_trade_date_hist_sina",
+                         "ASTOCK-032": "stock_info_global_cls", "ASTOCK-033": "stock_info_global_sina",
+                         "ASTOCK-061": "macro_china_shrzgm", "ASTOCK-062": "macro_china_pmi",
+                         "ASTOCK-046": "stock_zt_pool_zbgc_em", "ASTOCK-047": "stock_zt_pool_dtgc_em",
+                         "ASTOCK-048": "stock_zt_pool_previous_em", "ASTOCK-050": "stock_zt_pool_strong_em",
+                         "ASTOCK-026": "stock_zh_a_gdhs_detail_em", "ASTOCK-027": "stock_fhps_detail_em",
+                         "ASTOCK-028": "stock_individual_fund_flow",
+                         "SDA-BOARD-001": "stock_board_industry_name_ths", "SDA-BOARD-002": "stock_board_industry_index_ths",
+                         "SDA-BOARD-003": "stock_fund_flow_industry", "SDA-BOARD-004": "stock_fund_flow_concept"}
+        if input_id in sdk_functions:
+            import inspect
+            from ..providers.akshare.session import load_client
+            provider.client = provider.client or load_client()
+            function = getattr(provider.client, sdk_functions[input_id])
+            try:
+                sdk_source = inspect.getsource(function).encode("utf-8")
+            except (TypeError, OSError):
+                sdk_source = repr(type(provider.client)).encode("utf-8")
+            sdk_source_hash = hashlib.sha256(sdk_source).hexdigest()
+            # The SDK embeds a public client selector; keep its hash, redact token-like literals in the snapshot.
+            import re
+            sdk_snapshot = re.sub(rb'''(?i)(["'](?:ut|token|access_token|api_key|password|secret)["']\s*:\s*["'])[^"']*(["'])''',
+                                  rb'\1<redacted>\2', sdk_source)
+            sdk_ref = raw_store.write_bytes(sdk_snapshot, dataset="source_code", provider=contract.provider,
+                endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="sdk-function", content_addressed=True)
+            report["sdk_dependency"] = {"version": getattr(provider.client, "__version__", "injected_fixture"),
+                "function": function.__name__, "source_path": sdk_ref.path.relative_to(directory).as_posix(), "sha256": sdk_ref.content_hash,
+                "original_source_sha256": sdk_source_hash, "redacted": sdk_snapshot != sdk_source}
+            code_version = hashlib.sha256((code_version + sdk_source_hash + report["sdk_dependency"]["version"]).encode()).hexdigest()
+            if is_sdk_news or is_sdk_macro or is_factor or is_market_events:
+                import requests
+                import urllib3
+                report["transport_dependency"] = {"requests": requests.__version__, "urllib3": urllib3.__version__}
+                code_version = hashlib.sha256((code_version + requests.__version__ + urllib3.__version__).encode()).hexdigest()
+                namespace = getattr(function, "__globals__", {})
+                report["sdk_dependency"]["dependencies"] = []
+                if is_factor:
+                    constants = {name: namespace[name] for name in ("zh_sina_a_stock_qfq_url", "zh_sina_a_stock_hfq_url") if name in namespace}
+                    import json
+                    digest = hashlib.sha256(json.dumps(constants, sort_keys=True).encode()).hexdigest()
+                    report["sdk_dependency"].update(url_constants=constants, url_constants_sha256=digest)
+                    code_version = hashlib.sha256((code_version + digest).encode()).hexdigest()
+                if input_id == "ASTOCK-032":
+                    sdk_headers = sanitized_metadata(namespace.get("headers", {}))
+                    import json
+                    header_hash = hashlib.sha256(json.dumps(sdk_headers,sort_keys=True).encode()).hexdigest()
+                    report["sdk_dependency"]["headers"] = sdk_headers
+                    report["sdk_dependency"]["headers_sha256"] = header_hash
+                    code_version = hashlib.sha256((code_version + header_hash).encode()).hexdigest()
+                    helper = namespace.get("make_request_with_retry_json")
+                    if helper is not None:
+                        source = inspect.getsource(helper).encode("utf-8")
+                        ref = raw_store.write_bytes(source, dataset="source_code", provider=contract.provider,
+                            endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="sdk-retry-helper", content_addressed=True)
+                        report["sdk_dependency"]["dependencies"].append({"name": helper.__name__,
+                            "path": ref.path.relative_to(directory).as_posix(), "sha256": ref.content_hash})
+                        code_version = hashlib.sha256((code_version + ref.content_hash).encode()).hexdigest()
+                report["sdk_news_transport_policy"] = {"source_contract": "successful rate-limited original SDK probe",
+                    "timeout_seconds": None, "trust_env": True, "allow_redirects": True,
+                    "headers": "original Chrome/114 User-Agent" if input_id == "ASTOCK-032" else "requests defaults",
+                    "adapter_retry_total": 2, "adapter_backoff_min_seconds": 5,
+                    "status_forcelist": [500, 502, 503, 504], "outer_capture_interval_seconds": 3,
+                    "sdk_outer_attempts": 10 if input_id == "ASTOCK-032" else 1,
+                    "sdk_outer_delays_seconds": [1,2,4,8,16,32,64,128,256] if input_id == "ASTOCK-032" else [],
+                    "host_pause": "403/429 immediately; two consecutive transport or server errors",
+                    "physical_retry_count_observable": False}
+                if is_market_events:
+                    report["market_event_transport_policy"] = report.pop("sdk_news_transport_policy")
+                    report["market_event_transport_policy"].update(response_guard="after exact retention, before SDK positional parsing", source_fallback=False)
+                if is_sdk_macro:
+                    del report["sdk_news_transport_policy"]
+                    report["macro_sdk_transport_policy"] = {"source_contract":"successful rate-limited original SDK probe",
+                        "timeout_seconds":None,"trust_env":True,"allow_redirects":True,"headers":"requests defaults",
+                        "method":"POST" if input_id=="ASTOCK-061" else "GET",
+                        "https_adapter":"original SDK TLSAdapter, retry_total=0" if input_id=="ASTOCK-061" else "original probe conservative retry_total=2, minimum backoff=5",
+                        "outer_capture_interval_seconds":3,"sdk_outer_attempts":1,
+                        "host_pause":"403/429 immediately; two consecutive transport or server errors",
+                        "physical_retry_count_observable":False}
+                    dependency=namespace.get("TLSAdapter") if input_id=="ASTOCK-061" else None
+                    if dependency is not None:
+                        body=inspect.getsource(dependency).encode("utf-8")
+                        ref=raw_store.write_bytes(body,dataset="source_code",provider=contract.provider,endpoint=contract.endpoint,
+                            fetched_at=datetime.now(timezone.utc),attempt_id="sdk-tls-adapter",content_addressed=True)
+                        report["sdk_dependency"]["dependencies"].append({"name":"TLSAdapter","path":ref.path.relative_to(directory).as_posix(),"sha256":ref.content_hash})
+                        code_version=hashlib.sha256((code_version+ref.content_hash).encode()).hexdigest()
+                if is_factor:
+                    report["factor_sdk_transport_policy"] = report.pop("sdk_news_transport_policy")
+                    report["factor_sdk_transport_policy"].update(method="GET", literal_gate="after exact raw retention, before original SDK eval")
+            if input_id.startswith("SDA-BOARD-"):
+                namespace = getattr(function, "__globals__", {})
+                dependencies = []
+                for name in ("_get_stock_board_industry_name_ths", "_get_file_content_ths", "get_ths_js"):
+                    dependency = namespace.get(name)
+                    if dependency is not None:
+                        dependencies.append((name, inspect.getsource(dependency).encode("utf-8")))
+                if namespace.get("get_ths_js"):
+                    dependencies.append(("ths.js", Path(namespace["get_ths_js"]("ths.js")).read_bytes()))
+                report["sdk_dependency"]["dependencies"] = []
+                for name, body in dependencies:
+                    digest = hashlib.sha256(body).hexdigest()
+                    snapshot = re.sub(rb'''(?i)(["'](?:ut|token|access_token|api_key|password|secret)["']\s*:\s*["'])[^"']*(["'])''',
+                                      rb'\1<redacted>\2', body)
+                    ref = raw_store.write_bytes(snapshot, dataset="source_code", provider=contract.provider, endpoint=contract.endpoint,
+                                               fetched_at=datetime.now(timezone.utc), attempt_id="sdk-dependency", content_addressed=True)
+                    report["sdk_dependency"]["dependencies"].append({"name": name, "path": ref.path.relative_to(directory).as_posix(),
+                        "sha256": ref.content_hash, "original_source_sha256": digest, "redacted": snapshot != body})
+                    code_version = hashlib.sha256((code_version + name + digest).encode()).hexdigest()
+            report["code_version"] = code_version
+        from contextlib import ExitStack
+        actual_code = None
+        with ExitStack() as stack:
+            runtime_parameters = dict(parameters)
+            if is_em_events or is_lpr or is_cb:
+                stack.callback(provider.close_event_session)
+            if is_tencent_snapshot:
+                stack.callback(provider.transport.close)
+                # The input is a stock scope, while the legacy Provider also supports funds/indexes.
+                import re
+                if any(not re.fullmatch(r"(?:sh(?:60\d{4}|68\d{4})|sz(?:00\d{4}|30\d{4})|bj(?:[48]\d{5}|92\d{4}))", symbol)
+                       for symbol in parameters["symbols"]):
+                    raise ValueError("snapshot input accepts explicit stock codes only")
+            if is_baostock:
+                from ..providers.baostock.session import captured_sdk_queries
+                sdk_client, sdk_archive, response_events = stack.enter_context(captured_sdk_queries(raw_store, mode=mode,
+                    replay_manifest=replay_manifest, evidence_roots=(evidence_root, output_root),
+                    scope={"input_id": input_id, "parameters": normalized_context}, code_version=code_version,
+                    trade_date=parameters["trade_date"], pacer=pacer, interval_seconds=max(3, contract.request_interval_seconds),
+                    max_age_seconds=profile.refresh_interval_seconds or 86400, client=client))
+                provider.client = sdk_client
+                runtime_parameters["raw_archive"] = sdk_archive
+            else:
+                response_validator = None
+                if is_factor:
+                    from ..providers.sina.daily import validate_adjustment_response
+                    response_validator = validate_adjustment_response
+                if is_market_events:
+                    from ..providers.eastmoney.financial import validate_market_event_response
+                    def response_validator(response):
+                        validate_market_event_response(response.content, response.url, response.status_code,
+                            endpoint=contract.endpoint, start=parameters.get("start", parameters.get("date")),
+                            end=parameters.get("end", parameters.get("date")))
+                response_events = stack.enter_context(captured_requests(raw_store, provider=contract.provider, endpoint=contract.endpoint,
+                    scope={"input_id": input_id, "parameters": normalized_context}, code_version=code_version, pacer=pacer,
+                    replay_manifest=replay_manifest if mode == "replay" else None,
+                    evidence_roots=(evidence_root, output_root), max_age_seconds=profile.refresh_interval_seconds or 86400,
+                    sdk_retry_policy=is_stock_pool or is_sdk_news or is_sdk_macro or is_factor or is_market_events or input_id in {"ASTOCK-001", "ASTOCK-045", "ASTOCK-070", "ASTOCK-026", "ASTOCK-027", "ASTOCK-028"},
+                    probe_host_pause=is_sdk_news or is_sdk_macro or is_factor or is_market_events,require_empty_post_body=input_id=="ASTOCK-061",response_validator=response_validator))
+            if is_factor:
+                from ..providers.sina.daily import parse_adjustment_payload
+                def factor_payloads():
+                    for event in response_events:
+                        body = RawObjectStore.read_response(raw_store.root / "manifest.ndjson", event)
+                        yield parse_adjustment_payload(body, event["url"], event["status_code"])
+                runtime_parameters["source_payloads"] = factor_payloads
+            if is_cb and mode == "replay":
+                from zoneinfo import ZoneInfo
+                def original_classification_day():
+                    successful = [event for event in response_events if event.get("outcome") == "response"]
+                    if not successful:
+                        raise ValueError("CB replay requires original capture-time evidence")
+                    capture_time = max(datetime.fromisoformat(event["source_ref"]["fetched_at_utc"]) for event in successful)
+                    return capture_time.astimezone(ZoneInfo("Asia/Shanghai")).date()
+                runtime_parameters["replay_reference_date"] = original_classification_day
+                report["replay_clock_semantics"] = "actual matched response capture day in China timezone for classification; not a historical quote query"
+            if is_em_history or is_stock_pool or is_sdk_news or is_sdk_macro or is_market_events:
+                from ..providers.contracts import EndpointContract, HttpResponse
+                def retained_payloads():
+                    for event in response_events:
+                        if event.get("outcome") == "response" and (not (is_sdk_news or is_sdk_macro or is_market_events) or event["status_code"] == 200):
+                            body = RawObjectStore.read_response(raw_store.root / "manifest.ndjson", event)
+                            yield EndpointContract(frozenset()).parse_json(HttpResponse(
+                                event["status_code"], event.get("response_headers", {}), body))
+                runtime_parameters["source_payloads"] = retained_payloads
+                if mode == "replay" and input_id == "ASTOCK-032":
+                    from ..providers.cls.news import telegraph_replay_clock
+                    cutoff = stack.enter_context(telegraph_replay_clock(function, replay_manifest))
+                    report["replay_query_cutoff"] = cutoff
+                    report["replay_clock_semantics"] = "original archived SDK query cutoff only; live and process clocks unchanged"
+                if mode == "replay" and is_stock_pool:
+                    from ..providers.eastmoney.limit_pool import pool_replay_clock
+                    endpoint = {"ASTOCK-045": "getTopicZTPool", "ASTOCK-046": "getTopicZBPool", "ASTOCK-047": "getTopicDTPool",
+                                "ASTOCK-048": "getYesterdayZTPool", "ASTOCK-050": "getTopicQSPool"}[input_id]
+                    stack.enter_context(pool_replay_clock(function, replay_manifest, endpoint))
+                    report["replay_clock_semantics"] = "original capture clock for SDK recency guard only; live clock unchanged"
+                if mode == "replay" and input_id == "ASTOCK-028":
+                    from ..providers.eastmoney.realtime import history_replay_clock
+                    stack.enter_context(history_replay_clock(function, replay_manifest, parameters["code"]))
+                    report["replay_clock_semantics"] = "SDK cache-buster clock from matching archived request; live clock unchanged"
+            # Isolate only replay's directory cache; live SDK Session/cache policy stays intact.
+            if mode == "replay" and input_id in {"SDA-BOARD-001", "SDA-BOARD-002"}:
+                from functools import lru_cache
+                from unittest.mock import patch
+                namespace = getattr(function, "__globals__", {})
+                helper = namespace.get("_get_stock_board_industry_name_ths")
+                if helper is not None and hasattr(helper, "__wrapped__"):
+                    stack.enter_context(patch.dict(namespace, {"_get_stock_board_industry_name_ths": lru_cache()(helper.__wrapped__)}))
+                    report["replay_cache_isolated"] = True
+            fetched = getattr(provider, contract.runtime_method)(**runtime_parameters)
+            if input_id == "SDA-BOARD-002":
+                helper = getattr(function, "__globals__", {}).get("_get_stock_board_industry_name_ths")
+                if helper is not None:
+                    actual_code = helper()[parameters["board_name"]]
+        report["responses"] = response_events
+        report["live_http_calls"] = sum(event["mode"] == "live" and event.get("event") == "http_response" for event in response_events)
+        source_rows = getattr(fetched, "source_rows", None) or fetched.rows
+        source_ref = result_store.write_json(_json_value(source_rows), dataset="source_rows", provider=contract.provider,
+            endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="source-rows")
+        report["source_rows"] = {"path": source_ref.path.relative_to(directory).as_posix(),
+                                 "sha256": source_ref.content_hash, "row_count": len(source_rows)}
+        if is_stock_pool:
+            report.update(source_quote_date=fetched.mapping_context["source_quote_date"].isoformat(),
+                source_total_count=fetched.mapping_context["source_total_count"],
+                returned_window={"first": parameters["date"].isoformat(), "last": parameters["date"].isoformat()},
+                coverage_basis="source tc and returned SDK rows for requested qdate; not independent whole-market proof",
+                universe_completeness_verified=False)
+        mapping_rows = fetched.rows if is_em_history or is_lpr or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_repo_rate or is_cb or is_sina_futures else source_rows
+        if is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_repo_rate or is_cb or is_sina_futures:
+            parsed_ref = result_store.write_json(_json_value(mapping_rows), dataset="parsed_rows", provider=contract.provider,
+                endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="parsed-rows")
+            report["parsed_rows"] = {"path":parsed_ref.path.relative_to(directory).as_posix(),
+                "sha256":parsed_ref.content_hash,"row_count":len(mapping_rows),"code_version":code_version,
+                "source_response_hashes":[event["body_sha256"] for event in response_events]}
+        if is_factor:
+            excluded_ref = result_store.write_json(_json_value(fetched.excluded_rows), dataset="excluded_rows", provider=contract.provider,
+                endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="excluded-rows")
+            report["excluded_rows"] = {"path":excluded_ref.path.relative_to(directory).as_posix(), "sha256":excluded_ref.content_hash,"row_count":len(fetched.excluded_rows)}
+            report.update(original_row_count=len(source_rows), selected_row_count=len(mapping_rows), source_symbol=fetched.mapping_context["source_symbol"],
+                factor_kind=parameters["kind"], selection_policy="original requests retain both histories; config.kind selects one candidate series",
+                returned_window={"first":min(row["factor_date"] for row in mapping_rows),"last":max(row["factor_date"] for row in mapping_rows),"meaning":"source factor date labels; 1900 baseline is not a trading date"},
+                coverage_basis="source-reported factor rows, not independently certified economic events or pricing semantics",universe_completeness_verified=False)
+        if input_id == "ASTOCK-075":
+            excluded_ref = result_store.write_json(_json_value(fetched.excluded_rows), dataset="excluded_rows",
+                provider=contract.provider, endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="excluded-rows")
+            report["excluded_rows"] = {"path":excluded_ref.path.relative_to(directory).as_posix(),"sha256":excluded_ref.content_hash,"row_count":len(fetched.excluded_rows)}
+            report.update(original_row_count=len(source_rows),selected_row_count=len(mapping_rows),
+                selection_policy="original local date-window filter; complete returned source rows retained",
+                series_identity=fetched.mapping_context["series_identity"],source_contract=fetched.mapping_context["source_contract"])
+        if input_id=="ASTOCK-066":
+            excluded_ref=result_store.write_json(_json_value(fetched.excluded_rows),dataset="excluded_rows",provider=contract.provider,
+                endpoint=contract.endpoint,fetched_at=datetime.now(timezone.utc),attempt_id="excluded-rows")
+            report["excluded_rows"]={"path":excluded_ref.path.relative_to(directory).as_posix(),"sha256":excluded_ref.content_hash,"row_count":len(fetched.excluded_rows)}
+        if is_cb:
+            excluded_ref = result_store.write_json(_json_value(fetched.excluded_rows), dataset="excluded_rows",
+                provider=contract.provider, endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="excluded-rows")
+            report["excluded_rows"] = {"path": excluded_ref.path.relative_to(directory).as_posix(),
+                "sha256": excluded_ref.content_hash, "row_count": len(fetched.excluded_rows)}
+            report.update(original_row_count=len(source_rows), selected_row_count=len(mapping_rows),
+                selection_policy="original CB delisted exclusion unless include_delisted is true",
+                classification_reference_date=fetched.mapping_context["reference_date"],
+                source_total_count=fetched.mapping_context["source_total_count"],source_page_count=fetched.mapping_context["source_page_count"],
+                requested_limit=20000,result_limited=len(source_rows)<fetched.mapping_context["source_total_count"],
+                returned_window={"first":fetched.mapping_context["reference_date"],"last":fetched.mapping_context["reference_date"],
+                    "meaning":"local status classification day; quotes remain the source response snapshot"},
+                coverage_basis="selected source-reported CB list; not independent complete market coverage",
+                universe_completeness_verified=False)
+        if is_em_history or is_lpr:
+            excluded_ref = result_store.write_json(_json_value(fetched.excluded_rows), dataset="excluded_rows",
+                provider=contract.provider, endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="excluded-rows")
+            report["excluded_rows"] = {"path": excluded_ref.path.relative_to(directory).as_posix(),
+                "sha256": excluded_ref.content_hash, "row_count": len(fetched.excluded_rows)}
+            source_date = {"ASTOCK-026": "股东户数统计截止日", "ASTOCK-027": "报告期", "ASTOCK-028": "日期", "ASTOCK-065":"TRADE_DATE"}[input_id]
+            dates = [str(row[source_date])[:10] if is_lpr else str(row[source_date]) for row in (mapping_rows if is_lpr else source_rows)]
+            report.update(returned_window={"first": min(dates) if dates else None, "last": max(dates) if dates else None},
+                original_row_count=len(source_rows), selected_row_count=len(mapping_rows),
+                coverage_basis="selected returned SDK rows; not independently complete history or market coverage",
+                universe_completeness_verified=False,
+                selection_policy="original script LPR1Y non-null selection; baseline rows retained separately" if is_lpr else "implemented dividend events only; other plans retained in source evidence" if input_id == "ASTOCK-027" else "all returned rows")
+        if actual_code is not None and fetched.mapping_context["board_code"] != actual_code:
+            raise NormalizationError("board code dependency disagrees with source directory")
+        report["source_url"] = fetched.source_url
+        report["source_urls"] = list(dict.fromkeys(event["url"] for event in response_events if event.get("url")))
+        if is_baostock:
+            report.update(coverage_denominator=fetched.coverage_denominator, missing_symbols=list(fetched.missing_symbols),
+                missing_industry_symbols=list(fetched.missing_industry_symbols),
+                coverage_complete=len(source_rows) == fetched.coverage_denominator,
+                live_sdk_calls=sum(event["mode"] == "live" for event in response_events),
+                sdk_query_count=len(response_events), source_sdk_row_counts={event["endpoint"]: event.get("metadata", {}).get("row_count")
+                                                                        for event in response_events})
+            report["coverage_scope"] = "SH/SZ A-share codes filtered from this SDK response; not an independent market census"
+        if is_tencent_snapshot:
+            from zoneinfo import ZoneInfo
+            quote_dates = [datetime.strptime(row["datetime"], "%Y%m%d%H%M%S").date() for row in source_rows]
+            report.update(missing_symbols=list(fetched.missing_symbols), coverage_complete=not fetched.missing_symbols,
+                          returned_window={"first": min(row["datetime"] for row in source_rows),
+                                           "last": max(row["datetime"] for row in source_rows)},
+                          coverage_scope="explicit requested stock list; no independent whole-market completeness proof")
+            if any(day != parameters["as_of"].astimezone(ZoneInfo("Asia/Shanghai")).date() for day in quote_dates):
+                raise NormalizationError("source quote date differs from requested as_of date; snapshot cannot query history")
+        valid_empty = (is_em_events or is_cb or input_id=="ASTOCK-013") and fetched.empty_is_valid
+        if (not source_rows or not mapping_rows) and not valid_empty:
+            raise NormalizationError("temporary empty input; not certified as a valid empty dataset")
+        mapping_context = {"provider": contract.provider}
+        mapping_context.update(getattr(fetched, "mapping_context", {}))
+        if input_id.startswith("SDA-BOARD-") or is_tencent_snapshot or is_em_history or is_stock_pool or is_em_events or is_lpr or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_repo_rate or is_cb or is_sina_futures:
+            successful = [event for event in response_events if event.get("outcome") == "response" and (not (is_sdk_news or is_sdk_macro or is_market_events) or event["status_code"] == 200)]
+            if not successful:
+                raise NormalizationError("source response evidence is required; an SDK memory cache alone is insufficient")
+            source_times = []
+            for event in successful:
+                stamp = ((event.get("source_ref") or {}).get("fetched_at_utc")
+                         if event["mode"] in {"replay", "cached"} else event["fetched_at_utc"])
+                if not stamp:
+                    raise NormalizationError("original source capture time is missing")
+                source_times.append(datetime.fromisoformat(stamp))
+            if any(stamp.tzinfo is None for stamp in source_times):
+                raise NormalizationError("source capture time must be timezone-aware")
+            mapping_context["source_snapshot_at"] = max(source_times)
+            report["source_capture_window"] = {"first": min(source_times).isoformat(), "last": max(source_times).isoformat(),
+                                               "meaning": "source response capture times; not row-level market timestamps"}
+            if not is_tencent_snapshot and not is_em_history and not is_stock_pool and not is_em_events and not is_lpr and not is_news and not is_reports_calendar and not is_sdk_news and not is_sdk_macro and not is_factor and not is_market_events and not is_repo_rate and not is_cb and not is_sina_futures:
+                report["returned_window"] = {"first": fetched.returned_first_key, "last": fetched.returned_last_key}
+                report["source_units"] = list(fetched.units)
+                report["coverage_basis"] = "returned SDK rows; not an independently verified market universe"
+        if is_em_events:
+            date_field = fetched.mapping_context.get("returned_date_field", "NOTICE_DATE")
+            notice_days = [str(row[date_field])[:10] for row in source_rows if row.get(date_field)]
+            report.update(source_total_count=fetched.mapping_context["source_total_count"],
+                source_page_count=fetched.mapping_context["source_page_count"],
+                requested_limit=fetched.mapping_context["requested_limit"], valid_empty_dataset=valid_empty,
+                result_limited=fetched.mapping_context["source_total_count"] is not None and len(source_rows) < fetched.mapping_context["source_total_count"],
+                coverage_basis="bounded latest source events; denominator is returned rows, not whole-market coverage",
+                universe_completeness_verified=False,
+                returned_window={"first": min(notice_days) if notice_days else None,
+                                 "last": max(notice_days) if notice_days else None, "field": date_field})
+        if is_lpr:
+            report.update(source_total_count=fetched.mapping_context["source_total_count"],
+                source_page_count=fetched.mapping_context["source_page_count"],requested_limit=5000,
+                result_limited=len(source_rows)<fetched.mapping_context["source_total_count"],
+                coverage_basis="source-reported history within 5000-row original script limit; not independent completeness")
+        if is_news:
+            dates = [row["time"] for row in mapping_rows] if input_id == "ASTOCK-034" else [row["date"] for row in mapping_rows]
+            report.update(returned_window={"first": min(dates), "last": max(dates)},
+                coverage_basis="returned news items for requested channel/page or broadcast date; not independent complete history",
+                universe_completeness_verified=False)
+            if input_id == "ASTOCK-034":
+                report.update(next_cursor=fetched.mapping_context["next_cursor"], requested_limit=parameters["limit"],
+                    channel=parameters["channel"], pagination_completeness_verified=False)
+            else:
+                report.update(broadcast_date=fetched.mapping_context["broadcast_date"], article_content_verified=False,
+                    content_requests=0, request_date_semantics="calendar broadcast date; not an exchange trading date")
+        if is_sdk_news:
+            dates = [row["published_at"] if input_id == "ASTOCK-032" else row["时间"] for row in mapping_rows]
+            report.update(returned_window={"first":min(dates),"last":max(dates)}, requested_limit=20,
+                coverage_basis="latest returned 20 source news items; not complete news history or market coverage",
+                universe_completeness_verified=False, pagination_completeness_verified=False)
+        if is_sdk_macro:
+            periods=[row["statistical_month"] for row in mapping_rows]
+            report.update(returned_window={"first":min(periods),"last":max(periods),"meaning":"statistical months, not publication dates"},
+                coverage_basis="returned source monthly history; no independent current or complete history certification",
+                universe_completeness_verified=False,publication_time_available=False)
+        if is_market_events:
+            dates = [row[fetched.mapping_context["date_field"]].isoformat() for row in mapping_rows]
+            report.update(returned_window={"first": min(dates), "last": max(dates)},
+                requested_window={"first": parameters.get("start", parameters.get("date")).isoformat(),
+                    "last": parameters.get("end", parameters.get("date")).isoformat()},
+                source_total_count=fetched.mapping_context["source_total_count"], source_page_count=fetched.mapping_context["source_page_count"],
+                source_report=fetched.mapping_context["source_report"], coverage_complete=True,
+                coverage_basis="all pages of the source-reported market event window; no independent market census",
+                universe_completeness_verified=False, source_fallback_enabled=False, implicit_date_selection=False)
+        if is_reports_calendar:
+            times=[row["date"] if input_id=="ASTOCK-013" else row["time"] for row in mapping_rows]
+            report.update(returned_window={"first":min(times) if times else None,"last":max(times) if times else None},
+                coverage_basis="returned latest report page or original seven-day calendar slices; not independent complete history",
+                universe_completeness_verified=False)
+            if input_id=="ASTOCK-013":
+                report.update(page=parameters["page"],empty_page_attempts=fetched.mapping_context["empty_page_attempts"],valid_empty_dataset=valid_empty,
+                    empty_validation_basis="original two-attempt explicit empty-page rule; source absence not independently certified",pagination_completeness_verified=False)
+            else:
+                report.update(requested_window={"first":parameters["start"].isoformat(),"last":parameters["end"].isoformat()},
+                    original_row_count=len(source_rows),selected_row_count=len(mapping_rows),country=parameters.get("country"),
+                    min_importance=parameters["min_importance"],calendar_time_precision="minute, original source parser")
+        if is_repo_rate:
+            dates = [row["date"] for row in mapping_rows]
+            report.update(rate_kind=parameters["kind"], returned_window={"first":min(dates),"last":max(dates)},
+                coverage_basis="returned fixing CSV dates; not independently complete history",
+                universe_completeness_verified=False)
+        if is_sina_futures:
+            dates = [row["date"] if input_id == "ASTOCK-075" else row["datetime"] for row in mapping_rows]
+            report.update(returned_window={"first":min(dates),"last":max(dates)},
+                coverage_basis="returned source contracts and local date window; not independent exchange or market coverage",
+                universe_completeness_verified=False,quote_freshness_verified=False)
+            if input_id == "ASTOCK-074":
+                report["requested_contracts"] = fetched.mapping_context["requested_contracts"]
+            elif input_id == "ASTOCK-076":
+                report["source_contract"] = fetched.mapping_context["source_contract"]
+        if "date" in parameters:
+            mapping_context["trade_date"] = parameters["date"]
+        if input_id.startswith("ASTOCK-002"):
+            from ..providers.tencent.daily import tencent_symbol
+            symbol = tencent_symbol(parameters["code"])
+            mapping_context.update(instrument_id=f"{'XSHG' if symbol.startswith('sh') else 'XSHE'}:{symbol[2:]}",
+                                   adjustment="forward" if input_id.endswith("daily") else "none")
+        rows = [Normalizer.normalize_fields(row, rule=rule, fields=schema_fields,
+                                            context=mapping_context, allow_pending=True) for row in mapping_rows]
+        keys = [tuple(row[name] for name in dataset["dataset"]["primary_key"]) for row in rows]
+        if len(set(keys)) != len(keys):
+            raise NormalizationError("duplicate dataset primary key")
+        if contract.dataset in {"daily_bar", "minute_bar_5m", "industry_index_daily"}:
+            if any(not (row["low"] <= min(row["open"], row["close"]) <= max(row["open"], row["close"]) <= row["high"]) for row in rows):
+                raise NormalizationError("invalid OHLC ordering")
+        projected = [{name: value for name, value in row.items() if name in selected} for row in rows]
+        normalized_ref = result_store.write_json(_json_value(projected), dataset=contract.dataset, provider=contract.provider,
+            endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="mapped-rows")
+        report["output"] = {"path": normalized_ref.path.relative_to(directory).as_posix(),
+                            "sha256": normalized_ref.content_hash, "row_count": len(projected),
+                            "source_response_hashes": [event["body_sha256"] for event in response_events]}
+        report.update(status="candidate_complete", row_count=len(projected),
+                      coverage_denominator=fetched.coverage_denominator if is_baostock or is_tencent_snapshot else len(mapping_rows),
+                      first_key=_json_value(keys[0]) if keys else None, last_key=_json_value(keys[-1]) if keys else None)
+    except Exception as exc:
+        report.update(status="failed", failure_class=getattr(getattr(exc, "failure_class", None), "value", type(exc).__name__),
+                      error=str(exc) if isinstance(exc, (ValueError, NormalizationError)) else type(exc).__name__)
+    raw_manifest = raw_store.root / "manifest.ndjson"
+    if raw_manifest.exists():
+        import json
+        all_events = [json.loads(line) for line in raw_manifest.read_text(encoding="utf-8").splitlines()]
+        report["responses"] = [event for event in all_events if event.get("event") in {"http_response", "source_payload", "sdk_query_failure"}]
+        if is_sdk_news or is_sdk_macro or is_factor or is_market_events:
+            report["host_pause_events"] = [event for event in all_events if event.get("event") == "host_paused"]
+        if is_baostock:
+            report["sdk_session"] = [event for event in all_events if event.get("event") == "sdk_session"]
+            report["sdk_derived"] = [event for event in all_events if event.get("event") == "sdk_derived"]
+            report["live_sdk_calls"] = sum(event.get("mode") == "live" for event in report["responses"])
+            report["sdk_query_count"] = len(report["responses"])
+            report["sdk_dependency"]["live_sdk_executed"] = any(event.get("actual_session_called") for event in report["sdk_session"])
+        report["raw_manifest"] = {"path": raw_manifest.relative_to(directory).as_posix(),
+                                  "sha256": hashlib.sha256(raw_manifest.read_bytes()).hexdigest()}
+        report["live_http_calls"] = sum(event.get("mode") == "live" and event.get("event") == "http_response" for event in all_events)
+    report_ref = result_store.write_json(report, dataset="input_report", provider=contract.provider, endpoint=contract.endpoint,
+                                        fetched_at=datetime.now(timezone.utc), attempt_id="report")
+    return {**report, "run_directory": str(directory.resolve()), "report_path": str(report_ref.path.resolve())}
+
+
+def collect_due_inputs(*, now, config_root, output_root, trading_dates, securities=(), symbols=(),
+                       execute=False, mode="replay", replay_manifest=None, evidence_root=None,
+                       dependency_paths=(), collector=None):
+    """One scheduler tick, with durable attempts in candidate storage, never production publication."""
+    from ..domain import AttemptStatus
+    from ..storage.metadata import MetadataStore
+    from ..worker.attempts import CollectionAttempt
+    from ..worker.scheduler import plan_input_collection
+    from time import monotonic
+    import json
+
+    root, output = Path(config_root), Path(output_root)
+    if now.tzinfo is None:
+        raise ValueError("schedule time must be timezone-aware")
+    if mode not in {"live", "replay"}:
+        raise ValueError("only live/replay modes are supported")
+    if execute and mode == "live" and abs((datetime.now(timezone.utc) - now).total_seconds()) > 120:
+        raise ValueError("live scheduling requires current time; use replay to inspect historical slots")
+    _validate_candidate_root(root, output)
+    trading_dates, securities, symbols = tuple(trading_dates), tuple(securities), tuple(symbols)
+    jobs = plan_input_collection(root, now=now, trading_dates=trading_dates, securities=securities, symbols=symbols)
+    profiles = {p.name: p for p in load_collection_profiles(root / "collection.yaml")}
+    contracts = {c.input_id: c for c in load_input_capabilities(root / "providers.yaml")}
+    if execute and mode == "replay" and replay_manifest is None:
+        raise ValueError("execution in replay mode requires an explicit manifest")
+    report = {"now": now.isoformat(), "execute": execute, "mode": mode,
+        "eligible_for_production_routing": False, "production_writes": 0,
+        "profiles": [_json_value(asdict(p)) for p in profiles.values() if p.frequency_unit],
+        "dependencies": [{"path": str(Path(p).resolve()), "sha256": hashlib.sha256(Path(p).read_bytes()).hexdigest()}
+                         for p in dependency_paths],
+        "config_files": [{"path": str((root / name).resolve()), "sha256": hashlib.sha256((root / name).read_bytes()).hexdigest()}
+                         for name in ("collection.yaml", "providers.yaml")],
+        "code_files": [{"path": str(p.resolve()), "sha256": hashlib.sha256(p.read_bytes()).hexdigest()}
+                       for p in (Path(__file__), Path(__file__).parents[1] / "worker/scheduler.py",
+                                 Path(__file__).parents[1] / "config/loader.py")],
+        "scope_context": _json_value({"trading_dates": trading_dates, "securities": [asdict(s) for s in securities],
+                                      "symbols": symbols}), "jobs": []}
+    output.mkdir(parents=True, exist_ok=True)
+    pacer = RequestPacer()
+    # All enabled Tencent Kline inputs share one host pacing policy before any call starts.
+    interval = max([3] + [contracts[j.input_id].request_interval_seconds for j in jobs if j.status == "ready"])
+    for host in ("web.ifzq.gtimg.cn", "proxy.finance.qq.com", "ifzq.gtimg.cn", "qt.gtimg.cn"):
+        pacer.configure(host, interval, 1)
+    collector = collector or collect_input
+    metadata = MetadataStore(output / "schedule-attempts.duckdb") if execute else None
+    try:
+        for job in jobs:
+            entry = {**_json_value(asdict(job)), "coverage_denominator": len(job.symbols), "results": [],
+                     "validation_time_utc": datetime.now(timezone.utc).isoformat(),
+                     "config_files": report["config_files"], "code_files": report["code_files"],
+                     "universe_completeness_verified": False}
+            report["jobs"].append(entry)
+            if not execute or job.status != "ready":
+                continue
+            profile = profiles[job.profile]
+            slot_key = job.slot.date().isoformat() if profile.frequency_unit == "day" else job.slot.isoformat()
+            attempt_id = f"input-slot:{job.input_id}:{slot_key}"
+            attempt = CollectionAttempt(attempt_id).lease(owner="input-scheduler", acquired_at=now,
+                expires_at=now + timedelta(days=1)).transition(AttemptStatus.FETCHING)
+            # Persist the reservation before calling any source; a restart cannot repeat the same slot.
+            if not metadata.claim_attempt(attempt, updated_at=now):
+                previous = metadata.load_attempt(attempt_id)
+                entry.update(status="already_attempted", reason=previous.status.value,
+                             previous_report_path=previous.raw_object_path)
+                continue
+            started = monotonic()
+            budget = (profile.refresh_interval_seconds - (now - job.slot).total_seconds()
+                      if profile.frequency_unit == "minute" else None)
+            try:
+                for symbol in job.symbols:
+                    if budget is not None and monotonic() - started >= budget:
+                        entry.update(status="failed", reason="collection interval budget exhausted")
+                        break
+                    request = {"symbol": symbol}
+                    if job.input_id.endswith("daily"):
+                        request.update(start_date=job.slot.date(), end_date=job.slot.date())
+                    result = collector(input_id=job.input_id, context={"request": request,
+                        "calendar": {"trading_dates": trading_dates}}, config_root=root, output_root=output,
+                        mode=mode, replay_manifest=replay_manifest, evidence_root=evidence_root, pacer=pacer)
+                    result_path = Path(result["report_path"])
+                    entry["results"].append({"symbol": symbol, "status": result["status"],
+                        "report_path": str(result_path), "report_sha256": hashlib.sha256(result_path.read_bytes()).hexdigest()
+                        if result_path.is_file() else None, "row_count": result.get("row_count", 0),
+                        "code_version": result.get("code_version"),
+                        "source_response_hashes": result.get("output", {}).get("source_response_hashes", [])})
+                complete = (len(entry["results"]) == len(job.symbols)
+                            and all(r["status"] == "candidate_complete" for r in entry["results"]))
+                entry["status"] = "candidate_complete" if complete else "failed"
+                entry["successful_symbol_count"] = sum(r["status"] == "candidate_complete" for r in entry["results"])
+                # This is collection coverage, not a claim of complete/current bars or production readiness.
+                entry["coverage_semantics"] = "candidate results per requested security; bar freshness/completeness not certified"
+            except Exception as exc:
+                entry.update(status="failed", reason=type(exc).__name__)
+            entry_bytes = json.dumps(entry, ensure_ascii=False, indent=2).encode("utf-8")
+            saved = RawObjectStore(output).write_bytes(entry_bytes, dataset="schedule_attempt", provider="scheduler",
+                endpoint=job.input_id, fetched_at=datetime.now(timezone.utc), attempt_id=uuid4().hex)
+            attempt = replace(attempt, raw_object_path=str(saved.path.resolve()), raw_content_hash=saved.content_hash)
+            entry["attempt_record"] = {"path": str(saved.path.resolve()), "sha256": saved.content_hash}
+            if entry["status"] == "candidate_complete":
+                attempt = attempt.transition(AttemptStatus.RAW_COMMITTED).transition(AttemptStatus.NORMALIZED).transition(AttemptStatus.VALIDATED)
+            else:
+                attempt = attempt.transition(AttemptStatus.TERMINAL_FAILED)
+            metadata.save_attempt(attempt, updated_at=datetime.now(timezone.utc))
+    finally:
+        if metadata is not None:
+            metadata.close()
+    saved = RawObjectStore(output).write_json(report, dataset="schedule_tick", provider="scheduler", endpoint="inputs",
+        fetched_at=datetime.now(timezone.utc), attempt_id=uuid4().hex)
+    return {**report, "report_path": str(saved.path.resolve())}

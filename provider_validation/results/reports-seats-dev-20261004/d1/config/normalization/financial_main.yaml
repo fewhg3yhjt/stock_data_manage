@@ -1,0 +1,23 @@
+dataset: financial_main
+
+rules:
+  - id: eastmoney-financial-main-v1
+    provider: eastmoney
+    endpoint: financial_main
+    exchange: XSHG
+    asset_type: stock
+    frequency: null
+    adjustment: none
+    field_mapping:
+      report_date: REPORT_DATE
+      notice_date: NOTICE_DATE
+      report_type: REPORT_TYPE
+      currency: CURRENCY
+      eps: EPSJB
+      bps: BPS
+      operating_revenue: TOTALOPERATEREVE
+      parent_net_profit: PARENTNETPROFIT
+      roe: ROEJQ
+      operating_cash_flow: MGJYXJJE
+    status: pending_validation
+    version: eastmoney-financial-main-v1

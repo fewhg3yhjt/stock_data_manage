@@ -141,8 +141,15 @@ class RawObjectStore:
         return body
 
     @staticmethod
-    def find_cached_response(roots, *, url, method, scope, code_version, max_age_seconds):
+    def find_cached_response(roots, *, url, method, scope, code_version, max_age_seconds, ignored_query_parameters=()):
         now = datetime.now(timezone.utc)
+        def cache_url(value):
+            cleaned = sanitized_url(value)
+            if not ignored_query_parameters:
+                return cleaned
+            parts = urlsplit(cleaned)
+            query = [(key, item) for key, item in parse_qsl(parts.query, keep_blank_values=True) if key not in ignored_query_parameters]
+            return urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(query), ""))
         matches = []
         for root in roots:
             for manifest in Path(root).rglob("manifest.ndjson") if Path(root).exists() else ():
@@ -153,7 +160,7 @@ class RawObjectStore:
                         age = (now - stamp).total_seconds()
                         if (event.get("mode") == "live" and event.get("code_version") == code_version
                             and event.get("scope") == scope and event.get("method") == method
-                            and sanitized_url(event["url"]) == sanitized_url(url)
+                            and cache_url(event["url"]) == cache_url(url)
                             and event.get("status_code") == 200 and event.get("body_storage")
                             and event.get("body_bytes", 0) > 0 and 0 <= age <= max_age_seconds):
                             matches.append((stamp, manifest, event))

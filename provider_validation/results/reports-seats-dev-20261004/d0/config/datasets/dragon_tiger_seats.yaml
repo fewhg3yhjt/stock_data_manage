@@ -1,0 +1,17 @@
+dataset:
+  name: dragon_tiger_seats
+  display_name: 明确日期个股龙虎榜买卖席位候选输入
+  primary_key: [snapshot_at, source_security_code, trade_date, side, source_row_number]
+fields:
+  snapshot_at: {type: datetime, required: true}
+  source_security_code: {type: string, required: true}
+  trade_date: {type: date, required: true}
+  side: {type: string, required: true}
+  source_row_number: {type: integer, required: true}
+  department: {type: string, required: true}
+  listing_reason: {type: string, required: false}
+  buy_amount: {type: decimal, required: false, unit: unverified}
+  sell_amount: {type: decimal, required: false, unit: unverified}
+  net_amount: {type: decimal, required: false, unit: unverified}
+  buy_ratio: {type: decimal, required: false, unit: unverified}
+  sell_ratio: {type: decimal, required: false, unit: unverified}

@@ -1,0 +1,293 @@
+{
+  "validation_time_utc": "2026-10-04T08:43:46.639553+00:00",
+  "mode": "offline_replay",
+  "network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "verification_code": {
+    "path": "tests/test_input_collection.py",
+    "sha256": "77a1e52846a0189721abb75105a722164adc309289b5203b5cf76b2ab719cac0"
+  },
+  "runner": {
+    "path": "provider_validation/tests/replay_input_capabilities.py",
+    "sha256": "647c9c3fc1e7f99c8fba6434a3484043fba9a5766bd46c61798597ae97966697"
+  },
+  "inputs": [
+    {
+      "input_id": "ASTOCK-008",
+      "report_path": "provider_validation/results/reports-seats-final-20261004/ASTOCK-008/candidate/ASTOCK-008-f7f74aa48c34/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "report_sha256": "2632583d190f9842844494d979ef43fb0d38eaa61549ee6c79a98255cd09309f",
+      "source_manifest": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+      "source_manifest_sha256": "885abd6bf1c4b809b9029759f61b75c7d6a297755fd76ca6c545720db38a6767",
+      "row_count": 1,
+      "scope": {
+        "code": "600519",
+        "end": "2026-10-03",
+        "pages": 3,
+        "start": "2026-09-01"
+      },
+      "code_version": "bf955b90944c7a020f4942ef82133b99ccd882622e16c7efdd1e8ad29c8e6cf5",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-019",
+      "report_path": "provider_validation/results/reports-seats-final-20261004/ASTOCK-019/candidate/ASTOCK-019-3b92f5b2ce99/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "report_sha256": "1c017a345f4e6eb37a315e885fb82789001ce76184df63faf68610a998579e75",
+      "source_manifest": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+      "source_manifest_sha256": "885abd6bf1c4b809b9029759f61b75c7d6a297755fd76ca6c545720db38a6767",
+      "row_count": 10,
+      "scope": {
+        "code": "600519",
+        "date": "2013-01-28"
+      },
+      "code_version": "a3ab533861276d0708b4d7b9a55d1d7423e625f96e1cb80a8f6962fa8daf0bd4",
+      "result": "passed"
+    }
+  ],
+  "original_vs_provider": [
+    {
+      "input_id": "ASTOCK-008",
+      "all_business_fields_equal": true,
+      "all_retained_source_fields_equal": true,
+      "request_comparison_equal": true,
+      "original_request_count": 1,
+      "provider_request_count": 1,
+      "original_requested_date": null,
+      "actual_seat_day": null,
+      "original_csv": [
+        {
+          "path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\08_东财reportapi\\data.csv",
+          "sha256": "26c19ee7e64a345760e1227446cfaca404a2f36801c2c76052a04b54bfd4b06a"
+        }
+      ],
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-seats-final-20261004\\ASTOCK-008\\original-parsed.json",
+      "original_parsed_sha256": "a96270ee1f359ad9ca1df47ca53d93fd4f4dbaa5cc3704345a64e360bac608cf",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-seats-final-20261004\\ASTOCK-008\\candidate\\ASTOCK-008-f7f74aa48c34\\2026-10-04\\input_report\\eastmoney\\report_list\\report.json",
+      "report_sha256": "2632583d190f9842844494d979ef43fb0d38eaa61549ee6c79a98255cd09309f",
+      "known_difference": "no PDF download; numeric source strings retained without unit certification"
+    },
+    {
+      "input_id": "ASTOCK-019",
+      "all_business_fields_equal": true,
+      "all_retained_source_fields_equal": true,
+      "request_comparison_equal": true,
+      "original_request_count": 3,
+      "provider_request_count": 2,
+      "original_requested_date": "20260930",
+      "actual_seat_day": "20130128",
+      "original_csv": [
+        {
+          "path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\17_龙虎榜席位\\data\\dates.csv",
+          "sha256": "8031ea97bd0c2c7695e210b54d1e7645bf52749a992953e1372e488414053a17"
+        },
+        {
+          "path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\17_龙虎榜席位\\data\\buy.csv",
+          "sha256": "864bc3813a3ee7c869e72de6164cd3d8bd3fdd765d8ae927054898e40eb6ff38"
+        },
+        {
+          "path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\17_龙虎榜席位\\data\\sell.csv",
+          "sha256": "9334bd54ca1dc425c09185bf1c446e71ee7ce40e76992e484ca24692c31bb338"
+        }
+      ],
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-seats-final-20261004\\ASTOCK-019\\original-parsed.json",
+      "original_parsed_sha256": "12b322ad31afc6ebd8e3f50af6e411d506db98547699dcb4fb816b84bf8b3f08",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-seats-final-20261004\\ASTOCK-019\\candidate\\ASTOCK-019-3b92f5b2ce99\\2026-10-04\\input_report\\eastmoney\\dragon_tiger_seats\\report.json",
+      "report_sha256": "1c017a345f4e6eb37a315e885fb82789001ce76184df63faf68610a998579e75",
+      "known_difference": "explicit selected historical day; original date discovery retained only as evidence, no date/source fallback"
+    }
+  ],
+  "known_differences": [
+    "原财务Provider增加研报及明确日期席位两个方法，不新增Provider/回退层/入口。",
+    "研报原600519日期窗口1条完整51字段保留；原Session/头/Referer/代理/30秒超时/原探测重试保持，不含PDF。",
+    "席位原请求2026-09-30实际选中2013-01-28，日期发现及两侧原请求3次留证；Provider明确该历史日期只取两侧5+5条，无日期选择或新浪回退。",
+    "SDK按类型排序的行序号保留，不是金额排名或营业部永久身份；相同机构名称不合并。",
+    "研报时间戳只是原缓存刷新参数，严格回放只局部复现该时钟；既有缓存仅忽略该参数，其他来源默认不忽略，股票/窗口/版本/范围/有效期保持。",
+    "合成分页/失败/负值零值和注入Session/cache检查不算当前实时验证；原数值/精度留证，标准数值单位待认证，候选路由和自动调度关闭。"
+  ],
+  "negative_checks": [
+    {
+      "input_id": "ASTOCK-008",
+      "mutation": "empty",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/reports-seats-final-20261004/f0/candidate/ASTOCK-008-53961e9cc2b0/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "report_sha256": "e86d699cc66e47f8e6f12d454dce79c2eaf9c388bf2f07dda3c0c87e563645b3",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-008",
+      "mutation": "schema",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/reports-seats-final-20261004/f1/candidate/ASTOCK-008-60a52e25dc0d/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "report_sha256": "f3c90d6436e3b24b913de1192fd3cc71a37723f7d68000bc725a4d3ea0a67e6f",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-008",
+      "mutation": "numeric",
+      "failure_class": "InvalidOperation",
+      "report_path": "provider_validation/results/reports-seats-final-20261004/f2/candidate/ASTOCK-008-d3d4071fd62c/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "report_sha256": "1bf7977cf442ae17b1a514869e9fe748c9cbc3839e358275ecaeb6f75acd0890",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-008",
+      "mutation": "date",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/reports-seats-final-20261004/f3/candidate/ASTOCK-008-d55e2fa34b13/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "report_sha256": "fff2de16bc69c25b376d59880acf580a6de4a35ead0daa7037926753a531b19c",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-008",
+      "mutation": "code",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/reports-seats-final-20261004/f4/candidate/ASTOCK-008-ac1c8ffcabe1/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "report_sha256": "09bffc341aab3cb60cad878c5b948bf16bab3ec822bfa5b915ae1ce8a16c6e67",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-008",
+      "mutation": "duplicate",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/reports-seats-final-20261004/f5/candidate/ASTOCK-008-05d76db3dac9/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "report_sha256": "26bd5753460a8e5883135734d4df35d935f6a96ec7d9a273fdb8d9f5d235f5c5",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-008",
+      "mutation": "count",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/reports-seats-final-20261004/f6/candidate/ASTOCK-008-c93474ab5cfd/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "report_sha256": "51b04b6140bee39b0691b87a6a23e14f115a051c5c24518adca8d5c64b701497",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-008",
+      "mutation": "pages",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/reports-seats-final-20261004/f7/candidate/ASTOCK-008-ffe0fc0704fe/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "report_sha256": "291a2f6d4f7a1bd3888489f07da113ca034345af260a3b5c7bd32519d20938a6",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-008",
+      "mutation": "http403",
+      "failure_class": "HTTPError",
+      "report_path": "provider_validation/results/reports-seats-final-20261004/f8/candidate/ASTOCK-008-0bc32c70999a/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "report_sha256": "26f9032a3e289f7d042cee1412634ab996c4a13e42da3150eb63ed3ff2c3206d",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-019",
+      "mutation": "empty",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/reports-seats-final-20261004/f9/candidate/ASTOCK-019-df20a1c6c3ee/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "report_sha256": "14f316363772f592d6050d4b8767a45e6e987ff6144b8e9c19c1351dfc55d559",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-019",
+      "mutation": "schema",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/reports-seats-final-20261004/f10/candidate/ASTOCK-019-18866597ece7/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "report_sha256": "b623919c4027cb393f9852b872490c41b20eb835b19c5f385fb5ae618068516b",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-019",
+      "mutation": "numeric",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/reports-seats-final-20261004/f11/candidate/ASTOCK-019-246742e54bb3/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "report_sha256": "795dbf723a81a59f45f4b4338d86c10dc8bd5a0b4594980a7166e58d64b790bd",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-019",
+      "mutation": "date",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/reports-seats-final-20261004/f12/candidate/ASTOCK-019-32427b05ad94/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "report_sha256": "4ff554b44a1e7f0f0876c57cd9c51606e1f0d5c8f2b5a8d50186e7722ea1b874",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-019",
+      "mutation": "code",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/reports-seats-final-20261004/f13/candidate/ASTOCK-019-51eeb6d44f6a/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "report_sha256": "cecb4bd8084f78e093e9433128cd59e79b70e9231cddc7f97a2099967735abe8",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-019",
+      "mutation": "duplicate",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/reports-seats-final-20261004/f14/candidate/ASTOCK-019-b71a873d040d/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "report_sha256": "91d1091990951a665a9e94d9634f9338a3357f40ce588de895627604e85fc329",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-019",
+      "mutation": "count",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/reports-seats-final-20261004/f15/candidate/ASTOCK-019-c9081faf07ee/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "report_sha256": "58e1024d881e96925ed509223de043e6e45366af0fbab2b6e0989b405b51c439",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-019",
+      "mutation": "pages",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/reports-seats-final-20261004/f16/candidate/ASTOCK-019-5912b03e7a0a/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "report_sha256": "82a1627dbbcfff5caaa765de13edf403a9e1a1b7ba6bdfa7ea6ad300f40ae933",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-019",
+      "mutation": "http403",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/reports-seats-final-20261004/f17/candidate/ASTOCK-019-56d87d926dc2/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "report_sha256": "3629a1166b7eb0fad593ed717753b452663e42420301e81fda63eff2d3207212",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-008",
+      "mutation": "page",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/reports-seats-final-20261004/f18/candidate/ASTOCK-008-da8167992125/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "report_sha256": "453e625db441ee13da999204bf6f64807fd1410f7fb90653c35ffc122b8376d5",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-008",
+      "mutation": "missing",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/reports-seats-final-20261004/f19/candidate/ASTOCK-008-8249cb0737b0/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "report_sha256": "cda45a1754869f52d6da2aac24f3979d725535106c4796d0819ce4436a217889",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-019",
+      "mutation": "order",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/reports-seats-final-20261004/f20/candidate/ASTOCK-019-ebc81e2749b9/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "report_sha256": "b4b63c5d399b15907a36b6bcc99cf42b6cf8c50bd4bea5b6ba8375d6d211c4f0",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-019",
+      "mutation": "business",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/reports-seats-final-20261004/f21/candidate/ASTOCK-019-a1ec9c384f8f/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "report_sha256": "aafd55eccf39fadedf854c56ae66f7ddff7444fc1b00b3f9a5c569828d84b8e5",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-019",
+      "mutation": "missing_sell",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/reports-seats-final-20261004/f22/candidate/ASTOCK-019-a875d4e381fe/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "report_sha256": "5f4c58acd0271e68a74051f05f3f54eaafac1d72e6a5bbb2d1079e54ccf73949",
+      "result": "passed"
+    }
+  ]
+}

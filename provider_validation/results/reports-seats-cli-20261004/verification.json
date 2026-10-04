@@ -1,0 +1,62 @@
+{
+  "validation_time_utc": "2026-10-04T08:47:42.539720+00:00",
+  "results": [
+    {
+      "input_id": "ASTOCK-008",
+      "command": [
+        "D:\\Program Files\\Python\\python.exe",
+        "-m",
+        "stock_data_manage.cli",
+        "collect-input",
+        "--input",
+        "ASTOCK-008",
+        "--config-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\config",
+        "--output-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-seats-cli-20261004\\candidate",
+        "--mode",
+        "replay",
+        "--replay-manifest",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\_raw\\missing-capabilities-20261003T174623\\manifest.ndjson",
+        "--context-file",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-seats-cli-20261004\\0-context.json"
+      ],
+      "exit_code": 0,
+      "count": 1,
+      "stdout": "provider_validation/results/reports-seats-cli-20261004/0-stdout.json",
+      "stderr": "provider_validation/results/reports-seats-cli-20261004/0-stderr.bin",
+      "stdout_sha256": "5b934404a376e89f2cd969499dc0c9a56cffb92951b8f15eadf51e16d7fc03e6",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-seats-cli-20261004\\candidate\\ASTOCK-008-bab208c0176a\\2026-10-04\\input_report\\eastmoney\\report_list\\report.json"
+    },
+    {
+      "input_id": "ASTOCK-019",
+      "command": [
+        "D:\\Program Files\\Python\\python.exe",
+        "-m",
+        "stock_data_manage.cli",
+        "collect-input",
+        "--input",
+        "ASTOCK-019",
+        "--config-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\config",
+        "--output-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-seats-cli-20261004\\candidate",
+        "--mode",
+        "replay",
+        "--replay-manifest",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\_raw\\missing-capabilities-20261003T174623\\manifest.ndjson",
+        "--context-file",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-seats-cli-20261004\\1-context.json"
+      ],
+      "exit_code": 0,
+      "count": 10,
+      "stdout": "provider_validation/results/reports-seats-cli-20261004/1-stdout.json",
+      "stderr": "provider_validation/results/reports-seats-cli-20261004/1-stderr.bin",
+      "stdout_sha256": "f54362f37b1319891827059ee3d6df7453055b3810f3da5592a19cbc6262104f",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-seats-cli-20261004\\candidate\\ASTOCK-019-8ff7c236357b\\2026-10-04\\input_report\\eastmoney\\dragon_tiger_seats\\report.json"
+    }
+  ],
+  "script_sha256": "138d433c645c30ae17fcec1a7ec145bf8d50f142caa86d297c3247bb620f17e9"
+}

@@ -1,0 +1,12 @@
+dataset: industry_directory
+rules:
+  - id: ths-industry-directory-input-v1
+    input_id: SDA-BOARD-001
+    provider: ths
+    endpoint: industry_directory
+    field_mapping: {board_name: name, board_code: code}
+    context_fields: {board_type: board_type, source: source}
+    status: pending_validation
+    version: ths-industry-directory-input-v1
+    evidence_refs: [SDA-BOARD-001]
+    notes: 仅验证历史目录样本；不代表证券行业归属或当前全量完整性。

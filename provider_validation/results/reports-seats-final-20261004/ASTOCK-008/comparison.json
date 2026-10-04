@@ -1,0 +1,21 @@
+{
+  "input_id": "ASTOCK-008",
+  "all_business_fields_equal": true,
+  "all_retained_source_fields_equal": true,
+  "request_comparison_equal": true,
+  "original_request_count": 1,
+  "provider_request_count": 1,
+  "original_requested_date": null,
+  "actual_seat_day": null,
+  "original_csv": [
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\08_东财reportapi\\data.csv",
+      "sha256": "26c19ee7e64a345760e1227446cfaca404a2f36801c2c76052a04b54bfd4b06a"
+    }
+  ],
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-seats-final-20261004\\ASTOCK-008\\original-parsed.json",
+  "original_parsed_sha256": "a96270ee1f359ad9ca1df47ca53d93fd4f4dbaa5cc3704345a64e360bac608cf",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-seats-final-20261004\\ASTOCK-008\\candidate\\ASTOCK-008-f7f74aa48c34\\2026-10-04\\input_report\\eastmoney\\report_list\\report.json",
+  "report_sha256": "2632583d190f9842844494d979ef43fb0d38eaa61549ee6c79a98255cd09309f",
+  "known_difference": "no PDF download; numeric source strings retained without unit certification"
+}

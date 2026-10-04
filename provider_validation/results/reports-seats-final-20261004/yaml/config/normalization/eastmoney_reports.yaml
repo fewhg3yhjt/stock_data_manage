@@ -1,0 +1,49 @@
+dataset: eastmoney_reports
+rules:
+- context_fields:
+    snapshot_at: source_snapshot_at
+  endpoint: report_list
+  evidence_refs:
+  - ASTOCK-008
+  field_mapping:
+    eps_next_two_year: predictNextTwoYearEps
+    eps_next_year: predictNextYearEps
+    eps_this_year: predictThisYearEps
+    organization: orgName
+    organization_code: orgCode
+    pe_next_two_year: predictNextTwoYearPe
+    pe_next_year: predictNextYearPe
+    pe_this_year: predictThisYearPe
+    rating: emRatingName
+    report_date: publishDate
+    report_id: infoCode
+    researcher: researcher
+    source_encoded_locator: encodeUrl
+    source_publish_text: publishDate
+    source_report_type: reportType
+    source_security_code: stockCode
+    stock_name: stockName
+    target_price_lower: indvAimPriceL
+    target_price_upper: indvAimPriceT
+    title: orgName
+  id: eastmoney-report-list-input-v1
+  input_id: ASTOCK-008
+  notes: 完整51个来源字段含作者数组及预测字符串精度另存，不把encodeUrl编码定位符认定为PDF网址。publishDate午夜文本保留，仅以日期作索引，不认证精确发布时间；原预测值标准单位和年度口径未认证。
+  null_values:
+  - null
+  - ''
+  provider: eastmoney
+  status: pending_validation
+  transforms:
+    report_date:
+      format: '%Y-%m-%d %H:%M:%S.%f'
+  unverified_fields:
+  - eps_this_year
+  - pe_this_year
+  - eps_next_year
+  - pe_next_year
+  - eps_next_two_year
+  - pe_next_two_year
+  - target_price_upper
+  - target_price_lower
+  version: eastmoney-reports-seats-input-v1

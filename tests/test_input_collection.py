@@ -24,6 +24,269 @@ SDK_ARCHIVE = ROOT / "provider_validation/results/live-probes/rate-limited-all-2
 SDK_NEWS_CASES = [("ASTOCK-032", {}, SDK_ARCHIVE, 20), ("ASTOCK-033", {}, SDK_ARCHIVE, 20)]
 MACRO_CASES = [("ASTOCK-061", {}, SDK_ARCHIVE, 136), ("ASTOCK-062", {}, SDK_ARCHIVE, 225)]
 
+REPORTS_SEATS_CASES = [
+    ("ASTOCK-008", {"request":{"symbol":"600519", "start_date":"2026-09-01", "end_date":"2026-10-03"}}, SDK_ARCHIVE, 1),
+    ("ASTOCK-019", {"request":{"symbol":"600519", "trade_date":"2013-01-28"}, "calendar":{"trading_dates":[date(2013,1,28)]}}, SDK_ARCHIVE, 10)]
+REPORTS_SEATS_FAILURES = [(id, mutation) for id in ("ASTOCK-008", "ASTOCK-019")
+    for mutation in ("empty", "schema", "numeric", "date", "code", "duplicate", "count", "pages", "http403")] + [
+    ("ASTOCK-008","page"), ("ASTOCK-008","missing"), ("ASTOCK-019","order"), ("ASTOCK-019","business"), ("ASTOCK-019","missing_sell")]
+
+
+def reports_seats_records(input_id):
+    records = [json.loads(line) for line in SDK_ARCHIVE.read_text(encoding="utf-8").splitlines()]
+    return [r for r in records if ("reportapi.eastmoney.com/report/list" in r.get("url", "") if input_id=="ASTOCK-008"
+        else "RPT_BILLBOARD_DAILYDETAILS" in r.get("url", ""))][:1 if input_id=="ASTOCK-008" else 2]
+
+
+def compare_reports_seats_original(tmp_path, input_id, context, manifest, count):
+    import ast, csv, inspect, re
+    from types import SimpleNamespace
+    from typing import Any, Callable, List, Tuple, Dict
+    from requests.adapters import HTTPAdapter
+    from urllib3.util.retry import Retry
+    import akshare as sdk
+    import pandas as pd
+    from stock_data_manage.pipeline.inputs import _json_value
+    from stock_data_manage.providers.eastmoney.financial import reportapi_replay_clock
+    from contextlib import ExitStack
+    source = ROOT/"provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py"
+    names={"only_digits","date_dash","build_session","fetch_eastmoney_reportapi"} if input_id=="ASTOCK-008" else {"ak_function","call_ak","try_ak_variants","only_digits","fetch_lhb_seats"}
+    nodes=[n for n in ast.parse(source.read_text(encoding="utf-8")).body if isinstance(n,ast.FunctionDef) and n.name in names]
+    ua="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36"
+    namespace=dict(re=re,inspect=inspect,requests=requests,json=json,pd=pd,datetime=datetime,Any=Any,Callable=Callable,List=List,Tuple=Tuple,Dict=Dict,
+        Config=SimpleNamespace,ensure_ak=lambda:sdk,UA=ua,Retry=Retry,HTTPAdapter=HTTPAdapter)
+    exec(compile(ast.Module(body=nodes,type_ignores=[]),str(source),"exec"),namespace)
+    cfg=SimpleNamespace(code="600519",trade_date="20260930",start="20260901",end="20261003",report_pages=3,sleep=0.25)
+    with ExitStack() as stack:
+        events=stack.enter_context(captured_requests(RawObjectStore(tmp_path/"original"),provider="eastmoney",endpoint="original-reports-seats",scope={},
+            code_version="original-source",pacer=RequestPacer(),replay_manifest=manifest,sdk_retry_policy=True,probe_host_pause=True,
+            cache_ignored_query_parameters=("_",) if input_id=="ASTOCK-008" else ()))
+        if input_id=="ASTOCK-008":
+            # The successful rate-limited probe explicitly remounted the original module Session after loading it.
+            probe_path=ROOT/"provider_validation/tests/run_a_stock_rate_limited_probes.py"
+            spec=importlib.util.spec_from_file_location("original_report_probe_policy",probe_path)
+            probe=importlib.util.module_from_spec(spec);spec.loader.exec_module(probe)
+            session=namespace["build_session"]()
+            for scheme in ("http://","https://"):session.mount(scheme,HTTPAdapter(max_retries=probe.retry_policy()))
+            namespace["SESSION"]=session;stack.callback(session.close)
+            stack.enter_context(reportapi_replay_clock(namespace["fetch_eastmoney_reportapi"],manifest,code="600519",start=date(2026,9,1),end=date(2026,10,3),clock_name="time"))
+            frames={"reports":namespace["fetch_eastmoney_reportapi"](cfg)};chosen_date=None
+        else:
+            result=namespace["fetch_lhb_seats"](cfg);frames={k:result[k] for k in ("dates","buy","sell")};chosen_date=result["chosen_date"]
+            assert chosen_date=="20130128"
+    parsed={k:_json_value(frame.astype(object).where(pd.notna(frame),None).to_dict(orient="records")) for k,frame in frames.items()}
+    path=tmp_path/"original-parsed.json";path.write_text(json.dumps(dict(frames=parsed,original_requested_date=cfg.trade_date,chosen_date=chosen_date),ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    csv_refs=[]
+    for kind, rows in parsed.items():
+        csv_path=SDK_ARCHIVE.parents[2]/("08_东财reportapi/data.csv" if input_id=="ASTOCK-008" else "17_龙虎榜席位/data/"+kind+".csv")
+        with csv_path.open(encoding="utf-8-sig",newline="") as stream: golden=list(csv.DictReader(stream))
+        assert len(rows)==len(golden)
+        for row, old in zip(rows,golden):
+            assert tuple(row)==tuple(old)
+            for key,value in row.items():
+                if value is None:assert old[key]==""
+                elif isinstance(value,(int,float)):assert float(value)==pytest.approx(float(old[key]),rel=1e-12)
+                else:assert str(value)==old[key]
+        csv_refs.append(dict(path=str(csv_path),sha256=hashlib.sha256(csv_path.read_bytes()).hexdigest()))
+    report=collect_input(input_id=input_id,context=context,config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=manifest)
+    assert report["status"]=="candidate_complete" and report["row_count"]==count,report
+    candidate=read_artifact(report,"parsed_rows");source_rows=read_artifact(report,"source_rows")
+    if input_id=="ASTOCK-008":
+        assert candidate==source_rows==parsed["reports"]
+        assert source_rows[0]["predictNextTwoYearEps"]=="71.3200000000"
+        expected_events=events
+    else:
+        expected_events=events[1:]
+        for side in ("buy","sell"):
+            assert [{k:v for k,v in r.items() if k not in {"side","source_security_code","trade_date"}} for r in candidate if r["side"]==side]==parsed[side]
+        expected_raw=[{"side":side,**row} for side,record in zip(("buy","sell"),reports_seats_records(input_id))
+            for row in json.loads(RawObjectStore.read_response(manifest,record))["result"]["data"]]
+        assert source_rows==expected_raw and report["date_discovery_requests"]==0
+        assert report["returned_window"]=={"first":"2013-01-28","last":"2013-01-28"}
+        assert len(events)==3 and len(report["responses"])==2
+        assert report["side_counts"]=={"buy":5,"sell":5}
+    keys=("url","method","status_code","body_sha256","request_headers","request_options")
+    assert [{k:r.get(k) for k in keys} for r in expected_events]==[{k:r.get(k) for k in keys} for r in report["responses"]]
+    assert not report["source_fallback_enabled"] and not report["implicit_date_selection"]
+    assert report["production_writes"]==report["live_http_calls"]==0 and not report["eligible_for_production_routing"]
+    for row in read_artifact(report,"output"):
+        assert all(row[key] is None for key in report["unverified_fields"])
+        assert row["snapshot_at"]==report["source_capture_window"]["last"]
+    comparison=dict(input_id=input_id,all_business_fields_equal=True,all_retained_source_fields_equal=True,request_comparison_equal=True,
+        original_request_count=len(events),provider_request_count=len(report["responses"]),original_requested_date=cfg.trade_date if chosen_date else None,
+        actual_seat_day=chosen_date,original_csv=csv_refs,original_parsed_path=str(path.resolve()),original_parsed_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
+        report_path=report["report_path"],report_sha256=hashlib.sha256(Path(report["report_path"]).read_bytes()).hexdigest(),
+        known_difference="explicit selected historical day; original date discovery retained only as evidence, no date/source fallback" if chosen_date else "no PDF download; numeric source strings retained without unit certification")
+    (tmp_path/"comparison.json").write_text(json.dumps(comparison,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    return comparison
+
+
+@pytest.mark.parametrize("input_id,context,manifest,count",REPORTS_SEATS_CASES)
+def test_reports_seats_original_csv_requests_and_actual_day(tmp_path,no_network,input_id,context,manifest,count):
+    compare_reports_seats_original(tmp_path,input_id,context,manifest,count)
+
+
+def reports_seats_fixture(tmp_path,input_id,mutation):
+    from copy import deepcopy
+    records=reports_seats_records(input_id)
+    payloads=[json.loads(RawObjectStore.read_response(SDK_ARCHIVE,r)) for r in records]
+    payload=payloads[0];result=payload if input_id=="ASTOCK-008" else payload["result"];rows=result["data"]
+    code="stockCode" if input_id=="ASTOCK-008" else "SECURITY_CODE"
+    day="publishDate" if input_id=="ASTOCK-008" else "TRADE_DATE"
+    numeric="predictThisYearEps" if input_id=="ASTOCK-008" else "BUY"
+    if mutation=="empty":rows.clear()
+    elif mutation=="schema":rows[0].pop("infoCode" if input_id=="ASTOCK-008" else numeric)
+    elif mutation=="numeric":rows[0][numeric]="bad"
+    elif mutation=="date":rows[0][day]="2020-01-01 00:00:00.000"
+    elif mutation=="code":rows[0][code]="000001"
+    elif mutation=="duplicate":
+        if input_id=="ASTOCK-008":rows.append(deepcopy(rows[0]));result["hits"]=result["size"]=2
+        else:rows[1]=deepcopy(rows[0])
+    elif mutation=="count":result["hits" if input_id=="ASTOCK-008" else "count"]+=1
+    elif mutation=="pages":result["TotalPage" if input_id=="ASTOCK-008" else "pages"]+=1
+    elif mutation=="order":rows[0]={k:rows[0][k] for k in reversed(rows[0])}
+    elif mutation=="business":payload["success"]=False
+    elif mutation=="page":payload["pageNo"]=2
+    elif mutation=="missing_sell":payloads=payloads[:1];records=records[:1]
+    elif mutation=="zero_negative":
+        if input_id=="ASTOCK-008":rows[0].update(predictThisYearEps="-1.0000000000",predictNextYearEps="0.0000000000",predictNextTwoYearEps=None)
+        else:rows[0][numeric]=-1;rows[1][numeric]=0;rows[2][numeric]=None
+    store=RawObjectStore(tmp_path/"fixture")
+    if mutation=="missing":store.root.mkdir(parents=True,exist_ok=True);(store.root/"manifest.ndjson").write_text("",encoding="utf-8")
+    else:
+        for record,item in zip(records,payloads):
+            response=requests.Response();response.status_code=403 if mutation=="http403" else 200;response.encoding="utf-8"
+            text=json.dumps(item,ensure_ascii=False);response._content=("datatable("+text+")" if mutation=="jsonp" else text).encode()
+            store.record_response(response=response,url=record["url"],method="GET",request_headers=record["request_headers"],provider="fixture",endpoint="reports-seats",scope={"fixture":"synthetic mutation"},code_version="fixture",mode="fixture")
+    return store.root/"manifest.ndjson"
+
+
+@pytest.mark.parametrize("input_id,mutation",REPORTS_SEATS_FAILURES)
+def test_reports_seats_invalid_source_stops_without_source_or_date_fallback(tmp_path,no_network,input_id,mutation):
+    context=next(c[1] for c in REPORTS_SEATS_CASES if c[0]==input_id)
+    report=collect_input(input_id=input_id,context=context,config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=reports_seats_fixture(tmp_path,input_id,mutation))
+    assert report["status"]=="failed" and "output" not in report,report
+    assert report["production_writes"]==report["live_http_calls"]==0 and not report["eligible_for_production_routing"]
+    if mutation!="missing":
+        assert report["responses"] and len(report["responses"])<=2
+        for event in report["responses"]:assert RawObjectStore.read_response(Path(report["run_directory"])/report["raw_manifest"]["path"],event)
+
+
+@pytest.mark.parametrize("input_id",["ASTOCK-008","ASTOCK-019"])
+def test_reports_seats_zero_negative_null_and_jsonp_preservation(tmp_path,no_network,input_id):
+    context=next(c[1] for c in REPORTS_SEATS_CASES if c[0]==input_id)
+    report=collect_input(input_id=input_id,context=context,config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=reports_seats_fixture(tmp_path,input_id,"zero_negative"))
+    assert report["status"]=="candidate_complete",report
+    parsed=read_artifact(report,"parsed_rows")
+    if input_id=="ASTOCK-008":
+        assert [parsed[0][k] for k in ("predictThisYearEps","predictNextYearEps","predictNextTwoYearEps")]==["-1.0000000000","0.0000000000",None]
+        jsonp=collect_input(input_id=input_id,context=context,config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=reports_seats_fixture(tmp_path/"jsonp",input_id,"jsonp"))
+        assert jsonp["status"]=="candidate_complete" and read_artifact(jsonp,"source_rows")[0]["infoCode"]=="AP202609211829719676",jsonp
+    else:assert [r["买入金额"] for r in parsed[:3]]==[-1,0,None]
+
+
+def test_reports_seats_yaml_projection_scope_and_old_methods(tmp_path,no_network):
+    import ast
+    def methods(path):
+        cls=next(n for n in ast.parse(path.read_text(encoding="utf-8")).body if isinstance(n,ast.ClassDef) and n.name=="EastMoneyFinancialMainProvider")
+        return {n.name:ast.dump(n,include_attributes=False) for n in cls.body if isinstance(n,ast.FunctionDef)}
+    before=methods(ROOT/"provider_validation/results/reports-seats-original-20261004/0-financial.py.bin")
+    current=methods(ROOT/"src/stock_data_manage/providers/eastmoney/financial.py")
+    assert all(current[name]==body for name,body in before.items())
+    config=tmp_path/"config";shutil.copytree(ROOT/"config",config)
+    path=config/"normalization/eastmoney_reports.yaml";rule=yaml.safe_load(path.read_text(encoding="utf-8"));rule["rules"][0]["field_mapping"]["title"]="orgName"
+    path.write_text(yaml.safe_dump(rule,allow_unicode=True),encoding="utf-8")
+    fields=["snapshot_at","source_security_code","report_id","report_date","source_publish_text","title"]
+    report=collect_input(input_id="ASTOCK-008",context=REPORTS_SEATS_CASES[0][1],config_root=config,output_root=tmp_path/"candidate",replay_manifest=SDK_ARCHIVE,fields=fields)
+    assert report["status"]=="candidate_complete" and all(set(r)==set(fields) and r["title"]=="诚通证券股份有限公司" for r in read_artifact(report,"output")),report
+    for input_id,context,manifest,count in REPORTS_SEATS_CASES:
+        with pytest.raises(ValueError,match="does not support"):
+            collect_input(input_id=input_id,context={**context,"request":{**context["request"],"symbols":["600519"]}},config_root=ROOT/"config",output_root=tmp_path/"bad",replay_manifest=manifest)
+    with pytest.raises(ValueError,match="calendar"):
+        collect_input(input_id="ASTOCK-019",context={"request":{"symbol":"600519","trade_date":"2013-01-28"}},config_root=ROOT/"config",output_root=tmp_path/"bad",replay_manifest=SDK_ARCHIVE)
+    wrong=collect_input(input_id="ASTOCK-019",context={"request":{"symbol":"600519","trade_date":"2026-09-30"},"calendar":{"trading_dates":[date(2026,9,30)]}},config_root=ROOT/"config",output_root=tmp_path/"bad",replay_manifest=SDK_ARCHIVE)
+    assert wrong["status"]=="failed" and wrong["failure_class"]=="ValueError" and not wrong.get("responses")
+
+
+def test_reports_seats_session_headers_timeout_retry_cache_and_local_clock(tmp_path,no_network):
+    from unittest.mock import patch
+    from urllib.parse import parse_qs,urlsplit
+    import time
+    from stock_data_manage.providers.eastmoney import financial
+    seen=[];process_clock=time.time;report_clock=financial._report_clock
+    def send(session,request,**kwargs):
+        input_id="ASTOCK-008" if urlsplit(request.url).hostname=="reportapi.eastmoney.com" else "ASTOCK-019"
+        record=next(r for r in reports_seats_records(input_id) if input_id=="ASTOCK-008" or parse_qs(urlsplit(request.url).query)["reportName"]==parse_qs(urlsplit(r["url"]).query)["reportName"])
+        seen.append(request.url)
+        assert kwargs["timeout"]==(30 if input_id=="ASTOCK-008" else None) and kwargs["allow_redirects"] and session.trust_env
+        assert request.headers["User-Agent"]==record["request_headers"]["User-Agent"]
+        if input_id=="ASTOCK-008":
+            assert request.headers["Referer"]=="https://data.eastmoney.com/" and request.headers["Accept-Language"]==record["request_headers"]["Accept-Language"]
+        retry=session.get_adapter(request.url).max_retries
+        assert retry.total==retry.connect==retry.read==retry.status==2 and retry.backoff_factor==5
+        assert not retry.is_retry("GET",403) and not retry.is_retry("GET",429,True)
+        response=requests.Response();response.status_code=200;response.encoding="utf-8";response._content=RawObjectStore.read_response(SDK_ARCHIVE,record);response.url=request.url
+        return response
+    with patch("requests.Session.send",send):
+        for input_id,context,_,_ in REPORTS_SEATS_CASES:
+            first=collect_input(input_id=input_id,context=context,config_root=ROOT/"config",output_root=tmp_path/"candidate",mode="live",evidence_root=tmp_path/"unused")
+            second=collect_input(input_id=input_id,context=context,config_root=ROOT/"config",output_root=tmp_path/"candidate",mode="live",evidence_root=tmp_path/"candidate")
+            assert first["status"]==second["status"]=="candidate_complete",(first,second)
+            assert first["live_http_calls"]==(1 if input_id=="ASTOCK-008" else 2) and second["live_http_calls"]==0
+            assert read_artifact(first,"output")==read_artifact(second,"output")
+    assert len(seen)==3 and time.time is process_clock and financial._report_clock is report_clock
+    (tmp_path/"fixture-mode.json").write_text(json.dumps(dict(mode="injected Session; not real live validation",real_http_calls=0,fixture_send_calls=3)),encoding="utf-8")
+
+
+def test_report_cache_nonce_does_not_relax_scope_window_version_or_age(tmp_path,no_network):
+    from datetime import timedelta
+    original=reports_seats_records("ASTOCK-008")[0]
+    response=requests.Response();response.status_code=200;response._content=RawObjectStore.read_response(SDK_ARCHIVE,original);response.encoding="utf-8"
+    store=RawObjectStore(tmp_path/"cache");store.record_response(response=response,url=original["url"],method="GET",request_headers={},provider="eastmoney",endpoint="report_list",scope={"input_id":"ASTOCK-008"},code_version="current",mode="live")
+    url=original["url"].replace("1791020798080","1791020800000")
+    kwargs=dict(roots=(store.root,),url=url,method="GET",scope={"input_id":"ASTOCK-008"},code_version="current",max_age_seconds=86400)
+    assert RawObjectStore.find_cached_response(**kwargs) is None
+    assert RawObjectStore.find_cached_response(**kwargs,ignored_query_parameters=("_",)) is not None
+    for change in ({"code_version":"different"},{"scope":{"input_id":"other"}},{"method":"POST"},{"max_age_seconds":0},
+        {"url":url.replace("600519","000001")},{"url":url.replace("2026-09-01","2026-09-02")},{"url":url.replace("pageNo=1","pageNo=2")},
+        {"url":url.replace("reportapi.eastmoney.com","other.example.com")}):
+        assert RawObjectStore.find_cached_response(**{**kwargs,**change},ignored_query_parameters=("_",)) is None
+
+
+def report_pages_fixture(tmp_path, mutation):
+    from copy import deepcopy
+    from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
+    record=reports_seats_records("ASTOCK-008")[0]
+    payload=json.loads(RawObjectStore.read_response(SDK_ARCHIVE,record));base=payload["data"][0]
+    count=301 if mutation=="limited" else 101
+    store=RawObjectStore(tmp_path/"fixture")
+    for page in (1,2):
+        item=deepcopy(payload);size=min(100,count-(page-1)*100)
+        item.update(hits=count,TotalPage=(count+99)//100,pageNo=page,size=size)
+        item["data"]=[{**deepcopy(base),"infoCode":base["infoCode"]+str(i)} for i in range((page-1)*100,(page-1)*100+size)]
+        if page==2 and mutation=="duplicate_cross_page":item["data"][0]["infoCode"]=base["infoCode"]+"0"
+        if page==2 and mutation=="totals_drift":
+            item["hits"]=102;item["size"]=2;item["data"].append({**deepcopy(base),"infoCode":"extra"})
+        parts=urlsplit(record["url"]);query=dict(parse_qsl(parts.query,keep_blank_values=True))
+        for key in ("p","pageNo","pageNum","pageNumber"):query[key]=str(page)
+        query["_"]=str(int(query["_"])+1000*(page-1))
+        response=requests.Response();response.status_code=200;response.encoding="utf-8";response._content=json.dumps(item,ensure_ascii=False).encode()
+        store.record_response(response=response,url=urlunsplit((parts.scheme,parts.netloc,parts.path,urlencode(query),"")),method="GET",request_headers=record["request_headers"],
+            provider="fixture",endpoint="report-list",scope={"fixture":"synthetic report pages"},code_version="fixture",mode="fixture")
+    return store.root/"manifest.ndjson"
+
+
+@pytest.mark.parametrize("mutation",["complete","limited","totals_drift","duplicate_cross_page"])
+def test_report_pages_complete_bounded_or_inconsistent(tmp_path,no_network,mutation):
+    context={**REPORTS_SEATS_CASES[0][1],"config":{"pages":2}}
+    report=collect_input(input_id="ASTOCK-008",context=context,config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=report_pages_fixture(tmp_path,mutation))
+    if mutation in {"complete","limited"}:
+        assert report["status"]=="candidate_complete" and report["row_count"]==(101 if mutation=="complete" else 200),report
+        assert report["result_limited"] is (mutation=="limited") and report["coverage_complete"] is (mutation=="complete")
+        assert report["source_total_count"]==(101 if mutation=="complete" else 301) and report["retrieved_pages"]==[1,2]
+    else:assert report["status"]=="failed" and "output" not in report,report
+    assert report["live_http_calls"]==report["production_writes"]==0 and len(report["responses"])==2
+
 MARKET_EVENT_CASES = [
     ("ASTOCK-020", {"request": {"trade_date": "2026-09-30"}, "calendar": {"trading_dates": [date(2026, 9, 30)]}}, SDK_ARCHIVE, 84),
     ("ASTOCK-021", {"request": {"start_date": "2026-09-01", "end_date": "2026-10-03"}}, SDK_ARCHIVE, 167)]

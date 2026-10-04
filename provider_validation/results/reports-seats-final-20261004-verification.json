@@ -1,0 +1,3572 @@
+{
+  "validation_time_utc": "2026-10-04T08:58:18.979021+00:00",
+  "result": "passed",
+  "tests": 578,
+  "counts": {
+    "implemented_validation_only": 43,
+    "unimplemented": 21,
+    "blocked": 7,
+    "alias": 3
+  },
+  "real_network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "legacy_financial_methods_ast_equal": true,
+  "audited_reports": [
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/ASTOCK-008/candidate/ASTOCK-008-f7f74aa48c34/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "2632583d190f9842844494d979ef43fb0d38eaa61549ee6c79a98255cd09309f",
+      "status": "candidate_complete",
+      "row_count": 1,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/ASTOCK-019/candidate/ASTOCK-019-3b92f5b2ce99/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "1c017a345f4e6eb37a315e885fb82789001ce76184df63faf68610a998579e75",
+      "status": "candidate_complete",
+      "row_count": 10,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f0/candidate/ASTOCK-008-53961e9cc2b0/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "e86d699cc66e47f8e6f12d454dce79c2eaf9c388bf2f07dda3c0c87e563645b3",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f1/candidate/ASTOCK-008-60a52e25dc0d/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "f3c90d6436e3b24b913de1192fd3cc71a37723f7d68000bc725a4d3ea0a67e6f",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f10/candidate/ASTOCK-019-18866597ece7/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "b623919c4027cb393f9852b872490c41b20eb835b19c5f385fb5ae618068516b",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f11/candidate/ASTOCK-019-246742e54bb3/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "795dbf723a81a59f45f4b4338d86c10dc8bd5a0b4594980a7166e58d64b790bd",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f12/candidate/ASTOCK-019-32427b05ad94/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "4ff554b44a1e7f0f0876c57cd9c51606e1f0d5c8f2b5a8d50186e7722ea1b874",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f13/candidate/ASTOCK-019-51eeb6d44f6a/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "cecb4bd8084f78e093e9433128cd59e79b70e9231cddc7f97a2099967735abe8",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f14/candidate/ASTOCK-019-b71a873d040d/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "91d1091990951a665a9e94d9634f9338a3357f40ce588de895627604e85fc329",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f15/candidate/ASTOCK-019-c9081faf07ee/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "58e1024d881e96925ed509223de043e6e45366af0fbab2b6e0989b405b51c439",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f16/candidate/ASTOCK-019-5912b03e7a0a/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "82a1627dbbcfff5caaa765de13edf403a9e1a1b7ba6bdfa7ea6ad300f40ae933",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f17/candidate/ASTOCK-019-56d87d926dc2/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "3629a1166b7eb0fad593ed717753b452663e42420301e81fda63eff2d3207212",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f18/candidate/ASTOCK-008-da8167992125/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "453e625db441ee13da999204bf6f64807fd1410f7fb90653c35ffc122b8376d5",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f19/candidate/ASTOCK-008-8249cb0737b0/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "cda45a1754869f52d6da2aac24f3979d725535106c4796d0819ce4436a217889",
+      "status": "failed-before-request",
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f2/candidate/ASTOCK-008-d3d4071fd62c/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "1bf7977cf442ae17b1a514869e9fe748c9cbc3839e358275ecaeb6f75acd0890",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f20/candidate/ASTOCK-019-ebc81e2749b9/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "b4b63c5d399b15907a36b6bcc99cf42b6cf8c50bd4bea5b6ba8375d6d211c4f0",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f21/candidate/ASTOCK-019-a1ec9c384f8f/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "aafd55eccf39fadedf854c56ae66f7ddff7444fc1b00b3f9a5c569828d84b8e5",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f22/candidate/ASTOCK-019-a875d4e381fe/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "5f4c58acd0271e68a74051f05f3f54eaafac1d72e6a5bbb2d1079e54ccf73949",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f3/candidate/ASTOCK-008-d55e2fa34b13/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "fff2de16bc69c25b376d59880acf580a6de4a35ead0daa7037926753a531b19c",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f4/candidate/ASTOCK-008-ac1c8ffcabe1/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "09bffc341aab3cb60cad878c5b948bf16bab3ec822bfa5b915ae1ce8a16c6e67",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f5/candidate/ASTOCK-008-05d76db3dac9/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "26bd5753460a8e5883135734d4df35d935f6a96ec7d9a273fdb8d9f5d235f5c5",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f6/candidate/ASTOCK-008-c93474ab5cfd/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "51b04b6140bee39b0691b87a6a23e14f115a051c5c24518adca8d5c64b701497",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f7/candidate/ASTOCK-008-ffe0fc0704fe/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "291a2f6d4f7a1bd3888489f07da113ca034345af260a3b5c7bd32519d20938a6",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f8/candidate/ASTOCK-008-0bc32c70999a/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "26f9032a3e289f7d042cee1412634ab996c4a13e42da3150eb63ed3ff2c3206d",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f9/candidate/ASTOCK-019-df20a1c6c3ee/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "14f316363772f592d6050d4b8767a45e6e987ff6144b8e9c19c1351dfc55d559",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/numericASTOCK-008/candidate/ASTOCK-008-4fb8fd9505e3/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "7922f35b6563f29bd6a0a04be5a08a7594bf639c15b694088922fd314da29231",
+      "status": "candidate_complete",
+      "row_count": 1,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/numericASTOCK-008/candidate/ASTOCK-008-d487591e1655/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "d80a1f451d7956f971e681813f3e7d5238fdb0463a09b30a30f32d8d51557f0e",
+      "status": "candidate_complete",
+      "row_count": 1,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/numericASTOCK-019/candidate/ASTOCK-019-f879b25d302d/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "9b9442d2d94a9613817e76f245c96d24af442a0669dcde29ae2517072f0423c8",
+      "status": "candidate_complete",
+      "row_count": 10,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-complete/candidate/ASTOCK-008-6cbf688ab242/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "b45a9373a1f73b012e14214c5247cba27349081437e2e734afcc0c676df251a8",
+      "status": "candidate_complete",
+      "row_count": 101,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-duplicate_cross_page/candidate/ASTOCK-008-d204cfb44588/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "8a945a0c20de5ee7654d316017ac557ced84b2d25e1f1b292374de7561d880e1",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-limited/candidate/ASTOCK-008-541e8b068075/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "d2e599394bfe6dc4ba5a42e527040cdaf819a7a9cb5cc2007ed65cb55d5505dd",
+      "status": "candidate_complete",
+      "row_count": 200,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-totals_drift/candidate/ASTOCK-008-2f2ca7862658/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "cd558f41e01bc2338591b19313b6f34d0b9f8306407eccf3f035c7b9051a2ca1",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-008-1a7594b5fe3c/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "6ab3a39c7691b09b68101b7414bcc200aed2efcf4c33a500a6abed2610dd4c05",
+      "status": "candidate_complete",
+      "row_count": 1,
+      "live_http_calls": 1
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-008-bad714af4670/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "cab0304549524997e0b7faa931e327162456ec2867f10f0187531b5a87ccf5d0",
+      "status": "candidate_complete",
+      "row_count": 1,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-019-18083e26c086/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "b3aeb83554e58b18b51b6f7b3786506e4813ad99512921822df77766e91deecd",
+      "status": "candidate_complete",
+      "row_count": 10,
+      "live_http_calls": 2
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-019-73bd9f8569e9/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "9e9fd2f2b4ca5f73ede0a9e2f0e5d3786116724a5c19712a2e1dd6dfa562da76",
+      "status": "candidate_complete",
+      "row_count": 10,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/bad/ASTOCK-019-94bed460e414/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "b31acbc78b35c05a6afa60b9a1702509d61129a45c54368be1a2d93da8cd3f00",
+      "status": "failed-before-request",
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/candidate/ASTOCK-008-e0087ef19d08/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "2a859522ce23f034fb8d7bf3392cb9b230efa394032db7d4d694aecb3707907e",
+      "status": "candidate_complete",
+      "row_count": 1,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-cli-20261004/candidate/ASTOCK-008-bab208c0176a/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "a29835e94ccb83383a017e830220709627eeb198925b62738efa83733dd86879",
+      "status": "candidate_complete",
+      "row_count": 1,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-cli-20261004/candidate/ASTOCK-019-8ff7c236357b/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "0eb89bf4a79935ba201bc3a3a7512e881636c65396599ed002097fe4396cd761",
+      "status": "candidate_complete",
+      "row_count": 10,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-smoke-20261004/ASTOCK-008-5420ef883f43/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "dcd571ee0f0acffda8aca94ecef2a1552ee30728f40eab1fe4ccae9e14d17857",
+      "status": "candidate_complete",
+      "row_count": 1,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-smoke-20261004/ASTOCK-019-d25e94df0d4f/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "e366ae9c22a09c42a7c6ea5c45033bbafbc4741c8058a4ac21271466f24df475",
+      "status": "candidate_complete",
+      "row_count": 10,
+      "live_http_calls": 0
+    }
+  ],
+  "original_requests_checked": 4,
+  "files": [
+    {
+      "path": ".gitattributes",
+      "sha256": "da421775733a511f50e38d34c82372d99e2d8b1f31577fe4e052e54955239623",
+      "bytes": 16993
+    },
+    {
+      "path": "CODE_STRUCTURE.md",
+      "sha256": "94545de49b127af5701ae8d6a4b27a3ed94a1640cb1748d1ee3a2b09865e21d8",
+      "bytes": 27807
+    },
+    {
+      "path": "config/collection.yaml",
+      "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d",
+      "bytes": 2934
+    },
+    {
+      "path": "config/datasets/dragon_tiger_seats.yaml",
+      "sha256": "d02c9ef0c1aba19b42dd6ee123c602c0277367e89cc2390c1e3bf722b9aabdbb",
+      "bytes": 858
+    },
+    {
+      "path": "config/datasets/eastmoney_reports.yaml",
+      "sha256": "2f97f51d1f995a6791bb9070632b9c8ae7feb023068ac5bbc04082cfe88faf14",
+      "bytes": 1349
+    },
+    {
+      "path": "config/normalization/dragon_tiger_seats.yaml",
+      "sha256": "953a5a163fa9bf22ad97e3c2092702302b69a62398515ca4530b21bbfb65f857",
+      "bytes": 1105
+    },
+    {
+      "path": "config/normalization/eastmoney_reports.yaml",
+      "sha256": "2f271ad216bd10a857256443a43434b827ee2ef16b3a791cc27edf89f59e9bd3",
+      "bytes": 1493
+    },
+    {
+      "path": "config/providers.yaml",
+      "sha256": "4811dfb113893cf7c37796aa198744d992638b84fa6e754c94efeafe62c7dbac",
+      "bytes": 87323
+    },
+    {
+      "path": "PROJECT_PROGRESS.md",
+      "sha256": "d0bf10f887dc82665714934991d3869883c67e9edecc8af0a9eaa7da3f2de0d5",
+      "bytes": 16660
+    },
+    {
+      "path": "provider_validation/docs/2026-10-04-reports-seats-input-collection.md",
+      "sha256": "47323d48b281b3a67db52e993eccb49ead2535013c56cb1c9feead34620890bd",
+      "bytes": 4895
+    },
+    {
+      "path": "provider_validation/results/reports-calendar-final-20261004/verify.py",
+      "sha256": "cf60da6e809ed5d0b45c634fdb2a743d354b7c291ca2359fde4b990f9195e0a8",
+      "bytes": 9467
+    },
+    {
+      "path": "provider_validation/results/reports-seats-cli-20261004/0-context.json",
+      "sha256": "11a8fb9b4cf7c1f0eff9abd495bdeba67a03604099c04cd4cb9743e5e3409008",
+      "bytes": 115
+    },
+    {
+      "path": "provider_validation/results/reports-seats-cli-20261004/0-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-cli-20261004/0-stdout.json",
+      "sha256": "5b934404a376e89f2cd969499dc0c9a56cffb92951b8f15eadf51e16d7fc03e6",
+      "bytes": 17039
+    },
+    {
+      "path": "provider_validation/results/reports-seats-cli-20261004/1-context.json",
+      "sha256": "8f10c4f7e6c60fc06d0482f8816cf553b759c8a203ce575ece70683405071621",
+      "bytes": 158
+    },
+    {
+      "path": "provider_validation/results/reports-seats-cli-20261004/1-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-cli-20261004/1-stdout.json",
+      "sha256": "f54362f37b1319891827059ee3d6df7453055b3810f3da5592a19cbc6262104f",
+      "bytes": 19937
+    },
+    {
+      "path": "provider_validation/results/reports-seats-cli-20261004/candidate/ASTOCK-008-bab208c0176a/2026-10-04/eastmoney_reports/eastmoney/report_list/mapped-rows.json",
+      "sha256": "a0a52ff348b67b14c1b59baf0e17fe9230c5d8aac8b2f0ca4b1c441c444b0372",
+      "bytes": 728
+    },
+    {
+      "path": "provider_validation/results/reports-seats-cli-20261004/candidate/ASTOCK-008-bab208c0176a/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "a29835e94ccb83383a017e830220709627eeb198925b62738efa83733dd86879",
+      "bytes": 13844
+    },
+    {
+      "path": "provider_validation/results/reports-seats-cli-20261004/candidate/ASTOCK-008-bab208c0176a/2026-10-04/parsed_rows/eastmoney/report_list/parsed-rows.json",
+      "sha256": "baf4bf752d931d02fcdddda0a3e1a6032a6bcfca02af41e4c31127abc2e19b6c",
+      "bytes": 1422
+    },
+    {
+      "path": "provider_validation/results/reports-seats-cli-20261004/candidate/ASTOCK-008-bab208c0176a/2026-10-04/source_rows/eastmoney/report_list/source-rows.json",
+      "sha256": "baf4bf752d931d02fcdddda0a3e1a6032a6bcfca02af41e4c31127abc2e19b6c",
+      "bytes": 1422
+    },
+    {
+      "path": "provider_validation/results/reports-seats-cli-20261004/candidate/ASTOCK-008-bab208c0176a/_raw/bodies/7b8acdc4fb408e4ed9561829dd418de90c968a3ca343b06810dfb26cb677f0a8.bin",
+      "sha256": "7b8acdc4fb408e4ed9561829dd418de90c968a3ca343b06810dfb26cb677f0a8",
+      "bytes": 1493
+    },
+    {
+      "path": "provider_validation/results/reports-seats-cli-20261004/candidate/ASTOCK-008-bab208c0176a/_raw/manifest.ndjson",
+      "sha256": "e33031241336718954c0f792573b5e7223d10d6f2c862245cd5479a50465d550",
+      "bytes": 2151
+    },
+    {
+      "path": "provider_validation/results/reports-seats-cli-20261004/candidate/ASTOCK-019-8ff7c236357b/2026-10-04/dragon_tiger_seats/eastmoney/dragon_tiger_seats/mapped-rows.json",
+      "sha256": "61fed724023b290cd3e0de2c33cbb37ce84dfc758c7f2e3343ea85c449cddff6",
+      "bytes": 3802
+    },
+    {
+      "path": "provider_validation/results/reports-seats-cli-20261004/candidate/ASTOCK-019-8ff7c236357b/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "0eb89bf4a79935ba201bc3a3a7512e881636c65396599ed002097fe4396cd761",
+      "bytes": 16160
+    },
+    {
+      "path": "provider_validation/results/reports-seats-cli-20261004/candidate/ASTOCK-019-8ff7c236357b/2026-10-04/parsed_rows/eastmoney/dragon_tiger_seats/parsed-rows.json",
+      "sha256": "3508523d090dd12ee6f1923f6307798c5a6dabc57a6cc9aa01b4d0417f299c20",
+      "bytes": 3900
+    },
+    {
+      "path": "provider_validation/results/reports-seats-cli-20261004/candidate/ASTOCK-019-8ff7c236357b/2026-10-04/source_rows/eastmoney/dragon_tiger_seats/source-rows.json",
+      "sha256": "2efd84f2cd01f19b2e37fb5b56cbdac4238eaba91272e029a401a951909bf0bd",
+      "bytes": 6154
+    },
+    {
+      "path": "provider_validation/results/reports-seats-cli-20261004/candidate/ASTOCK-019-8ff7c236357b/_raw/bodies/779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6.bin",
+      "sha256": "779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6",
+      "bytes": 4575
+    },
+    {
+      "path": "provider_validation/results/reports-seats-cli-20261004/candidate/ASTOCK-019-8ff7c236357b/_raw/bodies/79c9b649544f48049cb8e39bb28b201360d17ae79ed35c91716e659ea6386a16.bin",
+      "sha256": "79c9b649544f48049cb8e39bb28b201360d17ae79ed35c91716e659ea6386a16",
+      "bytes": 3207
+    },
+    {
+      "path": "provider_validation/results/reports-seats-cli-20261004/candidate/ASTOCK-019-8ff7c236357b/_raw/bodies/fcb616bfc685257915bb87a1684395d02ba69efd164a1bd9d9512349d1aaa2a0.bin",
+      "sha256": "fcb616bfc685257915bb87a1684395d02ba69efd164a1bd9d9512349d1aaa2a0",
+      "bytes": 3061
+    },
+    {
+      "path": "provider_validation/results/reports-seats-cli-20261004/candidate/ASTOCK-019-8ff7c236357b/_raw/manifest.ndjson",
+      "sha256": "9a17161ac928f4e2a794e62bdf8ec8a502f0a52a544ae7326dedf9985b6d7db2",
+      "bytes": 4376
+    },
+    {
+      "path": "provider_validation/results/reports-seats-cli-20261004/verification.json",
+      "sha256": "d6f8684f5d727e054168bfaa9c034e809d144fb410eef582e2b984393c7e05ae",
+      "bytes": 3256
+    },
+    {
+      "path": "provider_validation/results/reports-seats-cli-20261004/verify.py",
+      "sha256": "138d433c645c30ae17fcec1a7ec145bf8d50f142caa86d297c3247bb620f17e9",
+      "bytes": 2475
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/capabilities.yaml",
+      "sha256": "7b7ce0da1d33b333165c6081a3ed788f85cb05d5f6945c745eec97d73e24f6e2",
+      "bytes": 4009
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/collection.yaml",
+      "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d",
+      "bytes": 2934
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/a50_quote.yaml",
+      "sha256": "d9b990dfe46e7b500890da82723dee287c4e2be29e009ab91ceadd8099a02fd2",
+      "bytes": 907
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/adjustment_factor.yaml",
+      "sha256": "380d49696daeb27b81ef2e0f55c31225544880da73c9213c3ad28650a11732f6",
+      "bytes": 458
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/board_fund_flow.yaml",
+      "sha256": "08f3566d0cf2787186e6106e4915d0d89b70232d737898480eda03785ea3c53a",
+      "bytes": 1110
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/broken_limit_pool.yaml",
+      "sha256": "60b3790eae896c968093c8d26a818c9dab325aca620510b4ec1dde061af7f65e",
+      "bytes": 1162
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/buyback.yaml",
+      "sha256": "807490acc8affc7dde3502ef62c2b80ad32923fe4c5ff6a6b4fd9d403b50d4f6",
+      "bytes": 1439
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/cctv_news_index.yaml",
+      "sha256": "a876cfcb7dfa79b79423cb3ae8044dab1bb43515f12fc090158228dbf95b6d33",
+      "bytes": 317
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/cls_telegraph.yaml",
+      "sha256": "80c414933f4ee26e2475403ceda50fc2f2b98141c18d0fd0c3f719dae3572f02",
+      "bytes": 331
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/concept_board.yaml",
+      "sha256": "eef0b07c9a41bfd5ef1a52f4f39516cb26d42b088d63a15783af0f94985fd76f",
+      "bytes": 379
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/convertible_bonds.yaml",
+      "sha256": "11723522544165617f1141aa08921252ca99447eba5cf507c574a887dd6748b9",
+      "bytes": 1362
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/daily_bar.yaml",
+      "sha256": "0a8c1dcae7e1c062ae70c224defc1362adc1d58bc196bbeb2f1edd61d6fd39e7",
+      "bytes": 995
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/dividend_event.yaml",
+      "sha256": "67a2b02063cb9a891e3fb388048407cbc08b05ce8ae97deea6976d3904340d2e",
+      "bytes": 759
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/dragon_tiger_daily.yaml",
+      "sha256": "d5a3adddecdf6cb89d80dc64ea4ef4fc92d396fd0c0bad0b3322ef763be7b176",
+      "bytes": 1485
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/dragon_tiger_seats.yaml",
+      "sha256": "d02c9ef0c1aba19b42dd6ee123c602c0277367e89cc2390c1e3bf722b9aabdbb",
+      "bytes": 858
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/earnings_forecast.yaml",
+      "sha256": "ded845c047fcefdbeb163f27620d4e67f2bc78e62a0bcfea5678d6df8758f8fd",
+      "bytes": 1060
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/eastmoney_reports.yaml",
+      "sha256": "2f97f51d1f995a6791bb9070632b9c8ae7feb023068ac5bbc04082cfe88faf14",
+      "bytes": 1349
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/financial_main.yaml",
+      "sha256": "23d8b55356620439d5c1b507601b782b31aa965fe24eaf194e869466bb271ab0",
+      "bytes": 766
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/futures_daily.yaml",
+      "sha256": "3c923f6d637e1409ec1be5733897ba267a8025169b36b6874aefd0b8181834d5",
+      "bytes": 938
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/futures_quote.yaml",
+      "sha256": "0fb3866f0cdfacfe6fe9dbe7d5396947b16514751639275db40352ff5655a33b",
+      "bytes": 1557
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/holder_trades.yaml",
+      "sha256": "44b0ecfc09c6e39823c50e83077354f25bc8026fc70272d92046ba3a51d09b92",
+      "bytes": 1246
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/industry_board.yaml",
+      "sha256": "c6930c70b55e171dee94b74b80f3c37df1466d4a10dadc3016975004b8b47ba4",
+      "bytes": 380
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/industry_directory.yaml",
+      "sha256": "9325d485bf7a1bc2b075c2d920b43b17caa039916536bedd8163be0f972bfe5b",
+      "bytes": 346
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/industry_index_daily.yaml",
+      "sha256": "5d542c72443410747f2ac643589bfd8160cdea07d01d6d0dd9c5e4753096043b",
+      "bytes": 676
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/industry_membership.yaml",
+      "sha256": "dff512c9b7f00330bbe408ba1e1eb74d99b49bc0b38ee419d4c463047c6fe69d",
+      "bytes": 709
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/institution_survey.yaml",
+      "sha256": "470fd4503d45cf0839e887fd276a0c3c82cdcae7cae8f52001006464c212733e",
+      "bytes": 703
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/intraday_trend.yaml",
+      "sha256": "5983e0eb29c1cd7a781fbad0be7332dda14e887ccd744e55ad4b8664c7a0c38a",
+      "bytes": 665
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/ipo_calendar.yaml",
+      "sha256": "7579b9174fd3554a92bc50865cabe7ac20604579403f748d09bcd4e8760bcac9",
+      "bytes": 1331
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/limit_down_pool.yaml",
+      "sha256": "67b3ca1ae9edf0f863d2b2d5257a315fe721f042086d4b5966653c0f2758d806",
+      "bytes": 1177
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/limit_up_pool.yaml",
+      "sha256": "73c1fa4ed6d7281d1857208a2ec9696a3637214bb256661ce943313c75772a69",
+      "bytes": 982
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/lockup_expiry.yaml",
+      "sha256": "53dccf257fe72dbb3596bec55f54126dacebef3e444b0f1275c002baa84da0f0",
+      "bytes": 931
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/lpr_history.yaml",
+      "sha256": "b40bb3000aa8db8b84aeaad6383c3dd7da1afb3c3bfb6ed6fc69343476ca7650",
+      "bytes": 330
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/macro_calendar.yaml",
+      "sha256": "96aeb6dab62b3d6411aecbb488c9f1cc5bd7656ce0a6762fcdaf614e9fbffef8",
+      "bytes": 801
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/minute_bar_5m.yaml",
+      "sha256": "fb6f822ed42479422a0b4c227577d8e559bb6b2238562af566af0464304bd873",
+      "bytes": 708
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/pledge.yaml",
+      "sha256": "40b46e96e55d8b1061c98ec979094b4f98ef4800e513cfa7a9c2c5f2152b2fb1",
+      "bytes": 878
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/pmi_history.yaml",
+      "sha256": "7c877511d1860472b43ba7be149a009e330462c8198ce3810dce259e71383edf",
+      "bytes": 630
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/previous_limit_pool.yaml",
+      "sha256": "5234397a7b87ed3e03c11431de1f00c012e135ba5ef57bf63a2f431f659703bc",
+      "bytes": 1199
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/realtime_quote.yaml",
+      "sha256": "ebc3e97bb7469eb4c7c80daf50991ebe38f0eb5b2476a9a579d22236d416378b",
+      "bytes": 1121
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/repo_fixing.yaml",
+      "sha256": "6908c6c805e15a153dc567d58c81daecb66026bdd0f48d8865e296a1ba883935",
+      "bytes": 506
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/security_snapshot.yaml",
+      "sha256": "255115893f64837a3b95ea9fe44551948eefa9604aca9d59214de87a580300be",
+      "bytes": 519
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/shareholder_count.yaml",
+      "sha256": "d325df1784c873bea73a1d907e9964e06c26e4d6b356dd6c16148837b57feccf",
+      "bytes": 923
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/sina_global_news.yaml",
+      "sha256": "688eeb3b698bb8fdb3fb33bc296869b6caca47bd9ff427a97ae989f74c595350",
+      "bytes": 297
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/sina_reports.yaml",
+      "sha256": "257c0a14c634da0267490b8d8bf2cfe48067f4b8818a85968ac922f3521392e6",
+      "bytes": 536
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/social_financing.yaml",
+      "sha256": "c1b1ff0cb118dd094c364b42939034b92aa04f7f77b31f1c477f94a182300cb9",
+      "bytes": 959
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/stock_fund_flow.yaml",
+      "sha256": "df3f21341463f3538a1f855ef19b7bbdb683405aaa65d5418c255023c18a429f",
+      "bytes": 736
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/strong_stock_pool.yaml",
+      "sha256": "264c9d759405d37733cf4daf29996240cb46fed46c3eb8835405a4311e1c1131",
+      "bytes": 1194
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/trading_calendar.yaml",
+      "sha256": "924b17a5be104252e85a377e4579432c6725bab99cbaa0ad70e71102149a1f49",
+      "bytes": 192
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets/wallstreetcn_news.yaml",
+      "sha256": "1bdecf169c6ea357cbb53787bd0a9a659d1f4a96e77e42996556b55df97bbd49",
+      "bytes": 534
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/datasets.yaml",
+      "sha256": "e992d13297e1f9a8f64acabc25f65f138b21ce12dca16689cc3f17bf1385a6eb",
+      "bytes": 587
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/a50_quote.yaml",
+      "sha256": "c984450a923a5655cdd60e1e35a9c8981fca80f9c4f996f5dcce790f10f08b9f",
+      "bytes": 886
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/adjustment_factor.yaml",
+      "sha256": "d9317a50a1042232c8f3cf1cb18fbcf55ff808c314d390f679ec365bde2b505f",
+      "bytes": 716
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/board_fund_flow.yaml",
+      "sha256": "fb7c6f1f2d425181b189e25152e465306982e10c7c6ee06b2917dfa00b891baa",
+      "bytes": 1395
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/broken_limit_pool.yaml",
+      "sha256": "8bd046757fc9fb3e7d144a0e9d41106267e828a60bc5a099280158c15459a84d",
+      "bytes": 1238
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/buyback.yaml",
+      "sha256": "70e6ee88258842e76509208c6d9df379478df717837489869ff1e9f72f82d1b3",
+      "bytes": 2520
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/cctv_news_index.yaml",
+      "sha256": "4de0d3f1b61694e5c6ab7450a38a7c85f583fadd64d48e52bd737545eb04e42b",
+      "bytes": 573
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/cls_telegraph.yaml",
+      "sha256": "7c64e6a2aad86a294ea4da3e99239fdadbef2f48c9cc40bcfd4685aaf753c372",
+      "bytes": 661
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/concept_board.yaml",
+      "sha256": "2b7e7f57d189541d6a232cd5391d2dab4289f9f3438f397d9fefd82bb1d996b7",
+      "bytes": 206
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/convertible_bonds.yaml",
+      "sha256": "147b800777f7042f9e4a7907841e038034db65a80f263fcb04628ea34943dd56",
+      "bytes": 1289
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/daily_bar.yaml",
+      "sha256": "41f9bbd0824e20d70f7ed276758b286094c33c79180befca4d8985afc3c8ad0b",
+      "bytes": 2913
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/dividend_event.yaml",
+      "sha256": "188df2f7f075b92e993136aef3f977eea419f9c6957404bd2f7071c76ed24a71",
+      "bytes": 1532
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/dragon_tiger_daily.yaml",
+      "sha256": "d9d64fef55ff8c7cdc268884583edd34f816ffc847895c57b10ac1ae9ee98740",
+      "bytes": 1470
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/dragon_tiger_seats.yaml",
+      "sha256": "953a5a163fa9bf22ad97e3c2092702302b69a62398515ca4530b21bbfb65f857",
+      "bytes": 1105
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/earnings_forecast.yaml",
+      "sha256": "5b323a3c3c6577527701985248bb13b54102463a167ba04c749f4908e2b401c4",
+      "bytes": 1633
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/eastmoney_reports.yaml",
+      "sha256": "5af7f5d63deb0dba6a7a6bf81556fa97bd4d2a30f46d78663d12896a8f41c6b8",
+      "bytes": 1578
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/financial_main.yaml",
+      "sha256": "eeeb2e7418aab430168f0c7e16c69f1b24a9e49ec8d156a28390cae0e7a69bda",
+      "bytes": 603
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/futures_daily.yaml",
+      "sha256": "94760152dd79821d2ed775f64924d84546e85194c44b3baa782b113a040f659b",
+      "bytes": 858
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/futures_quote.yaml",
+      "sha256": "21ef8cc411dc481644a1529846814a29aef0f86c38aa86fede5da7ebb52a1c8f",
+      "bytes": 1204
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/holder_trades.yaml",
+      "sha256": "2deca39ea7c1a57254b4ee31390587f39d640559181cd1ceae7968a4684e5f40",
+      "bytes": 1959
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/industry_board.yaml",
+      "sha256": "f3ff8bbe7fc4e8d4e5af1c36b9312e8db1c8c9cb09a09aadb472b22ae09de152",
+      "bytes": 210
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/industry_directory.yaml",
+      "sha256": "823d97db8afe4adb3f963faaa04b42b8f151e93f2e75f3eb18f8c678a68bae37",
+      "bytes": 478
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/industry_index_daily.yaml",
+      "sha256": "953087294fd2c3a3cb1b46f204d0a0f606f9060f0f89676fb3a189222a68dab1",
+      "bytes": 805
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/industry_membership.yaml",
+      "sha256": "7eb72a1b8ce7aff27aa1ad62534af2bf7183f3d78c6392208035396a11e21ccb",
+      "bytes": 765
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/institution_survey.yaml",
+      "sha256": "e33c639f75da6a7a1d699936d0624084ed3488ef773aa9fcf3eaefc66e829423",
+      "bytes": 1118
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/intraday_trend.yaml",
+      "sha256": "14b0b22ad1308c70b65152e711c4248d3c8bf1c28d842fba36309194ed38870a",
+      "bytes": 440
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/ipo_calendar.yaml",
+      "sha256": "d72db539afed6e890e81d6e1c4680fcb09ad4285551748f3c9e12ba124e6059c",
+      "bytes": 2338
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/limit_down_pool.yaml",
+      "sha256": "456b0a779929bb6ff71ed70e07cd420d42596068f142879926b86972e3704f7b",
+      "bytes": 1314
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/limit_up_pool.yaml",
+      "sha256": "411e6e6ead10a4d2cbff7ecf4de9bee26f411a66d005a33bc640865ef4b6e7ba",
+      "bytes": 1079
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/lockup_expiry.yaml",
+      "sha256": "a63b17bed61210cb9b2a1238b025ac385bd3c28b3dda9de426c802fa68ded352",
+      "bytes": 1222
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/lpr_history.yaml",
+      "sha256": "2a12cd26c069d8be0eb68e121eef7930f97f602ffe80e459b649c6cbc5a4c217",
+      "bytes": 682
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/macro_calendar.yaml",
+      "sha256": "e0d0012ce022adbc47f682b5de7caead1581af891e69367b2acdc4d514769c25",
+      "bytes": 918
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/minute_bar_5m.yaml",
+      "sha256": "f3e9abaededc01a15c651a99a22131a80067133deb89548dd12b17278e0e55b7",
+      "bytes": 1134
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/pledge.yaml",
+      "sha256": "4c8f7636e0b20e5923adbbf4c5e696247da67869d90ed19f0aee62f2e5612710",
+      "bytes": 1589
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/pmi_history.yaml",
+      "sha256": "5e9e93163114a9e265af1bd2e10dc587835b4745aff844310d273d8d873ebe47",
+      "bytes": 924
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/previous_limit_pool.yaml",
+      "sha256": "4c14b9ad1f0497e2d6f13a72978f1ddda74039b7c0d182c5a5a98ac01a678443",
+      "bytes": 1276
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/realtime_quote.yaml",
+      "sha256": "e9141547fbb85cb71c8e2336c20a2ebc948e3926f4b2a09e4f59505adea91b94",
+      "bytes": 1308
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/repo_fixing.yaml",
+      "sha256": "0d6b2b5b39a92c6f3d2629f3f805f0b12d609ea9b3f691a50c896c12d81b4681",
+      "bytes": 762
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/security_snapshot.yaml",
+      "sha256": "474ab0397cb1aad33abcd070942586a8460c468b1d3f7af97c2d152eee5a6537",
+      "bytes": 621
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/shareholder_count.yaml",
+      "sha256": "f8801367f055e0b1d419e648c9bd3e1d72984ffe2823c2d464770403c1b7c9e4",
+      "bytes": 1702
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/sina_global_news.yaml",
+      "sha256": "22b2caa83fecb10728649e033cf8b8fbbd4fa8c7928de1b8d8961e1516263b0f",
+      "bytes": 649
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/sina_reports.yaml",
+      "sha256": "3a19d455c1227852fe3b131c655129dd5e727194a26cfd60734097f673edb174",
+      "bytes": 682
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/social_financing.yaml",
+      "sha256": "86b691b8e26d88b42bae76aff769ac01ca33cbf109135f6c75dc00764d7ac59c",
+      "bytes": 1261
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/stock_fund_flow.yaml",
+      "sha256": "3d99bacf48ba3438c90d2d544f7223ffcb0a464f69f95841affe3e99a503bbe1",
+      "bytes": 1741
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/strong_stock_pool.yaml",
+      "sha256": "41733f419a6dd9d3a25edf361294a973df76d878d01bbf46b9f25f53a38f2304",
+      "bytes": 1234
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/trading_calendar.yaml",
+      "sha256": "4be7571914129769aeca321d892b8aa2fbd068db1c7c0b691ae0d5cefe7f69e0",
+      "bytes": 476
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/normalization/wallstreetcn_news.yaml",
+      "sha256": "cdca43fb9ef1d825fe75358ea6c828fec02b892e344505d484d302123079fca9",
+      "bytes": 770
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/providers.yaml",
+      "sha256": "4811dfb113893cf7c37796aa198744d992638b84fa6e754c94efeafe62c7dbac",
+      "bytes": 87323
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d0/config/schedules.yaml",
+      "sha256": "01b7e269ea4231024bf1c520f78fa571c2909986aad5573006bd80e186119113",
+      "bytes": 525
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/capabilities.yaml",
+      "sha256": "7b7ce0da1d33b333165c6081a3ed788f85cb05d5f6945c745eec97d73e24f6e2",
+      "bytes": 4009
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/collection.yaml",
+      "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d",
+      "bytes": 2934
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/a50_quote.yaml",
+      "sha256": "d9b990dfe46e7b500890da82723dee287c4e2be29e009ab91ceadd8099a02fd2",
+      "bytes": 907
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/adjustment_factor.yaml",
+      "sha256": "380d49696daeb27b81ef2e0f55c31225544880da73c9213c3ad28650a11732f6",
+      "bytes": 458
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/board_fund_flow.yaml",
+      "sha256": "08f3566d0cf2787186e6106e4915d0d89b70232d737898480eda03785ea3c53a",
+      "bytes": 1110
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/broken_limit_pool.yaml",
+      "sha256": "60b3790eae896c968093c8d26a818c9dab325aca620510b4ec1dde061af7f65e",
+      "bytes": 1162
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/buyback.yaml",
+      "sha256": "807490acc8affc7dde3502ef62c2b80ad32923fe4c5ff6a6b4fd9d403b50d4f6",
+      "bytes": 1439
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/cctv_news_index.yaml",
+      "sha256": "a876cfcb7dfa79b79423cb3ae8044dab1bb43515f12fc090158228dbf95b6d33",
+      "bytes": 317
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/cls_telegraph.yaml",
+      "sha256": "80c414933f4ee26e2475403ceda50fc2f2b98141c18d0fd0c3f719dae3572f02",
+      "bytes": 331
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/concept_board.yaml",
+      "sha256": "eef0b07c9a41bfd5ef1a52f4f39516cb26d42b088d63a15783af0f94985fd76f",
+      "bytes": 379
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/convertible_bonds.yaml",
+      "sha256": "11723522544165617f1141aa08921252ca99447eba5cf507c574a887dd6748b9",
+      "bytes": 1362
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/daily_bar.yaml",
+      "sha256": "0a8c1dcae7e1c062ae70c224defc1362adc1d58bc196bbeb2f1edd61d6fd39e7",
+      "bytes": 995
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/dividend_event.yaml",
+      "sha256": "67a2b02063cb9a891e3fb388048407cbc08b05ce8ae97deea6976d3904340d2e",
+      "bytes": 759
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/dragon_tiger_daily.yaml",
+      "sha256": "d5a3adddecdf6cb89d80dc64ea4ef4fc92d396fd0c0bad0b3322ef763be7b176",
+      "bytes": 1485
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/dragon_tiger_seats.yaml",
+      "sha256": "d02c9ef0c1aba19b42dd6ee123c602c0277367e89cc2390c1e3bf722b9aabdbb",
+      "bytes": 858
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/earnings_forecast.yaml",
+      "sha256": "ded845c047fcefdbeb163f27620d4e67f2bc78e62a0bcfea5678d6df8758f8fd",
+      "bytes": 1060
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/eastmoney_reports.yaml",
+      "sha256": "2f97f51d1f995a6791bb9070632b9c8ae7feb023068ac5bbc04082cfe88faf14",
+      "bytes": 1349
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/financial_main.yaml",
+      "sha256": "23d8b55356620439d5c1b507601b782b31aa965fe24eaf194e869466bb271ab0",
+      "bytes": 766
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/futures_daily.yaml",
+      "sha256": "3c923f6d637e1409ec1be5733897ba267a8025169b36b6874aefd0b8181834d5",
+      "bytes": 938
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/futures_quote.yaml",
+      "sha256": "0fb3866f0cdfacfe6fe9dbe7d5396947b16514751639275db40352ff5655a33b",
+      "bytes": 1557
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/holder_trades.yaml",
+      "sha256": "44b0ecfc09c6e39823c50e83077354f25bc8026fc70272d92046ba3a51d09b92",
+      "bytes": 1246
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/industry_board.yaml",
+      "sha256": "c6930c70b55e171dee94b74b80f3c37df1466d4a10dadc3016975004b8b47ba4",
+      "bytes": 380
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/industry_directory.yaml",
+      "sha256": "9325d485bf7a1bc2b075c2d920b43b17caa039916536bedd8163be0f972bfe5b",
+      "bytes": 346
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/industry_index_daily.yaml",
+      "sha256": "5d542c72443410747f2ac643589bfd8160cdea07d01d6d0dd9c5e4753096043b",
+      "bytes": 676
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/industry_membership.yaml",
+      "sha256": "dff512c9b7f00330bbe408ba1e1eb74d99b49bc0b38ee419d4c463047c6fe69d",
+      "bytes": 709
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/institution_survey.yaml",
+      "sha256": "470fd4503d45cf0839e887fd276a0c3c82cdcae7cae8f52001006464c212733e",
+      "bytes": 703
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/intraday_trend.yaml",
+      "sha256": "5983e0eb29c1cd7a781fbad0be7332dda14e887ccd744e55ad4b8664c7a0c38a",
+      "bytes": 665
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/ipo_calendar.yaml",
+      "sha256": "7579b9174fd3554a92bc50865cabe7ac20604579403f748d09bcd4e8760bcac9",
+      "bytes": 1331
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/limit_down_pool.yaml",
+      "sha256": "67b3ca1ae9edf0f863d2b2d5257a315fe721f042086d4b5966653c0f2758d806",
+      "bytes": 1177
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/limit_up_pool.yaml",
+      "sha256": "73c1fa4ed6d7281d1857208a2ec9696a3637214bb256661ce943313c75772a69",
+      "bytes": 982
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/lockup_expiry.yaml",
+      "sha256": "53dccf257fe72dbb3596bec55f54126dacebef3e444b0f1275c002baa84da0f0",
+      "bytes": 931
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/lpr_history.yaml",
+      "sha256": "b40bb3000aa8db8b84aeaad6383c3dd7da1afb3c3bfb6ed6fc69343476ca7650",
+      "bytes": 330
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/macro_calendar.yaml",
+      "sha256": "96aeb6dab62b3d6411aecbb488c9f1cc5bd7656ce0a6762fcdaf614e9fbffef8",
+      "bytes": 801
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/minute_bar_5m.yaml",
+      "sha256": "fb6f822ed42479422a0b4c227577d8e559bb6b2238562af566af0464304bd873",
+      "bytes": 708
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/pledge.yaml",
+      "sha256": "40b46e96e55d8b1061c98ec979094b4f98ef4800e513cfa7a9c2c5f2152b2fb1",
+      "bytes": 878
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/pmi_history.yaml",
+      "sha256": "7c877511d1860472b43ba7be149a009e330462c8198ce3810dce259e71383edf",
+      "bytes": 630
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/previous_limit_pool.yaml",
+      "sha256": "5234397a7b87ed3e03c11431de1f00c012e135ba5ef57bf63a2f431f659703bc",
+      "bytes": 1199
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/realtime_quote.yaml",
+      "sha256": "ebc3e97bb7469eb4c7c80daf50991ebe38f0eb5b2476a9a579d22236d416378b",
+      "bytes": 1121
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/repo_fixing.yaml",
+      "sha256": "6908c6c805e15a153dc567d58c81daecb66026bdd0f48d8865e296a1ba883935",
+      "bytes": 506
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/security_snapshot.yaml",
+      "sha256": "255115893f64837a3b95ea9fe44551948eefa9604aca9d59214de87a580300be",
+      "bytes": 519
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/shareholder_count.yaml",
+      "sha256": "d325df1784c873bea73a1d907e9964e06c26e4d6b356dd6c16148837b57feccf",
+      "bytes": 923
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/sina_global_news.yaml",
+      "sha256": "688eeb3b698bb8fdb3fb33bc296869b6caca47bd9ff427a97ae989f74c595350",
+      "bytes": 297
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/sina_reports.yaml",
+      "sha256": "257c0a14c634da0267490b8d8bf2cfe48067f4b8818a85968ac922f3521392e6",
+      "bytes": 536
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/social_financing.yaml",
+      "sha256": "c1b1ff0cb118dd094c364b42939034b92aa04f7f77b31f1c477f94a182300cb9",
+      "bytes": 959
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/stock_fund_flow.yaml",
+      "sha256": "df3f21341463f3538a1f855ef19b7bbdb683405aaa65d5418c255023c18a429f",
+      "bytes": 736
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/strong_stock_pool.yaml",
+      "sha256": "264c9d759405d37733cf4daf29996240cb46fed46c3eb8835405a4311e1c1131",
+      "bytes": 1194
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/trading_calendar.yaml",
+      "sha256": "924b17a5be104252e85a377e4579432c6725bab99cbaa0ad70e71102149a1f49",
+      "bytes": 192
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets/wallstreetcn_news.yaml",
+      "sha256": "1bdecf169c6ea357cbb53787bd0a9a659d1f4a96e77e42996556b55df97bbd49",
+      "bytes": 534
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/datasets.yaml",
+      "sha256": "e992d13297e1f9a8f64acabc25f65f138b21ce12dca16689cc3f17bf1385a6eb",
+      "bytes": 587
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/a50_quote.yaml",
+      "sha256": "c984450a923a5655cdd60e1e35a9c8981fca80f9c4f996f5dcce790f10f08b9f",
+      "bytes": 886
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/adjustment_factor.yaml",
+      "sha256": "d9317a50a1042232c8f3cf1cb18fbcf55ff808c314d390f679ec365bde2b505f",
+      "bytes": 716
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/board_fund_flow.yaml",
+      "sha256": "fb7c6f1f2d425181b189e25152e465306982e10c7c6ee06b2917dfa00b891baa",
+      "bytes": 1395
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/broken_limit_pool.yaml",
+      "sha256": "8bd046757fc9fb3e7d144a0e9d41106267e828a60bc5a099280158c15459a84d",
+      "bytes": 1238
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/buyback.yaml",
+      "sha256": "70e6ee88258842e76509208c6d9df379478df717837489869ff1e9f72f82d1b3",
+      "bytes": 2520
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/cctv_news_index.yaml",
+      "sha256": "4de0d3f1b61694e5c6ab7450a38a7c85f583fadd64d48e52bd737545eb04e42b",
+      "bytes": 573
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/cls_telegraph.yaml",
+      "sha256": "7c64e6a2aad86a294ea4da3e99239fdadbef2f48c9cc40bcfd4685aaf753c372",
+      "bytes": 661
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/concept_board.yaml",
+      "sha256": "2b7e7f57d189541d6a232cd5391d2dab4289f9f3438f397d9fefd82bb1d996b7",
+      "bytes": 206
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/convertible_bonds.yaml",
+      "sha256": "147b800777f7042f9e4a7907841e038034db65a80f263fcb04628ea34943dd56",
+      "bytes": 1289
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/daily_bar.yaml",
+      "sha256": "41f9bbd0824e20d70f7ed276758b286094c33c79180befca4d8985afc3c8ad0b",
+      "bytes": 2913
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/dividend_event.yaml",
+      "sha256": "188df2f7f075b92e993136aef3f977eea419f9c6957404bd2f7071c76ed24a71",
+      "bytes": 1532
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/dragon_tiger_daily.yaml",
+      "sha256": "d9d64fef55ff8c7cdc268884583edd34f816ffc847895c57b10ac1ae9ee98740",
+      "bytes": 1470
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/dragon_tiger_seats.yaml",
+      "sha256": "953a5a163fa9bf22ad97e3c2092702302b69a62398515ca4530b21bbfb65f857",
+      "bytes": 1105
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/earnings_forecast.yaml",
+      "sha256": "5b323a3c3c6577527701985248bb13b54102463a167ba04c749f4908e2b401c4",
+      "bytes": 1633
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/eastmoney_reports.yaml",
+      "sha256": "5af7f5d63deb0dba6a7a6bf81556fa97bd4d2a30f46d78663d12896a8f41c6b8",
+      "bytes": 1578
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/financial_main.yaml",
+      "sha256": "eeeb2e7418aab430168f0c7e16c69f1b24a9e49ec8d156a28390cae0e7a69bda",
+      "bytes": 603
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/futures_daily.yaml",
+      "sha256": "94760152dd79821d2ed775f64924d84546e85194c44b3baa782b113a040f659b",
+      "bytes": 858
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/futures_quote.yaml",
+      "sha256": "21ef8cc411dc481644a1529846814a29aef0f86c38aa86fede5da7ebb52a1c8f",
+      "bytes": 1204
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/holder_trades.yaml",
+      "sha256": "2deca39ea7c1a57254b4ee31390587f39d640559181cd1ceae7968a4684e5f40",
+      "bytes": 1959
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/industry_board.yaml",
+      "sha256": "f3ff8bbe7fc4e8d4e5af1c36b9312e8db1c8c9cb09a09aadb472b22ae09de152",
+      "bytes": 210
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/industry_directory.yaml",
+      "sha256": "823d97db8afe4adb3f963faaa04b42b8f151e93f2e75f3eb18f8c678a68bae37",
+      "bytes": 478
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/industry_index_daily.yaml",
+      "sha256": "953087294fd2c3a3cb1b46f204d0a0f606f9060f0f89676fb3a189222a68dab1",
+      "bytes": 805
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/industry_membership.yaml",
+      "sha256": "7eb72a1b8ce7aff27aa1ad62534af2bf7183f3d78c6392208035396a11e21ccb",
+      "bytes": 765
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/institution_survey.yaml",
+      "sha256": "e33c639f75da6a7a1d699936d0624084ed3488ef773aa9fcf3eaefc66e829423",
+      "bytes": 1118
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/intraday_trend.yaml",
+      "sha256": "14b0b22ad1308c70b65152e711c4248d3c8bf1c28d842fba36309194ed38870a",
+      "bytes": 440
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/ipo_calendar.yaml",
+      "sha256": "d72db539afed6e890e81d6e1c4680fcb09ad4285551748f3c9e12ba124e6059c",
+      "bytes": 2338
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/limit_down_pool.yaml",
+      "sha256": "456b0a779929bb6ff71ed70e07cd420d42596068f142879926b86972e3704f7b",
+      "bytes": 1314
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/limit_up_pool.yaml",
+      "sha256": "411e6e6ead10a4d2cbff7ecf4de9bee26f411a66d005a33bc640865ef4b6e7ba",
+      "bytes": 1079
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/lockup_expiry.yaml",
+      "sha256": "a63b17bed61210cb9b2a1238b025ac385bd3c28b3dda9de426c802fa68ded352",
+      "bytes": 1222
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/lpr_history.yaml",
+      "sha256": "2a12cd26c069d8be0eb68e121eef7930f97f602ffe80e459b649c6cbc5a4c217",
+      "bytes": 682
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/macro_calendar.yaml",
+      "sha256": "e0d0012ce022adbc47f682b5de7caead1581af891e69367b2acdc4d514769c25",
+      "bytes": 918
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/minute_bar_5m.yaml",
+      "sha256": "f3e9abaededc01a15c651a99a22131a80067133deb89548dd12b17278e0e55b7",
+      "bytes": 1134
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/pledge.yaml",
+      "sha256": "4c8f7636e0b20e5923adbbf4c5e696247da67869d90ed19f0aee62f2e5612710",
+      "bytes": 1589
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/pmi_history.yaml",
+      "sha256": "5e9e93163114a9e265af1bd2e10dc587835b4745aff844310d273d8d873ebe47",
+      "bytes": 924
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/previous_limit_pool.yaml",
+      "sha256": "4c14b9ad1f0497e2d6f13a72978f1ddda74039b7c0d182c5a5a98ac01a678443",
+      "bytes": 1276
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/realtime_quote.yaml",
+      "sha256": "e9141547fbb85cb71c8e2336c20a2ebc948e3926f4b2a09e4f59505adea91b94",
+      "bytes": 1308
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/repo_fixing.yaml",
+      "sha256": "0d6b2b5b39a92c6f3d2629f3f805f0b12d609ea9b3f691a50c896c12d81b4681",
+      "bytes": 762
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/security_snapshot.yaml",
+      "sha256": "474ab0397cb1aad33abcd070942586a8460c468b1d3f7af97c2d152eee5a6537",
+      "bytes": 621
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/shareholder_count.yaml",
+      "sha256": "f8801367f055e0b1d419e648c9bd3e1d72984ffe2823c2d464770403c1b7c9e4",
+      "bytes": 1702
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/sina_global_news.yaml",
+      "sha256": "22b2caa83fecb10728649e033cf8b8fbbd4fa8c7928de1b8d8961e1516263b0f",
+      "bytes": 649
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/sina_reports.yaml",
+      "sha256": "3a19d455c1227852fe3b131c655129dd5e727194a26cfd60734097f673edb174",
+      "bytes": 682
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/social_financing.yaml",
+      "sha256": "86b691b8e26d88b42bae76aff769ac01ca33cbf109135f6c75dc00764d7ac59c",
+      "bytes": 1261
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/stock_fund_flow.yaml",
+      "sha256": "3d99bacf48ba3438c90d2d544f7223ffcb0a464f69f95841affe3e99a503bbe1",
+      "bytes": 1741
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/strong_stock_pool.yaml",
+      "sha256": "41733f419a6dd9d3a25edf361294a973df76d878d01bbf46b9f25f53a38f2304",
+      "bytes": 1234
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/trading_calendar.yaml",
+      "sha256": "4be7571914129769aeca321d892b8aa2fbd068db1c7c0b691ae0d5cefe7f69e0",
+      "bytes": 476
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/normalization/wallstreetcn_news.yaml",
+      "sha256": "cdca43fb9ef1d825fe75358ea6c828fec02b892e344505d484d302123079fca9",
+      "bytes": 770
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/providers.yaml",
+      "sha256": "4811dfb113893cf7c37796aa198744d992638b84fa6e754c94efeafe62c7dbac",
+      "bytes": 87323
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/d1/config/schedules.yaml",
+      "sha256": "01b7e269ea4231024bf1c520f78fa571c2909986aad5573006bd80e186119113",
+      "bytes": 525
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004/index.json",
+      "sha256": "db53eb37eae3c0c16f26409c437f650ed519c558a1a9eeabd65dbd43546eb200",
+      "bytes": 77677
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev-20261004-tests.xml",
+      "sha256": "527982e8cb98837f3b0dec8711c14d5629fde1ce98269f2c26d08218978017e2",
+      "bytes": 8396
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev2-20261004-tests.xml",
+      "sha256": "c51fb9e73b7f300c40aa823d5cdcae710a3d0de58774b6adbe47bf98d24aa66d",
+      "bytes": 8943
+    },
+    {
+      "path": "provider_validation/results/reports-seats-dev3-20261004-tests.xml",
+      "sha256": "04295c41152b931af5149b51e705a033e895a7fb08d3245bf5167bee283ee430",
+      "bytes": 5575
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/ASTOCK-008/candidate/ASTOCK-008-f7f74aa48c34/2026-10-04/eastmoney_reports/eastmoney/report_list/mapped-rows.json",
+      "sha256": "a0a52ff348b67b14c1b59baf0e17fe9230c5d8aac8b2f0ca4b1c441c444b0372",
+      "bytes": 728
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/ASTOCK-008/candidate/ASTOCK-008-f7f74aa48c34/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "2632583d190f9842844494d979ef43fb0d38eaa61549ee6c79a98255cd09309f",
+      "bytes": 13616
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/ASTOCK-008/candidate/ASTOCK-008-f7f74aa48c34/2026-10-04/parsed_rows/eastmoney/report_list/parsed-rows.json",
+      "sha256": "baf4bf752d931d02fcdddda0a3e1a6032a6bcfca02af41e4c31127abc2e19b6c",
+      "bytes": 1422
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/ASTOCK-008/candidate/ASTOCK-008-f7f74aa48c34/2026-10-04/source_rows/eastmoney/report_list/source-rows.json",
+      "sha256": "baf4bf752d931d02fcdddda0a3e1a6032a6bcfca02af41e4c31127abc2e19b6c",
+      "bytes": 1422
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/ASTOCK-008/candidate/ASTOCK-008-f7f74aa48c34/_raw/bodies/7b8acdc4fb408e4ed9561829dd418de90c968a3ca343b06810dfb26cb677f0a8.bin",
+      "sha256": "7b8acdc4fb408e4ed9561829dd418de90c968a3ca343b06810dfb26cb677f0a8",
+      "bytes": 1493
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/ASTOCK-008/candidate/ASTOCK-008-f7f74aa48c34/_raw/manifest.ndjson",
+      "sha256": "74a90635a30e7863c25f9a6927a6c90cd6abdeb693afc3ebbe193b124e153c27",
+      "bytes": 2151
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/ASTOCK-008/comparison.json",
+      "sha256": "80a5c5784bbcd40efade7451d1afb37263aa019b68ceb93ad1e90440efea9719",
+      "bytes": 1266
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/ASTOCK-008/original/bodies/7b8acdc4fb408e4ed9561829dd418de90c968a3ca343b06810dfb26cb677f0a8.bin",
+      "sha256": "7b8acdc4fb408e4ed9561829dd418de90c968a3ca343b06810dfb26cb677f0a8",
+      "bytes": 1493
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/ASTOCK-008/original/manifest.ndjson",
+      "sha256": "672b470c82d1e859649c4ccef8d58dbbef17978507d15787356e1b8559ef7ab1",
+      "bytes": 1999
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/ASTOCK-008/original-parsed.json",
+      "sha256": "a96270ee1f359ad9ca1df47ca53d93fd4f4dbaa5cc3704345a64e360bac608cf",
+      "bytes": 2158
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/ASTOCK-019/candidate/ASTOCK-019-3b92f5b2ce99/2026-10-04/dragon_tiger_seats/eastmoney/dragon_tiger_seats/mapped-rows.json",
+      "sha256": "61fed724023b290cd3e0de2c33cbb37ce84dfc758c7f2e3343ea85c449cddff6",
+      "bytes": 3802
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/ASTOCK-019/candidate/ASTOCK-019-3b92f5b2ce99/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "1c017a345f4e6eb37a315e885fb82789001ce76184df63faf68610a998579e75",
+      "bytes": 15932
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/ASTOCK-019/candidate/ASTOCK-019-3b92f5b2ce99/2026-10-04/parsed_rows/eastmoney/dragon_tiger_seats/parsed-rows.json",
+      "sha256": "3508523d090dd12ee6f1923f6307798c5a6dabc57a6cc9aa01b4d0417f299c20",
+      "bytes": 3900
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/ASTOCK-019/candidate/ASTOCK-019-3b92f5b2ce99/2026-10-04/source_rows/eastmoney/dragon_tiger_seats/source-rows.json",
+      "sha256": "2efd84f2cd01f19b2e37fb5b56cbdac4238eaba91272e029a401a951909bf0bd",
+      "bytes": 6154
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/ASTOCK-019/candidate/ASTOCK-019-3b92f5b2ce99/_raw/bodies/779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6.bin",
+      "sha256": "779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6",
+      "bytes": 4575
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/ASTOCK-019/candidate/ASTOCK-019-3b92f5b2ce99/_raw/bodies/79c9b649544f48049cb8e39bb28b201360d17ae79ed35c91716e659ea6386a16.bin",
+      "sha256": "79c9b649544f48049cb8e39bb28b201360d17ae79ed35c91716e659ea6386a16",
+      "bytes": 3207
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/ASTOCK-019/candidate/ASTOCK-019-3b92f5b2ce99/_raw/bodies/fcb616bfc685257915bb87a1684395d02ba69efd164a1bd9d9512349d1aaa2a0.bin",
+      "sha256": "fcb616bfc685257915bb87a1684395d02ba69efd164a1bd9d9512349d1aaa2a0",
+      "bytes": 3061
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/ASTOCK-019/candidate/ASTOCK-019-3b92f5b2ce99/_raw/manifest.ndjson",
+      "sha256": "48410d691c2d2e0102ade1890e5feae9970cc87a6ac4729af02517b7b7d7cc54",
+      "bytes": 4376
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/ASTOCK-019/comparison.json",
+      "sha256": "44dea9bf97afff010b633dd80b8aeb20a0f6b801e889afbbc19790a63e94afda",
+      "bytes": 1862
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/ASTOCK-019/original/bodies/79c9b649544f48049cb8e39bb28b201360d17ae79ed35c91716e659ea6386a16.bin",
+      "sha256": "79c9b649544f48049cb8e39bb28b201360d17ae79ed35c91716e659ea6386a16",
+      "bytes": 3207
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/ASTOCK-019/original/bodies/bb562e80dfcff31208dd0a78762da71e790ef85e12e0f1367dcab5ac02c1ea8c.bin",
+      "sha256": "bb562e80dfcff31208dd0a78762da71e790ef85e12e0f1367dcab5ac02c1ea8c",
+      "bytes": 309
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/ASTOCK-019/original/bodies/fcb616bfc685257915bb87a1684395d02ba69efd164a1bd9d9512349d1aaa2a0.bin",
+      "sha256": "fcb616bfc685257915bb87a1684395d02ba69efd164a1bd9d9512349d1aaa2a0",
+      "bytes": 3061
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/ASTOCK-019/original/manifest.ndjson",
+      "sha256": "57c02c18b557c676fb240d42df03bf94ac83ca315d142ba955583f8eb181feaa",
+      "bytes": 6181
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/ASTOCK-019/original-parsed.json",
+      "sha256": "12b322ad31afc6ebd8e3f50af6e411d506db98547699dcb4fb816b84bf8b3f08",
+      "bytes": 4609
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/cache/cache/bodies/7b8acdc4fb408e4ed9561829dd418de90c968a3ca343b06810dfb26cb677f0a8.bin",
+      "sha256": "7b8acdc4fb408e4ed9561829dd418de90c968a3ca343b06810dfb26cb677f0a8",
+      "bytes": 1493
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/cache/cache/manifest.ndjson",
+      "sha256": "28f6ddb34c0f7dc219497bf5c2b4a5ab16f64d8788ae39872e81595228d619c4",
+      "bytes": 923
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/comparison.json",
+      "sha256": "ef404d1a50edc84a8437968be626fbaf48bf2458cdc17e0ef6a0f6bf1082a03f",
+      "bytes": 16124
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f0/candidate/ASTOCK-008-53961e9cc2b0/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "e86d699cc66e47f8e6f12d454dce79c2eaf9c388bf2f07dda3c0c87e563645b3",
+      "bytes": 11192
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f0/candidate/ASTOCK-008-53961e9cc2b0/_raw/bodies/902e1abe0c7fc4b9fa05c4dc227fea0da25732dfe4f9fa468c0f1e3073907c8f.bin",
+      "sha256": "902e1abe0c7fc4b9fa05c4dc227fea0da25732dfe4f9fa468c0f1e3073907c8f",
+      "bytes": 84
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f0/candidate/ASTOCK-008-53961e9cc2b0/_raw/manifest.ndjson",
+      "sha256": "279bf99e51657fb76c9c277c3f067c7c19e31e3bec39daf5b8ee99d00ad0c1a0",
+      "bytes": 1753
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f0/fixture/bodies/902e1abe0c7fc4b9fa05c4dc227fea0da25732dfe4f9fa468c0f1e3073907c8f.bin",
+      "sha256": "902e1abe0c7fc4b9fa05c4dc227fea0da25732dfe4f9fa468c0f1e3073907c8f",
+      "bytes": 84
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f0/fixture/manifest.ndjson",
+      "sha256": "31f10c91730dde657f1302b9b4c5ecb4858ca59deb32374433c9012a3ce61ee8",
+      "bytes": 1237
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f1/candidate/ASTOCK-008-60a52e25dc0d/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "f3c90d6436e3b24b913de1192fd3cc71a37723f7d68000bc725a4d3ea0a67e6f",
+      "bytes": 11188
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f1/candidate/ASTOCK-008-60a52e25dc0d/_raw/bodies/cc147d21bed72d2eb1b4516270a5f011282553f4105f77a72225b238951e277d.bin",
+      "sha256": "cc147d21bed72d2eb1b4516270a5f011282553f4105f77a72225b238951e277d",
+      "bytes": 1569
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f1/candidate/ASTOCK-008-60a52e25dc0d/_raw/manifest.ndjson",
+      "sha256": "610af81d25f8106a1fc1f524ba9802d63f0785e2d47d3ad1203b8c543eb7bd66",
+      "bytes": 1755
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f1/fixture/bodies/cc147d21bed72d2eb1b4516270a5f011282553f4105f77a72225b238951e277d.bin",
+      "sha256": "cc147d21bed72d2eb1b4516270a5f011282553f4105f77a72225b238951e277d",
+      "bytes": 1569
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f1/fixture/manifest.ndjson",
+      "sha256": "5a9d9d62d0adf2fa983e2484438ec4d84a4c5645f77f215238867d6977d2c26d",
+      "bytes": 1239
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f10/candidate/ASTOCK-019-18866597ece7/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "b623919c4027cb393f9852b872490c41b20eb835b19c5f385fb5ae618068516b",
+      "bytes": 10749
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f10/candidate/ASTOCK-019-18866597ece7/_raw/bodies/6bedc38ed19f92079b3e83d9a70bf475eb845eff76c884532dc52b2adf7edbe1.bin",
+      "sha256": "6bedc38ed19f92079b3e83d9a70bf475eb845eff76c884532dc52b2adf7edbe1",
+      "bytes": 3400
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f10/candidate/ASTOCK-019-18866597ece7/_raw/bodies/779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6.bin",
+      "sha256": "779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6",
+      "bytes": 4575
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f10/candidate/ASTOCK-019-18866597ece7/_raw/manifest.ndjson",
+      "sha256": "7c4d8f23806749b616be6b612dbe002f8a1b41a498f69f7a39d9507eed943319",
+      "bytes": 1522
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f10/fixture/bodies/6bedc38ed19f92079b3e83d9a70bf475eb845eff76c884532dc52b2adf7edbe1.bin",
+      "sha256": "6bedc38ed19f92079b3e83d9a70bf475eb845eff76c884532dc52b2adf7edbe1",
+      "bytes": 3400
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f10/fixture/bodies/b72c23ea4a0c96f4d97172309f9fd8e2ab14bc33faaee0405462388c1d6be56c.bin",
+      "sha256": "b72c23ea4a0c96f4d97172309f9fd8e2ab14bc33faaee0405462388c1d6be56c",
+      "bytes": 3274
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f10/fixture/manifest.ndjson",
+      "sha256": "9a905b26a0c424f1f5c301df903a874bfd990a22367632bf434b02abdf1d1e9f",
+      "bytes": 2144
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f11/candidate/ASTOCK-019-246742e54bb3/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "795dbf723a81a59f45f4b4338d86c10dc8bd5a0b4594980a7166e58d64b790bd",
+      "bytes": 10747
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f11/candidate/ASTOCK-019-246742e54bb3/_raw/bodies/779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6.bin",
+      "sha256": "779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6",
+      "bytes": 4575
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f11/candidate/ASTOCK-019-246742e54bb3/_raw/bodies/aedd2d8471b58e2b844593bb62b99792b708ec6919104627cd2fb0c84b2a3d3d.bin",
+      "sha256": "aedd2d8471b58e2b844593bb62b99792b708ec6919104627cd2fb0c84b2a3d3d",
+      "bytes": 3414
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f11/candidate/ASTOCK-019-246742e54bb3/_raw/manifest.ndjson",
+      "sha256": "223dcb36ce1c8d7111bec5d618941a447d57a0068cdf4241d0dc6d7bed2cc09b",
+      "bytes": 1522
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f11/fixture/bodies/aedd2d8471b58e2b844593bb62b99792b708ec6919104627cd2fb0c84b2a3d3d.bin",
+      "sha256": "aedd2d8471b58e2b844593bb62b99792b708ec6919104627cd2fb0c84b2a3d3d",
+      "bytes": 3414
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f11/fixture/bodies/b72c23ea4a0c96f4d97172309f9fd8e2ab14bc33faaee0405462388c1d6be56c.bin",
+      "sha256": "b72c23ea4a0c96f4d97172309f9fd8e2ab14bc33faaee0405462388c1d6be56c",
+      "bytes": 3274
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f11/fixture/manifest.ndjson",
+      "sha256": "0daffddab3d89fa6081a5fee753290f5a6055fae20cfd5f23e069eb1735ece54",
+      "bytes": 2144
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f12/candidate/ASTOCK-019-32427b05ad94/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "4ff554b44a1e7f0f0876c57cd9c51606e1f0d5c8f2b5a8d50186e7722ea1b874",
+      "bytes": 10737
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f12/candidate/ASTOCK-019-32427b05ad94/_raw/bodies/1bbcf822a80501af581f485d6bbe3d5d753fd9782e853cd0cbe2144bec65db89.bin",
+      "sha256": "1bbcf822a80501af581f485d6bbe3d5d753fd9782e853cd0cbe2144bec65db89",
+      "bytes": 3424
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f12/candidate/ASTOCK-019-32427b05ad94/_raw/bodies/779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6.bin",
+      "sha256": "779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6",
+      "bytes": 4575
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f12/candidate/ASTOCK-019-32427b05ad94/_raw/manifest.ndjson",
+      "sha256": "c2194364299516ead1073b7e7e3ed78579b3d1054cba152880028cc4ddf8d6c9",
+      "bytes": 1522
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f12/fixture/bodies/1bbcf822a80501af581f485d6bbe3d5d753fd9782e853cd0cbe2144bec65db89.bin",
+      "sha256": "1bbcf822a80501af581f485d6bbe3d5d753fd9782e853cd0cbe2144bec65db89",
+      "bytes": 3424
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f12/fixture/bodies/b72c23ea4a0c96f4d97172309f9fd8e2ab14bc33faaee0405462388c1d6be56c.bin",
+      "sha256": "b72c23ea4a0c96f4d97172309f9fd8e2ab14bc33faaee0405462388c1d6be56c",
+      "bytes": 3274
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f12/fixture/manifest.ndjson",
+      "sha256": "b24c73a6df71b5ef453401ce83119ef8e718ad9870393825e809179431562a83",
+      "bytes": 2144
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f13/candidate/ASTOCK-019-51eeb6d44f6a/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "cecb4bd8084f78e093e9433128cd59e79b70e9231cddc7f97a2099967735abe8",
+      "bytes": 10750
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f13/candidate/ASTOCK-019-51eeb6d44f6a/_raw/bodies/779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6.bin",
+      "sha256": "779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6",
+      "bytes": 4575
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f13/candidate/ASTOCK-019-51eeb6d44f6a/_raw/bodies/a3942da121dbd4ea1159aad8de5328c140eb743d0557069b0bfcb7b4c087d761.bin",
+      "sha256": "a3942da121dbd4ea1159aad8de5328c140eb743d0557069b0bfcb7b4c087d761",
+      "bytes": 3420
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f13/candidate/ASTOCK-019-51eeb6d44f6a/_raw/manifest.ndjson",
+      "sha256": "e65bf1c11b27238b72c093d7864ff2546ef74c8628cff7093ae61563f24b2cef",
+      "bytes": 1522
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f13/fixture/bodies/a3942da121dbd4ea1159aad8de5328c140eb743d0557069b0bfcb7b4c087d761.bin",
+      "sha256": "a3942da121dbd4ea1159aad8de5328c140eb743d0557069b0bfcb7b4c087d761",
+      "bytes": 3420
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f13/fixture/bodies/b72c23ea4a0c96f4d97172309f9fd8e2ab14bc33faaee0405462388c1d6be56c.bin",
+      "sha256": "b72c23ea4a0c96f4d97172309f9fd8e2ab14bc33faaee0405462388c1d6be56c",
+      "bytes": 3274
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f13/fixture/manifest.ndjson",
+      "sha256": "d7ec7805b393b668ad8ec50c89ba6ab7b82f54f1387349b22cecdc3a93b722d1",
+      "bytes": 2144
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f14/candidate/ASTOCK-019-b71a873d040d/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "91d1091990951a665a9e94d9634f9338a3357f40ce588de895627604e85fc329",
+      "bytes": 10741
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f14/candidate/ASTOCK-019-b71a873d040d/_raw/bodies/779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6.bin",
+      "sha256": "779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6",
+      "bytes": 4575
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f14/candidate/ASTOCK-019-b71a873d040d/_raw/bodies/ef2344707c50ba9f4fc6e5d6ac894e6e5d063d9bb78bb252ae2a0cb3aed85b40.bin",
+      "sha256": "ef2344707c50ba9f4fc6e5d6ac894e6e5d063d9bb78bb252ae2a0cb3aed85b40",
+      "bytes": 3471
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f14/candidate/ASTOCK-019-b71a873d040d/_raw/manifest.ndjson",
+      "sha256": "01a301bf50367c82740a253b11228ef5d8917ced4641bea4a66d2d3e42d5cfa4",
+      "bytes": 1522
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f14/fixture/bodies/b72c23ea4a0c96f4d97172309f9fd8e2ab14bc33faaee0405462388c1d6be56c.bin",
+      "sha256": "b72c23ea4a0c96f4d97172309f9fd8e2ab14bc33faaee0405462388c1d6be56c",
+      "bytes": 3274
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f14/fixture/bodies/ef2344707c50ba9f4fc6e5d6ac894e6e5d063d9bb78bb252ae2a0cb3aed85b40.bin",
+      "sha256": "ef2344707c50ba9f4fc6e5d6ac894e6e5d063d9bb78bb252ae2a0cb3aed85b40",
+      "bytes": 3471
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f14/fixture/manifest.ndjson",
+      "sha256": "9b53946dbde8c0966d806a6f6d69ec57081683475037ff20c2699742ae3f712d",
+      "bytes": 2144
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f15/candidate/ASTOCK-019-c9081faf07ee/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "58e1024d881e96925ed509223de043e6e45366af0fbab2b6e0989b405b51c439",
+      "bytes": 10746
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f15/candidate/ASTOCK-019-c9081faf07ee/_raw/bodies/12fc06135c78ca6194c8bd58635a2ca1ef390c36aae947e85c89d7ed1ccda5ee.bin",
+      "sha256": "12fc06135c78ca6194c8bd58635a2ca1ef390c36aae947e85c89d7ed1ccda5ee",
+      "bytes": 3420
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f15/candidate/ASTOCK-019-c9081faf07ee/_raw/bodies/779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6.bin",
+      "sha256": "779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6",
+      "bytes": 4575
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f15/candidate/ASTOCK-019-c9081faf07ee/_raw/manifest.ndjson",
+      "sha256": "d87d28687bd6119ae3f92b6f23c8ffad6aa095d89b2cb2470021f73a3fed5ee4",
+      "bytes": 1522
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f15/fixture/bodies/12fc06135c78ca6194c8bd58635a2ca1ef390c36aae947e85c89d7ed1ccda5ee.bin",
+      "sha256": "12fc06135c78ca6194c8bd58635a2ca1ef390c36aae947e85c89d7ed1ccda5ee",
+      "bytes": 3420
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f15/fixture/bodies/b72c23ea4a0c96f4d97172309f9fd8e2ab14bc33faaee0405462388c1d6be56c.bin",
+      "sha256": "b72c23ea4a0c96f4d97172309f9fd8e2ab14bc33faaee0405462388c1d6be56c",
+      "bytes": 3274
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f15/fixture/manifest.ndjson",
+      "sha256": "34b2e536dfb253a5dea3bbf1442abe5673fb51763896369b93f168c1f13f9f5a",
+      "bytes": 2144
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f16/candidate/ASTOCK-019-5912b03e7a0a/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "82a1627dbbcfff5caaa765de13edf403a9e1a1b7ba6bdfa7ea6ad300f40ae933",
+      "bytes": 10746
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f16/candidate/ASTOCK-019-5912b03e7a0a/_raw/bodies/779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6.bin",
+      "sha256": "779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6",
+      "bytes": 4575
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f16/candidate/ASTOCK-019-5912b03e7a0a/_raw/bodies/d85abea9a2361951d55796854e37fdb5d3d5dc8c00a3b193e8f698d4b8902639.bin",
+      "sha256": "d85abea9a2361951d55796854e37fdb5d3d5dc8c00a3b193e8f698d4b8902639",
+      "bytes": 3420
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f16/candidate/ASTOCK-019-5912b03e7a0a/_raw/manifest.ndjson",
+      "sha256": "2d2d44245d4d4090cd6b1a2fa7bad8af0823e5ff1b8d5949078a915a9ff4dc1a",
+      "bytes": 1522
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f16/fixture/bodies/b72c23ea4a0c96f4d97172309f9fd8e2ab14bc33faaee0405462388c1d6be56c.bin",
+      "sha256": "b72c23ea4a0c96f4d97172309f9fd8e2ab14bc33faaee0405462388c1d6be56c",
+      "bytes": 3274
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f16/fixture/bodies/d85abea9a2361951d55796854e37fdb5d3d5dc8c00a3b193e8f698d4b8902639.bin",
+      "sha256": "d85abea9a2361951d55796854e37fdb5d3d5dc8c00a3b193e8f698d4b8902639",
+      "bytes": 3420
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f16/fixture/manifest.ndjson",
+      "sha256": "9323c8a94aacb2eff9832b7fad8edaf9157b7af230edb70176158bf60ed23f31",
+      "bytes": 2144
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f17/candidate/ASTOCK-019-56d87d926dc2/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "3629a1166b7eb0fad593ed717753b452663e42420301e81fda63eff2d3207212",
+      "bytes": 10758
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f17/candidate/ASTOCK-019-56d87d926dc2/_raw/bodies/779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6.bin",
+      "sha256": "779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6",
+      "bytes": 4575
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f17/candidate/ASTOCK-019-56d87d926dc2/_raw/bodies/d2aeb1ae631b3e6a1f220c5c2df2ed3ff5f2e8f70d8cbaf182bdfa148aac2856.bin",
+      "sha256": "d2aeb1ae631b3e6a1f220c5c2df2ed3ff5f2e8f70d8cbaf182bdfa148aac2856",
+      "bytes": 3420
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f17/candidate/ASTOCK-019-56d87d926dc2/_raw/manifest.ndjson",
+      "sha256": "bf40c7fc99ffea7618bfe2e987629bdbbe6d91fb903771740945caddc5382b84",
+      "bytes": 1522
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f17/fixture/bodies/b72c23ea4a0c96f4d97172309f9fd8e2ab14bc33faaee0405462388c1d6be56c.bin",
+      "sha256": "b72c23ea4a0c96f4d97172309f9fd8e2ab14bc33faaee0405462388c1d6be56c",
+      "bytes": 3274
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f17/fixture/bodies/d2aeb1ae631b3e6a1f220c5c2df2ed3ff5f2e8f70d8cbaf182bdfa148aac2856.bin",
+      "sha256": "d2aeb1ae631b3e6a1f220c5c2df2ed3ff5f2e8f70d8cbaf182bdfa148aac2856",
+      "bytes": 3420
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f17/fixture/manifest.ndjson",
+      "sha256": "57753f687026798c78e88e75054debb009b1bd5f335d45ee2dd2b581bf9d2aff",
+      "bytes": 2144
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f18/candidate/ASTOCK-008-da8167992125/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "453e625db441ee13da999204bf6f64807fd1410f7fb90653c35ffc122b8376d5",
+      "bytes": 11195
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f18/candidate/ASTOCK-008-da8167992125/_raw/bodies/6de26e37fc6d6748ff1174052b88cdd35c3fd9e9b908d75df76c45e7c121c22a.bin",
+      "sha256": "6de26e37fc6d6748ff1174052b88cdd35c3fd9e9b908d75df76c45e7c121c22a",
+      "bytes": 1605
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f18/candidate/ASTOCK-008-da8167992125/_raw/manifest.ndjson",
+      "sha256": "ef15378b7a3a046550651004aca1665b9c97029cd6afa24cf98dd2303718cc2b",
+      "bytes": 1756
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f18/fixture/bodies/6de26e37fc6d6748ff1174052b88cdd35c3fd9e9b908d75df76c45e7c121c22a.bin",
+      "sha256": "6de26e37fc6d6748ff1174052b88cdd35c3fd9e9b908d75df76c45e7c121c22a",
+      "bytes": 1605
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f18/fixture/manifest.ndjson",
+      "sha256": "dd74cea01f69349945ec739b5a8c8db47b54e34ddbc47fb7e8f74c085f27d201",
+      "bytes": 1239
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f19/candidate/ASTOCK-008-8249cb0737b0/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "cda45a1754869f52d6da2aac24f3979d725535106c4796d0819ce4436a217889",
+      "bytes": 9377
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f19/fixture/manifest.ndjson",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f2/candidate/ASTOCK-008-d3d4071fd62c/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "1bf7977cf442ae17b1a514869e9fe748c9cbc3839e358275ecaeb6f75acd0890",
+      "bytes": 11175
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f2/candidate/ASTOCK-008-d3d4071fd62c/_raw/bodies/808512e94e1b932db4f14558b92074eea5b66ec1777ae167bad54124904c20cf.bin",
+      "sha256": "808512e94e1b932db4f14558b92074eea5b66ec1777ae167bad54124904c20cf",
+      "bytes": 1595
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f2/candidate/ASTOCK-008-d3d4071fd62c/_raw/manifest.ndjson",
+      "sha256": "b71bbf536bb111912fd07d28d4fe7c9d6106cb9a60694a0b3a0c8677c59142f7",
+      "bytes": 1755
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f2/fixture/bodies/808512e94e1b932db4f14558b92074eea5b66ec1777ae167bad54124904c20cf.bin",
+      "sha256": "808512e94e1b932db4f14558b92074eea5b66ec1777ae167bad54124904c20cf",
+      "bytes": 1595
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f2/fixture/manifest.ndjson",
+      "sha256": "c17cd0462d8de158491b9dc374a490b4b15da1995dbda0b0274481b5dee9ed67",
+      "bytes": 1239
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f20/candidate/ASTOCK-019-ebc81e2749b9/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "b4b63c5d399b15907a36b6bcc99cf42b6cf8c50bd4bea5b6ba8375d6d211c4f0",
+      "bytes": 10749
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f20/candidate/ASTOCK-019-ebc81e2749b9/_raw/bodies/779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6.bin",
+      "sha256": "779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6",
+      "bytes": 4575
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f20/candidate/ASTOCK-019-ebc81e2749b9/_raw/bodies/f52ef64c21ba123f5c40b3b38a194bbfe5bf0fea4e0e0271ff5dabc3cadb2681.bin",
+      "sha256": "f52ef64c21ba123f5c40b3b38a194bbfe5bf0fea4e0e0271ff5dabc3cadb2681",
+      "bytes": 3420
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f20/candidate/ASTOCK-019-ebc81e2749b9/_raw/manifest.ndjson",
+      "sha256": "6cb0b6f32426d714de12d40a468d048480a27dfac1571e19145d27259614a3f0",
+      "bytes": 1522
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f20/fixture/bodies/b72c23ea4a0c96f4d97172309f9fd8e2ab14bc33faaee0405462388c1d6be56c.bin",
+      "sha256": "b72c23ea4a0c96f4d97172309f9fd8e2ab14bc33faaee0405462388c1d6be56c",
+      "bytes": 3274
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f20/fixture/bodies/f52ef64c21ba123f5c40b3b38a194bbfe5bf0fea4e0e0271ff5dabc3cadb2681.bin",
+      "sha256": "f52ef64c21ba123f5c40b3b38a194bbfe5bf0fea4e0e0271ff5dabc3cadb2681",
+      "bytes": 3420
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f20/fixture/manifest.ndjson",
+      "sha256": "b6d8fa55dbb92e671a0211d5c644e3927c84ca14eaaafd6ba64ce1727b4c2d18",
+      "bytes": 2144
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f21/candidate/ASTOCK-019-a1ec9c384f8f/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "aafd55eccf39fadedf854c56ae66f7ddff7444fc1b00b3f9a5c569828d84b8e5",
+      "bytes": 10737
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f21/candidate/ASTOCK-019-a1ec9c384f8f/_raw/bodies/727811cd3b237fcbbc473ed429c0ff1015f819b5bb7453537f57039af9e03bda.bin",
+      "sha256": "727811cd3b237fcbbc473ed429c0ff1015f819b5bb7453537f57039af9e03bda",
+      "bytes": 3421
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f21/candidate/ASTOCK-019-a1ec9c384f8f/_raw/bodies/779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6.bin",
+      "sha256": "779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6",
+      "bytes": 4575
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f21/candidate/ASTOCK-019-a1ec9c384f8f/_raw/manifest.ndjson",
+      "sha256": "9a150df11ebfa6828775aeeaae2e66b05a917bd4565c8c0ff2163ebe233e8703",
+      "bytes": 1522
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f21/fixture/bodies/727811cd3b237fcbbc473ed429c0ff1015f819b5bb7453537f57039af9e03bda.bin",
+      "sha256": "727811cd3b237fcbbc473ed429c0ff1015f819b5bb7453537f57039af9e03bda",
+      "bytes": 3421
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f21/fixture/bodies/b72c23ea4a0c96f4d97172309f9fd8e2ab14bc33faaee0405462388c1d6be56c.bin",
+      "sha256": "b72c23ea4a0c96f4d97172309f9fd8e2ab14bc33faaee0405462388c1d6be56c",
+      "bytes": 3274
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f21/fixture/manifest.ndjson",
+      "sha256": "06532f77249215472e0401780f9100f49d21584659dd0eb304a47b993d97c12c",
+      "bytes": 2144
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f22/candidate/ASTOCK-019-a875d4e381fe/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "5f4c58acd0271e68a74051f05f3f54eaafac1d72e6a5bbb2d1079e54ccf73949",
+      "bytes": 10774
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f22/candidate/ASTOCK-019-a875d4e381fe/_raw/bodies/779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6.bin",
+      "sha256": "779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6",
+      "bytes": 4575
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f22/candidate/ASTOCK-019-a875d4e381fe/_raw/bodies/d2aeb1ae631b3e6a1f220c5c2df2ed3ff5f2e8f70d8cbaf182bdfa148aac2856.bin",
+      "sha256": "d2aeb1ae631b3e6a1f220c5c2df2ed3ff5f2e8f70d8cbaf182bdfa148aac2856",
+      "bytes": 3420
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f22/candidate/ASTOCK-019-a875d4e381fe/_raw/manifest.ndjson",
+      "sha256": "5f0626667b7638ae44ab997c1e013d21b02f62cdcb949a4fec2a9caad08c7158",
+      "bytes": 1522
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f22/fixture/bodies/d2aeb1ae631b3e6a1f220c5c2df2ed3ff5f2e8f70d8cbaf182bdfa148aac2856.bin",
+      "sha256": "d2aeb1ae631b3e6a1f220c5c2df2ed3ff5f2e8f70d8cbaf182bdfa148aac2856",
+      "bytes": 3420
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f22/fixture/manifest.ndjson",
+      "sha256": "c829139b74218e43b87153047841cb38926ca3818116eb93e0bbec8751fd61e2",
+      "bytes": 1071
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f3/candidate/ASTOCK-008-d55e2fa34b13/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "fff2de16bc69c25b376d59880acf580a6de4a35ead0daa7037926753a531b19c",
+      "bytes": 11198
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f3/candidate/ASTOCK-008-d55e2fa34b13/_raw/bodies/6a74fe3a3cc90b0c32c072c04451dcaf4e65992a5389cec0d38aaad3d97322db.bin",
+      "sha256": "6a74fe3a3cc90b0c32c072c04451dcaf4e65992a5389cec0d38aaad3d97322db",
+      "bytes": 1605
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f3/candidate/ASTOCK-008-d55e2fa34b13/_raw/manifest.ndjson",
+      "sha256": "c0e43d4156a81b98c4d1ae2b3992b06da34db73ad39cf0198d4115e5c7179ad5",
+      "bytes": 1755
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f3/fixture/bodies/6a74fe3a3cc90b0c32c072c04451dcaf4e65992a5389cec0d38aaad3d97322db.bin",
+      "sha256": "6a74fe3a3cc90b0c32c072c04451dcaf4e65992a5389cec0d38aaad3d97322db",
+      "bytes": 1605
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f3/fixture/manifest.ndjson",
+      "sha256": "6d5a6dfc289e7046829768a761e250bf5150e5615d67c37a8f90703a53948b7f",
+      "bytes": 1239
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f4/candidate/ASTOCK-008-ac1c8ffcabe1/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "09bffc341aab3cb60cad878c5b948bf16bab3ec822bfa5b915ae1ce8a16c6e67",
+      "bytes": 11192
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f4/candidate/ASTOCK-008-ac1c8ffcabe1/_raw/bodies/f52bc711cb24430c6e49b1fded061a69aa60fff7a9867a693c4c5d3b8eaee275.bin",
+      "sha256": "f52bc711cb24430c6e49b1fded061a69aa60fff7a9867a693c4c5d3b8eaee275",
+      "bytes": 1605
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f4/candidate/ASTOCK-008-ac1c8ffcabe1/_raw/manifest.ndjson",
+      "sha256": "67e301565447222c2d4e9f5f73adb10a26ecc06e7e7ade22801466bebb6d729d",
+      "bytes": 1755
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f4/fixture/bodies/f52bc711cb24430c6e49b1fded061a69aa60fff7a9867a693c4c5d3b8eaee275.bin",
+      "sha256": "f52bc711cb24430c6e49b1fded061a69aa60fff7a9867a693c4c5d3b8eaee275",
+      "bytes": 1605
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f4/fixture/manifest.ndjson",
+      "sha256": "6f60c6190047753a15dbb687f6bb4d78f1519536995c48ecefa9777673bc8e28",
+      "bytes": 1239
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f5/candidate/ASTOCK-008-05d76db3dac9/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "26bd5753460a8e5883135734d4df35d935f6a96ec7d9a273fdb8d9f5d235f5c5",
+      "bytes": 11200
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f5/candidate/ASTOCK-008-05d76db3dac9/_raw/bodies/53a675a7cbb7b4bc01a83984692e155b0e0d89707f30f846213f6db920017e44.bin",
+      "sha256": "53a675a7cbb7b4bc01a83984692e155b0e0d89707f30f846213f6db920017e44",
+      "bytes": 3128
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f5/candidate/ASTOCK-008-05d76db3dac9/_raw/manifest.ndjson",
+      "sha256": "864b3c3d01f279a2eb3ce0bdf2bb3497fe7b90af9d14d6e7e005a74bcbb71243",
+      "bytes": 1755
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f5/fixture/bodies/53a675a7cbb7b4bc01a83984692e155b0e0d89707f30f846213f6db920017e44.bin",
+      "sha256": "53a675a7cbb7b4bc01a83984692e155b0e0d89707f30f846213f6db920017e44",
+      "bytes": 3128
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f5/fixture/manifest.ndjson",
+      "sha256": "0cc258344f573bf7c54244aa7a438df26dc531c28168167030fc899e18a55f23",
+      "bytes": 1239
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f6/candidate/ASTOCK-008-c93474ab5cfd/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "51b04b6140bee39b0691b87a6a23e14f115a051c5c24518adca8d5c64b701497",
+      "bytes": 11194
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f6/candidate/ASTOCK-008-c93474ab5cfd/_raw/bodies/5e0312683233f4419998f1990ccb858059ab69b501833cd37f1643e7a8897fde.bin",
+      "sha256": "5e0312683233f4419998f1990ccb858059ab69b501833cd37f1643e7a8897fde",
+      "bytes": 1605
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f6/candidate/ASTOCK-008-c93474ab5cfd/_raw/manifest.ndjson",
+      "sha256": "89c99b3fdfe43a8a62eb7870b5b5c91d0e698fc24d8dcb418421ffbb3eefb04c",
+      "bytes": 1755
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f6/fixture/bodies/5e0312683233f4419998f1990ccb858059ab69b501833cd37f1643e7a8897fde.bin",
+      "sha256": "5e0312683233f4419998f1990ccb858059ab69b501833cd37f1643e7a8897fde",
+      "bytes": 1605
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f6/fixture/manifest.ndjson",
+      "sha256": "91236a281ea4ccc4070947dd8435c4f6dba42f6f7b54ad2ca4402da94844c9b2",
+      "bytes": 1239
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f7/candidate/ASTOCK-008-ffe0fc0704fe/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "291a2f6d4f7a1bd3888489f07da113ca034345af260a3b5c7bd32519d20938a6",
+      "bytes": 11194
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f7/candidate/ASTOCK-008-ffe0fc0704fe/_raw/bodies/00861f18e26f86daa4fa71a4f27b407633ba32e97d5e61b8bdc981d705e1d3d6.bin",
+      "sha256": "00861f18e26f86daa4fa71a4f27b407633ba32e97d5e61b8bdc981d705e1d3d6",
+      "bytes": 1605
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f7/candidate/ASTOCK-008-ffe0fc0704fe/_raw/manifest.ndjson",
+      "sha256": "24ad69bd1146aa541db41257f1aa95ff57b2bb93051555f22b1c2ae36e4f4626",
+      "bytes": 1755
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f7/fixture/bodies/00861f18e26f86daa4fa71a4f27b407633ba32e97d5e61b8bdc981d705e1d3d6.bin",
+      "sha256": "00861f18e26f86daa4fa71a4f27b407633ba32e97d5e61b8bdc981d705e1d3d6",
+      "bytes": 1605
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f7/fixture/manifest.ndjson",
+      "sha256": "b252fea2589e80f48b9d1993760bd443e132fc9f7b64667a77e8ad830dec2720",
+      "bytes": 1239
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f8/candidate/ASTOCK-008-0bc32c70999a/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "26f9032a3e289f7d042cee1412634ab996c4a13e42da3150eb63ed3ff2c3206d",
+      "bytes": 11161
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f8/candidate/ASTOCK-008-0bc32c70999a/_raw/bodies/8f6fdef97ea9086ced6fe20293a6e999f3cea4a4a28f2351b9a1019836fff535.bin",
+      "sha256": "8f6fdef97ea9086ced6fe20293a6e999f3cea4a4a28f2351b9a1019836fff535",
+      "bytes": 1605
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f8/candidate/ASTOCK-008-0bc32c70999a/_raw/manifest.ndjson",
+      "sha256": "1ccc7fe43005f38cc9206514d7a0ef471cdb5c6762974d3355a301fe965e48a7",
+      "bytes": 1755
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f8/fixture/bodies/8f6fdef97ea9086ced6fe20293a6e999f3cea4a4a28f2351b9a1019836fff535.bin",
+      "sha256": "8f6fdef97ea9086ced6fe20293a6e999f3cea4a4a28f2351b9a1019836fff535",
+      "bytes": 1605
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f8/fixture/manifest.ndjson",
+      "sha256": "0237a5ea5a2453c0d26f5574d96e8ecb47f7746d86f3c4a8e4c7a8808b9b8ebc",
+      "bytes": 1239
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f9/candidate/ASTOCK-019-df20a1c6c3ee/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "14f316363772f592d6050d4b8767a45e6e987ff6144b8e9c19c1351dfc55d559",
+      "bytes": 10744
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f9/candidate/ASTOCK-019-df20a1c6c3ee/_raw/bodies/6d1c45613ec1638cfd3a4b16f3be2a49e698856a1c918b35de977ed509a6810c.bin",
+      "sha256": "6d1c45613ec1638cfd3a4b16f3be2a49e698856a1c918b35de977ed509a6810c",
+      "bytes": 140
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f9/candidate/ASTOCK-019-df20a1c6c3ee/_raw/bodies/779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6.bin",
+      "sha256": "779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6",
+      "bytes": 4575
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f9/candidate/ASTOCK-019-df20a1c6c3ee/_raw/manifest.ndjson",
+      "sha256": "3917bdbdf4ccb5749ddb9464877064e268d7134b04739ece8fd8dd8555cc43d5",
+      "bytes": 1520
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f9/fixture/bodies/6d1c45613ec1638cfd3a4b16f3be2a49e698856a1c918b35de977ed509a6810c.bin",
+      "sha256": "6d1c45613ec1638cfd3a4b16f3be2a49e698856a1c918b35de977ed509a6810c",
+      "bytes": 140
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f9/fixture/bodies/b72c23ea4a0c96f4d97172309f9fd8e2ab14bc33faaee0405462388c1d6be56c.bin",
+      "sha256": "b72c23ea4a0c96f4d97172309f9fd8e2ab14bc33faaee0405462388c1d6be56c",
+      "bytes": 3274
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/f9/fixture/manifest.ndjson",
+      "sha256": "51be8bec4c80bb0c447bff1b36f1614960bbe36e693480ddcacd0fac0c99ecc4",
+      "bytes": 2143
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/numericASTOCK-008/candidate/ASTOCK-008-4fb8fd9505e3/2026-10-04/eastmoney_reports/eastmoney/report_list/mapped-rows.json",
+      "sha256": "a0f2ba307d890cf80484ce6934d536a6a80c519cf36aa5788c68522ab33fc51c",
+      "bytes": 728
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/numericASTOCK-008/candidate/ASTOCK-008-4fb8fd9505e3/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "7922f35b6563f29bd6a0a04be5a08a7594bf639c15b694088922fd314da29231",
+      "bytes": 13252
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/numericASTOCK-008/candidate/ASTOCK-008-4fb8fd9505e3/2026-10-04/parsed_rows/eastmoney/report_list/parsed-rows.json",
+      "sha256": "e1808135cdbef9e4281df8fb890cc73db91365ba31bc0b50bfcd5ebf6b5e6591",
+      "bytes": 1410
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/numericASTOCK-008/candidate/ASTOCK-008-4fb8fd9505e3/2026-10-04/source_rows/eastmoney/report_list/source-rows.json",
+      "sha256": "e1808135cdbef9e4281df8fb890cc73db91365ba31bc0b50bfcd5ebf6b5e6591",
+      "bytes": 1410
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/numericASTOCK-008/candidate/ASTOCK-008-4fb8fd9505e3/_raw/bodies/575c1719dd793e2cc1346fcef3fb53d3a50c74c7a4decd34ecf36d344df32f9a.bin",
+      "sha256": "575c1719dd793e2cc1346fcef3fb53d3a50c74c7a4decd34ecf36d344df32f9a",
+      "bytes": 1593
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/numericASTOCK-008/candidate/ASTOCK-008-4fb8fd9505e3/_raw/manifest.ndjson",
+      "sha256": "70cdcbccf30b91dd4f825ab617c4f676dee3f6fd14f2d901371ce956b3847372",
+      "bytes": 1770
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/numericASTOCK-008/candidate/ASTOCK-008-d487591e1655/2026-10-04/eastmoney_reports/eastmoney/report_list/mapped-rows.json",
+      "sha256": "2dc7efb42539ba3019827706481d8a3e9d2b40ca412e8d2e6b09d92f9c97f92f",
+      "bytes": 728
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/numericASTOCK-008/candidate/ASTOCK-008-d487591e1655/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "d80a1f451d7956f971e681813f3e7d5238fdb0463a09b30a30f32d8d51557f0e",
+      "bytes": 13259
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/numericASTOCK-008/candidate/ASTOCK-008-d487591e1655/2026-10-04/parsed_rows/eastmoney/report_list/parsed-rows.json",
+      "sha256": "baf4bf752d931d02fcdddda0a3e1a6032a6bcfca02af41e4c31127abc2e19b6c",
+      "bytes": 1422
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/numericASTOCK-008/candidate/ASTOCK-008-d487591e1655/2026-10-04/source_rows/eastmoney/report_list/source-rows.json",
+      "sha256": "baf4bf752d931d02fcdddda0a3e1a6032a6bcfca02af41e4c31127abc2e19b6c",
+      "bytes": 1422
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/numericASTOCK-008/candidate/ASTOCK-008-d487591e1655/_raw/bodies/6c10edf13d5f620e63028a16876c4375b3ed3c80761d25e5248df96651c9df69.bin",
+      "sha256": "6c10edf13d5f620e63028a16876c4375b3ed3c80761d25e5248df96651c9df69",
+      "bytes": 1616
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/numericASTOCK-008/candidate/ASTOCK-008-d487591e1655/_raw/manifest.ndjson",
+      "sha256": "422597dd32d9a0e4d4e44317d9cba95bd91df2283ea407da2fd0b494a9e9d66c",
+      "bytes": 1777
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/numericASTOCK-008/fixture/bodies/575c1719dd793e2cc1346fcef3fb53d3a50c74c7a4decd34ecf36d344df32f9a.bin",
+      "sha256": "575c1719dd793e2cc1346fcef3fb53d3a50c74c7a4decd34ecf36d344df32f9a",
+      "bytes": 1593
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/numericASTOCK-008/fixture/manifest.ndjson",
+      "sha256": "e7f4ebaf82337e9f57f7d1e06a2433ff4f6006e1c175406ecec77882f44b0023",
+      "bytes": 1239
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/numericASTOCK-008/jsonp/fixture/bodies/6c10edf13d5f620e63028a16876c4375b3ed3c80761d25e5248df96651c9df69.bin",
+      "sha256": "6c10edf13d5f620e63028a16876c4375b3ed3c80761d25e5248df96651c9df69",
+      "bytes": 1616
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/numericASTOCK-008/jsonp/fixture/manifest.ndjson",
+      "sha256": "1b86a6ced6cfd73c7619d113539a8c2aeec4a01761ffe0eeeddb396cacd4607a",
+      "bytes": 1239
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/numericASTOCK-019/candidate/ASTOCK-019-f879b25d302d/2026-10-04/dragon_tiger_seats/eastmoney/dragon_tiger_seats/mapped-rows.json",
+      "sha256": "ccee6b3d9f2d5889e0f8b9a9cb8f099d8618a11f2b3d1069c4821b0a013df68e",
+      "bytes": 3802
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/numericASTOCK-019/candidate/ASTOCK-019-f879b25d302d/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "9b9442d2d94a9613817e76f245c96d24af442a0669dcde29ae2517072f0423c8",
+      "bytes": 14688
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/numericASTOCK-019/candidate/ASTOCK-019-f879b25d302d/2026-10-04/parsed_rows/eastmoney/dragon_tiger_seats/parsed-rows.json",
+      "sha256": "9e19c786c93cd13dd6e9f3120e6cb8dc4b5031161cf13bce8145a2d7efc4f5df",
+      "bytes": 3879
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/numericASTOCK-019/candidate/ASTOCK-019-f879b25d302d/2026-10-04/source_rows/eastmoney/dragon_tiger_seats/source-rows.json",
+      "sha256": "833e4c794796b51050675185e5419e7e8889857b40ea01d036856fc573e5e730",
+      "bytes": 6129
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/numericASTOCK-019/candidate/ASTOCK-019-f879b25d302d/_raw/bodies/779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6.bin",
+      "sha256": "779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6",
+      "bytes": 4575
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/numericASTOCK-019/candidate/ASTOCK-019-f879b25d302d/_raw/bodies/7dab07186207dd28f5ba8b8db8ae4227d003b9a45436fef938fa03322deaeb1a.bin",
+      "sha256": "7dab07186207dd28f5ba8b8db8ae4227d003b9a45436fef938fa03322deaeb1a",
+      "bytes": 3395
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/numericASTOCK-019/candidate/ASTOCK-019-f879b25d302d/_raw/bodies/b72c23ea4a0c96f4d97172309f9fd8e2ab14bc33faaee0405462388c1d6be56c.bin",
+      "sha256": "b72c23ea4a0c96f4d97172309f9fd8e2ab14bc33faaee0405462388c1d6be56c",
+      "bytes": 3274
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/numericASTOCK-019/candidate/ASTOCK-019-f879b25d302d/_raw/manifest.ndjson",
+      "sha256": "ca2fe7888d2ef480ed0ca198122a8531c3c15b41b4274a00d1a4ba3891e90df0",
+      "bytes": 3074
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/numericASTOCK-019/fixture/bodies/7dab07186207dd28f5ba8b8db8ae4227d003b9a45436fef938fa03322deaeb1a.bin",
+      "sha256": "7dab07186207dd28f5ba8b8db8ae4227d003b9a45436fef938fa03322deaeb1a",
+      "bytes": 3395
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/numericASTOCK-019/fixture/bodies/b72c23ea4a0c96f4d97172309f9fd8e2ab14bc33faaee0405462388c1d6be56c.bin",
+      "sha256": "b72c23ea4a0c96f4d97172309f9fd8e2ab14bc33faaee0405462388c1d6be56c",
+      "bytes": 3274
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/numericASTOCK-019/fixture/manifest.ndjson",
+      "sha256": "07aa78016dfb026dcd2ac05b76c21c5a6fbcabc428608625feb2ca2d898bae52",
+      "bytes": 2144
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-complete/candidate/ASTOCK-008-6cbf688ab242/2026-10-04/eastmoney_reports/eastmoney/report_list/mapped-rows.json",
+      "sha256": "ac93bd096ce86f01eb52f5ded0325d952c61ea7fefe646b91b306e1abfbe9e03",
+      "bytes": 73621
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-complete/candidate/ASTOCK-008-6cbf688ab242/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "b45a9373a1f73b012e14214c5247cba27349081437e2e734afcc0c676df251a8",
+      "bytes": 15362
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-complete/candidate/ASTOCK-008-6cbf688ab242/2026-10-04/parsed_rows/eastmoney/report_list/parsed-rows.json",
+      "sha256": "cecbd35f5f6ca37827ac701fb82611de3bd3da26ead6e7c121f6bba7a746181c",
+      "bytes": 143715
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-complete/candidate/ASTOCK-008-6cbf688ab242/2026-10-04/source_rows/eastmoney/report_list/source-rows.json",
+      "sha256": "cecbd35f5f6ca37827ac701fb82611de3bd3da26ead6e7c121f6bba7a746181c",
+      "bytes": 143715
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-complete/candidate/ASTOCK-008-6cbf688ab242/_raw/bodies/1a1e79fb969a8f13cf6c8e34f3d90a7d046a250bbc024903c26e62a9e9e8e5c4.bin",
+      "sha256": "1a1e79fb969a8f13cf6c8e34f3d90a7d046a250bbc024903c26e62a9e9e8e5c4",
+      "bytes": 152576
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-complete/candidate/ASTOCK-008-6cbf688ab242/_raw/bodies/813d0b39fa4d1e79bf728d9090ffb1dccc9a2f0b04963eeb24cd37455bdd6fbc.bin",
+      "sha256": "813d0b39fa4d1e79bf728d9090ffb1dccc9a2f0b04963eeb24cd37455bdd6fbc",
+      "bytes": 1610
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-complete/candidate/ASTOCK-008-6cbf688ab242/_raw/manifest.ndjson",
+      "sha256": "23d5a3c49714e124c2dd6b3ebf6069c964a011a8da9d5bff425e82045464cd6f",
+      "bytes": 3536
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-complete/fixture/bodies/1a1e79fb969a8f13cf6c8e34f3d90a7d046a250bbc024903c26e62a9e9e8e5c4.bin",
+      "sha256": "1a1e79fb969a8f13cf6c8e34f3d90a7d046a250bbc024903c26e62a9e9e8e5c4",
+      "bytes": 152576
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-complete/fixture/bodies/813d0b39fa4d1e79bf728d9090ffb1dccc9a2f0b04963eeb24cd37455bdd6fbc.bin",
+      "sha256": "813d0b39fa4d1e79bf728d9090ffb1dccc9a2f0b04963eeb24cd37455bdd6fbc",
+      "bytes": 1610
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-complete/fixture/manifest.ndjson",
+      "sha256": "2390d7ed8f733d17694c4a3aa867e073f4ceb8792c5356967265ccce6d422382",
+      "bytes": 2484
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-duplicate_cross_page/candidate/ASTOCK-008-d204cfb44588/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "8a945a0c20de5ee7654d316017ac557ced84b2d25e1f1b292374de7561d880e1",
+      "bytes": 12944
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-duplicate_cross_page/candidate/ASTOCK-008-d204cfb44588/_raw/bodies/1a1e79fb969a8f13cf6c8e34f3d90a7d046a250bbc024903c26e62a9e9e8e5c4.bin",
+      "sha256": "1a1e79fb969a8f13cf6c8e34f3d90a7d046a250bbc024903c26e62a9e9e8e5c4",
+      "bytes": 152576
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-duplicate_cross_page/candidate/ASTOCK-008-d204cfb44588/_raw/bodies/92f56d07f0d657e729a3d0818438f58122f530e84ec45d8d972c3ba8b1294c93.bin",
+      "sha256": "92f56d07f0d657e729a3d0818438f58122f530e84ec45d8d972c3ba8b1294c93",
+      "bytes": 1608
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-duplicate_cross_page/candidate/ASTOCK-008-d204cfb44588/_raw/manifest.ndjson",
+      "sha256": "b4c1f58f596f972904909eb401005fa99ed67681a6c099c4b989f5a916344972",
+      "bytes": 3560
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-duplicate_cross_page/fixture/bodies/1a1e79fb969a8f13cf6c8e34f3d90a7d046a250bbc024903c26e62a9e9e8e5c4.bin",
+      "sha256": "1a1e79fb969a8f13cf6c8e34f3d90a7d046a250bbc024903c26e62a9e9e8e5c4",
+      "bytes": 152576
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-duplicate_cross_page/fixture/bodies/92f56d07f0d657e729a3d0818438f58122f530e84ec45d8d972c3ba8b1294c93.bin",
+      "sha256": "92f56d07f0d657e729a3d0818438f58122f530e84ec45d8d972c3ba8b1294c93",
+      "bytes": 1608
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-duplicate_cross_page/fixture/manifest.ndjson",
+      "sha256": "e7cca62a2b480b20145a429b5664c7e6ca30887758696cb10aba2e7e32723c01",
+      "bytes": 2484
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-limited/candidate/ASTOCK-008-541e8b068075/2026-10-04/eastmoney_reports/eastmoney/report_list/mapped-rows.json",
+      "sha256": "d884d2743372a3f908610405fbca78348f57201ba6bd245618f08a279713ecbb",
+      "bytes": 145891
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-limited/candidate/ASTOCK-008-541e8b068075/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "d2e599394bfe6dc4ba5a42e527040cdaf819a7a9cb5cc2007ed65cb55d5505dd",
+      "bytes": 15362
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-limited/candidate/ASTOCK-008-541e8b068075/2026-10-04/parsed_rows/eastmoney/report_list/parsed-rows.json",
+      "sha256": "80bfaa8e344b2e6306fdf79d674fe93bd7cbeb2388215d876dfe87763f360571",
+      "bytes": 284691
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-limited/candidate/ASTOCK-008-541e8b068075/2026-10-04/source_rows/eastmoney/report_list/source-rows.json",
+      "sha256": "80bfaa8e344b2e6306fdf79d674fe93bd7cbeb2388215d876dfe87763f360571",
+      "bytes": 284691
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-limited/candidate/ASTOCK-008-541e8b068075/_raw/bodies/1185f3261c6d85e2d0ec3e9d0ae3b67b18043a220106692ffbdf6d019c41cc2b.bin",
+      "sha256": "1185f3261c6d85e2d0ec3e9d0ae3b67b18043a220106692ffbdf6d019c41cc2b",
+      "bytes": 152576
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-limited/candidate/ASTOCK-008-541e8b068075/_raw/bodies/7ef25ae43bf058b5526e53abbe223c2d01ade7709aa3dcf2f3afc28f3a92f57b.bin",
+      "sha256": "7ef25ae43bf058b5526e53abbe223c2d01ade7709aa3dcf2f3afc28f3a92f57b",
+      "bytes": 152686
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-limited/candidate/ASTOCK-008-541e8b068075/_raw/manifest.ndjson",
+      "sha256": "5a6fa634f775038ca3341af3d8a992d5f17f5de17fbafe19949392cc15cae3a5",
+      "bytes": 3536
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-limited/fixture/bodies/1185f3261c6d85e2d0ec3e9d0ae3b67b18043a220106692ffbdf6d019c41cc2b.bin",
+      "sha256": "1185f3261c6d85e2d0ec3e9d0ae3b67b18043a220106692ffbdf6d019c41cc2b",
+      "bytes": 152576
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-limited/fixture/bodies/7ef25ae43bf058b5526e53abbe223c2d01ade7709aa3dcf2f3afc28f3a92f57b.bin",
+      "sha256": "7ef25ae43bf058b5526e53abbe223c2d01ade7709aa3dcf2f3afc28f3a92f57b",
+      "bytes": 152686
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-limited/fixture/manifest.ndjson",
+      "sha256": "cc0a202c8346a74559875ee36dcbca13923236ae2b6a7e2f79f0fe401edba6ec",
+      "bytes": 2486
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-totals_drift/candidate/ASTOCK-008-2f2ca7862658/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "cd558f41e01bc2338591b19313b6f34d0b9f8306407eccf3f035c7b9051a2ca1",
+      "bytes": 12916
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-totals_drift/candidate/ASTOCK-008-2f2ca7862658/_raw/bodies/1a1e79fb969a8f13cf6c8e34f3d90a7d046a250bbc024903c26e62a9e9e8e5c4.bin",
+      "sha256": "1a1e79fb969a8f13cf6c8e34f3d90a7d046a250bbc024903c26e62a9e9e8e5c4",
+      "bytes": 152576
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-totals_drift/candidate/ASTOCK-008-2f2ca7862658/_raw/bodies/7e031056915e2d99067ce0326624386477c262234fa8e21b6f52475e0cac4de5.bin",
+      "sha256": "7e031056915e2d99067ce0326624386477c262234fa8e21b6f52475e0cac4de5",
+      "bytes": 3118
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-totals_drift/candidate/ASTOCK-008-2f2ca7862658/_raw/manifest.ndjson",
+      "sha256": "3c08bf2507fed35a11f8ccfa814badd82ac6c7ac029baa6f2f33a23c400df53d",
+      "bytes": 3544
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-totals_drift/fixture/bodies/1a1e79fb969a8f13cf6c8e34f3d90a7d046a250bbc024903c26e62a9e9e8e5c4.bin",
+      "sha256": "1a1e79fb969a8f13cf6c8e34f3d90a7d046a250bbc024903c26e62a9e9e8e5c4",
+      "bytes": 152576
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-totals_drift/fixture/bodies/7e031056915e2d99067ce0326624386477c262234fa8e21b6f52475e0cac4de5.bin",
+      "sha256": "7e031056915e2d99067ce0326624386477c262234fa8e21b6f52475e0cac4de5",
+      "bytes": 3118
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/pages-totals_drift/fixture/manifest.ndjson",
+      "sha256": "0d3d81a1c6b145871b6c238868a9d4846bac5aed4ecbbdf3668ea7c7c6587c5c",
+      "bytes": 2484
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-008-1a7594b5fe3c/2026-10-04/eastmoney_reports/eastmoney/report_list/mapped-rows.json",
+      "sha256": "701e97c82b6a92b7d48bc8913e95c093222fae853cf10cd8ef5431f015ddf2ee",
+      "bytes": 728
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-008-1a7594b5fe3c/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "6ab3a39c7691b09b68101b7414bcc200aed2efcf4c33a500a6abed2610dd4c05",
+      "bytes": 12867
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-008-1a7594b5fe3c/2026-10-04/parsed_rows/eastmoney/report_list/parsed-rows.json",
+      "sha256": "baf4bf752d931d02fcdddda0a3e1a6032a6bcfca02af41e4c31127abc2e19b6c",
+      "bytes": 1422
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-008-1a7594b5fe3c/2026-10-04/source_rows/eastmoney/report_list/source-rows.json",
+      "sha256": "baf4bf752d931d02fcdddda0a3e1a6032a6bcfca02af41e4c31127abc2e19b6c",
+      "bytes": 1422
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-008-1a7594b5fe3c/_raw/bodies/7b8acdc4fb408e4ed9561829dd418de90c968a3ca343b06810dfb26cb677f0a8.bin",
+      "sha256": "7b8acdc4fb408e4ed9561829dd418de90c968a3ca343b06810dfb26cb677f0a8",
+      "bytes": 1493
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-008-1a7594b5fe3c/_raw/manifest.ndjson",
+      "sha256": "1e6cf6347380f9653492cd46ab523514035708b66ab37d57d705942de3dfa07b",
+      "bytes": 1541
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-008-bad714af4670/2026-10-04/eastmoney_reports/eastmoney/report_list/mapped-rows.json",
+      "sha256": "701e97c82b6a92b7d48bc8913e95c093222fae853cf10cd8ef5431f015ddf2ee",
+      "bytes": 728
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-008-bad714af4670/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "cab0304549524997e0b7faa931e327162456ec2867f10f0187531b5a87ccf5d0",
+      "bytes": 13181
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-008-bad714af4670/2026-10-04/parsed_rows/eastmoney/report_list/parsed-rows.json",
+      "sha256": "baf4bf752d931d02fcdddda0a3e1a6032a6bcfca02af41e4c31127abc2e19b6c",
+      "bytes": 1422
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-008-bad714af4670/2026-10-04/source_rows/eastmoney/report_list/source-rows.json",
+      "sha256": "baf4bf752d931d02fcdddda0a3e1a6032a6bcfca02af41e4c31127abc2e19b6c",
+      "bytes": 1422
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-008-bad714af4670/_raw/bodies/7b8acdc4fb408e4ed9561829dd418de90c968a3ca343b06810dfb26cb677f0a8.bin",
+      "sha256": "7b8acdc4fb408e4ed9561829dd418de90c968a3ca343b06810dfb26cb677f0a8",
+      "bytes": 1493
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-008-bad714af4670/_raw/manifest.ndjson",
+      "sha256": "debde018d31c53f2b217acf93de0f5171d0094e1fc7c77b8396165fa1f1693f2",
+      "bytes": 1860
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-019-18083e26c086/2026-10-04/dragon_tiger_seats/eastmoney/dragon_tiger_seats/mapped-rows.json",
+      "sha256": "d3939bb378b3ed5e6d4d05f36253b69a7484dec3fa65d910e13ccca2023a48ac",
+      "bytes": 3802
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-019-18083e26c086/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "b3aeb83554e58b18b51b6f7b3786506e4813ad99512921822df77766e91deecd",
+      "bytes": 14238
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-019-18083e26c086/2026-10-04/parsed_rows/eastmoney/dragon_tiger_seats/parsed-rows.json",
+      "sha256": "3508523d090dd12ee6f1923f6307798c5a6dabc57a6cc9aa01b4d0417f299c20",
+      "bytes": 3900
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-019-18083e26c086/2026-10-04/source_rows/eastmoney/dragon_tiger_seats/source-rows.json",
+      "sha256": "2efd84f2cd01f19b2e37fb5b56cbdac4238eaba91272e029a401a951909bf0bd",
+      "bytes": 6154
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-019-18083e26c086/_raw/bodies/779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6.bin",
+      "sha256": "779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6",
+      "bytes": 4575
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-019-18083e26c086/_raw/bodies/79c9b649544f48049cb8e39bb28b201360d17ae79ed35c91716e659ea6386a16.bin",
+      "sha256": "79c9b649544f48049cb8e39bb28b201360d17ae79ed35c91716e659ea6386a16",
+      "bytes": 3207
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-019-18083e26c086/_raw/bodies/fcb616bfc685257915bb87a1684395d02ba69efd164a1bd9d9512349d1aaa2a0.bin",
+      "sha256": "fcb616bfc685257915bb87a1684395d02ba69efd164a1bd9d9512349d1aaa2a0",
+      "bytes": 3061
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-019-18083e26c086/_raw/manifest.ndjson",
+      "sha256": "ee083567eaff0e780a40a1491d2855cf0426db258dd5971ae57c01d393c66535",
+      "bytes": 2616
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-019-73bd9f8569e9/2026-10-04/dragon_tiger_seats/eastmoney/dragon_tiger_seats/mapped-rows.json",
+      "sha256": "d3939bb378b3ed5e6d4d05f36253b69a7484dec3fa65d910e13ccca2023a48ac",
+      "bytes": 3802
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-019-73bd9f8569e9/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "9e9fd2f2b4ca5f73ede0a9e2f0e5d3786116724a5c19712a2e1dd6dfa562da76",
+      "bytes": 14866
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-019-73bd9f8569e9/2026-10-04/parsed_rows/eastmoney/dragon_tiger_seats/parsed-rows.json",
+      "sha256": "3508523d090dd12ee6f1923f6307798c5a6dabc57a6cc9aa01b4d0417f299c20",
+      "bytes": 3900
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-019-73bd9f8569e9/2026-10-04/source_rows/eastmoney/dragon_tiger_seats/source-rows.json",
+      "sha256": "2efd84f2cd01f19b2e37fb5b56cbdac4238eaba91272e029a401a951909bf0bd",
+      "bytes": 6154
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-019-73bd9f8569e9/_raw/bodies/779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6.bin",
+      "sha256": "779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6",
+      "bytes": 4575
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-019-73bd9f8569e9/_raw/bodies/79c9b649544f48049cb8e39bb28b201360d17ae79ed35c91716e659ea6386a16.bin",
+      "sha256": "79c9b649544f48049cb8e39bb28b201360d17ae79ed35c91716e659ea6386a16",
+      "bytes": 3207
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-019-73bd9f8569e9/_raw/bodies/fcb616bfc685257915bb87a1684395d02ba69efd164a1bd9d9512349d1aaa2a0.bin",
+      "sha256": "fcb616bfc685257915bb87a1684395d02ba69efd164a1bd9d9512349d1aaa2a0",
+      "bytes": 3061
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/candidate/ASTOCK-019-73bd9f8569e9/_raw/manifest.ndjson",
+      "sha256": "964dd8a6ce2747dff052cf97ebb3527a04e43c9b53cad47fa831a12798a41978",
+      "bytes": 3254
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/session/fixture-mode.json",
+      "sha256": "507e78167c48ad043839a6e7e7a58be83ad750f905d15048e9f844add3cb6581",
+      "bytes": 101
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/verify.py",
+      "sha256": "c5e4992afc6e85c29fa2c7a706fbbe2fee94796bef842cfaf3a5ad49fa4dbb75",
+      "bytes": 10752
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/bad/ASTOCK-019-94bed460e414/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "b31acbc78b35c05a6afa60b9a1702509d61129a45c54368be1a2d93da8cd3f00",
+      "bytes": 9163
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/bad/ASTOCK-019-94bed460e414/_raw/bodies/779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6.bin",
+      "sha256": "779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6",
+      "bytes": 4575
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/candidate/ASTOCK-008-e0087ef19d08/2026-10-04/eastmoney_reports/eastmoney/report_list/mapped-rows.json",
+      "sha256": "51bc61d4dfa72ed4119cea9a46624f94f0729adc9fcfbcf312b274b54d537610",
+      "bytes": 235
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/candidate/ASTOCK-008-e0087ef19d08/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "2a859522ce23f034fb8d7bf3392cb9b230efa394032db7d4d694aecb3707907e",
+      "bytes": 12951
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/candidate/ASTOCK-008-e0087ef19d08/2026-10-04/parsed_rows/eastmoney/report_list/parsed-rows.json",
+      "sha256": "baf4bf752d931d02fcdddda0a3e1a6032a6bcfca02af41e4c31127abc2e19b6c",
+      "bytes": 1422
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/candidate/ASTOCK-008-e0087ef19d08/2026-10-04/source_rows/eastmoney/report_list/source-rows.json",
+      "sha256": "baf4bf752d931d02fcdddda0a3e1a6032a6bcfca02af41e4c31127abc2e19b6c",
+      "bytes": 1422
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/candidate/ASTOCK-008-e0087ef19d08/_raw/bodies/7b8acdc4fb408e4ed9561829dd418de90c968a3ca343b06810dfb26cb677f0a8.bin",
+      "sha256": "7b8acdc4fb408e4ed9561829dd418de90c968a3ca343b06810dfb26cb677f0a8",
+      "bytes": 1493
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/candidate/ASTOCK-008-e0087ef19d08/_raw/manifest.ndjson",
+      "sha256": "f5ddc13aca66591c17a34c295f2f112340fe33d95f786922a9a37153ca7ea611",
+      "bytes": 2151
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/capabilities.yaml",
+      "sha256": "7b7ce0da1d33b333165c6081a3ed788f85cb05d5f6945c745eec97d73e24f6e2",
+      "bytes": 4009
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/collection.yaml",
+      "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d",
+      "bytes": 2934
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/a50_quote.yaml",
+      "sha256": "d9b990dfe46e7b500890da82723dee287c4e2be29e009ab91ceadd8099a02fd2",
+      "bytes": 907
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/adjustment_factor.yaml",
+      "sha256": "380d49696daeb27b81ef2e0f55c31225544880da73c9213c3ad28650a11732f6",
+      "bytes": 458
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/board_fund_flow.yaml",
+      "sha256": "08f3566d0cf2787186e6106e4915d0d89b70232d737898480eda03785ea3c53a",
+      "bytes": 1110
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/broken_limit_pool.yaml",
+      "sha256": "60b3790eae896c968093c8d26a818c9dab325aca620510b4ec1dde061af7f65e",
+      "bytes": 1162
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/buyback.yaml",
+      "sha256": "807490acc8affc7dde3502ef62c2b80ad32923fe4c5ff6a6b4fd9d403b50d4f6",
+      "bytes": 1439
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/cctv_news_index.yaml",
+      "sha256": "a876cfcb7dfa79b79423cb3ae8044dab1bb43515f12fc090158228dbf95b6d33",
+      "bytes": 317
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/cls_telegraph.yaml",
+      "sha256": "80c414933f4ee26e2475403ceda50fc2f2b98141c18d0fd0c3f719dae3572f02",
+      "bytes": 331
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/concept_board.yaml",
+      "sha256": "eef0b07c9a41bfd5ef1a52f4f39516cb26d42b088d63a15783af0f94985fd76f",
+      "bytes": 379
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/convertible_bonds.yaml",
+      "sha256": "11723522544165617f1141aa08921252ca99447eba5cf507c574a887dd6748b9",
+      "bytes": 1362
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/daily_bar.yaml",
+      "sha256": "0a8c1dcae7e1c062ae70c224defc1362adc1d58bc196bbeb2f1edd61d6fd39e7",
+      "bytes": 995
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/dividend_event.yaml",
+      "sha256": "67a2b02063cb9a891e3fb388048407cbc08b05ce8ae97deea6976d3904340d2e",
+      "bytes": 759
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/dragon_tiger_daily.yaml",
+      "sha256": "d5a3adddecdf6cb89d80dc64ea4ef4fc92d396fd0c0bad0b3322ef763be7b176",
+      "bytes": 1485
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/dragon_tiger_seats.yaml",
+      "sha256": "d02c9ef0c1aba19b42dd6ee123c602c0277367e89cc2390c1e3bf722b9aabdbb",
+      "bytes": 858
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/earnings_forecast.yaml",
+      "sha256": "ded845c047fcefdbeb163f27620d4e67f2bc78e62a0bcfea5678d6df8758f8fd",
+      "bytes": 1060
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/eastmoney_reports.yaml",
+      "sha256": "2f97f51d1f995a6791bb9070632b9c8ae7feb023068ac5bbc04082cfe88faf14",
+      "bytes": 1349
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/financial_main.yaml",
+      "sha256": "23d8b55356620439d5c1b507601b782b31aa965fe24eaf194e869466bb271ab0",
+      "bytes": 766
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/futures_daily.yaml",
+      "sha256": "3c923f6d637e1409ec1be5733897ba267a8025169b36b6874aefd0b8181834d5",
+      "bytes": 938
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/futures_quote.yaml",
+      "sha256": "0fb3866f0cdfacfe6fe9dbe7d5396947b16514751639275db40352ff5655a33b",
+      "bytes": 1557
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/holder_trades.yaml",
+      "sha256": "44b0ecfc09c6e39823c50e83077354f25bc8026fc70272d92046ba3a51d09b92",
+      "bytes": 1246
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/industry_board.yaml",
+      "sha256": "c6930c70b55e171dee94b74b80f3c37df1466d4a10dadc3016975004b8b47ba4",
+      "bytes": 380
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/industry_directory.yaml",
+      "sha256": "9325d485bf7a1bc2b075c2d920b43b17caa039916536bedd8163be0f972bfe5b",
+      "bytes": 346
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/industry_index_daily.yaml",
+      "sha256": "5d542c72443410747f2ac643589bfd8160cdea07d01d6d0dd9c5e4753096043b",
+      "bytes": 676
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/industry_membership.yaml",
+      "sha256": "dff512c9b7f00330bbe408ba1e1eb74d99b49bc0b38ee419d4c463047c6fe69d",
+      "bytes": 709
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/institution_survey.yaml",
+      "sha256": "470fd4503d45cf0839e887fd276a0c3c82cdcae7cae8f52001006464c212733e",
+      "bytes": 703
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/intraday_trend.yaml",
+      "sha256": "5983e0eb29c1cd7a781fbad0be7332dda14e887ccd744e55ad4b8664c7a0c38a",
+      "bytes": 665
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/ipo_calendar.yaml",
+      "sha256": "7579b9174fd3554a92bc50865cabe7ac20604579403f748d09bcd4e8760bcac9",
+      "bytes": 1331
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/limit_down_pool.yaml",
+      "sha256": "67b3ca1ae9edf0f863d2b2d5257a315fe721f042086d4b5966653c0f2758d806",
+      "bytes": 1177
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/limit_up_pool.yaml",
+      "sha256": "73c1fa4ed6d7281d1857208a2ec9696a3637214bb256661ce943313c75772a69",
+      "bytes": 982
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/lockup_expiry.yaml",
+      "sha256": "53dccf257fe72dbb3596bec55f54126dacebef3e444b0f1275c002baa84da0f0",
+      "bytes": 931
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/lpr_history.yaml",
+      "sha256": "b40bb3000aa8db8b84aeaad6383c3dd7da1afb3c3bfb6ed6fc69343476ca7650",
+      "bytes": 330
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/macro_calendar.yaml",
+      "sha256": "96aeb6dab62b3d6411aecbb488c9f1cc5bd7656ce0a6762fcdaf614e9fbffef8",
+      "bytes": 801
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/minute_bar_5m.yaml",
+      "sha256": "fb6f822ed42479422a0b4c227577d8e559bb6b2238562af566af0464304bd873",
+      "bytes": 708
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/pledge.yaml",
+      "sha256": "40b46e96e55d8b1061c98ec979094b4f98ef4800e513cfa7a9c2c5f2152b2fb1",
+      "bytes": 878
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/pmi_history.yaml",
+      "sha256": "7c877511d1860472b43ba7be149a009e330462c8198ce3810dce259e71383edf",
+      "bytes": 630
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/previous_limit_pool.yaml",
+      "sha256": "5234397a7b87ed3e03c11431de1f00c012e135ba5ef57bf63a2f431f659703bc",
+      "bytes": 1199
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/realtime_quote.yaml",
+      "sha256": "ebc3e97bb7469eb4c7c80daf50991ebe38f0eb5b2476a9a579d22236d416378b",
+      "bytes": 1121
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/repo_fixing.yaml",
+      "sha256": "6908c6c805e15a153dc567d58c81daecb66026bdd0f48d8865e296a1ba883935",
+      "bytes": 506
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/security_snapshot.yaml",
+      "sha256": "255115893f64837a3b95ea9fe44551948eefa9604aca9d59214de87a580300be",
+      "bytes": 519
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/shareholder_count.yaml",
+      "sha256": "d325df1784c873bea73a1d907e9964e06c26e4d6b356dd6c16148837b57feccf",
+      "bytes": 923
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/sina_global_news.yaml",
+      "sha256": "688eeb3b698bb8fdb3fb33bc296869b6caca47bd9ff427a97ae989f74c595350",
+      "bytes": 297
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/sina_reports.yaml",
+      "sha256": "257c0a14c634da0267490b8d8bf2cfe48067f4b8818a85968ac922f3521392e6",
+      "bytes": 536
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/social_financing.yaml",
+      "sha256": "c1b1ff0cb118dd094c364b42939034b92aa04f7f77b31f1c477f94a182300cb9",
+      "bytes": 959
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/stock_fund_flow.yaml",
+      "sha256": "df3f21341463f3538a1f855ef19b7bbdb683405aaa65d5418c255023c18a429f",
+      "bytes": 736
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/strong_stock_pool.yaml",
+      "sha256": "264c9d759405d37733cf4daf29996240cb46fed46c3eb8835405a4311e1c1131",
+      "bytes": 1194
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/trading_calendar.yaml",
+      "sha256": "924b17a5be104252e85a377e4579432c6725bab99cbaa0ad70e71102149a1f49",
+      "bytes": 192
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets/wallstreetcn_news.yaml",
+      "sha256": "1bdecf169c6ea357cbb53787bd0a9a659d1f4a96e77e42996556b55df97bbd49",
+      "bytes": 534
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/datasets.yaml",
+      "sha256": "e992d13297e1f9a8f64acabc25f65f138b21ce12dca16689cc3f17bf1385a6eb",
+      "bytes": 587
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/a50_quote.yaml",
+      "sha256": "c984450a923a5655cdd60e1e35a9c8981fca80f9c4f996f5dcce790f10f08b9f",
+      "bytes": 886
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/adjustment_factor.yaml",
+      "sha256": "d9317a50a1042232c8f3cf1cb18fbcf55ff808c314d390f679ec365bde2b505f",
+      "bytes": 716
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/board_fund_flow.yaml",
+      "sha256": "fb7c6f1f2d425181b189e25152e465306982e10c7c6ee06b2917dfa00b891baa",
+      "bytes": 1395
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/broken_limit_pool.yaml",
+      "sha256": "8bd046757fc9fb3e7d144a0e9d41106267e828a60bc5a099280158c15459a84d",
+      "bytes": 1238
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/buyback.yaml",
+      "sha256": "70e6ee88258842e76509208c6d9df379478df717837489869ff1e9f72f82d1b3",
+      "bytes": 2520
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/cctv_news_index.yaml",
+      "sha256": "4de0d3f1b61694e5c6ab7450a38a7c85f583fadd64d48e52bd737545eb04e42b",
+      "bytes": 573
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/cls_telegraph.yaml",
+      "sha256": "7c64e6a2aad86a294ea4da3e99239fdadbef2f48c9cc40bcfd4685aaf753c372",
+      "bytes": 661
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/concept_board.yaml",
+      "sha256": "2b7e7f57d189541d6a232cd5391d2dab4289f9f3438f397d9fefd82bb1d996b7",
+      "bytes": 206
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/convertible_bonds.yaml",
+      "sha256": "147b800777f7042f9e4a7907841e038034db65a80f263fcb04628ea34943dd56",
+      "bytes": 1289
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/daily_bar.yaml",
+      "sha256": "41f9bbd0824e20d70f7ed276758b286094c33c79180befca4d8985afc3c8ad0b",
+      "bytes": 2913
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/dividend_event.yaml",
+      "sha256": "188df2f7f075b92e993136aef3f977eea419f9c6957404bd2f7071c76ed24a71",
+      "bytes": 1532
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/dragon_tiger_daily.yaml",
+      "sha256": "d9d64fef55ff8c7cdc268884583edd34f816ffc847895c57b10ac1ae9ee98740",
+      "bytes": 1470
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/dragon_tiger_seats.yaml",
+      "sha256": "953a5a163fa9bf22ad97e3c2092702302b69a62398515ca4530b21bbfb65f857",
+      "bytes": 1105
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/earnings_forecast.yaml",
+      "sha256": "5b323a3c3c6577527701985248bb13b54102463a167ba04c749f4908e2b401c4",
+      "bytes": 1633
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/eastmoney_reports.yaml",
+      "sha256": "5af7f5d63deb0dba6a7a6bf81556fa97bd4d2a30f46d78663d12896a8f41c6b8",
+      "bytes": 1578
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/financial_main.yaml",
+      "sha256": "eeeb2e7418aab430168f0c7e16c69f1b24a9e49ec8d156a28390cae0e7a69bda",
+      "bytes": 603
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/futures_daily.yaml",
+      "sha256": "94760152dd79821d2ed775f64924d84546e85194c44b3baa782b113a040f659b",
+      "bytes": 858
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/futures_quote.yaml",
+      "sha256": "21ef8cc411dc481644a1529846814a29aef0f86c38aa86fede5da7ebb52a1c8f",
+      "bytes": 1204
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/holder_trades.yaml",
+      "sha256": "2deca39ea7c1a57254b4ee31390587f39d640559181cd1ceae7968a4684e5f40",
+      "bytes": 1959
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/industry_board.yaml",
+      "sha256": "f3ff8bbe7fc4e8d4e5af1c36b9312e8db1c8c9cb09a09aadb472b22ae09de152",
+      "bytes": 210
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/industry_directory.yaml",
+      "sha256": "823d97db8afe4adb3f963faaa04b42b8f151e93f2e75f3eb18f8c678a68bae37",
+      "bytes": 478
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/industry_index_daily.yaml",
+      "sha256": "953087294fd2c3a3cb1b46f204d0a0f606f9060f0f89676fb3a189222a68dab1",
+      "bytes": 805
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/industry_membership.yaml",
+      "sha256": "7eb72a1b8ce7aff27aa1ad62534af2bf7183f3d78c6392208035396a11e21ccb",
+      "bytes": 765
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/institution_survey.yaml",
+      "sha256": "e33c639f75da6a7a1d699936d0624084ed3488ef773aa9fcf3eaefc66e829423",
+      "bytes": 1118
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/intraday_trend.yaml",
+      "sha256": "14b0b22ad1308c70b65152e711c4248d3c8bf1c28d842fba36309194ed38870a",
+      "bytes": 440
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/ipo_calendar.yaml",
+      "sha256": "d72db539afed6e890e81d6e1c4680fcb09ad4285551748f3c9e12ba124e6059c",
+      "bytes": 2338
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/limit_down_pool.yaml",
+      "sha256": "456b0a779929bb6ff71ed70e07cd420d42596068f142879926b86972e3704f7b",
+      "bytes": 1314
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/limit_up_pool.yaml",
+      "sha256": "411e6e6ead10a4d2cbff7ecf4de9bee26f411a66d005a33bc640865ef4b6e7ba",
+      "bytes": 1079
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/lockup_expiry.yaml",
+      "sha256": "a63b17bed61210cb9b2a1238b025ac385bd3c28b3dda9de426c802fa68ded352",
+      "bytes": 1222
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/lpr_history.yaml",
+      "sha256": "2a12cd26c069d8be0eb68e121eef7930f97f602ffe80e459b649c6cbc5a4c217",
+      "bytes": 682
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/macro_calendar.yaml",
+      "sha256": "e0d0012ce022adbc47f682b5de7caead1581af891e69367b2acdc4d514769c25",
+      "bytes": 918
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/minute_bar_5m.yaml",
+      "sha256": "f3e9abaededc01a15c651a99a22131a80067133deb89548dd12b17278e0e55b7",
+      "bytes": 1134
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/pledge.yaml",
+      "sha256": "4c8f7636e0b20e5923adbbf4c5e696247da67869d90ed19f0aee62f2e5612710",
+      "bytes": 1589
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/pmi_history.yaml",
+      "sha256": "5e9e93163114a9e265af1bd2e10dc587835b4745aff844310d273d8d873ebe47",
+      "bytes": 924
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/previous_limit_pool.yaml",
+      "sha256": "4c14b9ad1f0497e2d6f13a72978f1ddda74039b7c0d182c5a5a98ac01a678443",
+      "bytes": 1276
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/realtime_quote.yaml",
+      "sha256": "e9141547fbb85cb71c8e2336c20a2ebc948e3926f4b2a09e4f59505adea91b94",
+      "bytes": 1308
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/repo_fixing.yaml",
+      "sha256": "0d6b2b5b39a92c6f3d2629f3f805f0b12d609ea9b3f691a50c896c12d81b4681",
+      "bytes": 762
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/security_snapshot.yaml",
+      "sha256": "474ab0397cb1aad33abcd070942586a8460c468b1d3f7af97c2d152eee5a6537",
+      "bytes": 621
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/shareholder_count.yaml",
+      "sha256": "f8801367f055e0b1d419e648c9bd3e1d72984ffe2823c2d464770403c1b7c9e4",
+      "bytes": 1702
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/sina_global_news.yaml",
+      "sha256": "22b2caa83fecb10728649e033cf8b8fbbd4fa8c7928de1b8d8961e1516263b0f",
+      "bytes": 649
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/sina_reports.yaml",
+      "sha256": "3a19d455c1227852fe3b131c655129dd5e727194a26cfd60734097f673edb174",
+      "bytes": 682
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/social_financing.yaml",
+      "sha256": "86b691b8e26d88b42bae76aff769ac01ca33cbf109135f6c75dc00764d7ac59c",
+      "bytes": 1261
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/stock_fund_flow.yaml",
+      "sha256": "3d99bacf48ba3438c90d2d544f7223ffcb0a464f69f95841affe3e99a503bbe1",
+      "bytes": 1741
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/strong_stock_pool.yaml",
+      "sha256": "41733f419a6dd9d3a25edf361294a973df76d878d01bbf46b9f25f53a38f2304",
+      "bytes": 1234
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/trading_calendar.yaml",
+      "sha256": "4be7571914129769aeca321d892b8aa2fbd068db1c7c0b691ae0d5cefe7f69e0",
+      "bytes": 476
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/normalization/wallstreetcn_news.yaml",
+      "sha256": "cdca43fb9ef1d825fe75358ea6c828fec02b892e344505d484d302123079fca9",
+      "bytes": 770
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/providers.yaml",
+      "sha256": "4811dfb113893cf7c37796aa198744d992638b84fa6e754c94efeafe62c7dbac",
+      "bytes": 87323
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004/yaml/config/schedules.yaml",
+      "sha256": "01b7e269ea4231024bf1c520f78fa571c2909986aad5573006bd80e186119113",
+      "bytes": 525
+    },
+    {
+      "path": "provider_validation/results/reports-seats-final-20261004-tests.xml",
+      "sha256": "317d9e045e3c208c1fdc0c1ebd0e61e6fee4c09dd0bc4fb8570838670a7ef0bc",
+      "bytes": 81704
+    },
+    {
+      "path": "provider_validation/results/reports-seats-original-20261004/0-financial.py.bin",
+      "sha256": "89f710c8c314b31c476ccfb5bf2768bd5694ebd767fa12c7dbc641554c5250b0",
+      "bytes": 39905
+    },
+    {
+      "path": "provider_validation/results/reports-seats-original-20261004/1-inputs.py.bin",
+      "sha256": "3e87ff162f4df2864df4af19c1c1ec659c159c874ff0b8c98d0dd65b26e8e8fa",
+      "bytes": 63041
+    },
+    {
+      "path": "provider_validation/results/reports-seats-original-20261004/10-transport.py.bin",
+      "sha256": "3a00e5c89608fd579f5544d2048497fb49b042a2232b0b64897f7a1e6b094a4c",
+      "bytes": 19300
+    },
+    {
+      "path": "provider_validation/results/reports-seats-original-20261004/2-factory.py.bin",
+      "sha256": "ff24a15b369b712b78b9a692b9ee38fe4169c3e1e4bacbaf25e85f71f7f1ed13",
+      "bytes": 24305
+    },
+    {
+      "path": "provider_validation/results/reports-seats-original-20261004/3-providers.yaml.bin",
+      "sha256": "b29438c9ad48a5d0794574af101c5afa12748ed99148c596db824062fc20cc5e",
+      "bytes": 85957
+    },
+    {
+      "path": "provider_validation/results/reports-seats-original-20261004/4-test_input_collection.py.bin",
+      "sha256": "bade9de84933ee4ef5183e59180115c294ecd2ab65df0dcce90ef777eb9c6db7",
+      "bytes": 249277
+    },
+    {
+      "path": "provider_validation/results/reports-seats-original-20261004/5-replay_input_capabilities.py.bin",
+      "sha256": "f85cc06a2c3e79f315ce48dd1dfc93c7caeda65f88ed61acde2deb2b1b49ccec",
+      "bytes": 54420
+    },
+    {
+      "path": "provider_validation/results/reports-seats-original-20261004/6-.gitattributes.bin",
+      "sha256": "b81653392cf60cf402ebbe0912fc0e631e617a38552b896af746c6ec1c5797b7",
+      "bytes": 16268
+    },
+    {
+      "path": "provider_validation/results/reports-seats-original-20261004/7-CODE_STRUCTURE.md.bin",
+      "sha256": "a745110037cc67de7d548db1504183e7fa171c5e007c663887383d8e88b203d0",
+      "bytes": 27205
+    },
+    {
+      "path": "provider_validation/results/reports-seats-original-20261004/8-PROJECT_PROGRESS.md.bin",
+      "sha256": "b64ac6637243bf555a97ecf900ff59cfe3706b8feb0421d625c8297d2bb1bfde",
+      "bytes": 16255
+    },
+    {
+      "path": "provider_validation/results/reports-seats-original-20261004/9-raw.py.bin",
+      "sha256": "3b803525f5b275119ca7af3b05d151fedaeecbe12abf484efe1de3af8994793d",
+      "bytes": 8494
+    },
+    {
+      "path": "provider_validation/results/reports-seats-original-20261004/date-evidence.json",
+      "sha256": "c2cb8354512643db1ea57bbd6cf1de481394856dc0485030e0b8c0644cb612d0",
+      "bytes": 3691
+    },
+    {
+      "path": "provider_validation/results/reports-seats-original-20261004/investigate.py",
+      "sha256": "6da88c3f5881b160068c86643dcf92c871fb89ad60fdb29881265cd9e815eecf",
+      "bytes": 2953
+    },
+    {
+      "path": "provider_validation/results/reports-seats-original-20261004/investigation.json",
+      "sha256": "78bafcab57ed88db2f883bf72fbe4974a2fc315a1be53daae320410e459ee1b2",
+      "bytes": 18389
+    },
+    {
+      "path": "provider_validation/results/reports-seats-original-20261004/ownership-check.json",
+      "sha256": "8b71fd1a4204683fc943e5ed9708870cc4d156178fb4869818c30ffb62a55050",
+      "bytes": 199
+    },
+    {
+      "path": "provider_validation/results/reports-seats-original-20261004/ownership.ps1",
+      "sha256": "e2c604abadc4a01b12fcba790ebac17e556b0a958f518aac87c92ad00c5121a5",
+      "bytes": 4742
+    },
+    {
+      "path": "provider_validation/results/reports-seats-original-20261004/preserve_development.py",
+      "sha256": "337246b2608b97ca7261d78847b3d701592347a5a1ce05b78aeb09cb980898be",
+      "bytes": 1302
+    },
+    {
+      "path": "provider_validation/results/reports-seats-smoke-20261004/ASTOCK-008-5420ef883f43/2026-10-04/eastmoney_reports/eastmoney/report_list/mapped-rows.json",
+      "sha256": "a0a52ff348b67b14c1b59baf0e17fe9230c5d8aac8b2f0ca4b1c441c444b0372",
+      "bytes": 728
+    },
+    {
+      "path": "provider_validation/results/reports-seats-smoke-20261004/ASTOCK-008-5420ef883f43/2026-10-04/input_report/eastmoney/report_list/report.json",
+      "sha256": "dcd571ee0f0acffda8aca94ecef2a1552ee30728f40eab1fe4ccae9e14d17857",
+      "bytes": 13616
+    },
+    {
+      "path": "provider_validation/results/reports-seats-smoke-20261004/ASTOCK-008-5420ef883f43/2026-10-04/parsed_rows/eastmoney/report_list/parsed-rows.json",
+      "sha256": "baf4bf752d931d02fcdddda0a3e1a6032a6bcfca02af41e4c31127abc2e19b6c",
+      "bytes": 1422
+    },
+    {
+      "path": "provider_validation/results/reports-seats-smoke-20261004/ASTOCK-008-5420ef883f43/2026-10-04/source_rows/eastmoney/report_list/source-rows.json",
+      "sha256": "baf4bf752d931d02fcdddda0a3e1a6032a6bcfca02af41e4c31127abc2e19b6c",
+      "bytes": 1422
+    },
+    {
+      "path": "provider_validation/results/reports-seats-smoke-20261004/ASTOCK-008-5420ef883f43/_raw/bodies/7b8acdc4fb408e4ed9561829dd418de90c968a3ca343b06810dfb26cb677f0a8.bin",
+      "sha256": "7b8acdc4fb408e4ed9561829dd418de90c968a3ca343b06810dfb26cb677f0a8",
+      "bytes": 1493
+    },
+    {
+      "path": "provider_validation/results/reports-seats-smoke-20261004/ASTOCK-008-5420ef883f43/_raw/manifest.ndjson",
+      "sha256": "ca0fdb4039ff59bba2de3a7b4c5acc621fd958478be736483a8abf0786fa644b",
+      "bytes": 2151
+    },
+    {
+      "path": "provider_validation/results/reports-seats-smoke-20261004/ASTOCK-019-d25e94df0d4f/2026-10-04/dragon_tiger_seats/eastmoney/dragon_tiger_seats/mapped-rows.json",
+      "sha256": "61fed724023b290cd3e0de2c33cbb37ce84dfc758c7f2e3343ea85c449cddff6",
+      "bytes": 3802
+    },
+    {
+      "path": "provider_validation/results/reports-seats-smoke-20261004/ASTOCK-019-d25e94df0d4f/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
+      "sha256": "e366ae9c22a09c42a7c6ea5c45033bbafbc4741c8058a4ac21271466f24df475",
+      "bytes": 15932
+    },
+    {
+      "path": "provider_validation/results/reports-seats-smoke-20261004/ASTOCK-019-d25e94df0d4f/2026-10-04/parsed_rows/eastmoney/dragon_tiger_seats/parsed-rows.json",
+      "sha256": "3508523d090dd12ee6f1923f6307798c5a6dabc57a6cc9aa01b4d0417f299c20",
+      "bytes": 3900
+    },
+    {
+      "path": "provider_validation/results/reports-seats-smoke-20261004/ASTOCK-019-d25e94df0d4f/2026-10-04/source_rows/eastmoney/dragon_tiger_seats/source-rows.json",
+      "sha256": "2efd84f2cd01f19b2e37fb5b56cbdac4238eaba91272e029a401a951909bf0bd",
+      "bytes": 6154
+    },
+    {
+      "path": "provider_validation/results/reports-seats-smoke-20261004/ASTOCK-019-d25e94df0d4f/_raw/bodies/779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6.bin",
+      "sha256": "779a04da824dc88fed24a9e077da2ca6e6b8153242756ecec76bea68c07908b6",
+      "bytes": 4575
+    },
+    {
+      "path": "provider_validation/results/reports-seats-smoke-20261004/ASTOCK-019-d25e94df0d4f/_raw/bodies/79c9b649544f48049cb8e39bb28b201360d17ae79ed35c91716e659ea6386a16.bin",
+      "sha256": "79c9b649544f48049cb8e39bb28b201360d17ae79ed35c91716e659ea6386a16",
+      "bytes": 3207
+    },
+    {
+      "path": "provider_validation/results/reports-seats-smoke-20261004/ASTOCK-019-d25e94df0d4f/_raw/bodies/fcb616bfc685257915bb87a1684395d02ba69efd164a1bd9d9512349d1aaa2a0.bin",
+      "sha256": "fcb616bfc685257915bb87a1684395d02ba69efd164a1bd9d9512349d1aaa2a0",
+      "bytes": 3061
+    },
+    {
+      "path": "provider_validation/results/reports-seats-smoke-20261004/ASTOCK-019-d25e94df0d4f/_raw/manifest.ndjson",
+      "sha256": "6168b387b193d544e9384ec3a02a983c41ee920cc86612e0bbf5274f4142e21b",
+      "bytes": 4376
+    },
+    {
+      "path": "provider_validation/tests/replay_input_capabilities.py",
+      "sha256": "647c9c3fc1e7f99c8fba6434a3484043fba9a5766bd46c61798597ae97966697",
+      "bytes": 57429
+    },
+    {
+      "path": "src/stock_data_manage/cli.py",
+      "sha256": "582f5caedfc538a012d7a2f6e8cd7af3fe8b6fc9152e5b9e0a3fa2cb8810ae19",
+      "bytes": 14323
+    },
+    {
+      "path": "src/stock_data_manage/config/loader.py",
+      "sha256": "93bb55ab150c88751fe9a58a2b75737878c1b0f07233b8ec47009c4901bb11e9",
+      "bytes": 26090
+    },
+    {
+      "path": "src/stock_data_manage/pipeline/inputs.py",
+      "sha256": "f604af6e2200f0336ddc75bd2cd3f8a1e3c95ba2412b051a57bebc8502d9caa8",
+      "bytes": 67802
+    },
+    {
+      "path": "src/stock_data_manage/providers/akshare/boards.py",
+      "sha256": "2060f150831cebaf707ed5becedc35428bc41d4428bab31555ed1d2bf817d122",
+      "bytes": 12416
+    },
+    {
+      "path": "src/stock_data_manage/providers/baostock/industry.py",
+      "sha256": "16c41b379eecbd87f082bd042e27fad7f3d8d77b5bfc6a3e8a286209b068494a",
+      "bytes": 10837
+    },
+    {
+      "path": "src/stock_data_manage/providers/baostock/session.py",
+      "sha256": "70ce19cdde1d6a8ed0c3d3db29caa28d1d8069826136ab6dd7fb6a2ef8c7b832",
+      "bytes": 15771
+    },
+    {
+      "path": "src/stock_data_manage/providers/cctv/news.py",
+      "sha256": "8839bdeed801611e8e6d11cb9441e6ede7bc94d56507eaa2c903e605c772ee7d",
+      "bytes": 2538
+    },
+    {
+      "path": "src/stock_data_manage/providers/chinamoney/rates.py",
+      "sha256": "e7407f1d4272b69cb439bb0a7bad3960b65bb41328d752f541bc8ef50231f922",
+      "bytes": 2716
+    },
+    {
+      "path": "src/stock_data_manage/providers/cls/news.py",
+      "sha256": "51da559a252b67a4a2e58171e3630ff1a5a80cd2bc23aa5df30a7e17ac02ad30",
+      "bytes": 3013
+    },
+    {
+      "path": "src/stock_data_manage/providers/contracts.py",
+      "sha256": "a4b16abc7e3686a4eb2791dcd4545fb2404e0214bf32e20db19d2582d39ea447",
+      "bytes": 5153
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/dividend.py",
+      "sha256": "5706a8cdb37eeeb8f66cb033a3091dd1b6ec1ed83d72d0f9fbeb8f5c75d9649b",
+      "bytes": 6407
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/financial.py",
+      "sha256": "b88fd28013942d1815d04eaf25521bd00dc0d44329ee411dbff48585bb1529a7",
+      "bytes": 50576
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/fund_flow.py",
+      "sha256": "0cf655efa0854d18651bb4f04f985f0f210b81a6d9eff065604d235ed8f75280",
+      "bytes": 5046
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/limit_pool.py",
+      "sha256": "2fbdfe3da3129545dfe8d2e457be7c42225696ddd74270567ae765e4b413f5ae",
+      "bytes": 5663
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/realtime.py",
+      "sha256": "6e09d2a5014cf316c4d1e26e913a44d5c2fbad95fb44d95cba159ef881f03bca",
+      "bytes": 16746
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/shareholder.py",
+      "sha256": "4c9d80f4d51845ac5541c42275f44f2a18643db5e9ccb705a3e16168f8db44c1",
+      "bytes": 4865
+    },
+    {
+      "path": "src/stock_data_manage/providers/mofcom/social_financing.py",
+      "sha256": "55d292958fb34991c56c626d5f6f61e7e6c44c8c2627b88ea735e751aa12c5ce",
+      "bytes": 2567
+    },
+    {
+      "path": "src/stock_data_manage/providers/sina/calendar.py",
+      "sha256": "3d114045f960bfcc94ade1ee03e4d25ebdf6980ba68aa2d0a2236bed78aaef05",
+      "bytes": 1388
+    },
+    {
+      "path": "src/stock_data_manage/providers/sina/daily.py",
+      "sha256": "dd15e0c6b0f8ed5e6db99b5d2b9725eb7e2cc6f3e42bd5e6d392c5334922dc89",
+      "bytes": 10480
+    },
+    {
+      "path": "src/stock_data_manage/providers/sina/news.py",
+      "sha256": "565774907b8f1c146eb729c5af12caef352d87e43e1e15719fe2a3928673e68f",
+      "bytes": 4949
+    },
+    {
+      "path": "src/stock_data_manage/providers/sina/snapshot.py",
+      "sha256": "cfa0b823b2fa8053ce899157e9b6078b94516d3fabd5d303480824111f62d136",
+      "bytes": 7778
+    },
+    {
+      "path": "src/stock_data_manage/providers/tencent/daily.py",
+      "sha256": "487a14fcbfc47146d6d5fd291fbf41667aba435e5fed22ea1ef61ded513fcaa7",
+      "bytes": 9941
+    },
+    {
+      "path": "src/stock_data_manage/providers/tencent/minute.py",
+      "sha256": "ff5cf1e91327bcab2e072bcfae9f1f77dca71a84ba26e456c26580a4d59d9cc1",
+      "bytes": 4709
+    },
+    {
+      "path": "src/stock_data_manage/providers/tencent/snapshot.py",
+      "sha256": "3278cadac776fe8cfe5d02775a5bf8f53bc1cb96c595a5f418172f53047434bf",
+      "bytes": 5160
+    },
+    {
+      "path": "src/stock_data_manage/providers/transport.py",
+      "sha256": "cb860d0022c40ffe450694b2b4e48bff50c64ed7083d25c847a8079f2baf28b1",
+      "bytes": 19564
+    },
+    {
+      "path": "src/stock_data_manage/providers/wallstreetcn/news.py",
+      "sha256": "fb870197a111ecad42d47e7e81315c7d59c3c6a8bd7cadb72b84cc537bc91fda",
+      "bytes": 7848
+    },
+    {
+      "path": "src/stock_data_manage/quality/normalization.py",
+      "sha256": "3ed0d663b7fda9ac6cdf7f1252435f2351c783af3244ccba2c2b0f3891e29b3e",
+      "bytes": 14958
+    },
+    {
+      "path": "src/stock_data_manage/routing/factory.py",
+      "sha256": "2e50aba8c7faf45c4a81bb2010c1ed2b2355cbef83f2fc5f9739f3a8e9e60e11",
+      "bytes": 24620
+    },
+    {
+      "path": "src/stock_data_manage/storage/raw.py",
+      "sha256": "d483c614830e96d41b697709c0cde9e4cb5adee26116020428b7697f57f2c108",
+      "bytes": 8933
+    },
+    {
+      "path": "tests/test_input_collection.py",
+      "sha256": "77a1e52846a0189721abb75105a722164adc309289b5203b5cf76b2ab719cac0",
+      "bytes": 270993
+    }
+  ]
+}

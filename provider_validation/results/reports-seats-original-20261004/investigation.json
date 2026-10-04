@@ -1,0 +1,636 @@
+{
+  "before": [
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/financial.py",
+      "snapshot": "provider_validation/results/reports-seats-original-20261004/0-financial.py.bin",
+      "sha256": "89f710c8c314b31c476ccfb5bf2768bd5694ebd767fa12c7dbc641554c5250b0"
+    },
+    {
+      "path": "src/stock_data_manage/pipeline/inputs.py",
+      "snapshot": "provider_validation/results/reports-seats-original-20261004/1-inputs.py.bin",
+      "sha256": "3e87ff162f4df2864df4af19c1c1ec659c159c874ff0b8c98d0dd65b26e8e8fa"
+    },
+    {
+      "path": "src/stock_data_manage/routing/factory.py",
+      "snapshot": "provider_validation/results/reports-seats-original-20261004/2-factory.py.bin",
+      "sha256": "ff24a15b369b712b78b9a692b9ee38fe4169c3e1e4bacbaf25e85f71f7f1ed13"
+    },
+    {
+      "path": "config/providers.yaml",
+      "snapshot": "provider_validation/results/reports-seats-original-20261004/3-providers.yaml.bin",
+      "sha256": "b29438c9ad48a5d0794574af101c5afa12748ed99148c596db824062fc20cc5e"
+    },
+    {
+      "path": "tests/test_input_collection.py",
+      "snapshot": "provider_validation/results/reports-seats-original-20261004/4-test_input_collection.py.bin",
+      "sha256": "bade9de84933ee4ef5183e59180115c294ecd2ab65df0dcce90ef777eb9c6db7"
+    },
+    {
+      "path": "provider_validation/tests/replay_input_capabilities.py",
+      "snapshot": "provider_validation/results/reports-seats-original-20261004/5-replay_input_capabilities.py.bin",
+      "sha256": "f85cc06a2c3e79f315ce48dd1dfc93c7caeda65f88ed61acde2deb2b1b49ccec"
+    },
+    {
+      "path": ".gitattributes",
+      "snapshot": "provider_validation/results/reports-seats-original-20261004/6-.gitattributes.bin",
+      "sha256": "b81653392cf60cf402ebbe0912fc0e631e617a38552b896af746c6ec1c5797b7"
+    },
+    {
+      "path": "CODE_STRUCTURE.md",
+      "snapshot": "provider_validation/results/reports-seats-original-20261004/7-CODE_STRUCTURE.md.bin",
+      "sha256": "a745110037cc67de7d548db1504183e7fa171c5e007c663887383d8e88b203d0"
+    },
+    {
+      "path": "PROJECT_PROGRESS.md",
+      "snapshot": "provider_validation/results/reports-seats-original-20261004/8-PROJECT_PROGRESS.md.bin",
+      "sha256": "b64ac6637243bf555a97ecf900ff59cfe3706b8feb0421d625c8297d2bb1bfde"
+    }
+  ],
+  "source_code": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+  "source_code_sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0",
+  "raw_manifest": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+  "raw_manifest_sha256": "885abd6bf1c4b809b9029759f61b75c7d6a297755fd76ca6c545720db38a6767",
+  "events": [
+    {
+      "query": {
+        "industryCode": [
+          "*"
+        ],
+        "pageSize": [
+          "100"
+        ],
+        "industry": [
+          "*"
+        ],
+        "rating": [
+          "*"
+        ],
+        "ratingChange": [
+          "*"
+        ],
+        "beginTime": [
+          "2026-09-01"
+        ],
+        "endTime": [
+          "2026-10-03"
+        ],
+        "pageNo": [
+          "1"
+        ],
+        "fields": [
+          ""
+        ],
+        "qType": [
+          "0"
+        ],
+        "orgCode": [
+          ""
+        ],
+        "code": [
+          "600519"
+        ],
+        "rcode": [
+          ""
+        ],
+        "p": [
+          "1"
+        ],
+        "pageNum": [
+          "1"
+        ],
+        "pageNumber": [
+          "1"
+        ],
+        "_": [
+          "1791020798080"
+        ]
+      },
+      "body_sha256": "7b8acdc4fb408e4ed9561829dd418de90c968a3ca343b06810dfb26cb677f0a8",
+      "status": 200,
+      "headers": {
+        "Accept": "*/*",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+        "Connection": "keep-alive",
+        "Referer": "https://data.eastmoney.com/",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36"
+      },
+      "request_options": null,
+      "payload_keys": [
+        "hits",
+        "size",
+        "data",
+        "TotalPage",
+        "pageNo",
+        "currentYear"
+      ],
+      "metadata": {
+        "hits": 1,
+        "size": 1,
+        "TotalPage": 1,
+        "pageNo": 1,
+        "currentYear": 2026
+      },
+      "row_count": 1,
+      "fields": [
+        "title",
+        "stockName",
+        "stockCode",
+        "orgCode",
+        "orgName",
+        "orgSName",
+        "publishDate",
+        "infoCode",
+        "column",
+        "predictNextTwoYearEps",
+        "predictNextTwoYearPe",
+        "predictNextYearEps",
+        "predictNextYearPe",
+        "predictThisYearEps",
+        "predictThisYearPe",
+        "predictLastYearEps",
+        "predictLastYearPe",
+        "actualLastTwoYearEps",
+        "actualLastYearEps",
+        "industryCode",
+        "industryName",
+        "emIndustryCode",
+        "indvInduCode",
+        "indvInduName",
+        "emRatingCode",
+        "emRatingValue",
+        "emRatingName",
+        "lastEmRatingCode",
+        "lastEmRatingValue",
+        "lastEmRatingName",
+        "ratingChange",
+        "reportType",
+        "author",
+        "indvIsNew",
+        "researcher",
+        "newListingDate",
+        "newPurchaseDate",
+        "newIssuePrice",
+        "newPeIssueA",
+        "indvAimPriceT",
+        "indvAimPriceL",
+        "attachType",
+        "attachSize",
+        "attachPages",
+        "encodeUrl",
+        "sRatingName",
+        "sRatingCode",
+        "market",
+        "authorID",
+        "count",
+        "orgType"
+      ],
+      "first": {
+        "title": "贵州茅台公司跟踪报告：以动销定投放，缓解市场压力，低速稳态发展",
+        "stockName": "贵州茅台",
+        "stockCode": "600519",
+        "orgCode": "80045894",
+        "orgName": "诚通证券股份有限公司",
+        "orgSName": "诚通证券",
+        "publishDate": "2026-09-21 00:00:00.000",
+        "infoCode": "AP202609211829719676",
+        "column": "002004002002",
+        "predictNextTwoYearEps": "71.3200000000",
+        "predictNextTwoYearPe": "18.0000000000",
+        "predictNextYearEps": "67.8700000000",
+        "predictNextYearPe": "18.9000000000",
+        "predictThisYearEps": "65.1400000000",
+        "predictThisYearPe": "19.7000000000",
+        "predictLastYearEps": "",
+        "predictLastYearPe": "",
+        "actualLastTwoYearEps": "",
+        "actualLastYearEps": "",
+        "industryCode": "",
+        "industryName": "",
+        "emIndustryCode": "",
+        "indvInduCode": "1277",
+        "indvInduName": "白酒Ⅱ",
+        "emRatingCode": "007",
+        "emRatingValue": "3",
+        "emRatingName": "买入",
+        "lastEmRatingCode": "007",
+        "lastEmRatingValue": "3",
+        "lastEmRatingName": "买入",
+        "ratingChange": 3,
+        "reportType": 2,
+        "author": [
+          "11000174941.陈文倩"
+        ],
+        "indvIsNew": "001",
+        "researcher": "陈文倩",
+        "newListingDate": "2001-08-27 00:00:00.000",
+        "newPurchaseDate": "2001-07-31 00:00:00.0",
+        "newIssuePrice": 31.39,
+        "newPeIssueA": 23.93,
+        "indvAimPriceT": "",
+        "indvAimPriceL": "",
+        "attachType": "0",
+        "attachSize": 2098,
+        "attachPages": 15,
+        "encodeUrl": "FBW2kTXi8dycEdW9Ckk/ZOJmw9273n/NocjBYulzIRw=",
+        "sRatingName": "强烈推荐",
+        "sRatingCode": "0201",
+        "market": "SHANGHAI",
+        "authorID": [
+          "11000174941"
+        ],
+        "count": 1,
+        "orgType": "white"
+      }
+    },
+    {
+      "query": {
+        "industryCode": [
+          "*"
+        ],
+        "pageSize": [
+          "100"
+        ],
+        "industry": [
+          "*"
+        ],
+        "rating": [
+          "*"
+        ],
+        "ratingChange": [
+          "*"
+        ],
+        "beginTime": [
+          "2026-09-01"
+        ],
+        "endTime": [
+          "2026-10-03"
+        ],
+        "pageNo": [
+          "1"
+        ],
+        "fields": [
+          ""
+        ],
+        "qType": [
+          "0"
+        ],
+        "orgCode": [
+          ""
+        ],
+        "code": [
+          "600519"
+        ],
+        "rcode": [
+          ""
+        ],
+        "p": [
+          "1"
+        ],
+        "pageNum": [
+          "1"
+        ],
+        "pageNumber": [
+          "1"
+        ],
+        "_": [
+          "1791020801815"
+        ]
+      },
+      "body_sha256": "7b8acdc4fb408e4ed9561829dd418de90c968a3ca343b06810dfb26cb677f0a8",
+      "status": 200,
+      "headers": {
+        "Accept": "*/*",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+        "Connection": "keep-alive",
+        "Referer": "https://data.eastmoney.com/",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36"
+      },
+      "request_options": null,
+      "payload_keys": [
+        "hits",
+        "size",
+        "data",
+        "TotalPage",
+        "pageNo",
+        "currentYear"
+      ],
+      "metadata": {
+        "hits": 1,
+        "size": 1,
+        "TotalPage": 1,
+        "pageNo": 1,
+        "currentYear": 2026
+      },
+      "row_count": 1,
+      "fields": [
+        "title",
+        "stockName",
+        "stockCode",
+        "orgCode",
+        "orgName",
+        "orgSName",
+        "publishDate",
+        "infoCode",
+        "column",
+        "predictNextTwoYearEps",
+        "predictNextTwoYearPe",
+        "predictNextYearEps",
+        "predictNextYearPe",
+        "predictThisYearEps",
+        "predictThisYearPe",
+        "predictLastYearEps",
+        "predictLastYearPe",
+        "actualLastTwoYearEps",
+        "actualLastYearEps",
+        "industryCode",
+        "industryName",
+        "emIndustryCode",
+        "indvInduCode",
+        "indvInduName",
+        "emRatingCode",
+        "emRatingValue",
+        "emRatingName",
+        "lastEmRatingCode",
+        "lastEmRatingValue",
+        "lastEmRatingName",
+        "ratingChange",
+        "reportType",
+        "author",
+        "indvIsNew",
+        "researcher",
+        "newListingDate",
+        "newPurchaseDate",
+        "newIssuePrice",
+        "newPeIssueA",
+        "indvAimPriceT",
+        "indvAimPriceL",
+        "attachType",
+        "attachSize",
+        "attachPages",
+        "encodeUrl",
+        "sRatingName",
+        "sRatingCode",
+        "market",
+        "authorID",
+        "count",
+        "orgType"
+      ],
+      "first": {
+        "title": "贵州茅台公司跟踪报告：以动销定投放，缓解市场压力，低速稳态发展",
+        "stockName": "贵州茅台",
+        "stockCode": "600519",
+        "orgCode": "80045894",
+        "orgName": "诚通证券股份有限公司",
+        "orgSName": "诚通证券",
+        "publishDate": "2026-09-21 00:00:00.000",
+        "infoCode": "AP202609211829719676",
+        "column": "002004002002",
+        "predictNextTwoYearEps": "71.3200000000",
+        "predictNextTwoYearPe": "18.0000000000",
+        "predictNextYearEps": "67.8700000000",
+        "predictNextYearPe": "18.9000000000",
+        "predictThisYearEps": "65.1400000000",
+        "predictThisYearPe": "19.7000000000",
+        "predictLastYearEps": "",
+        "predictLastYearPe": "",
+        "actualLastTwoYearEps": "",
+        "actualLastYearEps": "",
+        "industryCode": "",
+        "industryName": "",
+        "emIndustryCode": "",
+        "indvInduCode": "1277",
+        "indvInduName": "白酒Ⅱ",
+        "emRatingCode": "007",
+        "emRatingValue": "3",
+        "emRatingName": "买入",
+        "lastEmRatingCode": "007",
+        "lastEmRatingValue": "3",
+        "lastEmRatingName": "买入",
+        "ratingChange": 3,
+        "reportType": 2,
+        "author": [
+          "11000174941.陈文倩"
+        ],
+        "indvIsNew": "001",
+        "researcher": "陈文倩",
+        "newListingDate": "2001-08-27 00:00:00.000",
+        "newPurchaseDate": "2001-07-31 00:00:00.0",
+        "newIssuePrice": 31.39,
+        "newPeIssueA": 23.93,
+        "indvAimPriceT": "",
+        "indvAimPriceL": "",
+        "attachType": "0",
+        "attachSize": 2098,
+        "attachPages": 15,
+        "encodeUrl": "FBW2kTXi8dycEdW9Ckk/ZOJmw9273n/NocjBYulzIRw=",
+        "sRatingName": "强烈推荐",
+        "sRatingCode": "0201",
+        "market": "SHANGHAI",
+        "authorID": [
+          "11000174941"
+        ],
+        "count": 1,
+        "orgType": "white"
+      }
+    },
+    {
+      "query": {
+        "reportName": [
+          "RPT_BILLBOARD_DAILYDETAILSBUY"
+        ],
+        "columns": [
+          "ALL"
+        ],
+        "filter": [
+          "(TRADE_DATE='2013-01-28')(SECURITY_CODE=\"600519\")"
+        ],
+        "pageNumber": [
+          "1"
+        ],
+        "pageSize": [
+          "500"
+        ],
+        "sortTypes": [
+          "-1"
+        ],
+        "sortColumns": [
+          "BUY"
+        ],
+        "source": [
+          "WEB"
+        ],
+        "client": [
+          "WEB"
+        ]
+      },
+      "body_sha256": "79c9b649544f48049cb8e39bb28b201360d17ae79ed35c91716e659ea6386a16",
+      "status": 200,
+      "headers": {
+        "Accept": "*/*",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Connection": "keep-alive",
+        "User-Agent": "python-requests/2.32.5"
+      },
+      "request_options": null,
+      "payload_keys": [
+        "version",
+        "result",
+        "success",
+        "message",
+        "code"
+      ],
+      "metadata": {
+        "pages": 1,
+        "count": 5
+      },
+      "row_count": 5,
+      "fields": [
+        "SECURITY_CODE",
+        "SECUCODE",
+        "TRADE_DATE",
+        "OPERATEDEPT_CODE",
+        "OPERATEDEPT_NAME",
+        "EXPLANATION",
+        "CHANGE_RATE",
+        "CLOSE_PRICE",
+        "ACCUM_AMOUNT",
+        "ACCUM_VOLUME",
+        "BUY",
+        "SELL",
+        "NET",
+        "RISE_PROBABILITY_3DAY",
+        "TOTAL_BUYER_SALESTIMES_3DAY",
+        "CHANGE_TYPE",
+        "OPERATEDEPT_CODE_OLD",
+        "TOTAL_BUYRIO",
+        "TOTAL_SELLRIO",
+        "TRADE_ID"
+      ],
+      "first": {
+        "SECURITY_CODE": "600519",
+        "SECUCODE": "600519.SH",
+        "TRADE_DATE": "2013-01-28 00:00:00",
+        "OPERATEDEPT_CODE": "10023374",
+        "OPERATEDEPT_NAME": "海通证券股份有限公司杭州环城西路证券营业部",
+        "EXPLANATION": "有价格涨跌幅限制的日收盘价格跌幅偏离值达到7%的前三只证券",
+        "CHANGE_RATE": -5.581,
+        "CLOSE_PRICE": 178.5,
+        "ACCUM_AMOUNT": 2857093000,
+        "ACCUM_VOLUME": 15829058,
+        "BUY": 73528206.54,
+        "SELL": null,
+        "NET": 73528206.54,
+        "RISE_PROBABILITY_3DAY": 100,
+        "TOTAL_BUYER_SALESTIMES_3DAY": 1,
+        "CHANGE_TYPE": "137001002002001",
+        "OPERATEDEPT_CODE_OLD": "80033630",
+        "TOTAL_BUYRIO": 0.02573532137,
+        "TOTAL_SELLRIO": null,
+        "TRADE_ID": "57957"
+      }
+    },
+    {
+      "query": {
+        "reportName": [
+          "RPT_BILLBOARD_DAILYDETAILSSELL"
+        ],
+        "columns": [
+          "ALL"
+        ],
+        "filter": [
+          "(TRADE_DATE='2013-01-28')(SECURITY_CODE=\"600519\")"
+        ],
+        "pageNumber": [
+          "1"
+        ],
+        "pageSize": [
+          "500"
+        ],
+        "sortTypes": [
+          "-1"
+        ],
+        "sortColumns": [
+          "SELL"
+        ],
+        "source": [
+          "WEB"
+        ],
+        "client": [
+          "WEB"
+        ]
+      },
+      "body_sha256": "fcb616bfc685257915bb87a1684395d02ba69efd164a1bd9d9512349d1aaa2a0",
+      "status": 200,
+      "headers": {
+        "Accept": "*/*",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Connection": "keep-alive",
+        "User-Agent": "python-requests/2.32.5"
+      },
+      "request_options": null,
+      "payload_keys": [
+        "version",
+        "result",
+        "success",
+        "message",
+        "code"
+      ],
+      "metadata": {
+        "pages": 1,
+        "count": 5
+      },
+      "row_count": 5,
+      "fields": [
+        "SECURITY_CODE",
+        "TRADE_DATE",
+        "SECUCODE",
+        "OPERATEDEPT_CODE",
+        "OPERATEDEPT_NAME",
+        "EXPLANATION",
+        "CHANGE_RATE",
+        "CLOSE_PRICE",
+        "ACCUM_AMOUNT",
+        "ACCUM_VOLUME",
+        "BUY",
+        "SELL",
+        "NET",
+        "RISE_PROBABILITY_3DAY",
+        "TOTAL_BUYER_SALESTIMES_3DAY",
+        "CHANGE_TYPE",
+        "OPERATEDEPT_CODE_OLD",
+        "TOTAL_BUYRIO",
+        "TOTAL_SELLRIO",
+        "TRADE_ID"
+      ],
+      "first": {
+        "SECURITY_CODE": "600519",
+        "TRADE_DATE": "2013-01-28 00:00:00",
+        "SECUCODE": "600519.SH",
+        "OPERATEDEPT_CODE": "0",
+        "OPERATEDEPT_NAME": "机构专用",
+        "EXPLANATION": "有价格涨跌幅限制的日收盘价格跌幅偏离值达到7%的前三只证券",
+        "CHANGE_RATE": -5.581,
+        "CLOSE_PRICE": 178.5,
+        "ACCUM_AMOUNT": 2857093000,
+        "ACCUM_VOLUME": 15829058,
+        "BUY": null,
+        "SELL": 269342672.27,
+        "NET": -269342672.27,
+        "RISE_PROBABILITY_3DAY": 39.569892473118,
+        "TOTAL_BUYER_SALESTIMES_3DAY": 930,
+        "CHANGE_TYPE": "137001002002001",
+        "OPERATEDEPT_CODE_OLD": null,
+        "TOTAL_BUYRIO": null,
+        "TOTAL_SELLRIO": 0.094271580334,
+        "TRADE_ID": "57957"
+      }
+    }
+  ],
+  "seat_original_selection": {
+    "chosen_date": "20130128"
+  },
+  "seat_original_selection_sha256": "7f13e4733211de8eca8243694ce1ef409457f2da75ad721bae7aa8b9983e385b",
+  "boundary": "explicit report code/window and explicit seat code/day; no implicit endpoint/source/date fallback, candidates only"
+}

@@ -1,0 +1,49 @@
+dataset: dividend_event
+
+rules:
+  - id: eastmoney-dividend-event-v1
+    provider: eastmoney
+    endpoint: dividend_event
+    exchange: XSHG
+    asset_type: stock
+    frequency: null
+    adjustment: none
+    field_mapping:
+      source_security_code: SECURITY_CODE
+      ex_dividend_date: EX_DIVIDEND_DATE
+      record_date: EQUITY_RECORD_DATE
+      pretax_bonus_rmb: PRETAX_BONUS_RMB
+      bonus_ratio: BONUS_RATIO
+      transfer_ratio: IT_RATIO
+      assignment_progress: ASSIGN_PROGRESS
+      notice_date: NOTICE_DATE
+    version: eastmoney-dividend-event-v1
+    status: pending_validation
+    notes: 分红实施字段先保留来源原始语义，完成更宽窗口验证后再提升资格。
+
+  - id: eastmoney-dividend-event-sdk-input-v1
+    provider: eastmoney
+    endpoint: dividend_history
+    input_id: ASTOCK-027
+    field_mapping:
+      ex_dividend_date: 除权除息日
+      record_date: 股权登记日
+      pretax_bonus_rmb: 现金分红-现金分红比例
+      bonus_ratio: 送转股份-送股比例
+      transfer_ratio: 送转股份-转股比例
+      assignment_progress: 方案进度
+      notice_date: 最新公告日期
+    context_fields:
+      source_security_code: source_security_code
+    unverified_fields:
+    - pretax_bonus_rmb
+    - bonus_ratio
+    - transfer_ratio
+    status: pending_validation
+    version: eastmoney-history-input-v1
+    null_values:
+    - null
+    - ''
+    - '-'
+    - --
+    notes: 仅离线候选输入；未核准金额/比率单位保留于来源行，标准字段为空。

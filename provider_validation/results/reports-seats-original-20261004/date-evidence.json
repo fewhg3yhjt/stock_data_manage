@@ -1,0 +1,91 @@
+{
+  "raw_manifest": "provider_validation\\results\\live-probes\\rate-limited-all-20261003\\_raw\\missing-capabilities-20261003T174623\\manifest.ndjson",
+  "record": {
+    "body_sha256": "bb562e80dfcff31208dd0a78762da71e790ef85e12e0f1367dcab5ac02c1ea8c",
+    "body_storage": "bodies\\bb562e80dfcff31208dd0a78762da71e790ef85e12e0f1367dcab5ac02c1ea8c.body.gz",
+    "content_type": "text/plain;charset=UTF-8",
+    "event": "http_response",
+    "fetched_at_utc": "2026-10-03T09:50:07.546+00:00",
+    "method": "GET",
+    "outcome": "response",
+    "persistence_status": "exact_application_body_saved",
+    "request_body_bytes": 0,
+    "request_body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "request_headers": {
+      "Accept": "*/*",
+      "Accept-Encoding": "gzip, deflate, br, zstd",
+      "Connection": "keep-alive",
+      "User-Agent": "python-requests/2.32.5"
+    },
+    "requests_decoded_body_bytes": 309,
+    "response_encoding": "UTF-8",
+    "response_headers": {
+      "Ali-Swift-Global-Savetime": "1791021010",
+      "Cache-Control": "no-cache",
+      "Connection": "keep-alive",
+      "Content-Type": "text/plain;charset=UTF-8",
+      "Date": "Sat, 03 Oct 2026 09:50:10 GMT",
+      "EagleId": "27af042117910210104412010e",
+      "Server": "Tengine",
+      "Set-Cookie": "[REDACTED]",
+      "Timing-Allow-Origin": "*",
+      "Transfer-Encoding": "chunked",
+      "Vary": "Accept-Encoding",
+      "Via": "ens-cache7.l2cn9026[51,50,200-0,M], ens-cache23.l2cn9026[51,0], vcache6.cn4431[55,54,200-0,M], vcache13.cn4431[56,0]",
+      "X-Cache": "MISS TCP_MISS dirn:-2:-2",
+      "X-Swift-CacheTime": "0",
+      "X-Swift-SaveTime": "Sat, 03 Oct 2026 09:50:10 GMT"
+    },
+    "scope": {
+      "capability": "17:龙虎榜席位",
+      "code": "600519",
+      "date": "20260930",
+      "end": "20261003",
+      "min_host_interval_seconds": "3.0",
+      "probe_policy": "rate-limited-live-probe-v1",
+      "retry_policy": "max_2_retries; min_backoff_5.0s; no_retry_403_429",
+      "start": "20260901"
+    },
+    "status_code": 200,
+    "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_LHB_BOARDDATE&columns=SECURITY_CODE%2CTRADE_DATE%2CTR_DATE&filter=%28SECURITY_CODE%3D%22600519%22%29&pageNumber=1&pageSize=1000&sortTypes=-1&sortColumns=TRADE_DATE&source=WEB&client=WEB",
+    "evidence_redacted": true,
+    "redaction_reason": "Credential/session-like header value suppressed; exact request header value is not retained.",
+    "redacted_header_fields": [
+      "response_headers.Set-Cookie"
+    ]
+  },
+  "decoded": {
+    "version": "47fd674356a06496fe75f56943b99936",
+    "result": {
+      "pages": 1,
+      "data": [
+        {
+          "SECURITY_CODE": "600519",
+          "TRADE_DATE": "2013-01-28 00:00:00",
+          "TR_DATE": "2013年01月28日"
+        },
+        {
+          "SECURITY_CODE": "600519",
+          "TRADE_DATE": "2007-10-24 00:00:00",
+          "TR_DATE": "2007年10月24日"
+        }
+      ],
+      "count": 2
+    },
+    "success": true,
+    "message": "ok",
+    "code": 0
+  },
+  "before_additional": [
+    {
+      "path": "src/stock_data_manage/storage/raw.py",
+      "snapshot": "provider_validation/results/reports-seats-original-20261004/9-raw.py.bin",
+      "sha256": "3b803525f5b275119ca7af3b05d151fedaeecbe12abf484efe1de3af8994793d"
+    },
+    {
+      "path": "src/stock_data_manage/providers/transport.py",
+      "snapshot": "provider_validation/results/reports-seats-original-20261004/10-transport.py.bin",
+      "sha256": "3a00e5c89608fd579f5544d2048497fb49b042a2232b0b64897f7a1e6b094a4c"
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+dataset:
+  name: macro_calendar
+  display_name: 见闻宏观日历输入
+  primary_key:
+  - snapshot_at
+  - source_event_id
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  source_event_id:
+    type: string
+    required: true
+  event_time:
+    type: datetime
+    required: true
+  country:
+    type: string
+    required: false
+  title:
+    type: string
+    required: false
+  kind:
+    type: string
+    required: false
+  importance:
+    type: integer
+    required: true
+  actual_text:
+    type: string
+    required: false
+  forecast_text:
+    type: string
+    required: false
+  previous_text:
+    type: string
+    required: false
+  revised_text:
+    type: string
+    required: false
+  source_unit:
+    type: string
+    required: false
+  source_period:
+    type: string
+    required: false

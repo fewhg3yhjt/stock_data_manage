@@ -1,0 +1,23 @@
+timezone: Asia/Shanghai
+
+jobs:
+  - name: security_master_update
+    time: "08:00"
+  - name: daily_reconciliation
+    time: "08:30"
+  - name: realtime_minute_start
+    time: "09:25"
+  - name: tdx_delayed_minute_morning
+    time: "09:45"
+    enabled: false
+  - name: tdx_delayed_minute_afternoon
+    time: "13:15"
+    enabled: false
+  - name: realtime_minute_stop
+    time: "15:05"
+  - name: minute_reconciliation
+    time: "15:20"
+  - name: daily_bar_sync
+    time: "16:20"
+  - name: missing_partition_retry
+    time: "20:00"

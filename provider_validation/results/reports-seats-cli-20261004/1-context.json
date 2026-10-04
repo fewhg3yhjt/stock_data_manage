@@ -1,0 +1,11 @@
+{
+  "request": {
+    "symbol": "600519",
+    "trade_date": "2013-01-28"
+  },
+  "calendar": {
+    "trading_dates": [
+      "2013-01-28"
+    ]
+  }
+}
