@@ -1,0 +1,20 @@
+{
+  "input_id": "ASTOCK-066",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\storage-layout-20261005\\replay-data\\task_workspace\\macro_calendar\\scope-10a14099cab6ad9f\\ASTOCK-066-ddb4f1f2bcb7\\report.json",
+  "report_sha256": "7cc8e1052c2a4a72543011fb42fd3582d5f62742ff4eb738bed62c51410d0c90",
+  "source_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\manifest.ndjson",
+  "source_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+  "source_response_hashes": [
+    "20aa9d6503b285ea24a9abe6757464bf039a1aaa21fbe38b8cd7d681bc07bdfc",
+    "4577d33c3e12fc8f5a636023a075355fbee57c077dafb969464abdd23370671a",
+    "1611c59a139f218b2066e1df35526cb04c87bb73f2c8b6fcde7216740467df99"
+  ],
+  "code_version": "57bd43cd343cd4909d2b36ba86778beacf8d2746f19fc910c7f1de8e720ba6a1",
+  "row_count": 552,
+  "coverage_denominator": 552,
+  "validation_time_utc": "2026-10-04T18:54:33.356742+00:00",
+  "mode": "offline archive replay into isolated runtime layers",
+  "canonical_writes": 0,
+  "field_roundtrip_verified": true,
+  "raw_hashes_verified": true
+}

@@ -1,0 +1,18 @@
+{
+  "input_id": "ASTOCK-083",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\storage-layout-20261005\\replay-data-v2\\task_workspace\\ipo_calendar\\scope-1ca058c86dd2414b\\e247a7c3cd36\\report.json",
+  "report_sha256": "f833a610ec3987f07563a1198d9bd8196f2bbdd599043878eeeedcaf339ed469",
+  "source_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\manifest.ndjson",
+  "source_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+  "source_response_hashes": [
+    "083373253312402772f8dffb213639ac9edf877a9a728ba1aaad9b6d7fe864af"
+  ],
+  "code_version": "06c802dfed2620055ae9ed41036dcf1ee477f342ebf1ed6121bb696f4f943b01",
+  "row_count": 30,
+  "coverage_denominator": 30,
+  "validation_time_utc": "2026-10-04T19:14:11.895164+00:00",
+  "mode": "offline archive replay into isolated runtime layers",
+  "canonical_writes": 0,
+  "field_roundtrip_verified": true,
+  "raw_hashes_verified": true
+}

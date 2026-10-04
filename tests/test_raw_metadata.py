@@ -91,3 +91,22 @@ def test_conflict_log_is_deduplicated(tmp_path, minute_bar, final_minute_bar) ->
             dataset="minute_bar_1m", partition_key="2026-09-11", conflicts=conflicts
         )
         assert metadata.conflict_count("minute_bar_1m", "2026-09-11") == len(conflicts)
+
+
+@pytest.mark.parametrize("relative", ["../escape.json", "/absolute.json", "nested/../../escape.json", "."])
+def test_raw_compact_path_rejects_escape(tmp_path, relative):
+    store = RawObjectStore(tmp_path)
+    with pytest.raises(ValueError):
+        store.write_json({}, dataset="test", provider="fixture", endpoint="test",
+                         fetched_at=datetime.now(timezone.utc), attempt_id="a", relative_path=relative)
+
+
+def test_raw_compact_path_retains_immutable_write_contract(tmp_path):
+    store = RawObjectStore(tmp_path)
+    kwargs = dict(dataset="test", provider="fixture", endpoint="test", fetched_at=datetime.now(timezone.utc),
+                  attempt_id="a", relative_path="sources/fixture/parsed/rows.json")
+    first = store.write_json({"value":1}, **kwargs)
+    assert store.write_json({"value":1}, **kwargs) == first
+    with pytest.raises(FileExistsError):
+        store.write_json({"value":2}, **kwargs)
+    assert store.verify(first)

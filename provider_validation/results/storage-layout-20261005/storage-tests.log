@@ -1,0 +1,232 @@
+...F....................FFFF............................................ [ 92%]
+......                                                                   [100%]
+================================== FAILURES ===================================
+_________ test_normalized_parquet_roundtrips_precision_time_and_nulls _________
+
+tmp_path = WindowsPath('C:/Users/sp181/AppData/Local/Temp/pytest-of-sp181/pytest-116/test_normalized_parquet_roundt0')
+
+    def test_normalized_parquet_roundtrips_precision_time_and_nulls(tmp_path):
+        from datetime import date, datetime, timezone
+        from decimal import Decimal
+        import pyarrow.parquet as pq
+        from stock_data_manage.storage.parquet import write_normalized_rows
+        fields = {"amount":{"type":"decimal", "required":True}, "day":{"type":"date"},
+                  "time":{"type":"datetime"}, "count":{"type":"integer"},
+                  "kind":{"type":"enum", "values":["a","b"]}, "missing":{"type":"decimal"}}
+        row = {"amount":Decimal("123456789012345678901234567890123456789.000000000000000001"),
+               "day":date(2026,9,30), "time":datetime(2026,9,30,15,10,tzinfo=timezone.utc),
+               "count":0, "kind":"a", "missing":None}
+        path = tmp_path / "normalized.parquet"
+>       write_normalized_rows(path, [row], fields)
+
+tests\test_canonical_recovery.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+path = WindowsPath('C:/Users/sp181/AppData/Local/Temp/pytest-of-sp181/pytest-116/test_normalized_parquet_roundt0/normalized.parquet')
+rows = [{'amount': Decimal('123456789012345678901234567890123456789.000000000000000001'), 'count': 0, 'day': datetime.date(2026, 9, 30), 'kind': 'a', ...}]
+fields = {'amount': {'required': True, 'type': 'decimal'}, 'count': {'type': 'integer'}, 'day': {'type': 'date'}, 'kind': {'type': 'enum', 'values': ['a', 'b']}, ...}
+
+    def write_normalized_rows(path: str | Path, rows: Iterable[Mapping], fields: Mapping) -> dict:
+        """Persist source candidates using the declared field contract, without publishing."""
+        import hashlib
+        from uuid import uuid4
+    
+        path = Path(path)
+        records = list(rows)
+        if any(set(row) - set(fields) for row in records):
+            raise ValueError("normalized rows contain undeclared fields")
+        arrow_fields = []
+        for name, definition in fields.items():
+            values = [row.get(name) for row in records if row.get(name) is not None]
+            kind = definition["type"]
+            if definition.get("required") and len(values) != len(records):
+                raise ValueError(f"missing required normalized field: {name}")
+            if kind == "decimal":
+                if any(not isinstance(value, Decimal) or not value.is_finite() for value in values):
+                    raise ValueError(f"decimal field requires finite Decimal values: {name}")
+                scale = max([0] + [-value.as_tuple().exponent for value in values])
+                integer_digits = max([0] + [max(0, value.adjusted() + 1) for value in values])
+                precision = max(1, integer_digits + scale)
+                if precision > 76:
+                    raise ValueError(f"decimal precision exceeds Parquet capacity: {name}")
+                arrow_type = pa.decimal128(precision, scale) if precision <= 38 else pa.decimal256(precision, scale)
+            elif kind in {"string", "enum"}:
+                if any(not isinstance(value, str) for value in values):
+                    raise ValueError(f"string field requires string values: {name}")
+                if kind == "enum" and any(value not in definition["values"] for value in values):
+                    raise ValueError(f"undeclared enum value: {name}")
+                arrow_type = pa.string()
+            elif kind == "date":
+                if any(not isinstance(value, date) or isinstance(value, datetime) for value in values):
+                    raise ValueError(f"date field requires date values: {name}")
+                arrow_type = pa.date32()
+            elif kind == "datetime":
+                if any(not isinstance(value, datetime) for value in values):
+                    raise ValueError(f"datetime field requires datetime values: {name}")
+                aware = [value.utcoffset() is not None for value in values]
+                if aware and any(aware) != all(aware):
+                    raise ValueError(f"mixed naive and aware timestamps: {name}")
+                arrow_type = pa.timestamp("us", tz="UTC" if any(aware) else None)
+            elif kind == "integer":
+                if any(type(value) is not int for value in values):
+                    raise ValueError(f"integer field requires integer values: {name}")
+                arrow_type = pa.int64()
+            else:
+                raise ValueError(f"unsupported normalized field type: {kind}")
+            arrow_fields.append(pa.field(name, arrow_type, nullable=not definition.get("required", False)))
+        table = pa.Table.from_pylist(records, schema=pa.schema(arrow_fields))
+        path.parent.mkdir(parents=True, exist_ok=True)
+        temporary = path.with_name(f"{path.name}.{uuid4().hex[:12]}.tmp")
+        try:
+            pq.write_table(table, temporary)
+            with temporary.open("rb") as stream:
+>               os.fsync(stream.fileno())
+E               OSError: [Errno 9] Bad file descriptor
+
+src\storage\parquet.py:127: OSError
+_ test_storage_paths_reject_escape_or_overlapping_layers[raw_root-../outside] _
+
+tmp_path = WindowsPath('C:/Users/sp181/AppData/Local/Temp/pytest-of-sp181/pytest-116/test_storage_paths_reject_esca0')
+key = 'raw_root', value = '../outside'
+
+    @pytest.mark.parametrize("key,value", [("raw_root", "../outside"),
+        ("workspace_root", "data/raw/nested"), ("archive_root", "data/task_workspace"),
+        ("metadata_path", "data/metadata.duckdb")])
+    def test_storage_paths_reject_escape_or_overlapping_layers(tmp_path, key, value):
+        from stock_data_manage.config.loader import load_storage_paths
+        config = tmp_path / "config"
+        config.mkdir()
+>       document = yaml.safe_load((PROJECT_ROOT / "config/collection.yaml").read_text())
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_config_contract.py:132: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Program Files\Python\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/Project/PythonProgram/stock_data_manage/config/collection.yaml')
+encoding = 'locale', errors = None, newline = None
+
+    def read_text(self, encoding=None, errors=None, newline=None):
+        """
+        Open the file in text mode, read it, and close the file.
+        """
+        with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+>           return f.read()
+                   ^^^^^^^^
+E           UnicodeDecodeError: 'gbk' codec can't decode byte 0xae in position 852: illegal multibyte sequence
+
+D:\Program Files\Python\Lib\pathlib\_abc.py:633: UnicodeDecodeError
+_ test_storage_paths_reject_escape_or_overlapping_layers[workspace_root-data/raw/nested] _
+
+tmp_path = WindowsPath('C:/Users/sp181/AppData/Local/Temp/pytest-of-sp181/pytest-116/test_storage_paths_reject_esca1')
+key = 'workspace_root', value = 'data/raw/nested'
+
+    @pytest.mark.parametrize("key,value", [("raw_root", "../outside"),
+        ("workspace_root", "data/raw/nested"), ("archive_root", "data/task_workspace"),
+        ("metadata_path", "data/metadata.duckdb")])
+    def test_storage_paths_reject_escape_or_overlapping_layers(tmp_path, key, value):
+        from stock_data_manage.config.loader import load_storage_paths
+        config = tmp_path / "config"
+        config.mkdir()
+>       document = yaml.safe_load((PROJECT_ROOT / "config/collection.yaml").read_text())
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_config_contract.py:132: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Program Files\Python\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/Project/PythonProgram/stock_data_manage/config/collection.yaml')
+encoding = 'locale', errors = None, newline = None
+
+    def read_text(self, encoding=None, errors=None, newline=None):
+        """
+        Open the file in text mode, read it, and close the file.
+        """
+        with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+>           return f.read()
+                   ^^^^^^^^
+E           UnicodeDecodeError: 'gbk' codec can't decode byte 0xae in position 852: illegal multibyte sequence
+
+D:\Program Files\Python\Lib\pathlib\_abc.py:633: UnicodeDecodeError
+_ test_storage_paths_reject_escape_or_overlapping_layers[archive_root-data/task_workspace] _
+
+tmp_path = WindowsPath('C:/Users/sp181/AppData/Local/Temp/pytest-of-sp181/pytest-116/test_storage_paths_reject_esca2')
+key = 'archive_root', value = 'data/task_workspace'
+
+    @pytest.mark.parametrize("key,value", [("raw_root", "../outside"),
+        ("workspace_root", "data/raw/nested"), ("archive_root", "data/task_workspace"),
+        ("metadata_path", "data/metadata.duckdb")])
+    def test_storage_paths_reject_escape_or_overlapping_layers(tmp_path, key, value):
+        from stock_data_manage.config.loader import load_storage_paths
+        config = tmp_path / "config"
+        config.mkdir()
+>       document = yaml.safe_load((PROJECT_ROOT / "config/collection.yaml").read_text())
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_config_contract.py:132: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Program Files\Python\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/Project/PythonProgram/stock_data_manage/config/collection.yaml')
+encoding = 'locale', errors = None, newline = None
+
+    def read_text(self, encoding=None, errors=None, newline=None):
+        """
+        Open the file in text mode, read it, and close the file.
+        """
+        with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+>           return f.read()
+                   ^^^^^^^^
+E           UnicodeDecodeError: 'gbk' codec can't decode byte 0xae in position 852: illegal multibyte sequence
+
+D:\Program Files\Python\Lib\pathlib\_abc.py:633: UnicodeDecodeError
+_ test_storage_paths_reject_escape_or_overlapping_layers[metadata_path-data/metadata.duckdb] _
+
+tmp_path = WindowsPath('C:/Users/sp181/AppData/Local/Temp/pytest-of-sp181/pytest-116/test_storage_paths_reject_esca3')
+key = 'metadata_path', value = 'data/metadata.duckdb'
+
+    @pytest.mark.parametrize("key,value", [("raw_root", "../outside"),
+        ("workspace_root", "data/raw/nested"), ("archive_root", "data/task_workspace"),
+        ("metadata_path", "data/metadata.duckdb")])
+    def test_storage_paths_reject_escape_or_overlapping_layers(tmp_path, key, value):
+        from stock_data_manage.config.loader import load_storage_paths
+        config = tmp_path / "config"
+        config.mkdir()
+>       document = yaml.safe_load((PROJECT_ROOT / "config/collection.yaml").read_text())
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_config_contract.py:132: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Program Files\Python\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/Project/PythonProgram/stock_data_manage/config/collection.yaml')
+encoding = 'locale', errors = None, newline = None
+
+    def read_text(self, encoding=None, errors=None, newline=None):
+        """
+        Open the file in text mode, read it, and close the file.
+        """
+        with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+>           return f.read()
+                   ^^^^^^^^
+E           UnicodeDecodeError: 'gbk' codec can't decode byte 0xae in position 852: illegal multibyte sequence
+
+D:\Program Files\Python\Lib\pathlib\_abc.py:633: UnicodeDecodeError
+=========================== short test summary info ===========================
+FAILED tests/test_canonical_recovery.py::test_normalized_parquet_roundtrips_precision_time_and_nulls
+FAILED tests/test_config_contract.py::test_storage_paths_reject_escape_or_overlapping_layers[raw_root-../outside]
+FAILED tests/test_config_contract.py::test_storage_paths_reject_escape_or_overlapping_layers[workspace_root-data/raw/nested]
+FAILED tests/test_config_contract.py::test_storage_paths_reject_escape_or_overlapping_layers[archive_root-data/task_workspace]
+FAILED tests/test_config_contract.py::test_storage_paths_reject_escape_or_overlapping_layers[metadata_path-data/metadata.duckdb]

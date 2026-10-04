@@ -1,7 +1,7 @@
 {
   "record_type": "formal_provider_interface_spec",
-  "generated_at_utc": "2026-10-04T16:19:41.215238+00:00",
-  "source_commit": "584964154ec3ee1a5847a7b6571c93eeda778e4f",
+  "generated_at_utc": "2026-10-04T19:03:08.644293+00:00",
+  "source_commit": "274f376c7880594e7ef1c62e68683ed3bf6fa936",
   "scope": "source collection inputs; no production eligibility or scheduling changes",
   "counts": {
     "implemented_validation_only": 64,
@@ -14,7 +14,7 @@
   "sources": [
     {
       "path": "config/collection.yaml",
-      "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d"
+      "sha256": "ababf15d1db15b4c564eca039a59488e734ec43facdc4359c2ee84b0a5fc8afa"
     },
     {
       "path": "config/datasets/a50_quote.yaml",
@@ -525,6 +525,10 @@
       "sha256": "11abb8bc03cb75b615539eee413983f54dbf4b28ee5b6584d90ca0824f737196"
     },
     {
+      "path": "docs/storage/README.md",
+      "sha256": "d488ae01d6f525715a580d6b9c2a620bc1bb2245cd5cad14f947c4f61f4b0e28"
+    },
+    {
       "path": "provider_validation/coverage/interface-coverage.csv",
       "sha256": "c89d947d06ec9b42e5e03a134bd72d7f3e4898d9b5235dd2c30ac09b6cde2cb5"
     },
@@ -538,11 +542,35 @@
     },
     {
       "path": "provider_validation/tests/build_interface_coverage.py",
-      "sha256": "46272249fc4479198514c25523516cd4bbc8b3b72534be4ef9b5909422862412"
+      "sha256": "37478d28bb67775f8b283b2890c8f68f21b69d3b106be124abd9acbdc89c67a4"
+    },
+    {
+      "path": "src/cli.py",
+      "sha256": "b2514b0c99626ab9feeec1a49049e428fce2cd424c4292e43cb33f478fc69598"
+    },
+    {
+      "path": "src/config/loader.py",
+      "sha256": "4eb26be4095ffded991bf0620167cce5376ccd78ccc4017d72933d3b5b01901c"
+    },
+    {
+      "path": "src/pipeline/inputs.py",
+      "sha256": "532ec4f72b6d1eef8b0ce24af91e01f246348f53a0d6c1d751461cbb5d56105c"
     },
     {
       "path": "src/routing/factory.py",
       "sha256": "91b80e626acb7779f2836f0486d4918e85956e0bdbb28e1fa4dd2485bb3ec85a"
+    },
+    {
+      "path": "src/storage/parquet.py",
+      "sha256": "284ad423d21e22c6ed58e59ff7fdeb7957c3b832402372938bfff81e54dd60e4"
+    },
+    {
+      "path": "src/storage/raw.py",
+      "sha256": "374f69c07649cce5509bbaee84675cbfb3bf6baefdff470f634cc583762148c0"
+    },
+    {
+      "path": "src/worker/recovery.py",
+      "sha256": "8b6042dc87aea744fb08f26ac48d22813a92a6641b13273d2625323ce8d0c38e"
     }
   ],
   "evidence": [
@@ -9393,7 +9421,12 @@
         "禁止的参数来源",
         "验证报告",
         "原始证据清单",
-        "配置与代码入口"
+        "配置与代码入口",
+        "运行原始响应路径",
+        "任务工作区路径",
+        "来源标准化文件",
+        "最终数据与发布状态",
+        "任务归档条件"
       ],
       "rows": [
         [
@@ -9426,7 +9459,12 @@
           "request.symbol\nrequest.trade_date\nrequest.start_date\nrequest.end_date",
           "provider_validation/results/tencent-final-20261004-v2/1/adapter/ASTOCK-001-da16fc02d2dc/2026-10-03/input_report/tencent/single_quote/report.json",
           "provider_validation/results/tencent-final-20261004-v2/1/adapter/ASTOCK-001-da16fc02d2dc/_raw/manifest.ndjson\nprovider_validation/results/live-probes/pilot-20261003-tencent-quote-network/_raw/missing-capabilities-20261003T173649/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-001\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-001\nsrc/routing/factory.py",
+          "data/raw/tencent/single_quote/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/realtime_quote/scope-<请求范围哈希>/<任务ID>/",
+          "sources/tencent/ASTOCK-001/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-002-5m",
@@ -9458,7 +9496,12 @@
           "request.start_date\nrequest.end_date",
           "provider_validation/results/tencent-final-20261004-v2/3/ASTOCK-002-5m-9f37f58dcf44/2026-10-03/input_report/tencent/kline_5m/report.json",
           "provider_validation/results/tencent-final-20261004-v2/3/ASTOCK-002-5m-9f37f58dcf44/_raw/manifest.ndjson\nprovider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-002-5m\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-002-5m\nsrc/routing/factory.py",
+          "data/raw/tencent/kline_5m/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/minute_bar_5m/scope-<请求范围哈希>/<任务ID>/",
+          "sources/tencent/ASTOCK-002-5m/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-002-daily",
@@ -9490,7 +9533,12 @@
           "",
           "provider_validation/results/tencent-final-20261004-v2/2/ASTOCK-002-daily-13ed72394ce8/2026-10-03/input_report/tencent/kline_daily/report.json",
           "provider_validation/results/tencent-final-20261004-v2/2/ASTOCK-002-daily-13ed72394ce8/_raw/manifest.ndjson\nprovider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-002-daily\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-002-daily\nsrc/routing/factory.py",
+          "data/raw/tencent/kline_daily/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/daily_bar/scope-<请求范围哈希>/<任务ID>/",
+          "sources/tencent/ASTOCK-002-daily/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-003",
@@ -9522,7 +9570,12 @@
           "request.symbols\nconfig.limit\nconfig.count\nrequest.symbol\nrequest.start_date\nrequest.end_date",
           "provider_validation/results/remaining-final-v2-20261004/8/candidate/ASTOCK-003-d411a1975df3/2026-10-04/input_report/tdx/daily_package/report.json",
           "provider_validation/results/remaining-final-v2-20261004/8/candidate/ASTOCK-003-d411a1975df3/_raw/manifest.ndjson\nprovider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-003\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-003\nsrc/routing/factory.py",
+          "data/raw/tdx/daily_package/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/tdx_daily_package/scope-<请求范围哈希>/<任务ID>/",
+          "sources/tdx/ASTOCK-003/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-004",
@@ -9554,7 +9607,12 @@
           "request.symbols\nconfig.limit\nconfig.count\nrequest.start_date\nrequest.end_date\nrequest.trade_date",
           "provider_validation/results/remaining-final-v2-20261004/9/candidate/ASTOCK-004-f4ad3f5702b0/2026-10-04/input_report/tencent/ticks/report.json",
           "provider_validation/results/remaining-final-v2-20261004/9/candidate/ASTOCK-004-f4ad3f5702b0/_raw/manifest.ndjson\nprovider_validation/results/raw/2026-10-01-v310-live/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-004\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-004\nsrc/routing/factory.py",
+          "data/raw/tencent/ticks/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/tencent_ticks/scope-<请求范围哈希>/<任务ID>/",
+          "sources/tencent/ASTOCK-004/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-006",
@@ -9586,7 +9644,12 @@
           "request.start_date\nrequest.end_date",
           "provider_validation/results/factor-final-20261004/2/candidate/ASTOCK-006-5b8a2afbcc7f/2026-10-04/input_report/sina/adjustment_factor/report.json",
           "provider_validation/results/factor-final-20261004/2/candidate/ASTOCK-006-5b8a2afbcc7f/_raw/manifest.ndjson\nprovider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-006\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-006\nsrc/routing/factory.py",
+          "data/raw/sina/adjustment_factor/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/adjustment_factor/scope-<请求范围哈希>/<任务ID>/",
+          "sources/sina/ASTOCK-006/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-008",
@@ -9618,7 +9681,12 @@
           "request.symbols\nrequest.trade_date",
           "provider_validation/results/reports-seats-final-20261004/ASTOCK-008/candidate/ASTOCK-008-f7f74aa48c34/2026-10-04/input_report/eastmoney/report_list/report.json",
           "provider_validation/results/reports-seats-final-20261004/ASTOCK-008/candidate/ASTOCK-008-f7f74aa48c34/_raw/manifest.ndjson\nprovider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-008\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-008\nsrc/routing/factory.py",
+          "data/raw/eastmoney/report_list/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/eastmoney_reports/scope-<请求范围哈希>/<任务ID>/",
+          "sources/eastmoney/ASTOCK-008/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-013",
@@ -9650,7 +9718,12 @@
           "request.symbol\nrequest.start_date\nrequest.end_date",
           "provider_validation/results/reports-calendar-final-20261004/1/candidate/ASTOCK-013-2bc95fee99da/2026-10-04/input_report/sina/report_list/report.json",
           "provider_validation/results/reports-calendar-final-20261004/1/candidate/ASTOCK-013-2bc95fee99da/_raw/manifest.ndjson\nprovider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-013\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-013\nsrc/routing/factory.py",
+          "data/raw/sina/report_list/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/sina_reports/scope-<请求范围哈希>/<任务ID>/",
+          "sources/sina/ASTOCK-013/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-014",
@@ -9682,7 +9755,12 @@
           "request.symbol\nrequest.symbols\nrequest.start_date\nrequest.end_date\nrequest.trade_date\nconfig.limit\nconfig.count",
           "provider_validation/results/actual-data-final-20261004/1/candidate/ASTOCK-014-484955dda07e/2026-10-04/input_report/ths/concept_directory/report.json",
           "provider_validation/results/actual-data-final-20261004/1/candidate/ASTOCK-014-484955dda07e/_raw/manifest.ndjson\nprovider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-014\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-014\nsrc/routing/factory.py",
+          "data/raw/ths/concept_directory/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/concept_directory/scope-<请求范围哈希>/<任务ID>/",
+          "sources/ths/ASTOCK-014/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-019",
@@ -9714,7 +9792,12 @@
           "request.symbols\nrequest.start_date\nrequest.end_date",
           "provider_validation/results/reports-seats-final-20261004/ASTOCK-019/candidate/ASTOCK-019-3b92f5b2ce99/2026-10-04/input_report/eastmoney/dragon_tiger_seats/report.json",
           "provider_validation/results/reports-seats-final-20261004/ASTOCK-019/candidate/ASTOCK-019-3b92f5b2ce99/_raw/manifest.ndjson\nprovider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-019\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-019\nsrc/routing/factory.py",
+          "data/raw/eastmoney/dragon_tiger_seats/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/dragon_tiger_seats/scope-<请求范围哈希>/<任务ID>/",
+          "sources/eastmoney/ASTOCK-019/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-020",
@@ -9746,7 +9829,12 @@
           "request.symbol\nrequest.symbols\nrequest.start_date\nrequest.end_date",
           "provider_validation/results/market-events-final-v2-20261004/ASTOCK-020/candidate/ASTOCK-020-6b8cf95e35e2/2026-10-04/input_report/eastmoney/dragon_tiger_daily/report.json",
           "provider_validation/results/market-events-final-v2-20261004/ASTOCK-020/candidate/ASTOCK-020-6b8cf95e35e2/_raw/manifest.ndjson\nprovider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-020\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-020\nsrc/routing/factory.py",
+          "data/raw/eastmoney/dragon_tiger_daily/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/dragon_tiger_daily/scope-<请求范围哈希>/<任务ID>/",
+          "sources/eastmoney/ASTOCK-020/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-021",
@@ -9778,7 +9866,12 @@
           "request.symbol\nrequest.symbols",
           "provider_validation/results/market-events-final-v2-20261004/ASTOCK-021/candidate/ASTOCK-021-4bd988e10b88/2026-10-04/input_report/eastmoney/lockup_expiry/report.json",
           "provider_validation/results/market-events-final-v2-20261004/ASTOCK-021/candidate/ASTOCK-021-4bd988e10b88/_raw/manifest.ndjson\nprovider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-021\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-021\nsrc/routing/factory.py",
+          "data/raw/eastmoney/lockup_expiry/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/lockup_expiry/scope-<请求范围哈希>/<任务ID>/",
+          "sources/eastmoney/ASTOCK-021/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-026",
@@ -9810,7 +9903,12 @@
           "request.start_date\nrequest.end_date\nrequest.trade_date\nrequest.count\nconfig.count",
           "provider_validation/results/em-final-20261004/ASTOCK-026/candidate/ASTOCK-026-405682b8ee77/2026-10-03/input_report/eastmoney/shareholder_count/report.json",
           "provider_validation/results/em-final-20261004/ASTOCK-026/candidate/ASTOCK-026-405682b8ee77/_raw/manifest.ndjson\nprovider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-026\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-026\nsrc/routing/factory.py",
+          "data/raw/eastmoney/shareholder_count/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/shareholder_count/scope-<请求范围哈希>/<任务ID>/",
+          "sources/eastmoney/ASTOCK-026/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-027",
@@ -9842,7 +9940,12 @@
           "request.start_date\nrequest.end_date\nrequest.trade_date\nrequest.count\nconfig.count",
           "provider_validation/results/em-final-20261004/ASTOCK-027/candidate/ASTOCK-027-f8b3bab13861/2026-10-03/input_report/eastmoney/dividend_history/report.json",
           "provider_validation/results/em-final-20261004/ASTOCK-027/candidate/ASTOCK-027-f8b3bab13861/_raw/manifest.ndjson\nprovider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-027\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-027\nsrc/routing/factory.py",
+          "data/raw/eastmoney/dividend_history/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/dividend_event/scope-<请求范围哈希>/<任务ID>/",
+          "sources/eastmoney/ASTOCK-027/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-028",
@@ -9874,7 +9977,12 @@
           "request.start_date\nrequest.end_date\nrequest.trade_date\nrequest.count\nconfig.count",
           "provider_validation/results/em-final-20261004/ASTOCK-028/candidate/ASTOCK-028-b390a44595db/2026-10-03/input_report/eastmoney/stock_fund_flow/report.json",
           "provider_validation/results/em-final-20261004/ASTOCK-028/candidate/ASTOCK-028-b390a44595db/_raw/manifest.ndjson\nprovider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-028\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-028\nsrc/routing/factory.py",
+          "data/raw/eastmoney/stock_fund_flow/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/stock_fund_flow/scope-<请求范围哈希>/<任务ID>/",
+          "sources/eastmoney/ASTOCK-028/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-030",
@@ -9906,7 +10014,12 @@
           "request.symbols\nconfig.limit\nconfig.count\nrequest.symbol\nrequest.start_date\nrequest.end_date",
           "provider_validation/results/remaining-final-v2-20261004/10/candidate/ASTOCK-030-87cb250d9a0b/2026-10-04/input_report/sse/etf_shares/report.json",
           "provider_validation/results/remaining-final-v2-20261004/10/candidate/ASTOCK-030-87cb250d9a0b/_raw/manifest.ndjson\nprovider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-030\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-030\nsrc/routing/factory.py",
+          "data/raw/sse/etf_shares/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/etf_shares/scope-<请求范围哈希>/<任务ID>/",
+          "sources/sse/ASTOCK-030/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-031",
@@ -9938,7 +10051,12 @@
           "request.symbols\nconfig.limit\nconfig.count\nrequest.start_date\nrequest.end_date\nrequest.trade_date",
           "provider_validation/results/remaining-final-v2-20261004/y/candidate/ASTOCK-031-2c13bb53fda2/2026-10-04/input_report/eastmoney/stock_news/report.json",
           "provider_validation/results/remaining-final-v2-20261004/y/candidate/ASTOCK-031-2c13bb53fda2/_raw/manifest.ndjson\nprovider_validation/results/remaining-evidence-direct-20261004/ASTOCK-031/_raw/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-031\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-031\nsrc/routing/factory.py",
+          "data/raw/eastmoney/stock_news/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/stock_news/scope-<请求范围哈希>/<任务ID>/",
+          "sources/eastmoney/ASTOCK-031/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-032",
@@ -9970,7 +10088,12 @@
           "request.symbol\nrequest.start_date\nrequest.end_date\nmetadata.cursor",
           "provider_validation/results/sdk-news-final-20261004/ASTOCK-032/candidate/ASTOCK-032-9e3d8cb585d0/2026-10-04/input_report/cls/telegraph/report.json",
           "provider_validation/results/sdk-news-final-20261004/ASTOCK-032/candidate/ASTOCK-032-9e3d8cb585d0/_raw/manifest.ndjson\nprovider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-032\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-032\nsrc/routing/factory.py",
+          "data/raw/cls/telegraph/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/cls_telegraph/scope-<请求范围哈希>/<任务ID>/",
+          "sources/cls/ASTOCK-032/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-033",
@@ -10002,7 +10125,12 @@
           "request.symbol\nrequest.start_date\nrequest.end_date\nmetadata.cursor",
           "provider_validation/results/sdk-news-final-20261004/ASTOCK-033/candidate/ASTOCK-033-018ac7a46b3b/2026-10-04/input_report/sina/global_news/report.json",
           "provider_validation/results/sdk-news-final-20261004/ASTOCK-033/candidate/ASTOCK-033-018ac7a46b3b/_raw/manifest.ndjson\nprovider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-033\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-033\nsrc/routing/factory.py",
+          "data/raw/sina/global_news/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/sina_global_news/scope-<请求范围哈希>/<任务ID>/",
+          "sources/sina/ASTOCK-033/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-034",
@@ -10034,7 +10162,12 @@
           "request.symbol\nrequest.start_date\nrequest.end_date",
           "provider_validation/results/news-final-20261004/ASTOCK-034/candidate/ASTOCK-034-9c36f6da2654/2026-10-04/input_report/wallstreetcn/news_lives/report.json",
           "provider_validation/results/news-final-20261004/ASTOCK-034/candidate/ASTOCK-034-9c36f6da2654/_raw/manifest.ndjson\nprovider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-034\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-034\nsrc/routing/factory.py",
+          "data/raw/wallstreetcn/news_lives/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/wallstreetcn_news/scope-<请求范围哈希>/<任务ID>/",
+          "sources/wallstreetcn/ASTOCK-034/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-035",
@@ -10066,7 +10199,12 @@
           "request.symbol\nrequest.start_date\nrequest.end_date",
           "provider_validation/results/news-final-20261004/ASTOCK-035/candidate/ASTOCK-035-a38ce474d9f3/2026-10-04/input_report/cctv/news/report.json",
           "provider_validation/results/news-final-20261004/ASTOCK-035/candidate/ASTOCK-035-a38ce474d9f3/_raw/manifest.ndjson\nprovider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-035\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-035\nsrc/routing/factory.py",
+          "data/raw/cctv/news/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/cctv_news_index/scope-<请求范围哈希>/<任务ID>/",
+          "sources/cctv/ASTOCK-035/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-039",
@@ -10098,7 +10236,12 @@
           "request.symbols\nconfig.limit\nconfig.count\nrequest.start_date\nrequest.end_date\nrequest.trade_date",
           "provider_validation/results/remaining-final-v2-20261004/3/candidate/ASTOCK-039-9844d7b62a3d/2026-10-04/input_report/sina/financial_statements/report.json",
           "provider_validation/results/remaining-final-v2-20261004/3/candidate/ASTOCK-039-9844d7b62a3d/_raw/manifest.ndjson\nprovider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-039\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-039\nsrc/routing/factory.py",
+          "data/raw/sina/financial_statements/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/sina_financial_statements/scope-<请求范围哈希>/<任务ID>/",
+          "sources/sina/ASTOCK-039/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-044",
@@ -10130,7 +10273,12 @@
           "request.symbol\nrequest.symbols\nrequest.start_date\nrequest.end_date\nrequest.trade_date\nconfig.limit\nconfig.count",
           "provider_validation/results/actual-data-final-20261004/4/candidate/ASTOCK-044-48f5850c6891/2026-10-04/input_report/baostock/st_list/report.json",
           "provider_validation/results/actual-data-final-20261004/4/candidate/ASTOCK-044-48f5850c6891/_raw/manifest.ndjson\nprovider_validation/results/actual-data-original-20261004/st/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-044\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-044\nsrc/routing/factory.py",
+          "data/raw/baostock/st_list/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/st_name_list/scope-<请求范围哈希>/<任务ID>/",
+          "sources/baostock/ASTOCK-044/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-045",
@@ -10162,7 +10310,12 @@
           "",
           "provider_validation/results/input-scheduling-accepted-20261003/ASTOCK-045/ASTOCK-045-eff7b79d2c10/2026-10-03/input_report/eastmoney/limit_up_pool/report.json",
           "provider_validation/results/input-scheduling-accepted-20261003/ASTOCK-045/ASTOCK-045-eff7b79d2c10/_raw/manifest.ndjson\nprovider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-045\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-045\nsrc/routing/factory.py",
+          "data/raw/eastmoney/limit_up_pool/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/limit_up_pool/scope-<请求范围哈希>/<任务ID>/",
+          "sources/eastmoney/ASTOCK-045/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-046",
@@ -10194,7 +10347,12 @@
           "request.symbol\nrequest.start_date\nrequest.end_date\nrequest.count\nconfig.count",
           "provider_validation/results/pools-final-20261004/ASTOCK-046/candidate/ASTOCK-046-c2c12945cbae/2026-10-03/input_report/eastmoney/broken_limit_pool/report.json",
           "provider_validation/results/pools-final-20261004/ASTOCK-046/candidate/ASTOCK-046-c2c12945cbae/_raw/manifest.ndjson\nprovider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-046\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-046\nsrc/routing/factory.py",
+          "data/raw/eastmoney/broken_limit_pool/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/broken_limit_pool/scope-<请求范围哈希>/<任务ID>/",
+          "sources/eastmoney/ASTOCK-046/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-047",
@@ -10226,7 +10384,12 @@
           "request.symbol\nrequest.start_date\nrequest.end_date\nrequest.count\nconfig.count",
           "provider_validation/results/pools-final-20261004/ASTOCK-047/candidate/ASTOCK-047-ee4eab8ca69b/2026-10-03/input_report/eastmoney/limit_down_pool/report.json",
           "provider_validation/results/pools-final-20261004/ASTOCK-047/candidate/ASTOCK-047-ee4eab8ca69b/_raw/manifest.ndjson\nprovider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-047\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-047\nsrc/routing/factory.py",
+          "data/raw/eastmoney/limit_down_pool/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/limit_down_pool/scope-<请求范围哈希>/<任务ID>/",
+          "sources/eastmoney/ASTOCK-047/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-048",
@@ -10258,7 +10421,12 @@
           "request.symbol\nrequest.start_date\nrequest.end_date\nrequest.count\nconfig.count",
           "provider_validation/results/pools-final-20261004/ASTOCK-048/candidate/ASTOCK-048-20504b891a16/2026-10-03/input_report/eastmoney/previous_limit_pool/report.json",
           "provider_validation/results/pools-final-20261004/ASTOCK-048/candidate/ASTOCK-048-20504b891a16/_raw/manifest.ndjson\nprovider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-048\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-048\nsrc/routing/factory.py",
+          "data/raw/eastmoney/previous_limit_pool/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/previous_limit_pool/scope-<请求范围哈希>/<任务ID>/",
+          "sources/eastmoney/ASTOCK-048/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-050",
@@ -10290,7 +10458,12 @@
           "request.symbol\nrequest.start_date\nrequest.end_date\nrequest.count\nconfig.count",
           "provider_validation/results/pools-final-20261004/ASTOCK-050/candidate/ASTOCK-050-65cd38f98ab6/2026-10-03/input_report/eastmoney/strong_stock_pool/report.json",
           "provider_validation/results/pools-final-20261004/ASTOCK-050/candidate/ASTOCK-050-65cd38f98ab6/_raw/manifest.ndjson\nprovider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-050\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-050\nsrc/routing/factory.py",
+          "data/raw/eastmoney/strong_stock_pool/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/strong_stock_pool/scope-<请求范围哈希>/<任务ID>/",
+          "sources/eastmoney/ASTOCK-050/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-051",
@@ -10322,7 +10495,12 @@
           "request.symbols\nconfig.limit\nconfig.count\nrequest.symbol\nrequest.start_date\nrequest.end_date",
           "provider_validation/results/remaining-final-v2-20261004/13/candidate/ASTOCK-051-cdeaf651c3d4/2026-10-04/input_report/eastmoney/intraday_changes/report.json",
           "provider_validation/results/remaining-final-v2-20261004/13/candidate/ASTOCK-051-cdeaf651c3d4/_raw/manifest.ndjson\nprovider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-051\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-051\nsrc/routing/factory.py",
+          "data/raw/eastmoney/intraday_changes/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/intraday_changes/scope-<请求范围哈希>/<任务ID>/",
+          "sources/eastmoney/ASTOCK-051/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-055",
@@ -10354,7 +10532,12 @@
           "request.symbols\nconfig.limit\nconfig.count\nrequest.symbol\nrequest.start_date\nrequest.end_date",
           "provider_validation/results/remaining-final-v2-20261004/4/candidate/ASTOCK-055-a326ca32b9cd/2026-10-04/input_report/sse/option_risk/report.json",
           "provider_validation/results/remaining-final-v2-20261004/4/candidate/ASTOCK-055-a326ca32b9cd/_raw/manifest.ndjson\nprovider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-055\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-055\nsrc/routing/factory.py",
+          "data/raw/sse/option_risk/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/option_risk/scope-<请求范围哈希>/<任务ID>/",
+          "sources/sse/ASTOCK-055/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-061",
@@ -10386,7 +10569,12 @@
           "request.symbol\nrequest.start_date\nrequest.end_date",
           "provider_validation/results/macro-final-20261004/ASTOCK-061/candidate/ASTOCK-061-2e73bd0d70b2/2026-10-04/input_report/mofcom/social_financing/report.json",
           "provider_validation/results/macro-final-20261004/ASTOCK-061/candidate/ASTOCK-061-2e73bd0d70b2/_raw/manifest.ndjson\nprovider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-061\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-061\nsrc/routing/factory.py",
+          "data/raw/mofcom/social_financing/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/social_financing/scope-<请求范围哈希>/<任务ID>/",
+          "sources/mofcom/ASTOCK-061/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-062",
@@ -10418,7 +10606,12 @@
           "request.symbol\nrequest.start_date\nrequest.end_date",
           "provider_validation/results/macro-final-20261004/ASTOCK-062/candidate/ASTOCK-062-a09ff533759e/2026-10-04/input_report/eastmoney/pmi/report.json",
           "provider_validation/results/macro-final-20261004/ASTOCK-062/candidate/ASTOCK-062-a09ff533759e/_raw/manifest.ndjson\nprovider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-062\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-062\nsrc/routing/factory.py",
+          "data/raw/eastmoney/pmi/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/pmi_history/scope-<请求范围哈希>/<任务ID>/",
+          "sources/eastmoney/ASTOCK-062/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-063",
@@ -10450,7 +10643,12 @@
           "request.symbols\nconfig.limit\nconfig.count\nrequest.symbol\nrequest.trade_date",
           "provider_validation/results/remaining-final-v2-20261004/11/candidate/ASTOCK-063-670f07245fd0/2026-10-04/input_report/chinabond/yield_curve/report.json",
           "provider_validation/results/remaining-final-v2-20261004/11/candidate/ASTOCK-063-670f07245fd0/_raw/manifest.ndjson\nprovider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-063\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-063\nsrc/routing/factory.py",
+          "data/raw/chinabond/yield_curve/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/bond_yield_curve/scope-<请求范围哈希>/<任务ID>/",
+          "sources/chinabond/ASTOCK-063/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-064",
@@ -10482,7 +10680,12 @@
           "request.symbol\nrequest.start_date\nrequest.end_date\nrequest.trade_date\nconfig.limit\nconfig.count\nrequest.as_of",
           "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-064/candidate/ASTOCK-064-5e9f1235868d/2026-10-04/input_report/chinamoney/repo_fixing/report.json",
           "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-064/candidate/ASTOCK-064-5e9f1235868d/_raw/manifest.ndjson\nprovider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-064\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-064\nsrc/routing/factory.py",
+          "data/raw/chinamoney/repo_fixing/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/repo_fixing/scope-<请求范围哈希>/<任务ID>/",
+          "sources/chinamoney/ASTOCK-064/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-065",
@@ -10514,7 +10717,12 @@
           "request.symbol\nrequest.start_date\nrequest.end_date\nrequest.trade_date\nconfig.limit\nconfig.count",
           "provider_validation/results/lpr-final-v2-20261004/ASTOCK-065/candidate/ASTOCK-065-435f1df4d747/2026-10-04/input_report/eastmoney/lpr/report.json",
           "provider_validation/results/lpr-final-v2-20261004/ASTOCK-065/candidate/ASTOCK-065-435f1df4d747/_raw/manifest.ndjson\nprovider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-065\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-065\nsrc/routing/factory.py",
+          "data/raw/eastmoney/lpr/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/lpr_history/scope-<请求范围哈希>/<任务ID>/",
+          "sources/eastmoney/ASTOCK-065/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-066",
@@ -10546,7 +10754,12 @@
           "request.symbol",
           "provider_validation/results/reports-calendar-final-20261004/3/candidate/ASTOCK-066-ea709dd94e1e/2026-10-04/input_report/wallstreetcn/macro_calendar/report.json",
           "provider_validation/results/reports-calendar-final-20261004/3/candidate/ASTOCK-066-ea709dd94e1e/_raw/manifest.ndjson\nprovider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-066\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-066\nsrc/routing/factory.py",
+          "data/raw/wallstreetcn/macro_calendar/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/macro_calendar/scope-<请求范围哈希>/<任务ID>/",
+          "sources/wallstreetcn/ASTOCK-066/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-067",
@@ -10578,7 +10791,12 @@
           "request.symbols\nconfig.limit\nconfig.count\nrequest.symbol\nrequest.start_date\nrequest.end_date\nrequest.trade_date",
           "provider_validation/results/remaining-final-v2-20261004/5/candidate/ASTOCK-067-f1b7dbaa2b01/2026-10-04/input_report/csindex/constituents/report.json",
           "provider_validation/results/remaining-final-v2-20261004/5/candidate/ASTOCK-067-f1b7dbaa2b01/_raw/manifest.ndjson\nprovider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-067\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-067\nsrc/routing/factory.py",
+          "data/raw/csindex/constituents/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/index_constituents/scope-<请求范围哈希>/<任务ID>/",
+          "sources/csindex/ASTOCK-067/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-068",
@@ -10610,7 +10828,12 @@
           "request.symbols\nconfig.limit\nconfig.count\nrequest.symbol\nrequest.start_date\nrequest.end_date\nrequest.trade_date",
           "provider_validation/results/remaining-final-v2-20261004/6/candidate/ASTOCK-068-2bfd0244e6dc/2026-10-04/input_report/csindex/weights/report.json",
           "provider_validation/results/remaining-final-v2-20261004/6/candidate/ASTOCK-068-2bfd0244e6dc/_raw/manifest.ndjson\nprovider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-068\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-068\nsrc/routing/factory.py",
+          "data/raw/csindex/weights/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/index_weights/scope-<请求范围哈希>/<任务ID>/",
+          "sources/csindex/ASTOCK-068/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-069",
@@ -10642,7 +10865,12 @@
           "request.symbols\nconfig.limit\nconfig.count\nrequest.symbol\nrequest.start_date\nrequest.end_date\nrequest.trade_date",
           "provider_validation/results/remaining-final-v2-20261004/2/candidate/ASTOCK-069-8e97c95a0c27/2026-10-04/input_report/csindex/index_valuation/report.json",
           "provider_validation/results/remaining-final-v2-20261004/2/candidate/ASTOCK-069-8e97c95a0c27/_raw/manifest.ndjson\nprovider_validation/results/remaining-evidence-direct-20261004/ASTOCK-069/_raw/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-069\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-069\nsrc/routing/factory.py",
+          "data/raw/csindex/index_valuation/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/index_valuation/scope-<请求范围哈希>/<任务ID>/",
+          "sources/csindex/ASTOCK-069/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-070",
@@ -10674,7 +10902,12 @@
           "",
           "provider_validation/results/input-scheduling-accepted-20261003/ASTOCK-070/ASTOCK-070-9ae51281fd0f/2026-10-03/input_report/sina/trading_calendar/report.json",
           "provider_validation/results/input-scheduling-accepted-20261003/ASTOCK-070/ASTOCK-070-9ae51281fd0f/_raw/manifest.ndjson\nprovider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-070\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-070\nsrc/routing/factory.py",
+          "data/raw/sina/trading_calendar/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/trading_calendar/scope-<请求范围哈希>/<任务ID>/",
+          "sources/sina/ASTOCK-070/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-071",
@@ -10706,7 +10939,12 @@
           "request.symbols\nconfig.limit\nconfig.count\nrequest.symbol\nrequest.start_date\nrequest.end_date\nrequest.contract",
           "provider_validation/results/remaining-final-v2-20261004/18/candidate/ASTOCK-071-39b0078f61fa/2026-10-04/input_report/exchange_composite/futures_daily/report.json",
           "provider_validation/results/remaining-final-v2-20261004/18/candidate/ASTOCK-071-39b0078f61fa/_raw/manifest.ndjson\nprovider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-071\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-071\nsrc/routing/factory.py",
+          "data/raw/exchange_composite/futures_daily/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/official_futures_daily/scope-<请求范围哈希>/<任务ID>/",
+          "sources/exchange_composite/ASTOCK-071/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-072",
@@ -10738,7 +10976,12 @@
           "request.symbols\nconfig.limit\nconfig.count\nrequest.symbol\nrequest.start_date\nrequest.end_date\nrequest.contract",
           "provider_validation/results/remaining-final-v2-20261004/20/candidate/ASTOCK-072-56d6cbacefbd/2026-10-04/input_report/exchange_composite/options_daily/report.json",
           "provider_validation/results/remaining-final-v2-20261004/20/candidate/ASTOCK-072-56d6cbacefbd/_raw/manifest.ndjson\nprovider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-072\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-072\nsrc/routing/factory.py",
+          "data/raw/exchange_composite/options_daily/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/official_options_daily/scope-<请求范围哈希>/<任务ID>/",
+          "sources/exchange_composite/ASTOCK-072/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-073",
@@ -10770,7 +11013,12 @@
           "request.symbols\nconfig.limit\nconfig.count\nrequest.symbol\nrequest.start_date\nrequest.end_date",
           "provider_validation/results/remaining-final-v2-20261004/21/candidate/ASTOCK-073-8df60da7f996/2026-10-04/input_report/cffex/position_rank/report.json",
           "provider_validation/results/remaining-final-v2-20261004/21/candidate/ASTOCK-073-8df60da7f996/_raw/manifest.ndjson\nprovider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-073\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-073\nsrc/routing/factory.py",
+          "data/raw/cffex/position_rank/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/position_rank/scope-<请求范围哈希>/<任务ID>/",
+          "sources/cffex/ASTOCK-073/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-074",
@@ -10802,7 +11050,12 @@
           "request.symbol\nrequest.start_date\nrequest.end_date\nrequest.trade_date\nrequest.as_of\nconfig.limit\nconfig.count",
           "provider_validation/results/sina-futures-final-v2-20261004/1/candidate/ASTOCK-074-0a7165c72a2b/2026-10-04/input_report/sina/futures_quote/report.json",
           "provider_validation/results/sina-futures-final-v2-20261004/1/candidate/ASTOCK-074-0a7165c72a2b/_raw/manifest.ndjson\nprovider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-074\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-074\nsrc/routing/factory.py",
+          "data/raw/sina/futures_quote/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/futures_quote/scope-<请求范围哈希>/<任务ID>/",
+          "sources/sina/ASTOCK-074/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-075",
@@ -10834,7 +11087,12 @@
           "request.symbol\nrequest.trade_date\nconfig.limit\nconfig.count",
           "provider_validation/results/sina-futures-final-v2-20261004/3/candidate/ASTOCK-075-d7a46faab44c/2026-10-04/input_report/sina/futures_kline/report.json",
           "provider_validation/results/sina-futures-final-v2-20261004/3/candidate/ASTOCK-075-d7a46faab44c/_raw/manifest.ndjson\nprovider_validation/results/raw/2026-10-01-v310-live/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-075\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-075\nsrc/routing/factory.py",
+          "data/raw/sina/futures_kline/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/futures_daily/scope-<请求范围哈希>/<任务ID>/",
+          "sources/sina/ASTOCK-075/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-076",
@@ -10866,7 +11124,12 @@
           "request.symbol\nrequest.start_date\nrequest.end_date\nrequest.trade_date\nrequest.as_of\nconfig.limit\nconfig.count",
           "provider_validation/results/sina-futures-final-v2-20261004/4/candidate/ASTOCK-076-db0429c63c60/2026-10-04/input_report/sina/a50_quote/report.json",
           "provider_validation/results/sina-futures-final-v2-20261004/4/candidate/ASTOCK-076-db0429c63c60/_raw/manifest.ndjson\nprovider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-076\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-076\nsrc/routing/factory.py",
+          "data/raw/sina/a50_quote/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/a50_quote/scope-<请求范围哈希>/<任务ID>/",
+          "sources/sina/ASTOCK-076/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-077",
@@ -10898,7 +11161,12 @@
           "request.symbols\nconfig.limit\nconfig.count\nrequest.symbol\nrequest.start_date\nrequest.end_date\nrequest.trade_date",
           "provider_validation/results/remaining-final-v2-20261004/12/candidate/ASTOCK-077-c8ac604c41ea/2026-10-04/input_report/sge/spot/report.json",
           "provider_validation/results/remaining-final-v2-20261004/12/candidate/ASTOCK-077-c8ac604c41ea/_raw/manifest.ndjson\nprovider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-077\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-077\nsrc/routing/factory.py",
+          "data/raw/sge/spot/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/sge_spot/scope-<请求范围哈希>/<任务ID>/",
+          "sources/sge/ASTOCK-077/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-078",
@@ -10930,7 +11198,12 @@
           "request.start_date\nrequest.end_date\nrequest.trade_date\nconfig.detail\nconfig.count",
           "provider_validation/results/events-final-v2-20261004/ASTOCK-078/candidate/ASTOCK-078-83559a2df75c/2026-10-03/input_report/eastmoney/earnings_forecast/report.json",
           "provider_validation/results/events-final-v2-20261004/ASTOCK-078/candidate/ASTOCK-078-83559a2df75c/_raw/manifest.ndjson\nprovider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-078\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-078\nsrc/routing/factory.py",
+          "data/raw/eastmoney/earnings_forecast/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/earnings_forecast/scope-<请求范围哈希>/<任务ID>/",
+          "sources/eastmoney/ASTOCK-078/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-079",
@@ -10962,7 +11235,12 @@
           "request.report_date\nrequest.trade_date\nconfig.count",
           "provider_validation/results/events-final-v2-20261004/ASTOCK-079/candidate/ASTOCK-079-feeee46e9eba/2026-10-03/input_report/eastmoney/institution_survey/report.json",
           "provider_validation/results/events-final-v2-20261004/ASTOCK-079/candidate/ASTOCK-079-feeee46e9eba/_raw/manifest.ndjson\nprovider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-079\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-079\nsrc/routing/factory.py",
+          "data/raw/eastmoney/institution_survey/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/institution_survey/scope-<请求范围哈希>/<任务ID>/",
+          "sources/eastmoney/ASTOCK-079/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-080",
@@ -10994,7 +11272,12 @@
           "request.trade_date\nrequest.report_date\nrequest.statistic_date\nconfig.progress\nconfig.count",
           "provider_validation/results/actions-final-v2-20261004/ASTOCK-080/candidate/ASTOCK-080-8456ebd27e9f/2026-10-03/input_report/eastmoney/holder_trades/report.json",
           "provider_validation/results/actions-final-v2-20261004/ASTOCK-080/candidate/ASTOCK-080-8456ebd27e9f/_raw/manifest.ndjson\nprovider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-080\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-080\nsrc/routing/factory.py",
+          "data/raw/eastmoney/holder_trades/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/holder_trades/scope-<请求范围哈希>/<任务ID>/",
+          "sources/eastmoney/ASTOCK-080/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-081",
@@ -11026,7 +11309,12 @@
           "request.start_date\nrequest.end_date\nrequest.trade_date\nrequest.statistic_date\nconfig.direction\nconfig.count",
           "provider_validation/results/actions-final-v2-20261004/ASTOCK-081/candidate/ASTOCK-081-50f91da53312/2026-10-03/input_report/eastmoney/buyback/report.json",
           "provider_validation/results/actions-final-v2-20261004/ASTOCK-081/candidate/ASTOCK-081-50f91da53312/_raw/manifest.ndjson\nprovider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-081\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-081\nsrc/routing/factory.py",
+          "data/raw/eastmoney/buyback/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/buyback/scope-<请求范围哈希>/<任务ID>/",
+          "sources/eastmoney/ASTOCK-081/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-082",
@@ -11058,7 +11346,12 @@
           "request.start_date\nrequest.end_date\nrequest.trade_date\nrequest.report_date\nconfig.direction\nconfig.progress\nconfig.count",
           "provider_validation/results/actions-final-v2-20261004/ASTOCK-082/candidate/ASTOCK-082-bbf5459f27b0/2026-10-03/input_report/eastmoney/pledge/report.json",
           "provider_validation/results/actions-final-v2-20261004/ASTOCK-082/candidate/ASTOCK-082-bbf5459f27b0/_raw/manifest.ndjson\nprovider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-082\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-082\nsrc/routing/factory.py",
+          "data/raw/eastmoney/pledge/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/pledge/scope-<请求范围哈希>/<任务ID>/",
+          "sources/eastmoney/ASTOCK-082/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-083",
@@ -11090,7 +11383,12 @@
           "request.symbol\nrequest.start_date\nrequest.end_date\nrequest.trade_date\nrequest.statistic_date\nconfig.count",
           "provider_validation/results/actions-final-v2-20261004/ASTOCK-083/candidate/ASTOCK-083-89a642ebcea2/2026-10-03/input_report/eastmoney/ipo_calendar/report.json",
           "provider_validation/results/actions-final-v2-20261004/ASTOCK-083/candidate/ASTOCK-083-89a642ebcea2/_raw/manifest.ndjson\nprovider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-083\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-083\nsrc/routing/factory.py",
+          "data/raw/eastmoney/ipo_calendar/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/ipo_calendar/scope-<请求范围哈希>/<任务ID>/",
+          "sources/eastmoney/ASTOCK-083/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-084",
@@ -11122,7 +11420,12 @@
           "request.symbol\nrequest.start_date\nrequest.end_date\nrequest.trade_date\nconfig.limit\nconfig.count\nrequest.as_of",
           "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-084/candidate/ASTOCK-084-cdc1ddaafda2/2026-10-04/input_report/eastmoney/convertible_bonds/report.json",
           "provider_validation/results/rates-bonds-final-v2-20261004/ASTOCK-084/candidate/ASTOCK-084-cdc1ddaafda2/_raw/manifest.ndjson\nprovider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-084\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-084\nsrc/routing/factory.py",
+          "data/raw/eastmoney/convertible_bonds/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/convertible_bonds/scope-<请求范围哈希>/<任务ID>/",
+          "sources/eastmoney/ASTOCK-084/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-085",
@@ -11154,7 +11457,12 @@
           "request.symbols\nconfig.limit\nconfig.count\nrequest.symbol\nrequest.start_date\nrequest.end_date",
           "provider_validation/results/remaining-final-v2-20261004/7/candidate/ASTOCK-085-c7558ae45d4e/2026-10-04/input_report/sina/dragon_tiger_daily/report.json",
           "provider_validation/results/remaining-final-v2-20261004/7/candidate/ASTOCK-085-c7558ae45d4e/_raw/manifest.ndjson\nprovider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-085\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-085\nsrc/routing/factory.py",
+          "data/raw/sina/dragon_tiger_daily/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/sina_dragon_tiger_daily/scope-<请求范围哈希>/<任务ID>/",
+          "sources/sina/ASTOCK-085/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-087",
@@ -11186,7 +11494,12 @@
           "request.symbol\nrequest.symbols\nrequest.start_date\nrequest.end_date\nrequest.trade_date\nconfig.limit\nconfig.count",
           "provider_validation/results/actual-data-final-20261004/5/candidate/ASTOCK-087-88404906f93b/2026-10-04/input_report/eastmoney/dated_announcements/report.json",
           "provider_validation/results/actual-data-final-20261004/5/candidate/ASTOCK-087-88404906f93b/_raw/manifest.ndjson\nprovider_validation/results/actual-data-network-20261004/ASTOCK-087/_raw/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-087\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-087\nsrc/routing/factory.py",
+          "data/raw/eastmoney/dated_announcements/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/dated_announcements/scope-<请求范围哈希>/<任务ID>/",
+          "sources/eastmoney/ASTOCK-087/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "SDA-BOARD-001",
@@ -11218,7 +11531,12 @@
           "",
           "provider_validation/results/ths-final-20261004/1/SDA-BOARD-001-08de0ffe6822/2026-10-03/input_report/ths/industry_directory/report.json",
           "provider_validation/results/ths-final-20261004/1/SDA-BOARD-001-08de0ffe6822/_raw/manifest.ndjson\nprovider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson",
-          "config/providers.yaml#SDA-BOARD-001\nsrc/routing/factory.py"
+          "config/providers.yaml#SDA-BOARD-001\nsrc/routing/factory.py",
+          "data/raw/ths/industry_directory/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/industry_directory/scope-<请求范围哈希>/<任务ID>/",
+          "sources/ths/SDA-BOARD-001/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "SDA-BOARD-002",
@@ -11250,7 +11568,12 @@
           "",
           "provider_validation/results/ths-final-20261004/2/SDA-BOARD-002-00164cdb8f8a/2026-10-03/input_report/ths/industry_index_daily/report.json",
           "provider_validation/results/ths-final-20261004/2/SDA-BOARD-002-00164cdb8f8a/_raw/manifest.ndjson\nprovider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson",
-          "config/providers.yaml#SDA-BOARD-002\nsrc/routing/factory.py"
+          "config/providers.yaml#SDA-BOARD-002\nsrc/routing/factory.py",
+          "data/raw/ths/industry_index_daily/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/industry_index_daily/scope-<请求范围哈希>/<任务ID>/",
+          "sources/ths/SDA-BOARD-002/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "SDA-BOARD-003",
@@ -11282,7 +11605,12 @@
           "",
           "provider_validation/results/ths-final-20261004/3/SDA-BOARD-003-2695bcad3752/2026-10-03/input_report/ths/industry_fund_flow/report.json",
           "provider_validation/results/ths-final-20261004/3/SDA-BOARD-003-2695bcad3752/_raw/manifest.ndjson\nprovider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson",
-          "config/providers.yaml#SDA-BOARD-003\nsrc/routing/factory.py"
+          "config/providers.yaml#SDA-BOARD-003\nsrc/routing/factory.py",
+          "data/raw/ths/industry_fund_flow/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/board_fund_flow/scope-<请求范围哈希>/<任务ID>/",
+          "sources/ths/SDA-BOARD-003/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "SDA-BOARD-004",
@@ -11314,7 +11642,12 @@
           "",
           "provider_validation/results/ths-final-20261004/4/SDA-BOARD-004-e33741691686/2026-10-03/input_report/ths/concept_fund_flow/report.json",
           "provider_validation/results/ths-final-20261004/4/SDA-BOARD-004-e33741691686/_raw/manifest.ndjson\nprovider_validation/results/raw/2026-10-02-sector-capabilities-network-retry/manifest.ndjson",
-          "config/providers.yaml#SDA-BOARD-004\nsrc/routing/factory.py"
+          "config/providers.yaml#SDA-BOARD-004\nsrc/routing/factory.py",
+          "data/raw/ths/concept_fund_flow/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/board_fund_flow/scope-<请求范围哈希>/<任务ID>/",
+          "sources/ths/SDA-BOARD-004/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "SDA-BOARD-005",
@@ -11346,7 +11679,12 @@
           "request.symbol",
           "provider_validation/results/bao-final-20261004/1/SDA-BOARD-005-b7c3fdef4d9a/2026-10-03/input_report/baostock/security_snapshot/report.json",
           "provider_validation/results/bao-final-20261004/1/SDA-BOARD-005-b7c3fdef4d9a/_raw/manifest.ndjson\nprovider_validation/results/live-probes/baostock-industry-20260930-20261003/_raw/baostock-industry/manifest.ndjson",
-          "config/providers.yaml#SDA-BOARD-005\nsrc/routing/factory.py"
+          "config/providers.yaml#SDA-BOARD-005\nsrc/routing/factory.py",
+          "data/raw/baostock/security_snapshot/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/security_snapshot/scope-<请求范围哈希>/<任务ID>/",
+          "sources/baostock/SDA-BOARD-005/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "SDA-BOARD-006",
@@ -11378,7 +11716,12 @@
           "request.symbol",
           "provider_validation/results/bao-final-20261004/2/SDA-BOARD-006-ead29872b05d/2026-10-03/input_report/baostock/industry_membership/report.json",
           "provider_validation/results/bao-final-20261004/2/SDA-BOARD-006-ead29872b05d/_raw/manifest.ndjson\nprovider_validation/results/live-probes/baostock-industry-20260930-20261003/_raw/baostock-industry/manifest.ndjson",
-          "config/providers.yaml#SDA-BOARD-006\nsrc/routing/factory.py"
+          "config/providers.yaml#SDA-BOARD-006\nsrc/routing/factory.py",
+          "data/raw/baostock/industry_membership/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/industry_membership/scope-<请求范围哈希>/<任务ID>/",
+          "sources/baostock/SDA-BOARD-006/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-037-profile",
@@ -11410,7 +11753,12 @@
           "request.symbols\nrequest.start_date\nrequest.end_date\nrequest.trade_date\nconfig.limit\nconfig.count",
           "provider_validation/results/actual-data-final-20261004/2/candidate/ASTOCK-037-profile-60716f8e12a0/2026-10-04/input_report/cninfo/company_profile/report.json",
           "provider_validation/results/actual-data-final-20261004/2/candidate/ASTOCK-037-profile-60716f8e12a0/_raw/manifest.ndjson\nprovider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-037-profile\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-037-profile\nsrc/routing/factory.py",
+          "data/raw/cninfo/company_profile/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/company_profile/scope-<请求范围哈希>/<任务ID>/",
+          "sources/cninfo/ASTOCK-037-profile/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ],
         [
           "ASTOCK-037-events",
@@ -11442,7 +11790,12 @@
           "request.symbols\nrequest.start_date\nrequest.end_date\nrequest.trade_date\nconfig.limit\nconfig.count\nrequest.symbol",
           "provider_validation/results/actual-data-final-20261004/3/candidate/ASTOCK-037-events-61a89f763457/2026-10-04/input_report/eastmoney/company_events/report.json",
           "provider_validation/results/actual-data-final-20261004/3/candidate/ASTOCK-037-events-61a89f763457/_raw/manifest.ndjson\nprovider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
-          "config/providers.yaml#ASTOCK-037-events\nsrc/routing/factory.py"
+          "config/providers.yaml#ASTOCK-037-events\nsrc/routing/factory.py",
+          "data/raw/eastmoney/company_events/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+          "data/task_workspace/company_events/scope-<请求范围哈希>/<任务ID>/",
+          "sources/eastmoney/ASTOCK-037-events/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+          "data/canonical/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+          "正式发布与元数据状态均成功、文件哈希通过后进入 data/task_archive/；候选和失败任务保留工作区"
         ]
       ]
     },

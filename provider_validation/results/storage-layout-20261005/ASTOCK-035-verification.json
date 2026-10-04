@@ -1,0 +1,18 @@
+{
+  "input_id": "ASTOCK-035",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\storage-layout-20261005\\replay-data-v2\\task_workspace\\cctv_news_index\\scope-12d02053bb5ba5cf\\9354c5305ad3\\report.json",
+  "report_sha256": "27c55e8216a1671051d66558a395a0a430d386c3cc6410259540ea5ab6251f95",
+  "source_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\manifest.ndjson",
+  "source_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+  "source_response_hashes": [
+    "8373a95432cfd8403af3820c0c37729dc141c778f53dacfd24fec8d9fa490a5e"
+  ],
+  "code_version": "06c802dfed2620055ae9ed41036dcf1ee477f342ebf1ed6121bb696f4f943b01",
+  "row_count": 14,
+  "coverage_denominator": 14,
+  "validation_time_utc": "2026-10-04T19:13:52.240340+00:00",
+  "mode": "offline archive replay into isolated runtime layers",
+  "canonical_writes": 0,
+  "field_roundtrip_verified": true,
+  "raw_hashes_verified": true
+}

@@ -25,8 +25,7 @@
 | `docs/` | 按模块职责归档的正式说明；各子目录随文档产生建立 |
 | `provider_validation/` | 来源探针、覆盖报告、原始响应及验证证据；入口见 [Provider 验证目录说明](provider_validation/README.md) |
 | `AGENTS.md` | 协作、验证及文档管理约定 |
-| `data/` | 配置指定的实际运行数据目录，按需生成，不提交 Git；当前 Raw、Canonical 和 Hot 分别为 `data/raw/`、`data/canonical/`、`data/hot/` |
-| `metadata/` | 当前配置指定的元数据库目录，按需生成；路径为 `metadata/metadata.duckdb` |
+| `data/` | 统一运行根目录：`raw/`、`task_workspace/`、`canonical/`、`task_archive/`、`metadata/` 和 `hot/`；按需生成，不提交 Git，详见 [存储与归档说明](docs/storage/README.md) |
 | `tmp/` | 本地临时工作和离线验收输出；历史内容保留，新输出不作为生产数据 |
 | `tmp_test/` | 历史研究脚本及输出，保留历史引用；新来源验证统一进入 `provider_validation/` |
 | `CODE_STRUCTURE.md` | 当前代码和文档目录的职责索引 |
@@ -47,7 +46,7 @@
 
 正式代码直接放在 `src/` 下，模块按职责分目录，不再套一层项目同名目录。Python 导入名仍为 `stock_data_manage`，由 `pyproject.toml` 将该包映射到 `src/`；`stock_data_manage.providers` 对应 `src/providers/`。根目录 `config/` 保存 YAML，`src/config/` 保存读取和校验配置的代码。
 
-来源可行性证据位于 `provider_validation/results/`。通用输入入口 `collect-input` 当前仍生成候选数据，输出到显式指定的 `--output-root`，尚未发布到生产数据目录。历史报告中的旧源码路径表示报告生成时的位置，原始证据和哈希不因目录调整而改写。
+来源可行性证据位于 `provider_validation/results/`。通用输入入口 `collect-input` 默认将原响应保存到 `data/raw/`，来源解析和标准化结果保存到 `data/task_workspace/`，元数据库保存到 `data/metadata/metadata.duckdb`。当前64项输入仍为候选数据，尚未接通最终发布；只有正式发布任务才允许归档。显式 `--output-root` 保留隔离验证布局，详见 [存储与归档说明](docs/storage/README.md)。历史报告中的旧源码路径表示报告生成时的位置，原始证据和哈希不因目录调整而改写。
 
 ## 当前开发状态
 
@@ -104,7 +103,7 @@ python -m stock_data_manage.cli probe-minute --provider tencent --symbol sh60051
 进程中断后的 Canonical 与元数据恢复：
 
 ```powershell
-python -m stock_data_manage.cli recover --canonical-root data/canonical --metadata metadata/metadata.duckdb
+python -m stock_data_manage.cli recover --canonical-root data/canonical --metadata data/metadata/metadata.duckdb
 ```
 
 运行可重复的离线 M1 验收证据：

@@ -1,0 +1,35 @@
+{
+  "authorized_files": [
+    ".gitattributes",
+    "CODE_STRUCTURE.md",
+    "PROJECT_PROGRESS.md",
+    "README.md",
+    "config/collection.yaml",
+    "docs/providers/README.md",
+    "docs/providers/源头采集接口说明.json",
+    "docs/providers/源头采集接口说明.xlsx",
+    "docs/storage/README.md",
+    "provider_validation/tests/build_interface_coverage.py",
+    "provider_validation/tests/build_interface_coverage_workbook.mjs",
+    "src/cli.py",
+    "src/config/loader.py",
+    "src/pipeline/inputs.py",
+    "src/storage/raw.py",
+    "src/storage/parquet.py",
+    "src/worker/recovery.py",
+    "tests/test_cli.py",
+    "tests/test_config_contract.py",
+    "tests/test_input_collection.py",
+    "tests/test_raw_metadata.py",
+    "tests/test_scheduler.py",
+    "tests/test_canonical_recovery.py"
+  ],
+  "audit_directory": "provider_validation/results/storage-layout-20261005",
+  "exclude": [
+    "AGENTS.md",
+    "unrelated pre-existing untracked files",
+    "production data"
+  ],
+  "preexisting_agents_sha256": "1f7da7b5c58a463be4a69ecc85d1b6ce3d5cc91bc0ca00eec2a008d1461cf876",
+  "git_head": "274f376c7880594e7ef1c62e68683ed3bf6fa936"
+}

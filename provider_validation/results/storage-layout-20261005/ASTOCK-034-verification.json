@@ -1,0 +1,18 @@
+{
+  "input_id": "ASTOCK-034",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\storage-layout-20261005\\replay-data-v2\\task_workspace\\wallstreetcn_news\\scope-a76401d9a37aea26\\738fc47c67ac\\report.json",
+  "report_sha256": "8457b74afc4ebb5a7313f7844354512654929604695772ea3a92e7c3665647b1",
+  "source_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\manifest.ndjson",
+  "source_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+  "source_response_hashes": [
+    "a7c874fbbe260d8b207835c57f51359e07bd92626f58f2c1ef8614592aa1dba7"
+  ],
+  "code_version": "06c802dfed2620055ae9ed41036dcf1ee477f342ebf1ed6121bb696f4f943b01",
+  "row_count": 50,
+  "coverage_denominator": 50,
+  "validation_time_utc": "2026-10-04T19:13:50.393727+00:00",
+  "mode": "offline archive replay into isolated runtime layers",
+  "canonical_writes": 0,
+  "field_roundtrip_verified": true,
+  "raw_hashes_verified": true
+}

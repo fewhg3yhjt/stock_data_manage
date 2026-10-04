@@ -4108,3 +4108,99 @@ def test_candidate_response_archive_fits_nested_windows_path(tmp_path, no_networ
         if event["outcome"] == "response":
             assert len(str((manifest.parent / event["body_storage"]).resolve())) < 250
             RawObjectStore.read_response(manifest, event)
+
+
+# Reuse the independently checked request contexts and immutable source archives above.
+RUNTIME_CASES = {}
+for _case_group in (REMAINING_CASES, SDK_NEWS_CASES, ACTUAL_DATA_CASES, MACRO_CASES,
+                    REPORTS_SEATS_CASES, MARKET_EVENT_CASES, FACTOR_CASES, CASES,
+                    THS_CASES, BAO_CASES, EM_CASES, POOL_CASES, REPORTS_CALENDAR_CASES,
+                    SINA_FUTURES_CASES, NEWS_CASES, RATES_BONDS_CASES, EVENT_CASES, ACTION_CASES):
+    for _case in _case_group:
+        RUNTIME_CASES.setdefault(_case[0], _case)
+RUNTIME_CASES["ASTOCK-001"] = ("ASTOCK-001", QUOTE_CONTEXT, QUOTE_ARCHIVE, 1)
+RUNTIME_CASES["ASTOCK-065"] = ("ASTOCK-065", {}, EVENT_ARCHIVE, 1538)
+
+
+@pytest.mark.parametrize("input_id,context,manifest,count", list(RUNTIME_CASES.values()),
+                         ids=list(RUNTIME_CASES))
+def test_runtime_layered_storage_preserves_source_and_mapping(tmp_path, no_network, input_id, context, manifest, count):
+    import pyarrow.parquet as pq
+    from stock_data_manage.config.loader import load_storage_paths
+    from stock_data_manage.storage.metadata import MetadataStore
+    from stock_data_manage.domain import AttemptStatus
+
+    import os
+    audit_root = os.environ.get("STOCKDATA_LAYOUT_EVIDENCE_ROOT")
+    data_root = Path(audit_root).resolve() if audit_root else tmp_path / "data"
+    report = collect_input(input_id=input_id, context=context, config_root=ROOT / "config",
+                           data_root=data_root, replay_manifest=manifest)
+    assert report["status"] == "candidate_complete", {k: report.get(k) for k in ("input_id", "status", "error")}
+    assert report["row_count"] == count
+    paths = load_storage_paths(ROOT / "config", data_root=data_root)
+    task = Path(report["run_directory"])
+    assert task.is_relative_to(paths["workspace_root"] / report["dataset"])
+    assert task.parent.name.startswith("scope-")
+    raw_manifest = (task / report["raw_manifest"]["path"]).resolve()
+    assert raw_manifest.is_relative_to(paths["raw_root"] / report["provider"] / report["endpoint"])
+    assert not (task / "_raw").exists()
+    assert not paths["canonical_root"].exists() and not paths["archive_root"].exists()
+    assert report["live_http_calls"] == report["production_writes"] == 0
+    assert not report["eligible_for_production_routing"]
+    for event in report["responses"]:
+        if event.get("body_sha256"):
+            body = RawObjectStore.read_response(raw_manifest, event)
+            assert hashlib.sha256(body).hexdigest() == event["body_sha256"]
+    parquet = task / report["normalized_parquet"]["path"]
+    assert hashlib.sha256(parquet.read_bytes()).hexdigest() == report["normalized_parquet"]["sha256"]
+    records = pq.ParquetFile(parquet).read().to_pylist()
+    from stock_data_manage.pipeline.inputs import _json_value
+    # Every mapped value, including exact decimals/nulls and timestamp instants, must survive.
+    mapped = read_artifact(report, "output")
+    for row, expected in zip(records, mapped):
+        for name, value in row.items():
+            if isinstance(value, datetime):
+                assert value == datetime.fromisoformat(expected[name])
+            elif isinstance(value, Decimal):
+                assert value == Decimal(expected[name])
+            else:
+                assert _json_value(value) == expected[name]
+    task_manifest = json.loads((task / "manifest.json").read_text(encoding="utf-8"))
+    quality = json.loads((task / "quality_report.json").read_text(encoding="utf-8"))
+    assert task_manifest["status"] == quality["status"] == "candidate_complete"
+    assert not task_manifest["publication_permitted"] and not task_manifest["canonical_refs"]
+    assert task_manifest["source_response_hashes"] == report["output"]["source_response_hashes"]
+    assert quality["coverage_denominator"] == report["coverage_denominator"]
+    source_refs = json.loads((parquet.parent / "raw_refs.json").read_text(encoding="utf-8"))
+    assert source_refs["raw_manifest"] == report["raw_manifest"]
+    metadata = MetadataStore(paths["metadata_path"])
+    try:
+        attempt = metadata.load_attempt(task.name)
+        assert attempt.status == AttemptStatus.VALIDATED
+        assert Path(attempt.raw_object_path) == raw_manifest
+        assert attempt.raw_content_hash == report["raw_manifest"]["sha256"]
+    finally:
+        metadata.close()
+    if audit_root:
+        evidence = {"input_id":input_id, "report_path":report["report_path"],
+            "report_sha256":hashlib.sha256(Path(report["report_path"]).read_bytes()).hexdigest(),
+            "source_manifest":str(manifest.resolve()), "source_manifest_sha256":hashlib.sha256(manifest.read_bytes()).hexdigest(),
+            "source_response_hashes":report["output"]["source_response_hashes"],
+            "code_version":report["code_version"], "row_count":report["row_count"],
+            "coverage_denominator":report["coverage_denominator"],
+            "validation_time_utc":report["validation_time_utc"],
+            "mode":"offline archive replay into isolated runtime layers", "canonical_writes":0,
+            "field_roundtrip_verified":True, "raw_hashes_verified":True}
+        target=data_root.parent / (input_id+"-verification.json")
+        target.write_text(json.dumps(evidence,ensure_ascii=False,indent=2),encoding="utf-8")
+
+
+def test_runtime_failed_task_keeps_raw_without_publishing(tmp_path, no_network):
+    manifest = quote_fixture_manifest(tmp_path / "probe", ["sh600519"], mutation="empty")
+    result = collect_input(input_id="ASTOCK-001", context=QUOTE_CONTEXT, config_root=ROOT / "config",
+                           data_root=tmp_path / "data", replay_manifest=manifest)
+    assert result["status"] == "failed"
+    task = Path(result["run_directory"])
+    assert (task / result["raw_manifest"]["path"]).is_file()
+    assert json.loads((task / "manifest.json").read_text())["status"] == "failed"
+    assert not (tmp_path / "data/canonical").exists()

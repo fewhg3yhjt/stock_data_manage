@@ -1,0 +1,19 @@
+{
+  "input_id": "ASTOCK-069",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\storage-layout-20261005\\replay-data\\task_workspace\\index_valuation\\scope-8552db885e319649\\ASTOCK-069-333cffe7e821\\report.json",
+  "report_sha256": "1ceb10e342a307db0114c4ea6f43a975999a50512924a61b63ed9c6f7d590b51",
+  "source_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-evidence-direct-20261004\\ASTOCK-069\\_raw\\manifest.ndjson",
+  "source_manifest_sha256": "dad3a35e701c415f4deffb566c4b00e0128d54a6e946be5690094121057b5d21",
+  "source_response_hashes": [
+    "6e3db55e58791c9db7a9e4b4a45d44c0ad80763ee6b44e033c554051615c6472",
+    "6e3db55e58791c9db7a9e4b4a45d44c0ad80763ee6b44e033c554051615c6472"
+  ],
+  "code_version": "ed5d9f206e9b7782a0eb7b7b6b4f8592d68f054f2bc6246a97ccba8c5eff590d",
+  "row_count": 20,
+  "coverage_denominator": 20,
+  "validation_time_utc": "2026-10-04T18:52:16.982131+00:00",
+  "mode": "offline archive replay into isolated runtime layers",
+  "canonical_writes": 0,
+  "field_roundtrip_verified": true,
+  "raw_hashes_verified": true
+}

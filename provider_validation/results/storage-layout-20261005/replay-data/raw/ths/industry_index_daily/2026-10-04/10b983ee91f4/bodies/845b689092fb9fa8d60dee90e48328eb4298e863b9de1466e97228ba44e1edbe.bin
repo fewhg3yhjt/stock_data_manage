@@ -1,0 +1,99 @@
+def stock_board_industry_index_ths(
+    symbol: str = "元件",
+    start_date: str = "20200101",
+    end_date: str = "20240108",
+) -> pd.DataFrame:
+    """
+    同花顺-板块-行业板块-指数数据
+    https://q.10jqka.com.cn/thshy/detail/code/881270/
+    :param start_date: 开始时间
+    :type start_date: str
+    :param end_date: 结束时间
+    :type end_date: str
+    :param symbol: 指数数据
+    :type symbol: str
+    :return: 指数数据
+    :rtype: pandas.DataFrame
+    """
+    code_map = _get_stock_board_industry_name_ths()
+    symbol_code = code_map[symbol]
+    big_df = pd.DataFrame()
+    current_year = datetime.now().year
+    begin_year = int(start_date[:4])
+    tqdm = get_tqdm()
+    js_code = py_mini_racer.MiniRacer()
+    js_content = _get_file_content_ths("ths.js")
+    js_code.eval(js_content)
+    v_code = js_code.call("v")
+    for year in tqdm(range(begin_year, current_year + 1), leave=False):
+        url = f"https://d.10jqka.com.cn/v4/line/bk_{symbol_code}/01/{year}.js"
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/89.0.4389.90 Safari/537.36",
+            "Referer": "http://q.10jqka.com.cn",
+            "Host": "d.10jqka.com.cn",
+            "Cookie": f"v={v_code}",
+        }
+        r = requests.get(url, headers=headers)
+        data_text = r.text
+
+        try:
+            demjson.decode(data_text[data_text.find("{") : -1])
+        except:  # noqa: E722
+            continue
+        temp_df = demjson.decode(data_text[data_text.find("{") : -1])
+        temp_df = pd.DataFrame(temp_df["data"].split(";"))
+        temp_df = temp_df.iloc[:, 0].str.split(",", expand=True)
+        big_df = pd.concat(objs=[big_df, temp_df], ignore_index=True)
+
+    if len(big_df.columns) == 11:
+        big_df.columns = [
+            "日期",
+            "开盘价",
+            "最高价",
+            "最低价",
+            "收盘价",
+            "成交量",
+            "成交额",
+            "_",
+            "_",
+            "_",
+            "_",
+        ]
+    else:
+        big_df.columns = [
+            "日期",
+            "开盘价",
+            "最高价",
+            "最低价",
+            "收盘价",
+            "成交量",
+            "成交额",
+            "_",
+            "_",
+            "_",
+            "_",
+            "_",
+        ]
+    big_df = big_df[
+        [
+            "日期",
+            "开盘价",
+            "最高价",
+            "最低价",
+            "收盘价",
+            "成交量",
+            "成交额",
+        ]
+    ]
+    big_df["日期"] = pd.to_datetime(big_df["日期"], errors="coerce").dt.date
+    big_df.index = pd.to_datetime(big_df["日期"], errors="coerce")
+    big_df = big_df[start_date:end_date]
+    big_df.reset_index(drop=True, inplace=True)
+    big_df["开盘价"] = pd.to_numeric(big_df["开盘价"], errors="coerce")
+    big_df["最高价"] = pd.to_numeric(big_df["最高价"], errors="coerce")
+    big_df["最低价"] = pd.to_numeric(big_df["最低价"], errors="coerce")
+    big_df["收盘价"] = pd.to_numeric(big_df["收盘价"], errors="coerce")
+    big_df["成交量"] = pd.to_numeric(big_df["成交量"], errors="coerce")
+    big_df["成交额"] = pd.to_numeric(big_df["成交额"], errors="coerce")
+    return big_df

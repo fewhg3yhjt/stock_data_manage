@@ -20,7 +20,7 @@
 - `src/__init__.py` 是逻辑包 `stock_data_manage` 的初始化文件，`src/cli.py` 是命令入口。`pyproject.toml` 显式将逻辑包映射到 `src/`，列出当前28个 Python 包；新增含 `__init__.py` 的子包时同步更新该清单。
 - 根目录 `config/` 保存 YAML 参数、调度意图、字段模板和字段映射；`src/config/` 保存配置读取与校验代码。
 - `tests/` 保存实现测试；`provider_validation/` 保存来源可行性验证、原响应与派生证据；`docs/` 保存按职责归档的正式说明。
-- `data/` 为配置指定、按需生成的运行数据目录，目前配置 Raw、Canonical 和 Hot；元数据库仍位于配置指定的 `metadata/metadata.duckdb`。通用输入入口当前只向显式指定的候选输出目录写入，目录整理不代表生产发布已接通。
+- `data/` 统一保存 `raw/`、`task_workspace/`、`canonical/`、`task_archive/`、`metadata/` 和 `hot/`，按需生成。通用采集入口默认分层落盘；显式验证输出保持历史布局。来源候选成功不自动发布或归档，详见 [运行数据与归档](docs/storage/README.md)。
 - `tmp/` 用于本地临时工作与离线验收，`tmp_test/` 保留历史研究脚本和结果；不删除已有内容，新来源验证归入 `provider_validation/`。
 - 测试、命令及验证脚本在安装当前项目的同一环境中运行，不再通过 `PYTHONPATH=src` 暴露顶层 `providers`、`config` 等包。历史证据中的旧路径及哈希保留原样。
 
@@ -65,7 +65,7 @@ BaoStock 后续两项转换见 `provider_validation/docs/2026-10-04-baostock-inp
 
 ## 正式文档目录
 
-正式文档按现有模块职责归入 `docs/`，不按开发批次或阶段编号分类。当前已建立 `docs/providers/`，其余目录随实际文档建立；下表为职责归属，不表示后续模块文档已经建成。
+正式文档按现有模块职责归入 `docs/`，不按开发批次或阶段编号分类。当前已建立 `docs/providers/` 与 `docs/storage/`，其余目录随实际文档建立；下表为职责归属，不表示后续模块文档已经建成。
 
 | 文档目录 | 职责 |
 |---|---|
@@ -133,7 +133,7 @@ Excel、CSV、JSON 等说明属于从代码、YAML 和证据派生的文档，�
 
 | 文件 | 职责 |
 |---|---|
-| `config/loader.py` | 加载来源、输入契约、参数来源、采集意图、字段模板、路由与映射/状态/范围配置；参数绑定与类型/范围校验；配置不生成验证有效期 |
+| `config/loader.py` | 加载来源、输入契约、参数来源、采集意图、字段模板、路由与映射/状态/范围配置；参数绑定与类型/范围校验、统一运行路径及隔离层校验；配置不生成验证有效期 |
 | `routing/factory.py` | 按现有端点创建 Provider，保留来源传输并共享限速；读取已有元数据证据，按实际验证范围和原有效期注册能力，并在选择时复查证据与冷却状态 |
 
 ## 能力路由器
@@ -160,7 +160,7 @@ Excel、CSV、JSON 等说明属于从代码、YAML 和证据派生的文档，�
 | 文件 | 职责 |
 |---|---|
 | `pipeline/daily.py` | 日线按来源补缺、标准化、校验、候选生成和发布编排 |
-| `pipeline/inputs.py` | 单项输入及按周期触发的候选采集/回放；共享限速、独立候选 Attempt 幂等状态、响应留证、分红选择/排除记录及 YAML 映射；不注册正式路由 |
+| `pipeline/inputs.py` | 单项输入及按周期触发的候选采集/回放；统一原始层和任务工作区、来源解析及类型化 Parquet、原始引用、任务/质量清单、既有 Attempt 幂等状态；共享限速和 YAML 映射，不注册正式路由或发布新输入 |
 | `pipeline/daily_reconciliation.py` | 日线 provisional/final 合并、缺失统计和盘后校准 |
 | `pipeline/minute.py` | Watchlist 实时分钟采集和 Hot Store 写入 |
 | `pipeline/minute_reconciliation.py` | 分钟盘后校准、final 提升、冲突隔离和完整性处理 |
@@ -174,9 +174,9 @@ Excel、CSV、JSON 等说明属于从代码、YAML 和证据派生的文档，�
 
 | 文件 | 职责 |
 |---|---|
-| `storage/raw.py` | 不覆盖的 Raw Object Store、解析前响应字节/清单、哈希复查、脱敏和匹配有效响应复用 |
+| `storage/raw.py` | 不覆盖的 Raw Object Store、任务相对路径校验、解析前响应字节/清单、哈希复查、脱敏和匹配有效响应复用 |
 | `storage/hot.py` | SQLite WAL Hot Minute Store 和即时查询数据 |
-| `storage/parquet.py` | Canonical Parquet 分区、Manifest、文件锁和原子发布 |
+| `storage/parquet.py` | 来源字段合同的候选 Parquet 精确类型写入；既有 Canonical Bar 分区、Manifest、文件锁和原子发布 |
 | `storage/metadata.py` | DuckDB 元数据、Attempt 及调度周期的原子占用、Provider 健康、Probe 验证记录、既有能力证据查询和冲突记录；不新增能力管理数据库 |
 | `storage/integrity.py` | 确定性 row hash、Manifest 生成和完整性校验 |
 | `storage/__init__.py` | 存储包说明，不承载业务实现 |
@@ -197,11 +197,11 @@ Excel、CSV、JSON 等说明属于从代码、YAML 和证据派生的文档，�
 | 文件 | 职责 |
 |---|---|
 | `worker/attempts.py` | Collection Attempt 状态机和租约状态 |
-| `worker/recovery.py` | 中断后的临时文件、Canonical 和元数据恢复扫描 |
+| `worker/recovery.py` | 中断后的临时文件、Canonical 和元数据恢复扫描；已发布任务的证据复查和原子归档 |
 | `worker/scheduler.py` | 既有 Phase 1 固定任务时间表；输入配置的天/分钟周期、交易日/交易时段槽位、证券范围绑定及容量门禁 |
 | `worker/acceptance.py` | 离线验收回放和容量/恢复验收证据 |
 | `worker/__init__.py` | Worker 包说明，不承载业务实现 |
-| `cli.py` | `collect-due-inputs`（默认保存计划）、`collect-input`（支持 JSON 参数上下文）、`probe-*`、`recover`、`acceptance-offline` 等入口，负责参数解析和现有流程组装 |
+| `cli.py` | `collect-due-inputs`（默认保存计划）、`collect-input`（默认分层落盘，支持 JSON 参数上下文及隔离验证输出）、`probe-*`、`recover`、`acceptance-offline` 等入口，负责参数解析和现有流程组装 |
 | `__init__.py` | 包级公共领域模型导出 |
 
 ## 迁移约束

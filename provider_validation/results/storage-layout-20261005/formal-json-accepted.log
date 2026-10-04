@@ -1,0 +1,1 @@
+{"output": "docs/providers/源头采集接口说明.json", "counts": {"implemented_validation_only": 64, "unimplemented": 2, "blocked": 8, "alias": 3}, "hash_linked_reports": 64, "rows": {"接口总览": 64, "调用参数": 111, "采集字段与映射": 1006, "暂不纳入及历史": 13}}

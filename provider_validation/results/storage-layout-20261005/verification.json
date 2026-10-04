@@ -1,0 +1,2835 @@
+{
+  "result": "passed",
+  "validated_at_utc": "2026-10-04T19:17:31.111054+00:00",
+  "mode": "offline archived source replay and saved artifact comparison",
+  "network_requests": 0,
+  "production_writes": 0,
+  "new_runtime_inputs": 64,
+  "unique_datasets": 63,
+  "mapped_rows_checked": 103011,
+  "response_events_checked": 239,
+  "unique_original_body_hashes": 222,
+  "provider_files_unchanged": 60,
+  "tests": {
+    "release-tests.xml": {
+      "tests": 737,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "storage-final-tests.xml": {
+      "tests": 80,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "routing_and_schedules": "unchanged; new inputs not enabled",
+  "canonical_and_archive_writes": 0,
+  "preexisting_agents_changes": "untouched",
+  "markdown_links_checked": 11,
+  "task_artifacts": [
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/realtime_quote/scope-f76e934a2f7b3475/76adbb5ddb14/manifest.json",
+      "sha256": "7aab4a3da971963a18c8753e8cefcf8f9d2b685706e52feafb210776ff4b2e5a",
+      "byte_length": 2662
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/realtime_quote/scope-f76e934a2f7b3475/76adbb5ddb14/quality_report.json",
+      "sha256": "1885d6d604b26e1b9824a3d3c6f19a6458360906c2faf5a534c942167cdccf89",
+      "byte_length": 666
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/realtime_quote/scope-f76e934a2f7b3475/76adbb5ddb14/report.json",
+      "sha256": "7876c947e75b4d1a352c94258605a9224f678c0386a89f0eb8cfefe678a96a21",
+      "byte_length": 13316
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/realtime_quote/scope-f76e934a2f7b3475/76adbb5ddb14/started.json",
+      "sha256": "fe8a99cbe0535cfec33d8f724c36be439ed13bf214d91062bcd51e26c6bee0ac",
+      "byte_length": 272
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/realtime_quote/scope-f76e934a2f7b3475/76adbb5ddb14/sources/tencent/ASTOCK-001/normalized.json",
+      "sha256": "54f3714beda453604635ff8785da530acbd177f1b78ce51c999ac7235111107d",
+      "byte_length": 333
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/realtime_quote/scope-f76e934a2f7b3475/76adbb5ddb14/sources/tencent/ASTOCK-001/normalized.parquet",
+      "sha256": "9c92f1c700ea4b63f9d66a90a9a309beaea7cebc6f2e81c0830e5624cb407b9f",
+      "byte_length": 4220
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/realtime_quote/scope-f76e934a2f7b3475/76adbb5ddb14/sources/tencent/ASTOCK-001/raw_refs.json",
+      "sha256": "13bc622b1fd6f66b07ad2777a47bb9a0952d583c252c0371b6b34fe69bc6f32d",
+      "byte_length": 382
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/realtime_quote/scope-f76e934a2f7b3475/76adbb5ddb14/sources/tencent/ASTOCK-001/parsed/source-rows.json",
+      "sha256": "901877bb0190b2eeeb09dcf34188e1e82172e3d70b133ecf1ad8e8917d46ebca",
+      "byte_length": 844
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/minute_bar_5m/scope-0b6b0d477b8768cb/87b1f23e36a7/manifest.json",
+      "sha256": "c4db39b268366a7c9f4708d9f22482d62781be27d6c74cdb463a96c19ce89377",
+      "byte_length": 2515
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/minute_bar_5m/scope-0b6b0d477b8768cb/87b1f23e36a7/quality_report.json",
+      "sha256": "6221debed1138ba9b548bfb5e290aafa411022e2c220e591db1dff3e1581a16e",
+      "byte_length": 673
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/minute_bar_5m/scope-0b6b0d477b8768cb/87b1f23e36a7/report.json",
+      "sha256": "940178cb6d5af5d33835ba08e849e2233f55b368dd6a2eee02c97c25cc19b3e8",
+      "byte_length": 13306
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/minute_bar_5m/scope-0b6b0d477b8768cb/87b1f23e36a7/started.json",
+      "sha256": "afe356c05d29b1c6fca8a92167a3602ac73370fe7c902f198d502d07efe0445f",
+      "byte_length": 242
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/minute_bar_5m/scope-0b6b0d477b8768cb/87b1f23e36a7/sources/tencent/ASTOCK-002-5m/normalized.json",
+      "sha256": "bb3c999c8ae6d29bd870c2c091e0a3d0d396eba8bf77468de31db8ff33c9bf1e",
+      "byte_length": 22945
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/minute_bar_5m/scope-0b6b0d477b8768cb/87b1f23e36a7/sources/tencent/ASTOCK-002-5m/normalized.parquet",
+      "sha256": "15285d45e40fcca065ffe37317b07804fef60a78773359036ab2ce81689764da",
+      "byte_length": 5529
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/minute_bar_5m/scope-0b6b0d477b8768cb/87b1f23e36a7/sources/tencent/ASTOCK-002-5m/raw_refs.json",
+      "sha256": "c10795addbbfde93b3dc9a6c2e5948055d0b37e7f01f159467d40418283ad48c",
+      "byte_length": 378
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/minute_bar_5m/scope-0b6b0d477b8768cb/87b1f23e36a7/sources/tencent/ASTOCK-002-5m/parsed/source-rows.json",
+      "sha256": "9ca0ab909641717eebdc06bedcead0e6d154a05eed16b8d1829fcd4b94874e80",
+      "byte_length": 12110
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/daily_bar/scope-88d40ce22505aa3a/8455f353a3ea/manifest.json",
+      "sha256": "ece9d1569ba6616789f3c8c3e25af6d38230d5fa52d2cca8d2ed53c53111e05d",
+      "byte_length": 2474
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/daily_bar/scope-88d40ce22505aa3a/8455f353a3ea/quality_report.json",
+      "sha256": "f8376290047dde70662489ffd289dc4ae81b5f8d50a24a2457f1ee1d3710c528",
+      "byte_length": 649
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/daily_bar/scope-88d40ce22505aa3a/8455f353a3ea/report.json",
+      "sha256": "343ce859a5b145a48c60945fee75957aea52e2e2211da62c8917bf213e9d5fd3",
+      "byte_length": 12308
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/daily_bar/scope-88d40ce22505aa3a/8455f353a3ea/started.json",
+      "sha256": "730e30a716563f1e80d59e36c0a41a7cf3cc81ab8cfe3ed8a23d42b4d7b13b5a",
+      "byte_length": 285
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/daily_bar/scope-88d40ce22505aa3a/8455f353a3ea/sources/tencent/ASTOCK-002-daily/normalized.json",
+      "sha256": "dbf2dc37354f6a0ae5fca46275a5e64c7ff2989147da9a3b17f26cca0a53ec0a",
+      "byte_length": 2535
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/daily_bar/scope-88d40ce22505aa3a/8455f353a3ea/sources/tencent/ASTOCK-002-daily/normalized.parquet",
+      "sha256": "dbc8586915c98b4548d796d648485806a493e1efe75dff8919b0a6f7f5a1c09e",
+      "byte_length": 2757
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/daily_bar/scope-88d40ce22505aa3a/8455f353a3ea/sources/tencent/ASTOCK-002-daily/raw_refs.json",
+      "sha256": "a34124b9de63667e670324090dcdfa68f5c6a6ef02ddf5d6af85b0bdbc69d58e",
+      "byte_length": 381
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/daily_bar/scope-88d40ce22505aa3a/8455f353a3ea/sources/tencent/ASTOCK-002-daily/parsed/source-rows.json",
+      "sha256": "bf8410ba6a4cdceceb5bf8a9a101c7628a41fb79322e7b63bcac3662e1d222b0",
+      "byte_length": 1611
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/tdx_daily_package/scope-3f1912ca922f068b/a93752ae73be/manifest.json",
+      "sha256": "bc311d6a8372871269b9a28196b34dc992e1d28b58b0d29028e90b30cfa66ce7",
+      "byte_length": 2490
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/tdx_daily_package/scope-3f1912ca922f068b/a93752ae73be/quality_report.json",
+      "sha256": "1f78a406520df9c79e7ea70d0a18d34e8f62bc9dfb8bcd79a4e5d1a641870475",
+      "byte_length": 755
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/tdx_daily_package/scope-3f1912ca922f068b/a93752ae73be/report.json",
+      "sha256": "475a54434d28272bee83b82e891c2225581b9cc4ec9e760a40843c589289f163",
+      "byte_length": 13690
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/tdx_daily_package/scope-3f1912ca922f068b/a93752ae73be/started.json",
+      "sha256": "2ab00f48aadd285f203f075ecb93642ff8b31a57408dd9916865efaec566ca37",
+      "byte_length": 232
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/tdx_daily_package/scope-3f1912ca922f068b/a93752ae73be/sources/tdx/ASTOCK-003/normalized.json",
+      "sha256": "a167e2a30a178dd6b4ed07aa6a6f3c290740d046c5be1754180bf619e234027f",
+      "byte_length": 12427915
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/tdx_daily_package/scope-3f1912ca922f068b/a93752ae73be/sources/tdx/ASTOCK-003/normalized.parquet",
+      "sha256": "dbea72f95dc40de2462ebf8e2c74d5e92f227dd11fd80e5a17351560d53a58c1",
+      "byte_length": 720542
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/tdx_daily_package/scope-3f1912ca922f068b/a93752ae73be/sources/tdx/ASTOCK-003/raw_refs.json",
+      "sha256": "8800a1369feda24b9126de346dbccae4903913758dfeda997eb9f6ca7264cb77",
+      "byte_length": 379
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/tdx_daily_package/scope-3f1912ca922f068b/a93752ae73be/sources/tdx/ASTOCK-003/parsed/parsed-rows.json",
+      "sha256": "17b92b7b1d70a7797974070a4aa6569d1c33a11502f37e2c5b57b4c0820e2113",
+      "byte_length": 8702368
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/tdx_daily_package/scope-3f1912ca922f068b/a93752ae73be/sources/tdx/ASTOCK-003/parsed/source-rows.json",
+      "sha256": "17b92b7b1d70a7797974070a4aa6569d1c33a11502f37e2c5b57b4c0820e2113",
+      "byte_length": 8702368
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/tencent_ticks/scope-5ae394c1f5abc157/aac951de1a42/manifest.json",
+      "sha256": "463a597fd7279837fd32159e55260e9af90f5010ce5bb9f7e2a9772d96b26a3d",
+      "byte_length": 11267
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/tencent_ticks/scope-5ae394c1f5abc157/aac951de1a42/quality_report.json",
+      "sha256": "37ad574e8931be225ee6996271d68d275966a2d241a44746537f6e4e620ec34b",
+      "byte_length": 5152
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/tencent_ticks/scope-5ae394c1f5abc157/aac951de1a42/report.json",
+      "sha256": "1006bd3f2cf1a49bb00b1afa9ae0c86fcc739716b53580312498ec6c91208b0e",
+      "byte_length": 133756
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/tencent_ticks/scope-5ae394c1f5abc157/aac951de1a42/started.json",
+      "sha256": "72f0203dbe6ff27c692d6f572c1615b415f4063cab21c60df61462161e1380e2",
+      "byte_length": 228
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/tencent_ticks/scope-5ae394c1f5abc157/aac951de1a42/sources/tencent/ASTOCK-004/normalized.json",
+      "sha256": "2919959b687b8fb208425ca4618a02c5ca3f16001e258e278d55ec49e1f6f500",
+      "byte_length": 967901
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/tencent_ticks/scope-5ae394c1f5abc157/aac951de1a42/sources/tencent/ASTOCK-004/normalized.parquet",
+      "sha256": "65ba7e51a506932b442caf9575fee0dbfe42dab828ad83292add1b16bb20d2b4",
+      "byte_length": 52425
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/tencent_ticks/scope-5ae394c1f5abc157/aac951de1a42/sources/tencent/ASTOCK-004/raw_refs.json",
+      "sha256": "27ef09188998a9262aff32fd5be07d879e2ad66c5ce6db8d92736b4ef94c15b1",
+      "byte_length": 4797
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/tencent_ticks/scope-5ae394c1f5abc157/aac951de1a42/sources/tencent/ASTOCK-004/parsed/parsed-rows.json",
+      "sha256": "23783cc8fb19c3621ebc01c43ba0c442ffa572a58fd9b7599575fb06158736a4",
+      "byte_length": 617315
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/tencent_ticks/scope-5ae394c1f5abc157/aac951de1a42/sources/tencent/ASTOCK-004/parsed/source-rows.json",
+      "sha256": "23783cc8fb19c3621ebc01c43ba0c442ffa572a58fd9b7599575fb06158736a4",
+      "byte_length": 617315
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/adjustment_factor/scope-04a1f17df1dda783/d3f748554d4d/manifest.json",
+      "sha256": "429154a924ac53d9aca5e135bf9170e5ef3be72e0cc8f550bca4766c6302f9ab",
+      "byte_length": 2507
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/adjustment_factor/scope-04a1f17df1dda783/d3f748554d4d/quality_report.json",
+      "sha256": "8ed17ce2f67c3d92a2a3d3407ce3c3998c6766e191a9ab462133872f5529f6ef",
+      "byte_length": 784
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/adjustment_factor/scope-04a1f17df1dda783/d3f748554d4d/report.json",
+      "sha256": "6ac8f8b1bbbeecfec46c5030e4d039836554008cd8ef0c9dea1ae2a4485c4952",
+      "byte_length": 18158
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/adjustment_factor/scope-04a1f17df1dda783/d3f748554d4d/started.json",
+      "sha256": "69ea81789f06c651104689714d41b516ee046fc94dc1bae35191d899f7ac4193",
+      "byte_length": 242
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/adjustment_factor/scope-04a1f17df1dda783/d3f748554d4d/sources/sina/ASTOCK-006/normalized.json",
+      "sha256": "1ee1f3e559ecd4b7d36ebbbb560c9dccf1df018469bda87089fa9dce13eab0f6",
+      "byte_length": 6007
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/adjustment_factor/scope-04a1f17df1dda783/d3f748554d4d/sources/sina/ASTOCK-006/normalized.parquet",
+      "sha256": "1b81eab86142ebf4b4f6749019c31dd5e4ae252b540b3441197720b67226ba00",
+      "byte_length": 2536
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/adjustment_factor/scope-04a1f17df1dda783/d3f748554d4d/sources/sina/ASTOCK-006/raw_refs.json",
+      "sha256": "a814a58a2622f5e06dc8418a307695308021f0a4979e23aa55c1b7942c99c5ae",
+      "byte_length": 1134
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/adjustment_factor/scope-04a1f17df1dda783/d3f748554d4d/sources/sina/ASTOCK-006/parsed/excluded-rows.json",
+      "sha256": "8674a0bed8871b0177640c72d615f9287d70ac8390b669c1912e2ba27b40304b",
+      "byte_length": 5149
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/adjustment_factor/scope-04a1f17df1dda783/d3f748554d4d/sources/sina/ASTOCK-006/parsed/parsed-rows.json",
+      "sha256": "9487016ac9ed885496ebc2d0a0df5968c80a7c0fe40d0b6ef4e34fa7a5628284",
+      "byte_length": 5149
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/adjustment_factor/scope-04a1f17df1dda783/d3f748554d4d/sources/sina/ASTOCK-006/parsed/source-rows.json",
+      "sha256": "d1db08db4bf199bcc2e83bfdb758a5db9f641023cbf07214875a1dd78ecb1aa7",
+      "byte_length": 4225
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/eastmoney_reports/scope-addf07f7c437986d/cc70ef10fe7c/manifest.json",
+      "sha256": "46fe1fcb13fbb9c38900000337d790f4f193f475a6ec668f65e832e76a22386d",
+      "byte_length": 2869
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/eastmoney_reports/scope-addf07f7c437986d/cc70ef10fe7c/quality_report.json",
+      "sha256": "812be21df14b503c6f0e975b78a8f39c9b954985dd3c094a3dc46692365349dc",
+      "byte_length": 841
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/eastmoney_reports/scope-addf07f7c437986d/cc70ef10fe7c/report.json",
+      "sha256": "6f39f1a763544fc4e01499ccf7266cacee96587a372e07a2bdd6e1f0df1a26d3",
+      "byte_length": 16168
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/eastmoney_reports/scope-addf07f7c437986d/cc70ef10fe7c/started.json",
+      "sha256": "dd6b567c4713465ca06b3cf19c60c91498c8d792f61e2e2a19b0c035d5217654",
+      "byte_length": 284
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/eastmoney_reports/scope-addf07f7c437986d/cc70ef10fe7c/sources/eastmoney/ASTOCK-008/normalized.json",
+      "sha256": "a0a52ff348b67b14c1b59baf0e17fe9230c5d8aac8b2f0ca4b1c441c444b0372",
+      "byte_length": 728
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/eastmoney_reports/scope-addf07f7c437986d/cc70ef10fe7c/sources/eastmoney/ASTOCK-008/normalized.parquet",
+      "sha256": "dc87edc4fa3643b36f00a231c2a6d49c6a9c16b3702770cbef6628518a5f8611",
+      "byte_length": 6546
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/eastmoney_reports/scope-addf07f7c437986d/cc70ef10fe7c/sources/eastmoney/ASTOCK-008/raw_refs.json",
+      "sha256": "52addde7f821b8aa7de428722ee527419b76b1e65a34fb60ec78913f3f8b9904",
+      "byte_length": 383
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/eastmoney_reports/scope-addf07f7c437986d/cc70ef10fe7c/sources/eastmoney/ASTOCK-008/parsed/parsed-rows.json",
+      "sha256": "baf4bf752d931d02fcdddda0a3e1a6032a6bcfca02af41e4c31127abc2e19b6c",
+      "byte_length": 1422
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/eastmoney_reports/scope-addf07f7c437986d/cc70ef10fe7c/sources/eastmoney/ASTOCK-008/parsed/source-rows.json",
+      "sha256": "baf4bf752d931d02fcdddda0a3e1a6032a6bcfca02af41e4c31127abc2e19b6c",
+      "byte_length": 1422
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_reports/scope-70fb0185588d2e76/32d161de25aa/manifest.json",
+      "sha256": "01dd8002c4c268de9816fff0c634b96337193d874559e421b0f4e8336b704d78",
+      "byte_length": 2330
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_reports/scope-70fb0185588d2e76/32d161de25aa/quality_report.json",
+      "sha256": "e9762e3a6fbb3bd79f568d6a7d61b959683e4b11c3320bce1f74b8ae20990fef",
+      "byte_length": 667
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_reports/scope-70fb0185588d2e76/32d161de25aa/report.json",
+      "sha256": "22ba7bdba5cd85f67c4969acfbc15f38bac1f10a47a5b078972be13bf5bba85c",
+      "byte_length": 13456
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_reports/scope-70fb0185588d2e76/32d161de25aa/started.json",
+      "sha256": "4e5601dd1ac96e24b39de967d20a93d2090bd38b30f919c3123cf765ee6d73a9",
+      "byte_length": 217
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_reports/scope-70fb0185588d2e76/32d161de25aa/sources/sina/ASTOCK-013/normalized.json",
+      "sha256": "842877aba7a95eb363c5792e4b3d58c89f48b0adf78e53f5c4a1a1febbc2ccfc",
+      "byte_length": 17036
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_reports/scope-70fb0185588d2e76/32d161de25aa/sources/sina/ASTOCK-013/normalized.parquet",
+      "sha256": "2294eaff674acbf26f1a6456bf8256a7d5e7814415709320f50aa9cde67b883d",
+      "byte_length": 8034
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_reports/scope-70fb0185588d2e76/32d161de25aa/sources/sina/ASTOCK-013/raw_refs.json",
+      "sha256": "c78d3c6d936dfe70805c268dfcda48bebc3eccc4f676ec2476557e9b479df9e6",
+      "byte_length": 378
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_reports/scope-70fb0185588d2e76/32d161de25aa/sources/sina/ASTOCK-013/parsed/parsed-rows.json",
+      "sha256": "bcc3f222da299505158028bcfde428fd2525fd0dfb3d1155394e072dcea60f05",
+      "byte_length": 13876
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_reports/scope-70fb0185588d2e76/32d161de25aa/sources/sina/ASTOCK-013/parsed/source-rows.json",
+      "sha256": "bcc3f222da299505158028bcfde428fd2525fd0dfb3d1155394e072dcea60f05",
+      "byte_length": 13876
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/concept_directory/scope-44136fa355b3678a/e56482130974/manifest.json",
+      "sha256": "ecec7eeeae3453e60e04e7bf0b18951bbbb406d52efd49660ef19e9bab1b2973",
+      "byte_length": 7646
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/concept_directory/scope-44136fa355b3678a/e56482130974/quality_report.json",
+      "sha256": "c2712a7ccad41bf442e9d50f6f2ef180c2d2339f6afd259951294091faadede1",
+      "byte_length": 3337
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/concept_directory/scope-44136fa355b3678a/e56482130974/report.json",
+      "sha256": "d92060c2424f439c223c76f297cc9c1969f91bd16ca9387ed5fcb2718cffd280",
+      "byte_length": 102521
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/concept_directory/scope-44136fa355b3678a/e56482130974/started.json",
+      "sha256": "6b73784874f0e8a335985e7804960ccc4a4fc6d8153419b655736938c52faaa2",
+      "byte_length": 213
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/concept_directory/scope-44136fa355b3678a/e56482130974/sources/ths/ASTOCK-014/normalized.json",
+      "sha256": "ae8442d0d6bd1b9bf2c2e79e50d783a249909a23711a7d9044271627602ee26e",
+      "byte_length": 52269
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/concept_directory/scope-44136fa355b3678a/e56482130974/sources/ths/ASTOCK-014/normalized.parquet",
+      "sha256": "f50e16542eade4f6d36cceb3006c103499a5c9bfef8ba326a4ed30312049c8ce",
+      "byte_length": 8744
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/concept_directory/scope-44136fa355b3678a/e56482130974/sources/ths/ASTOCK-014/raw_refs.json",
+      "sha256": "0b6f6b8bb0c7185b6dfc1f3116fc8b31fe5b43f2c2fd7e914e848b649205a1c8",
+      "byte_length": 5653
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/concept_directory/scope-44136fa355b3678a/e56482130974/sources/ths/ASTOCK-014/parsed/parsed-rows.json",
+      "sha256": "91db000470ff7f9e79a9542f4c403ccf8b3cd05ed620e1ebb571fe9a2dbf2cc1",
+      "byte_length": 15144
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/concept_directory/scope-44136fa355b3678a/e56482130974/sources/ths/ASTOCK-014/parsed/source-rows.json",
+      "sha256": "91db000470ff7f9e79a9542f4c403ccf8b3cd05ed620e1ebb571fe9a2dbf2cc1",
+      "byte_length": 15144
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dragon_tiger_seats/scope-8ae31d4a38513fe3/a5abbc28be9f/manifest.json",
+      "sha256": "93e05fa8e593a5bda6cf961d73d15a5772e75dccf4a61c3e0d9874fff4007800",
+      "byte_length": 2710
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dragon_tiger_seats/scope-8ae31d4a38513fe3/a5abbc28be9f/quality_report.json",
+      "sha256": "6d2915088eb0392a16366cc5a9594ee55e585776c31e9a8ea5441fccb15d0403",
+      "byte_length": 829
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dragon_tiger_seats/scope-8ae31d4a38513fe3/a5abbc28be9f/report.json",
+      "sha256": "d08e577e10ab5a9f53c1064811bd70c125a962ed94569975bd827e60761def45",
+      "byte_length": 18327
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dragon_tiger_seats/scope-8ae31d4a38513fe3/a5abbc28be9f/started.json",
+      "sha256": "124ca07911eb47bf8544c09b21cb593fdb9dfdb4f6092651ce27bcca7d15878f",
+      "byte_length": 255
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dragon_tiger_seats/scope-8ae31d4a38513fe3/a5abbc28be9f/sources/eastmoney/ASTOCK-019/normalized.json",
+      "sha256": "61fed724023b290cd3e0de2c33cbb37ce84dfc758c7f2e3343ea85c449cddff6",
+      "byte_length": 3802
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dragon_tiger_seats/scope-8ae31d4a38513fe3/a5abbc28be9f/sources/eastmoney/ASTOCK-019/normalized.parquet",
+      "sha256": "07ad073500190aa5782baceeb5962c8ff6d25aa4d457b1985d46d352a46e8f18",
+      "byte_length": 4020
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dragon_tiger_seats/scope-8ae31d4a38513fe3/a5abbc28be9f/sources/eastmoney/ASTOCK-019/raw_refs.json",
+      "sha256": "4984343d02dda7659a52636fc8a030c72906b45423d9920c5b0dd5fc315171b9",
+      "byte_length": 879
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dragon_tiger_seats/scope-8ae31d4a38513fe3/a5abbc28be9f/sources/eastmoney/ASTOCK-019/parsed/parsed-rows.json",
+      "sha256": "3508523d090dd12ee6f1923f6307798c5a6dabc57a6cc9aa01b4d0417f299c20",
+      "byte_length": 3900
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dragon_tiger_seats/scope-8ae31d4a38513fe3/a5abbc28be9f/sources/eastmoney/ASTOCK-019/parsed/source-rows.json",
+      "sha256": "2efd84f2cd01f19b2e37fb5b56cbdac4238eaba91272e029a401a951909bf0bd",
+      "byte_length": 6154
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dragon_tiger_daily/scope-06229278c5d91305/df37088bb67e/manifest.json",
+      "sha256": "bb8eb953ac4f5e197f943d1e49f8215a17e9a2d036070e3f2c58f139bd8181f2",
+      "byte_length": 2997
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dragon_tiger_daily/scope-06229278c5d91305/df37088bb67e/quality_report.json",
+      "sha256": "f1cd95d4e2ee15ebe3f36bd2b31a7b449976f8beb54861422f59f0f3ad806cc9",
+      "byte_length": 1068
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dragon_tiger_daily/scope-06229278c5d91305/df37088bb67e/report.json",
+      "sha256": "ed07397310495ad7f293ec2b2fccbfa979d3f08ae8c289344bd9ca114aa55a54",
+      "byte_length": 20423
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dragon_tiger_daily/scope-06229278c5d91305/df37088bb67e/started.json",
+      "sha256": "eab6ad238ee0de7593f714db78b3158b9b6f11ae30ba1ca67ef809f05a772682",
+      "byte_length": 239
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dragon_tiger_daily/scope-06229278c5d91305/df37088bb67e/sources/eastmoney/ASTOCK-020/normalized.json",
+      "sha256": "424092bebd3ed953a7eea4284393fa95ae66e595e33d32dcbd6a5999a465b538",
+      "byte_length": 48490
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dragon_tiger_daily/scope-06229278c5d91305/df37088bb67e/sources/eastmoney/ASTOCK-020/normalized.parquet",
+      "sha256": "ff02ac85c3059dbf7872bce6511b21c14d738586712e65419bf9cff438ee60f4",
+      "byte_length": 8741
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dragon_tiger_daily/scope-06229278c5d91305/df37088bb67e/sources/eastmoney/ASTOCK-020/raw_refs.json",
+      "sha256": "025aab061071798876d8aa36ed0e6807453201699801b165e35f481a2de1c95a",
+      "byte_length": 873
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dragon_tiger_daily/scope-06229278c5d91305/df37088bb67e/sources/eastmoney/ASTOCK-020/parsed/parsed-rows.json",
+      "sha256": "b57b8354e8c2f69e467ebbb8a444c67cc89adff36eb04c534562ee5339f91a54",
+      "byte_length": 52461
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dragon_tiger_daily/scope-06229278c5d91305/df37088bb67e/sources/eastmoney/ASTOCK-020/parsed/source-rows.json",
+      "sha256": "6e6f84d7cd139b533f86538cff20bad4a7cc37530befbf67679fd97a544d6e94",
+      "byte_length": 58856
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/lockup_expiry/scope-823851654746de89/ad0213e3b0f1/manifest.json",
+      "sha256": "fc6d85cf0e256575b42ec99b6cfca5725525a2789e36484c6552ef4edd32c000",
+      "byte_length": 2743
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/lockup_expiry/scope-823851654746de89/ad0213e3b0f1/quality_report.json",
+      "sha256": "220ca4d245431f4cb57da189d856f8c1e13d47565df37bf72f5684d498eb015d",
+      "byte_length": 949
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/lockup_expiry/scope-823851654746de89/ad0213e3b0f1/report.json",
+      "sha256": "eb9d6cc4fee8439af1521a5c15432071db8db657e059a03e12793443772b373b",
+      "byte_length": 18822
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/lockup_expiry/scope-823851654746de89/ad0213e3b0f1/started.json",
+      "sha256": "3cdb7a82377201888dd72e1635fe85b01a6e85ef0f90311f42aed66a49f8a55d",
+      "byte_length": 254
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/lockup_expiry/scope-823851654746de89/ad0213e3b0f1/sources/eastmoney/ASTOCK-021/normalized.json",
+      "sha256": "a3b5f1c65a4bff8a65d1d9ee8b82f77383591e44856d0d2437975ae3cf611512",
+      "byte_length": 59665
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/lockup_expiry/scope-823851654746de89/ad0213e3b0f1/sources/eastmoney/ASTOCK-021/normalized.parquet",
+      "sha256": "71225d02ce3f2ea011fd43d8b54b553946b9f1037dfd70149e227ee95d21d564",
+      "byte_length": 7020
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/lockup_expiry/scope-823851654746de89/ad0213e3b0f1/sources/eastmoney/ASTOCK-021/raw_refs.json",
+      "sha256": "f4cbea1b8901e5ad1982ca0617ee21e1f13d7a4f0ad0d75d9590428c4024b3fe",
+      "byte_length": 878
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/lockup_expiry/scope-823851654746de89/ad0213e3b0f1/sources/eastmoney/ASTOCK-021/parsed/parsed-rows.json",
+      "sha256": "e225899956059f5f9d1635326bd32e2fd04630c4265651263b8e4ec684dc62b6",
+      "byte_length": 65898
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/lockup_expiry/scope-823851654746de89/ad0213e3b0f1/sources/eastmoney/ASTOCK-021/parsed/source-rows.json",
+      "sha256": "ff4da790c493bbabae8bb8efcbedb2de692a14096d91491fe77eaa81d33a4e07",
+      "byte_length": 66365
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/shareholder_count/scope-31fbb93fc08d2b86/95f66b713088/manifest.json",
+      "sha256": "6d4e1b3b87e026e6d594cfe04752358ad64f1c9df3a8241ac4775fc70b3951ce",
+      "byte_length": 2713
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/shareholder_count/scope-31fbb93fc08d2b86/95f66b713088/quality_report.json",
+      "sha256": "4e9417be830d0cdba250f1c6a106c3112629f6710f2a97f38d389eed866bfda5",
+      "byte_length": 746
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/shareholder_count/scope-31fbb93fc08d2b86/95f66b713088/report.json",
+      "sha256": "d856ad15b6fe5b912e29cd48edf5a46962884d8568061e9b3572358c51570dc3",
+      "byte_length": 17358
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/shareholder_count/scope-31fbb93fc08d2b86/95f66b713088/started.json",
+      "sha256": "10abd98f7153b9f39fa2f8ca3977e06c36368fcd82b91f5b3a663ea0350d3f74",
+      "byte_length": 234
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/shareholder_count/scope-31fbb93fc08d2b86/95f66b713088/sources/eastmoney/ASTOCK-026/normalized.json",
+      "sha256": "ecc6905fe817fa4a963d02db9e15d3f493089d9f3b674c935c571d6b48c0ef15",
+      "byte_length": 20983
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/shareholder_count/scope-31fbb93fc08d2b86/95f66b713088/sources/eastmoney/ASTOCK-026/normalized.parquet",
+      "sha256": "c71b024f88dff835ed2b2e9bbf6dc9b1a5755be5debbf5037bfe68bcbcb637d0",
+      "byte_length": 5255
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/shareholder_count/scope-31fbb93fc08d2b86/95f66b713088/sources/eastmoney/ASTOCK-026/raw_refs.json",
+      "sha256": "af06abefd3ff8592dfc79399e2dfe844ee33633caad85e31103f3a8e9173ed40",
+      "byte_length": 859
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/shareholder_count/scope-31fbb93fc08d2b86/95f66b713088/sources/eastmoney/ASTOCK-026/parsed/excluded-rows.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "byte_length": 2
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/shareholder_count/scope-31fbb93fc08d2b86/95f66b713088/sources/eastmoney/ASTOCK-026/parsed/source-rows.json",
+      "sha256": "fa42a34f6c4cf62de085810924ababbecfb2cb258b92aa5da509f0829de00570",
+      "byte_length": 28690
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dividend_event/scope-31fbb93fc08d2b86/5dab3dd98b51/manifest.json",
+      "sha256": "e8ba36153deedb395c0d87b0730d5536db87d7989ae8673007f1c8d1c6ab5c64",
+      "byte_length": 2552
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dividend_event/scope-31fbb93fc08d2b86/5dab3dd98b51/quality_report.json",
+      "sha256": "af6f741722962f299323fb7411e25eeb334de3f7b7d5b0100089f5fd90a2c125",
+      "byte_length": 727
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dividend_event/scope-31fbb93fc08d2b86/5dab3dd98b51/report.json",
+      "sha256": "88cae7d71fc8b34465452a1d4e30e43772d046cbf3fb1d4c5467694f097cf7a5",
+      "byte_length": 16351
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dividend_event/scope-31fbb93fc08d2b86/5dab3dd98b51/started.json",
+      "sha256": "caed8f698447be55dbd4593f1b3acd3ddd9bf9904808f99f99d2a78c1db82cf8",
+      "byte_length": 231
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dividend_event/scope-31fbb93fc08d2b86/5dab3dd98b51/sources/eastmoney/ASTOCK-027/normalized.json",
+      "sha256": "1a0be5edf183de168c0805f4852559a642f013210c66c24bebe91d660c468a68",
+      "byte_length": 5995
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dividend_event/scope-31fbb93fc08d2b86/5dab3dd98b51/sources/eastmoney/ASTOCK-027/normalized.parquet",
+      "sha256": "5f18204fc55cb0133d28657a4e196f13c3ee40e17be7018653320d3108aef2a3",
+      "byte_length": 2724
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dividend_event/scope-31fbb93fc08d2b86/5dab3dd98b51/sources/eastmoney/ASTOCK-027/raw_refs.json",
+      "sha256": "6f835713b99175ff66e291e6eb40419999b6a0579b1a3059f430e5ccccdc7b8e",
+      "byte_length": 852
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dividend_event/scope-31fbb93fc08d2b86/5dab3dd98b51/sources/eastmoney/ASTOCK-027/parsed/excluded-rows.json",
+      "sha256": "00479a0f1289b2c9796b4cc36a0f04b77bfc14171b51d6d8c30d93af8d9413dc",
+      "byte_length": 772
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dividend_event/scope-31fbb93fc08d2b86/5dab3dd98b51/sources/eastmoney/ASTOCK-027/parsed/source-rows.json",
+      "sha256": "404dbad5243b90088c70ff434e6a72907469a5fbfc4dfe6335f5d42a8bbbfacb",
+      "byte_length": 18720
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/stock_fund_flow/scope-31fbb93fc08d2b86/223258e24b8b/manifest.json",
+      "sha256": "692b76702add6f7e2bfa1fcf9dc9374936ab38ca8130802e3e5d486c9091d4be",
+      "byte_length": 2467
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/stock_fund_flow/scope-31fbb93fc08d2b86/223258e24b8b/quality_report.json",
+      "sha256": "15d3baab4a2ab1f67b81c1b6377ae48376bda7dfc1dadc78dc44bb54c7bcc93d",
+      "byte_length": 723
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/stock_fund_flow/scope-31fbb93fc08d2b86/223258e24b8b/report.json",
+      "sha256": "b904df6e0cb35b086f8f1691ec709241525821db381b2fd31a7506f132b93492",
+      "byte_length": 14207
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/stock_fund_flow/scope-31fbb93fc08d2b86/223258e24b8b/started.json",
+      "sha256": "7088c73469b0d4c368badf0bacca3952ad820604a577ed7fed193a796c1a80a0",
+      "byte_length": 232
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/stock_fund_flow/scope-31fbb93fc08d2b86/223258e24b8b/sources/eastmoney/ASTOCK-028/normalized.json",
+      "sha256": "e10fdb5144b0eb7ae2c6ad8a3ebb1f3408eb4e556eb9995a70376098556fd460",
+      "byte_length": 26675
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/stock_fund_flow/scope-31fbb93fc08d2b86/223258e24b8b/sources/eastmoney/ASTOCK-028/normalized.parquet",
+      "sha256": "d1f17842a13a23a113701cd856dc553091cd841f9ba33ee2f7e84bd0c28cbfea",
+      "byte_length": 3964
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/stock_fund_flow/scope-31fbb93fc08d2b86/223258e24b8b/sources/eastmoney/ASTOCK-028/raw_refs.json",
+      "sha256": "ade9517b2ef9fa8e20a752dd4c8dcdbda34f6ff1c67e593bfed3d66222522dac",
+      "byte_length": 788
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/stock_fund_flow/scope-31fbb93fc08d2b86/223258e24b8b/sources/eastmoney/ASTOCK-028/parsed/excluded-rows.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "byte_length": 2
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/stock_fund_flow/scope-31fbb93fc08d2b86/223258e24b8b/sources/eastmoney/ASTOCK-028/parsed/source-rows.json",
+      "sha256": "1026e9ae47e58a6d5c0edc399eebdab25de82ff4c851745cf4f3fd53b82b8043",
+      "byte_length": 50321
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/etf_shares/scope-02b86c5bf304fcb6/3461c50b9e71/manifest.json",
+      "sha256": "2d26dcfbdd5616c269923a08a4c3ad9efaf3cc5b961cef12cbb98d04e27c2382",
+      "byte_length": 2347
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/etf_shares/scope-02b86c5bf304fcb6/3461c50b9e71/quality_report.json",
+      "sha256": "175efadb96ecf337cfe31098f172c1490c8d3098f562a8ac2350e5e23573144a",
+      "byte_length": 701
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/etf_shares/scope-02b86c5bf304fcb6/3461c50b9e71/report.json",
+      "sha256": "e78303621c6302191c5737baf249289740d0bf890b4c74f162615b5b8fad735a",
+      "byte_length": 14084
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/etf_shares/scope-02b86c5bf304fcb6/3461c50b9e71/started.json",
+      "sha256": "b930af7a52c7c8ea4e00f1dd4f1a8b43de4d3a75878bb3c729f86fc7207a85d1",
+      "byte_length": 241
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/etf_shares/scope-02b86c5bf304fcb6/3461c50b9e71/sources/sse/ASTOCK-030/normalized.json",
+      "sha256": "1f207b9504573c6bc80c734eb44d7f7c1b1d1da538cf1a18da43d8eaeea6995e",
+      "byte_length": 163403
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/etf_shares/scope-02b86c5bf304fcb6/3461c50b9e71/sources/sse/ASTOCK-030/normalized.parquet",
+      "sha256": "d7cadb0106dd3c504bed1380852522cc2b28778851bdc6d72e5ddea92e2303cc",
+      "byte_length": 15057
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/etf_shares/scope-02b86c5bf304fcb6/3461c50b9e71/sources/sse/ASTOCK-030/raw_refs.json",
+      "sha256": "6c42ac6af4b94c7497a16f855282637ee214ab00e1c37de312938b75a512a994",
+      "byte_length": 376
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/etf_shares/scope-02b86c5bf304fcb6/3461c50b9e71/sources/sse/ASTOCK-030/parsed/parsed-rows.json",
+      "sha256": "9e2308fd4a4fa4530f89399b1d950bd3a12adfa4bf6ed3bdac0ba754985c6f75",
+      "byte_length": 105538
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/etf_shares/scope-02b86c5bf304fcb6/3461c50b9e71/sources/sse/ASTOCK-030/parsed/source-rows.json",
+      "sha256": "9e2308fd4a4fa4530f89399b1d950bd3a12adfa4bf6ed3bdac0ba754985c6f75",
+      "byte_length": 105538
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/stock_news/scope-31fbb93fc08d2b86/eb576feddc1d/manifest.json",
+      "sha256": "4ea61add87bee10acd844a7af09292212ac7601977e9eddfee555be1f65a0270",
+      "byte_length": 2326
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/stock_news/scope-31fbb93fc08d2b86/eb576feddc1d/quality_report.json",
+      "sha256": "ea9577918c1baf7c0f92fd5a05320ffaad839e4261b4ccf0f85c8a66a177a912",
+      "byte_length": 679
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/stock_news/scope-31fbb93fc08d2b86/eb576feddc1d/report.json",
+      "sha256": "4a667a9977f87b2f7371bda815b0ce8da4a4bbe08a67f2c7eb5db7aefbbd5eac",
+      "byte_length": 17165
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/stock_news/scope-31fbb93fc08d2b86/eb576feddc1d/started.json",
+      "sha256": "192aa61e9826eda728c443f6d7185736c1423ee0e1918624eadceb4da9171941",
+      "byte_length": 227
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/stock_news/scope-31fbb93fc08d2b86/eb576feddc1d/sources/eastmoney/ASTOCK-031/normalized.json",
+      "sha256": "5557da7355fb59372813eeb0b552d5dcbe211f768fa54899ced73968186b545f",
+      "byte_length": 5855
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/stock_news/scope-31fbb93fc08d2b86/eb576feddc1d/sources/eastmoney/ASTOCK-031/normalized.parquet",
+      "sha256": "537fbe1f1aa80e66218a1ed135859092453de3766bacb7979bb6fb1518be6c27",
+      "byte_length": 6932
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/stock_news/scope-31fbb93fc08d2b86/eb576feddc1d/sources/eastmoney/ASTOCK-031/raw_refs.json",
+      "sha256": "0f589b8cac7bf4ca0c074ae3fb2e77873e5702a8383295cdebf4a25b8cfe08d7",
+      "byte_length": 783
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/stock_news/scope-31fbb93fc08d2b86/eb576feddc1d/sources/eastmoney/ASTOCK-031/parsed/parsed-rows.json",
+      "sha256": "a732d2982a74743c4322cbf7adab42dbeaecd5d2b16446670d30c2a333cb28a1",
+      "byte_length": 5645
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/stock_news/scope-31fbb93fc08d2b86/eb576feddc1d/sources/eastmoney/ASTOCK-031/parsed/source-rows.json",
+      "sha256": "82a2cc862f47916b985c6cece5a0f5a897c0e3ff35b2104328a709d0156fe5f9",
+      "byte_length": 5419
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/cls_telegraph/scope-44136fa355b3678a/7373d4f6fe19/manifest.json",
+      "sha256": "d4290bdf73cbf12eaaff91390ec451903e56609cebb3504c4c22d6f48baf5507",
+      "byte_length": 2239
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/cls_telegraph/scope-44136fa355b3678a/7373d4f6fe19/quality_report.json",
+      "sha256": "127550a0455367402c6af5f6cfddd572857f9396469bf43b525e505ef193fd92",
+      "byte_length": 1285
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/cls_telegraph/scope-44136fa355b3678a/7373d4f6fe19/report.json",
+      "sha256": "c21e096986c70ca1ff6052a1f735b14216b8b2fcad2d483e8949c8bd5a980b4a",
+      "byte_length": 15014
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/cls_telegraph/scope-44136fa355b3678a/7373d4f6fe19/started.json",
+      "sha256": "5e707914f4ecf2c78d3563cbc632bbcfee81863bf648c7d4a0fddd3ec94bfa09",
+      "byte_length": 209
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/cls_telegraph/scope-44136fa355b3678a/7373d4f6fe19/sources/cls/ASTOCK-032/normalized.json",
+      "sha256": "a2f61aad2db395fb0fc97e25f0047a57482cfeba25be7abfa18db4b46128598c",
+      "byte_length": 11581
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/cls_telegraph/scope-44136fa355b3678a/7373d4f6fe19/sources/cls/ASTOCK-032/normalized.parquet",
+      "sha256": "cefbb565bb58eeb44c3aaf77ecd814dc6f1d020e11968a9754a48800dc03f3b0",
+      "byte_length": 9121
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/cls_telegraph/scope-44136fa355b3678a/7373d4f6fe19/sources/cls/ASTOCK-032/raw_refs.json",
+      "sha256": "be509f38e60f47a9da4f0411b6d0803603880573858b10da7bbd65d38d82e303",
+      "byte_length": 1255
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/cls_telegraph/scope-44136fa355b3678a/7373d4f6fe19/sources/cls/ASTOCK-032/parsed/parsed-rows.json",
+      "sha256": "4da48ce503bb1c0eed9de6bd349101378a844cca79cbe0d922ca44ba236c14e0",
+      "byte_length": 11621
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/cls_telegraph/scope-44136fa355b3678a/7373d4f6fe19/sources/cls/ASTOCK-032/parsed/source-rows.json",
+      "sha256": "c13c7c65d7a0215c6023bde811a6c70a0e224a58bc63e633edd6b90267cc9ebc",
+      "byte_length": 10881
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_global_news/scope-44136fa355b3678a/e703ea69ad60/manifest.json",
+      "sha256": "4f0c7d50629fc423587c88bd576c47055c2f9f8f373099bee55b9cdd7212e3f4",
+      "byte_length": 2241
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_global_news/scope-44136fa355b3678a/e703ea69ad60/quality_report.json",
+      "sha256": "b0028dba23bb01255d189d230fb6e203c31a69c86085086eb8d82c5e7b44d2d7",
+      "byte_length": 1609
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_global_news/scope-44136fa355b3678a/e703ea69ad60/report.json",
+      "sha256": "a05531f1610cef78137e04e8b7f54f931b96bf33cfb11cc499dc0313cdc33dfb",
+      "byte_length": 14596
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_global_news/scope-44136fa355b3678a/e703ea69ad60/started.json",
+      "sha256": "74ebbc7df8594b35fef576baca7d63aaa1f874475f02540009adf46bfe839cd3",
+      "byte_length": 213
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_global_news/scope-44136fa355b3678a/e703ea69ad60/sources/sina/ASTOCK-033/normalized.json",
+      "sha256": "3f449b0369b48df6ea54a4ae11dab316ddcf07d55bf20ee4c73b90cc86687a1a",
+      "byte_length": 8625
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_global_news/scope-44136fa355b3678a/e703ea69ad60/sources/sina/ASTOCK-033/normalized.parquet",
+      "sha256": "c5da1f62506303a925b10fba0ae728ac3f285e8a195a7b4bfc990beac9cc7105",
+      "byte_length": 6754
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_global_news/scope-44136fa355b3678a/e703ea69ad60/sources/sina/ASTOCK-033/raw_refs.json",
+      "sha256": "52dacaf1eae8eaa1206c23ece930f8528f684ccc28d8dd296218ba99e13e9dea",
+      "byte_length": 785
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_global_news/scope-44136fa355b3678a/e703ea69ad60/sources/sina/ASTOCK-033/parsed/parsed-rows.json",
+      "sha256": "74558bc1ba52b59ee620cd6c07b12a52f66cd07d6c03d9308f0abc3debf74418",
+      "byte_length": 7445
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_global_news/scope-44136fa355b3678a/e703ea69ad60/sources/sina/ASTOCK-033/parsed/source-rows.json",
+      "sha256": "74558bc1ba52b59ee620cd6c07b12a52f66cd07d6c03d9308f0abc3debf74418",
+      "byte_length": 7445
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/wallstreetcn_news/scope-a76401d9a37aea26/738fc47c67ac/manifest.json",
+      "sha256": "3dd57d7fe7f66dafa64717c7f1955acbaf0e3c4359906c7f4b40174e57d0c9aa",
+      "byte_length": 2396
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/wallstreetcn_news/scope-a76401d9a37aea26/738fc47c67ac/quality_report.json",
+      "sha256": "976578a4d2076e83ea7d003356940b28d261be5ff5c2356be06edce375c9df99",
+      "byte_length": 657
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/wallstreetcn_news/scope-a76401d9a37aea26/738fc47c67ac/report.json",
+      "sha256": "8457b74afc4ebb5a7313f7844354512654929604695772ea3a92e7c3665647b1",
+      "byte_length": 13445
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/wallstreetcn_news/scope-a76401d9a37aea26/738fc47c67ac/started.json",
+      "sha256": "e1e9972960143c3af9bb0a02babb82174b5250e50731424e3eb9907761dfad9e",
+      "byte_length": 260
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/wallstreetcn_news/scope-a76401d9a37aea26/738fc47c67ac/sources/wallstreetcn/ASTOCK-034/normalized.json",
+      "sha256": "ee4233aa8ca68329e2f1b5c886b5354e1c46623af5a6356cd90a45b46d428188",
+      "byte_length": 27778
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/wallstreetcn_news/scope-a76401d9a37aea26/738fc47c67ac/sources/wallstreetcn/ASTOCK-034/normalized.parquet",
+      "sha256": "41eb4c063194678abf8930541d0bbe79d42c48af5b098ee1653e8107e194afb3",
+      "byte_length": 15227
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/wallstreetcn_news/scope-a76401d9a37aea26/738fc47c67ac/sources/wallstreetcn/ASTOCK-034/raw_refs.json",
+      "sha256": "2c0eb6d4d9c44b0728b8131a6b4f51dd6566a4f5073e924c36336661129e5188",
+      "byte_length": 385
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/wallstreetcn_news/scope-a76401d9a37aea26/738fc47c67ac/sources/wallstreetcn/ASTOCK-034/parsed/parsed-rows.json",
+      "sha256": "7c2d1abbbcbec04cea148930a84a6155cb129fbda5aa364ef67ecfee4f798da4",
+      "byte_length": 24078
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/wallstreetcn_news/scope-a76401d9a37aea26/738fc47c67ac/sources/wallstreetcn/ASTOCK-034/parsed/source-rows.json",
+      "sha256": "d04ea8ef4ddc6005131738b38d2dae04a315e926c59d62292fb72506af9444e7",
+      "byte_length": 70795
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/cctv_news_index/scope-12d02053bb5ba5cf/9354c5305ad3/manifest.json",
+      "sha256": "3179624df3bd743ad9360cf97d95e80a22ff780522e4f1b7e825614bae6cb51b",
+      "byte_length": 2279
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/cctv_news_index/scope-12d02053bb5ba5cf/9354c5305ad3/quality_report.json",
+      "sha256": "7697211475661a6016b5df43bd89f636194eeb006f442815078c99735521fbd7",
+      "byte_length": 733
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/cctv_news_index/scope-12d02053bb5ba5cf/9354c5305ad3/report.json",
+      "sha256": "27c55e8216a1671051d66558a395a0a430d386c3cc6410259540ea5ab6251f95",
+      "byte_length": 13209
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/cctv_news_index/scope-12d02053bb5ba5cf/9354c5305ad3/started.json",
+      "sha256": "0525cf0d36a01fa55ae7b7810bc0ba812fbfdff0dde789860035ff910e1f1151",
+      "byte_length": 252
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/cctv_news_index/scope-12d02053bb5ba5cf/9354c5305ad3/sources/cctv/ASTOCK-035/normalized.json",
+      "sha256": "785928217e06bb695bef1fdbf87bc0048b2f2606aab40a2f9998cb0b48abbd85",
+      "byte_length": 3147
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/cctv_news_index/scope-12d02053bb5ba5cf/9354c5305ad3/sources/cctv/ASTOCK-035/normalized.parquet",
+      "sha256": "d1795b9c02e8a723976a28e2cb1c55a31349840976772bcfeb6a05fc8254c3fd",
+      "byte_length": 2943
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/cctv_news_index/scope-12d02053bb5ba5cf/9354c5305ad3/sources/cctv/ASTOCK-035/raw_refs.json",
+      "sha256": "26a5d34e2d4fce30340594b688dc2f1153215ff352240f0ae158f597227b87e5",
+      "byte_length": 371
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/cctv_news_index/scope-12d02053bb5ba5cf/9354c5305ad3/sources/cctv/ASTOCK-035/parsed/parsed-rows.json",
+      "sha256": "c68d0c37463855a9e825e7158890c1c10f119d95c144d59a90d3220e158d7b30",
+      "byte_length": 2321
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/cctv_news_index/scope-12d02053bb5ba5cf/9354c5305ad3/sources/cctv/ASTOCK-035/parsed/source-rows.json",
+      "sha256": "c68d0c37463855a9e825e7158890c1c10f119d95c144d59a90d3220e158d7b30",
+      "byte_length": 2321
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/company_events/scope-780a2c03822cbdf3/f3242c2b3633/manifest.json",
+      "sha256": "d02a390f144f7e8c76900eb169c5351f00841fbb48bc3aced2979faca6169435",
+      "byte_length": 2388
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/company_events/scope-780a2c03822cbdf3/f3242c2b3633/quality_report.json",
+      "sha256": "4aeb2e55af831886ec8f86507931570c846c3dcfda90a59fec65f7fcfade8eb7",
+      "byte_length": 646
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/company_events/scope-780a2c03822cbdf3/f3242c2b3633/report.json",
+      "sha256": "9041e35724ae3f2e9e2e65268e90b11d3193703e32dc4d76f5bed11fc863adc9",
+      "byte_length": 15272
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/company_events/scope-780a2c03822cbdf3/f3242c2b3633/started.json",
+      "sha256": "d1dac5a1393d8e43360e208fbe255b75f3142f0c152c993c4b9b493a0c49613c",
+      "byte_length": 242
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/company_events/scope-780a2c03822cbdf3/f3242c2b3633/sources/eastmoney/ASTOCK-037-events/normalized.json",
+      "sha256": "2b561981963dcee04bb5156ed8ed074f7aaffcd1a3da7eaec37172ec22155faa",
+      "byte_length": 46422
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/company_events/scope-780a2c03822cbdf3/f3242c2b3633/sources/eastmoney/ASTOCK-037-events/normalized.parquet",
+      "sha256": "4677137fbd54f4171e50adfacc89c14e5a2d23fbda5c708e649a97b8235e81fb",
+      "byte_length": 20540
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/company_events/scope-780a2c03822cbdf3/f3242c2b3633/sources/eastmoney/ASTOCK-037-events/raw_refs.json",
+      "sha256": "f8f28c222eef2b5bbc7e98740715e18d4eede983d1c7e1a8372d4a9250619eb3",
+      "byte_length": 797
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/company_events/scope-780a2c03822cbdf3/f3242c2b3633/sources/eastmoney/ASTOCK-037-events/parsed/parsed-rows.json",
+      "sha256": "a5e4cc7d67560caa78528a383d5591fe2544026a5e3eb69a7843748d04913114",
+      "byte_length": 41547
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/company_events/scope-780a2c03822cbdf3/f3242c2b3633/sources/eastmoney/ASTOCK-037-events/parsed/source-rows.json",
+      "sha256": "4b1243d660e9d934f07832cc8a681f83c5f6da2c9a8d3468abbd48aaab0410eb",
+      "byte_length": 44481
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/company_profile/scope-31fbb93fc08d2b86/9581da12092c/manifest.json",
+      "sha256": "ce9475f11bf041155315486d0711a84b19c14261b0388202da5bf6d01466e37d",
+      "byte_length": 2853
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/company_profile/scope-31fbb93fc08d2b86/9581da12092c/quality_report.json",
+      "sha256": "8fb49f151b7b6c448e7736117ce80333f884b50e893072489c5d49e899a5c8d3",
+      "byte_length": 673
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/company_profile/scope-31fbb93fc08d2b86/9581da12092c/report.json",
+      "sha256": "f8c18530ee8390edec73e6d919ca5f45da5c6ce2b1f748672631aabec0280023",
+      "byte_length": 17590
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/company_profile/scope-31fbb93fc08d2b86/9581da12092c/started.json",
+      "sha256": "097f5e2428fb2e5fca4d734f42f9b9de475c1be7c510da8b63dede09248de6c9",
+      "byte_length": 237
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/company_profile/scope-31fbb93fc08d2b86/9581da12092c/sources/cninfo/ASTOCK-037-profile/normalized.json",
+      "sha256": "3aa41a01db75d03bcd147c77519b427e77072ab4e533395806506bcba74102c2",
+      "byte_length": 2201
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/company_profile/scope-31fbb93fc08d2b86/9581da12092c/sources/cninfo/ASTOCK-037-profile/normalized.parquet",
+      "sha256": "a2ea29fb0f982ebf26b7d4aa3b395b74375f7450a2345fe404698e530c1d4904",
+      "byte_length": 14724
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/company_profile/scope-31fbb93fc08d2b86/9581da12092c/sources/cninfo/ASTOCK-037-profile/raw_refs.json",
+      "sha256": "320d5869885449cb5b62ece35b0e5ed9a70b12bf5eb24e3f5adbec95e88565ff",
+      "byte_length": 2220
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/company_profile/scope-31fbb93fc08d2b86/9581da12092c/sources/cninfo/ASTOCK-037-profile/parsed/parsed-rows.json",
+      "sha256": "a4b0dc46837338e8fa701e011a8fe3bc676c7c7acc9968b0ea8ebe8d7908d59d",
+      "byte_length": 2105
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/company_profile/scope-31fbb93fc08d2b86/9581da12092c/sources/cninfo/ASTOCK-037-profile/parsed/source-rows.json",
+      "sha256": "8fbcd7514bf4eb956cbe6d4880316f20f3567fe9ca25bef2f9e3f5722ef5c94a",
+      "byte_length": 2021
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_financial_statements/scope-31fbb93fc08d2b86/6394a826f4ab/manifest.json",
+      "sha256": "0dd63beacd22925b1c446cdd8ab195489e7d2bb61a042d1fcbc6ba23658d5e0d",
+      "byte_length": 15221
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_financial_statements/scope-31fbb93fc08d2b86/6394a826f4ab/quality_report.json",
+      "sha256": "a696c343543e5c538853d4f3538c607735bac959aa391f35c5b158dd4c883af7",
+      "byte_length": 8589
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_financial_statements/scope-31fbb93fc08d2b86/6394a826f4ab/report.json",
+      "sha256": "7b1affe380c628b070e66eaa8cb517ca0b9e33e56feb4c203c9b811a87c593ea",
+      "byte_length": 67664
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_financial_statements/scope-31fbb93fc08d2b86/6394a826f4ab/started.json",
+      "sha256": "74b91137aed96b195ea62713e1da426e8b8fc99df0f8bd30b9faf0a458a5da94",
+      "byte_length": 237
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_financial_statements/scope-31fbb93fc08d2b86/6394a826f4ab/sources/sina/ASTOCK-039/normalized.json",
+      "sha256": "4b939f9e4baa0f262a2198f8b54353fd7a8b0a353480c8cfd65a02f4ab22649a",
+      "byte_length": 2884071
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_financial_statements/scope-31fbb93fc08d2b86/6394a826f4ab/sources/sina/ASTOCK-039/normalized.parquet",
+      "sha256": "9b57d7a9d13cc5042a17409617aad686cb4d9f20b2b0faaf58609d79cb71600d",
+      "byte_length": 82213
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_financial_statements/scope-31fbb93fc08d2b86/6394a826f4ab/sources/sina/ASTOCK-039/raw_refs.json",
+      "sha256": "9159e804d39f87b4ff7039bd7df05f60b4139a860ed5a5a1bae3767faac54866",
+      "byte_length": 942
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_financial_statements/scope-31fbb93fc08d2b86/6394a826f4ab/sources/sina/ASTOCK-039/parsed/parsed-rows.json",
+      "sha256": "237545b1ddc708be720549bb30acafee1962df98595ffc5b18c677f50372bc04",
+      "byte_length": 1087780
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_financial_statements/scope-31fbb93fc08d2b86/6394a826f4ab/sources/sina/ASTOCK-039/parsed/source-rows.json",
+      "sha256": "858c65984d4bb51077606cdaac534b09f9e720a3c9243f62eaada8203629c157",
+      "byte_length": 6330414
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/st_name_list/scope-44136fa355b3678a/7455662ac140/manifest.json",
+      "sha256": "c8942b1cf99c2fd43b8da82886b1d63f0f3ea4cccb2da1a1e0afb912d75fb396",
+      "byte_length": 2300
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/st_name_list/scope-44136fa355b3678a/7455662ac140/quality_report.json",
+      "sha256": "df5f0126ba59b8f4c11a1d40892f5e5dc729feef70cea40aee676b62f52395de",
+      "byte_length": 667
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/st_name_list/scope-44136fa355b3678a/7455662ac140/report.json",
+      "sha256": "421316aadb8259eefd1febcc16bb4faeb196ac352a995030e3f906cbcc4693a2",
+      "byte_length": 14912
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/st_name_list/scope-44136fa355b3678a/7455662ac140/started.json",
+      "sha256": "1ef21a61f2bd92a07dd499e65b368ce88ed8da18ae0f40a9995a5e9941dc0092",
+      "byte_length": 213
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/st_name_list/scope-44136fa355b3678a/7455662ac140/sources/baostock/ASTOCK-044/normalized.json",
+      "sha256": "069a4871be5fc14ae5645017c1aeb112c2b96a6c5e1652f53fa72ec0683c573c",
+      "byte_length": 29514
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/st_name_list/scope-44136fa355b3678a/7455662ac140/sources/baostock/ASTOCK-044/normalized.parquet",
+      "sha256": "1cfd9724bd2da3f7e2ab23829f6788392907c3712129d4922f5346b7cfa57de5",
+      "byte_length": 4799
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/st_name_list/scope-44136fa355b3678a/7455662ac140/sources/baostock/ASTOCK-044/raw_refs.json",
+      "sha256": "817b310af3bf98243cdfad8c1d1f232d53995b0f3be2b4bbfec84b030a010be8",
+      "byte_length": 1504
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/st_name_list/scope-44136fa355b3678a/7455662ac140/sources/baostock/ASTOCK-044/parsed/parsed-rows.json",
+      "sha256": "99157b1aeed570e732ea207785cff2debc7842908528ec3beef8bab1b464e950",
+      "byte_length": 19218
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/st_name_list/scope-44136fa355b3678a/7455662ac140/sources/baostock/ASTOCK-044/parsed/source-rows.json",
+      "sha256": "0f6991000ffedb60cac739612ebc910e1e9d7cc6a1937451f786e5bf08983cbc",
+      "byte_length": 34384
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/limit_up_pool/scope-06229278c5d91305/f95c0308b169/manifest.json",
+      "sha256": "e4c5e7d49f57f56e5f73281749057f0c963a480aed436a02dc19aeed626731c3",
+      "byte_length": 2686
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/limit_up_pool/scope-06229278c5d91305/f95c0308b169/quality_report.json",
+      "sha256": "bd326fcac0c831235effa4db854a54572e23de6debe27dc1136a9d0341f165cc",
+      "byte_length": 673
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/limit_up_pool/scope-06229278c5d91305/f95c0308b169/report.json",
+      "sha256": "c422a37f681e06aacf389a4367877f5c3f130931b93ec13347b88cfab8d40f0c",
+      "byte_length": 14051
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/limit_up_pool/scope-06229278c5d91305/f95c0308b169/started.json",
+      "sha256": "6fb510327283cb990a376ee0a18f9eecce059622b9bcc0f345a049589165d77c",
+      "byte_length": 234
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/limit_up_pool/scope-06229278c5d91305/f95c0308b169/sources/eastmoney/ASTOCK-045/normalized.json",
+      "sha256": "d8bd152e2c331d75d4853d39b14107277ee3aee8379c8e35d00a1e11b302328a",
+      "byte_length": 20706
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/limit_up_pool/scope-06229278c5d91305/f95c0308b169/sources/eastmoney/ASTOCK-045/normalized.parquet",
+      "sha256": "cefbd05aaaf1a5076c2fd261d63fee545055b0df54ba6c3f1ad8381d42253db0",
+      "byte_length": 7933
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/limit_up_pool/scope-06229278c5d91305/f95c0308b169/sources/eastmoney/ASTOCK-045/raw_refs.json",
+      "sha256": "6430f4cf9a800ced3a18563b78d423656f9664b6b9974eb6b63b82c57972aba2",
+      "byte_length": 774
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/limit_up_pool/scope-06229278c5d91305/f95c0308b169/sources/eastmoney/ASTOCK-045/parsed/source-rows.json",
+      "sha256": "050adf19f8673360e17a3d7b43b0f78f042decabef27150a61b40886ae4257bc",
+      "byte_length": 19534
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/broken_limit_pool/scope-06229278c5d91305/5d691faa6a7e/manifest.json",
+      "sha256": "48bb3e80fe64a7405c544b47c274d056e19d164e76bdc948148de6473303b866",
+      "byte_length": 2762
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/broken_limit_pool/scope-06229278c5d91305/5d691faa6a7e/quality_report.json",
+      "sha256": "a49dd3fcbc4f9832348a95c94ac75d61a4ad2c94f4850c2c38e7aeedeb45e846",
+      "byte_length": 657
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/broken_limit_pool/scope-06229278c5d91305/5d691faa6a7e/report.json",
+      "sha256": "1b18f24f901ba97cb2217d54380ee6cf4751b7aec55525d4084165bfdc8e1782",
+      "byte_length": 14093
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/broken_limit_pool/scope-06229278c5d91305/5d691faa6a7e/started.json",
+      "sha256": "bac7bb5a708bebef99c8585a70c41ebe22e040d68a1cda598991624a52a66d99",
+      "byte_length": 238
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/broken_limit_pool/scope-06229278c5d91305/5d691faa6a7e/sources/eastmoney/ASTOCK-046/normalized.json",
+      "sha256": "b71cadc055c470356f92b4b9e0347ebed604e7a3db14135bb40c3c9537f6abeb",
+      "byte_length": 5378
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/broken_limit_pool/scope-06229278c5d91305/5d691faa6a7e/sources/eastmoney/ASTOCK-046/normalized.parquet",
+      "sha256": "d05efc230b246b782cfe0396ba5dfb1200eb544a19a4f858b61e11670feebaee",
+      "byte_length": 5755
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/broken_limit_pool/scope-06229278c5d91305/5d691faa6a7e/sources/eastmoney/ASTOCK-046/raw_refs.json",
+      "sha256": "b0e7b46b13d19f14cd4d33de0fd7c217bee6c94f1027f697000b4ff3de3a2556",
+      "byte_length": 787
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/broken_limit_pool/scope-06229278c5d91305/5d691faa6a7e/sources/eastmoney/ASTOCK-046/parsed/source-rows.json",
+      "sha256": "1756a67fec7d43d3f41d5c0a6c8741d2ff437df11100518dc4d41190095a4209",
+      "byte_length": 4422
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/limit_down_pool/scope-06229278c5d91305/d8fda9e2ebbe/manifest.json",
+      "sha256": "7bfe887e89e0340a2eb7a5f6a5f96a90d359aff18e3d913186199235230f9ded",
+      "byte_length": 2754
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/limit_down_pool/scope-06229278c5d91305/d8fda9e2ebbe/quality_report.json",
+      "sha256": "2d01521c992f249adfc0612760d75b18c0152e0fe513549ec63cf4aec996e20f",
+      "byte_length": 692
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/limit_down_pool/scope-06229278c5d91305/d8fda9e2ebbe/report.json",
+      "sha256": "09b450850eb0879b272cb91685c07e7658bffde7d353860f91b7cee67239219b",
+      "byte_length": 14231
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/limit_down_pool/scope-06229278c5d91305/d8fda9e2ebbe/started.json",
+      "sha256": "01358468ba1818d0657c86349f765acc2d68ce9bbdf52be83a519e75564a4aaa",
+      "byte_length": 236
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/limit_down_pool/scope-06229278c5d91305/d8fda9e2ebbe/sources/eastmoney/ASTOCK-047/normalized.json",
+      "sha256": "f1b95ecc0c2c3a05304bf2aa0c70f4fa5c2cec76ac101e75bd6567c884e06ede",
+      "byte_length": 4129
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/limit_down_pool/scope-06229278c5d91305/d8fda9e2ebbe/sources/eastmoney/ASTOCK-047/normalized.parquet",
+      "sha256": "b8ef712afc7b7e0b65c70ba51b8e3f49c0c430019621b12a910267cc2eed63d4",
+      "byte_length": 5539
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/limit_down_pool/scope-06229278c5d91305/d8fda9e2ebbe/sources/eastmoney/ASTOCK-047/raw_refs.json",
+      "sha256": "e6de5a70216151deb618cc983178e9e67b2614354579fc86ae790caf1058a5ad",
+      "byte_length": 783
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/limit_down_pool/scope-06229278c5d91305/d8fda9e2ebbe/sources/eastmoney/ASTOCK-047/parsed/source-rows.json",
+      "sha256": "bf553bbc827648dd29e17747a2271967a943d1ed5e9a76919b66bba77b69023f",
+      "byte_length": 3488
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/previous_limit_pool/scope-06229278c5d91305/893c9a7769b1/manifest.json",
+      "sha256": "af539578c385d0ab9afd9f66c2c1b1a2e280c137a9d9ce95f45eb58c8a0e5879",
+      "byte_length": 2799
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/previous_limit_pool/scope-06229278c5d91305/893c9a7769b1/quality_report.json",
+      "sha256": "f6b2d45f20144a7f9d7ce5438aea3701b4a054f40c51619867b52eeadf498833",
+      "byte_length": 657
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/previous_limit_pool/scope-06229278c5d91305/893c9a7769b1/report.json",
+      "sha256": "e4c116fb168b6d06467360f0bc2d4a140b41c6ce05f7e2a0593c39b06ab14f05",
+      "byte_length": 14211
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/previous_limit_pool/scope-06229278c5d91305/893c9a7769b1/started.json",
+      "sha256": "dc50392160783453c04f6a8f4b87a832d0a194ecb4af3ec5cf9f441cc8411c6a",
+      "byte_length": 240
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/previous_limit_pool/scope-06229278c5d91305/893c9a7769b1/sources/eastmoney/ASTOCK-048/normalized.json",
+      "sha256": "939bc7ba19957dd57dcf8395213f72481c36cb5fd96e37b8493d2863fff0c7b9",
+      "byte_length": 27025
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/previous_limit_pool/scope-06229278c5d91305/893c9a7769b1/sources/eastmoney/ASTOCK-048/normalized.parquet",
+      "sha256": "d964214e572ea41018ff8c30af36916439171225e1b5e2774d51efbeaa413096",
+      "byte_length": 8911
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/previous_limit_pool/scope-06229278c5d91305/893c9a7769b1/sources/eastmoney/ASTOCK-048/raw_refs.json",
+      "sha256": "1e0cf45da9560b6d6464df612303f19b8e969c1b253fa90b4d6afaa3ddd28d61",
+      "byte_length": 795
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/previous_limit_pool/scope-06229278c5d91305/893c9a7769b1/sources/eastmoney/ASTOCK-048/parsed/source-rows.json",
+      "sha256": "d5c7a837fea19b21c35f23b6b36428b7d5aa0f702d9f5c71a9c25dcb77faf99c",
+      "byte_length": 20917
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/strong_stock_pool/scope-06229278c5d91305/13611b22b494/manifest.json",
+      "sha256": "5d1100a940c18b3738a89ff52c6a9cdf35c634fa056bfc6bc1195b91f5497b37",
+      "byte_length": 2769
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/strong_stock_pool/scope-06229278c5d91305/13611b22b494/quality_report.json",
+      "sha256": "2dac16a1c2fed58f743c975890be06258dd304b367172b39459831fc6810c310",
+      "byte_length": 659
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/strong_stock_pool/scope-06229278c5d91305/13611b22b494/report.json",
+      "sha256": "4ffdbf6cd30fb977fc5bea77ade0caeff741be07325de0a1edf892a5212fb074",
+      "byte_length": 14113
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/strong_stock_pool/scope-06229278c5d91305/13611b22b494/started.json",
+      "sha256": "af63322e56f708126ce7641971a74b0fdface50f04d1e310c2cfc140cad57ca2",
+      "byte_length": 238
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/strong_stock_pool/scope-06229278c5d91305/13611b22b494/sources/eastmoney/ASTOCK-050/normalized.json",
+      "sha256": "f392cae98dea691aca40a813fb4351dfb9adec80abf9f8fb6f58714debb35aac",
+      "byte_length": 91924
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/strong_stock_pool/scope-06229278c5d91305/13611b22b494/sources/eastmoney/ASTOCK-050/normalized.parquet",
+      "sha256": "2feca777155877aa633d876b509daf69b4e1c60a91e39875b81e923e75be389b",
+      "byte_length": 17605
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/strong_stock_pool/scope-06229278c5d91305/13611b22b494/sources/eastmoney/ASTOCK-050/raw_refs.json",
+      "sha256": "c44fab45ce45a9b4515f839450b33ebc4948845f6e98cf8c98b41b20c240ea4f",
+      "byte_length": 789
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/strong_stock_pool/scope-06229278c5d91305/13611b22b494/sources/eastmoney/ASTOCK-050/parsed/source-rows.json",
+      "sha256": "8be31e0cd564a28532436a5fee4688bbfaa756ab19d51e6b4884f5d8ae711ddc",
+      "byte_length": 74386
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/intraday_changes/scope-44136fa355b3678a/d6aa3d352eb3/manifest.json",
+      "sha256": "95dd0c29ff06704af20fabe651f7ab246f0d0811847528b83f9cb918f8d49444",
+      "byte_length": 5176
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/intraday_changes/scope-44136fa355b3678a/d6aa3d352eb3/quality_report.json",
+      "sha256": "9f2f640fb6a64ba4ea17142105ebbe771bf56a955a0b64fa699b3998993e0161",
+      "byte_length": 2055
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/intraday_changes/scope-44136fa355b3678a/d6aa3d352eb3/report.json",
+      "sha256": "779f58641790054ebad34205ad8f14712e80ab3fdb485696b207779025673633",
+      "byte_length": 55727
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/intraday_changes/scope-44136fa355b3678a/d6aa3d352eb3/started.json",
+      "sha256": "79960734505974355c0ab599c89092efe968d78bff0dfcfcdfc093290f73ae78",
+      "byte_length": 218
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/intraday_changes/scope-44136fa355b3678a/d6aa3d352eb3/sources/eastmoney/ASTOCK-051/normalized.json",
+      "sha256": "d8d52fe5a6baa75cdb50da88fd9853d04958ccf175159e9a9d74afb2676c38f3",
+      "byte_length": 2047059
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/intraday_changes/scope-44136fa355b3678a/d6aa3d352eb3/sources/eastmoney/ASTOCK-051/normalized.parquet",
+      "sha256": "a787959b3dcd59a7b7d9a2f685db89570f3136ac501ebe709e95f63e80a2c8a9",
+      "byte_length": 292752
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/intraday_changes/scope-44136fa355b3678a/d6aa3d352eb3/sources/eastmoney/ASTOCK-051/raw_refs.json",
+      "sha256": "fb7c0da73481e5a39714ec6417c0c30f1a684d13b6df4c897d96cabf2a7c51fb",
+      "byte_length": 2205
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/intraday_changes/scope-44136fa355b3678a/d6aa3d352eb3/sources/eastmoney/ASTOCK-051/parsed/parsed-rows.json",
+      "sha256": "b1317c24ffb80cb5e59f83e3a05853c08d535c1f49dc17aba65c1a3060e1bca1",
+      "byte_length": 1498889
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/intraday_changes/scope-44136fa355b3678a/d6aa3d352eb3/sources/eastmoney/ASTOCK-051/parsed/source-rows.json",
+      "sha256": "ce0056fc671a46f0b4809c6431b14d7312d9ec3cac5d5c9ac48cdb4717aeb9a9",
+      "byte_length": 997164
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/option_risk/scope-06229278c5d91305/60a8265c982d/manifest.json",
+      "sha256": "ff07c295ef9b34da42642830d0c4d81453b172f092e6bc066191ffcffebf29ee",
+      "byte_length": 2433
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/option_risk/scope-06229278c5d91305/60a8265c982d/quality_report.json",
+      "sha256": "22af421a8e6cdfe9a4801e4496eda555bf94840f85cf7962b2d6d84dce086e2b",
+      "byte_length": 744
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/option_risk/scope-06229278c5d91305/60a8265c982d/report.json",
+      "sha256": "b9daa2f16c249e454c5fea3c07a0e0582ab0e6e5cf5b1090fe4c51da4cf57cf5",
+      "byte_length": 15684
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/option_risk/scope-06229278c5d91305/60a8265c982d/started.json",
+      "sha256": "49450173eabe0d783a6f7d47af8f8e22c0e98d5d4e6d1a20ce12177aef60b32f",
+      "byte_length": 226
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/option_risk/scope-06229278c5d91305/60a8265c982d/sources/sse/ASTOCK-055/normalized.json",
+      "sha256": "54cb23bde8d4fc1a0c245e39f83c5fd1f99556ccd85b631475fdff92622caad9",
+      "byte_length": 148031
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/option_risk/scope-06229278c5d91305/60a8265c982d/sources/sse/ASTOCK-055/normalized.parquet",
+      "sha256": "3bfedc6ccd5aee070b0009c9674cde24abbee53e759147bf2909b5d3e17805b9",
+      "byte_length": 13585
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/option_risk/scope-06229278c5d91305/60a8265c982d/sources/sse/ASTOCK-055/raw_refs.json",
+      "sha256": "13870d82bcb3c3a4c054d9717be581d936573eafbad7ab97261845428aba234d",
+      "byte_length": 786
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/option_risk/scope-06229278c5d91305/60a8265c982d/sources/sse/ASTOCK-055/parsed/parsed-rows.json",
+      "sha256": "ec5af2cdd1799bdb8eb985b0443dbff09a2e51149e6d5253daca3f3ec7f6ab6c",
+      "byte_length": 143891
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/option_risk/scope-06229278c5d91305/60a8265c982d/sources/sse/ASTOCK-055/parsed/source-rows.json",
+      "sha256": "14a7955cb91ae331d3ef87434262cd6a19f08592818cffb304583317e65fa9b1",
+      "byte_length": 166011
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/social_financing/scope-44136fa355b3678a/7b9d95e6a15d/manifest.json",
+      "sha256": "24d92c3bce7205e303d255aebb5e1dd4e3e8db6b5f0da65700d3ae1b615525d2",
+      "byte_length": 2560
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/social_financing/scope-44136fa355b3678a/7b9d95e6a15d/quality_report.json",
+      "sha256": "f72dae2b8032f3a6ddab6dc57d01368cf31c386d0b9b8c487dae74f212e1ff72",
+      "byte_length": 829
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/social_financing/scope-44136fa355b3678a/7b9d95e6a15d/report.json",
+      "sha256": "3867d1c94bf7c1c3655e7d24b73fa94303b3eb5814398d407c6057f158a8c392",
+      "byte_length": 14968
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/social_financing/scope-44136fa355b3678a/7b9d95e6a15d/started.json",
+      "sha256": "fe2f9aeadcacdd232c58eb744ffd5dadfc4cfcc382fcf9a0a615bead167ad638",
+      "byte_length": 215
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/social_financing/scope-44136fa355b3678a/7b9d95e6a15d/sources/mofcom/ASTOCK-061/normalized.json",
+      "sha256": "b547f6e14719fc48874e6d3462d71f37344dc45b4fa44c3c05e54aa9b3e3c6cd",
+      "byte_length": 42977
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/social_financing/scope-44136fa355b3678a/7b9d95e6a15d/sources/mofcom/ASTOCK-061/normalized.parquet",
+      "sha256": "5e311a4dabd7abfabfce0f2bfe5563d714e3cdb2ec6a2cb8aff64c75a2efc917",
+      "byte_length": 3802
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/social_financing/scope-44136fa355b3678a/7b9d95e6a15d/sources/mofcom/ASTOCK-061/raw_refs.json",
+      "sha256": "b51fed4fcfb89f34c92d3ca6dc079424b0a0634c2bb268e1c19ea5e477c7d7d2",
+      "byte_length": 1041
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/social_financing/scope-44136fa355b3678a/7b9d95e6a15d/sources/mofcom/ASTOCK-061/parsed/parsed-rows.json",
+      "sha256": "e8e7b9f15d821241564940fb9c339994bd9573254e715d331aba1679b5526606",
+      "byte_length": 44002
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/social_financing/scope-44136fa355b3678a/7b9d95e6a15d/sources/mofcom/ASTOCK-061/parsed/source-rows.json",
+      "sha256": "27e48d3c5884d79f82b9da0ac1380169d29292191bdb8308bb3b4c263355b153",
+      "byte_length": 18844
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/pmi_history/scope-44136fa355b3678a/f02b647dff9a/manifest.json",
+      "sha256": "7b439c4f5c1c7cbffa69e124f6c052c43fc1a79211ee5ce91abbe23d55c744ec",
+      "byte_length": 2387
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/pmi_history/scope-44136fa355b3678a/f02b647dff9a/quality_report.json",
+      "sha256": "31e2c4cadcd12b06ad0b78698e99d7744a0c046af5e6cde383426f166b5b2ed1",
+      "byte_length": 748
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/pmi_history/scope-44136fa355b3678a/f02b647dff9a/report.json",
+      "sha256": "2842ab829d396fc32cbe4b70eebb4a33783b3ae15de190b817b87089c4f46ed1",
+      "byte_length": 14784
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/pmi_history/scope-44136fa355b3678a/f02b647dff9a/started.json",
+      "sha256": "9960d430a16e49a4cf34e92273412cd6921fa1a669b03d75d79772bdcccd1db6",
+      "byte_length": 213
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/pmi_history/scope-44136fa355b3678a/f02b647dff9a/sources/eastmoney/ASTOCK-062/normalized.json",
+      "sha256": "38cc39703a3dd42da39d91fda91a572004c46e63a5bbc4c34d0300c4271542a7",
+      "byte_length": 48376
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/pmi_history/scope-44136fa355b3678a/f02b647dff9a/sources/eastmoney/ASTOCK-062/normalized.parquet",
+      "sha256": "0002b7fa95a1ca71a557159b49e22994ace87d52491b75a12628d4c247ca6549",
+      "byte_length": 3212
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/pmi_history/scope-44136fa355b3678a/f02b647dff9a/sources/eastmoney/ASTOCK-062/raw_refs.json",
+      "sha256": "433cf6b167c5aedc563c796e1592ca6f7cd13d021613052024552d13ccad8f4f",
+      "byte_length": 772
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/pmi_history/scope-44136fa355b3678a/f02b647dff9a/sources/eastmoney/ASTOCK-062/parsed/parsed-rows.json",
+      "sha256": "844476a29c77a5fa49fa735e9b5c55c53b8fabebaa9109f6a5b567863b2504a9",
+      "byte_length": 41659
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/pmi_history/scope-44136fa355b3678a/f02b647dff9a/sources/eastmoney/ASTOCK-062/parsed/source-rows.json",
+      "sha256": "da62926e9af832581b5c9163d87a673a1afffff5d35bb9db55b076c18e2e5bf4",
+      "byte_length": 32969
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/bond_yield_curve/scope-1e9aba804efcc02f/e7ff6e342bea/manifest.json",
+      "sha256": "7e04e97db9a76becc2df6678a88701de02c31d584d9eb39807cdd04ea80db19c",
+      "byte_length": 2526
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/bond_yield_curve/scope-1e9aba804efcc02f/e7ff6e342bea/quality_report.json",
+      "sha256": "6bd40643faf6dab7443a24da247445b8ddb0149efda5390182e460989ed2b896",
+      "byte_length": 826
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/bond_yield_curve/scope-1e9aba804efcc02f/e7ff6e342bea/report.json",
+      "sha256": "399d5736a4ec7077e4c711edd71df9ef7b7e4c4fb7e88f2e356b2462c837b504",
+      "byte_length": 14162
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/bond_yield_curve/scope-1e9aba804efcc02f/e7ff6e342bea/started.json",
+      "sha256": "b8e2fe87ec7f8dece0a3078275cc73913bfb9b6919afeee7bc4babda68b4b82b",
+      "byte_length": 271
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/bond_yield_curve/scope-1e9aba804efcc02f/e7ff6e342bea/sources/chinabond/ASTOCK-063/normalized.json",
+      "sha256": "f5a4e213b1e6ace1fcd6f87c86ea865fbd2c398fa59f2c986ea48a8e5cb02fd1",
+      "byte_length": 10767
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/bond_yield_curve/scope-1e9aba804efcc02f/e7ff6e342bea/sources/chinabond/ASTOCK-063/normalized.parquet",
+      "sha256": "b1a30c5cf36b1d56280296f0710989918097c385cd59328848bf47997bdd3a74",
+      "byte_length": 3039
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/bond_yield_curve/scope-1e9aba804efcc02f/e7ff6e342bea/sources/chinabond/ASTOCK-063/raw_refs.json",
+      "sha256": "fa3007f4cddad179c1e29c95682a536f71d3a68a46383712acb3abd4860398e4",
+      "byte_length": 383
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/bond_yield_curve/scope-1e9aba804efcc02f/e7ff6e342bea/sources/chinabond/ASTOCK-063/parsed/parsed-rows.json",
+      "sha256": "0e297f4a73acb98c62db4e789d65a4d02542bc7cd91a1c083fe34da0cdc0fdd1",
+      "byte_length": 7036
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/bond_yield_curve/scope-1e9aba804efcc02f/e7ff6e342bea/sources/chinabond/ASTOCK-063/parsed/source-rows.json",
+      "sha256": "0e297f4a73acb98c62db4e789d65a4d02542bc7cd91a1c083fe34da0cdc0fdd1",
+      "byte_length": 7036
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/repo_fixing/scope-fbb0c579e581b0cf/1d4e510df397/manifest.json",
+      "sha256": "4fdb8a87a1e93d452a02be29f5f237b187c9cb4c13aec147d92e670661457dfa",
+      "byte_length": 2351
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/repo_fixing/scope-fbb0c579e581b0cf/1d4e510df397/quality_report.json",
+      "sha256": "b3165809595d0ccd00a41e99c21d947596bb18c63b302e0cb9c45db3b12fbefd",
+      "byte_length": 650
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/repo_fixing/scope-fbb0c579e581b0cf/1d4e510df397/report.json",
+      "sha256": "cacdced474e84017846ed3c226af7c651625e03208836d2ad409ed048c7bac75",
+      "byte_length": 13725
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/repo_fixing/scope-fbb0c579e581b0cf/1d4e510df397/started.json",
+      "sha256": "c889e632c3d200c3df10fe14adfb6fd37e69d504d9201499396af545974243b0",
+      "byte_length": 225
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/repo_fixing/scope-fbb0c579e581b0cf/1d4e510df397/sources/chinamoney/ASTOCK-064/normalized.json",
+      "sha256": "41512e81908961a5325d994a6acd12b7a27425e5019f168559efcc900cbe6d0e",
+      "byte_length": 115039
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/repo_fixing/scope-fbb0c579e581b0cf/1d4e510df397/sources/chinamoney/ASTOCK-064/normalized.parquet",
+      "sha256": "5f7cc77de67a90059574eca2dd8db7b93b73a4f1bbe8a5f1bd20296f69559fd2",
+      "byte_length": 5681
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/repo_fixing/scope-fbb0c579e581b0cf/1d4e510df397/sources/chinamoney/ASTOCK-064/raw_refs.json",
+      "sha256": "39c46ae4bb7c3dbcbf2df4e7412046c56909a1015ac5681a7bfaace07b59800b",
+      "byte_length": 384
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/repo_fixing/scope-fbb0c579e581b0cf/1d4e510df397/sources/chinamoney/ASTOCK-064/parsed/parsed-rows.json",
+      "sha256": "44818f9f29c43611ada026cc6f5b12e5082910ffb7ac915073151e54a1aeb1e6",
+      "byte_length": 45080
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/repo_fixing/scope-fbb0c579e581b0cf/1d4e510df397/sources/chinamoney/ASTOCK-064/parsed/source-rows.json",
+      "sha256": "37fe74323874d783b6fff56d3d9ab993b9897c2d0e8db76065cf28a703d5316b",
+      "byte_length": 49562
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/lpr_history/scope-44136fa355b3678a/eeed99b69d21/manifest.json",
+      "sha256": "731856948a2ee85e6542e695cad514f243cd4443d0e737cc40b1570256ce3d9f",
+      "byte_length": 2650
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/lpr_history/scope-44136fa355b3678a/eeed99b69d21/quality_report.json",
+      "sha256": "7e3b47a82444896ad1fe218162a7f25f28689ca46213aa33030a084e6e95026c",
+      "byte_length": 815
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/lpr_history/scope-44136fa355b3678a/eeed99b69d21/report.json",
+      "sha256": "b28c2708d2a77aeb38df8ed4289dc948fef7f7a63050d0df910290e0fb753ef7",
+      "byte_length": 20387
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/lpr_history/scope-44136fa355b3678a/eeed99b69d21/started.json",
+      "sha256": "ade61dca382fd1faf87be2e91763bb716b8c18fec924362e7e0cf9bb7612ea1e",
+      "byte_length": 213
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/lpr_history/scope-44136fa355b3678a/eeed99b69d21/sources/eastmoney/ASTOCK-065/normalized.json",
+      "sha256": "ec5a29efad153cad0bdcf9db8dcff68ddaeb38710155bf879b3cb97558862dc3",
+      "byte_length": 159953
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/lpr_history/scope-44136fa355b3678a/eeed99b69d21/sources/eastmoney/ASTOCK-065/normalized.parquet",
+      "sha256": "92431b4a298dc04a07efde6a7d6006ab5d4b983d73c5b0757eb23b58f0c4d760",
+      "byte_length": 9534
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/lpr_history/scope-44136fa355b3678a/eeed99b69d21/sources/eastmoney/ASTOCK-065/raw_refs.json",
+      "sha256": "8b0c1183aa236d683062e80694b6a40ed3d65abe2e315383a70a29dd61a8b4a8",
+      "byte_length": 576
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/lpr_history/scope-44136fa355b3678a/eeed99b69d21/sources/eastmoney/ASTOCK-065/parsed/excluded-rows.json",
+      "sha256": "ea428dec7fd334fb17c20de0be0fe600345bdaae762dd77a7895084edf9f9218",
+      "byte_length": 2395
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/lpr_history/scope-44136fa355b3678a/eeed99b69d21/sources/eastmoney/ASTOCK-065/parsed/source-rows.json",
+      "sha256": "acefbe0f852f5b9d14400642f2b41d84a9c45fa5c408209b916b1fecab738130",
+      "byte_length": 98470
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/macro_calendar/scope-10a14099cab6ad9f/2be3dc2b36d5/manifest.json",
+      "sha256": "ea86d087a7504da60e5cfe8ba43b204d3e81bdc19b18541d072a1c9b07947ad8",
+      "byte_length": 2804
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/macro_calendar/scope-10a14099cab6ad9f/2be3dc2b36d5/quality_report.json",
+      "sha256": "a98acf927be82c2b3d7265383f8664819e9998e8de4e7ce6667af2e76266f645",
+      "byte_length": 791
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/macro_calendar/scope-10a14099cab6ad9f/2be3dc2b36d5/report.json",
+      "sha256": "9fada085f798a42f84a401c0336eb2cc97d49cc328abc5227a2193d2890d5c98",
+      "byte_length": 18219
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/macro_calendar/scope-10a14099cab6ad9f/2be3dc2b36d5/started.json",
+      "sha256": "ce6ee244ff026afa9df3d6087f1aa3dc5df8d7644a4ff3612da22310056a8fda",
+      "byte_length": 277
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/macro_calendar/scope-10a14099cab6ad9f/2be3dc2b36d5/sources/wallstreetcn/ASTOCK-066/normalized.json",
+      "sha256": "a67282a752638e5655b20be7d94e7f065219da7de4f0ca53ca799fb0ed900ac0",
+      "byte_length": 188265
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/macro_calendar/scope-10a14099cab6ad9f/2be3dc2b36d5/sources/wallstreetcn/ASTOCK-066/normalized.parquet",
+      "sha256": "169e07f99d658a7dd585e1308ec6d34d2b5ec40838f4e1d6df255319695a2d61",
+      "byte_length": 26406
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/macro_calendar/scope-10a14099cab6ad9f/2be3dc2b36d5/sources/wallstreetcn/ASTOCK-066/raw_refs.json",
+      "sha256": "cc1e7ac8135258b961cef5f53cb6d3705f93d166c656337baa5934efce271060",
+      "byte_length": 523
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/macro_calendar/scope-10a14099cab6ad9f/2be3dc2b36d5/sources/wallstreetcn/ASTOCK-066/parsed/excluded-rows.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "byte_length": 2
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/macro_calendar/scope-10a14099cab6ad9f/2be3dc2b36d5/sources/wallstreetcn/ASTOCK-066/parsed/parsed-rows.json",
+      "sha256": "8df803d793bdd3920553c4a7e54a6bfe5c573d9379c4ba2b90661528ceb91137",
+      "byte_length": 134169
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/macro_calendar/scope-10a14099cab6ad9f/2be3dc2b36d5/sources/wallstreetcn/ASTOCK-066/parsed/source-rows.json",
+      "sha256": "da5a2d95e95ed80317e3658eceac37063696d7140836061f2bae2f5d88fe78dc",
+      "byte_length": 362728
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/index_constituents/scope-8552db885e319649/a6e62f7fd191/manifest.json",
+      "sha256": "fcccce3f6791469e2f978f3691fe69f7a1ad319ab1a430b1571f480859599754",
+      "byte_length": 2366
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/index_constituents/scope-8552db885e319649/a6e62f7fd191/quality_report.json",
+      "sha256": "7f0af3dbb81fcc660983205f291412b30349771463af5b28531fa187d06763b5",
+      "byte_length": 701
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/index_constituents/scope-8552db885e319649/a6e62f7fd191/report.json",
+      "sha256": "9685de65e449f07bf0ec2f97aecdbe5ae2fedd9e0978dfe3f1770d1e0349233f",
+      "byte_length": 14561
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/index_constituents/scope-8552db885e319649/a6e62f7fd191/started.json",
+      "sha256": "2913e7a58796133f139ae799f7f18e88e92a5c441beec37c8af75969cde4b66b",
+      "byte_length": 239
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/index_constituents/scope-8552db885e319649/a6e62f7fd191/sources/csindex/ASTOCK-067/normalized.json",
+      "sha256": "0a6fa3556484ac2d6ea52a8bfa82cb8b29e5b26b5a678c38adb243528e4426ea",
+      "byte_length": 65324
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/index_constituents/scope-8552db885e319649/a6e62f7fd191/sources/csindex/ASTOCK-067/normalized.parquet",
+      "sha256": "9a7033aefe1d1df3a055e040de0f6314a50111ddd0e5b4008660f02fa9a20fd9",
+      "byte_length": 7492
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/index_constituents/scope-8552db885e319649/a6e62f7fd191/sources/csindex/ASTOCK-067/raw_refs.json",
+      "sha256": "667ce7c76734ebfa6c7954414248e187b7bfcc8b6c46fff33be63a986a884c62",
+      "byte_length": 795
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/index_constituents/scope-8552db885e319649/a6e62f7fd191/sources/csindex/ASTOCK-067/parsed/parsed-rows.json",
+      "sha256": "73d742bd552185c34cabaf0a6f0250379d97cde54a4aaa5dc6095c19b100ba6d",
+      "byte_length": 93509
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/index_constituents/scope-8552db885e319649/a6e62f7fd191/sources/csindex/ASTOCK-067/parsed/source-rows.json",
+      "sha256": "bd2efb07414099765ece99ee5c64312840a87eedbfc56296ece977a521742395",
+      "byte_length": 90017
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/index_weights/scope-8552db885e319649/0595c1832292/manifest.json",
+      "sha256": "f20e8e66e19e983e407eae46034d9883e94d22edb5b30c32643b65304ddfd752",
+      "byte_length": 2372
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/index_weights/scope-8552db885e319649/0595c1832292/quality_report.json",
+      "sha256": "41d71aebb2d77af50d4ef777d1f31bb804a82808041a2e7d062291858e08354a",
+      "byte_length": 709
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/index_weights/scope-8552db885e319649/0595c1832292/report.json",
+      "sha256": "c4d0b8bfa7b61920dc279adeee79501a53fc618006d26997cfcb8e6c824657a0",
+      "byte_length": 14673
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/index_weights/scope-8552db885e319649/0595c1832292/started.json",
+      "sha256": "d2e8475d2042d193a3e1e90005c623fc7cd034d9ea59c50513000ceb8659bb7e",
+      "byte_length": 234
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/index_weights/scope-8552db885e319649/0595c1832292/sources/csindex/ASTOCK-068/normalized.json",
+      "sha256": "779a80cda2590a78205af14d4a8fc9c9a5ec9316e98a0b2079c0cc0db5769fc1",
+      "byte_length": 69524
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/index_weights/scope-8552db885e319649/0595c1832292/sources/csindex/ASTOCK-068/normalized.parquet",
+      "sha256": "7cac8262c811b083a0703c95c888eda455124b3699a8a9cb7f2a614e1b3ce8a3",
+      "byte_length": 7714
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/index_weights/scope-8552db885e319649/0595c1832292/sources/csindex/ASTOCK-068/raw_refs.json",
+      "sha256": "ac4d8ed732bff5a30093bfd47e08b0bbc3b0419a07304b78136def574a252340",
+      "byte_length": 792
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/index_weights/scope-8552db885e319649/0595c1832292/sources/csindex/ASTOCK-068/parsed/parsed-rows.json",
+      "sha256": "07e127421677269eb36ae5446eacc472f854db713fc98c24ebc9dfcb88a6da6e",
+      "byte_length": 97974
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/index_weights/scope-8552db885e319649/0595c1832292/sources/csindex/ASTOCK-068/parsed/source-rows.json",
+      "sha256": "6ef184b704be8029659880c0ba1720deaabf6b60b49eb653ff3d7c82e0d2e398",
+      "byte_length": 94482
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/index_valuation/scope-8552db885e319649/37da4e63234c/manifest.json",
+      "sha256": "67298e703bc47bd5632494b6b0f7b2753bf9b7f4885803a72eead61a2d6133d1",
+      "byte_length": 2538
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/index_valuation/scope-8552db885e319649/37da4e63234c/quality_report.json",
+      "sha256": "cb63a6720417eafc5f8670ae951077a2aee49d6b3863fb16d5495833bce5135f",
+      "byte_length": 799
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/index_valuation/scope-8552db885e319649/37da4e63234c/report.json",
+      "sha256": "1e19b12b3739a1b87a03f23ace8f5f002738f85944da53bb3c930f616dbf478d",
+      "byte_length": 16249
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/index_valuation/scope-8552db885e319649/37da4e63234c/started.json",
+      "sha256": "a008b09dead777a2fd731b447b316d2466185245f0708e735f6c4a72f046c842",
+      "byte_length": 236
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/index_valuation/scope-8552db885e319649/37da4e63234c/sources/csindex/ASTOCK-069/normalized.json",
+      "sha256": "eb92cd667ca2e6f6ea3fd8515aec6ec57a502f69faa1f0668eda466902b11a89",
+      "byte_length": 3921
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/index_valuation/scope-8552db885e319649/37da4e63234c/sources/csindex/ASTOCK-069/normalized.parquet",
+      "sha256": "4b2524a8d826c925802028782d4006b9815b9c13a792906773d136bff513d5da",
+      "byte_length": 2324
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/index_valuation/scope-8552db885e319649/37da4e63234c/sources/csindex/ASTOCK-069/raw_refs.json",
+      "sha256": "dcfac77ff23d9147c223aa287f79392cfb457f16ca23b81423b129d2f5e7a52b",
+      "byte_length": 872
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/index_valuation/scope-8552db885e319649/37da4e63234c/sources/csindex/ASTOCK-069/parsed/parsed-rows.json",
+      "sha256": "3a7036993bea12d98a76f71f125376c94e04f0b103003e284535ff25edca59e3",
+      "byte_length": 5134
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/index_valuation/scope-8552db885e319649/37da4e63234c/sources/csindex/ASTOCK-069/parsed/source-rows.json",
+      "sha256": "a7fede3721a7c82b5dbb5b955636dd77a804b790d1ddbab30c6a956047842724",
+      "byte_length": 5054
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/trading_calendar/scope-44136fa355b3678a/22bc79d88f80/manifest.json",
+      "sha256": "aecf16c0f4d431833ad5f23b084a98906895dbafe61621f849766041b13a9247",
+      "byte_length": 2199
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/trading_calendar/scope-44136fa355b3678a/22bc79d88f80/quality_report.json",
+      "sha256": "4b6885b244597bb15b41619441c482adeb1fd8d6102ed21cd4c52f4d4e989443",
+      "byte_length": 597
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/trading_calendar/scope-44136fa355b3678a/22bc79d88f80/report.json",
+      "sha256": "a245b938ecfd2753c890319228f51546926c35892b4b1029a89a8e55a0f55631",
+      "byte_length": 12782
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/trading_calendar/scope-44136fa355b3678a/22bc79d88f80/started.json",
+      "sha256": "99e7ac46946cdb7d5b9f7910e0d4dceeb44fa1da3e9929d4bf169cd7abd526f3",
+      "byte_length": 213
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/trading_calendar/scope-44136fa355b3678a/22bc79d88f80/sources/sina/ASTOCK-070/normalized.json",
+      "sha256": "8e9044686d815f408588c2bdda1d9ded752b7db9fe05efd4c933ccc7d89c3b8a",
+      "byte_length": 387069
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/trading_calendar/scope-44136fa355b3678a/22bc79d88f80/sources/sina/ASTOCK-070/normalized.parquet",
+      "sha256": "c99549562cfc3766f91366e03a0f87adb64d9e5b3950b9236af484f19336132f",
+      "byte_length": 51340
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/trading_calendar/scope-44136fa355b3678a/22bc79d88f80/sources/sina/ASTOCK-070/raw_refs.json",
+      "sha256": "384894d42f770c65d940a9664d6e7fc32abf4885262ad9c7cfdd99e0d17b3c75",
+      "byte_length": 780
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/trading_calendar/scope-44136fa355b3678a/22bc79d88f80/sources/sina/ASTOCK-070/parsed/source-rows.json",
+      "sha256": "5607d47a2de7580ace1fd769301f0f3e0bd2f7c8024ff7bd204084f9b876c8b5",
+      "byte_length": 246317
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/official_futures_daily/scope-7f5a6af6367cc5a5/83b01d8723a7/manifest.json",
+      "sha256": "616b66b809ad78cc6c0cdfcd4c2a6188be6a0b1d2319470a48f981074726dbc2",
+      "byte_length": 2790
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/official_futures_daily/scope-7f5a6af6367cc5a5/83b01d8723a7/quality_report.json",
+      "sha256": "284d6a3e7e6aea65a756db12c7024c46a0f3fad4fedc4435eac54277bd328da5",
+      "byte_length": 865
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/official_futures_daily/scope-7f5a6af6367cc5a5/83b01d8723a7/report.json",
+      "sha256": "a9bfb16320f713868d6450109e008230040ab0dc948a145792d5014acf05fcc9",
+      "byte_length": 16691
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/official_futures_daily/scope-7f5a6af6367cc5a5/83b01d8723a7/started.json",
+      "sha256": "22b7dd0f0f27f2db8ad5834ade58e57a8af0e6c84d1ee1c806127f7c905fe126",
+      "byte_length": 270
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/official_futures_daily/scope-7f5a6af6367cc5a5/83b01d8723a7/sources/exchange_composite/ASTOCK-071/normalized.json",
+      "sha256": "772c4a927950270e193f0a0cacb7b1b9d95983ca5f637a4635754e173cdc2d96",
+      "byte_length": 69739
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/official_futures_daily/scope-7f5a6af6367cc5a5/83b01d8723a7/sources/exchange_composite/ASTOCK-071/normalized.parquet",
+      "sha256": "dd1daa722fd8aeb723ab51e60da9a4721ca0afa7bd692e5020585c2499f25c68",
+      "byte_length": 5176
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/official_futures_daily/scope-7f5a6af6367cc5a5/83b01d8723a7/sources/exchange_composite/ASTOCK-071/raw_refs.json",
+      "sha256": "269ad5077dd44ebdd02866890e2f4f4326f4019fa110e6089ffd429d7c17e1fe",
+      "byte_length": 461
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/official_futures_daily/scope-7f5a6af6367cc5a5/83b01d8723a7/sources/exchange_composite/ASTOCK-071/parsed/parsed-rows.json",
+      "sha256": "e371328ed3d3d97308f9ec40a96abe714d6d777fa67094f885a572ce382daa99",
+      "byte_length": 60259
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/official_futures_daily/scope-7f5a6af6367cc5a5/83b01d8723a7/sources/exchange_composite/ASTOCK-071/parsed/source-rows.json",
+      "sha256": "e371328ed3d3d97308f9ec40a96abe714d6d777fa67094f885a572ce382daa99",
+      "byte_length": 60259
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/official_options_daily/scope-7f5a6af6367cc5a5/fc08737f6cfd/manifest.json",
+      "sha256": "6c78b714ae54b51b1b94a4dc7576a074bc919d4c394cedaeeab9ea2921fc912e",
+      "byte_length": 2922
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/official_options_daily/scope-7f5a6af6367cc5a5/fc08737f6cfd/quality_report.json",
+      "sha256": "a52d9ac741d48b2c6dce5d3336f83480bad0ca021bb55d60b25068a48586e4d3",
+      "byte_length": 920
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/official_options_daily/scope-7f5a6af6367cc5a5/fc08737f6cfd/report.json",
+      "sha256": "d66f5fe2567c85e536a05506517b725d054ab5abef4104db45b40a1d02dfd67c",
+      "byte_length": 17188
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/official_options_daily/scope-7f5a6af6367cc5a5/fc08737f6cfd/started.json",
+      "sha256": "ec5b29f10991d5e862eff2cca73b55de1625d613597454473011fd31107bb269",
+      "byte_length": 270
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/official_options_daily/scope-7f5a6af6367cc5a5/fc08737f6cfd/sources/exchange_composite/ASTOCK-072/normalized.json",
+      "sha256": "76fe23548aef77d8e88f6acdc7c7dc2a3b9d52760e3be0f2d6e5bd6f4daaf3be",
+      "byte_length": 2459349
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/official_options_daily/scope-7f5a6af6367cc5a5/fc08737f6cfd/sources/exchange_composite/ASTOCK-072/normalized.parquet",
+      "sha256": "ccc126dcc0a48a43751667c04644885ba3836706c4ea97ab51431f14f518634a",
+      "byte_length": 45183
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/official_options_daily/scope-7f5a6af6367cc5a5/fc08737f6cfd/sources/exchange_composite/ASTOCK-072/raw_refs.json",
+      "sha256": "85af41baaadc95d965f8f0129d682e574e572b576d52e79fbd9471b2e0c744f2",
+      "byte_length": 461
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/official_options_daily/scope-7f5a6af6367cc5a5/fc08737f6cfd/sources/exchange_composite/ASTOCK-072/parsed/parsed-rows.json",
+      "sha256": "47770c1382bd5539498f72eab2dea7bcb74dd7470a589cd494ee8ad33257fad5",
+      "byte_length": 2133300
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/official_options_daily/scope-7f5a6af6367cc5a5/fc08737f6cfd/sources/exchange_composite/ASTOCK-072/parsed/source-rows.json",
+      "sha256": "47770c1382bd5539498f72eab2dea7bcb74dd7470a589cd494ee8ad33257fad5",
+      "byte_length": 2133300
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/position_rank/scope-54d7e261f40efaed/7c5f4d18f500/manifest.json",
+      "sha256": "32b80c5a15200a0a03fab069cde28e5376ec54ce8717e9d6e0aafd7a5bbc2039",
+      "byte_length": 3520
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/position_rank/scope-54d7e261f40efaed/7c5f4d18f500/quality_report.json",
+      "sha256": "0127b36d0264670ce7412621599be56494017b831ddcd653297fda0856ee3775",
+      "byte_length": 1260
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/position_rank/scope-54d7e261f40efaed/7c5f4d18f500/report.json",
+      "sha256": "2352c64bc3af51ce69543f01551e46aa59c5899d97a6d2bb4620b87493e320c6",
+      "byte_length": 28143
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/position_rank/scope-54d7e261f40efaed/7c5f4d18f500/started.json",
+      "sha256": "429d296694b6b2b98f4c016d4e20ae81a96e2b05fd7b33487ac6a9c6fb0bca7f",
+      "byte_length": 249
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/position_rank/scope-54d7e261f40efaed/7c5f4d18f500/sources/cffex/ASTOCK-073/normalized.json",
+      "sha256": "8bb52618b94a81ca2f7e08570e49639a8894c297ccd1fe1210d9b2b04778f0a1",
+      "byte_length": 158133
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/position_rank/scope-54d7e261f40efaed/7c5f4d18f500/sources/cffex/ASTOCK-073/normalized.parquet",
+      "sha256": "e2b1447b60448b087057aa3c92e4eccb8145855158cd5076f389923439f56c6d",
+      "byte_length": 7037
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/position_rank/scope-54d7e261f40efaed/7c5f4d18f500/sources/cffex/ASTOCK-073/raw_refs.json",
+      "sha256": "512f211d0cf4b01f12855a4dee561aaa127a69565fe3f8ed414a909372bf6ef1",
+      "byte_length": 850
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/position_rank/scope-54d7e261f40efaed/7c5f4d18f500/sources/cffex/ASTOCK-073/parsed/parsed-rows.json",
+      "sha256": "533537f68a02d16a32844d2d7fbafde75cdf037998dc8926d0c00d16eebb9163",
+      "byte_length": 134097
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/position_rank/scope-54d7e261f40efaed/7c5f4d18f500/sources/cffex/ASTOCK-073/parsed/source-rows.json",
+      "sha256": "533537f68a02d16a32844d2d7fbafde75cdf037998dc8926d0c00d16eebb9163",
+      "byte_length": 134097
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/futures_quote/scope-6f914356bf8ba522/0e4ab3747b70/manifest.json",
+      "sha256": "2fdbd4b756c43aa1de965fc8c75df9cbe8b3c9b36b7b0b3e7ce8fb701d227099",
+      "byte_length": 2684
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/futures_quote/scope-6f914356bf8ba522/0e4ab3747b70/quality_report.json",
+      "sha256": "c70c1a5a5f7dfd185dd600e9d297f9928f2830f9e76cda9fa1c17857dc2fb7ee",
+      "byte_length": 795
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/futures_quote/scope-6f914356bf8ba522/0e4ab3747b70/report.json",
+      "sha256": "1db7caf662ba9b9dd8d332922b02c681dc8cae37e4430dfa607d6343a6b331d3",
+      "byte_length": 14435
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/futures_quote/scope-6f914356bf8ba522/0e4ab3747b70/started.json",
+      "sha256": "f7aff49b16f2b172cd40910fbf6689c02047fc241abf23372bd8563f9a5ffb33",
+      "byte_length": 238
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/futures_quote/scope-6f914356bf8ba522/0e4ab3747b70/sources/sina/ASTOCK-074/normalized.json",
+      "sha256": "7007435c3b9d73a028c88e2d3c72942df367a50e80361a3e66f840d14c47073a",
+      "byte_length": 1104
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/futures_quote/scope-6f914356bf8ba522/0e4ab3747b70/sources/sina/ASTOCK-074/normalized.parquet",
+      "sha256": "507c3f95eb8fa574299e161a444e717550ae93bca833ca33f35ec5c1c80d4841",
+      "byte_length": 4594
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/futures_quote/scope-6f914356bf8ba522/0e4ab3747b70/sources/sina/ASTOCK-074/raw_refs.json",
+      "sha256": "150eec473a3ab5789db78acd2384173c14ed46a981a1f65132ba9c26baf2184a",
+      "byte_length": 380
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/futures_quote/scope-6f914356bf8ba522/0e4ab3747b70/sources/sina/ASTOCK-074/parsed/parsed-rows.json",
+      "sha256": "c48abf2fa2137c0e662fa3daab40063f826afc156315400cd7ce2a6f36486e2d",
+      "byte_length": 989
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/futures_quote/scope-6f914356bf8ba522/0e4ab3747b70/sources/sina/ASTOCK-074/parsed/source-rows.json",
+      "sha256": "14bb8a1efcfcb50d3654c508279251e6b9274c4d1e5e9772ede9dc9a915ea81f",
+      "byte_length": 1205
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/futures_daily/scope-f35c0c2b670d067b/a9d6fd74ece5/manifest.json",
+      "sha256": "6d6b6cd70893ae5f6a8599d2c5849bc3dcd6ab04735ac060cb944dba7762dd7c",
+      "byte_length": 2497
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/futures_daily/scope-f35c0c2b670d067b/a9d6fd74ece5/quality_report.json",
+      "sha256": "5bf49f58c5bd06608d762ee131370dcdaf732ffd009593044ee9ba14bbd0e1d5",
+      "byte_length": 668
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/futures_daily/scope-f35c0c2b670d067b/a9d6fd74ece5/report.json",
+      "sha256": "57e51d9c08bd52495d57f1928d77c42ac5b6ccfe855db0024f111ea066284bbd",
+      "byte_length": 14332
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/futures_daily/scope-f35c0c2b670d067b/a9d6fd74ece5/started.json",
+      "sha256": "70fa1e347dbaafe69bbda6a99d5ca144fa66353702bc1c77ef69238fdc3de014",
+      "byte_length": 264
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/futures_daily/scope-f35c0c2b670d067b/a9d6fd74ece5/sources/sina/ASTOCK-075/normalized.json",
+      "sha256": "3af7e4d646168dac8fddb300d00d3a435afab5b74bc544a7a508dd2be742b6a5",
+      "byte_length": 41993
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/futures_daily/scope-f35c0c2b670d067b/a9d6fd74ece5/sources/sina/ASTOCK-075/normalized.parquet",
+      "sha256": "80b36dcac81c61cfa6b213cae6cd8c72e6403189d09df9596cda18a8474814b5",
+      "byte_length": 3768
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/futures_daily/scope-f35c0c2b670d067b/a9d6fd74ece5/sources/sina/ASTOCK-075/raw_refs.json",
+      "sha256": "1906489a8ebe450be0d4dea654bf29cf24e58c3878ec1568f781e38da5c9fa92",
+      "byte_length": 380
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/futures_daily/scope-f35c0c2b670d067b/a9d6fd74ece5/sources/sina/ASTOCK-075/parsed/excluded-rows.json",
+      "sha256": "4af67a9c50f10df66def12d5b508eb32da64ab82f1da763bcdc9d0d1f3ce1434",
+      "byte_length": 494400
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/futures_daily/scope-f35c0c2b670d067b/a9d6fd74ece5/sources/sina/ASTOCK-075/parsed/parsed-rows.json",
+      "sha256": "2ef5b6b86b4930b58e65ef99b6947d55a8c680df76cfdf22f23c60af750e4639",
+      "byte_length": 27706
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/futures_daily/scope-f35c0c2b670d067b/a9d6fd74ece5/sources/sina/ASTOCK-075/parsed/source-rows.json",
+      "sha256": "de139498810b52e5b68819d0c9e9c34495555dfa894b2e603f3527f6df86f3c7",
+      "byte_length": 516313
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/a50_quote/scope-44136fa355b3678a/d176f847eab5/manifest.json",
+      "sha256": "7b4ce653d525d868f9241d39e5ceaa76f17c9d17e66852b1549a951c905c5c8c",
+      "byte_length": 2407
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/a50_quote/scope-44136fa355b3678a/d176f847eab5/quality_report.json",
+      "sha256": "1d88ac2bb660b4b4640bec585352973986e7aab739c99a15770cbac3991a82e0",
+      "byte_length": 714
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/a50_quote/scope-44136fa355b3678a/d176f847eab5/report.json",
+      "sha256": "d92e1a66f1226af52f530703ee3356f2a8d1b41297769df6d93638e0ab9450c2",
+      "byte_length": 13438
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/a50_quote/scope-44136fa355b3678a/d176f847eab5/started.json",
+      "sha256": "79192c83c9fcd35d18cebcc1143658b9941cf9dcb321adeb92fcc88649fa32ae",
+      "byte_length": 206
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/a50_quote/scope-44136fa355b3678a/d176f847eab5/sources/sina/ASTOCK-076/normalized.json",
+      "sha256": "2c8e1a8e5d4a71877d1de2f84ae5d3e241ab7f8c9c0752fc758f95186e0bb351",
+      "byte_length": 243
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/a50_quote/scope-44136fa355b3678a/d176f847eab5/sources/sina/ASTOCK-076/normalized.parquet",
+      "sha256": "e9c44a2a7db414779d334330957e47c8444a2a33d9acf374faa270b773f5c3c6",
+      "byte_length": 2861
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/a50_quote/scope-44136fa355b3678a/d176f847eab5/sources/sina/ASTOCK-076/raw_refs.json",
+      "sha256": "cedc59726b918af85be7a8e4f702b72a58451bcf80ae2248f8d44c3020c90fdb",
+      "byte_length": 376
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/a50_quote/scope-44136fa355b3678a/d176f847eab5/sources/sina/ASTOCK-076/parsed/parsed-rows.json",
+      "sha256": "df456063471b7866b06e75f4f4276dc42359c49b05f13c8a7b2d91c39d8011b2",
+      "byte_length": 175
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/a50_quote/scope-44136fa355b3678a/d176f847eab5/sources/sina/ASTOCK-076/parsed/source-rows.json",
+      "sha256": "9071ca63503a94389027e0099eba656834e09e1ea638334c77854ec587dc1fc8",
+      "byte_length": 208
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sge_spot/scope-34d40584bcc4ddaf/ccdb5527617d/manifest.json",
+      "sha256": "5b96d6916276bc09831ab12e899312e6f59622cc89ab37a55e523ae87f6de98e",
+      "byte_length": 2324
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sge_spot/scope-34d40584bcc4ddaf/ccdb5527617d/quality_report.json",
+      "sha256": "240031e4e0ad82aca80a338c7bde20b30f3860c3d63de885c460cbb8b3f67277",
+      "byte_length": 714
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sge_spot/scope-34d40584bcc4ddaf/ccdb5527617d/report.json",
+      "sha256": "def79479eceae4208e84d4943a588bf9740a756c6e75c321100170565ce11ac1",
+      "byte_length": 13535
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sge_spot/scope-34d40584bcc4ddaf/ccdb5527617d/started.json",
+      "sha256": "4e2dacc966e47ca688e22831cbab44b57089e290cae9512a2507699152ec8e2e",
+      "byte_length": 226
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sge_spot/scope-34d40584bcc4ddaf/ccdb5527617d/sources/sge/ASTOCK-077/normalized.json",
+      "sha256": "8c3d36a490f765fd3f8286b24f120362f5332c4739197ed4317d283320428e1a",
+      "byte_length": 351501
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sge_spot/scope-34d40584bcc4ddaf/ccdb5527617d/sources/sge/ASTOCK-077/normalized.parquet",
+      "sha256": "afdad45ef7aaca4e14e3bd09fb47a20ab94f33863b33b36e7b5f714db663566d",
+      "byte_length": 14993
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sge_spot/scope-34d40584bcc4ddaf/ccdb5527617d/sources/sge/ASTOCK-077/raw_refs.json",
+      "sha256": "4f69ff9cf9da03d5fcfd1d495b09bf7b2b1292599a7cf55a2276785b49826223",
+      "byte_length": 370
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sge_spot/scope-34d40584bcc4ddaf/ccdb5527617d/sources/sge/ASTOCK-077/parsed/parsed-rows.json",
+      "sha256": "947c300c8f50694e681baeaf606308c6300fdd1bd2ff464c378f79f8de06fb7d",
+      "byte_length": 234956
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sge_spot/scope-34d40584bcc4ddaf/ccdb5527617d/sources/sge/ASTOCK-077/parsed/source-rows.json",
+      "sha256": "947c300c8f50694e681baeaf606308c6300fdd1bd2ff464c378f79f8de06fb7d",
+      "byte_length": 234956
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/earnings_forecast/scope-2a8276f650319ab7/fa63d18d38cb/manifest.json",
+      "sha256": "b058900e0715dae0e5c831132dbda109d2c20cc96020f5bb42b7676809fdff8c",
+      "byte_length": 2620
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/earnings_forecast/scope-2a8276f650319ab7/fa63d18d38cb/quality_report.json",
+      "sha256": "59317baf6ac1949b7888a86f62587f491d32ea95d6a5103b0e491e7bd680b6ba",
+      "byte_length": 768
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/earnings_forecast/scope-2a8276f650319ab7/fa63d18d38cb/report.json",
+      "sha256": "a4c02c448f8537eaa3fc68044755c82c9c3ff9773da0542f956f8ac7111db08d",
+      "byte_length": 14447
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/earnings_forecast/scope-2a8276f650319ab7/fa63d18d38cb/started.json",
+      "sha256": "f9421602f04a3b0723ba5ad25dc0d82e875ddf1c9d261968f9983670ada3e381",
+      "byte_length": 229
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/earnings_forecast/scope-2a8276f650319ab7/fa63d18d38cb/sources/eastmoney/ASTOCK-078/normalized.json",
+      "sha256": "55a900a2cbd2565577cd5b35a846eda955ec41de7b3cd0f43d8ffb0948e9f551",
+      "byte_length": 41082
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/earnings_forecast/scope-2a8276f650319ab7/fa63d18d38cb/sources/eastmoney/ASTOCK-078/normalized.parquet",
+      "sha256": "a40c5e7db2d80eac2f27c7a447c486d37d04abbc47ddf0edc8082814d2adee10",
+      "byte_length": 15459
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/earnings_forecast/scope-2a8276f650319ab7/fa63d18d38cb/sources/eastmoney/ASTOCK-078/raw_refs.json",
+      "sha256": "7b8428b9766068b3f64fed4c1ca46c999f29dba3ad1cefbaa845f5acb0b5919c",
+      "byte_length": 389
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/earnings_forecast/scope-2a8276f650319ab7/fa63d18d38cb/sources/eastmoney/ASTOCK-078/parsed/source-rows.json",
+      "sha256": "87ad07ad7d001f4e0baa3d2c5f09320448afb7c2a7ea1929cea6e908774b6251",
+      "byte_length": 60263
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/institution_survey/scope-f1d51d08333fae56/3fb31c0f462d/manifest.json",
+      "sha256": "4fc8999516b3af62637818f619c995917f6f19712d11fe275871623b709b501b",
+      "byte_length": 2448
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/institution_survey/scope-f1d51d08333fae56/3fb31c0f462d/quality_report.json",
+      "sha256": "21f746cbac52d90b7e07d4bf8346f04ffb16e51776b844797773179701da61d3",
+      "byte_length": 707
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/institution_survey/scope-f1d51d08333fae56/3fb31c0f462d/report.json",
+      "sha256": "263746b896255cffe6b7028167227084b412b9c7bd654bde31d55d2166930866",
+      "byte_length": 13929
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/institution_survey/scope-f1d51d08333fae56/3fb31c0f462d/started.json",
+      "sha256": "2c62dec49db997a3d116a657eb40d9ff7680d571fdcafb14e07907e4949b8554",
+      "byte_length": 245
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/institution_survey/scope-f1d51d08333fae56/3fb31c0f462d/sources/eastmoney/ASTOCK-079/normalized.json",
+      "sha256": "2f759636409471432c4dd6abbef469253884ca918b228a2b3bb0915c948e8010",
+      "byte_length": 24099
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/institution_survey/scope-f1d51d08333fae56/3fb31c0f462d/sources/eastmoney/ASTOCK-079/normalized.parquet",
+      "sha256": "f889a9d8d1a08a61a482a77b96e1560e7270afe76ab3b8e9b6047856c96e7020",
+      "byte_length": 5756
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/institution_survey/scope-f1d51d08333fae56/3fb31c0f462d/sources/eastmoney/ASTOCK-079/raw_refs.json",
+      "sha256": "8acbf22c8f405b73ede1024fac3ae6b156405c216895c74b29ffeb9769208b1d",
+      "byte_length": 390
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/institution_survey/scope-f1d51d08333fae56/3fb31c0f462d/sources/eastmoney/ASTOCK-079/parsed/source-rows.json",
+      "sha256": "3b73a7bc5664336dfedecb9ef140c83950bc6b6052601c97cddf4e8add4fd199",
+      "byte_length": 50919
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/holder_trades/scope-2a8276f650319ab7/e7ac3a0c394a/manifest.json",
+      "sha256": "904fd3caaf2f1b60dd52738ef4f326c391b70a8a4a927a86db733d730323f11f",
+      "byte_length": 2676
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/holder_trades/scope-2a8276f650319ab7/e7ac3a0c394a/quality_report.json",
+      "sha256": "9142159b16570295996a1459df6d780ae3283ece58575c4afebf5ff51922fa95",
+      "byte_length": 880
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/holder_trades/scope-2a8276f650319ab7/e7ac3a0c394a/report.json",
+      "sha256": "4751f1c9178e86caaa181e59bd900aa68648761020b512264646a66623a88bfc",
+      "byte_length": 14752
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/holder_trades/scope-2a8276f650319ab7/e7ac3a0c394a/started.json",
+      "sha256": "998920cc00dd7e36b0445c8b3c21318cac62e9f2b5dc02289cbce9278308acd1",
+      "byte_length": 225
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/holder_trades/scope-2a8276f650319ab7/e7ac3a0c394a/sources/eastmoney/ASTOCK-080/normalized.json",
+      "sha256": "29d2c80df10f581a260d1791cb7951eaa7a2e969aac8a83a203f536864320404",
+      "byte_length": 24175
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/holder_trades/scope-2a8276f650319ab7/e7ac3a0c394a/sources/eastmoney/ASTOCK-080/normalized.parquet",
+      "sha256": "e189092b05243df0c10eedc7f4739343e05902a494ceb2951fb6b38a0a62e438",
+      "byte_length": 7641
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/holder_trades/scope-2a8276f650319ab7/e7ac3a0c394a/sources/eastmoney/ASTOCK-080/raw_refs.json",
+      "sha256": "e991e1cca3e0bc2bf6c08d930ae8b6c8c01831dfc419a339c78182ce71c76bb2",
+      "byte_length": 385
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/holder_trades/scope-2a8276f650319ab7/e7ac3a0c394a/sources/eastmoney/ASTOCK-080/parsed/source-rows.json",
+      "sha256": "100ed90ee1ec288e2b645a7d984032441ca92df9734f2dc346a1213104af13c7",
+      "byte_length": 33081
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/buyback/scope-2a8276f650319ab7/e5cbb97f310a/manifest.json",
+      "sha256": "aceb5e2fc5369e5e7504243eafe1f09a31aed60900bbe84a141e8f57523fd194",
+      "byte_length": 2763
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/buyback/scope-2a8276f650319ab7/e5cbb97f310a/quality_report.json",
+      "sha256": "9f4d16ee2e5398a5a8a80a887a513ccda5219deb6bc7670a18973103115aaad3",
+      "byte_length": 805
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/buyback/scope-2a8276f650319ab7/e5cbb97f310a/report.json",
+      "sha256": "8de30c17e6ff39ea1578996d8be704e8c1e5964498a0892bb28b5dae5530745b",
+      "byte_length": 14967
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/buyback/scope-2a8276f650319ab7/e5cbb97f310a/started.json",
+      "sha256": "1a5cc07e79eef472e356874f935190860b4d6158cd790f7172be6d79aec529ea",
+      "byte_length": 219
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/buyback/scope-2a8276f650319ab7/e5cbb97f310a/sources/eastmoney/ASTOCK-081/normalized.json",
+      "sha256": "58c6cbfd0057c64bafa212ba8596064bf2c85116c4e998b5d34394af65aa42ce",
+      "byte_length": 50385
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/buyback/scope-2a8276f650319ab7/e5cbb97f310a/sources/eastmoney/ASTOCK-081/normalized.parquet",
+      "sha256": "bb2987b8962b68d26c00c1988563b7cbdeef0d629f2de12157b656e3992b1132",
+      "byte_length": 18306
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/buyback/scope-2a8276f650319ab7/e5cbb97f310a/sources/eastmoney/ASTOCK-081/raw_refs.json",
+      "sha256": "3f75a78c89f403f3b55de2c6cc8079a549baf862473b67a05edbff4096f57544",
+      "byte_length": 379
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/buyback/scope-2a8276f650319ab7/e5cbb97f310a/sources/eastmoney/ASTOCK-081/parsed/source-rows.json",
+      "sha256": "c1cb85845fb64b77d8fa4e8b957dd114d343e1324f24c0a1f5aefa795c66a79a",
+      "byte_length": 113757
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/pledge/scope-2a8276f650319ab7/17a2361e4b58/manifest.json",
+      "sha256": "bd5d89280ab207ac9eb20037e02e3504a320242c408894e1c4a15f12a6c76b59",
+      "byte_length": 2625
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/pledge/scope-2a8276f650319ab7/17a2361e4b58/quality_report.json",
+      "sha256": "b0dd3569d32e8addd2a9949eeb77954f678bc3e189f98dd57f3d0560d43f1130",
+      "byte_length": 841
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/pledge/scope-2a8276f650319ab7/17a2361e4b58/report.json",
+      "sha256": "e18816b5fcd1eda46c7522616d3c4c06a9f1a4f973059b3afdf136f4ffd62448",
+      "byte_length": 16452
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/pledge/scope-2a8276f650319ab7/17a2361e4b58/started.json",
+      "sha256": "597f9027c17d8868527bccea60953ba51d853cde00f23a550b6f916bbd3071b3",
+      "byte_length": 218
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/pledge/scope-2a8276f650319ab7/17a2361e4b58/sources/eastmoney/ASTOCK-082/normalized.json",
+      "sha256": "4105853b5d38c9c599ab4955eabe4f6d3302c403b2d3bf22d2a28a65d2749a40",
+      "byte_length": 15907
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/pledge/scope-2a8276f650319ab7/17a2361e4b58/sources/eastmoney/ASTOCK-082/normalized.parquet",
+      "sha256": "e12a915822344048335440cff4d3b275ad5c28d3bb5984bc4a8d6291bbe7316f",
+      "byte_length": 4990
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/pledge/scope-2a8276f650319ab7/17a2361e4b58/sources/eastmoney/ASTOCK-082/raw_refs.json",
+      "sha256": "6806d9d2a4e8524f3c7c7c7dc47176e97918e79ed858179e9e4ef40f31ff7f6e",
+      "byte_length": 445
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/pledge/scope-2a8276f650319ab7/17a2361e4b58/sources/eastmoney/ASTOCK-082/parsed/source-rows.json",
+      "sha256": "8966939a5e866d84e0f24bb94d9a69860f881334ae509222768517aad8c60f91",
+      "byte_length": 19691
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/ipo_calendar/scope-1ca058c86dd2414b/e247a7c3cd36/manifest.json",
+      "sha256": "fad1080832383e7e9cb8af9953fa183c300c00c702aa5bf64631c767df5abb85",
+      "byte_length": 2744
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/ipo_calendar/scope-1ca058c86dd2414b/e247a7c3cd36/quality_report.json",
+      "sha256": "8c501bc24401b2d951c738b80c52f51898a67de888356db5744d6d36aadc7904",
+      "byte_length": 761
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/ipo_calendar/scope-1ca058c86dd2414b/e247a7c3cd36/report.json",
+      "sha256": "f833a610ec3987f07563a1198d9bd8196f2bbdd599043878eeeedcaf339ed469",
+      "byte_length": 14727
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/ipo_calendar/scope-1ca058c86dd2414b/e247a7c3cd36/started.json",
+      "sha256": "c2e04822990222837c6cc4c0124a2ae4aec45abf56b3af4d303699c87a496333",
+      "byte_length": 224
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/ipo_calendar/scope-1ca058c86dd2414b/e247a7c3cd36/sources/eastmoney/ASTOCK-083/normalized.json",
+      "sha256": "1c8e9b31bc7c4a07140a953a97ae249b37b695f77387383a588a824786075704",
+      "byte_length": 15639
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/ipo_calendar/scope-1ca058c86dd2414b/e247a7c3cd36/sources/eastmoney/ASTOCK-083/normalized.parquet",
+      "sha256": "3f899ba0d536b4819d457699f2ebdc02861c50635f8217aa8f8f839d95135bb4",
+      "byte_length": 7318
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/ipo_calendar/scope-1ca058c86dd2414b/e247a7c3cd36/sources/eastmoney/ASTOCK-083/raw_refs.json",
+      "sha256": "3ae70175d11a9377a2e367d29e29702e4e6b2bf9319fb137ffa1678a93af74fb",
+      "byte_length": 384
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/ipo_calendar/scope-1ca058c86dd2414b/e247a7c3cd36/sources/eastmoney/ASTOCK-083/parsed/source-rows.json",
+      "sha256": "a23e5998a51a8905bdf58331786d4ede727a642e82968170ff3e19924ce7981a",
+      "byte_length": 128509
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/convertible_bonds/scope-f535ec8be8a79a4e/6dcc9448b8ae/manifest.json",
+      "sha256": "a535c9633fbc492fdfc09018b41b64e3b86860ebe1b1d29fe8be1ea502881fd9",
+      "byte_length": 3017
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/convertible_bonds/scope-f535ec8be8a79a4e/6dcc9448b8ae/quality_report.json",
+      "sha256": "b6e632a81974d9c14591b1cf956d6c5c22b8b12b7c7186ed08b6dd745cb9e663",
+      "byte_length": 905
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/convertible_bonds/scope-f535ec8be8a79a4e/6dcc9448b8ae/report.json",
+      "sha256": "417ef0069349bab53772390fe9986f66e118f5146ce42a5b0254b2e24547cf5b",
+      "byte_length": 21879
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/convertible_bonds/scope-f535ec8be8a79a4e/6dcc9448b8ae/started.json",
+      "sha256": "a9c6210bad9a9d8e9d669046fc6c04336359bf47293e7da0b81f9f7637343885",
+      "byte_length": 243
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/convertible_bonds/scope-f535ec8be8a79a4e/6dcc9448b8ae/sources/eastmoney/ASTOCK-084/normalized.json",
+      "sha256": "7b34143a6e05999fb1c9024fa051d57995f9b4dacc0f31e8975bdc251e9c9200",
+      "byte_length": 155858
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/convertible_bonds/scope-f535ec8be8a79a4e/6dcc9448b8ae/sources/eastmoney/ASTOCK-084/normalized.parquet",
+      "sha256": "2e622ff8a0509bddd84a09aa35bd18b3a390fed5b9009ac316fd88d1dae1d3e8",
+      "byte_length": 24123
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/convertible_bonds/scope-f535ec8be8a79a4e/6dcc9448b8ae/sources/eastmoney/ASTOCK-084/raw_refs.json",
+      "sha256": "d6a058ddbabeca806047083dbadb7bedc534cc169b9a5b079c50cccdde644205",
+      "byte_length": 523
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/convertible_bonds/scope-f535ec8be8a79a4e/6dcc9448b8ae/sources/eastmoney/ASTOCK-084/parsed/excluded-rows.json",
+      "sha256": "122ef002ee7d218887b331a18cb09424d92f11a85b1f04e343f6bead01f9fe8e",
+      "byte_length": 4526077
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/convertible_bonds/scope-f535ec8be8a79a4e/6dcc9448b8ae/sources/eastmoney/ASTOCK-084/parsed/parsed-rows.json",
+      "sha256": "8df5b81d700b163b6c2aaf7324695b0a92965602132355222f13e701bbd792cf",
+      "byte_length": 139143
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/convertible_bonds/scope-f535ec8be8a79a4e/6dcc9448b8ae/sources/eastmoney/ASTOCK-084/parsed/source-rows.json",
+      "sha256": "e85e633e6cc7033d3244905963747166eff64d26bc5f6a4f3dccf30711d3f986",
+      "byte_length": 6617104
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_dragon_tiger_daily/scope-06229278c5d91305/7a1e637b0eec/manifest.json",
+      "sha256": "e94f8d99d334ae086446f318a242fa532b3a35042289a60f6f9d01998f160a61",
+      "byte_length": 2471
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_dragon_tiger_daily/scope-06229278c5d91305/7a1e637b0eec/quality_report.json",
+      "sha256": "fbe0b34562e5b8407d8c962bf7a1b5fa3c8c2b5cadefd9b14a932dd1e269f7fc",
+      "byte_length": 717
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_dragon_tiger_daily/scope-06229278c5d91305/7a1e637b0eec/report.json",
+      "sha256": "ef82dab329ce4b2be9a60f70f6065cd8184fa663dfb4c72ef7e3a71a8d49299f",
+      "byte_length": 14914
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_dragon_tiger_daily/scope-06229278c5d91305/7a1e637b0eec/started.json",
+      "sha256": "1fccc04f80ad71e08e85cb55ed3d8b85b76b48b05d4488221b9b00f4a694d55e",
+      "byte_length": 239
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_dragon_tiger_daily/scope-06229278c5d91305/7a1e637b0eec/sources/sina/ASTOCK-085/normalized.json",
+      "sha256": "0e493729c43f4a13207a9d23d32f4e48a045489788f10e39d0662fe83c4fb406",
+      "byte_length": 22475
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_dragon_tiger_daily/scope-06229278c5d91305/7a1e637b0eec/sources/sina/ASTOCK-085/normalized.parquet",
+      "sha256": "933aca0f05c119732feee1d9ae30176d1a97fbd99cd8bc63086671f652f5a581",
+      "byte_length": 4953
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_dragon_tiger_daily/scope-06229278c5d91305/7a1e637b0eec/sources/sina/ASTOCK-085/raw_refs.json",
+      "sha256": "252468befb6874b8c52023f00496e21d814f6e21ce2b174cc11ac870ccf6e68a",
+      "byte_length": 804
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_dragon_tiger_daily/scope-06229278c5d91305/7a1e637b0eec/sources/sina/ASTOCK-085/parsed/parsed-rows.json",
+      "sha256": "da800e28b8c2334541953eca1b575d967bb2d17c84b5bfaed104ba9150cc1ff4",
+      "byte_length": 19458
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/sina_dragon_tiger_daily/scope-06229278c5d91305/7a1e637b0eec/sources/sina/ASTOCK-085/parsed/source-rows.json",
+      "sha256": "da800e28b8c2334541953eca1b575d967bb2d17c84b5bfaed104ba9150cc1ff4",
+      "byte_length": 19458
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dated_announcements/scope-e40f66150eec519a/18ad85e41318/manifest.json",
+      "sha256": "64e3b4c71f38cd81b76d58898c246cf88b6a3ae193baab83998484349c56727b",
+      "byte_length": 3486
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dated_announcements/scope-e40f66150eec519a/18ad85e41318/quality_report.json",
+      "sha256": "a24b45ebcaeb108dbad8c9549465fae2881a031e2515dddb2188711da340e291",
+      "byte_length": 1221
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dated_announcements/scope-e40f66150eec519a/18ad85e41318/report.json",
+      "sha256": "19fad1de1001babfe4d2db1445188554257983109402a1abb43682517ed947c9",
+      "byte_length": 31521
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dated_announcements/scope-e40f66150eec519a/18ad85e41318/started.json",
+      "sha256": "eec3b2133d144817beb6a4ec5bb34fd12e74aa6995aa906f77d08c17643b3984",
+      "byte_length": 240
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dated_announcements/scope-e40f66150eec519a/18ad85e41318/sources/eastmoney/ASTOCK-087/normalized.json",
+      "sha256": "b6655461e7d38ef682762826b8059438cdfa5e671108617475707b46c1319bed",
+      "byte_length": 287443
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dated_announcements/scope-e40f66150eec519a/18ad85e41318/sources/eastmoney/ASTOCK-087/normalized.parquet",
+      "sha256": "9fd0deb998aa3a43c8a95323fbffe8930c59c61389fa8df81007cd73d9a0bc56",
+      "byte_length": 50130
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dated_announcements/scope-e40f66150eec519a/18ad85e41318/sources/eastmoney/ASTOCK-087/raw_refs.json",
+      "sha256": "75a03944ee9190a39c70fc993530c9eba320ffe11ec2296b5fc8c8b394cb0663",
+      "byte_length": 1715
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dated_announcements/scope-e40f66150eec519a/18ad85e41318/sources/eastmoney/ASTOCK-087/parsed/parsed-rows.json",
+      "sha256": "d24fe7fd077c97d8c051a8b0b3b3d0cfce6a12ef121e83387af6b4a5c88b08bd",
+      "byte_length": 251543
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/dated_announcements/scope-e40f66150eec519a/18ad85e41318/sources/eastmoney/ASTOCK-087/parsed/source-rows.json",
+      "sha256": "be92620f48fcd78e014f746f0d59bcb48621fde3a1869e9d2852cb4154b625d1",
+      "byte_length": 507240
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/industry_directory/scope-44136fa355b3678a/68e05f0c7962/manifest.json",
+      "sha256": "4a41f0742c3f9d37f7d1d6e97f2b75d01d7ede31d169a3cbf43726cba7bf4495",
+      "byte_length": 2261
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/industry_directory/scope-44136fa355b3678a/68e05f0c7962/quality_report.json",
+      "sha256": "457f6b15815c1b55524b5df646994935eb093fd09fc9e517583b18629aa2b0f2",
+      "byte_length": 607
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/industry_directory/scope-44136fa355b3678a/68e05f0c7962/report.json",
+      "sha256": "ae8ef1ea0cf6c652f737722036eb34ae5812f66b095679ea91afd4c6322542fb",
+      "byte_length": 14237
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/industry_directory/scope-44136fa355b3678a/68e05f0c7962/started.json",
+      "sha256": "4e4a06bfbdfc129a307c3b00d2fe5ed0b1b737094323e8c42b1e54be70a51979",
+      "byte_length": 217
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/industry_directory/scope-44136fa355b3678a/68e05f0c7962/sources/ths/SDA-BOARD-001/normalized.json",
+      "sha256": "1d7f91779e57bbe9105ef73f7399cfdb17b44b3c6e0c002c0b8d9a3824be4c9e",
+      "byte_length": 8151
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/industry_directory/scope-44136fa355b3678a/68e05f0c7962/sources/ths/SDA-BOARD-001/normalized.parquet",
+      "sha256": "d705b05a8119492592f59c8e556579552258a7fdbdae8cf1e1c4e8d37d8fe1af",
+      "byte_length": 2772
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/industry_directory/scope-44136fa355b3678a/68e05f0c7962/sources/ths/SDA-BOARD-001/raw_refs.json",
+      "sha256": "2f2f4a200cd382171b722b74297779bd69dae001b5b08fad0af59449e76aaa6e",
+      "byte_length": 2254
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/industry_directory/scope-44136fa355b3678a/68e05f0c7962/sources/ths/SDA-BOARD-001/parsed/source-rows.json",
+      "sha256": "b9e71c4d432635fdfeace8775021e4c5fd9ccea5ed9af730f775e1a06103e154",
+      "byte_length": 3561
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/industry_index_daily/scope-f814d4fe4eabf6b9/895291532374/manifest.json",
+      "sha256": "5d6df1a1fb40f956e25076ff929608ab640f6650b3c69593ba4c47a9d2d7580a",
+      "byte_length": 3070
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/industry_index_daily/scope-f814d4fe4eabf6b9/895291532374/quality_report.json",
+      "sha256": "9c5217b1b7c782d4091ed318951ddd70fd056e64484544bdd8b44f98aab4307a",
+      "byte_length": 695
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/industry_index_daily/scope-f814d4fe4eabf6b9/895291532374/report.json",
+      "sha256": "532b2ed4b4405a4a43e3e861f588e84379baf55f3073227b24e7dc95b04d6e5e",
+      "byte_length": 17530
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/industry_index_daily/scope-f814d4fe4eabf6b9/895291532374/started.json",
+      "sha256": "6d1cfaa278f535964cd4d64ac41a5d7072cae31a13cfb55d3388ce17d84bc89a",
+      "byte_length": 315
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/industry_index_daily/scope-f814d4fe4eabf6b9/895291532374/sources/ths/SDA-BOARD-002/normalized.json",
+      "sha256": "314cd56f60dd722af5635e473fa9ced3cca0ba8d01a2343338781ac2dcc7f653",
+      "byte_length": 4570
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/industry_index_daily/scope-f814d4fe4eabf6b9/895291532374/sources/ths/SDA-BOARD-002/normalized.parquet",
+      "sha256": "0955b6a5eff168589227c8e6a3c1f92fc62f33c6cc087fbc84c50af28cdd2b5a",
+      "byte_length": 3394
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/industry_index_daily/scope-f814d4fe4eabf6b9/895291532374/sources/ths/SDA-BOARD-002/raw_refs.json",
+      "sha256": "9c09bdea4aa86c427134ca3676259085b97950998d1d57cdd8a6d8d032dc4d9a",
+      "byte_length": 2334
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/industry_index_daily/scope-f814d4fe4eabf6b9/895291532374/sources/ths/SDA-BOARD-002/parsed/source-rows.json",
+      "sha256": "7280ea567517a1464de7fc5bd80241383a53ff271ee5988e877c9d74358e4c5b",
+      "byte_length": 3394
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/board_fund_flow/scope-604979b92061e22d/225514fd25aa/manifest.json",
+      "sha256": "37a371217f28ae91b1d89d62d0352301cc020efff25a996372a79a223fd40460",
+      "byte_length": 2893
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/board_fund_flow/scope-604979b92061e22d/225514fd25aa/quality_report.json",
+      "sha256": "833e8c39afaa1e05feb599ecf4d5174394042de84344e89d44f49964795af6d5",
+      "byte_length": 878
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/board_fund_flow/scope-604979b92061e22d/225514fd25aa/report.json",
+      "sha256": "14c0b576f31f5433561b29f762c460ddbb44d55f3e819565d9da44e038982a8b",
+      "byte_length": 20306
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/board_fund_flow/scope-604979b92061e22d/225514fd25aa/started.json",
+      "sha256": "fe1c5d097c7c482a0fc2e73acfdd374ff2e68e1e2a346a06742a051d7ffbef72",
+      "byte_length": 255
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/board_fund_flow/scope-604979b92061e22d/225514fd25aa/sources/ths/SDA-BOARD-003/normalized.json",
+      "sha256": "023bca4d5ec50d877ef2df836a9b2c1954aced4e7df907220cd48cfe6b27d7d1",
+      "byte_length": 31676
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/board_fund_flow/scope-604979b92061e22d/225514fd25aa/sources/ths/SDA-BOARD-003/normalized.parquet",
+      "sha256": "b440a364040b4d29fd28d3079972a0e777607a57481dc86e5c06c12272da5640",
+      "byte_length": 8756
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/board_fund_flow/scope-604979b92061e22d/225514fd25aa/sources/ths/SDA-BOARD-003/raw_refs.json",
+      "sha256": "dbe921b6895ebd08d1a69feb4938ab9173fa9678cd3f48fd7e0ef92a3e8e22ce",
+      "byte_length": 2004
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/board_fund_flow/scope-604979b92061e22d/225514fd25aa/sources/ths/SDA-BOARD-003/parsed/source-rows.json",
+      "sha256": "fdf61aeb2f9c0aa1875f556cf6945c0e5f15f7ed5eaaf82fc5254bf48ab67107",
+      "byte_length": 20726
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/board_fund_flow/scope-200883daa9bfef27/f106fe075d00/manifest.json",
+      "sha256": "4275236b864c055c48fa3580f105a8bd9907bf0087da2e4182c6d261ac7d9095",
+      "byte_length": 3696
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/board_fund_flow/scope-200883daa9bfef27/f106fe075d00/quality_report.json",
+      "sha256": "092482900210d1a3652763c5a9d9c4210970d73ee7c026611ec534ad29250c3f",
+      "byte_length": 1295
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/board_fund_flow/scope-200883daa9bfef27/f106fe075d00/report.json",
+      "sha256": "ece580f7755309558eb25ad2ca1aa7f49253cf2774ab9c5a4833606188dfb2da",
+      "byte_length": 35325
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/board_fund_flow/scope-200883daa9bfef27/f106fe075d00/started.json",
+      "sha256": "b9525f80339381d5ac6358af573285066a2917f7d62cacbaed3c9b9d346c8797",
+      "byte_length": 254
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/board_fund_flow/scope-200883daa9bfef27/f106fe075d00/sources/ths/SDA-BOARD-004/normalized.json",
+      "sha256": "88932e5fea5a212b0ab99999b05006a66cf134fb5b9fa4591177bd329e7bcecc",
+      "byte_length": 136884
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/board_fund_flow/scope-200883daa9bfef27/f106fe075d00/sources/ths/SDA-BOARD-004/normalized.parquet",
+      "sha256": "66682fbb52eab948c26021c92ba5ac4a4cb48fccf956d142f9e06e81e642159c",
+      "byte_length": 19813
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/board_fund_flow/scope-200883daa9bfef27/f106fe075d00/sources/ths/SDA-BOARD-004/raw_refs.json",
+      "sha256": "9ef5b326c6aca7f440c3bce00d67d88ae23c11defa05ee6b2741e090eddb9bc1",
+      "byte_length": 2400
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/board_fund_flow/scope-200883daa9bfef27/f106fe075d00/sources/ths/SDA-BOARD-004/parsed/source-rows.json",
+      "sha256": "989d8fd6933f506614edf7ad0d1e64d6717a1a316414262740297c753c02315e",
+      "byte_length": 90694
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/security_snapshot/scope-544866dc87932451/ed50aab1622e/manifest.json",
+      "sha256": "d8c0d87133bab4f8a06e4dc342c66bd85725dc7d59e3845222a433fb2cef8621",
+      "byte_length": 2495
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/security_snapshot/scope-544866dc87932451/ed50aab1622e/quality_report.json",
+      "sha256": "b7e2ddaac055aa51e4c3e9db433c2ed1615824d0edfb314ed0805e249123eed9",
+      "byte_length": 696
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/security_snapshot/scope-544866dc87932451/ed50aab1622e/report.json",
+      "sha256": "d98c8470d31f4701967f364b4b8d67905642740a03c53af17def9a044c83e0dd",
+      "byte_length": 16951
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/security_snapshot/scope-544866dc87932451/ed50aab1622e/started.json",
+      "sha256": "8ec3ba9277e647625628c0ae00b005403152bd4fc7ccfd594dee01d2db1be18f",
+      "byte_length": 246
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/security_snapshot/scope-544866dc87932451/ed50aab1622e/sources/baostock/SDA-BOARD-005/normalized.json",
+      "sha256": "dbc8a989278cab4835351d136493f78f40835b7817b3e060d9af90a9ea4606bc",
+      "byte_length": 697174
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/security_snapshot/scope-544866dc87932451/ed50aab1622e/sources/baostock/SDA-BOARD-005/normalized.parquet",
+      "sha256": "75b13b09f20e0b7553761dda6c7ea38a60c88f370c5f7f5a0b8553462df4d26c",
+      "byte_length": 88423
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/security_snapshot/scope-544866dc87932451/ed50aab1622e/sources/baostock/SDA-BOARD-005/raw_refs.json",
+      "sha256": "0f32b568b1f50f9e3a8929a894c929a2b82e482f181db7dafb62b2e3abd5030d",
+      "byte_length": 1978
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/security_snapshot/scope-544866dc87932451/ed50aab1622e/sources/baostock/SDA-BOARD-005/parsed/source-rows.json",
+      "sha256": "ad1a26000dea4741b005a605271a5d4718896f76a9b33fdfec928f6399eb6b68",
+      "byte_length": 697174
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/industry_membership/scope-544866dc87932451/81d42329426e/manifest.json",
+      "sha256": "b74781b2f4adc008eaf280eb717614af324b85295a3108e654f7d85afa03605b",
+      "byte_length": 2620
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/industry_membership/scope-544866dc87932451/81d42329426e/quality_report.json",
+      "sha256": "3ec0f07eccc74a421b4ec7290bb7a320ebba101030403a3158c25c95e61db507",
+      "byte_length": 682
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/industry_membership/scope-544866dc87932451/81d42329426e/report.json",
+      "sha256": "27c8ec353fdf4fea7a4bcf43b2aec98a46a97ea12de863467b7e6125c7bae351",
+      "byte_length": 17235
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/industry_membership/scope-544866dc87932451/81d42329426e/started.json",
+      "sha256": "428ba9a067e72b02b4698bcd042ec491da01c9533e5424b5420ff56e23542fc4",
+      "byte_length": 248
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/industry_membership/scope-544866dc87932451/81d42329426e/sources/baostock/SDA-BOARD-006/normalized.json",
+      "sha256": "db47f41c3144d56f7f22f208d460c0a68f98d6261d1f570cc18fd229a32053f2",
+      "byte_length": 1385769
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/industry_membership/scope-544866dc87932451/81d42329426e/sources/baostock/SDA-BOARD-006/normalized.parquet",
+      "sha256": "4ebd5a76fdfeb40be526856c9796301a0deea15cb076874329626243ed2ae0d2",
+      "byte_length": 95696
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/industry_membership/scope-544866dc87932451/81d42329426e/sources/baostock/SDA-BOARD-006/raw_refs.json",
+      "sha256": "871b20fdf9225f2c9cc1dc08a8e1873476286529c428293a2f415b0c8ae4fd46",
+      "byte_length": 1988
+    },
+    {
+      "path": "provider_validation/results/storage-layout-20261005/replay-data-v2/task_workspace/industry_membership/scope-544866dc87932451/81d42329426e/sources/baostock/SDA-BOARD-006/parsed/source-rows.json",
+      "sha256": "3625466a2258df5166582cb737a138236b4cc0a2548a2b60db2edb427193fa6e",
+      "byte_length": 1317896
+    }
+  ],
+  "baseline_sha256": "2c351035f206e4f109acd7f63d46ae087157c7611168894eef23b90478e84523",
+  "formal_verification_sha256": "7280631079307dde3920a313fb13dd84a3e3b83abba301e7bf76724e50b40575",
+  "remaining_work": [
+    "dataset-specific multi-source construction and publication semantics",
+    "connect successful production publication to archival",
+    "online freshness, scope and capacity qualification before routing"
+  ]
+}

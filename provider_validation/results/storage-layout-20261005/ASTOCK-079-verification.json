@@ -1,0 +1,18 @@
+{
+  "input_id": "ASTOCK-079",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\storage-layout-20261005\\replay-data-v2\\task_workspace\\institution_survey\\scope-f1d51d08333fae56\\3fb31c0f462d\\report.json",
+  "report_sha256": "263746b896255cffe6b7028167227084b412b9c7bd654bde31d55d2166930866",
+  "source_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\manifest.ndjson",
+  "source_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+  "source_response_hashes": [
+    "852a3a28fe9c3e66a4f899162d281af07a62e33a436f514dd3af33c8b82c7888"
+  ],
+  "code_version": "06c802dfed2620055ae9ed41036dcf1ee477f342ebf1ed6121bb696f4f943b01",
+  "row_count": 50,
+  "coverage_denominator": 50,
+  "validation_time_utc": "2026-10-04T19:14:04.253944+00:00",
+  "mode": "offline archive replay into isolated runtime layers",
+  "canonical_writes": 0,
+  "field_roundtrip_verified": true,
+  "raw_hashes_verified": true
+}

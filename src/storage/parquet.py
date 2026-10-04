@@ -70,6 +70,69 @@ class InvalidPartitionError(RuntimeError):
     pass
 
 
+def write_normalized_rows(path: str | Path, rows: Iterable[Mapping], fields: Mapping) -> dict:
+    """Persist source candidates using the declared field contract, without publishing."""
+    import hashlib
+    from uuid import uuid4
+
+    path = Path(path)
+    records = list(rows)
+    if any(set(row) - set(fields) for row in records):
+        raise ValueError("normalized rows contain undeclared fields")
+    arrow_fields = []
+    for name, definition in fields.items():
+        values = [row.get(name) for row in records if row.get(name) is not None]
+        kind = definition["type"]
+        if definition.get("required") and len(values) != len(records):
+            raise ValueError(f"missing required normalized field: {name}")
+        if kind == "decimal":
+            if any(not isinstance(value, Decimal) or not value.is_finite() for value in values):
+                raise ValueError(f"decimal field requires finite Decimal values: {name}")
+            scale = max([0] + [-value.as_tuple().exponent for value in values])
+            integer_digits = max([0] + [max(0, value.adjusted() + 1) for value in values])
+            precision = max(1, integer_digits + scale)
+            if precision > 76:
+                raise ValueError(f"decimal precision exceeds Parquet capacity: {name}")
+            arrow_type = pa.decimal128(precision, scale) if precision <= 38 else pa.decimal256(precision, scale)
+        elif kind in {"string", "enum"}:
+            if any(not isinstance(value, str) for value in values):
+                raise ValueError(f"string field requires string values: {name}")
+            if kind == "enum" and any(value not in definition["values"] for value in values):
+                raise ValueError(f"undeclared enum value: {name}")
+            arrow_type = pa.string()
+        elif kind == "date":
+            if any(not isinstance(value, date) or isinstance(value, datetime) for value in values):
+                raise ValueError(f"date field requires date values: {name}")
+            arrow_type = pa.date32()
+        elif kind == "datetime":
+            if any(not isinstance(value, datetime) for value in values):
+                raise ValueError(f"datetime field requires datetime values: {name}")
+            aware = [value.utcoffset() is not None for value in values]
+            if aware and any(aware) != all(aware):
+                raise ValueError(f"mixed naive and aware timestamps: {name}")
+            arrow_type = pa.timestamp("us", tz="UTC" if any(aware) else None)
+        elif kind == "integer":
+            if any(type(value) is not int for value in values):
+                raise ValueError(f"integer field requires integer values: {name}")
+            arrow_type = pa.int64()
+        else:
+            raise ValueError(f"unsupported normalized field type: {kind}")
+        arrow_fields.append(pa.field(name, arrow_type, nullable=not definition.get("required", False)))
+    table = pa.Table.from_pylist(records, schema=pa.schema(arrow_fields))
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f"{path.name}.{uuid4().hex[:12]}.tmp")
+    try:
+        pq.write_table(table, temporary)
+        with temporary.open("r+b") as stream:
+            os.fsync(stream.fileno())
+        # Link is an atomic, no-overwrite publication within this task directory.
+        os.link(temporary, path)
+    finally:
+        temporary.unlink(missing_ok=True)
+    return {"sha256": hashlib.sha256(path.read_bytes()).hexdigest(), "row_count": len(records),
+            "byte_length": path.stat().st_size, "arrow_schema": str(table.schema)}
+
+
 class PartitionLock(AbstractContextManager["PartitionLock"]):
     def __init__(self, path: Path) -> None:
         self.path = path

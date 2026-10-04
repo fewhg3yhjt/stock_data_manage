@@ -223,7 +223,7 @@ async function buildFormalSpecWorkbook() {
     };
     for (let col = 0; col < data.headers.length; col++) {
       const header = data.headers[col];
-      const width = /限制|备注|原因|入口|证据|报告|清单|路径|禁止|实测参数|规则|来源地址/.test(header) ? 55
+      const width = /限制|备注|原因|入口|证据|报告|清单|路径|禁止|实测参数|规则|来源地址|标准化文件|最终数据|归档条件/.test(header) ? 55
         : /能力名称/.test(header) ? 30 : /频率|含义|参数来源|来源字段|验证方式/.test(header) ? 32 : 20;
       sheet.getRange(`${letter(col)}${start}:${letter(col)}${end}`).format.columnWidth = width;
       sheet.getRange(`${letter(col)}1:${letter(col)}8`).format.columnWidth = width;
@@ -279,6 +279,8 @@ async function buildFormalSpecWorkbook() {
     const preview = await workbook.render({ sheetName: data.name, range: "A1:G13", scale: 1, format: "png" });
     await fs.writeFile(path.join(visualDir, `formal-interface-spec-${index}.png`), new Uint8Array(await preview.arrayBuffer()));
   }
+  const storagePreview = await workbook.render({ sheetName: "接口总览", range: "AE9:AI12", scale: 1, format: "png" });
+  await fs.writeFile(path.join(visualDir, "formal-interface-spec-storage.png"), new Uint8Array(await storagePreview.arrayBuffer()));
   const outputArgument = process.argv.indexOf("--output");
   if (outputArgument !== -1 && !process.argv[outputArgument + 1]) throw new Error("--output requires a file path");
   const outputPath = outputArgument === -1 ? path.join(directory, "源头采集接口说明.xlsx") : path.resolve(process.argv[outputArgument + 1]);

@@ -48,3 +48,9 @@ node provider_validation/tests/build_interface_coverage_workbook.mjs --formal-sp
 两步分别刷新配套JSON和XLSX。它们仅复用已提交审计索引中有哈希关联的成功执行报告，不采集新数据。原测试覆盖报告的默认导出模式及存放位置保持不变；旧证据哈希不匹配时不授予新的验证结论。
 
 本次目录迁移后的导出核对记录见 [正式接口说明核对结果](../../provider_validation/results/source-layout-20261005/formal/verification.json)，迁移与安装验证见 [目录整理核对结果](../../provider_validation/results/source-layout-20261005/verification.json)。2026-10-04 的原导出核对记录保留原样。
+
+## 运行输出与历史验证证据
+
+接口总览新增运行原始响应路径、任务工作区路径、来源标准化文件、最终数据与发布状态、任务归档条件五列。它们描述当前代码和配置的默认落盘位置；原有验证报告及原始证据清单列继续指向历史来源验证材料。历史材料没有搬迁，历史样本成功不等于当前全量生产验证。
+
+当前默认运行输出统一进入 `data/`，详细职责、命令和归档门禁见 [运行数据目录与归档](../storage/README.md)。标准化成功仍为候选完成，保留在工作区；63种输入数据集的正式发布和多来源构建尚未接通，生产路由与自动调度不因目录配置而启用。

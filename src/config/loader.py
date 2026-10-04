@@ -13,6 +13,38 @@ from ..routing.capabilities import ProviderCapability
 from ..quality.normalization import NormalizationRule
 
 
+def load_storage_paths(config_root: str | Path, *, data_root: str | Path | None = None) -> dict[str, Path]:
+    """Resolve existing storage settings under one runtime root; create no files."""
+    root = Path(config_root).resolve()
+    document = yaml.safe_load((root / "collection.yaml").read_text(encoding="utf-8"))
+    settings = document["storage"]
+    project = root.parent
+    configured = (project / settings.get("data_root", "data")).resolve()
+    runtime = Path(data_root).resolve() if data_root is not None else configured
+    defaults = {"raw_root": "raw", "workspace_root": "task_workspace", "archive_root": "task_archive",
+                "canonical_root": "canonical", "metadata_path": "metadata/metadata.duckdb"}
+    paths = {"data_root": runtime}
+    for name, default in defaults.items():
+        configured_path = (project / settings.get(name, str(configured / default))).resolve()
+        if not configured_path.is_relative_to(configured) or configured_path == configured:
+            raise ValueError(f"{name} must be inside data_root")
+        paths[name] = (runtime / configured_path.relative_to(configured)).resolve()
+        if not paths[name].is_relative_to(runtime):
+            raise ValueError(f"{name} resolves outside runtime data_root")
+    hot = (project / document.get("realtime_minute", {}).get("hot_store", {}).get("path", str(configured / "hot/minute_hot.db"))).resolve()
+    if not hot.is_relative_to(configured) or hot == configured:
+        raise ValueError("hot store must be inside data_root")
+    paths["hot_path"] = (runtime / hot.relative_to(configured)).resolve()
+    if not paths["hot_path"].is_relative_to(runtime):
+        raise ValueError("hot store resolves outside runtime data_root")
+    directories = [paths[name] for name in ("raw_root", "workspace_root", "archive_root", "canonical_root")]
+    directories.extend((paths["metadata_path"].parent, paths["hot_path"].parent))
+    for index, first in enumerate(directories):
+        if any(first.is_relative_to(second) or second.is_relative_to(first) for second in directories[index + 1:]):
+            raise ValueError("runtime storage directories must be distinct and must not contain one another")
+    return paths
+
+
 @dataclass(frozen=True, slots=True)
 class ParameterBinding:
     name: str

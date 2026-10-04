@@ -46,8 +46,12 @@ def main(argv: list[str] | None = None) -> int:
     minute_probe.add_argument("--code-prefix", default="")
 
     recover = subcommands.add_parser("recover", help="repair canonical files and metadata after interruption")
-    recover.add_argument("--canonical-root", type=Path, required=True)
-    recover.add_argument("--metadata", type=Path, required=True)
+    recover.add_argument("--canonical-root", type=Path)
+    recover.add_argument("--metadata", type=Path)
+    recover.add_argument("--config-root", type=Path, default=Path("config"))
+    recover.add_argument("--data-root", type=Path)
+    recover.add_argument("--archive-task", type=Path, action="append", default=[],
+                         help="archive an explicitly selected, verified published task")
 
     acceptance = subcommands.add_parser(
         "acceptance-offline", help="run deterministic offline M1 acceptance evidence"
@@ -59,7 +63,8 @@ def main(argv: list[str] | None = None) -> int:
     collect = subcommands.add_parser("collect-input", help="collect or replay one configured input into candidate files")
     collect.add_argument("--input", required=True)
     collect.add_argument("--config-root", type=Path, default=Path("config"))
-    collect.add_argument("--output-root", type=Path, required=True)
+    collect.add_argument("--output-root", type=Path, help="explicit isolated validation output; historical evidence layout")
+    collect.add_argument("--data-root", type=Path, help="override configured runtime data root, keeping all storage layers together")
     collect.add_argument("--mode", choices=("replay", "live"), default="replay")
     collect.add_argument("--replay-manifest", type=Path)
     collect.add_argument("--evidence-root", type=Path)
@@ -74,7 +79,8 @@ def main(argv: list[str] | None = None) -> int:
 
     due = subcommands.add_parser("collect-due-inputs", help="plan one scheduler tick, or explicitly execute candidate collection")
     due.add_argument("--config-root", type=Path, default=Path("config"))
-    due.add_argument("--output-root", type=Path, required=True)
+    due.add_argument("--output-root", type=Path, help="explicit isolated validation output; historical evidence layout")
+    due.add_argument("--data-root", type=Path, help="override configured runtime data root")
     due.add_argument("--now", type=_parse_datetime, help="aware schedule time; defaults to current UTC time")
     due.add_argument("--calendar-file", type=Path, required=True)
     due.add_argument("--securities-file", type=Path, help="saved SecurityRecord array for all_stock scope")
@@ -112,7 +118,8 @@ def main(argv: list[str] | None = None) -> int:
             report = collect_due_inputs(now=args.now or datetime.now(timezone.utc), config_root=args.config_root,
                 output_root=args.output_root, trading_dates=days, securities=records, symbols=args.symbol,
                 execute=args.execute, mode=args.mode, replay_manifest=args.replay_manifest,
-                evidence_root=args.evidence_root, dependency_paths=paths)
+                evidence_root=args.evidence_root, dependency_paths=paths,
+                **({"data_root": args.data_root} if args.data_root is not None else {}))
         except (ValueError, TypeError, KeyError) as exc:
             parser.error(str(exc))
         print(json.dumps(report, ensure_ascii=False, default=_json_default, indent=2))
@@ -143,7 +150,8 @@ def main(argv: list[str] | None = None) -> int:
             report = collect_input(input_id=args.input, context=context,
                 config_root=args.config_root, output_root=args.output_root, mode=args.mode,
                 replay_manifest=args.replay_manifest, evidence_root=args.evidence_root,
-                fields=[name.strip() for name in args.fields.split(",")] if args.fields else None)
+                fields=[name.strip() for name in args.fields.split(",")] if args.fields else None,
+                **({"data_root": args.data_root} if args.data_root is not None else {}))
         except ValueError as exc:
             parser.error(str(exc))
         print(json.dumps(report, ensure_ascii=False, default=_json_default, indent=2))
@@ -215,9 +223,24 @@ def main(argv: list[str] | None = None) -> int:
         print(payload)
         return 0
 
-    with MetadataStore(args.metadata) as metadata:
-        report = RecoveryScanner(args.canonical_root, metadata).recover()
-    print(json.dumps(asdict(report), ensure_ascii=False, default=_json_default, indent=2))
+    from .config.loader import load_storage_paths
+    from .worker.recovery import archive_published_task
+    # Preserve the existing explicit recovery contract outside a project checkout.
+    paths = load_storage_paths(args.config_root, data_root=args.data_root) if (
+        not args.canonical_root or not args.metadata or args.archive_task or args.data_root) else None
+    canonical_root = args.canonical_root or paths["canonical_root"]
+    try:
+        with MetadataStore(args.metadata or paths["metadata_path"]) as metadata:
+            report = RecoveryScanner(canonical_root, metadata).recover()
+            archived = [str(archive_published_task(task, workspace_root=paths["workspace_root"],
+                archive_root=paths["archive_root"], canonical_root=canonical_root,
+                raw_root=paths["raw_root"], metadata=metadata)) for task in args.archive_task]
+    except ValueError as exc:
+        parser.error(str(exc))
+    output = asdict(report)
+    if args.archive_task:
+        output["archived_tasks"] = archived
+    print(json.dumps(output, ensure_ascii=False, default=_json_default, indent=2))
     return 0 if not report.invalid_final_partitions else 2
 
 

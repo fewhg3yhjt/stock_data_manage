@@ -61,21 +61,31 @@ class RawObjectStore:
         endpoint: str,
         fetched_at: datetime,
         attempt_id: str,
+        relative_path: str | Path | None = None,
     ) -> RawObjectRef:
         content = json.dumps(
             payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")
         ).encode("utf-8")
         return self.write_bytes(content, dataset=dataset, provider=provider, endpoint=endpoint,
-                                fetched_at=fetched_at, attempt_id=attempt_id, suffix="json")
+                                fetched_at=fetched_at, attempt_id=attempt_id, suffix="json", relative_path=relative_path)
 
     def write_bytes(self, content: bytes, *, dataset: str, provider: str, endpoint: str,
-                    fetched_at: datetime, attempt_id: str, suffix: str = "bin", content_addressed: bool = False) -> RawObjectRef:
+                    fetched_at: datetime, attempt_id: str, suffix: str = "bin", content_addressed: bool = False,
+                    relative_path: str | Path | None = None) -> RawObjectRef:
         for component in (dataset, provider, endpoint, attempt_id, suffix):
             if not component or component in {".", ".."} or any(c in component for c in ("/", "\\", ":")):
                 raise ValueError("invalid raw object path component")
         relative = Path("bodies", hashlib.sha256(content).hexdigest() + ".bin") if content_addressed else Path(
             fetched_at.date().isoformat(), dataset, provider, endpoint, f"{attempt_id}.{suffix}"
         )
+        if relative_path is not None:
+            if content_addressed:
+                raise ValueError("content-addressed bodies must retain their hash path")
+            relative = Path(relative_path)
+            if relative.is_absolute() or ".." in relative.parts or not relative.parts:
+                raise ValueError("artifact path must stay within its store")
+            if not (self.root / relative).resolve().is_relative_to(self.root.resolve()):
+                raise ValueError("artifact path escapes its store")
         target = self.root / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         expected_hash = hashlib.sha256(content).hexdigest()

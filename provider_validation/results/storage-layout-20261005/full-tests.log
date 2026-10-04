@@ -1,0 +1,133 @@
+........................................................................ [  9%]
+........................................................................ [ 19%]
+........................................................................ [ 29%]
+........................................................................ [ 39%]
+........................................................................ [ 48%]
+........................................................................ [ 58%]
+........................................................................ [ 68%]
+....................................................FF....FF............ [ 78%]
+........................................................................ [ 88%]
+........................................................................ [ 97%]
+...............                                                          [100%]
+================================== FAILURES ===================================
+____ test_runtime_layered_storage_preserves_source_and_mapping[ASTOCK-071] ____
+
+tmp_path = WindowsPath('C:/Users/sp181/AppData/Local/Temp/pytest-of-sp181/pytest-118/test_runtime_layered_storage_p13')
+no_network = None, input_id = 'ASTOCK-071'
+context = {'calendar': {'trading_dates': [datetime.date(2026, 9, 18)]}, 'request': {'exchange': 'SHFE', 'trade_date': '2026-09-18'}}
+manifest = WindowsPath('D:/Project/PythonProgram/stock_data_manage/provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson')
+count = 238
+
+    @pytest.mark.parametrize("input_id,context,manifest,count", list(RUNTIME_CASES.values()),
+                             ids=list(RUNTIME_CASES))
+    def test_runtime_layered_storage_preserves_source_and_mapping(tmp_path, no_network, input_id, context, manifest, count):
+        import pyarrow.parquet as pq
+        from stock_data_manage.config.loader import load_storage_paths
+        from stock_data_manage.storage.metadata import MetadataStore
+        from stock_data_manage.domain import AttemptStatus
+    
+        import os
+        audit_root = os.environ.get("STOCKDATA_LAYOUT_EVIDENCE_ROOT")
+        data_root = Path(audit_root).resolve() if audit_root else tmp_path / "data"
+        report = collect_input(input_id=input_id, context=context, config_root=ROOT / "config",
+                               data_root=data_root, replay_manifest=manifest)
+>       assert report["status"] == "candidate_complete", {k: report.get(k) for k in ("input_id", "status", "error")}
+E       AssertionError: {'error': 'FileNotFoundError', 'input_id': 'ASTOCK-071', 'status': 'failed'}
+E       assert 'failed' == 'candidate_complete'
+E         
+E         - candidate_complete
+E         + failed
+
+tests\test_input_collection.py:4138: AssertionError
+____ test_runtime_layered_storage_preserves_source_and_mapping[ASTOCK-072] ____
+
+tmp_path = WindowsPath('C:/Users/sp181/AppData/Local/Temp/pytest-of-sp181/pytest-118/test_runtime_layered_storage_p14')
+no_network = None, input_id = 'ASTOCK-072'
+context = {'calendar': {'trading_dates': [datetime.date(2026, 9, 18)]}, 'request': {'exchange': 'SHFE', 'trade_date': '2026-09-18'}}
+manifest = WindowsPath('D:/Project/PythonProgram/stock_data_manage/provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson')
+count = 6546
+
+    @pytest.mark.parametrize("input_id,context,manifest,count", list(RUNTIME_CASES.values()),
+                             ids=list(RUNTIME_CASES))
+    def test_runtime_layered_storage_preserves_source_and_mapping(tmp_path, no_network, input_id, context, manifest, count):
+        import pyarrow.parquet as pq
+        from stock_data_manage.config.loader import load_storage_paths
+        from stock_data_manage.storage.metadata import MetadataStore
+        from stock_data_manage.domain import AttemptStatus
+    
+        import os
+        audit_root = os.environ.get("STOCKDATA_LAYOUT_EVIDENCE_ROOT")
+        data_root = Path(audit_root).resolve() if audit_root else tmp_path / "data"
+        report = collect_input(input_id=input_id, context=context, config_root=ROOT / "config",
+                               data_root=data_root, replay_manifest=manifest)
+>       assert report["status"] == "candidate_complete", {k: report.get(k) for k in ("input_id", "status", "error")}
+E       AssertionError: {'error': 'FileNotFoundError', 'input_id': 'ASTOCK-072', 'status': 'failed'}
+E       assert 'failed' == 'candidate_complete'
+E         
+E         - candidate_complete
+E         + failed
+
+tests\test_input_collection.py:4138: AssertionError
+_ test_runtime_layered_storage_preserves_source_and_mapping[ASTOCK-037-profile] _
+
+tmp_path = WindowsPath('C:/Users/sp181/AppData/Local/Temp/pytest-of-sp181/pytest-118/test_runtime_layered_storage_p19')
+no_network = None, input_id = 'ASTOCK-037-profile'
+context = {'request': {'symbol': '600519'}}
+manifest = WindowsPath('D:/Project/PythonProgram/stock_data_manage/provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson')
+count = 1
+
+    @pytest.mark.parametrize("input_id,context,manifest,count", list(RUNTIME_CASES.values()),
+                             ids=list(RUNTIME_CASES))
+    def test_runtime_layered_storage_preserves_source_and_mapping(tmp_path, no_network, input_id, context, manifest, count):
+        import pyarrow.parquet as pq
+        from stock_data_manage.config.loader import load_storage_paths
+        from stock_data_manage.storage.metadata import MetadataStore
+        from stock_data_manage.domain import AttemptStatus
+    
+        import os
+        audit_root = os.environ.get("STOCKDATA_LAYOUT_EVIDENCE_ROOT")
+        data_root = Path(audit_root).resolve() if audit_root else tmp_path / "data"
+        report = collect_input(input_id=input_id, context=context, config_root=ROOT / "config",
+                               data_root=data_root, replay_manifest=manifest)
+>       assert report["status"] == "candidate_complete", {k: report.get(k) for k in ("input_id", "status", "error")}
+E       AssertionError: {'error': 'FileNotFoundError', 'input_id': 'ASTOCK-037-profile', 'status': 'failed'}
+E       assert 'failed' == 'candidate_complete'
+E         
+E         - candidate_complete
+E         + failed
+
+tests\test_input_collection.py:4138: AssertionError
+_ test_runtime_layered_storage_preserves_source_and_mapping[ASTOCK-037-events] _
+
+tmp_path = WindowsPath('C:/Users/sp181/AppData/Local/Temp/pytest-of-sp181/pytest-118/test_runtime_layered_storage_p20')
+no_network = None, input_id = 'ASTOCK-037-events'
+context = {'request': {'date': '2023-08-08'}}
+manifest = WindowsPath('D:/Project/PythonProgram/stock_data_manage/provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson')
+count = 75
+
+    @pytest.mark.parametrize("input_id,context,manifest,count", list(RUNTIME_CASES.values()),
+                             ids=list(RUNTIME_CASES))
+    def test_runtime_layered_storage_preserves_source_and_mapping(tmp_path, no_network, input_id, context, manifest, count):
+        import pyarrow.parquet as pq
+        from stock_data_manage.config.loader import load_storage_paths
+        from stock_data_manage.storage.metadata import MetadataStore
+        from stock_data_manage.domain import AttemptStatus
+    
+        import os
+        audit_root = os.environ.get("STOCKDATA_LAYOUT_EVIDENCE_ROOT")
+        data_root = Path(audit_root).resolve() if audit_root else tmp_path / "data"
+        report = collect_input(input_id=input_id, context=context, config_root=ROOT / "config",
+                               data_root=data_root, replay_manifest=manifest)
+>       assert report["status"] == "candidate_complete", {k: report.get(k) for k in ("input_id", "status", "error")}
+E       AssertionError: {'error': 'FileNotFoundError', 'input_id': 'ASTOCK-037-events', 'status': 'failed'}
+E       assert 'failed' == 'candidate_complete'
+E         
+E         - candidate_complete
+E         + failed
+
+tests\test_input_collection.py:4138: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_input_collection.py::test_runtime_layered_storage_preserves_source_and_mapping[ASTOCK-071]
+FAILED tests/test_input_collection.py::test_runtime_layered_storage_preserves_source_and_mapping[ASTOCK-072]
+FAILED tests/test_input_collection.py::test_runtime_layered_storage_preserves_source_and_mapping[ASTOCK-037-profile]
+FAILED tests/test_input_collection.py::test_runtime_layered_storage_preserves_source_and_mapping[ASTOCK-037-events]

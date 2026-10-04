@@ -1,9 +1,12 @@
 timezone: Asia/Shanghai
 
 storage:
+  data_root: data
   raw_root: data/raw
+  workspace_root: data/task_workspace
+  archive_root: data/task_archive
   canonical_root: data/canonical
-  metadata_path: metadata/metadata.duckdb
+  metadata_path: data/metadata/metadata.duckdb
   raw_retention_days:
     daily_bar: 90
     snapshot: 30

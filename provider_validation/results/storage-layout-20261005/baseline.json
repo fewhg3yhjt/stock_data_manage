@@ -1,0 +1,285 @@
+{
+  "head": "274f376c7880594e7ef1c62e68683ed3bf6fa936",
+  "files": [
+    {
+      "path": "src/config/loader.py",
+      "sha256": "93bb55ab150c88751fe9a58a2b75737878c1b0f07233b8ec47009c4901bb11e9",
+      "snapshot": "provider_validation/results/storage-layout-20261005/baseline/src/config/loader.py"
+    },
+    {
+      "path": "src/pipeline/inputs.py",
+      "sha256": "800b69457ab0a6ab718ffe5c40a3b47b98529ff28fbbbb5c5630066c84317d38",
+      "snapshot": "provider_validation/results/storage-layout-20261005/baseline/src/pipeline/inputs.py"
+    },
+    {
+      "path": "src/storage/raw.py",
+      "sha256": "16e1905b7f84e3fd49c0e38241e90f4b0d42786d92ea93f604c200cfd361bc46",
+      "snapshot": "provider_validation/results/storage-layout-20261005/baseline/src/storage/raw.py"
+    },
+    {
+      "path": "src/storage/parquet.py",
+      "sha256": "c21d0e423e645c1d123ad91a64dcca013fbcf87890829c4c78c527d12bb7f1a9",
+      "snapshot": "provider_validation/results/storage-layout-20261005/baseline/src/storage/parquet.py"
+    },
+    {
+      "path": "src/worker/recovery.py",
+      "sha256": "cd1f54d3d00fa261ea72b6b36ae27b12f1e05849909db2e11e5168c9ae0dc308",
+      "snapshot": "provider_validation/results/storage-layout-20261005/baseline/src/worker/recovery.py"
+    },
+    {
+      "path": "src/cli.py",
+      "sha256": "582f5caedfc538a012d7a2f6e8cd7af3fe8b6fc9152e5b9e0a3fa2cb8810ae19",
+      "snapshot": "provider_validation/results/storage-layout-20261005/baseline/src/cli.py"
+    },
+    {
+      "path": "config/collection.yaml",
+      "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d",
+      "snapshot": "provider_validation/results/storage-layout-20261005/baseline/config/collection.yaml"
+    }
+  ],
+  "providers": [
+    {
+      "path": "src/providers/base.py",
+      "sha256": "69804e1c118bd1232d1759e8d78b4e25f7c34ce8c8fca4e5001df87fab7be230"
+    },
+    {
+      "path": "src/providers/contracts.py",
+      "sha256": "2e88e4875a56bbebd79154c6343af4f21e933c155ad64a24b7025263f258e391"
+    },
+    {
+      "path": "src/providers/probes.py",
+      "sha256": "e171d73981449e37c16c2acedc45e2b8e2cf2e644cafe2f7b37efe4b80e8030f"
+    },
+    {
+      "path": "src/providers/transport.py",
+      "sha256": "1e164987c1465e3333f7ff0fe0091a16e62e7e4da0f25ea20beb66600c4ea024"
+    },
+    {
+      "path": "src/providers/__init__.py",
+      "sha256": "c40119ca495518db8479b678af55c3ce8405964b69e201da51d2ee8ad2d33bb2"
+    },
+    {
+      "path": "src/providers/akshare/boards.py",
+      "sha256": "8c71899c8bac007b604c72479d5751a3bf3a28eb9b3061b828d866c693c9aec1"
+    },
+    {
+      "path": "src/providers/akshare/daily.py",
+      "sha256": "c08a15bdae773a57c804e82d7bcdcf20e6027d40f644e37863fa4783d2c3f9fc"
+    },
+    {
+      "path": "src/providers/akshare/session.py",
+      "sha256": "f281a7247b74efd4f8f86174f7ab8ba0bc2646e40e67a5022827fbdaf8488b95"
+    },
+    {
+      "path": "src/providers/akshare/__init__.py",
+      "sha256": "19ae3bca8e34cdcb75299e7db14185625b0c7eaf33a1abc816fbdc3303245291"
+    },
+    {
+      "path": "src/providers/baostock/daily.py",
+      "sha256": "5eb1d7221fa76b0542eecb9ecbaebe33bd2771ad3c8f7e110a1e0fbfea5ecda3"
+    },
+    {
+      "path": "src/providers/baostock/industry.py",
+      "sha256": "d3d97d239567ee9cdaff1af1e7bab2fee812d362a46554f871d43e31f3d81486"
+    },
+    {
+      "path": "src/providers/baostock/minute.py",
+      "sha256": "d3dbdef19f0145e32c8a05056dd6433b01063605baf04d173f2dbaf509ce5526"
+    },
+    {
+      "path": "src/providers/baostock/session.py",
+      "sha256": "7060828b4ae4125de14447d62d76c6e700b9224cb27c2d645164d5e31ab2e665"
+    },
+    {
+      "path": "src/providers/baostock/__init__.py",
+      "sha256": "a850cc81e8ff4ed7184b1a2ab653cb8f11a26cabe9ea423868fcdb4c12dcaf28"
+    },
+    {
+      "path": "src/providers/cctv/news.py",
+      "sha256": "8839bdeed801611e8e6d11cb9441e6ede7bc94d56507eaa2c903e605c772ee7d"
+    },
+    {
+      "path": "src/providers/cctv/__init__.py",
+      "sha256": "b9121d0dd84448588f48225109a2f88d9a66717477241e67b81e2c29f68aff50"
+    },
+    {
+      "path": "src/providers/chinabond/yield_curve.py",
+      "sha256": "2fcb5bf39aec2e7fb893baa214036cf24bb6265b57afc01e96e1ea7201c05331"
+    },
+    {
+      "path": "src/providers/chinabond/__init__.py",
+      "sha256": "ac52b81b664bed23f531f7bce14869f8ae404a1e380f3915deccdac5de8d461b"
+    },
+    {
+      "path": "src/providers/chinamoney/rates.py",
+      "sha256": "e7407f1d4272b69cb439bb0a7bad3960b65bb41328d752f541bc8ef50231f922"
+    },
+    {
+      "path": "src/providers/chinamoney/__init__.py",
+      "sha256": "f97ae4440a40a399e81b2e5ac61c0cf9d7c50fe9328490856e18030f9cf2692e"
+    },
+    {
+      "path": "src/providers/cls/news.py",
+      "sha256": "51da559a252b67a4a2e58171e3630ff1a5a80cd2bc23aa5df30a7e17ac02ad30"
+    },
+    {
+      "path": "src/providers/cls/__init__.py",
+      "sha256": "1609e66c332900944d1f86aa8537370984d25d76ef659616ebc2501f4da0c63c"
+    },
+    {
+      "path": "src/providers/cninfo/profile.py",
+      "sha256": "cb0e68bd9ae09abf9caab432f401f86798452b62080f1159d0d354f5d6978331"
+    },
+    {
+      "path": "src/providers/cninfo/__init__.py",
+      "sha256": "fa200baf13f4ef851faa1953053974b26746a40feddd5b3546b9125f0a53c5a0"
+    },
+    {
+      "path": "src/providers/csindex/indices.py",
+      "sha256": "4b95f2bbda23abc28dc160a76386cc2bf5d82817747dfcbcb518ee22ea07741b"
+    },
+    {
+      "path": "src/providers/csindex/__init__.py",
+      "sha256": "fca1b41b1c3fbd0262456031d6dd886314bccb2794cad918299382948832679a"
+    },
+    {
+      "path": "src/providers/eastmoney/dividend.py",
+      "sha256": "5706a8cdb37eeeb8f66cb033a3091dd1b6ec1ed83d72d0f9fbeb8f5c75d9649b"
+    },
+    {
+      "path": "src/providers/eastmoney/financial.py",
+      "sha256": "bba51b00d8d879327bef6338633c406f2405683d2ecf84d7d151063259b6663b"
+    },
+    {
+      "path": "src/providers/eastmoney/fund_flow.py",
+      "sha256": "0cf655efa0854d18651bb4f04f985f0f210b81a6d9eff065604d235ed8f75280"
+    },
+    {
+      "path": "src/providers/eastmoney/limit_pool.py",
+      "sha256": "2fbdfe3da3129545dfe8d2e457be7c42225696ddd74270567ae765e4b413f5ae"
+    },
+    {
+      "path": "src/providers/eastmoney/news.py",
+      "sha256": "89912d67f040541e13c9953f05a7594eb0d85f608cef5b5679802defd61cb1ed"
+    },
+    {
+      "path": "src/providers/eastmoney/realtime.py",
+      "sha256": "6e09d2a5014cf316c4d1e26e913a44d5c2fbad95fb44d95cba159ef881f03bca"
+    },
+    {
+      "path": "src/providers/eastmoney/security_list.py",
+      "sha256": "b3564c12953e2dc37932d9075a526cfc33b25753b4749d6e58eec1d3908466f1"
+    },
+    {
+      "path": "src/providers/eastmoney/shareholder.py",
+      "sha256": "4c9d80f4d51845ac5541c42275f44f2a18643db5e9ccb705a3e16168f8db44c1"
+    },
+    {
+      "path": "src/providers/eastmoney/__init__.py",
+      "sha256": "a4b6e77a1d1b321d811f0ab1b89f589ab3a48ba49b9e66ad5dd2afb38d03e637"
+    },
+    {
+      "path": "src/providers/exchanges/daily.py",
+      "sha256": "23685819ea2b740388b513421c0d1aa7c90aaf0198daa03bc0eca41696d8e8b5"
+    },
+    {
+      "path": "src/providers/exchanges/__init__.py",
+      "sha256": "ac52b81b664bed23f531f7bce14869f8ae404a1e380f3915deccdac5de8d461b"
+    },
+    {
+      "path": "src/providers/mofcom/social_financing.py",
+      "sha256": "55d292958fb34991c56c626d5f6f61e7e6c44c8c2627b88ea735e751aa12c5ce"
+    },
+    {
+      "path": "src/providers/mofcom/__init__.py",
+      "sha256": "97464189f10fcb5e23f028ad60ca2e28bfe556845fd0b4dc1144d3ab08cb6f90"
+    },
+    {
+      "path": "src/providers/sge/spot.py",
+      "sha256": "0801abb4eee03dada2500120b5963f5ebfb39f6f6a95f67cb4feda24dc3ec8a6"
+    },
+    {
+      "path": "src/providers/sge/__init__.py",
+      "sha256": "ac52b81b664bed23f531f7bce14869f8ae404a1e380f3915deccdac5de8d461b"
+    },
+    {
+      "path": "src/providers/sina/calendar.py",
+      "sha256": "3d114045f960bfcc94ade1ee03e4d25ebdf6980ba68aa2d0a2236bed78aaef05"
+    },
+    {
+      "path": "src/providers/sina/daily.py",
+      "sha256": "dd15e0c6b0f8ed5e6db99b5d2b9725eb7e2cc6f3e42bd5e6d392c5334922dc89"
+    },
+    {
+      "path": "src/providers/sina/financial.py",
+      "sha256": "699475f190f9864a5f7edafc23a5a85734f22a299f187a62819b4ebb5cb6e247"
+    },
+    {
+      "path": "src/providers/sina/minute.py",
+      "sha256": "62f69b05f5ebfae6fbf7b9cb88146ed204f533d4f63420cc7eff7e1ab6f30407"
+    },
+    {
+      "path": "src/providers/sina/news.py",
+      "sha256": "0392f60b5a2ab83eaec1b4b05fda39906b7be223b5cc8fc95cb0c814ed63481e"
+    },
+    {
+      "path": "src/providers/sina/snapshot.py",
+      "sha256": "cfa0b823b2fa8053ce899157e9b6078b94516d3fabd5d303480824111f62d136"
+    },
+    {
+      "path": "src/providers/sina/__init__.py",
+      "sha256": "78f18f089212842879afa283e56df5b616f8975215617d6a1f89133e6a58fb84"
+    },
+    {
+      "path": "src/providers/sse/market.py",
+      "sha256": "472ffdf622937612d9780f2192bf9e3943edd727fc405af0c474bb9e29d08124"
+    },
+    {
+      "path": "src/providers/sse/__init__.py",
+      "sha256": "f886a28a35e30e8947b4bcdecb36a34f4ecb0148db6c0c8a65463b7e0aaf8434"
+    },
+    {
+      "path": "src/providers/tdx/minute.py",
+      "sha256": "690b2db863d35e781bdea2451b5732b08a1b54d222a8b126e73091bf5d4930da"
+    },
+    {
+      "path": "src/providers/tdx/__init__.py",
+      "sha256": "a3bacd04deeae00fdfd5df0f78c57d51d2aac26b32d76b75d479dc2d3c50aa4b"
+    },
+    {
+      "path": "src/providers/tencent/daily.py",
+      "sha256": "487a14fcbfc47146d6d5fd291fbf41667aba435e5fed22ea1ef61ded513fcaa7"
+    },
+    {
+      "path": "src/providers/tencent/minute.py",
+      "sha256": "ff5cf1e91327bcab2e072bcfae9f1f77dca71a84ba26e456c26580a4d59d9cc1"
+    },
+    {
+      "path": "src/providers/tencent/snapshot.py",
+      "sha256": "56f37a638ad921cc028da499288e62df403fa70eb25433f3cc11617fd19ce42e"
+    },
+    {
+      "path": "src/providers/tencent/__init__.py",
+      "sha256": "80af3d883f2fd4de6167698d5047538c76b78babcf5f7fce809a6e985a0c1b3b"
+    },
+    {
+      "path": "src/providers/ths/boards.py",
+      "sha256": "431ed695ad38025e61e322cdc1e358aa8e93b656f02de20dcb4649432ef6e05b"
+    },
+    {
+      "path": "src/providers/ths/__init__.py",
+      "sha256": "30e7508aa462cbc510c1d9ac99016bc70cb0048f3630251e711b1d7ba17630f6"
+    },
+    {
+      "path": "src/providers/wallstreetcn/news.py",
+      "sha256": "fb870197a111ecad42d47e7e81315c7d59c3c6a8bd7cadb72b84cc537bc91fda"
+    },
+    {
+      "path": "src/providers/wallstreetcn/__init__.py",
+      "sha256": "aa623eb9c3094c1c1d27dd0ba39decfcc6d5bc28981c4e711ae65c86f02536cd"
+    }
+  ],
+  "preexisting_agents_sha256": "1f7da7b5c58a463be4a69ecc85d1b6ce3d5cc91bc0ca00eec2a008d1461cf876",
+  "network_requests": 0,
+  "production_writes": 0
+}

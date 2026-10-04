@@ -1,0 +1,19 @@
+{
+  "input_id": "SDA-BOARD-005",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\storage-layout-20261005\\replay-data-v2\\task_workspace\\security_snapshot\\scope-544866dc87932451\\ed50aab1622e\\report.json",
+  "report_sha256": "d98c8470d31f4701967f364b4b8d67905642740a03c53af17def9a044c83e0dd",
+  "source_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\baostock-industry-20260930-20261003\\_raw\\baostock-industry\\manifest.ndjson",
+  "source_manifest_sha256": "7096e007984eed7f33b465d27efadc7ae2d3049de62913f15a8d95e9c8ad474e",
+  "source_response_hashes": [
+    "d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66",
+    "3394d65b570d90ac8e39329ec93f87f63cfe658c2bc843438573ac955e38bc26"
+  ],
+  "code_version": "6f7d6dbad1d0c88df42ed22c1660d4b8800b60640aaa6b8e5cf6ae0b5f8392b0",
+  "row_count": 5223,
+  "coverage_denominator": 5223,
+  "validation_time_utc": "2026-10-04T19:13:20.356702+00:00",
+  "mode": "offline archive replay into isolated runtime layers",
+  "canonical_writes": 0,
+  "field_roundtrip_verified": true,
+  "raw_hashes_verified": true
+}

@@ -239,3 +239,23 @@ def test_daily_time_edit_does_not_repeat_completed_day(tmp_path):
     report = collect_due_inputs(now=stamp(16, 30), **args)
     assert report["jobs"][-1]["status"] == "already_attempted"
     assert len(calls) == 1
+
+
+
+def test_runtime_scheduler_uses_unified_metadata_and_survives_restart(tmp_path):
+    root=edited_config(tmp_path,"tencent_minute_5m",scheduling_enabled=True)
+    calls=[]
+    def collector(**kwargs):
+        calls.append(kwargs)
+        assert kwargs["data_root"]==tmp_path/"data" and "output_root" not in kwargs
+        path=tmp_path/("report-"+str(len(calls))+".json");path.write_text("{}")
+        return {"status":"candidate_complete","row_count":96,"report_path":str(path)}
+    args=dict(config_root=root,data_root=tmp_path/"data",trading_dates=[DAY],symbols=["sz300750"],
+              execute=True,replay_manifest=Path("fixture"),collector=collector)
+    first=collect_due_inputs(now=stamp(9,35,5),**args)
+    second=collect_due_inputs(now=stamp(9,35,6),**args)
+    assert first["jobs"][0]["status"]=="candidate_complete"
+    assert second["jobs"][0]["status"]=="already_attempted" and len(calls)==1
+    assert (tmp_path/"data/metadata/metadata.duckdb").exists()
+    assert Path(first["report_path"]).is_relative_to(tmp_path/"data/task_workspace/_scheduler")
+    assert not (tmp_path/"data/task_archive").exists() and not (tmp_path/"data/canonical").exists()

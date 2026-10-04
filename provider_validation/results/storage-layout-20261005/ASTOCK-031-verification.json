@@ -1,0 +1,18 @@
+{
+  "input_id": "ASTOCK-031",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\storage-layout-20261005\\replay-data-v2\\task_workspace\\stock_news\\scope-31fbb93fc08d2b86\\eb576feddc1d\\report.json",
+  "report_sha256": "4a667a9977f87b2f7371bda815b0ce8da4a4bbe08a67f2c7eb5db7aefbbd5eac",
+  "source_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\remaining-evidence-direct-20261004\\ASTOCK-031\\_raw\\manifest.ndjson",
+  "source_manifest_sha256": "e400d1b3bfd0de50219a34b2d6e268cd58470cd6d43ca2df029e7fd1a68670b8",
+  "source_response_hashes": [
+    "572a3e1a92d0413b96e3288976cb1b9f20bac093ecefcaadc0807f1594225154"
+  ],
+  "code_version": "496b239eb605b890663f4f8e0dca304a69a5271be21efb134bb762db5cfcd325",
+  "row_count": 10,
+  "coverage_denominator": 10,
+  "validation_time_utc": "2026-10-04T19:11:03.935492+00:00",
+  "mode": "offline archive replay into isolated runtime layers",
+  "canonical_writes": 0,
+  "field_roundtrip_verified": true,
+  "raw_hashes_verified": true
+}

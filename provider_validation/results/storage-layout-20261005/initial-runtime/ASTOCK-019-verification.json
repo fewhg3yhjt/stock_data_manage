@@ -1,0 +1,19 @@
+{
+  "input_id": "ASTOCK-019",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\storage-layout-20261005\\replay-data\\task_workspace\\dragon_tiger_seats\\scope-8ae31d4a38513fe3\\ASTOCK-019-a866a5fa3a38\\report.json",
+  "report_sha256": "c04fe7990121c3bbb70d5a15df32f417b602e32bc2cdefc0d59f2935323075c5",
+  "source_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\_raw\\missing-capabilities-20261003T174623\\manifest.ndjson",
+  "source_manifest_sha256": "885abd6bf1c4b809b9029759f61b75c7d6a297755fd76ca6c545720db38a6767",
+  "source_response_hashes": [
+    "79c9b649544f48049cb8e39bb28b201360d17ae79ed35c91716e659ea6386a16",
+    "fcb616bfc685257915bb87a1684395d02ba69efd164a1bd9d9512349d1aaa2a0"
+  ],
+  "code_version": "098e8be0b6c40435eb863dec9810b9ca7880f30f26ae27bc7f1150ac4191571e",
+  "row_count": 10,
+  "coverage_denominator": 10,
+  "validation_time_utc": "2026-10-04T18:53:53.600623+00:00",
+  "mode": "offline archive replay into isolated runtime layers",
+  "canonical_writes": 0,
+  "field_roundtrip_verified": true,
+  "raw_hashes_verified": true
+}

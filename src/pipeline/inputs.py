@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import hashlib
+import os
 from dataclasses import asdict, replace
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from uuid import uuid4
 
-from ..config.loader import load_input_capabilities, load_input_field_contract, load_collection_profiles
+from ..config.loader import load_input_capabilities, load_input_field_contract, load_collection_profiles, load_storage_paths
 from ..providers.transport import captured_requests, RequestPacer
 from ..quality.normalization import Normalizer, NormalizationError
 from ..routing.factory import build_input_provider
@@ -31,6 +32,9 @@ def _validate_candidate_root(config_root, output_root):
     import yaml
     collection_document = yaml.safe_load((config_root / "collection.yaml").read_text(encoding="utf-8"))
     project_root = config_root.resolve().parent
+    data_root = load_storage_paths(config_root)["data_root"]
+    if output_root.resolve().is_relative_to(data_root):
+        raise ValueError("manual input outputs must be outside production paths")
     for key in ("raw_root", "canonical_root", "metadata_path"):
         protected = (project_root / collection_document["storage"][key]).resolve()
         if output_root.resolve().is_relative_to(protected):
@@ -41,13 +45,20 @@ def _validate_candidate_root(config_root, output_root):
     return project_root
 
 
-def collect_input(*, input_id, context, config_root, output_root, mode="replay", replay_manifest=None,
+def collect_input(*, input_id, context, config_root, output_root=None, data_root=None, mode="replay", replay_manifest=None,
                   evidence_root=None, fields=None, client=None, pacer=None):
     """One explicit input, candidate output only. Existing Bar publication flows are unchanged."""
-    config_root, output_root = Path(config_root), Path(output_root)
+    import json
+    import re
+    config_root = Path(config_root)
+    if output_root is not None and data_root is not None:
+        raise ValueError("output_root and data_root are mutually exclusive")
+    runtime = output_root is None
+    paths = load_storage_paths(config_root, data_root=data_root) if runtime else None
+    output_root = paths["raw_root"] if runtime else Path(output_root)
     if mode not in {"live", "replay"} or (mode == "replay" and replay_manifest is None):
         raise ValueError("replay requires an explicit manifest; only live/replay modes are supported")
-    project_root = _validate_candidate_root(config_root, output_root)
+    project_root = config_root.resolve().parent if runtime else _validate_candidate_root(config_root, output_root)
     contracts = {c.input_id: c for c in load_input_capabilities(config_root / "providers.yaml")}
     if input_id not in contracts:
         raise ValueError("unknown input ID")
@@ -67,6 +78,9 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                   Path(__file__).parents[1] / "quality/normalization.py",
                   Path(__file__).parents[1] / "providers/transport.py",
                   Path(__file__).parents[1] / "storage/raw.py",
+                  Path(__file__).parents[1] / "storage/parquet.py",
+                  Path(__file__).parents[1] / "storage/metadata.py",
+                  Path(__file__).parents[1] / "worker/attempts.py",
                   Path(__file__).parents[1] / "routing/factory.py",
                   Path(__file__).parents[1] / "providers/tencent/daily.py",
                   Path(__file__).parents[1] / "providers/tencent/minute.py",
@@ -102,10 +116,37 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
     # Response filenames contain a full SHA-256 plus a temporary suffix. Keep the
     # run component short for Windows paths; UTC times remain in every evidence record.
     run_id = uuid4().hex[:12]
-    directory = output_root / f"{input_id}-{run_id}"
-    directory.mkdir(parents=True, exist_ok=False)
-    raw_store, result_store = RawObjectStore(directory / "_raw"), RawObjectStore(directory)
+    # The input identity already lives in the source directory and manifest.
+    # Avoid repeating it in runtime paths near the Windows filename limit.
+    task_id = run_id if runtime else f"{input_id}-{run_id}"
     normalized_context = _json_value(parameters)
+    scope_key = "scope-" + hashlib.sha256(json.dumps(sanitized_metadata(normalized_context),
+        ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()[:16]
+    if runtime:
+        if any(not re.fullmatch(r"[A-Za-z0-9_-]+", part) for part in
+               (contract.dataset, contract.provider, contract.endpoint, input_id)):
+            raise ValueError("unsafe input storage path component")
+        directory = paths["workspace_root"] / contract.dataset / scope_key / task_id
+        raw_directory = paths["raw_root"] / contract.provider / contract.endpoint / datetime.now(timezone.utc).date().isoformat() / run_id
+        source_directory = Path("sources") / contract.provider / input_id
+    else:
+        directory = output_root / task_id
+        raw_directory = directory / "_raw"
+    directory.mkdir(parents=True, exist_ok=False)
+    raw_store, result_store = RawObjectStore(raw_directory), RawObjectStore(directory)
+
+    def relative_file(path):
+        return Path(os.path.relpath(path, directory)).as_posix()
+
+    def write_result(value, **kwargs):
+        if runtime:
+            name = kwargs["attempt_id"]
+            relative = Path("report.json") if name == "report" else (
+                source_directory / "normalized.json" if name == "mapped-rows" else
+                source_directory / "parsed" / f"{name}.json")
+            kwargs["relative_path"] = relative
+        return result_store.write_json(value, **kwargs)
+
     report = {"input_id": input_id, "dataset": contract.dataset, "mode": mode,
         "parameters": sanitized_metadata(normalized_context), "provider": contract.provider, "endpoint": contract.endpoint,
         "collection_profile": _json_value(asdict(profile)),
@@ -122,6 +163,24 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
         "unverified_fields": rule.get("unverified_fields", []), "selected_fields": sorted(selected),
         "eligible_for_production_routing": False, "production_writes": 0, "live_http_calls": 0,
         "validation_time_utc": datetime.now(timezone.utc).isoformat(), "status": "started"}
+    if runtime:
+        from ..domain import AttemptStatus
+        from ..storage.metadata import MetadataStore
+        from ..worker.attempts import CollectionAttempt
+        now = datetime.now(timezone.utc)
+        attempt = CollectionAttempt(task_id).lease(owner="input-collection", acquired_at=now,
+            expires_at=now + timedelta(days=1)).transition(AttemptStatus.FETCHING)
+        metadata = MetadataStore(paths["metadata_path"])
+        try:
+            if not metadata.claim_attempt(attempt, updated_at=now):
+                raise ValueError("input task ID already reserved")
+        finally:
+            metadata.close()
+        result_store.write_json({"task_id": task_id, "status": "fetching", "scope_key": scope_key,
+            "scope": sanitized_metadata(normalized_context), "dataset": contract.dataset,
+            "provider": contract.provider, "input_id": input_id, "created_at": now.isoformat()},
+            dataset="task_start", provider=contract.provider, endpoint=contract.endpoint,
+            fetched_at=now, attempt_id="started", relative_path="started.json")
     report["response_freshness_seconds"] = profile.refresh_interval_seconds or 86400
     is_baostock = input_id in {"SDA-BOARD-005", "SDA-BOARD-006", "ASTOCK-044"}
     is_actual_data = input_id in {'ASTOCK-014', 'ASTOCK-037-profile', 'ASTOCK-037-events', 'ASTOCK-087'}
@@ -208,7 +267,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
     from urllib.parse import urlsplit
     for host in getattr(provider, "input_hosts", ()):
         pacer.configure(urlsplit(host).hostname, max(3, contract.request_interval_seconds), 1)
-    evidence_root = Path(evidence_root) if evidence_root else project_root / "provider_validation/results"
+    evidence_root = Path(evidence_root) if evidence_root else (paths["raw_root"] if runtime else project_root / "provider_validation/results")
     try:
         if is_baostock:
             import inspect
@@ -235,7 +294,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                 snapshot = re.sub(rb'''(?i)((?:password|user_id|token|api_key)\s*=\s*["'])[^"']*(["'])''', rb'\1<redacted>\2', source)
                 sdk_ref = raw_store.write_bytes(snapshot, dataset="source_code", provider=contract.provider, endpoint=contract.endpoint,
                     fetched_at=datetime.now(timezone.utc), attempt_id="sdk-function", content_addressed=True)
-                report["sdk_dependency"]["dependencies"].append({"name": name, "path": sdk_ref.path.relative_to(directory).as_posix(),
+                report["sdk_dependency"]["dependencies"].append({"name": name, "path": relative_file(sdk_ref.path),
                     "sha256": sdk_ref.content_hash, "original_source_sha256": digest, "redacted": snapshot != source})
                 code_version = hashlib.sha256((code_version + name + digest).encode()).hexdigest()
             code_version = hashlib.sha256((code_version + report["sdk_dependency"]["version"]).encode()).hexdigest()
@@ -273,7 +332,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             sdk_ref = raw_store.write_bytes(sdk_snapshot, dataset="source_code", provider=contract.provider,
                 endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="sdk-function", content_addressed=True)
             report["sdk_dependency"] = {"version": getattr(provider.client, "__version__", "injected_fixture"),
-                "function": function.__name__, "source_path": sdk_ref.path.relative_to(directory).as_posix(), "sha256": sdk_ref.content_hash,
+                "function": function.__name__, "source_path": relative_file(sdk_ref.path), "sha256": sdk_ref.content_hash,
                 "original_source_sha256": sdk_source_hash, "redacted": sdk_snapshot != sdk_source}
             code_version = hashlib.sha256((code_version + sdk_source_hash + report["sdk_dependency"]["version"]).encode()).hexdigest()
             if is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_seats or is_source_sdk:
@@ -310,7 +369,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                         ref = raw_store.write_bytes(source, dataset="source_code", provider=contract.provider,
                             endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="sdk-retry-helper", content_addressed=True)
                         report["sdk_dependency"]["dependencies"].append({"name": helper.__name__,
-                            "path": ref.path.relative_to(directory).as_posix(), "sha256": ref.content_hash})
+                            "path": relative_file(ref.path), "sha256": ref.content_hash})
                         code_version = hashlib.sha256((code_version + ref.content_hash).encode()).hexdigest()
                 report["sdk_news_transport_policy"] = {"source_contract": "successful rate-limited original SDK probe",
                     "timeout_seconds": None, "trust_env": True, "allow_redirects": True,
@@ -350,7 +409,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                         body=inspect.getsource(dependency).encode("utf-8")
                         ref=raw_store.write_bytes(body,dataset="source_code",provider=contract.provider,endpoint=contract.endpoint,
                             fetched_at=datetime.now(timezone.utc),attempt_id="sdk-tls-adapter",content_addressed=True)
-                        report["sdk_dependency"]["dependencies"].append({"name":"TLSAdapter","path":ref.path.relative_to(directory).as_posix(),"sha256":ref.content_hash})
+                        report["sdk_dependency"]["dependencies"].append({"name":"TLSAdapter","path":relative_file(ref.path),"sha256":ref.content_hash})
                         code_version=hashlib.sha256((code_version+ref.content_hash).encode()).hexdigest()
                 if is_factor:
                     report["factor_sdk_transport_policy"] = report.pop("sdk_news_transport_policy")
@@ -380,7 +439,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                                       rb'\1<redacted>\2', body)
                     ref = raw_store.write_bytes(snapshot, dataset="source_code", provider=contract.provider, endpoint=contract.endpoint,
                                                fetched_at=datetime.now(timezone.utc), attempt_id="sdk-dependency", content_addressed=True)
-                    report["sdk_dependency"]["dependencies"].append({"name": name, "path": ref.path.relative_to(directory).as_posix(),
+                    report["sdk_dependency"]["dependencies"].append({"name": name, "path": relative_file(ref.path),
                         "sha256": ref.content_hash, "original_source_sha256": digest, "redacted": snapshot != body})
                     code_version = hashlib.sha256((code_version + name + digest).encode()).hexdigest()
             report["code_version"] = code_version
@@ -504,11 +563,20 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                 if helper is not None:
                     actual_code = helper()[parameters["board_name"]]
         report["responses"] = response_events
+        if runtime:
+            raw_manifest = raw_store.root / "manifest.ndjson"
+            attempt = replace(attempt, raw_object_path=str(raw_manifest.resolve()),
+                raw_content_hash=hashlib.sha256(raw_manifest.read_bytes()).hexdigest()).transition(AttemptStatus.RAW_COMMITTED)
+            metadata = MetadataStore(paths["metadata_path"])
+            try:
+                metadata.save_attempt(attempt, updated_at=datetime.now(timezone.utc))
+            finally:
+                metadata.close()
         report["live_http_calls"] = sum(event["mode"] == "live" and event.get("event") == "http_response" for event in response_events)
         source_rows = getattr(fetched, "source_rows", None) or fetched.rows
-        source_ref = result_store.write_json(_json_value(source_rows), dataset="source_rows", provider=contract.provider,
+        source_ref = write_result(_json_value(source_rows), dataset="source_rows", provider=contract.provider,
             endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="source-rows")
-        report["source_rows"] = {"path": source_ref.path.relative_to(directory).as_posix(),
+        report["source_rows"] = {"path": relative_file(source_ref.path),
                                  "sha256": source_ref.content_hash, "row_count": len(source_rows)}
         if is_stock_pool:
             report.update(source_quote_date=fetched.mapping_context["source_quote_date"].isoformat(),
@@ -518,34 +586,34 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                 universe_completeness_verified=False)
         mapping_rows = fetched.rows if input_id == 'ASTOCK-044' or is_em_history or is_lpr or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_extension or is_repo_rate or is_cb or is_sina_futures else source_rows
         if input_id == 'ASTOCK-044' or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_extension or is_repo_rate or is_cb or is_sina_futures:
-            parsed_ref = result_store.write_json(_json_value(mapping_rows), dataset="parsed_rows", provider=contract.provider,
+            parsed_ref = write_result(_json_value(mapping_rows), dataset="parsed_rows", provider=contract.provider,
                 endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="parsed-rows")
-            report["parsed_rows"] = {"path":parsed_ref.path.relative_to(directory).as_posix(),
+            report["parsed_rows"] = {"path":relative_file(parsed_ref.path),
                 "sha256":parsed_ref.content_hash,"row_count":len(mapping_rows),"code_version":code_version,
                 "source_response_hashes":[event["body_sha256"] for event in response_events]}
         if is_factor:
-            excluded_ref = result_store.write_json(_json_value(fetched.excluded_rows), dataset="excluded_rows", provider=contract.provider,
+            excluded_ref = write_result(_json_value(fetched.excluded_rows), dataset="excluded_rows", provider=contract.provider,
                 endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="excluded-rows")
-            report["excluded_rows"] = {"path":excluded_ref.path.relative_to(directory).as_posix(), "sha256":excluded_ref.content_hash,"row_count":len(fetched.excluded_rows)}
+            report["excluded_rows"] = {"path":relative_file(excluded_ref.path), "sha256":excluded_ref.content_hash,"row_count":len(fetched.excluded_rows)}
             report.update(original_row_count=len(source_rows), selected_row_count=len(mapping_rows), source_symbol=fetched.mapping_context["source_symbol"],
                 factor_kind=parameters["kind"], selection_policy="original requests retain both histories; config.kind selects one candidate series",
                 returned_window={"first":min(row["factor_date"] for row in mapping_rows),"last":max(row["factor_date"] for row in mapping_rows),"meaning":"source factor date labels; 1900 baseline is not a trading date"},
                 coverage_basis="source-reported factor rows, not independently certified economic events or pricing semantics",universe_completeness_verified=False)
         if input_id == "ASTOCK-075":
-            excluded_ref = result_store.write_json(_json_value(fetched.excluded_rows), dataset="excluded_rows",
+            excluded_ref = write_result(_json_value(fetched.excluded_rows), dataset="excluded_rows",
                 provider=contract.provider, endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="excluded-rows")
-            report["excluded_rows"] = {"path":excluded_ref.path.relative_to(directory).as_posix(),"sha256":excluded_ref.content_hash,"row_count":len(fetched.excluded_rows)}
+            report["excluded_rows"] = {"path":relative_file(excluded_ref.path),"sha256":excluded_ref.content_hash,"row_count":len(fetched.excluded_rows)}
             report.update(original_row_count=len(source_rows),selected_row_count=len(mapping_rows),
                 selection_policy="original local date-window filter; complete returned source rows retained",
                 series_identity=fetched.mapping_context["series_identity"],source_contract=fetched.mapping_context["source_contract"])
         if input_id=="ASTOCK-066":
-            excluded_ref=result_store.write_json(_json_value(fetched.excluded_rows),dataset="excluded_rows",provider=contract.provider,
+            excluded_ref=write_result(_json_value(fetched.excluded_rows),dataset="excluded_rows",provider=contract.provider,
                 endpoint=contract.endpoint,fetched_at=datetime.now(timezone.utc),attempt_id="excluded-rows")
-            report["excluded_rows"]={"path":excluded_ref.path.relative_to(directory).as_posix(),"sha256":excluded_ref.content_hash,"row_count":len(fetched.excluded_rows)}
+            report["excluded_rows"]={"path":relative_file(excluded_ref.path),"sha256":excluded_ref.content_hash,"row_count":len(fetched.excluded_rows)}
         if is_cb:
-            excluded_ref = result_store.write_json(_json_value(fetched.excluded_rows), dataset="excluded_rows",
+            excluded_ref = write_result(_json_value(fetched.excluded_rows), dataset="excluded_rows",
                 provider=contract.provider, endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="excluded-rows")
-            report["excluded_rows"] = {"path": excluded_ref.path.relative_to(directory).as_posix(),
+            report["excluded_rows"] = {"path": relative_file(excluded_ref.path),
                 "sha256": excluded_ref.content_hash, "row_count": len(fetched.excluded_rows)}
             report.update(original_row_count=len(source_rows), selected_row_count=len(mapping_rows),
                 selection_policy="original CB delisted exclusion unless include_delisted is true",
@@ -557,9 +625,9 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                 coverage_basis="selected source-reported CB list; not independent complete market coverage",
                 universe_completeness_verified=False)
         if is_em_history or is_lpr:
-            excluded_ref = result_store.write_json(_json_value(fetched.excluded_rows), dataset="excluded_rows",
+            excluded_ref = write_result(_json_value(fetched.excluded_rows), dataset="excluded_rows",
                 provider=contract.provider, endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="excluded-rows")
-            report["excluded_rows"] = {"path": excluded_ref.path.relative_to(directory).as_posix(),
+            report["excluded_rows"] = {"path": relative_file(excluded_ref.path),
                 "sha256": excluded_ref.content_hash, "row_count": len(fetched.excluded_rows)}
             source_date = {"ASTOCK-026": "股东户数统计截止日", "ASTOCK-027": "报告期", "ASTOCK-028": "日期", "ASTOCK-065":"TRADE_DATE"}[input_id]
             dates = [str(row[source_date])[:10] if is_lpr else str(row[source_date]) for row in (mapping_rows if is_lpr else source_rows)]
@@ -742,11 +810,20 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             if any(not (row["low"] <= min(row["open"], row["close"]) <= max(row["open"], row["close"]) <= row["high"]) for row in rows):
                 raise NormalizationError("invalid OHLC ordering")
         projected = [{name: value for name, value in row.items() if name in selected} for row in rows]
-        normalized_ref = result_store.write_json(_json_value(projected), dataset=contract.dataset, provider=contract.provider,
+        normalized_ref = write_result(_json_value(projected), dataset=contract.dataset, provider=contract.provider,
             endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="mapped-rows")
-        report["output"] = {"path": normalized_ref.path.relative_to(directory).as_posix(),
+        report["output"] = {"path": relative_file(normalized_ref.path),
                             "sha256": normalized_ref.content_hash, "row_count": len(projected),
                             "source_response_hashes": [event["body_sha256"] for event in response_events]}
+        if runtime:
+            from ..storage.parquet import write_normalized_rows
+            parquet_path = directory / source_directory / "normalized.parquet"
+            descriptor = write_normalized_rows(parquet_path, projected,
+                {name: definition for name, definition in schema_fields.items() if name in selected})
+            report["normalized_parquet"] = {"path": relative_file(parquet_path), **descriptor,
+                "source_response_hashes": report["output"]["source_response_hashes"],
+                "code_version": code_version, "normalization_version": rule["version"]}
+            attempt = attempt.transition(AttemptStatus.NORMALIZED)
         report.update(status="candidate_complete", row_count=len(projected),
                       coverage_denominator=fetched.coverage_denominator if is_baostock or is_tencent_snapshot else len(mapping_rows),
                       first_key=_json_value(keys[0]) if keys else None, last_key=_json_value(keys[-1]) if keys else None)
@@ -766,15 +843,62 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             report["live_sdk_calls"] = sum(event.get("mode") == "live" for event in report["responses"])
             report["sdk_query_count"] = len(report["responses"])
             report["sdk_dependency"]["live_sdk_executed"] = any(event.get("actual_session_called") for event in report["sdk_session"])
-        report["raw_manifest"] = {"path": raw_manifest.relative_to(directory).as_posix(),
+        report["raw_manifest"] = {"path": relative_file(raw_manifest),
                                   "sha256": hashlib.sha256(raw_manifest.read_bytes()).hexdigest()}
         report["live_http_calls"] = sum(event.get("mode") == "live" and event.get("event") == "http_response" for event in all_events)
-    report_ref = result_store.write_json(report, dataset="input_report", provider=contract.provider, endpoint=contract.endpoint,
+    report_ref = write_result(report, dataset="input_report", provider=contract.provider, endpoint=contract.endpoint,
                                         fetched_at=datetime.now(timezone.utc), attempt_id="report")
+    if runtime:
+        from ..domain import AttemptStatus
+        from ..storage.metadata import MetadataStore
+        from ..worker.attempts import CollectionAttempt
+        source_refs = {"raw_manifest": report.get("raw_manifest"),
+            "source_response_hashes": [event.get("body_sha256") for event in report.get("responses", [])
+                                       if event.get("body_sha256")],
+            "sdk_source_snapshots": report.get("sdk_dependency", {}),
+            "code_version": code_version}
+        result_store.write_json(source_refs, dataset="raw_refs", provider=contract.provider,
+            endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="raw-refs",
+            relative_path=source_directory / "raw_refs.json")
+        quality = {name: report.get(name) for name in ("status", "failure_class", "error", "row_count",
+            "coverage_denominator", "first_key", "last_key", "unverified_fields", "validation_time_utc")}
+        quality.update(publication_permitted=False, eligible_for_production_routing=False,
+            source_response_hashes=source_refs["source_response_hashes"], code_version=code_version,
+            report={"path": "report.json", "sha256": report_ref.content_hash})
+        quality_ref = result_store.write_json(quality, dataset="quality_report", provider=contract.provider,
+            endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="quality",
+            relative_path="quality_report.json")
+        manifest = {"version": 1, "task_id": task_id, "dataset": contract.dataset,
+            "provider": contract.provider, "input_id": input_id, "status": report["status"],
+            "scope_key": scope_key, "scope": sanitized_metadata(normalized_context),
+            "partition_semantics": "canonical request scope; not a business-date partition",
+            "publication_permitted": False, "canonical_refs": [],
+            "raw_manifest": report.get("raw_manifest"), "output": report.get("normalized_parquet"),
+            "report": {"path": "report.json", "sha256": report_ref.content_hash},
+            "quality_report": {"path": "quality_report.json", "sha256": quality_ref.content_hash},
+            "source_response_hashes": source_refs["source_response_hashes"],
+            "code_version": code_version, "config_files": report["config_files"],
+            "created_at": report["validation_time_utc"], "archive_condition": "published canonical refs and published metadata attempt"}
+        result_store.write_json(manifest, dataset="task_manifest", provider=contract.provider,
+            endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="task",
+            relative_path="manifest.json")
+        now = datetime.now(timezone.utc)
+        raw_ref = report.get("raw_manifest")
+        if raw_ref:
+            attempt = replace(attempt, raw_object_path=str(raw_manifest.resolve()), raw_content_hash=raw_ref["sha256"])
+        if report["status"] == "candidate_complete":
+            attempt = attempt.transition(AttemptStatus.VALIDATED)
+        else:
+            attempt = attempt.transition(AttemptStatus.TERMINAL_FAILED if attempt.status == AttemptStatus.FETCHING else AttemptStatus.QUARANTINED)
+        metadata = MetadataStore(paths["metadata_path"])
+        try:
+            metadata.save_attempt(attempt, updated_at=now)
+        finally:
+            metadata.close()
     return {**report, "run_directory": str(directory.resolve()), "report_path": str(report_ref.path.resolve())}
 
 
-def collect_due_inputs(*, now, config_root, output_root, trading_dates, securities=(), symbols=(),
+def collect_due_inputs(*, now, config_root, output_root=None, data_root=None, trading_dates, securities=(), symbols=(),
                        execute=False, mode="replay", replay_manifest=None, evidence_root=None,
                        dependency_paths=(), collector=None):
     """One scheduler tick, with durable attempts in candidate storage, never production publication."""
@@ -785,14 +909,20 @@ def collect_due_inputs(*, now, config_root, output_root, trading_dates, securiti
     from time import monotonic
     import json
 
-    root, output = Path(config_root), Path(output_root)
+    root = Path(config_root)
+    if output_root is not None and data_root is not None:
+        raise ValueError("output_root and data_root are mutually exclusive")
+    runtime = output_root is None
+    paths = load_storage_paths(root, data_root=data_root) if runtime else None
+    output = paths["workspace_root"] / "_scheduler" if runtime else Path(output_root)
     if now.tzinfo is None:
         raise ValueError("schedule time must be timezone-aware")
     if mode not in {"live", "replay"}:
         raise ValueError("only live/replay modes are supported")
     if execute and mode == "live" and abs((datetime.now(timezone.utc) - now).total_seconds()) > 120:
         raise ValueError("live scheduling requires current time; use replay to inspect historical slots")
-    _validate_candidate_root(root, output)
+    if not runtime:
+        _validate_candidate_root(root, output)
     trading_dates, securities, symbols = tuple(trading_dates), tuple(securities), tuple(symbols)
     jobs = plan_input_collection(root, now=now, trading_dates=trading_dates, securities=securities, symbols=symbols)
     profiles = {p.name: p for p in load_collection_profiles(root / "collection.yaml")}
@@ -818,7 +948,7 @@ def collect_due_inputs(*, now, config_root, output_root, trading_dates, securiti
     for host in ("web.ifzq.gtimg.cn", "proxy.finance.qq.com", "ifzq.gtimg.cn", "qt.gtimg.cn"):
         pacer.configure(host, interval, 1)
     collector = collector or collect_input
-    metadata = MetadataStore(output / "schedule-attempts.duckdb") if execute else None
+    metadata = MetadataStore(paths["metadata_path"] if runtime else output / "schedule-attempts.duckdb") if execute else None
     try:
         for job in jobs:
             entry = {**_json_value(asdict(job)), "coverage_denominator": len(job.symbols), "results": [],
@@ -850,8 +980,9 @@ def collect_due_inputs(*, now, config_root, output_root, trading_dates, securiti
                     request = {"symbol": symbol}
                     if job.input_id.endswith("daily"):
                         request.update(start_date=job.slot.date(), end_date=job.slot.date())
+                    storage_args = {"data_root": paths["data_root"]} if runtime else {"output_root": output}
                     result = collector(input_id=job.input_id, context={"request": request,
-                        "calendar": {"trading_dates": trading_dates}}, config_root=root, output_root=output,
+                        "calendar": {"trading_dates": trading_dates}}, config_root=root, **storage_args,
                         mode=mode, replay_manifest=replay_manifest, evidence_root=evidence_root, pacer=pacer)
                     result_path = Path(result["report_path"])
                     entry["results"].append({"symbol": symbol, "status": result["status"],

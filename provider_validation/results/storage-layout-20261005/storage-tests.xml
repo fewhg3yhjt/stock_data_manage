@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="5" skipped="0" tests="78" time="46.795" timestamp="2026-10-05T02:33:25.342798+08:00" hostname="WIN-O3LLBLVKP56"><testcase classname="tests.test_canonical_recovery" name="test_canonical_publish_is_idempotent_and_locked" time="0.496" /><testcase classname="tests.test_canonical_recovery" name="test_recovery_finishes_replace_and_repairs_metadata" time="1.295" /><testcase classname="tests.test_canonical_recovery" name="test_recovery_quarantines_unverifiable_orphan_temp_file" time="0.195" /><testcase classname="tests.test_canonical_recovery" name="test_normalized_parquet_roundtrips_precision_time_and_nulls" time="0.142"><failure message="OSError: [Errno 9] Bad file descriptor">tmp_path = WindowsPath('C:/Users/sp181/AppData/Local/Temp/pytest-of-sp181/pytest-116/test_normalized_parquet_roundt0')
+
+    def test_normalized_parquet_roundtrips_precision_time_and_nulls(tmp_path):
+        from datetime import date, datetime, timezone
+        from decimal import Decimal
+        import pyarrow.parquet as pq
+        from stock_data_manage.storage.parquet import write_normalized_rows
+        fields = {"amount":{"type":"decimal", "required":True}, "day":{"type":"date"},
+                  "time":{"type":"datetime"}, "count":{"type":"integer"},
+                  "kind":{"type":"enum", "values":["a","b"]}, "missing":{"type":"decimal"}}
+        row = {"amount":Decimal("123456789012345678901234567890123456789.000000000000000001"),
+               "day":date(2026,9,30), "time":datetime(2026,9,30,15,10,tzinfo=timezone.utc),
+               "count":0, "kind":"a", "missing":None}
+        path = tmp_path / "normalized.parquet"
+&gt;       write_normalized_rows(path, [row], fields)
+
+tests\test_canonical_recovery.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+path = WindowsPath('C:/Users/sp181/AppData/Local/Temp/pytest-of-sp181/pytest-116/test_normalized_parquet_roundt0/normalized.parquet')
+rows = [{'amount': Decimal('123456789012345678901234567890123456789.000000000000000001'), 'count': 0, 'day': datetime.date(2026, 9, 30), 'kind': 'a', ...}]
+fields = {'amount': {'required': True, 'type': 'decimal'}, 'count': {'type': 'integer'}, 'day': {'type': 'date'}, 'kind': {'type': 'enum', 'values': ['a', 'b']}, ...}
+
+    def write_normalized_rows(path: str | Path, rows: Iterable[Mapping], fields: Mapping) -&gt; dict:
+        """Persist source candidates using the declared field contract, without publishing."""
+        import hashlib
+        from uuid import uuid4
+    
+        path = Path(path)
+        records = list(rows)
+        if any(set(row) - set(fields) for row in records):
+            raise ValueError("normalized rows contain undeclared fields")
+        arrow_fields = []
+        for name, definition in fields.items():
+            values = [row.get(name) for row in records if row.get(name) is not None]
+            kind = definition["type"]
+            if definition.get("required") and len(values) != len(records):
+                raise ValueError(f"missing required normalized field: {name}")
+            if kind == "decimal":
+                if any(not isinstance(value, Decimal) or not value.is_finite() for value in values):
+                    raise ValueError(f"decimal field requires finite Decimal values: {name}")
+                scale = max([0] + [-value.as_tuple().exponent for value in values])
+                integer_digits = max([0] + [max(0, value.adjusted() + 1) for value in values])
+                precision = max(1, integer_digits + scale)
+                if precision &gt; 76:
+                    raise ValueError(f"decimal precision exceeds Parquet capacity: {name}")
+                arrow_type = pa.decimal128(precision, scale) if precision &lt;= 38 else pa.decimal256(precision, scale)
+            elif kind in {"string", "enum"}:
+                if any(not isinstance(value, str) for value in values):
+                    raise ValueError(f"string field requires string values: {name}")
+                if kind == "enum" and any(value not in definition["values"] for value in values):
+                    raise ValueError(f"undeclared enum value: {name}")
+                arrow_type = pa.string()
+            elif kind == "date":
+                if any(not isinstance(value, date) or isinstance(value, datetime) for value in values):
+                    raise ValueError(f"date field requires date values: {name}")
+                arrow_type = pa.date32()
+            elif kind == "datetime":
+                if any(not isinstance(value, datetime) for value in values):
+                    raise ValueError(f"datetime field requires datetime values: {name}")
+                aware = [value.utcoffset() is not None for value in values]
+                if aware and any(aware) != all(aware):
+                    raise ValueError(f"mixed naive and aware timestamps: {name}")
+                arrow_type = pa.timestamp("us", tz="UTC" if any(aware) else None)
+            elif kind == "integer":
+                if any(type(value) is not int for value in values):
+                    raise ValueError(f"integer field requires integer values: {name}")
+                arrow_type = pa.int64()
+            else:
+                raise ValueError(f"unsupported normalized field type: {kind}")
+            arrow_fields.append(pa.field(name, arrow_type, nullable=not definition.get("required", False)))
+        table = pa.Table.from_pylist(records, schema=pa.schema(arrow_fields))
+        path.parent.mkdir(parents=True, exist_ok=True)
+        temporary = path.with_name(f"{path.name}.{uuid4().hex[:12]}.tmp")
+        try:
+            pq.write_table(table, temporary)
+            with temporary.open("rb") as stream:
+&gt;               os.fsync(stream.fileno())
+E               OSError: [Errno 9] Bad file descriptor
+
+src\storage\parquet.py:127: OSError</failure></testcase><testcase classname="tests.test_canonical_recovery" name="test_normalized_parquet_refuses_invalid_values_before_writing[definition0-1.1]" time="0.019" /><testcase classname="tests.test_canonical_recovery" name="test_normalized_parquet_refuses_invalid_values_before_writing[definition1-value1]" time="0.013" /><testcase classname="tests.test_canonical_recovery" name="test_normalized_parquet_refuses_invalid_values_before_writing[definition2-value2]" time="0.028" /><testcase classname="tests.test_canonical_recovery" name="test_normalized_parquet_refuses_invalid_values_before_writing[definition3-True]" time="0.012" /><testcase classname="tests.test_canonical_recovery" name="test_normalized_parquet_refuses_invalid_values_before_writing[definition4-b]" time="0.021" /><testcase classname="tests.test_canonical_recovery" name="test_normalized_parquet_refuses_invalid_values_before_writing[definition5-None]" time="0.015" /><testcase classname="tests.test_canonical_recovery" name="test_archive_requires_verified_publication_without_overwriting[None]" time="0.345" /><testcase classname="tests.test_canonical_recovery" name="test_archive_requires_verified_publication_without_overwriting[candidate]" time="0.316" /><testcase classname="tests.test_canonical_recovery" name="test_archive_requires_verified_publication_without_overwriting[metadata]" time="0.235" /><testcase classname="tests.test_canonical_recovery" name="test_archive_requires_verified_publication_without_overwriting[canonical]" time="0.264" /><testcase classname="tests.test_canonical_recovery" name="test_archive_requires_verified_publication_without_overwriting[output]" time="0.331" /><testcase classname="tests.test_canonical_recovery" name="test_archive_requires_verified_publication_without_overwriting[destination]" time="0.540" /><testcase classname="tests.test_canonical_recovery" name="test_archive_requires_verified_publication_without_overwriting[escape]" time="0.382" /><testcase classname="tests.test_config_contract" name="test_yaml_configuration_is_parseable_and_keeps_minute_scope_bounded" time="0.745" /><testcase classname="tests.test_config_contract" name="test_input_catalog_covers_successful_rows_without_granting_production_routes" time="0.563" /><testcase classname="tests.test_config_contract" name="test_parameter_binding_uses_explicit_contexts_and_preserves_types" time="0.002" /><testcase classname="tests.test_config_contract" name="test_recent_minute_contract_rejects_history_and_invalid_count" time="0.377" /><testcase classname="tests.test_config_contract" name="test_snapshot_requires_known_trading_date_and_separates_local_filter" time="1.250" /><testcase classname="tests.test_config_contract" name="test_window_validation_and_unsupported_scheduling_are_explicit" time="0.537" /><testcase classname="tests.test_config_contract" name="test_disabled_provider_cannot_be_enabled_by_an_endpoint_override" time="0.012" /><testcase classname="tests.test_config_contract" name="test_storage_paths_reject_escape_or_overlapping_layers[raw_root-../outside]" time="0.007"><failure message="UnicodeDecodeError: 'gbk' codec can't decode byte 0xae in position 852: illegal multibyte sequence">tmp_path = WindowsPath('C:/Users/sp181/AppData/Local/Temp/pytest-of-sp181/pytest-116/test_storage_paths_reject_esca0')
+key = 'raw_root', value = '../outside'
+
+    @pytest.mark.parametrize("key,value", [("raw_root", "../outside"),
+        ("workspace_root", "data/raw/nested"), ("archive_root", "data/task_workspace"),
+        ("metadata_path", "data/metadata.duckdb")])
+    def test_storage_paths_reject_escape_or_overlapping_layers(tmp_path, key, value):
+        from stock_data_manage.config.loader import load_storage_paths
+        config = tmp_path / "config"
+        config.mkdir()
+&gt;       document = yaml.safe_load((PROJECT_ROOT / "config/collection.yaml").read_text())
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_config_contract.py:132: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Program Files\Python\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/Project/PythonProgram/stock_data_manage/config/collection.yaml')
+encoding = 'locale', errors = None, newline = None
+
+    def read_text(self, encoding=None, errors=None, newline=None):
+        """
+        Open the file in text mode, read it, and close the file.
+        """
+        with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+&gt;           return f.read()
+                   ^^^^^^^^
+E           UnicodeDecodeError: 'gbk' codec can't decode byte 0xae in position 852: illegal multibyte sequence
+
+D:\Program Files\Python\Lib\pathlib\_abc.py:633: UnicodeDecodeError</failure></testcase><testcase classname="tests.test_config_contract" name="test_storage_paths_reject_escape_or_overlapping_layers[workspace_root-data/raw/nested]" time="0.007"><failure message="UnicodeDecodeError: 'gbk' codec can't decode byte 0xae in position 852: illegal multibyte sequence">tmp_path = WindowsPath('C:/Users/sp181/AppData/Local/Temp/pytest-of-sp181/pytest-116/test_storage_paths_reject_esca1')
+key = 'workspace_root', value = 'data/raw/nested'
+
+    @pytest.mark.parametrize("key,value", [("raw_root", "../outside"),
+        ("workspace_root", "data/raw/nested"), ("archive_root", "data/task_workspace"),
+        ("metadata_path", "data/metadata.duckdb")])
+    def test_storage_paths_reject_escape_or_overlapping_layers(tmp_path, key, value):
+        from stock_data_manage.config.loader import load_storage_paths
+        config = tmp_path / "config"
+        config.mkdir()
+&gt;       document = yaml.safe_load((PROJECT_ROOT / "config/collection.yaml").read_text())
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_config_contract.py:132: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Program Files\Python\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/Project/PythonProgram/stock_data_manage/config/collection.yaml')
+encoding = 'locale', errors = None, newline = None
+
+    def read_text(self, encoding=None, errors=None, newline=None):
+        """
+        Open the file in text mode, read it, and close the file.
+        """
+        with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+&gt;           return f.read()
+                   ^^^^^^^^
+E           UnicodeDecodeError: 'gbk' codec can't decode byte 0xae in position 852: illegal multibyte sequence
+
+D:\Program Files\Python\Lib\pathlib\_abc.py:633: UnicodeDecodeError</failure></testcase><testcase classname="tests.test_config_contract" name="test_storage_paths_reject_escape_or_overlapping_layers[archive_root-data/task_workspace]" time="0.007"><failure message="UnicodeDecodeError: 'gbk' codec can't decode byte 0xae in position 852: illegal multibyte sequence">tmp_path = WindowsPath('C:/Users/sp181/AppData/Local/Temp/pytest-of-sp181/pytest-116/test_storage_paths_reject_esca2')
+key = 'archive_root', value = 'data/task_workspace'
+
+    @pytest.mark.parametrize("key,value", [("raw_root", "../outside"),
+        ("workspace_root", "data/raw/nested"), ("archive_root", "data/task_workspace"),
+        ("metadata_path", "data/metadata.duckdb")])
+    def test_storage_paths_reject_escape_or_overlapping_layers(tmp_path, key, value):
+        from stock_data_manage.config.loader import load_storage_paths
+        config = tmp_path / "config"
+        config.mkdir()
+&gt;       document = yaml.safe_load((PROJECT_ROOT / "config/collection.yaml").read_text())
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_config_contract.py:132: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Program Files\Python\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/Project/PythonProgram/stock_data_manage/config/collection.yaml')
+encoding = 'locale', errors = None, newline = None
+
+    def read_text(self, encoding=None, errors=None, newline=None):
+        """
+        Open the file in text mode, read it, and close the file.
+        """
+        with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+&gt;           return f.read()
+                   ^^^^^^^^
+E           UnicodeDecodeError: 'gbk' codec can't decode byte 0xae in position 852: illegal multibyte sequence
+
+D:\Program Files\Python\Lib\pathlib\_abc.py:633: UnicodeDecodeError</failure></testcase><testcase classname="tests.test_config_contract" name="test_storage_paths_reject_escape_or_overlapping_layers[metadata_path-data/metadata.duckdb]" time="0.007"><failure message="UnicodeDecodeError: 'gbk' codec can't decode byte 0xae in position 852: illegal multibyte sequence">tmp_path = WindowsPath('C:/Users/sp181/AppData/Local/Temp/pytest-of-sp181/pytest-116/test_storage_paths_reject_esca3')
+key = 'metadata_path', value = 'data/metadata.duckdb'
+
+    @pytest.mark.parametrize("key,value", [("raw_root", "../outside"),
+        ("workspace_root", "data/raw/nested"), ("archive_root", "data/task_workspace"),
+        ("metadata_path", "data/metadata.duckdb")])
+    def test_storage_paths_reject_escape_or_overlapping_layers(tmp_path, key, value):
+        from stock_data_manage.config.loader import load_storage_paths
+        config = tmp_path / "config"
+        config.mkdir()
+&gt;       document = yaml.safe_load((PROJECT_ROOT / "config/collection.yaml").read_text())
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_config_contract.py:132: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Program Files\Python\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/Project/PythonProgram/stock_data_manage/config/collection.yaml')
+encoding = 'locale', errors = None, newline = None
+
+    def read_text(self, encoding=None, errors=None, newline=None):
+        """
+        Open the file in text mode, read it, and close the file.
+        """
+        with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+&gt;           return f.read()
+                   ^^^^^^^^
+E           UnicodeDecodeError: 'gbk' codec can't decode byte 0xae in position 852: illegal multibyte sequence
+
+D:\Program Files\Python\Lib\pathlib\_abc.py:633: UnicodeDecodeError</failure></testcase><testcase classname="tests.test_config_contract" name="test_storage_paths_override_whole_data_root_without_creating_directories" time="0.029" /><testcase classname="tests.test_raw_metadata" name="test_raw_objects_are_immutable_and_verifiable" time="0.020" /><testcase classname="tests.test_raw_metadata" name="test_metadata_round_trips_attempt_and_completed_no_trade_partition" time="0.280" /><testcase classname="tests.test_raw_metadata" name="test_conflict_log_is_deduplicated" time="0.269" /><testcase classname="tests.test_raw_metadata" name="test_raw_compact_path_rejects_escape[../escape.json]" time="0.008" /><testcase classname="tests.test_raw_metadata" name="test_raw_compact_path_rejects_escape[/absolute.json]" time="0.007" /><testcase classname="tests.test_raw_metadata" name="test_raw_compact_path_rejects_escape[nested/../../escape.json]" time="0.008" /><testcase classname="tests.test_raw_metadata" name="test_raw_compact_path_rejects_escape[.]" time="0.006" /><testcase classname="tests.test_raw_metadata" name="test_raw_compact_path_retains_immutable_write_contract" time="0.040" /><testcase classname="tests.test_scheduler" name="test_phase_one_schedule_is_configured_and_idempotent_per_day" time="0.001" /><testcase classname="tests.test_scheduler" name="test_schedule_yaml_skips_disabled_tdx_delayed_jobs" time="0.005" /><testcase classname="tests.test_scheduler" name="test_tencent_profiles_separate_scope_frequency_and_request_speed" time="0.017" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[9-30-5-None]" time="0.016" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[9-34-59-None]" time="0.016" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[9-35-4-None]" time="0.016" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[9-35-5-expected3]" time="0.016" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[9-35-34-expected4]" time="0.017" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[9-35-35-None]" time="0.017" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[11-30-5-expected6]" time="0.016" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[11-31-0-None]" time="0.014" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[12-0-0-None]" time="0.014" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[13-0-5-None]" time="0.015" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[13-5-5-expected10]" time="0.014" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[15-0-5-expected11]" time="0.015" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[15-1-0-None]" time="0.055" /><testcase classname="tests.test_scheduler" name="test_minute_slots_respect_delay_sessions_and_no_stale_catchup[16-0-0-None]" time="0.038" /><testcase classname="tests.test_scheduler" name="test_daily_slots_calendar_intervals_and_timezone" time="0.017" /><testcase classname="tests.test_scheduler" name="test_full_stock_selection_has_no_100_or_200_symbol_truncation" time="0.525" /><testcase classname="tests.test_scheduler" name="test_snapshot_switch_to_minutes_keeps_full_scope_and_migration_gate" time="0.881" /><testcase classname="tests.test_scheduler" name="test_minute_capacity_missing_scope_and_scope_limits_block_execution" time="3.169" /><testcase classname="tests.test_scheduler" name="test_invalid_frequency_config_is_rejected[changes0]" time="1.001" /><testcase classname="tests.test_scheduler" name="test_invalid_frequency_config_is_rejected[changes1]" time="0.414" /><testcase classname="tests.test_scheduler" name="test_invalid_frequency_config_is_rejected[changes2]" time="0.328" /><testcase classname="tests.test_scheduler" name="test_invalid_frequency_config_is_rejected[changes3]" time="0.460" /><testcase classname="tests.test_scheduler" name="test_invalid_frequency_config_is_rejected[changes4]" time="0.444" /><testcase classname="tests.test_scheduler" name="test_invalid_frequency_config_is_rejected[changes5]" time="0.938" /><testcase classname="tests.test_scheduler" name="test_invalid_frequency_config_is_rejected[changes6]" time="0.456" /><testcase classname="tests.test_scheduler" name="test_invalid_frequency_config_is_rejected[changes7]" time="0.408" /><testcase classname="tests.test_scheduler" name="test_invalid_frequency_config_is_rejected[changes8]" time="0.675" /><testcase classname="tests.test_scheduler" name="test_candidate_tick_survives_restart_and_uses_existing_collector_and_shared_pacer" time="4.936" /><testcase classname="tests.test_scheduler" name="test_failed_slot_does_not_hammer_source_on_every_tick" time="3.611" /><testcase classname="tests.test_scheduler" name="test_daily_tick_passes_current_slot_date_and_does_not_change_qfq_semantics" time="1.642" /><testcase classname="tests.test_scheduler" name="test_planning_does_not_create_database_or_call_collector" time="1.611" /><testcase classname="tests.test_scheduler" name="test_scheduler_cannot_write_production_outputs" time="0.051" /><testcase classname="tests.test_scheduler" name="test_daily_time_edit_does_not_repeat_completed_day" time="3.104" /><testcase classname="tests.test_scheduler" name="test_runtime_scheduler_uses_unified_metadata_and_survives_restart" time="2.830" /><testcase classname="tests.test_cli" name="test_collect_input_context_file_merges_explicit_flags_and_preserves_dependency" time="0.049" /><testcase classname="tests.test_cli" name="test_collect_input_rejects_malformed_context_before_execution" time="0.025" /><testcase classname="tests.test_cli" name="test_recover_cli_returns_success_for_empty_store" time="0.130" /><testcase classname="tests.test_cli" name="test_due_input_cli_saves_plan_and_filters_explicit_closed_calendar_days" time="2.753" /></testsuite></testsuites>

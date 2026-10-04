@@ -120,3 +120,27 @@ def test_disabled_provider_cannot_be_enabled_by_an_endpoint_override(tmp_path):
     config_path = tmp_path / "providers.yaml"
     config_path.write_text("providers:\n  example:\n    enabled: false\n    endpoints:\n      sample:\n        enabled: true\n", encoding="utf-8")
     assert not load_provider_configs(config_path)[0].enabled
+
+
+@pytest.mark.parametrize("key,value", [("raw_root", "../outside"),
+    ("workspace_root", "data/raw/nested"), ("archive_root", "data/task_workspace"),
+    ("metadata_path", "data/metadata.duckdb")])
+def test_storage_paths_reject_escape_or_overlapping_layers(tmp_path, key, value):
+    from stock_data_manage.config.loader import load_storage_paths
+    config = tmp_path / "config"
+    config.mkdir()
+    document = yaml.safe_load((PROJECT_ROOT / "config/collection.yaml").read_text(encoding="utf-8"))
+    document["storage"][key] = value
+    (config / "collection.yaml").write_text(yaml.safe_dump(document), encoding="utf-8")
+    with pytest.raises(ValueError):
+        load_storage_paths(config)
+
+
+def test_storage_paths_override_whole_data_root_without_creating_directories(tmp_path):
+    from stock_data_manage.config.loader import load_storage_paths
+    paths = load_storage_paths(PROJECT_ROOT / "config", data_root=tmp_path / "isolated")
+    for name, relative in {"raw_root":"raw", "workspace_root":"task_workspace",
+                          "archive_root":"task_archive", "canonical_root":"canonical",
+                          "metadata_path":"metadata/metadata.duckdb", "hot_path":"hot/minute_hot.db"}.items():
+        assert paths[name] == tmp_path / "isolated" / relative
+    assert not paths["data_root"].exists()

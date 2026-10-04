@@ -1,0 +1,26 @@
+{
+  "input_id": "SDA-BOARD-004",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\storage-layout-20261005\\replay-data\\task_workspace\\board_fund_flow\\scope-200883daa9bfef27\\SDA-BOARD-004-fc5c4d19ca0a\\report.json",
+  "report_sha256": "087181314ce8a5da6ae2ff50b61b1a5b58d7b10dffc1543c4d9e1637bfae6fb3",
+  "source_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-02-sector-capabilities-network-retry\\manifest.ndjson",
+  "source_manifest_sha256": "0ab33015093fd13dd9c82d2a40f061658441e70cb9b2cd76401dd741e642a97a",
+  "source_response_hashes": [
+    "07895b44254d181f38a608624dd8800029fa3d5e75a4983610ee613ba99017e2",
+    "07895b44254d181f38a608624dd8800029fa3d5e75a4983610ee613ba99017e2",
+    "d04bd4e542784def7d3a505d9a761b3cfd97b1b02791d8f7ee61589c0acf9fd1",
+    "1c476d4e023c3c0429f20d1b317b495021bace6224b909d4b660b171a775a730",
+    "57a2d379884dca8c7e3e7cb439a01c52e181c23aa43f2237a2631733153f1349",
+    "5cf941abd8d37b4320675084e6e367f280e93adfd4a9824c2884f72b0a50f96e",
+    "288a5c7b512db985a117c80c1c518002f17077586e1de7e7c9506bde4320373d",
+    "754f19b7692b21d706f3061e91e4244d00d710c281a359ac72b7053f28e44e4f",
+    "9ed30a3c2816bc2c37c6ac47b7c6bd6c024de29ea5d9ed3ddc406e6c9db3c88f"
+  ],
+  "code_version": "75ce7cd57bb5f6b2786acd06edd6df5acf155b4af4fbcf4e4fe145c1062b0b9e",
+  "row_count": 387,
+  "coverage_denominator": 387,
+  "validation_time_utc": "2026-10-04T18:54:11.323634+00:00",
+  "mode": "offline archive replay into isolated runtime layers",
+  "canonical_writes": 0,
+  "field_roundtrip_verified": true,
+  "raw_hashes_verified": true
+}

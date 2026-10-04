@@ -831,7 +831,7 @@ def build_formal_spec() -> dict[str, Any]:
     Historical coverage exports remain unchanged when this mode is selected.
     """
     import yaml
-    from stock_data_manage.config.loader import load_input_capabilities, load_input_field_contract
+    from stock_data_manage.config.loader import load_input_capabilities, load_input_field_contract, load_storage_paths
 
     def read_json(path: Path):
         return json.loads(path.read_text(encoding="utf-8-sig"))
@@ -905,11 +905,18 @@ def build_formal_spec() -> dict[str, Any]:
 
     historical = {r["接口ID"]: r for r in read_csv(OUT_CSV)}
     headers = ["输入ID", "能力名称", "来源", "来源端点", "标准数据集", "数据周期", "请求范围形态", "实现状态", "生产路由", "自动调度", "采集策略", "刷新频率", "执行日历", "调度覆盖配置", "请求间隔（秒）", "有效并发", "限速执行位置", "实际验证方式", "实测参数", "返回行数", "覆盖分母", "覆盖分母含义", "验证时间（UTC）", "来源地址/协议", "调用方法", "能力限制", "禁止的参数来源", "验证报告", "原始证据清单", "配置与代码入口"]
+    headers.extend(["运行原始响应路径", "任务工作区路径", "来源标准化文件", "最终数据与发布状态", "任务归档条件"])
+    storage_paths = load_storage_paths(ROOT / "config")
+    def storage_label(name):
+        return rel(storage_paths[name])
     param_headers = ["输入ID", "能力名称", "参数", "含义", "类型", "必填", "参数来源", "默认值", "允许值", "最小值", "最大值", "执行位置", "实测参数示例", "日期门禁", "禁止的参数来源"]
     field_headers = ["输入ID", "能力名称", "数据集", "标准字段", "来源字段/上下文", "类型", "必填", "标准单位", "来源单位验证", "主键", "转换规则", "空值标记", "未核准字段处理", "映射状态", "映射版本", "规则备注", "模板路径", "映射路径"]
     excluded_headers = ["输入ID", "能力名称", "来源", "记录分类", "本轮采集", "原因", "对应正式输入", "验证时间（UTC）", "验证证据"]
     overview, parameters, fields, excluded, evidence = [], [], [], [], []
-    tracked_sources = {provider_path, ROOT / "config/collection.yaml", factory_path, Path(__file__), OUT_CSV}
+    tracked_sources = {provider_path, ROOT / "config/collection.yaml", factory_path, Path(__file__), OUT_CSV,
+        ROOT / "src/config/loader.py", ROOT / "src/pipeline/inputs.py", ROOT / "src/storage/raw.py",
+        ROOT / "src/storage/parquet.py", ROOT / "src/worker/recovery.py", ROOT / "src/cli.py",
+        ROOT / "docs/storage/README.md"}
     meanings = {"code": "证券/合约代码", "codes": "证券/合约代码集合", "date": "目标日期（具体日历及含义见能力限制）", "start": "请求起始日期", "end": "请求截止日期", "adjust": "复权口径", "period": "来源统计周期", "symbol": "来源查询标的或查询类别", "keyword": "查询关键词", "board_code": "来源板块代码", "board_name": "来源板块名称", "count": "来源允许的返回数量", "limit": "来源允许的返回上限"}
     meanings.update({"symbols": "待采集证券代码集合", "as_of": "请求参考时刻", "board_type": "板块类别", "channel": "来源频道", "country": "来源国家筛选", "cursor": "来源分页/增量游标", "curve": "收益率曲线类别", "detail": "来源明细选项", "direction": "买卖方向", "end_date": "请求截止日期", "exchange": "来源交易所类别", "include_delisted": "是否保留已摘牌记录", "index_code": "来源指数代码", "instrument": "标的身份上下文", "kind": "来源数据类别", "min_importance": "来源事件重要性下限", "page": "来源页码", "pages": "来源页数限制", "progress": "来源业务进度代码", "report_date": "目标报告日期", "start_date": "请求起始日期", "trade_date": "目标交易日期", "with_content": "来源正文采集选项"})
     shapes = {"single_symbol": "单标的", "symbol_batch": "标的集合分批", "full_snapshot": "来源全量快照", "date_snapshot": "指定日期快照", "file_package": "来源文件包", "paged_list": "分页列表"}
@@ -979,6 +986,13 @@ def build_formal_spec() -> dict[str, Any]:
         parent = next((historical[v] for v in cfg.get("evidence_refs", []) if v in historical), {})
         endpoints = list(dict.fromkeys(r.get("url", "").split("?", 1)[0] for r in report.get("responses", []) if r.get("url")))
         overview.append([ident, cfg.get("display_name", ident), cfg["provider"], cfg["endpoint"], cfg["dataset"], frequencies.get(cfg["data_frequency"], cfg["data_frequency"]), shapes.get(cfg["request_shape"], cfg["request_shape"]), "已实现（验证输入）", "未授予生产路由资格", "已启用" if profile.get("scheduling_enabled") else "未启用", cfg["collection_profile"], refresh, profile.get("business_day"), profile.get("universe", "未显式指定；不代表全市场"), cfg["request_interval_seconds"], cfg["effective_concurrency"], cfg["request_limit_enforcement"], mode, text(example), report.get("row_count"), report.get("coverage_denominator"), report.get("coverage_basis", "返回样本范围；不代表全市场完整性"), report.get("validation_time_utc"), "\n".join(endpoints) or report.get("source_url") or parent.get("接口地址/协议"), cfg["runtime_method"], "\n".join(cfg.get("limitations", [])), "\n".join(cfg.get("forbidden_sources", [])), rel(rp) if rp else parent.get("逐接口结果记录"), "\n".join(dict.fromkeys(manifests)), f"config/providers.yaml#{ident}\n{rel(factory_path)}"])
+        overview[-1].extend([
+            f"{storage_label('raw_root')}/{cfg['provider']}/{cfg['endpoint']}/\n<UTC抓取日期>/<批次>/manifest.ndjson\nbodies/<SHA256>.bin",
+            f"{storage_label('workspace_root')}/{cfg['dataset']}/scope-<请求范围哈希>/<任务ID>/",
+            f"sources/{cfg['provider']}/{ident}/\nnormalized.parquet\nnormalized.json；parsed/；raw_refs.json",
+            f"{storage_label('canonical_root')}/ 按数据集及业务分区；本输入仅候选完成，尚未接通正式发布",
+            f"正式发布与元数据状态均成功、文件哈希通过后进入 {storage_label('archive_root')}/；候选和失败任务保留工作区"
+        ])
         for name, parameter in cfg.get("parameters", {}).items():
             parameters.append([ident, cfg.get("display_name", ident), name, meanings.get(name, "按来源协议及参数来源解释"), parameter["type"], "是" if parameter.get("required") else "否", parameter.get("source"), text(parameter.get("default")), text(parameter.get("choices")), parameter.get("min"), parameter.get("max"), parameter.get("applied_at", "来源调用参数"), text(example.get(name)), "须为交易日" if cfg.get("trading_date_parameter") == name else "未设置交易日门禁", "\n".join(cfg.get("forbidden_sources", []))])
         if not cfg.get("parameters"):
@@ -995,7 +1009,13 @@ def build_formal_spec() -> dict[str, Any]:
     document = {"record_type": "formal_provider_interface_spec", "generated_at_utc": datetime.now(timezone.utc).isoformat(), "source_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(), "scope": "source collection inputs; no production eligibility or scheduling changes", "counts": dict(Counter(c["implementation_status"] for c in current.values())), "network_requests": 0, "production_writes": 0, "sources": [{"path": rel(p), "sha256": sha256(p)} for p in sorted(tracked_sources)], "evidence": evidence, "sheets": [{"name": "接口总览", "headers": headers, "rows": overview}, {"name": "调用参数", "headers": param_headers, "rows": parameters}, {"name": "采集字段与映射", "headers": field_headers, "rows": fields}, {"name": "暂不纳入及历史", "headers": excluded_headers, "rows": excluded}]}
     destination = ROOT / "docs/providers/源头采集接口说明.json"
     destination.parent.mkdir(parents=True, exist_ok=True)
-    destination.write_text(json.dumps(document, ensure_ascii=False, indent=2, default=str) + "\n", encoding="utf-8")
+    payload = (json.dumps(document, ensure_ascii=False, indent=2, default=str) + "\n").replace("\n", "\r\n").encode("utf-8")
+    if destination.exists():
+        with destination.open("r+b") as stream:
+            stream.write(payload)
+            stream.truncate()
+    else:
+        destination.write_bytes(payload)
     print(json.dumps({"output": rel(destination), "counts": document["counts"], "hash_linked_reports": len(evidence), "rows": {s["name"]: len(s["rows"]) for s in document["sheets"]}}, ensure_ascii=False))
     return document
 

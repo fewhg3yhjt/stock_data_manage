@@ -1,0 +1,18 @@
+{
+  "input_id": "ASTOCK-001",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\storage-layout-20261005\\replay-data-v2\\task_workspace\\realtime_quote\\scope-f76e934a2f7b3475\\76adbb5ddb14\\report.json",
+  "report_sha256": "7876c947e75b4d1a352c94258605a9224f678c0386a89f0eb8cfefe678a96a21",
+  "source_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\pilot-20261003-tencent-quote-network\\_raw\\missing-capabilities-20261003T173649\\manifest.ndjson",
+  "source_manifest_sha256": "b2c15224346d15fa1d750b745984e0d86501c9519be7867e575627846c647fa3",
+  "source_response_hashes": [
+    "6ed41c4189fef3f0c6daa5cccf77084b2920ba95e4df716d284aa74821231695"
+  ],
+  "code_version": "461f090fb955cab293f619736844cde6d088dc1bc3e27a097b709c5263c0323d",
+  "row_count": 1,
+  "coverage_denominator": 1,
+  "validation_time_utc": "2026-10-04T19:14:14.659189+00:00",
+  "mode": "offline archive replay into isolated runtime layers",
+  "canonical_writes": 0,
+  "field_roundtrip_verified": true,
+  "raw_hashes_verified": true
+}

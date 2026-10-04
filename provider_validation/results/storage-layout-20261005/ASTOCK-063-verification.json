@@ -1,0 +1,18 @@
+{
+  "input_id": "ASTOCK-063",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\storage-layout-20261005\\replay-data-v2\\task_workspace\\bond_yield_curve\\scope-1e9aba804efcc02f\\e7ff6e342bea\\report.json",
+  "report_sha256": "399d5736a4ec7077e4c711edd71df9ef7b7e4c4fb7e88f2e356b2462c837b504",
+  "source_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\manifest.ndjson",
+  "source_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+  "source_response_hashes": [
+    "64b832cbb8482882526554b51e1b33f9f9c82eab0737f11f8fa5044ca95bda7e"
+  ],
+  "code_version": "461f090fb955cab293f619736844cde6d088dc1bc3e27a097b709c5263c0323d",
+  "row_count": 42,
+  "coverage_denominator": 42,
+  "validation_time_utc": "2026-10-04T19:12:14.832656+00:00",
+  "mode": "offline archive replay into isolated runtime layers",
+  "canonical_writes": 0,
+  "field_roundtrip_verified": true,
+  "raw_hashes_verified": true
+}

@@ -61,3 +61,20 @@ def test_due_input_cli_saves_plan_and_filters_explicit_closed_calendar_days(tmp_
     assert main(["collect-due-inputs", "--now", "2026-10-03T15:10:00+08:00", "--calendar-file", str(calendar),
                  "--output-root", str(tmp_path / "closed")]) == 0
     assert json.loads(capsys.readouterr().out)["jobs"] == []
+
+
+
+def test_default_collect_input_passes_unified_root_without_validation_output(tmp_path, monkeypatch):
+    calls=[]
+    def collector(**kwargs):
+        calls.append(kwargs)
+        return {"status":"candidate_complete"}
+    monkeypatch.setattr("stock_data_manage.pipeline.inputs.collect_input",collector)
+    assert main(["collect-input","--input","ASTOCK-002-daily","--data-root",str(tmp_path/"data")])==0
+    assert calls[0]["output_root"] is None and calls[0]["data_root"]==tmp_path/"data"
+
+
+def test_explicit_recovery_does_not_require_project_config(tmp_path, capsys, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    assert main(["recover","--canonical-root",str(tmp_path/"canonical"),"--metadata",str(tmp_path/"meta.duckdb")])==0
+    assert '"invalid_final_partitions": []' in capsys.readouterr().out

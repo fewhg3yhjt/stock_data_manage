@@ -1,0 +1,18 @@
+{
+  "input_id": "ASTOCK-030",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\storage-layout-20261005\\replay-data-v2\\task_workspace\\etf_shares\\scope-02b86c5bf304fcb6\\3461c50b9e71\\report.json",
+  "report_sha256": "e78303621c6302191c5737baf249289740d0bf890b4c74f162615b5b8fad735a",
+  "source_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\manifest.ndjson",
+  "source_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+  "source_response_hashes": [
+    "30a88d08c745cd399972cea86c49065b279c7965aa726bbfc4796a4bc6309478"
+  ],
+  "code_version": "461f090fb955cab293f619736844cde6d088dc1bc3e27a097b709c5263c0323d",
+  "row_count": 912,
+  "coverage_denominator": 912,
+  "validation_time_utc": "2026-10-04T19:12:13.158476+00:00",
+  "mode": "offline archive replay into isolated runtime layers",
+  "canonical_writes": 0,
+  "field_roundtrip_verified": true,
+  "raw_hashes_verified": true
+}

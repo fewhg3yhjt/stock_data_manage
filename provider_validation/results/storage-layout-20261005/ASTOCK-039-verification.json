@@ -1,0 +1,20 @@
+{
+  "input_id": "ASTOCK-039",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\storage-layout-20261005\\replay-data-v2\\task_workspace\\sina_financial_statements\\scope-31fbb93fc08d2b86\\6394a826f4ab\\report.json",
+  "report_sha256": "7b1affe380c628b070e66eaa8cb517ca0b9e33e56feb4c203c9b811a87c593ea",
+  "source_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\_raw\\missing-capabilities-20261003T174623\\manifest.ndjson",
+  "source_manifest_sha256": "885abd6bf1c4b809b9029759f61b75c7d6a297755fd76ca6c545720db38a6767",
+  "source_response_hashes": [
+    "3c00915108233b0c7727831ffdeec6ddced5a088bfc53a329d991110fc48c77c",
+    "e2f52c5a261901d8825555b0f6e353018633b30447e9e74da7f15372383735db",
+    "fdfd259b762555afd43a1f0cf378bc031d1b54c910f0868cf9c304657e1bb883"
+  ],
+  "code_version": "35a31d9cbaa8750a25b081262b21c690efc6564096792b193db9e67852d92e08",
+  "row_count": 305,
+  "coverage_denominator": 305,
+  "validation_time_utc": "2026-10-04T19:11:07.175580+00:00",
+  "mode": "offline archive replay into isolated runtime layers",
+  "canonical_writes": 0,
+  "field_roundtrip_verified": true,
+  "raw_hashes_verified": true
+}

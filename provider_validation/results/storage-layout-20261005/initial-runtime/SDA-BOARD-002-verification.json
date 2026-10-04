@@ -1,0 +1,19 @@
+{
+  "input_id": "SDA-BOARD-002",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\storage-layout-20261005\\replay-data\\task_workspace\\industry_index_daily\\scope-f814d4fe4eabf6b9\\SDA-BOARD-002-10b983ee91f4\\report.json",
+  "report_sha256": "c9c2dba46a2d88140442667f81f1aef123cce47d925fa774197d99fcf4f302f8",
+  "source_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-02-sector-capabilities-network-retry\\manifest.ndjson",
+  "source_manifest_sha256": "0ab33015093fd13dd9c82d2a40f061658441e70cb9b2cd76401dd741e642a97a",
+  "source_response_hashes": [
+    "b1639d45922f7a86173529c1f809831cfbe5b71fc19bb6c66907a00e70056282",
+    "6fbcb5f15fa5edac8ef542309c5ac39a63bfb74d5340753fecd5b675bbd251cf"
+  ],
+  "code_version": "2d60bfbe7240c19b77e725d0935bfc0b3a05ac8b953c75ebace445c04ab1edf9",
+  "row_count": 21,
+  "coverage_denominator": 21,
+  "validation_time_utc": "2026-10-04T18:54:07.860236+00:00",
+  "mode": "offline archive replay into isolated runtime layers",
+  "canonical_writes": 0,
+  "field_roundtrip_verified": true,
+  "raw_hashes_verified": true
+}

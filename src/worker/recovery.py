@@ -90,3 +90,69 @@ class RecoveryScanner:
             shutil.move(str(path), str(destination))
             moved += 1
         return moved
+
+
+def archive_published_task(task_directory: str | Path, *, workspace_root: str | Path,
+                           archive_root: str | Path, canonical_root: str | Path,
+                           raw_root: str | Path, metadata: MetadataStore) -> Path:
+    """Archive an existing published task only after checking durable publication evidence."""
+    import json
+    from ..domain import AttemptStatus
+    from ..storage.integrity import file_hash
+
+    task = Path(task_directory).resolve()
+    workspace, archive = Path(workspace_root).resolve(), Path(archive_root).resolve()
+    canonical, raw = Path(canonical_root).resolve(), Path(raw_root).resolve()
+    roots = (workspace, archive, canonical, raw)
+    if any(first.is_relative_to(second) or second.is_relative_to(first)
+           for index, first in enumerate(roots) for second in roots[index + 1:]):
+        raise ValueError("archive storage roots must be disjoint")
+    if task == workspace or not task.is_relative_to(workspace) or not task.is_dir():
+        raise ValueError("task must be an existing directory inside task_workspace")
+    relative = task.relative_to(workspace)
+    if len(relative.parts) != 3:
+        raise ValueError("task path must be dataset/scope/task-id")
+    destination = (archive / relative).resolve()
+    if not destination.is_relative_to(archive) or destination.exists():
+        raise ValueError("archive destination must be new and inside task_archive")
+    manifest = json.loads((task / "manifest.json").read_text(encoding="utf-8"))
+    if manifest.get("task_id") != task.name or manifest.get("dataset") != relative.parts[0]:
+        raise ValueError("task identity does not match directory")
+    attempt = metadata.load_attempt(manifest["task_id"])
+    if manifest.get("status") != "published" or not attempt or attempt.status != AttemptStatus.PUBLISHED:
+        raise ValueError("only published tasks can be archived")
+    raw_ref = manifest.get("raw_manifest") or {}
+    raw_manifest = (task / raw_ref.get("path", "")).resolve()
+    if not raw_manifest.is_relative_to(raw) or not raw_manifest.is_file() or file_hash(raw_manifest) != raw_ref.get("sha256"):
+        raise ValueError("raw response reference is invalid")
+    if Path(attempt.raw_object_path or "").resolve() != raw_manifest or attempt.raw_content_hash != raw_ref["sha256"]:
+        raise ValueError("metadata does not match task raw evidence")
+    if (destination / raw_ref["path"]).resolve() != raw_manifest:
+        raise ValueError("archive layout would break the relative raw reference")
+    for event in (json.loads(line) for line in raw_manifest.read_text(encoding="utf-8").splitlines()):
+        if event.get("body_sha256"):
+            from ..storage.raw import RawObjectStore
+            RawObjectStore.read_response(raw_manifest, event)
+    for name in ("output", "report", "quality_report"):
+        descriptor = manifest.get(name) or {}
+        path = (task / descriptor.get("path", "")).resolve()
+        if not path.is_relative_to(task) or not path.is_file() or file_hash(path) != descriptor.get("sha256"):
+            raise ValueError(f"task {name} is missing or corrupt")
+    refs = manifest.get("canonical_refs") or []
+    if not refs:
+        raise ValueError("published task needs canonical publication references")
+    for ref in refs:
+        manifest_path = (canonical / ref["manifest_path"]).resolve()
+        if not manifest_path.is_relative_to(canonical) or not manifest_path.is_file() or file_hash(manifest_path) != ref["sha256"]:
+            raise ValueError("canonical publication reference is invalid")
+        published = Manifest.load(manifest_path)
+        if published.dataset != manifest["dataset"] or not published.verify(manifest_path.parent / "data.parquet"):
+            raise ValueError("canonical dataset does not match task publication")
+    # rename keeps the move atomic; cross-device archives are refused, never copied/deleted.
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    from ..storage.parquet import PartitionLock
+    with PartitionLock(task.with_name(task.name + ".archive.lock")):
+        if destination.exists():
+            raise ValueError("archive destination already exists")
+        os.rename(task, destination)
+    return destination
