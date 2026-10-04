@@ -1,0 +1,1949 @@
+{
+  "validation_time_utc": "2026-10-04T01:47:02.809099+00:00",
+  "result": "passed",
+  "tests": 447,
+  "counts": {
+    "implemented_validation_only": 34,
+    "unimplemented": 30,
+    "blocked": 7,
+    "alias": 3
+  },
+  "real_network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "audited_reports": [
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/ASTOCK-032/candidate/ASTOCK-032-9e3d8cb585d0/2026-10-04/input_report/cls/telegraph/report.json",
+      "sha256": "58413d22a5ddcbb852142ecd564f60e88b34e9f7b0bc62a6c66f418f1bcad62c",
+      "status": "candidate_complete",
+      "row_count": 20,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/ASTOCK-033/candidate/ASTOCK-033-018ac7a46b3b/2026-10-04/input_report/sina/global_news/report.json",
+      "sha256": "69d2a7302f9feb569915aa4bf7ba70cd4536ab086bac27406633d784fbb8a018",
+      "status": "candidate_complete",
+      "row_count": 20,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f0/candidate/ASTOCK-032-e9c7de340c1e/2026-10-04/input_report/cls/telegraph/report.json",
+      "sha256": "9838494f67fbd6d3e8e9f6e01330e1b3c22cfd58aa0e5190d819f437e25f732e",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f1/candidate/ASTOCK-032-0181742d68c7/2026-10-04/input_report/cls/telegraph/report.json",
+      "sha256": "8dfb4691f370d748fec1af2a7e828262187576a49700b085dd7e22d1599edf97",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f10/candidate/ASTOCK-033-8cf507c7dfaa/2026-10-04/input_report/sina/global_news/report.json",
+      "sha256": "d5eb3c46877c5a57cac9575a750b8e5ea1e005cd54cacb1fb7f0568574fb9f24",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f11/candidate/ASTOCK-033-00c51732413d/2026-10-04/input_report/sina/global_news/report.json",
+      "sha256": "7211820cc5ec47b97290debd25ec27a9a491fdd48c257f9216a5352152fffebd",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f12/candidate/ASTOCK-033-32c9087d6c2d/2026-10-04/input_report/sina/global_news/report.json",
+      "sha256": "e348820b325cd8affda0eb685840ab7aea89b318f56c6b68b96d27dafdb5e479",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f13/candidate/ASTOCK-033-ff9d119c9d98/2026-10-04/input_report/sina/global_news/report.json",
+      "sha256": "71359ce96e7be3b2cf86f5008a5601f06db6e39564b84c3cc2cf395cc4326123",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f2/candidate/ASTOCK-032-53961bf22cd1/2026-10-04/input_report/cls/telegraph/report.json",
+      "sha256": "401e09d9d6b4f6fecb6065e028c4bd484d6b6c3c54fdcd3336c88da980a24ad6",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f3/candidate/ASTOCK-032-9cc2c78926ea/2026-10-04/input_report/cls/telegraph/report.json",
+      "sha256": "bc7b1dc44df6bf673f4cd6783b8858811d8a9c69142e5cce1b4257e2937834f4",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f4/candidate/ASTOCK-032-32d5470f818f/2026-10-04/input_report/cls/telegraph/report.json",
+      "sha256": "18d3d63fb270f4fc51119cddc505d5bbfb7d056da43b82f2e57a110fd2ed0650",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f5/candidate/ASTOCK-032-761a6d2c84a5/2026-10-04/input_report/cls/telegraph/report.json",
+      "sha256": "ec6fb0e6a48ca45887675d7b3d1a19d0b380d624525bbe581e9e10247e127013",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f6/candidate/ASTOCK-032-ad179f1a9b06/2026-10-04/input_report/cls/telegraph/report.json",
+      "sha256": "5932a7062598297bb4d23b5a6c50c9f72f8d89f9951549a4fe39534d6be1e8f9",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f7/candidate/ASTOCK-033-61cab9a6e287/2026-10-04/input_report/sina/global_news/report.json",
+      "sha256": "d4d481b192403d1a7ecc0f5f26ff8139f124b6ca8868b8119ae5b30ffecfa27c",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f8/candidate/ASTOCK-033-ca6d77d4d81f/2026-10-04/input_report/sina/global_news/report.json",
+      "sha256": "8afe315f8e7c20719ebacf41cfd399747800e0b2a281cc097ad812afa2ed2224",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f9/candidate/ASTOCK-033-8842923e3756/2026-10-04/input_report/sina/global_news/report.json",
+      "sha256": "ee8a28b396090a8762d959bd46d3dec0bef2c7b644049e4b8beeacd8561c689a",
+      "status": "failed",
+      "row_count": null,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/miss/candidate/ASTOCK-032-22e7a40fbe90/2026-10-04/input_report/cls/telegraph/report.json",
+      "sha256": "650f725c1368a4a44cb62ce7254ac1a3a3afec58dd8f9ed90a1b124bd2358b1f",
+      "status": "failed-before-request",
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/retry/candidate/ASTOCK-032-b5d10ace9ad6/2026-10-04/input_report/cls/telegraph/report.json",
+      "sha256": "a20d495c52c8f3cac0ef55aa80a6cdaf3149343e71cd4ba2ed32e7d6bc50bb51",
+      "status": "candidate_complete",
+      "row_count": 20,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-032-ed4cbc3d5f26/2026-10-04/input_report/cls/telegraph/report.json",
+      "sha256": "945dd23dbe41af55b3570b6b9158886b7b1762ec60d08ec193d30485b9b5582a",
+      "status": "candidate_complete",
+      "row_count": 20,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-032-f7d528979131/2026-10-04/input_report/cls/telegraph/report.json",
+      "sha256": "042572bcf0462ac2c93a8bcb4e26b6a8f579468c26bb36a377ab4522fdfcf4a4",
+      "status": "candidate_complete",
+      "row_count": 20,
+      "live_http_calls": 1
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-033-b19e3928af6e/2026-10-04/input_report/sina/global_news/report.json",
+      "sha256": "1a1ac503846f90016c4dd5fcb1e48ed0abe52d398e3c800212e64a6dd70b9241",
+      "status": "candidate_complete",
+      "row_count": 20,
+      "live_http_calls": 1
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-033-dfea339d6820/2026-10-04/input_report/sina/global_news/report.json",
+      "sha256": "289015f888fa4fb5a3d024f77ace3a6a451fa1c36f0d485e555318b83621135d",
+      "status": "candidate_complete",
+      "row_count": 20,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/candidate/ASTOCK-032-b9eed468f019/2026-10-04/input_report/cls/telegraph/report.json",
+      "sha256": "13de64499fc9cd6c36c06f10e3ad48af0e3dba2412d79ae54e49d2c3687b00ef",
+      "status": "candidate_complete",
+      "row_count": 20,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/projection/ASTOCK-032-432cd3162d85/2026-10-04/input_report/cls/telegraph/report.json",
+      "sha256": "2592963e036c0f8047a62fb0da19996acd919f3fc3420b985c3ac3dc0eb3dfaf",
+      "status": "candidate_complete",
+      "row_count": 20,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sdk-news-cli-20261004/candidate/ASTOCK-032-751fcdab90a4/2026-10-04/input_report/cls/telegraph/report.json",
+      "sha256": "0e7141df7ba05fe9a2abad521127b2251bd77160248048e0843f9ca026cad9db",
+      "status": "candidate_complete",
+      "row_count": 20,
+      "live_http_calls": 0
+    },
+    {
+      "path": "provider_validation/results/sdk-news-cli-20261004/candidate/ASTOCK-033-970baeebd522/2026-10-04/input_report/sina/global_news/report.json",
+      "sha256": "514ea1c32fceb1c256771ae2da30e61ac16e3a4960f840f1d85b23f37be954ca",
+      "status": "candidate_complete",
+      "row_count": 20,
+      "live_http_calls": 0
+    }
+  ],
+  "files": [
+    {
+      "path": ".gitattributes",
+      "sha256": "d7bdd2f92a63941cfc46d93e5f7f513e70bc2575fbb049c2d79bb16cafd721ee",
+      "bytes": 12702
+    },
+    {
+      "path": "CODE_STRUCTURE.md",
+      "sha256": "aca00aa7b428c5dedff797b36fba47de0913d53e688c91c786e9c92398d715e7",
+      "bytes": 24191
+    },
+    {
+      "path": "config/datasets/cls_telegraph.yaml",
+      "sha256": "80c414933f4ee26e2475403ceda50fc2f2b98141c18d0fd0c3f719dae3572f02",
+      "bytes": 331
+    },
+    {
+      "path": "config/datasets/sina_global_news.yaml",
+      "sha256": "688eeb3b698bb8fdb3fb33bc296869b6caca47bd9ff427a97ae989f74c595350",
+      "bytes": 297
+    },
+    {
+      "path": "config/normalization/cls_telegraph.yaml",
+      "sha256": "7c64e6a2aad86a294ea4da3e99239fdadbef2f48c9cc40bcfd4685aaf753c372",
+      "bytes": 661
+    },
+    {
+      "path": "config/normalization/sina_global_news.yaml",
+      "sha256": "22b2caa83fecb10728649e033cf8b8fbbd4fa8c7928de1b8d8961e1516263b0f",
+      "bytes": 649
+    },
+    {
+      "path": "config/providers.yaml",
+      "sha256": "525141790ced92c40375dddf4ddf71b34d0a41c37e67be0a103daaf191afb166",
+      "bytes": 83142
+    },
+    {
+      "path": "PROJECT_PROGRESS.md",
+      "sha256": "a8fabaae7aebda57befdefc8af68264c28afac03116991e56885e01f87b2fbe0",
+      "bytes": 13321
+    },
+    {
+      "path": "provider_validation/docs/2026-10-04-sdk-news-input-collection.md",
+      "sha256": "2f8a65f54a30cdee9a2c4749a6d5c2a24e25241cd1e90682a1d3bd7d59746610",
+      "bytes": 3213
+    },
+    {
+      "path": "provider_validation/results/sdk-news-cli-20261004/ASTOCK-032-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "provider_validation/results/sdk-news-cli-20261004/ASTOCK-032-stdout.json",
+      "sha256": "dfdb31d7851376ab81755c1cd947ac8c84caea1efd3bd39332b70774dfb9669a",
+      "bytes": 15554
+    },
+    {
+      "path": "provider_validation/results/sdk-news-cli-20261004/ASTOCK-033-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "provider_validation/results/sdk-news-cli-20261004/ASTOCK-033-stdout.json",
+      "sha256": "a98c96586e9ac8f8c9517ecb4bb361a357e57a698d087ce98401f426ad018eca",
+      "bytes": 15028
+    },
+    {
+      "path": "provider_validation/results/sdk-news-cli-20261004/candidate/ASTOCK-032-751fcdab90a4/2026-10-04/cls_telegraph/cls/telegraph/mapped-rows.json",
+      "sha256": "a2f61aad2db395fb0fc97e25f0047a57482cfeba25be7abfa18db4b46128598c",
+      "bytes": 11581
+    },
+    {
+      "path": "provider_validation/results/sdk-news-cli-20261004/candidate/ASTOCK-032-751fcdab90a4/2026-10-04/input_report/cls/telegraph/report.json",
+      "sha256": "0e7141df7ba05fe9a2abad521127b2251bd77160248048e0843f9ca026cad9db",
+      "bytes": 12704
+    },
+    {
+      "path": "provider_validation/results/sdk-news-cli-20261004/candidate/ASTOCK-032-751fcdab90a4/2026-10-04/parsed_rows/cls/telegraph/parsed-rows.json",
+      "sha256": "4da48ce503bb1c0eed9de6bd349101378a844cca79cbe0d922ca44ba236c14e0",
+      "bytes": 11621
+    },
+    {
+      "path": "provider_validation/results/sdk-news-cli-20261004/candidate/ASTOCK-032-751fcdab90a4/2026-10-04/source_rows/cls/telegraph/source-rows.json",
+      "sha256": "c13c7c65d7a0215c6023bde811a6c70a0e224a58bc63e633edd6b90267cc9ebc",
+      "bytes": 10881
+    },
+    {
+      "path": "provider_validation/results/sdk-news-cli-20261004/candidate/ASTOCK-032-751fcdab90a4/_raw/bodies/015c5b37ffa4c6d337ab8e984272ed407fc43782a417a8cf223cca2c55704336.bin",
+      "sha256": "015c5b37ffa4c6d337ab8e984272ed407fc43782a417a8cf223cca2c55704336",
+      "bytes": 48502
+    },
+    {
+      "path": "provider_validation/results/sdk-news-cli-20261004/candidate/ASTOCK-032-751fcdab90a4/_raw/bodies/b358009aa8181c0b07ca50acecaff6d2ad70a2d195a935a1b67b421a5d1a418c.bin",
+      "sha256": "b358009aa8181c0b07ca50acecaff6d2ad70a2d195a935a1b67b421a5d1a418c",
+      "bytes": 1705
+    },
+    {
+      "path": "provider_validation/results/sdk-news-cli-20261004/candidate/ASTOCK-032-751fcdab90a4/_raw/bodies/cc4630f26f0d32ec623cd249d853a165f25da6d65099e2c1239c613f7877a847.bin",
+      "sha256": "cc4630f26f0d32ec623cd249d853a165f25da6d65099e2c1239c613f7877a847",
+      "bytes": 2021
+    },
+    {
+      "path": "provider_validation/results/sdk-news-cli-20261004/candidate/ASTOCK-032-751fcdab90a4/_raw/manifest.ndjson",
+      "sha256": "0ae41fb9bbce48addd90ac414d0727eb8f8f1b5b41edd91b698914125968b570",
+      "bytes": 1822
+    },
+    {
+      "path": "provider_validation/results/sdk-news-cli-20261004/candidate/ASTOCK-033-970baeebd522/2026-10-04/input_report/sina/global_news/report.json",
+      "sha256": "514ea1c32fceb1c256771ae2da30e61ac16e3a4960f840f1d85b23f37be954ca",
+      "bytes": 12349
+    },
+    {
+      "path": "provider_validation/results/sdk-news-cli-20261004/candidate/ASTOCK-033-970baeebd522/2026-10-04/parsed_rows/sina/global_news/parsed-rows.json",
+      "sha256": "74558bc1ba52b59ee620cd6c07b12a52f66cd07d6c03d9308f0abc3debf74418",
+      "bytes": 7445
+    },
+    {
+      "path": "provider_validation/results/sdk-news-cli-20261004/candidate/ASTOCK-033-970baeebd522/2026-10-04/sina_global_news/sina/global_news/mapped-rows.json",
+      "sha256": "3f449b0369b48df6ea54a4ae11dab316ddcf07d55bf20ee4c73b90cc86687a1a",
+      "bytes": 8625
+    },
+    {
+      "path": "provider_validation/results/sdk-news-cli-20261004/candidate/ASTOCK-033-970baeebd522/2026-10-04/source_rows/sina/global_news/source-rows.json",
+      "sha256": "74558bc1ba52b59ee620cd6c07b12a52f66cd07d6c03d9308f0abc3debf74418",
+      "bytes": 7445
+    },
+    {
+      "path": "provider_validation/results/sdk-news-cli-20261004/candidate/ASTOCK-033-970baeebd522/_raw/bodies/07c6926ed23a9e9be235bbfe45d7bd3af98cab8b60e8d7a1966bec0e56f5f228.bin",
+      "sha256": "07c6926ed23a9e9be235bbfe45d7bd3af98cab8b60e8d7a1966bec0e56f5f228",
+      "bytes": 63590
+    },
+    {
+      "path": "provider_validation/results/sdk-news-cli-20261004/candidate/ASTOCK-033-970baeebd522/_raw/bodies/d93bd2b0aa3c71ce5539a6c139204baf3f34b0a4bdd52938921438523d484a0e.bin",
+      "sha256": "d93bd2b0aa3c71ce5539a6c139204baf3f34b0a4bdd52938921438523d484a0e",
+      "bytes": 851
+    },
+    {
+      "path": "provider_validation/results/sdk-news-cli-20261004/candidate/ASTOCK-033-970baeebd522/_raw/manifest.ndjson",
+      "sha256": "680a833356e31dc2ec66075649f1254d7b6721d8305be57add2c3b9a2b54832b",
+      "bytes": 1770
+    },
+    {
+      "path": "provider_validation/results/sdk-news-cli-20261004/verification.json",
+      "sha256": "a52d70639b71bb3691ff0ba58a2bad2682a46e061129b3f85f23c94ce2465304",
+      "bytes": 2915
+    },
+    {
+      "path": "provider_validation/results/sdk-news-cli-20261004/verify.py",
+      "sha256": "195bdcb1414ea74b8bd10df99c4b65c112306f8dc466aeeb4fad5da3ff3704a4",
+      "bytes": 1792
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/ASTOCK-032/candidate/ASTOCK-032-9e3d8cb585d0/2026-10-04/cls_telegraph/cls/telegraph/mapped-rows.json",
+      "sha256": "a2f61aad2db395fb0fc97e25f0047a57482cfeba25be7abfa18db4b46128598c",
+      "bytes": 11581
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/ASTOCK-032/candidate/ASTOCK-032-9e3d8cb585d0/2026-10-04/input_report/cls/telegraph/report.json",
+      "sha256": "58413d22a5ddcbb852142ecd564f60e88b34e9f7b0bc62a6c66f418f1bcad62c",
+      "bytes": 12704
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/ASTOCK-032/candidate/ASTOCK-032-9e3d8cb585d0/2026-10-04/parsed_rows/cls/telegraph/parsed-rows.json",
+      "sha256": "4da48ce503bb1c0eed9de6bd349101378a844cca79cbe0d922ca44ba236c14e0",
+      "bytes": 11621
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/ASTOCK-032/candidate/ASTOCK-032-9e3d8cb585d0/2026-10-04/source_rows/cls/telegraph/source-rows.json",
+      "sha256": "c13c7c65d7a0215c6023bde811a6c70a0e224a58bc63e633edd6b90267cc9ebc",
+      "bytes": 10881
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/ASTOCK-032/candidate/ASTOCK-032-9e3d8cb585d0/_raw/bodies/015c5b37ffa4c6d337ab8e984272ed407fc43782a417a8cf223cca2c55704336.bin",
+      "sha256": "015c5b37ffa4c6d337ab8e984272ed407fc43782a417a8cf223cca2c55704336",
+      "bytes": 48502
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/ASTOCK-032/candidate/ASTOCK-032-9e3d8cb585d0/_raw/bodies/b358009aa8181c0b07ca50acecaff6d2ad70a2d195a935a1b67b421a5d1a418c.bin",
+      "sha256": "b358009aa8181c0b07ca50acecaff6d2ad70a2d195a935a1b67b421a5d1a418c",
+      "bytes": 1705
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/ASTOCK-032/candidate/ASTOCK-032-9e3d8cb585d0/_raw/bodies/cc4630f26f0d32ec623cd249d853a165f25da6d65099e2c1239c613f7877a847.bin",
+      "sha256": "cc4630f26f0d32ec623cd249d853a165f25da6d65099e2c1239c613f7877a847",
+      "bytes": 2021
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/ASTOCK-032/candidate/ASTOCK-032-9e3d8cb585d0/_raw/manifest.ndjson",
+      "sha256": "905181792c0bb3b65829c93e08d9a75be6f4ee035a5ec80f0e259d5a4ce22cdd",
+      "bytes": 1822
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/ASTOCK-032/comparison.json",
+      "sha256": "28834b177b9acc434daa23dc4a5d29c88024154131723094e79e3270374ce79e",
+      "bytes": 1045
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/ASTOCK-032/original/bodies/015c5b37ffa4c6d337ab8e984272ed407fc43782a417a8cf223cca2c55704336.bin",
+      "sha256": "015c5b37ffa4c6d337ab8e984272ed407fc43782a417a8cf223cca2c55704336",
+      "bytes": 48502
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/ASTOCK-032/original/manifest.ndjson",
+      "sha256": "cbb50923b4a6dd44e1e1dd9c7fc54128dc40b453c70f5ab65abd7067078b54bc",
+      "bytes": 1732
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/ASTOCK-032/original-parsed.json",
+      "sha256": "7bd816a197442e13baab2fa38adb45581153bf9e1ea62c142219d841358282f2",
+      "bytes": 11605
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/ASTOCK-033/candidate/ASTOCK-033-018ac7a46b3b/2026-10-04/input_report/sina/global_news/report.json",
+      "sha256": "69d2a7302f9feb569915aa4bf7ba70cd4536ab086bac27406633d784fbb8a018",
+      "bytes": 12349
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/ASTOCK-033/candidate/ASTOCK-033-018ac7a46b3b/2026-10-04/parsed_rows/sina/global_news/parsed-rows.json",
+      "sha256": "74558bc1ba52b59ee620cd6c07b12a52f66cd07d6c03d9308f0abc3debf74418",
+      "bytes": 7445
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/ASTOCK-033/candidate/ASTOCK-033-018ac7a46b3b/2026-10-04/sina_global_news/sina/global_news/mapped-rows.json",
+      "sha256": "3f449b0369b48df6ea54a4ae11dab316ddcf07d55bf20ee4c73b90cc86687a1a",
+      "bytes": 8625
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/ASTOCK-033/candidate/ASTOCK-033-018ac7a46b3b/2026-10-04/source_rows/sina/global_news/source-rows.json",
+      "sha256": "74558bc1ba52b59ee620cd6c07b12a52f66cd07d6c03d9308f0abc3debf74418",
+      "bytes": 7445
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/ASTOCK-033/candidate/ASTOCK-033-018ac7a46b3b/_raw/bodies/07c6926ed23a9e9be235bbfe45d7bd3af98cab8b60e8d7a1966bec0e56f5f228.bin",
+      "sha256": "07c6926ed23a9e9be235bbfe45d7bd3af98cab8b60e8d7a1966bec0e56f5f228",
+      "bytes": 63590
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/ASTOCK-033/candidate/ASTOCK-033-018ac7a46b3b/_raw/bodies/d93bd2b0aa3c71ce5539a6c139204baf3f34b0a4bdd52938921438523d484a0e.bin",
+      "sha256": "d93bd2b0aa3c71ce5539a6c139204baf3f34b0a4bdd52938921438523d484a0e",
+      "bytes": 851
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/ASTOCK-033/candidate/ASTOCK-033-018ac7a46b3b/_raw/manifest.ndjson",
+      "sha256": "22a02dc236db24e137c8fcaba7c9dc9afe4db03a6c0bbf707d59f0f093bb9e99",
+      "bytes": 1770
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/ASTOCK-033/comparison.json",
+      "sha256": "0def96b03bfa108f8001d315a19db4748d45899a25c49a2439a1f385679b7135",
+      "bytes": 1045
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/ASTOCK-033/original/bodies/07c6926ed23a9e9be235bbfe45d7bd3af98cab8b60e8d7a1966bec0e56f5f228.bin",
+      "sha256": "07c6926ed23a9e9be235bbfe45d7bd3af98cab8b60e8d7a1966bec0e56f5f228",
+      "bytes": 63590
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/ASTOCK-033/original/manifest.ndjson",
+      "sha256": "dc297bffcd9b223488bab61aaf9e2f828ae7b0445e381e12e14f8977bc140f39",
+      "bytes": 1678
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/ASTOCK-033/original-parsed.json",
+      "sha256": "2c2b2a37b10417e7c7a4534c2c5bc52b338437f116411b195f1f425a9c348900",
+      "bytes": 7889
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/comparison.json",
+      "sha256": "2f8e14c933090c8588c804375cd90f37267abc70888cdfd2b6ac4e10254fb843",
+      "bytes": 10723
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f0/candidate/ASTOCK-032-e9c7de340c1e/2026-10-04/input_report/cls/telegraph/report.json",
+      "sha256": "9838494f67fbd6d3e8e9f6e01330e1b3c22cfd58aa0e5190d819f437e25f732e",
+      "bytes": 10129
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f0/candidate/ASTOCK-032-e9c7de340c1e/_raw/bodies/b358009aa8181c0b07ca50acecaff6d2ad70a2d195a935a1b67b421a5d1a418c.bin",
+      "sha256": "b358009aa8181c0b07ca50acecaff6d2ad70a2d195a935a1b67b421a5d1a418c",
+      "bytes": 1705
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f0/candidate/ASTOCK-032-e9c7de340c1e/_raw/bodies/cc4630f26f0d32ec623cd249d853a165f25da6d65099e2c1239c613f7877a847.bin",
+      "sha256": "cc4630f26f0d32ec623cd249d853a165f25da6d65099e2c1239c613f7877a847",
+      "bytes": 2021
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f0/candidate/ASTOCK-032-e9c7de340c1e/_raw/bodies/d962360cb55dcc43bd6affe43899dbf853ec4df117dc2b0793a10d58c5840b16.bin",
+      "sha256": "d962360cb55dcc43bd6affe43899dbf853ec4df117dc2b0793a10d58c5840b16",
+      "bytes": 51743
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f0/candidate/ASTOCK-032-e9c7de340c1e/_raw/manifest.ndjson",
+      "sha256": "9f5991e6400a8a09fbd7bd19f5ec4076648237b37ce42b7cf54bc6dd2d95668f",
+      "bytes": 1442
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f0/fixture/bodies/d962360cb55dcc43bd6affe43899dbf853ec4df117dc2b0793a10d58c5840b16.bin",
+      "sha256": "d962360cb55dcc43bd6affe43899dbf853ec4df117dc2b0793a10d58c5840b16",
+      "bytes": 51743
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f0/fixture/manifest.ndjson",
+      "sha256": "c979263d76bf81af580e41a9d15f7c935c07e1d753c448d08085073cc30db5dd",
+      "bytes": 1306
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f1/candidate/ASTOCK-032-0181742d68c7/2026-10-04/input_report/cls/telegraph/report.json",
+      "sha256": "8dfb4691f370d748fec1af2a7e828262187576a49700b085dd7e22d1599edf97",
+      "bytes": 10119
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f1/candidate/ASTOCK-032-0181742d68c7/_raw/bodies/147ae488cb718cd8cf21047c60fa63320727b76f9af77415a49989cc88003c7d.bin",
+      "sha256": "147ae488cb718cd8cf21047c60fa63320727b76f9af77415a49989cc88003c7d",
+      "bytes": 152
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f1/candidate/ASTOCK-032-0181742d68c7/_raw/bodies/b358009aa8181c0b07ca50acecaff6d2ad70a2d195a935a1b67b421a5d1a418c.bin",
+      "sha256": "b358009aa8181c0b07ca50acecaff6d2ad70a2d195a935a1b67b421a5d1a418c",
+      "bytes": 1705
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f1/candidate/ASTOCK-032-0181742d68c7/_raw/bodies/cc4630f26f0d32ec623cd249d853a165f25da6d65099e2c1239c613f7877a847.bin",
+      "sha256": "cc4630f26f0d32ec623cd249d853a165f25da6d65099e2c1239c613f7877a847",
+      "bytes": 2021
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f1/candidate/ASTOCK-032-0181742d68c7/_raw/manifest.ndjson",
+      "sha256": "640f2ac27c00bba74eb39b10583618462e686232ec09ff98c3efa9125449881a",
+      "bytes": 1440
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f1/fixture/bodies/147ae488cb718cd8cf21047c60fa63320727b76f9af77415a49989cc88003c7d.bin",
+      "sha256": "147ae488cb718cd8cf21047c60fa63320727b76f9af77415a49989cc88003c7d",
+      "bytes": 152
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f1/fixture/manifest.ndjson",
+      "sha256": "21f40c73cd926a91e3790c13881a5aedd43e8938abb6e5ffdb8f66efdc55581d",
+      "bytes": 1304
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f10/candidate/ASTOCK-033-8cf507c7dfaa/2026-10-04/input_report/sina/global_news/report.json",
+      "sha256": "d5eb3c46877c5a57cac9575a750b8e5ea1e005cd54cacb1fb7f0568574fb9f24",
+      "bytes": 9450
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f10/candidate/ASTOCK-033-8cf507c7dfaa/_raw/bodies/ad138523014714b14ab633dcb6d2b884d04ceb63821ca6f0fe4b9972d6a0e58b.bin",
+      "sha256": "ad138523014714b14ab633dcb6d2b884d04ceb63821ca6f0fe4b9972d6a0e58b",
+      "bytes": 58918
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f10/candidate/ASTOCK-033-8cf507c7dfaa/_raw/bodies/d93bd2b0aa3c71ce5539a6c139204baf3f34b0a4bdd52938921438523d484a0e.bin",
+      "sha256": "d93bd2b0aa3c71ce5539a6c139204baf3f34b0a4bdd52938921438523d484a0e",
+      "bytes": 851
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f10/candidate/ASTOCK-033-8cf507c7dfaa/_raw/manifest.ndjson",
+      "sha256": "5f01a1500388f430e11706c50ce46f76640f8e62cb2b008c5850b724915c8854",
+      "bytes": 1323
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f10/fixture/bodies/ad138523014714b14ab633dcb6d2b884d04ceb63821ca6f0fe4b9972d6a0e58b.bin",
+      "sha256": "ad138523014714b14ab633dcb6d2b884d04ceb63821ca6f0fe4b9972d6a0e58b",
+      "bytes": 58918
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f10/fixture/manifest.ndjson",
+      "sha256": "6182381157e4c838f52ac7a190869047883028a4da5b8baa35d4bd5b34b74662",
+      "bytes": 1184
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f11/candidate/ASTOCK-033-00c51732413d/2026-10-04/input_report/sina/global_news/report.json",
+      "sha256": "7211820cc5ec47b97290debd25ec27a9a491fdd48c257f9216a5352152fffebd",
+      "bytes": 10609
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f11/candidate/ASTOCK-033-00c51732413d/2026-10-04/parsed_rows/sina/global_news/parsed-rows.json",
+      "sha256": "c71bb7d5d0b7010d52951ceaa83df4df951eb5195fe028439512b840a5a25eda",
+      "bytes": 7885
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f11/candidate/ASTOCK-033-00c51732413d/2026-10-04/source_rows/sina/global_news/source-rows.json",
+      "sha256": "c71bb7d5d0b7010d52951ceaa83df4df951eb5195fe028439512b840a5a25eda",
+      "bytes": 7885
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f11/candidate/ASTOCK-033-00c51732413d/_raw/bodies/d93bd2b0aa3c71ce5539a6c139204baf3f34b0a4bdd52938921438523d484a0e.bin",
+      "sha256": "d93bd2b0aa3c71ce5539a6c139204baf3f34b0a4bdd52938921438523d484a0e",
+      "bytes": 851
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f11/candidate/ASTOCK-033-00c51732413d/_raw/bodies/f348b0e0a3533c17c8108a4044ca50959cb3e50bbc36ba228df0474d1c6dc5fd.bin",
+      "sha256": "f348b0e0a3533c17c8108a4044ca50959cb3e50bbc36ba228df0474d1c6dc5fd",
+      "bytes": 59376
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f11/candidate/ASTOCK-033-00c51732413d/_raw/manifest.ndjson",
+      "sha256": "16cf458667de6d4022b92c074e7e4875cdac1832985962b6b38449efa2182051",
+      "bytes": 1323
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f11/fixture/bodies/f348b0e0a3533c17c8108a4044ca50959cb3e50bbc36ba228df0474d1c6dc5fd.bin",
+      "sha256": "f348b0e0a3533c17c8108a4044ca50959cb3e50bbc36ba228df0474d1c6dc5fd",
+      "bytes": 59376
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f11/fixture/manifest.ndjson",
+      "sha256": "050f00f43b72a11a2d82ba2e7be0dca69c802897a55825d39ebb71a86e8ea7b6",
+      "bytes": 1184
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f12/candidate/ASTOCK-033-32c9087d6c2d/2026-10-04/input_report/sina/global_news/report.json",
+      "sha256": "e348820b325cd8affda0eb685840ab7aea89b318f56c6b68b96d27dafdb5e479",
+      "bytes": 9399
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f12/candidate/ASTOCK-033-32c9087d6c2d/_raw/bodies/4c284af83696dcd86a234c5242be73330c60f099135ef8dfc5dc89bab9e4223f.bin",
+      "sha256": "4c284af83696dcd86a234c5242be73330c60f099135ef8dfc5dc89bab9e4223f",
+      "bytes": 58181
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f12/candidate/ASTOCK-033-32c9087d6c2d/_raw/bodies/d93bd2b0aa3c71ce5539a6c139204baf3f34b0a4bdd52938921438523d484a0e.bin",
+      "sha256": "d93bd2b0aa3c71ce5539a6c139204baf3f34b0a4bdd52938921438523d484a0e",
+      "bytes": 851
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f12/candidate/ASTOCK-033-32c9087d6c2d/_raw/manifest.ndjson",
+      "sha256": "4cd0d5851b9e5d0b86a8619790b7708953719b8fb8a0df7528e277b821358644",
+      "bytes": 1323
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f12/fixture/bodies/4c284af83696dcd86a234c5242be73330c60f099135ef8dfc5dc89bab9e4223f.bin",
+      "sha256": "4c284af83696dcd86a234c5242be73330c60f099135ef8dfc5dc89bab9e4223f",
+      "bytes": 58181
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f12/fixture/manifest.ndjson",
+      "sha256": "f08f24377d76f9246c041348834ae775f11479af7eb8ff5fafaad688e3764dc7",
+      "bytes": 1184
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f13/candidate/ASTOCK-033-ff9d119c9d98/2026-10-04/input_report/sina/global_news/report.json",
+      "sha256": "71359ce96e7be3b2cf86f5008a5601f06db6e39564b84c3cc2cf395cc4326123",
+      "bytes": 9407
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f13/candidate/ASTOCK-033-ff9d119c9d98/_raw/bodies/d93bd2b0aa3c71ce5539a6c139204baf3f34b0a4bdd52938921438523d484a0e.bin",
+      "sha256": "d93bd2b0aa3c71ce5539a6c139204baf3f34b0a4bdd52938921438523d484a0e",
+      "bytes": 851
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f13/candidate/ASTOCK-033-ff9d119c9d98/_raw/bodies/f527c37571b42757a5a84b1bb53167d9161c4b55c7b6011fa08b2152984475fb.bin",
+      "sha256": "f527c37571b42757a5a84b1bb53167d9161c4b55c7b6011fa08b2152984475fb",
+      "bytes": 58934
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f13/candidate/ASTOCK-033-ff9d119c9d98/_raw/manifest.ndjson",
+      "sha256": "e29f897b23b4fc4c48c0c46f1396844da37f435537c69272a525936ef0ea1d95",
+      "bytes": 1323
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f13/fixture/bodies/f527c37571b42757a5a84b1bb53167d9161c4b55c7b6011fa08b2152984475fb.bin",
+      "sha256": "f527c37571b42757a5a84b1bb53167d9161c4b55c7b6011fa08b2152984475fb",
+      "bytes": 58934
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f13/fixture/manifest.ndjson",
+      "sha256": "5be6510d25d215bddbf137c5b0b1d90c36c8392064a317021b82c2f979ea0c6b",
+      "bytes": 1184
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f2/candidate/ASTOCK-032-53961bf22cd1/2026-10-04/input_report/cls/telegraph/report.json",
+      "sha256": "401e09d9d6b4f6fecb6065e028c4bd484d6b6c3c54fdcd3336c88da980a24ad6",
+      "bytes": 10129
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f2/candidate/ASTOCK-032-53961bf22cd1/_raw/bodies/3c639b2de0b150464eadc7a838740d25118499ee838a9c867a170eb69f86db00.bin",
+      "sha256": "3c639b2de0b150464eadc7a838740d25118499ee838a9c867a170eb69f86db00",
+      "bytes": 51656
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f2/candidate/ASTOCK-032-53961bf22cd1/_raw/bodies/b358009aa8181c0b07ca50acecaff6d2ad70a2d195a935a1b67b421a5d1a418c.bin",
+      "sha256": "b358009aa8181c0b07ca50acecaff6d2ad70a2d195a935a1b67b421a5d1a418c",
+      "bytes": 1705
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f2/candidate/ASTOCK-032-53961bf22cd1/_raw/bodies/cc4630f26f0d32ec623cd249d853a165f25da6d65099e2c1239c613f7877a847.bin",
+      "sha256": "cc4630f26f0d32ec623cd249d853a165f25da6d65099e2c1239c613f7877a847",
+      "bytes": 2021
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f2/candidate/ASTOCK-032-53961bf22cd1/_raw/manifest.ndjson",
+      "sha256": "7c979dbd2bacb3c8c38f521ca95244c8b45b9f07f8efd91d531ac9e0cd4119a0",
+      "bytes": 1442
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f2/fixture/bodies/3c639b2de0b150464eadc7a838740d25118499ee838a9c867a170eb69f86db00.bin",
+      "sha256": "3c639b2de0b150464eadc7a838740d25118499ee838a9c867a170eb69f86db00",
+      "bytes": 51656
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f2/fixture/manifest.ndjson",
+      "sha256": "3964bc09830087ce74312749c9689343514b71b1b4885d2491ce95a8ba554f07",
+      "bytes": 1306
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f3/candidate/ASTOCK-032-9cc2c78926ea/2026-10-04/input_report/cls/telegraph/report.json",
+      "sha256": "bc7b1dc44df6bf673f4cd6783b8858811d8a9c69142e5cce1b4257e2937834f4",
+      "bytes": 10173
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f3/candidate/ASTOCK-032-9cc2c78926ea/_raw/bodies/8a63cc91d342e9175766a409be1793deff8995510229cb489422d18005214e63.bin",
+      "sha256": "8a63cc91d342e9175766a409be1793deff8995510229cb489422d18005214e63",
+      "bytes": 51738
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f3/candidate/ASTOCK-032-9cc2c78926ea/_raw/bodies/b358009aa8181c0b07ca50acecaff6d2ad70a2d195a935a1b67b421a5d1a418c.bin",
+      "sha256": "b358009aa8181c0b07ca50acecaff6d2ad70a2d195a935a1b67b421a5d1a418c",
+      "bytes": 1705
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f3/candidate/ASTOCK-032-9cc2c78926ea/_raw/bodies/cc4630f26f0d32ec623cd249d853a165f25da6d65099e2c1239c613f7877a847.bin",
+      "sha256": "cc4630f26f0d32ec623cd249d853a165f25da6d65099e2c1239c613f7877a847",
+      "bytes": 2021
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f3/candidate/ASTOCK-032-9cc2c78926ea/_raw/manifest.ndjson",
+      "sha256": "04aedbeb0011e962975c1b9cd552598f0913ff07fb6816faa88d7484ec7baa5c",
+      "bytes": 1442
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f3/fixture/bodies/8a63cc91d342e9175766a409be1793deff8995510229cb489422d18005214e63.bin",
+      "sha256": "8a63cc91d342e9175766a409be1793deff8995510229cb489422d18005214e63",
+      "bytes": 51738
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f3/fixture/manifest.ndjson",
+      "sha256": "687e9e295547d1bdeee1046fc9a7be070cfcd0da469b2886287eafd03ec36cce",
+      "bytes": 1306
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f4/candidate/ASTOCK-032-32d5470f818f/2026-10-04/input_report/cls/telegraph/report.json",
+      "sha256": "18d3d63fb270f4fc51119cddc505d5bbfb7d056da43b82f2e57a110fd2ed0650",
+      "bytes": 11359
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f4/candidate/ASTOCK-032-32d5470f818f/2026-10-04/parsed_rows/cls/telegraph/parsed-rows.json",
+      "sha256": "c2034a4ca5893d68a2a5e3951253914489bcbff58d1cddbb9d53d3476112aa37",
+      "bytes": 11021
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f4/candidate/ASTOCK-032-32d5470f818f/2026-10-04/source_rows/cls/telegraph/source-rows.json",
+      "sha256": "b2255af4a1fc1688f3fd4e8d2c26baada514cee7ec59decd67b08e34012784e1",
+      "bytes": 10281
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f4/candidate/ASTOCK-032-32d5470f818f/_raw/bodies/7a11cf290bba1cfce4135a149e6552b6d66d801484bd49bd7e5a3c14523ca651.bin",
+      "sha256": "7a11cf290bba1cfce4135a149e6552b6d66d801484bd49bd7e5a3c14523ca651",
+      "bytes": 50619
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f4/candidate/ASTOCK-032-32d5470f818f/_raw/bodies/b358009aa8181c0b07ca50acecaff6d2ad70a2d195a935a1b67b421a5d1a418c.bin",
+      "sha256": "b358009aa8181c0b07ca50acecaff6d2ad70a2d195a935a1b67b421a5d1a418c",
+      "bytes": 1705
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f4/candidate/ASTOCK-032-32d5470f818f/_raw/bodies/cc4630f26f0d32ec623cd249d853a165f25da6d65099e2c1239c613f7877a847.bin",
+      "sha256": "cc4630f26f0d32ec623cd249d853a165f25da6d65099e2c1239c613f7877a847",
+      "bytes": 2021
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f4/candidate/ASTOCK-032-32d5470f818f/_raw/manifest.ndjson",
+      "sha256": "eca7a755d6677e44c88d7e5b59efef7a69509c3e7194b76efb06e9d526e508b5",
+      "bytes": 1442
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f4/fixture/bodies/7a11cf290bba1cfce4135a149e6552b6d66d801484bd49bd7e5a3c14523ca651.bin",
+      "sha256": "7a11cf290bba1cfce4135a149e6552b6d66d801484bd49bd7e5a3c14523ca651",
+      "bytes": 50619
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f4/fixture/manifest.ndjson",
+      "sha256": "3efefe2f28ea847d20c7edbb6ea695c209e895fea69106f77cf6716e945825c9",
+      "bytes": 1306
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f5/candidate/ASTOCK-032-761a6d2c84a5/2026-10-04/input_report/cls/telegraph/report.json",
+      "sha256": "ec6fb0e6a48ca45887675d7b3d1a19d0b380d624525bbe581e9e10247e127013",
+      "bytes": 10129
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f5/candidate/ASTOCK-032-761a6d2c84a5/_raw/bodies/b358009aa8181c0b07ca50acecaff6d2ad70a2d195a935a1b67b421a5d1a418c.bin",
+      "sha256": "b358009aa8181c0b07ca50acecaff6d2ad70a2d195a935a1b67b421a5d1a418c",
+      "bytes": 1705
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f5/candidate/ASTOCK-032-761a6d2c84a5/_raw/bodies/b85e70c5901fe0245e0d3d7355bdc51a84534c3902d098b86ecbc224278e0144.bin",
+      "sha256": "b85e70c5901fe0245e0d3d7355bdc51a84534c3902d098b86ecbc224278e0144",
+      "bytes": 51639
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f5/candidate/ASTOCK-032-761a6d2c84a5/_raw/bodies/cc4630f26f0d32ec623cd249d853a165f25da6d65099e2c1239c613f7877a847.bin",
+      "sha256": "cc4630f26f0d32ec623cd249d853a165f25da6d65099e2c1239c613f7877a847",
+      "bytes": 2021
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f5/candidate/ASTOCK-032-761a6d2c84a5/_raw/manifest.ndjson",
+      "sha256": "ef5658f4eb5de1f42fcd4e67dcfde4114a56b4df833eea9a1c4ab99fb15a7c44",
+      "bytes": 1442
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f5/fixture/bodies/b85e70c5901fe0245e0d3d7355bdc51a84534c3902d098b86ecbc224278e0144.bin",
+      "sha256": "b85e70c5901fe0245e0d3d7355bdc51a84534c3902d098b86ecbc224278e0144",
+      "bytes": 51639
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f5/fixture/manifest.ndjson",
+      "sha256": "2445b8e43e36ef6d04e8e00ca9015237af580cc83ae8f5e7626dbfe565729c06",
+      "bytes": 1306
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f6/candidate/ASTOCK-032-ad179f1a9b06/2026-10-04/input_report/cls/telegraph/report.json",
+      "sha256": "5932a7062598297bb4d23b5a6c50c9f72f8d89f9951549a4fe39534d6be1e8f9",
+      "bytes": 10468
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f6/candidate/ASTOCK-032-ad179f1a9b06/_raw/bodies/a22bde10ef9859b43c57792c5a3f480783b1a6db15d9059e8804ee04768e42e7.bin",
+      "sha256": "a22bde10ef9859b43c57792c5a3f480783b1a6db15d9059e8804ee04768e42e7",
+      "bytes": 51743
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f6/candidate/ASTOCK-032-ad179f1a9b06/_raw/bodies/b358009aa8181c0b07ca50acecaff6d2ad70a2d195a935a1b67b421a5d1a418c.bin",
+      "sha256": "b358009aa8181c0b07ca50acecaff6d2ad70a2d195a935a1b67b421a5d1a418c",
+      "bytes": 1705
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f6/candidate/ASTOCK-032-ad179f1a9b06/_raw/bodies/cc4630f26f0d32ec623cd249d853a165f25da6d65099e2c1239c613f7877a847.bin",
+      "sha256": "cc4630f26f0d32ec623cd249d853a165f25da6d65099e2c1239c613f7877a847",
+      "bytes": 2021
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f6/candidate/ASTOCK-032-ad179f1a9b06/_raw/manifest.ndjson",
+      "sha256": "5b73fbeae1b03642606c2519d789eb41ec7b7257cfac5e1bc09109769fa94856",
+      "bytes": 1795
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f6/fixture/bodies/a22bde10ef9859b43c57792c5a3f480783b1a6db15d9059e8804ee04768e42e7.bin",
+      "sha256": "a22bde10ef9859b43c57792c5a3f480783b1a6db15d9059e8804ee04768e42e7",
+      "bytes": 51743
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f6/fixture/manifest.ndjson",
+      "sha256": "9d440d136c9a06c2ae1e115df2c86d757cb314824b683df0af6c35b7fb955f55",
+      "bytes": 1306
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f7/candidate/ASTOCK-033-61cab9a6e287/2026-10-04/input_report/sina/global_news/report.json",
+      "sha256": "d4d481b192403d1a7ecc0f5f26ff8139f124b6ca8868b8119ae5b30ffecfa27c",
+      "bytes": 9406
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f7/candidate/ASTOCK-033-61cab9a6e287/_raw/bodies/44e550801e0130d6173db0c7d4fe2f89f99aacc0dcaf8aaa11d5df481f5160a7.bin",
+      "sha256": "44e550801e0130d6173db0c7d4fe2f89f99aacc0dcaf8aaa11d5df481f5160a7",
+      "bytes": 58934
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f7/candidate/ASTOCK-033-61cab9a6e287/_raw/bodies/d93bd2b0aa3c71ce5539a6c139204baf3f34b0a4bdd52938921438523d484a0e.bin",
+      "sha256": "d93bd2b0aa3c71ce5539a6c139204baf3f34b0a4bdd52938921438523d484a0e",
+      "bytes": 851
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f7/candidate/ASTOCK-033-61cab9a6e287/_raw/manifest.ndjson",
+      "sha256": "801e9e04d0293c00a5125a1313d6ac87d781f20c5088098133a1f01913751c6a",
+      "bytes": 1322
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f7/fixture/bodies/44e550801e0130d6173db0c7d4fe2f89f99aacc0dcaf8aaa11d5df481f5160a7.bin",
+      "sha256": "44e550801e0130d6173db0c7d4fe2f89f99aacc0dcaf8aaa11d5df481f5160a7",
+      "bytes": 58934
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f7/fixture/manifest.ndjson",
+      "sha256": "d5dcb316eddd97f27da4614ab04770c19824566726a4359b2b80b08b3f9b6584",
+      "bytes": 1184
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f8/candidate/ASTOCK-033-ca6d77d4d81f/2026-10-04/input_report/sina/global_news/report.json",
+      "sha256": "8afe315f8e7c20719ebacf41cfd399747800e0b2a281cc097ad812afa2ed2224",
+      "bytes": 9404
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f8/candidate/ASTOCK-033-ca6d77d4d81f/_raw/bodies/bc4f42fab06796f279340040f4b9d9f6171bff1c92263bc3e84cc7831c048874.bin",
+      "sha256": "bc4f42fab06796f279340040f4b9d9f6171bff1c92263bc3e84cc7831c048874",
+      "bytes": 439
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f8/candidate/ASTOCK-033-ca6d77d4d81f/_raw/bodies/d93bd2b0aa3c71ce5539a6c139204baf3f34b0a4bdd52938921438523d484a0e.bin",
+      "sha256": "d93bd2b0aa3c71ce5539a6c139204baf3f34b0a4bdd52938921438523d484a0e",
+      "bytes": 851
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f8/candidate/ASTOCK-033-ca6d77d4d81f/_raw/manifest.ndjson",
+      "sha256": "eb5999541fc36df60ec3a17d7c52cf306c578d0c76a59b6eb01af904d3c55d7c",
+      "bytes": 1320
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f8/fixture/bodies/bc4f42fab06796f279340040f4b9d9f6171bff1c92263bc3e84cc7831c048874.bin",
+      "sha256": "bc4f42fab06796f279340040f4b9d9f6171bff1c92263bc3e84cc7831c048874",
+      "bytes": 439
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f8/fixture/manifest.ndjson",
+      "sha256": "215b89f273e5c3e0eeb2d146df0c8c0c797b87562b2cf8a6a140f96dd86fbac4",
+      "bytes": 1182
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f9/candidate/ASTOCK-033-8842923e3756/2026-10-04/input_report/sina/global_news/report.json",
+      "sha256": "ee8a28b396090a8762d959bd46d3dec0bef2c7b644049e4b8beeacd8561c689a",
+      "bytes": 9406
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f9/candidate/ASTOCK-033-8842923e3756/_raw/bodies/8b0210beaf768f5dd1e7dc8f2fe4ebd044ce0381e67117bf9147a8fc38c8c50e.bin",
+      "sha256": "8b0210beaf768f5dd1e7dc8f2fe4ebd044ce0381e67117bf9147a8fc38c8c50e",
+      "bytes": 58200
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f9/candidate/ASTOCK-033-8842923e3756/_raw/bodies/d93bd2b0aa3c71ce5539a6c139204baf3f34b0a4bdd52938921438523d484a0e.bin",
+      "sha256": "d93bd2b0aa3c71ce5539a6c139204baf3f34b0a4bdd52938921438523d484a0e",
+      "bytes": 851
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f9/candidate/ASTOCK-033-8842923e3756/_raw/manifest.ndjson",
+      "sha256": "ce86d3782b585b276aa55b09e3bf27f3a605a18a1a8955800c2f57f9047fe71c",
+      "bytes": 1322
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f9/fixture/bodies/8b0210beaf768f5dd1e7dc8f2fe4ebd044ce0381e67117bf9147a8fc38c8c50e.bin",
+      "sha256": "8b0210beaf768f5dd1e7dc8f2fe4ebd044ce0381e67117bf9147a8fc38c8c50e",
+      "bytes": 58200
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/f9/fixture/manifest.ndjson",
+      "sha256": "faf62839e9bc3899ee03efe7c8db48f4909663b4cfd97821cd66a20db7f890cc",
+      "bytes": 1184
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/miss/candidate/ASTOCK-032-22e7a40fbe90/2026-10-04/input_report/cls/telegraph/report.json",
+      "sha256": "650f725c1368a4a44cb62ce7254ac1a3a3afec58dd8f9ed90a1b124bd2358b1f",
+      "bytes": 8516
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/miss/candidate/ASTOCK-032-22e7a40fbe90/_raw/bodies/b358009aa8181c0b07ca50acecaff6d2ad70a2d195a935a1b67b421a5d1a418c.bin",
+      "sha256": "b358009aa8181c0b07ca50acecaff6d2ad70a2d195a935a1b67b421a5d1a418c",
+      "bytes": 1705
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/miss/candidate/ASTOCK-032-22e7a40fbe90/_raw/bodies/cc4630f26f0d32ec623cd249d853a165f25da6d65099e2c1239c613f7877a847.bin",
+      "sha256": "cc4630f26f0d32ec623cd249d853a165f25da6d65099e2c1239c613f7877a847",
+      "bytes": 2021
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/miss/fixture/bodies/44e550801e0130d6173db0c7d4fe2f89f99aacc0dcaf8aaa11d5df481f5160a7.bin",
+      "sha256": "44e550801e0130d6173db0c7d4fe2f89f99aacc0dcaf8aaa11d5df481f5160a7",
+      "bytes": 58934
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/miss/fixture/manifest.ndjson",
+      "sha256": "151f7be62e26538496ad9c9aea8b4d3813d742d195aec966513139a680f090fb",
+      "bytes": 1184
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/pause0/original-vs-provider-pause.json",
+      "sha256": "d9cd11323fccc81347d00647be6c48600555c5458c0ad2dd52ead9b6b67f9213",
+      "bytes": 175
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/pause0/True/bodies/44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a.bin",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/pause0/True/manifest.ndjson",
+      "sha256": "d6abb219c6875b15686187000c2bbc7c8a5e2ef9943696c6dbbf9efb4cdba32f",
+      "bytes": 1180
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/pause1/original-vs-provider-pause.json",
+      "sha256": "a55025cebed6b71ab2d01bb1bae017fffc9b6238c1b52cc37b30ebe03008fd7d",
+      "bytes": 175
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/pause1/True/bodies/44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a.bin",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/pause1/True/manifest.ndjson",
+      "sha256": "62928a7190f19a51ddc84cc0a2f070f843f5854e1573636c903dc1fcad7ec946",
+      "bytes": 1180
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/pause2/original-vs-provider-pause.json",
+      "sha256": "49ad17ff9c70bc0017b57bb1168b4adbeb034bc59704ce8a942a9b495edd784e",
+      "bytes": 200
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/pause2/True/bodies/44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a.bin",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/pause2/True/manifest.ndjson",
+      "sha256": "0cdb38e84e2bb4c94dddd4a64dc5bfed6273e12201881b3bb07409674f67a533",
+      "bytes": 2073
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/pause3/original-vs-provider-pause.json",
+      "sha256": "a4f15dfe337d78e5fc027f14f1ae5c0f57812b793fa179b9edbdd2862456bff0",
+      "bytes": 207
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/pause3/True/bodies/44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a.bin",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "bytes": 2
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/pause3/True/manifest.ndjson",
+      "sha256": "83adacb5097bbd9b210b38a5a4bc3dcdb8ea79ddad3a7241b5a30925d78d9385",
+      "bytes": 3680
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/pause4/original-vs-provider-pause.json",
+      "sha256": "3fc48f28183fc86b58509321e92947df33a3309da728966dd6e2245569097e81",
+      "bytes": 280
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/pause4/True/manifest.ndjson",
+      "sha256": "308f393e7c85740009d449d78c59f5229b9f27a60908bbc1519c26eec8a60bac",
+      "bytes": 1146
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/retry/candidate/ASTOCK-032-b5d10ace9ad6/2026-10-04/cls_telegraph/cls/telegraph/mapped-rows.json",
+      "sha256": "80f6bae09546add4586fd86f23b37098d53d3e1e53dfdfd0f554b424bdbd2b2a",
+      "bytes": 11581
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/retry/candidate/ASTOCK-032-b5d10ace9ad6/2026-10-04/input_report/cls/telegraph/report.json",
+      "sha256": "a20d495c52c8f3cac0ef55aa80a6cdaf3149343e71cd4ba2ed32e7d6bc50bb51",
+      "bytes": 13852
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/retry/candidate/ASTOCK-032-b5d10ace9ad6/2026-10-04/parsed_rows/cls/telegraph/parsed-rows.json",
+      "sha256": "4da48ce503bb1c0eed9de6bd349101378a844cca79cbe0d922ca44ba236c14e0",
+      "bytes": 11621
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/retry/candidate/ASTOCK-032-b5d10ace9ad6/2026-10-04/source_rows/cls/telegraph/source-rows.json",
+      "sha256": "c13c7c65d7a0215c6023bde811a6c70a0e224a58bc63e633edd6b90267cc9ebc",
+      "bytes": 10881
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/retry/candidate/ASTOCK-032-b5d10ace9ad6/_raw/bodies/015c5b37ffa4c6d337ab8e984272ed407fc43782a417a8cf223cca2c55704336.bin",
+      "sha256": "015c5b37ffa4c6d337ab8e984272ed407fc43782a417a8cf223cca2c55704336",
+      "bytes": 48502
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/retry/candidate/ASTOCK-032-b5d10ace9ad6/_raw/bodies/6ecfd15b6b5c57dd290aaa10e56cd39d5c728a427a33dde5a7a92ad65b0d51c0.bin",
+      "sha256": "6ecfd15b6b5c57dd290aaa10e56cd39d5c728a427a33dde5a7a92ad65b0d51c0",
+      "bytes": 38
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/retry/candidate/ASTOCK-032-b5d10ace9ad6/_raw/bodies/b358009aa8181c0b07ca50acecaff6d2ad70a2d195a935a1b67b421a5d1a418c.bin",
+      "sha256": "b358009aa8181c0b07ca50acecaff6d2ad70a2d195a935a1b67b421a5d1a418c",
+      "bytes": 1705
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/retry/candidate/ASTOCK-032-b5d10ace9ad6/_raw/bodies/cc4630f26f0d32ec623cd249d853a165f25da6d65099e2c1239c613f7877a847.bin",
+      "sha256": "cc4630f26f0d32ec623cd249d853a165f25da6d65099e2c1239c613f7877a847",
+      "bytes": 2021
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/retry/candidate/ASTOCK-032-b5d10ace9ad6/_raw/manifest.ndjson",
+      "sha256": "d35849715e4f8aea00d18b1a9c084d736a48095bcd2efb44906246eeb4081253",
+      "bytes": 2887
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/retry/fixture/bodies/015c5b37ffa4c6d337ab8e984272ed407fc43782a417a8cf223cca2c55704336.bin",
+      "sha256": "015c5b37ffa4c6d337ab8e984272ed407fc43782a417a8cf223cca2c55704336",
+      "bytes": 48502
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/retry/fixture/bodies/6ecfd15b6b5c57dd290aaa10e56cd39d5c728a427a33dde5a7a92ad65b0d51c0.bin",
+      "sha256": "6ecfd15b6b5c57dd290aaa10e56cd39d5c728a427a33dde5a7a92ad65b0d51c0",
+      "bytes": 38
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/retry/fixture/manifest.ndjson",
+      "sha256": "769ed7145ede16f71f06178c7a520158ac92e08975bb873634740c780b39b76e",
+      "bytes": 2113
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/retry/sdk-retry-proof.json",
+      "sha256": "1bf0dffa0913bbbff5ad474497819c54aa1c855499ddada77c653264de4f0e35",
+      "bytes": 104
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-032-ed4cbc3d5f26/2026-10-04/cls_telegraph/cls/telegraph/mapped-rows.json",
+      "sha256": "5a84dfc9541ab611ab7038d468b2a46dad14580931abb4f345728980352971af",
+      "bytes": 11581
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-032-ed4cbc3d5f26/2026-10-04/input_report/cls/telegraph/report.json",
+      "sha256": "945dd23dbe41af55b3570b6b9158886b7b1762ec60d08ec193d30485b9b5582a",
+      "bytes": 12309
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-032-ed4cbc3d5f26/2026-10-04/parsed_rows/cls/telegraph/parsed-rows.json",
+      "sha256": "4da48ce503bb1c0eed9de6bd349101378a844cca79cbe0d922ca44ba236c14e0",
+      "bytes": 11621
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-032-ed4cbc3d5f26/2026-10-04/source_rows/cls/telegraph/source-rows.json",
+      "sha256": "c13c7c65d7a0215c6023bde811a6c70a0e224a58bc63e633edd6b90267cc9ebc",
+      "bytes": 10881
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-032-ed4cbc3d5f26/_raw/bodies/015c5b37ffa4c6d337ab8e984272ed407fc43782a417a8cf223cca2c55704336.bin",
+      "sha256": "015c5b37ffa4c6d337ab8e984272ed407fc43782a417a8cf223cca2c55704336",
+      "bytes": 48502
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-032-ed4cbc3d5f26/_raw/bodies/b358009aa8181c0b07ca50acecaff6d2ad70a2d195a935a1b67b421a5d1a418c.bin",
+      "sha256": "b358009aa8181c0b07ca50acecaff6d2ad70a2d195a935a1b67b421a5d1a418c",
+      "bytes": 1705
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-032-ed4cbc3d5f26/_raw/bodies/cc4630f26f0d32ec623cd249d853a165f25da6d65099e2c1239c613f7877a847.bin",
+      "sha256": "cc4630f26f0d32ec623cd249d853a165f25da6d65099e2c1239c613f7877a847",
+      "bytes": 2021
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-032-ed4cbc3d5f26/_raw/manifest.ndjson",
+      "sha256": "9d97941bcb1ecd744bf26dad7425a39a0237ec53b33a11becbccb7f64d353f89",
+      "bytes": 1547
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-032-f7d528979131/2026-10-04/cls_telegraph/cls/telegraph/mapped-rows.json",
+      "sha256": "5a84dfc9541ab611ab7038d468b2a46dad14580931abb4f345728980352971af",
+      "bytes": 11581
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-032-f7d528979131/2026-10-04/input_report/cls/telegraph/report.json",
+      "sha256": "042572bcf0462ac2c93a8bcb4e26b6a8f579468c26bb36a377ab4522fdfcf4a4",
+      "bytes": 12000
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-032-f7d528979131/2026-10-04/parsed_rows/cls/telegraph/parsed-rows.json",
+      "sha256": "4da48ce503bb1c0eed9de6bd349101378a844cca79cbe0d922ca44ba236c14e0",
+      "bytes": 11621
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-032-f7d528979131/2026-10-04/source_rows/cls/telegraph/source-rows.json",
+      "sha256": "c13c7c65d7a0215c6023bde811a6c70a0e224a58bc63e633edd6b90267cc9ebc",
+      "bytes": 10881
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-032-f7d528979131/_raw/bodies/015c5b37ffa4c6d337ab8e984272ed407fc43782a417a8cf223cca2c55704336.bin",
+      "sha256": "015c5b37ffa4c6d337ab8e984272ed407fc43782a417a8cf223cca2c55704336",
+      "bytes": 48502
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-032-f7d528979131/_raw/bodies/b358009aa8181c0b07ca50acecaff6d2ad70a2d195a935a1b67b421a5d1a418c.bin",
+      "sha256": "b358009aa8181c0b07ca50acecaff6d2ad70a2d195a935a1b67b421a5d1a418c",
+      "bytes": 1705
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-032-f7d528979131/_raw/bodies/cc4630f26f0d32ec623cd249d853a165f25da6d65099e2c1239c613f7877a847.bin",
+      "sha256": "cc4630f26f0d32ec623cd249d853a165f25da6d65099e2c1239c613f7877a847",
+      "bytes": 2021
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-032-f7d528979131/_raw/manifest.ndjson",
+      "sha256": "763f12d8a67dd51fa41f323806d66dcda32b6bc563e9f16902efde30969e001c",
+      "bytes": 1233
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-033-b19e3928af6e/2026-10-04/input_report/sina/global_news/report.json",
+      "sha256": "1a1ac503846f90016c4dd5fcb1e48ed0abe52d398e3c800212e64a6dd70b9241",
+      "bytes": 11714
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-033-b19e3928af6e/2026-10-04/parsed_rows/sina/global_news/parsed-rows.json",
+      "sha256": "74558bc1ba52b59ee620cd6c07b12a52f66cd07d6c03d9308f0abc3debf74418",
+      "bytes": 7445
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-033-b19e3928af6e/2026-10-04/sina_global_news/sina/global_news/mapped-rows.json",
+      "sha256": "a7c4ebee8dc93c585630d07daf704e473f03184e3188d552a937677bb03d6c0a",
+      "bytes": 8625
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-033-b19e3928af6e/2026-10-04/source_rows/sina/global_news/source-rows.json",
+      "sha256": "74558bc1ba52b59ee620cd6c07b12a52f66cd07d6c03d9308f0abc3debf74418",
+      "bytes": 7445
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-033-b19e3928af6e/_raw/bodies/07c6926ed23a9e9be235bbfe45d7bd3af98cab8b60e8d7a1966bec0e56f5f228.bin",
+      "sha256": "07c6926ed23a9e9be235bbfe45d7bd3af98cab8b60e8d7a1966bec0e56f5f228",
+      "bytes": 63590
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-033-b19e3928af6e/_raw/bodies/d93bd2b0aa3c71ce5539a6c139204baf3f34b0a4bdd52938921438523d484a0e.bin",
+      "sha256": "d93bd2b0aa3c71ce5539a6c139204baf3f34b0a4bdd52938921438523d484a0e",
+      "bytes": 851
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-033-b19e3928af6e/_raw/manifest.ndjson",
+      "sha256": "9b549d5d7458c23fb6b193b4480da697d31cbac7fbc7a9e373bdc93144c8a536",
+      "bytes": 1113
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-033-dfea339d6820/2026-10-04/input_report/sina/global_news/report.json",
+      "sha256": "289015f888fa4fb5a3d024f77ace3a6a451fa1c36f0d485e555318b83621135d",
+      "bytes": 12023
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-033-dfea339d6820/2026-10-04/parsed_rows/sina/global_news/parsed-rows.json",
+      "sha256": "74558bc1ba52b59ee620cd6c07b12a52f66cd07d6c03d9308f0abc3debf74418",
+      "bytes": 7445
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-033-dfea339d6820/2026-10-04/sina_global_news/sina/global_news/mapped-rows.json",
+      "sha256": "a7c4ebee8dc93c585630d07daf704e473f03184e3188d552a937677bb03d6c0a",
+      "bytes": 8625
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-033-dfea339d6820/2026-10-04/source_rows/sina/global_news/source-rows.json",
+      "sha256": "74558bc1ba52b59ee620cd6c07b12a52f66cd07d6c03d9308f0abc3debf74418",
+      "bytes": 7445
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-033-dfea339d6820/_raw/bodies/07c6926ed23a9e9be235bbfe45d7bd3af98cab8b60e8d7a1966bec0e56f5f228.bin",
+      "sha256": "07c6926ed23a9e9be235bbfe45d7bd3af98cab8b60e8d7a1966bec0e56f5f228",
+      "bytes": 63590
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-033-dfea339d6820/_raw/bodies/d93bd2b0aa3c71ce5539a6c139204baf3f34b0a4bdd52938921438523d484a0e.bin",
+      "sha256": "d93bd2b0aa3c71ce5539a6c139204baf3f34b0a4bdd52938921438523d484a0e",
+      "bytes": 851
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/candidate/ASTOCK-033-dfea339d6820/_raw/manifest.ndjson",
+      "sha256": "417aad017723ea747d7c6aab894bc09aafd51daace292b69c79d2aa0d064a95f",
+      "bytes": 1427
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/session/fixture-mode.json",
+      "sha256": "26447b0e5552b41fc095d74d7fa91db98c6dba158730063ff5cb2dff41b01eb5",
+      "bytes": 126
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/verify.py",
+      "sha256": "bf4552780e4cc96825c6510fb251a293c421a5f729641e5fe4a76907f61eb5ef",
+      "bytes": 9509
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/candidate/ASTOCK-032-b9eed468f019/2026-10-04/cls_telegraph/cls/telegraph/mapped-rows.json",
+      "sha256": "55ba8c27a50968cc24cab035395d29058844d22d0d40aa4476777aed8e9882c2",
+      "bytes": 19343
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/candidate/ASTOCK-032-b9eed468f019/2026-10-04/input_report/cls/telegraph/report.json",
+      "sha256": "13de64499fc9cd6c36c06f10e3ad48af0e3dba2412d79ae54e49d2c3687b00ef",
+      "bytes": 12948
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/candidate/ASTOCK-032-b9eed468f019/2026-10-04/parsed_rows/cls/telegraph/parsed-rows.json",
+      "sha256": "4da48ce503bb1c0eed9de6bd349101378a844cca79cbe0d922ca44ba236c14e0",
+      "bytes": 11621
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/candidate/ASTOCK-032-b9eed468f019/2026-10-04/source_rows/cls/telegraph/source-rows.json",
+      "sha256": "c13c7c65d7a0215c6023bde811a6c70a0e224a58bc63e633edd6b90267cc9ebc",
+      "bytes": 10881
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/candidate/ASTOCK-032-b9eed468f019/_raw/bodies/015c5b37ffa4c6d337ab8e984272ed407fc43782a417a8cf223cca2c55704336.bin",
+      "sha256": "015c5b37ffa4c6d337ab8e984272ed407fc43782a417a8cf223cca2c55704336",
+      "bytes": 48502
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/candidate/ASTOCK-032-b9eed468f019/_raw/bodies/b358009aa8181c0b07ca50acecaff6d2ad70a2d195a935a1b67b421a5d1a418c.bin",
+      "sha256": "b358009aa8181c0b07ca50acecaff6d2ad70a2d195a935a1b67b421a5d1a418c",
+      "bytes": 1705
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/candidate/ASTOCK-032-b9eed468f019/_raw/bodies/cc4630f26f0d32ec623cd249d853a165f25da6d65099e2c1239c613f7877a847.bin",
+      "sha256": "cc4630f26f0d32ec623cd249d853a165f25da6d65099e2c1239c613f7877a847",
+      "bytes": 2021
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/candidate/ASTOCK-032-b9eed468f019/_raw/manifest.ndjson",
+      "sha256": "2e5d90a046365dd40a6aa0736e799a8d19866d7933cf143fef4924e5c0625d4f",
+      "bytes": 1822
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/capabilities.yaml",
+      "sha256": "7b7ce0da1d33b333165c6081a3ed788f85cb05d5f6945c745eec97d73e24f6e2",
+      "bytes": 4009
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/collection.yaml",
+      "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d",
+      "bytes": 2934
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/a50_quote.yaml",
+      "sha256": "d9b990dfe46e7b500890da82723dee287c4e2be29e009ab91ceadd8099a02fd2",
+      "bytes": 907
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/board_fund_flow.yaml",
+      "sha256": "08f3566d0cf2787186e6106e4915d0d89b70232d737898480eda03785ea3c53a",
+      "bytes": 1110
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/broken_limit_pool.yaml",
+      "sha256": "60b3790eae896c968093c8d26a818c9dab325aca620510b4ec1dde061af7f65e",
+      "bytes": 1162
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/buyback.yaml",
+      "sha256": "807490acc8affc7dde3502ef62c2b80ad32923fe4c5ff6a6b4fd9d403b50d4f6",
+      "bytes": 1439
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/cctv_news_index.yaml",
+      "sha256": "a876cfcb7dfa79b79423cb3ae8044dab1bb43515f12fc090158228dbf95b6d33",
+      "bytes": 317
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/cls_telegraph.yaml",
+      "sha256": "80c414933f4ee26e2475403ceda50fc2f2b98141c18d0fd0c3f719dae3572f02",
+      "bytes": 331
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/concept_board.yaml",
+      "sha256": "eef0b07c9a41bfd5ef1a52f4f39516cb26d42b088d63a15783af0f94985fd76f",
+      "bytes": 379
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/convertible_bonds.yaml",
+      "sha256": "11723522544165617f1141aa08921252ca99447eba5cf507c574a887dd6748b9",
+      "bytes": 1362
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/daily_bar.yaml",
+      "sha256": "0a8c1dcae7e1c062ae70c224defc1362adc1d58bc196bbeb2f1edd61d6fd39e7",
+      "bytes": 995
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/dividend_event.yaml",
+      "sha256": "67a2b02063cb9a891e3fb388048407cbc08b05ce8ae97deea6976d3904340d2e",
+      "bytes": 759
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/earnings_forecast.yaml",
+      "sha256": "ded845c047fcefdbeb163f27620d4e67f2bc78e62a0bcfea5678d6df8758f8fd",
+      "bytes": 1060
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/financial_main.yaml",
+      "sha256": "23d8b55356620439d5c1b507601b782b31aa965fe24eaf194e869466bb271ab0",
+      "bytes": 766
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/futures_daily.yaml",
+      "sha256": "3c923f6d637e1409ec1be5733897ba267a8025169b36b6874aefd0b8181834d5",
+      "bytes": 938
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/futures_quote.yaml",
+      "sha256": "0fb3866f0cdfacfe6fe9dbe7d5396947b16514751639275db40352ff5655a33b",
+      "bytes": 1557
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/holder_trades.yaml",
+      "sha256": "44b0ecfc09c6e39823c50e83077354f25bc8026fc70272d92046ba3a51d09b92",
+      "bytes": 1246
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/industry_board.yaml",
+      "sha256": "c6930c70b55e171dee94b74b80f3c37df1466d4a10dadc3016975004b8b47ba4",
+      "bytes": 380
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/industry_directory.yaml",
+      "sha256": "9325d485bf7a1bc2b075c2d920b43b17caa039916536bedd8163be0f972bfe5b",
+      "bytes": 346
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/industry_index_daily.yaml",
+      "sha256": "5d542c72443410747f2ac643589bfd8160cdea07d01d6d0dd9c5e4753096043b",
+      "bytes": 676
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/industry_membership.yaml",
+      "sha256": "dff512c9b7f00330bbe408ba1e1eb74d99b49bc0b38ee419d4c463047c6fe69d",
+      "bytes": 709
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/institution_survey.yaml",
+      "sha256": "470fd4503d45cf0839e887fd276a0c3c82cdcae7cae8f52001006464c212733e",
+      "bytes": 703
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/intraday_trend.yaml",
+      "sha256": "5983e0eb29c1cd7a781fbad0be7332dda14e887ccd744e55ad4b8664c7a0c38a",
+      "bytes": 665
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/ipo_calendar.yaml",
+      "sha256": "7579b9174fd3554a92bc50865cabe7ac20604579403f748d09bcd4e8760bcac9",
+      "bytes": 1331
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/limit_down_pool.yaml",
+      "sha256": "67b3ca1ae9edf0f863d2b2d5257a315fe721f042086d4b5966653c0f2758d806",
+      "bytes": 1177
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/limit_up_pool.yaml",
+      "sha256": "73c1fa4ed6d7281d1857208a2ec9696a3637214bb256661ce943313c75772a69",
+      "bytes": 982
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/lpr_history.yaml",
+      "sha256": "b40bb3000aa8db8b84aeaad6383c3dd7da1afb3c3bfb6ed6fc69343476ca7650",
+      "bytes": 330
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/minute_bar_5m.yaml",
+      "sha256": "fb6f822ed42479422a0b4c227577d8e559bb6b2238562af566af0464304bd873",
+      "bytes": 708
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/pledge.yaml",
+      "sha256": "40b46e96e55d8b1061c98ec979094b4f98ef4800e513cfa7a9c2c5f2152b2fb1",
+      "bytes": 878
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/previous_limit_pool.yaml",
+      "sha256": "5234397a7b87ed3e03c11431de1f00c012e135ba5ef57bf63a2f431f659703bc",
+      "bytes": 1199
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/realtime_quote.yaml",
+      "sha256": "ebc3e97bb7469eb4c7c80daf50991ebe38f0eb5b2476a9a579d22236d416378b",
+      "bytes": 1121
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/repo_fixing.yaml",
+      "sha256": "6908c6c805e15a153dc567d58c81daecb66026bdd0f48d8865e296a1ba883935",
+      "bytes": 506
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/security_snapshot.yaml",
+      "sha256": "255115893f64837a3b95ea9fe44551948eefa9604aca9d59214de87a580300be",
+      "bytes": 519
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/shareholder_count.yaml",
+      "sha256": "d325df1784c873bea73a1d907e9964e06c26e4d6b356dd6c16148837b57feccf",
+      "bytes": 923
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/sina_global_news.yaml",
+      "sha256": "688eeb3b698bb8fdb3fb33bc296869b6caca47bd9ff427a97ae989f74c595350",
+      "bytes": 297
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/stock_fund_flow.yaml",
+      "sha256": "df3f21341463f3538a1f855ef19b7bbdb683405aaa65d5418c255023c18a429f",
+      "bytes": 736
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/strong_stock_pool.yaml",
+      "sha256": "264c9d759405d37733cf4daf29996240cb46fed46c3eb8835405a4311e1c1131",
+      "bytes": 1194
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/trading_calendar.yaml",
+      "sha256": "924b17a5be104252e85a377e4579432c6725bab99cbaa0ad70e71102149a1f49",
+      "bytes": 192
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets/wallstreetcn_news.yaml",
+      "sha256": "1bdecf169c6ea357cbb53787bd0a9a659d1f4a96e77e42996556b55df97bbd49",
+      "bytes": 534
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/datasets.yaml",
+      "sha256": "e992d13297e1f9a8f64acabc25f65f138b21ce12dca16689cc3f17bf1385a6eb",
+      "bytes": 587
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/a50_quote.yaml",
+      "sha256": "c984450a923a5655cdd60e1e35a9c8981fca80f9c4f996f5dcce790f10f08b9f",
+      "bytes": 886
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/board_fund_flow.yaml",
+      "sha256": "fb7c6f1f2d425181b189e25152e465306982e10c7c6ee06b2917dfa00b891baa",
+      "bytes": 1395
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/broken_limit_pool.yaml",
+      "sha256": "8bd046757fc9fb3e7d144a0e9d41106267e828a60bc5a099280158c15459a84d",
+      "bytes": 1238
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/buyback.yaml",
+      "sha256": "70e6ee88258842e76509208c6d9df379478df717837489869ff1e9f72f82d1b3",
+      "bytes": 2520
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/cctv_news_index.yaml",
+      "sha256": "4de0d3f1b61694e5c6ab7450a38a7c85f583fadd64d48e52bd737545eb04e42b",
+      "bytes": 573
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/cls_telegraph.yaml",
+      "sha256": "0776fa15a17c77d8a9aca9fec1d1b1cda0fdbedb4252405f37b234993c9dcdc7",
+      "bytes": 685
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/concept_board.yaml",
+      "sha256": "2b7e7f57d189541d6a232cd5391d2dab4289f9f3438f397d9fefd82bb1d996b7",
+      "bytes": 206
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/convertible_bonds.yaml",
+      "sha256": "147b800777f7042f9e4a7907841e038034db65a80f263fcb04628ea34943dd56",
+      "bytes": 1289
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/daily_bar.yaml",
+      "sha256": "41f9bbd0824e20d70f7ed276758b286094c33c79180befca4d8985afc3c8ad0b",
+      "bytes": 2913
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/dividend_event.yaml",
+      "sha256": "188df2f7f075b92e993136aef3f977eea419f9c6957404bd2f7071c76ed24a71",
+      "bytes": 1532
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/earnings_forecast.yaml",
+      "sha256": "5b323a3c3c6577527701985248bb13b54102463a167ba04c749f4908e2b401c4",
+      "bytes": 1633
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/financial_main.yaml",
+      "sha256": "eeeb2e7418aab430168f0c7e16c69f1b24a9e49ec8d156a28390cae0e7a69bda",
+      "bytes": 603
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/futures_daily.yaml",
+      "sha256": "94760152dd79821d2ed775f64924d84546e85194c44b3baa782b113a040f659b",
+      "bytes": 858
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/futures_quote.yaml",
+      "sha256": "21ef8cc411dc481644a1529846814a29aef0f86c38aa86fede5da7ebb52a1c8f",
+      "bytes": 1204
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/holder_trades.yaml",
+      "sha256": "2deca39ea7c1a57254b4ee31390587f39d640559181cd1ceae7968a4684e5f40",
+      "bytes": 1959
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/industry_board.yaml",
+      "sha256": "f3ff8bbe7fc4e8d4e5af1c36b9312e8db1c8c9cb09a09aadb472b22ae09de152",
+      "bytes": 210
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/industry_directory.yaml",
+      "sha256": "823d97db8afe4adb3f963faaa04b42b8f151e93f2e75f3eb18f8c678a68bae37",
+      "bytes": 478
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/industry_index_daily.yaml",
+      "sha256": "953087294fd2c3a3cb1b46f204d0a0f606f9060f0f89676fb3a189222a68dab1",
+      "bytes": 805
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/industry_membership.yaml",
+      "sha256": "7eb72a1b8ce7aff27aa1ad62534af2bf7183f3d78c6392208035396a11e21ccb",
+      "bytes": 765
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/institution_survey.yaml",
+      "sha256": "e33c639f75da6a7a1d699936d0624084ed3488ef773aa9fcf3eaefc66e829423",
+      "bytes": 1118
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/intraday_trend.yaml",
+      "sha256": "14b0b22ad1308c70b65152e711c4248d3c8bf1c28d842fba36309194ed38870a",
+      "bytes": 440
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/ipo_calendar.yaml",
+      "sha256": "d72db539afed6e890e81d6e1c4680fcb09ad4285551748f3c9e12ba124e6059c",
+      "bytes": 2338
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/limit_down_pool.yaml",
+      "sha256": "456b0a779929bb6ff71ed70e07cd420d42596068f142879926b86972e3704f7b",
+      "bytes": 1314
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/limit_up_pool.yaml",
+      "sha256": "411e6e6ead10a4d2cbff7ecf4de9bee26f411a66d005a33bc640865ef4b6e7ba",
+      "bytes": 1079
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/lpr_history.yaml",
+      "sha256": "2a12cd26c069d8be0eb68e121eef7930f97f602ffe80e459b649c6cbc5a4c217",
+      "bytes": 682
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/minute_bar_5m.yaml",
+      "sha256": "f3e9abaededc01a15c651a99a22131a80067133deb89548dd12b17278e0e55b7",
+      "bytes": 1134
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/pledge.yaml",
+      "sha256": "4c8f7636e0b20e5923adbbf4c5e696247da67869d90ed19f0aee62f2e5612710",
+      "bytes": 1589
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/previous_limit_pool.yaml",
+      "sha256": "4c14b9ad1f0497e2d6f13a72978f1ddda74039b7c0d182c5a5a98ac01a678443",
+      "bytes": 1276
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/realtime_quote.yaml",
+      "sha256": "e9141547fbb85cb71c8e2336c20a2ebc948e3926f4b2a09e4f59505adea91b94",
+      "bytes": 1308
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/repo_fixing.yaml",
+      "sha256": "0d6b2b5b39a92c6f3d2629f3f805f0b12d609ea9b3f691a50c896c12d81b4681",
+      "bytes": 762
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/security_snapshot.yaml",
+      "sha256": "474ab0397cb1aad33abcd070942586a8460c468b1d3f7af97c2d152eee5a6537",
+      "bytes": 621
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/shareholder_count.yaml",
+      "sha256": "f8801367f055e0b1d419e648c9bd3e1d72984ffe2823c2d464770403c1b7c9e4",
+      "bytes": 1702
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/sina_global_news.yaml",
+      "sha256": "22b2caa83fecb10728649e033cf8b8fbbd4fa8c7928de1b8d8961e1516263b0f",
+      "bytes": 649
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/stock_fund_flow.yaml",
+      "sha256": "3d99bacf48ba3438c90d2d544f7223ffcb0a464f69f95841affe3e99a503bbe1",
+      "bytes": 1741
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/strong_stock_pool.yaml",
+      "sha256": "41733f419a6dd9d3a25edf361294a973df76d878d01bbf46b9f25f53a38f2304",
+      "bytes": 1234
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/trading_calendar.yaml",
+      "sha256": "4be7571914129769aeca321d892b8aa2fbd068db1c7c0b691ae0d5cefe7f69e0",
+      "bytes": 476
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/normalization/wallstreetcn_news.yaml",
+      "sha256": "cdca43fb9ef1d825fe75358ea6c828fec02b892e344505d484d302123079fca9",
+      "bytes": 770
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/providers.yaml",
+      "sha256": "525141790ced92c40375dddf4ddf71b34d0a41c37e67be0a103daaf191afb166",
+      "bytes": 83142
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/config/schedules.yaml",
+      "sha256": "01b7e269ea4231024bf1c520f78fa571c2909986aad5573006bd80e186119113",
+      "bytes": 525
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/projection/ASTOCK-032-432cd3162d85/2026-10-04/cls_telegraph/cls/telegraph/mapped-rows.json",
+      "sha256": "41daa2edeae40f5f6ccbcf99897a5c7be16e09c1abe8c286d41a393f220d3778",
+      "bytes": 10602
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/projection/ASTOCK-032-432cd3162d85/2026-10-04/input_report/cls/telegraph/report.json",
+      "sha256": "2592963e036c0f8047a62fb0da19996acd919f3fc3420b985c3ac3dc0eb3dfaf",
+      "bytes": 12683
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/projection/ASTOCK-032-432cd3162d85/2026-10-04/parsed_rows/cls/telegraph/parsed-rows.json",
+      "sha256": "4da48ce503bb1c0eed9de6bd349101378a844cca79cbe0d922ca44ba236c14e0",
+      "bytes": 11621
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/projection/ASTOCK-032-432cd3162d85/2026-10-04/source_rows/cls/telegraph/source-rows.json",
+      "sha256": "c13c7c65d7a0215c6023bde811a6c70a0e224a58bc63e633edd6b90267cc9ebc",
+      "bytes": 10881
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/projection/ASTOCK-032-432cd3162d85/_raw/bodies/015c5b37ffa4c6d337ab8e984272ed407fc43782a417a8cf223cca2c55704336.bin",
+      "sha256": "015c5b37ffa4c6d337ab8e984272ed407fc43782a417a8cf223cca2c55704336",
+      "bytes": 48502
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/projection/ASTOCK-032-432cd3162d85/_raw/bodies/b358009aa8181c0b07ca50acecaff6d2ad70a2d195a935a1b67b421a5d1a418c.bin",
+      "sha256": "b358009aa8181c0b07ca50acecaff6d2ad70a2d195a935a1b67b421a5d1a418c",
+      "bytes": 1705
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/projection/ASTOCK-032-432cd3162d85/_raw/bodies/cc4630f26f0d32ec623cd249d853a165f25da6d65099e2c1239c613f7877a847.bin",
+      "sha256": "cc4630f26f0d32ec623cd249d853a165f25da6d65099e2c1239c613f7877a847",
+      "bytes": 2021
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004/yaml/projection/ASTOCK-032-432cd3162d85/_raw/manifest.ndjson",
+      "sha256": "f2adffad9944c32aba19cf4c59a090ca01302675b76555d28478a76936d2c392",
+      "bytes": 1822
+    },
+    {
+      "path": "provider_validation/results/sdk-news-final-20261004-tests.xml",
+      "sha256": "dbab495c9d71a99ae21686ee4d071a5c8765ec99874a14b3ec50438ae2df96b7",
+      "bytes": 62505
+    },
+    {
+      "path": "provider_validation/results/sdk-news-original-20261004/1-transport.py.bin",
+      "sha256": "7cf1c5f1f9b526e54e7d82e60b95b35e1f8f91e60effc31d74052f9273988b03",
+      "bytes": 16593
+    },
+    {
+      "path": "provider_validation/results/sdk-news-original-20261004/2-inputs.py.bin",
+      "sha256": "2fad9092f94d28d6172c0744b1c903d7d5638369787e9e48693f078fc6571d22",
+      "bytes": 49330
+    },
+    {
+      "path": "provider_validation/results/sdk-news-original-20261004/3-factory.py.bin",
+      "sha256": "151afd201b2728a38052956a07f7f5a1f0e49584dd25665672f5db7c56a1ccfd",
+      "bytes": 22205
+    },
+    {
+      "path": "provider_validation/results/sdk-news-original-20261004/4-providers.yaml.bin",
+      "sha256": "3441064a76ea456240cb368441643ba6d6eabb3ce9a63c99e1b0a67e65ca660a",
+      "bytes": 82441
+    },
+    {
+      "path": "provider_validation/results/sdk-news-original-20261004/5-test_input_collection.py.bin",
+      "sha256": "a46108f172a2fe2816b77d59f981c5643142ab40d2b93760a55b3b6288a04302",
+      "bytes": 179342
+    },
+    {
+      "path": "provider_validation/results/sdk-news-original-20261004/6-replay_input_capabilities.py.bin",
+      "sha256": "3ac9cf660cc7d03a59b4f7e01037f866a413d644e82d4709377e1e97c773fcc2",
+      "bytes": 41674
+    },
+    {
+      "path": "provider_validation/results/sdk-news-original-20261004/7-CODE_STRUCTURE.md.bin",
+      "sha256": "835aa5eb2ae21aab233600975a4e1d60f60658fe15288d3831cb1412b76a467a",
+      "bytes": 23414
+    },
+    {
+      "path": "provider_validation/results/sdk-news-original-20261004/8-PROJECT_PROGRESS.md.bin",
+      "sha256": "47f791ea14fe62c10443b2712b3cf5e0dd9b18b141ab4ede302e20e7901cbf3f",
+      "bytes": 12690
+    },
+    {
+      "path": "provider_validation/results/sdk-news-original-20261004/9-raw.py.bin",
+      "sha256": "564c940feb99b358c41c5456c3142e7501b21505b5c2d8d88d811c53e145b752",
+      "bytes": 8487
+    },
+    {
+      "path": "provider_validation/results/sdk-news-original-20261004/manifest.json",
+      "sha256": "38bcc1eb110f9261f5c72daaf0dd529d7821a1ffd373879668afd84fa0c70e60",
+      "bytes": 2968
+    },
+    {
+      "path": "provider_validation/tests/replay_input_capabilities.py",
+      "sha256": "b8b3c8c61aa19ff96093a5ca16bf006192d641b7f1cd8c78b980809feb95aeb7",
+      "bytes": 44441
+    },
+    {
+      "path": "src/stock_data_manage/cli.py",
+      "sha256": "582f5caedfc538a012d7a2f6e8cd7af3fe8b6fc9152e5b9e0a3fa2cb8810ae19",
+      "bytes": 14323
+    },
+    {
+      "path": "src/stock_data_manage/config/loader.py",
+      "sha256": "93bb55ab150c88751fe9a58a2b75737878c1b0f07233b8ec47009c4901bb11e9",
+      "bytes": 26090
+    },
+    {
+      "path": "src/stock_data_manage/pipeline/inputs.py",
+      "sha256": "4edf6e164f10f6260b2f794dfc35f38130cc12bc6dec1b9ce581fd3e509ea1ee",
+      "bytes": 53520
+    },
+    {
+      "path": "src/stock_data_manage/providers/akshare/boards.py",
+      "sha256": "2060f150831cebaf707ed5becedc35428bc41d4428bab31555ed1d2bf817d122",
+      "bytes": 12416
+    },
+    {
+      "path": "src/stock_data_manage/providers/baostock/industry.py",
+      "sha256": "16c41b379eecbd87f082bd042e27fad7f3d8d77b5bfc6a3e8a286209b068494a",
+      "bytes": 10837
+    },
+    {
+      "path": "src/stock_data_manage/providers/baostock/session.py",
+      "sha256": "70ce19cdde1d6a8ed0c3d3db29caa28d1d8069826136ab6dd7fb6a2ef8c7b832",
+      "bytes": 15771
+    },
+    {
+      "path": "src/stock_data_manage/providers/cctv/news.py",
+      "sha256": "8839bdeed801611e8e6d11cb9441e6ede7bc94d56507eaa2c903e605c772ee7d",
+      "bytes": 2538
+    },
+    {
+      "path": "src/stock_data_manage/providers/chinamoney/rates.py",
+      "sha256": "e7407f1d4272b69cb439bb0a7bad3960b65bb41328d752f541bc8ef50231f922",
+      "bytes": 2716
+    },
+    {
+      "path": "src/stock_data_manage/providers/cls/__init__.py",
+      "sha256": "1609e66c332900944d1f86aa8537370984d25d76ef659616ebc2501f4da0c63c",
+      "bytes": 67
+    },
+    {
+      "path": "src/stock_data_manage/providers/cls/news.py",
+      "sha256": "51da559a252b67a4a2e58171e3630ff1a5a80cd2bc23aa5df30a7e17ac02ad30",
+      "bytes": 3013
+    },
+    {
+      "path": "src/stock_data_manage/providers/contracts.py",
+      "sha256": "a4b16abc7e3686a4eb2791dcd4545fb2404e0214bf32e20db19d2582d39ea447",
+      "bytes": 5153
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/dividend.py",
+      "sha256": "5706a8cdb37eeeb8f66cb033a3091dd1b6ec1ed83d72d0f9fbeb8f5c75d9649b",
+      "bytes": 6407
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/financial.py",
+      "sha256": "6a8b8ae6d5740c78a7456697964ec07f3728f870d51f5237d2b409199081971b",
+      "bytes": 29705
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/fund_flow.py",
+      "sha256": "0cf655efa0854d18651bb4f04f985f0f210b81a6d9eff065604d235ed8f75280",
+      "bytes": 5046
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/limit_pool.py",
+      "sha256": "2fbdfe3da3129545dfe8d2e457be7c42225696ddd74270567ae765e4b413f5ae",
+      "bytes": 5663
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/realtime.py",
+      "sha256": "6e09d2a5014cf316c4d1e26e913a44d5c2fbad95fb44d95cba159ef881f03bca",
+      "bytes": 16746
+    },
+    {
+      "path": "src/stock_data_manage/providers/eastmoney/shareholder.py",
+      "sha256": "4c9d80f4d51845ac5541c42275f44f2a18643db5e9ccb705a3e16168f8db44c1",
+      "bytes": 4865
+    },
+    {
+      "path": "src/stock_data_manage/providers/sina/calendar.py",
+      "sha256": "3d114045f960bfcc94ade1ee03e4d25ebdf6980ba68aa2d0a2236bed78aaef05",
+      "bytes": 1388
+    },
+    {
+      "path": "src/stock_data_manage/providers/sina/daily.py",
+      "sha256": "f9793bf9f5b8d77411abe459b285fc25892c840ff0962133e6b7c3ef628b2c92",
+      "bytes": 6059
+    },
+    {
+      "path": "src/stock_data_manage/providers/sina/news.py",
+      "sha256": "822454e50d8ed60eef2b90d6ad6c0a8ff417eaa4ae2dee556d8137a58fab46a0",
+      "bytes": 2056
+    },
+    {
+      "path": "src/stock_data_manage/providers/sina/snapshot.py",
+      "sha256": "cfa0b823b2fa8053ce899157e9b6078b94516d3fabd5d303480824111f62d136",
+      "bytes": 7778
+    },
+    {
+      "path": "src/stock_data_manage/providers/tencent/daily.py",
+      "sha256": "487a14fcbfc47146d6d5fd291fbf41667aba435e5fed22ea1ef61ded513fcaa7",
+      "bytes": 9941
+    },
+    {
+      "path": "src/stock_data_manage/providers/tencent/minute.py",
+      "sha256": "ff5cf1e91327bcab2e072bcfae9f1f77dca71a84ba26e456c26580a4d59d9cc1",
+      "bytes": 4709
+    },
+    {
+      "path": "src/stock_data_manage/providers/tencent/snapshot.py",
+      "sha256": "3278cadac776fe8cfe5d02775a5bf8f53bc1cb96c595a5f418172f53047434bf",
+      "bytes": 5160
+    },
+    {
+      "path": "src/stock_data_manage/providers/transport.py",
+      "sha256": "58eeb29069ace26ab1868ada39bea73dd64e0e678163a861c90b904658f6513a",
+      "bytes": 18337
+    },
+    {
+      "path": "src/stock_data_manage/providers/wallstreetcn/news.py",
+      "sha256": "705de425d8526ced4e866d9beaf4c571c443c4955117c0cccada30ee06e07eea",
+      "bytes": 3203
+    },
+    {
+      "path": "src/stock_data_manage/quality/normalization.py",
+      "sha256": "3ed0d663b7fda9ac6cdf7f1252435f2351c783af3244ccba2c2b0f3891e29b3e",
+      "bytes": 14958
+    },
+    {
+      "path": "src/stock_data_manage/routing/factory.py",
+      "sha256": "1c1907fc47037375b5f2c87316df25b9d399c20c383951311e27c52d587ceefd",
+      "bytes": 22566
+    },
+    {
+      "path": "src/stock_data_manage/storage/raw.py",
+      "sha256": "3b803525f5b275119ca7af3b05d151fedaeecbe12abf484efe1de3af8994793d",
+      "bytes": 8494
+    },
+    {
+      "path": "tests/test_input_collection.py",
+      "sha256": "c2ac41d102c67ebafe8040f34ce69b01c0acbdab6cfb1340d82d07901b0af4ae",
+      "bytes": 194757
+    }
+  ]
+}

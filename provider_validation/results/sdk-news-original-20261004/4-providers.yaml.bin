@@ -1,0 +1,2463 @@
+providers:
+  capability_probe:
+    validation_ttl_days: 7
+    cooldown_probe_required: true
+  failure_policy:
+    consecutive_failure_threshold: 3
+    cooldown_seconds: 300
+  tencent:
+    enabled: true
+    endpoints:
+      daily_history:
+        implementation_status: implemented
+        request_group: tencent.kline
+        request_shape: single_symbol
+        parameters:
+          symbols:
+            type: strings
+            source: request.symbols
+            required: true
+          trade_date:
+            type: date
+            source: request.trade_date
+            required: true
+        request_limit_enforcement: physical_request
+        enabled: true
+        role: primary
+        datasets: [daily_bar]
+        adjustments: [none]
+        asset_types: [stock, etf, lof, index]
+        exchanges: [XSHG, XSHE, BSE]
+        capability_version: tencent-kline-v1
+        max_symbols_per_request: 1
+        max_rows_per_request: 1024
+        supports_pagination: false
+        request_interval_seconds: 0.5
+      forward_history:
+        implementation_status: implemented
+        request_group: tencent.kline
+        request_shape: single_symbol
+        parameters:
+          symbols:
+            type: strings
+            source: request.symbols
+            required: true
+          trade_date:
+            type: date
+            source: request.trade_date
+            required: true
+        request_limit_enforcement: physical_request
+        enabled: true
+        role: primary
+        datasets: [daily_bar]
+        adjustments: [forward]
+        asset_types: [stock, etf]
+        exchanges: [XSHG, XSHE]
+        capability_version: tencent-qfq-kline-v1
+        max_symbols_per_request: 1
+        max_rows_per_request: 640
+        supports_pagination: false
+        request_interval_seconds: 0.5
+      native_1m:
+        implementation_status: implemented
+        request_group: tencent.kline
+        request_shape: single_symbol
+        parameters:
+          symbols:
+            type: strings
+            source: request.symbols
+            required: true
+          as_of:
+            type: datetime
+            source: request.as_of
+            required: true
+        frequencies:
+        - 1
+        request_limit_enforcement: physical_request
+        capability_version: tencent-native-1m-v1
+        role: primary
+        datasets: [minute_bar_1m]
+        max_symbols_per_request: 1
+        request_interval_seconds: 1
+        effective_concurrency: 1
+      bulk_snapshot:
+        implementation_status: implemented
+        request_group: tencent.bulk_snapshot
+        request_shape: symbol_batch
+        parameters:
+          symbols:
+            type: strings
+            source: request.symbols
+            required: true
+          as_of:
+            type: datetime
+            source: request.as_of
+            required: true
+        request_limit_enforcement: physical_request
+        role: primary
+        datasets: [snapshot, daily_bar]
+        adjustments: [none]
+        asset_types: [stock, etf, lof, index]
+        exchanges: [XSHG, XSHE, BSE]
+        capability_version: tencent-snapshot-v1
+        max_symbols_per_request: 100
+        request_interval_seconds: 1
+  sina:
+    enabled: true
+    endpoints:
+      full_history:
+        implementation_status: implemented
+        request_group: sina.full_history
+        request_shape: single_symbol
+        parameters:
+          symbols:
+            type: strings
+            source: request.symbols
+            required: true
+          trade_date:
+            type: date
+            source: request.trade_date
+            required: true
+        request_limit_enforcement: physical_request
+        role: primary
+        datasets: [daily_bar]
+        adjustments: [none]
+        asset_types: [stock, etf, lof, index]
+        exchanges: [XSHG, XSHE, BSE]
+        capability_version: sina-cn-marketdata-v1
+        max_symbols_per_request: 1
+  tdx:
+    enabled: false
+    disabled_reason: public_servers_unstable_in_current_network
+    require_capability_probe_before_enable: true
+    endpoints:
+      delayed_1m:
+        implementation_status: unimplemented
+        request_group: tdx.delayed_1m
+        request_shape: single_symbol
+        parameters:
+          symbols:
+            type: strings
+            source: request.symbols
+            required: true
+          as_of:
+            type: datetime
+            source: request.as_of
+            required: true
+        frequencies:
+        - 1
+        request_limit_enforcement: unimplemented
+        role: fallback
+        datasets: [minute_bar_1m]
+        freshness_delay_seconds: 900
+  eastmoney:
+    enabled: false
+    disabled_reason: unstable_in_current_network
+    require_capability_probe_before_enable: true
+    allowed_low_frequency_capabilities: [security_master]
+    endpoints:
+      security_list:
+        supports_pagination: true
+        implementation_status: implemented
+        request_group: eastmoney.quote
+        request_shape: paged_list
+        parameters: {}
+        request_limit_enforcement: physical_request
+        enabled: false
+        role: validation_only
+        datasets: [security_master]
+        adjustments: [none]
+        asset_types: [stock, etf, lof, index]
+        exchanges: [XSHG, XSHE, BSE]
+        capability_version: eastmoney-security-list-v1
+        max_symbols_per_request: 100
+        request_interval_seconds: 3
+      single_quote:
+        implementation_status: implemented
+        request_group: eastmoney.quote
+        request_shape: single_symbol
+        parameters:
+          symbols:
+            type: strings
+            source: request.symbols
+            required: true
+        request_limit_enforcement: call_boundary_only
+        enabled: false
+        role: validation_only
+        datasets: [realtime_quote]
+        adjustments: [none]
+        asset_types: [stock, etf, lof, index]
+        exchanges: [XSHG, XSHE, BSE]
+        capability_version: eastmoney-realtime-quote-v1
+        request_interval_seconds: 1
+      batch_quote:
+        implementation_status: implemented
+        request_group: eastmoney.quote
+        request_shape: symbol_batch
+        parameters:
+          symbols:
+            type: strings
+            source: request.symbols
+            required: true
+        request_limit_enforcement: call_boundary_only
+        enabled: false
+        role: validation_only
+        datasets: [realtime_quote]
+        adjustments: [none]
+        asset_types: [stock, etf, lof, index]
+        exchanges: [XSHG, XSHE, BSE]
+        capability_version: eastmoney-batch-quote-v1
+        max_symbols_per_request: 100
+        request_interval_seconds: 1
+      intraday_trend:
+        implementation_status: implemented
+        request_group: eastmoney.quote
+        request_shape: single_symbol
+        parameters:
+          symbols:
+            type: strings
+            source: request.symbols
+            required: true
+        request_limit_enforcement: call_boundary_only
+        enabled: false
+        role: validation_only
+        datasets: [intraday_trend]
+        adjustments: [none]
+        asset_types: [stock, etf, lof, index]
+        exchanges: [XSHG, XSHE, BSE]
+        capability_version: eastmoney-intraday-trend-v1
+        request_interval_seconds: 1
+      stock_fund_flow:
+        implementation_status: implemented
+        request_group: eastmoney.quote
+        request_shape: single_symbol
+        parameters:
+          symbols:
+            type: strings
+            source: request.symbols
+            required: true
+        request_limit_enforcement: call_boundary_only
+        enabled: false
+        role: validation_only
+        datasets: [stock_fund_flow]
+        adjustments: [none]
+        asset_types: [stock]
+        exchanges: [XSHG, XSHE, BSE]
+        capability_version: eastmoney-stock-fund-flow-v1
+        max_symbols_per_request: 1
+        request_interval_seconds: 1
+      financial_main:
+        implementation_status: implemented
+        request_group: eastmoney.datacenter
+        request_shape: single_symbol
+        parameters:
+          symbols:
+            type: strings
+            source: request.symbols
+            required: true
+        request_limit_enforcement: call_boundary_only
+        enabled: false
+        role: validation_only
+        datasets: [financial_main]
+        adjustments: [none]
+        asset_types: [stock]
+        exchanges: [XSHG, XSHE, BSE]
+        capability_version: eastmoney-financial-main-v1
+        max_symbols_per_request: 1
+        request_interval_seconds: 1
+      shareholder_count:
+        implementation_status: implemented
+        request_group: eastmoney.datacenter
+        request_shape: single_symbol
+        parameters:
+          symbols:
+            type: strings
+            source: request.symbols
+            required: true
+        request_limit_enforcement: call_boundary_only
+        enabled: false
+        role: validation_only
+        datasets: [shareholder_count]
+        adjustments: [none]
+        asset_types: [stock]
+        exchanges: [XSHG, XSHE, BSE]
+        capability_version: eastmoney-shareholder-count-v1
+        max_symbols_per_request: 1
+        request_interval_seconds: 1
+      dividend_event:
+        supports_pagination: true
+        implementation_status: implemented
+        request_group: eastmoney.datacenter
+        request_shape: paged_list
+        parameters:
+          start_date:
+            type: date
+            source: request.start_date
+            required: true
+          end_date:
+            type: date
+            source: request.end_date
+            required: true
+        request_limit_enforcement: physical_request
+        enabled: false
+        role: discovery
+        datasets: [dividend_event]
+        adjustments: [none]
+        asset_types: [stock, etf, lof]
+        exchanges: [XSHG, XSHE, BSE]
+        capability_version: eastmoney-dividend-event-v1
+        request_interval_seconds: 3
+        page_size: 100
+  baostock:
+    enabled: true
+    default_role: validation_only
+    endpoints:
+      daily_history:
+        implementation_status: implemented
+        request_group: baostock.sdk
+        request_shape: single_symbol
+        parameters:
+          symbols:
+            type: strings
+            source: request.symbols
+            required: true
+          trade_date:
+            type: date
+            source: request.trade_date
+            required: true
+        request_limit_enforcement: unimplemented
+        enabled: true
+        role: validation_only
+        datasets: [daily_bar]
+        adjustments: [none, forward, backward]
+        asset_types: [stock, etf, index]
+        exchanges: [XSHG, XSHE]
+        capability_version: baostock-daily-v1
+        max_symbols_per_request: 1
+        request_interval_seconds: 0.5
+      minute_5m:
+        implementation_status: implemented
+        request_group: baostock.sdk
+        request_shape: single_symbol
+        parameters:
+          symbols:
+            type: strings
+            source: request.symbols
+            required: true
+          as_of:
+            type: datetime
+            source: request.as_of
+            required: true
+        frequencies:
+        - 5
+        request_limit_enforcement: unimplemented
+        enabled: true
+        role: validation_only
+        datasets: [minute_bar_5m]
+        adjustments: [none]
+        asset_types: [stock, etf]
+        exchanges: [XSHG, XSHE]
+        capability_version: baostock-minute-5m-v1
+        max_symbols_per_request: 1
+        request_interval_seconds: 0.5
+      industry_membership:
+        implementation_status: implemented
+        request_group: baostock.sdk
+        request_shape: full_snapshot
+        parameters:
+          symbols:
+            type: strings
+            source: request.symbols
+            required: false
+            applied_at: local_filter
+          trade_date:
+            type: date
+            source: request.trade_date
+            required: true
+        base_requests_per_fetch: 2
+        request_limit_enforcement: unimplemented
+        enabled: true
+        role: validation_only
+        datasets: [industry_membership]
+        adjustments: [none]
+        asset_types: [stock]
+        exchanges: [XSHG, XSHE]
+        capability_version: baostock-csrc-industry-v1
+        max_symbols_per_request: 1
+        request_interval_seconds: 0.5
+      snapshot:
+        implementation_status: unimplemented
+        request_group: baostock.sdk
+        request_shape: single_symbol
+        parameters:
+          symbols:
+            type: strings
+            source: request.symbols
+            required: true
+          trade_date:
+            type: date
+            source: request.trade_date
+            required: true
+        request_limit_enforcement: unimplemented
+        enabled: false
+        disabled_reason: unsupported_by_provider
+  akshare:
+    enabled: true
+    default_role: validation_only
+    endpoints:
+      stock_daily:
+        implementation_status: implemented
+        request_group: akshare.stock_daily
+        request_shape: single_symbol
+        parameters:
+          symbols:
+            type: strings
+            source: request.symbols
+            required: true
+          trade_date:
+            type: date
+            source: request.trade_date
+            required: true
+        request_limit_enforcement: unimplemented
+        enabled: true
+        role: validation_only
+        datasets: [daily_bar]
+        adjustments: [none, forward, backward]
+        asset_types: [stock]
+        exchanges: [XSHG, XSHE, BSE]
+        capability_version: akshare-stock-daily-v1
+        max_symbols_per_request: 1
+        request_interval_seconds: 1
+      etf_daily:
+        implementation_status: implemented
+        request_group: akshare.etf_daily
+        request_shape: single_symbol
+        parameters:
+          symbols:
+            type: strings
+            source: request.symbols
+            required: true
+          trade_date:
+            type: date
+            source: request.trade_date
+            required: true
+        request_limit_enforcement: unimplemented
+        enabled: true
+        role: validation_only
+        datasets: [daily_bar]
+        adjustments: [none, forward, backward]
+        asset_types: [etf]
+        exchanges: [XSHG, XSHE]
+        capability_version: akshare-etf-daily-v1
+        max_symbols_per_request: 1
+        request_interval_seconds: 1
+      lof_daily:
+        implementation_status: implemented
+        request_group: akshare.lof_daily
+        request_shape: single_symbol
+        parameters:
+          symbols:
+            type: strings
+            source: request.symbols
+            required: true
+          trade_date:
+            type: date
+            source: request.trade_date
+            required: true
+        request_limit_enforcement: unimplemented
+        enabled: true
+        role: validation_only
+        datasets: [daily_bar]
+        adjustments: [none, forward, backward]
+        asset_types: [lof]
+        exchanges: [XSHG, XSHE]
+        capability_version: akshare-lof-daily-v1
+        max_symbols_per_request: 1
+        request_interval_seconds: 1
+      index_daily:
+        implementation_status: implemented
+        request_group: akshare.index_daily
+        request_shape: single_symbol
+        parameters:
+          symbols:
+            type: strings
+            source: request.symbols
+            required: true
+          trade_date:
+            type: date
+            source: request.trade_date
+            required: true
+        request_limit_enforcement: unimplemented
+        enabled: true
+        role: validation_only
+        datasets: [daily_bar]
+        adjustments: [none]
+        asset_types: [index]
+        exchanges: [XSHG, XSHE]
+        capability_version: akshare-index-daily-v1
+        max_symbols_per_request: 1
+        request_interval_seconds: 1
+      industry_index_daily:
+        implementation_status: implemented
+        request_group: akshare.industry_index_daily
+        request_shape: single_symbol
+        parameters:
+          board_name:
+            type: string
+            source: request.board_name
+            required: true
+          board_code:
+            type: string
+            source: dependency.board_code
+            required: false
+          start_date:
+            type: date
+            source: request.start_date
+            required: true
+          end_date:
+            type: date
+            source: request.end_date
+            required: true
+        request_limit_enforcement: unimplemented
+        enabled: true
+        role: validation_only
+        datasets: [industry_index_daily]
+        adjustments: [none]
+        asset_types: [stock]
+        exchanges: [XSHG, XSHE]
+        capability_version: akshare-ths-industry-index-v1
+        max_symbols_per_request: 1
+        request_interval_seconds: 1
+      industry_fund_flow:
+        supports_pagination: true
+        implementation_status: implemented
+        request_group: akshare.industry_fund_flow
+        request_shape: paged_list
+        parameters:
+          period:
+            type: string
+            source: config.period
+            default: 即时
+            choices:
+            - 即时
+        request_limit_enforcement: unimplemented
+        enabled: true
+        role: validation_only
+        datasets: [board_fund_flow]
+        adjustments: [none]
+        asset_types: [stock]
+        exchanges: [XSHG, XSHE]
+        capability_version: akshare-ths-industry-fund-flow-v1
+        max_symbols_per_request: 1
+        request_interval_seconds: 1
+      concept_fund_flow:
+        supports_pagination: true
+        implementation_status: implemented
+        request_group: akshare.concept_fund_flow
+        request_shape: paged_list
+        parameters:
+          period:
+            type: string
+            source: config.period
+            default: 即时
+            choices:
+            - 即时
+        request_limit_enforcement: unimplemented
+        enabled: true
+        role: validation_only
+        datasets: [board_fund_flow]
+        adjustments: [none]
+        asset_types: [stock]
+        exchanges: [XSHG, XSHE]
+        capability_version: akshare-ths-concept-fund-flow-v1
+        max_symbols_per_request: 1
+        request_interval_seconds: 1
+  ths:
+    enabled: true
+    default_role: validation_only
+    endpoints:
+      industry_board:
+        supports_pagination: true
+        implementation_status: implemented
+        request_group: ths.boards
+        request_shape: paged_list
+        parameters: {}
+        request_limit_enforcement: unimplemented
+        enabled: true
+        role: validation_only
+        datasets: [industry_board]
+        adjustments: [none]
+        asset_types: [stock]
+        capability_version: ths-industry-members-v1
+        request_interval_seconds: 3
+      concept_board:
+        supports_pagination: true
+        implementation_status: implemented
+        request_group: ths.boards
+        request_shape: paged_list
+        parameters: {}
+        request_limit_enforcement: unimplemented
+        enabled: true
+        role: validation_only
+        datasets: [concept_board]
+        adjustments: [none]
+        asset_types: [stock]
+        capability_version: ths-concept-members-v1
+        request_interval_seconds: 3
+
+# 已验证输入契约：声明采集意图，保留验证限制，不自动授予生产路由资格。
+input_capabilities:
+  ASTOCK-001:
+    dataset: realtime_quote
+    runtime_method: fetch_snapshot
+    provider: tencent
+    endpoint: single_quote
+    parameters:
+      symbols:
+        type: strings
+        source: request.symbols
+        required: true
+      as_of:
+        type: datetime
+        source: request.as_of
+        required: true
+    data_kind: quote
+    data_frequency: snapshot
+    request_shape: symbol_batch
+    collection_profile: tencent_market_snapshot
+    implementation_status: implemented_validation_only
+    runtime_endpoint: tencent.bulk_snapshot
+    display_name: 腾讯财经
+    limitations:
+    - 原单证券响应与脚本对照；多证券分批仅有离线夹具验证，尚无在线批量和全市场完整性证据
+    - as_of只校验返回日期，不是上游历史查询参数；量额单位未独立核验，标准量额列为空
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-001
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    forbidden_sources: [request.symbol, request.trade_date, request.start_date, request.end_date]
+  ASTOCK-002-5m:
+    dataset: minute_bar_5m
+    runtime_method: fetch_recent
+    provider: tencent
+    endpoint: kline_5m
+    display_name: 腾讯最近5分钟线
+    data_kind: time_series
+    data_frequency: 5m
+    request_shape: single_symbol
+    parameters:
+      code: &id001
+        type: string
+        source: request.symbol
+        required: true
+      count:
+        type: integer
+        source: config.count
+        required: true
+        default: 96
+        minimum: 1
+        maximum: 320
+    collection_profile: tencent_minute_5m
+    implementation_status: implemented_validation_only
+    runtime_endpoint: tencent.native_1m
+    evidence_refs:
+    - ASTOCK-002
+    limitations:
+    - 仅实测沪市日线前复权/深市最近5分钟样本；其他周期和北交所不继承资格
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    forbidden_sources:
+    - request.start_date
+    - request.end_date
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+  ASTOCK-002-daily:
+    dataset: daily_bar
+    runtime_method: fetch_window
+    provider: tencent
+    endpoint: kline_daily
+    display_name: 腾讯前复权日线
+    data_kind: time_series
+    data_frequency: daily
+    request_shape: single_symbol
+    parameters:
+      code: *id001
+      start: &id005
+        type: date
+        source: request.start_date
+        required: true
+      end: &id006
+        type: date
+        source: request.end_date
+        required: true
+      adjust:
+        type: string
+        source: config.adjust
+        required: true
+        default: qfq
+        choices:
+        - qfq
+    collection_profile: tencent_daily
+    implementation_status: implemented_validation_only
+    runtime_endpoint: tencent.forward_history
+    evidence_refs:
+    - ASTOCK-002
+    limitations:
+    - 仅实测沪市日线前复权/深市最近5分钟样本；其他周期和北交所不继承资格
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+  ASTOCK-003:
+    provider: tdx
+    endpoint: daily_package
+    parameters: &id004
+      date: &id003
+        type: date
+        source: request.trade_date
+        required: true
+    data_kind: file_package
+    data_frequency: daily
+    request_shape: file_package
+    collection_profile: market_after_close
+    implementation_status: unimplemented
+    display_name: 通达信盘后包
+    limitations:
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    trading_date_parameter: date
+    evidence_refs:
+    - ASTOCK-003
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-004:
+    provider: tencent
+    endpoint: ticks
+    parameters: &id002
+      code: *id001
+    data_kind: ticks
+    data_frequency: tick
+    request_shape: single_symbol
+    collection_profile: market_intraday
+    implementation_status: unimplemented
+    display_name: 腾讯逐笔成交
+    limitations:
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-004
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-006:
+    provider: sina
+    endpoint: adjustment_factor
+    parameters:
+      code: *id001
+      kind:
+        type: string
+        source: config.kind
+        required: true
+        default: qfq
+        choices:
+        - qfq
+        - hfq
+    data_kind: factor
+    data_frequency: event
+    request_shape: single_symbol
+    collection_profile: market_after_close
+    implementation_status: unimplemented
+    display_name: 新浪复权因子
+    limitations:
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-006
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-008:
+    provider: eastmoney
+    endpoint: report_list
+    parameters: *id002
+    data_kind: document_index
+    data_frequency: snapshot
+    request_shape: single_symbol
+    collection_profile: event_daily
+    implementation_status: unimplemented
+    display_name: 东财 reportapi
+    limitations:
+    - 研报列表成功不包括PDF下载能力
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-008
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-011:
+    provider: ths
+    endpoint: earnings_consensus
+    parameters: *id002
+    data_kind: forecast
+    data_frequency: snapshot
+    request_shape: single_symbol
+    collection_profile: event_daily
+    implementation_status: unimplemented
+    display_name: 同花顺一致预期
+    limitations:
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-011
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-013:
+    provider: sina
+    endpoint: report_list
+    parameters:
+      code:
+        type: string
+        source: request.symbol
+        required: false
+      page:
+        type: integer
+        source: metadata.page
+        required: false
+        default: 1
+        minimum: 1
+    data_kind: document_index
+    data_frequency: snapshot
+    request_shape: paged_list
+    collection_profile: event_daily
+    implementation_status: unimplemented
+    display_name: 新浪研报列表
+    limitations:
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-013
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-014:
+    provider: ths
+    endpoint: hot_reason
+    parameters: {}
+    data_kind: snapshot
+    data_frequency: snapshot
+    request_shape: full_snapshot
+    collection_profile: market_intraday
+    implementation_status: unimplemented
+    display_name: 同花顺热点
+    limitations:
+    - 记录内含401响应，不能由部分非空返回推断完整性
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-014
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-015:
+    provider: eastmoney
+    endpoint: northbound_summary
+    parameters: {}
+    data_kind: snapshot
+    data_frequency: snapshot
+    request_shape: full_snapshot
+    collection_profile: market_intraday
+    implementation_status: blocked
+    display_name: 沪深港通汇总（实时资金有效性未证明）
+    limitations:
+    - 净买额和净流入为0，实时资金语义未证明
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-015
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-019:
+    provider: eastmoney
+    endpoint: dragon_tiger_seats
+    parameters: &id010
+      code: *id001
+      date: *id003
+    data_kind: event
+    data_frequency: daily
+    request_shape: single_symbol
+    collection_profile: market_after_close
+    implementation_status: unimplemented
+    display_name: 龙虎榜席位
+    limitations:
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    trading_date_parameter: date
+    evidence_refs:
+    - ASTOCK-019
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-020:
+    provider: eastmoney
+    endpoint: dragon_tiger_daily
+    parameters: *id004
+    data_kind: event
+    data_frequency: daily
+    request_shape: date_snapshot
+    collection_profile: market_after_close
+    implementation_status: unimplemented
+    display_name: 全市场龙虎榜
+    limitations:
+    - 最新2026-09-30原始响应与解析输出84行；旧失败备注不作为排除依据
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    trading_date_parameter: date
+    evidence_refs:
+    - ASTOCK-020
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-021:
+    provider: eastmoney
+    endpoint: lockup_expiry
+    parameters:
+      code: *id001
+      start: *id005
+      end: *id006
+    data_kind: event
+    data_frequency: event
+    request_shape: single_symbol
+    collection_profile: event_daily
+    implementation_status: unimplemented
+    display_name: 限售解禁日历
+    limitations:
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-021
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-023:
+    provider: ths
+    endpoint: industry_fund_flow
+    parameters:
+      period:
+        type: string
+        source: config.period
+        required: true
+        default: 即时
+        choices:
+        - 即时
+    data_kind: snapshot
+    data_frequency: snapshot
+    request_shape: paged_list
+    collection_profile: market_intraday
+    implementation_status: alias
+    canonical_input: SDA-BOARD-003
+    runtime_endpoint: akshare.industry_fund_flow
+    display_name: 板块资金流向
+    limitations:
+    - 实际成功回退为同花顺行业资金流；失败的东财变体不合并授予资格
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-023
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-024:
+    provider: exchange_composite
+    endpoint: margin_detail
+    parameters:
+      code: *id001
+      date: *id003
+    data_kind: table
+    data_frequency: daily
+    request_shape: date_snapshot
+    collection_profile: market_after_close
+    implementation_status: blocked
+    display_name: 融资融券明细
+    limitations:
+    - 沪市filtered仍为全量2000行，深市为空；日期回退必须显式保留实际返回日期
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    trading_date_parameter: date
+    evidence_refs:
+    - ASTOCK-024
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-026:
+    dataset: shareholder_count
+    runtime_method: fetch_history
+    forbidden_sources: [request.start_date, request.end_date, request.trade_date, request.count, config.count]
+    base_requests_per_fetch: 2
+    provider: eastmoney
+    endpoint: shareholder_count
+    parameters: *id002
+    data_kind: event
+    data_frequency: report_period
+    request_shape: single_symbol
+    collection_profile: event_daily
+    implementation_status: implemented_validation_only
+    runtime_endpoint: eastmoney.shareholder_count
+    display_name: 股东户数变化
+    limitations:
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-026
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+  ASTOCK-027:
+    dataset: dividend_event
+    runtime_method: fetch_history
+    forbidden_sources: [request.start_date, request.end_date, request.trade_date, request.count, config.count]
+    base_requests_per_fetch: 2
+    provider: eastmoney
+    endpoint: dividend_history
+    parameters: *id002
+    data_kind: event
+    data_frequency: event
+    request_shape: single_symbol
+    collection_profile: event_daily
+    implementation_status: implemented_validation_only
+    runtime_endpoint: eastmoney.dividend_event
+    display_name: 分红送转历史
+    limitations:
+    - 单证券历史接口与现有批量分红事件适配器请求契约不同；保留证券归属证据
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-027
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+  ASTOCK-028:
+    dataset: stock_fund_flow
+    runtime_method: fetch_history
+    forbidden_sources: [request.start_date, request.end_date, request.trade_date, request.count, config.count]
+    base_requests_per_fetch: 1
+    provider: eastmoney
+    endpoint: stock_fund_flow
+    parameters: *id002
+    data_kind: time_series
+    data_frequency: daily
+    request_shape: single_symbol
+    collection_profile: market_after_close
+    implementation_status: implemented_validation_only
+    runtime_endpoint: eastmoney.stock_fund_flow
+    display_name: 个股资金流120日
+    limitations:
+    - 最新600519返回120行；来源控制返回长度，不能承诺固定120行；旧网络受阻备注已过时
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-028
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+  ASTOCK-029:
+    provider: eastmoney
+    endpoint: chip_distribution
+    parameters: *id002
+    data_kind: derived
+    data_frequency: daily
+    request_shape: single_symbol
+    collection_profile: market_after_close
+    implementation_status: blocked
+    display_name: 筹码分布 CYQ
+    limitations:
+    - 算法派生口径未独立核准，不按外部原始输入授予资格
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-029
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-030:
+    provider: sse
+    endpoint: etf_shares
+    parameters:
+      date: *id003
+      exchange: &id008
+        type: string
+        source: request.exchange
+        required: true
+    data_kind: time_series
+    data_frequency: daily
+    request_shape: date_snapshot
+    collection_profile: market_after_close
+    implementation_status: unimplemented
+    display_name: ETF 份额
+    limitations:
+    - 已测上交所日期数据，深交所当前快照未测
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    trading_date_parameter: date
+    evidence_refs:
+    - ASTOCK-030
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-031:
+    provider: eastmoney
+    endpoint: stock_news
+    parameters: *id002
+    data_kind: document_index
+    data_frequency: snapshot
+    request_shape: single_symbol
+    collection_profile: news_intraday
+    implementation_status: unimplemented
+    display_name: 个股新闻
+    limitations:
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-031
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-032:
+    provider: cls
+    endpoint: telegraph
+    parameters: {}
+    data_kind: document_index
+    data_frequency: snapshot
+    request_shape: full_snapshot
+    collection_profile: news_intraday
+    implementation_status: unimplemented
+    display_name: 财联社电报
+    limitations:
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-032
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-033:
+    provider: sina
+    endpoint: global_news
+    parameters: {}
+    data_kind: document_index
+    data_frequency: snapshot
+    request_shape: full_snapshot
+    collection_profile: news_intraday
+    implementation_status: unimplemented
+    display_name: 新浪全球资讯（实测成功来源）
+    limitations:
+    - 脚本先尝试新浪，成功响应来自新浪；东财名称不作为真实来源
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-033
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-034:
+    provider: wallstreetcn
+    endpoint: news_lives
+    parameters:
+      channel:
+        type: string
+        source: config.channel
+        required: true
+        default: a-stock-channel
+        choices:
+        - a-stock-channel
+      limit:
+        type: integer
+        source: config.limit
+        required: true
+        default: 50
+        minimum: 1
+        maximum: 100
+      cursor:
+        type: string
+        source: metadata.cursor
+        required: false
+    data_kind: document_index
+    data_frequency: snapshot
+    request_shape: paged_list
+    collection_profile: news_intraday
+    implementation_status: implemented_validation_only
+    display_name: 华尔街见闻快讯
+    limitations:
+    - 成功归档仅A股频道50条快讯；保留next_cursor但跨页历史完整性未认证
+    - 原配置global不是有效频道名，候选默认设为已验证的a-stock-channel；其他频道待验证
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-034
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    dataset: wallstreetcn_news
+    runtime_method: fetch
+    base_requests_per_fetch: 1
+    forbidden_sources:
+    - request.symbol
+    - request.start_date
+    - request.end_date
+  ASTOCK-035:
+    provider: cctv
+    endpoint: news
+    parameters:
+      date:
+        type: date
+        source: request.trade_date
+        required: true
+      with_content:
+        type: boolean
+        source: config.with_content
+        required: true
+        default: false
+        choices:
+        - false
+    data_kind: document_index
+    data_frequency: daily
+    request_shape: date_snapshot
+    collection_profile: event_daily
+    implementation_status: implemented_validation_only
+    display_name: 新闻联播
+    limitations:
+    - 成功归档仅2026-09-18标题与链接，正文抓取未认证且禁止启用
+    - request.trade_date沿用参数名，但含义为新闻联播日历播出日，不要求交易日
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-035
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    dataset: cctv_news_index
+    runtime_method: fetch
+    base_requests_per_fetch: 1
+    forbidden_sources:
+    - request.symbol
+    - request.start_date
+    - request.end_date
+  ASTOCK-037:
+    provider: script_composite
+    endpoint: company_profile
+    parameters: *id002
+    data_kind: composite
+    data_frequency: snapshot
+    request_shape: single_symbol
+    collection_profile: event_daily
+    implementation_status: unimplemented
+    display_name: F10 文本
+    limitations:
+    - 复合输出必须拆分成功子接口；不能标为通达信F10完整能力
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-037
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-039:
+    provider: sina
+    endpoint: financial_statements
+    parameters: *id002
+    data_kind: table
+    data_frequency: report_period
+    request_shape: single_symbol
+    collection_profile: event_daily
+    implementation_status: unimplemented
+    display_name: 新浪财报三表
+    limitations:
+    - 三张报表分别保留报告期、披露时间和来源字段，尚未定义生产标准表
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-039
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-044:
+    provider: eastmoney
+    endpoint: st_list
+    parameters: {}
+    data_kind: snapshot
+    data_frequency: snapshot
+    request_shape: full_snapshot
+    collection_profile: reference_daily
+    implementation_status: unimplemented
+    display_name: ST 名单
+    limitations:
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-044
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-045:
+    dataset: limit_up_pool
+    runtime_method: fetch
+    provider: eastmoney
+    endpoint: limit_up_pool
+    parameters: *id004
+    data_kind: snapshot
+    data_frequency: daily
+    request_shape: date_snapshot
+    collection_profile: market_intraday
+    implementation_status: implemented_validation_only
+    runtime_endpoint: eastmoney.limit_up_pool
+    display_name: 东财涨停池
+    limitations:
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    trading_date_parameter: date
+    evidence_refs:
+    - ASTOCK-045
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+  ASTOCK-046:
+    dataset: broken_limit_pool
+    runtime_method: fetch
+    forbidden_sources: [request.symbol, request.start_date, request.end_date, request.count, config.count]
+    base_requests_per_fetch: 1
+    provider: eastmoney
+    endpoint: broken_limit_pool
+    parameters: *id004
+    data_kind: snapshot
+    data_frequency: daily
+    request_shape: date_snapshot
+    collection_profile: market_intraday
+    implementation_status: implemented_validation_only
+    display_name: 东财炸板池
+    limitations:
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    trading_date_parameter: date
+    evidence_refs:
+    - ASTOCK-046
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+  ASTOCK-047:
+    dataset: limit_down_pool
+    runtime_method: fetch
+    forbidden_sources: [request.symbol, request.start_date, request.end_date, request.count, config.count]
+    base_requests_per_fetch: 1
+    provider: eastmoney
+    endpoint: limit_down_pool
+    parameters: *id004
+    data_kind: snapshot
+    data_frequency: daily
+    request_shape: date_snapshot
+    collection_profile: market_intraday
+    implementation_status: implemented_validation_only
+    display_name: 东财跌停池
+    limitations:
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    trading_date_parameter: date
+    evidence_refs:
+    - ASTOCK-047
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+  ASTOCK-048:
+    dataset: previous_limit_pool
+    runtime_method: fetch
+    forbidden_sources: [request.symbol, request.start_date, request.end_date, request.count, config.count]
+    base_requests_per_fetch: 1
+    provider: eastmoney
+    endpoint: previous_limit_pool
+    parameters: *id004
+    data_kind: snapshot
+    data_frequency: daily
+    request_shape: date_snapshot
+    collection_profile: market_intraday
+    implementation_status: implemented_validation_only
+    display_name: 东财昨日涨停池
+    limitations:
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    trading_date_parameter: date
+    evidence_refs:
+    - ASTOCK-048
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+  ASTOCK-049:
+    provider: eastmoney
+    endpoint: limit_up_pool
+    parameters: *id004
+    data_kind: snapshot
+    data_frequency: daily
+    request_shape: date_snapshot
+    collection_profile: market_intraday
+    implementation_status: alias
+    display_name: 东财涨停池替代（同花顺涨停揭秘未实现）
+    limitations:
+    - 实际响应与东财涨停池相同，缺同花顺题材/原因字段，不作为独立来源
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    canonical_input: ASTOCK-045
+    trading_date_parameter: date
+    evidence_refs:
+    - ASTOCK-049
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-050:
+    dataset: strong_stock_pool
+    runtime_method: fetch
+    forbidden_sources: [request.symbol, request.start_date, request.end_date, request.count, config.count]
+    base_requests_per_fetch: 1
+    provider: eastmoney
+    endpoint: strong_stock_pool
+    parameters: *id004
+    data_kind: snapshot
+    data_frequency: daily
+    request_shape: date_snapshot
+    collection_profile: market_intraday
+    implementation_status: implemented_validation_only
+    display_name: 东财强势股池
+    limitations:
+    - 不能作为交易所重点监控名单
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    trading_date_parameter: date
+    evidence_refs:
+    - ASTOCK-050
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+  ASTOCK-051:
+    provider: eastmoney
+    endpoint: intraday_changes
+    parameters: {}
+    data_kind: event
+    data_frequency: snapshot
+    request_shape: full_snapshot
+    collection_profile: market_intraday
+    implementation_status: unimplemented
+    display_name: 东财日内异动池（明细接口）
+    limitations:
+    - 逐异动类型展开请求；日期和完整性待迁移核验
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-051
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-052:
+    provider: local
+    endpoint: intraday_change_counts
+    parameters:
+      rows:
+        type: records
+        source: dependency.intraday_changes
+        required: true
+    data_kind: derived
+    data_frequency: snapshot
+    request_shape: full_snapshot
+    collection_profile: market_intraday
+    implementation_status: blocked
+    display_name: 东财日内异动池（按标的统计接口）
+    limitations:
+    - 由异动明细派生，统计口径未核准；不作为独立外部来源
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-052
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-055:
+    provider: sse
+    endpoint: option_risk
+    parameters: *id004
+    data_kind: table
+    data_frequency: daily
+    request_shape: date_snapshot
+    collection_profile: market_after_close
+    implementation_status: unimplemented
+    display_name: 上交所期权风险指标
+    limitations:
+    - 实际调用option_risk_indicator_sse；日期回退、希腊值和IV口径待核验
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    trading_date_parameter: date
+    evidence_refs:
+    - ASTOCK-055
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-059:
+    provider: eastmoney
+    endpoint: popularity
+    parameters: {}
+    data_kind: snapshot
+    data_frequency: snapshot
+    request_shape: full_snapshot
+    collection_profile: market_intraday
+    implementation_status: blocked
+    display_name: 东财人气榜
+    limitations:
+    - 仅10行item/value，未返回声称的股票排名字段
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-059
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-060:
+    provider: eastmoney
+    endpoint: stock_concept_keyword
+    parameters: *id002
+    data_kind: snapshot
+    data_frequency: snapshot
+    request_shape: single_symbol
+    collection_profile: reference_daily
+    implementation_status: blocked
+    display_name: 东财个股关键词（概念归属未证明）
+    limitations:
+    - 关键词不等于证券-概念成员关系，related子接口失败
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-060
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-061:
+    provider: mofcom
+    endpoint: social_financing
+    parameters: {}
+    data_kind: time_series
+    data_frequency: monthly
+    request_shape: full_snapshot
+    collection_profile: macro_daily
+    implementation_status: unimplemented
+    display_name: 社融历史（商务部站点实测返回）
+    limitations:
+    - 保留统计期与发布时间，不用抓取日期替代；上游真实来源见原始请求
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    - 最新原始响应来自data.mofcom.gov.cn，不标记为人民银行直接接口
+    evidence_refs:
+    - ASTOCK-061
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-062:
+    provider: eastmoney
+    endpoint: pmi
+    parameters: {}
+    data_kind: time_series
+    data_frequency: monthly
+    request_shape: full_snapshot
+    collection_profile: macro_daily
+    implementation_status: unimplemented
+    display_name: PMI历史（AkShare实测接口）
+    limitations:
+    - 保留指标口径和原始来源，不能因原清单标题赋予国家统计局直接来源身份
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-062
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-063:
+    provider: chinabond
+    endpoint: yield_curve
+    parameters:
+      start: *id005
+      end: *id006
+      curve:
+        type: string
+        source: config.curve
+        required: true
+    data_kind: time_series
+    data_frequency: daily
+    request_shape: date_snapshot
+    collection_profile: macro_daily
+    implementation_status: unimplemented
+    display_name: 中债收益率曲线
+    limitations:
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-063
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-064:
+    provider: chinamoney
+    endpoint: repo_fixing
+    parameters:
+      kind:
+        type: string
+        source: config.kind
+        required: true
+        default: FR
+        choices:
+        - FR
+    data_kind: time_series
+    data_frequency: daily
+    request_shape: full_snapshot
+    collection_profile: macro_daily
+    implementation_status: implemented_validation_only
+    display_name: 回购定盘利率
+    limitations:
+    - 原中国货币网CSV归档仅FR全市场定盘；FDR银银间品种未保存匹配证据，候选禁用
+    - 保留九列布局、必填三期限、日期排序和去重校验；标准利率单位待独立认证
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-064
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    dataset: repo_fixing
+    runtime_method: fetch
+    base_requests_per_fetch: 1
+    forbidden_sources:
+    - request.symbol
+    - request.start_date
+    - request.end_date
+    - request.trade_date
+    - config.limit
+    - config.count
+    - request.as_of
+  ASTOCK-065:
+    dataset: lpr_history
+    runtime_method: fetch_lpr_history
+    provider: eastmoney
+    endpoint: lpr
+    parameters: {}
+    data_kind: time_series
+    data_frequency: monthly
+    request_shape: full_snapshot
+    collection_profile: macro_daily
+    implementation_status: implemented_validation_only
+    display_name: LPR
+    limitations:
+    - 原四页1576行回放，保持原脚本过滤LPR1Y为空行，保留旧每日机制与后续月度报价
+    - 利率单位尚未独立认证，标准利率列为空，来源值与被过滤行均留证
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-065
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    base_requests_per_fetch: 4
+    forbidden_sources: [request.symbol, request.start_date, request.end_date, request.trade_date, config.limit, config.count]
+  ASTOCK-066:
+    provider: wallstreetcn
+    endpoint: macro_calendar
+    parameters:
+      start: *id005
+      end: *id006
+      country:
+        type: string
+        source: config.country
+        required: false
+      min_importance:
+        type: integer
+        source: config.min_importance
+        required: false
+        minimum: 0
+    data_kind: event
+    data_frequency: event
+    request_shape: date_snapshot
+    collection_profile: macro_daily
+    implementation_status: unimplemented
+    display_name: 全球宏观日历
+    limitations:
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-066
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-067:
+    provider: csindex
+    endpoint: constituents
+    parameters: &id007
+      index_code:
+        type: string
+        source: request.index_code
+        required: true
+    data_kind: snapshot
+    data_frequency: snapshot
+    request_shape: single_symbol
+    collection_profile: reference_daily
+    implementation_status: unimplemented
+    display_name: 指数成分
+    limitations:
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-067
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-068:
+    provider: csindex
+    endpoint: weights
+    parameters: *id007
+    data_kind: snapshot
+    data_frequency: snapshot
+    request_shape: single_symbol
+    collection_profile: reference_daily
+    implementation_status: unimplemented
+    display_name: 指数权重
+    limitations:
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-068
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-069:
+    provider: script_composite
+    endpoint: index_valuation
+    parameters: *id007
+    data_kind: time_series
+    data_frequency: daily
+    request_shape: single_symbol
+    collection_profile: market_after_close
+    implementation_status: unimplemented
+    display_name: 指数估值
+    limitations:
+    - 来源变体及股本口径未核准，仅保留候选契约
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-069
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-070:
+    dataset: trading_calendar
+    runtime_method: fetch
+    provider: sina
+    endpoint: trading_calendar
+    parameters: {}
+    data_kind: calendar
+    data_frequency: snapshot
+    request_shape: full_snapshot
+    collection_profile: reference_daily
+    implementation_status: implemented_validation_only
+    runtime_endpoint: sina.trading_calendar
+    display_name: 新浪交易日历
+    limitations:
+    - 实际调用tool_trade_date_hist_sina，不作为交易所官方日历
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-070
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+  ASTOCK-071:
+    provider: exchange_composite
+    endpoint: futures_daily
+    parameters: &id009
+      date: *id003
+      exchange: *id008
+    data_kind: time_series
+    data_frequency: daily
+    request_shape: date_snapshot
+    collection_profile: source_market_daily
+    implementation_status: unimplemented
+    display_name: 期货日行情
+    limitations:
+    - 使用各交易所自己的日历；只按原始证据授予交易所范围
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-071
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-072:
+    provider: exchange_composite
+    endpoint: options_daily
+    parameters: *id009
+    data_kind: time_series
+    data_frequency: daily
+    request_shape: date_snapshot
+    collection_profile: source_market_daily
+    implementation_status: unimplemented
+    display_name: 期权日行情
+    limitations:
+    - 使用各交易所自己的日历；只按原始证据授予交易所范围
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-072
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-073:
+    provider: cffex
+    endpoint: position_rank
+    parameters:
+      date: *id003
+      exchange: *id008
+      symbol:
+        type: string
+        source: request.contract
+        required: false
+    data_kind: table
+    data_frequency: daily
+    request_shape: date_snapshot
+    collection_profile: source_market_daily
+    implementation_status: unimplemented
+    display_name: 会员持仓排名
+    limitations:
+    - 本轮只测试CFFEX
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-073
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-074:
+    provider: sina
+    endpoint: futures_quote
+    parameters:
+      symbols:
+        type: strings
+        source: request.contracts
+        required: true
+    data_kind: quote
+    data_frequency: snapshot
+    request_shape: symbol_batch
+    collection_profile: source_market_daily
+    implementation_status: implemented_validation_only
+    display_name: 实时期货
+    limitations:
+    - 复用原新浪快照Provider，原GBK解析、请求UA/Referer、环境代理与10/40秒超时保持
+    - 仅RB0/M0/IF0三合约或hf_CHA50CFD归档；来源时间原样保留，不认证当前盘中或全市场覆盖
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-074
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    dataset: futures_quote
+    runtime_method: fetch_futures
+    base_requests_per_fetch: 1
+    forbidden_sources:
+    - request.symbol
+    - request.start_date
+    - request.end_date
+    - request.trade_date
+    - request.as_of
+    - config.limit
+    - config.count
+  ASTOCK-075:
+    provider: sina
+    endpoint: futures_kline
+    parameters:
+      symbol:
+        type: string
+        source: request.contract
+        required: true
+      start:
+        type: date
+        source: request.start_date
+        required: false
+        applied_at: local_filter
+      end:
+        type: date
+        source: request.end_date
+        required: false
+        applied_at: local_filter
+    data_kind: time_series
+    data_frequency: daily
+    request_shape: single_symbol
+    collection_profile: source_market_daily
+    implementation_status: implemented_validation_only
+    display_name: 期货日 K
+    limitations:
+    - 复用原新浪日线Provider，原完整JSONP响应留证后按请求日期本地筛选；不复权、不拼接真实合约
+    - 仅RB0/M0归档；主力连续代码与实际合约代码身份保留，价格/数量单位待认证
+    - 仅RB0/M0样本；连续合约与实际合约身份分开
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-075
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    dataset: futures_daily
+    runtime_method: fetch_futures_kline
+    base_requests_per_fetch: 1
+    forbidden_sources:
+    - request.symbol
+    - request.trade_date
+    - config.limit
+    - config.count
+  ASTOCK-076:
+    provider: sina
+    endpoint: a50_quote
+    parameters: {}
+    data_kind: quote
+    data_frequency: snapshot
+    request_shape: full_snapshot
+    collection_profile: source_market_daily
+    implementation_status: implemented_validation_only
+    display_name: A50 期指
+    limitations:
+    - 复用原新浪快照Provider，原GBK解析、请求UA/Referer、环境代理与10/40秒超时保持
+    - 仅RB0/M0/IF0三合约或hf_CHA50CFD归档；来源时间原样保留，不认证当前盘中或全市场覆盖
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-076
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    dataset: a50_quote
+    runtime_method: fetch_a50
+    base_requests_per_fetch: 1
+    forbidden_sources:
+    - request.symbol
+    - request.start_date
+    - request.end_date
+    - request.trade_date
+    - request.as_of
+    - config.limit
+    - config.count
+  ASTOCK-077:
+    provider: sge
+    endpoint: spot
+    parameters:
+      instrument:
+        type: string
+        source: request.instrument
+        required: true
+    data_kind: quote
+    data_frequency: snapshot
+    request_shape: single_symbol
+    collection_profile: source_market_daily
+    implementation_status: unimplemented
+    display_name: 上海金现货
+    limitations:
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-077
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-078:
+    dataset: earnings_forecast
+    runtime_method: fetch_event_list
+    provider: eastmoney
+    endpoint: earnings_forecast
+    parameters:
+      code:
+        type: string
+        source: request.symbol
+        required: false
+      report_date:
+        type: date
+        source: request.report_date
+        required: false
+      limit:
+        type: integer
+        source: config.limit
+        required: true
+        default: 100
+        minimum: 1
+        maximum: 5000
+    data_kind: event
+    data_frequency: report_period
+    request_shape: paged_list
+    collection_profile: event_daily
+    implementation_status: implemented_validation_only
+    display_name: 业绩预告
+    limitations:
+    - 归档仅验证全市场最近50条；不是全部事件覆盖，机构调研仅汇总模式
+    - 保留原成功测试的会话、默认请求头、代理和重试，单位未独立认证
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-078
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    forbidden_sources: [request.start_date, request.end_date, request.trade_date, config.detail, config.count]
+  ASTOCK-079:
+    dataset: institution_survey
+    runtime_method: fetch_event_list
+    provider: eastmoney
+    endpoint: institution_survey
+    parameters:
+      code:
+        type: string
+        source: request.symbol
+        required: false
+      start:
+        type: date
+        source: request.start_date
+        required: false
+      end:
+        type: date
+        source: request.end_date
+        required: false
+      detail:
+        type: boolean
+        source: config.detail
+        required: true
+        default: false
+        choices: [false]
+      limit:
+        type: integer
+        source: config.limit
+        required: true
+        default: 100
+        minimum: 1
+        maximum: 5000
+    data_kind: event
+    data_frequency: event
+    request_shape: paged_list
+    collection_profile: event_daily
+    implementation_status: implemented_validation_only
+    display_name: 机构调研
+    limitations:
+    - 归档仅验证全市场最近50条；不是全部事件覆盖，机构调研仅汇总模式
+    - 保留原成功测试的会话、默认请求头、代理和重试，单位未独立认证
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-079
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    forbidden_sources: [request.report_date, request.trade_date, config.count]
+  ASTOCK-080:
+    dataset: holder_trades
+    runtime_method: fetch_action_list
+    provider: eastmoney
+    endpoint: holder_trades
+    parameters:
+      code:
+        type: string
+        source: request.symbol
+        required: false
+      start:
+        type: date
+        source: request.start_date
+        required: false
+      end:
+        type: date
+        source: request.end_date
+        required: false
+      direction:
+        type: string
+        source: config.direction
+        required: false
+        choices: [增持, 减持]
+      limit:
+        type: integer
+        source: config.limit
+        required: true
+        default: 100
+        minimum: 1
+        maximum: 5000
+    data_kind: event
+    data_frequency: event
+    request_shape: paged_list
+    collection_profile: event_daily
+    implementation_status: implemented_validation_only
+    display_name: 股东增减持
+    limitations:
+    - 仅回放原成功样本的有界结果；不认证当前可用性或全部历史/市场覆盖
+    - 量额单位未独立认证，原字段留证；质押统计日不冒充交易日，新股保留未来排期
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-080
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    forbidden_sources: [request.trade_date, request.report_date, request.statistic_date, config.progress, config.count]
+  ASTOCK-081:
+    dataset: buyback
+    runtime_method: fetch_action_list
+    provider: eastmoney
+    endpoint: buyback
+    parameters:
+      code:
+        type: string
+        source: request.symbol
+        required: false
+      progress:
+        type: string
+        source: config.progress
+        required: false
+        choices: [董事会预案, 股东大会通过, 股东大会否决, 实施中, 停止实施, 完成实施]
+      limit:
+        type: integer
+        source: config.limit
+        required: true
+        default: 100
+        minimum: 1
+        maximum: 5000
+    data_kind: event
+    data_frequency: event
+    request_shape: paged_list
+    collection_profile: event_daily
+    implementation_status: implemented_validation_only
+    display_name: 股票回购
+    limitations:
+    - 仅回放原成功样本的有界结果；不认证当前可用性或全部历史/市场覆盖
+    - 量额单位未独立认证，原字段留证；质押统计日不冒充交易日，新股保留未来排期
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-081
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    forbidden_sources: [request.start_date, request.end_date, request.trade_date, request.statistic_date, config.direction, config.count]
+  ASTOCK-082:
+    dataset: pledge
+    runtime_method: fetch_action_list
+    provider: eastmoney
+    endpoint: pledge
+    parameters:
+      code:
+        type: string
+        source: request.symbol
+        required: false
+      date:
+        type: date
+        source: request.statistic_date
+        required: false
+      limit:
+        type: integer
+        source: config.limit
+        required: true
+        default: 100
+        minimum: 1
+        maximum: 5000
+    data_kind: event
+    data_frequency: event
+    request_shape: paged_list
+    collection_profile: event_daily
+    implementation_status: implemented_validation_only
+    display_name: 股权质押
+    limitations:
+    - 仅回放原成功样本的有界结果；不认证当前可用性或全部历史/市场覆盖
+    - 量额单位未独立认证，原字段留证；质押统计日不冒充交易日，新股保留未来排期
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-082
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    base_requests_per_fetch: 2
+    forbidden_sources: [request.start_date, request.end_date, request.trade_date, request.report_date, config.direction, config.progress, config.count]
+  ASTOCK-083:
+    dataset: ipo_calendar
+    runtime_method: fetch_action_list
+    provider: eastmoney
+    endpoint: ipo_calendar
+    parameters:
+      limit:
+        type: integer
+        source: config.limit
+        required: true
+        default: 100
+        minimum: 1
+        maximum: 5000
+    data_kind: event
+    data_frequency: event
+    request_shape: paged_list
+    collection_profile: event_daily
+    implementation_status: implemented_validation_only
+    display_name: 新股申购日历
+    limitations:
+    - 仅回放原成功样本的有界结果；不认证当前可用性或全部历史/市场覆盖
+    - 量额单位未独立认证，原字段留证；质押统计日不冒充交易日，新股保留未来排期
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-083
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    forbidden_sources: [request.symbol, request.start_date, request.end_date, request.trade_date, request.statistic_date, config.count]
+  ASTOCK-084:
+    provider: eastmoney
+    endpoint: convertible_bonds
+    parameters:
+      include_delisted:
+        type: boolean
+        source: config.include_delisted
+        required: true
+        default: false
+    data_kind: snapshot
+    data_frequency: snapshot
+    request_shape: full_snapshot
+    collection_profile: reference_daily
+    implementation_status: implemented_validation_only
+    display_name: 可转债
+    limitations:
+    - 复用原财务Provider的三页全表与quoteColumns参数，1059条来源按原规则保留322条、排除737条
+    - 离线状态使用原响应捕获日北京时间2026-10-01，不把今天的上市或摘牌状态套到历史报价
+    - include_delisted可配置，原已摘牌数据全部保留；量额及比率单位待独立认证
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-084
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    dataset: convertible_bonds
+    runtime_method: fetch_convertible_bonds
+    base_requests_per_fetch: 3
+    forbidden_sources:
+    - request.symbol
+    - request.start_date
+    - request.end_date
+    - request.trade_date
+    - config.limit
+    - config.count
+    - request.as_of
+  ASTOCK-085:
+    provider: sina
+    endpoint: dragon_tiger_daily
+    parameters: *id004
+    data_kind: event
+    data_frequency: daily
+    request_shape: date_snapshot
+    collection_profile: market_after_close
+    implementation_status: unimplemented
+    display_name: 新浪龙虎榜备用（实测来源）
+    limitations:
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    trading_date_parameter: date
+    evidence_refs:
+    - ASTOCK-085
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-086:
+    provider: ths
+    endpoint: individual_fund_flow
+    parameters:
+      period:
+        type: string
+        source: config.period
+        required: true
+        default: 即时
+        choices:
+        - 即时
+    data_kind: snapshot
+    data_frequency: snapshot
+    request_shape: paged_list
+    collection_profile: market_intraday
+    implementation_status: blocked
+    display_name: 资金流备胎
+    limitations:
+    - 105页请求仅取得16次响应后安全停止；没有完整解析结果
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-086
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-087:
+    provider: eastmoney
+    endpoint: announcements
+    parameters:
+      code: *id001
+      start: *id005
+      end: *id006
+    data_kind: document_index
+    data_frequency: snapshot
+    request_shape: single_symbol
+    collection_profile: event_daily
+    implementation_status: unimplemented
+    display_name: 公告备胎
+    limitations:
+    - 仅解析输出，缺精确原始响应；回退的全市场公告不能标成单票接口
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    evidence_refs:
+    - ASTOCK-087
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  ASTOCK-088:
+    provider: exchange_composite
+    endpoint: margin_detail
+    parameters: *id010
+    data_kind: table
+    data_frequency: daily
+    request_shape: date_snapshot
+    collection_profile: market_after_close
+    implementation_status: alias
+    display_name: 官方两融备胎
+    limitations:
+    - 与融资融券明细复用同一脚本，不当作独立备用来源
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    canonical_input: ASTOCK-024
+    trading_date_parameter: date
+    evidence_refs:
+    - ASTOCK-088
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: unimplemented
+  SDA-BOARD-001:
+    provider: ths
+    endpoint: industry_directory
+    display_name: AkShare.stock_board_industry_name_ths()
+    data_kind: snapshot
+    data_frequency: snapshot
+    request_shape: full_snapshot
+    collection_profile: reference_daily
+    parameters: {}
+    implementation_status: implemented_validation_only
+    dataset: industry_directory
+    runtime_method: fetch_industry_list
+    runtime_endpoint: akshare.industry_index_daily
+    limitations:
+    - 行业目录不等于证券概念归属；单位不适用
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    base_requests_per_fetch: 1
+    evidence_refs:
+    - SDA-BOARD-001
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+  SDA-BOARD-002:
+    provider: ths
+    endpoint: industry_index_daily
+    display_name: AkShare.stock_board_industry_index_ths(symbol=..., start_date=..., end_date=...)
+    data_kind: time_series
+    data_frequency: daily
+    request_shape: single_symbol
+    collection_profile: market_after_close
+    parameters:
+      board_name:
+        type: string
+        source: request.board_name
+        required: true
+      start_date: *id005
+      end_date: *id006
+      board_code:
+        type: string
+        source: dependency.board_code
+        required: false
+    implementation_status: implemented_validation_only
+    dataset: industry_index_daily
+    runtime_method: fetch_industry_daily
+    runtime_endpoint: akshare.industry_index_daily
+    limitations:
+    - 只测一个板块和窗口；成交量/成交额单位未确认
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    base_requests_per_fetch: 1
+    evidence_refs:
+    - SDA-BOARD-002
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+  SDA-BOARD-003:
+    provider: ths
+    endpoint: industry_fund_flow
+    display_name: AkShare.stock_fund_flow_industry(symbol='即时')
+    data_kind: snapshot
+    data_frequency: snapshot
+    request_shape: paged_list
+    collection_profile: market_intraday
+    parameters:
+      board_type:
+        type: string
+        source: config.board_type
+        required: true
+        default: industry
+        choices: [industry]
+      period:
+        type: string
+        source: config.period
+        required: true
+        default: 即时
+        choices:
+        - 即时
+    implementation_status: implemented_validation_only
+    dataset: board_fund_flow
+    runtime_method: fetch_fund_flow
+    runtime_endpoint: akshare.industry_fund_flow
+    limitations:
+    - 快照无逐行日期；金额单位未确认；不是历史资金流
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    base_requests_per_fetch: 1
+    evidence_refs:
+    - SDA-BOARD-003
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+  SDA-BOARD-004:
+    provider: ths
+    endpoint: concept_fund_flow
+    display_name: AkShare.stock_fund_flow_concept(symbol='即时')
+    data_kind: snapshot
+    data_frequency: snapshot
+    request_shape: paged_list
+    collection_profile: market_intraday
+    parameters:
+      board_type:
+        type: string
+        source: config.board_type
+        required: true
+        default: concept
+        choices: [concept]
+      period:
+        type: string
+        source: config.period
+        required: true
+        default: 即时
+        choices:
+        - 即时
+    implementation_status: implemented_validation_only
+    dataset: board_fund_flow
+    runtime_method: fetch_fund_flow
+    runtime_endpoint: akshare.concept_fund_flow
+    limitations:
+    - 不是证券-概念成员关系；无逐行日期；金额单位未确认
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    base_requests_per_fetch: 1
+    evidence_refs:
+    - SDA-BOARD-004
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+  SDA-BOARD-005:
+    provider: baostock
+    endpoint: security_snapshot
+    display_name: BaoStock.query_all_stock(day='2026-09-30')
+    data_kind: snapshot
+    data_frequency: snapshot
+    request_shape: full_snapshot
+    collection_profile: reference_daily
+    parameters:
+      trade_date:
+        type: date
+        source: request.trade_date
+        required: true
+      symbols:
+        type: strings
+        source: request.symbols
+        required: false
+        applied_at: local_filter
+    implementation_status: implemented_validation_only
+    dataset: security_snapshot
+    runtime_method: fetch_snapshot
+    forbidden_sources: [request.symbol]
+    runtime_endpoint: baostock.industry_membership
+    limitations:
+    - 通过代码/交易所规则筛选得到沪深A股证券集合；BaoStock TCP原始帧不对SDK调用方开放。2026-10-02非交易日空返回已保存在 provider_validation/results/live-probes/baostock-industry-20261003/result.json。
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    base_requests_per_fetch: 2
+    trading_date_parameter: trade_date
+    evidence_refs:
+    - SDA-BOARD-005
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+  SDA-BOARD-006:
+    provider: baostock
+    endpoint: industry_membership
+    display_name: BaoStock.query_stock_industry(date='2026-09-30')
+    data_kind: snapshot
+    data_frequency: snapshot
+    request_shape: full_snapshot
+    collection_profile: reference_daily
+    parameters:
+      trade_date:
+        type: date
+        source: request.trade_date
+        required: true
+      symbols:
+        type: strings
+        source: request.symbols
+        required: false
+        applied_at: local_filter
+    implementation_status: implemented_validation_only
+    dataset: industry_membership
+    runtime_method: fetch_snapshot
+    forbidden_sources: [request.symbol]
+    runtime_endpoint: baostock.industry_membership
+    limitations:
+    - 已归档query_stock_industry SDK解码字段与原始行；缺失2只，因此覆盖不完整。BaoStock TCP原始帧不对SDK调用方开放。2026-10-02非交易日空返回已单独留档。
+    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    base_requests_per_fetch: 2
+    trading_date_parameter: trade_date
+    evidence_refs:
+    - SDA-BOARD-006
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only

@@ -1,0 +1,17 @@
+dataset:
+  name: sina_global_news
+  display_name: 新浪全球财经资讯输入
+  primary_key:
+  - snapshot_at
+  - news_time
+  - content
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  news_time:
+    type: datetime
+    required: true
+  content:
+    type: string
+    required: true

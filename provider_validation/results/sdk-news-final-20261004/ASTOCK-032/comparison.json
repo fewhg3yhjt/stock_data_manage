@@ -1,0 +1,14 @@
+{
+  "input_id": "ASTOCK-032",
+  "row_count": 20,
+  "mode": "offline_replay",
+  "all_business_fields_equal": true,
+  "all_retained_source_fields_equal": true,
+  "request_comparison_equal": true,
+  "original_csv_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\30_财联社电报\\data.csv",
+  "original_csv_sha256": "4b9bd8347e31fb383ca436b3fe7d6020fb46536bc398e4f0f7127ff80c2188cd",
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sdk-news-final-20261004\\ASTOCK-032\\original-parsed.json",
+  "original_parsed_sha256": "7bd816a197442e13baab2fa38adb45581153bf9e1ea62c142219d841358282f2",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sdk-news-final-20261004\\ASTOCK-032\\candidate\\ASTOCK-032-9e3d8cb585d0\\2026-10-04\\input_report\\cls\\telegraph\\report.json",
+  "report_sha256": "58413d22a5ddcbb852142ecd564f60e88b34e9f7b0bc62a6c66f418f1bcad62c"
+}

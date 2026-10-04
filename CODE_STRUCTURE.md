@@ -164,6 +164,10 @@ BaoStock 后续两项转换见 `provider_validation/docs/2026-10-04-baostock-inp
 
 ## 迁移约束
 
+- `providers/cls/{__init__,news}.py` 与 `providers/sina/news.py`：必要新闻适配器，沿用原成功 SDK 请求与解析；财联社的回放查询时钟仅用于归档重放。
+- `config/{datasets,normalization}/{cls_telegraph,sina_global_news}.yaml`：两新闻输入的标准字段及来源映射；现有 `providers/transport.py` 显式补原探测主机暂停，默认不影响其他输入，`storage/raw.py` 将 `sign` 纳入脱敏。
+- 原验证入口增加 `--verify-sdk-news`；`provider_validation/docs/2026-10-04-sdk-news-input-collection.md` 和 `results/sdk-news-*-20261004*` 保存修改前快照、原结果对照、异常/暂停/缓存夹具、实际入口、回归及最终哈希审计。当前34项候选、30项待转换、7项阻断、3项别名。
+
 - 旧的根级模块路径已经删除，不保留兼容转发模块。
 - 新功能必须进入对应设计模块，不能在包根目录继续增加散落模块。
 - 目录调整只改变模块归属和导入路径，不改变现有业务行为。

@@ -53,9 +53,14 @@ class RequestsTransport:
 _REQUEST_CAPTURE_LOCK = Lock()
 
 
+class HostPausedError(ConnectionError):
+    """Same failure boundary as the successful rate-limited source probe."""
+
+
 @contextmanager
 def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
-                      replay_manifest=None, evidence_roots=(), max_age_seconds=0, sdk_retry_policy=False):
+                      replay_manifest=None, evidence_roots=(), max_age_seconds=0, sdk_retry_policy=False,
+                      probe_host_pause=False):
     """Serialized single-input capture/replay. Session identity, proxies and request arguments are retained.
 
     SDK session policy matches the saved conservative probe. Internal urllib3 retries
@@ -74,6 +79,7 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
             if record.get("event") == "http_response":
                 replay_records.append((number, record))
     used = set()
+    consecutive_errors, paused_hosts = {}, {}
     with _REQUEST_CAPTURE_LOCK:
         original_send, original_init = requests.Session.send, requests.Session.__init__
         scope = sanitized_metadata(scope)
@@ -88,6 +94,17 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
             return response
 
         def send(session, request, **kwargs):
+            host = (urlsplit(request.url).hostname or "unknown").lower()
+            if probe_host_pause and host in paused_hosts:
+                store.append_event({"event": "host_paused", "provider": provider, "endpoint": endpoint,
+                    "host": host, "reason": paused_hosts[host], "scope": scope, "code_version": code_version,
+                    "fetched_at_utc": datetime.now(timezone.utc).isoformat()})
+                raise HostPausedError(f"Probe host paused: {host}: {paused_hosts[host]}")
+            def transport_error():
+                if probe_host_pause:
+                    consecutive_errors[host] = consecutive_errors.get(host, 0) + 1
+                    if consecutive_errors[host] >= 2:
+                        paused_hosts[host] = "two consecutive transport errors"
             source_ref = None
             mode = "live"
             if replay_manifest:
@@ -101,6 +118,7 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                 source_ref = {"manifest": str(replay_manifest.resolve()), "line": number,
                               "fetched_at_utc": record.get("fetched_at_utc")}
                 if record.get("outcome") == "transport_error":
+                    transport_error()
                     store.append_event({"event": "http_response", "mode": "replay", "outcome": "transport_error",
                                         "url": sanitized_url(request.url), "method": request.method,
                                         "request_headers": sanitized_headers(request.headers),
@@ -126,6 +144,7 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                         with pacer.request(host):
                             response = original_send(session, request, **kwargs)
                     except Exception as exc:
+                        transport_error()
                         store.append_event({"event": "http_response", "mode": "live", "outcome": "transport_error",
                             "url": sanitized_url(request.url), "method": request.method,
                             "request_headers": sanitized_headers(request.headers), "scope": scope,
@@ -138,8 +157,19 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                 code_version=code_version, mode=mode, source_ref=source_ref,
                 request_options={"timeout": kwargs.get("timeout"), "allow_redirects": kwargs.get("allow_redirects", True),
                                  "trust_env": session.trust_env, "proxies": kwargs.get("proxies", {}),
-                                 "sdk_retry_policy": sdk_retry_policy})
+                                 "sdk_retry_policy": sdk_retry_policy,
+                                 "probe_host_pause": probe_host_pause})
             events.append(event)
+            if probe_host_pause:
+                status = int(response.status_code or 0)
+                if status in {403, 429}:
+                    paused_hosts[host] = f"HTTP {status}; no further requests to this host in this run"
+                elif status >= 500:
+                    consecutive_errors[host] = consecutive_errors.get(host, 0) + 1
+                    if consecutive_errors[host] >= 2:
+                        paused_hosts[host] = f"{consecutive_errors[host]} consecutive server errors"
+                else:
+                    consecutive_errors[host] = 0
             return response
 
         class ConservativeRetry(Retry):

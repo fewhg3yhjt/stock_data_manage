@@ -1,0 +1,14 @@
+{
+  "input_id": "ASTOCK-033",
+  "row_count": 20,
+  "mode": "offline_replay",
+  "all_business_fields_equal": true,
+  "all_retained_source_fields_equal": true,
+  "request_comparison_equal": true,
+  "original_csv_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\31_全球资讯\\data.csv",
+  "original_csv_sha256": "36507fdc2641835b9c142b85986a5830ec17d306dab2e2d23af338391fc6381b",
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sdk-news-final-20261004\\ASTOCK-033\\original-parsed.json",
+  "original_parsed_sha256": "2c2b2a37b10417e7c7a4534c2c5bc52b338437f116411b195f1f425a9c348900",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sdk-news-final-20261004\\ASTOCK-033\\candidate\\ASTOCK-033-018ac7a46b3b\\2026-10-04\\input_report\\sina\\global_news\\report.json",
+  "report_sha256": "69d2a7302f9feb569915aa4bf7ba70cd4536ab086bac27406633d784fbb8a018"
+}

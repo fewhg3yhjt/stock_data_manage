@@ -205,3 +205,16 @@
 /src/stock_data_manage/providers/sina/snapshot.py text eol=lf
 /src/stock_data_manage/providers/sina/daily.py text eol=lf
 /provider_validation/docs/2026-10-04-sina-futures-input-collection.md text eol=lf
+
+# SDK news inputs and exact evidence bytes.
+/provider_validation/results/sdk-news-*-20261004/** -text whitespace=cr-at-eol
+/provider_validation/results/sdk-news-*-20261004/**/*.bin binary
+/provider_validation/results/sdk-news-*-20261004-*.xml -text whitespace=-blank-at-eol,cr-at-eol
+/provider_validation/results/sdk-news-*-20261004-*.json -text whitespace=cr-at-eol
+/config/datasets/cls_telegraph.yaml text eol=lf
+/config/normalization/cls_telegraph.yaml text eol=lf
+/config/datasets/sina_global_news.yaml text eol=lf
+/config/normalization/sina_global_news.yaml text eol=lf
+/src/stock_data_manage/providers/cls/*.py text eol=lf
+/src/stock_data_manage/providers/sina/news.py text eol=lf
+/provider_validation/docs/2026-10-04-sdk-news-input-collection.md text eol=lf

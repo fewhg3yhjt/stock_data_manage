@@ -1,0 +1,191 @@
+{
+  "validation_time_utc": "2026-10-04T01:41:39.491800+00:00",
+  "mode": "offline_replay",
+  "network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "verification_code": {
+    "path": "tests/test_input_collection.py",
+    "sha256": "c2ac41d102c67ebafe8040f34ce69b01c0acbdab6cfb1340d82d07901b0af4ae"
+  },
+  "runner": {
+    "path": "provider_validation/tests/replay_input_capabilities.py",
+    "sha256": "b8b3c8c61aa19ff96093a5ca16bf006192d641b7f1cd8c78b980809feb95aeb7"
+  },
+  "inputs": [
+    {
+      "input_id": "ASTOCK-032",
+      "report_path": "provider_validation/results/sdk-news-final-20261004/ASTOCK-032/candidate/ASTOCK-032-9e3d8cb585d0/2026-10-04/input_report/cls/telegraph/report.json",
+      "report_sha256": "58413d22a5ddcbb852142ecd564f60e88b34e9f7b0bc62a6c66f418f1bcad62c",
+      "source_manifest": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+      "source_manifest_sha256": "885abd6bf1c4b809b9029759f61b75c7d6a297755fd76ca6c545720db38a6767",
+      "row_count": 20,
+      "scope": {},
+      "code_version": "7f377c3a82a332765117cbf3f1be3dd4556f19be5c8b81372716b85a21c57c15",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-033",
+      "report_path": "provider_validation/results/sdk-news-final-20261004/ASTOCK-033/candidate/ASTOCK-033-018ac7a46b3b/2026-10-04/input_report/sina/global_news/report.json",
+      "report_sha256": "69d2a7302f9feb569915aa4bf7ba70cd4536ab086bac27406633d784fbb8a018",
+      "source_manifest": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+      "source_manifest_sha256": "885abd6bf1c4b809b9029759f61b75c7d6a297755fd76ca6c545720db38a6767",
+      "row_count": 20,
+      "scope": {},
+      "code_version": "420549c5a5b4c939bd2a7b099946f9c3a537ca80d98cded4995d6bd0e51c8500",
+      "result": "passed"
+    }
+  ],
+  "original_vs_provider": [
+    {
+      "input_id": "ASTOCK-032",
+      "row_count": 20,
+      "mode": "offline_replay",
+      "all_business_fields_equal": true,
+      "all_retained_source_fields_equal": true,
+      "request_comparison_equal": true,
+      "original_csv_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\30_财联社电报\\data.csv",
+      "original_csv_sha256": "4b9bd8347e31fb383ca436b3fe7d6020fb46536bc398e4f0f7127ff80c2188cd",
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sdk-news-final-20261004\\ASTOCK-032\\original-parsed.json",
+      "original_parsed_sha256": "7bd816a197442e13baab2fa38adb45581153bf9e1ea62c142219d841358282f2",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sdk-news-final-20261004\\ASTOCK-032\\candidate\\ASTOCK-032-9e3d8cb585d0\\2026-10-04\\input_report\\cls\\telegraph\\report.json",
+      "report_sha256": "58413d22a5ddcbb852142ecd564f60e88b34e9f7b0bc62a6c66f418f1bcad62c"
+    },
+    {
+      "input_id": "ASTOCK-033",
+      "row_count": 20,
+      "mode": "offline_replay",
+      "all_business_fields_equal": true,
+      "all_retained_source_fields_equal": true,
+      "request_comparison_equal": true,
+      "original_csv_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\31_全球资讯\\data.csv",
+      "original_csv_sha256": "36507fdc2641835b9c142b85986a5830ec17d306dab2e2d23af338391fc6381b",
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sdk-news-final-20261004\\ASTOCK-033\\original-parsed.json",
+      "original_parsed_sha256": "2c2b2a37b10417e7c7a4534c2c5bc52b338437f116411b195f1f425a9c348900",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sdk-news-final-20261004\\ASTOCK-033\\candidate\\ASTOCK-033-018ac7a46b3b\\2026-10-04\\input_report\\sina\\global_news\\report.json",
+      "report_sha256": "69d2a7302f9feb569915aa4bf7ba70cd4536ab086bac27406633d784fbb8a018"
+    }
+  ],
+  "known_differences": [
+    "两来源各20条真实归档回放，原SDK请求/字段/顺序/北京时间/CSV逐项对照。",
+    "原架构无新闻适配器，仅补必要来源Provider及字段模板；新浪成功分支接入，未认证东财备用分支不接入。",
+    "保留原SDK和探测脚本Session、代理、无显式超时、两次适配器重试及主机暂停；CLS原十次外层重试及退避保持。",
+    "回放只绑定CLS原查询截止时钟；签名按原算法生成，留证脱敏；实时分支保持当前时钟。",
+    "主机暂停与原探测脚本直接对照；重试恢复、会话/cache均为合成或注入夹具，不认证当前在线能力。",
+    "最近20条不代表历史或全量资讯；没有真实新请求、生产写入、调度或正式路由启用。"
+  ],
+  "negative_checks": [
+    {
+      "input_id": "ASTOCK-032",
+      "mutation": "business",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/sdk-news-final-20261004/f0/candidate/ASTOCK-032-e9c7de340c1e/2026-10-04/input_report/cls/telegraph/report.json",
+      "report_sha256": "9838494f67fbd6d3e8e9f6e01330e1b3c22cfd58aa0e5190d819f437e25f732e",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-032",
+      "mutation": "empty",
+      "failure_class": "KeyError",
+      "report_path": "provider_validation/results/sdk-news-final-20261004/f1/candidate/ASTOCK-032-0181742d68c7/2026-10-04/input_report/cls/telegraph/report.json",
+      "report_sha256": "8dfb4691f370d748fec1af2a7e828262187576a49700b085dd7e22d1599edf97",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-032",
+      "mutation": "content",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/sdk-news-final-20261004/f2/candidate/ASTOCK-032-53961bf22cd1/2026-10-04/input_report/cls/telegraph/report.json",
+      "report_sha256": "401e09d9d6b4f6fecb6065e028c4bd484d6b6c3c54fdcd3336c88da980a24ad6",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-032",
+      "mutation": "time",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/sdk-news-final-20261004/f3/candidate/ASTOCK-032-9cc2c78926ea/2026-10-04/input_report/cls/telegraph/report.json",
+      "report_sha256": "bc7b1dc44df6bf673f4cd6783b8858811d8a9c69142e5cce1b4257e2937834f4",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-032",
+      "mutation": "duplicate",
+      "failure_class": "NormalizationError",
+      "report_path": "provider_validation/results/sdk-news-final-20261004/f4/candidate/ASTOCK-032-32d5470f818f/2026-10-04/input_report/cls/telegraph/report.json",
+      "report_sha256": "18d3d63fb270f4fc51119cddc505d5bbfb7d056da43b82f2e57a110fd2ed0650",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-032",
+      "mutation": "schema",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/sdk-news-final-20261004/f5/candidate/ASTOCK-032-761a6d2c84a5/2026-10-04/input_report/cls/telegraph/report.json",
+      "report_sha256": "ec6fb0e6a48ca45887675d7b3d1a19d0b380d624525bbe581e9e10247e127013",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-032",
+      "mutation": "http403",
+      "failure_class": "HostPausedError",
+      "report_path": "provider_validation/results/sdk-news-final-20261004/f6/candidate/ASTOCK-032-ad179f1a9b06/2026-10-04/input_report/cls/telegraph/report.json",
+      "report_sha256": "5932a7062598297bb4d23b5a6c50c9f72f8d89f9951549a4fe39534d6be1e8f9",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-033",
+      "mutation": "business",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/sdk-news-final-20261004/f7/candidate/ASTOCK-033-61cab9a6e287/2026-10-04/input_report/sina/global_news/report.json",
+      "report_sha256": "d4d481b192403d1a7ecc0f5f26ff8139f124b6ca8868b8119ae5b30ffecfa27c",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-033",
+      "mutation": "empty",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/sdk-news-final-20261004/f8/candidate/ASTOCK-033-ca6d77d4d81f/2026-10-04/input_report/sina/global_news/report.json",
+      "report_sha256": "8afe315f8e7c20719ebacf41cfd399747800e0b2a281cc097ad812afa2ed2224",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-033",
+      "mutation": "content",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/sdk-news-final-20261004/f9/candidate/ASTOCK-033-8842923e3756/2026-10-04/input_report/sina/global_news/report.json",
+      "report_sha256": "ee8a28b396090a8762d959bd46d3dec0bef2c7b644049e4b8beeacd8561c689a",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-033",
+      "mutation": "time",
+      "failure_class": "ValueError",
+      "report_path": "provider_validation/results/sdk-news-final-20261004/f10/candidate/ASTOCK-033-8cf507c7dfaa/2026-10-04/input_report/sina/global_news/report.json",
+      "report_sha256": "d5eb3c46877c5a57cac9575a750b8e5ea1e005cd54cacb1fb7f0568574fb9f24",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-033",
+      "mutation": "duplicate",
+      "failure_class": "NormalizationError",
+      "report_path": "provider_validation/results/sdk-news-final-20261004/f11/candidate/ASTOCK-033-00c51732413d/2026-10-04/input_report/sina/global_news/report.json",
+      "report_sha256": "7211820cc5ec47b97290debd25ec27a9a491fdd48c257f9216a5352152fffebd",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-033",
+      "mutation": "schema",
+      "failure_class": "KeyError",
+      "report_path": "provider_validation/results/sdk-news-final-20261004/f12/candidate/ASTOCK-033-32c9087d6c2d/2026-10-04/input_report/sina/global_news/report.json",
+      "report_sha256": "e348820b325cd8affda0eb685840ab7aea89b318f56c6b68b96d27dafdb5e479",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-033",
+      "mutation": "http403",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/sdk-news-final-20261004/f13/candidate/ASTOCK-033-ff9d119c9d98/2026-10-04/input_report/sina/global_news/report.json",
+      "report_sha256": "71359ce96e7be3b2cf86f5008a5601f06db6e39564b84c3cc2cf395cc4326123",
+      "result": "passed"
+    }
+  ]
+}

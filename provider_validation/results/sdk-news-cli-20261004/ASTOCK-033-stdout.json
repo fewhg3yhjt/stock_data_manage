@@ -1,0 +1,325 @@
+{
+  "input_id": "ASTOCK-033",
+  "dataset": "sina_global_news",
+  "mode": "replay",
+  "parameters": {},
+  "provider": "sina",
+  "endpoint": "global_news",
+  "collection_profile": {
+    "name": "news_intraday",
+    "mode": "intraday",
+    "refresh_interval_seconds": 300,
+    "business_day": "calendar_day",
+    "scheduling_enabled": false,
+    "frequency_unit": null,
+    "frequency_interval": 1,
+    "at_time": null,
+    "anchor_date": null,
+    "settle_delay_seconds": 0,
+    "trigger_grace_seconds": 30,
+    "universe": "static",
+    "max_symbols": null
+  },
+  "request_interval_seconds": 3,
+  "effective_concurrency": 1,
+  "request_limit_enforcement": "call_boundary_only",
+  "adapter_version": "sina-global-news-input-v1",
+  "code_version": "420549c5a5b4c939bd2a7b099946f9c3a537ca80d98cded4995d6bd0e51c8500",
+  "code_files": [
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\pipeline\\inputs.py",
+      "sha256": "4edf6e164f10f6260b2f794dfc35f38130cc12bc6dec1b9ce581fd3e509ea1ee"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\cli.py",
+      "sha256": "582f5caedfc538a012d7a2f6e8cd7af3fe8b6fc9152e5b9e0a3fa2cb8810ae19"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\config\\loader.py",
+      "sha256": "93bb55ab150c88751fe9a58a2b75737878c1b0f07233b8ec47009c4901bb11e9"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\contracts.py",
+      "sha256": "a4b16abc7e3686a4eb2791dcd4545fb2404e0214bf32e20db19d2582d39ea447"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\quality\\normalization.py",
+      "sha256": "3ed0d663b7fda9ac6cdf7f1252435f2351c783af3244ccba2c2b0f3891e29b3e"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\transport.py",
+      "sha256": "58eeb29069ace26ab1868ada39bea73dd64e0e678163a861c90b904658f6513a"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\storage\\raw.py",
+      "sha256": "3b803525f5b275119ca7af3b05d151fedaeecbe12abf484efe1de3af8994793d"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\routing\\factory.py",
+      "sha256": "1c1907fc47037375b5f2c87316df25b9d399c20c383951311e27c52d587ceefd"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\daily.py",
+      "sha256": "487a14fcbfc47146d6d5fd291fbf41667aba435e5fed22ea1ef61ded513fcaa7"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\minute.py",
+      "sha256": "ff5cf1e91327bcab2e072bcfae9f1f77dca71a84ba26e456c26580a4d59d9cc1"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\snapshot.py",
+      "sha256": "3278cadac776fe8cfe5d02775a5bf8f53bc1cb96c595a5f418172f53047434bf"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\limit_pool.py",
+      "sha256": "2fbdfe3da3129545dfe8d2e457be7c42225696ddd74270567ae765e4b413f5ae"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\shareholder.py",
+      "sha256": "4c9d80f4d51845ac5541c42275f44f2a18643db5e9ccb705a3e16168f8db44c1"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\financial.py",
+      "sha256": "6a8b8ae6d5740c78a7456697964ec07f3728f870d51f5237d2b409199081971b"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\wallstreetcn\\news.py",
+      "sha256": "705de425d8526ced4e866d9beaf4c571c443c4955117c0cccada30ee06e07eea"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\cctv\\news.py",
+      "sha256": "8839bdeed801611e8e6d11cb9441e6ede7bc94d56507eaa2c903e605c772ee7d"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\cls\\news.py",
+      "sha256": "51da559a252b67a4a2e58171e3630ff1a5a80cd2bc23aa5df30a7e17ac02ad30"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\news.py",
+      "sha256": "822454e50d8ed60eef2b90d6ad6c0a8ff417eaa4ae2dee556d8137a58fab46a0"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\chinamoney\\rates.py",
+      "sha256": "e7407f1d4272b69cb439bb0a7bad3960b65bb41328d752f541bc8ef50231f922"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\dividend.py",
+      "sha256": "5706a8cdb37eeeb8f66cb033a3091dd1b6ec1ed83d72d0f9fbeb8f5c75d9649b"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\fund_flow.py",
+      "sha256": "0cf655efa0854d18651bb4f04f985f0f210b81a6d9eff065604d235ed8f75280"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\realtime.py",
+      "sha256": "6e09d2a5014cf316c4d1e26e913a44d5c2fbad95fb44d95cba159ef881f03bca"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\calendar.py",
+      "sha256": "3d114045f960bfcc94ade1ee03e4d25ebdf6980ba68aa2d0a2236bed78aaef05"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\snapshot.py",
+      "sha256": "cfa0b823b2fa8053ce899157e9b6078b94516d3fabd5d303480824111f62d136"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\daily.py",
+      "sha256": "f9793bf9f5b8d77411abe459b285fc25892c840ff0962133e6b7c3ef628b2c92"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\akshare\\boards.py",
+      "sha256": "2060f150831cebaf707ed5becedc35428bc41d4428bab31555ed1d2bf817d122"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\baostock\\industry.py",
+      "sha256": "16c41b379eecbd87f082bd042e27fad7f3d8d77b5bfc6a3e8a286209b068494a"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\baostock\\session.py",
+      "sha256": "70ce19cdde1d6a8ed0c3d3db29caa28d1d8069826136ab6dd7fb6a2ef8c7b832"
+    }
+  ],
+  "config_files": [
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\providers.yaml",
+      "sha256": "525141790ced92c40375dddf4ddf71b34d0a41c37e67be0a103daaf191afb166"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\collection.yaml",
+      "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\datasets\\sina_global_news.yaml",
+      "sha256": "688eeb3b698bb8fdb3fb33bc296869b6caca47bd9ff427a97ae989f74c595350"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\normalization\\sina_global_news.yaml",
+      "sha256": "22b2caa83fecb10728649e033cf8b8fbbd4fa8c7928de1b8d8961e1516263b0f"
+    }
+  ],
+  "normalization_version": "sina-global-news-input-v1",
+  "normalization_status": "pending_validation",
+  "field_units": {
+    "snapshot_at": null,
+    "news_time": null,
+    "content": null
+  },
+  "unverified_fields": [],
+  "selected_fields": [
+    "content",
+    "news_time",
+    "snapshot_at"
+  ],
+  "eligible_for_production_routing": false,
+  "production_writes": 0,
+  "live_http_calls": 0,
+  "validation_time_utc": "2026-10-04T01:43:17.242520+00:00",
+  "status": "candidate_complete",
+  "response_freshness_seconds": 300,
+  "sdk_dependency": {
+    "version": "1.18.83",
+    "function": "stock_info_global_sina",
+    "source_path": "_raw/bodies/d93bd2b0aa3c71ce5539a6c139204baf3f34b0a4bdd52938921438523d484a0e.bin",
+    "sha256": "d93bd2b0aa3c71ce5539a6c139204baf3f34b0a4bdd52938921438523d484a0e",
+    "original_source_sha256": "d93bd2b0aa3c71ce5539a6c139204baf3f34b0a4bdd52938921438523d484a0e",
+    "redacted": false,
+    "dependencies": []
+  },
+  "transport_dependency": {
+    "requests": "2.32.5",
+    "urllib3": "2.3.0"
+  },
+  "sdk_news_transport_policy": {
+    "source_contract": "successful rate-limited original SDK probe",
+    "timeout_seconds": null,
+    "trust_env": true,
+    "allow_redirects": true,
+    "headers": "requests defaults",
+    "adapter_retry_total": 2,
+    "adapter_backoff_min_seconds": 5,
+    "status_forcelist": [
+      500,
+      502,
+      503,
+      504
+    ],
+    "outer_capture_interval_seconds": 3,
+    "sdk_outer_attempts": 1,
+    "sdk_outer_delays_seconds": [],
+    "host_pause": "403/429 immediately; two consecutive transport or server errors",
+    "physical_retry_count_observable": false
+  },
+  "responses": [
+    {
+      "event": "http_response",
+      "method": "GET",
+      "url": "https://zhibo.sina.com.cn/api/zhibo/feed?dire=f&dpc=1&page=1&page_size=20&pagesize=20&tag_id=0&type=1&zhibo_id=152",
+      "request_headers": {
+        "User-Agent": "python-requests/2.32.5",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept": "*/*",
+        "Connection": "keep-alive"
+      },
+      "scope": {
+        "input_id": "ASTOCK-033",
+        "parameters": {}
+      },
+      "request_options": {
+        "timeout": null,
+        "allow_redirects": true,
+        "trust_env": true,
+        "proxies": {},
+        "sdk_retry_policy": true,
+        "probe_host_pause": true
+      },
+      "provider": "sina",
+      "endpoint": "global_news",
+      "code_version": "420549c5a5b4c939bd2a7b099946f9c3a537ca80d98cded4995d6bd0e51c8500",
+      "fetched_at_utc": "2026-10-04T01:43:17.505908+00:00",
+      "mode": "replay",
+      "source_ref": {
+        "manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\_raw\\missing-capabilities-20261003T174623\\manifest.ndjson",
+        "line": 84,
+        "fetched_at_utc": "2026-10-03T09:52:11.547+00:00"
+      },
+      "outcome": "response",
+      "status_code": 200,
+      "response_headers": {
+        "Connection": "keep-alive",
+        "Content-Encoding": "gzip",
+        "Content-Type": "application/json; charset=UTF-8",
+        "DPOOL_HEADER": "zhibo-sina-com-cn-6b7464b6d-kd6fw",
+        "Date": "Sat, 03 Oct 2026 09:52:14 GMT",
+        "SN-REQID": "69a000a80350ee2ad5eb13438dfb8456",
+        "Server": "nginx",
+        "Transfer-Encoding": "chunked",
+        "Vary": "Accept-Encoding",
+        "X-Via-SSL": "ssl.32.sinag1.hj4.lb.sinanode.com"
+      },
+      "content_type": "application/json; charset=UTF-8",
+      "encoding": "UTF-8",
+      "body_bytes": 63590,
+      "body_sha256": "07c6926ed23a9e9be235bbfe45d7bd3af98cab8b60e8d7a1966bec0e56f5f228",
+      "body_storage": "bodies/07c6926ed23a9e9be235bbfe45d7bd3af98cab8b60e8d7a1966bec0e56f5f228.bin",
+      "persistence_status": "exact_application_payload_saved"
+    }
+  ],
+  "source_rows": {
+    "path": "2026-10-04/source_rows/sina/global_news/source-rows.json",
+    "sha256": "74558bc1ba52b59ee620cd6c07b12a52f66cd07d6c03d9308f0abc3debf74418",
+    "row_count": 20
+  },
+  "parsed_rows": {
+    "path": "2026-10-04/parsed_rows/sina/global_news/parsed-rows.json",
+    "sha256": "74558bc1ba52b59ee620cd6c07b12a52f66cd07d6c03d9308f0abc3debf74418",
+    "row_count": 20,
+    "code_version": "420549c5a5b4c939bd2a7b099946f9c3a537ca80d98cded4995d6bd0e51c8500",
+    "source_response_hashes": [
+      "07c6926ed23a9e9be235bbfe45d7bd3af98cab8b60e8d7a1966bec0e56f5f228"
+    ]
+  },
+  "source_url": "https://zhibo.sina.com.cn/api/zhibo/feed",
+  "source_urls": [
+    "https://zhibo.sina.com.cn/api/zhibo/feed?dire=f&dpc=1&page=1&page_size=20&pagesize=20&tag_id=0&type=1&zhibo_id=152"
+  ],
+  "source_capture_window": {
+    "first": "2026-10-03T09:52:11.547000+00:00",
+    "last": "2026-10-03T09:52:11.547000+00:00",
+    "meaning": "source response capture times; not row-level market timestamps"
+  },
+  "returned_window": {
+    "first": "2026-10-03 16:39:58",
+    "last": "2026-10-03 17:51:23"
+  },
+  "requested_limit": 20,
+  "coverage_basis": "latest returned 20 source news items; not complete news history or market coverage",
+  "universe_completeness_verified": false,
+  "pagination_completeness_verified": false,
+  "output": {
+    "path": "2026-10-04/sina_global_news/sina/global_news/mapped-rows.json",
+    "sha256": "3f449b0369b48df6ea54a4ae11dab316ddcf07d55bf20ee4c73b90cc86687a1a",
+    "row_count": 20,
+    "source_response_hashes": [
+      "07c6926ed23a9e9be235bbfe45d7bd3af98cab8b60e8d7a1966bec0e56f5f228"
+    ]
+  },
+  "row_count": 20,
+  "coverage_denominator": 20,
+  "first_key": [
+    "2026-10-03T09:52:11.547000+00:00",
+    "2026-10-03T17:51:23+08:00",
+    "【俄官员：普京是否出席G20峰会取决于一系列因素】据塔斯社10月3日报道，俄罗斯二十国集团（G20）事务协调人、俄总统办公厅专家局局长丹尼斯·阿加福诺夫表示，俄罗斯总统普京是否出席今年12月在美国迈阿密举行的G20峰会，将取决于一系列因素，包括峰会的实质性筹备情况和整体地缘政治背景。阿加福诺夫在俄罗斯驻美使馆举行的新闻发布会上说，出席峰会“须有一个目的”，相关决定可能将在此基础上作出。他还表示，美国总统特朗普“已非常明确”表示支持俄总统出席此次峰会。阿加福诺夫说，最终决定将在临近峰会日期时作出。（环球网）"
+  ],
+  "last_key": [
+    "2026-10-03T09:52:11.547000+00:00",
+    "2026-10-03T16:39:58+08:00",
+    "伊朗太空研究中心代理负责人周六表示，伊朗已修复冲突期间受损的关键卫星开发基础设施，尽管这些设施尚未恢复到满负荷状态。"
+  ],
+  "host_pause_events": [],
+  "raw_manifest": {
+    "path": "_raw/manifest.ndjson",
+    "sha256": "680a833356e31dc2ec66075649f1254d7b6721d8305be57add2c3b9a2b54832b"
+  },
+  "run_directory": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sdk-news-cli-20261004\\candidate\\ASTOCK-033-970baeebd522",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sdk-news-cli-20261004\\candidate\\ASTOCK-033-970baeebd522\\2026-10-04\\input_report\\sina\\global_news\\report.json"
+}

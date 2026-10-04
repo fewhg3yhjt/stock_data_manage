@@ -21,6 +21,213 @@ from stock_data_manage.storage.raw import RawObjectStore
 ROOT = Path(__file__).resolve().parents[1]
 TENCENT_ARCHIVE = ROOT / "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson"
 SDK_ARCHIVE = ROOT / "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson"
+SDK_NEWS_CASES = [("ASTOCK-032", {}, SDK_ARCHIVE, 20), ("ASTOCK-033", {}, SDK_ARCHIVE, 20)]
+
+
+def sdk_news_record(input_id):
+    host = "www.cls.cn" if input_id == "ASTOCK-032" else "zhibo.sina.com.cn"
+    return next(json.loads(line) for line in SDK_ARCHIVE.read_text(encoding="utf-8").splitlines()
+                if host in json.loads(line).get("url", ""))
+
+
+def compare_sdk_news_original(tmp_path, input_id, context, manifest, count):
+    import csv
+    from contextlib import ExitStack
+    from stock_data_manage.providers.cls.news import telegraph_replay_clock
+    from stock_data_manage.pipeline.inputs import _json_value
+    import ast
+    import inspect
+    import akshare as sdk
+    import pandas as pd
+    from types import SimpleNamespace
+    from typing import Any, Callable, List, Tuple, Dict
+    source = ROOT / "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py"
+    nodes = [n for n in ast.parse(source.read_text(encoding="utf-8")).body if isinstance(n, ast.FunctionDef)
+             and n.name in {"ak_function", "call_ak", "try_ak_variants", "fetch_cls_telegraph", "fetch_global_news"}]
+    namespace = dict(inspect=inspect, Any=Any, Callable=Callable, List=List, Tuple=Tuple, Dict=Dict,
+                     Config=SimpleNamespace, pd=pd, ensure_ak=lambda:sdk)
+    exec(compile(ast.Module(body=nodes,type_ignores=[]),str(source),"exec"),namespace)
+    function = sdk.stock_info_global_cls if input_id == "ASTOCK-032" else sdk.stock_info_global_sina
+    store = RawObjectStore(tmp_path / "original")
+    with ExitStack() as stack:
+        events = stack.enter_context(captured_requests(store, provider="cls" if input_id == "ASTOCK-032" else "sina",
+            endpoint="sdk-news", scope={}, code_version="original-sdk-news", pacer=RequestPacer(),
+            replay_manifest=manifest, sdk_retry_policy=True, probe_host_pause=True))
+        if input_id == "ASTOCK-032": stack.enter_context(telegraph_replay_clock(function, manifest))
+        frame = namespace["fetch_cls_telegraph"](None) if input_id == "ASTOCK-032" else namespace["fetch_global_news"](None)
+    parsed = _json_value(frame.to_dict(orient="records"))
+    original_path = tmp_path / "original-parsed.json"
+    original_path.write_text(json.dumps(parsed, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
+    csv_path = ROOT / "provider_validation/results/live-probes/rate-limited-all-20261003" / ("30_财联社电报" if input_id == "ASTOCK-032" else "31_全球资讯") / "data.csv"
+    with csv_path.open(encoding="utf-8-sig", newline="") as stream: csv_rows = list(csv.DictReader(stream))
+    assert [{k: str(v) for k, v in row.items()} for row in parsed] == csv_rows
+    report = collect_input(input_id=input_id, context=context, config_root=ROOT/"config", output_root=tmp_path/"candidate", replay_manifest=manifest)
+    assert report["status"] == "candidate_complete" and report["row_count"] == len(parsed) == count, report
+    assert read_artifact(report, "source_rows") == parsed
+    keys = ("url", "method", "status_code", "body_sha256", "request_headers", "request_options")
+    assert [{k: r.get(k) for k in keys} for r in events] == [{k: r.get(k) for k in keys} for r in report["responses"]]
+    for row, old in zip(read_artifact(report, "output"), parsed):
+        assert row["snapshot_at"] == report["source_capture_window"]["last"]
+        assert row["content"] == old["内容"]
+        expected_time = old["发布日期"]+"T"+old["发布时间"] if input_id == "ASTOCK-032" else old["时间"].replace(" ", "T")
+        assert row["news_time"] == expected_time+"+08:00"
+        if input_id == "ASTOCK-032": assert row["title"] == old["标题"]
+    comparison = dict(input_id=input_id, row_count=count, mode="offline_replay", all_business_fields_equal=True,
+        all_retained_source_fields_equal=True, request_comparison_equal=True, original_csv_path=str(csv_path),
+        original_csv_sha256=hashlib.sha256(csv_path.read_bytes()).hexdigest(), original_parsed_path=str(original_path.resolve()),
+        original_parsed_sha256=hashlib.sha256(original_path.read_bytes()).hexdigest(), report_path=report["report_path"],
+        report_sha256=hashlib.sha256(Path(report["report_path"]).read_bytes()).hexdigest())
+    (tmp_path/"comparison.json").write_text(json.dumps(comparison,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    return comparison
+
+
+@pytest.mark.parametrize("input_id,context,manifest,count", SDK_NEWS_CASES)
+def test_sdk_news_preserve_original_requests_csv_and_business_fields(tmp_path,no_network,input_id,context,manifest,count):
+    compare_sdk_news_original(tmp_path,input_id,context,manifest,count)
+
+
+SDK_NEWS_FAILURES = [(id, mutation) for id in ("ASTOCK-032", "ASTOCK-033")
+                     for mutation in ("business", "empty", "content", "time", "duplicate", "schema", "http403")]
+
+
+def sdk_news_fixture(tmp_path, input_id, mutation):
+    record = sdk_news_record(input_id); payload = json.loads(RawObjectStore.read_response(SDK_ARCHIVE,record))
+    items = payload["data"]["roll_data"] if input_id == "ASTOCK-032" else payload["result"]["data"]["feed"]["list"]
+    if mutation == "business":
+        if input_id == "ASTOCK-032": payload["errno"] = 1
+        else: payload["result"]["status"]["code"] = 1
+    elif mutation == "empty": items.clear()
+    elif mutation == "content": items[0]["content" if input_id=="ASTOCK-032" else "rich_text"] = None
+    elif mutation == "time": items[0]["ctime" if input_id=="ASTOCK-032" else "create_time"] = "bad"
+    elif mutation == "duplicate": items[1] = items[0].copy()
+    elif mutation == "schema": items[0].pop("content" if input_id=="ASTOCK-032" else "rich_text")
+    store = RawObjectStore(tmp_path/"fixture")
+    status = 403 if mutation=="http403" else 200
+    body = json.dumps(payload,ensure_ascii=False).encode()
+    response = requests.Response(); response.status_code=status; response.encoding="utf-8"; response._content=body
+    store.record_response(response=response,url=record["url"],method="GET",request_headers=record["request_headers"],
+        scope={"fixture":"synthetic mutation"},provider="cls" if input_id=="ASTOCK-032" else "sina",endpoint="fixture",code_version="fixture",
+        mode="fixture",source_ref={"manifest":str(SDK_ARCHIVE),"sha256":record["body_sha256"]})
+    return store.root/"manifest.ndjson"
+
+
+@pytest.mark.parametrize("input_id,mutation",SDK_NEWS_FAILURES)
+def test_sdk_news_failures_keep_raw_and_never_publish(tmp_path,no_network,input_id,mutation):
+    import akshare
+    from types import SimpleNamespace
+    from unittest.mock import patch
+    helper = akshare.stock_info_global_cls.__globals__["make_request_with_retry_json"]
+    waits = []
+    with patch.dict(helper.__globals__, {"time":SimpleNamespace(sleep=waits.append)}):
+        report=collect_input(input_id=input_id,context={},config_root=ROOT/"config",output_root=tmp_path/"candidate",
+            replay_manifest=sdk_news_fixture(tmp_path,input_id,mutation))
+    assert report["status"]=="failed" and "output" not in report,report
+    assert report["responses"] and report["production_writes"]==report["live_http_calls"]==0
+    if input_id=="ASTOCK-032" and mutation=="http403":
+        assert report["failure_class"]=="HostPausedError" and waits==[1] and len(report["host_pause_events"])==1
+
+
+def test_sdk_news_yaml_projection_and_scope(tmp_path,no_network):
+    config=tmp_path/"config"; shutil.copytree(ROOT/"config",config)
+    path=config/"normalization/cls_telegraph.yaml";rule=yaml.safe_load(path.read_text(encoding="utf-8"))
+    rule["rules"][0]["field_mapping"]["title"]="内容";path.write_text(yaml.safe_dump(rule,allow_unicode=True),encoding="utf-8")
+    report=collect_input(input_id="ASTOCK-032",context={},config_root=config,output_root=tmp_path/"candidate",replay_manifest=SDK_ARCHIVE)
+    assert report["status"]=="candidate_complete",report
+    assert read_artifact(report,"output")[0]["title"]==read_artifact(report,"source_rows")[0]["内容"]
+    report=collect_input(input_id="ASTOCK-032",context={},config_root=ROOT/"config",output_root=tmp_path/"projection",
+        replay_manifest=SDK_ARCHIVE,fields=["snapshot_at","news_time","content"])
+    assert report["status"]=="candidate_complete" and set(read_artifact(report,"output")[0])=={"snapshot_at","news_time","content"}
+    for id in ("ASTOCK-032","ASTOCK-033"):
+        for context in ({"request":{"symbol":"600519"}},{"metadata":{"cursor":"older"}},{"request":{"start_date":"2026-01-01"}}):
+            with pytest.raises(ValueError):collect_input(input_id=id,context=context,config_root=ROOT/"config",output_root=tmp_path/"bad",replay_manifest=SDK_ARCHIVE)
+
+
+def test_sdk_news_original_session_policy_and_cache(tmp_path,monkeypatch):
+    import akshare
+    from unittest.mock import patch
+    from stock_data_manage.providers.cls.news import telegraph_replay_clock
+    from stock_data_manage.storage.raw import sanitized_url
+    seen=[]
+    def send(session,request,**kwargs):
+        record=next(sdk_news_record(id) for id in ("ASTOCK-032","ASTOCK-033") if sanitized_url(sdk_news_record(id)["url"])==sanitized_url(request.url))
+        seen.append(request.url)
+        assert session.trust_env is True and kwargs["timeout"] is None and kwargs["allow_redirects"] is True
+        retry=session.get_adapter(request.url).max_retries
+        assert retry.total==retry.connect==retry.read==retry.status==2 and retry.backoff_factor==5
+        assert not retry.is_retry("GET",403) and not retry.is_retry("GET",429,True) and retry.is_retry("GET",503)
+        assert request.headers["User-Agent"]==record["request_headers"]["User-Agent"]
+        response=requests.Response();response.status_code=200;response.encoding="utf-8";response._content=RawObjectStore.read_response(SDK_ARCHIVE,record)
+        response.url=request.url;return response
+    with patch("requests.Session.send",send),telegraph_replay_clock(akshare.stock_info_global_cls,SDK_ARCHIVE):
+        for id in ("ASTOCK-032","ASTOCK-033"):
+            first=collect_input(input_id=id,context={},config_root=ROOT/"config",output_root=tmp_path/"candidate",mode="live",evidence_root=tmp_path/"unused")
+            second=collect_input(input_id=id,context={},config_root=ROOT/"config",output_root=tmp_path/"candidate",mode="live",evidence_root=tmp_path/"candidate")
+            assert first["status"]==second["status"]=="candidate_complete",(first,second)
+            assert first["live_http_calls"]==1 and second["live_http_calls"]==0 and read_artifact(first,"output")==read_artifact(second,"output")
+    assert len(seen)==2
+    (tmp_path/"fixture-mode.json").write_text(json.dumps(dict(mode="injected Session and fixed CLS query clock; no real live validation",real_http_calls=0,fixture_send_calls=2)),encoding="utf-8")
+
+
+def test_sdk_news_cls_retry_retains_failed_response_and_sdk_backoff(tmp_path,no_network):
+    import akshare
+    from types import SimpleNamespace
+    from unittest.mock import patch
+    record=sdk_news_record("ASTOCK-032");store=RawObjectStore(tmp_path/"fixture")
+    for status in (503,200):
+        response=requests.Response();response.status_code=status;response.encoding="utf-8"
+        response._content=b'{"fixture":"temporary server failure"}' if status==503 else RawObjectStore.read_response(SDK_ARCHIVE,record)
+        store.record_response(response=response,url=record["url"],method="GET",request_headers=record["request_headers"],
+            provider="cls",endpoint="fixture",scope={"fixture":"failed request then successful retry"},code_version="fixture",mode="fixture")
+    helper=akshare.stock_info_global_cls.__globals__["make_request_with_retry_json"];waits=[]
+    with patch.dict(helper.__globals__,{"time":SimpleNamespace(sleep=waits.append)}):
+        report=collect_input(input_id="ASTOCK-032",context={},config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=store.root/"manifest.ndjson")
+    assert report["status"]=="candidate_complete" and report["row_count"]==20,report
+    assert waits==[1] and [r["status_code"] for r in report["responses"]]==[503,200] and not report["host_pause_events"]
+    assert len(report["output"]["source_response_hashes"])==2
+    (tmp_path/"sdk-retry-proof.json").write_text(json.dumps(dict(sdk_delays=waits,statuses=[503,200],all_responses_retained=True,mode="synthetic offline")),encoding="utf-8")
+
+
+def test_sdk_news_replay_miss_never_contacts_network(tmp_path,no_network):
+    wrong=sdk_news_fixture(tmp_path,"ASTOCK-033","business")
+    report=collect_input(input_id="ASTOCK-032",context={},config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=wrong)
+    assert report["status"]=="failed" and report["failure_class"]=="ValueError" and report["live_http_calls"]==0 and not report.get("responses")
+
+
+def test_sdk_news_signature_redaction():
+    from stock_data_manage.storage.raw import sanitized_url,sanitized_metadata
+    assert "secret-sign" not in sanitized_url("https://www.cls.cn/feed?last_time=123&sign=secret-sign")
+    assert sanitized_metadata({"sign":"secret-sign","last_time":123})=={"sign":"<redacted>","last_time":123}
+
+
+@pytest.mark.parametrize("sequence",[(429,200),(403,200),(503,503,200),(503,200,503,200),("error","error",200)])
+def test_sdk_news_host_pause_matches_original_probe(tmp_path,sequence):
+    from types import SimpleNamespace
+    from unittest.mock import patch
+    from stock_data_manage.providers.transport import HostPausedError
+    spec=importlib.util.spec_from_file_location("news_rate_probe",ROOT/"provider_validation/tests/run_a_stock_rate_limited_probes.py")
+    original=importlib.util.module_from_spec(spec);spec.loader.exec_module(original)
+    results=[]
+    for candidate in (False,True):
+        calls=[];outcomes=[];store=RawObjectStore(tmp_path/str(candidate));clock=[100.0]
+        def fake_send(session,request,**kwargs):
+            value=sequence[len(calls)];calls.append(value)
+            if value=="error":raise requests.ConnectionError("fixture transport error")
+            response=requests.Response();response.status_code=value;response._content=b'{}';response.url=request.url;return response
+        if candidate:
+            with patch("requests.Session.send",fake_send),captured_requests(store,provider="fixture",endpoint="news",scope={},code_version="fixture",
+                pacer=RequestPacer(clock=lambda:clock[0],wait=lambda n:clock.__setitem__(0,clock[0]+n)),probe_host_pause=True):
+                for _ in sequence:
+                    try:outcomes.append(requests.get("https://news.fixture.test/feed").status_code)
+                    except (HostPausedError,requests.ConnectionError) as exc:outcomes.append(type(exc).__name__)
+        else:
+            with patch.object(original,"time",SimpleNamespace(monotonic=lambda:clock[0],sleep=lambda n:clock.__setitem__(0,clock[0]+n))),patch("requests.Session.send",original.paced_send_wrapper(fake_send)):
+                for _ in sequence:
+                    try:outcomes.append(requests.get("https://news.fixture.test/feed").status_code)
+                    except (original.HostPausedError,requests.ConnectionError) as exc:outcomes.append(type(exc).__name__)
+        results.append(dict(calls=calls,outcomes=outcomes))
+    assert results[0]==results[1]
+    (tmp_path/"original-vs-provider-pause.json").write_text(json.dumps(dict(sequence=sequence,original=results[0],provider=results[1],equal=True)),encoding="utf-8")
+
 CASES = [
     ("ASTOCK-002-daily", {"request": {"symbol": "600519", "start_date": date(2026, 9, 1), "end_date": date(2026, 9, 18)}}, TENCENT_ARCHIVE, 14),
     ("ASTOCK-002-5m", {"request": {"symbol": "300750"}, "config": {"count": 96}}, TENCENT_ARCHIVE, 96),

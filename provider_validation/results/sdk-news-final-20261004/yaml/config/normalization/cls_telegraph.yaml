@@ -1,0 +1,24 @@
+dataset: cls_telegraph
+rules:
+- context_fields:
+    snapshot_at: source_snapshot_at
+  endpoint: telegraph
+  evidence_refs:
+  - ASTOCK-032
+  field_mapping:
+    content: 内容
+    news_time: published_at
+    title: 内容
+  id: cls-telegraph-input-v1
+  input_id: ASTOCK-032
+  notes: 保留原SDK文本和北京时间，不清洗HTML、不推测标题；snapshot_at为原响应采集时间。仅最近20条候选输入，正式路由关闭。
+  null_values:
+  - null
+  provider: cls
+  status: pending_validation
+  transforms:
+    news_time:
+      format: '%Y-%m-%dT%H:%M:%S'
+      timezone: Asia/Shanghai
+  unverified_fields: []
+  version: cls-telegraph-input-v1

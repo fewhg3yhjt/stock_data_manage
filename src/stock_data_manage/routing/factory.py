@@ -37,7 +37,7 @@ def build_input_provider(contract, *, providers_path, client=None):
                         "ASTOCK-078": "fetch_event_list", "ASTOCK-079": "fetch_event_list",
                         "ASTOCK-080": "fetch_action_list", "ASTOCK-081": "fetch_action_list", "ASTOCK-082": "fetch_action_list", "ASTOCK-083": "fetch_action_list",
                         "ASTOCK-065": "fetch_lpr_history",
-                        "ASTOCK-034": "fetch", "ASTOCK-035": "fetch",
+                        "ASTOCK-032": "fetch", "ASTOCK-033": "fetch", "ASTOCK-034": "fetch", "ASTOCK-035": "fetch",
                         "ASTOCK-064": "fetch", "ASTOCK-084": "fetch_convertible_bonds",
                         "ASTOCK-074": "fetch_futures", "ASTOCK-075": "fetch_futures_kline", "ASTOCK-076": "fetch_a50",
                         "SDA-BOARD-001": "fetch_industry_list", "SDA-BOARD-002": "fetch_industry_daily",
@@ -74,6 +74,12 @@ def build_input_provider(contract, *, providers_path, client=None):
     if contract.input_id == "ASTOCK-034":
         from ..providers.wallstreetcn.news import WallStreetCNNewsProvider
         return WallStreetCNNewsProvider()
+    if contract.input_id == "ASTOCK-032":
+        from ..providers.cls.news import CLSTelegraphProvider
+        return CLSTelegraphProvider(client=client)
+    if contract.input_id == "ASTOCK-033":
+        from ..providers.sina.news import SinaGlobalNewsProvider
+        return SinaGlobalNewsProvider(client=client)
     if contract.input_id == "ASTOCK-035":
         from ..providers.cctv.news import CCTVNewsProvider
         return CCTVNewsProvider()

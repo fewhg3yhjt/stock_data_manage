@@ -1,0 +1,29 @@
+def stock_info_global_sina() -> pd.DataFrame:
+    """
+    新浪财经-全球财经快讯
+    https://finance.sina.com.cn/7x24
+    :return: 全球财经快讯
+    :rtype: pandas.DataFrame
+    """
+    url = "https://zhibo.sina.com.cn/api/zhibo/feed"
+    params = {
+        "page": "1",
+        "page_size": "20",
+        "zhibo_id": "152",
+        "tag_id": "0",
+        "dire": "f",
+        "dpc": "1",
+        "pagesize": "20",
+        "type": "1",
+    }
+    r = requests.get(url, params=params)
+    data_json = r.json()
+    time_list = [
+        item["create_time"] for item in data_json["result"]["data"]["feed"]["list"]
+    ]
+    text_list = [
+        item["rich_text"] for item in data_json["result"]["data"]["feed"]["list"]
+    ]
+    temp_df = pd.DataFrame([time_list, text_list]).T
+    temp_df.columns = ["时间", "内容"]
+    return temp_df

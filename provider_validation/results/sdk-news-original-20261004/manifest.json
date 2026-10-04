@@ -1,0 +1,56 @@
+{
+  "base_commit": "26ae37869e11791890ce5314abc41a603b889a2e",
+  "original_files": [
+    {
+      "path": "src/stock_data_manage/providers/transport.py",
+      "snapshot": "provider_validation/results/sdk-news-original-20261004/1-transport.py.bin",
+      "sha256": "7cf1c5f1f9b526e54e7d82e60b95b35e1f8f91e60effc31d74052f9273988b03"
+    },
+    {
+      "path": "src/stock_data_manage/pipeline/inputs.py",
+      "snapshot": "provider_validation/results/sdk-news-original-20261004/2-inputs.py.bin",
+      "sha256": "2fad9092f94d28d6172c0744b1c903d7d5638369787e9e48693f078fc6571d22"
+    },
+    {
+      "path": "src/stock_data_manage/routing/factory.py",
+      "snapshot": "provider_validation/results/sdk-news-original-20261004/3-factory.py.bin",
+      "sha256": "151afd201b2728a38052956a07f7f5a1f0e49584dd25665672f5db7c56a1ccfd"
+    },
+    {
+      "path": "config/providers.yaml",
+      "snapshot": "provider_validation/results/sdk-news-original-20261004/4-providers.yaml.bin",
+      "sha256": "3441064a76ea456240cb368441643ba6d6eabb3ce9a63c99e1b0a67e65ca660a"
+    },
+    {
+      "path": "tests/test_input_collection.py",
+      "snapshot": "provider_validation/results/sdk-news-original-20261004/5-test_input_collection.py.bin",
+      "sha256": "a46108f172a2fe2816b77d59f981c5643142ab40d2b93760a55b3b6288a04302"
+    },
+    {
+      "path": "provider_validation/tests/replay_input_capabilities.py",
+      "snapshot": "provider_validation/results/sdk-news-original-20261004/6-replay_input_capabilities.py.bin",
+      "sha256": "3ac9cf660cc7d03a59b4f7e01037f866a413d644e82d4709377e1e97c773fcc2"
+    },
+    {
+      "path": "CODE_STRUCTURE.md",
+      "snapshot": "provider_validation/results/sdk-news-original-20261004/7-CODE_STRUCTURE.md.bin",
+      "sha256": "835aa5eb2ae21aab233600975a4e1d60f60658fe15288d3831cb1412b76a467a"
+    },
+    {
+      "path": "PROJECT_PROGRESS.md",
+      "snapshot": "provider_validation/results/sdk-news-original-20261004/8-PROJECT_PROGRESS.md.bin",
+      "sha256": "47f791ea14fe62c10443b2712b3cf5e0dd9b18b141ab4ede302e20e7901cbf3f"
+    },
+    {
+      "path": "src/stock_data_manage/storage/raw.py",
+      "snapshot": "provider_validation/results/sdk-news-original-20261004/9-raw.py.bin",
+      "sha256": "564c940feb99b358c41c5456c3142e7501b21505b5c2d8d88d811c53e145b752"
+    }
+  ],
+  "source_code": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+  "source_code_sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0",
+  "probe_code": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+  "probe_code_sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c",
+  "raw_manifest": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+  "raw_manifest_sha256": "885abd6bf1c4b809b9029759f61b75c7d6a297755fd76ca6c545720db38a6767"
+}

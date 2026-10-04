@@ -1,0 +1,58 @@
+{
+  "validation_time_utc": "2026-10-04T01:43:17.608976+00:00",
+  "results": [
+    {
+      "input_id": "ASTOCK-032",
+      "command": [
+        "D:\\Program Files\\Python\\python.exe",
+        "-m",
+        "stock_data_manage.cli",
+        "collect-input",
+        "--input",
+        "ASTOCK-032",
+        "--config-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\config",
+        "--output-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sdk-news-cli-20261004\\candidate",
+        "--mode",
+        "replay",
+        "--replay-manifest",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\_raw\\missing-capabilities-20261003T174623\\manifest.ndjson"
+      ],
+      "exit_code": 0,
+      "count": 20,
+      "stdout": "provider_validation/results/sdk-news-cli-20261004/ASTOCK-032-stdout.json",
+      "stderr": "provider_validation/results/sdk-news-cli-20261004/ASTOCK-032-stderr.bin",
+      "stdout_sha256": "dfdb31d7851376ab81755c1cd947ac8c84caea1efd3bd39332b70774dfb9669a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sdk-news-cli-20261004\\candidate\\ASTOCK-032-751fcdab90a4\\2026-10-04\\input_report\\cls\\telegraph\\report.json"
+    },
+    {
+      "input_id": "ASTOCK-033",
+      "command": [
+        "D:\\Program Files\\Python\\python.exe",
+        "-m",
+        "stock_data_manage.cli",
+        "collect-input",
+        "--input",
+        "ASTOCK-033",
+        "--config-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\config",
+        "--output-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sdk-news-cli-20261004\\candidate",
+        "--mode",
+        "replay",
+        "--replay-manifest",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\_raw\\missing-capabilities-20261003T174623\\manifest.ndjson"
+      ],
+      "exit_code": 0,
+      "count": 20,
+      "stdout": "provider_validation/results/sdk-news-cli-20261004/ASTOCK-033-stdout.json",
+      "stderr": "provider_validation/results/sdk-news-cli-20261004/ASTOCK-033-stderr.bin",
+      "stdout_sha256": "a98c96586e9ac8f8c9517ecb4bb361a357e57a698d087ce98401f426ad018eca",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\sdk-news-cli-20261004\\candidate\\ASTOCK-033-970baeebd522\\2026-10-04\\input_report\\sina\\global_news\\report.json"
+    }
+  ],
+  "script_sha256": "195bdcb1414ea74b8bd10df99c4b65c112306f8dc466aeeb4fad5da3ff3704a4"
+}
