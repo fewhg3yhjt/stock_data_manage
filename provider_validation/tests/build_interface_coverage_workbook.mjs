@@ -10,6 +10,9 @@ const require = createRequire(path.join(visualDir, "artifact-tool-loader.cjs"));
 const artifactToolEntry = require.resolve("@oai/artifact-tool");
 const { SpreadsheetFile, Workbook } = await import(pathToFileURL(artifactToolEntry).href);
 
+if (process.argv.slice(2).includes("--formal-spec")) {
+  await buildFormalSpecWorkbook();
+} else {
 const csvPath = path.join(repo, "provider_validation", "coverage", "interface-coverage.csv");
 const xlsxPath = path.join(repo, "provider_validation", "coverage", "interface-coverage.xlsx");
 const csvText = (await fs.readFile(csvPath, "utf8")).replace(/^\uFEFF/, "");
@@ -169,3 +172,116 @@ await fs.writeFile(path.join(previewDir, "interface-coverage-inspect.ndjson"), i
 const xlsx = await SpreadsheetFile.exportXlsx(workbook);
 await xlsx.save(xlsxPath);
 console.log(JSON.stringify({ xlsxPath, rows: rows.length, headers: headers.length, statusCounts: { pass: countBy("通过"), partial: countBy("部分通过"), fail: countBy("未通过"), unverified: countBy("未验证") }, inspect: inspect.ndjson }, null, 2));
+}
+
+async function buildFormalSpecWorkbook() {
+  const directory = path.join(repo, "docs", "providers");
+  const spec = JSON.parse(await fs.readFile(path.join(directory, "源头采集接口说明.json"), "utf8"));
+  const workbook = Workbook.create();
+  const sheets = spec.sheets.map(data => ({ data, sheet: workbook.worksheets.add(data.name) }));
+  const clean = value => typeof value === "string"
+    ? value.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\uFFFE\uFFFF]/g, "") : value;
+  const letter = index => {
+    let out = "";
+    for (let n = index + 1; n; n = Math.floor((n - 1) / 26)) out = String.fromCharCode(65 + (n - 1) % 26) + out;
+    return out;
+  };
+  const start = 9;
+  const summaries = [];
+  for (const [index, { data, sheet }] of sheets.entries()) {
+    const end = start + data.rows.length;
+    const last = letter(data.headers.length - 1);
+    sheet.showGridLines = false;
+    sheet.tabColor = index === 0 ? "#1F4E78" : index === 3 ? "#A37A37" : "#5B9BD5";
+    sheet.getRange(`A1:${last}${end}`).format = {
+      font: { name: "Arial", size: 10, color: "#202020" },
+      verticalAlignment: "center", rowHeight: 22,
+    };
+    sheet.getRange("A2").values = [[index === 0 ? "源头采集接口说明" : data.name]];
+    sheet.getRange("A2:H2").format.font = { name: "Arial", size: 14, bold: true, color: "#17365D" };
+    sheet.getRange("A3").values = [["文档生成时间（UTC）"]];
+    sheet.getRange("B3").values = [[new Date(spec.generated_at_utc)]];
+    sheet.getRange("B3").setNumberFormat("yyyy-mm-dd hh:mm");
+    sheet.getRange("A4").values = [[index === 0 ? "已实现输入数量" : "记录数量"]];
+    sheet.getRange("B4").formulas = [[`=COUNTIFS(A${start + 1}:A${end},"<>")`]];
+    sheet.getRange("A6").values = [[[
+      "数据周期、刷新频率和请求间隔分别记录。验证范围限于对应证据。",
+      "参数来源对应请求、配置、元数据或依赖输入。示例采用实测参数。",
+      "标准单位来自字段模板。来源单位未核准的字段置空，原值另行留证。",
+      "暂不纳入记录、别名和已拆分复合记录分别说明，均不重复计入采集输入。",
+    ][index]]];
+    sheet.getRange("A7").values = [["配置以代码和 YAML 为准；修改本表不会改变采集行为。"]];
+    sheet.getRange("A6:H7").format.font = { name: "Arial", size: 10, color: "#666666" };
+    sheet.getRange(`A${start}:${last}${end}`).values = [data.headers, ...data.rows.map(row => row.map(clean))];
+    const table = sheet.tables.add(`A${start}:${last}${end}`, true, `FormalProviderSpec${index}`);
+    table.style = "TableStyleMedium2";
+    table.showFilterButton = true;
+    sheet.getRange(`A${start}:${last}${end}`).format.wrapText = true;
+    sheet.getRange(`A${start}:${last}${start}`).format = {
+      fill: "#1F4E78", font: { name: "Arial", size: 10, bold: true, color: "#FFFFFF" },
+      horizontalAlignment: "center", verticalAlignment: "center", wrapText: true, rowHeight: 34,
+    };
+    for (let col = 0; col < data.headers.length; col++) {
+      const header = data.headers[col];
+      const width = /限制|备注|原因|入口|证据|报告|清单|路径|禁止|实测参数|规则|来源地址/.test(header) ? 55
+        : /能力名称/.test(header) ? 30 : /频率|含义|参数来源|来源字段|验证方式/.test(header) ? 32 : 20;
+      sheet.getRange(`${letter(col)}${start}:${letter(col)}${end}`).format.columnWidth = width;
+      sheet.getRange(`${letter(col)}1:${letter(col)}8`).format.columnWidth = width;
+      const numeric = /数量|行数|覆盖分母$|秒）|有效并发|最小值|最大值/.test(header);
+      if (numeric) sheet.getRange(`${letter(col)}${start + 1}:${letter(col)}${end}`).setNumberFormat("0.###");
+      if (header === "验证时间（UTC）") {
+        sheet.getRange(`${letter(col)}${start + 1}:${letter(col)}${end}`).values = data.rows.map(row => [row[col] ? new Date(row[col]) : null]);
+        sheet.getRange(`${letter(col)}${start + 1}:${letter(col)}${end}`).setNumberFormat("yyyy-mm-dd hh:mm:ss");
+        sheet.getRange(`${letter(col)}${start}:${letter(col)}${end}`).format.columnWidth = 24;
+      }
+      if (["验证报告", "模板路径", "映射路径"].includes(header)) {
+        for (let row = 0; row < data.rows.length; row++) {
+          const target = data.rows[row][col];
+          if (!target || !target.endsWith(".json") && !target.endsWith(".yaml")) continue;
+          await fs.access(path.join(repo, target));
+          // Artifact Tool cannot calculate HYPERLINK. Keep a readable repository
+          // path rather than exporting a cached formula error as evidence text.
+          sheet.getRange(`${letter(col)}${start + row + 1}`).values = [[target]];
+        }
+      }
+    }
+    sheet.getRange(`A${start + 1}:A${end}`).setNumberFormat("@");
+    // Fit each record to its actual line count, including long source paths, so
+    // mapping notes and exclusions remain readable without shrinking fonts.
+    for (let row = 0; row < data.rows.length; row++) {
+      const lines = Math.max(...data.rows[row].map((value, col) => {
+        const width = sheet.getRange(`${letter(col)}${start}`).format.columnWidth;
+        return String(value ?? "").split("\n").reduce((sum, line) => sum + Math.max(1, Math.ceil([...line].reduce((n, c) => n + (c.charCodeAt(0) > 255 ? 2 : 1), 0) / (width - 2))), 0);
+      }));
+      sheet.getRange(`A${start + 1 + row}:${last}${start + 1 + row}`).format.rowHeight = Math.max(28, Math.ceil(lines * 13.5 + 8));
+    }
+    sheet.freezePanes.freezeRows(start);
+    sheet.freezePanes.freezeColumns(2);
+    summaries.push({ name: data.name, rows: data.rows.length, columns: data.headers.length });
+  }
+  const main = sheets[0].sheet;
+  main.getRange("D4").values = [["自动调度启用数量"]];
+  main.getRange("E4").formulas = [[`=COUNTIFS(J10:J${start + spec.sheets[0].rows.length},"已启用")`]];
+  const excluded = sheets[3].sheet;
+  excluded.getRange(`D10:D${start + spec.sheets[3].rows.length}`).conditionalFormats.add("containsText", {
+    text: "暂不纳入", format: { fill: "#FFF2CC", font: { color: "#7F6000" } },
+  });
+  workbook.recalculate();
+  const counts = sheets.map(({ sheet, data }) => ({ sheet: data.name, value: sheet.getRange("B4").values[0][0] }));
+  counts.forEach((item, index) => {
+    if (item.value !== spec.sheets[index].rows.length) throw new Error(`Unexpected row count: ${item.sheet}`);
+  });
+  const inspect = await workbook.inspect({ kind: "workbook,sheet,table", maxChars: 3000, tableMaxRows: 2, tableMaxCols: 6 });
+  const errors = await workbook.inspect({ kind: "match", searchTerm: "#REF!|#DIV/0!|#VALUE!|#NAME\\?|#N/A|#NUM!|#NULL!|#SPILL!|#CALC!", options: { useRegex: true, maxResults: 30 } });
+  await fs.writeFile(path.join(visualDir, "formal-interface-spec-inspect.ndjson"), inspect.ndjson ?? String(inspect));
+  await fs.writeFile(path.join(visualDir, "formal-interface-spec-errors.ndjson"), errors.ndjson ?? String(errors));
+  for (const [index, { data }] of sheets.entries()) {
+    const preview = await workbook.render({ sheetName: data.name, range: "A1:G13", scale: 1, format: "png" });
+    await fs.writeFile(path.join(visualDir, `formal-interface-spec-${index}.png`), new Uint8Array(await preview.arrayBuffer()));
+  }
+  const outputPath = path.join(directory, "源头采集接口说明.xlsx");
+  const output = await SpreadsheetFile.exportXlsx(workbook);
+  await output.save(outputPath);
+  await fs.writeFile(path.join(visualDir, "formal-interface-spec-export-check.json"), JSON.stringify({ outputPath, counts, summaries, schedulingEnabled: main.getRange("E4").values[0][0], inspectedWithArtifactTool: true }, null, 2));
+  console.log(JSON.stringify({ outputPath, counts, schedulingEnabled: main.getRange("E4").values[0][0] }));
+}

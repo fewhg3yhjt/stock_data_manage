@@ -13,6 +13,34 @@
 - [EastMoney 数据域覆盖设计](eastmoney-data-domain-coverage.md)
 - [项目开发进度](PROJECT_PROGRESS.md)
 
+## 目录与文档导航
+
+目录和文件的详细职责见 [代码目录与文件职责](CODE_STRUCTURE.md)，文档归属规则见 [项目协作要求中的文档管理](AGENTS.md#文档管理)。
+
+| 目录或文件 | 用途 |
+|---|---|
+| `src/stock_data_manage/` | 按 providers、routing、quality、pipeline、storage、service、worker 等职责组织的正式实现 |
+| `config/` | 来源参数、采集频率、路由、数据集字段模板及归一化映射配置 |
+| `tests/` | 实现的自动化测试 |
+| `docs/` | 按模块职责归档的正式说明；各子目录随文档产生建立 |
+| `provider_validation/` | 来源探针、覆盖报告、原始响应及验证证据；入口见 [Provider 验证目录说明](provider_validation/README.md) |
+| `AGENTS.md` | 协作、验证及文档管理约定 |
+| `CODE_STRUCTURE.md` | 当前代码和文档目录的职责索引 |
+
+正式文档的归属如下。当前已建立 [源头采集接口文档](docs/providers/README.md)，其他模块文档目录随实际文档建立；现有根目录设计文档保持原位，入口见本文开头。
+
+| 文档目录 | 内容 |
+|---|---|
+| `docs/providers/` | 源头采集接口、调用参数、来源字段、采集限制及接入状态 |
+| `docs/routing/` | 来源选择、补缺与回退 |
+| `docs/quality/` | 标准字段、归一化与质量检查 |
+| `docs/pipeline/` | 数据构建、合并、重做与发布 |
+| `docs/storage/` | 数据存储与归档 |
+| `docs/service/` | 面向业务的数据查询接口 |
+| `docs/worker/` | 任务调度、执行与恢复 |
+
+正式说明表引用当前代码、YAML 和验证证据；修改说明表不会修改运行配置。能力已实现、已验证的范围、生产路由资格与调度启用状态分别记录。
+
 ## 当前开发状态
 
 第一批基础能力已实现：

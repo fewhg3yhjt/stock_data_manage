@@ -51,6 +51,26 @@ BaoStock 后续两项转换见 `provider_validation/docs/2026-10-04-baostock-inp
 
 `.gitattributes` 对本次新证据目录禁用 Git 换行转换，并固定新增实现/模板的 LF 格式，避免提交和检出改变证据字节及其 SHA-256 引用；不更改旧证据属性。
 
+## 正式文档目录
+
+正式文档按现有模块职责归入 `docs/`，不按开发批次或阶段编号分类。当前已建立 `docs/providers/`，其余目录随实际文档建立；下表为职责归属，不表示后续模块文档已经建成。
+
+| 文档目录 | 职责 |
+|---|---|
+| `docs/providers/` | 源头采集接口、参数、来源字段、采集限制及接入状态；源头采集接口说明表归入此处 |
+| `docs/routing/` | 来源选择、补缺与回退规则 |
+| `docs/quality/` | 标准字段、归一化与质量规则 |
+| `docs/pipeline/` | 数据构建、合并、重做与发布流程 |
+| `docs/storage/` | 数据存储与归档 |
+| `docs/service/` | 面向业务的数据查询接口 |
+| `docs/worker/` | 任务调度、执行与恢复 |
+
+`README.md` 提供项目及文档入口，本文维护目录与文件职责，`AGENTS.md` 的“文档管理”约束后续维护。总体设计可放在 `docs/` 根目录；现有根目录设计文档保持原位。验证方法、测试报告和原始证据仍留在 `provider_validation/`，正式文档引用其位置，不迁移或复制证据。
+
+Excel、CSV、JSON 等说明属于从代码、YAML 和证据派生的文档，不构成另一套运行配置；已实现能力、验证范围、生产路由资格和调度启用状态分别说明。
+
+`docs/providers/README.md` 说明源头采集文档范围、配置依据和刷新方式；`源头采集接口说明.xlsx` 为正式阅读版，配套同名 JSON 保存当前配置快照、字段映射和逐项证据哈希关联。现有 `provider_validation/tests/build_interface_coverage.py` 与 `build_interface_coverage_workbook.mjs` 增加 `--formal-spec` 模式，分别从现有 YAML/审计索引生成数据及导出工作簿；原测试覆盖报告模式保持。导出核对证据保存于 `provider_validation/results/formal-interface-spec-20261004/verification.json`，同目录 `verify.py` 独立核对配置、证据哈希、保存后的XLSX结构与文档链接，不属于生产数据。
+
 ## 领域模型
 
 | 文件 | 职责 |

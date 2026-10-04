@@ -39,6 +39,16 @@
 - New provider functionality belongs under `providers/`; routing under `routing/`; normalization and quality rules under `quality/`; production flows under `pipeline/`; persistence under `storage/`.
 - Update `CODE_STRUCTURE.md` whenever a file is added, moved, merged, or its responsibility changes.
 
+## 文档管理
+
+- 正式功能说明、接口说明和使用文档按现有模块职责归入 `docs/`，不使用开发批次或阶段编号作为长期目录分类。
+- `docs/providers/` 保存源头采集接口、参数、来源字段、采集限制和接入状态；`docs/routing/` 保存来源选择、补缺与回退；`docs/quality/` 保存标准字段、归一化与质量规则；`docs/pipeline/` 保存数据构建、合并、重做与发布；`docs/storage/` 保存存储与归档；`docs/service/` 保存面向业务的数据查询接口；`docs/worker/` 保存任务调度、执行与恢复说明。
+- 按实际文档需要创建目录，不预建空目录。跨模块总体设计可放在 `docs/` 根目录，并链接各模块说明；现有根目录文档保持原位，未经确认不集中搬迁。
+- `provider_validation/` 保存验证脚本、验证方法、测试覆盖报告、原始响应及派生证据；正式能力说明保存于 `docs/`，通过链接引用验证证据，不复制或替换原始证据。
+- `README.md` 维护项目入口和文档导航，`CODE_STRUCTURE.md` 维护目录与文件职责；新增、移动文档或改变职责时同步更新对应入口，链接只指向已存在的文件，规划中的目录或文件明确标为待建立。
+- YAML 与可执行代码是配置和实现依据，Excel、CSV、JSON 等说明文件是派生文档；生成说明时保留来源路径、版本及验证范围，不能把编辑说明表当作修改运行配置。
+- 接口说明必须区分已实现能力、实际验证范围、生产路由资格和调度启用状态；源头采集接口与面向业务的数据服务接口分别归档。
+
 ## Safety
 
 - Do not delete, overwrite, or reset existing user data or files without explicit confirmation.

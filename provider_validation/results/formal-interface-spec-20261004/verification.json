@@ -1,0 +1,45 @@
+{
+  "validation_time_utc": "2026-10-04T13:44:25.896680+00:00",
+  "result": "passed",
+  "mode": "offline_documentation_check",
+  "network_requests": 0,
+  "production_writes": 0,
+  "configured_records": 77,
+  "hash_linked_reports": 64,
+  "raw_response_bodies_hash_checked": 224,
+  "response_events_without_body": 1,
+  "sheet_rows": {
+    "接口总览": 64,
+    "调用参数": 111,
+    "采集字段与映射": 1006,
+    "暂不纳入及历史": 13
+  },
+  "xlsx_formulas_checked": 5,
+  "markdown_links_checked": 22,
+  "xlsx_zip_xml": "passed",
+  "freeze_and_filters": "passed",
+  "native_excel_application_test": "not_performed",
+  "visual_review": "four worksheets reviewed with Artifact Tool renders",
+  "artifacts": [
+    {
+      "path": "docs/providers/源头采集接口说明.json",
+      "sha256": "47e2e132834b6cb8a0bdea0b4290e705a8bbebf7b6a50bc83ef4286702e3820c"
+    },
+    {
+      "path": "docs/providers/源头采集接口说明.xlsx",
+      "sha256": "00375d37c76088630e71d59726bec768101ad5e66ff9233853182eb9decfd8d5"
+    },
+    {
+      "path": "provider_validation/results/formal-interface-spec-20261004/verify.py",
+      "sha256": "16afa2599588c90aacdc5b5c346944da87e56e6169594e2fdec5602562e2e856"
+    },
+    {
+      "path": "provider_validation/tests/build_interface_coverage.py",
+      "sha256": "5fae3d82e077edc61b1725902e9d5729c71d8f2c8257f40ebd28c1f4cab0afb5"
+    },
+    {
+      "path": "provider_validation/tests/build_interface_coverage_workbook.mjs",
+      "sha256": "cd8287c5a03c65557ed2781941b0ea3dc4feda21fa21cf3dc77d3a6eb07d9e7b"
+    }
+  ]
+}

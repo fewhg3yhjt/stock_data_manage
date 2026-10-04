@@ -10,6 +10,8 @@ import gzip
 import hashlib
 import json
 import re
+import subprocess
+import sys
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
@@ -822,5 +824,187 @@ def main() -> None:
     print(json.dumps(summary, ensure_ascii=False, indent=2))
 
 
+def build_formal_spec() -> dict[str, Any]:
+    """Document executable inputs using current configuration and hash-linked evidence.
+
+    This is an offline documentation export, not a new routing eligibility decision.
+    Historical coverage exports remain unchanged when this mode is selected.
+    """
+    import yaml
+    sys.path.insert(0, str(ROOT / "src"))
+    from stock_data_manage.config.loader import load_input_capabilities, load_input_field_contract
+
+    def read_json(path: Path):
+        return json.loads(path.read_text(encoding="utf-8-sig"))
+
+    def resolve(value: str) -> Path:
+        candidate = Path(value)
+        candidate = (candidate if candidate.is_absolute() else ROOT / candidate).resolve()
+        candidate.relative_to(ROOT)
+        return candidate
+
+    def text(value: Any) -> str:
+        if value is None:
+            return "未配置"
+        if isinstance(value, str):
+            return value
+        return json.dumps(value, ensure_ascii=False, separators=(",", ":"), default=str)
+
+    provider_path = ROOT / "config/providers.yaml"
+    provider_doc = yaml.safe_load(provider_path.read_text(encoding="utf-8"))
+    contracts = {c.input_id: c for c in load_input_capabilities(provider_path)}
+    current = provider_doc["input_capabilities"]
+    profiles = yaml.safe_load((ROOT / "config/collection.yaml").read_text(encoding="utf-8"))["collection_profiles"]
+    factory_path = ROOT / "src/stock_data_manage/routing/factory.py"
+    factory = ast.parse(factory_path.read_text(encoding="utf-8"))
+    expected = next(ast.literal_eval(n.value) for n in ast.walk(factory)
+                    if isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and t.id == "expected_methods" for t in n.targets))
+
+    # Only committed audit indexes are considered. A loose smoke/fixture report is
+    # never selected just because it is newer or returns a positive row count.
+    tracked = subprocess.check_output(["git", "ls-files", "-z", "provider_validation/results"], cwd=ROOT)
+    paths = [ROOT / p.decode("utf-8") for p in tracked.split(b"\0") if p]
+    indexes = [p for p in paths if p.name in {"comparison.json", "verification.json", "artifact-index.json", "summary.json"}]
+    reports: dict[str, list[tuple[int, str, Path, dict, Path]]] = {}
+    checked: dict[str, str] = {}
+
+    def check(path: Path, digest: str) -> bool:
+        actual = checked.setdefault(str(path), sha256(path))
+        return actual == digest
+
+    def records(value):
+        if isinstance(value, dict):
+            yield value
+            for child in value.values():
+                yield from records(child)
+        elif isinstance(value, list):
+            for child in value:
+                yield from records(child)
+
+    for index in sorted(indexes):
+        if not any(x in index.as_posix() for x in ("final", "cli", "verified", "accepted", "seal")):
+            continue
+        for record in records(read_json(index)):
+            name = record.get("report_path") or record.get("path")
+            digest = record.get("report_sha256") or record.get("sha256")
+            if not isinstance(name, str) or not name.endswith("report.json") or not digest:
+                continue
+            try:
+                path = resolve(name)
+                if not path.is_file() or not check(path, digest):
+                    continue
+                report = read_json(path)
+                ident = report.get("input_id")
+                if ident not in current or report.get("status") != "candidate_complete" or not report.get("row_count"):
+                    continue
+                if any(x in path.parts for x in ("invalid", "negative", "failure", "errors")):
+                    continue
+                weight = 2 if "report_path" in record and record.get("source_manifest") else 1
+                reports.setdefault(ident, []).append((weight, report.get("validation_time_utc", ""), path, report, index))
+            except (ValueError, OSError, KeyError):
+                continue
+
+    historical = {r["接口ID"]: r for r in read_csv(OUT_CSV)}
+    headers = ["输入ID", "能力名称", "来源", "来源端点", "标准数据集", "数据周期", "请求范围形态", "实现状态", "生产路由", "自动调度", "采集策略", "刷新频率", "执行日历", "调度覆盖配置", "请求间隔（秒）", "有效并发", "限速执行位置", "实际验证方式", "实测参数", "返回行数", "覆盖分母", "覆盖分母含义", "验证时间（UTC）", "来源地址/协议", "调用方法", "能力限制", "禁止的参数来源", "验证报告", "原始证据清单", "配置与代码入口"]
+    param_headers = ["输入ID", "能力名称", "参数", "含义", "类型", "必填", "参数来源", "默认值", "允许值", "最小值", "最大值", "执行位置", "实测参数示例", "日期门禁", "禁止的参数来源"]
+    field_headers = ["输入ID", "能力名称", "数据集", "标准字段", "来源字段/上下文", "类型", "必填", "标准单位", "来源单位验证", "主键", "转换规则", "空值标记", "未核准字段处理", "映射状态", "映射版本", "规则备注", "模板路径", "映射路径"]
+    excluded_headers = ["输入ID", "能力名称", "来源", "记录分类", "本轮采集", "原因", "对应正式输入", "验证时间（UTC）", "验证证据"]
+    overview, parameters, fields, excluded, evidence = [], [], [], [], []
+    tracked_sources = {provider_path, ROOT / "config/collection.yaml", factory_path, Path(__file__), OUT_CSV}
+    meanings = {"code": "证券/合约代码", "codes": "证券/合约代码集合", "date": "目标日期（具体日历及含义见能力限制）", "start": "请求起始日期", "end": "请求截止日期", "adjust": "复权口径", "period": "来源统计周期", "symbol": "来源查询标的或查询类别", "keyword": "查询关键词", "board_code": "来源板块代码", "board_name": "来源板块名称", "count": "来源允许的返回数量", "limit": "来源允许的返回上限"}
+    meanings.update({"symbols": "待采集证券代码集合", "as_of": "请求参考时刻", "board_type": "板块类别", "channel": "来源频道", "country": "来源国家筛选", "cursor": "来源分页/增量游标", "curve": "收益率曲线类别", "detail": "来源明细选项", "direction": "买卖方向", "end_date": "请求截止日期", "exchange": "来源交易所类别", "include_delisted": "是否保留已摘牌记录", "index_code": "来源指数代码", "instrument": "标的身份上下文", "kind": "来源数据类别", "min_importance": "来源事件重要性下限", "page": "来源页码", "pages": "来源页数限制", "progress": "来源业务进度代码", "report_date": "目标报告日期", "start_date": "请求起始日期", "trade_date": "目标交易日期", "with_content": "来源正文采集选项"})
+    shapes = {"single_symbol": "单标的", "symbol_batch": "标的集合分批", "full_snapshot": "来源全量快照", "date_snapshot": "指定日期快照", "file_package": "来源文件包", "paged_list": "分页列表"}
+    frequencies = {"daily": "日线/日级", "5m": "5分钟", "snapshot": "快照", "event": "事件", "report_period": "报告期", "monthly": "月级", "tick": "分笔"}
+    for ident, cfg in current.items():
+        if cfg["implementation_status"] != "implemented_validation_only":
+            category = {"alias": "别名（不重复计数）", "unimplemented": "暂不纳入（未完成接入）", "blocked": "暂不纳入（语义或覆盖受限）"}[cfg["implementation_status"]]
+            reason = "\n".join(cfg.get("limitations", []))
+            when, refs = None, []
+            if ident == "ASTOCK-037":
+                category = "原复合记录（已拆分）"
+            if ident in {"ASTOCK-011", "ASTOCK-037-business"}:
+                cancellation = VALIDATION / "results/actual-data-network-20261004" / ident / "cancellation.json"
+                failure = read_json(cancellation)
+                assert failure["source_unavailable"] is False
+                when = failure["validation_time_utc"]
+                reason = "原请求120秒未返回有效响应；历史HTML仅保留哈希，缺可回放响应。当前暂不采集，尚不能认定来源永久不可用。"
+                refs = [rel(cancellation), "provider_validation/results/actual-data-original-20261004/ths-archive-search.json"]
+                tracked_sources.add(cancellation)
+            else:
+                refs = [f"provider_validation/results/interface-records/{v}.json" for v in cfg.get("evidence_refs", []) if (VALIDATION / "results/interface-records" / f"{v}.json").is_file()]
+            excluded.append([ident, cfg.get("display_name", ident), cfg["provider"], category, "不作为独立可采集输入", reason, cfg.get("canonical_input") or ("ASTOCK-037-profile、ASTOCK-037-events" if ident == "ASTOCK-037" else None), when, "\n".join(refs)])
+            continue
+        assert expected.get(ident) == cfg.get("runtime_method"), f"unbound input: {ident}"
+        dataset, rule = load_input_field_contract(ROOT / "config", contracts[ident])
+        profile = profiles[cfg["collection_profile"]]
+        ds_path = ROOT / "config/datasets" / f"{cfg['dataset']}.yaml"
+        rule_path = ROOT / "config/normalization" / f"{cfg['dataset']}.yaml"
+        tracked_sources.update((ds_path, rule_path))
+        frequency = profile.get("frequency")
+        if frequency:
+            refresh = f"每{frequency['interval']}{ {'day': '天', 'minute': '分钟'}.get(frequency['unit'], frequency['unit']) }" + (f"，{frequency['at']}" if frequency.get("at") else "")
+        elif profile.get("refresh_interval_seconds"):
+            refresh = f"每{profile['refresh_interval_seconds']}秒（策略配置）"
+        else:
+            refresh = {"daily": "日级意图；未指定执行时刻", "after_close": "盘后意图；未指定执行时刻"}.get(profile["mode"], "未指定具体间隔")
+        picked = sorted(reports.get(ident, []), key=lambda v: (v[0], v[1], str(v[2])), reverse=True)
+        report, rp, audit = (picked[0][3], picked[0][2], picked[0][4]) if picked else ({}, None, None)
+        manifests = []
+        if rp:
+            # Resolve report-relative derived files from its enclosing candidate root.
+            candidates = [base for base in rp.parents if (base / report.get("output", {}).get("path", "__absent__")).is_file()]
+            if not candidates:
+                raise ValueError(f"missing derived output for {ident}: {rp}")
+            base = candidates[0]
+            output = report["output"]
+            if not check(base / output["path"], output["sha256"]):
+                raise ValueError(f"derived output hash mismatch: {ident}")
+            raw = report.get("raw_manifest")
+            if raw:
+                raw_path = base / raw["path"]
+                if not check(raw_path, raw["sha256"]):
+                    raise ValueError(f"manifest hash mismatch: {ident}")
+                manifests.append(rel(raw_path))
+            for response in report.get("responses", []):
+                source_ref = response.get("source_ref", {})
+                if source_ref.get("manifest"):
+                    ref = resolve(source_ref["manifest"])
+                    if not ref.is_file():
+                        raise ValueError(f"missing source manifest: {ident}")
+                    manifests.append(rel(ref))
+            mode = {"replay": "归档原响应离线回放", "live": "在线采样"}.get(report.get("mode"), str(report.get("mode")))
+            example = report.get("parameters", {})
+            evidence.append({"input_id": ident, "report": rel(rp), "report_sha256": sha256(rp), "audit_index": rel(audit), "audit_index_sha256": sha256(audit), "historical_code_version": report.get("code_version"), "historical_code_files": report.get("code_files", []), "source_response_hashes": output.get("source_response_hashes", []), "derived_output": {"path": rel(base / output["path"]), "sha256": output["sha256"], "row_count": output["row_count"]}, "manifests": [{"path": m, "sha256": sha256(ROOT / m)} for m in dict.fromkeys(manifests)]})
+        else:
+            mode, example = "本表未关联到哈希核准的执行报告；见历史证据", {}
+        parent = next((historical[v] for v in cfg.get("evidence_refs", []) if v in historical), {})
+        endpoints = list(dict.fromkeys(r.get("url", "").split("?", 1)[0] for r in report.get("responses", []) if r.get("url")))
+        overview.append([ident, cfg.get("display_name", ident), cfg["provider"], cfg["endpoint"], cfg["dataset"], frequencies.get(cfg["data_frequency"], cfg["data_frequency"]), shapes.get(cfg["request_shape"], cfg["request_shape"]), "已实现（验证输入）", "未授予生产路由资格", "已启用" if profile.get("scheduling_enabled") else "未启用", cfg["collection_profile"], refresh, profile.get("business_day"), profile.get("universe", "未显式指定；不代表全市场"), cfg["request_interval_seconds"], cfg["effective_concurrency"], cfg["request_limit_enforcement"], mode, text(example), report.get("row_count"), report.get("coverage_denominator"), report.get("coverage_basis", "返回样本范围；不代表全市场完整性"), report.get("validation_time_utc"), "\n".join(endpoints) or report.get("source_url") or parent.get("接口地址/协议"), cfg["runtime_method"], "\n".join(cfg.get("limitations", [])), "\n".join(cfg.get("forbidden_sources", [])), rel(rp) if rp else parent.get("逐接口结果记录"), "\n".join(dict.fromkeys(manifests)), f"config/providers.yaml#{ident}\n{rel(factory_path)}"])
+        for name, parameter in cfg.get("parameters", {}).items():
+            parameters.append([ident, cfg.get("display_name", ident), name, meanings.get(name, "按来源协议及参数来源解释"), parameter["type"], "是" if parameter.get("required") else "否", parameter.get("source"), text(parameter.get("default")), text(parameter.get("choices")), parameter.get("min"), parameter.get("max"), parameter.get("applied_at", "来源调用参数"), text(example.get(name)), "须为交易日" if cfg.get("trading_date_parameter") == name else "未设置交易日门禁", "\n".join(cfg.get("forbidden_sources", []))])
+        if not cfg.get("parameters"):
+            parameters.append([ident, cfg.get("display_name", ident), "无调用参数", "按来源当前快照/目录范围采集", None, "不适用", None, None, None, None, None, None, None, "不适用", "\n".join(cfg.get("forbidden_sources", []))])
+        for name, field in dataset["fields"].items():
+            context = rule.get("context_fields", {}).get(name)
+            source = rule.get("field_mapping", {}).get(name)
+            unverified = name in rule.get("unverified_fields", [])
+            transform = dict(rule.get("transforms", {}).get(name, {}))
+            for numeric in ("volume", "amount"):
+                if name == numeric and f"{numeric}_multiplier" in rule:
+                    transform["multiplier"] = rule[f"{numeric}_multiplier"]
+            fields.append([ident, cfg.get("display_name", ident), cfg["dataset"], name, f"上下文:{context}" if context else text(source) if source is not None else "来源未提供/没有映射", field["type"], "是" if field.get("required") else "否", field.get("unit", "不适用/未声明"), "未独立核准" if unverified else (report.get("field_units", {}).get(name) or "见规则及验证范围"), "是" if name in dataset["dataset"]["primary_key"] else "否", text(transform) if transform else "按类型转换", text(rule.get("null_values", [])), "标准输出置空；来源值另行留证" if unverified else "按模板与映射规则", rule["status"], rule.get("version"), rule.get("notes"), rel(ds_path), rel(rule_path)])
+    document = {"record_type": "formal_provider_interface_spec", "generated_at_utc": datetime.now(timezone.utc).isoformat(), "source_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(), "scope": "source collection inputs; no production eligibility or scheduling changes", "counts": dict(Counter(c["implementation_status"] for c in current.values())), "network_requests": 0, "production_writes": 0, "sources": [{"path": rel(p), "sha256": sha256(p)} for p in sorted(tracked_sources)], "evidence": evidence, "sheets": [{"name": "接口总览", "headers": headers, "rows": overview}, {"name": "调用参数", "headers": param_headers, "rows": parameters}, {"name": "采集字段与映射", "headers": field_headers, "rows": fields}, {"name": "暂不纳入及历史", "headers": excluded_headers, "rows": excluded}]}
+    destination = ROOT / "docs/providers/源头采集接口说明.json"
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_text(json.dumps(document, ensure_ascii=False, indent=2, default=str) + "\n", encoding="utf-8")
+    print(json.dumps({"output": rel(destination), "counts": document["counts"], "hash_linked_reports": len(evidence), "rows": {s["name"]: len(s["rows"]) for s in document["sheets"]}}, ensure_ascii=False))
+    return document
+
+
 if __name__ == "__main__":
-    main()
+    if sys.argv[1:] == ["--formal-spec"]:
+        build_formal_spec()
+    elif sys.argv[1:]:
+        raise SystemExit("Usage: build_interface_coverage.py [--formal-spec]")
+    else:
+        main()

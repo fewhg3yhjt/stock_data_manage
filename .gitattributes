@@ -333,3 +333,11 @@
 /provider_validation/results/actual-data-final-20261004-tests.log binary
 /src/stock_data_manage/providers/cninfo/*.py text eol=lf
 /provider_validation/docs/2026-10-04-actual-data-input-collection.md text eol=lf
+# Formal interface documentation: keep source hashes reproducible on checkout.
+provider_validation/tests/build_interface_coverage.py text eol=lf
+provider_validation/tests/build_interface_coverage_workbook.mjs text eol=lf
+docs/providers/*.md text eol=lf
+docs/providers/*.json -text whitespace=cr-at-eol
+docs/providers/*.xlsx binary
+provider_validation/results/formal-interface-spec-20261004/*.json -text whitespace=cr-at-eol
+provider_validation/results/formal-interface-spec-20261004/verify.py text eol=lf
