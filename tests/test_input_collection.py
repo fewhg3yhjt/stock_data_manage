@@ -419,6 +419,180 @@ POOL_SOURCE = {"ASTOCK-046": ("fetch_broken_board_pool", "stock_zt_pool_zbgc_em"
 
 EVENT_ARCHIVE = ROOT / "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson"
 FUTURES_ARCHIVE = ROOT / "provider_validation/results/raw/2026-10-01-v310-live/manifest.ndjson"
+REPORTS_CALENDAR_CONTEXT={"request":{"start_date":"2026-09-01","end_date":"2026-09-18"}}
+REPORTS_CALENDAR_CASES=[("ASTOCK-013",{},EVENT_ARCHIVE,40),("ASTOCK-066",REPORTS_CALENDAR_CONTEXT,EVENT_ARCHIVE,552),
+    ("ASTOCK-066",{**REPORTS_CALENDAR_CONTEXT,"config":{"country":"中国","min_importance":3}},EVENT_ARCHIVE,48)]
+
+
+class ReportTestClock:
+    def __init__(self):self.now=1000.0;self.waits=[]
+    def time(self):return self.now
+    def sleep(self,seconds):self.waits.append(seconds);self.now+=seconds
+
+
+def reports_calendar_records(input_id):
+    needle="https://vip.stock.finance.sina.com.cn/q/go.php/vReport_List/" if input_id=="ASTOCK-013" else "/apiv1/finance/macrodatas?"
+    return [json.loads(line) for line in EVENT_ARCHIVE.read_text(encoding="utf-8").splitlines() if needle in json.loads(line).get("url","")]
+
+
+def compare_reports_calendar_original(tmp_path,input_id,context,manifest,count):
+    import pandas as pd
+    from unittest.mock import patch
+    from stock_data_manage.providers.sina import news as sina_news
+    spec=importlib.util.spec_from_file_location("reports_calendar_original",ROOT/"provider_validation/tests/source_snapshots/a-stock-data/tests/test_v39_sources.py")
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);ns=module.load_shipped_code();store=RawObjectStore(tmp_path/"original")
+    ns["time"]=ReportTestClock()
+    try:
+        with captured_requests(store,provider="sina" if input_id=="ASTOCK-013" else "wallstreetcn",endpoint="reports-calendar",scope=context,
+            code_version="original-reports-calendar",pacer=RequestPacer(),replay_manifest=manifest) as events:
+            request=context.get("request",{});params=context.get("config",{})
+            frame=ns["sina_research_reports"]() if input_id=="ASTOCK-013" else ns["macro_calendar"](request["start_date"],request["end_date"],**params)
+    finally:ns["EM_SESSION"].close()
+    parsed=[{k:None if pd.isna(v) else v for k,v in row.items()} for row in frame.to_dict(orient="records")]
+    original_path=tmp_path/"original-parsed.json";original_path.write_text(json.dumps(parsed,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    with patch.object(sina_news,"_report_clock",ReportTestClock()),patch.object(sina_news,"_report_last",[0.0]):
+        report=collect_input(input_id=input_id,context=context,config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=manifest)
+    assert report["status"]=="candidate_complete" and report["row_count"]==len(parsed)==count,report
+    keys=("url","method","status_code","body_sha256","request_headers","request_options")
+    assert [{k:r.get(k) for k in keys} for r in events]==[{k:r.get(k) for k in keys} for r in report["responses"]]
+    candidate=read_artifact(report,"parsed_rows")
+    for row,old in zip(candidate,parsed):
+        for key,value in row.items():
+            if key!="source_event_id":assert value==old[key],(key,value,old[key])
+    if input_id=="ASTOCK-013":assert read_artifact(report,"source_rows")==candidate
+    else:
+        raw=[]
+        for record in reports_calendar_records(input_id):raw.extend(json.loads(RawObjectStore.read_response(manifest,record))["data"]["items"])
+        assert read_artifact(report,"source_rows")==raw
+        selected_ids={row["source_event_id"] for row in candidate}
+        assert read_artifact(report,"excluded_rows")==[row for row in raw if str(row["id"]) not in selected_ids]
+        by_id={str(row["id"]):row for row in raw}
+        for row in candidate:
+            old=by_id[row["source_event_id"]]
+            assert row["title"]==old["title"] and row["importance"]==old["importance"]
+    for row,old in zip(read_artifact(report,"output"),candidate):
+        assert row["snapshot_at"]==report["source_capture_window"]["last"]
+        if input_id=="ASTOCK-013":assert row["source_report_id"]==old["report_id"] and row["report_date"]==old["date"] and row["title"]==old["title"]
+        else:
+            assert row["event_time"]==old["time"].replace(" ","T")+":00+08:00"
+            assert row["source_event_id"]==old["source_event_id"] and row["title"]==old["title"]
+            for key in ("actual","forecast","previous","revised"):
+                assert row[key+"_text"]==(str(old[key]) if old[key] is not None else None)
+    comparison=dict(input_id=input_id,row_count=count,mode="offline_replay",all_business_fields_equal=True,all_retained_source_fields_equal=True,
+        request_comparison_equal=True,original_parsed_path=str(original_path.resolve()),original_parsed_sha256=hashlib.sha256(original_path.read_bytes()).hexdigest(),
+        report_path=report["report_path"],report_sha256=hashlib.sha256(Path(report["report_path"]).read_bytes()).hexdigest())
+    (tmp_path/"comparison.json").write_text(json.dumps(comparison,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    return comparison
+
+
+@pytest.mark.parametrize("input_id,context,manifest,count",REPORTS_CALENDAR_CASES)
+def test_reports_calendar_original_requests_fields_and_filters(tmp_path,no_network,input_id,context,manifest,count):
+    compare_reports_calendar_original(tmp_path,input_id,context,manifest,count)
+
+
+REPORTS_CALENDAR_FAILURES=[("ASTOCK-013",m) for m in ("table","missing_row","day","duplicate","http403")]+[
+    ("ASTOCK-066",m) for m in ("business","structure","week_empty","time","outside","importance","duplicate","http403")]
+
+
+def reports_calendar_fixture(tmp_path,input_id,mutation):
+    import re
+    store=RawObjectStore(tmp_path/"fixture")
+    for index,record in enumerate(reports_calendar_records(input_id)):
+        body=RawObjectStore.read_response(EVENT_ARCHIVE,record)
+        if index==0:
+            if input_id=="ASTOCK-013":
+                text=body.decode("gbk","replace")
+                if mutation=="table":text=text.replace("研究员","changed")
+                elif mutation=="missing_row":text=text.replace('class="tal f14"','class="changed"',1)
+                elif mutation=="day":text=re.sub(r'(<td>)\d{4}-\d{2}-\d{2}(</td>)',r'\1bad\2',text,count=1)
+                elif mutation=="duplicate":
+                    ids=re.findall(r'/rptid/(\d+)/',text);text=text.replace('/rptid/'+ids[1]+'/', '/rptid/'+ids[0]+'/',1)
+                elif mutation in {"false_empty","valid_empty"}:text='<table class="tb_01">研究员</table>没有找到相关内容'
+                body=text.encode("gbk",errors="replace")
+            else:
+                payload=json.loads(body);items=payload["data"]["items"]
+                if mutation=="business":payload["code"]=0
+                elif mutation=="structure":payload["data"]["items"]={}
+                elif mutation=="week_empty":items.clear()
+                elif mutation=="time":items[0]["public_date"]="bad"
+                elif mutation=="outside":items[0]["public_date"]=0
+                elif mutation=="importance":items[0]["importance"]=True
+                elif mutation=="duplicate":items[1]["id"]=items[0]["id"]
+                elif mutation=="display_values":items[0].update(actual=0,forecast="0",previous="--",revised=" null ")
+                body=json.dumps(payload,ensure_ascii=False).encode()
+        response=requests.Response();response.status_code=403 if mutation=="http403" and index==0 else 200;response.encoding=record.get("response_encoding") or "utf-8";response._content=body
+        store.record_response(response=response,url=record["url"],method="GET",request_headers=record["request_headers"],provider="fixture",endpoint="reports-calendar",
+            scope={"fixture":"synthetic mutation"},code_version="fixture",mode="fixture")
+        if input_id=="ASTOCK-013" and mutation in {"false_empty","valid_empty"}:
+            response._content=RawObjectStore.read_response(EVENT_ARCHIVE,record) if mutation=="false_empty" else body
+            store.record_response(response=response,url=record["url"],method="GET",request_headers=record["request_headers"],provider="fixture",endpoint="reports-calendar",scope={"fixture":"second empty-page attempt"},code_version="fixture",mode="fixture")
+    return store.root/"manifest.ndjson"
+
+
+@pytest.mark.parametrize("input_id,mutation",REPORTS_CALENDAR_FAILURES)
+def test_reports_calendar_failures_keep_evidence(tmp_path,no_network,input_id,mutation):
+    from stock_data_manage.providers.sina import news as sina_news
+    from unittest.mock import patch
+    context={} if input_id=="ASTOCK-013" else REPORTS_CALENDAR_CONTEXT
+    with patch.object(sina_news,"_report_clock",ReportTestClock()),patch.object(sina_news,"_report_last",[0.0]):
+        report=collect_input(input_id=input_id,context=context,config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=reports_calendar_fixture(tmp_path,input_id,mutation))
+    assert report["status"]=="failed" and "output" not in report and report["responses"],report
+    assert report["production_writes"]==report["live_http_calls"]==0
+
+
+@pytest.mark.parametrize("mutation,count",[("false_empty",40),("valid_empty",0)])
+def test_reports_calendar_original_empty_retry_and_six_seconds(tmp_path,no_network,mutation,count):
+    from stock_data_manage.providers.sina import news as sina_news
+    from unittest.mock import patch
+    clock=ReportTestClock()
+    with patch.object(sina_news,"_report_clock",clock),patch.object(sina_news,"_report_last",[0.0]):
+        report=collect_input(input_id="ASTOCK-013",context={},config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=reports_calendar_fixture(tmp_path,"ASTOCK-013",mutation))
+    assert report["status"]=="candidate_complete" and report["row_count"]==count and report["empty_page_attempts"]==2,report
+    assert len(report["responses"])==2 and clock.waits==[6.0] and report["valid_empty_dataset"]==(count==0)
+    (tmp_path/"retry-proof.json").write_text(json.dumps(dict(mode="synthetic clock and empty HTML fixture",waits=clock.waits,attempts=2,rows=count)),encoding="utf-8")
+
+
+def test_reports_calendar_source_display_values_not_reinterpreted(tmp_path,no_network):
+    report=collect_input(input_id="ASTOCK-066",context=REPORTS_CALENDAR_CONTEXT,config_root=ROOT/"config",output_root=tmp_path/"candidate",replay_manifest=reports_calendar_fixture(tmp_path,"ASTOCK-066","display_values"))
+    assert report["status"]=="candidate_complete",report
+    id=str(read_artifact(report,"source_rows")[0]["id"]);row=next(row for row in read_artifact(report,"output") if row["source_event_id"]==id)
+    assert [row[key+"_text"] for key in ("actual","forecast","previous","revised")]==["0","0","--"," null "]
+
+
+def test_reports_calendar_yaml_and_scope(tmp_path,no_network):
+    config=tmp_path/"config";shutil.copytree(ROOT/"config",config);path=config/"normalization/macro_calendar.yaml";rule=yaml.safe_load(path.read_text(encoding="utf-8"))
+    rule["rules"][0]["field_mapping"]["title"]="country";path.write_text(yaml.safe_dump(rule,allow_unicode=True),encoding="utf-8")
+    report=collect_input(input_id="ASTOCK-066",context=REPORTS_CALENDAR_CONTEXT,config_root=config,output_root=tmp_path/"candidate",replay_manifest=EVENT_ARCHIVE,
+        fields=["snapshot_at","source_event_id","event_time","importance","title"])
+    assert report["status"]=="candidate_complete" and read_artifact(report,"output")[0]["title"]==read_artifact(report,"parsed_rows")[0]["country"],report
+    for id,bad in [("ASTOCK-013",{"metadata":{"page":2}}),("ASTOCK-013",{"request":{"symbol":"600519"}}),
+        ("ASTOCK-066",{**REPORTS_CALENDAR_CONTEXT,"config":{"min_importance":0}}),("ASTOCK-066",{**REPORTS_CALENDAR_CONTEXT,"config":{"min_importance":True}})]:
+        with pytest.raises(ValueError):collect_input(input_id=id,context=bad,config_root=ROOT/"config",output_root=tmp_path/"bad",replay_manifest=EVENT_ARCHIVE)
+    for context in [{"request":{"start_date":"2026-01-01","end_date":"2026-09-18"}},{**REPORTS_CALENDAR_CONTEXT,"config":{"country":"not a country"}}]:
+        report=collect_input(input_id="ASTOCK-066",context=context,config_root=ROOT/"config",output_root=tmp_path/"bad",replay_manifest=EVENT_ARCHIVE)
+        assert report["status"]=="failed" and report["failure_class"]=="ValueError" and "output" not in report
+
+
+def test_reports_calendar_direct_http_policy_and_cache(tmp_path,monkeypatch):
+    from stock_data_manage.providers.sina import news as sina_news
+    from stock_data_manage.storage.raw import sanitized_url
+    from unittest.mock import patch
+    seen=[]
+    def send(session,request,**kwargs):
+        record=next(record for id in ("ASTOCK-013","ASTOCK-066") for record in reports_calendar_records(id) if sanitized_url(record["url"])==sanitized_url(request.url));seen.append(request.url)
+        assert session.trust_env is True and kwargs["timeout"]==(10,40) and kwargs["allow_redirects"] is True and session.get_adapter(request.url).max_retries.total==0
+        assert request.headers["User-Agent"]==record["request_headers"]["User-Agent"]
+        if "vReport_List" in request.url:assert request.headers["Referer"]=="https://finance.sina.com.cn/"
+        response=requests.Response();response.status_code=200;response.encoding=record.get("response_encoding") or "utf-8";response._content=RawObjectStore.read_response(EVENT_ARCHIVE,record);response.url=request.url;return response
+    with patch("requests.Session.send",send),patch.object(sina_news,"_report_clock",ReportTestClock()),patch.object(sina_news,"_report_last",[0.0]):
+        for id,context,_,count in REPORTS_CALENDAR_CASES[:2]:
+            first=collect_input(input_id=id,context=context,config_root=ROOT/"config",output_root=tmp_path/"candidate",mode="live",evidence_root=tmp_path/"unused",pacer=RequestPacer(clock=lambda:1000,wait=lambda n:None))
+            second=collect_input(input_id=id,context=context,config_root=ROOT/"config",output_root=tmp_path/"candidate",mode="live",evidence_root=tmp_path/"candidate")
+            assert first["status"]==second["status"]=="candidate_complete" and first["row_count"]==count,(first,second)
+            assert first["live_http_calls"]==(1 if id=="ASTOCK-013" else 3) and second["live_http_calls"]==0 and read_artifact(first,"output")==read_artifact(second,"output")
+    assert len(seen)==4
+    (tmp_path/"fixture-mode.json").write_text(json.dumps(dict(mode="injected Session and clock; no real live validation",real_http_calls=0,fixture_send_calls=4)),encoding="utf-8")
+
 SINA_FUTURES_CASES = [("ASTOCK-074",{"request":{"contracts":["RB0","M0","IF0"]}},EVENT_ARCHIVE,3),
     ("ASTOCK-075",{"request":{"contract":"RB0","start_date":"2026-01-01","end_date":"2026-09-30"}},FUTURES_ARCHIVE,181),
     ("ASTOCK-075",{"request":{"contract":"M0","start_date":"2026-01-01","end_date":"2026-09-30"}},FUTURES_ARCHIVE,181),

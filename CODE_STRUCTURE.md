@@ -164,6 +164,9 @@ BaoStock 后续两项转换见 `provider_validation/docs/2026-10-04-baostock-inp
 
 ## 迁移约束
 
+- 原 `providers/sina/news.py` 增加研报列表与原 GBK/HTML/6 秒假空页重试；原 `providers/wallstreetcn/news.py` 增加宏观日历七天切片/窗口/唯一性/重要度和筛选；没有新 Provider。`config/{datasets,normalization}/{sina_reports,macro_calendar}.yaml` 定义来源字段和标准显示文本。
+- `pipeline/inputs.py` 扩展研报合法候选空表及日历排除行/请求窗口/分钟精度留证，原验证入口增加 `--verify-reports-calendar`；`provider_validation/docs/2026-10-04-reports-calendar-input-collection.md` 与 `results/reports-calendar-*-20261004*` 保存原实现对照、模拟/异常/会话检查、实际入口、回归和提交字节审计。当前38项候选、26项待转换、7项阻断、3项别名。
+
 - 原 `providers/eastmoney/financial.py` 增加 PMI 月历史方法与注入 SDK 字段；`providers/mofcom/{__init__,social_financing}.py` 为必要商务部社融适配器，沿用原 SDK/TLS。`config/{datasets,normalization}/{social_financing,pmi_history}.yaml` 定义统计月、来源映射及待认证单位。
 - `pipeline/inputs.py` 扩展宏观来源/解析/月窗口/TLS依赖留证，`providers/transport.py` 仅对社融合同启用空 POST 身份核对；原验证入口增加 `--verify-macro`。`provider_validation/docs/2026-10-04-macro-input-collection.md`、`results/macro-*-20261004*` 保存原脚本对照、失败/语义/会话模拟、实际入口、回归和哈希审计。当前36项候选、28项待转换、7项阻断、3项别名。
 

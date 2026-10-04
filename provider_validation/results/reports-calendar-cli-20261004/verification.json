@@ -1,0 +1,90 @@
+{
+  "validation_time_utc": "2026-10-04T05:31:53.865469+00:00",
+  "results": [
+    {
+      "input_id": "ASTOCK-013",
+      "command": [
+        "D:\\Program Files\\Python\\python.exe",
+        "-m",
+        "stock_data_manage.cli",
+        "collect-input",
+        "--input",
+        "ASTOCK-013",
+        "--config-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\config",
+        "--output-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-calendar-cli-20261004\\candidate",
+        "--mode",
+        "replay",
+        "--replay-manifest",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\manifest.ndjson",
+        "--context-file",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-calendar-cli-20261004\\0-context.json"
+      ],
+      "exit_code": 0,
+      "count": 40,
+      "stdout": "provider_validation/results/reports-calendar-cli-20261004/0-stdout.json",
+      "stderr": "provider_validation/results/reports-calendar-cli-20261004/0-stderr.bin",
+      "stdout_sha256": "b5ff71aace59d2cd9827a9caae1fbdc55c027552d31eacf186e2bf37d3a13505",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-calendar-cli-20261004\\candidate\\ASTOCK-013-1e9cf6bcd743\\2026-10-04\\input_report\\sina\\report_list\\report.json"
+    },
+    {
+      "input_id": "ASTOCK-066",
+      "command": [
+        "D:\\Program Files\\Python\\python.exe",
+        "-m",
+        "stock_data_manage.cli",
+        "collect-input",
+        "--input",
+        "ASTOCK-066",
+        "--config-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\config",
+        "--output-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-calendar-cli-20261004\\candidate",
+        "--mode",
+        "replay",
+        "--replay-manifest",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\manifest.ndjson",
+        "--context-file",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-calendar-cli-20261004\\1-context.json"
+      ],
+      "exit_code": 0,
+      "count": 552,
+      "stdout": "provider_validation/results/reports-calendar-cli-20261004/1-stdout.json",
+      "stderr": "provider_validation/results/reports-calendar-cli-20261004/1-stderr.bin",
+      "stdout_sha256": "70ef76771c904f2d1ca29ef34f76e8adbd50829a76561d12a743afeab4ecc8d3",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-calendar-cli-20261004\\candidate\\ASTOCK-066-5143a245c3c9\\2026-10-04\\input_report\\wallstreetcn\\macro_calendar\\report.json"
+    },
+    {
+      "input_id": "ASTOCK-066",
+      "command": [
+        "D:\\Program Files\\Python\\python.exe",
+        "-m",
+        "stock_data_manage.cli",
+        "collect-input",
+        "--input",
+        "ASTOCK-066",
+        "--config-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\config",
+        "--output-root",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-calendar-cli-20261004\\candidate",
+        "--mode",
+        "replay",
+        "--replay-manifest",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\manifest.ndjson",
+        "--context-file",
+        "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-calendar-cli-20261004\\2-context.json"
+      ],
+      "exit_code": 0,
+      "count": 48,
+      "stdout": "provider_validation/results/reports-calendar-cli-20261004/2-stdout.json",
+      "stderr": "provider_validation/results/reports-calendar-cli-20261004/2-stderr.bin",
+      "stdout_sha256": "b2b1c2c3aea22d4ac0c58a48e464a0d1a3a84435dc28a092e7c905ab8c621b0b",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-calendar-cli-20261004\\candidate\\ASTOCK-066-a03cd03d7f48\\2026-10-04\\input_report\\wallstreetcn\\macro_calendar\\report.json"
+    }
+  ],
+  "script_sha256": "12365ae2d0072b145f6bf292dcd829eb0f2c76e59f29ba2e1beca6af20e5b193"
+}

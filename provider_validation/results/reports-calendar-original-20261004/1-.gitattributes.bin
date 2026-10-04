@@ -1,0 +1,232 @@
+# Preserve this delivery's evidence bytes: Git newline conversion must not invalidate SHA-256 references.
+/provider_validation/results/input-collection-20261003/** -text whitespace=cr-at-eol
+/provider_validation/results/input-debug-20261003/** -text whitespace=cr-at-eol
+/provider_validation/results/input-final-20261003/** -text whitespace=cr-at-eol
+/provider_validation/results/input-live-20261003/** -text whitespace=cr-at-eol
+/provider_validation/results/input-replay-20261003/** -text whitespace=cr-at-eol
+/provider_validation/results/input-verified-20261003/** -text whitespace=cr-at-eol
+/provider_validation/results/2026-10-03-yaml-input-collection-tests.xml -text whitespace=cr-at-eol
+/provider_validation/results/2026-10-03-yaml-input-collection-verification.json -text whitespace=cr-at-eol
+/provider_validation/results/sdk-snapshot-redaction-20261003.json -text whitespace=cr-at-eol
+/provider_validation/coverage/successful-input-capabilities-20261003-implemented.* -text whitespace=cr-at-eol
+
+# Newly added implementation/configuration files are hashed as LF source files.
+/src/stock_data_manage/pipeline/inputs.py text eol=lf
+/src/stock_data_manage/providers/eastmoney/limit_pool.py text eol=lf
+/src/stock_data_manage/providers/sina/calendar.py text eol=lf
+/tests/test_input_collection.py text eol=lf
+/provider_validation/tests/replay_input_capabilities.py text eol=lf
+/config/datasets/limit_up_pool.yaml text eol=lf
+/config/datasets/minute_bar_5m.yaml text eol=lf
+/config/datasets/trading_calendar.yaml text eol=lf
+/config/normalization/limit_up_pool.yaml text eol=lf
+/config/normalization/minute_bar_5m.yaml text eol=lf
+/config/normalization/trading_calendar.yaml text eol=lf
+
+# Response payloads and SDK source snapshots are byte archives, including when they resemble text.
+/provider_validation/results/input-*-20261003/**/bodies/*.bin binary
+
+# Tencent frequency implementation: source hashes and immutable offline evidence.
+/config/collection.yaml text eol=lf
+/config/providers.yaml text eol=lf
+/src/stock_data_manage/cli.py text eol=lf
+/src/stock_data_manage/config/loader.py text eol=lf
+/src/stock_data_manage/providers/tencent/snapshot.py text eol=lf
+/src/stock_data_manage/storage/metadata.py text eol=lf
+/src/stock_data_manage/worker/scheduler.py text eol=lf
+/tests/test_cli.py text eol=lf
+/tests/test_scheduler.py text eol=lf
+/tests/test_daily_collection_e2e.py text eol=lf
+/provider_validation/results/tencent-final-20261004-v2/** -text whitespace=cr-at-eol
+/provider_validation/results/tencent-final-20261004-v2/**/*.bin binary
+/tests/test_provider_contract_adapters.py text eol=lf
+/provider_validation/tests/prepare_capability_results.py text eol=lf
+/provider_validation/results/input-scheduling*-20261003/** -text whitespace=cr-at-eol
+/provider_validation/results/input-scheduling*-20261003/**/*.bin binary
+/provider_validation/results/input-scheduling*-20261003/**/*.duckdb binary
+/provider_validation/results/2026-10-03-tencent-scheduling-*.xml -text whitespace=cr-at-eol
+/provider_validation/results/2026-10-03-tencent-scheduling-*.json -text whitespace=cr-at-eol
+/provider_validation/coverage/successful-input-capabilities-20261003-scheduling.* -text whitespace=cr-at-eol
+
+/provider_validation/coverage/successful-input-capabilities-20261003-scheduling-release.* -text whitespace=cr-at-eol
+
+# Read-only input migration review: preserve source and report hash links.
+/provider_validation/results/input-transition-review-20261004/** -text whitespace=cr-at-eol
+
+# THS input migration: immutable source/response evidence and stable implementation hashes.
+/provider_validation/results/ths-*-20261004/** -text whitespace=cr-at-eol
+/provider_validation/results/ths-*-20261004/**/*.bin binary
+/provider_validation/results/ths-*-20261004-*.xml -text whitespace=cr-at-eol
+/provider_validation/results/ths-*-20261004-*.json -text whitespace=cr-at-eol
+/src/stock_data_manage/providers/akshare/boards.py text eol=lf
+/src/stock_data_manage/providers/transport.py text eol=lf
+/src/stock_data_manage/storage/raw.py text eol=lf
+/src/stock_data_manage/routing/factory.py text eol=lf
+/tests/test_sector_data_providers.py text eol=lf
+/config/datasets/industry_directory.yaml text eol=lf
+/config/datasets/industry_index_daily.yaml text eol=lf
+/config/datasets/board_fund_flow.yaml text eol=lf
+/config/normalization/industry_directory.yaml text eol=lf
+/config/normalization/industry_index_daily.yaml text eol=lf
+/config/normalization/board_fund_flow.yaml text eol=lf
+
+# BaoStock migration keeps SDK representations and original code snapshots immutable.
+/provider_validation/results/bao-*-20261004/** -text whitespace=cr-at-eol
+/provider_validation/results/bao-*-20261004/**/*.bin binary
+/provider_validation/results/bao-*-20261004-*.xml -text whitespace=cr-at-eol
+# Preserve pytest failure traceback whitespace as immutable investigation evidence.
+/provider_validation/results/bao-dev-20261004-full-tests.xml -text whitespace=-blank-at-eol,cr-at-eol
+/provider_validation/results/bao-*-20261004-*.json -text whitespace=cr-at-eol
+/src/stock_data_manage/providers/baostock/industry.py text eol=lf
+/src/stock_data_manage/providers/baostock/session.py text eol=lf
+/config/datasets/security_snapshot.yaml text eol=lf
+/config/datasets/industry_membership.yaml text eol=lf
+/config/normalization/security_snapshot.yaml text eol=lf
+/config/normalization/industry_membership.yaml text eol=lf
+/tests/test_config_contract.py text eol=lf
+
+# Tencent migration evidence retains exact response bytes and investigation snapshots.
+/provider_validation/results/tencent-*-20261004/** -text whitespace=cr-at-eol
+/provider_validation/results/tencent-*-20261004/**/*.bin binary
+/provider_validation/results/tencent-*-20261004-*.xml -text whitespace=-blank-at-eol,cr-at-eol
+/provider_validation/results/tencent-*-20261004-*.json -text whitespace=cr-at-eol
+/src/stock_data_manage/providers/tencent/snapshot.py text eol=lf
+/src/stock_data_manage/worker/scheduler.py text eol=lf
+/config/normalization/realtime_quote.yaml text eol=lf
+/tests/test_provider_contract_adapters.py text eol=lf
+/tests/test_scheduler.py text eol=lf
+
+# EastMoney input evidence keeps application bytes and source snapshots immutable.
+/provider_validation/results/em-*-20261004/** -text whitespace=cr-at-eol
+/provider_validation/results/em-*-20261004/**/*.bin binary
+/provider_validation/results/em-*-20261004-*.xml -text whitespace=-blank-at-eol,cr-at-eol
+/provider_validation/results/em-*-20261004-*.json -text whitespace=cr-at-eol
+/src/stock_data_manage/providers/contracts.py text eol=lf
+/src/stock_data_manage/providers/eastmoney/realtime.py text eol=lf
+/src/stock_data_manage/providers/eastmoney/shareholder.py text eol=lf
+/src/stock_data_manage/providers/eastmoney/dividend.py text eol=lf
+/src/stock_data_manage/providers/eastmoney/fund_flow.py text eol=lf
+/config/normalization/shareholder_count.yaml text eol=lf
+/config/normalization/dividend_event.yaml text eol=lf
+/config/normalization/stock_fund_flow.yaml text eol=lf
+/.gitattributes text eol=lf
+/CODE_STRUCTURE.md text eol=lf
+/PROJECT_PROGRESS.md text eol=lf
+/provider_validation/docs/2026-10-04-eastmoney-input-collection.md text eol=lf
+
+# Stock-pool migration investigation and response evidence are immutable byte archives.
+/provider_validation/results/pools-*-20261004/** -text whitespace=cr-at-eol
+/provider_validation/results/pools-*-20261004/**/*.bin binary
+/provider_validation/results/pools-*-20261004-*.xml -text whitespace=-blank-at-eol,cr-at-eol
+/provider_validation/results/pools-*-20261004-*.json -text whitespace=cr-at-eol
+/provider_validation/docs/2026-10-04-stock-pool-input-collection.md text eol=lf
+/config/datasets/broken_limit_pool.yaml text eol=lf
+/config/normalization/broken_limit_pool.yaml text eol=lf
+/config/datasets/limit_down_pool.yaml text eol=lf
+/config/normalization/limit_down_pool.yaml text eol=lf
+/config/datasets/previous_limit_pool.yaml text eol=lf
+/config/normalization/previous_limit_pool.yaml text eol=lf
+/config/datasets/strong_stock_pool.yaml text eol=lf
+/config/normalization/strong_stock_pool.yaml text eol=lf
+
+# Event input evidence and original snapshots retain their exact bytes.
+/provider_validation/results/events-*-20261004/** -text whitespace=cr-at-eol
+/provider_validation/results/events-*-20261004/**/*.bin binary
+/provider_validation/results/events-*-20261004-*.xml -text whitespace=-blank-at-eol,cr-at-eol
+/provider_validation/results/events-*-20261004-*.json -text whitespace=cr-at-eol
+/src/stock_data_manage/providers/eastmoney/financial.py text eol=lf
+/config/datasets/earnings_forecast.yaml text eol=lf
+/config/normalization/earnings_forecast.yaml text eol=lf
+/config/datasets/institution_survey.yaml text eol=lf
+/config/normalization/institution_survey.yaml text eol=lf
+/provider_validation/docs/2026-10-04-eastmoney-events-input-collection.md text eol=lf
+
+# Financial-action source and response evidence is immutable.
+/provider_validation/results/actions-*-20261004/** -text whitespace=cr-at-eol
+/provider_validation/results/actions-*-20261004/**/*.bin binary
+/provider_validation/results/actions-*-20261004-*.xml -text whitespace=-blank-at-eol,cr-at-eol
+/provider_validation/results/actions-*-20261004-*.json -text whitespace=cr-at-eol
+/config/datasets/holder_trades.yaml text eol=lf
+/config/normalization/holder_trades.yaml text eol=lf
+/config/datasets/buyback.yaml text eol=lf
+/config/normalization/buyback.yaml text eol=lf
+/config/datasets/pledge.yaml text eol=lf
+/config/normalization/pledge.yaml text eol=lf
+/config/datasets/ipo_calendar.yaml text eol=lf
+/config/normalization/ipo_calendar.yaml text eol=lf
+/provider_validation/docs/2026-10-04-eastmoney-actions-input-collection.md text eol=lf
+/src/stock_data_manage/quality/normalization.py text eol=lf
+
+# LPR investigation and replay evidence is immutable.
+/provider_validation/results/lpr-*-20261004/** -text whitespace=cr-at-eol
+/provider_validation/results/lpr-*-20261004/**/*.bin binary
+/provider_validation/results/lpr-*-20261004-*.xml -text whitespace=-blank-at-eol,cr-at-eol
+/provider_validation/results/lpr-*-20261004-*.json -text whitespace=cr-at-eol
+/config/datasets/lpr_history.yaml text eol=lf
+/config/normalization/lpr_history.yaml text eol=lf
+/provider_validation/docs/2026-10-04-lpr-input-collection.md text eol=lf
+
+# News investigation and replay evidence is immutable.
+/provider_validation/results/news-*-20261004/** -text whitespace=cr-at-eol
+/provider_validation/results/news-*-20261004/**/*.bin binary
+/provider_validation/results/news-*-20261004-*.xml -text whitespace=-blank-at-eol,cr-at-eol
+/provider_validation/results/news-*-20261004-*.json -text whitespace=cr-at-eol
+/config/datasets/wallstreetcn_news.yaml text eol=lf
+/config/normalization/wallstreetcn_news.yaml text eol=lf
+/config/datasets/cctv_news_index.yaml text eol=lf
+/config/normalization/cctv_news_index.yaml text eol=lf
+/src/stock_data_manage/providers/wallstreetcn/*.py text eol=lf
+/src/stock_data_manage/providers/cctv/*.py text eol=lf
+/provider_validation/docs/2026-10-04-news-input-collection.md text eol=lf
+
+# Fixing-rate and CB investigation/replay evidence is immutable.
+/provider_validation/results/rates-bonds-*-20261004/** -text whitespace=cr-at-eol
+/provider_validation/results/rates-bonds-*-20261004/**/*.bin binary
+/provider_validation/results/rates-bonds-*-20261004-*.xml -text whitespace=-blank-at-eol,cr-at-eol
+/provider_validation/results/rates-bonds-*-20261004-*.json -text whitespace=cr-at-eol
+/config/datasets/repo_fixing.yaml text eol=lf
+/config/normalization/repo_fixing.yaml text eol=lf
+/config/datasets/convertible_bonds.yaml text eol=lf
+/config/normalization/convertible_bonds.yaml text eol=lf
+/src/stock_data_manage/providers/chinamoney/*.py text eol=lf
+/provider_validation/docs/2026-10-04-rates-bonds-input-collection.md text eol=lf
+
+# Existing Sina futures input investigation and replay evidence is immutable.
+/provider_validation/results/sina-futures-*-20261004/** -text whitespace=cr-at-eol
+/provider_validation/results/sina-futures-*-20261004/**/*.bin binary
+/provider_validation/results/sina-futures-*-20261004-*.xml -text whitespace=-blank-at-eol,cr-at-eol
+/provider_validation/results/sina-futures-*-20261004-*.json -text whitespace=cr-at-eol
+/config/datasets/futures_quote.yaml text eol=lf
+/config/normalization/futures_quote.yaml text eol=lf
+/config/datasets/futures_daily.yaml text eol=lf
+/config/normalization/futures_daily.yaml text eol=lf
+/config/datasets/a50_quote.yaml text eol=lf
+/config/normalization/a50_quote.yaml text eol=lf
+/src/stock_data_manage/providers/sina/snapshot.py text eol=lf
+/src/stock_data_manage/providers/sina/daily.py text eol=lf
+/provider_validation/docs/2026-10-04-sina-futures-input-collection.md text eol=lf
+
+# SDK news inputs and exact evidence bytes.
+/provider_validation/results/sdk-news-*-20261004/** -text whitespace=cr-at-eol
+/provider_validation/results/sdk-news-*-20261004/**/*.bin binary
+/provider_validation/results/sdk-news-*-20261004-*.xml -text whitespace=-blank-at-eol,cr-at-eol
+/provider_validation/results/sdk-news-*-20261004-*.json -text whitespace=cr-at-eol
+/config/datasets/cls_telegraph.yaml text eol=lf
+/config/normalization/cls_telegraph.yaml text eol=lf
+/config/datasets/sina_global_news.yaml text eol=lf
+/config/normalization/sina_global_news.yaml text eol=lf
+/src/stock_data_manage/providers/cls/*.py text eol=lf
+/src/stock_data_manage/providers/sina/news.py text eol=lf
+/provider_validation/docs/2026-10-04-sdk-news-input-collection.md text eol=lf
+
+# Monthly macro migration preserves original response and derived bytes.
+/provider_validation/results/macro-*-20261004/** -text whitespace=cr-at-eol
+/provider_validation/results/macro-*-20261004/**/*.bin binary
+/provider_validation/results/macro-*-20261004-*.xml -text whitespace=-blank-at-eol,cr-at-eol
+/provider_validation/results/macro-*-20261004-*.json -text whitespace=cr-at-eol
+/config/datasets/social_financing.yaml text eol=lf
+/config/normalization/social_financing.yaml text eol=lf
+/config/datasets/pmi_history.yaml text eol=lf
+/config/normalization/pmi_history.yaml text eol=lf
+/src/stock_data_manage/providers/mofcom/*.py text eol=lf
+/provider_validation/docs/2026-10-04-macro-input-collection.md text eol=lf

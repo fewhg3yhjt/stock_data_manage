@@ -40,6 +40,7 @@ def build_input_provider(contract, *, providers_path, client=None):
                         "ASTOCK-032": "fetch", "ASTOCK-033": "fetch", "ASTOCK-034": "fetch", "ASTOCK-035": "fetch",
                         "ASTOCK-064": "fetch", "ASTOCK-084": "fetch_convertible_bonds",
                         "ASTOCK-061": "fetch", "ASTOCK-062": "fetch_pmi",
+                        "ASTOCK-013": "fetch_reports", "ASTOCK-066": "fetch_macro_calendar",
                         "ASTOCK-074": "fetch_futures", "ASTOCK-075": "fetch_futures_kline", "ASTOCK-076": "fetch_a50",
                         "SDA-BOARD-001": "fetch_industry_list", "SDA-BOARD-002": "fetch_industry_daily",
                         "SDA-BOARD-003": "fetch_fund_flow", "SDA-BOARD-004": "fetch_fund_flow",
@@ -81,6 +82,18 @@ def build_input_provider(contract, *, providers_path, client=None):
     if contract.input_id == "ASTOCK-033":
         from ..providers.sina.news import SinaGlobalNewsProvider
         return SinaGlobalNewsProvider(client=client)
+    if contract.input_id == "ASTOCK-013":
+        from ..providers.sina.news import SinaGlobalNewsProvider
+        provider=SinaGlobalNewsProvider()
+        provider.capability_version="sina-report-input-v1"
+        provider.input_hosts=("https://vip.stock.finance.sina.com.cn",)
+        return provider
+    if contract.input_id == "ASTOCK-066":
+        from ..providers.wallstreetcn.news import WallStreetCNNewsProvider
+        provider=WallStreetCNNewsProvider()
+        provider.capability_version="wallstreetcn-calendar-input-v1"
+        provider.input_hosts=("https://api-one-wscn.awtmt.com",)
+        return provider
     if contract.input_id == "ASTOCK-035":
         from ..providers.cctv.news import CCTVNewsProvider
         return CCTVNewsProvider()

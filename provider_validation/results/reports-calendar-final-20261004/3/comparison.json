@@ -1,0 +1,12 @@
+{
+  "input_id": "ASTOCK-066",
+  "row_count": 48,
+  "mode": "offline_replay",
+  "all_business_fields_equal": true,
+  "all_retained_source_fields_equal": true,
+  "request_comparison_equal": true,
+  "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-calendar-final-20261004\\3\\original-parsed.json",
+  "original_parsed_sha256": "e57a143bd9a742bc24bea6fcdb1cc184dc0f180dfd9cd4c40dbd994e1afb587d",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-calendar-final-20261004\\3\\candidate\\ASTOCK-066-ea709dd94e1e\\2026-10-04\\input_report\\wallstreetcn\\macro_calendar\\report.json",
+  "report_sha256": "a3f8f9bb83feaba1bc2b377625893378c90a249b0577cf3d81a152809e1047da"
+}

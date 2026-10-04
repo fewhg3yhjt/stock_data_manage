@@ -1,0 +1,335 @@
+{
+  "input_id": "ASTOCK-013",
+  "dataset": "sina_reports",
+  "mode": "replay",
+  "parameters": {
+    "page": 1
+  },
+  "provider": "sina",
+  "endpoint": "report_list",
+  "collection_profile": {
+    "name": "event_daily",
+    "mode": "daily",
+    "refresh_interval_seconds": null,
+    "business_day": "calendar_day",
+    "scheduling_enabled": false,
+    "frequency_unit": null,
+    "frequency_interval": 1,
+    "at_time": null,
+    "anchor_date": null,
+    "settle_delay_seconds": 0,
+    "trigger_grace_seconds": 30,
+    "universe": "static",
+    "max_symbols": null
+  },
+  "request_interval_seconds": 6.0,
+  "effective_concurrency": 1,
+  "request_limit_enforcement": "call_boundary_only",
+  "adapter_version": "sina-report-input-v1",
+  "code_version": "40ae8d47d136d9cbbeaf08374f166a0d6fe51579be64c48f2d821dea1240319f",
+  "code_files": [
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\pipeline\\inputs.py",
+      "sha256": "0109ed74a07dcdf638267aabd26424053f9ad9442d3a33340ab2d00c5013c218"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\cli.py",
+      "sha256": "582f5caedfc538a012d7a2f6e8cd7af3fe8b6fc9152e5b9e0a3fa2cb8810ae19"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\config\\loader.py",
+      "sha256": "93bb55ab150c88751fe9a58a2b75737878c1b0f07233b8ec47009c4901bb11e9"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\contracts.py",
+      "sha256": "a4b16abc7e3686a4eb2791dcd4545fb2404e0214bf32e20db19d2582d39ea447"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\quality\\normalization.py",
+      "sha256": "3ed0d663b7fda9ac6cdf7f1252435f2351c783af3244ccba2c2b0f3891e29b3e"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\transport.py",
+      "sha256": "4f4fb06ffe10f82f1cba6a3e2c5cb5e55e6bfa40601b99eb40e2b241f6870d97"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\storage\\raw.py",
+      "sha256": "3b803525f5b275119ca7af3b05d151fedaeecbe12abf484efe1de3af8994793d"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\routing\\factory.py",
+      "sha256": "5a846927e24c269fc197e48291f832a1d8fe1cf3a4d3c6e4b1ada3de3537061e"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\daily.py",
+      "sha256": "487a14fcbfc47146d6d5fd291fbf41667aba435e5fed22ea1ef61ded513fcaa7"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\minute.py",
+      "sha256": "ff5cf1e91327bcab2e072bcfae9f1f77dca71a84ba26e456c26580a4d59d9cc1"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\snapshot.py",
+      "sha256": "3278cadac776fe8cfe5d02775a5bf8f53bc1cb96c595a5f418172f53047434bf"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\limit_pool.py",
+      "sha256": "2fbdfe3da3129545dfe8d2e457be7c42225696ddd74270567ae765e4b413f5ae"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\shareholder.py",
+      "sha256": "4c9d80f4d51845ac5541c42275f44f2a18643db5e9ccb705a3e16168f8db44c1"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\financial.py",
+      "sha256": "02a4b6f0dc09aefe064a2655ab596ec84f94e32a79f070f0136df4e51cd30ba1"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\wallstreetcn\\news.py",
+      "sha256": "fb870197a111ecad42d47e7e81315c7d59c3c6a8bd7cadb72b84cc537bc91fda"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\cctv\\news.py",
+      "sha256": "8839bdeed801611e8e6d11cb9441e6ede7bc94d56507eaa2c903e605c772ee7d"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\cls\\news.py",
+      "sha256": "51da559a252b67a4a2e58171e3630ff1a5a80cd2bc23aa5df30a7e17ac02ad30"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\news.py",
+      "sha256": "565774907b8f1c146eb729c5af12caef352d87e43e1e15719fe2a3928673e68f"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\mofcom\\social_financing.py",
+      "sha256": "55d292958fb34991c56c626d5f6f61e7e6c44c8c2627b88ea735e751aa12c5ce"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\chinamoney\\rates.py",
+      "sha256": "e7407f1d4272b69cb439bb0a7bad3960b65bb41328d752f541bc8ef50231f922"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\dividend.py",
+      "sha256": "5706a8cdb37eeeb8f66cb033a3091dd1b6ec1ed83d72d0f9fbeb8f5c75d9649b"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\fund_flow.py",
+      "sha256": "0cf655efa0854d18651bb4f04f985f0f210b81a6d9eff065604d235ed8f75280"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\realtime.py",
+      "sha256": "6e09d2a5014cf316c4d1e26e913a44d5c2fbad95fb44d95cba159ef881f03bca"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\calendar.py",
+      "sha256": "3d114045f960bfcc94ade1ee03e4d25ebdf6980ba68aa2d0a2236bed78aaef05"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\snapshot.py",
+      "sha256": "cfa0b823b2fa8053ce899157e9b6078b94516d3fabd5d303480824111f62d136"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\daily.py",
+      "sha256": "f9793bf9f5b8d77411abe459b285fc25892c840ff0962133e6b7c3ef628b2c92"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\akshare\\boards.py",
+      "sha256": "2060f150831cebaf707ed5becedc35428bc41d4428bab31555ed1d2bf817d122"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\baostock\\industry.py",
+      "sha256": "16c41b379eecbd87f082bd042e27fad7f3d8d77b5bfc6a3e8a286209b068494a"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\baostock\\session.py",
+      "sha256": "70ce19cdde1d6a8ed0c3d3db29caa28d1d8069826136ab6dd7fb6a2ef8c7b832"
+    }
+  ],
+  "config_files": [
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\providers.yaml",
+      "sha256": "d0f1cc371bb192c7bd26b2d5280d048be165497f2ac048db58234d8cf63b5b13"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\collection.yaml",
+      "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\datasets\\sina_reports.yaml",
+      "sha256": "257c0a14c634da0267490b8d8bf2cfe48067f4b8818a85968ac922f3521392e6"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\normalization\\sina_reports.yaml",
+      "sha256": "3a19d455c1227852fe3b131c655129dd5e727194a26cfd60734097f673edb174"
+    }
+  ],
+  "normalization_version": "sina-reports-input-v1",
+  "normalization_status": "pending_validation",
+  "field_units": {
+    "snapshot_at": null,
+    "report_date": null,
+    "title": null,
+    "report_type": null,
+    "organization": null,
+    "author": null,
+    "source_report_id": null,
+    "url": null
+  },
+  "unverified_fields": [],
+  "selected_fields": [
+    "author",
+    "organization",
+    "report_date",
+    "report_type",
+    "snapshot_at",
+    "source_report_id",
+    "title",
+    "url"
+  ],
+  "eligible_for_production_routing": false,
+  "production_writes": 0,
+  "live_http_calls": 0,
+  "validation_time_utc": "2026-10-04T05:31:51.954644+00:00",
+  "status": "candidate_complete",
+  "response_freshness_seconds": 86400,
+  "transport_dependency": {
+    "requests": "2.32.5",
+    "urllib3": "2.3.0"
+  },
+  "news_transport_policy": {
+    "source_contract": "successful runnable original source",
+    "headers": "original Chrome/126 User-Agent and finance.sina.com.cn Referer",
+    "trust_env": true,
+    "timeout_seconds": [
+      10,
+      40
+    ],
+    "allow_redirects": true,
+    "retry_total": 0,
+    "outer_capture_interval_seconds": 3,
+    "original_report_min_interval_seconds": 6,
+    "empty_page_attempts": 2,
+    "encoding": "GBK"
+  },
+  "context_dependency": {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-calendar-cli-20261004\\0-context.json",
+    "sha256": "e3566b3a06430868d71e9287dfd6c6c520a3da027aabea01951d407ee131dc2f"
+  },
+  "responses": [
+    {
+      "event": "http_response",
+      "method": "GET",
+      "url": "https://vip.stock.finance.sina.com.cn/q/go.php/vReport_List/kind/lastest/index.phtml?p=1",
+      "request_headers": {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept": "*/*",
+        "Connection": "keep-alive",
+        "Referer": "https://finance.sina.com.cn/"
+      },
+      "scope": {
+        "input_id": "ASTOCK-013",
+        "parameters": {
+          "page": 1
+        }
+      },
+      "request_options": {
+        "timeout": [
+          10,
+          40
+        ],
+        "allow_redirects": true,
+        "trust_env": true,
+        "proxies": {},
+        "sdk_retry_policy": false,
+        "probe_host_pause": false
+      },
+      "provider": "sina",
+      "endpoint": "report_list",
+      "code_version": "40ae8d47d136d9cbbeaf08374f166a0d6fe51579be64c48f2d821dea1240319f",
+      "fetched_at_utc": "2026-10-04T05:31:51.957463+00:00",
+      "mode": "replay",
+      "source_ref": {
+        "manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\raw\\2026-10-01-v39-live-escalated\\manifest.ndjson",
+        "line": 7,
+        "fetched_at_utc": "2026-10-01T12:55:06.241+00:00"
+      },
+      "outcome": "response",
+      "status_code": 200,
+      "response_headers": {
+        "Cache-Control": "max-age=10",
+        "Connection": "close",
+        "Content-Encoding": "gzip",
+        "Content-Type": "text/html; charset=gbk",
+        "Date": "Thu, 01 Oct 2026 12:55:10 GMT",
+        "Dpool_header": "stock7-finance-sina-com-cn-5785cfcbb8-4nvhf",
+        "Transfer-Encoding": "chunked",
+        "Vary": "Accept-Encoding"
+      },
+      "content_type": "text/html; charset=gbk",
+      "encoding": "gbk",
+      "body_bytes": 56821,
+      "body_sha256": "f6901c1bf3dc321a976c5cf7acc6f51e993fa1945c2af61b1aed4b4d2ef4c311",
+      "body_storage": "bodies/f6901c1bf3dc321a976c5cf7acc6f51e993fa1945c2af61b1aed4b4d2ef4c311.bin",
+      "persistence_status": "exact_application_payload_saved"
+    }
+  ],
+  "source_rows": {
+    "path": "2026-10-04/source_rows/sina/report_list/source-rows.json",
+    "sha256": "bcc3f222da299505158028bcfde428fd2525fd0dfb3d1155394e072dcea60f05",
+    "row_count": 40
+  },
+  "parsed_rows": {
+    "path": "2026-10-04/parsed_rows/sina/report_list/parsed-rows.json",
+    "sha256": "bcc3f222da299505158028bcfde428fd2525fd0dfb3d1155394e072dcea60f05",
+    "row_count": 40,
+    "code_version": "40ae8d47d136d9cbbeaf08374f166a0d6fe51579be64c48f2d821dea1240319f",
+    "source_response_hashes": [
+      "f6901c1bf3dc321a976c5cf7acc6f51e993fa1945c2af61b1aed4b4d2ef4c311"
+    ]
+  },
+  "source_url": "https://vip.stock.finance.sina.com.cn/q/go.php/vReport_List/kind/lastest/index.phtml?p=1",
+  "source_urls": [
+    "https://vip.stock.finance.sina.com.cn/q/go.php/vReport_List/kind/lastest/index.phtml?p=1"
+  ],
+  "source_capture_window": {
+    "first": "2026-10-01T12:55:06.241000+00:00",
+    "last": "2026-10-01T12:55:06.241000+00:00",
+    "meaning": "source response capture times; not row-level market timestamps"
+  },
+  "returned_window": {
+    "first": "2026-09-30",
+    "last": "2026-10-01"
+  },
+  "coverage_basis": "returned latest report page or original seven-day calendar slices; not independent complete history",
+  "universe_completeness_verified": false,
+  "page": 1,
+  "empty_page_attempts": 1,
+  "valid_empty_dataset": false,
+  "empty_validation_basis": "original two-attempt explicit empty-page rule; source absence not independently certified",
+  "pagination_completeness_verified": false,
+  "output": {
+    "path": "2026-10-04/sina_reports/sina/report_list/mapped-rows.json",
+    "sha256": "842877aba7a95eb363c5792e4b3d58c89f48b0adf78e53f5c4a1a1febbc2ccfc",
+    "row_count": 40,
+    "source_response_hashes": [
+      "f6901c1bf3dc321a976c5cf7acc6f51e993fa1945c2af61b1aed4b4d2ef4c311"
+    ]
+  },
+  "row_count": 40,
+  "coverage_denominator": 40,
+  "first_key": [
+    "2026-10-01T12:55:06.241000+00:00",
+    "844185017754"
+  ],
+  "last_key": [
+    "2026-10-01T12:55:06.241000+00:00",
+    "844139648196"
+  ],
+  "raw_manifest": {
+    "path": "_raw/manifest.ndjson",
+    "sha256": "63132461d6e9f3b252f3cee6dfcf7dc2e4c5e0a4c18bf25496f0f1a0982ba3f9"
+  },
+  "run_directory": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-calendar-cli-20261004\\candidate\\ASTOCK-013-1e9cf6bcd743",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-calendar-cli-20261004\\candidate\\ASTOCK-013-1e9cf6bcd743\\2026-10-04\\input_report\\sina\\report_list\\report.json"
+}

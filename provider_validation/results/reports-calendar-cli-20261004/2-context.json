@@ -1,0 +1,10 @@
+{
+  "request": {
+    "start_date": "2026-09-01",
+    "end_date": "2026-09-18"
+  },
+  "config": {
+    "country": "中国",
+    "min_importance": 3
+  }
+}

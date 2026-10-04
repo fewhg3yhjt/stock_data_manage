@@ -1,0 +1,213 @@
+{
+  "validation_time_utc": "2026-10-04T05:30:13.857703+00:00",
+  "mode": "offline_replay",
+  "network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "verification_code": {
+    "path": "tests/test_input_collection.py",
+    "sha256": "39821e0307bbd9ee72354c10db7b68e43d6cb30f7bf50b262768e14c6e03c65d"
+  },
+  "runner": {
+    "path": "provider_validation/tests/replay_input_capabilities.py",
+    "sha256": "99d93ce1193bf347e9d99a43b62c564e7d42ca4acec00b1d7caa0f95c5b553fa"
+  },
+  "inputs": [
+    {
+      "input_id": "ASTOCK-013",
+      "report_path": "provider_validation/results/reports-calendar-final-20261004/1/candidate/ASTOCK-013-2bc95fee99da/2026-10-04/input_report/sina/report_list/report.json",
+      "report_sha256": "0a9ea0b90cf74105256e59defcafaca246201f1681d42feb921b45454479a6d5",
+      "source_manifest": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+      "source_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+      "row_count": 40,
+      "scope": {
+        "page": 1
+      },
+      "code_version": "40ae8d47d136d9cbbeaf08374f166a0d6fe51579be64c48f2d821dea1240319f",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-066",
+      "report_path": "provider_validation/results/reports-calendar-final-20261004/2/candidate/ASTOCK-066-914b5e44c04d/2026-10-04/input_report/wallstreetcn/macro_calendar/report.json",
+      "report_sha256": "fa5fe5303a67010c070987f00ba3b914e48aa5905341dd37a53dcd58a0ccc702",
+      "source_manifest": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+      "source_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+      "row_count": 552,
+      "scope": {
+        "end": "2026-09-18",
+        "min_importance": 1,
+        "start": "2026-09-01"
+      },
+      "code_version": "40ae8d47d136d9cbbeaf08374f166a0d6fe51579be64c48f2d821dea1240319f",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-066",
+      "report_path": "provider_validation/results/reports-calendar-final-20261004/3/candidate/ASTOCK-066-ea709dd94e1e/2026-10-04/input_report/wallstreetcn/macro_calendar/report.json",
+      "report_sha256": "a3f8f9bb83feaba1bc2b377625893378c90a249b0577cf3d81a152809e1047da",
+      "source_manifest": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+      "source_manifest_sha256": "2c96b1709b2408aab249e7facadb803e02e45462d31d3e21b833829305851079",
+      "row_count": 48,
+      "scope": {
+        "country": "中国",
+        "end": "2026-09-18",
+        "min_importance": 3,
+        "start": "2026-09-01"
+      },
+      "code_version": "40ae8d47d136d9cbbeaf08374f166a0d6fe51579be64c48f2d821dea1240319f",
+      "result": "passed"
+    }
+  ],
+  "original_vs_provider": [
+    {
+      "input_id": "ASTOCK-013",
+      "row_count": 40,
+      "mode": "offline_replay",
+      "all_business_fields_equal": true,
+      "all_retained_source_fields_equal": true,
+      "request_comparison_equal": true,
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-calendar-final-20261004\\1\\original-parsed.json",
+      "original_parsed_sha256": "53e3d3c7a1afda695e2dfb3a0687e62df466c588b9aa6bb71f0c17b253a3ee21",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-calendar-final-20261004\\1\\candidate\\ASTOCK-013-2bc95fee99da\\2026-10-04\\input_report\\sina\\report_list\\report.json",
+      "report_sha256": "0a9ea0b90cf74105256e59defcafaca246201f1681d42feb921b45454479a6d5"
+    },
+    {
+      "input_id": "ASTOCK-066",
+      "row_count": 552,
+      "mode": "offline_replay",
+      "all_business_fields_equal": true,
+      "all_retained_source_fields_equal": true,
+      "request_comparison_equal": true,
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-calendar-final-20261004\\2\\original-parsed.json",
+      "original_parsed_sha256": "44decc6f5775c21cd91e44278d3d57537ae80281aa742d52bc2189295c81969e",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-calendar-final-20261004\\2\\candidate\\ASTOCK-066-914b5e44c04d\\2026-10-04\\input_report\\wallstreetcn\\macro_calendar\\report.json",
+      "report_sha256": "fa5fe5303a67010c070987f00ba3b914e48aa5905341dd37a53dcd58a0ccc702"
+    },
+    {
+      "input_id": "ASTOCK-066",
+      "row_count": 48,
+      "mode": "offline_replay",
+      "all_business_fields_equal": true,
+      "all_retained_source_fields_equal": true,
+      "request_comparison_equal": true,
+      "original_parsed_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-calendar-final-20261004\\3\\original-parsed.json",
+      "original_parsed_sha256": "e57a143bd9a742bc24bea6fcdb1cc184dc0f180dfd9cd4c40dbd994e1afb587d",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\reports-calendar-final-20261004\\3\\candidate\\ASTOCK-066-ea709dd94e1e\\2026-10-04\\input_report\\wallstreetcn\\macro_calendar\\report.json",
+      "report_sha256": "a3f8f9bb83feaba1bc2b377625893378c90a249b0577cf3d81a152809e1047da"
+    }
+  ],
+  "known_differences": [
+    "原新浪资讯/见闻类扩展必要方法，不新增Provider；新浪40条，见闻三段552条及中国重要度筛选48条原实现对照。",
+    "保留原Chrome/126请求头、环境代理、10/40秒超时与零重试；新浪GBK和6秒间隔/假空页二次尝试保持。",
+    "新浪候选范围仅全市场第1页，个股搜索和跨页禁用；原双空页规则作为候选有效空表，不认证当前来源确实无数据。",
+    "日历原7天分段、窗口/ID/重要度校验、排序和本地筛选保持；完整源行与排除行分别留证。",
+    "宏观值保留显示文本和原单位，0、--、空白文本不擅自重解释；北京时间原解析精度为分钟。",
+    "反向检查、假空页、会话/cache使用模拟，不认证当前在线能力；没有新真实请求、生产写入或调度/路由启用。"
+  ],
+  "negative_checks": [
+    {
+      "input_id": "ASTOCK-013",
+      "mutation": "table",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/reports-calendar-final-20261004/f0/candidate/ASTOCK-013-be56e10d5ff2/2026-10-04/input_report/sina/report_list/report.json",
+      "report_sha256": "4c26abe74773e0de65f1c3666af9ca798acec6f0dcd2f3a69e0e6ae56dbdb601",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-013",
+      "mutation": "missing_row",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/reports-calendar-final-20261004/f1/candidate/ASTOCK-013-75d5f69088e5/2026-10-04/input_report/sina/report_list/report.json",
+      "report_sha256": "ae84a371d0c21662deb6a5e92dab85527b57b2dcfb641e226eee658016729a7a",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-013",
+      "mutation": "day",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/reports-calendar-final-20261004/f2/candidate/ASTOCK-013-8769295976d4/2026-10-04/input_report/sina/report_list/report.json",
+      "report_sha256": "325e71c16bcdbe34a5f48dad4774d5751d8edc03a0fc8ce3c62599cb77357205",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-013",
+      "mutation": "duplicate",
+      "failure_class": "NormalizationError",
+      "report_path": "provider_validation/results/reports-calendar-final-20261004/f3/candidate/ASTOCK-013-340da8829d51/2026-10-04/input_report/sina/report_list/report.json",
+      "report_sha256": "1d98ef8f658ecc904f7ea60f4838c9356262d6cbe05a4d652ac604b810ecc1d1",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-013",
+      "mutation": "http403",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/reports-calendar-final-20261004/f4/candidate/ASTOCK-013-13e261723a73/2026-10-04/input_report/sina/report_list/report.json",
+      "report_sha256": "ab533b8b298ca57d58a3804a9a4f2d41689800d3aaf3cc2abd8d2bb2a57a27b3",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-066",
+      "mutation": "business",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/reports-calendar-final-20261004/f5/candidate/ASTOCK-066-838e74608498/2026-10-04/input_report/wallstreetcn/macro_calendar/report.json",
+      "report_sha256": "74833cd7c59ad654418d1e7379f123f03c5f4edd1666ea506a0d2d541da658e9",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-066",
+      "mutation": "structure",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/reports-calendar-final-20261004/f6/candidate/ASTOCK-066-d37974cdbd1a/2026-10-04/input_report/wallstreetcn/macro_calendar/report.json",
+      "report_sha256": "1ce4127f8225d3880c3170d72660b48e8e8f811135a473fefb7df67b1168813c",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-066",
+      "mutation": "week_empty",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/reports-calendar-final-20261004/f7/candidate/ASTOCK-066-137fe35d9296/2026-10-04/input_report/wallstreetcn/macro_calendar/report.json",
+      "report_sha256": "070df9351293aa6fef54e45f2233264f95f86a2f87efca75ead051600f291f43",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-066",
+      "mutation": "time",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/reports-calendar-final-20261004/f8/candidate/ASTOCK-066-058f5a9c1b84/2026-10-04/input_report/wallstreetcn/macro_calendar/report.json",
+      "report_sha256": "750973daa11d9d83a1adc7c95b128f7e5b8aac2f86a37d22a84555437b3e231c",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-066",
+      "mutation": "outside",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/reports-calendar-final-20261004/f9/candidate/ASTOCK-066-37a1d5c7e577/2026-10-04/input_report/wallstreetcn/macro_calendar/report.json",
+      "report_sha256": "68ff00092acdfc7cf604defc217035d3c7f96984c3dcc6ed0697d22c100588c7",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-066",
+      "mutation": "importance",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/reports-calendar-final-20261004/f10/candidate/ASTOCK-066-960d6b867592/2026-10-04/input_report/wallstreetcn/macro_calendar/report.json",
+      "report_sha256": "3c49c2d643b6eefc4212462518e1b49886dc83e9b7e75ddcb04c896c64f2ddae",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-066",
+      "mutation": "duplicate",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/reports-calendar-final-20261004/f11/candidate/ASTOCK-066-3e8be4b8a361/2026-10-04/input_report/wallstreetcn/macro_calendar/report.json",
+      "report_sha256": "c5e263acb88d7a57da8a0ae4b0fc5fc4f9cf69c51397d43a9d67c533721b187d",
+      "result": "passed"
+    },
+    {
+      "input_id": "ASTOCK-066",
+      "mutation": "http403",
+      "failure_class": "RuntimeError",
+      "report_path": "provider_validation/results/reports-calendar-final-20261004/f12/candidate/ASTOCK-066-264c23e26aef/2026-10-04/input_report/wallstreetcn/macro_calendar/report.json",
+      "report_sha256": "25aae09049bb21eb152fdd1d692161f294df8f581220b59450b960eb2e65ba47",
+      "result": "passed"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+dataset:
+  name: sina_reports
+  display_name: 新浪研报最新列表输入
+  primary_key:
+  - snapshot_at
+  - source_report_id
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  report_date:
+    type: date
+    required: true
+  title:
+    type: string
+    required: true
+  report_type:
+    type: string
+    required: false
+  organization:
+    type: string
+    required: false
+  author:
+    type: string
+    required: false
+  source_report_id:
+    type: string
+    required: true
+  url:
+    type: string
+    required: false

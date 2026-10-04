@@ -230,3 +230,14 @@
 /config/normalization/pmi_history.yaml text eol=lf
 /src/stock_data_manage/providers/mofcom/*.py text eol=lf
 /provider_validation/docs/2026-10-04-macro-input-collection.md text eol=lf
+
+# Report lists and economic-calendar evidence remains byte-exact.
+/provider_validation/results/reports-calendar-*-20261004/** -text whitespace=cr-at-eol
+/provider_validation/results/reports-calendar-*-20261004/**/*.bin binary
+/provider_validation/results/reports-calendar-*-20261004-*.xml -text whitespace=-blank-at-eol,cr-at-eol
+/provider_validation/results/reports-calendar-*-20261004-*.json -text whitespace=cr-at-eol
+/config/datasets/sina_reports.yaml text eol=lf
+/config/normalization/sina_reports.yaml text eol=lf
+/config/datasets/macro_calendar.yaml text eol=lf
+/config/normalization/macro_calendar.yaml text eol=lf
+/provider_validation/docs/2026-10-04-reports-calendar-input-collection.md text eol=lf

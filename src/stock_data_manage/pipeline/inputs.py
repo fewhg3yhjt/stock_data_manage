@@ -120,12 +120,13 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
     is_em_events = input_id in {"ASTOCK-078", "ASTOCK-079", "ASTOCK-080", "ASTOCK-081", "ASTOCK-082", "ASTOCK-083"}
     is_lpr = input_id == "ASTOCK-065"
     is_news = input_id in {"ASTOCK-034", "ASTOCK-035"}
+    is_reports_calendar = input_id in {"ASTOCK-013", "ASTOCK-066"}
     is_sdk_news = input_id in {"ASTOCK-032", "ASTOCK-033"}
     is_sdk_macro = input_id in {"ASTOCK-061", "ASTOCK-062"}
     is_repo_rate = input_id == "ASTOCK-064"
     is_cb = input_id == "ASTOCK-084"
     is_sina_futures = input_id in {"ASTOCK-074", "ASTOCK-075", "ASTOCK-076"}
-    if is_news or is_repo_rate or is_sina_futures:
+    if is_news or is_reports_calendar or is_repo_rate or is_sina_futures:
         import requests
         import urllib3
         report["transport_dependency"] = {"requests": requests.__version__, "urllib3": urllib3.__version__}
@@ -136,6 +137,9 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             "headers": "original Chrome/126 User-Agent and finance.sina.com.cn Referer" if is_sina_futures else "original Chrome/126 User-Agent and Chinamoney bkfrr Referer" if is_repo_rate else "original Chrome/126 User-Agent; requests defaults otherwise", "trust_env": True,
             "timeout_seconds": [10, 40], "allow_redirects": True, "retry_total": 0,
             "outer_capture_interval_seconds": 3}
+        if input_id=="ASTOCK-013":
+            report[policy_key].update(headers="original Chrome/126 User-Agent and finance.sina.com.cn Referer",
+                original_report_min_interval_seconds=6,empty_page_attempts=2,encoding="GBK")
     if is_em_events or is_lpr or is_cb:
         import requests
         import urllib3
@@ -393,8 +397,8 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                 returned_window={"first": parameters["date"].isoformat(), "last": parameters["date"].isoformat()},
                 coverage_basis="source tc and returned SDK rows for requested qdate; not independent whole-market proof",
                 universe_completeness_verified=False)
-        mapping_rows = fetched.rows if is_em_history or is_lpr or is_news or is_sdk_news or is_sdk_macro or is_repo_rate or is_cb or is_sina_futures else source_rows
-        if is_news or is_sdk_news or is_sdk_macro or is_repo_rate or is_cb or is_sina_futures:
+        mapping_rows = fetched.rows if is_em_history or is_lpr or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_repo_rate or is_cb or is_sina_futures else source_rows
+        if is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_repo_rate or is_cb or is_sina_futures:
             parsed_ref = result_store.write_json(_json_value(mapping_rows), dataset="parsed_rows", provider=contract.provider,
                 endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="parsed-rows")
             report["parsed_rows"] = {"path":parsed_ref.path.relative_to(directory).as_posix(),
@@ -407,6 +411,10 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             report.update(original_row_count=len(source_rows),selected_row_count=len(mapping_rows),
                 selection_policy="original local date-window filter; complete returned source rows retained",
                 series_identity=fetched.mapping_context["series_identity"],source_contract=fetched.mapping_context["source_contract"])
+        if input_id=="ASTOCK-066":
+            excluded_ref=result_store.write_json(_json_value(fetched.excluded_rows),dataset="excluded_rows",provider=contract.provider,
+                endpoint=contract.endpoint,fetched_at=datetime.now(timezone.utc),attempt_id="excluded-rows")
+            report["excluded_rows"]={"path":excluded_ref.path.relative_to(directory).as_posix(),"sha256":excluded_ref.content_hash,"row_count":len(fetched.excluded_rows)}
         if is_cb:
             excluded_ref = result_store.write_json(_json_value(fetched.excluded_rows), dataset="excluded_rows",
                 provider=contract.provider, endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="excluded-rows")
@@ -454,12 +462,12 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                           coverage_scope="explicit requested stock list; no independent whole-market completeness proof")
             if any(day != parameters["as_of"].astimezone(ZoneInfo("Asia/Shanghai")).date() for day in quote_dates):
                 raise NormalizationError("source quote date differs from requested as_of date; snapshot cannot query history")
-        valid_empty = (is_em_events or is_cb) and fetched.empty_is_valid
+        valid_empty = (is_em_events or is_cb or input_id=="ASTOCK-013") and fetched.empty_is_valid
         if (not source_rows or not mapping_rows) and not valid_empty:
             raise NormalizationError("temporary empty input; not certified as a valid empty dataset")
         mapping_context = {"provider": contract.provider}
         mapping_context.update(getattr(fetched, "mapping_context", {}))
-        if input_id.startswith("SDA-BOARD-") or is_tencent_snapshot or is_em_history or is_stock_pool or is_em_events or is_lpr or is_news or is_sdk_news or is_sdk_macro or is_repo_rate or is_cb or is_sina_futures:
+        if input_id.startswith("SDA-BOARD-") or is_tencent_snapshot or is_em_history or is_stock_pool or is_em_events or is_lpr or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_repo_rate or is_cb or is_sina_futures:
             successful = [event for event in response_events if event.get("outcome") == "response" and (not (is_sdk_news or is_sdk_macro) or event["status_code"] == 200)]
             if not successful:
                 raise NormalizationError("source response evidence is required; an SDK memory cache alone is insufficient")
@@ -475,7 +483,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             mapping_context["source_snapshot_at"] = max(source_times)
             report["source_capture_window"] = {"first": min(source_times).isoformat(), "last": max(source_times).isoformat(),
                                                "meaning": "source response capture times; not row-level market timestamps"}
-            if not is_tencent_snapshot and not is_em_history and not is_stock_pool and not is_em_events and not is_lpr and not is_news and not is_sdk_news and not is_sdk_macro and not is_repo_rate and not is_cb and not is_sina_futures:
+            if not is_tencent_snapshot and not is_em_history and not is_stock_pool and not is_em_events and not is_lpr and not is_news and not is_reports_calendar and not is_sdk_news and not is_sdk_macro and not is_repo_rate and not is_cb and not is_sina_futures:
                 report["returned_window"] = {"first": fetched.returned_first_key, "last": fetched.returned_last_key}
                 report["source_units"] = list(fetched.units)
                 report["coverage_basis"] = "returned SDK rows; not an independently verified market universe"
@@ -516,6 +524,18 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             report.update(returned_window={"first":min(periods),"last":max(periods),"meaning":"statistical months, not publication dates"},
                 coverage_basis="returned source monthly history; no independent current or complete history certification",
                 universe_completeness_verified=False,publication_time_available=False)
+        if is_reports_calendar:
+            times=[row["date"] if input_id=="ASTOCK-013" else row["time"] for row in mapping_rows]
+            report.update(returned_window={"first":min(times) if times else None,"last":max(times) if times else None},
+                coverage_basis="returned latest report page or original seven-day calendar slices; not independent complete history",
+                universe_completeness_verified=False)
+            if input_id=="ASTOCK-013":
+                report.update(page=parameters["page"],empty_page_attempts=fetched.mapping_context["empty_page_attempts"],valid_empty_dataset=valid_empty,
+                    empty_validation_basis="original two-attempt explicit empty-page rule; source absence not independently certified",pagination_completeness_verified=False)
+            else:
+                report.update(requested_window={"first":parameters["start"].isoformat(),"last":parameters["end"].isoformat()},
+                    original_row_count=len(source_rows),selected_row_count=len(mapping_rows),country=parameters.get("country"),
+                    min_importance=parameters["min_importance"],calendar_time_precision="minute, original source parser")
         if is_repo_rate:
             dates = [row["date"] for row in mapping_rows]
             report.update(rate_kind=parameters["kind"], returned_window={"first":min(dates),"last":max(dates)},
