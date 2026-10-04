@@ -1,0 +1,77 @@
+{
+  "previous_commit": "6c15a99",
+  "before": [
+    {
+      "original_path": "config/providers.yaml",
+      "snapshot": "provider_validation/results/actual-data-original-20261004/0-providers.yaml.bin",
+      "sha256": "894d4ca63bd2c95d99abb9fd0c8cd41b3cdfc117898396bb3030885cdd53c7e9"
+    },
+    {
+      "original_path": "src/stock_data_manage/pipeline/inputs.py",
+      "snapshot": "provider_validation/results/actual-data-original-20261004/1-inputs.py.bin",
+      "sha256": "e4a3001c4b14cc4e0a9e14f14d62f2ab56beb4c5d640e695d4711d3931ffa5d1"
+    },
+    {
+      "original_path": "src/stock_data_manage/routing/factory.py",
+      "snapshot": "provider_validation/results/actual-data-original-20261004/2-factory.py.bin",
+      "sha256": "20da198cfa3f0a3da69ba61564e828503fca8582681b684cd13cc1b0c59e90b8"
+    },
+    {
+      "original_path": "src/stock_data_manage/providers/akshare/boards.py",
+      "snapshot": "provider_validation/results/actual-data-original-20261004/3-boards.py.bin",
+      "sha256": "2060f150831cebaf707ed5becedc35428bc41d4428bab31555ed1d2bf817d122"
+    },
+    {
+      "original_path": "src/stock_data_manage/providers/baostock/industry.py",
+      "snapshot": "provider_validation/results/actual-data-original-20261004/4-industry.py.bin",
+      "sha256": "16c41b379eecbd87f082bd042e27fad7f3d8d77b5bfc6a3e8a286209b068494a"
+    },
+    {
+      "original_path": "src/stock_data_manage/providers/baostock/session.py",
+      "snapshot": "provider_validation/results/actual-data-original-20261004/5-session.py.bin",
+      "sha256": "70ce19cdde1d6a8ed0c3d3db29caa28d1d8069826136ab6dd7fb6a2ef8c7b832"
+    },
+    {
+      "original_path": "src/stock_data_manage/providers/eastmoney/news.py",
+      "snapshot": "provider_validation/results/actual-data-original-20261004/6-news.py.bin",
+      "sha256": "b85358369ecd6f6d5356d749e376e2d1ee466f34e6e0fab603940c582351dfe6"
+    },
+    {
+      "original_path": "src/stock_data_manage/providers/eastmoney/financial.py",
+      "snapshot": "provider_validation/results/actual-data-original-20261004/7-financial.py.bin",
+      "sha256": "412d5033dcd71e8f13f2fda8a607ee8b5c5f408457dbd7e38f43cb635f1ecf33"
+    },
+    {
+      "original_path": "src/stock_data_manage/storage/raw.py",
+      "snapshot": "provider_validation/results/actual-data-original-20261004/8-raw.py.bin",
+      "sha256": "d483c614830e96d41b697709c0cde9e4cb5adee26116020428b7697f57f2c108"
+    },
+    {
+      "original_path": "CODE_STRUCTURE.md",
+      "snapshot": "provider_validation/results/actual-data-original-20261004/9-CODE_STRUCTURE.md.bin",
+      "sha256": "b1f3ab984a7c5134d258bc7419155f94d1ff1965f16eefc5072b0c90c0fa33c7"
+    },
+    {
+      "original_path": "PROJECT_PROGRESS.md",
+      "snapshot": "provider_validation/results/actual-data-original-20261004/10-PROJECT_PROGRESS.md.bin",
+      "sha256": "9d7372c3698f1e9429af8b27c37288f4a73d2bae249a1b31aad8705d2aab4e6c"
+    },
+    {
+      "original_path": "tests/test_input_collection.py",
+      "snapshot": "provider_validation/results/actual-data-original-20261004/11-test_input_collection.py.bin",
+      "sha256": "505d201994bc226217d50b14e36640deb2b6939b4ddeab257a083c647cab8efd"
+    },
+    {
+      "original_path": "provider_validation/tests/replay_input_capabilities.py",
+      "snapshot": "provider_validation/results/actual-data-original-20261004/12-replay_input_capabilities.py.bin",
+      "sha256": "8b0b60287e1bb0eb38feae8c4dcd31550c2baaf023fcf81948442589f9f0750b"
+    },
+    {
+      "original_path": ".gitattributes",
+      "snapshot": "provider_validation/results/actual-data-original-20261004/13-.gitattributes.bin",
+      "sha256": "cb46d985e3067c60cf6ca8308f80b3f980b6e44e0acf774164248b979ee8e245"
+    }
+  ],
+  "authorization": "user:以实际的数据为准，而不是看之前的定义",
+  "production_writes": 0
+}

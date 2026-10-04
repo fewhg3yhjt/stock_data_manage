@@ -1,0 +1,18 @@
+def stock_board_concept_name_ths() -> pd.DataFrame:
+    """
+    同花顺-板块-概念板块-概念
+    http://q.10jqka.com.cn/thshy/
+    :return: 所有概念板块的名称和链接
+    :rtype: pandas.DataFrame
+    """
+    code_name_ths_map = _get_stock_board_concept_name_ths()
+    temp_df = pd.DataFrame.from_dict(code_name_ths_map, orient="index")
+    temp_df.reset_index(inplace=True)
+    temp_df.columns = ["name", "code"]
+    temp_df = temp_df[
+        [
+            "name",
+            "code",
+        ]
+    ]
+    return temp_df

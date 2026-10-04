@@ -1,0 +1,17 @@
+{
+  "input_id": "ASTOCK-037-profile",
+  "scope": {
+    "code": "600519"
+  },
+  "row_count": 1,
+  "original_parsed_sha256": "14cf7f1ad8da403ee9b9dc6a453a4a7e770cfca3e4889b2a2b2006f9fbed56a7",
+  "response_hashes": [
+    "9f6f270d58fe87dfb6a6c3df35de7475d95ee83750105cfa653144e38f2a0b81"
+  ],
+  "original_fields_equal": true,
+  "original_transport_equal": true,
+  "production_writes": 0,
+  "mode": "offline_replay",
+  "universe_completeness_verified": false,
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-final-20261004\\2\\candidate\\ASTOCK-037-profile-60716f8e12a0\\2026-10-04\\input_report\\cninfo\\company_profile\\report.json"
+}

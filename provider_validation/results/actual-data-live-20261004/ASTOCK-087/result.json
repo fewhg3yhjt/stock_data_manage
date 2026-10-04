@@ -1,0 +1,16 @@
+{
+  "input_id": "ASTOCK-087",
+  "function": "stock_notice_report",
+  "parameters": {
+    "symbol": "全部",
+    "date": "20261001"
+  },
+  "code_version": "36061c8c8bd6e3f235f486670de17fc14780b2c9dfae019e5be49f58fd6eb211",
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "archive_search": "actual-data-original-20261004/matching-responses.json",
+  "status": "failed",
+  "failure_class": "ConnectionError",
+  "error": "HTTPSConnectionPool(host='np-anotice-stock.eastmoney.com', port=443): Max retries exceeded with url: /api/security/ann?sr=-1&page_size=100&page_index=1&ann_type=A&client_source=web&f_node=0&s_node=0&begin_time=2026-10-01&end_time=2026-10-01 (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x000002D1CC851F90>: Failed to establish a new connection: [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。'))",
+  "manifest_sha256": "d5567ae1348019feec66e64af18417464f78a790e1c749bcb3d890d6081d5490"
+}

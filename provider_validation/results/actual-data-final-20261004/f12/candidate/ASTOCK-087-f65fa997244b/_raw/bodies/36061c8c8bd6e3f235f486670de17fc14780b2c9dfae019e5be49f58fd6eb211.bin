@@ -1,0 +1,16 @@
+def stock_notice_report(symbol: str = "全部", date: str = "20220511") -> pd.DataFrame:
+    """
+    东方财富网-数据中心-公告大全-沪深京 A 股公告
+    https://data.eastmoney.com/notices/hsa/5.html
+    :param symbol: 报告类型; choice of {"全部", "重大事项", "财务报告", "融资公告", "风险提示", "资产重组", "信息变更", "持股变动"}
+    :type symbol: str
+    :param date: 制定日期
+    :type date: str
+    :return: 沪深京 A 股公告
+    :rtype: pandas.DataFrame
+    """
+    return _stock_notice_report(
+        symbol=symbol,
+        begin_date="-".join([date[:4], date[4:6], date[6:]]),
+        end_date="-".join([date[:4], date[4:6], date[6:]]),
+    )

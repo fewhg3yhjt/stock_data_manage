@@ -30,7 +30,9 @@ def build_input_provider(contract, *, providers_path, client=None):
     """Bind explicit validation inputs to existing adapters, outside production routing."""
     if contract.implementation_status != "implemented_validation_only":
         raise ValueError("input adapter is not implemented for validation")
-    expected_methods = {"ASTOCK-001": "fetch_snapshot", "ASTOCK-002-daily": "fetch_window", "ASTOCK-002-5m": "fetch_recent",
+    expected_methods = {"ASTOCK-087": "fetch_announcements", "ASTOCK-014": "fetch_concept_list", "ASTOCK-044": "fetch_st_list",
+                        "ASTOCK-037-profile": "fetch", "ASTOCK-037-events": "fetch_company_events",
+                        "ASTOCK-001": "fetch_snapshot", "ASTOCK-002-daily": "fetch_window", "ASTOCK-002-5m": "fetch_recent",
                         "ASTOCK-045": "fetch", "ASTOCK-070": "fetch",
                         "ASTOCK-026": "fetch_history", "ASTOCK-027": "fetch_history", "ASTOCK-028": "fetch_history",
                         "ASTOCK-046": "fetch", "ASTOCK-047": "fetch", "ASTOCK-048": "fetch", "ASTOCK-050": "fetch",
@@ -55,6 +57,25 @@ def build_input_provider(contract, *, providers_path, client=None):
                         "SDA-BOARD-005": "fetch_snapshot", "SDA-BOARD-006": "fetch_snapshot"}
     if contract.input_id not in expected_methods or contract.runtime_method != expected_methods[contract.input_id]:
         raise ValueError("input runtime method does not match its verified adapter")
+    if contract.input_id == 'ASTOCK-014':
+        provider = AkShareBoardProvider(client=client, endpoint=contract.endpoint)
+        provider.capability_version = 'akshare-ths-concept-directory-input-v1'
+        return provider
+    if contract.input_id == 'ASTOCK-087':
+        from ..providers.eastmoney.news import EastMoneyStockNewsProvider
+        provider = EastMoneyStockNewsProvider(client=client)
+        provider.capability_version = 'eastmoney-dated-announcements-input-v1'
+        provider.input_hosts = ('https://np-anotice-stock.eastmoney.com',)
+        return provider
+    if contract.input_id == 'ASTOCK-044':
+        return BaoStockIndustryMembershipProvider(client=client, endpoint=contract.endpoint,
+                                                   capability_version='baostock-st-name-input-v1')
+    if contract.input_id == 'ASTOCK-037-profile':
+        from ..providers.cninfo.profile import CNInfoCompanyProfileProvider
+        return CNInfoCompanyProfileProvider(client=client)
+    if contract.input_id == 'ASTOCK-037-events':
+        return EastMoneyFinancialMainProvider(client=client, endpoint=contract.endpoint,
+                                             capability_version='eastmoney-company-events-input-v1')
     headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
                "Referer": "https://gu.qq.com/"}
     if contract.input_id == "ASTOCK-001":

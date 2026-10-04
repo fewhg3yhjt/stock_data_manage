@@ -1,0 +1,22 @@
+dataset: concept_directory
+rules:
+- id: concept_directory-actual-input-v1
+  input_id: ASTOCK-014
+  provider: ths
+  endpoint: concept_directory
+  field_mapping:
+    board_name: name
+    board_code: code
+  context_fields:
+    snapshot_at: source_snapshot_at
+    board_type: board_type
+    source: source
+  null_values:
+  - null
+  - ''
+  unverified_fields: []
+  status: pending_validation
+  version: actual-data-input-v1
+  evidence_refs:
+  - ASTOCK-014
+  notes: 按原成功数据范围接入；snapshot_at 为原响应捕获时间，不是来源生效日期。原字段独立留证，不自动启用生产。

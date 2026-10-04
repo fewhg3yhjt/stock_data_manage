@@ -16,7 +16,7 @@ from .session import logged_in_session, read_rows
 class BaoStockIndustryResult:
     rows: tuple[Mapping[str, Any], ...]
     requested_symbols: tuple[str, ...]
-    trade_date: date
+    trade_date: date | None
     coverage_denominator: int
     missing_symbols: tuple[str, ...]
     response_statuses: tuple[int, ...] = ()
@@ -39,6 +39,33 @@ class BaoStockIndustryMembershipProvider:
     capability_version: str = "baostock-snapshot-input-v2"
     client: Any | None = None
     normalization_root: Path | None = None
+
+    def fetch_st_list(self, *, raw_archive=None) -> BaoStockIndustryResult:
+        with logged_in_session(client=self.client) as bs:
+            result = bs.query_stock_basic(code_name='ST')
+            source_rows = _read_success(result, 'query_stock_basic', raw_archive, None)
+            _archive_sdk_rows(raw_archive, 'query_stock_basic', result, source_rows, None)
+        expected = {'code', 'code_name', 'ipoDate', 'outDate', 'type', 'status'}
+        if any(set(row) != expected for row in source_rows):
+            raise ValueError('BaoStock stock basic fields changed')
+        picked = [row for row in source_rows if row['type'] == '1' and row['status'] == '1'
+                  and 'ST' in row['code_name'].upper()]
+        rows = []
+        for item in picked:
+            market, dot, code = item['code'].partition('.')
+            if not dot or market not in {'sh', 'sz'} or len(code) != 6 or not code.isdigit():
+                raise ValueError('ST source security identity changed')
+            rows.append({'code': code, 'market': market, 'name': item['code_name'],
+                         'st_type': '*ST' if item['code_name'].startswith('*') else 'ST',
+                         'price': None, 'pct_change': None})
+        if not rows:
+            raise ValueError('BaoStock ST name search has no selected active securities')
+        if len({(r['market'], r['code']) for r in rows}) != len(rows):
+            raise ValueError('duplicate ST source security')
+        return BaoStockIndustryResult(tuple(rows), (), None, len(rows), (), source_rows=tuple(source_rows),
+            source_url='baostock.query_stock_basic', mapping_context={'source': 'baostock',
+                'scope_meaning': 'SH/SZ active stock names containing ST; not an official risk flag or BJ coverage'},
+            returned_first_key=rows[0]['code'], returned_last_key=rows[-1]['code'])
 
     def fetch_snapshot(
         self,
@@ -218,7 +245,7 @@ def _archive_sdk_rows(
     scope = archive.scope(
         provider="baostock",
         endpoint=endpoint,
-        request_scope=f"trade_date={trade_date.isoformat()};exchange_scope=SH+SZ A shares",
+        request_scope=f"trade_date={trade_date.isoformat()};exchange_scope=SH+SZ A shares" if trade_date else 'code_name=ST;exchange_scope=SH+SZ',
         representation=representation,
     ) if hasattr(archive, "scope") else nullcontext()
     with scope:
@@ -229,7 +256,7 @@ def _archive_sdk_rows(
             representation=representation,
             metadata={
                 "row_count": len(rows),
-                "trade_date": trade_date.isoformat(),
+                **({"trade_date": trade_date.isoformat()} if trade_date else {"code_name": "ST"}),
                 "outcome": dict(failure) if failure else "success",
             },
         )

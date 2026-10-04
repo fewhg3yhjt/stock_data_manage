@@ -1,0 +1,92 @@
+dataset:
+  name: company_profile
+  display_name: 巨潮公司概况原字段
+  primary_key:
+  - snapshot_at
+  - stock_code
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  company_name:
+    type: string
+    required: true
+  english_name:
+    type: string
+    required: false
+  former_name:
+    type: string
+    required: false
+  stock_code:
+    type: string
+    required: true
+  stock_name:
+    type: string
+    required: true
+  b_share_code:
+    type: string
+    required: false
+  b_share_name:
+    type: string
+    required: false
+  h_share_code:
+    type: string
+    required: false
+  h_share_name:
+    type: string
+    required: false
+  index_names:
+    type: string
+    required: false
+  market:
+    type: string
+    required: false
+  industry_name:
+    type: string
+    required: false
+  legal_representative:
+    type: string
+    required: false
+  registered_capital_source_value:
+    type: string
+    required: false
+  established_date:
+    type: date
+    required: false
+  listed_date:
+    type: date
+    required: false
+  website:
+    type: string
+    required: false
+  email:
+    type: string
+    required: false
+  phone:
+    type: string
+    required: false
+  fax:
+    type: string
+    required: false
+  registered_address:
+    type: string
+    required: false
+  office_address:
+    type: string
+    required: false
+  postal_code:
+    type: string
+    required: false
+  main_business:
+    type: string
+    required: false
+  business_scope:
+    type: string
+    required: false
+  introduction:
+    type: string
+    required: false
+  registered_capital:
+    type: decimal
+    required: false
+    unit: unverified

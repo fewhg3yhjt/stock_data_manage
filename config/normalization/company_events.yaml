@@ -1,0 +1,24 @@
+dataset: company_events
+rules:
+- id: company_events-actual-input-v1
+  input_id: ASTOCK-037-events
+  provider: eastmoney
+  endpoint: company_events
+  field_mapping:
+    source_row_number: 序号
+    stock_code: 代码
+    stock_name: 简称
+    event_type: 事件类型
+    content: 具体事项
+    source_date: 交易日
+  context_fields:
+    snapshot_at: source_snapshot_at
+  null_values:
+  - null
+  - ''
+  unverified_fields: []
+  status: pending_validation
+  version: actual-data-input-v1
+  evidence_refs:
+  - ASTOCK-037
+  notes: 按原成功数据范围接入；snapshot_at 为原响应捕获时间，不是来源生效日期。原字段独立留证，不自动启用生产。

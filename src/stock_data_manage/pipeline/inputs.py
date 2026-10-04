@@ -96,6 +96,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                   Path(__file__).parents[1] / "providers/sina/daily.py",
                   Path(__file__).parents[1] / "providers/akshare/boards.py",
                   Path(__file__).parents[1] / "providers/baostock/industry.py",
+                  Path(__file__).parents[1] / "providers/cninfo/profile.py",
                   Path(__file__).parents[1] / "providers/baostock/session.py"]
     code_version = hashlib.sha256(b"".join(path.read_bytes() for path in code_files)).hexdigest()
     # Response filenames contain a full SHA-256 plus a temporary suffix. Keep the
@@ -122,7 +123,8 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
         "eligible_for_production_routing": False, "production_writes": 0, "live_http_calls": 0,
         "validation_time_utc": datetime.now(timezone.utc).isoformat(), "status": "started"}
     report["response_freshness_seconds"] = profile.refresh_interval_seconds or 86400
-    is_baostock = input_id in {"SDA-BOARD-005", "SDA-BOARD-006"}
+    is_baostock = input_id in {"SDA-BOARD-005", "SDA-BOARD-006", "ASTOCK-044"}
+    is_actual_data = input_id in {'ASTOCK-014', 'ASTOCK-037-profile', 'ASTOCK-037-events', 'ASTOCK-087'}
     is_tencent_snapshot = input_id == "ASTOCK-001"
     is_em_history = input_id in {"ASTOCK-026", "ASTOCK-027", "ASTOCK-028"}
     is_em_events = input_id in {"ASTOCK-078", "ASTOCK-079", "ASTOCK-080", "ASTOCK-081", "ASTOCK-082", "ASTOCK-083"}
@@ -136,7 +138,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
     is_reportapi = input_id == "ASTOCK-008"
     is_seats = input_id == "ASTOCK-019"
     is_reports_seats = is_reportapi or is_seats
-    is_source_sdk = input_id in {"ASTOCK-031","ASTOCK-039","ASTOCK-051","ASTOCK-055","ASTOCK-067","ASTOCK-068","ASTOCK-069","ASTOCK-085"}
+    is_source_sdk = is_actual_data or input_id in {"ASTOCK-031","ASTOCK-039","ASTOCK-051","ASTOCK-055","ASTOCK-067","ASTOCK-068","ASTOCK-069","ASTOCK-085"}
     is_original_source = input_id in {"ASTOCK-003","ASTOCK-004","ASTOCK-030","ASTOCK-063","ASTOCK-071","ASTOCK-072","ASTOCK-073","ASTOCK-077"}
     is_source_extension = is_source_sdk or is_original_source
     is_repo_rate = input_id == "ASTOCK-064"
@@ -219,7 +221,8 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             report["sdk_dependency"] = {"version": (getattr(client, "__version__", "injected_fixture") if client is not None else
                                                      importlib.metadata.version("baostock") if sdk_module else "unavailable_offline"),
                                         "client_injected": client is not None, "dependencies": []}
-            for name in ("query_all_stock", "query_stock_industry", "login", "logout"):
+            for name in (("query_stock_basic", "login", "logout") if input_id == 'ASTOCK-044' else
+                         ("query_all_stock", "query_stock_industry", "login", "logout")):
                 function = getattr(sdk, name, None)
                 if function is None:
                     continue
@@ -239,7 +242,9 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             report["code_version"] = code_version
             report["evidence_representation"] = "SDK-decoded ResultSet fields and rows; BaoStock TCP wire bytes are not exposed"
             report["request_limit_enforcement"] = "sdk_query_boundary_only"
-        sdk_functions = {"ASTOCK-031":"stock_news_em", "ASTOCK-069":"stock_zh_index_value_csindex", "ASTOCK-039":"stock_financial_report_sina", "ASTOCK-051":"stock_changes_em", "ASTOCK-055":"option_risk_indicator_sse",
+        sdk_functions = {"ASTOCK-087": "stock_notice_report", "ASTOCK-014": "stock_board_concept_name_ths", "ASTOCK-037-profile": "stock_profile_cninfo",
+                         "ASTOCK-037-events": "stock_gsrl_gsdt_em",
+                         "ASTOCK-031":"stock_news_em", "ASTOCK-069":"stock_zh_index_value_csindex", "ASTOCK-039":"stock_financial_report_sina", "ASTOCK-051":"stock_changes_em", "ASTOCK-055":"option_risk_indicator_sse",
                          "ASTOCK-067":"index_stock_cons_csindex", "ASTOCK-068":"index_stock_cons_weight_csindex", "ASTOCK-085":"stock_lhb_detail_daily_sina",
                          "ASTOCK-019": "stock_lhb_stock_detail_em", "ASTOCK-020": "stock_lhb_detail_em", "ASTOCK-021": "stock_restricted_release_detail_em",
                          "ASTOCK-006": "stock_zh_a_daily", "ASTOCK-045": "stock_zt_pool_em", "ASTOCK-070": "tool_trade_date_hist_sina",
@@ -350,15 +355,24 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                 if is_factor:
                     report["factor_sdk_transport_policy"] = report.pop("sdk_news_transport_policy")
                     report["factor_sdk_transport_policy"].update(method="GET", literal_gate="after exact raw retention, before original SDK eval")
-            if input_id.startswith("SDA-BOARD-"):
+            if input_id.startswith("SDA-BOARD-") or input_id in {'ASTOCK-014', 'ASTOCK-037-profile', 'ASTOCK-087'}:
                 namespace = getattr(function, "__globals__", {})
                 dependencies = []
-                for name in ("_get_stock_board_industry_name_ths", "_get_file_content_ths", "get_ths_js"):
+                for name in ("_get_stock_board_industry_name_ths", "_get_stock_board_concept_name_ths", "_get_file_content_ths", "get_ths_js"):
                     dependency = namespace.get(name)
                     if dependency is not None:
                         dependencies.append((name, inspect.getsource(dependency).encode("utf-8")))
                 if namespace.get("get_ths_js"):
                     dependencies.append(("ths.js", Path(namespace["get_ths_js"]("ths.js")).read_bytes()))
+                if input_id == 'ASTOCK-014':
+                    helper = namespace['_get_stock_board_concept_name_ths']
+                    child = helper.__wrapped__.__globals__['__stock_board_concept_summary_ths']
+                    dependencies.append(('__stock_board_concept_summary_ths', inspect.getsource(child).encode('utf-8')))
+                    dependencies.append(('ths.js', helper.__wrapped__.__globals__['_get_file_content_ths']('ths.js').encode('utf-8')))
+                if input_id == 'ASTOCK-037-profile':
+                    dependencies.append(('cninfo.js', namespace['_get_file_content_ths']('cninfo.js').encode('utf-8')))
+                if input_id == 'ASTOCK-087':
+                    dependencies.append(('_stock_notice_report', inspect.getsource(namespace['_stock_notice_report']).encode('utf-8')))
                 report["sdk_dependency"]["dependencies"] = []
                 for name, body in dependencies:
                     digest = hashlib.sha256(body).hexdigest()
@@ -390,8 +404,9 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                 sdk_client, sdk_archive, response_events = stack.enter_context(captured_sdk_queries(raw_store, mode=mode,
                     replay_manifest=replay_manifest, evidence_roots=(evidence_root, output_root),
                     scope={"input_id": input_id, "parameters": normalized_context}, code_version=code_version,
-                    trade_date=parameters["trade_date"], pacer=pacer, interval_seconds=max(3, contract.request_interval_seconds),
-                    max_age_seconds=profile.refresh_interval_seconds or 86400, client=client))
+                    trade_date=parameters.get("trade_date"), pacer=pacer, interval_seconds=max(3, contract.request_interval_seconds),
+                    max_age_seconds=profile.refresh_interval_seconds or 86400, client=client,
+                    query_requests={'query_stock_basic': {'code_name': 'ST'}} if input_id == 'ASTOCK-044' else None))
                 provider.client = sdk_client
                 runtime_parameters["raw_archive"] = sdk_archive
             else:
@@ -423,7 +438,8 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                 def retained_responses():
                     for event in response_events:
                         if event.get("outcome")=="response" and event["status_code"]==200:
-                            yield {"url":event["url"],"body":RawObjectStore.read_response(raw_store.root/"manifest.ndjson",event)}
+                            yield {"url":event["url"],"body":RawObjectStore.read_response(raw_store.root/"manifest.ndjson",event),
+                                   "encoding":event.get("encoding")}
                 runtime_parameters["source_responses"]=retained_responses
             if is_reportapi and mode == "replay":
                 from ..providers.eastmoney.financial import reportapi_replay_clock
@@ -500,8 +516,8 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                 returned_window={"first": parameters["date"].isoformat(), "last": parameters["date"].isoformat()},
                 coverage_basis="source tc and returned SDK rows for requested qdate; not independent whole-market proof",
                 universe_completeness_verified=False)
-        mapping_rows = fetched.rows if is_em_history or is_lpr or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_extension or is_repo_rate or is_cb or is_sina_futures else source_rows
-        if is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_extension or is_repo_rate or is_cb or is_sina_futures:
+        mapping_rows = fetched.rows if input_id == 'ASTOCK-044' or is_em_history or is_lpr or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_extension or is_repo_rate or is_cb or is_sina_futures else source_rows
+        if input_id == 'ASTOCK-044' or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_extension or is_repo_rate or is_cb or is_sina_futures:
             parsed_ref = result_store.write_json(_json_value(mapping_rows), dataset="parsed_rows", provider=contract.provider,
                 endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="parsed-rows")
             report["parsed_rows"] = {"path":parsed_ref.path.relative_to(directory).as_posix(),
@@ -564,6 +580,11 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                 sdk_query_count=len(response_events), source_sdk_row_counts={event["endpoint"]: event.get("metadata", {}).get("row_count")
                                                                         for event in response_events})
             report["coverage_scope"] = "SH/SZ A-share codes filtered from this SDK response; not an independent market census"
+            if input_id == 'ASTOCK-044':
+                report.update(original_row_count=len(source_rows), selected_row_count=len(mapping_rows),
+                    coverage_complete=True, coverage_basis='all rows selected by original active stock ST-name rule from returned SDK search',
+                    source_fallback_enabled=False, implicit_date_selection=False, universe_completeness_verified=False,
+                    source_metadata=_json_value(fetched.mapping_context))
         if is_tencent_snapshot:
             from zoneinfo import ZoneInfo
             quote_dates = [datetime.strptime(row["datetime"], "%Y%m%d%H%M%S").date() for row in source_rows]
@@ -578,7 +599,7 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
             raise NormalizationError("temporary empty input; not certified as a valid empty dataset")
         mapping_context = {"provider": contract.provider}
         mapping_context.update(getattr(fetched, "mapping_context", {}))
-        if input_id.startswith("SDA-BOARD-") or is_tencent_snapshot or is_em_history or is_stock_pool or is_em_events or is_lpr or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_extension or is_repo_rate or is_cb or is_sina_futures:
+        if is_baostock or input_id.startswith("SDA-BOARD-") or is_tencent_snapshot or is_em_history or is_stock_pool or is_em_events or is_lpr or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_extension or is_repo_rate or is_cb or is_sina_futures:
             successful = [event for event in response_events if event.get("outcome") == "response" and (not (is_sdk_news or is_sdk_macro or is_market_events or is_reports_seats) or event["status_code"] == 200)]
             if not successful:
                 raise NormalizationError("source response evidence is required; an SDK memory cache alone is insufficient")
@@ -660,7 +681,15 @@ def collect_input(*, input_id, context, config_root, output_root, mode="replay",
                     source_symbol=fetched.mapping_context["source_symbol"], coverage_complete=True, date_discovery_requests=0,
                     source_row_number_semantics="original SDK row order after type sort; not monetary rank or permanent department identity",
                     coverage_basis="two source-reported nonempty single pages for explicit stock/day; no independent seat census")
-        if is_source_extension:
+        if is_actual_data:
+            dates = [str(row['交易日' if input_id == 'ASTOCK-037-events' else '公告日期']) for row in mapping_rows] if input_id in {'ASTOCK-037-events','ASTOCK-087'} else []
+            report.update(returned_window={'first': min(dates) if dates else None, 'last': max(dates) if dates else None,
+                'meaning': 'source event date labels' if dates else 'no source effective date; capture time retained separately'},
+                source_fallback_enabled=False, implicit_date_selection=False, universe_completeness_verified=False,
+                original_row_count=len(source_rows), selected_row_count=len(mapping_rows),
+                source_metadata=_json_value(fetched.mapping_context),
+                coverage_basis='returned actual source records; no independent universe proof')
+        elif is_source_extension:
             key = '发布时间' if input_id=='ASTOCK-031' else '报告日' if input_id=='ASTOCK-039' else '时间' if input_id=='ASTOCK-051' else 'TRADE_DATE' if input_id=='ASTOCK-055' else '日期' if input_id in {'ASTOCK-067','ASTOCK-068','ASTOCK-069'} else 'trade_date' if input_id=='ASTOCK-085' else 'date'
             days=[str(row[key]) for row in mapping_rows]
             window_meaning = ('source intraday clock labels; source date unavailable' if input_id=='ASTOCK-051'

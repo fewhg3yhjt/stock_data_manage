@@ -1,0 +1,9 @@
+def get_ths_js(file: str = "ths.js") -> pathlib.Path:
+    """
+    get path to data "ths.js" text file.
+    :return: 文件路径
+    :rtype: pathlib.Path
+    """
+    with resources.path("akshare.data", file) as f:
+        data_file_path = f
+        return data_file_path

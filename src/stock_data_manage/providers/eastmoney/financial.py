@@ -154,6 +154,40 @@ class FinancialMainFetchResult:
 @dataclass(slots=True)
 class EastMoneyFinancialMainProvider:
     input_hosts = ("https://datacenter-web.eastmoney.com", "https://reportapi.eastmoney.com")
+
+    def fetch_company_events(self, *, date, source_responses):
+        import json
+        from ..akshare.session import load_client
+        from ..contracts import InputFetchResult
+        self.client = self.client or load_client()
+        frame = self.client.stock_gsrl_gsdt_em(date=date.strftime('%Y%m%d'))
+        responses = list(source_responses())
+        if len(responses) != 1:
+            raise ValueError('one original company-events response is required')
+        payload = json.loads(responses[0]['body'])
+        result = payload.get('result') or {}
+        items = result.get('data')
+        if payload.get('success') is not True or payload.get('code') != 0 or not isinstance(items, list) or not items:
+            raise ValueError('company-events source status/data changed')
+        if result.get('pages') != 1 or result.get('count') != len(items) or len(frame) != len(items):
+            raise ValueError('company-events original single-page completeness changed')
+        if tuple(frame.columns) != ('序号','代码','简称','事件类型','具体事项','交易日'):
+            raise ValueError('company-events fields changed')
+        rows = tuple(frame.astype(object).where(frame.notna(), None).to_dict('records'))
+        for n, (raw, row) in enumerate(zip(items, rows), 1):
+            if set(raw) != {'SECURITY_CODE','SECUCODE','SECURITY_NAME_ABBR','EVENT_TYPE','EVENT_CONTENT','TRADE_DATE'}:
+                raise ValueError('company-events raw fields changed')
+            if str(raw['TRADE_DATE'])[:10] != date.isoformat() or row['交易日'] != date:
+                raise ValueError('company-events response differs from explicit requested date')
+            if any(row[label] != raw[field] for label, field in
+                   [('代码','SECURITY_CODE'),('简称','SECURITY_NAME_ABBR'),('事件类型','EVENT_TYPE'),('具体事项','EVENT_CONTENT')]):
+                raise ValueError('company-events SDK disagrees with raw response')
+            if row['序号'] != n:
+                raise ValueError('company-events source row numbering changed')
+        return InputFetchResult(rows, source_rows=tuple(items), source_url=responses[0]['url'],
+            mapping_context={'requested_date': date, 'source_total_count': len(items),
+                             'pagination_completeness_verified': True,
+                             'scope_meaning': 'returned whole-market company events for explicit source date; no stock filter'})
     transport: Any | None = None
     endpoint: str = "financial_main"
     name: str = "eastmoney"

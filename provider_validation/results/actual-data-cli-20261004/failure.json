@@ -1,0 +1,6 @@
+{
+  "failure_class": "verification_entry_point_mistake",
+  "source_failure": false,
+  "note": "Used package without __main__; corrected to existing stock_data_manage.cli, preserving original failed verification outputs",
+  "production_writes": 0
+}

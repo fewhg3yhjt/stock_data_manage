@@ -1,0 +1,31 @@
+dataset:
+  name: dated_announcements
+  display_name: 东财指定日期全市场公告目录
+  primary_key:
+  - snapshot_at
+  - source_article_code
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  source_article_code:
+    type: string
+    required: true
+  stock_code:
+    type: string
+    required: true
+  stock_name:
+    type: string
+    required: false
+  title:
+    type: string
+    required: true
+  notice_type:
+    type: string
+    required: false
+  publication_date:
+    type: date
+    required: true
+  url:
+    type: string
+    required: true

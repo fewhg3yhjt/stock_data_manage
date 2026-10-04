@@ -44,7 +44,7 @@ def test_input_catalog_covers_successful_rows_without_granting_production_routes
         rows = list(csv.DictReader(f))
     successes = {r["接口ID"] for r in rows if r["接口取数结果"] in {"通过", "部分通过"}}
     assert {ref for c in inputs for ref in c.evidence_refs} == successes
-    assert len(inputs) == 74
+    assert len(inputs) == 77
     assert len(successes) == 73
     assert all(c.collection_profile in profiles for c in inputs)
     assert all(not p.scheduling_enabled for p in profiles.values())

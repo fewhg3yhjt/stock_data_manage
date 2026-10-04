@@ -1,0 +1,13 @@
+{
+  "result": "passed",
+  "validation_time_utc": "2026-10-04T12:22:21.431024+00:00",
+  "staged_files_verified": 627,
+  "artifact_index_sha256": "1793936463df4f32ac2194b84c900017870ed9e787a45e44279c22d81ef4d280",
+  "unrelated_user_files_staged": false,
+  "bytes_equal": true,
+  "production_writes": 0,
+  "scope": "all indexed files plus index itself; this staged-check record is added after the check",
+  "normal_project_owner": "书非の主机\\sp181",
+  "indexed_path_ownership_verified": 627,
+  "staged_whitespace_check": "passed; immutable bin/log bytes are binary"
+}

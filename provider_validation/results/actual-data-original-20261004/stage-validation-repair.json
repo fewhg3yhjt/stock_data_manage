@@ -1,0 +1,9 @@
+{
+  "failure_class": "raw_evidence_treated_as_text_by_git_whitespace_check",
+  "byte_hash_check_passed": true,
+  "action": "preserve raw bytes; declare bin/log artifacts binary and CR-at-EOL for archived JSON; preserve first index and generate new delivery index",
+  "previous_attribute_sha256": "451f18c0d90b767d775c136ff9bc1b31ba986277355fff31a177296a1f2b841b",
+  "previous_sealer_sha256": "8147cac6d3a080044ee73aac781ee6df43a145a3217077815754ea3b6a6d1148",
+  "first_index_sha256": "9ae929c00778e19e9ef1830068f547657e159086043c3d9be338a9d402903dea",
+  "production_writes": 0
+}

@@ -1,0 +1,15 @@
+{
+  "input_id": "ASTOCK-044",
+  "scope": {},
+  "row_count": 198,
+  "original_parsed_sha256": "9094a0d81a17c6516356a8a58acffb8d350bbabea504257fa6274d235645fb96",
+  "response_hashes": [
+    "93891b70d9360fda6a0ed99264934e0c6f46414feca604acca94351f74c6b9e8"
+  ],
+  "original_fields_equal": true,
+  "original_transport_equal": true,
+  "production_writes": 0,
+  "mode": "offline_replay",
+  "universe_completeness_verified": false,
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-final-20261004\\4\\candidate\\ASTOCK-044-48f5850c6891\\2026-10-04\\input_report\\baostock\\st_list\\report.json"
+}

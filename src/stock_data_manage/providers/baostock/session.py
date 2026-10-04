@@ -86,7 +86,7 @@ def _decoded_result_set(document):
 
 @contextmanager
 def captured_sdk_queries(store, *, mode, replay_manifest, evidence_roots, scope, code_version,
-                         trade_date, pacer, interval_seconds, max_age_seconds, client=None):
+                         trade_date, pacer, interval_seconds, max_age_seconds, client=None, query_requests=None):
     """Capture the existing two SDK queries, preserving the live client/session and TCP boundary.
 
     Replay/cache ResultSets implement the SDK's external fields/next/get_row_data contract;
@@ -101,7 +101,8 @@ def captured_sdk_queries(store, *, mode, replay_manifest, evidence_roots, scope,
 
         events, used, selected = [], set(), {}
         last_payload_time = None
-        query_scope = {"trade_date": trade_date.isoformat(), "exchange_scope": "SH+SZ A shares"}
+        query_scope = ({"trade_date": trade_date.isoformat(), "exchange_scope": "SH+SZ A shares"}
+                       if trade_date else {"code_name": "ST", "exchange_scope": "SH+SZ"})
         archive_records = []
         if mode == "replay":
             manifest = Path(replay_manifest).resolve()
@@ -112,7 +113,7 @@ def captured_sdk_queries(store, *, mode, replay_manifest, evidence_roots, scope,
             return (record.get("event") == "source_payload" and record.get("provider") == "baostock"
                     and record.get("endpoint") == name
                     and (record.get("request_parameters") == parameters if record.get("request_parameters") is not None
-                         else record.get("metadata", {}).get("trade_date") == trade_date.isoformat()))
+                         else trade_date is not None and record.get("metadata", {}).get("trade_date") == trade_date.isoformat()))
 
         def lookup(name, parameters):
             if mode == "replay":
@@ -143,7 +144,9 @@ def captured_sdk_queries(store, *, mode, replay_manifest, evidence_roots, scope,
             _, path, number, record = min(candidates, key=lambda item: item[0])
             return path.resolve(), number, record, "cached"
 
-        requests = {"query_all_stock": {"day": trade_date.isoformat()}, "query_stock_industry": {"date": trade_date.isoformat()}}
+        requests = query_requests or {"query_all_stock": {"day": trade_date.isoformat()}, "query_stock_industry": {"date": trade_date.isoformat()}}
+        if query_requests is not None and query_requests != {"query_stock_basic": {"code_name": "ST"}}:
+            raise ValueError('only the verified ST name query is supported as an additional SDK scope')
         # Search evidence before authenticating or issuing either live SDK query.
         cached = {name: lookup(name, parameters) for name, parameters in requests.items()}
         needs_live = mode == "live" and any(record is None for record in cached.values())
@@ -262,6 +265,5 @@ def captured_sdk_queries(store, *, mode, replay_manifest, evidence_roots, scope,
             return result
 
         sdk_client = SimpleNamespace(login=lambda: session_call("login"), logout=lambda: session_call("logout"),
-                                     query_all_stock=lambda **kwargs: query("query_all_stock", **kwargs),
-                                     query_stock_industry=lambda **kwargs: query("query_stock_industry", **kwargs))
+                                     **{name: (lambda name=name, **kwargs: query(name, **kwargs)) for name in requests})
         yield sdk_client, SimpleNamespace(store_source_payload=persist_decoded), events

@@ -126,6 +126,9 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                 used.add(number)
                 source_ref = {"manifest": str(replay_manifest.resolve()), "line": number,
                               "fetched_at_utc": record.get("fetched_at_utc")}
+                if record.get('redacted'):
+                    source_ref.update(redacted=True, original_body_sha256=record.get('original_body_sha256'),
+                                      exact_original_bytes_retained=False)
                 if record.get("outcome") == "transport_error":
                     transport_error()
                     store.append_event({"event": "http_response", "mode": "replay", "outcome": "transport_error",

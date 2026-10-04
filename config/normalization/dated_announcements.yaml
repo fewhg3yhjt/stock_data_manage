@@ -1,0 +1,25 @@
+dataset: dated_announcements
+rules:
+- id: dated_announcements-actual-input-v1
+  input_id: ASTOCK-087
+  provider: eastmoney
+  endpoint: dated_announcements
+  field_mapping:
+    source_article_code: source_article_code
+    stock_code: 代码
+    stock_name: 名称
+    title: 公告标题
+    notice_type: 公告类型
+    publication_date: 公告日期
+    url: 网址
+  context_fields:
+    snapshot_at: source_snapshot_at
+  null_values:
+  - null
+  - ''
+  unverified_fields: []
+  status: pending_validation
+  version: actual-data-input-v1
+  evidence_refs:
+  - ASTOCK-087
+  notes: 按原成功数据范围接入；snapshot_at 为原响应捕获时间，不是来源生效日期。原字段独立留证，不自动启用生产。

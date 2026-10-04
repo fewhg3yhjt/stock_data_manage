@@ -1,0 +1,12 @@
+def _get_file_content_ths(file: str = "ths.js") -> str:
+    """
+    获取 JS 文件的内容
+    :param file:  JS 文件名
+    :type file: str
+    :return: 文件内容
+    :rtype: str
+    """
+    setting_file_path = get_ths_js(file)
+    with open(setting_file_path, encoding="utf-8") as f:
+        file_data = f.read()
+    return file_data

@@ -1,0 +1,212 @@
+{
+  "result": "passed",
+  "validation_time_utc": "2026-10-04T12:11:12.901185+00:00",
+  "counts": {
+    "implemented_validation_only": 64,
+    "unimplemented": 2,
+    "blocked": 8,
+    "alias": 3
+  },
+  "full_regression_tests": 645,
+  "reports": [
+    {
+      "path": "provider_validation/results/actual-data-final-20261004/y/candidate/ASTOCK-037-profile-831b270e4074/2026-10-04/input_report/cninfo/company_profile/report.json",
+      "sha256": "67cde2092402297fcd81349daea6455831b6b05e4675c4c6ce20446058d1ad73",
+      "status": "candidate_complete",
+      "row_count": 1
+    },
+    {
+      "path": "provider_validation/results/actual-data-final-20261004/f9/candidate/ASTOCK-087-14b2a0868e48/2026-10-04/input_report/eastmoney/dated_announcements/report.json",
+      "sha256": "3b1fad3a243cb7113c8e07e924312ceb4e51ffdbfe8cbfbdaad00481fbf4bd55",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation/results/actual-data-final-20261004/f8/candidate/ASTOCK-037-events-0640fed4a697/2026-10-04/input_report/eastmoney/company_events/report.json",
+      "sha256": "9c2129c2a3ae7a5320bf52f08dcb983b0893a0f5d29940a539c21d2f7375e8da",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation/results/actual-data-final-20261004/f7/candidate/ASTOCK-037-events-a8f619179212/2026-10-04/input_report/eastmoney/company_events/report.json",
+      "sha256": "48a56e363bf8d4b2f73784151b8ccb99fc2230f952f69ea15e045bf907c6cba8",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation/results/actual-data-final-20261004/f6/candidate/ASTOCK-037-events-c1e67016f3ff/2026-10-04/input_report/eastmoney/company_events/report.json",
+      "sha256": "868b3e859738bdf96443fb2b653d41fe2ae02e10ebcf3a1570d6646aa2a24819",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation/results/actual-data-final-20261004/f5/candidate/ASTOCK-037-events-20d7dbcc6b60/2026-10-04/input_report/eastmoney/company_events/report.json",
+      "sha256": "f76d0490af74935e9a48f2575f5ddc0a3d4f35818d7a7be5db2007601b5e42ec",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation/results/actual-data-final-20261004/f4/candidate/ASTOCK-037-profile-612427530035/2026-10-04/input_report/cninfo/company_profile/report.json",
+      "sha256": "5f934515b4d9e153abd3f435cb4648fca3b1f25a1bac42d6f7e4dccf5192cd16",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation/results/actual-data-final-20261004/f3/candidate/ASTOCK-037-profile-b0879d202680/2026-10-04/input_report/cninfo/company_profile/report.json",
+      "sha256": "52516f14205b217955986a2cfc49daf43d5ec3873c43671c483136e5b1a54fec",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation/results/actual-data-final-20261004/f2/candidate/ASTOCK-037-profile-a08bd32868ed/2026-10-04/input_report/cninfo/company_profile/report.json",
+      "sha256": "972388f5011216d13549349bb3bd9f2c29a4360a1c6e2d73a9d7ae7ad35ac5c0",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation/results/actual-data-final-20261004/f17/candidate/ASTOCK-014-78a38b453e25/2026-10-04/input_report/ths/concept_directory/report.json",
+      "sha256": "021c0f3a2302e7598673ee0720425dae541fe1c72f9009e4b7043c21db18d477",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation/results/actual-data-final-20261004/f16/candidate/ASTOCK-044-95c8b51b84da/2026-10-04/input_report/baostock/st_list/report.json",
+      "sha256": "936c2790cd1639d8fbc3a48ab2bea2cd27df53006eab4e7e94fa57a8ea196535",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation/results/actual-data-final-20261004/f15/candidate/ASTOCK-044-0c6928629be5/2026-10-04/input_report/baostock/st_list/report.json",
+      "sha256": "943d7478b35c53c4ac8839c6e59adb5d16aafa2457b5fbaf0c0ee7cdd8745c79",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation/results/actual-data-final-20261004/f14/candidate/ASTOCK-044-b155224820dc/2026-10-04/input_report/baostock/st_list/report.json",
+      "sha256": "0f7a5b0c12fbb4171b6906f4e784303f21a055e36503c905c1b3b85b1cdcfb67",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation/results/actual-data-final-20261004/f13/candidate/ASTOCK-087-606f3fb8129a/2026-10-04/input_report/eastmoney/dated_announcements/report.json",
+      "sha256": "abaf8574bddf5996662c895021f198ad3c83c38cc366d3e17fd8a5e2929aacfd",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation/results/actual-data-final-20261004/f12/candidate/ASTOCK-087-f65fa997244b/2026-10-04/input_report/eastmoney/dated_announcements/report.json",
+      "sha256": "2e2b0d01a732b84c4f7783ebc2d3ad5a93aef766ee69b1337c854e120e8142d7",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation/results/actual-data-final-20261004/f11/candidate/ASTOCK-087-25decc87aa2b/2026-10-04/input_report/eastmoney/dated_announcements/report.json",
+      "sha256": "b7511094581ce11a19836267d11d954b0cfc04264f2245cb0e0b694ab71debdc",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation/results/actual-data-final-20261004/f10/candidate/ASTOCK-087-d05f6ca33c0c/2026-10-04/input_report/eastmoney/dated_announcements/report.json",
+      "sha256": "6ef2369906d068a58b6551c9e8fb97392492e1ef966eb4c9e95360efe66b8bf3",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation/results/actual-data-final-20261004/f1/candidate/ASTOCK-037-profile-401f69aeefe5/2026-10-04/input_report/cninfo/company_profile/report.json",
+      "sha256": "7888f7d3bb7cc98789d3ecdda203fc4d50d7761aa66d81e8246ce3b1ce1122de",
+      "status": "failed",
+      "row_count": null
+    },
+    {
+      "path": "provider_validation/results/actual-data-final-20261004/5/candidate/ASTOCK-087-88404906f93b/2026-10-04/input_report/eastmoney/dated_announcements/report.json",
+      "sha256": "aa562c1206e6a7d6efcca497d6c8256a99cbb1fc386b5b25f0beeab3ad6138bb",
+      "status": "candidate_complete",
+      "row_count": 718
+    },
+    {
+      "path": "provider_validation/results/actual-data-final-20261004/4/candidate/ASTOCK-044-48f5850c6891/2026-10-04/input_report/baostock/st_list/report.json",
+      "sha256": "280f7324fcec364d320c75a141a8764cc8510552e6c247075621fc77c2a9cb63",
+      "status": "candidate_complete",
+      "row_count": 198
+    },
+    {
+      "path": "provider_validation/results/actual-data-final-20261004/3/candidate/ASTOCK-037-events-61a89f763457/2026-10-04/input_report/eastmoney/company_events/report.json",
+      "sha256": "2246633949abeb984f4a7a82d7a707fe19cb1c09cda818167cd3d2187ede2c95",
+      "status": "candidate_complete",
+      "row_count": 75
+    },
+    {
+      "path": "provider_validation/results/actual-data-final-20261004/2/candidate/ASTOCK-037-profile-60716f8e12a0/2026-10-04/input_report/cninfo/company_profile/report.json",
+      "sha256": "5dafefe45704e4b7d00a62aae77fe4078ca577f55757e31b74bc1fe55b6219ef",
+      "status": "candidate_complete",
+      "row_count": 1
+    },
+    {
+      "path": "provider_validation/results/actual-data-final-20261004/1/candidate/ASTOCK-014-484955dda07e/2026-10-04/input_report/ths/concept_directory/report.json",
+      "sha256": "5139bf82c7423521a702c6b7ef1a459cb1238cb2c4992bf92effa9cd212b5920",
+      "status": "candidate_complete",
+      "row_count": 375
+    },
+    {
+      "path": "provider_validation/results/actual-data-cli-v2-20261004/5/candidate/ASTOCK-087-7a3fb5e502de/2026-10-04/input_report/eastmoney/dated_announcements/report.json",
+      "sha256": "da64e8e41d9954380df9a455bf2274457581c8577d98c0b369cb409bac5029c5",
+      "status": "candidate_complete",
+      "row_count": 718
+    },
+    {
+      "path": "provider_validation/results/actual-data-cli-v2-20261004/4/candidate/ASTOCK-044-8927e8a57c37/2026-10-04/input_report/baostock/st_list/report.json",
+      "sha256": "e39552e39c31d00925a162bd870f5f7eddffc3094704ca56904388ebeaf47175",
+      "status": "candidate_complete",
+      "row_count": 198
+    },
+    {
+      "path": "provider_validation/results/actual-data-cli-v2-20261004/3/candidate/ASTOCK-037-events-84842f58a3cd/2026-10-04/input_report/eastmoney/company_events/report.json",
+      "sha256": "f450522a666acc3f4631652041410ae980a204edbe0232007ca2d2e1a488ec3d",
+      "status": "candidate_complete",
+      "row_count": 75
+    },
+    {
+      "path": "provider_validation/results/actual-data-cli-v2-20261004/2/candidate/ASTOCK-037-profile-94ee2165d3bc/2026-10-04/input_report/cninfo/company_profile/report.json",
+      "sha256": "280452454fed5ae895f904f4145003b438b6e21dd49f7e45ee6da9de3d76274e",
+      "status": "candidate_complete",
+      "row_count": 1
+    },
+    {
+      "path": "provider_validation/results/actual-data-cli-v2-20261004/1/candidate/ASTOCK-014-54583d34f657/2026-10-04/input_report/ths/concept_directory/report.json",
+      "sha256": "5ea77a613713a4e423fdb9edc99e0f4fc09643b34f45058fd9020f6d541b580a",
+      "status": "candidate_complete",
+      "row_count": 375
+    }
+  ],
+  "legacy_methods_preserved": [
+    "akshare/boards.py:_mapping",
+    "akshare/boards.py:fetch_industry_list",
+    "akshare/boards.py:fetch_industry_daily",
+    "akshare/boards.py:fetch_fund_flow",
+    "baostock/industry.py:fetch_snapshot",
+    "eastmoney/news.py:__init__",
+    "eastmoney/news.py:fetch",
+    "eastmoney/financial.py:close_report_session",
+    "eastmoney/financial.py:fetch_intraday_changes",
+    "eastmoney/financial.py:fetch_report_list",
+    "eastmoney/financial.py:fetch_dragon_tiger_seats",
+    "eastmoney/financial.py:fetch_dragon_tiger_daily",
+    "eastmoney/financial.py:fetch_lockup_expiry",
+    "eastmoney/financial.py:_fetch_market_events",
+    "eastmoney/financial.py:fetch_pmi",
+    "eastmoney/financial.py:close_event_session",
+    "eastmoney/financial.py:_event_get",
+    "eastmoney/financial.py:fetch_event_list",
+    "eastmoney/financial.py:fetch_lpr_history",
+    "eastmoney/financial.py:fetch_convertible_bonds",
+    "eastmoney/financial.py:fetch_action_list",
+    "eastmoney/financial.py:_event_rows",
+    "eastmoney/financial.py:__post_init__",
+    "eastmoney/financial.py:fetch"
+  ],
+  "cli_inputs_verified": 5,
+  "original_vs_provider_scopes": 5,
+  "negative_checks": 17,
+  "production_writes": 0,
+  "eligible_for_production_routing": false
+}

@@ -1,0 +1,28 @@
+dataset:
+  name: company_events
+  display_name: 东财全市场指定日期公司动态
+  primary_key:
+  - snapshot_at
+  - source_row_number
+fields:
+  snapshot_at:
+    type: datetime
+    required: true
+  source_row_number:
+    type: string
+    required: true
+  stock_code:
+    type: string
+    required: true
+  stock_name:
+    type: string
+    required: false
+  event_type:
+    type: string
+    required: true
+  content:
+    type: string
+    required: true
+  source_date:
+    type: date
+    required: true

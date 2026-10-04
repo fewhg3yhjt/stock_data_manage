@@ -35,6 +35,34 @@ class AkShareBoardProvider:
     normalization_root: Path | None = None
     input_hosts: tuple[str, ...] = ("https://q.10jqka.com.cn", "https://d.10jqka.com.cn", "http://data.10jqka.com.cn")
 
+    def fetch_concept_list(self, *, source_responses):
+        from bs4 import BeautifulSoup
+        from ..contracts import InputFetchResult
+        self.client = self.client or load_client()
+        frame = self.client.stock_board_concept_name_ths()
+        responses = list(source_responses())
+        if not responses or not any('/gn/detail/code/307822/' in r['url'] for r in responses):
+            raise ValueError('original concept directory response is required; SDK cache alone is insufficient')
+        if tuple(frame.columns) != ('name', 'code') or frame.empty:
+            raise ValueError('concept directory fields or nonempty contract changed')
+        rows = tuple(frame.astype(object).where(frame.notna(), None).to_dict('records'))
+        if any(not r['name'] or not str(r['code']).isdigit() for r in rows):
+            raise ValueError('concept directory name/code missing')
+        if len({r['code'] for r in rows}) != len(rows):
+            raise ValueError('duplicate concept code')
+        # Independently justify every returned pair with an anchor in retained HTML.
+        pairs = set()
+        for response in responses:
+            soup = BeautifulSoup(response['body'].decode(response.get('encoding') or 'utf-8'), 'lxml')
+            pairs.update((a.get_text(), a['href'].rsplit('/')[-2]) for a in soup.find_all('a', href=True)
+                         if '/detail/code/' in a['href'])
+        if any((r['name'], r['code']) not in pairs for r in rows):
+            raise ValueError('concept directory pair has no source anchor')
+        return InputFetchResult(rows, source_rows=rows, source_url=responses[0]['url'],
+            mapping_context={'board_type': 'concept', 'source': 'ths',
+                             'scope_meaning': 'returned concept names and codes; no hotness or membership',
+                             'pagination_completeness_verified': False})
+
     def _mapping(self, dataset: str, input_id: str) -> Mapping[str, str]:
         from ...config.loader import load_normalization_document
         document = load_normalization_document(self.normalization_root or Path(__file__).resolve().parents[4] / "config/normalization", dataset)

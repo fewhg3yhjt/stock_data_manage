@@ -1,0 +1,15 @@
+{
+  "input_id": "ASTOCK-011",
+  "function": "stock_profit_forecast_ths",
+  "parameters": {
+    "symbol": "600519"
+  },
+  "code_version": "15ceb3c926df6d8a2d72ee357d8159da76084dab83fbd90165526703ae18830b",
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "archive_search": "actual-data-original-20261004/matching-responses.json",
+  "status": "failed",
+  "failure_class": "ConnectionError",
+  "error": "HTTPSConnectionPool(host='basic.10jqka.com.cn', port=443): Max retries exceeded with url: /new/600519/worth.html (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x0000024F8D581F90>: Failed to establish a new connection: [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。'))",
+  "manifest_sha256": "ea5152e137169fd4d09deebe3a8c91d2dd68ad4f7ba5f0099777e8f47f8ec09a"
+}

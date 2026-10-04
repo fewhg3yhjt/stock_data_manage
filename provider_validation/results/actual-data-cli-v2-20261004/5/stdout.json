@@ -1,0 +1,862 @@
+{
+  "input_id": "ASTOCK-087",
+  "dataset": "dated_announcements",
+  "mode": "replay",
+  "parameters": {
+    "date": "2026-10-01"
+  },
+  "provider": "eastmoney",
+  "endpoint": "dated_announcements",
+  "collection_profile": {
+    "name": "event_daily",
+    "mode": "daily",
+    "refresh_interval_seconds": null,
+    "business_day": "calendar_day",
+    "scheduling_enabled": false,
+    "frequency_unit": null,
+    "frequency_interval": 1,
+    "at_time": null,
+    "anchor_date": null,
+    "settle_delay_seconds": 0,
+    "trigger_grace_seconds": 30,
+    "universe": "static",
+    "max_symbols": null
+  },
+  "request_interval_seconds": 3,
+  "effective_concurrency": 1,
+  "request_limit_enforcement": "call_boundary_only",
+  "adapter_version": "eastmoney-dated-announcements-input-v1",
+  "code_version": "b3a7f989bf2f0025a8d2af306c215784590867c8b48d86c88a01ebed86596ea8",
+  "code_files": [
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\pipeline\\inputs.py",
+      "sha256": "800b69457ab0a6ab718ffe5c40a3b47b98529ff28fbbbb5c5630066c84317d38"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\cli.py",
+      "sha256": "582f5caedfc538a012d7a2f6e8cd7af3fe8b6fc9152e5b9e0a3fa2cb8810ae19"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\config\\loader.py",
+      "sha256": "93bb55ab150c88751fe9a58a2b75737878c1b0f07233b8ec47009c4901bb11e9"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\contracts.py",
+      "sha256": "2e88e4875a56bbebd79154c6343af4f21e933c155ad64a24b7025263f258e391"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\quality\\normalization.py",
+      "sha256": "3ed0d663b7fda9ac6cdf7f1252435f2351c783af3244ccba2c2b0f3891e29b3e"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\transport.py",
+      "sha256": "1e164987c1465e3333f7ff0fe0091a16e62e7e4da0f25ea20beb66600c4ea024"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\storage\\raw.py",
+      "sha256": "16e1905b7f84e3fd49c0e38241e90f4b0d42786d92ea93f604c200cfd361bc46"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\routing\\factory.py",
+      "sha256": "91b80e626acb7779f2836f0486d4918e85956e0bdbb28e1fa4dd2485bb3ec85a"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\daily.py",
+      "sha256": "487a14fcbfc47146d6d5fd291fbf41667aba435e5fed22ea1ef61ded513fcaa7"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\minute.py",
+      "sha256": "ff5cf1e91327bcab2e072bcfae9f1f77dca71a84ba26e456c26580a4d59d9cc1"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tencent\\snapshot.py",
+      "sha256": "56f37a638ad921cc028da499288e62df403fa70eb25433f3cc11617fd19ce42e"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\limit_pool.py",
+      "sha256": "2fbdfe3da3129545dfe8d2e457be7c42225696ddd74270567ae765e4b413f5ae"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\shareholder.py",
+      "sha256": "4c9d80f4d51845ac5541c42275f44f2a18643db5e9ccb705a3e16168f8db44c1"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\financial.py",
+      "sha256": "bba51b00d8d879327bef6338633c406f2405683d2ecf84d7d151063259b6663b"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\news.py",
+      "sha256": "89912d67f040541e13c9953f05a7594eb0d85f608cef5b5679802defd61cb1ed"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\wallstreetcn\\news.py",
+      "sha256": "fb870197a111ecad42d47e7e81315c7d59c3c6a8bd7cadb72b84cc537bc91fda"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\cctv\\news.py",
+      "sha256": "8839bdeed801611e8e6d11cb9441e6ede7bc94d56507eaa2c903e605c772ee7d"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\cls\\news.py",
+      "sha256": "51da559a252b67a4a2e58171e3630ff1a5a80cd2bc23aa5df30a7e17ac02ad30"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\news.py",
+      "sha256": "0392f60b5a2ab83eaec1b4b05fda39906b7be223b5cc8fc95cb0c814ed63481e"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\financial.py",
+      "sha256": "699475f190f9864a5f7edafc23a5a85734f22a299f187a62819b4ebb5cb6e247"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sse\\market.py",
+      "sha256": "472ffdf622937612d9780f2192bf9e3943edd727fc405af0c474bb9e29d08124"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\csindex\\indices.py",
+      "sha256": "4b95f2bbda23abc28dc160a76386cc2bf5d82817747dfcbcb518ee22ea07741b"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\tdx\\minute.py",
+      "sha256": "690b2db863d35e781bdea2451b5732b08a1b54d222a8b126e73091bf5d4930da"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\chinabond\\yield_curve.py",
+      "sha256": "2fcb5bf39aec2e7fb893baa214036cf24bb6265b57afc01e96e1ea7201c05331"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\exchanges\\daily.py",
+      "sha256": "23685819ea2b740388b513421c0d1aa7c90aaf0198daa03bc0eca41696d8e8b5"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sge\\spot.py",
+      "sha256": "0801abb4eee03dada2500120b5963f5ebfb39f6f6a95f67cb4feda24dc3ec8a6"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\mofcom\\social_financing.py",
+      "sha256": "55d292958fb34991c56c626d5f6f61e7e6c44c8c2627b88ea735e751aa12c5ce"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\chinamoney\\rates.py",
+      "sha256": "e7407f1d4272b69cb439bb0a7bad3960b65bb41328d752f541bc8ef50231f922"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\dividend.py",
+      "sha256": "5706a8cdb37eeeb8f66cb033a3091dd1b6ec1ed83d72d0f9fbeb8f5c75d9649b"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\fund_flow.py",
+      "sha256": "0cf655efa0854d18651bb4f04f985f0f210b81a6d9eff065604d235ed8f75280"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\eastmoney\\realtime.py",
+      "sha256": "6e09d2a5014cf316c4d1e26e913a44d5c2fbad95fb44d95cba159ef881f03bca"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\calendar.py",
+      "sha256": "3d114045f960bfcc94ade1ee03e4d25ebdf6980ba68aa2d0a2236bed78aaef05"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\snapshot.py",
+      "sha256": "cfa0b823b2fa8053ce899157e9b6078b94516d3fabd5d303480824111f62d136"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\sina\\daily.py",
+      "sha256": "dd15e0c6b0f8ed5e6db99b5d2b9725eb7e2cc6f3e42bd5e6d392c5334922dc89"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\akshare\\boards.py",
+      "sha256": "9ed187b79fb61bb6f8d10355e4dd7e6483829e1b71f493a9107d668e9b8c0460"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\baostock\\industry.py",
+      "sha256": "d3209d26579d2d47be990ea8fb47fd92c5b80a8bf3e8bf03aa553ae2c61d7f08"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\cninfo\\profile.py",
+      "sha256": "cb0e68bd9ae09abf9caab432f401f86798452b62080f1159d0d354f5d6978331"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\src\\stock_data_manage\\providers\\baostock\\session.py",
+      "sha256": "7060828b4ae4125de14447d62d76c6e700b9224cb27c2d645164d5e31ab2e665"
+    }
+  ],
+  "config_files": [
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\providers.yaml",
+      "sha256": "11abb8bc03cb75b615539eee413983f54dbf4b28ee5b6584d90ca0824f737196"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\collection.yaml",
+      "sha256": "241b7984ebfdc094238726bb6a90606413fda618365cf918fcedbe1c6099805d"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\datasets\\dated_announcements.yaml",
+      "sha256": "09fa6fd9de4c829254966ef7080e38923eeef12c660eed94ff2cc5bc29e23a1a"
+    },
+    {
+      "path": "D:\\Project\\PythonProgram\\stock_data_manage\\config\\normalization\\dated_announcements.yaml",
+      "sha256": "fb61e81fde87bd73191743dd6d52d3b33dd8548ab71bd9cedd33d3e831a99ad7"
+    }
+  ],
+  "normalization_version": "actual-data-input-v1",
+  "normalization_status": "pending_validation",
+  "field_units": {
+    "snapshot_at": null,
+    "source_article_code": null,
+    "stock_code": null,
+    "stock_name": null,
+    "title": null,
+    "notice_type": null,
+    "publication_date": null,
+    "url": null
+  },
+  "unverified_fields": [],
+  "selected_fields": [
+    "notice_type",
+    "publication_date",
+    "snapshot_at",
+    "source_article_code",
+    "stock_code",
+    "stock_name",
+    "title",
+    "url"
+  ],
+  "eligible_for_production_routing": false,
+  "production_writes": 0,
+  "live_http_calls": 0,
+  "validation_time_utc": "2026-10-04T12:08:57.043586+00:00",
+  "status": "candidate_complete",
+  "response_freshness_seconds": 86400,
+  "context_dependency": {
+    "path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-cli-v2-20261004\\5\\context.json",
+    "sha256": "8ed96617cd46b0a395cad2f9f3d56dd449117c8fa02e21bd88d259001ab42ed1"
+  },
+  "sdk_dependency": {
+    "version": "1.18.83",
+    "function": "stock_notice_report",
+    "source_path": "_raw/bodies/36061c8c8bd6e3f235f486670de17fc14780b2c9dfae019e5be49f58fd6eb211.bin",
+    "sha256": "36061c8c8bd6e3f235f486670de17fc14780b2c9dfae019e5be49f58fd6eb211",
+    "original_source_sha256": "36061c8c8bd6e3f235f486670de17fc14780b2c9dfae019e5be49f58fd6eb211",
+    "redacted": false,
+    "dependencies": [
+      {
+        "name": "_stock_notice_report",
+        "path": "_raw/bodies/cd0d10e8f18708a39b4f5bf5d7dc4f4fa1c7555041e4e4e3e0e92e8de61bcac7.bin",
+        "sha256": "cd0d10e8f18708a39b4f5bf5d7dc4f4fa1c7555041e4e4e3e0e92e8de61bcac7",
+        "original_source_sha256": "cd0d10e8f18708a39b4f5bf5d7dc4f4fa1c7555041e4e4e3e0e92e8de61bcac7",
+        "redacted": false
+      }
+    ]
+  },
+  "transport_dependency": {
+    "requests": "2.32.5",
+    "urllib3": "2.3.0"
+  },
+  "source_sdk_transport_policy": {
+    "source_contract": "successful rate-limited original SDK probe",
+    "timeout_seconds": null,
+    "trust_env": true,
+    "allow_redirects": true,
+    "headers": "requests defaults",
+    "adapter_retry_total": 2,
+    "adapter_backoff_min_seconds": 5,
+    "status_forcelist": [
+      500,
+      502,
+      503,
+      504
+    ],
+    "outer_capture_interval_seconds": 3,
+    "sdk_outer_attempts": 1,
+    "sdk_outer_delays_seconds": [],
+    "host_pause": "403/429 immediately; two consecutive transport or server errors",
+    "physical_retry_count_observable": false,
+    "source_fallback": false,
+    "implicit_date_selection": false,
+    "source_scope": "explicit source SDK and parameters; exact original response retained before parsing"
+  },
+  "responses": [
+    {
+      "event": "http_response",
+      "method": "GET",
+      "url": "https://np-anotice-stock.eastmoney.com/api/security/ann?ann_type=A&begin_time=2026-10-01&client_source=web&end_time=2026-10-01&f_node=0&page_index=1&page_size=100&s_node=0&sr=-1",
+      "request_headers": {
+        "User-Agent": "python-requests/2.32.5",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept": "*/*",
+        "Connection": "keep-alive"
+      },
+      "scope": {
+        "input_id": "ASTOCK-087",
+        "parameters": {
+          "date": "2026-10-01"
+        }
+      },
+      "request_options": {
+        "timeout": null,
+        "allow_redirects": true,
+        "trust_env": true,
+        "proxies": {},
+        "sdk_retry_policy": true,
+        "probe_host_pause": true
+      },
+      "provider": "eastmoney",
+      "endpoint": "dated_announcements",
+      "code_version": "b3a7f989bf2f0025a8d2af306c215784590867c8b48d86c88a01ebed86596ea8",
+      "fetched_at_utc": "2026-10-04T12:08:57.749624+00:00",
+      "mode": "replay",
+      "source_ref": {
+        "manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-network-20261004\\ASTOCK-087\\_raw\\manifest.ndjson",
+        "line": 1,
+        "fetched_at_utc": "2026-10-04T11:38:07.676648+00:00"
+      },
+      "outcome": "response",
+      "status_code": 200,
+      "response_headers": {
+        "Server": "Tengine",
+        "Content-Type": "text/plain;charset=UTF-8",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Content-Length": "71649",
+        "Connection": "keep-alive",
+        "Date": "Sun, 04 Oct 2026 11:38:09 GMT",
+        "EO-LOG-UUID": "6336257474802917771",
+        "EO-Cache-Status": "MISS"
+      },
+      "content_type": "text/plain;charset=UTF-8",
+      "encoding": "UTF-8",
+      "body_bytes": 71649,
+      "body_sha256": "61df2023fac7e02d3564b5761647c686839cfccd62ca4d5dee4137f72985ab3d",
+      "body_storage": "bodies/61df2023fac7e02d3564b5761647c686839cfccd62ca4d5dee4137f72985ab3d.bin",
+      "persistence_status": "exact_application_payload_saved"
+    },
+    {
+      "event": "http_response",
+      "method": "GET",
+      "url": "https://np-anotice-stock.eastmoney.com/api/security/ann?ann_type=A&begin_time=2026-10-01&client_source=web&end_time=2026-10-01&f_node=0&page_index=1&page_size=100&s_node=0&sr=-1",
+      "request_headers": {
+        "User-Agent": "python-requests/2.32.5",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept": "*/*",
+        "Connection": "keep-alive"
+      },
+      "scope": {
+        "input_id": "ASTOCK-087",
+        "parameters": {
+          "date": "2026-10-01"
+        }
+      },
+      "request_options": {
+        "timeout": null,
+        "allow_redirects": true,
+        "trust_env": true,
+        "proxies": {},
+        "sdk_retry_policy": true,
+        "probe_host_pause": true
+      },
+      "provider": "eastmoney",
+      "endpoint": "dated_announcements",
+      "code_version": "b3a7f989bf2f0025a8d2af306c215784590867c8b48d86c88a01ebed86596ea8",
+      "fetched_at_utc": "2026-10-04T12:08:57.788772+00:00",
+      "mode": "replay",
+      "source_ref": {
+        "manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-network-20261004\\ASTOCK-087\\_raw\\manifest.ndjson",
+        "line": 2,
+        "fetched_at_utc": "2026-10-04T11:38:11.173408+00:00"
+      },
+      "outcome": "response",
+      "status_code": 200,
+      "response_headers": {
+        "Server": "Tengine",
+        "Content-Type": "text/plain;charset=UTF-8",
+        "Keep-Alive": "timeout=5",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Content-Length": "71649",
+        "Connection": "keep-alive",
+        "Date": "Sun, 04 Oct 2026 11:38:13 GMT",
+        "EO-LOG-UUID": "4422315424110875357",
+        "EO-Cache-Status": "MISS"
+      },
+      "content_type": "text/plain;charset=UTF-8",
+      "encoding": "UTF-8",
+      "body_bytes": 71649,
+      "body_sha256": "0a092bc62ba62d3823b7ed17966b220fdf29f7a9481466429e21bc8083f6ae5e",
+      "body_storage": "bodies/0a092bc62ba62d3823b7ed17966b220fdf29f7a9481466429e21bc8083f6ae5e.bin",
+      "persistence_status": "exact_application_payload_saved"
+    },
+    {
+      "event": "http_response",
+      "method": "GET",
+      "url": "https://np-anotice-stock.eastmoney.com/api/security/ann?ann_type=A&begin_time=2026-10-01&client_source=web&end_time=2026-10-01&f_node=0&page_index=2&page_size=100&s_node=0&sr=-1",
+      "request_headers": {
+        "User-Agent": "python-requests/2.32.5",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept": "*/*",
+        "Connection": "keep-alive"
+      },
+      "scope": {
+        "input_id": "ASTOCK-087",
+        "parameters": {
+          "date": "2026-10-01"
+        }
+      },
+      "request_options": {
+        "timeout": null,
+        "allow_redirects": true,
+        "trust_env": true,
+        "proxies": {},
+        "sdk_retry_policy": true,
+        "probe_host_pause": true
+      },
+      "provider": "eastmoney",
+      "endpoint": "dated_announcements",
+      "code_version": "b3a7f989bf2f0025a8d2af306c215784590867c8b48d86c88a01ebed86596ea8",
+      "fetched_at_utc": "2026-10-04T12:08:57.824478+00:00",
+      "mode": "replay",
+      "source_ref": {
+        "manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-network-20261004\\ASTOCK-087\\_raw\\manifest.ndjson",
+        "line": 3,
+        "fetched_at_utc": "2026-10-04T11:38:14.125925+00:00"
+      },
+      "outcome": "response",
+      "status_code": 200,
+      "response_headers": {
+        "Server": "Tengine",
+        "Content-Type": "text/plain;charset=UTF-8",
+        "Keep-Alive": "timeout=5",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Content-Length": "71091",
+        "Connection": "keep-alive",
+        "Date": "Sun, 04 Oct 2026 11:38:16 GMT",
+        "EO-LOG-UUID": "9849535718527911113",
+        "EO-Cache-Status": "MISS"
+      },
+      "content_type": "text/plain;charset=UTF-8",
+      "encoding": "UTF-8",
+      "body_bytes": 71091,
+      "body_sha256": "c3b853b246eaab7dee9ad00da99feaff58c06987e67b50db91b81f0a512a4ab2",
+      "body_storage": "bodies/c3b853b246eaab7dee9ad00da99feaff58c06987e67b50db91b81f0a512a4ab2.bin",
+      "persistence_status": "exact_application_payload_saved"
+    },
+    {
+      "event": "http_response",
+      "method": "GET",
+      "url": "https://np-anotice-stock.eastmoney.com/api/security/ann?ann_type=A&begin_time=2026-10-01&client_source=web&end_time=2026-10-01&f_node=0&page_index=3&page_size=100&s_node=0&sr=-1",
+      "request_headers": {
+        "User-Agent": "python-requests/2.32.5",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept": "*/*",
+        "Connection": "keep-alive"
+      },
+      "scope": {
+        "input_id": "ASTOCK-087",
+        "parameters": {
+          "date": "2026-10-01"
+        }
+      },
+      "request_options": {
+        "timeout": null,
+        "allow_redirects": true,
+        "trust_env": true,
+        "proxies": {},
+        "sdk_retry_policy": true,
+        "probe_host_pause": true
+      },
+      "provider": "eastmoney",
+      "endpoint": "dated_announcements",
+      "code_version": "b3a7f989bf2f0025a8d2af306c215784590867c8b48d86c88a01ebed86596ea8",
+      "fetched_at_utc": "2026-10-04T12:08:57.857250+00:00",
+      "mode": "replay",
+      "source_ref": {
+        "manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-network-20261004\\ASTOCK-087\\_raw\\manifest.ndjson",
+        "line": 4,
+        "fetched_at_utc": "2026-10-04T11:38:17.361323+00:00"
+      },
+      "outcome": "response",
+      "status_code": 200,
+      "response_headers": {
+        "Server": "Tengine",
+        "Content-Type": "text/plain;charset=UTF-8",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Content-Length": "71106",
+        "Connection": "keep-alive",
+        "Date": "Sun, 04 Oct 2026 11:38:19 GMT",
+        "EO-LOG-UUID": "7736416716653125429",
+        "EO-Cache-Status": "MISS"
+      },
+      "content_type": "text/plain;charset=UTF-8",
+      "encoding": "UTF-8",
+      "body_bytes": 71106,
+      "body_sha256": "a72649555e0d49bc7a64671cbdca7c3eb1157c20b34e6a537c2837ce3c283736",
+      "body_storage": "bodies/a72649555e0d49bc7a64671cbdca7c3eb1157c20b34e6a537c2837ce3c283736.bin",
+      "persistence_status": "exact_application_payload_saved"
+    },
+    {
+      "event": "http_response",
+      "method": "GET",
+      "url": "https://np-anotice-stock.eastmoney.com/api/security/ann?ann_type=A&begin_time=2026-10-01&client_source=web&end_time=2026-10-01&f_node=0&page_index=4&page_size=100&s_node=0&sr=-1",
+      "request_headers": {
+        "User-Agent": "python-requests/2.32.5",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept": "*/*",
+        "Connection": "keep-alive"
+      },
+      "scope": {
+        "input_id": "ASTOCK-087",
+        "parameters": {
+          "date": "2026-10-01"
+        }
+      },
+      "request_options": {
+        "timeout": null,
+        "allow_redirects": true,
+        "trust_env": true,
+        "proxies": {},
+        "sdk_retry_policy": true,
+        "probe_host_pause": true
+      },
+      "provider": "eastmoney",
+      "endpoint": "dated_announcements",
+      "code_version": "b3a7f989bf2f0025a8d2af306c215784590867c8b48d86c88a01ebed86596ea8",
+      "fetched_at_utc": "2026-10-04T12:08:57.892889+00:00",
+      "mode": "replay",
+      "source_ref": {
+        "manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-network-20261004\\ASTOCK-087\\_raw\\manifest.ndjson",
+        "line": 5,
+        "fetched_at_utc": "2026-10-04T11:38:20.294344+00:00"
+      },
+      "outcome": "response",
+      "status_code": 200,
+      "response_headers": {
+        "Server": "Tengine",
+        "Content-Type": "text/plain;charset=UTF-8",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Content-Length": "69625",
+        "Connection": "keep-alive",
+        "Date": "Sun, 04 Oct 2026 11:38:22 GMT",
+        "EO-LOG-UUID": "13097591379024332405",
+        "EO-Cache-Status": "MISS"
+      },
+      "content_type": "text/plain;charset=UTF-8",
+      "encoding": "UTF-8",
+      "body_bytes": 69625,
+      "body_sha256": "51009720b412b95bc927110b4628ed195127633c830ced45d4af581bf08116ac",
+      "body_storage": "bodies/51009720b412b95bc927110b4628ed195127633c830ced45d4af581bf08116ac.bin",
+      "persistence_status": "exact_application_payload_saved"
+    },
+    {
+      "event": "http_response",
+      "method": "GET",
+      "url": "https://np-anotice-stock.eastmoney.com/api/security/ann?ann_type=A&begin_time=2026-10-01&client_source=web&end_time=2026-10-01&f_node=0&page_index=5&page_size=100&s_node=0&sr=-1",
+      "request_headers": {
+        "User-Agent": "python-requests/2.32.5",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept": "*/*",
+        "Connection": "keep-alive"
+      },
+      "scope": {
+        "input_id": "ASTOCK-087",
+        "parameters": {
+          "date": "2026-10-01"
+        }
+      },
+      "request_options": {
+        "timeout": null,
+        "allow_redirects": true,
+        "trust_env": true,
+        "proxies": {},
+        "sdk_retry_policy": true,
+        "probe_host_pause": true
+      },
+      "provider": "eastmoney",
+      "endpoint": "dated_announcements",
+      "code_version": "b3a7f989bf2f0025a8d2af306c215784590867c8b48d86c88a01ebed86596ea8",
+      "fetched_at_utc": "2026-10-04T12:08:57.926748+00:00",
+      "mode": "replay",
+      "source_ref": {
+        "manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-network-20261004\\ASTOCK-087\\_raw\\manifest.ndjson",
+        "line": 6,
+        "fetched_at_utc": "2026-10-04T11:38:23.100566+00:00"
+      },
+      "outcome": "response",
+      "status_code": 200,
+      "response_headers": {
+        "Server": "Tengine",
+        "Content-Type": "text/plain;charset=UTF-8",
+        "Keep-Alive": "timeout=5",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Content-Length": "69809",
+        "Connection": "keep-alive",
+        "Date": "Sun, 04 Oct 2026 11:38:25 GMT",
+        "EO-LOG-UUID": "4811447334399547621",
+        "EO-Cache-Status": "MISS"
+      },
+      "content_type": "text/plain;charset=UTF-8",
+      "encoding": "UTF-8",
+      "body_bytes": 69809,
+      "body_sha256": "58ff5c07111ae15b562c6e18268e0519daeddf5dca591804a2d3908da0f40597",
+      "body_storage": "bodies/58ff5c07111ae15b562c6e18268e0519daeddf5dca591804a2d3908da0f40597.bin",
+      "persistence_status": "exact_application_payload_saved"
+    },
+    {
+      "event": "http_response",
+      "method": "GET",
+      "url": "https://np-anotice-stock.eastmoney.com/api/security/ann?ann_type=A&begin_time=2026-10-01&client_source=web&end_time=2026-10-01&f_node=0&page_index=6&page_size=100&s_node=0&sr=-1",
+      "request_headers": {
+        "User-Agent": "python-requests/2.32.5",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept": "*/*",
+        "Connection": "keep-alive"
+      },
+      "scope": {
+        "input_id": "ASTOCK-087",
+        "parameters": {
+          "date": "2026-10-01"
+        }
+      },
+      "request_options": {
+        "timeout": null,
+        "allow_redirects": true,
+        "trust_env": true,
+        "proxies": {},
+        "sdk_retry_policy": true,
+        "probe_host_pause": true
+      },
+      "provider": "eastmoney",
+      "endpoint": "dated_announcements",
+      "code_version": "b3a7f989bf2f0025a8d2af306c215784590867c8b48d86c88a01ebed86596ea8",
+      "fetched_at_utc": "2026-10-04T12:08:57.954555+00:00",
+      "mode": "replay",
+      "source_ref": {
+        "manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-network-20261004\\ASTOCK-087\\_raw\\manifest.ndjson",
+        "line": 7,
+        "fetched_at_utc": "2026-10-04T11:38:25.981059+00:00"
+      },
+      "outcome": "response",
+      "status_code": 200,
+      "response_headers": {
+        "Server": "Tengine",
+        "Content-Type": "text/plain;charset=UTF-8",
+        "Keep-Alive": "timeout=5",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Content-Length": "71768",
+        "Connection": "keep-alive",
+        "Date": "Sun, 04 Oct 2026 11:38:28 GMT",
+        "EO-LOG-UUID": "5309127903570906045",
+        "EO-Cache-Status": "MISS"
+      },
+      "content_type": "text/plain;charset=UTF-8",
+      "encoding": "UTF-8",
+      "body_bytes": 71768,
+      "body_sha256": "ecf4f516e805055864442006056e33e414d249199f2819c98dd5e25733eed1c0",
+      "body_storage": "bodies/ecf4f516e805055864442006056e33e414d249199f2819c98dd5e25733eed1c0.bin",
+      "persistence_status": "exact_application_payload_saved"
+    },
+    {
+      "event": "http_response",
+      "method": "GET",
+      "url": "https://np-anotice-stock.eastmoney.com/api/security/ann?ann_type=A&begin_time=2026-10-01&client_source=web&end_time=2026-10-01&f_node=0&page_index=7&page_size=100&s_node=0&sr=-1",
+      "request_headers": {
+        "User-Agent": "python-requests/2.32.5",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept": "*/*",
+        "Connection": "keep-alive"
+      },
+      "scope": {
+        "input_id": "ASTOCK-087",
+        "parameters": {
+          "date": "2026-10-01"
+        }
+      },
+      "request_options": {
+        "timeout": null,
+        "allow_redirects": true,
+        "trust_env": true,
+        "proxies": {},
+        "sdk_retry_policy": true,
+        "probe_host_pause": true
+      },
+      "provider": "eastmoney",
+      "endpoint": "dated_announcements",
+      "code_version": "b3a7f989bf2f0025a8d2af306c215784590867c8b48d86c88a01ebed86596ea8",
+      "fetched_at_utc": "2026-10-04T12:08:57.986283+00:00",
+      "mode": "replay",
+      "source_ref": {
+        "manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-network-20261004\\ASTOCK-087\\_raw\\manifest.ndjson",
+        "line": 8,
+        "fetched_at_utc": "2026-10-04T11:38:28.997197+00:00"
+      },
+      "outcome": "response",
+      "status_code": 200,
+      "response_headers": {
+        "Server": "Tengine",
+        "Content-Type": "text/plain;charset=UTF-8",
+        "Keep-Alive": "timeout=5",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Content-Length": "70354",
+        "Connection": "keep-alive",
+        "Date": "Sun, 04 Oct 2026 11:38:31 GMT",
+        "EO-LOG-UUID": "11080217345529860386",
+        "EO-Cache-Status": "MISS"
+      },
+      "content_type": "text/plain;charset=UTF-8",
+      "encoding": "UTF-8",
+      "body_bytes": 70354,
+      "body_sha256": "5af22cad3e1ee6e08fad1b27501fb5ed187b3d5753d2db3fbb473492f9af88ea",
+      "body_storage": "bodies/5af22cad3e1ee6e08fad1b27501fb5ed187b3d5753d2db3fbb473492f9af88ea.bin",
+      "persistence_status": "exact_application_payload_saved"
+    },
+    {
+      "event": "http_response",
+      "method": "GET",
+      "url": "https://np-anotice-stock.eastmoney.com/api/security/ann?ann_type=A&begin_time=2026-10-01&client_source=web&end_time=2026-10-01&f_node=0&page_index=8&page_size=100&s_node=0&sr=-1",
+      "request_headers": {
+        "User-Agent": "python-requests/2.32.5",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept": "*/*",
+        "Connection": "keep-alive"
+      },
+      "scope": {
+        "input_id": "ASTOCK-087",
+        "parameters": {
+          "date": "2026-10-01"
+        }
+      },
+      "request_options": {
+        "timeout": null,
+        "allow_redirects": true,
+        "trust_env": true,
+        "proxies": {},
+        "sdk_retry_policy": true,
+        "probe_host_pause": true
+      },
+      "provider": "eastmoney",
+      "endpoint": "dated_announcements",
+      "code_version": "b3a7f989bf2f0025a8d2af306c215784590867c8b48d86c88a01ebed86596ea8",
+      "fetched_at_utc": "2026-10-04T12:08:58.026658+00:00",
+      "mode": "replay",
+      "source_ref": {
+        "manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-network-20261004\\ASTOCK-087\\_raw\\manifest.ndjson",
+        "line": 9,
+        "fetched_at_utc": "2026-10-04T11:38:31.942815+00:00"
+      },
+      "outcome": "response",
+      "status_code": 200,
+      "response_headers": {
+        "Server": "Tengine",
+        "Content-Type": "text/plain;charset=UTF-8",
+        "Keep-Alive": "timeout=5",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Content-Length": "12557",
+        "Connection": "keep-alive",
+        "Date": "Sun, 04 Oct 2026 11:38:34 GMT",
+        "EO-LOG-UUID": "11274404468915492072",
+        "EO-Cache-Status": "MISS"
+      },
+      "content_type": "text/plain;charset=UTF-8",
+      "encoding": "UTF-8",
+      "body_bytes": 12557,
+      "body_sha256": "b8f7aaafdfb3ec12a2dfe87e7fba0d1b653072f1e8a610ac6e871e9f588b60a7",
+      "body_storage": "bodies/b8f7aaafdfb3ec12a2dfe87e7fba0d1b653072f1e8a610ac6e871e9f588b60a7.bin",
+      "persistence_status": "exact_application_payload_saved"
+    }
+  ],
+  "source_rows": {
+    "path": "2026-10-04/source_rows/eastmoney/dated_announcements/source-rows.json",
+    "sha256": "be92620f48fcd78e014f746f0d59bcb48621fde3a1869e9d2852cb4154b625d1",
+    "row_count": 718
+  },
+  "parsed_rows": {
+    "path": "2026-10-04/parsed_rows/eastmoney/dated_announcements/parsed-rows.json",
+    "sha256": "d24fe7fd077c97d8c051a8b0b3b3d0cfce6a12ef121e83387af6b4a5c88b08bd",
+    "row_count": 718,
+    "code_version": "b3a7f989bf2f0025a8d2af306c215784590867c8b48d86c88a01ebed86596ea8",
+    "source_response_hashes": [
+      "61df2023fac7e02d3564b5761647c686839cfccd62ca4d5dee4137f72985ab3d",
+      "0a092bc62ba62d3823b7ed17966b220fdf29f7a9481466429e21bc8083f6ae5e",
+      "c3b853b246eaab7dee9ad00da99feaff58c06987e67b50db91b81f0a512a4ab2",
+      "a72649555e0d49bc7a64671cbdca7c3eb1157c20b34e6a537c2837ce3c283736",
+      "51009720b412b95bc927110b4628ed195127633c830ced45d4af581bf08116ac",
+      "58ff5c07111ae15b562c6e18268e0519daeddf5dca591804a2d3908da0f40597",
+      "ecf4f516e805055864442006056e33e414d249199f2819c98dd5e25733eed1c0",
+      "5af22cad3e1ee6e08fad1b27501fb5ed187b3d5753d2db3fbb473492f9af88ea",
+      "b8f7aaafdfb3ec12a2dfe87e7fba0d1b653072f1e8a610ac6e871e9f588b60a7"
+    ]
+  },
+  "source_url": "https://np-anotice-stock.eastmoney.com/api/security/ann?ann_type=A&begin_time=2026-10-01&client_source=web&end_time=2026-10-01&f_node=0&page_index=1&page_size=100&s_node=0&sr=-1",
+  "source_urls": [
+    "https://np-anotice-stock.eastmoney.com/api/security/ann?ann_type=A&begin_time=2026-10-01&client_source=web&end_time=2026-10-01&f_node=0&page_index=1&page_size=100&s_node=0&sr=-1",
+    "https://np-anotice-stock.eastmoney.com/api/security/ann?ann_type=A&begin_time=2026-10-01&client_source=web&end_time=2026-10-01&f_node=0&page_index=2&page_size=100&s_node=0&sr=-1",
+    "https://np-anotice-stock.eastmoney.com/api/security/ann?ann_type=A&begin_time=2026-10-01&client_source=web&end_time=2026-10-01&f_node=0&page_index=3&page_size=100&s_node=0&sr=-1",
+    "https://np-anotice-stock.eastmoney.com/api/security/ann?ann_type=A&begin_time=2026-10-01&client_source=web&end_time=2026-10-01&f_node=0&page_index=4&page_size=100&s_node=0&sr=-1",
+    "https://np-anotice-stock.eastmoney.com/api/security/ann?ann_type=A&begin_time=2026-10-01&client_source=web&end_time=2026-10-01&f_node=0&page_index=5&page_size=100&s_node=0&sr=-1",
+    "https://np-anotice-stock.eastmoney.com/api/security/ann?ann_type=A&begin_time=2026-10-01&client_source=web&end_time=2026-10-01&f_node=0&page_index=6&page_size=100&s_node=0&sr=-1",
+    "https://np-anotice-stock.eastmoney.com/api/security/ann?ann_type=A&begin_time=2026-10-01&client_source=web&end_time=2026-10-01&f_node=0&page_index=7&page_size=100&s_node=0&sr=-1",
+    "https://np-anotice-stock.eastmoney.com/api/security/ann?ann_type=A&begin_time=2026-10-01&client_source=web&end_time=2026-10-01&f_node=0&page_index=8&page_size=100&s_node=0&sr=-1"
+  ],
+  "source_capture_window": {
+    "first": "2026-10-04T11:38:07.676648+00:00",
+    "last": "2026-10-04T11:38:31.942815+00:00",
+    "meaning": "source response capture times; not row-level market timestamps"
+  },
+  "returned_window": {
+    "first": "2026-10-01",
+    "last": "2026-10-01",
+    "meaning": "source event date labels"
+  },
+  "source_fallback_enabled": false,
+  "implicit_date_selection": false,
+  "universe_completeness_verified": false,
+  "original_row_count": 718,
+  "selected_row_count": 718,
+  "source_metadata": {
+    "requested_date": "2026-10-01",
+    "source_total_count": 718,
+    "source_page_count": 8,
+    "pagination_completeness_verified": true,
+    "scope_meaning": "whole-market dated announcement index; SDK selects first A issuer; no document contents"
+  },
+  "coverage_basis": "returned actual source records; no independent universe proof",
+  "output": {
+    "path": "2026-10-04/dated_announcements/eastmoney/dated_announcements/mapped-rows.json",
+    "sha256": "b6655461e7d38ef682762826b8059438cdfa5e671108617475707b46c1319bed",
+    "row_count": 718,
+    "source_response_hashes": [
+      "61df2023fac7e02d3564b5761647c686839cfccd62ca4d5dee4137f72985ab3d",
+      "0a092bc62ba62d3823b7ed17966b220fdf29f7a9481466429e21bc8083f6ae5e",
+      "c3b853b246eaab7dee9ad00da99feaff58c06987e67b50db91b81f0a512a4ab2",
+      "a72649555e0d49bc7a64671cbdca7c3eb1157c20b34e6a537c2837ce3c283736",
+      "51009720b412b95bc927110b4628ed195127633c830ced45d4af581bf08116ac",
+      "58ff5c07111ae15b562c6e18268e0519daeddf5dca591804a2d3908da0f40597",
+      "ecf4f516e805055864442006056e33e414d249199f2819c98dd5e25733eed1c0",
+      "5af22cad3e1ee6e08fad1b27501fb5ed187b3d5753d2db3fbb473492f9af88ea",
+      "b8f7aaafdfb3ec12a2dfe87e7fba0d1b653072f1e8a610ac6e871e9f588b60a7"
+    ]
+  },
+  "row_count": 718,
+  "coverage_denominator": 718,
+  "first_key": [
+    "2026-10-04T11:38:31.942815+00:00",
+    "AN202610011830059731"
+  ],
+  "last_key": [
+    "2026-10-04T11:38:31.942815+00:00",
+    "AN202609301830039786"
+  ],
+  "host_pause_events": [],
+  "raw_manifest": {
+    "path": "_raw/manifest.ndjson",
+    "sha256": "7ddd96a32fc319c716df571acecfb24f9cdd5cf242b872f84e749d938d52c347"
+  },
+  "run_directory": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-cli-v2-20261004\\5\\candidate\\ASTOCK-087-7a3fb5e502de",
+  "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-cli-v2-20261004\\5\\candidate\\ASTOCK-087-7a3fb5e502de\\2026-10-04\\input_report\\eastmoney\\dated_announcements\\report.json"
+}

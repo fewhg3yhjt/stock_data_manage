@@ -1,0 +1,7 @@
+{
+  "status": "passed",
+  "case_count": 4,
+  "scope": "synthetic escaped literals only; no provider/network calls",
+  "transformation_sha256": "35b835e41f9d913ec75057c35de9e37eaefc56f0834396a10c412433c8c977c2",
+  "production_writes": 0
+}

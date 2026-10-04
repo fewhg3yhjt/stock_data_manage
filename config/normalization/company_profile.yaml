@@ -1,0 +1,46 @@
+dataset: company_profile
+rules:
+- id: company_profile-actual-input-v1
+  input_id: ASTOCK-037-profile
+  provider: cninfo
+  endpoint: company_profile
+  field_mapping:
+    company_name: 公司名称
+    english_name: 英文名称
+    former_name: 曾用简称
+    stock_code: A股代码
+    stock_name: A股简称
+    b_share_code: B股代码
+    b_share_name: B股简称
+    h_share_code: H股代码
+    h_share_name: H股简称
+    index_names: 入选指数
+    market: 所属市场
+    industry_name: 所属行业
+    legal_representative: 法人代表
+    registered_capital_source_value: 注册资金
+    established_date: 成立日期
+    listed_date: 上市日期
+    website: 官方网站
+    email: 电子邮箱
+    phone: 联系电话
+    fax: 传真
+    registered_address: 注册地址
+    office_address: 办公地址
+    postal_code: 邮政编码
+    main_business: 主营业务
+    business_scope: 经营范围
+    introduction: 机构简介
+    registered_capital: 注册资金
+  context_fields:
+    snapshot_at: source_snapshot_at
+  null_values:
+  - null
+  - ''
+  unverified_fields:
+  - registered_capital
+  status: pending_validation
+  version: actual-data-input-v1
+  evidence_refs:
+  - ASTOCK-037
+  notes: 按原成功数据范围接入；snapshot_at 为原响应捕获时间，不是来源生效日期。原字段独立留证，不自动启用生产。

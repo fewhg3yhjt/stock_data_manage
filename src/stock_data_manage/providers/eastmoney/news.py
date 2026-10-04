@@ -11,6 +11,53 @@ class EastMoneyStockNewsProvider:
     capability_version='eastmoney-stock-news-input-v1'
     input_hosts=('https://search-api-web.eastmoney.com',)
     def __init__(self,client=None):self.client=client
+
+    def fetch_announcements(self, *, date, source_responses):
+        import math
+        from urllib.parse import urlsplit, parse_qs
+        self.client = self.client or load_client()
+        frame = self.client.stock_notice_report(symbol='全部', date=date.strftime('%Y%m%d'))
+        responses = list(source_responses())
+        if not responses:
+            raise ValueError('original announcement responses are required')
+        payloads = [json.loads(r['body']) for r in responses]
+        if any(p.get('success') != 1 or p.get('error') not in ('', None) for p in payloads):
+            raise ValueError('announcement business status changed')
+        total = payloads[0].get('data', {}).get('total_hits')
+        if isinstance(total, bool) or not isinstance(total, int) or total <= 0:
+            raise ValueError('announcement positive source total changed')
+        pages = math.ceil(total / 100)
+        if len(responses) != pages + 1:
+            raise ValueError('announcement original discovery request and all pages required')
+        items = []
+        for page, (response, payload) in enumerate(zip(responses[1:], payloads[1:]), 1):
+            query = parse_qs(urlsplit(response['url']).query)
+            if query.get('page_index') != [str(page)] or query.get('begin_time') != [date.isoformat()] or query.get('end_time') != [date.isoformat()] or 'stock_list' in query:
+                raise ValueError('announcement response differs from explicit whole-market date/page scope')
+            data = payload.get('data', {})
+            rows = data.get('list')
+            if data.get('total_hits') != total or not isinstance(rows, list) or len(rows) != min(100, total - (page-1)*100):
+                raise ValueError('announcement page count changed')
+            items.extend(rows)
+        if len(frame) != total or tuple(frame.columns) != ('代码','名称','公告标题','公告类型','公告日期','网址'):
+            raise ValueError('announcement SDK skipped rows or fields changed')
+        parsed = frame.astype(object).where(frame.notna(), None).to_dict('records')
+        for item, row in zip(items, parsed):
+            if not item.get('art_code') or str(item.get('notice_date', ''))[:10] != date.isoformat() or row['公告日期'] != date:
+                raise ValueError('announcement article identity/date changed')
+            codes, columns = item.get('codes'), item.get('columns')
+            if not codes or not columns:
+                raise ValueError('announcement issuer/type metadata missing')
+            selected = codes[0] if len(codes) == 1 else next((c for c in codes if c['ann_type'].startswith('A')), None)
+            if selected is None or row['代码'] != selected['stock_code'] or row['名称'] != selected['short_name'] or row['公告标题'] != item['title'] or row['公告类型'] != columns[0]['column_name']:
+                raise ValueError('announcement SDK disagrees with raw selected issuer/article')
+            if row['网址'] != f"https://data.eastmoney.com/notices/detail/{row['代码']}/{item['art_code']}.html":
+                raise ValueError('announcement original link changed')
+            row['source_article_code'] = item['art_code']
+        return InputFetchResult(tuple(parsed), source_rows=tuple(items), source_url=responses[0]['url'],
+            mapping_context={'requested_date': date, 'source_total_count': total, 'source_page_count': pages,
+                             'pagination_completeness_verified': True,
+                             'scope_meaning': 'whole-market dated announcement index; SDK selects first A issuer; no document contents'})
     def fetch(self,*,code,source_responses):
         code=history_stock_identity(code)[0]
         self.client=self.client or load_client()

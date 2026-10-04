@@ -302,6 +302,183 @@ def test_remaining_news_yaml_projection_mapping_and_scope(tmp_path,no_network):
     with pytest.raises(ValueError,match='does not support'):
         collect_input(input_id='ASTOCK-031',context={'request':{'symbol':'600519','start_date':'2026-01-01'}},config_root=config,output_root=tmp_path/'bad',replay_manifest=NEWS_NATIVE_ARCHIVE)
 SDK_NEWS_CASES = [("ASTOCK-032", {}, SDK_ARCHIVE, 20), ("ASTOCK-033", {}, SDK_ARCHIVE, 20)]
+
+ACTUAL_DATA_CASES = [
+    ('ASTOCK-014', {}, SDK_ARCHIVE, 375),
+    ('ASTOCK-037-profile', {'request': {'symbol': '600519'}}, SDK_ARCHIVE, 1),
+    ('ASTOCK-037-events', {'request': {'date': '2023-08-08'}}, SDK_ARCHIVE, 75),
+    ('ASTOCK-044', {}, ROOT/'provider_validation/results/actual-data-original-20261004/st/manifest.ndjson', 198),
+    ('ASTOCK-087', {'request': {'date': '2026-10-01'}}, ROOT/'provider_validation/results/actual-data-network-20261004/ASTOCK-087/_raw/manifest.ndjson', 718),
+]
+
+
+def clear_concept_sdk_cache():
+    import akshare as sdk
+    helper = sdk.stock_board_concept_name_ths.__globals__['_get_stock_board_concept_name_ths']
+    helper.cache_clear()
+    helper.__wrapped__.__globals__['__stock_board_concept_summary_ths'].cache_clear()
+
+
+def compare_actual_data_original(tmp_path, input_id, context, manifest, count):
+    import akshare as sdk
+    from stock_data_manage.pipeline.inputs import _json_value
+    from stock_data_manage.providers.baostock.session import captured_sdk_queries
+    from unittest.mock import patch
+    store = RawObjectStore(tmp_path/'original')
+    function = {'ASTOCK-014': 'stock_board_concept_name_ths', 'ASTOCK-037-profile': 'stock_profile_cninfo',
+                'ASTOCK-037-events': 'stock_gsrl_gsdt_em', 'ASTOCK-087': 'stock_notice_report'}
+    if input_id == 'ASTOCK-044':
+        import sys, baostock
+        tests = ROOT/'provider_validation/tests/source_snapshots/a-stock-data/tests'
+        sys.path.insert(0, str(tests))
+        spec = importlib.util.spec_from_file_location('st_original_v39', tests/'test_v39_sources.py')
+        module = importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        ns = module.load_shipped_code()
+        try:
+            with captured_sdk_queries(store, mode='replay', replay_manifest=manifest, evidence_roots=(), scope={},
+                    code_version='original-v39-comparison', trade_date=None, pacer=RequestPacer(wait=lambda _:None),
+                    interval_seconds=3, max_age_seconds=0, query_requests={'query_stock_basic':{'code_name':'ST'}}) as (client, _, events):
+                with patch.object(baostock,'query_stock_basic',client.query_stock_basic), patch.object(baostock,'login',client.login), patch.object(baostock,'logout',client.logout):
+                    frame = ns['_st_list_baostock']('independent original branch replay')
+        finally:
+            ns['EM_SESSION'].close()
+    else:
+        if input_id=='ASTOCK-014':clear_concept_sdk_cache()
+        with captured_requests(store, provider='original-sdk', endpoint=function[input_id], scope=context,
+                code_version='original-sdk-comparison', pacer=RequestPacer(wait=lambda _:None),
+                replay_manifest=manifest, sdk_retry_policy=True, probe_host_pause=True) as events:
+            kwargs = {} if input_id=='ASTOCK-014' else {'symbol':'600519'} if input_id=='ASTOCK-037-profile' else {'date':'20230808'} if input_id=='ASTOCK-037-events' else {'symbol':'全部','date':'20261001'}
+            frame = getattr(sdk,function[input_id])(**kwargs)
+            if input_id=='ASTOCK-087':
+                items = [item for e in events[1:] for item in json.loads(RawObjectStore.read_response(store.root/'manifest.ndjson', e))['data']['list']]
+                frame = frame.assign(source_article_code=[item['art_code'] for item in items])
+    original = _json_value(frame.astype(object).where(frame.notna(),None).to_dict('records'))
+    original = [{k:v for k,v in r.items() if k not in {'source','source_url','fetched_at'}} for r in original]
+    assert len(original)==count
+    path = tmp_path/'original-parsed.json';path.write_bytes(json.dumps(original,ensure_ascii=False,indent=2).encode())
+    if input_id=='ASTOCK-014':clear_concept_sdk_cache()
+    report = collect_input(input_id=input_id, context=context, config_root=ROOT/'config', output_root=tmp_path/'candidate',
+        replay_manifest=manifest, pacer=RequestPacer(wait=lambda _:None))
+    assert report['status']=='candidate_complete', {k:report.get(k) for k in ['status','error','failure_class']}
+    assert read_artifact(report,'parsed_rows') == original
+    assert report['row_count']==count and report['production_writes']==report['live_http_calls']==0
+    assert not report['eligible_for_production_routing'] and not report['source_fallback_enabled']
+    keys = ('endpoint','request_parameters','outcome','body_sha256') if input_id=='ASTOCK-044' else ('url','method','status_code','body_sha256','request_headers','request_options')
+    assert [{k:e.get(k) for k in keys} for e in events] == [{k:e.get(k) for k in keys} for e in report['responses']]
+    for row in read_artifact(report,'output'):
+        assert row['snapshot_at']==report['source_capture_window']['last']
+        assert all(row[f] is None for f in report['unverified_fields'])
+    if input_id=='ASTOCK-014':
+        assert any(e['status_code']==401 for e in report['responses'])
+        assert report['source_metadata']['pagination_completeness_verified'] is False
+        clear_concept_sdk_cache()
+    if input_id=='ASTOCK-037-events':
+        assert report['returned_window']['first']==report['returned_window']['last']=='2023-08-08'
+        assert len({r['代码'] for r in original}) > 1
+    if input_id=='ASTOCK-044':
+        assert report['original_row_count']==317 and report['selected_row_count']==198
+        assert not report['sdk_dependency']['live_sdk_executed']
+    summary = dict(input_id=input_id, scope=report['parameters'], row_count=count, original_parsed_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
+        response_hashes=[e['body_sha256'] for e in report['responses']], original_fields_equal=True, original_transport_equal=True,
+        production_writes=0, mode='offline_replay', universe_completeness_verified=False, report_path=report['report_path'])
+    (tmp_path/'comparison.json').write_bytes(json.dumps(summary,ensure_ascii=False,indent=2).encode())
+    return report
+
+
+@pytest.mark.parametrize('input_id,context,manifest,count',ACTUAL_DATA_CASES)
+def test_actual_data_original_scope_transport_and_fields(tmp_path,no_network,input_id,context,manifest,count):
+    compare_actual_data_original(tmp_path,input_id,context,manifest,count)
+
+
+def test_actual_data_yaml_projection_and_mapping(tmp_path,no_network):
+    config=tmp_path/'config'
+    for name in ['providers.yaml','collection.yaml','datasets/company_profile.yaml','normalization/company_profile.yaml']:
+        target=config/name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(ROOT/'config'/name,target)
+    path=config/'normalization/company_profile.yaml';doc=yaml.safe_load(path.read_text(encoding='utf-8'))
+    doc['rules'][0]['field_mapping']['company_name']='英文名称';path.write_bytes(yaml.safe_dump(doc,allow_unicode=True,sort_keys=False).encode())
+    fields=['snapshot_at','stock_code','stock_name','company_name']
+    report=collect_input(input_id='ASTOCK-037-profile',context={'request':{'symbol':'600519'}},config_root=config,
+        output_root=tmp_path/'candidate',replay_manifest=SDK_ARCHIVE,fields=fields,pacer=RequestPacer(wait=lambda _:None))
+    assert report['status']=='candidate_complete',report.get('error')
+    row=read_artifact(report,'output')[0]
+    assert set(row)==set(fields) and row['company_name']=='Kweichow Moutai Co., Ltd.'
+
+
+@pytest.mark.parametrize('input_id',['ASTOCK-014','ASTOCK-044','ASTOCK-037-events','ASTOCK-087'])
+def test_actual_data_full_scope_rejects_stock_filter(tmp_path,no_network,input_id):
+    with pytest.raises(ValueError,match='does not support'):
+        collect_input(input_id=input_id,context={'request':{'symbol':'600519','date':'2026-10-01'}},config_root=ROOT/'config',
+            output_root=tmp_path/'candidate',replay_manifest=SDK_ARCHIVE)
+
+
+def test_actual_data_generated_auth_header_is_redacted():
+    from stock_data_manage.storage.raw import sanitized_headers
+    assert sanitized_headers({'Accept-Enckey':'test-only-auth','Cookie':'test-only-cookie'}) == {'Accept-Enckey':'<redacted>','Cookie':'<redacted>'}
+
+
+ACTUAL_DATA_FAILURES = [('ASTOCK-037-profile', kind) for kind in ['status','order','code','count']] + [
+    ('ASTOCK-037-events', kind) for kind in ['status','date','pages','count']] + [
+    ('ASTOCK-087', kind) for kind in ['status','date','count','missing_page','missing_issuer']] + [
+    ('ASTOCK-044', kind) for kind in ['empty','missing_field','sdk_status']] + [('ASTOCK-014','missing_directory')]
+
+
+def actual_data_invalid_fixture(tmp_path,input_id,mutation):
+    manifest=next(c[2] for c in ACTUAL_DATA_CASES if c[0]==input_id)
+    parents=[json.loads(l) for l in manifest.read_text(encoding='utf-8').splitlines()]
+    needle={'ASTOCK-014':'q.10jqka.com.cn/gn/','ASTOCK-037-profile':'p_sysapi1133',
+            'ASTOCK-037-events':'RPT_ORGOP_ALL','ASTOCK-087':'np-anotice-stock','ASTOCK-044':'query_stock_basic'}[input_id]
+    parents=[e for e in parents if needle in e.get('url',e.get('endpoint',''))]
+    store=RawObjectStore(tmp_path/'fixture')
+    for i,e in enumerate(parents):
+        if mutation=='missing_page' and i==len(parents)-1:continue
+        body=RawObjectStore.read_response(manifest,e)
+        if i==0 or input_id=='ASTOCK-087':
+            if input_id=='ASTOCK-014':
+                body=body.replace(b'cate_inner',b'missing_category') if i==0 else body
+            else:
+                p=json.loads(body)
+                if input_id=='ASTOCK-037-profile':
+                    if mutation=='status':p['resultcode']=500
+                    elif mutation=='count':p['count']=2
+                    elif mutation=='code':p['records'][0]['ASECCODE']='000001'
+                    else:p['records'][0]=dict(reversed(list(p['records'][0].items())))
+                elif input_id=='ASTOCK-037-events':
+                    if mutation=='status':p['success']=False
+                    elif mutation=='pages':p['result']['pages']=2
+                    elif mutation=='count':p['result']['count']+=1
+                    else:p['result']['data'][0]['TRADE_DATE']='1999-01-01 00:00:00'
+                elif input_id=='ASTOCK-087':
+                    if mutation=='status':p['success']=0
+                    elif mutation=='count':p['data']['total_hits']+=1
+                    elif mutation=='date':p['data']['list'][0]['notice_date']='1999-01-01'
+                    elif mutation=='missing_issuer':p['data']['list'][0]['codes']=[]
+                else:
+                    if mutation=='empty':p['rows']=[]
+                    elif mutation=='sdk_status':p['result']={'error_code':'10001001','error_msg':'fixture SDK failure'}
+                    else:
+                        p['fields'].remove('code_name')
+                        for r in p['rows']:r.pop('code_name')
+                body=json.dumps(p,ensure_ascii=False,separators=(',',':')).encode()
+        ref=store.write_bytes(body,dataset='fixture',provider='source',endpoint=input_id,
+            fetched_at=datetime.now(timezone.utc),attempt_id=str(i),content_addressed=True)
+        store.append_event({**e,'body_storage':ref.path.relative_to(store.root).as_posix(),'body_sha256':ref.content_hash,
+            'body_bytes':len(body),'derived_from_sha256':e['body_sha256'],'mutation':mutation,'mode':'offline_mutation_fixture',
+            'transformation_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest()})
+    return store.root/'manifest.ndjson'
+
+
+@pytest.mark.parametrize('input_id,mutation',ACTUAL_DATA_FAILURES)
+def test_actual_data_invalid_response_does_not_produce_output(tmp_path,no_network,input_id,mutation):
+    if input_id=='ASTOCK-014':clear_concept_sdk_cache()
+    manifest=actual_data_invalid_fixture(tmp_path,input_id,mutation)
+    context=next(c[1] for c in ACTUAL_DATA_CASES if c[0]==input_id)
+    report=collect_input(input_id=input_id,context=context,config_root=ROOT/'config',output_root=tmp_path/'candidate',
+        replay_manifest=manifest,pacer=RequestPacer(wait=lambda _:None))
+    assert report['status']=='failed' and 'output' not in report and report['responses'],report
+    assert report['production_writes']==report['live_http_calls']==0 and not report['eligible_for_production_routing']
+    for e in report['responses']:
+        assert hashlib.sha256(RawObjectStore.read_response(Path(report['run_directory'])/'_raw/manifest.ndjson',e)).hexdigest()==e['body_sha256']
+    if input_id=='ASTOCK-014':clear_concept_sdk_cache()
 MACRO_CASES = [("ASTOCK-061", {}, SDK_ARCHIVE, 136), ("ASTOCK-062", {}, SDK_ARCHIVE, 225)]
 
 REPORTS_SEATS_CASES = [

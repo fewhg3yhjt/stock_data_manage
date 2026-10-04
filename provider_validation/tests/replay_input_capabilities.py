@@ -36,8 +36,9 @@ def main():
     parser.add_argument("--verify-market-events", action="store_true", help="verify independent EastMoney daily billboard and market release-window endpoints")
     parser.add_argument("--verify-reports-seats", action="store_true", help="verify report lists and independent explicit-date stock seats")
     parser.add_argument("--verify-remaining", action="store_true", help="verify remaining original SDK, package and exchange input contracts")
+    parser.add_argument("--verify-actual-data", action="store_true", help="verify source scopes corrected from actual returned data")
     args = parser.parse_args()
-    if sum((args.verify_ths_inputs, args.verify_bao_inputs, args.verify_scheduling, args.verify_tencent_snapshot, args.verify_em_inputs, args.verify_stock_pools, args.verify_em_events, args.verify_em_actions, args.verify_lpr, args.verify_news, args.verify_rates_bonds, args.verify_sina_futures, args.verify_sdk_news, args.verify_macro, args.verify_reports_calendar, args.verify_factors, args.verify_market_events, args.verify_reports_seats, args.verify_remaining)) > 1:
+    if sum((args.verify_actual_data, args.verify_ths_inputs, args.verify_bao_inputs, args.verify_scheduling, args.verify_tencent_snapshot, args.verify_em_inputs, args.verify_stock_pools, args.verify_em_events, args.verify_em_actions, args.verify_lpr, args.verify_news, args.verify_rates_bonds, args.verify_sina_futures, args.verify_sdk_news, args.verify_macro, args.verify_reports_calendar, args.verify_factors, args.verify_market_events, args.verify_reports_seats, args.verify_remaining)) > 1:
         parser.error("THS, BaoStock, Tencent snapshot and scheduling verification are separate scopes")
     args.output_root = args.output_root.resolve()
     if not args.output_root.is_relative_to(ROOT / "provider_validation/results"):
@@ -73,6 +74,30 @@ def main():
     with ExitStack() as network_guard:
         network_guard.enter_context(patch("requests.adapters.HTTPAdapter.send", forbidden_network))
         network_guard.enter_context(patch("socket.socket.connect", guarded_connect))
+        if args.verify_actual_data:
+            summary['known_differences']=['以实际来源及请求日期纠正旧类别；候选输入不授予生产资格。',
+                '概念目录归档包含401及重复页，不认证全量；ST为沪深活跃证券名称筛选，不是官方风险标志。',
+                'F10公司动态实际为2023-08-08全市场动态；公告为明确发布日全市场目录，无正文。',
+                '一致预期和主营业务原HTML仍缺可回放证据，限时补采记录不代表来源不可用。']
+            for index,(input_id,context,manifest,count) in enumerate(checks.ACTUAL_DATA_CASES):
+                directory=args.output_root/str(index+1)
+                report=checks.compare_actual_data_original(directory,input_id,context,manifest,count)
+                summary['inputs'].append(dict(input_id=input_id,row_count=count,scope=report['parameters'],
+                    report_path=report['report_path'],report_sha256=hashlib.sha256(Path(report['report_path']).read_bytes()).hexdigest(),
+                    source_manifest=str(manifest),source_manifest_sha256=hashlib.sha256(manifest.read_bytes()).hexdigest()))
+                summary['original_vs_provider'].append(json.loads((directory/'comparison.json').read_text(encoding='utf-8')))
+            summary['negative_checks']=[]
+            for index,(input_id,mutation) in enumerate(checks.ACTUAL_DATA_FAILURES):
+                directory=args.output_root/('f'+str(index+1))
+                checks.test_actual_data_invalid_response_does_not_produce_output(directory,None,input_id,mutation)
+                path=next((directory/'candidate').rglob('report.json'))
+                summary['negative_checks'].append(dict(input_id=input_id,mutation=mutation,result='passed',
+                    report_path=str(path),report_sha256=hashlib.sha256(path.read_bytes()).hexdigest()))
+            checks.test_actual_data_yaml_projection_and_mapping(args.output_root/'y',None)
+            summary['yaml_projection_mapping']='passed'
+            target=args.output_root/'comparison.json';target.write_bytes(json.dumps(summary,ensure_ascii=False,indent=2).encode())
+            print(json.dumps(dict(result='passed',inputs=len(summary['inputs']),comparison=str(target)),ensure_ascii=False))
+            return
         if args.verify_remaining:
             import curl_cffi.requests as curl_requests
             import pandas.io.common as common

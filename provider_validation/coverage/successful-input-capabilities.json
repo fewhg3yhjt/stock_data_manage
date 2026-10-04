@@ -1,7 +1,7 @@
 {
   "record_type": "successful_input_capability_catalog",
   "validation_time_utc": "2026-10-03T12:13:14.548329+00:00",
-  "input_count": 74,
+  "input_count": 77,
   "successful_interface_count": 73,
   "coverage_denominator": 73,
   "original_inventory_denominator": 87,
@@ -2779,8 +2779,8 @@
       "contract": {
         "input_id": "ASTOCK-011",
         "provider": "ths",
-        "endpoint": "earnings_consensus",
-        "display_name": "同花顺一致预期",
+        "endpoint": "earnings_eps_forecast",
+        "display_name": "同花顺年度每股收益预测",
         "data_kind": "forecast",
         "data_frequency": "snapshot",
         "request_shape": "single_symbol",
@@ -2803,6 +2803,7 @@
           }
         ],
         "limitations": [
+          "原成功返回 3 个年度的预测机构数及每股收益预测统计；原 HTML 仅哈希，限时补采未返回，不认证当前可用性。",
           "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
         ],
         "canonical_input": null,
@@ -2812,14 +2813,24 @@
         "request_interval_seconds": 3.0,
         "effective_concurrency": 1,
         "request_limit_enforcement": "unimplemented",
-        "base_requests_per_fetch": 1
+        "base_requests_per_fetch": 1,
+        "dataset": null,
+        "runtime_method": null
       },
       "collection_profile": {
         "name": "event_daily",
         "mode": "daily",
         "refresh_interval_seconds": null,
         "business_day": "calendar_day",
-        "scheduling_enabled": false
+        "scheduling_enabled": false,
+        "frequency_unit": null,
+        "frequency_interval": 1,
+        "at_time": null,
+        "anchor_date": null,
+        "settle_delay_seconds": 0,
+        "trigger_grace_seconds": 30,
+        "universe": "static",
+        "max_symbols": null
       },
       "evidence": [
         {
@@ -2866,7 +2877,52 @@
           }
         }
       ],
-      "eligible_for_production_routing": false
+      "eligible_for_production_routing": false,
+      "original_reported_contract": {
+        "input_id": "ASTOCK-011",
+        "provider": "ths",
+        "endpoint": "earnings_consensus",
+        "display_name": "同花顺一致预期",
+        "data_kind": "forecast",
+        "data_frequency": "snapshot",
+        "request_shape": "single_symbol",
+        "collection_profile": "event_daily",
+        "implementation_status": "unimplemented",
+        "evidence_refs": [
+          "ASTOCK-011"
+        ],
+        "parameters": [
+          {
+            "name": "code",
+            "source": "request.symbol",
+            "value_type": "string",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          }
+        ],
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "canonical_input": null,
+        "runtime_endpoint": null,
+        "forbidden_sources": [],
+        "trading_date_parameter": null,
+        "request_interval_seconds": 3.0,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented",
+        "base_requests_per_fetch": 1
+      },
+      "actual_scope_correction": {
+        "authorization": "user:以实际的数据为准，而不是看之前的定义",
+        "validation_mode": "source response replay or explicitly pending raw evidence",
+        "evidence_directory": "provider_validation/results/actual-data-original-20261004",
+        "complete_market_coverage_verified": false,
+        "production_writes": 0
+      }
     },
     {
       "contract": {
@@ -2967,36 +3023,53 @@
       "contract": {
         "input_id": "ASTOCK-014",
         "provider": "ths",
-        "endpoint": "hot_reason",
-        "display_name": "同花顺热点",
+        "endpoint": "concept_directory",
+        "display_name": "同花顺概念目录（返回样本范围）",
         "data_kind": "snapshot",
         "data_frequency": "snapshot",
         "request_shape": "full_snapshot",
-        "collection_profile": "market_intraday",
-        "implementation_status": "unimplemented",
+        "collection_profile": "reference_daily",
+        "implementation_status": "implemented_validation_only",
         "evidence_refs": [
           "ASTOCK-014"
         ],
         "parameters": [],
         "limitations": [
-          "记录内含401响应，不能由部分非空返回推断完整性",
-          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+          "原 SDK 合并目录和概念时间表，归档含 401 和重复内容页；仅认证返回的名称及代码，不认证全量、热度或成员关系。"
         ],
         "canonical_input": null,
         "runtime_endpoint": null,
-        "forbidden_sources": [],
+        "forbidden_sources": [
+          "request.symbol",
+          "request.symbols",
+          "request.start_date",
+          "request.end_date",
+          "request.trade_date",
+          "config.limit",
+          "config.count"
+        ],
         "trading_date_parameter": null,
         "request_interval_seconds": 3.0,
         "effective_concurrency": 1,
-        "request_limit_enforcement": "unimplemented",
-        "base_requests_per_fetch": 1
+        "request_limit_enforcement": "call_boundary_only",
+        "base_requests_per_fetch": 41,
+        "dataset": "concept_directory",
+        "runtime_method": "fetch_concept_list"
       },
       "collection_profile": {
-        "name": "market_intraday",
-        "mode": "intraday",
-        "refresh_interval_seconds": 60,
+        "name": "reference_daily",
+        "mode": "daily",
+        "refresh_interval_seconds": null,
         "business_day": "trading_day",
-        "scheduling_enabled": false
+        "scheduling_enabled": false,
+        "frequency_unit": null,
+        "frequency_interval": 1,
+        "at_time": null,
+        "anchor_date": null,
+        "settle_delay_seconds": 0,
+        "trigger_grace_seconds": 30,
+        "universe": "static",
+        "max_symbols": null
       },
       "evidence": [
         {
@@ -3220,7 +3293,41 @@
           }
         }
       ],
-      "eligible_for_production_routing": false
+      "eligible_for_production_routing": false,
+      "original_reported_contract": {
+        "input_id": "ASTOCK-014",
+        "provider": "ths",
+        "endpoint": "hot_reason",
+        "display_name": "同花顺热点",
+        "data_kind": "snapshot",
+        "data_frequency": "snapshot",
+        "request_shape": "full_snapshot",
+        "collection_profile": "market_intraday",
+        "implementation_status": "unimplemented",
+        "evidence_refs": [
+          "ASTOCK-014"
+        ],
+        "parameters": [],
+        "limitations": [
+          "记录内含401响应，不能由部分非空返回推断完整性",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "canonical_input": null,
+        "runtime_endpoint": null,
+        "forbidden_sources": [],
+        "trading_date_parameter": null,
+        "request_interval_seconds": 3.0,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented",
+        "base_requests_per_fetch": 1
+      },
+      "actual_scope_correction": {
+        "authorization": "user:以实际的数据为准，而不是看之前的定义",
+        "validation_mode": "source response replay or explicitly pending raw evidence",
+        "evidence_directory": "provider_validation/results/actual-data-original-20261004",
+        "complete_market_coverage_verified": false,
+        "production_writes": 0
+      }
     },
     {
       "contract": {
@@ -5000,12 +5107,12 @@
         "input_id": "ASTOCK-037",
         "provider": "script_composite",
         "endpoint": "company_profile",
-        "display_name": "F10 文本",
+        "display_name": "F10 原复合验证记录（已拆分）",
         "data_kind": "composite",
         "data_frequency": "snapshot",
         "request_shape": "single_symbol",
         "collection_profile": "event_daily",
-        "implementation_status": "unimplemented",
+        "implementation_status": "blocked",
         "evidence_refs": [
           "ASTOCK-037"
         ],
@@ -5023,8 +5130,7 @@
           }
         ],
         "limitations": [
-          "复合输出必须拆分成功子接口；不能标为通达信F10完整能力",
-          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+          "原复合记录不是可执行的完整 F10 接口；成功子项分别见 ASTOCK-037-profile、ASTOCK-037-events、ASTOCK-037-business。失败子项不接入。"
         ],
         "canonical_input": null,
         "runtime_endpoint": null,
@@ -5033,14 +5139,24 @@
         "request_interval_seconds": 3.0,
         "effective_concurrency": 1,
         "request_limit_enforcement": "unimplemented",
-        "base_requests_per_fetch": 1
+        "base_requests_per_fetch": 1,
+        "dataset": null,
+        "runtime_method": null
       },
       "collection_profile": {
         "name": "event_daily",
         "mode": "daily",
         "refresh_interval_seconds": null,
         "business_day": "calendar_day",
-        "scheduling_enabled": false
+        "scheduling_enabled": false,
+        "frequency_unit": null,
+        "frequency_interval": 1,
+        "at_time": null,
+        "anchor_date": null,
+        "settle_delay_seconds": 0,
+        "trigger_grace_seconds": 30,
+        "universe": "static",
+        "max_symbols": null
       },
       "evidence": [
         {
@@ -5162,7 +5278,53 @@
           }
         }
       ],
-      "eligible_for_production_routing": false
+      "eligible_for_production_routing": false,
+      "original_reported_contract": {
+        "input_id": "ASTOCK-037",
+        "provider": "script_composite",
+        "endpoint": "company_profile",
+        "display_name": "F10 文本",
+        "data_kind": "composite",
+        "data_frequency": "snapshot",
+        "request_shape": "single_symbol",
+        "collection_profile": "event_daily",
+        "implementation_status": "unimplemented",
+        "evidence_refs": [
+          "ASTOCK-037"
+        ],
+        "parameters": [
+          {
+            "name": "code",
+            "source": "request.symbol",
+            "value_type": "string",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          }
+        ],
+        "limitations": [
+          "复合输出必须拆分成功子接口；不能标为通达信F10完整能力",
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "canonical_input": null,
+        "runtime_endpoint": null,
+        "forbidden_sources": [],
+        "trading_date_parameter": null,
+        "request_interval_seconds": 3.0,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented",
+        "base_requests_per_fetch": 1
+      },
+      "actual_scope_correction": {
+        "authorization": "user:以实际的数据为准，而不是看之前的定义",
+        "validation_mode": "source response replay or explicitly pending raw evidence",
+        "evidence_directory": "provider_validation/results/actual-data-original-20261004",
+        "complete_market_coverage_verified": false,
+        "production_writes": 0
+      }
     },
     {
       "contract": {
@@ -5588,36 +5750,54 @@
     {
       "contract": {
         "input_id": "ASTOCK-044",
-        "provider": "eastmoney",
+        "provider": "baostock",
         "endpoint": "st_list",
-        "display_name": "ST 名单",
+        "display_name": "BaoStock 沪深 ST 名称筛选名单",
         "data_kind": "snapshot",
         "data_frequency": "snapshot",
         "request_shape": "full_snapshot",
         "collection_profile": "reference_daily",
-        "implementation_status": "unimplemented",
+        "implementation_status": "implemented_validation_only",
         "evidence_refs": [
           "ASTOCK-044"
         ],
         "parameters": [],
         "limitations": [
-          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+          "按原 code_name=ST 查询并筛选 type=1/status=1；名称规则不是官方风险标志，无北交所、价格或涨跌幅。"
         ],
         "canonical_input": null,
         "runtime_endpoint": null,
-        "forbidden_sources": [],
+        "forbidden_sources": [
+          "request.symbol",
+          "request.symbols",
+          "request.start_date",
+          "request.end_date",
+          "request.trade_date",
+          "config.limit",
+          "config.count"
+        ],
         "trading_date_parameter": null,
         "request_interval_seconds": 3.0,
         "effective_concurrency": 1,
-        "request_limit_enforcement": "unimplemented",
-        "base_requests_per_fetch": 1
+        "request_limit_enforcement": "call_boundary_only",
+        "base_requests_per_fetch": 1,
+        "dataset": "st_name_list",
+        "runtime_method": "fetch_st_list"
       },
       "collection_profile": {
         "name": "reference_daily",
         "mode": "daily",
         "refresh_interval_seconds": null,
         "business_day": "trading_day",
-        "scheduling_enabled": false
+        "scheduling_enabled": false,
+        "frequency_unit": null,
+        "frequency_interval": 1,
+        "at_time": null,
+        "anchor_date": null,
+        "settle_delay_seconds": 0,
+        "trigger_grace_seconds": 30,
+        "universe": "static",
+        "max_symbols": null
       },
       "evidence": [
         {
@@ -5649,7 +5829,40 @@
           }
         }
       ],
-      "eligible_for_production_routing": false
+      "eligible_for_production_routing": false,
+      "original_reported_contract": {
+        "input_id": "ASTOCK-044",
+        "provider": "eastmoney",
+        "endpoint": "st_list",
+        "display_name": "ST 名单",
+        "data_kind": "snapshot",
+        "data_frequency": "snapshot",
+        "request_shape": "full_snapshot",
+        "collection_profile": "reference_daily",
+        "implementation_status": "unimplemented",
+        "evidence_refs": [
+          "ASTOCK-044"
+        ],
+        "parameters": [],
+        "limitations": [
+          "采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由"
+        ],
+        "canonical_input": null,
+        "runtime_endpoint": null,
+        "forbidden_sources": [],
+        "trading_date_parameter": null,
+        "request_interval_seconds": 3.0,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented",
+        "base_requests_per_fetch": 1
+      },
+      "actual_scope_correction": {
+        "authorization": "user:以实际的数据为准，而不是看之前的定义",
+        "validation_mode": "source response replay or explicitly pending raw evidence",
+        "evidence_directory": "provider_validation/results/actual-data-original-20261004",
+        "complete_market_coverage_verified": false,
+        "production_writes": 0
+      }
     },
     {
       "contract": {
@@ -9709,6 +9922,115 @@
       "contract": {
         "input_id": "ASTOCK-087",
         "provider": "eastmoney",
+        "endpoint": "dated_announcements",
+        "display_name": "东财全市场指定日期公告目录",
+        "data_kind": "document_index",
+        "data_frequency": "snapshot",
+        "request_shape": "date_snapshot",
+        "collection_profile": "event_daily",
+        "implementation_status": "implemented_validation_only",
+        "evidence_refs": [
+          "ASTOCK-087"
+        ],
+        "parameters": [
+          {
+            "name": "date",
+            "source": "request.date",
+            "value_type": "date",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          }
+        ],
+        "limitations": [
+          "明确公告发布日期、全部分类、全市场范围；保存全部页原响应及文章编码，沿用原 SDK 第一 A 类发行人选择，无正文、无单股过滤。"
+        ],
+        "canonical_input": null,
+        "runtime_endpoint": null,
+        "forbidden_sources": [
+          "request.symbol",
+          "request.symbols",
+          "request.start_date",
+          "request.end_date",
+          "request.trade_date",
+          "config.limit",
+          "config.count"
+        ],
+        "trading_date_parameter": null,
+        "request_interval_seconds": 3.0,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "call_boundary_only",
+        "base_requests_per_fetch": 9,
+        "dataset": "dated_announcements",
+        "runtime_method": "fetch_announcements"
+      },
+      "collection_profile": {
+        "name": "event_daily",
+        "mode": "daily",
+        "refresh_interval_seconds": null,
+        "business_day": "calendar_day",
+        "scheduling_enabled": false,
+        "frequency_unit": null,
+        "frequency_interval": 1,
+        "at_time": null,
+        "anchor_date": null,
+        "settle_delay_seconds": 0,
+        "trigger_grace_seconds": 30,
+        "universe": "static",
+        "max_symbols": null
+      },
+      "evidence": [
+        {
+          "interface_id": "ASTOCK-087",
+          "path": "provider_validation/results/interface-records/ASTOCK-087.json",
+          "sha256": "8bd03ebf882e3143f76328fbea91d4b90c73b3f992099cbf0f93e65254f898e8",
+          "validation_result": "部分通过",
+          "evidence_status": "parsed_only",
+          "tested_scope": "解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。 本次只核验了本行注明的样例范围。 a_stock_missing_output\\85_公告备胎\\data.csv [CSV行数=718]",
+          "coverage_denominator": 87,
+          "original_note": "通过：解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。；脚本结果 success：saved 1 file(s)。解析结果非空；未留精确原始响应。",
+          "manifest_ref": "",
+          "response_artifacts": [],
+          "derived_artifacts": [
+            {
+              "path": "provider_validation/results/a-stock-data-missing-output/85_公告备胎/data.csv",
+              "sha256": "ad52f242ef2634e23eda0fedc5dbff4b638afa9565b402dfcbd42be6cc5f902c",
+              "bytes": 158266,
+              "field_names": [
+                "代码",
+                "名称",
+                "公告标题",
+                "公告类型",
+                "公告日期",
+                "网址"
+              ],
+              "row_count": 718
+            }
+          ],
+          "source_code_artifacts": [
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+              "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+            },
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
+              "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
+            }
+          ],
+          "validation_time_utc": "2026-10-03T10:20:07.920111+00:00",
+          "original_transformation": {
+            "path": "provider_validation/tests/build_interface_coverage.py",
+            "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
+          }
+        }
+      ],
+      "eligible_for_production_routing": false,
+      "original_reported_contract": {
+        "input_id": "ASTOCK-087",
+        "provider": "eastmoney",
         "endpoint": "announcements",
         "display_name": "公告备胎",
         "data_kind": "document_index",
@@ -9767,59 +10089,13 @@
         "request_limit_enforcement": "unimplemented",
         "base_requests_per_fetch": 1
       },
-      "collection_profile": {
-        "name": "event_daily",
-        "mode": "daily",
-        "refresh_interval_seconds": null,
-        "business_day": "calendar_day",
-        "scheduling_enabled": false
-      },
-      "evidence": [
-        {
-          "interface_id": "ASTOCK-087",
-          "path": "provider_validation/results/interface-records/ASTOCK-087.json",
-          "sha256": "8bd03ebf882e3143f76328fbea91d4b90c73b3f992099cbf0f93e65254f898e8",
-          "validation_result": "部分通过",
-          "evidence_status": "parsed_only",
-          "tested_scope": "解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。 本次只核验了本行注明的样例范围。 a_stock_missing_output\\85_公告备胎\\data.csv [CSV行数=718]",
-          "coverage_denominator": 87,
-          "original_note": "通过：解析结果非空且关键字段/范围抽查合理；不等于全市场完整性验证。；脚本结果 success：saved 1 file(s)。解析结果非空；未留精确原始响应。",
-          "manifest_ref": "",
-          "response_artifacts": [],
-          "derived_artifacts": [
-            {
-              "path": "provider_validation/results/a-stock-data-missing-output/85_公告备胎/data.csv",
-              "sha256": "ad52f242ef2634e23eda0fedc5dbff4b638afa9565b402dfcbd42be6cc5f902c",
-              "bytes": 158266,
-              "field_names": [
-                "代码",
-                "名称",
-                "公告标题",
-                "公告类型",
-                "公告日期",
-                "网址"
-              ],
-              "row_count": 718
-            }
-          ],
-          "source_code_artifacts": [
-            {
-              "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
-              "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
-            },
-            {
-              "path": "provider_validation/tests/source_snapshots/a-stock-data/SKILL.md",
-              "sha256": "c308741846b8dfb0e05108e94345af1bf22561ee3e24248bd2a64ae479044f03"
-            }
-          ],
-          "validation_time_utc": "2026-10-03T10:20:07.920111+00:00",
-          "original_transformation": {
-            "path": "provider_validation/tests/build_interface_coverage.py",
-            "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
-          }
-        }
-      ],
-      "eligible_for_production_routing": false
+      "actual_scope_correction": {
+        "authorization": "user:以实际的数据为准，而不是看之前的定义",
+        "validation_mode": "source response replay or explicitly pending raw evidence",
+        "evidence_directory": "provider_validation/results/actual-data-original-20261004",
+        "complete_market_coverage_verified": false,
+        "production_writes": 0
+      }
     },
     {
       "contract": {
@@ -10680,7 +10956,594 @@
         }
       ],
       "eligible_for_production_routing": false
+    },
+    {
+      "contract": {
+        "input_id": "ASTOCK-037-profile",
+        "provider": "cninfo",
+        "endpoint": "company_profile",
+        "display_name": "巨潮公司概况",
+        "data_kind": "table",
+        "data_frequency": "snapshot",
+        "request_shape": "single_symbol",
+        "collection_profile": "event_daily",
+        "implementation_status": "implemented_validation_only",
+        "evidence_refs": [
+          "ASTOCK-037"
+        ],
+        "parameters": [
+          {
+            "name": "code",
+            "source": "request.symbol",
+            "value_type": "string",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          }
+        ],
+        "limitations": [
+          "仅一只明确股票；注册资金原值保留，金额单位未认证；不称为完整 F10。"
+        ],
+        "canonical_input": null,
+        "runtime_endpoint": null,
+        "forbidden_sources": [
+          "request.symbols",
+          "request.start_date",
+          "request.end_date",
+          "request.trade_date",
+          "config.limit",
+          "config.count"
+        ],
+        "trading_date_parameter": null,
+        "request_interval_seconds": 3.0,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "call_boundary_only",
+        "base_requests_per_fetch": 1,
+        "dataset": "company_profile",
+        "runtime_method": "fetch"
+      },
+      "evidence": [
+        {
+          "interface_id": "ASTOCK-037",
+          "path": "provider_validation/results/interface-records/ASTOCK-037.json",
+          "sha256": "2a15406a4fbe6e9261e07395046c86f96631bc04aeb3d1ad7a57b746afd91248",
+          "validation_result": "部分通过",
+          "evidence_status": "live_raw",
+          "tested_scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×5, transport_error×1；主机：basic.10jqka.com.cn, datacenter-web.eastmoney.com, emweb.securities.eastmoney.com, push2.eastmoney.com, webapi.cninfo.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+          "coverage_denominator": 87,
+          "original_note": "部分：5个子结果中个股信息文件内是ProxyError；其余4个子文件有数据，因此仅部分返回。；本轮低频真实探测 partial：5 outputs: usable=3, errors=2。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×5, transport_error×1；主机：basic.10jqka.com.cn, datacenter-web.eastmoney.com, emweb.securities.eastmoney.com, push2.eastmoney.com, webapi.cninfo.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+          "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+          "response_artifacts": [
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/ef8be25eebd4b5ebe01f92930bcbc59ff6abdc9b2411fb03002ee05628025241.body.gz",
+              "sha256": "ef8be25eebd4b5ebe01f92930bcbc59ff6abdc9b2411fb03002ee05628025241",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/9f6f270d58fe87dfb6a6c3df35de7475d95ee83750105cfa653144e38f2a0b81.body.gz",
+              "sha256": "9f6f270d58fe87dfb6a6c3df35de7475d95ee83750105cfa653144e38f2a0b81",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/235673dbe4d79fec9eed2a592e05d5232fbed11481c9e0b74993722e88fb9eea.body.gz",
+              "sha256": "235673dbe4d79fec9eed2a592e05d5232fbed11481c9e0b74993722e88fb9eea",
+              "matches_filename": true
+            }
+          ],
+          "derived_artifacts": [
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/business_composition_em.json",
+              "sha256": "dfc831d7a5134fe93e2265d3585e2b307944bedfb0b523f45f718e0fd4365791",
+              "bytes": 37,
+              "row_count": null
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/company_events_em.csv",
+              "sha256": "8592ae85c936e3948cd0f99ec1740d856dbac866955005e8861a3ee7dcd195a9",
+              "bytes": 35749,
+              "field_names": [
+                "序号",
+                "代码",
+                "简称",
+                "事件类型",
+                "具体事项",
+                "交易日"
+              ],
+              "row_count": 75
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/individual_info_em.json",
+              "sha256": "e09489a5fbe1f663b8a63bc2cab06280cf50ba4508a10fc957a5b1e73ee04f3c",
+              "bytes": 108,
+              "row_count": null
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/main_business_ths.csv",
+              "sha256": "4a3eb62c1cf920f5791fb7980b455fb1911fa2549ee133784ec5f02a57fe9c17",
+              "bytes": 504,
+              "field_names": [
+                "股票代码",
+                "主营业务",
+                "产品类型",
+                "产品名称",
+                "经营范围"
+              ],
+              "row_count": 1
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/profile_cninfo.csv",
+              "sha256": "d150bfd361991954244e845181f46997a5389412d3a037e9a9f3ea6b81004600",
+              "bytes": 1999,
+              "field_names": [
+                "公司名称",
+                "英文名称",
+                "曾用简称",
+                "A股代码",
+                "A股简称",
+                "B股代码",
+                "B股简称",
+                "H股代码",
+                "H股简称",
+                "入选指数",
+                "所属市场",
+                "所属行业",
+                "法人代表",
+                "注册资金",
+                "成立日期",
+                "上市日期",
+                "官方网站",
+                "电子邮箱",
+                "联系电话",
+                "传真",
+                "注册地址",
+                "办公地址",
+                "邮政编码",
+                "主营业务",
+                "经营范围",
+                "机构简介"
+              ],
+              "row_count": 1
+            }
+          ],
+          "source_code_artifacts": [
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+              "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+            },
+            {
+              "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+              "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
+            }
+          ],
+          "validation_time_utc": "2026-10-03T10:20:07.147050+00:00",
+          "original_transformation": {
+            "path": "provider_validation/tests/build_interface_coverage.py",
+            "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
+          }
+        }
+      ],
+      "eligible_for_production_routing": false,
+      "parent_validation_record": "ASTOCK-037",
+      "collection_profile": {
+        "name": "event_daily",
+        "mode": "daily",
+        "refresh_interval_seconds": null,
+        "business_day": "calendar_day",
+        "scheduling_enabled": false,
+        "frequency_unit": null,
+        "frequency_interval": 1,
+        "at_time": null,
+        "anchor_date": null,
+        "settle_delay_seconds": 0,
+        "trigger_grace_seconds": 30,
+        "universe": "static",
+        "max_symbols": null
+      },
+      "actual_scope_correction": {
+        "authorization": "user:以实际的数据为准，而不是看之前的定义",
+        "validation_mode": "source response replay or explicitly pending raw evidence",
+        "evidence_directory": "provider_validation/results/actual-data-original-20261004",
+        "complete_market_coverage_verified": false,
+        "production_writes": 0
+      }
+    },
+    {
+      "contract": {
+        "input_id": "ASTOCK-037-events",
+        "provider": "eastmoney",
+        "endpoint": "company_events",
+        "display_name": "东财全市场指定日期公司动态",
+        "data_kind": "table",
+        "data_frequency": "snapshot",
+        "request_shape": "date_snapshot",
+        "collection_profile": "event_daily",
+        "implementation_status": "implemented_validation_only",
+        "evidence_refs": [
+          "ASTOCK-037"
+        ],
+        "parameters": [
+          {
+            "name": "date",
+            "source": "request.date",
+            "value_type": "date",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          }
+        ],
+        "limitations": [
+          "原成功请求实际日期为 2023-08-08，75 条为全市场动态；调用必须明确日期，无个股筛选。"
+        ],
+        "canonical_input": null,
+        "runtime_endpoint": null,
+        "forbidden_sources": [
+          "request.symbols",
+          "request.start_date",
+          "request.end_date",
+          "request.trade_date",
+          "config.limit",
+          "config.count",
+          "request.symbol"
+        ],
+        "trading_date_parameter": null,
+        "request_interval_seconds": 3.0,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "call_boundary_only",
+        "base_requests_per_fetch": 1,
+        "dataset": "company_events",
+        "runtime_method": "fetch_company_events"
+      },
+      "evidence": [
+        {
+          "interface_id": "ASTOCK-037",
+          "path": "provider_validation/results/interface-records/ASTOCK-037.json",
+          "sha256": "2a15406a4fbe6e9261e07395046c86f96631bc04aeb3d1ad7a57b746afd91248",
+          "validation_result": "部分通过",
+          "evidence_status": "live_raw",
+          "tested_scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×5, transport_error×1；主机：basic.10jqka.com.cn, datacenter-web.eastmoney.com, emweb.securities.eastmoney.com, push2.eastmoney.com, webapi.cninfo.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+          "coverage_denominator": 87,
+          "original_note": "部分：5个子结果中个股信息文件内是ProxyError；其余4个子文件有数据，因此仅部分返回。；本轮低频真实探测 partial：5 outputs: usable=3, errors=2。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×5, transport_error×1；主机：basic.10jqka.com.cn, datacenter-web.eastmoney.com, emweb.securities.eastmoney.com, push2.eastmoney.com, webapi.cninfo.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+          "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+          "response_artifacts": [
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/ef8be25eebd4b5ebe01f92930bcbc59ff6abdc9b2411fb03002ee05628025241.body.gz",
+              "sha256": "ef8be25eebd4b5ebe01f92930bcbc59ff6abdc9b2411fb03002ee05628025241",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/9f6f270d58fe87dfb6a6c3df35de7475d95ee83750105cfa653144e38f2a0b81.body.gz",
+              "sha256": "9f6f270d58fe87dfb6a6c3df35de7475d95ee83750105cfa653144e38f2a0b81",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/235673dbe4d79fec9eed2a592e05d5232fbed11481c9e0b74993722e88fb9eea.body.gz",
+              "sha256": "235673dbe4d79fec9eed2a592e05d5232fbed11481c9e0b74993722e88fb9eea",
+              "matches_filename": true
+            }
+          ],
+          "derived_artifacts": [
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/business_composition_em.json",
+              "sha256": "dfc831d7a5134fe93e2265d3585e2b307944bedfb0b523f45f718e0fd4365791",
+              "bytes": 37,
+              "row_count": null
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/company_events_em.csv",
+              "sha256": "8592ae85c936e3948cd0f99ec1740d856dbac866955005e8861a3ee7dcd195a9",
+              "bytes": 35749,
+              "field_names": [
+                "序号",
+                "代码",
+                "简称",
+                "事件类型",
+                "具体事项",
+                "交易日"
+              ],
+              "row_count": 75
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/individual_info_em.json",
+              "sha256": "e09489a5fbe1f663b8a63bc2cab06280cf50ba4508a10fc957a5b1e73ee04f3c",
+              "bytes": 108,
+              "row_count": null
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/main_business_ths.csv",
+              "sha256": "4a3eb62c1cf920f5791fb7980b455fb1911fa2549ee133784ec5f02a57fe9c17",
+              "bytes": 504,
+              "field_names": [
+                "股票代码",
+                "主营业务",
+                "产品类型",
+                "产品名称",
+                "经营范围"
+              ],
+              "row_count": 1
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/profile_cninfo.csv",
+              "sha256": "d150bfd361991954244e845181f46997a5389412d3a037e9a9f3ea6b81004600",
+              "bytes": 1999,
+              "field_names": [
+                "公司名称",
+                "英文名称",
+                "曾用简称",
+                "A股代码",
+                "A股简称",
+                "B股代码",
+                "B股简称",
+                "H股代码",
+                "H股简称",
+                "入选指数",
+                "所属市场",
+                "所属行业",
+                "法人代表",
+                "注册资金",
+                "成立日期",
+                "上市日期",
+                "官方网站",
+                "电子邮箱",
+                "联系电话",
+                "传真",
+                "注册地址",
+                "办公地址",
+                "邮政编码",
+                "主营业务",
+                "经营范围",
+                "机构简介"
+              ],
+              "row_count": 1
+            }
+          ],
+          "source_code_artifacts": [
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+              "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+            },
+            {
+              "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+              "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
+            }
+          ],
+          "validation_time_utc": "2026-10-03T10:20:07.147050+00:00",
+          "original_transformation": {
+            "path": "provider_validation/tests/build_interface_coverage.py",
+            "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
+          }
+        }
+      ],
+      "eligible_for_production_routing": false,
+      "parent_validation_record": "ASTOCK-037",
+      "collection_profile": {
+        "name": "event_daily",
+        "mode": "daily",
+        "refresh_interval_seconds": null,
+        "business_day": "calendar_day",
+        "scheduling_enabled": false,
+        "frequency_unit": null,
+        "frequency_interval": 1,
+        "at_time": null,
+        "anchor_date": null,
+        "settle_delay_seconds": 0,
+        "trigger_grace_seconds": 30,
+        "universe": "static",
+        "max_symbols": null
+      },
+      "actual_scope_correction": {
+        "authorization": "user:以实际的数据为准，而不是看之前的定义",
+        "validation_mode": "source response replay or explicitly pending raw evidence",
+        "evidence_directory": "provider_validation/results/actual-data-original-20261004",
+        "complete_market_coverage_verified": false,
+        "production_writes": 0
+      }
+    },
+    {
+      "contract": {
+        "input_id": "ASTOCK-037-business",
+        "provider": "ths",
+        "endpoint": "main_business",
+        "display_name": "同花顺主营业务",
+        "data_kind": "table",
+        "data_frequency": "snapshot",
+        "request_shape": "single_symbol",
+        "collection_profile": "event_daily",
+        "implementation_status": "unimplemented",
+        "evidence_refs": [
+          "ASTOCK-037"
+        ],
+        "parameters": [
+          {
+            "name": "code",
+            "source": "request.symbol",
+            "value_type": "string",
+            "required": true,
+            "default": null,
+            "choices": [],
+            "minimum": null,
+            "maximum": null,
+            "applied_at": "request"
+          }
+        ],
+        "limitations": [
+          "旧样本为 600519 的 1 条主营业务；原 HTML 未保留，仅哈希，补采原 SDK 超过 120 秒。待可回放证据，不标成来源不可用。"
+        ],
+        "canonical_input": null,
+        "runtime_endpoint": null,
+        "forbidden_sources": [
+          "request.symbols",
+          "request.start_date",
+          "request.end_date",
+          "request.trade_date",
+          "config.limit",
+          "config.count"
+        ],
+        "trading_date_parameter": null,
+        "request_interval_seconds": 3.0,
+        "effective_concurrency": 1,
+        "request_limit_enforcement": "unimplemented",
+        "base_requests_per_fetch": 1,
+        "dataset": "main_business",
+        "runtime_method": "fetch_main_business"
+      },
+      "evidence": [
+        {
+          "interface_id": "ASTOCK-037",
+          "path": "provider_validation/results/interface-records/ASTOCK-037.json",
+          "sha256": "2a15406a4fbe6e9261e07395046c86f96631bc04aeb3d1ad7a57b746afd91248",
+          "validation_result": "部分通过",
+          "evidence_status": "live_raw",
+          "tested_scope": "参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×5, transport_error×1；主机：basic.10jqka.com.cn, datacenter-web.eastmoney.com, emweb.securities.eastmoney.com, push2.eastmoney.com, webapi.cninfo.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+          "coverage_denominator": 87,
+          "original_note": "部分：5个子结果中个股信息文件内是ProxyError；其余4个子文件有数据，因此仅部分返回。；本轮低频真实探测 partial：5 outputs: usable=3, errors=2。参数范围：code=600519, date=20260930, start=20260901, end=20261003；请求事件：HTTP200×5, transport_error×1；主机：basic.10jqka.com.cn, datacenter-web.eastmoney.com, emweb.securities.eastmoney.com, push2.eastmoney.com, webapi.cninfo.com.cn；低频探测批次：rate-limited-all-20261003；策略=rate-limited-live-probe-v1；每主机最短间隔3.0秒",
+          "manifest_ref": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/manifest.ndjson",
+          "response_artifacts": [
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/ef8be25eebd4b5ebe01f92930bcbc59ff6abdc9b2411fb03002ee05628025241.body.gz",
+              "sha256": "ef8be25eebd4b5ebe01f92930bcbc59ff6abdc9b2411fb03002ee05628025241",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/9f6f270d58fe87dfb6a6c3df35de7475d95ee83750105cfa653144e38f2a0b81.body.gz",
+              "sha256": "9f6f270d58fe87dfb6a6c3df35de7475d95ee83750105cfa653144e38f2a0b81",
+              "matches_filename": true
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/_raw/missing-capabilities-20261003T174623/bodies/235673dbe4d79fec9eed2a592e05d5232fbed11481c9e0b74993722e88fb9eea.body.gz",
+              "sha256": "235673dbe4d79fec9eed2a592e05d5232fbed11481c9e0b74993722e88fb9eea",
+              "matches_filename": true
+            }
+          ],
+          "derived_artifacts": [
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/business_composition_em.json",
+              "sha256": "dfc831d7a5134fe93e2265d3585e2b307944bedfb0b523f45f718e0fd4365791",
+              "bytes": 37,
+              "row_count": null
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/company_events_em.csv",
+              "sha256": "8592ae85c936e3948cd0f99ec1740d856dbac866955005e8861a3ee7dcd195a9",
+              "bytes": 35749,
+              "field_names": [
+                "序号",
+                "代码",
+                "简称",
+                "事件类型",
+                "具体事项",
+                "交易日"
+              ],
+              "row_count": 75
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/individual_info_em.json",
+              "sha256": "e09489a5fbe1f663b8a63bc2cab06280cf50ba4508a10fc957a5b1e73ee04f3c",
+              "bytes": 108,
+              "row_count": null
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/main_business_ths.csv",
+              "sha256": "4a3eb62c1cf920f5791fb7980b455fb1911fa2549ee133784ec5f02a57fe9c17",
+              "bytes": 504,
+              "field_names": [
+                "股票代码",
+                "主营业务",
+                "产品类型",
+                "产品名称",
+                "经营范围"
+              ],
+              "row_count": 1
+            },
+            {
+              "path": "provider_validation/results/live-probes/rate-limited-all-20261003/35_F10结构化资料/data/profile_cninfo.csv",
+              "sha256": "d150bfd361991954244e845181f46997a5389412d3a037e9a9f3ea6b81004600",
+              "bytes": 1999,
+              "field_names": [
+                "公司名称",
+                "英文名称",
+                "曾用简称",
+                "A股代码",
+                "A股简称",
+                "B股代码",
+                "B股简称",
+                "H股代码",
+                "H股简称",
+                "入选指数",
+                "所属市场",
+                "所属行业",
+                "法人代表",
+                "注册资金",
+                "成立日期",
+                "上市日期",
+                "官方网站",
+                "电子邮箱",
+                "联系电话",
+                "传真",
+                "注册地址",
+                "办公地址",
+                "邮政编码",
+                "主营业务",
+                "经营范围",
+                "机构简介"
+              ],
+              "row_count": 1
+            }
+          ],
+          "source_code_artifacts": [
+            {
+              "path": "provider_validation/tests/source_snapshots/a-stock-data/a_stock_missing_capabilities.py",
+              "sha256": "ad18c9753a8f8af2ec06883589d106a6779edcb18658cfc396a3f455d5700ca0"
+            },
+            {
+              "path": "provider_validation/tests/run_a_stock_rate_limited_probes.py",
+              "sha256": "fcdda013c9f55a0497ec0b9d291a7a3c7c9aeb88988412f690fc8db247269b3c"
+            }
+          ],
+          "validation_time_utc": "2026-10-03T10:20:07.147050+00:00",
+          "original_transformation": {
+            "path": "provider_validation/tests/build_interface_coverage.py",
+            "sha256": "cbb037a287ee985a3f8405cf1d35e9825cd2b8443985bf5a1bba999644742e89"
+          }
+        }
+      ],
+      "eligible_for_production_routing": false,
+      "parent_validation_record": "ASTOCK-037",
+      "collection_profile": {
+        "name": "event_daily",
+        "mode": "daily",
+        "refresh_interval_seconds": null,
+        "business_day": "calendar_day",
+        "scheduling_enabled": false,
+        "frequency_unit": null,
+        "frequency_interval": 1,
+        "at_time": null,
+        "anchor_date": null,
+        "settle_delay_seconds": 0,
+        "trigger_grace_seconds": 30,
+        "universe": "static",
+        "max_symbols": null
+      },
+      "actual_scope_correction": {
+        "authorization": "user:以实际的数据为准，而不是看之前的定义",
+        "validation_mode": "source response replay or explicitly pending raw evidence",
+        "evidence_directory": "provider_validation/results/actual-data-original-20261004",
+        "complete_market_coverage_verified": false,
+        "production_writes": 0
+      }
     }
   ],
-  "reference_redaction_policy": "Token-like query values in copied references are redacted; original archives are unchanged."
+  "reference_redaction_policy": "Token-like query values in copied references are redacted; original archives are unchanged.",
+  "actual_scope_revision_time_utc": "2026-10-04T11:51:24.046868+00:00",
+  "historical_catalog_snapshot": {
+    "path": "provider_validation/results/actual-data-original-20261004/catalog-before.json.bin",
+    "sha256": "dd135f2fb3164a475175017c956e2b6ce31dcc2a729b5a001122b1bad10d31a2"
+  },
+  "original_validation_contract_count": 74,
+  "new_f10_child_input_count": 3
 }

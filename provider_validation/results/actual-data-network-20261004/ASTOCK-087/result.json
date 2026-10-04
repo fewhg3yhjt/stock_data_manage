@@ -1,0 +1,24 @@
+{
+  "input_id": "ASTOCK-087",
+  "function": "stock_notice_report",
+  "parameters": {
+    "symbol": "全部",
+    "date": "20261001"
+  },
+  "code_version": "36061c8c8bd6e3f235f486670de17fc14780b2c9dfae019e5be49f58fd6eb211",
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "archive_search": "actual-data-original-20261004/matching-responses.json",
+  "status": "parsed",
+  "row_count": 718,
+  "fields": [
+    "代码",
+    "名称",
+    "公告标题",
+    "公告类型",
+    "公告日期",
+    "网址"
+  ],
+  "parsed_sha256": "d1009f4a7fa79aa79dcc2c3f1ef783f1540612723bd5b2075182f84efb50b208",
+  "manifest_sha256": "d227be222840ebd0c90473e6f278b6ebffdb7448746c3daa31785c13d79aaf0f"
+}

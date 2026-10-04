@@ -1,0 +1,327 @@
+{
+  "validation_time_utc": "2026-10-04T11:52:01.500973+00:00",
+  "mode": "offline_replay",
+  "network_requests": 0,
+  "production_writes": 0,
+  "eligible_for_production_routing": false,
+  "verification_code": {
+    "path": "tests/test_input_collection.py",
+    "sha256": "bce62da121994e9a5e025c0e9b97f03fd4e613f64b9d25811503a7bb222a47bf"
+  },
+  "runner": {
+    "path": "provider_validation/tests/replay_input_capabilities.py",
+    "sha256": "08043cb953c57148236296f39a03527392dd3fb1eb10fa4623017e400d3801dd"
+  },
+  "inputs": [
+    {
+      "input_id": "ASTOCK-014",
+      "row_count": 375,
+      "scope": {},
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-final-20261004\\1\\candidate\\ASTOCK-014-484955dda07e\\2026-10-04\\input_report\\ths\\concept_directory\\report.json",
+      "report_sha256": "5139bf82c7423521a702c6b7ef1a459cb1238cb2c4992bf92effa9cd212b5920",
+      "source_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\_raw\\missing-capabilities-20261003T174623\\manifest.ndjson",
+      "source_manifest_sha256": "885abd6bf1c4b809b9029759f61b75c7d6a297755fd76ca6c545720db38a6767"
+    },
+    {
+      "input_id": "ASTOCK-037-profile",
+      "row_count": 1,
+      "scope": {
+        "code": "600519"
+      },
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-final-20261004\\2\\candidate\\ASTOCK-037-profile-60716f8e12a0\\2026-10-04\\input_report\\cninfo\\company_profile\\report.json",
+      "report_sha256": "5dafefe45704e4b7d00a62aae77fe4078ca577f55757e31b74bc1fe55b6219ef",
+      "source_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\_raw\\missing-capabilities-20261003T174623\\manifest.ndjson",
+      "source_manifest_sha256": "885abd6bf1c4b809b9029759f61b75c7d6a297755fd76ca6c545720db38a6767"
+    },
+    {
+      "input_id": "ASTOCK-037-events",
+      "row_count": 75,
+      "scope": {
+        "date": "2023-08-08"
+      },
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-final-20261004\\3\\candidate\\ASTOCK-037-events-61a89f763457\\2026-10-04\\input_report\\eastmoney\\company_events\\report.json",
+      "report_sha256": "2246633949abeb984f4a7a82d7a707fe19cb1c09cda818167cd3d2187ede2c95",
+      "source_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\live-probes\\rate-limited-all-20261003\\_raw\\missing-capabilities-20261003T174623\\manifest.ndjson",
+      "source_manifest_sha256": "885abd6bf1c4b809b9029759f61b75c7d6a297755fd76ca6c545720db38a6767"
+    },
+    {
+      "input_id": "ASTOCK-044",
+      "row_count": 198,
+      "scope": {},
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-final-20261004\\4\\candidate\\ASTOCK-044-48f5850c6891\\2026-10-04\\input_report\\baostock\\st_list\\report.json",
+      "report_sha256": "280f7324fcec364d320c75a141a8764cc8510552e6c247075621fc77c2a9cb63",
+      "source_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-original-20261004\\st\\manifest.ndjson",
+      "source_manifest_sha256": "b63cf7b3461b4624c9e5f53e8a977082512725b8ffe9f0133874fbefedf24833"
+    },
+    {
+      "input_id": "ASTOCK-087",
+      "row_count": 718,
+      "scope": {
+        "date": "2026-10-01"
+      },
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-final-20261004\\5\\candidate\\ASTOCK-087-88404906f93b\\2026-10-04\\input_report\\eastmoney\\dated_announcements\\report.json",
+      "report_sha256": "aa562c1206e6a7d6efcca497d6c8256a99cbb1fc386b5b25f0beeab3ad6138bb",
+      "source_manifest": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-network-20261004\\ASTOCK-087\\_raw\\manifest.ndjson",
+      "source_manifest_sha256": "d227be222840ebd0c90473e6f278b6ebffdb7448746c3daa31785c13d79aaf0f"
+    }
+  ],
+  "original_vs_provider": [
+    {
+      "input_id": "ASTOCK-014",
+      "scope": {},
+      "row_count": 375,
+      "original_parsed_sha256": "8eca5fcfe3de494ff093acead44b2c12499ae30099027fbb48e959cb73f012ef",
+      "response_hashes": [
+        "f5fbebef7f2a4cab00055428994ef01dea3b90235b61f5867e396da1dcf4aa2c",
+        "ebc22898fe4f2fbd9494ea27b83c3ab5bee920ff2362c6866a28062a419e2291",
+        "ebc22898fe4f2fbd9494ea27b83c3ab5bee920ff2362c6866a28062a419e2291",
+        "ea5dd7ee4123a6f6b94b6d2b49e17059c4abd15784c3466b95f8d84e8f057230",
+        "4de8e47a4cef7116d72ceae6e2aaeca98d25c09737f4e68a0e571430cdeaeef3",
+        "fa1366efc8cd30b25e4b6bb4d18bc1d5f270412f09b110f9d1d4d2af5c5ee68e",
+        "3e69d8ba74c41ea6c1a1f7f6c227de4c003709179e3f29ee12980aad758aa54a",
+        "c8c256b2497f437fd785998b947fd820d2f4561326059b7447d583f2a46c3f15",
+        "c8c256b2497f437fd785998b947fd820d2f4561326059b7447d583f2a46c3f15",
+        "c8c256b2497f437fd785998b947fd820d2f4561326059b7447d583f2a46c3f15",
+        "c8c256b2497f437fd785998b947fd820d2f4561326059b7447d583f2a46c3f15",
+        "aca325e8c737c2296851988d0640fd31e02c461a383ac77c6f8b90b7581deb94",
+        "c8c256b2497f437fd785998b947fd820d2f4561326059b7447d583f2a46c3f15",
+        "64af3acc01ff3b87b53482be496cfa5598feea0e54b509a14ba06e611cea31b0",
+        "9b4843ee52f24322414262bb9fbb6afb53a5ea8b182735299067d3b189521d06",
+        "ce97cd6d3e302215efe94aebc1bfbf3becdece4b88c1cb6a77c4988a29f87705",
+        "9f2ecf02070ecd332f2177648476c4fa7bb52ae00322b464aec8cccff2ae66f9",
+        "292ae09f4f76a5ea9f1e4e22c4df6e81c3851985a7c713f9b985bd3ef8b29308",
+        "5ec41e413e7e8776e0650847eda2b3d3486fd67bc9ccb1e5f79467de35da8898",
+        "fa781a0ba8428c2561343048a65f9cb6e61aafb998cea3d4ed2815ef40e702d0",
+        "d71109424ab0ea47e2747a04ad6d468a57b15e2c9b58c3b404fa5d5080010ebe",
+        "12703a5fe0d0abe9886337c12cc1060bea8913ca19d85b72fd2c824dd96f5479",
+        "d2b71285eb4984e3808b6cc8b74713c96f6d5567adb04b939b82d7b83a3a9222",
+        "1e2a8d4d14a6b7da4b59ac0847423c73a7d1a92455e3641118df1c92affaebfb",
+        "1fcca9efcfef1969e25557df8ee815c226434d003986c64effc9aae381b90416",
+        "f204b2b69017abf9273f74bd814ec822514df9dfd8c5ca7e98988b7acd997103",
+        "a33b46e7d6b580069c7729e11da8c27a336655ceb386e3dbc0f79526187e17ed",
+        "1610e7cad59a8ea4a356fffa651648af07ec25c2e591c3d57e6c91ab227678d0",
+        "969a9bb97f7283f22a5feb6460d24328ac76e14a64534561d51cfcb6c416113c",
+        "899ad6b471ac207efa1d24b4cebc97e9fcc5f56e55188f9621140e9d67beaecc",
+        "f0a9f15f07b5bd58de823f3d6b70553c522c8b8fec803519c11d4fc6c5d77bda",
+        "1f273fbeffb95d2e60e67aa95b10dade4df4bba039a75d070e30c9f0d403bd23",
+        "2f36b3351799fdc85b44623de5780ef033fd7cc58b04a99d20c051283a40b155",
+        "9d1f93302d7a0c527613ebf38a67d2155b3fa557ddd9b113e73d8587abe0ad15",
+        "6e3df060cf8aee27cb38d760d8afc430e101797f617deefd167ce57fba5fe5f8",
+        "626ade9667c40bd47061b16cdd1ef3a74a5226b0a5cb584186820189fe64012e",
+        "0ce76b1ef40144180b15468cd9a506bf32b3e6e7dd8a1b721ea139bdfe312dc8",
+        "7cb9e5c352f98c128e719b827c17f4e98b8c14607f53e7652d160e4859a4462e",
+        "09775a3bb5d1e629f6d5ad6eb00f3268e8510142d6400e2d74fb37ff2f4b882e",
+        "6904ef850d2ef790ef89fc774a0dcee30c2e08bc1c29c324fefc172bd21e9d8f",
+        "b925cdc85f4ce4ef71aa70699809f0506544039ae202583afbce32fe9777cb50"
+      ],
+      "original_fields_equal": true,
+      "original_transport_equal": true,
+      "production_writes": 0,
+      "mode": "offline_replay",
+      "universe_completeness_verified": false,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-final-20261004\\1\\candidate\\ASTOCK-014-484955dda07e\\2026-10-04\\input_report\\ths\\concept_directory\\report.json"
+    },
+    {
+      "input_id": "ASTOCK-037-profile",
+      "scope": {
+        "code": "600519"
+      },
+      "row_count": 1,
+      "original_parsed_sha256": "14cf7f1ad8da403ee9b9dc6a453a4a7e770cfca3e4889b2a2b2006f9fbed56a7",
+      "response_hashes": [
+        "9f6f270d58fe87dfb6a6c3df35de7475d95ee83750105cfa653144e38f2a0b81"
+      ],
+      "original_fields_equal": true,
+      "original_transport_equal": true,
+      "production_writes": 0,
+      "mode": "offline_replay",
+      "universe_completeness_verified": false,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-final-20261004\\2\\candidate\\ASTOCK-037-profile-60716f8e12a0\\2026-10-04\\input_report\\cninfo\\company_profile\\report.json"
+    },
+    {
+      "input_id": "ASTOCK-037-events",
+      "scope": {
+        "date": "2023-08-08"
+      },
+      "row_count": 75,
+      "original_parsed_sha256": "4818c09bf3809d20eed5cc47431404824c5f374ccb8e9aca7244eba96eb605db",
+      "response_hashes": [
+        "235673dbe4d79fec9eed2a592e05d5232fbed11481c9e0b74993722e88fb9eea"
+      ],
+      "original_fields_equal": true,
+      "original_transport_equal": true,
+      "production_writes": 0,
+      "mode": "offline_replay",
+      "universe_completeness_verified": false,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-final-20261004\\3\\candidate\\ASTOCK-037-events-61a89f763457\\2026-10-04\\input_report\\eastmoney\\company_events\\report.json"
+    },
+    {
+      "input_id": "ASTOCK-044",
+      "scope": {},
+      "row_count": 198,
+      "original_parsed_sha256": "9094a0d81a17c6516356a8a58acffb8d350bbabea504257fa6274d235645fb96",
+      "response_hashes": [
+        "93891b70d9360fda6a0ed99264934e0c6f46414feca604acca94351f74c6b9e8"
+      ],
+      "original_fields_equal": true,
+      "original_transport_equal": true,
+      "production_writes": 0,
+      "mode": "offline_replay",
+      "universe_completeness_verified": false,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-final-20261004\\4\\candidate\\ASTOCK-044-48f5850c6891\\2026-10-04\\input_report\\baostock\\st_list\\report.json"
+    },
+    {
+      "input_id": "ASTOCK-087",
+      "scope": {
+        "date": "2026-10-01"
+      },
+      "row_count": 718,
+      "original_parsed_sha256": "bfc65d3b29126ec4df2f6fcf955b95e4217c438c7cb9b7fbc0d518414d8a5779",
+      "response_hashes": [
+        "61df2023fac7e02d3564b5761647c686839cfccd62ca4d5dee4137f72985ab3d",
+        "0a092bc62ba62d3823b7ed17966b220fdf29f7a9481466429e21bc8083f6ae5e",
+        "c3b853b246eaab7dee9ad00da99feaff58c06987e67b50db91b81f0a512a4ab2",
+        "a72649555e0d49bc7a64671cbdca7c3eb1157c20b34e6a537c2837ce3c283736",
+        "51009720b412b95bc927110b4628ed195127633c830ced45d4af581bf08116ac",
+        "58ff5c07111ae15b562c6e18268e0519daeddf5dca591804a2d3908da0f40597",
+        "ecf4f516e805055864442006056e33e414d249199f2819c98dd5e25733eed1c0",
+        "5af22cad3e1ee6e08fad1b27501fb5ed187b3d5753d2db3fbb473492f9af88ea",
+        "b8f7aaafdfb3ec12a2dfe87e7fba0d1b653072f1e8a610ac6e871e9f588b60a7"
+      ],
+      "original_fields_equal": true,
+      "original_transport_equal": true,
+      "production_writes": 0,
+      "mode": "offline_replay",
+      "universe_completeness_verified": false,
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-final-20261004\\5\\candidate\\ASTOCK-087-88404906f93b\\2026-10-04\\input_report\\eastmoney\\dated_announcements\\report.json"
+    }
+  ],
+  "known_differences": [
+    "以实际来源及请求日期纠正旧类别；候选输入不授予生产资格。",
+    "概念目录归档包含401及重复页，不认证全量；ST为沪深活跃证券名称筛选，不是官方风险标志。",
+    "F10公司动态实际为2023-08-08全市场动态；公告为明确发布日全市场目录，无正文。",
+    "一致预期和主营业务原HTML仍缺可回放证据，限时补采记录不代表来源不可用。"
+  ],
+  "negative_checks": [
+    {
+      "input_id": "ASTOCK-037-profile",
+      "mutation": "status",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-final-20261004\\f1\\candidate\\ASTOCK-037-profile-401f69aeefe5\\2026-10-04\\input_report\\cninfo\\company_profile\\report.json",
+      "report_sha256": "7888f7d3bb7cc98789d3ecdda203fc4d50d7761aa66d81e8246ce3b1ce1122de"
+    },
+    {
+      "input_id": "ASTOCK-037-profile",
+      "mutation": "order",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-final-20261004\\f2\\candidate\\ASTOCK-037-profile-a08bd32868ed\\2026-10-04\\input_report\\cninfo\\company_profile\\report.json",
+      "report_sha256": "972388f5011216d13549349bb3bd9f2c29a4360a1c6e2d73a9d7ae7ad35ac5c0"
+    },
+    {
+      "input_id": "ASTOCK-037-profile",
+      "mutation": "code",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-final-20261004\\f3\\candidate\\ASTOCK-037-profile-b0879d202680\\2026-10-04\\input_report\\cninfo\\company_profile\\report.json",
+      "report_sha256": "52516f14205b217955986a2cfc49daf43d5ec3873c43671c483136e5b1a54fec"
+    },
+    {
+      "input_id": "ASTOCK-037-profile",
+      "mutation": "count",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-final-20261004\\f4\\candidate\\ASTOCK-037-profile-612427530035\\2026-10-04\\input_report\\cninfo\\company_profile\\report.json",
+      "report_sha256": "5f934515b4d9e153abd3f435cb4648fca3b1f25a1bac42d6f7e4dccf5192cd16"
+    },
+    {
+      "input_id": "ASTOCK-037-events",
+      "mutation": "status",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-final-20261004\\f5\\candidate\\ASTOCK-037-events-20d7dbcc6b60\\2026-10-04\\input_report\\eastmoney\\company_events\\report.json",
+      "report_sha256": "f76d0490af74935e9a48f2575f5ddc0a3d4f35818d7a7be5db2007601b5e42ec"
+    },
+    {
+      "input_id": "ASTOCK-037-events",
+      "mutation": "date",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-final-20261004\\f6\\candidate\\ASTOCK-037-events-c1e67016f3ff\\2026-10-04\\input_report\\eastmoney\\company_events\\report.json",
+      "report_sha256": "868b3e859738bdf96443fb2b653d41fe2ae02e10ebcf3a1570d6646aa2a24819"
+    },
+    {
+      "input_id": "ASTOCK-037-events",
+      "mutation": "pages",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-final-20261004\\f7\\candidate\\ASTOCK-037-events-a8f619179212\\2026-10-04\\input_report\\eastmoney\\company_events\\report.json",
+      "report_sha256": "48a56e363bf8d4b2f73784151b8ccb99fc2230f952f69ea15e045bf907c6cba8"
+    },
+    {
+      "input_id": "ASTOCK-037-events",
+      "mutation": "count",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-final-20261004\\f8\\candidate\\ASTOCK-037-events-0640fed4a697\\2026-10-04\\input_report\\eastmoney\\company_events\\report.json",
+      "report_sha256": "9c2129c2a3ae7a5320bf52f08dcb983b0893a0f5d29940a539c21d2f7375e8da"
+    },
+    {
+      "input_id": "ASTOCK-087",
+      "mutation": "status",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-final-20261004\\f9\\candidate\\ASTOCK-087-14b2a0868e48\\2026-10-04\\input_report\\eastmoney\\dated_announcements\\report.json",
+      "report_sha256": "3b1fad3a243cb7113c8e07e924312ceb4e51ffdbfe8cbfbdaad00481fbf4bd55"
+    },
+    {
+      "input_id": "ASTOCK-087",
+      "mutation": "date",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-final-20261004\\f10\\candidate\\ASTOCK-087-d05f6ca33c0c\\2026-10-04\\input_report\\eastmoney\\dated_announcements\\report.json",
+      "report_sha256": "6ef2369906d068a58b6551c9e8fb97392492e1ef966eb4c9e95360efe66b8bf3"
+    },
+    {
+      "input_id": "ASTOCK-087",
+      "mutation": "count",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-final-20261004\\f11\\candidate\\ASTOCK-087-25decc87aa2b\\2026-10-04\\input_report\\eastmoney\\dated_announcements\\report.json",
+      "report_sha256": "b7511094581ce11a19836267d11d954b0cfc04264f2245cb0e0b694ab71debdc"
+    },
+    {
+      "input_id": "ASTOCK-087",
+      "mutation": "missing_page",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-final-20261004\\f12\\candidate\\ASTOCK-087-f65fa997244b\\2026-10-04\\input_report\\eastmoney\\dated_announcements\\report.json",
+      "report_sha256": "2e2b0d01a732b84c4f7783ebc2d3ad5a93aef766ee69b1337c854e120e8142d7"
+    },
+    {
+      "input_id": "ASTOCK-087",
+      "mutation": "missing_issuer",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-final-20261004\\f13\\candidate\\ASTOCK-087-606f3fb8129a\\2026-10-04\\input_report\\eastmoney\\dated_announcements\\report.json",
+      "report_sha256": "abaf8574bddf5996662c895021f198ad3c83c38cc366d3e17fd8a5e2929aacfd"
+    },
+    {
+      "input_id": "ASTOCK-044",
+      "mutation": "empty",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-final-20261004\\f14\\candidate\\ASTOCK-044-b155224820dc\\2026-10-04\\input_report\\baostock\\st_list\\report.json",
+      "report_sha256": "0f7a5b0c12fbb4171b6906f4e784303f21a055e36503c905c1b3b85b1cdcfb67"
+    },
+    {
+      "input_id": "ASTOCK-044",
+      "mutation": "missing_field",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-final-20261004\\f15\\candidate\\ASTOCK-044-0c6928629be5\\2026-10-04\\input_report\\baostock\\st_list\\report.json",
+      "report_sha256": "943d7478b35c53c4ac8839c6e59adb5d16aafa2457b5fbaf0c0ee7cdd8745c79"
+    },
+    {
+      "input_id": "ASTOCK-044",
+      "mutation": "sdk_status",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-final-20261004\\f16\\candidate\\ASTOCK-044-95c8b51b84da\\2026-10-04\\input_report\\baostock\\st_list\\report.json",
+      "report_sha256": "936c2790cd1639d8fbc3a48ab2bea2cd27df53006eab4e7e94fa57a8ea196535"
+    },
+    {
+      "input_id": "ASTOCK-014",
+      "mutation": "missing_directory",
+      "result": "passed",
+      "report_path": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\actual-data-final-20261004\\f17\\candidate\\ASTOCK-014-78a38b453e25\\2026-10-04\\input_report\\ths\\concept_directory\\report.json",
+      "report_sha256": "021c0f3a2302e7598673ee0720425dae541fe1c72f9009e4b7043c21db18d477"
+    }
+  ],
+  "yaml_projection_mapping": "passed"
+}

@@ -1,0 +1,31 @@
+@lru_cache()
+def _get_stock_board_concept_name_ths() -> dict:
+    """
+    获取同花顺概念板块代码和名称字典
+    :return: 获取同花顺概念板块代码和名称字典
+    :rtype: dict
+    """
+    js_code = py_mini_racer.MiniRacer()
+    js_content = _get_file_content_ths("ths.js")
+    js_code.eval(js_content)
+    v_code = js_code.call("v")
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/89.0.4389.90 Safari/537.36",
+        "Cookie": f"v={v_code}",
+    }
+    url = "https://q.10jqka.com.cn/gn/detail/code/307822/"
+    r = requests.get(url, headers=headers)
+    soup = BeautifulSoup(r.text, features="lxml")
+    code_list = [
+        item["href"].split("/")[-2]
+        for item in soup.find(name="div", attrs={"class": "cate_inner"}).find_all("a")
+    ]
+    name_list = [
+        item.text
+        for item in soup.find(name="div", attrs={"class": "cate_inner"}).find_all("a")
+    ]
+    name_code_map = dict(zip(name_list, code_list))
+    temp_dict = __stock_board_concept_summary_ths()
+    name_code_map.update(temp_dict)
+    return name_code_map

@@ -1,0 +1,23 @@
+dataset: st_name_list
+rules:
+- id: st_name_list-actual-input-v1
+  input_id: ASTOCK-044
+  provider: baostock
+  endpoint: st_list
+  field_mapping:
+    stock_code: code
+    exchange: market
+    stock_name: name
+    st_type: st_type
+  context_fields:
+    snapshot_at: source_snapshot_at
+    source: source
+  null_values:
+  - null
+  - ''
+  unverified_fields: []
+  status: pending_validation
+  version: actual-data-input-v1
+  evidence_refs:
+  - ASTOCK-044
+  notes: 按原成功数据范围接入；snapshot_at 为原响应捕获时间，不是来源生效日期。原字段独立留证，不自动启用生产。
