@@ -54,7 +54,8 @@ def build_input_provider(contract, *, providers_path, client=None):
                         "ASTOCK-074": "fetch_futures", "ASTOCK-075": "fetch_futures_kline", "ASTOCK-076": "fetch_a50",
                         "SDA-BOARD-001": "fetch_industry_list", "SDA-BOARD-002": "fetch_industry_daily",
                         "SDA-BOARD-003": "fetch_fund_flow", "SDA-BOARD-004": "fetch_fund_flow",
-                        "SDA-BOARD-005": "fetch_snapshot", "SDA-BOARD-006": "fetch_snapshot"}
+                        "SDA-BOARD-005": "fetch_snapshot", "SDA-BOARD-006": "fetch_snapshot",
+                        "SECURITY-BSE-001": "fetch_snapshot"}
     if contract.input_id not in expected_methods or contract.runtime_method != expected_methods[contract.input_id]:
         raise ValueError("input runtime method does not match its verified adapter")
     if contract.input_id == 'ASTOCK-014':
@@ -214,6 +215,9 @@ def build_input_provider(contract, *, providers_path, client=None):
     if contract.input_id in {"SDA-BOARD-005", "SDA-BOARD-006"}:
         return BaoStockIndustryMembershipProvider(client=client, endpoint=contract.endpoint,
                                                   normalization_root=Path(providers_path).parent / "normalization")
+    if contract.input_id == "SECURITY-BSE-001":
+        from ..providers.exchanges.security import BseSecurityListProvider
+        return BseSecurityListProvider(client=client)
     if contract.input_id.startswith("SDA-BOARD-"):
         return AkShareBoardProvider(client=client, endpoint=contract.endpoint,
                                    normalization_root=Path(providers_path).parent / "normalization")

@@ -12,7 +12,7 @@ from math import isfinite
 import json
 from pathlib import Path
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlencode, urlsplit
+from urllib.parse import urlencode, urlsplit, parse_qsl
 from urllib.request import Request, urlopen
 
 from .contracts import EndpointContract, FailureClass, HttpResponse, ProviderContractError
@@ -61,7 +61,7 @@ class HostPausedError(ConnectionError):
 def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                       replay_manifest=None, evidence_roots=(), max_age_seconds=0, sdk_retry_policy=False,
                       probe_host_pause=False, require_empty_post_body=False, response_validator=None, cache_ignored_query_parameters=(),
-                      native_transport=None):
+                      native_transport=None, match_request_body=False):
     """Serialized single-input capture/replay. Session identity, proxies and request arguments are retained.
 
     SDK session policy matches the saved conservative probe. Internal urllib3 retries
@@ -97,6 +97,20 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
         def send(session, request, **kwargs):
             native_call = kwargs.pop('_native_call', None)
             native_options = kwargs.pop('_native_options', None)
+            request_scope = scope
+            body_metadata = {}
+            if match_request_body:
+                import hashlib
+                body = request.body or b""
+                if isinstance(body, str):
+                    body = body.encode("utf-8")
+                if not isinstance(body, bytes):
+                    raise ValueError("request-body matching requires a fixed byte or string body")
+                digest = hashlib.sha256(body).hexdigest()
+                body_metadata = {"request_body_bytes": len(body), "request_body_sha256": digest}
+                if "application/x-www-form-urlencoded" in request.headers.get("Content-Type", ""):
+                    body_metadata["request_form"] = sanitized_metadata(dict(parse_qsl(body.decode("utf-8"), keep_blank_values=True)))
+                request_scope = {**scope, "request_body_sha256": digest}
             # The observed social-financing SDK uses a bodyless POST, not an arbitrary POST query.
             if require_empty_post_body and (request.method != "POST" or request.body not in (None, b"", "")):
                 raise ValueError("source contract requires a bodyless POST")
@@ -117,6 +131,9 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                 matching = next(((n, r) for n, r in replay_records if n not in used
                                  and r.get("method") == request.method
                                  and sanitized_url(r["url"]) == sanitized_url(request.url)
+                                 and (not match_request_body or
+                                      (r.get("request_body_sha256") or r.get("request_options", {}).get("request_body_sha256")
+                                       or r.get("scope", {}).get("request_body_sha256")) == digest)
                                  and (not require_empty_post_body or
                                       (r.get("request_body_sha256") or r.get("request_options", {}).get("request_body_sha256")) ==
                                       "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")), None)
@@ -135,7 +152,7 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                                         "url": sanitized_url(request.url), "method": request.method,
                                         "request_headers": sanitized_headers(request.headers),
                                         "fetched_at_utc": datetime.now(timezone.utc).isoformat(),
-                                        "scope": scope, "code_version": code_version,
+                                        "scope": request_scope, "code_version": code_version,
                                         "provider": provider, "endpoint": endpoint, "source_ref": source_ref,
                                         "error_type": record.get("error_type")})
                     raise requests.ConnectionError("archived transport failure")
@@ -143,7 +160,7 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                 mode = "replay"
             else:
                 cached = RawObjectStore.find_cached_response(evidence_roots, url=request.url, method=request.method,
-                    scope=scope, code_version=code_version, max_age_seconds=max_age_seconds,
+                    scope=request_scope, code_version=code_version, max_age_seconds=max_age_seconds,
                     ignored_query_parameters=cache_ignored_query_parameters)
                 if cached:
                     manifest, record, body = cached
@@ -160,18 +177,20 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                         transport_error()
                         store.append_event({"event": "http_response", "mode": "live", "outcome": "transport_error",
                             "url": sanitized_url(request.url), "method": request.method,
-                            "request_headers": sanitized_headers(request.headers), "scope": scope,
+                            "request_headers": sanitized_headers(request.headers), "scope": request_scope,
                             "provider": provider, "endpoint": endpoint, "code_version": code_version,
                             "fetched_at_utc": datetime.now(timezone.utc).isoformat(),
+                            **({"request_options": body_metadata} if body_metadata else {}),
                             "error_type": type(exc).__name__})
                         raise
             event = store.record_response(response=response, url=request.url, method=request.method,
-                request_headers=request.headers, scope=scope, provider=provider, endpoint=endpoint,
+                request_headers=request.headers, scope=request_scope, provider=provider, endpoint=endpoint,
                 code_version=code_version, mode=mode, source_ref=source_ref,
                 request_options=native_options if native_options is not None else {"timeout": kwargs.get("timeout"), "allow_redirects": kwargs.get("allow_redirects", True),
                                  "trust_env": session.trust_env, "proxies": kwargs.get("proxies", {}),
                                  "sdk_retry_policy": sdk_retry_policy,
                                  "probe_host_pause": probe_host_pause,
+                                 **body_metadata,
                                  **({"cache_ignored_query_parameters":list(cache_ignored_query_parameters)} if cache_ignored_query_parameters else {}),
                                  **({"request_body_bytes":0,"request_body_sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"}
                                     if require_empty_post_body else {})})

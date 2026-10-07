@@ -1,13 +1,14 @@
 dataset:
   name: security_snapshot
-  display_name: BaoStock 沪深 A 股证券状态快照
+  display_name: 证券来源名单快照
   primary_key: [trade_date, exchange, stock_code]
-  allowed_asset_types: [stock]
-  allowed_exchanges: [XSHG, XSHE]
+  allowed_asset_types: [stock, etf]
+  allowed_exchanges: [XSHG, XSHE, BSE]
 fields:
   trade_date: {type: date, required: true}
   stock_code: {type: string, required: true}
   stock_name: {type: string, required: true}
-  exchange: {type: enum, values: [XSHG, XSHE], required: true}
-  status: {type: enum, values: [active, suspended], required: true}
+  exchange: {type: enum, values: [XSHG, XSHE, BSE], required: true}
+  status: {type: enum, values: [active, suspended, unknown], required: true}
   source: {type: string, required: true}
+  asset_type: {type: enum, values: [stock, etf], required: false}

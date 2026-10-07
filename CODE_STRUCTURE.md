@@ -1,5 +1,7 @@
 # 代码目录与文件职责
 
+本轮证券名单修正原 `providers/baostock/industry.py`，通过原查询响应补充ETF及302股票；原行业接口范围保持。北交所此前只有验证脚本，必要新增 `providers/exchanges/security.py` 承接同一官方目录、会话和分页方式，不新增包或任务系统。原 `providers/transport.py` 增加可选POST请求体哈希匹配，原 `routing/factory.py` 与 `pipeline/inputs.py` 绑定唯一北交所输入、来源日期与证据。字段定义继续放在现有 `security_snapshot` 和 `security_master` YAML。新增 `tests/test_security_catalog.py` 验证分类、分页、原生会话和请求体匹配；正式说明见 [证券名单来源](docs/providers/security-catalog.md)。原始来源探针在 `provider_validation/`，运行候选和检查在 `data/`，尚未发布全市场名单。
+
 本次原始暂存与重做继续修改既有模块：`pipeline/inputs.py` 的 `collect_task` 在 `collect_input` 上组织持久化单元、冻结证券范围、三种重做和提交收尾；`pipeline/daily.py` 检查来源候选并构建日线；`service/instruments_update.py` 复用证券主数据合并；`storage/metadata.py` 保存业务任务记录，`storage/raw.py` 处理 scoped 暂存、审计留证及当前响应转正，`storage/parquet.py` 增加目标范围替换和待提交读写保护；`worker/recovery.py` 续接提交，`cli.py` 增加既有命令的任务操作。没有新建运行时服务或任务管理模块。
 
 必要新增 `config/datasets/security_master.yaml` 定义发布名单字段，来源字段映射仍用原 `security_snapshot` YAML；`tests/test_collection_tasks.py` 覆盖三种重做、故障、范围冻结、来源证据回放及锁恢复。正式设计和使用说明位于 [任务流程](docs/pipeline/collection-tasks.md)，离线任务参数示例位于 `docs/pipeline/examples/{security-master-replay,daily-replay}.json`；示例只引用既有来源验证证据，不保存运行结果。业务运行产物统一使用 `config/collection.yaml` 配置的 `data/`，隔离回放产物放在显式指定的 `tmp/` 工作目录。业务任务入口拒绝将输出放入 `provider_validation/`。来源资格和后台调度尚未启用。

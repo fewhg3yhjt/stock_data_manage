@@ -43,8 +43,10 @@ def test_input_catalog_covers_successful_rows_without_granting_production_routes
     with (PROJECT_ROOT / "provider_validation/coverage/interface-coverage.csv").open(encoding="utf-8-sig", newline="") as f:
         rows = list(csv.DictReader(f))
     successes = {r["接口ID"] for r in rows if r["接口取数结果"] in {"通过", "部分通过"}}
-    assert {ref for c in inputs for ref in c.evidence_refs} == successes
-    assert len(inputs) == 77
+    # Preserve the original 87-interface investigation as a historical inventory.
+    original_inputs = [c for c in inputs if c.input_id != "SECURITY-BSE-001"]
+    assert {ref for c in original_inputs for ref in c.evidence_refs} == successes
+    assert len(original_inputs) == 77 and len(inputs) == 78
     assert len(successes) == 73
     assert all(c.collection_profile in profiles for c in inputs)
     assert all(not p.scheduling_enabled for p in profiles.values())
@@ -57,7 +59,11 @@ def test_input_catalog_covers_successful_rows_without_granting_production_routes
     assert by_id["ASTOCK-052"].data_kind == "derived"
     assert by_id["ASTOCK-002-daily"].evidence_refs == by_id["ASTOCK-002-5m"].evidence_refs == ("ASTOCK-002",)
     catalog = json.loads((PROJECT_ROOT / "provider_validation/coverage/successful-input-capabilities.json").read_text(encoding="utf-8"))
-    assert {row["contract"]["input_id"] for row in catalog["catalog"]} == set(by_id)
+    assert {row["contract"]["input_id"] for row in catalog["catalog"]} == {c.input_id for c in original_inputs}
+    bse = by_id["SECURITY-BSE-001"]
+    assert bse.implementation_status == "implemented_validation_only"
+    assert bse.evidence_refs == ("provider_validation/results/raw/security-catalog-bse-20261007/manifest.ndjson",)
+    assert all((PROJECT_ROOT / ref).is_file() for ref in bse.evidence_refs)
     assert all(not row["eligible_for_production_routing"] for row in catalog["catalog"])
 
 
@@ -95,7 +101,7 @@ def test_recent_minute_contract_rejects_history_and_invalid_count():
 def test_snapshot_requires_known_trading_date_and_separates_local_filter():
     contract = next(c for c in load_input_capabilities(PROJECT_ROOT / "config/providers.yaml") if c.input_id == "SDA-BOARD-005")
     context = {"request": {"trade_date": "2026-09-30"}, "calendar": {"trading_dates": [date(2026, 9, 30)]}}
-    assert contract.bind_parameters(context) == {"trade_date": date(2026, 9, 30)}
+    assert contract.bind_parameters(context) == {"trade_date": date(2026, 9, 30), "include_etf": False}
     with pytest.raises(ValueError, match="calendar coverage"):
         contract.bind_parameters({"request": {"trade_date": "2026-09-30"}})
     with pytest.raises(ValueError, match="known trading day"):

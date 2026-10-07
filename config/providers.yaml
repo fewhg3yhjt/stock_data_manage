@@ -2731,13 +2731,18 @@ input_capabilities:
         source: request.symbols
         required: false
         applied_at: local_filter
+      include_etf:
+        type: boolean
+        source: config.include_etf
+        default: false
+        applied_at: local_filter
     implementation_status: implemented_validation_only
     dataset: security_snapshot
     runtime_method: fetch_snapshot
     forbidden_sources: [request.symbol]
     runtime_endpoint: baostock.industry_membership
     limitations:
-    - 通过代码/交易所规则筛选得到沪深A股证券集合；BaoStock TCP原始帧不对SDK调用方开放。2026-10-02非交易日空返回已保存在 provider_validation/results/live-probes/baostock-industry-20261003/result.json。
+    - 默认筛选沪深A股，名单支持302代码段；config.include_etf=true 时保留ETF交易代码范围内记录，含简称没有ETF的货币ETF。ETF指数、LOF及联接基金不混入ETF；该分类不证明独立全量覆盖。BaoStock TCP原始帧不对SDK调用方开放。2026-10-02非交易日空返回已保存在 provider_validation/results/live-probes/baostock-industry-20261003/result.json。
     - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
     base_requests_per_fetch: 2
     trading_date_parameter: trade_date
@@ -2870,3 +2875,28 @@ input_capabilities:
     - request.trade_date
     - config.limit
     - config.count
+
+  SECURITY-BSE-001:
+    provider: bse
+    endpoint: security_snapshot
+    display_name: 北交所官方当前证券名单
+    data_kind: snapshot
+    data_frequency: snapshot
+    request_shape: full_snapshot
+    collection_profile: reference_daily
+    parameters: {}
+    implementation_status: implemented_validation_only
+    dataset: security_snapshot
+    runtime_method: fetch_snapshot
+    runtime_endpoint: bse.security_snapshot
+    forbidden_sources: [request.symbol, request.symbols, request.trade_date, request.start_date, request.end_date]
+    evidence_refs: [provider_validation/results/raw/security-catalog-bse-20261007/manifest.ndjson]
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    base_requests_per_fetch: 2
+    limitations:
+    - 沿用原官方目录脚本 Session、代理、Referer、POST 分页、重定向时刷新页面后重试一次和页间等待；不新增来源回退。
+    - 仅查询当前名单，按原响应采集日标记；行情日期单独留在源字段和报告中，不支持历史日期或单证券目录查询。
+    - 逐页核对声明总数、页号、结束页及唯一证券；停牌状态未知，不推断上市日期；分页完整不等于独立市场总数证明。
+    - 2026-10-07 来源实测18页348条；仍为验证资格，未启用正式路由或自动调度。

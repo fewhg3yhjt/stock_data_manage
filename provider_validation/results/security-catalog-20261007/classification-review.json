@@ -1,0 +1,36 @@
+{
+  "scope": "source catalog classification correction; original source requests unchanged",
+  "raw_source_hash": "d1273019364bb47887294558180690974480c6586165661c51733e45713f8b66",
+  "changes": [
+    {
+      "type": "stock",
+      "code": "302132",
+      "official_reference": "https://disc.static.szse.cn/download/disc/disk03/finalpage/2025-03-19/dd95a920-8b43-4643-9405-93047fcddf93.PDF",
+      "reason": "current source row omitted by original 300/301-only catalog filter"
+    },
+    {
+      "type": "etf",
+      "code": "511600",
+      "official_reference": "https://www.sse.com.cn/disclosure/announcement/general/jjzssgg/c/c_20260213_10809590.shtml",
+      "reason": "official monetary ETF, source short name lacks ETF marker"
+    },
+    {
+      "type": "etf",
+      "code": "159003",
+      "official_reference": "https://investor.szse.cn/knowledge/fund/other/t20141209_538861.html",
+      "reason": "official monetary ETF, source short name lacks ETF marker"
+    }
+  ],
+  "classification_boundary": "known stock/ETF trading-code ranges of returned source securities; not an independently verified current whole-market census",
+  "industry_endpoint_scope_changed": false,
+  "formal_routing_qualification": false,
+  "verified_at_utc": "2026-10-07T17:04:00.834665+00:00",
+  "transformation_code": {
+    "path": "src/providers/baostock/industry.py",
+    "sha256": "853cb7064ef9b6db308b4aa965275b071f47b2bdbe4dac5dfeccc4fcd60680ac"
+  },
+  "source_stock_count": 5224,
+  "source_etf_count": 1692,
+  "source_excluded_count": 507,
+  "independent_market_denominator": null
+}

@@ -324,7 +324,7 @@ def test_real_archived_source_inputs_end_to_end(tmp_path):
     definition["units"][0]["replay_manifest"] = str(archive)
     result = collect_task(definition=definition, config_root=CONFIG, data_root=tmp_path, mode="replay")
     assert result["status"] == "published", result.get("error")
-    assert result["row_count"] == 5223
+    assert result["row_count"] == 5224
     tencent = ROOT / "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson"
     # Existing evidence covers this window; a one-day task selects the archived day.
     day = "2026-09-18"

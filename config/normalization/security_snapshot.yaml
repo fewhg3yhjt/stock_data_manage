@@ -1,6 +1,6 @@
 dataset: security_snapshot
 rules:
-  - id: baostock-security-snapshot-input-v1
+  - id: baostock-security-snapshot-input-v2
     input_id: SDA-BOARD-005
     provider: baostock
     endpoint: security_snapshot
@@ -9,8 +9,24 @@ rules:
       stock_name: code_name
       exchange: exchange
       status: status
+      asset_type: asset_type
     context_fields: {trade_date: trade_date, source: source}
     status: pending_validation
-    version: baostock-security-snapshot-input-v1
+    version: baostock-security-snapshot-input-v2
     evidence_refs: [SDA-BOARD-005]
-    notes: 原 SDK 两查询保持；沪深 A 股代码筛选沿用原适配器。行业缺失不影响证券快照行数，不更新证券主数据。
+    notes: 原 SDK 两查询保持；默认保留沪深 A 股；config.include_etf=true 时补充 ETF 交易代码范围内证券，货币 ETF 不依赖名称中的 ETF 字样；排除 ETF 指数、LOF 与联接基金，新增股票代码段302。行业缺失不影响名单，不授予全市场资格。
+  - id: bse-security-catalog-input-v1
+    input_id: SECURITY-BSE-001
+    provider: bse
+    endpoint: security_snapshot
+    field_mapping:
+      stock_code: hqzqdm
+      stock_name: hqzqjc
+      exchange: exchange
+      asset_type: asset_type
+      status: status
+    context_fields: {trade_date: source_capture_date, source: provider}
+    status: pending_validation
+    version: bse-security-catalog-input-v1
+    evidence_refs: [provider_validation/results/raw/security-catalog-bse-20261007/manifest.ndjson]
+    notes: 北交所当前官方名单；名单日期为原响应在上海时区的采集日，不使用 hqjsrq 行情日期冒充历史名单。无可靠停牌状态，status=unknown。

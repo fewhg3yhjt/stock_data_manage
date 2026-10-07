@@ -28,6 +28,7 @@ class BaoStockIndustryResult:
     returned_first_key: str | None = None
     returned_last_key: str | None = None
     missing_industry_symbols: tuple[str, ...] = ()
+    excluded_rows: tuple[Mapping[str, Any], ...] = ()
 
 
 @dataclass(slots=True)
@@ -36,7 +37,7 @@ class BaoStockIndustryMembershipProvider:
 
     name: str = "baostock"
     endpoint: str = "industry_membership"
-    capability_version: str = "baostock-snapshot-input-v2"
+    capability_version: str = "baostock-snapshot-input-v3"
     client: Any | None = None
     normalization_root: Path | None = None
 
@@ -73,7 +74,10 @@ class BaoStockIndustryMembershipProvider:
         symbols: Sequence[str] | None = None,
         *,
         raw_archive: Any | None = None,
+        include_etf: bool = False,
     ) -> BaoStockIndustryResult:
+        if type(include_etf) is not bool or (include_etf and self.endpoint != "security_snapshot"):
+            raise ValueError("ETF selection is supported only by the security snapshot")
         requested_filter = (
             {_canonical_symbol(item) for item in symbols} if symbols is not None else None
         )
@@ -102,10 +106,16 @@ class BaoStockIndustryMembershipProvider:
                 raise ProviderContractError("BaoStock snapshot columns changed", FailureClass.SCHEMA_CHANGED, retryable=False)
 
         securities: dict[str, dict[str, str]] = {}
+        excluded_rows = []
         for row in listed_rows:
             raw_code = str(row.get("code", ""))
-            code = _a_share_code(raw_code)
+            code = _a_share_code(raw_code, include_transferred=self.endpoint == "security_snapshot")
+            asset_type = "stock"
+            if code is None and include_etf and _is_etf(raw_code, str(row.get("code_name", ""))):
+                code = raw_code.partition(".")[2]
+                asset_type = "etf"
             if code is None:
+                excluded_rows.append({**row, "exclusion_reason": "outside_selected_stock_etf_scope"})
                 continue
             symbol = _symbol(raw_code)
             if requested_filter is not None and symbol not in requested_filter:
@@ -118,6 +128,7 @@ class BaoStockIndustryMembershipProvider:
                 "stock_name": str(row.get("code_name", "")),
                 "status": "active" if str(row.get("tradeStatus", "")) == "1" else "suspended",
                 "exchange": "XSHG" if raw_code.lower().startswith("sh.") else "XSHE",
+                "asset_type": asset_type,
             }
 
         if requested_filter is not None:
@@ -131,7 +142,7 @@ class BaoStockIndustryMembershipProvider:
 
         industries: dict[str, Mapping[str, Any]] = {}
         for row in industry_rows:
-            code = _a_share_code(str(row.get("code", "")))
+            code = _a_share_code(str(row.get("code", "")), include_transferred=self.endpoint == "security_snapshot")
             if code:
                 industries[code] = row
 
@@ -155,6 +166,8 @@ class BaoStockIndustryMembershipProvider:
             if dataset == "industry_membership":
                 raw.update({key: value for key, value in industry.items() if key not in {"code", "code_name"}})
             raw.update(canonical_stock_code=code, exchange=security["exchange"], status=security["status"])
+            if dataset == "security_snapshot":
+                raw["asset_type"] = security["asset_type"]
             source_rows.append(raw)
             rows.append(
                 {
@@ -178,12 +191,16 @@ class BaoStockIndustryMembershipProvider:
             field_semantics=(
                 "stock_code", "stock_name", "exchange", "status", "industry_name",
                 "classification", "classification_update_date",
-            ) if dataset == "industry_membership" else ("stock_code", "stock_name", "exchange", "status"),
+            ) if dataset == "industry_membership" else ("stock_code", "stock_name", "exchange", "status", "asset_type"),
             source_rows=tuple(source_rows),
-            mapping_context={"trade_date": trade_date, "source": "baostock"},
+            mapping_context={"trade_date": trade_date, "source": "baostock",
+                "include_etf": include_etf, "original_list_row_count": len(listed_rows),
+                "classification_policy": "A-share stock ranges including SZ 302 for catalog; ETF trading ranges SH 51/52/53/55/56/58 and SZ 158/159, no ETF-name requirement; exclude LOF and feeder names",
+                "independent_universe_denominator": None},
             returned_first_key=str(rows[0]["stock_code"]) if rows else None,
             returned_last_key=str(rows[-1]["stock_code"]) if rows else None,
             missing_industry_symbols=tuple(missing_symbols),
+            excluded_rows=tuple(excluded_rows) if dataset == "security_snapshot" else (),
         )
 
 
@@ -245,7 +262,7 @@ def _archive_sdk_rows(
     scope = archive.scope(
         provider="baostock",
         endpoint=endpoint,
-        request_scope=f"trade_date={trade_date.isoformat()};exchange_scope=SH+SZ A shares" if trade_date else 'code_name=ST;exchange_scope=SH+SZ',
+        request_scope=f"trade_date={trade_date.isoformat()};exchange_scope=SH+SZ;source_unfiltered" if trade_date else 'code_name=ST;exchange_scope=SH+SZ',
         representation=representation,
     ) if hasattr(archive, "scope") else nullcontext()
     with scope:
@@ -262,15 +279,24 @@ def _archive_sdk_rows(
         )
 
 
-def _a_share_code(source_code: str) -> str | None:
+def _a_share_code(source_code: str, *, include_transferred: bool = False) -> str | None:
     prefix, dot, code = str(source_code).lower().partition(".")
     if not dot or len(code) != 6 or not code.isdigit():
         return None
     if (prefix == "sh" and code.startswith(("60", "68"))) or (
-        prefix == "sz" and code.startswith(("000", "001", "002", "003", "300", "301"))
+        prefix == "sz" and (code.startswith(("000", "001", "002", "003", "300", "301"))
+                            or (include_transferred and code.startswith("302")))
     ):
         return code
     return None
+
+
+def _is_etf(source_code: str, name: str) -> bool:
+    prefix, dot, code = str(source_code).lower().partition(".")
+    return bool(dot and len(code) == 6 and code.isdigit() and name.strip()
+                and "LOF" not in name.upper() and "联接" not in name
+                and ((prefix == "sh" and code.startswith(("51", "52", "53", "55", "56", "58"))) or
+                     (prefix == "sz" and code.startswith(("158", "159")))))
 
 
 def _symbol(source_code: str) -> str:
@@ -283,7 +309,11 @@ def _canonical_symbol(value: str) -> str:
     if len(text) == 6 and text.isdigit():
         if text.startswith(("60", "68")):
             text = "sh" + text
-        elif text.startswith(("000", "001", "002", "003", "300", "301")):
+        elif text.startswith(("000", "001", "002", "003", "300", "301", "302")):
+            text = "sz" + text
+        elif text.startswith("5"):
+            text = "sh" + text
+        elif text.startswith("15"):
             text = "sz" + text
     if len(text) != 8 or text[:2] not in {"sh", "sz"} or not text[2:].isdigit():
         raise ValueError(f"BaoStock CSRC industry membership requires an SH/SZ A-share symbol: {value}")

@@ -1,0 +1,22 @@
+{
+  "record_type": "original_vs_provider_source_comparison",
+  "verified_at_utc": "2026-10-07T17:04:00.834665+00:00",
+  "runtime_verification": "D:\\Project\\PythonProgram\\stock_data_manage\\data\\task_workspace\\_checks\\security-catalog\\verification.json",
+  "runtime_verification_sha256": "2f34b15a6372ca1b5dd009e5b1ffd40b63f810a4bbedd24d65cabd5279c4535f",
+  "source_provider_comparison": {
+    "request_count": 19,
+    "data_page_count": 18,
+    "all_urls_methods_statuses_body_hashes_and_request_body_hashes_equal": true,
+    "all_nonsecret_request_headers_equal": true,
+    "cookie_secret_unavailable_in_replay": true,
+    "native_session_cookie_proxy_timeout_fixture_passed": true
+  },
+  "transformation_code": {
+    "path": "src/providers/exchanges/security.py",
+    "sha256": "3415e681e8ad695b1fff0c3fafd9a429fe51ffabff33f40b6afb464ff9d95751"
+  },
+  "live_evidence": "original BSE catalog script fetched official responses; Provider replay and Session fixture validated",
+  "production_routing_eligibility": false,
+  "market_census_denominator": null,
+  "coverage_denominator": 348
+}

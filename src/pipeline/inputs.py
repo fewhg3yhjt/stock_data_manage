@@ -101,6 +101,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                   Path(__file__).parents[1] / "providers/tdx/minute.py",
                   Path(__file__).parents[1] / "providers/chinabond/yield_curve.py",
                   Path(__file__).parents[1] / "providers/exchanges/daily.py",
+                  Path(__file__).parents[1] / "providers/exchanges/security.py",
                   Path(__file__).parents[1] / "providers/sge/spot.py",
                   Path(__file__).parents[1] / "providers/mofcom/social_financing.py",
                   Path(__file__).parents[1] / "providers/chinamoney/rates.py",
@@ -195,6 +196,20 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
             fetched_at=now, attempt_id="started", relative_path="started.json")
     report["response_freshness_seconds"] = profile.refresh_interval_seconds or 86400
     is_baostock = input_id in {"SDA-BOARD-005", "SDA-BOARD-006", "ASTOCK-044"}
+    is_bse_catalog = input_id == "SECURITY-BSE-001"
+    if is_bse_catalog:
+        import requests
+        import urllib3
+        report["transport_dependency"] = {"requests": requests.__version__, "urllib3": urllib3.__version__}
+        code_version = hashlib.sha256((code_version + requests.__version__ + urllib3.__version__).encode()).hexdigest()
+        report["code_version"] = code_version
+        report["catalog_transport_policy"] = {"source_contract": "retained BSE official catalog probe",
+            "session": "reuse page session and cookies", "trust_env": False,
+            "proxy_reference": "STOCK_DATA_HTTP_PROXY; original local proxy default",
+            "headers": "original Mozilla/5.0, quotation-page Referer and JSON Accept",
+            "page_timeout_seconds": 20, "api_timeout_seconds": 30, "allow_redirects": False,
+            "http_adapter_retries": 0, "redirect_retry": "refresh page, then repeat same POST once",
+            "page_pause_seconds": 0.25, "request_body_matching": True, "source_fallback": False}
     is_actual_data = input_id in {'ASTOCK-014', 'ASTOCK-037-profile', 'ASTOCK-037-events', 'ASTOCK-087'}
     is_tencent_snapshot = input_id == "ASTOCK-001"
     is_em_history = input_id in {"ASTOCK-026", "ASTOCK-027", "ASTOCK-028"}
@@ -504,7 +519,8 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                     sdk_retry_policy=is_stock_pool or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_sdk or input_id in {"ASTOCK-001", "ASTOCK-045", "ASTOCK-070", "ASTOCK-026", "ASTOCK-027", "ASTOCK-028"},
                     probe_host_pause=is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_sdk,require_empty_post_body=input_id=="ASTOCK-061",response_validator=response_validator,
                     cache_ignored_query_parameters=("_",) if is_reportapi else (),
-                    native_transport='curl_cffi' if input_id=='ASTOCK-031' else 'pandas_urllib' if input_id=='ASTOCK-069' else None))
+                     native_transport='curl_cffi' if input_id=='ASTOCK-031' else 'pandas_urllib' if input_id=='ASTOCK-069' else None,
+                     match_request_body=is_bse_catalog))
             if is_source_sdk:
                 def retained_responses():
                     for event in response_events:
@@ -603,6 +619,14 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
             report["parsed_rows"] = {"path":relative_file(parsed_ref.path),
                 "sha256":parsed_ref.content_hash,"row_count":len(mapping_rows),"code_version":code_version,
                 "source_response_hashes":[event["body_sha256"] for event in response_events]}
+        if input_id == "SDA-BOARD-005":
+            excluded_ref = write_result(_json_value(fetched.excluded_rows), dataset="excluded_rows", provider=contract.provider,
+                endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="excluded-rows")
+            report["excluded_rows"] = {"path": relative_file(excluded_ref.path), "sha256": excluded_ref.content_hash,
+                "row_count": len(fetched.excluded_rows), "code_version": code_version,
+                "source_response_hashes": [event["body_sha256"] for event in response_events]}
+            report.update(source_metadata=_json_value(fetched.mapping_context), universe_completeness_verified=False,
+                asset_type_counts={kind: sum(row["asset_type"] == kind for row in source_rows) for kind in ("stock", "etf")})
         if is_factor:
             excluded_ref = write_result(_json_value(fetched.excluded_rows), dataset="excluded_rows", provider=contract.provider,
                 endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="excluded-rows")
@@ -659,7 +683,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                 live_sdk_calls=sum(event["mode"] == "live" for event in response_events),
                 sdk_query_count=len(response_events), source_sdk_row_counts={event["endpoint"]: event.get("metadata", {}).get("row_count")
                                                                         for event in response_events})
-            report["coverage_scope"] = "SH/SZ A-share codes filtered from this SDK response; not an independent market census"
+            report["coverage_scope"] = "SH/SZ selected stocks and optional ETFs from the SDK response; not an independent market census"
             if input_id == 'ASTOCK-044':
                 report.update(original_row_count=len(source_rows), selected_row_count=len(mapping_rows),
                     coverage_complete=True, coverage_basis='all rows selected by original active stock ST-name rule from returned SDK search',
@@ -679,8 +703,10 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
             raise NormalizationError("temporary empty input; not certified as a valid empty dataset")
         mapping_context = {"provider": contract.provider}
         mapping_context.update(getattr(fetched, "mapping_context", {}))
-        if is_baostock or input_id.startswith("SDA-BOARD-") or is_tencent_snapshot or is_em_history or is_stock_pool or is_em_events or is_lpr or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_extension or is_repo_rate or is_cb or is_sina_futures:
+        if is_bse_catalog or is_baostock or input_id.startswith("SDA-BOARD-") or is_tencent_snapshot or is_em_history or is_stock_pool or is_em_events or is_lpr or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_extension or is_repo_rate or is_cb or is_sina_futures:
             successful = [event for event in response_events if event.get("outcome") == "response" and (not (is_sdk_news or is_sdk_macro or is_market_events or is_reports_seats) or event["status_code"] == 200)]
+            if is_bse_catalog:
+                successful = [event for event in successful if event.get("method") == "POST" and event.get("status_code") == 200]
             if not successful:
                 raise NormalizationError("source response evidence is required; an SDK memory cache alone is insufficient")
             source_times = []
@@ -693,9 +719,22 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
             if any(stamp.tzinfo is None for stamp in source_times):
                 raise NormalizationError("source capture time must be timezone-aware")
             mapping_context["source_snapshot_at"] = max(source_times)
+            if is_bse_catalog:
+                from zoneinfo import ZoneInfo
+                capture_days = {stamp.astimezone(ZoneInfo("Asia/Shanghai")).date() for stamp in source_times}
+                if len(capture_days) != 1:
+                    raise NormalizationError("BSE catalog pages crossed capture days; retry a complete snapshot")
+                mapping_context["source_capture_date"] = capture_days.pop()
+                report.update(source_metadata=_json_value(fetched.mapping_context),
+                    source_total_count=fetched.mapping_context["source_total_count"],
+                    source_page_count=fetched.mapping_context["source_page_count"],
+                    pagination_completeness_verified=True, universe_completeness_verified=False,
+                    returned_window={"first": mapping_context["source_capture_date"].isoformat(),
+                                     "last": mapping_context["source_capture_date"].isoformat(),
+                                     "meaning": "catalog capture day; not a historical security query"})
             report["source_capture_window"] = {"first": min(source_times).isoformat(), "last": max(source_times).isoformat(),
                                                "meaning": "source response capture times; not row-level market timestamps"}
-            if not is_tencent_snapshot and not is_em_history and not is_stock_pool and not is_em_events and not is_lpr and not is_news and not is_reports_calendar and not is_sdk_news and not is_sdk_macro and not is_factor and not is_market_events and not is_reports_seats and not is_source_extension and not is_repo_rate and not is_cb and not is_sina_futures:
+            if not is_bse_catalog and not is_tencent_snapshot and not is_em_history and not is_stock_pool and not is_em_events and not is_lpr and not is_news and not is_reports_calendar and not is_sdk_news and not is_sdk_macro and not is_factor and not is_market_events and not is_reports_seats and not is_source_extension and not is_repo_rate and not is_cb and not is_sina_futures:
                 report["returned_window"] = {"first": fetched.returned_first_key, "last": fetched.returned_last_key}
                 report["source_units"] = list(fetched.units)
                 report["coverage_basis"] = "returned SDK rows; not an independently verified market universe"

@@ -1477,7 +1477,7 @@ THS_CASES = [
 BAO_ARCHIVE = ROOT / "provider_validation/results/live-probes/baostock-industry-20260930-20261003/_raw/baostock-industry/manifest.ndjson"
 BAO_EMPTY_ARCHIVE = ROOT / "provider_validation/results/live-probes/baostock-industry-20261003/_raw/baostock-industry/manifest.ndjson"
 BAO_CONTEXT = {"request": {"trade_date": "2026-09-30"}, "calendar": {"trading_dates": [date(2026, 9, 30)]}}
-BAO_CASES = [("SDA-BOARD-005", BAO_CONTEXT, BAO_ARCHIVE, 5223), ("SDA-BOARD-006", BAO_CONTEXT, BAO_ARCHIVE, 5221)]
+BAO_CASES = [("SDA-BOARD-005", BAO_CONTEXT, BAO_ARCHIVE, 5224), ("SDA-BOARD-006", BAO_CONTEXT, BAO_ARCHIVE, 5221)]
 QUOTE_ARCHIVE = ROOT / "provider_validation/results/live-probes/pilot-20261003-tencent-quote-network/_raw/missing-capabilities-20261003T173649/manifest.ndjson"
 QUOTE_CONTEXT = {"request": {"symbols": ["sh600519"], "as_of": "2026-09-30T15:10:00+08:00"}}
 EM_CONTEXT = {"request": {"symbol": "600519"}}
@@ -3442,7 +3442,7 @@ def test_bao_archived_inputs_preserve_sdk_rows_and_coverage(tmp_path, no_network
     import re
     report = collect_input(input_id=input_id, context=context, config_root=ROOT / "config", output_root=tmp_path, replay_manifest=manifest)
     assert report["status"] == "candidate_complete", report
-    assert report["row_count"] == count and report["coverage_denominator"] == 5223
+    assert report["row_count"] == count and report["coverage_denominator"] == (5224 if input_id == "SDA-BOARD-005" else 5223)
     assert report["production_writes"] == report["live_sdk_calls"] == report["live_http_calls"] == 0
     assert not report["eligible_for_production_routing"] and not report["sdk_dependency"]["live_sdk_executed"]
     assert report["sdk_query_count"] == 2
@@ -3462,9 +3462,9 @@ def test_bao_archived_inputs_preserve_sdk_rows_and_coverage(tmp_path, no_network
     assert len(source) == len(mapped) == count
     assert "code_name" in source[0] and "canonical_stock_code" in source[0]
     if input_id.endswith("005"):
-        pattern = re.compile(r"^(?:sh\.(?:60|68)\d{4}|sz\.(?:000|001|002|003|300|301)\d{3})$")
+        pattern = re.compile(r"^(?:sh\.(?:60|68)\d{4}|sz\.(?:000|001|002|003|300|301|302)\d{3})$")
         stocks = {row["code"]: row for row in payloads[0]["rows"] if pattern.fullmatch(row["code"])}
-        assert len(stocks) == 5223
+        assert len(stocks) == 5224
         assert report["coverage_complete"] and report["missing_symbols"] == []
         for row in mapped:
             code = ("sh." if row["exchange"] == "XSHG" else "sz.") + row["stock_code"]

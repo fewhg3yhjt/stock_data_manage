@@ -1,0 +1,11 @@
+{
+  "started_at_utc": "2026-10-07T15:56:07.913931+00:00",
+  "scope": "BSE official catalog source verification; no per-security quotes or memberships",
+  "original_script": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\tests\\verify_security_board_coverage.py",
+  "original_script_sha256": "91197d325261dcbe8a10854bfc6acac3b7797615a069057b2bb2586d6860d89e",
+  "previous_parsed_evidence": "D:\\Project\\PythonProgram\\stock_data_manage\\provider_validation\\results\\legacy\\2026-10-01-security-board-coverage.json",
+  "previous_raw_evidence_exists": false,
+  "reason": "legacy result explicitly states original responses were not retained",
+  "production_writes": 0,
+  "run_id": "security-catalog-bse-20261007"
+}

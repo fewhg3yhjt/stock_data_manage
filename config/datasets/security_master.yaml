@@ -12,4 +12,4 @@ fields:
   name: {type: string, required: false}
   list_date: {type: date, required: false}
   delist_date: {type: date, required: false}
-  status: {type: enum, values: [active, suspended, delisted, prelisted], required: true}
+  status: {type: enum, values: [active, suspended, delisted, prelisted, unknown], required: true}

@@ -373,3 +373,10 @@ provider_validation/results/formal-interface-spec-20261004/verify.py text eol=lf
 /src/pipeline/daily.py text eol=lf
 /src/service/instruments_update.py text eol=lf
 /docs/pipeline/examples/*.json text eol=lf
+
+# Security catalog source evidence must retain original bytes.
+/provider_validation/results/raw/security-catalog-bse-20261007/** -text whitespace=cr-at-eol
+/provider_validation/results/security-catalog-20261007/** -text whitespace=cr-at-eol
+/src/providers/exchanges/security.py text eol=lf
+/tests/test_security_catalog.py text eol=lf
+/docs/providers/security-catalog.md text eol=lf
