@@ -910,8 +910,8 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
     return {**report, "run_directory": str(directory.resolve()), "report_path": str(report_ref.path.resolve())}
 
 
-def collect_task(*, definition, config_root, data_root, redo="resume", symbols=(),
-                 mode="replay", collector=None, collector_options=None, failure_hook=None):
+def collect_task(*, definition, config_root, data_root=None, redo="resume", symbols=(),
+                 mode="live", collector=None, collector_options=None, failure_hook=None):
     """One durable source-to-publication task, using the existing input executor."""
     import json
     import re
@@ -923,6 +923,9 @@ def collect_task(*, definition, config_root, data_root, redo="resume", symbols=(
     paths = load_storage_paths(config_root, data_root=data_root)
     if redo not in {"full", "resume", "selected"} or mode not in {"replay", "live"}:
         raise ValueError("unsupported task execution mode")
+    validation_root = (Path(__file__).resolve().parents[2] / "provider_validation").resolve()
+    if paths["data_root"].is_relative_to(validation_root):
+        raise ValueError("business task data must be outside provider_validation; use configured data storage")
     production_root = load_storage_paths(config_root)["data_root"]
     if mode == "replay" and (paths["data_root"].is_relative_to(production_root) or production_root.is_relative_to(paths["data_root"])):
         raise ValueError("task replay publication requires an isolated --data-root")

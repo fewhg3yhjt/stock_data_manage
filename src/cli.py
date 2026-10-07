@@ -77,13 +77,13 @@ def main(argv: list[str] | None = None) -> int:
     collect.add_argument("--calendar-file", type=Path, help="explicit saved calendar rows for date-snapshot validation")
     collect.add_argument("--context-file", type=Path, help="JSON parameter namespaces; explicit CLI flags override matching values")
 
-    task = subcommands.add_parser("collect-task", help="execute a durable security-master or daily task in isolated storage")
+    task = subcommands.add_parser("collect-task", help="execute a durable security-master or daily task using configured storage")
     task.add_argument("--task-file", type=Path, required=True)
     task.add_argument("--config-root", type=Path, default=Path("config"))
-    task.add_argument("--data-root", type=Path, required=True)
+    task.add_argument("--data-root", type=Path, help="override configured data root; replay requires an isolated root outside provider_validation")
     task.add_argument("--redo", choices=("resume", "full", "selected"), default="resume")
     task.add_argument("--symbol", action="append", default=[])
-    task.add_argument("--mode", choices=("replay", "live"), default="replay")
+    task.add_argument("--mode", choices=("replay", "live"), default="live")
 
     due = subcommands.add_parser("collect-due-inputs", help="plan one scheduler tick, or explicitly execute candidate collection")
     due.add_argument("--config-root", type=Path, default=Path("config"))

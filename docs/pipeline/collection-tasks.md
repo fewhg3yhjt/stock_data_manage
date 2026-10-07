@@ -4,7 +4,7 @@
 
 接口响应先落入 `data/raw/_tmp`，来源解析、字段映射、检查与发布成功后，更新该来源范围的当前原始数据。任务支持全量重做、断点重做和指定证券重做。复用 `pipeline/inputs.py`、日线和证券主数据合并、现有元数据库、Parquet 发布及恢复模块，不增加服务、调度平台或 Provider 副本。
 
-本次先接通证券主数据与指定交易日的日线流程；管理页面、后台定时运行、全市场在线启用不在本次范围。现有验证专用来源的声明不是生产资格。离线回放必须使用隔离的 `--data-root`，不能发布到配置的生产目录。沪深股票、ETF 和北交所的完整来源覆盖需分别证明，来源缺失不得包装成全量完成。
+本次先接通证券主数据与指定交易日的日线流程；管理页面、后台定时运行、全市场在线启用不在本次范围。现有验证专用来源的声明不是生产资格。正式任务默认使用 `config/collection.yaml` 指定的 `data/`，默认模式为 `live`，在线来源资格检查仍在写入前阻断执行。离线回放必须显式使用 `--mode replay` 和隔离的 `--data-root`，不能发布到配置的生产目录。业务任务输出不能放入 `provider_validation/`。沪深股票、ETF 和北交所的完整来源覆盖需分别证明，来源缺失不得包装成全量完成。
 
 ## 原始数据与任务的边界
 
@@ -46,9 +46,9 @@
 
 ## 操作方式
 
-本轮完整离线回归754项通过，其中17项为新增任务流程测试（16项夹具/故障场景、1项真实历史证据回放）。名单5,223条、指定交易日日线1条的独立产物哈希核验通过，详细范围和索引见 [验收结论](../../provider_validation/results/task-raw-20261007/verification.json)。此结果验证流程实现，不授予来源在线生产资格。
+原任务流程实现及当时的离线回归记录保留在 Git 提交 `3adc785` 中。上一轮错放的任务演示结果已按要求删除，不将历史沪深股票样本作为全量证券结果。原始来源探针证据保留，后续验证仍可从这些证据回放；来源在线资格、ETF 与北交所覆盖需要后续阶段独立完成。
 
-命令仍在既有 `src/cli.py` 中。任务定义是本次执行参数，字段模板和来源映射仍来自 YAML；任务 JSON 不重复定义字段映射。来源输入执行仍生成候选报告，业务任务在隔离回放中检查并发布，不能通过这条入口绕过生产来源资格。
+命令仍在既有 `src/cli.py` 中。任务定义是本次执行参数，字段模板和来源映射仍来自 YAML；任务 JSON 不重复定义字段映射。来源输入执行仍生成候选报告，业务任务在隔离回放中检查并发布，不能通过这条入口绕过生产来源资格。正式执行可省略 `--data-root`；目前会返回在线资格阻断，待后续阶段接通，不能将此视为已经采集成功。
 
 日线可以显式给单证券单元，也可以从已发布名单自动展开。例如：
 
@@ -66,22 +66,36 @@
 
 此定义在首次执行时读取已发布名单；断点及全量重做保持冻结的证券范围。下一次新任务重新展开范围。ETF 使用 `universe: all_etf` 并必须配置适用 ETF 的实际输入接口。本轮没有通用条件分组、分钟任务或多交易日调度；这些属于后续扩展。历史上市日期缺失时只能使用当前名单中的证券，不能宣称历史证券覆盖完整。离线实际执行需要各单元能精确匹配的 `replay_manifest`，上例只是自动展开的参数形状。
 
-可运行的真实证据任务定义和结果见 [本次验收目录](../../provider_validation/results/task-raw-20261007/)：`master-task.json`、`daily-task.json`。名单任务特意声明仅沪深股票验证范围，不能代表全量证券。
+已有真实来源证据的离线参数示例见 [沪深股票名单回放](examples/security-master-replay.json) 和 [单股票日线回放](examples/daily-replay.json)。示例直接引用保留的原始来源探针，运行结果生成到下面指定的 `tmp/`，不回写探针目录。名单示例仅包含沪深股票，日线示例只包含 `sh600519` 的一个交易日，均不能代表全量证券。
 
 ```powershell
-# 首次执行或断点重做（默认 resume）
-python -m stock_data_manage.cli collect-task --task-file provider_validation/results/task-raw-20261007/daily-task.json --data-root provider_validation/results/task-raw-20261007/data-proof
+# 离线示例：首次执行或断点重做（默认 resume），显式声明回放模式
+python -m stock_data_manage.cli collect-task --task-file docs/pipeline/examples/daily-replay.json --mode replay --data-root tmp/collection-task-replay
 
 # 全量重新执行本任务单元
-python -m stock_data_manage.cli collect-task --task-file provider_validation/results/task-raw-20261007/daily-task.json --data-root provider_validation/results/task-raw-20261007/data-proof --redo full
+python -m stock_data_manage.cli collect-task --task-file docs/pipeline/examples/daily-replay.json --mode replay --data-root tmp/collection-task-replay --redo full
 
 # 只重新执行指定证券，其余正式记录保留
-python -m stock_data_manage.cli collect-task --task-file provider_validation/results/task-raw-20261007/daily-task.json --data-root provider_validation/results/task-raw-20261007/data-proof --redo selected --symbol sh600519
+python -m stock_data_manage.cli collect-task --task-file docs/pipeline/examples/daily-replay.json --mode replay --data-root tmp/collection-task-replay --redo selected --symbol sh600519
 
 # 发布中断后续接；无需再传源头请求
-python -m stock_data_manage.cli recover --data-root provider_validation/results/task-raw-20261007/data-proof
+python -m stock_data_manage.cli recover --data-root tmp/collection-task-replay
 ```
 
 正式记录按证券、日期、复权主键去重；全量重做替换本任务证券范围和复权口径，其他任务范围和复权数据保留。日线沿用 YAML 的最大缺失比例和数量；满足阈值的部分发布会保留缺失状态，不宣称全部采集成功。已发布任务再次断点执行直接校验后返回，其他任务已改写同一分区时要求新任务或明确重做，避免悄悄覆盖。
 
 当前在线发布被明确阻断，原因是现有输入来源全部仍为验证资格。已有请求和解析实现没有另建副本。完成来源资格核准后，需要将主流程接到既有能力路由和日历调度；本次不自动开启后台采集。
+
+## 分阶段校正
+
+每阶段完成后汇报，由用户确认再继续，不自动执行后续阶段。
+
+| 步骤 | 范围 | 当前状态 |
+|---|---|---|
+| 1 | 统一任务运行目录、删除上一轮错放产物、修正入口与文档、离线核验 | 已完成，等待用户确认第二阶段 |
+| 2 | 修改现有来源与字段配置，补齐 ETF 与北交所名单能力 | 待第一阶段确认 |
+| 3 | 按市场、资产类别检查覆盖，明确前次有效数据的回退日期与原因 | 待前一阶段确认 |
+| 4 | 接通现有路由资格检查与证券主数据定时更新 | 待前一阶段确认 |
+| 5 | 以发布名单验证股票与 ETF 日线，以及三种重做流程 | 待前一阶段确认 |
+
+第一阶段相关离线测试 66 项通过，包含目录边界、三种重做、提交恢复和既有真实来源证据回放。原始来源清单与响应哈希核验通过；两份参数示例除任务ID外与原示例一致。删除上一轮错放的 57 个文件；本机检查记录位于 `data/task_workspace/_checks/directory-layout/{regression.xml,verification.json}`，不生成正式名单或日线，不作为在线资格证据。

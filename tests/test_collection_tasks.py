@@ -84,6 +84,7 @@ class FaultCollector:
 
 
 def run(root, definition, collector, **options):
+    options.setdefault("mode", "replay")
     return collect_task(definition=definition, config_root=CONFIG, data_root=root,
                         collector=collector, **options)
 
@@ -234,9 +235,36 @@ def test_selected_scope_and_live_production_gate(tmp_path):
     with pytest.raises(ValueError, match="blocked"):
         run(tmp_path, daily_definition(), FaultCollector(), mode="live")
     with pytest.raises(ValueError, match="isolated"):
-        collect_task(definition=daily_definition(), config_root=CONFIG, data_root=ROOT / "data")
+        collect_task(definition=daily_definition(), config_root=CONFIG, data_root=ROOT / "data", mode="replay")
     with pytest.raises(ValueError, match="invalid task"):
         run(tmp_path, daily_definition(task_id="../raw"), FaultCollector())
+
+
+@pytest.mark.parametrize("mode", ["replay", "live"])
+@pytest.mark.parametrize("suffix", ["", "results/business-task/data"])
+def test_business_tasks_reject_provider_validation_output_before_execution(mode, suffix):
+    collector = FaultCollector()
+    with pytest.raises(ValueError, match="outside provider_validation"):
+        collect_task(definition=daily_definition(), config_root=CONFIG,
+                     data_root=ROOT / "provider_validation" / suffix, mode=mode, collector=collector)
+    assert collector.calls == []
+
+
+def test_task_defaults_use_configured_storage_and_keep_live_qualification_gate(monkeypatch):
+    from stock_data_manage.config.loader import load_storage_paths
+    paths_used = []
+
+    def resolve_paths(config_root, **kwargs):
+        paths = load_storage_paths(config_root, **kwargs)
+        paths_used.append(paths)
+        return paths
+
+    monkeypatch.setattr("stock_data_manage.pipeline.inputs.load_storage_paths", resolve_paths)
+    collector = FaultCollector()
+    with pytest.raises(ValueError, match="formal routing qualification"):
+        collect_task(definition=daily_definition(), config_root=CONFIG, collector=collector)
+    assert paths_used and all(paths["data_root"] == ROOT / "data" for paths in paths_used)
+    assert collector.calls == []
 
 
 def test_processing_retry_uses_saved_response_and_keeps_other_tasks_staging(tmp_path):
@@ -294,7 +322,7 @@ def test_real_archived_source_inputs_end_to_end(tmp_path):
     archive = ROOT / "provider_validation/results/live-probes/baostock-industry-20260930-20261003/_raw/baostock-industry/manifest.ndjson"
     definition = master_definition("real-master")
     definition["units"][0]["replay_manifest"] = str(archive)
-    result = collect_task(definition=definition, config_root=CONFIG, data_root=tmp_path)
+    result = collect_task(definition=definition, config_root=CONFIG, data_root=tmp_path, mode="replay")
     assert result["status"] == "published", result.get("error")
     assert result["row_count"] == 5223
     tencent = ROOT / "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson"
@@ -304,6 +332,6 @@ def test_real_archived_source_inputs_end_to_end(tmp_path):
                   "adjustment": "forward", "asset_type": "stock", "units": [{
         "key": "sh600519", "symbol": "sh600519", "input_id": "ASTOCK-002-daily", "replay_manifest": str(tencent),
         "context": {"request": {"symbol": "600519", "start_date": "2026-09-01", "end_date": day}}}]}
-    daily = collect_task(definition=definition, config_root=CONFIG, data_root=tmp_path)
+    daily = collect_task(definition=definition, config_root=CONFIG, data_root=tmp_path, mode="replay")
     assert daily["status"] == "published", daily.get("error")
     assert daily["row_count"] == 1

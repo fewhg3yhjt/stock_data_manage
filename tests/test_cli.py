@@ -1,6 +1,28 @@
 from stock_data_manage.cli import main
 
 
+def test_collect_task_defaults_to_configured_root_and_live_mode(tmp_path, monkeypatch, capsys):
+    import json
+    definition = {"task_id": "daily", "dataset": "daily_bar", "trade_date": "2026-09-30"}
+    saved = tmp_path / "task.json"
+    saved.write_text(json.dumps(definition), encoding="utf-8")
+    calls = []
+
+    def collector(**kwargs):
+        calls.append(kwargs)
+        return {"status": "published"}
+
+    monkeypatch.setattr("stock_data_manage.pipeline.inputs.collect_task", collector)
+    assert main(["collect-task", "--task-file", str(saved)]) == 0
+    assert calls[0]["data_root"] is None and calls[0]["mode"] == "live"
+    assert calls[0]["definition"] == definition
+    assert json.loads(capsys.readouterr().out)["status"] == "published"
+    assert main(["collect-task", "--task-file", str(saved), "--mode", "replay",
+                 "--data-root", str(tmp_path / "isolated"), "--redo", "selected", "--symbol", "sh600519"]) == 0
+    assert calls[1]["mode"] == "replay" and calls[1]["data_root"] == tmp_path / "isolated"
+    assert calls[1]["redo"] == "selected" and calls[1]["symbols"] == ["sh600519"]
+
+
 def test_collect_input_context_file_merges_explicit_flags_and_preserves_dependency(tmp_path, monkeypatch, capsys):
     import json
     from datetime import date

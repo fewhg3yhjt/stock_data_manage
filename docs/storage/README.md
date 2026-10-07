@@ -20,7 +20,9 @@ data/
 
 来源报告中的 `_tmp` 路径表示采集当时的位置，不随转正改写。最终原始位置由 DuckDB 任务单元的 `raw_manifest`（稳定证据）与 `current_raw`（当前结果）记录；任务输出 JSON 也包含这组关联。追溯已发布记录时从正式清单的 `raw_refs` 进入，按源响应哈希关联原始请求、来源报告和处理代码版本。
 
-正式运行产物统一由 [collection.yaml](../../config/collection.yaml) 的 `storage` 配置指定，默认根目录为 `data/`。配置读取代码位于 [现有配置模块](../../src/config/loader.py)，单项输入和周期采集共用 [现有采集流程](../../src/pipeline/inputs.py)。本次没有增加存储服务或独立配置系统。
+正式运行产物统一由 [collection.yaml](../../config/collection.yaml) 的 `storage` 配置指定，默认根目录为 `data/`。配置读取代码位于 [现有配置模块](../../src/config/loader.py)，单项输入和周期采集共用 [现有采集流程](../../src/pipeline/inputs.py)。本次没有增加存储服务或独立配置系统。`collect-task` 也默认使用同一配置，默认执行模式为 `live`；当前来源资格尚未核准，在线任务在写入前被阻断。显式 `--mode replay` 必须配合独立的 `--data-root`（示例使用 `tmp/collection-task-replay`），避免将历史回放数据当成正式数据。业务任务不允许将运行目录设置在 `provider_validation/` 内。
+
+上一轮错误放在 `provider_validation/results/task-raw-20261007/` 的任务演示、派生数据和报告已删除；本次没有将它们迁入正式目录或当作全量证券结果。来源原始探针及其他历史验证证据保留。任务参数示例归入正式流程文档的 `examples/`，只引用保留的来源档案。
 
 ## 目录及职责
 

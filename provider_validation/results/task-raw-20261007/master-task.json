@@ -1,7 +1,0 @@
-{
-  "task_id": "master-proof", "dataset": "security_master", "trade_date": "2026-09-30",
-  "required_exchanges": ["XSHG", "XSHE"], "required_asset_types": ["stock"],
-  "units": [{"key": "shenzhen-shanghai", "input_id": "SDA-BOARD-005",
-    "replay_manifest": "provider_validation/results/live-probes/baostock-industry-20260930-20261003/_raw/baostock-industry/manifest.ndjson",
-    "context": {"request": {"trade_date": "2026-09-30"}, "calendar": {"trading_dates": ["2026-09-30"]}}}]
-}

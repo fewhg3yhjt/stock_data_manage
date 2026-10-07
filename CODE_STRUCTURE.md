@@ -2,11 +2,9 @@
 
 本次原始暂存与重做继续修改既有模块：`pipeline/inputs.py` 的 `collect_task` 在 `collect_input` 上组织持久化单元、冻结证券范围、三种重做和提交收尾；`pipeline/daily.py` 检查来源候选并构建日线；`service/instruments_update.py` 复用证券主数据合并；`storage/metadata.py` 保存业务任务记录，`storage/raw.py` 处理 scoped 暂存、审计留证及当前响应转正，`storage/parquet.py` 增加目标范围替换和待提交读写保护；`worker/recovery.py` 续接提交，`cli.py` 增加既有命令的任务操作。没有新建运行时服务或任务管理模块。
 
-必要新增 `config/datasets/security_master.yaml` 定义发布名单字段，来源字段映射仍用原 `security_snapshot` YAML；`tests/test_collection_tasks.py` 覆盖三种重做、故障、范围冻结、来源证据回放及锁恢复。正式设计和使用说明位于 [任务流程](docs/pipeline/collection-tasks.md)，实际原始/派生证据、任务参数和验收结论位于 `provider_validation/results/task-raw-20261007/`。来源资格和后台调度本轮不启用。
+必要新增 `config/datasets/security_master.yaml` 定义发布名单字段，来源字段映射仍用原 `security_snapshot` YAML；`tests/test_collection_tasks.py` 覆盖三种重做、故障、范围冻结、来源证据回放及锁恢复。正式设计和使用说明位于 [任务流程](docs/pipeline/collection-tasks.md)，离线任务参数示例位于 `docs/pipeline/examples/{security-master-replay,daily-replay}.json`；示例只引用既有来源验证证据，不保存运行结果。业务运行产物统一使用 `config/collection.yaml` 配置的 `data/`，隔离回放产物放在显式指定的 `tmp/` 工作目录。业务任务入口拒绝将输出放入 `provider_validation/`。来源资格和后台调度尚未启用。
 
-`.gitattributes` 延续既有证据保存规则，禁止本轮原始响应、派生文件、元数据库和报告进行换行转换，避免 Git 检出破坏响应及产物哈希；新增字段模板、测试和正式说明保持 LF。
-
-`provider_validation/results/task-raw-20261007/verify.py` 仅独立核验已持久化的本轮证据与回归报告，生成 `verification.json`；不发起来源请求、不执行正式采集，与运行入口区分。
+`.gitattributes` 保留既有来源证据的字节保存规则；任务字段模板、测试、正式说明和参数示例保持 LF。上一轮错放的任务演示目录及专用核验脚本已按用户要求删除，原始来源探针档案保持原位。
 
 本次按用户确认的实际数据修正剩余输入：原 `providers/akshare/boards.py` 增加概念目录，原 `providers/baostock/industry.py` 增加ST名称筛选，原 `providers/eastmoney/financial.py` 增加明确日期全市场公司动态，原 `providers/eastmoney/news.py` 增加全市场发布日期公告目录。必要新增 `providers/cninfo/{__init__,profile}.py` 承接原巨潮公司概况SDK及字段顺序校验。现有 `baostock/session.py` 扩展单个已验证ST查询的SDK留证范围；`storage/raw.py` 脱敏动态Accept-Enckey，`transport.py` 保留脱敏归档的原哈希关联。五套必要字段模板与映射位于 `config/{datasets,normalization}/{concept_directory,company_profile,company_events,st_name_list,dated_announcements}.yaml`。原 `pipeline/inputs.py` 接入实际范围、日期和证据，原验证入口补 `--verify-actual-data`；`tests/test_input_collection.py` 承担原实现、17种错误和YAML行为验证。调查、限时探针、最终回放及审计见 `provider_validation/results/actual-data-*-20261004*`，说明见 `provider_validation/docs/2026-10-04-actual-data-input-collection.md`。当前64条候选，剩2条缺原HTML证据；不新增管理层或Provider内部回退。
 
