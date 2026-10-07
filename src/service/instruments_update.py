@@ -90,6 +90,17 @@ class SecurityMasterUpdater:
         return SecurityMasterUpdateResult(merged, errors, len(changes))
 
 
+def prepare_security_publication(source_rows, previous=()):
+    """Build from normalized source candidates with the existing identity and merge rules."""
+    parsed = {}
+    for source, rows in source_rows.items():
+        parsed[source] = [parse_security_row({
+            **row, "code": row.get("symbol", row.get("stock_code", row.get("code"))),
+            "name": row.get("name", row.get("stock_name")),
+        }, source=source) for row in rows]
+    return merge_security_sources(previous, parsed)
+
+
 def _as_date(value: Any) -> date | None:
     if value is None or value == "":
         return None

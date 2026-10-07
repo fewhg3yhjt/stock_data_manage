@@ -134,12 +134,15 @@ def write_normalized_rows(path: str | Path, rows: Iterable[Mapping], fields: Map
 
 
 class PartitionLock(AbstractContextManager["PartitionLock"]):
-    def __init__(self, path: Path) -> None:
+    def __init__(self, path: Path, *, recover_stale: bool = False) -> None:
         self.path = path
         self._acquired = False
+        self.recover_stale = recover_stale
 
     def __enter__(self) -> "PartitionLock":
         self.path.parent.mkdir(parents=True, exist_ok=True)
+        if self.recover_stale and self.path.exists():
+            self._clear_dead_owner()
         try:
             descriptor = os.open(self.path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
         except FileExistsError as exc:
@@ -150,6 +153,40 @@ class PartitionLock(AbstractContextManager["PartitionLock"]):
             os.fsync(stream.fileno())
         self._acquired = True
         return self
+
+    def _clear_dead_owner(self) -> None:
+        """Reclaim only a well-formed lock whose owning process is proven dead."""
+        import re
+        original = self.path.read_bytes()
+        matched = re.fullmatch(rb"pid=([1-9][0-9]*)\r?\n", original)
+        if not matched:
+            return
+        pid = int(matched[1])
+        if os.name == "nt":
+            import ctypes
+            kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+            kernel.OpenProcess.restype = ctypes.c_void_p
+            kernel.OpenProcess.argtypes = [ctypes.c_ulong, ctypes.c_int, ctypes.c_ulong]
+            kernel.CloseHandle.argtypes = [ctypes.c_void_p]
+            kernel.WaitForSingleObject.argtypes = [ctypes.c_void_p, ctypes.c_ulong]
+            handle = kernel.OpenProcess(0x00101000, False, pid)
+            if handle:
+                exited = kernel.WaitForSingleObject(handle, 0) == 0
+                kernel.CloseHandle(handle)
+                if not exited:
+                    return
+            elif ctypes.get_last_error() != 87:  # ERROR_INVALID_PARAMETER: no such process
+                return
+        else:
+            try:
+                os.kill(pid, 0)
+                return
+            except ProcessLookupError:
+                pass
+            except PermissionError:
+                return
+        if self.path.read_bytes() == original:
+            self.path.unlink()
 
     def __exit__(self, exc_type: object, exc: object, traceback: object) -> None:
         if self._acquired:
@@ -164,8 +201,10 @@ class CanonicalPartitionStore:
     def partition_directory(self, dataset: Dataset, asset_type: str, partition_key: str) -> Path:
         return self.root / dataset.value / f"asset_type={asset_type}" / f"trade_date={partition_key}"
 
-    def read(self, dataset: Dataset, asset_type: str, partition_key: str) -> list[BarRecord]:
+    def read(self, dataset: Dataset, asset_type: str, partition_key: str, *, allow_pending: bool = False) -> list[BarRecord]:
         partition = self.partition_directory(dataset, asset_type, partition_key)
+        if not allow_pending and (partition / "task-commit.json").exists():
+            raise InvalidPartitionError("task publication is pending raw finalization; recover the task first")
         path = partition / "data.parquet"
         manifest_path = partition / "manifest.json"
         if not path.exists() and not manifest_path.exists():
@@ -194,11 +233,23 @@ class CanonicalPartitionStore:
         item_statuses: Mapping[str, ItemStatus] | None = None,
         source_providers: Mapping[str, str | None] | None = None,
         failure_hook: Callable[[str], None] | None = None,
+        replace_instrument_ids: frozenset[str] | None = None,
+        replace_adjustment: Adjustment | None = None,
     ) -> PublishResult:
         partition = self.partition_directory(dataset, asset_type, partition_key)
         partition.mkdir(parents=True, exist_ok=True)
-        with PartitionLock(partition / ".publish.lock"):
-            existing = self.read(dataset, asset_type, partition_key)
+        marker = partition / "task-commit.json"
+        if marker.exists():
+            import json
+            if json.loads(marker.read_text(encoding="utf-8"))["task_id"] != run_id:
+                raise InvalidPartitionError("another task publication is pending")
+        with PartitionLock(partition / ".publish.lock", recover_stale=marker.exists()):
+            existing = self.read(dataset, asset_type, partition_key, allow_pending=True)
+            if replace_instrument_ids is not None:
+                if replace_adjustment is None:
+                    raise ValueError("scoped replacement requires an adjustment")
+                existing = [record for record in existing if not (
+                    record.instrument_id in replace_instrument_ids and record.adjustment is replace_adjustment)]
             merged, conflicts, quarantined = _merge(existing, list(new_records))
             invalid = [record for record in merged if not validate_bar(record).valid]
             if invalid:

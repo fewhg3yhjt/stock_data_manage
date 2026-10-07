@@ -52,6 +52,66 @@ class RawObjectStore:
     def __init__(self, root: str | Path) -> None:
         self.root = Path(root)
 
+    @staticmethod
+    def task_unit_path(raw_root: str | Path, task_id: str, unit_key: str) -> Path:
+        if not re.fullmatch(r"[A-Za-z0-9_-]{1,64}", task_id):
+            raise ValueError("invalid task ID")
+        key = hashlib.sha256(unit_key.encode("utf-8")).hexdigest()[:16]
+        return Path(raw_root).resolve() / "_tmp" / task_id / key
+
+    @staticmethod
+    def verify_manifest(manifest: str | Path) -> str:
+        path = Path(manifest)
+        events = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
+        if not events:
+            raise ValueError("empty raw manifest")
+        for event in events:
+            if event.get("body_storage"):
+                RawObjectStore.read_response(path, event)
+        return hashlib.sha256(path.read_bytes()).hexdigest()
+
+    @staticmethod
+    def preserve_directory(directory: str | Path, *, permitted_root: str | Path,
+                           archive_root: str | Path) -> Path | None:
+        """Remove a managed working directory from active use, retaining exact evidence."""
+        from uuid import uuid4
+        directory, permitted = Path(directory).resolve(), Path(permitted_root).resolve()
+        archive = Path(archive_root).resolve()
+        if directory == permitted or not directory.is_relative_to(permitted):
+            raise ValueError("cleanup path escapes its permitted scope")
+        if directory.is_relative_to(archive) or archive.is_relative_to(directory):
+            raise ValueError("evidence archive overlaps cleanup scope")
+        if not directory.exists():
+            return None
+        destination = archive / "_raw_audit" / uuid4().hex[:16]
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        os.rename(directory, destination)
+        return destination
+
+    @staticmethod
+    def promote_unit(*, temporary: str | Path, current: str | Path, raw_root: str | Path,
+                     archive_root: str | Path, expected_hash: str) -> None:
+        """Idempotent finalization; current data is a single managed source result."""
+        temporary, current, root = Path(temporary).resolve(), Path(current).resolve(), Path(raw_root).resolve()
+        if not temporary.is_relative_to(root / "_tmp") or temporary == root / "_tmp":
+            raise ValueError("raw promotion requires a scoped _tmp directory")
+        if not current.is_relative_to(root) or current == root or current.is_relative_to(root / "_tmp"):
+            raise ValueError("invalid current raw destination")
+        if not temporary.exists():
+            if RawObjectStore.verify_manifest(current / "manifest.ndjson") != expected_hash:
+                raise ValueError("completed raw promotion does not match commit")
+            return
+        if RawObjectStore.verify_manifest(temporary / "manifest.ndjson") != expected_hash:
+            raise ValueError("temporary raw data changed after validation")
+        current.parent.mkdir(parents=True, exist_ok=True)
+        from .parquet import PartitionLock
+        with PartitionLock(current.parent / ".raw.lock", recover_stale=True):
+            if current.exists():
+                if not (current / "_managed_task.json").is_file():
+                    raise ValueError("refusing to replace unmanaged existing raw data")
+                RawObjectStore.preserve_directory(current, permitted_root=root, archive_root=archive_root)
+            os.rename(temporary, current)
+
     def write_json(
         self,
         payload: Any,

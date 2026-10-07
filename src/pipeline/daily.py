@@ -47,6 +47,77 @@ class PublicationThresholdExceeded(ValueError):
     pass
 
 
+def prepare_daily_task_publication(state, units, source_rows, paths, config_root, trade_date):
+    """Resolve persisted normalized inputs before touching the existing canonical partition."""
+    import yaml
+    from decimal import Decimal
+    from ..domain import BarRecord
+    from ..quality.publication import PublicationPolicy
+    from ..quality.resolution import resolve_records
+
+    definition = state["definition"]
+    adjustment = Adjustment(definition.get("adjustment", "forward"))
+    asset_type = definition.get("asset_type", "stock")
+    AssetType(asset_type)
+    expected = {}
+    for unit in units:
+        symbol = unit["symbol"]
+        if not symbol.startswith(("sh", "sz", "bj")) or not symbol[2:].isdigit():
+            raise ValueError("daily task requires an exchange-qualified security symbol")
+        exchange = {"sh": "XSHG", "sz": "XSHE", "bj": "BSE"}[symbol[:2]]
+        expected[symbol] = exchange + ":" + symbol[2:]
+    selected = set(state.get("selected_symbols", ()))
+    target_ids = {expected[symbol] for symbol in selected} if state["redo"] == "selected" else set(expected.values())
+    records = {}
+    for key, source in source_rows.items():
+        if selected and source["symbol"] not in selected:
+            continue
+        contract, report = source["contract"], source["entry"]["report"]
+        for row in source["rows"]:
+            if row["trade_date"] != trade_date or row["adjustment"] != adjustment.value:
+                raise ValueError("normalized input date or adjustment differs from task scope")
+            if row["instrument_id"] != expected[source["symbol"]]:
+                raise ValueError("normalized input security differs from requested security")
+            record = BarRecord(dataset=Dataset.DAILY_BAR, instrument_id=row["instrument_id"],
+                source_symbol=source["symbol"], trade_date=trade_date, adjustment=adjustment,
+                open=row["open"], high=row["high"], low=row["low"], close=row["close"],
+                volume=row.get("volume"), amount=row.get("amount"), source_provider=contract.provider,
+                endpoint=contract.endpoint, source_method="daily_history", quality_status=QualityStatus.FINAL,
+                field_level="full_bar" if row.get("amount") is not None else "ohlcv" if row.get("volume") is not None else "ohlc",
+                capability_priority=0, capability_version=report.get("adapter_version", "unknown"),
+                normalizer_version=report.get("normalization_version", "unknown"),
+                raw_object_path=source["raw_ref"], fetch_time=datetime.fromisoformat(report["validation_time_utc"]))
+            if not validate_bar(record).valid:
+                raise ValueError("normalized daily candidate failed business validity")
+            records.setdefault(record.key, []).append(record)
+    accepted = []
+    for candidates in records.values():
+        resolved = resolve_records(candidates)
+        if resolved.quarantined:
+            raise ValueError("new daily candidates have a hard source conflict")
+        accepted.append(resolved.selected)
+    store = CanonicalPartitionStore(paths["canonical_root"])
+    existing = store.read(Dataset.DAILY_BAR, asset_type, trade_date.isoformat())
+    available = {record.instrument_id for record in accepted}
+    if state["redo"] != "full":
+        available.update(record.instrument_id for record in existing if record.adjustment is adjustment
+                         and record.instrument_id not in target_ids and record.quality_status is QualityStatus.FINAL)
+    # A resumed incomplete task has no prior published candidate: its successful
+    # source units are in accepted. Explicit selected redo can preserve other keys.
+    statuses = {instrument_id: ItemStatus.SUCCESS.value if instrument_id in available else ItemStatus.MISSING.value
+                for instrument_id in expected.values()}
+    settings = yaml.safe_load((Path(config_root) / "datasets/daily_bar.yaml").read_text(encoding="utf-8"))["dataset"]["publication"]
+    policy = PublicationPolicy(Decimal(str(settings["max_missing_ratio"])), settings["max_missing_count"])
+    if not policy.allows(expected_count=len(expected), actual_count=len(available & set(expected.values()))):
+        raise PublicationThresholdExceeded("daily task coverage rejected; missing=" + ",".join(
+            sorted(set(expected.values()) - available)))
+    outside = [record for record in existing if record.adjustment is not adjustment or record.instrument_id not in expected.values()]
+    return {"records": accepted, "partition_directory": str(store.partition_directory(Dataset.DAILY_BAR, asset_type, trade_date.isoformat())),
+            "asset_type": asset_type, "partition_key": trade_date.isoformat(), "adjustment": adjustment.value,
+            "expected_count": len(expected) + len(outside), "item_statuses": statuses,
+            "replace_ids": sorted(target_ids)}
+
+
 class DailyCollectionService:
     """Small end-to-end daily collection path used by schedulers and replay tests."""
 

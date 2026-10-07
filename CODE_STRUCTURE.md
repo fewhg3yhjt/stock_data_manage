@@ -1,5 +1,13 @@
 # 代码目录与文件职责
 
+本次原始暂存与重做继续修改既有模块：`pipeline/inputs.py` 的 `collect_task` 在 `collect_input` 上组织持久化单元、冻结证券范围、三种重做和提交收尾；`pipeline/daily.py` 检查来源候选并构建日线；`service/instruments_update.py` 复用证券主数据合并；`storage/metadata.py` 保存业务任务记录，`storage/raw.py` 处理 scoped 暂存、审计留证及当前响应转正，`storage/parquet.py` 增加目标范围替换和待提交读写保护；`worker/recovery.py` 续接提交，`cli.py` 增加既有命令的任务操作。没有新建运行时服务或任务管理模块。
+
+必要新增 `config/datasets/security_master.yaml` 定义发布名单字段，来源字段映射仍用原 `security_snapshot` YAML；`tests/test_collection_tasks.py` 覆盖三种重做、故障、范围冻结、来源证据回放及锁恢复。正式设计和使用说明位于 [任务流程](docs/pipeline/collection-tasks.md)，实际原始/派生证据、任务参数和验收结论位于 `provider_validation/results/task-raw-20261007/`。来源资格和后台调度本轮不启用。
+
+`.gitattributes` 延续既有证据保存规则，禁止本轮原始响应、派生文件、元数据库和报告进行换行转换，避免 Git 检出破坏响应及产物哈希；新增字段模板、测试和正式说明保持 LF。
+
+`provider_validation/results/task-raw-20261007/verify.py` 仅独立核验已持久化的本轮证据与回归报告，生成 `verification.json`；不发起来源请求、不执行正式采集，与运行入口区分。
+
 本次按用户确认的实际数据修正剩余输入：原 `providers/akshare/boards.py` 增加概念目录，原 `providers/baostock/industry.py` 增加ST名称筛选，原 `providers/eastmoney/financial.py` 增加明确日期全市场公司动态，原 `providers/eastmoney/news.py` 增加全市场发布日期公告目录。必要新增 `providers/cninfo/{__init__,profile}.py` 承接原巨潮公司概况SDK及字段顺序校验。现有 `baostock/session.py` 扩展单个已验证ST查询的SDK留证范围；`storage/raw.py` 脱敏动态Accept-Enckey，`transport.py` 保留脱敏归档的原哈希关联。五套必要字段模板与映射位于 `config/{datasets,normalization}/{concept_directory,company_profile,company_events,st_name_list,dated_announcements}.yaml`。原 `pipeline/inputs.py` 接入实际范围、日期和证据，原验证入口补 `--verify-actual-data`；`tests/test_input_collection.py` 承担原实现、17种错误和YAML行为验证。调查、限时探针、最终回放及审计见 `provider_validation/results/actual-data-*-20261004*`，说明见 `provider_validation/docs/2026-10-04-actual-data-input-collection.md`。当前64条候选，剩2条缺原HTML证据；不新增管理层或Provider内部回退。
 
 本轮16项剩余接口已接通并回归：必要新增 `providers/csindex/{__init__,indices}.py` 对应中证成分/权重原工作簿，`providers/sse/{__init__,market}.py` 对应上交所明确日期风险指标和SH ETF份额，`providers/sina/financial.py` 对应新浪原三张宽报表；新浪龙虎榜修改原 `sina/news.py`。原 `tdx/minute.py`、`tencent/snapshot.py` 增加盘后包/分笔方法，原 `eastmoney/financial.py` 增加22类型异动明细。必要新增 `providers/chinabond/yield_curve.py`、`exchanges/daily.py`、`sge/spot.py` 及包初始化文件对应原中债/交易所/上金所独立来源。原 `contracts.py` 和 `transport.py` 承接原脚本共用的数值/日期/出表与请求函数，保留原行为；不创建管理层或另一个配置体系。新增16组必要 `datasets` 与同名 `normalization` 的字段模板。三表数值单位未认证、来源全部字段和报告日/公告文本分别留证；异动只有来源时钟，禁止推断交易日。原脚本函数迁移的语法树与来源哈希在 `results/remaining-original-20261004/migration-provenance.json`；修改前清单及逐项调查在同目录，原验证入口扩展 `--verify-remaining`，原方法语法树/请求/字段/映射和14项异常检查保留；完整回归617项通过。另新增必要 `providers/eastmoney/news.py` 承接原关键词新闻SDK，原中证Provider同时承接估值工作簿；既有请求留证范围扩展可选原curl_cffi与pandas/urllib捕获。说明见 `provider_validation/docs/2026-10-04-remaining-input-collection.md`，当前59项候选、5项待转换、7项原阻断、3项别名；待转换实际原因及所需确认见同目录 `2026-10-04-remaining-input-decisions.md`。

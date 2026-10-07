@@ -1,0 +1,15 @@
+dataset:
+  name: security_master
+  display_name: 证券主数据
+  primary_key: [instrument_id]
+  publication:
+    mode: atomic_replace
+fields:
+  instrument_id: {type: string, required: true}
+  symbol: {type: string, required: true}
+  exchange: {type: enum, values: [XSHG, XSHE, BSE], required: true}
+  asset_type: {type: enum, values: [stock, etf, lof, index], required: true}
+  name: {type: string, required: false}
+  list_date: {type: date, required: false}
+  delist_date: {type: date, required: false}
+  status: {type: enum, values: [active, suspended, delisted, prelisted], required: true}

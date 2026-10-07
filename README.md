@@ -9,6 +9,7 @@
 - [测试设计与验收基线](stock-data-test-design-acceptance-baseline.md)
 - [Provider 能力验证矩阵](PROVIDER_CAPABILITY_MATRIX.md)
 - [代码目录与文件职责](CODE_STRUCTURE.md)
+- [原始暂存、任务重做与发布](docs/pipeline/collection-tasks.md)
 - [Provider 能力验证与归一化设计](provider-capability-verification-and-normalization.md)
 - [EastMoney 数据域覆盖设计](eastmoney-data-domain-coverage.md)
 - [项目开发进度](PROJECT_PROGRESS.md)
@@ -46,7 +47,7 @@
 
 正式代码直接放在 `src/` 下，模块按职责分目录，不再套一层项目同名目录。Python 导入名仍为 `stock_data_manage`，由 `pyproject.toml` 将该包映射到 `src/`；`stock_data_manage.providers` 对应 `src/providers/`。根目录 `config/` 保存 YAML，`src/config/` 保存读取和校验配置的代码。
 
-来源可行性证据位于 `provider_validation/results/`。通用输入入口 `collect-input` 默认将原响应保存到 `data/raw/`，来源解析和标准化结果保存到 `data/task_workspace/`，元数据库保存到 `data/metadata/metadata.duckdb`。当前64项输入仍为候选数据，尚未接通最终发布；只有正式发布任务才允许归档。显式 `--output-root` 保留隔离验证布局，详见 [存储与归档说明](docs/storage/README.md)。历史报告中的旧源码路径表示报告生成时的位置，原始证据和哈希不因目录调整而改写。
+来源可行性证据位于 `provider_validation/results/`。通用输入入口 `collect-input` 默认将原响应保存到 `data/raw/`，来源解析和标准化结果保存到 `data/task_workspace/`，元数据库保存到 `data/metadata/metadata.duckdb`。64项输入仍为候选数据；新增 `collect-task` 先对证券主数据和单交易日日线接通 `raw/_tmp`、检查、重做及发布收尾，当前仅允许在隔离目录回放，尚未在线启用。详见 [任务流程](docs/pipeline/collection-tasks.md) 和 [存储与归档说明](docs/storage/README.md)。显式 `--output-root` 保留隔离验证布局；历史报告中的旧路径及哈希不改写。
 
 ## 当前开发状态
 

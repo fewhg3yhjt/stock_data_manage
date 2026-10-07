@@ -82,6 +82,14 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
                 raw_content_hash VARCHAR,
                 updated_at TIMESTAMPTZ NOT NULL
             );
+            CREATE TABLE IF NOT EXISTS collection_task (
+                task_id VARCHAR PRIMARY KEY,
+                definition_hash VARCHAR NOT NULL,
+                dataset VARCHAR NOT NULL,
+                status VARCHAR NOT NULL,
+                state_json VARCHAR NOT NULL,
+                updated_at TIMESTAMPTZ NOT NULL
+            );
             CREATE TABLE IF NOT EXISTS conflict_log (
                 conflict_id VARCHAR PRIMARY KEY,
                 dataset VARCHAR NOT NULL,
@@ -190,6 +198,36 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
             "ALTER TABLE capability_registry ADD COLUMN IF NOT EXISTS adjustment VARCHAR DEFAULT 'none'",
         ):
             self.connection.execute(statement)
+
+    def save_collection_task(self, state: dict) -> None:
+        """Durable business progress in the existing database, not a second queue."""
+        from .raw import sanitized_metadata
+        if state["status"] not in {"collecting", "checking", "committing", "failed", "published"}:
+            raise ValueError("invalid collection task status")
+        previous = self.load_collection_task(state["task_id"])
+        if previous and previous["definition_hash"] != state["definition_hash"]:
+            raise ValueError("task definition is immutable; use a new task ID")
+        self.connection.execute(
+            """INSERT INTO collection_task VALUES (?, ?, ?, ?, ?, ?)
+               ON CONFLICT(task_id) DO UPDATE SET status=excluded.status,
+                   state_json=excluded.state_json, updated_at=excluded.updated_at""",
+            [state["task_id"], state["definition_hash"], state["dataset"], state["status"],
+             json.dumps(sanitized_metadata(state), ensure_ascii=False, default=str),
+             datetime.now(timezone.utc)],
+        )
+
+    def load_collection_task(self, task_id: str) -> dict | None:
+        row = self.connection.execute(
+            "SELECT state_json FROM collection_task WHERE task_id=?", [task_id]
+        ).fetchone()
+        return json.loads(row[0]) if row else None
+
+    def collection_tasks(self, *, status: str | None = None) -> tuple[dict, ...]:
+        rows = self.connection.execute(
+            "SELECT state_json FROM collection_task" + (" WHERE status=?" if status else "")
+            + " ORDER BY task_id", [status] if status else [],
+        ).fetchall()
+        return tuple(json.loads(row[0]) for row in rows)
 
     def save_dividend_events(self, events: list[DividendEvent]) -> int:
         for event in events:

@@ -1,0 +1,14 @@
+[
+  {
+    "path": "src/pipeline/daily.py",
+    "before_sha256": "89ba42f0804f9fe0a25690f445655550f853f1ffa375d5a3de09f8caa1f6ffdd",
+    "after_sha256": "1315f6dce0145fc26a45458a876c112e25ff2e60b24fc275f1f980db4c9c254b",
+    "syntax_tree_unchanged": true
+  },
+  {
+    "path": "src/service/instruments_update.py",
+    "before_sha256": "722b76a90a16f7a6b92fdfd4cf46c4013e45541cf6aabe2967aca819efaa66f7",
+    "after_sha256": "2355e871104bdaee26c84706609bddc020b2a26adc1c0a8f6dc5ebe09099b010",
+    "syntax_tree_unchanged": true
+  }
+]

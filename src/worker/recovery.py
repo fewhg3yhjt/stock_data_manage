@@ -74,7 +74,7 @@ class RecoveryScanner:
         return sorted(
             path
             for path in self.canonical_root.rglob(pattern)
-            if self.quarantine_root not in path.parents
+            if self.quarantine_root not in path.parents and not (path.parent / "task-commit.json").exists()
         )
 
     def _quarantine(self, *paths: Path) -> int:
@@ -90,6 +90,28 @@ class RecoveryScanner:
             shutil.move(str(path), str(destination))
             moved += 1
         return moved
+
+
+def recover_collection_tasks(*, config_root, data_root=None) -> tuple[str, ...]:
+    """Finish durable task commits before the legacy partition scanner is run."""
+    from ..config.loader import load_storage_paths
+    from ..pipeline.inputs import _finish_task_commit
+    from ..storage.integrity import row_hash
+    from ..storage.parquet import PartitionLock
+    paths = load_storage_paths(config_root, data_root=data_root)
+    completed = []
+    with MetadataStore(paths["metadata_path"]) as metadata:
+        for state in metadata.collection_tasks():
+            marker = Path(state.get("published_manifest", "missing")).parent / "task-commit.json"
+            if state["status"] != "committing" and not (state["status"] == "published" and marker.exists()):
+                continue
+            definition = state["definition"]
+            scope = row_hash([state["dataset"], "current" if state["dataset"] == "security_master" else definition["trade_date"],
+                             "security" if state["dataset"] == "security_master" else definition.get("asset_type", "stock")])[:16]
+            with PartitionLock(paths["workspace_root"] / "_locks" / (scope + ".lock"), recover_stale=True):
+                _finish_task_commit(state, paths, metadata)
+            completed.append(state["task_id"])
+    return tuple(completed)
 
 
 def archive_published_task(task_directory: str | Path, *, workspace_root: str | Path,

@@ -77,6 +77,14 @@ def main(argv: list[str] | None = None) -> int:
     collect.add_argument("--calendar-file", type=Path, help="explicit saved calendar rows for date-snapshot validation")
     collect.add_argument("--context-file", type=Path, help="JSON parameter namespaces; explicit CLI flags override matching values")
 
+    task = subcommands.add_parser("collect-task", help="execute a durable security-master or daily task in isolated storage")
+    task.add_argument("--task-file", type=Path, required=True)
+    task.add_argument("--config-root", type=Path, default=Path("config"))
+    task.add_argument("--data-root", type=Path, required=True)
+    task.add_argument("--redo", choices=("resume", "full", "selected"), default="resume")
+    task.add_argument("--symbol", action="append", default=[])
+    task.add_argument("--mode", choices=("replay", "live"), default="replay")
+
     due = subcommands.add_parser("collect-due-inputs", help="plan one scheduler tick, or explicitly execute candidate collection")
     due.add_argument("--config-root", type=Path, default=Path("config"))
     due.add_argument("--output-root", type=Path, help="explicit isolated validation output; historical evidence layout")
@@ -91,6 +99,16 @@ def main(argv: list[str] | None = None) -> int:
     due.add_argument("--evidence-root", type=Path)
 
     args = parser.parse_args(argv)
+    if args.command == "collect-task":
+        from .pipeline.inputs import collect_task
+        try:
+            definition = json.loads(args.task_file.read_text(encoding="utf-8"))
+            report = collect_task(definition=definition, config_root=args.config_root, data_root=args.data_root,
+                                  redo=args.redo, symbols=args.symbol, mode=args.mode)
+        except (ValueError, KeyError, TypeError, OSError) as exc:
+            parser.error(str(exc))
+        print(json.dumps(report, ensure_ascii=False, default=_json_default, indent=2))
+        return 0 if report["status"] == "published" else 2
     if args.command == "collect-due-inputs":
         from .pipeline.inputs import collect_due_inputs
         from .service.instruments import SecurityRecord
@@ -224,12 +242,14 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     from .config.loader import load_storage_paths
-    from .worker.recovery import archive_published_task
+    from .worker.recovery import archive_published_task, recover_collection_tasks
     # Preserve the existing explicit recovery contract outside a project checkout.
     paths = load_storage_paths(args.config_root, data_root=args.data_root) if (
         not args.canonical_root or not args.metadata or args.archive_task or args.data_root) else None
     canonical_root = args.canonical_root or paths["canonical_root"]
     try:
+        recovered_tasks = recover_collection_tasks(config_root=args.config_root, data_root=args.data_root) if (
+            paths and not args.metadata and not args.canonical_root) else ()
         with MetadataStore(args.metadata or paths["metadata_path"]) as metadata:
             report = RecoveryScanner(canonical_root, metadata).recover()
             archived = [str(archive_published_task(task, workspace_root=paths["workspace_root"],
@@ -238,6 +258,8 @@ def main(argv: list[str] | None = None) -> int:
     except ValueError as exc:
         parser.error(str(exc))
     output = asdict(report)
+    if recovered_tasks:
+        output["recovered_tasks"] = recovered_tasks
     if args.archive_task:
         output["archived_tasks"] = archived
     print(json.dumps(output, ensure_ascii=False, default=_json_default, indent=2))

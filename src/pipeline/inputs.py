@@ -46,7 +46,7 @@ def _validate_candidate_root(config_root, output_root):
 
 
 def collect_input(*, input_id, context, config_root, output_root=None, data_root=None, mode="replay", replay_manifest=None,
-                  evidence_root=None, fields=None, client=None, pacer=None):
+                  evidence_root=None, fields=None, client=None, pacer=None, task_unit=None, force_fetch=False):
     """One explicit input, candidate output only. Existing Bar publication flows are unchanged."""
     import json
     import re
@@ -54,6 +54,8 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
     if output_root is not None and data_root is not None:
         raise ValueError("output_root and data_root are mutually exclusive")
     runtime = output_root is None
+    if task_unit is not None and not runtime:
+        raise ValueError("task collection requires runtime storage layout")
     paths = load_storage_paths(config_root, data_root=data_root) if runtime else None
     output_root = paths["raw_root"] if runtime else Path(output_root)
     if mode not in {"live", "replay"} or (mode == "replay" and replay_manifest is None):
@@ -128,12 +130,22 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
             raise ValueError("unsafe input storage path component")
         directory = paths["workspace_root"] / contract.dataset / scope_key / task_id
         raw_directory = paths["raw_root"] / contract.provider / contract.endpoint / datetime.now(timezone.utc).date().isoformat() / run_id
+        if task_unit is not None:
+            raw_directory = RawObjectStore.task_unit_path(paths["raw_root"], *task_unit)
+            if raw_directory.exists():
+                raise ValueError("task unit raw directory must be prepared before collection")
         source_directory = Path("sources") / contract.provider / input_id
     else:
         directory = output_root / task_id
         raw_directory = directory / "_raw"
     directory.mkdir(parents=True, exist_ok=False)
     raw_store, result_store = RawObjectStore(raw_directory), RawObjectStore(directory)
+    if task_unit is not None:
+        if not runtime:
+            raise ValueError("task collection requires runtime storage layout")
+        raw_store.write_json({"task_id": task_unit[0], "unit_key": task_unit[1]}, dataset="task",
+            provider=contract.provider, endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc),
+            attempt_id="owner", relative_path="_managed_task.json")
 
     def relative_file(path):
         return Path(os.path.relpath(path, directory)).as_posix()
@@ -464,7 +476,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                     replay_manifest=replay_manifest, evidence_roots=(evidence_root, output_root),
                     scope={"input_id": input_id, "parameters": normalized_context}, code_version=code_version,
                     trade_date=parameters.get("trade_date"), pacer=pacer, interval_seconds=max(3, contract.request_interval_seconds),
-                    max_age_seconds=profile.refresh_interval_seconds or 86400, client=client,
+                    max_age_seconds=0 if force_fetch else profile.refresh_interval_seconds or 86400, client=client,
                     query_requests={'query_stock_basic': {'code_name': 'ST'}} if input_id == 'ASTOCK-044' else None))
                 provider.client = sdk_client
                 runtime_parameters["raw_archive"] = sdk_archive
@@ -488,7 +500,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                 response_events = stack.enter_context(captured_requests(raw_store, provider=contract.provider, endpoint=contract.endpoint,
                     scope={"input_id": input_id, "parameters": normalized_context}, code_version=code_version, pacer=pacer,
                     replay_manifest=replay_manifest if mode == "replay" else None,
-                    evidence_roots=(evidence_root, output_root), max_age_seconds=profile.refresh_interval_seconds or 86400,
+                    evidence_roots=(evidence_root, output_root), max_age_seconds=0 if force_fetch else profile.refresh_interval_seconds or 86400,
                     sdk_retry_policy=is_stock_pool or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_sdk or input_id in {"ASTOCK-001", "ASTOCK-045", "ASTOCK-070", "ASTOCK-026", "ASTOCK-027", "ASTOCK-028"},
                     probe_host_pause=is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_sdk,require_empty_post_body=input_id=="ASTOCK-061",response_validator=response_validator,
                     cache_ignored_query_parameters=("_",) if is_reportapi else (),
@@ -896,6 +908,424 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
         finally:
             metadata.close()
     return {**report, "run_directory": str(directory.resolve()), "report_path": str(report_ref.path.resolve())}
+
+
+def collect_task(*, definition, config_root, data_root, redo="resume", symbols=(),
+                 mode="replay", collector=None, collector_options=None, failure_hook=None):
+    """One durable source-to-publication task, using the existing input executor."""
+    import json
+    import re
+    from ..storage.integrity import file_hash, row_hash
+    from ..storage.metadata import MetadataStore
+    from ..storage.parquet import PartitionLock
+
+    config_root = Path(config_root).resolve()
+    paths = load_storage_paths(config_root, data_root=data_root)
+    if redo not in {"full", "resume", "selected"} or mode not in {"replay", "live"}:
+        raise ValueError("unsupported task execution mode")
+    production_root = load_storage_paths(config_root)["data_root"]
+    if mode == "replay" and (paths["data_root"].is_relative_to(production_root) or production_root.is_relative_to(paths["data_root"])):
+        raise ValueError("task replay publication requires an isolated --data-root")
+    task_id = definition["task_id"]
+    if not re.fullmatch(r"[A-Za-z0-9_-]{1,64}", task_id):
+        raise ValueError("invalid task ID")
+    dataset = definition["dataset"]
+    if dataset not in {"security_master", "daily_bar"}:
+        raise ValueError("only security_master and daily_bar tasks are supported")
+    day = datetime.strptime(definition["trade_date"], "%Y-%m-%d").date()
+    contracts = {item.input_id: item for item in load_input_capabilities(config_root / "providers.yaml")}
+    units = _task_units(definition, paths)
+    if not units or len({unit["key"] for unit in units}) != len(units):
+        raise ValueError("task requires nonempty, unique source units")
+    for unit in units:
+        calendar = unit["context"].get("calendar", {})
+        if "trading_dates" in calendar:
+            calendar["trading_dates"] = [datetime.strptime(value, "%Y-%m-%d").date() if isinstance(value, str) else value
+                                         for value in calendar["trading_dates"]]
+        contract = contracts[unit["input_id"]]
+        if contract.dataset != ("security_snapshot" if dataset == "security_master" else "daily_bar"):
+            raise ValueError("input dataset does not match business task")
+        contract.bind_parameters(unit["context"])
+        if dataset == "daily_bar":
+            if contract.request_shape != "single_symbol" or not unit.get("symbol"):
+                raise ValueError("daily tasks require one explicit security per unit")
+            request = unit["context"]["request"]
+            if not (str(request.get("start_date")) <= day.isoformat() <= str(request.get("end_date"))):
+                raise ValueError("daily source window must contain the task trading date")
+        if mode == "live":
+            # Current source inputs are validation-only. Do not bypass qualification
+            # by calling the new publication path instead of the existing router.
+            raise ValueError("live task publication is blocked: inputs have no formal routing qualification")
+    if redo == "selected":
+        if dataset != "daily_bar" or not symbols:
+            raise ValueError("selected redo requires a daily task and explicit symbols")
+        if set(symbols) - {unit["symbol"] for unit in units}:
+            raise ValueError("selected securities are outside the frozen task scope")
+    elif symbols:
+        raise ValueError("symbols are only accepted for selected redo")
+    immutable = {**definition, "units": [{k: v for k, v in unit.items() if k != "replay_manifest"} for unit in units]}
+    definition_hash = row_hash(immutable)
+    lock_scope = row_hash([dataset, "current" if dataset == "security_master" else day.isoformat(),
+                          "security" if dataset == "security_master" else definition.get("asset_type", "stock")])[:16]
+    work = paths["workspace_root"] / "_tasks" / task_id
+    with PartitionLock(paths["workspace_root"] / "_locks" / (lock_scope + ".lock"), recover_stale=True):
+        with MetadataStore(paths["metadata_path"]) as metadata:
+            state = metadata.load_collection_task(task_id)
+            if state and state["definition_hash"] != definition_hash:
+                raise ValueError("task scope changed; create a new task ID")
+            if state and state["status"] == "committing":
+                if redo != "resume":
+                    raise ValueError("recover the pending commit before restarting or selecting securities")
+                return _finish_task_commit(state, paths, metadata, failure_hook)
+            if state and state["status"] == "published" and redo == "resume":
+                published = Path(state["published_manifest"])
+                if (published.parent / "task-commit.json").exists():
+                    return _finish_task_commit(state, paths, metadata, failure_hook)
+                if file_hash(published) != state["published_hash"]:
+                    raise ValueError("task publication has changed; use a new task or explicit redo")
+                from ..storage.integrity import Manifest
+                if not Manifest.load(published).verify(published.parent / "data.parquet"):
+                    raise ValueError("published task data failed integrity verification")
+                return {**state, "no_op": True}
+            if state is None:
+                state = {"task_id": task_id, "dataset": dataset, "definition_hash": definition_hash,
+                         "definition": _json_value(immutable), "units": {}, "status": "collecting"}
+            if redo == "full":
+                RawObjectStore.preserve_directory(paths["raw_root"] / "_tmp" / task_id,
+                    permitted_root=paths["raw_root"] / "_tmp", archive_root=paths["archive_root"])
+                RawObjectStore.preserve_directory(work, permitted_root=paths["workspace_root"] / "_tasks",
+                    archive_root=paths["archive_root"])
+                state["units"] = {}
+            if redo == "resume" and state.get("status") == "failed":
+                effective_redo = state.get("redo", "resume")
+                effective_symbols = state.get("selected_symbols", [])
+            else:
+                effective_redo, effective_symbols = redo, list(symbols)
+            state.update(status="collecting", redo=effective_redo, selected_symbols=effective_symbols, error=None,
+                         complete_today=False, verification_mode=mode)
+            metadata.save_collection_task(state)
+            work.mkdir(parents=True, exist_ok=True)
+            executor = collector or collect_input
+            for unit in units:
+                key = unit["key"]
+                old = state["units"].get(key)
+                force = redo == "full" or (redo == "selected" and unit["symbol"] in symbols)
+                if state["redo"] == "selected" and unit["symbol"] not in state["selected_symbols"]:
+                    continue
+                if not force and old and _task_unit_valid(old):
+                    continue
+                temporary = RawObjectStore.task_unit_path(paths["raw_root"], task_id, key)
+                replay = unit.get("replay_manifest")
+                # A transformation failure can continue from exact saved bytes.
+                if not force and old and (old.get("failure_class") == "NormalizationError" or old.get("status") == "candidate_complete"):
+                    try:
+                        RawObjectStore.verify_manifest(old["raw_manifest"])
+                        replay = old["raw_manifest"]
+                    except (ValueError, OSError, KeyError):
+                        pass
+                preserved = RawObjectStore.preserve_directory(temporary,
+                    permitted_root=paths["raw_root"] / "_tmp" / task_id, archive_root=paths["archive_root"])
+                if preserved and replay == str(temporary / "manifest.ndjson"):
+                    replay = str(preserved / "manifest.ndjson")
+                options = dict(collector_options or {})
+                options.update(input_id=unit["input_id"], context=unit["context"], config_root=config_root,
+                    data_root=paths["data_root"], mode=mode, replay_manifest=replay,
+                    task_unit=(task_id, key), force_fetch=force)
+                try:
+                    report = executor(**options)
+                    result_dir = Path(report["run_directory"]).resolve()
+                    if not result_dir.is_relative_to(paths["workspace_root"]):
+                        raise ValueError("source result escaped task workspace")
+                    raw_manifest = temporary / "manifest.ndjson"
+                    entry = {"input_id": unit["input_id"], "symbol": unit.get("symbol"),
+                             "report": report, "raw_manifest": str(raw_manifest),
+                             "failure_class": report.get("failure_class"), "status": report["status"]}
+                    if report["status"] == "candidate_complete":
+                        entry["raw_hash"] = RawObjectStore.verify_manifest(raw_manifest)
+                        artifact = result_dir / report["normalized_parquet"]["path"]
+                        if not artifact.resolve().is_relative_to(result_dir):
+                            raise ValueError("normalized artifact escaped source workspace")
+                        if file_hash(artifact) != report["normalized_parquet"]["sha256"]:
+                            raise ValueError("normalized artifact does not match the source report")
+                        _validate_task_candidate(artifact, unit, contracts[unit["input_id"]], dataset, day,
+                                                 definition.get("adjustment", "forward"))
+                        entry.update(artifact=str(artifact), artifact_hash=file_hash(artifact))
+                    state["units"][key] = entry
+                except Exception as exc:
+                    temporary.mkdir(parents=True, exist_ok=True)
+                    RawObjectStore(temporary).append_event({"event": "task_unit_failure", "outcome": "failure",
+                        "error_class": type(exc).__name__, "mode": mode, "unit_key": key,
+                        "fetched_at_utc": datetime.now(timezone.utc).isoformat()})
+                    state["units"][key] = {"status": "failed", "input_id": unit["input_id"],
+                        "symbol": unit.get("symbol"), "raw_manifest": str(temporary / "manifest.ndjson"),
+                        "failure_class": type(exc).__name__}
+                metadata.save_collection_task(state)
+            state["status"] = "checking"
+            metadata.save_collection_task(state)
+            try:
+                _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
+            except Exception as exc:
+                state.update(status="failed", error=str(exc))
+                metadata.save_collection_task(state)
+                return state
+            state["status"] = "committing"
+            metadata.save_collection_task(state)
+            return _finish_task_commit(state, paths, metadata, failure_hook)
+
+
+def _task_units(definition, paths):
+    """Resolve all_stock/all_etf against published master once, then freeze in the task."""
+    import json
+    from datetime import date
+    from ..storage.metadata import MetadataStore
+    units = definition.get("units")
+    if units is not None:
+        return json.loads(json.dumps(_json_value(units)))
+    if definition["dataset"] != "daily_bar":
+        raise ValueError("security master requires explicit source-interface units")
+    with MetadataStore(paths["metadata_path"]) as metadata:
+        old = metadata.load_collection_task(definition["task_id"])
+        if old:
+            return old["definition"]["units"]
+    import pyarrow.parquet as pq
+    manifest_path = paths["canonical_root"] / "security_master" / "current" / "manifest.json"
+    from ..storage.integrity import Manifest
+    manifest = Manifest.load(manifest_path)
+    source = manifest_path.parent / "data.parquet"
+    if (manifest_path.parent / "task-commit.json").exists() or not manifest.verify(source):
+        raise ValueError("published security master is unavailable or pending")
+    day = date.fromisoformat(definition["trade_date"])
+    selected = []
+    wanted = "etf" if definition.get("universe") == "all_etf" else "stock"
+    if definition.get("universe") not in {"all_stock", "all_etf"}:
+        raise ValueError("supported dynamic universes are all_stock and all_etf")
+    for row in pq.read_table(source).to_pylist():
+        if row["asset_type"] != wanted or row["status"] == "prelisted":
+            continue
+        if row.get("list_date") and row["list_date"] > day or row.get("delist_date") and row["delist_date"] < day:
+            continue
+        prefix = {"XSHG": "sh", "XSHE": "sz", "BSE": "bj"}[row["exchange"]]
+        symbol = prefix + row["symbol"]
+        selected.append({"key": symbol, "symbol": symbol, "input_id": definition["input_id"],
+            "context": {"request": {"symbol": symbol, "start_date": day.isoformat(), "end_date": day.isoformat()}}})
+    return selected
+
+
+def _task_unit_valid(entry):
+    from ..storage.integrity import file_hash
+    try:
+        report = entry.get("report", {})
+        config_ok = all(file_hash(Path(item["path"])) == item["sha256"]
+                        for item in (*report.get("config_files", ()), *report.get("code_files", ())))
+        return (config_ok and entry["status"] == "candidate_complete"
+                and RawObjectStore.verify_manifest(entry["raw_manifest"]) == entry["raw_hash"]
+                and file_hash(Path(entry["artifact"])) == entry["artifact_hash"])
+    except (OSError, ValueError, KeyError):
+        return False
+
+
+def _validate_task_candidate(artifact, unit, contract, dataset, day, adjustment):
+    import pyarrow.parquet as pq
+    rows = pq.read_table(artifact).to_pylist()
+    if not rows:
+        raise ValueError("empty source candidate is not a successful collection unit")
+    if dataset == "security_master":
+        keys = [(row["exchange"], row["stock_code"]) for row in rows]
+        if any(row["trade_date"] != day for row in rows):
+            raise ValueError("security snapshot date differs from task")
+    else:
+        symbol = unit["symbol"]
+        prefix = {"sh": "XSHG", "sz": "XSHE", "bj": "BSE"}.get(symbol[:2])
+        identity = f"{prefix}:{symbol[2:]}"
+        request = unit["context"]["request"]
+        if any(row["instrument_id"] != identity or row["adjustment"] != adjustment
+               or not (str(request["start_date"]) <= row["trade_date"].isoformat() <= str(request["end_date"])) for row in rows):
+            raise ValueError("source candidate is outside the source request window")
+        rows = [row for row in rows if row["trade_date"] == day]
+        if not rows:
+            raise ValueError("source candidate has no row for the task trading date")
+        keys = [(row["instrument_id"], row["trade_date"], row["adjustment"]) for row in rows]
+        if any(row["instrument_id"] != identity or row["trade_date"] != day or row["adjustment"] != adjustment for row in rows):
+            raise ValueError("source candidate is outside requested security/date/adjustment")
+        if any(row["low"] <= 0 or row["high"] < max(row["open"], row["close"], row["low"])
+               or row["low"] > min(row["open"], row["close"]) for row in rows):
+            raise ValueError("source candidate OHLC values are invalid")
+    if len(set(keys)) != len(keys):
+        raise ValueError("source candidate has duplicate business keys")
+
+
+def _prepare_task_commit(state, units, contracts, paths, config_root, work, day):
+    import json
+    import shutil
+    import pyarrow.parquet as pq
+    from .daily import prepare_daily_task_publication
+    from ..service.instruments_update import prepare_security_publication, parse_security_row
+    from ..storage.integrity import file_hash, row_hash, Manifest
+    from ..storage.parquet import write_normalized_rows, _records_to_table
+    import yaml
+
+    valid = {key: entry for key, entry in state["units"].items() if _task_unit_valid(entry)}
+    if not valid and state["dataset"] == "daily_bar":
+        raise ValueError("no valid source units; raw stays in _tmp")
+    promotions, source_rows = [], {}
+    for unit in units:
+        key = unit["key"]
+        if key not in valid:
+            continue
+        entry, contract = valid[key], contracts[unit["input_id"]]
+        if state["redo"] == "selected" and unit["symbol"] not in state["selected_symbols"]:
+            continue
+        parameters = contract.bind_parameters(unit["context"])
+        if state["dataset"] == "security_master":
+            parameters = {k: v for k, v in parameters.items() if k != "trade_date"}
+        current = paths["raw_root"] / contract.provider / contract.endpoint / ("scope-" + row_hash(parameters)[:16])
+        temporary = Path(entry["raw_manifest"]).parent
+        # Stable immutable evidence references survive replacement of current raw.
+        # Retain the full digest in metadata; short containers avoid Windows
+        # MAX_PATH failures when the response body itself has a SHA-256 name.
+        audit = paths["archive_root"] / "_raw_evidence" / entry["raw_hash"][:12]
+        if not audit.exists():
+            audit.parent.mkdir(parents=True, exist_ok=True)
+            pending_audit = audit.parent / ("pending-" + uuid4().hex[:12])
+            shutil.copytree(temporary, pending_audit, copy_function=os.link)
+            try:
+                os.rename(pending_audit, audit)
+            except FileExistsError:
+                RawObjectStore.preserve_directory(pending_audit, permitted_root=audit.parent,
+                    archive_root=paths["archive_root"])
+        if RawObjectStore.verify_manifest(audit / "manifest.ndjson") != entry["raw_hash"]:
+            raise ValueError("audit evidence does not match source")
+        if not entry.get("promoted"):
+            promotions.append({"key": key, "temporary": str(temporary), "current": str(current),
+                           "audit_manifest": str(audit / "manifest.ndjson"), "raw_hash": entry["raw_hash"]})
+        rows = pq.read_table(entry["artifact"]).to_pylist()
+        if state["dataset"] == "daily_bar":
+            rows = [row for row in rows if row["trade_date"] == day]
+        source_rows[key] = {"rows": rows, "entry": entry, "contract": contract,
+                            "raw_ref": str(audit / "manifest.ndjson"), "symbol": unit.get("symbol")}
+    if state["dataset"] == "daily_bar":
+        prepared = prepare_daily_task_publication(state, units, source_rows, paths, config_root, day)
+        candidate = work / "prepared.parquet"
+        pq.write_table(_records_to_table(prepared.pop("records")), candidate, compression="zstd")
+    else:
+        current_dir = paths["canonical_root"] / "security_master" / "current"
+        previous = []
+        if (current_dir / "manifest.json").exists():
+            manifest = Manifest.load(current_dir / "manifest.json")
+            if not manifest.verify(current_dir / "data.parquet"):
+                raise ValueError("existing security master failed hash verification")
+            previous = [parse_security_row(row, source="previous") for row in pq.read_table(current_dir / "data.parquet").to_pylist()]
+        missing = [unit["key"] for unit in units if unit["key"] not in valid]
+        if missing and (state["redo"] == "full" or not previous or not state["definition"].get("allow_previous", True)):
+            raise ValueError("security source units are incomplete: " + ",".join(missing))
+        merged = prepare_security_publication({key: value["rows"] for key, value in source_rows.items()}, previous)
+        records = merged.records
+        required_exchanges = set(state["definition"].get("required_exchanges", ["XSHG", "XSHE", "BSE"]))
+        required_assets = set(state["definition"].get("required_asset_types", ["stock", "etf"]))
+        if required_exchanges - {item.exchange.value for item in records} or required_assets - {item.asset_type.value for item in records}:
+            raise ValueError("security master is missing required market or asset-type coverage")
+        if merged.classification_conflicts:
+            raise ValueError("security classification conflict requires verification")
+        rows = [{name: _json_value(getattr(item, name)) if name not in {"list_date", "delist_date"} else getattr(item, name)
+                 for name in ("instrument_id", "symbol", "exchange", "asset_type", "name", "list_date", "delist_date", "status")}
+                for item in records]
+        fields = yaml.safe_load((config_root / "datasets/security_master.yaml").read_text(encoding="utf-8"))["fields"]
+        candidate = work / "prepared.parquet"
+        if candidate.exists():
+            RawObjectStore.preserve_directory(work, permitted_root=paths["workspace_root"] / "_tasks", archive_root=paths["archive_root"])
+            work.mkdir(parents=True, exist_ok=True)
+        write_normalized_rows(candidate, rows, fields)
+        prepared = {"partition_directory": str(current_dir), "expected_count": len(records),
+                    "row_count": len(records), "asset_type": "security", "partition_key": "current",
+                    "fallback_units": missing, "item_statuses": {item.instrument_id: "success" for item in records}}
+        if missing:
+            prepared["prior_raw_refs"] = list(manifest.raw_refs)
+    prepared.update(candidate=str(candidate), candidate_hash=file_hash(candidate), promotions=promotions,
+                    trade_date=day.isoformat(), raw_refs=list(dict.fromkeys(
+                        [source["raw_ref"] for source in source_rows.values()] + prepared.get("prior_raw_refs", []))))
+    state["commit"] = prepared
+    state["complete_today"] = len(valid) == len(units)
+
+
+def _finish_task_commit(state, paths, metadata, failure_hook=None):
+    import json
+    import pyarrow.parquet as pq
+    from ..domain import Dataset, Adjustment, ItemStatus
+    from ..storage.integrity import Manifest, file_hash
+    from ..storage.parquet import CanonicalPartitionStore, _mapping_to_bar, _fsync_file
+    commit = state["commit"]
+    candidate = Path(commit["candidate"])
+    if not candidate.resolve().is_relative_to(paths["workspace_root"]) or file_hash(candidate) != commit["candidate_hash"]:
+        raise ValueError("prepared publication is missing, escaped, or corrupt")
+    partition = Path(commit["partition_directory"])
+    if not partition.resolve().is_relative_to(paths["canonical_root"]):
+        raise ValueError("commit partition escaped canonical root")
+    partition.mkdir(parents=True, exist_ok=True)
+    marker = partition / "task-commit.json"
+    if marker.exists() and json.loads(marker.read_text(encoding="utf-8"))["task_id"] != state["task_id"]:
+        raise ValueError("another task has a pending commit for this partition")
+    RawObjectStore(partition).write_json({"task_id": state["task_id"], "definition_hash": state["definition_hash"]},
+        dataset=state["dataset"], provider="pipeline", endpoint="commit", fetched_at=datetime.now(timezone.utc),
+        attempt_id="commit", relative_path="task-commit.json")
+    if failure_hook:
+        failure_hook("before_publish")
+    if state["dataset"] == "daily_bar":
+        # A crash may leave the new data paired with the previous manifest.
+        # Complete this task's verified pair before reading/merging the partition.
+        pending_manifest = partition / ("manifest." + state["task_id"] + ".tmp.json")
+        if pending_manifest.exists():
+            pending = Manifest.load(pending_manifest)
+            pending_data = partition / ("data." + state["task_id"] + ".tmp.parquet")
+            if pending_data.exists() and pending.verify(pending_data):
+                os.replace(pending_data, partition / "data.parquet")
+            elif not pending.verify(partition / "data.parquet"):
+                raise ValueError("interrupted task publication failed integrity verification")
+            os.replace(pending_manifest, partition / "manifest.json")
+        result = CanonicalPartitionStore(paths["canonical_root"]).publish(dataset=Dataset.DAILY_BAR,
+            asset_type=commit["asset_type"], partition_key=commit["partition_key"],
+            new_records=[_mapping_to_bar(row) for row in pq.read_table(candidate).to_pylist()],
+            expected_count=commit["expected_count"], run_id=state["task_id"],
+            item_statuses={key: ItemStatus(value) for key, value in commit["item_statuses"].items()},
+            replace_instrument_ids=frozenset(commit["replace_ids"]), replace_adjustment=Adjustment(commit["adjustment"]),
+            failure_hook=failure_hook)
+        manifest_path, manifest = result.manifest_path, result.manifest
+        if result.quarantined_keys:
+            raise ValueError("publication contains quarantined source conflicts")
+    else:
+        target = partition / ("data." + state["task_id"] + ".tmp.parquet")
+        import shutil
+        shutil.copyfile(candidate, target)
+        _fsync_file(target)
+        manifest = Manifest.from_file(target, dataset="security_master", asset_type="security", partition_key="current",
+            row_count=commit["row_count"], expected_count=commit["expected_count"], first_key=None, last_key=None,
+            raw_refs=tuple(commit["raw_refs"]), item_statuses=commit["item_statuses"])
+        temporary_manifest = partition / ("manifest." + state["task_id"] + ".tmp.json")
+        manifest.write_atomic(temporary_manifest)
+        os.replace(target, partition / "data.parquet")
+        if failure_hook:
+            failure_hook("after_data_replace")
+        manifest_path = partition / "manifest.json"
+        os.replace(temporary_manifest, manifest_path)
+    if failure_hook:
+        failure_hook("after_publish")
+    for promotion in commit["promotions"]:
+        RawObjectStore.promote_unit(temporary=promotion["temporary"], current=promotion["current"],
+            raw_root=paths["raw_root"], archive_root=paths["archive_root"], expected_hash=promotion["raw_hash"])
+        if failure_hook:
+            failure_hook("after_raw_promote")
+        entry = state["units"][promotion["key"]]
+        entry.update(raw_manifest=promotion["audit_manifest"], current_raw=promotion["current"], promoted=True)
+    if not manifest.verify(partition / "data.parquet"):
+        raise ValueError("completed task publication is corrupt")
+    metadata.record_partition_publish(manifest=manifest, manifest_path=manifest_path)
+    state.update(status="published", published_manifest=str(manifest_path),
+                 published_hash=file_hash(manifest_path), row_count=manifest.row_count, error=None)
+    metadata.save_collection_task(state)
+    marker.unlink()
+    temporary_task = paths["raw_root"] / "_tmp" / state["task_id"]
+    if temporary_task.exists() and not any(temporary_task.iterdir()):
+        temporary_task.rmdir()
+    return state
 
 
 def collect_due_inputs(*, now, config_root, output_root=None, data_root=None, trading_dates, securities=(), symbols=(),

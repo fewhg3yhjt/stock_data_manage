@@ -365,3 +365,14 @@ provider_validation/results/formal-interface-spec-20261004/verify.py text eol=lf
 /PROJECT_PROGRESS.md text eol=lf
 # Preserve generated failure-trace XML whitespace as evidence.
 /provider_validation/results/storage-layout-20261005/*.xml -text whitespace=-blank-at-eol,cr-at-eol
+
+# Task recovery evidence must retain exact raw/derived hashes across checkouts.
+/provider_validation/results/task-raw-20261007/** -text whitespace=cr-at-eol
+/provider_validation/results/task-raw-20261007/**/*.bin binary
+/provider_validation/results/task-raw-20261007/**/*.parquet binary
+/provider_validation/results/task-raw-20261007/**/*.duckdb binary
+/config/datasets/security_master.yaml text eol=lf
+/tests/test_collection_tasks.py text eol=lf
+/docs/pipeline/collection-tasks.md text eol=lf
+/src/pipeline/daily.py text eol=lf
+/src/service/instruments_update.py text eol=lf

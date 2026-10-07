@@ -1,5 +1,25 @@
 # 运行数据目录与归档
 
+新增业务任务入口的暂存、重做和发布规则见 [任务流程](../pipeline/collection-tasks.md)。下文原 `collect-input` 候选布局继续适用；`collect-task` 对证券主数据和日线使用以下扩展：
+
+```text
+data/
+├── raw/_tmp/<任务ID>/<单元哈希>/     # 本次尚未转正的完整响应
+├── raw/<来源>/<端点>/scope-<哈希>/   # 每个请求范围只有一个当前结果
+├── task_workspace/_tasks/<任务ID>/prepared.parquet
+├── canonical/security_master/current/{data.parquet,manifest.json}
+├── canonical/daily_bar/asset_type=<类型>/trade_date=<日期>/
+├── task_archive/_raw_evidence/<清单哈希>/  # 正式记录的稳定证据引用
+├── task_archive/_raw_audit/<标识>/         # 重做清空、旧当前响应的审计留存
+└── metadata/metadata.duckdb               # 自动维护任务阶段、单元和提交记录
+```
+
+这里的“清空”是从活动 `_tmp` 中移走，保留原字节证据；审计归档不作为当前输入版本供业务选择。正式记录引用稳定证据，避免下一次更新当前 raw 后旧记录无法追溯。在同一磁盘内用硬链接留存相同文件，不重复复制响应字节；后续目录转正只重命名、不修改响应内容。归档暂无自动清理，修改过的新响应仍会增加审计占用。`_raw_audit` 也可保存被清空的本任务构建文件，属于执行证据。
+
+业务任务完成后，采集报告及来源候选仍保留在工作区，业务任务记录已标记发布。它们当前不会自动迁入旧 `archive_published_task` 布局，避免改写报告中的历史引用；自动归档与保留期限暂未扩展。未成功来源的暂存保留以便重做。其他63种来源数据集没有套用日线的覆盖和发布规则。
+
+来源报告中的 `_tmp` 路径表示采集当时的位置，不随转正改写。最终原始位置由 DuckDB 任务单元的 `raw_manifest`（稳定证据）与 `current_raw`（当前结果）记录；任务输出 JSON 也包含这组关联。追溯已发布记录时从正式清单的 `raw_refs` 进入，按源响应哈希关联原始请求、来源报告和处理代码版本。
+
 正式运行产物统一由 [collection.yaml](../../config/collection.yaml) 的 `storage` 配置指定，默认根目录为 `data/`。配置读取代码位于 [现有配置模块](../../src/config/loader.py)，单项输入和周期采集共用 [现有采集流程](../../src/pipeline/inputs.py)。本次没有增加存储服务或独立配置系统。
 
 ## 目录及职责

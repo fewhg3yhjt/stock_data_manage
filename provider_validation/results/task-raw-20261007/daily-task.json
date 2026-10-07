@@ -1,0 +1,7 @@
+{
+  "task_id": "daily-proof", "dataset": "daily_bar", "trade_date": "2026-09-18",
+  "asset_type": "stock", "adjustment": "forward",
+  "units": [{"key": "sh600519", "symbol": "sh600519", "input_id": "ASTOCK-002-daily",
+    "replay_manifest": "provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson",
+    "context": {"request": {"symbol": "600519", "start_date": "2026-09-01", "end_date": "2026-09-18"}}}]
+}
