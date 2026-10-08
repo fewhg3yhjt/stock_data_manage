@@ -98,12 +98,14 @@ def recover_collection_tasks(*, config_root, data_root=None) -> tuple[str, ...]:
     from ..pipeline.inputs import _finish_task_commit
     from ..storage.integrity import row_hash
     from ..storage.parquet import PartitionLock
+    import json
     paths = load_storage_paths(config_root, data_root=data_root)
     completed = []
     with MetadataStore(paths["metadata_path"]) as metadata:
         for state in metadata.collection_tasks():
             marker = Path(state.get("published_manifest", "missing")).parent / "task-commit.json"
-            if state["status"] != "committing" and not (state["status"] == "published" and marker.exists()):
+            owned_marker = (marker.exists() and json.loads(marker.read_text(encoding="utf-8")).get("task_id") == state["task_id"])
+            if state["status"] != "committing" and not (state["status"] == "published" and owned_marker):
                 continue
             definition = state["definition"]
             scope = row_hash([state["dataset"], "current" if state["dataset"] == "security_master" else definition["trade_date"],

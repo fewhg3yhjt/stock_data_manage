@@ -43,6 +43,7 @@ class Manifest:
     schema_version: str = "v1"
     item_statuses: dict[str, str] = field(default_factory=dict)
     source_providers: dict[str, str | None] = field(default_factory=dict)
+    publication_metadata: dict[str, Any] = field(default_factory=dict)
 
     @classmethod
     def from_file(
@@ -62,6 +63,7 @@ class Manifest:
         schema_version: str = "v1",
         item_statuses: dict[str, str] | None = None,
         source_providers: dict[str, str | None] | None = None,
+        publication_metadata: dict[str, Any] | None = None,
     ) -> "Manifest":
         if row_count < 0:
             raise ValueError("row_count cannot be negative")
@@ -81,6 +83,7 @@ class Manifest:
             schema_version=schema_version,
             item_statuses=dict(item_statuses or {}),
             source_providers=dict(source_providers or {}),
+            publication_metadata=dict(publication_metadata or {}),
         )
 
     def verify(self, path: Path) -> bool:

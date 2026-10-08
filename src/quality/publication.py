@@ -38,3 +38,23 @@ def load_publication_policy(path: str | Path, dataset: str) -> PublicationPolicy
         max_missing_ratio=Decimal(str(publication["max_missing_ratio"])),
         max_missing_count=int(publication["max_missing_count"]),
     )
+
+
+def check_security_coverage(records, *, required_groups, previous=()):
+    """Check configured market/type pairs and omissions, without claiming a census."""
+    counts = {}
+    for record in records:
+        pair = f"{record.exchange.value}/{record.asset_type.value}"
+        if record.status not in {"delisted", "prelisted"}:
+            counts[pair] = counts.get(pair, 0) + 1
+    identities = {record.instrument_id for record in records}
+    missing_previous = sorted(record.instrument_id for record in previous
+                              if record.status not in {"delisted", "prelisted"}
+                              and record.instrument_id not in identities)
+    missing_groups = sorted(f"{exchange}/{asset}" for exchange, asset in required_groups
+                            if not counts.get(f"{exchange}/{asset}"))
+    return {"group_counts": counts, "missing_groups": missing_groups,
+            "missing_previous_securities": missing_previous,
+            "passed": not missing_groups and not missing_previous,
+            "independent_full_market_coverage_verified": False,
+            "basis": "configured market/asset pairs and previous valid identities; no independent market census"}

@@ -4,6 +4,16 @@ dataset:
   primary_key: [instrument_id]
   publication:
     mode: atomic_replace
+    required_groups:
+      - [XSHG, stock]
+      - [XSHE, stock]
+      - [BSE, stock]
+      - [XSHG, etf]
+      - [XSHE, etf]
+    max_previous_age_days: 1
+    source_groups:
+      SDA-BOARD-005: [[XSHG, stock], [XSHE, stock], [XSHG, etf], [XSHE, etf]]
+      SECURITY-BSE-001: [[BSE, stock]]
 fields:
   instrument_id: {type: string, required: true}
   symbol: {type: string, required: true}

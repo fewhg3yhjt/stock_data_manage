@@ -1,5 +1,7 @@
 # 代码目录与文件职责
 
+证券名单覆盖与回退继续修改既有模块：`quality/publication.py` 检查市场/资产组合及证券遗漏；`pipeline/inputs.py` 先检查当日候选，必要时整份回退，并保留实际日期、原因和断点续采状态；`storage/integrity.py` 在原发布清单中增加 `publication_metadata`，与数据一同恢复；`worker/recovery.py` 核对提交标记的任务归属。规则仍在原 `config/datasets/security_master.yaml`，没有增加管理层或新文件；正式流程说明见 [任务流程](docs/pipeline/collection-tasks.md)。
+
 本轮证券名单修正原 `providers/baostock/industry.py`，通过原查询响应补充ETF及302股票；原行业接口范围保持。北交所此前只有验证脚本，必要新增 `providers/exchanges/security.py` 承接同一官方目录、会话和分页方式，不新增包或任务系统。原 `providers/transport.py` 增加可选POST请求体哈希匹配，原 `routing/factory.py` 与 `pipeline/inputs.py` 绑定唯一北交所输入、来源日期与证据。字段定义继续放在现有 `security_snapshot` 和 `security_master` YAML。新增 `tests/test_security_catalog.py` 验证分类、分页、原生会话和请求体匹配；正式说明见 [证券名单来源](docs/providers/security-catalog.md)。原始来源探针在 `provider_validation/`，运行候选和检查在 `data/`，尚未发布全市场名单。
 
 本次原始暂存与重做继续修改既有模块：`pipeline/inputs.py` 的 `collect_task` 在 `collect_input` 上组织持久化单元、冻结证券范围、三种重做和提交收尾；`pipeline/daily.py` 检查来源候选并构建日线；`service/instruments_update.py` 复用证券主数据合并；`storage/metadata.py` 保存业务任务记录，`storage/raw.py` 处理 scoped 暂存、审计留证及当前响应转正，`storage/parquet.py` 增加目标范围替换和待提交读写保护；`worker/recovery.py` 续接提交，`cli.py` 增加既有命令的任务操作。没有新建运行时服务或任务管理模块。

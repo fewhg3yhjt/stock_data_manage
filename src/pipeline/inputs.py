@@ -1028,7 +1028,8 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
                 from ..storage.integrity import Manifest
                 if not Manifest.load(published).verify(published.parent / "data.parquet"):
                     raise ValueError("published task data failed integrity verification")
-                return {**state, "no_op": True}
+                if dataset != "security_master" or state.get("complete_today"):
+                    return {**state, "no_op": True}
             if state is None:
                 state = {"task_id": task_id, "dataset": dataset, "definition_hash": definition_hash,
                          "definition": _json_value(immutable), "units": {}, "status": "collecting"}
@@ -1051,7 +1052,7 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
             for unit in units:
                 key = unit["key"]
                 old = state["units"].get(key)
-                force = redo == "full" or (redo == "selected" and unit["symbol"] in symbols)
+                force = redo == "full" or (redo == "selected" and unit["symbol"] in symbols) or bool(old and old.get("coverage_rejected"))
                 if state["redo"] == "selected" and unit["symbol"] not in state["selected_symbols"]:
                     continue
                 if not force and old and _task_unit_valid(old):
@@ -1100,14 +1101,20 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
                         "fetched_at_utc": datetime.now(timezone.utc).isoformat()})
                     state["units"][key] = {"status": "failed", "input_id": unit["input_id"],
                         "symbol": unit.get("symbol"), "raw_manifest": str(temporary / "manifest.ndjson"),
-                        "failure_class": type(exc).__name__}
+                        "failure_class": type(exc).__name__, "error": str(exc),
+                        "coverage_rejected": dataset == "security_master" and isinstance(exc, ValueError)}
                 metadata.save_collection_task(state)
             state["status"] = "checking"
+            state.pop("security_check", None)
             metadata.save_collection_task(state)
             try:
                 _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
             except Exception as exc:
                 state.update(status="failed", error=str(exc))
+                if state.get("security_check"):
+                    RawObjectStore(work).write_json(state["security_check"], dataset="security_master",
+                        provider="pipeline", endpoint="coverage", fetched_at=datetime.now(timezone.utc),
+                        attempt_id="coverage", relative_path="coverage.json")
                 metadata.save_collection_task(state)
                 return state
             state["status"] = "committing"
@@ -1159,7 +1166,7 @@ def _task_unit_valid(entry):
         report = entry.get("report", {})
         config_ok = all(file_hash(Path(item["path"])) == item["sha256"]
                         for item in (*report.get("config_files", ()), *report.get("code_files", ())))
-        return (config_ok and entry["status"] == "candidate_complete"
+        return (config_ok and not entry.get("coverage_rejected") and entry["status"] == "candidate_complete"
                 and RawObjectStore.verify_manifest(entry["raw_manifest"]) == entry["raw_hash"]
                 and file_hash(Path(entry["artifact"])) == entry["artifact_hash"])
     except (OSError, ValueError, KeyError):
@@ -1250,24 +1257,107 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
         candidate = work / "prepared.parquet"
         pq.write_table(_records_to_table(prepared.pop("records")), candidate, compression="zstd")
     else:
+        from datetime import date
+        from ..quality.publication import check_security_coverage
         current_dir = paths["canonical_root"] / "security_master" / "current"
         previous = []
+        prior = None
+        previous_path = current_dir / "data.parquet"
+        policy = yaml.safe_load((config_root / "datasets/security_master.yaml").read_text(encoding="utf-8"))
+        allowed_groups = {tuple(pair) for pair in policy["dataset"]["publication"]["required_groups"]}
+        definition = state["definition"]
+        if "required_groups" in definition:
+            required_groups = {tuple(pair) for pair in definition["required_groups"]}
+        else:
+            exchanges = set(definition.get("required_exchanges", ["XSHG", "XSHE", "BSE"]))
+            assets = set(definition.get("required_asset_types", ["stock", "etf"]))
+            if not exchanges <= {"XSHG", "XSHE", "BSE"} or not assets <= {"stock", "etf"}:
+                raise ValueError("unsupported security coverage scope")
+            required_groups = {pair for pair in allowed_groups if pair[0] in exchanges and pair[1] in assets}
+        if not required_groups or not required_groups <= allowed_groups:
+            raise ValueError("unsupported security coverage groups")
+        source_scope = [{"key": unit["key"], "input_id": unit["input_id"],
+                         "parameters": {key: value for key, value in contracts[unit["input_id"]].bind_parameters(unit["context"]).items()
+                                        if key != "trade_date"}} for unit in units]
+        scope_hash = row_hash({"groups": sorted(required_groups), "sources": source_scope})
         if (current_dir / "manifest.json").exists():
             manifest = Manifest.load(current_dir / "manifest.json")
-            if not manifest.verify(current_dir / "data.parquet"):
+            if (current_dir / "task-commit.json").exists() or not manifest.verify(previous_path):
                 raise ValueError("existing security master failed hash verification")
-            previous = [parse_security_row(row, source="previous") for row in pq.read_table(current_dir / "data.parquet").to_pylist()]
+            previous = [parse_security_row(row, source="previous") for row in pq.read_table(previous_path).to_pylist()]
+            prior = manifest.publication_metadata
+            if prior.get("as_of_date") and date.fromisoformat(prior["as_of_date"]) > day:
+                raise ValueError("cannot replace a newer security master with an older task")
         missing = [unit["key"] for unit in units if unit["key"] not in valid]
-        if missing and (state["redo"] == "full" or not previous or not state["definition"].get("allow_previous", True)):
-            raise ValueError("security source units are incomplete: " + ",".join(missing))
-        merged = prepare_security_publication({key: value["rows"] for key, value in source_rows.items()}, previous)
+        # Inspect today's sources alone. Previous rows must not conceal omissions.
+        merged = prepare_security_publication({key: value["rows"] for key, value in source_rows.items()})
         records = merged.records
-        required_exchanges = set(state["definition"].get("required_exchanges", ["XSHG", "XSHE", "BSE"]))
-        required_assets = set(state["definition"].get("required_asset_types", ["stock", "etf"]))
-        if required_exchanges - {item.exchange.value for item in records} or required_assets - {item.asset_type.value for item in records}:
-            raise ValueError("security master is missing required market or asset-type coverage")
-        if merged.classification_conflicts:
-            raise ValueError("security classification conflict requires verification")
+        comparable = previous if prior and prior.get("scope_hash") == scope_hash else ()
+        check = check_security_coverage(records, required_groups=required_groups, previous=comparable)
+        check.update(missing_units=missing, requested_date=day.isoformat(),
+                     classification_conflicts=[item.instrument_id for item in merged.classification_conflicts],
+                     source_failures={key: {"failure_class": state["units"][key].get("failure_class"),
+                                            "error": state["units"][key].get("error") or state["units"][key].get("report", {}).get("error")}
+                                      for key in missing})
+        if comparable:
+            old_types = {item.instrument_id: item.asset_type for item in comparable}
+            check["classification_conflicts"].extend(item.instrument_id for item in records
+                if item.instrument_id in old_types and item.asset_type != old_types[item.instrument_id])
+        check["passed"] = check["passed"] and not missing and not check["classification_conflicts"]
+        check["recollect_units"] = []
+        for key, value in source_rows.items():
+            source_records = prepare_security_publication({key: value["rows"]}).records
+            declared_groups = {tuple(pair) for pair in policy["dataset"]["publication"]["source_groups"].get(value["entry"]["input_id"], ())} & required_groups
+            source_previous = [item for item in comparable if (item.exchange.value, item.asset_type.value) in declared_groups]
+            unit_check = check_security_coverage(source_records, required_groups=declared_groups, previous=source_previous)
+            conflicted_ids = set(check["classification_conflicts"])
+            if not unit_check["passed"] or any(item.instrument_id in conflicted_ids for item in source_records):
+                value["entry"]["coverage_rejected"] = True
+                check["recollect_units"].append(key)
+                check["passed"] = False
+        check.update(validated_at_utc=datetime.now(timezone.utc).isoformat(),
+                     policy_sha256=file_hash(config_root / "datasets/security_master.yaml"),
+                     code_sha256=file_hash(Path(__file__).parents[1] / "quality/publication.py"),
+                     source_response_hashes={key: value["entry"]["raw_hash"] for key, value in source_rows.items()})
+        state["security_check"] = check
+        max_age = policy["dataset"]["publication"]["max_previous_age_days"]
+        if type(max_age) is not int or max_age < 0:
+            raise ValueError("max_previous_age_days must be a nonnegative calendar-day count")
+        fallback = not check["passed"]
+        if fallback:
+            eligible = (state["redo"] != "full" and definition.get("allow_previous", True) and previous and prior
+                        and prior.get("scope_hash") == scope_hash and prior.get("coverage_passed")
+                        and prior.get("as_of_date"))
+            age = (day - date.fromisoformat(prior["as_of_date"])).days if eligible else None
+            if not eligible or not 0 <= age <= max_age:
+                check["fallback_rejection"] = "no matching dated valid publication within configured age, or fallback disabled"
+                raise ValueError("security source units or market/asset coverage are incomplete; no eligible previous publication")
+            if not check_security_coverage(previous, required_groups=required_groups)["passed"]:
+                raise ValueError("previous security master failed coverage verification")
+            if {source["raw_ref"] for source in prior["sources"]} != set(manifest.raw_refs):
+                raise ValueError("previous source metadata does not match raw evidence references")
+            for source in prior["sources"]:
+                raw_manifest = Path(source["raw_ref"]).resolve()
+                if not raw_manifest.is_relative_to(paths["archive_root"]) or RawObjectStore.verify_manifest(raw_manifest) != source["raw_hash"]:
+                    raise ValueError("previous source evidence failed integrity verification")
+            records = tuple(previous)
+            promotions = []
+            publication_metadata = {**prior, "requested_date": day.isoformat(), "fallback": True,
+                                    "previous_age_days": age, "fallback_reason": check,
+                                    "previous_manifest_hash": file_hash(current_dir / "manifest.json")}
+        else:
+            # Retain trusted descriptive fields, but never retain omitted identities.
+            records = prepare_security_publication({key: value["rows"] for key, value in source_rows.items()}, comparable).records
+            publication_metadata = {"as_of_date": day.isoformat(), "requested_date": day.isoformat(),
+                "scope_hash": scope_hash, "coverage_passed": True, "fallback": False,
+                "required_groups": sorted(required_groups), "coverage": check,
+                "sources": [{"unit_key": key, "input_id": value["entry"]["input_id"],
+                             "source_date": day.isoformat(), "raw_ref": value["raw_ref"],
+                             "raw_hash": value["entry"]["raw_hash"],
+                             "artifact_hash": value["entry"]["artifact_hash"],
+                             "adapter_version": value["entry"]["report"].get("adapter_version"),
+                             "normalization_version": value["entry"]["report"].get("normalization_version")}
+                            for key, value in source_rows.items()]}
         rows = [{name: _json_value(getattr(item, name)) if name not in {"list_date", "delist_date"} else getattr(item, name)
                  for name in ("instrument_id", "symbol", "exchange", "asset_type", "name", "list_date", "delist_date", "status")}
                 for item in records]
@@ -1276,17 +1366,27 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
         if candidate.exists():
             RawObjectStore.preserve_directory(work, permitted_root=paths["workspace_root"] / "_tasks", archive_root=paths["archive_root"])
             work.mkdir(parents=True, exist_ok=True)
-        write_normalized_rows(candidate, rows, fields)
+        if fallback:
+            shutil.copyfile(previous_path, candidate)
+        else:
+            write_normalized_rows(candidate, rows, fields)
+        RawObjectStore(work).write_json(check, dataset="security_master", provider="pipeline", endpoint="coverage",
+            fetched_at=datetime.now(timezone.utc), attempt_id="coverage", relative_path="coverage.json")
         prepared = {"partition_directory": str(current_dir), "expected_count": len(records),
                     "row_count": len(records), "asset_type": "security", "partition_key": "current",
-                    "fallback_units": missing, "item_statuses": {item.instrument_id: "success" for item in records}}
-        if missing:
+                    "fallback_units": sorted(set(missing + check["recollect_units"])), "publication_metadata": publication_metadata,
+                    "item_statuses": {item.instrument_id: "success" for item in records}}
+        if fallback:
             prepared["prior_raw_refs"] = list(manifest.raw_refs)
     prepared.update(candidate=str(candidate), candidate_hash=file_hash(candidate), promotions=promotions,
                     trade_date=day.isoformat(), raw_refs=list(dict.fromkeys(
-                        [source["raw_ref"] for source in source_rows.values()] + prepared.get("prior_raw_refs", []))))
+                        prepared["prior_raw_refs"] if "prior_raw_refs" in prepared else
+                        [source["raw_ref"] for source in source_rows.values()])))
     state["commit"] = prepared
-    state["complete_today"] = len(valid) == len(units)
+    state["complete_today"] = len(valid) == len(units) and not prepared.get("publication_metadata", {}).get("fallback", False)
+    if state["dataset"] == "security_master":
+        state["data_date"] = prepared["publication_metadata"]["as_of_date"]
+        state["fallback_used"] = prepared["publication_metadata"]["fallback"]
 
 
 def _finish_task_commit(state, paths, metadata, failure_hook=None):
@@ -1340,7 +1440,8 @@ def _finish_task_commit(state, paths, metadata, failure_hook=None):
         _fsync_file(target)
         manifest = Manifest.from_file(target, dataset="security_master", asset_type="security", partition_key="current",
             row_count=commit["row_count"], expected_count=commit["expected_count"], first_key=None, last_key=None,
-            raw_refs=tuple(commit["raw_refs"]), item_statuses=commit["item_statuses"])
+            raw_refs=tuple(commit["raw_refs"]), item_statuses=commit["item_statuses"],
+            publication_metadata=commit.get("publication_metadata", {}))
         temporary_manifest = partition / ("manifest." + state["task_id"] + ".tmp.json")
         manifest.write_atomic(temporary_manifest)
         os.replace(target, partition / "data.parquet")
