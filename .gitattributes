@@ -1,4 +1,5 @@
 # Preserve this delivery's evidence bytes: Git newline conversion must not invalidate SHA-256 references.
+/provider_validation/results/legacy/tmp_test/** -text whitespace=cr-at-eol
 /provider_validation/results/input-collection-20261003/** -text whitespace=cr-at-eol
 /provider_validation/results/input-debug-20261003/** -text whitespace=cr-at-eol
 /provider_validation/results/input-final-20261003/** -text whitespace=cr-at-eol

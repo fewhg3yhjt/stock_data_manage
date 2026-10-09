@@ -178,10 +178,12 @@ TDX：公共行情适合延迟分钟与盘后校准，不宣称交易所级实�
 已落盘的 LOF 验证摘要位于：
 
 ```text
-tmp_test/etf_daily_probe/gap_lof_20260913/summary.json
-tmp_test/etf_daily_probe/gap_lof_eastmoney_only_20260913/summary.json
+provider_validation/results/legacy/tmp_test/etf_daily_probe/gap_lof_20260913/summary.json
+provider_validation/results/legacy/tmp_test/etf_daily_probe/gap_lof_eastmoney_only_20260913/summary.json
 ```
 
 探针脚本中“请求完成”不得直接映射为 `published`；零行结果必须按 `temporary_empty` 处理，这一规则同样适用于未来所有 Capability Probe。
 
 上述内容从被合并的旧总体设计保留，原文版本为 `72f94aca247691c3b0b72ee185505761f6197fb4`。本次仅保存独有的历史抽样解释，没有重新执行探针；其来源顺序、数量、TDX样本和时效不构成当前正式能力。当前TDX未取得正式Provider在线资格，证券清单任务仍受来源门禁约束。
+
+2026-10-09目录整理只更新以上历史摘要的文件位置，原字节和验证范围不变。原 `tmp_test/` 已归档；原路径与新路径的关系见 [迁移清单](provider_validation/results/legacy/tmp_test/archive-manifest.json)。

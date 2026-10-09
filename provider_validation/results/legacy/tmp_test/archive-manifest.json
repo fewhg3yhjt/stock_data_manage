@@ -1,0 +1,2325 @@
+{
+  "archive_kind": "historical_preimplementation_probe_evidence",
+  "moved_at": "2026-10-09T15:41:06.467998+00:00",
+  "previous_root": "tmp_test/",
+  "archive_root": "provider_validation/results/legacy/tmp_test/",
+  "source_git_revision": "d2f1ce7c8fea35c70b26d1f9e9671c6b478e6e17",
+  "file_count": 381,
+  "bytes": 61182860,
+  "excluded": {
+    "reason": "Only Python bytecode cache removed",
+    "file_count": 8
+  },
+  "files": [
+    {
+      "relative_path": "build_security_master.py",
+      "bytes": 7230,
+      "sha256": "14b9d3cce332ab94537213262d5895a0004d90db202d5344578df120df79d059",
+      "tracked_before": true
+    },
+    {
+      "relative_path": "etf_daily_probe/.etf_daily_probe.lock",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_20260913/baostock/history_checkpoint.jsonl",
+      "bytes": 422,
+      "sha256": "1af357efac0fe65b6e69c98f74c5ac233d98f5048a032c593a4b0d4638f8d57d",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_20260913/baostock/history_status.csv",
+      "bytes": 160,
+      "sha256": "911bb9e6c5ac794d84e3183dcca80f41884b00783cd96cc14df6044becda49a6",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_20260913/baostock/history_status.parquet",
+      "bytes": 4369,
+      "sha256": "eeb8a4cd87e35298ad57472b32dfd503ae91f2647df9367e33e320a5ff76d365",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_20260913/eastmoney/history_checkpoint.jsonl",
+      "bytes": 1824,
+      "sha256": "213c12189cbdda73dc25ce99f3437484e29196cf164a87fe26215db662006533",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_20260913/eastmoney/history_status.csv",
+      "bytes": 1550,
+      "sha256": "0fa0e761fafc63b942850daf0404e1c9be5baffeed914bb7027e66c099dd5838",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_20260913/eastmoney/history_status.parquet",
+      "bytes": 5671,
+      "sha256": "371dee68e5d8b1538c6ecfb5d4ef502a8c92703c629c16a6269f24ea98a7addb",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_20260913/run.log",
+      "bytes": 594,
+      "sha256": "8051159630f9443063726e03b94a13f46cad719a65bbb631216e5e513c6e4c54",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_20260913/run_config.json",
+      "bytes": 467,
+      "sha256": "6c5f9734af1fa76b360e361a831e5c7edae1b86f5566ecac0b91a929960a5e59",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_20260913/sina/history_checkpoint.jsonl",
+      "bytes": 1900,
+      "sha256": "ea75ce932c6fbecbf8ffc14beadbdf6e2e5fe014faa0086c636d089912ff2194",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_20260913/sina/history_status.csv",
+      "bytes": 1088,
+      "sha256": "b939fa10f816da1f2f556cc02d145e691d0ba0e319d8ecef39d9ee455ae93f0c",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_20260913/sina/history_status.parquet",
+      "bytes": 6920,
+      "sha256": "02f668fc4bf87de17e4d082d1fd7d8cd7745e67cbba0fb85ff4e25ec887d7a0b",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_20260913/sina/symbols/sh501018.parquet",
+      "bytes": 83669,
+      "sha256": "77787f4781ac3f77705744910d1745e73ab71bd5423986bbe39dc85c7cc1bd81",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_20260913/sina/symbols/sz166009.parquet",
+      "bytes": 101182,
+      "sha256": "cf0977016b0aed965a3157d69fa0c4503bb3d241b86f209d6861969b341f5483",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_20260913/summary.json",
+      "bytes": 3695,
+      "sha256": "4cf3c9bf74a5eb400cd62c8df1e5966aae9258a77d18f7b084fe771bf583fd9a",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_20260913/tencent/history_checkpoint.jsonl",
+      "bytes": 1654,
+      "sha256": "81b1e48c4fb499e2ad23f454c2ab5bc7aff0a058d60b22e92ae0b106f5b7b42b",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_20260913/tencent/history_status.csv",
+      "bytes": 1114,
+      "sha256": "042862ce09013c2b43971f961f4068a939025f5f58037c15756ae3c090c78a38",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_20260913/tencent/history_status.parquet",
+      "bytes": 6962,
+      "sha256": "262ca8603e0750669a725cfb1200ff5b8b38a52607ed652345f3ed4dc420d37e",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_20260913/tencent/symbols/sh501018.parquet",
+      "bytes": 31532,
+      "sha256": "6571d998e994b137d58e174baa5cc6c89eee14bdfa6edc8456ef50bbae967076",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_20260913/tencent/symbols/sz166009.parquet",
+      "bytes": 30620,
+      "sha256": "cf88ad796960fd0dee82c51119b823a71c65f879849ad71ace9a82e0a311538a",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_eastmoney_only_20260913/run.log",
+      "bytes": 167,
+      "sha256": "ea8491bd0e8f0609254b128ecbfc2f49f92c712fe30dca640340b9dc2caa73fa",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_eastmoney_only_20260913/run_config.json",
+      "bytes": 467,
+      "sha256": "9d2c7721c9d5aa2775e84483f90ec331347226b774bed08822032613c85ce0a2",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_eastmoney_only_20260913/sina/history_checkpoint.jsonl",
+      "bytes": 2595,
+      "sha256": "bfb4ae7bc5b04d950ec15113e0d4d9412c1d09fbc89bc6e4f9aef4ef7d6c9af8",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_eastmoney_only_20260913/sina/history_status.csv",
+      "bytes": 469,
+      "sha256": "9cf71ef91c64571f87c96c04943ecf643de5002874ed576abcf953f8609d36f3",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_eastmoney_only_20260913/sina/history_status.parquet",
+      "bytes": 4643,
+      "sha256": "327a237f5b07f05d13676c24a18b49ea4e9918caff21c94ed068e87a440f04e0",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_eastmoney_only_20260913/sina/symbols/sh501075.parquet",
+      "bytes": 64739,
+      "sha256": "564bbaceb23c978322cdf84d4922791fd20f3e6a2b47082bf8805bb3c8b10d25",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_eastmoney_only_20260913/sina/symbols/sh501076.parquet",
+      "bytes": 57122,
+      "sha256": "89ec3b574fd03293485f4cf99e4fc1114aeb9e9b951e17a52b4c63aeb877878c",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_eastmoney_only_20260913/sina/symbols/sz160128.parquet",
+      "bytes": 62710,
+      "sha256": "d2e986ceca741516401ba22dd16b6d9be096ba1118a51be64deddb1a5620098c",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_eastmoney_only_20260913/sina/symbols/sz160219.parquet",
+      "bytes": 46464,
+      "sha256": "b4b3efa616419ee8acbcd3e8af09a230483a90cee5373a27b074000984c46771",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_eastmoney_only_20260913/sina/symbols/sz160618.parquet",
+      "bytes": 59494,
+      "sha256": "5d4bfd07afd09571ffd51a61654b1d48af1da54d0103a7e5bb66cbf64f1acfa9",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_eastmoney_only_20260913/sina/symbols/sz160626.parquet",
+      "bytes": 48149,
+      "sha256": "95d024b076669c11672bfb953129e780923ae06dcb1ff2afc6b6c6f06217e3a4",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_eastmoney_only_20260913/summary.json",
+      "bytes": 2194,
+      "sha256": "3cabd5cfec434634be3f822825091173f9127f7326a4ce9dc4aa6b4ff22ab448",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_eastmoney_only_20260913/tencent/history_checkpoint.jsonl",
+      "bytes": 1797,
+      "sha256": "b375833c4384c14ea788a006aceb456ae6e865562941386a52fcaf637486b836",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_eastmoney_only_20260913/tencent/history_status.csv",
+      "bytes": 487,
+      "sha256": "85b63d11abf6dc33f16c3180f5c001e91c708e7f0902d90bd66ad69faddd2ec6",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_eastmoney_only_20260913/tencent/history_status.parquet",
+      "bytes": 4626,
+      "sha256": "2eb99862da2d6571a7278278f9a1beb2a5cf4b332c2ee0a68b927512367fb286",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_eastmoney_only_20260913/tencent/symbols/sh501075.parquet",
+      "bytes": 33851,
+      "sha256": "c10fdab5b92a276f289df31ccaa506b62dcadd3d88192da4ae10e3e228f179b9",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_eastmoney_only_20260913/tencent/symbols/sh501076.parquet",
+      "bytes": 30585,
+      "sha256": "611ddaefbb13bfd16033c5790e986ad982838dae8fed2a3703abf3bc57975c86",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_eastmoney_only_20260913/tencent/symbols/sz160128.parquet",
+      "bytes": 22560,
+      "sha256": "c358b2e0bdadb0ab0d87cc18a1e8d0e0d7544ac1e21e367a6434b431d86730ce",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_eastmoney_only_20260913/tencent/symbols/sz160219.parquet",
+      "bytes": 26620,
+      "sha256": "af3116426fe03ce1a0fe11c438357288067544ab5bfe460383a946cda62220a5",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_eastmoney_only_20260913/tencent/symbols/sz160618.parquet",
+      "bytes": 23797,
+      "sha256": "15af8ef5278f70f7b2a21cb1ec7a588b403850b23ea10253a35f463ab76fb5d2",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/gap_lof_eastmoney_only_20260913/tencent/symbols/sz160626.parquet",
+      "bytes": 29445,
+      "sha256": "035a90afcb90f905256e2fd23f97abd056e01fcbfb1bad31e1f0c8effe97b7e2",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/LATEST.txt",
+      "bytes": 99,
+      "sha256": "ab12575ff3fc5e15f242dfb2f23939cfb051f8ebeab720be702e0c977c478904",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_221825/eastmoney/snapshot.csv",
+      "bytes": 281327,
+      "sha256": "9523fb836a6e59422757a68bfd57746705191a7e8b360c9605c1ad24392e1fc1",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_221825/eastmoney/snapshot.parquet",
+      "bytes": 183095,
+      "sha256": "9dc29b7241ed16d86cce1b3c3353be59859d437ad06b67243a51705f48ebc711",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_221825/run.log",
+      "bytes": 326,
+      "sha256": "7b31b94ed56302f3adbbed75701c5343b8e23aed453056cec90b4c48189a59d0",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_221825/run_config.json",
+      "bytes": 461,
+      "sha256": "abe92e5344de02b9ec0ab53c0d4f5385a6bd0b8423729167e6f5dc14b327bc85",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_221825/sina/snapshot.csv",
+      "bytes": 172426,
+      "sha256": "849a9178c5b752c33520f78f506ca11f130ff3efe002a9b41d77c1d0167d3cb9",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_221825/sina/snapshot.parquet",
+      "bytes": 118328,
+      "sha256": "e563dddd031a31f0d9e92d08a123c1f386ec772c069991a39c777e24dff59c01",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_221825/summary.json",
+      "bytes": 1920,
+      "sha256": "66dd9cb27865d4dc3cca10f03a9d8c451e0715c48a8c285f06de1082ba05c724",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_221825/tencent/daily.parquet",
+      "bytes": 105218,
+      "sha256": "25a7ce972166cf9a82b017ad155c226d1ed5ad2a917bf1be6fc74b069bb92eac",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_221825/tencent/responses.jsonl",
+      "bytes": 860237,
+      "sha256": "d834f148739245d66f4f50fd387e63236cca0f93e3c18beb12e80dd31bffbf68",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222058/baostock/daily_rows.csv",
+      "bytes": 683,
+      "sha256": "29e4057bc320c5773b7547072c9591af9c0b74231e626653820e890034001032",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222058/baostock/daily_rows.parquet",
+      "bytes": 9713,
+      "sha256": "c286b16fc25075a9bad47f4398b2d86da992185287190eecdcb6a9053be2290f",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222058/baostock/history_checkpoint.jsonl",
+      "bytes": 1906,
+      "sha256": "5d85fc14a17cb267d00ad1c419f31ca9599460a49645603fb111cf2790453743",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222058/baostock/history_status.csv",
+      "bytes": 242,
+      "sha256": "011828bb5af11ffebb6d815065c2e214391bcc9e222199f50a9c19511a0effe7",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222058/baostock/history_status.parquet",
+      "bytes": 3923,
+      "sha256": "db785afa4439487a604ef42896711ae9e826dab048a205146ccaf7cdb8aedc5a",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222058/eastmoney/daily_rows.csv",
+      "bytes": 5,
+      "sha256": "f01a374e9c81e3db89b3a42940c4d6a5447684986a1296e42bf13f196eed6295",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222058/eastmoney/daily_rows.parquet",
+      "bytes": 636,
+      "sha256": "4aee2b36531c274dd9439e9e79ed1190fe9e4f679774b697f5568a65ebea5e90",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222058/eastmoney/history_checkpoint.jsonl",
+      "bytes": 968,
+      "sha256": "445c1d1d3865156365e364271794c2be5e660cebace27b0124f975ff033fd5c0",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222058/eastmoney/history_status.csv",
+      "bytes": 712,
+      "sha256": "c5f4efa38250af9ada0b026192f4bfed02fedecc07b51865e01cc4a5c9a76619",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222058/eastmoney/history_status.parquet",
+      "bytes": 4949,
+      "sha256": "92b2c11f6d1841580aaa07c2beee78c0032a6925e56d089ce663b32422f42567",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222058/run.log",
+      "bytes": 340,
+      "sha256": "9d37b79d5bcee140d2ac02199d9e79ae63dbdba5c8d0a556b670769350c420cf",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222058/run_config.json",
+      "bytes": 457,
+      "sha256": "9d087da20855ee7fea3328339ba8c65d0e93edb87f448eb363ccc92c119f08c8",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222058/sina/daily_rows.csv",
+      "bytes": 401,
+      "sha256": "05d932a5f66e3ee9ea741d888dab4d64862ac64bc8218c09742255189615de0c",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222058/sina/daily_rows.parquet",
+      "bytes": 5942,
+      "sha256": "7b284e3307143b74a41a39017ac79e0a21e4d832b97ac62fae171f9a0cd1249b",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222058/sina/history_checkpoint.jsonl",
+      "bytes": 1616,
+      "sha256": "54f40d852a7d754a555a89b3ede4f2c3dfdb9ab5c4018ed2cbd087560b88a3dc",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222058/sina/history_status.csv",
+      "bytes": 226,
+      "sha256": "2b3f2efcf4cf192e0ebbf4389ed77fdacbe013448b05387d6a8f70d73d296dbf",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222058/sina/history_status.parquet",
+      "bytes": 3903,
+      "sha256": "345d062efb9c36834493ec048bc917fa3cf7b05617e55a6c2305dc673ca5018c",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222058/summary.json",
+      "bytes": 4316,
+      "sha256": "44e054ba3cb7eb8f5418894a58ff81fe97187e73ddde8cd1eeb0d05b8fbb46df",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222058/tencent/daily_rows.csv",
+      "bytes": 421,
+      "sha256": "5bd9f6557d77751609b412da5dc65723a5415306d9349d214dfc1c985e7d964e",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222058/tencent/daily_rows.parquet",
+      "bytes": 5961,
+      "sha256": "dd0066c93a23320b8409a11e22ebe608951e24b87f02268bf3a5fd534d05c4d9",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222058/tencent/history_checkpoint.jsonl",
+      "bytes": 1488,
+      "sha256": "be8e3e696b08692f590e1e6a44f9c856256969ff378225b1f53c6fdb08e448ef",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222058/tencent/history_status.csv",
+      "bytes": 238,
+      "sha256": "79c88253d7017fd88151ccf1461988bb8cfd2dcc181dc32f5607b44b76200d63",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222058/tencent/history_status.parquet",
+      "bytes": 3918,
+      "sha256": "a839cf749a42b956521bc13352c375f1170ae8f90e68dec26ab7232037da5132",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222920/run.log",
+      "bytes": 82,
+      "sha256": "2ac76dd90c1c0a1e0bd50b055c1422858fd3e0b6aaefa20dac15066217a14bdb",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222920/run_config.json",
+      "bytes": 457,
+      "sha256": "5148edf69ac9d7c14b3775dcbab712c6e1a215f06a0a0665c5cdd2912d2f6b27",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222920/sina/daily_rows.csv",
+      "bytes": 352449,
+      "sha256": "1ae1114ac8766af732494ec6a7334b38690ce349d0df2806914c04e7dc0006e0",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222920/sina/daily_rows.parquet",
+      "bytes": 132200,
+      "sha256": "cd78f221563207d484b36e60d41c37e493b97d7e51cf17e7c22d27c53bacf804",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222920/sina/history_checkpoint.jsonl",
+      "bytes": 550583,
+      "sha256": "45889dfaf14517011f726dbb02048501f4e089d7e8d4553541ca2d5f150dc5ac",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222920/sina/history_status.csv",
+      "bytes": 141,
+      "sha256": "c1476233592bc4beba632f3075315e717630b2c73d7b342fc035a4f2209dc3af",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222920/sina/history_status.parquet",
+      "bytes": 4469,
+      "sha256": "2238d01dd63bd462cd4746555615c413081af855bcc5288603f0ca6588142884",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222920/sina/symbols/sh510300.parquet",
+      "bytes": 132200,
+      "sha256": "cd78f221563207d484b36e60d41c37e493b97d7e51cf17e7c22d27c53bacf804",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260912_222920/summary.json",
+      "bytes": 1316,
+      "sha256": "21638b85605416d6885076f5aed6aec88d63a81a56ce8e468cb9ae9945e8b9f1",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260913_132826/eastmoney/eastmoney_checkpoint.json",
+      "bytes": 378,
+      "sha256": "fb02f690be9454d119e32aa2e5eed7ee49a614944e447deb69a0910e8b115bd2",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260913_132826/eastmoney/snapshot.csv",
+      "bytes": 60732,
+      "sha256": "8348370a1cc70277a0e961e7794e1bbd728ac0d5f8fe92b76673bed2c601ba70",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260913_132826/run.log",
+      "bytes": 79,
+      "sha256": "4736b9a1949c1d74efd3e368b2a10fb368bff236ed1155bef66ebfabee372c25",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260913_132826/run_config.json",
+      "bytes": 460,
+      "sha256": "49ccf817e197c1891f833525218b313a075e83379b7e11bd32258f32750ef61b",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260913_132826/sina/snapshot.csv",
+      "bytes": 35083,
+      "sha256": "03b379e15808f8fb253de8396784f407454921345abcc2902ce99c4f41c7028d",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260913_132826/sina/snapshot.parquet",
+      "bytes": 37551,
+      "sha256": "2c55dad6094ada963e1ba5bb679f812c101ae6573c5209b38c32fb470f9be2e4",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260913_132826/summary.json",
+      "bytes": 2116,
+      "sha256": "16dc9bea0dfc640b49e2bb4c48ddabe2617601f6b05237641220cece5cc79f0b",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260913_132826/tencent/daily.parquet",
+      "bytes": 31676,
+      "sha256": "3ceee9842a4176c16127d0fe941f6f2866e28510c68f07a21b7cb15fb6409933",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260913_132826/tencent/responses.jsonl",
+      "bytes": 174948,
+      "sha256": "d9850c6ed9fa4040f8769b4a6902f554cf40d5893fb62889b42f796938fae0c1",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260913_133214/run.log",
+      "bytes": 76,
+      "sha256": "29b76112a4157ce8b1d9462ecb9842d43e081cbd2453255e534e1409241e0771",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260913_133214/run_config.json",
+      "bytes": 471,
+      "sha256": "8788ffa3ac979e85bbf506e7ecd3dc34d2167f20f69e02ecb3b21fd1ef087751",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260913_133214/summary.json",
+      "bytes": 662,
+      "sha256": "816a7a17e410fd80ed4b274ffa711f1f8ff5038d0f6e8cf0ea679599688162b5",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260913_133214/tencent/daily.parquet",
+      "bytes": 10470,
+      "sha256": "03b72b5ea0243c2596a546608bdbc9fa82b3c62b4e1c8a4bf6ac1da1787b47b9",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe/run_20260913_133214/tencent/responses.jsonl",
+      "bytes": 19281,
+      "sha256": "54b58bd9c7b9d7a74826ed8fd74a54ee096da514d100914b81959748300a5d2c",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_daily_probe.py",
+      "bytes": 23028,
+      "sha256": "d4ab7a0dbc0f3519bb7ceb2e31b279ef19cb9693e9951a0577d40e03ed8ff91d",
+      "tracked_before": true
+    },
+    {
+      "relative_path": "etf_full_probe/LATEST.txt",
+      "bytes": 88,
+      "sha256": "0b67f958559b2fc9428a69d3c20769a171448406bba62c4d2b8a3e2b28618b6a",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_full_probe/run_20260912_220930/eastmoney_etf/eastmoney_checkpoint.json",
+      "bytes": 1485,
+      "sha256": "432c8d8547b5d1c30567eda0a48a2242ad7ac2028223a8c53db37af2b6d53344",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_full_probe/run_20260912_220930/eastmoney_etf/instrument_normalized.csv",
+      "bytes": 93714,
+      "sha256": "faee0a06b739fb435929e06a83cff7973e432fc26c403a7d59ba95d78040231d",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_full_probe/run_20260912_220930/eastmoney_etf/instrument_normalized.parquet",
+      "bytes": 30058,
+      "sha256": "73249fe5133835b604243eb55dc40d7797790fccf7950d8c31fd647b1fd8d88a",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_full_probe/run_20260912_220930/eastmoney_etf/snapshot_raw.csv",
+      "bytes": 281327,
+      "sha256": "9523fb836a6e59422757a68bfd57746705191a7e8b360c9605c1ad24392e1fc1",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_full_probe/run_20260912_220930/instrument_master.csv",
+      "bytes": 126207,
+      "sha256": "1eb10041de6173176f2c37ee02e66952d64285dd8c745dfc06a9505769ef8858",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_full_probe/run_20260912_220930/instrument_master.parquet",
+      "bytes": 35587,
+      "sha256": "f7ae57edd2189d7a7f9952b272563d171b9636f0b16598e0d1e913c7a6040c90",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_full_probe/run_20260912_220930/instrument_master_all_sources.csv",
+      "bytes": 143157,
+      "sha256": "f1d139d4d14a2032979b2a5028df665337b7e6891cff0e35b8b1118be9fdcc35",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_full_probe/run_20260912_220930/instrument_master_all_sources.parquet",
+      "bytes": 37299,
+      "sha256": "4fd9ba9e132d1ed5faab46b0b04945134a4c541a1f0e9e328c35d8e86262903f",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_full_probe/run_20260912_220930/security_master.csv",
+      "bytes": 1436887,
+      "sha256": "eb943596f1cc27478ea83df109f7fdaf78a2c9238ec1da95d71fd12573f21d5e",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_full_probe/run_20260912_220930/security_master.parquet",
+      "bytes": 342399,
+      "sha256": "6e86e28c2016a1560908dc84771a9eced7d2cd41ab3c77f72a2f581a2a202548",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_full_probe/run_20260912_220930/security_master_all_sources.csv",
+      "bytes": 1448914,
+      "sha256": "20d6aa847d8afa0dd2a5d1fcddc5aaacf22582a63ede163e2c11c2c5732a6ae2",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_full_probe/run_20260912_220930/security_master_all_sources.parquet",
+      "bytes": 344494,
+      "sha256": "604a5332460c2db241f30b2161506d97c047572fe4ac80cae5768f8813bd5e7b",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_full_probe/run_20260912_220930/security_master_all_sources_summary.json",
+      "bytes": 405,
+      "sha256": "86aa847ebf48db81195c89aedf046d015c8333c4c225b39c255126bc4fd32cbd",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_full_probe/run_20260912_220930/security_master_summary.json",
+      "bytes": 405,
+      "sha256": "647e5879558133e4686a0befe4e90b97f2922dce97902ec0218664a64dd7f40c",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_full_probe/run_20260912_220930/sina_etf/instrument_normalized.csv",
+      "bytes": 88430,
+      "sha256": "eef760c1d6249068a662068761b8469649abde7e9785ecb42feb0d7d2ca02220",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_full_probe/run_20260912_220930/sina_etf/instrument_normalized.parquet",
+      "bytes": 29358,
+      "sha256": "b0e0ce96cfbce7fd1268956a40b33552a5da9c47020d0a89d77f7b018d20da7a",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_full_probe/run_20260912_220930/sina_etf/snapshot_raw.csv",
+      "bytes": 172426,
+      "sha256": "849a9178c5b752c33520f78f506ca11f130ff3efe002a9b41d77c1d0167d3cb9",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_full_probe/run_20260912_220930/sina_etf/snapshot_raw.parquet",
+      "bytes": 118328,
+      "sha256": "e563dddd031a31f0d9e92d08a123c1f386ec772c069991a39c777e24dff59c01",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_full_probe/run_20260912_220930/sina_lof/instrument_normalized.csv",
+      "bytes": 18562,
+      "sha256": "8d5002a63348c14cec42120e810ac59eba9104b9d3f65feca5d51f510a1ac832",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_full_probe/run_20260912_220930/sina_lof/instrument_normalized.parquet",
+      "bytes": 10268,
+      "sha256": "049e728f6f37a514641ae5d0635595a340fa94aec64400acee69e680b6a0b071",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_full_probe/run_20260912_220930/sina_lof/snapshot_raw.csv",
+      "bytes": 35083,
+      "sha256": "03b379e15808f8fb253de8396784f407454921345abcc2902ce99c4f41c7028d",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_full_probe/run_20260912_220930/sina_lof/snapshot_raw.parquet",
+      "bytes": 37551,
+      "sha256": "2c55dad6094ada963e1ba5bb679f812c101ae6573c5209b38c32fb470f9be2e4",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "etf_full_probe/run_20260912_220930/summary.json",
+      "bytes": 4869,
+      "sha256": "37a5908d2eab846d49cc33b018b4e5a491d8ff817a4e85aea4ca94f36f830b80",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "ETF_MINUTE_REPORT.md",
+      "bytes": 5167,
+      "sha256": "65c896750af5a9eb17560e83f01a08335e6e3a30ce20d81c8bb6e28fe6546d23",
+      "tracked_before": true
+    },
+    {
+      "relative_path": "etf_universe_probe.py",
+      "bytes": 10901,
+      "sha256": "e9d35914f7241e91dc98509b761fa4a46d89e128ede8fedf6689f9900c30d7f4",
+      "tracked_before": true
+    },
+    {
+      "relative_path": "full_market_day_probe.py",
+      "bytes": 23994,
+      "sha256": "d7f722428ac47eed9a7dad34fc9b6df5c797b1ec7402cbdbc61b575e148e4fda",
+      "tracked_before": true
+    },
+    {
+      "relative_path": "historical_daily_probe/.historical_daily_probe.lock",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/CAPABILITY_REPORT.md",
+      "bytes": 4332,
+      "sha256": "c87bf6835c948183c1669f706793043db45d2e4b699d52e9dd9629f1b9279f6c",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_baostock/baostock/chinext/raw.json",
+      "bytes": 924577,
+      "sha256": "4f7be757c0bb43eddb2252a96f0980109f3399097a344f795fe347115689f9f1",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_baostock/baostock/chinext/source_rows.parquet",
+      "bytes": 180780,
+      "sha256": "5a708ffa9e58092a8c94a1c237d43a11ea6f9c858c67b0d2dab0dd9e6df06d72",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_baostock/baostock/new_302/raw.json",
+      "bytes": 1765675,
+      "sha256": "21ce51dbb2a9b152b03200605263d4c4f3d2ae8b7ac4eb0e7a888dea0b6fe791",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_baostock/baostock/new_302/source_rows.parquet",
+      "bytes": 293766,
+      "sha256": "10d634034bffb3521221443be5c6b4c3df21de6a607fc9ba39f887b8d9b8bc25",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_baostock/baostock/sh_etf/raw.json",
+      "bytes": 73772,
+      "sha256": "3296639fedf79570ae5da099e658c55f081472beb33568a60d27a3136d8e2316",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_baostock/baostock/sh_etf/source_rows.parquet",
+      "bytes": 21384,
+      "sha256": "e14c1456a67000c22b8c18468c6e5cd3cecc764a8f572b8880d1bbd823003b16",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_baostock/baostock/sh_index/raw.json",
+      "bytes": 4030816,
+      "sha256": "be46214f9242c5adf69df5af12ca1019f498093de7fa736b17a6b65499d1ddff",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_baostock/baostock/sh_index/source_rows.parquet",
+      "bytes": 686020,
+      "sha256": "2584baf9ef748718d44adc3ac992453f3c604a8a69d8eb9495e0fce8f6f7e398",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_baostock/baostock/sh_main/raw.json",
+      "bytes": 2794720,
+      "sha256": "4e911d256593b529693c6323caf6395e4c2d927ba2ff91f0deba4cfa7c924293",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_baostock/baostock/sh_main/source_rows.parquet",
+      "bytes": 509112,
+      "sha256": "f0bee285980a734da06bf41ad31268a72112f0a346201eb9d4d2675fb4a992b8",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_baostock/baostock/star/raw.json",
+      "bytes": 788251,
+      "sha256": "7a77a285b5077a599200e6b26b57c442a3d554fb4d20368adc9c2349344c416b",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_baostock/baostock/star/source_rows.parquet",
+      "bytes": 143265,
+      "sha256": "8685130e50ccb53ad5cf9628b6563cf06082338272317becced66ac502d5d4d9",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_baostock/baostock/suspended/raw.json",
+      "bytes": 3776101,
+      "sha256": "431eb7a0ea51a2967d45ddb454d698b098c3dd8e917c2c3b193450e390e881c3",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_baostock/baostock/suspended/source_rows.parquet",
+      "bytes": 544665,
+      "sha256": "24fd1e2cca42059f02a6965bfc32fd8797eb5bb0bd48ee73dfe928be02ed04ad",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_baostock/baostock/sz_etf/raw.json",
+      "bytes": 73616,
+      "sha256": "8758363925f605964399ab0cf990e454385fb9f9d0f3db4978ec4df2bb5711bb",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_baostock/baostock/sz_etf/source_rows.parquet",
+      "bytes": 21495,
+      "sha256": "da818c7c91b3cdf2b1cae2e7539c266a1a3c8dc90c2a7147288cb0acb22c210b",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_baostock/baostock/sz_main/raw.json",
+      "bytes": 3921966,
+      "sha256": "9d708fe30f1c505ec78462fd1aff90c5aecc4e1ebd62b5a40520daa236b1eded",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_baostock/baostock/sz_main/source_rows.parquet",
+      "bytes": 601362,
+      "sha256": "ae3789a201ebff1f76b5398e405a8976a48d6051fcb2278a4af2bd71835fd3be",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_baostock/completed.json",
+      "bytes": 6648,
+      "sha256": "161f7e6c23909d2d5ea894a4dc6a17b5cd85b8eaa379032e266968210a6a98f9",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_baostock/run.log",
+      "bytes": 1386,
+      "sha256": "c5b44445a0c6f51da392d8b6066d0e441aabee761a995d521bfbc9f71e1f91a4",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_baostock/run_config.json",
+      "bytes": 2857,
+      "sha256": "ee2bf474968a5d5adc6e2936b990d40a5764edeb2f11cbc56cfa5e286666375e",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_baostock/summary.csv",
+      "bytes": 2553,
+      "sha256": "a4995f7eaa5532900080a550d6ca843e45573a688e6988da33d036959e0674e0",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_eastmoney/completed.json",
+      "bytes": 6312,
+      "sha256": "37e09001dd0dfa2ce52c5edf42c6f065972090fb268f3a61062904c3b66a7107",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_eastmoney/run.log",
+      "bytes": 429,
+      "sha256": "f9052a4bb2933436635d01fd55205a7b096f065e0cee751d4131e20b07fc0fec",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_eastmoney/run_config.json",
+      "bytes": 2858,
+      "sha256": "9dc00f3900db9432bb1575e952ce44e05ab433a1be98a408956a37701df3dfae",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_eastmoney/summary.csv",
+      "bytes": 2183,
+      "sha256": "cb05897057d2c8337767b9bc2b77266c935af03888f592117cd9d3e81ec13e70",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_sina/completed.json",
+      "bytes": 5893,
+      "sha256": "5dc530a669bd2ca697a380365f3a8b5c64dce13fc614e4cf4cd65565b7a3ba81",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_sina/run.log",
+      "bytes": 1327,
+      "sha256": "31e44ae0b47e096c1261e7a0ec5db93ebcdd26441c408dd3a7f2ad974f0c9f53",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_sina/run_config.json",
+      "bytes": 2853,
+      "sha256": "499454e95499ea63787a3244f1c45a7913c195e1968415007e9eba4f34bc7959",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_sina/sina/bse/raw.json",
+      "bytes": 171114,
+      "sha256": "1b2e1ebeb40edac74a3d3a0f5de50d956acfcbf921d3bfe3118149636885dbf8",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_sina/sina/bse/source_rows.parquet",
+      "bytes": 31811,
+      "sha256": "005345429bb57dec553c117f4f169764ae44166cb088567e67cbc9e647e5ff73",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_sina/sina/chinext/raw.json",
+      "bytes": 179094,
+      "sha256": "f1deba2813516e947d6fd6217202f613608d76948d90296c8cea7bb7e4601bf4",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_sina/sina/chinext/source_rows.parquet",
+      "bytes": 38633,
+      "sha256": "6ec7d8d8dd9cf3d130dd47b031d8b4f04963ac51711420370bb7ec44c869787c",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_sina/sina/new_302/raw.json",
+      "bytes": 174461,
+      "sha256": "762c85749b8bf1d6176f19ebfac170a6734c89ea20fddaa265421b6f57fe0112",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_sina/sina/new_302/source_rows.parquet",
+      "bytes": 37361,
+      "sha256": "e9decb5819e23ca4117cd8d68028d025059a953309a0fe92d957b7c9338b09ec",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_sina/sina/sh_etf/raw.json",
+      "bytes": 172349,
+      "sha256": "aef72d2f477854452104f7c933698c095cebeefeed3388b9b302721f7f566c6f",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_sina/sina/sh_etf/source_rows.parquet",
+      "bytes": 35870,
+      "sha256": "0616e9d906371ef9ff9cc1c3b7cd04f71c73773b691c236b20e6b93f67aba7f2",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_sina/sina/sh_index/raw.json",
+      "bytes": 186322,
+      "sha256": "f92536f821c7f7f07139d48f6ca3b329f6ed65296b4ac2e7036a0089914e7c6c",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_sina/sina/sh_index/source_rows.parquet",
+      "bytes": 47241,
+      "sha256": "3f4857db9b2a9007a88c2e2bc7056776c831833f86a2b198d2243997b19e2c0c",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_sina/sina/sh_main/raw.json",
+      "bytes": 182239,
+      "sha256": "eb3226cf2c8c0b9f91a4d62feebd77091b4686826f0f00d19a0e8c2871c82db2",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_sina/sina/sh_main/source_rows.parquet",
+      "bytes": 36751,
+      "sha256": "12defb4245215648a3bc5c738ee269e73957beedb633e7000a942f654a4f23b2",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_sina/sina/star/raw.json",
+      "bytes": 174010,
+      "sha256": "38e8b62a573658a7b6e370f2c4e49c951b624e1e4460522c75f81b89d7c97918",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_sina/sina/star/source_rows.parquet",
+      "bytes": 35245,
+      "sha256": "ed4698f3e27e797f2cdff9fef8c3e905d05f31877d31558179f62e2067b412cc",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_sina/sina/suspended/raw.json",
+      "bytes": 170923,
+      "sha256": "e3afda6e870fabed2e0375ce69ee075a63172e676a43e207bb8e9e75c4aea28d",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_sina/sina/suspended/source_rows.parquet",
+      "bytes": 26876,
+      "sha256": "91a0dbf38924fb082482e72fad2b665d7224119225d0a488a77b0d688740aceb",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_sina/sina/sz_etf/raw.json",
+      "bytes": 171861,
+      "sha256": "3424e4dd6196bff5a075d3af1983653d9c198e5abdedebd1f4976f9ec098d35d",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_sina/sina/sz_etf/source_rows.parquet",
+      "bytes": 35892,
+      "sha256": "ce6cb0e46318126182e466a2b593a1e11ca84eb65baee36b3cb7e227f8f684dd",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_sina/sina/sz_main/raw.json",
+      "bytes": 175251,
+      "sha256": "6d2512611137e41b9fa3e3afbf6088de11c1250891ba6529e8ae07971ca3ffee",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_sina/sina/sz_main/source_rows.parquet",
+      "bytes": 28020,
+      "sha256": "158aac791bd173716dd04e7b8e78652f6445b9a89928c5363173b5b86b4d0150",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_sina/summary.csv",
+      "bytes": 1802,
+      "sha256": "758180ca24bd3c435e4dc70d405e217f2d4bdabad931f5a9ec03b13128feff8a",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent/completed.json",
+      "bytes": 5966,
+      "sha256": "3877ec1c8b94b8207bd37b7792dfd687c7e969633f107049b10e5c9d45f31c57",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent/run.log",
+      "bytes": 2607,
+      "sha256": "048e3ef648211645f8bd274abc7f978bff012b7dd832492fb3dc3366a20401b2",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent/run_config.json",
+      "bytes": 2856,
+      "sha256": "edd822294926a7962d7d065a2e06988242d46db41405bee4468e0575a74c9580",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent/summary.csv",
+      "bytes": 1875,
+      "sha256": "86ed11ec689dcd772db004ad0fa76ed72a228c44e4513af1cfa6c3d3d78d992b",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent/tencent/bse/raw.json",
+      "bytes": 2957,
+      "sha256": "ef5fa9f09939a19cf9d9d8bd84382bcc1c13dad09d988817a474d80f1373b187",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent/tencent/bse/source_rows.parquet",
+      "bytes": 3867,
+      "sha256": "a287aaee52474958eaf86e828bddbd342bf8151af2dcf5ecbdc6ca91b745f552",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent/tencent/chinext/raw.json",
+      "bytes": 116968,
+      "sha256": "3f494e04d581e41413558b6e3c9d8008d8784a8405a09b6d822baa7c381386b5",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent/tencent/chinext/source_rows.parquet",
+      "bytes": 27167,
+      "sha256": "c9b2985ed3a0b67565b2c6d98016321792a4f823cd62637986875e001f419012",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent/tencent/new_302/raw.json",
+      "bytes": 113430,
+      "sha256": "2f32025ade2bccfe06a4ecdbd12845f96c9dda219c83fe8d4624b70f744393e9",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent/tencent/new_302/source_rows.parquet",
+      "bytes": 26716,
+      "sha256": "dd30d374a986a57a7136cc9480bfae0a522a5e805ad3c488bf4d2996d77a70f2",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent/tencent/sh_etf/raw.json",
+      "bytes": 111521,
+      "sha256": "5cd4145380d5191a1341995568efa5d9030930532f731d38e2c8f5a07dcbd9fa",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent/tencent/sh_etf/source_rows.parquet",
+      "bytes": 25294,
+      "sha256": "84a2e089b58f9f4de8ad79853903a31d8ba06256bd2b31c21aa0dfd9d2f2dbfa",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent/tencent/sh_index/raw.json",
+      "bytes": 190627,
+      "sha256": "35ee30cf625aa8738f250e2d8c925f65848b53b9b139245e6d825f2df8aaf861",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent/tencent/sh_index/source_rows.parquet",
+      "bytes": 42196,
+      "sha256": "c0f4c8a1388924bec5dd6106b43727c16eabf684176d249fedc99dde3faf1dbc",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent/tencent/sh_main/raw.json",
+      "bytes": 118721,
+      "sha256": "e7b68a7e96a019527f5a8a367cc056b5b039c3e32848f6c472fc5df8c8d3df4e",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent/tencent/sh_main/source_rows.parquet",
+      "bytes": 26527,
+      "sha256": "dfe27f85072627f963695961bd0c8391a9555eb81e6ae2c12b7684d9527621c4",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent/tencent/star/raw.json",
+      "bytes": 114239,
+      "sha256": "7a2054a18454044403c5c0f9ee4674ea8687338015cffa5d8c518d9534354835",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent/tencent/star/source_rows.parquet",
+      "bytes": 26250,
+      "sha256": "c46f89d692ce19b6e333190f6acd6ec918c4a966c2102ab59600d5e5e27ce088",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent/tencent/suspended/raw.json",
+      "bytes": 110577,
+      "sha256": "47298cef2b1e290d6e3823bffd7500cf537dceb9fe3b3e3a0bb8ab9c69887504",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent/tencent/suspended/source_rows.parquet",
+      "bytes": 19126,
+      "sha256": "9aeb504c0217e0bb0701d39bb53b52dce8e2a84917b1da424a8ea6df76926f64",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent/tencent/sz_etf/raw.json",
+      "bytes": 111181,
+      "sha256": "00117067a07b5ef02df1d767cdcf932c8b292c46c78dde3841625a200aeb7b9b",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent/tencent/sz_etf/source_rows.parquet",
+      "bytes": 25026,
+      "sha256": "61d3971727204c0bf204222cf10fc283b0361e3f2f33739e778f08564458a527",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent/tencent/sz_main/raw.json",
+      "bytes": 113815,
+      "sha256": "c05bef196eb28b43938138b702fcb2a6563aee976f6a7ad98ce58f64c9347d31",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent/tencent/sz_main/source_rows.parquet",
+      "bytes": 22336,
+      "sha256": "adc5473c28bae0524b7f30af54839ac93969f25d3847fb8aa1abe11ee458cf91",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent_none/completed.json",
+      "bytes": 5973,
+      "sha256": "4ee42d5a63ae1fb091f36e514511c0598672f3971dd0cff7903c828a4353eee8",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent_none/run.log",
+      "bytes": 1371,
+      "sha256": "6afb3fdb3f86fe08efd5bc9726d27e634024954bf7d0b2242b243f40d752b4f6",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent_none/run_config.json",
+      "bytes": 2856,
+      "sha256": "45db1fb94e9d50fb664fe3f58921257d7b1c1ed301e0636aba761ad3400d8dee",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent_none/summary.csv",
+      "bytes": 1882,
+      "sha256": "412d48615c754bea116fa2a8ffe73054a16c4a60d24ff98a7086b671074946fa",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent_none/tencent/bse/raw.json",
+      "bytes": 2953,
+      "sha256": "78e71fd9cad65d91969e5ba4f766b8dc63ef6930383bf8bc57a039574c56e7a9",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent_none/tencent/bse/source_rows.parquet",
+      "bytes": 3867,
+      "sha256": "a287aaee52474958eaf86e828bddbd342bf8151af2dcf5ecbdc6ca91b745f552",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent_none/tencent/chinext/raw.json",
+      "bytes": 184803,
+      "sha256": "7a3dda5aabbb0fd5915c66014c3d7eee4594965e4542fe21390950cca829a910",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent_none/tencent/chinext/source_rows.parquet",
+      "bytes": 38014,
+      "sha256": "fe52a0fbceccac48e8fe8e7f6ff0c83115d21dcc137186338d447bfcaac7df92",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent_none/tencent/new_302/raw.json",
+      "bytes": 179480,
+      "sha256": "67ec903eb0e318b5f2f21878338ed411c6abc6f909e1d42d4ba7b2a55d9e7d41",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent_none/tencent/new_302/source_rows.parquet",
+      "bytes": 36863,
+      "sha256": "362750ceb3db1310cb152ab3c4490ba4eb1d6d6f9a676517c6ca77e30015991b",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent_none/tencent/sh_etf/raw.json",
+      "bytes": 176375,
+      "sha256": "339e1595b4467c6f1736ba9663c2ed2f1c508a7a45ee5a9a60e520468da2493b",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent_none/tencent/sh_etf/source_rows.parquet",
+      "bytes": 35537,
+      "sha256": "7061849d327eb83c783f53ee47204ab678b1b358056b5890f4bb8ca8d7b476de",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent_none/tencent/sh_index/raw.json",
+      "bytes": 190623,
+      "sha256": "b5e425f6ce111c8902be7e5fb5a2906073cd00e10f96cba1df4f2a2361971649",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent_none/tencent/sh_index/source_rows.parquet",
+      "bytes": 42196,
+      "sha256": "c0f4c8a1388924bec5dd6106b43727c16eabf684176d249fedc99dde3faf1dbc",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent_none/tencent/sh_main/raw.json",
+      "bytes": 188191,
+      "sha256": "21ce26bf8bef9c7e26d7cbe7fbcc76a29d9d2925db93d3f1f96112ce56084101",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent_none/tencent/sh_main/source_rows.parquet",
+      "bytes": 36443,
+      "sha256": "ec53ccf6c8681a9fb1a99f2fd1674d33091baca62d597c1ac4673a3f2af64528",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent_none/tencent/star/raw.json",
+      "bytes": 180896,
+      "sha256": "c02c0c8e0682521d83b1d44fe31c3a1b3133fc5b6a3abc7273c8664e49a51e89",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent_none/tencent/star/source_rows.parquet",
+      "bytes": 35538,
+      "sha256": "a2432d39aae736e8e377c1b8ca5a613f5bacc40f983d4804280431ecf492ee9e",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent_none/tencent/suspended/raw.json",
+      "bytes": 175031,
+      "sha256": "b17f549f6b12343f375d18477934f3d3c49780a1b405d3478e9ec68613ea0436",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent_none/tencent/suspended/source_rows.parquet",
+      "bytes": 26230,
+      "sha256": "642f74bccf400241c12d1665acedb2fdd6a8d3e1da18b12097a8471fbc3e404d",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent_none/tencent/sz_etf/raw.json",
+      "bytes": 175871,
+      "sha256": "d1b449befbd6486977216ace25b619e70472883a1c18e1654b8fa471a04d1bf3",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent_none/tencent/sz_etf/source_rows.parquet",
+      "bytes": 35411,
+      "sha256": "29c994deada721e8678e5099d13d448dce90e47a2cb0bd34b2156e7377d7b1a3",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent_none/tencent/sz_main/raw.json",
+      "bytes": 180709,
+      "sha256": "c679defc80adcd2bde44e9b7bc9477250e0de059cac904531c353bf211d994cc",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe/run_20260912_tencent_none/tencent/sz_main/source_rows.parquet",
+      "bytes": 27219,
+      "sha256": "336571aefdc6ccaf46ef3380b1c60aaa4890fe2a0ec5c0df2d809966351c31ab",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "historical_daily_probe.py",
+      "bytes": 18284,
+      "sha256": "3815ec80140cd0f96cd5034028be63836e51f27d38010175e35f3ef7e23cfb5b",
+      "tracked_before": true
+    },
+    {
+      "relative_path": "market_data_contract.yaml",
+      "bytes": 26135,
+      "sha256": "adc0d19ee3628b9932f4e6ad6cb30645fec0af1e9783b32114871c5debd3c69f",
+      "tracked_before": true
+    },
+    {
+      "relative_path": "market_day_probe/.full_day_probe.lock",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/interval_probe_20260912_3s/eastmoney/stocks_3pages_responses_20260912_195042_998440.jsonl",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/interval_probe_20260912_3s/INTERVAL_REPORT.md",
+      "bytes": 1508,
+      "sha256": "62c839ef8c23da788e6dad1a5860e815f5e65b322a8690b0ace166bd503a0948",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/interval_probe_20260912_3s/sina/stocks.parquet",
+      "bytes": 62442,
+      "sha256": "0b21302f8ee626135ee1bcbf499efb2bb2c2f3a0a1cde368d6b152cb76206960",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/interval_probe_20260912_3s/sina/stocks_responses_20260912_195101_065596.jsonl",
+      "bytes": 160726,
+      "sha256": "4a1ba9354d72e7000c0bbf39e22dfced21aa12b6a3bb386c630b2b123f9f7912",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/baostock/daily.parquet",
+      "bytes": 340440,
+      "sha256": "e4b8d447ed8be296153783243a4b5b3744a3f658c3fc49c5fb9dd2186f159c3d",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/baostock/daily_checkpoint.jsonl",
+      "bytes": 1577995,
+      "sha256": "1af18cf5ab8c27d5723eacc3c0a5df02497827ce7913b0e70995a870037826e8",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/baostock/normalized/daily_bar.csv",
+      "bytes": 1601968,
+      "sha256": "02223f2d33270d66c7be08d028f558d1aad3ac52cb8076097753415e9dbb81fc",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/baostock/normalized/daily_bar.parquet",
+      "bytes": 698656,
+      "sha256": "161b1ba370973779442eb1838fa58b3e2911f968856b6f04b9b91873fdffad9e",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/baostock/universe.parquet",
+      "bytes": 91805,
+      "sha256": "50271239975dbb15f6300266db0520f3fbd1bd90e335fd39d2c3a9a82ccc9112",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/completed.json",
+      "bytes": 337,
+      "sha256": "23725ea596798616205813846eae2ad81808de1b2edfd3b8b96a29294a2df3e8",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/eastmoney/concept_boards.parquet",
+      "bytes": 16230,
+      "sha256": "1c8c56055695418b9bff5a7ed5f29fc0c80c7c89948eb47a211f24b049c606f7",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/eastmoney/concept_boards_raw.json",
+      "bytes": 17910,
+      "sha256": "3ff51139ee9783917013dc41629d7ccdb876f7cc56ced3d893a9a7e77fdb5773",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/eastmoney/concept_boards_responses.jsonl",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/eastmoney/industry_boards.parquet",
+      "bytes": 16395,
+      "sha256": "b15b0f5ce89f977d5359f2eb780f6a8c8749c1bb4ce506548484367f2c98a75e",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/eastmoney/industry_boards_raw.json",
+      "bytes": 17807,
+      "sha256": "e32d9bd7d4849c5012f272324a21e322efa19f32df712ca5ef1758a1fdcabde4",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/eastmoney/industry_boards_responses.jsonl",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/eastmoney/normalized/daily_bar.csv",
+      "bytes": 38042,
+      "sha256": "ec59208faa91650b9e5be885210b60b1a5c4b66de8897f3f2b9117d5f799b310",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/eastmoney/normalized/daily_bar.parquet",
+      "bytes": 30331,
+      "sha256": "e8aa114b8609702ba8e98895f1229d52fbd7947cf1f29ce6e0b9f3d03ad2cc8a",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/eastmoney/stocks_raw.json",
+      "bytes": 16107,
+      "sha256": "b058101e5cab4e75772a48e23c30cb6fe570e21610019558b33844761e00de70",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/eastmoney/stocks_responses.jsonl",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/normalized_comparison/COMPARISON_REPORT.md",
+      "bytes": 4657,
+      "sha256": "7e21374b0e8b3865d130a6661ac8aaba16e30e27166e082936abc092c8396296",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/normalized_comparison/differences.csv",
+      "bytes": 7715,
+      "sha256": "40b663295493b08c5d472656cf4c0f67041bb3340fa45b2bfd79bdc724de6641",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/normalized_comparison/differences.parquet",
+      "bytes": 7047,
+      "sha256": "7ed42fbce2ab2f533adf5649d3828063d4f20c1bf8ccd796b8f810ad8ec7cfc0",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/normalized_comparison/field_comparison.csv",
+      "bytes": 13028,
+      "sha256": "ba07549cccf27c598d458e17d88ef6448b82e998458ec3f547bc0873305cf5f3",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/normalized_comparison/pairwise_coverage.csv",
+      "bytes": 265,
+      "sha256": "3785a7ea5842857d92df94a4b2d30af1aec93d60ddaf0e04ad15341066f07d8e",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/normalized_comparison/summary.json",
+      "bytes": 2052,
+      "sha256": "0f62f4068880a6f37e708bfe71890231b332b919fd650d20e400c012a152e4c9",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/PROBE_REPORT.md",
+      "bytes": 3566,
+      "sha256": "e79f065ed5185daba051ff062335e68ea0bd235cf965bef114127c2aef40c9d1",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/run.log",
+      "bytes": 10468,
+      "sha256": "d78e535fd2ba04505a5476af4006ba69e3c4437799b809fe4c2b403ea71909ec",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/run_config.json",
+      "bytes": 207,
+      "sha256": "9e0c3f39b2ad5596fb1f4606a1af517ae1f2b63d9b0df37a95c9546448d55d14",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/sina/normalized/daily_bar.csv",
+      "bytes": 1924449,
+      "sha256": "77d4441fd342f06d482863370899fa37968acb8ac9ba8f682cae75e889825a62",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/sina/normalized/daily_bar.parquet",
+      "bytes": 700056,
+      "sha256": "7082a562f9aaaece74e015cf111f7919d198c7d8bfe39689bea7b4ab558fd170",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/sina/stocks.parquet",
+      "bytes": 381784,
+      "sha256": "1b69accd6639532e6b511182dffbd311c0a0263a856dc43d3958339ede49fe29",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/summary.csv",
+      "bytes": 122,
+      "sha256": "d8c2b4e5d32ab5fd8d640a5e4fd7426f99ee9732d333d726655132e8ed8c2450",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/tencent/daily.parquet",
+      "bytes": 323982,
+      "sha256": "59da685320e446e0a20ea0f3f46c3bad1f0b29650f8246d792a6bc6a040babb0",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/tencent/normalized/daily_bar.csv",
+      "bytes": 2085942,
+      "sha256": "fa0e242cb5c8b8c26302c94ae19ea8171ccd7c099f3aa68448e2477423c59ba7",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/tencent/normalized/daily_bar.parquet",
+      "bytes": 662402,
+      "sha256": "05cfc426ef2ff913b94ffdb372993281ea93bb6c234f7962a78d78f427dc8ab9",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/tencent/responses.jsonl",
+      "bytes": 2703985,
+      "sha256": "81fa2be5866d8e3302799fe7858d893eba2b9b69fffaba6642d67146c529c735",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/tencent_sina_extras/daily.parquet",
+      "bytes": 32485,
+      "sha256": "772277bb58e3779165c34a3ed740018a78bc1becdb1d4a8301349a79ff4e26f7",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_day_probe/run_20260912_184212/tencent_sina_extras/responses.jsonl",
+      "bytes": 168990,
+      "sha256": "6dd56b864ed87795b97c0b3e883adb3f9902069e9d8ed3d0603caafab4152ae7",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_source_probe/akshare_em__board_5m_BK0475.csv",
+      "bytes": 132755,
+      "sha256": "a6d1b83c609cc88e59f1ae31f44b4549ae743bd845372f63e7b728f446b9350b",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_source_probe/akshare_em__board_daily_BK0475.csv",
+      "bytes": 2738,
+      "sha256": "dc07e6fef3dd9396aabb6700d6644fa49b29e67f0a1bedad13156d8380e3dbd3",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_source_probe/baostock__index_daily_000001.csv",
+      "bytes": 4453,
+      "sha256": "cf40088b1181c032d70aa3d735cb55950ae9c5e7c769f4b78bc9d73ebb240eb2",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_source_probe/baostock__stock_5m_600519.csv",
+      "bytes": 44245,
+      "sha256": "3658849ec64ae8f34c660e898d221b4bd4f5219ef95d118e4e1d156d0f2c96ba",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_source_probe/baostock__stock_daily_600519.csv",
+      "bytes": 4297,
+      "sha256": "02f0b4d9dbbbfa25e7392be8b79ad64c620478f8972f31b5edf8c9551f01738d",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_source_probe/eastmoney_raw__board_1m_BK0475.csv",
+      "bytes": 18534,
+      "sha256": "7b33e2b6998d24b3884726a08f097b5d14cae3640bf974251b6bd4894e96de0f",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_source_probe/eastmoney_raw__board_5m_BK0475.csv",
+      "bytes": 128430,
+      "sha256": "4a5cf5bab813ebee6ee7c6821c8409a3b262a667369912c3a654ba22184057d6",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_source_probe/eastmoney_raw__board_daily_BK0475.csv",
+      "bytes": 2720,
+      "sha256": "cec63b2b3f593d5cf6fff8481a17b93f9989d981b905411e32e844837e9a6ce3",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_source_probe/eastmoney_raw__index_1m_000001.csv",
+      "bytes": 91942,
+      "sha256": "2b7fc2cdde6faabc610ae498276a436e77548a9b6e3177b6b7169ae020f88489",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_source_probe/eastmoney_raw__index_daily_000001.csv",
+      "bytes": 2775,
+      "sha256": "903d03db83c2d40cadda3ba200bf8c00c7f6e197baac7bde1e30fc2992ce10ba",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_source_probe/eastmoney_raw__stock_1m_600519.csv",
+      "bytes": 82869,
+      "sha256": "bc5b5f7c21c0861a5f929356a9fb22d89eaaa003459606abffe7a00fb72b576e",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_source_probe/eastmoney_raw__stock_daily_600519.csv",
+      "bytes": 2531,
+      "sha256": "dd63b1fcecf5cc1b23c209629b184e2a9dc535590ab9e0f52cf6ec98b277a237",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_source_probe/sina__index_daily_000001.csv",
+      "bytes": 7235,
+      "sha256": "48f7acf6d0af2ea21594d795833e6d2571fc676697bcb224f1a03c20091f4f0b",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_source_probe/sina__stock_5m_600519.csv",
+      "bytes": 7606,
+      "sha256": "04c67ee0159a98f9f29024e74937648a9425e5eb418aaf566978796efd734674",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_source_probe/sina__stock_daily_600519.csv",
+      "bytes": 6756,
+      "sha256": "e4851e1d7a77ce2e65eb7549e2edfa222e59d85ac2a012deadd9252c4ff6c96e",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_source_probe/summary.csv",
+      "bytes": 4348,
+      "sha256": "335cf76e9c88cce4ff18807e58cb982a8b2973d60f0a0e23c730a84a4db041b4",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_source_probe/tdx_official_zip__hsjday_zip_probe.csv",
+      "bytes": 162,
+      "sha256": "90251c5b25a2c235e85d9d0af1837813da9620c6b958ed5d15764f75bf22a86a",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_source_probe/tencent__index_1m_000001.csv",
+      "bytes": 6696,
+      "sha256": "ec963f03f78ab46a5dcc79c6bde407620964926e5bb4d96f52880881ff3814b7",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_source_probe/tencent__index_daily_000001.csv",
+      "bytes": 6709,
+      "sha256": "6bd8906b494b02c752e3dc6172754240fe9c81ed92e46c676af4c2204fd85b5a",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_source_probe/tencent__stock_1m_600519.csv",
+      "bytes": 6088,
+      "sha256": "b4aec9e054399c545ed96d5c89ea57326821a866d8e1d75bc83075147377214d",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_source_probe/tencent__stock_5m_600519.csv",
+      "bytes": 6201,
+      "sha256": "6aa92534c0a70d747c026fe64925b949927294053a75969a67e022bc3500f2b0",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "market_source_probe/tencent__stock_daily_600519.csv",
+      "bytes": 6420,
+      "sha256": "eaa5ddbc046f72e6446a53efc819056669f879c0540368686e669207f0c23782",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/.minute_data_probe.lock",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/LATEST.txt",
+      "bytes": 91,
+      "sha256": "65d5627f1824b934dd0cdeb91ad2eefd7d5bd0161d5204d4a43c97322f24a71d",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/baostock/chinext/m5/raw.json",
+      "bytes": 120,
+      "sha256": "0349fc1314333785050ed390dedb6c495b4d7bb48b9e812a9eb96742b27e74c0",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/baostock/chinext/m5/source_rows.parquet",
+      "bytes": 24465,
+      "sha256": "8bb4c05de0638f486c53a5e73bdf2eedaa1194b96ff86aae2a8036fa1828559a",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/baostock/sh_etf/m5/raw.json",
+      "bytes": 120,
+      "sha256": "72a70bc0ae4b5728e15da70e6ddb69e40d66902ef9a4ece1a61145a999bfd0f6",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/baostock/sh_etf/m5/source_rows.parquet",
+      "bytes": 21015,
+      "sha256": "5e58aac3dfa7967ae54fae7e22a8b036e69997499e79c161fcc0aab3bce3d9a0",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/baostock/sh_index/m5/raw.json",
+      "bytes": 120,
+      "sha256": "fda7c1be954ee8d3ad440b6f30c5fc48a24f05a7cf3055ac768bf501c791f656",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/baostock/sh_index/m5/source_rows.parquet",
+      "bytes": 4510,
+      "sha256": "651b3128091e88167ae6ff6bb53ab83cb8615681bd3876945d6fcca9a0041bb4",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/baostock/sh_lof/m5/raw.json",
+      "bytes": 120,
+      "sha256": "76208ad9e885f18a96d2216cd99da7cb30bca699ffb1d7f989942b6bd66bd02c",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/baostock/sh_lof/m5/source_rows.parquet",
+      "bytes": 4510,
+      "sha256": "651b3128091e88167ae6ff6bb53ab83cb8615681bd3876945d6fcca9a0041bb4",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/baostock/sh_main/m5/raw.json",
+      "bytes": 120,
+      "sha256": "8b0a26e5b3a389b9b12b4fa47d20b982db58e5f597ddd45af24cb57379a4ddc2",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/baostock/sh_main/m5/source_rows.parquet",
+      "bytes": 24071,
+      "sha256": "c79200138a115486dad849553ba3cdf8150e7f5ba6639dc02d8e4626a7116b1c",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/baostock/star/m5/raw.json",
+      "bytes": 120,
+      "sha256": "853435cb2aafb293e12f4a4ec1d79b0bd800c76a9100961d3a2218b16ff44cff",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/baostock/star/m5/source_rows.parquet",
+      "bytes": 23485,
+      "sha256": "e0cf327364e49df611a4a0c0510747341b6e29b5962633631fa6ed56c07a030d",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/baostock/sz_etf/m5/raw.json",
+      "bytes": 120,
+      "sha256": "140d4318bdc7309446379fcc446e651d7aedc229ca6d17d01ddbda67916bc9d2",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/baostock/sz_etf/m5/source_rows.parquet",
+      "bytes": 21008,
+      "sha256": "6bd91c7a68ee0114cdf41a45d60cc41bdc2e125f97554a89c124679a33e73476",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/baostock/sz_main/m5/raw.json",
+      "bytes": 120,
+      "sha256": "de80c8339343bb356fc70a417c9989c9ea63206fbc82c7b3935dafe692cb35b1",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/baostock/sz_main/m5/source_rows.parquet",
+      "bytes": 18837,
+      "sha256": "0b2a1bd39313accf616851464a0d2be8dc32d4dc0398cb965e7a9eaa936a4d70",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/completed.json",
+      "bytes": 30375,
+      "sha256": "941a7497036154acb149119d2c3da32d5dafa0ca6fe5deae9784c4fce9e97c8f",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/run.log",
+      "bytes": 4888,
+      "sha256": "9e538ff090bb93a6f4945a8f249ba39e79564244d49e5d966612b0b999ba41d3",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/run_config.json",
+      "bytes": 2374,
+      "sha256": "6b513d05da9a5c52f0a10c252f91c8ae0cac365c4d22f3b29209e86920c66d2f",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/sina/bse/m5/raw.json",
+      "bytes": 126,
+      "sha256": "e86bcf9475b3b03fa31647eda17405d9652ada6768cdce6a2d987daa19d95b82",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/sina/bse/m5/source_rows.parquet",
+      "bytes": 6797,
+      "sha256": "9866b6cf28ed422ec1fbb2771a02867723e6622edad0f48a6a9b7c2276633818",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/sina/chinext/m5/raw.json",
+      "bytes": 126,
+      "sha256": "336c0c1f829ae9c12393b4ac5641a36ee44d07faec08df37dfc3f291942a2a08",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/sina/chinext/m5/source_rows.parquet",
+      "bytes": 8020,
+      "sha256": "17e377ebf03fcbad2347e8077c3da2281c444ead589c00f7b83819fb20cfb5f2",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/sina/sh_etf/m5/raw.json",
+      "bytes": 126,
+      "sha256": "187bdf0e6640658bb06903faaf2082743f952fa8135d17a3ab1e7f91cb42742c",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/sina/sh_etf/m5/source_rows.parquet",
+      "bytes": 7623,
+      "sha256": "398622099991dbcd0f8f5c777a2f1c20d84df8a54eeaaf6dc40f96f4a9905f41",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/sina/sh_index/m5/raw.json",
+      "bytes": 126,
+      "sha256": "4bb77e14659254ced4a81626e7690a977df7a87134b9750c1057d77e5bbf9fc9",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/sina/sh_index/m5/source_rows.parquet",
+      "bytes": 9447,
+      "sha256": "599cdd20814188fd264e3ce3cedf4f60e7570faf5d0a9892d2b3e099713bd42e",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/sina/sh_lof/m5/raw.json",
+      "bytes": 126,
+      "sha256": "28f69645b8e2417e62b606f8bc57a6b7c1a3365c1fe38c2b0de299f06d9142ed",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/sina/sh_lof/m5/source_rows.parquet",
+      "bytes": 7978,
+      "sha256": "61d866a6671f1f3a9e1b85d9858de0f61628714bf14ed2248ee2a19a4c6648a3",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/sina/sh_main/m5/raw.json",
+      "bytes": 126,
+      "sha256": "8772cdb44bd8fa66c4f07ad55d61776df90f501ada769bb59b0940da1fc479b9",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/sina/sh_main/m5/source_rows.parquet",
+      "bytes": 8020,
+      "sha256": "6910f90703b4ac739e80da2ad003345fa50e54e0118c9315941debb4917be4dd",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/sina/star/m5/raw.json",
+      "bytes": 126,
+      "sha256": "93dc73e49ed02adf879395e9c54857b58c952b4bb052ce2cc5fa76f19ccfe2a9",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/sina/star/m5/source_rows.parquet",
+      "bytes": 7920,
+      "sha256": "fee21867a79377429df5325999036ab7a8008c95467838c7d28fd6ed43492126",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/sina/sz_etf/m5/raw.json",
+      "bytes": 126,
+      "sha256": "f7a9ff30a002d9b2415d3a554461941821bfa756c7db20c26b3ca3bd90583a47",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/sina/sz_etf/m5/source_rows.parquet",
+      "bytes": 7752,
+      "sha256": "54c59c5880fc579250fa5d242b2205ead7bcd623c50f72b8d9ed6fa86e24407f",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/sina/sz_main/m5/raw.json",
+      "bytes": 126,
+      "sha256": "ee391f7dd3c14e9312729cc0627e4d2bd566116936aba6b795e42c4660858fb9",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/sina/sz_main/m5/source_rows.parquet",
+      "bytes": 6192,
+      "sha256": "a02614f405fa7f1a9711f3b315ea4f877b6ac3dc6fa2654d0aa3a5ed942952fb",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/summary.csv",
+      "bytes": 8904,
+      "sha256": "552f00a26a3b2852c899256cdc6a3abd8d5a273fc600812db87df0889ac17c15",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/bse/m1/raw.json",
+      "bytes": 101,
+      "sha256": "725780bd3715369a7cb4efcb43a71edc052ed5f51c1b61542239f69591e83af0",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/bse/m1/source_rows.parquet",
+      "bytes": 3005,
+      "sha256": "37e0d6380114b0d0bc79b63761659a0c65740e73e53b41030dae434f7aa58885",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/bse/m5/raw.json",
+      "bytes": 101,
+      "sha256": "2048bb8567e9324f538989aa7a707ca5539fad9c5bd50a7da17fb296bc4aa9eb",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/bse/m5/source_rows.parquet",
+      "bytes": 3005,
+      "sha256": "37e0d6380114b0d0bc79b63761659a0c65740e73e53b41030dae434f7aa58885",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/chinext/m1/raw.json",
+      "bytes": 112,
+      "sha256": "d3be4ea4aafd7389fef12cb949ea5534a642fac7519f29db0135c791ee362d24",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/chinext/m1/source_rows.parquet",
+      "bytes": 7450,
+      "sha256": "80ba67fb569451f9a24cee4b98953400e8490f2c8cebc39202d40b7facca1173",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/chinext/m5/raw.json",
+      "bytes": 112,
+      "sha256": "f5ffb742ea5a63f86c4911fbe6993551241a1a48b16143762defff072f7fc335",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/chinext/m5/source_rows.parquet",
+      "bytes": 7984,
+      "sha256": "13f9e295e26747b7d1e7c2356f478ada86ecac6ea1f4e8dd617c24d622617768",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/sh_etf/m1/raw.json",
+      "bytes": 112,
+      "sha256": "7cff4fbce5b9ccdf34b43e7e03e47443fc65d8b8269b3bb4dbb85b73d852e5d1",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/sh_etf/m1/source_rows.parquet",
+      "bytes": 6719,
+      "sha256": "4bf095504882f843e1db42f66eb4e9ac92cba4976d53e4d70f52e0d155114969",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/sh_etf/m5/raw.json",
+      "bytes": 112,
+      "sha256": "f0b705241de1428ae4ee6cc4d30c11d6c06b8ed0e0f650de3cd8aa12739bcc7e",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/sh_etf/m5/source_rows.parquet",
+      "bytes": 7596,
+      "sha256": "b8a03fca1383790dfcc797993a5a0dad885146a371cf240ceb94dabd40143279",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/sh_index/m1/raw.json",
+      "bytes": 112,
+      "sha256": "9a8321620f99b70f343bc645ada9594e14295bc29b4e0691115f7fb839f47397",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/sh_index/m1/source_rows.parquet",
+      "bytes": 8256,
+      "sha256": "e0673d6480f2414beac14249c5ec6b060a9aa228c8b62360ce0eae80b5fa633d",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/sh_index/m5/raw.json",
+      "bytes": 112,
+      "sha256": "359b2ead356b25ac824365d127b9b170cc22da3201cb56287305b59c4c33e494",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/sh_index/m5/source_rows.parquet",
+      "bytes": 8365,
+      "sha256": "b0db6729e69d9ad6183c0cd895ba68fc792bb13a85df4fd47b9119429b1ab15c",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/sh_lof/m1/raw.json",
+      "bytes": 112,
+      "sha256": "6b48ef77bc8762ec95a3b0dcdbe119a5decb00f52ee07c2d046e07d9ed83e911",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/sh_lof/m1/source_rows.parquet",
+      "bytes": 7035,
+      "sha256": "2c0a23eb875003498bd8ac8fb9f285ed01a7a93d82ce45c6fff7b91f2d479298",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/sh_lof/m5/raw.json",
+      "bytes": 112,
+      "sha256": "1a423ac8bd5d16a90207f63da893aa631738750aa3bec87e157b60d253f89677",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/sh_lof/m5/source_rows.parquet",
+      "bytes": 7931,
+      "sha256": "931cdf9754cc2f9b3f0cb7ef8c05dabce6f60026621f43204d6b8dd63ebd4eeb",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/sh_main/m1/raw.json",
+      "bytes": 112,
+      "sha256": "be7829030497c996580cc94326cb1e47b50cec178c480e1316881d84bd1c4ba1",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/sh_main/m1/source_rows.parquet",
+      "bytes": 7421,
+      "sha256": "92dc9b48ecb0898cecb85c211d11ac404f8273e913933f693b35e232c83d6d0f",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/sh_main/m5/raw.json",
+      "bytes": 112,
+      "sha256": "d9194c264e63b2c33f69dcd153a86fa43f83fe01c82cf3142bfee1306911d791",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/sh_main/m5/source_rows.parquet",
+      "bytes": 7908,
+      "sha256": "04ecf84708f15e6ffb54e3d7601cc2f888bf8473947a590d132a03d1ca64f154",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/star/m1/raw.json",
+      "bytes": 112,
+      "sha256": "34dd746aca47e788a8a2dbf2763d25ca3c46483c359ff97558db9c838f1eecbc",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/star/m1/source_rows.parquet",
+      "bytes": 7557,
+      "sha256": "a96faa3d52869e6b191dfea7fa937bf22baf1486cd3b01e54427e029e692b786",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/star/m5/raw.json",
+      "bytes": 112,
+      "sha256": "2d45ebc578a9bb5cb394945969b0ccb1223fbc8f6f4472baa747dec0d55cd054",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/star/m5/source_rows.parquet",
+      "bytes": 7991,
+      "sha256": "f4892ddef5eac3057086734b711c5d87485033958a7cc9d8e567666e0eac07d1",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/sz_etf/m1/raw.json",
+      "bytes": 112,
+      "sha256": "5665ed38dd52f04ad1759882cc6f166416f402a84234433177ec9377ada0a4ad",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/sz_etf/m1/source_rows.parquet",
+      "bytes": 6716,
+      "sha256": "cbfeaaeee167d57b32a55924e86820bd0708340b165c7b21e09152db46cf4d8a",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/sz_etf/m5/raw.json",
+      "bytes": 112,
+      "sha256": "29ccb40831ce4338a93cecdd6e645215e602826f0811e32be5adf34eb64ff92b",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/sz_etf/m5/source_rows.parquet",
+      "bytes": 7644,
+      "sha256": "b2524d0822b2fa4802e592a611178c1ee62d4f21153acb013e711655799ba7fb",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/sz_main/m1/raw.json",
+      "bytes": 112,
+      "sha256": "c00d51686bc071f83fa01f66052ef4fb79f0e0ba31045e8266542852b36b4a15",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/sz_main/m1/source_rows.parquet",
+      "bytes": 5867,
+      "sha256": "0068d884b90e40fe38529cab7fe2d68a9e8c3cb23a985b4f33fb7ab9cf4c40ab",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/sz_main/m5/raw.json",
+      "bytes": 112,
+      "sha256": "61fc1c2b92ce9340d23a2ecdb32b0d887a4752676aac5fb250607843be4e39fe",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe/run_20260912_222158/tencent/sz_main/m5/source_rows.parquet",
+      "bytes": 6169,
+      "sha256": "054e32e06b5ad810a4594fbdbb39cdf11ffd3fdfb80f9001ac0b2660093b5018",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "minute_data_probe.py",
+      "bytes": 16181,
+      "sha256": "8cbb150089e86f8e5b10a9162b7ac7952632e4681213b16eb8dec81f20df87ae",
+      "tracked_before": true
+    },
+    {
+      "relative_path": "normalize_compare_all_securities.py",
+      "bytes": 16693,
+      "sha256": "6247e10d611ecf101e38ae965f1702a93df73b895a6bb8e12324e6c3d603daf5",
+      "tracked_before": true
+    },
+    {
+      "relative_path": "normalize_compare_daily.py",
+      "bytes": 20399,
+      "sha256": "f89a07c83cfd27d6d94e87c40b7bc648569163209848db8fbd2b2f4fcc844a68",
+      "tracked_before": true
+    },
+    {
+      "relative_path": "security_comparison/trade_date_20260911/ALL_SECURITY_REPORT.md",
+      "bytes": 5332,
+      "sha256": "5abe0c4619af312602730706eede1cc4efc2e794fada6b19a0f76faa89e4f447",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "security_comparison/trade_date_20260911/baostock/daily_bar.csv",
+      "bytes": 1603219,
+      "sha256": "1933748631889360ca9b3ff2f794131357c9292b149b4970ea8da7317e658036",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "security_comparison/trade_date_20260911/baostock/daily_bar.parquet",
+      "bytes": 701381,
+      "sha256": "a76303ed76dd9d249dd5236e292fd2dea3038adce1f04cfb1a50ac97719c737b",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "security_comparison/trade_date_20260911/coverage.csv",
+      "bytes": 382,
+      "sha256": "07a20313c4d3f7ab53f465e0e08b28fc56708cf48fc73584492aa68a552f5355",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "security_comparison/trade_date_20260911/eastmoney/daily_bar.csv",
+      "bytes": 758752,
+      "sha256": "268571b31d9d2c9dcc8f9cc861cd5e5e4963233b230a2ab8fadb60280589b68d",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "security_comparison/trade_date_20260911/eastmoney/daily_bar.parquet",
+      "bytes": 276777,
+      "sha256": "cb8bb281f3f737b849f02fd4a2d4b579160275aa9e69fff5cb5e33a004274886",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "security_comparison/trade_date_20260911/field_comparison.csv",
+      "bytes": 25879,
+      "sha256": "ca2d06a66429985be0f425964083520724a4000fd64ac25c41668a4c8a0404a9",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "security_comparison/trade_date_20260911/sina/daily_bar.csv",
+      "bytes": 2610904,
+      "sha256": "eea3a9c5a4889c8d90472672115ebbac45bb6bf893dd29573a456102c7cfe505",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "security_comparison/trade_date_20260911/sina/daily_bar.parquet",
+      "bytes": 952081,
+      "sha256": "887af611a210cd2dceded0de9b2d45306835e246a57f703d66a82426180e06e9",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "security_comparison/trade_date_20260911/tencent/daily_bar.csv",
+      "bytes": 2866233,
+      "sha256": "e8dcef5054b140c07df4694f6e54b24fbbe82c3979a272564f494ed9e701589b",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "security_comparison/trade_date_20260911/tencent/daily_bar.parquet",
+      "bytes": 901337,
+      "sha256": "21a289c83137bf76639ff82f0d7e383e41ff4a9f30f6c47d6d31098f231a4815",
+      "tracked_before": false
+    },
+    {
+      "relative_path": "stock_data_catch.py",
+      "bytes": 26934,
+      "sha256": "616c026408ea13d8c35c0fe5fc13575f6dce7b7b50d84fd4223e651c392e82ac",
+      "tracked_before": true
+    }
+  ],
+  "legacy_absolute_pointers": [
+    {
+      "file": "etf_daily_probe/LATEST.txt",
+      "historical_path": "D:\\Project\\PythonProgram\\stock_data_manage\\tmp_test\\etf_daily_probe\\gap_lof_eastmoney_only_20260913",
+      "archive_relative_target": "etf_daily_probe/gap_lof_eastmoney_only_20260913",
+      "target_exists": true,
+      "original_bytes_unchanged": true
+    },
+    {
+      "file": "etf_full_probe/LATEST.txt",
+      "historical_path": "D:\\Project\\PythonProgram\\StockInvestmentTool\\tmp_test\\etf_full_probe\\run_20260912_220930",
+      "archive_relative_target": "etf_full_probe/run_20260912_220930",
+      "target_exists": true,
+      "original_bytes_unchanged": true
+    },
+    {
+      "file": "minute_data_probe/LATEST.txt",
+      "historical_path": "D:\\Project\\PythonProgram\\StockInvestmentTool\\tmp_test\\minute_data_probe\\run_20260912_222158",
+      "archive_relative_target": "minute_data_probe/run_20260912_222158",
+      "target_exists": true,
+      "original_bytes_unchanged": true
+    }
+  ],
+  "note": "原文件字节与相对目录结构保持；历史脚本不作为正式Provider或业务运行入口。旧绝对路径只通过本清单解释，不改写原始证据。大体积原始及派生结果保留本地忽略状态，Git继续跟踪原11个文件及此清单。"
+}

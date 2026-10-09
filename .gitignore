@@ -13,13 +13,13 @@ venv/
 .vscode/
 
 # Generated probe data (keep the probe scripts and reports)
-tmp_test/etf_daily_probe/
-tmp_test/etf_full_probe/
-tmp_test/historical_daily_probe/
-tmp_test/market_day_probe/
-tmp_test/market_source_probe/
-tmp_test/minute_data_probe/
-tmp_test/security_comparison/
+provider_validation/results/legacy/tmp_test/etf_daily_probe/
+provider_validation/results/legacy/tmp_test/etf_full_probe/
+provider_validation/results/legacy/tmp_test/historical_daily_probe/
+provider_validation/results/legacy/tmp_test/market_day_probe/
+provider_validation/results/legacy/tmp_test/market_source_probe/
+provider_validation/results/legacy/tmp_test/minute_data_probe/
+provider_validation/results/legacy/tmp_test/security_comparison/
 
 # Runtime artifacts
 *.log

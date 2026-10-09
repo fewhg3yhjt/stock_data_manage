@@ -26,11 +26,10 @@
 | `config/` | 来源参数、采集频率、路由、数据集字段模板及归一化映射配置 |
 | `tests/` | 实现的自动化测试 |
 | `docs/` | 按模块职责归档的正式说明；各子目录随文档产生建立 |
-| `provider_validation/` | 正式实现前的来源可行性验证脚本、原始返回、覆盖报告及结论；业务开发后只读引用已有证据，入口见 [Provider 验证目录说明](provider_validation/README.md) |
+| `provider_validation/` | 正式实现前的来源可行性验证脚本、原始返回、覆盖报告及结论；历史研究材料已归档至 `results/legacy/tmp_test/`，业务开发后只读引用已有证据，入口见 [Provider 验证目录说明](provider_validation/README.md) |
 | `AGENTS.md` | 协作、验证及文档管理约定 |
 | `data/` | 统一运行根目录：`raw/`、`task_workspace/`、`canonical/`、`task_archive/`、`metadata/` 和 `hot/`；按需生成，不提交 Git，详见 [存储与归档说明](docs/storage/README.md) |
 | `tmp/` | 本地临时工作、正式实现的隔离回放、联调与故障验收；按独立运行根目录分层输出，不能冒充真实生产数据 |
-| `tmp_test/` | 历史研究脚本及输出，保留历史引用；新来源验证统一进入 `provider_validation/` |
 | `CODE_STRUCTURE.md` | 当前代码和文档目录的职责索引 |
 
 正式文档的归属如下。当前已建立源头接口、任务流程和存储文档；证券清单调度并入任务流程。其他模块目录按需要建立，现有总体及专项设计保持原位，入口见本文开头。

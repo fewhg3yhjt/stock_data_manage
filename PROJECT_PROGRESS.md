@@ -56,4 +56,10 @@
 
 将旧总体设计与术语并入总体架构，证券调度并入任务流程，东财域边界并入来源说明，开发要求与待办分别并入AGENTS和本文；删除5份被替代文档。历史能力矩阵保留独有证据说明并标日期。README维护入口，CODE_STRUCTURE维护职责，AGENTS要求阶段收尾和设计变化后定期审视文档。
 
-本次仅整理文档，不修改业务代码、配置、正式数据或历史原始证据；`tmp`、`tmp_test`及验证目录的清理未执行。独有内容承接与链接检查结果保存在 `data/task_workspace/_checks/document-cleanup-20261009/`，不新增长期设计说明。
+上一批仅整理文档，不修改业务代码、配置、正式数据或历史原始证据；当时未清理目录。独有内容承接与链接检查结果保存在 `data/task_workspace/_checks/document-cleanup-20261009/`，不新增长期设计说明。
+
+## 本次目录整理
+
+撤掉根目录 `tmp_test/`：381个非缓存文件按原相对结构迁移到 `provider_validation/results/legacy/tmp_test/`，逐文件校验字节哈希，旧脚本不改写或转为正式代码。原8个Python缓存文件不保留，3个旧绝对路径指针由迁移清单说明。原11个Git跟踪文件继续跟踪，大体积历史结果保持本地忽略状态。
+
+删除 `tmp/directory-phase1-cache/`、`tmp/security-catalog-phase2-cache/`、`tmp/task-flow-cache/` 三个已确认pytest缓存和文档合并后空的 `docs/worker/`。`tmp` 其余测试数据、既有验证证据和正式数据保留，不批量清空。迁移索引见 [清单](provider_validation/results/legacy/tmp_test/archive-manifest.json)，本机检查保存在 `data/task_workspace/_checks/directory-cleanup-20261009/`；本次未采集新接口数据或改变来源资格。
