@@ -1,20 +1,20 @@
 # Stock Data Manage
 
-证券数据采集与管理平台 Phase 1 的实现仓库。设计目标和完整验收标准分别见：
+证券数据采集与管理项目。当前源头适配和基础流程已有实现，正式全量证券名单与在线发布仍待验收；状态见 [项目进度](PROJECT_PROGRESS.md)。
 
-- [市场数据中心术语与数据流程规范](stock-data-terminology-and-data-flow.md)
-- [市场数据中心架构设计](STOCK_ANALYSIS_V2_MARKET_DATA_CENTER_ARCHITECTURE_V1.md)
-- [前复权日线与历史重建设计](stock-data-design-qfq-history-rebuild.md)
-- [实时采集设计](stock-data-design-realtime.md)
-- [测试设计与验收基线](stock-data-test-design-acceptance-baseline.md)
-- [Provider 能力验证矩阵](PROVIDER_CAPABILITY_MATRIX.md)
-- [代码目录与文件职责](CODE_STRUCTURE.md)
-- [原始暂存、任务重做与发布](docs/pipeline/collection-tasks.md)
-- [股票与 ETF 来源名单](docs/providers/security-catalog.md)
-- [证券清单定时更新与来源资格](docs/worker/security-master.md)：默认交易日08:00，沿用同日任务和失败续采；证券状态口径与真实任务发布验收未完成。512390目录差异涉及清算，不能直接认定漏采；已核验导入交易日历。
-- [Provider 能力验证与归一化设计](provider-capability-verification-and-normalization.md)
-- [EastMoney 数据域覆盖设计](eastmoney-data-domain-coverage.md)
-- [项目开发进度](PROJECT_PROGRESS.md)
+| 需要了解什么 | 文档入口 |
+|---|---|
+| 总体架构、术语和模块边界 | [总体设计](STOCK_ANALYSIS_V2_MARKET_DATA_CENTER_ARCHITECTURE_V1.md) |
+| 现有目录和代码负责什么 | [代码结构](CODE_STRUCTURE.md) |
+| 输入参数、采集字段、映射及范围 | [源头接口说明](docs/providers/README.md)、[股票与ETF来源](docs/providers/security-catalog.md) |
+| 原始暂存、检查、发布、重做和证券清单调度 | [任务流程](docs/pipeline/collection-tasks.md) |
+| 数据在哪里、日期如何区分和归档 | [存储说明](docs/storage/README.md) |
+| 来源资格、证据与归一化设计 | [来源专项设计](provider-capability-verification-and-normalization.md) |
+| 前复权变化后如何重建历史 | [历史重建设计](stock-data-design-qfq-history-rebuild.md) |
+| 怎么判断功能完成和数据可用 | [验收基线](stock-data-test-design-acceptance-baseline.md) |
+| 开发协作与文档维护要求 | [AGENTS.md](AGENTS.md) |
+
+[2026-10-03历史能力矩阵](PROVIDER_CAPABILITY_MATRIX.md)只用于追溯旧样本和证据，不作为当前能力入口。
 
 ## 目录与文档导航
 
@@ -33,7 +33,7 @@
 | `tmp_test/` | 历史研究脚本及输出，保留历史引用；新来源验证统一进入 `provider_validation/` |
 | `CODE_STRUCTURE.md` | 当前代码和文档目录的职责索引 |
 
-正式文档的归属如下。当前已建立 [源头采集接口文档](docs/providers/README.md)，其他模块文档目录随实际文档建立；现有根目录设计文档保持原位，入口见本文开头。
+正式文档的归属如下。当前已建立源头接口、任务流程和存储文档；证券清单调度并入任务流程。其他模块目录按需要建立，现有总体及专项设计保持原位，入口见本文开头。
 
 | 文档目录 | 内容 |
 |---|---|
@@ -119,7 +119,7 @@ python -m stock_data_manage.cli recover --canonical-root data/canonical --metada
 python -m stock_data_manage.cli acceptance-offline --root tmp/acceptance-m1 --output tmp/acceptance-m1/report.json
 ```
 
-该报告覆盖 20 个工作日回放、Canonical 幂等、断电恢复和 200 只 Watchlist 容量；真实 Provider Probe 结果见 [Provider 能力验证矩阵](PROVIDER_CAPABILITY_MATRIX.md)，连续交易日试运行仍需在目标运行环境执行。
+该报告覆盖 20 个工作日回放、Canonical 幂等、断电恢复和 200 只 Watchlist 容量；旧 Provider Probe 样本见 [历史能力矩阵](PROVIDER_CAPABILITY_MATRIX.md)，当前资格不能由旧矩阵推导，连续交易日试运行仍需在目标运行环境执行。
 
 ## 本地验证
 

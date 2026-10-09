@@ -1,7 +1,7 @@
 # 证券数据采集平台测试设计与验收基线
 
 > 版本：2026-09-13 Phase 1 基线版  
-> 对应设计：[证券全量数据采集与管理平台设计方案](stock-data-design-realtime.md)  
+> 对应设计：[市场数据中心总体架构](STOCK_ANALYSIS_V2_MARKET_DATA_CENTER_ARCHITECTURE_V1.md)
 > 适用范围：Security Master、Trading Calendar、日线、Watchlist 1m/5m、快照、Raw/Hot/Canonical、来源切换与恢复
 
 > 2026-10-09补充：接口验证区只用于正式实现前的可行性验证；业务开发及验收使用正式模块和业务运行布局。raw每天唯一及真实任务验收要求见下文4.5；新增要求当前待代码实现及执行验收，不表示M1或M2已通过。
