@@ -25,6 +25,10 @@ python -m stock_data_manage.cli collect-due-inputs --dataset security_master
 5. 再次执行同一天的入口沿用同一任务：只补失败或不完整来源，合格当天单元复用；完整任务校验后直接返回。回退任务不会被误判为当天完成。
 6. 发布中断时沿用原提交恢复流程，不重新采集。全量与指定证券重做仍使用既有任务操作，详见 [任务流程](../pipeline/collection-tasks.md)。
 
+以上描述当前已接通的任务逻辑；下一阶段按已确认存储规则修正暂存为 `data/raw/_tmp/<数据日期>/<任务>/<单元>/`，转正为 `data/raw/<来源>/<接口>/<数据日期>/scope-<范围哈希>/`。同日重做沿用当日范围，不覆盖其他日期。正式开发后的来源复核、调度联调及发布验收都通过业务运行布局留存，不再新增到 `provider_validation/`。
+
+中间阶段只保存基础有效性和单元状态以支持重做。发布前的最终摘要由任务自动生成，关联范围、请求日期、实际数据日期、数量、失败原因、回退和原始引用；没有可靠独立分母时不报告全市场100%。当前相关字段分散在任务状态、覆盖检查和发布清单，统一摘要仍待实现，复用已有元数据而不增加管理层。
+
 来源新返回HTTP403或429时记录到既有来源健康状态，后续请求受禁用及冷却检查约束。回放和缺少资格本身不记作真实接口限流。
 
 ## 资格依据与当前限制
@@ -35,7 +39,7 @@ python -m stock_data_manage.cli collect-due-inputs --dataset security_master
 
 核准登记复用 `MetadataStore.save_probe_evidence`；本阶段不新增登记后台或管理页面。正式Provider在线对照、独立覆盖基准及合格端到端证据未齐全时保持阻断。证据有效期或代码、配置变化后须重新核验，不能沿用旧资格。
 
-2026-10-09 两项正式来源真实取数及独立交易所清单核对已完成：沪深股票、深市ETF和北交所股票逐代码匹配；沪市ETF缺少512390，现有组合尚未达到全市场完整覆盖要求。详细结果见 [来源说明](../providers/security-catalog.md)。未登记完整生产资格，未生成合格端到端发布证据，生产目录没有生成全市场名单。调度配置已接通，实际正式采集仍未激活。
+2026-10-09 两项既有Provider真实取数及交易所目录核对得到7,266条；沪深股票、深市ETF和北交所股票逐代码匹配。沪市ETF目录差异涉及已进入清算的512390，不能直接解释为漏采；同日期、状态范围尚待核准，见 [来源说明](../providers/security-catalog.md)。未登记完整生产资格，生产元数据库业务任务记录为0，没有生成全市场正式名单。调度代码已接通，真实业务任务与发布验收未完成；此前手工来源核验不能替代此项验收。
 
 ## 交易日历来源与当前状态
 
@@ -51,4 +55,4 @@ python -m stock_data_manage.cli collect-due-inputs --dataset security_master
 - 任务结果与覆盖检查：既有 `data/task_workspace/` 任务工作区；正式名单在 `data/canonical/security_master/current/`。
 - 任务及资格元数据：`data/metadata/metadata.duckdb`。
 - 本机离线回归与检查索引：`data/task_workspace/_checks/security-schedule/`；不作为真实在线资格证据。
-- 原始来源探针与资格调查证据仍归 `provider_validation/`，参见 [来源说明](../providers/security-catalog.md)。
+- 实现前的接口可行性原响应及现存历史证据保留在 `provider_validation/`，正式开发只读引用；业务复核与资格验收新响应和报告归业务运行根目录或 `tmp/` 下的隔离测试根目录，参见 [存储说明](../storage/README.md)。

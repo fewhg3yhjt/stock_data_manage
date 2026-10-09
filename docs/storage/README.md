@@ -1,111 +1,84 @@
 # 运行数据目录与归档
 
-新增业务任务入口的暂存、重做和发布规则见 [任务流程](../pipeline/collection-tasks.md)。下文原 `collect-input` 候选布局继续适用；`collect-task` 对证券主数据和日线使用以下扩展：
+## 已确认规则与当前实现
+
+2026-10-09确认：接口可行性验证在正式功能实现前进行，验证脚本及原始返回放在 `provider_validation/`。某接口进入正式业务开发后，业务代码位于 `src/`，实现测试位于 `tests/`，正式文档位于 `docs/`；业务原始响应、来源复核、联调、质量及端到端验收新产物均走业务运行布局。正式运行根目录为 `data/`，隔离回放、故障注入与实现测试使用 `tmp/` 下的独立运行根目录。已有验证证据可以只读引用。
+
+raw 的活动结果按“来源＋接口＋数据所属日期＋请求范围”唯一。每天分别保存；同一天重做更新当天对应范围，不跨日期覆盖。精确响应字节和请求清单不可拆拼修改，重做合并的是派生记录及其响应引用。
+
+以下目标布局已确认，**按日raw路径尚未在代码中实现**：
 
 ```text
 data/
-├── raw/_tmp/<任务ID>/<单元哈希>/     # 本次尚未转正的完整响应
-├── raw/<来源>/<端点>/scope-<哈希>/   # 每个请求范围只有一个当前结果
-├── task_workspace/_tasks/<任务ID>/prepared.parquet
-├── canonical/security_master/current/{data.parquet,manifest.json}
-├── canonical/daily_bar/asset_type=<类型>/trade_date=<日期>/
-├── task_archive/_raw_evidence/<清单哈希>/  # 正式记录的稳定证据引用
-├── task_archive/_raw_audit/<标识>/         # 重做清空、旧当前响应的审计留存
-└── metadata/metadata.duckdb               # 自动维护任务阶段、单元和提交记录
-```
-
-这里的“清空”是从活动 `_tmp` 中移走，保留原字节证据；审计归档不作为当前输入版本供业务选择。正式记录引用稳定证据，避免下一次更新当前 raw 后旧记录无法追溯。在同一磁盘内用硬链接留存相同文件，不重复复制响应字节；后续目录转正只重命名、不修改响应内容。归档暂无自动清理，修改过的新响应仍会增加审计占用。`_raw_audit` 也可保存被清空的本任务构建文件，属于执行证据。
-
-业务任务完成后，采集报告及来源候选仍保留在工作区，业务任务记录已标记发布。它们当前不会自动迁入旧 `archive_published_task` 布局，避免改写报告中的历史引用；自动归档与保留期限暂未扩展。未成功来源的暂存保留以便重做。其他63种来源数据集没有套用日线的覆盖和发布规则。
-
-来源报告中的 `_tmp` 路径表示采集当时的位置，不随转正改写。最终原始位置由 DuckDB 任务单元的 `raw_manifest`（稳定证据）与 `current_raw`（当前结果）记录；任务输出 JSON 也包含这组关联。追溯已发布记录时从正式清单的 `raw_refs` 进入，按源响应哈希关联原始请求、来源报告和处理代码版本。
-
-正式运行产物统一由 [collection.yaml](../../config/collection.yaml) 的 `storage` 配置指定，默认根目录为 `data/`。配置读取代码位于 [现有配置模块](../../src/config/loader.py)，单项输入和周期采集共用 [现有采集流程](../../src/pipeline/inputs.py)。本次没有增加存储服务或独立配置系统。`collect-task` 也默认使用同一配置，默认执行模式为 `live`；当前来源资格尚未核准，在线任务在写入前被阻断。显式 `--mode replay` 必须配合独立的 `--data-root`（示例使用 `tmp/collection-task-replay`），避免将历史回放数据当成正式数据。业务任务不允许将运行目录设置在 `provider_validation/` 内。
-
-上一轮错误放在 `provider_validation/results/task-raw-20261007/` 的任务演示、派生数据和报告已删除；本次没有将它们迁入正式目录或当作全量证券结果。来源原始探针及其他历史验证证据保留。任务参数示例归入正式流程文档的 `examples/`，只引用保留的来源档案。
-
-## 目录及职责
-
-```text
-data/
-├── raw/<来源>/<端点>/<UTC抓取日期>/<批次>/
+├── raw/_tmp/<数据日期>/<任务ID>/<单元哈希>/
+├── raw/<来源>/<接口>/<数据日期>/scope-<范围哈希>/
 │   ├── bodies/<SHA256>.bin
 │   └── manifest.ndjson
-├── task_workspace/<数据集>/scope-<请求范围哈希>/<任务ID>/
-│   ├── started.json
-│   ├── sources/<来源>/<输入ID>/
-│   │   ├── raw_refs.json
-│   │   ├── parsed/                 # 原列、解析及必要的排除行
-│   │   ├── normalized.json
-│   │   └── normalized.parquet
-│   ├── report.json
-│   ├── quality_report.json
-│   └── manifest.json
-├── task_workspace/_scheduler/      # 周期计划和执行摘要
-├── canonical/<数据集>/<既有业务分区>/
-├── task_archive/<数据集>/scope-<请求范围哈希>/<任务ID>/
-├── metadata/metadata.duckdb
-└── hot/minute_hot.db
+├── task_workspace/<数据集>/scope-<请求范围哈希>/<运行ID>/
+│   └── sources/<来源>/<输入ID>/{parsed/,normalized.json,normalized.parquet}
+├── task_workspace/_tasks/<任务ID>/{prepared.parquet,coverage.json}
+├── task_workspace/_scheduler/           # 计划及执行摘要
+├── task_workspace/_checks/              # 正式开发的核对、联调及验收记录
+├── canonical/security_master/current/{data.parquet,manifest.json}
+├── canonical/daily_bar/asset_type=<类型>/trade_date=<日期>/
+├── task_archive/_raw_evidence/<清单哈希>/  # 稳定来源证据
+├── task_archive/_raw_audit/<标识>/         # 既有重做及替换审计
+└── metadata/metadata.duckdb               # 任务、单元、提交及引用索引
 ```
 
-目录按实际写入需要生成；未生成 `canonical/` 或 `task_archive/` 不代表路径没有定义。来源原始响应与来源标准化结果按来源区分，最终数据按数据集统一保存，来源通过原始证据、标准记录和发布清单追溯。
+`security_master/current` 是已发布名单的既有读取分区；本次按日唯一规则针对来源raw，不扩展为证券主数据历史查询服务。分钟热数据仍使用既有 `data/hot/minute_hot.db`。
 
-`scope-...` 根据脱敏后的绑定参数生成，代表请求范围，不是交易日期。交易日、公告日、统计月和报告期需要各数据集自己的发布分区规则，抓取日期不能替代这些业务日期。运行任务ID使用短随机批次，输入ID保存在任务清单和来源目录中，避免 Windows 深目录重复标识造成长路径失败；显式验证输出继续保留原输入ID前缀。重复请求不会覆盖旧任务。
+| 项目 | 当前代码行为 | 下一阶段修正目标 |
+|---|---|---|
+| 独立 `collect-input` | raw按来源、接口、UTC抓取日期、随机运行ID保存；只生成候选 | 对正式业务使用统一按数据日期暂存、检查及转正规则，复用现有入口 |
+| `collect-task` | raw先到 `_tmp/<任务>/<单元>`，发布后转到不带日期的来源范围目录 | 暂存和当天转正位置均明确数据日期；不同日期互不覆盖 |
+| 显式 `--output-root` | 可将Provider回放及联调结果写入指定隔离路径 | 已进入业务开发的接口不得再以该参数输出到验证区；隔离实现验收使用独立运行根目录 |
+| 任务发布 | 证券主数据、单交易日日线已有构建、重做及恢复代码；在线资格未完成 | 路径修正后以实际任务生成数据与自动报告验收，分别记录代码完成和发布完成 |
+| 任务摘要 | 已有单元状态、覆盖记录及发布清单，日期范围分散 | 在既有报告中汇总范围、请求日期、实际数据日期、采集时间、数量及回退原因 |
 
-各层职责如下：
+## 日期和范围
 
-| 层级 | 保存内容与当前行为 |
-|---|---|
-| 原始层 `raw/` | 解析前保存精确应用响应字节及请求/响应清单；原有脱敏、缓存、重试和 SDK 会话行为保留。SDK 不暴露底层传输字节时继续明确标注可见证据边界 |
-| 中间层 `task_workspace/` | 原列、解析结果、来源字段映射、精确类型的 Parquet、质量报告、原始响应引用和任务清单。当前64项输入成功后为候选完成，不等于正式发布 |
-| 最终层 `canonical/` | 保留已有标准 Bar 的发布和查询格式。本轮没有为63种输入数据集另造合并、覆盖或业务完成规则，也没有把候选文件直接复制为最终数据 |
-| 归档 `task_archive/` | 只有正式发布完成的任务可以转入。保留整个任务及其原始响应引用；不重复搬运 `raw/`。候选、失败、中断任务留在工作区 |
-| 元数据 `metadata/` | 复用已有 DuckDB，索引采集状态、原始证据路径及哈希、调度幂等占用、质量与既有分区发布状态。它不存储市场行情主体数据 |
-| 分钟热数据 `hot/` | 保留现有实时分钟 SQLite 数据及查询用途，不替代最终层 |
+- 数据所属日期：历史日线使用任务目标交易日，今天补采昨天仍存昨天；历史名单接口使用明确请求日；只返回当前证券目录的接口使用原响应在上海时区的采集日。回放保持原数据日期。
+- 采集时间：记录实际取得响应的时间及其时区，用于新鲜度检查和追溯，不代替数据日期。
+- 请求窗口：完整保存接口实际请求的起止日期、分页、粒度、复权及证券范围。来源返回多日窗口时，原字节整体保留，业务任务只提取目标日；本次未新增按多日窗口自动拆分raw的能力。
+- 请求范围：日期作为独立路径层；同日影响内容的证券、窗口、粒度、复权等参数仍需区分，不能只按接口名覆盖。按日路径及范围键由下一阶段在现有存储和任务模块中统一实现。
+- 回退日期：沿用前次已发布名单时保留旧 `as_of_date`，另记本次 `requested_date`，不生成伪装为当天的新raw。
 
-多来源仲裁后的 `candidate/` 文件由后续正式数据构建流程生成，本轮单来源采集不创建空候选合并结果。
+## 正常运行、失败和重做
 
-## 输入、输出与验证位置
+1. 任务固定数据日期和目标范围，通过来源资格后调用现有Provider。
+2. 接口响应在解析前进入对应日期的 `_tmp`；失败和空返回也记录，请求参数和响应哈希可核验。
+3. 解析、YAML映射与基础校验结果进入 `task_workspace`，单元成功或失败状态由既有元数据库维护。
+4. 构建候选并合并去重，在发布前检查覆盖及有效性并生成报告；通过后发布 `canonical`，完成对应日期raw转正及引用收尾。
+5. 失败时保留工作区与暂存，已有正式数据保持可恢复；断点继续复用合格单元，补采缺失或异常单元；指定证券只更新目标日所选单元。
+6. 全量重做只清空目标日期、本任务的活动暂存和构建结果，从源头重采；成功后替换当天范围。其他日期的raw及正式记录不受影响。
 
-输入参数来源仍由 [providers.yaml](../../config/providers.yaml) 定义；频率由 `collection.yaml` 定义；字段模板、必填字段及主键来自 `config/datasets/`，字段映射来自 `config/normalization/`。命令参数或 JSON 上下文提供实际请求范围，不会改变字段含义。
+清空和替换沿用既有审计归档，不让业务选择多个活动版本。原始字节证据和正式引用仍保留；不同内容的响应会增加审计占用，自动清理及保存期限本次未实现。归档位置也属于业务根目录，不回写验证区。
 
-默认 `collect-input` 和 `collect-due-inputs` 使用上述运行目录。`--data-root` 可整体切换运行根目录，各层相对位置一起切换；同时指定 `--data-root` 和 `--output-root` 会拒绝执行。各存储层必须位于根目录内，不能相互嵌套或通过路径链接逃逸。
+业务唯一键去重发生在构建及正式发布层，原始HTTP响应或SDK载荷不做字段拼接。正式清单的 `raw_refs` 和任务单元中的 `raw_manifest`、`current_raw` 自动关联稳定证据和当天结果；调用方不维护来源文件清单。
 
-显式 `--output-root` 继续表示隔离验证模式，保留已验证脚本依赖的旧 `输入ID-批次/_raw/` 布局。这是已有脚本及历史报告的外部路径契约，同一个采集与映射流程只调整落盘位置，没有第二套 Provider。验证输出不能放进配置指定的正式 `data/`。
+## 配置、入口及隔离验收
+
+[collection.yaml](../../config/collection.yaml) 指定存储根目录与频率；[providers.yaml](../../config/providers.yaml) 指定参数来源；字段模板和映射分别来自 `config/datasets/`、`config/normalization/`。读取与执行继续使用 [现有配置模块](../../src/config/loader.py)、[现有采集流程](../../src/pipeline/inputs.py)，不增加存储或任务管理服务。
+
+正式任务默认使用配置的 `data/`。已有离线任务回放必须显式 `--mode replay` 并使用隔离的 `--data-root`，业务任务拒绝验证目录。单接口入口目前仍允许在默认data目录生成回放候选；这一行为与独立raw布局也列入下一阶段校正，历史回放不能冒充真实发布。
 
 ```powershell
-# 默认运行目录中的离线回放：不会获得生产路由资格或发布最终数据。
+# 正式开发中的隔离回放：只读已有验证证据，输出进入独立运行根目录。
 python -m stock_data_manage.cli collect-input --input ASTOCK-002-daily `
   --symbol 600519 --start-date 2026-09-01 --end-date 2026-09-18 `
-  --replay-manifest provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson
-
-# 使用同一分层布局在隔离目录验收。
-python -m stock_data_manage.cli collect-input --input ASTOCK-002-daily `
-  --symbol 600519 --start-date 2026-09-01 --end-date 2026-09-18 `
-  --data-root tmp/storage-check/data `
+  --mode replay --data-root tmp/storage-check/data `
   --replay-manifest provider_validation/results/raw/2026-10-01-v39-live-escalated/manifest.ndjson
 ```
 
-运行中的 `report.json`、`raw_refs.json` 和任务清单所用文件路径以任务根目录为基准；原始响应引用允许指向同一 `data/` 下的 `raw/`。响应清单中的 `body_storage` 则始终以响应清单所在目录为基准。默认工作区与归档区深度相同，移入归档后引用继续有效；自定义布局若导致引用失效，归档会拒绝。
+故障注入及实现回归使用同样的隔离原则；真实业务的复核和验收报告放在 `data/task_workspace/_checks/`。新接口在正式实现前的可行性探针才写入验证区。正式开发即使调用同一个接口做小样本联调，也不改变产物归属。
 
-历史来源可行性证据仍位于 `provider_validation/results/`，覆盖表仍位于 `provider_validation/coverage/`。正式接口说明仍位于 [docs/providers/](../providers/README.md)。这些历史材料没有搬进运行数据区，表内的历史证据路径也没有改写为当前输出路径。
+## 现状、历史记录和验收
 
-正式运行时的采集与质量记录位于任务工作区，发布后随任务进入归档；本轮64项验证产物特意保存于 [隔离验收目录](../../provider_validation/results/storage-layout-20261005/)，属于开发验收证据，不是实际生产数据。
+2026-10-09核查：生产元数据库业务任务记录为0，工作区只有4份来源回放候选；此前 `_tmp` 中沪深名单对应2026-09-30，北交所目录对应2026-10-07。最新10月9日在线Provider核验仍放在历史验证区，且没有正式名单发布。这些材料保留原路径和哈希，不能作为本次真实任务验收成果；后续业务开发停止向验证区新增此类产物。
 
-## 发布与归档门禁
+历史 `actions-cli` 与 `actions-cli-v2` 是重复回放的证据批次，不是业务存储版本；旧目录整理和来源证据均不在本阶段搬迁或删除。当前接口说明表是历史导出快照，其输出路径列需在代码修正后再刷新。
 
-任务执行复用已有采集尝试状态（Collection Attempt）：请求前占用并保存 `fetching`，保存原始响应后记录 `raw_committed`，成功生成来源标准文件后转为 `normalized`，候选检查完成后记录 `validated`。来源或转换失败保存失败证据，进入既有失败或隔离状态；中断不会自动视为发布成功。
+验收必须同时证明：不同日期不互相覆盖、同日全量替换、断点与指定证券仅更新所需部分、响应及引用可追溯、重复运行无重复主键、失败不误发布、中断可恢复，以及真实任务报告自动生成。文档对齐不等于代码修正或生产发布完成。
 
-当前64项输入不授予生产路由资格、不自动开启调度、不扩大市场覆盖；未独立核准的单位继续使标准字段置空，原值留在原始层与解析结果中。质量报告显式记录 `publication_permitted: false`。
-
-归档实现位于 [现有恢复模块](../../src/worker/recovery.py)，可由主流程调用 `archive_published_task`，也可以通过现有恢复命令显式选择任务：
-
-```powershell
-python -m stock_data_manage.cli recover --archive-task data/task_workspace/<数据集>/<范围>/<任务ID>
-```
-
-该命令先执行既有分区恢复，再核对所选任务。任务清单和 DuckDB 状态必须均为 `published`；原始清单、响应体、来源输出、质量报告、采集报告、最终分区清单及数据文件必须完整且哈希匹配。归档拒绝候选任务、损坏文件、路径越界、已有目标目录及会破坏原始引用的布局。移动使用同一文件系统的原子目录重命名，跨文件系统失败时保留工作区，不进行复制后删除。
-
-本轮未对已有用户数据执行搬迁、覆盖或清理。原配置中的保存天数不新增自动清理动作。`metadata/metadata.duckdb` 的默认位置已统一为 `data/metadata/metadata.duckdb`；验收前未发现旧数据库，需要处理已有数据库的部署应另做明确迁移，不自动覆盖目标。
-
-仍需后续接通的工作是各数据集的多来源候选构建、业务完成标准与正式发布，再在发布成功后调用归档。已有日线和分钟发布行为不因这次目录统一而扩大适用范围。
+业务报告及候选当前留在工作区，原 `archive_published_task` 只允许哈希完整、任务和元数据均已发布的结果归档；自动整体任务归档及其他输入数据集的发布规则仍待接通。验收和流程细则见 [任务流程](../pipeline/collection-tasks.md)、[测试验收基线](../../stock-data-test-design-acceptance-baseline.md)。

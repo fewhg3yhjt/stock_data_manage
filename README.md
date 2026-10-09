@@ -11,7 +11,7 @@
 - [代码目录与文件职责](CODE_STRUCTURE.md)
 - [原始暂存、任务重做与发布](docs/pipeline/collection-tasks.md)
 - [股票与 ETF 来源名单](docs/providers/security-catalog.md)
-- [证券清单定时更新与来源资格](docs/worker/security-master.md)：默认交易日08:00，沿用同日任务和失败续采；10月9日独立核验发现沪市ETF缺1只，尚未发布全量名单。已将留证校验的交易日历写入既有元数据库。
+- [证券清单定时更新与来源资格](docs/worker/security-master.md)：默认交易日08:00，沿用同日任务和失败续采；证券状态口径与真实任务发布验收未完成。512390目录差异涉及清算，不能直接认定漏采；已核验导入交易日历。
 - [Provider 能力验证与归一化设计](provider-capability-verification-and-normalization.md)
 - [EastMoney 数据域覆盖设计](eastmoney-data-domain-coverage.md)
 - [项目开发进度](PROJECT_PROGRESS.md)
@@ -26,10 +26,10 @@
 | `config/` | 来源参数、采集频率、路由、数据集字段模板及归一化映射配置 |
 | `tests/` | 实现的自动化测试 |
 | `docs/` | 按模块职责归档的正式说明；各子目录随文档产生建立 |
-| `provider_validation/` | 来源探针、覆盖报告、原始响应及验证证据；入口见 [Provider 验证目录说明](provider_validation/README.md) |
+| `provider_validation/` | 正式实现前的来源可行性验证脚本、原始返回、覆盖报告及结论；业务开发后只读引用已有证据，入口见 [Provider 验证目录说明](provider_validation/README.md) |
 | `AGENTS.md` | 协作、验证及文档管理约定 |
 | `data/` | 统一运行根目录：`raw/`、`task_workspace/`、`canonical/`、`task_archive/`、`metadata/` 和 `hot/`；按需生成，不提交 Git，详见 [存储与归档说明](docs/storage/README.md) |
-| `tmp/` | 本地临时工作和离线验收输出；历史内容保留，新输出不作为生产数据 |
+| `tmp/` | 本地临时工作、正式实现的隔离回放、联调与故障验收；按独立运行根目录分层输出，不能冒充真实生产数据 |
 | `tmp_test/` | 历史研究脚本及输出，保留历史引用；新来源验证统一进入 `provider_validation/` |
 | `CODE_STRUCTURE.md` | 当前代码和文档目录的职责索引 |
 
@@ -50,6 +50,10 @@
 正式代码直接放在 `src/` 下，模块按职责分目录，不再套一层项目同名目录。Python 导入名仍为 `stock_data_manage`，由 `pyproject.toml` 将该包映射到 `src/`；`stock_data_manage.providers` 对应 `src/providers/`。根目录 `config/` 保存 YAML，`src/config/` 保存读取和校验配置的代码。
 
 来源可行性证据位于 `provider_validation/results/`。通用输入入口 `collect-input` 默认将原响应保存到 `data/raw/`，来源解析和标准化结果保存到 `data/task_workspace/`，元数据库保存到 `data/metadata/metadata.duckdb`。已实现的来源输入仍为候选数据；新增 `collect-task` 先对证券主数据和单交易日日线接通 `raw/_tmp`、检查、重做及发布收尾，正式执行默认使用配置中的 `data/`，目前仍受来源资格检查阻断；离线回放须显式指定独立的 `--data-root`，业务任务输出禁止放入 `provider_validation/`。尚未在线启用。详见 [任务流程](docs/pipeline/collection-tasks.md) 和 [存储与归档说明](docs/storage/README.md)。显式 `--output-root` 保留隔离验证布局；历史报告中的旧路径及哈希不改写。
+
+2026-10-09确认的开发边界进一步限定：`provider_validation/` 仅服务正式实现前的接口可行性确认；进入业务开发后，业务原始响应、Provider联调、来源复核及端到端验收都使用 `data/` 或 `tmp/` 下独立运行布局，不向该验证区新增产物。历史证据只读保留，业务代码位于 `src/`、实现测试位于 `tests/`。
+
+raw按“来源＋接口＋数据所属日期＋请求范围”每天唯一：不同日期保留，同日重做只更新目标范围。当前代码仍有独立采集按UTC抓取日生成多批次、业务任务转正路径缺日期、显式输出可回写验证区等差距，尚未修改。现有生产元数据库业务任务为0、未发布正式全量名单；10月9日手工来源候选不算真实任务完成。本次仅对齐设计、目录边界和验收文档，下一阶段需修改现有路径及任务摘要，再按正式入口验收。进度与代码差距见 [项目进度](PROJECT_PROGRESS.md)。
 
 ## 当前开发状态
 

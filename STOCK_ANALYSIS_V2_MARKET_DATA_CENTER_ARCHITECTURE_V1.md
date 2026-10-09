@@ -2,13 +2,15 @@
 
 > 目标：把现有 `stock_data_manage` 收敛为一个简单、可靠、可维护的 A 股市场数据中心，为股票分析工具 V2 提供稳定的数据产品。
 >
-> V1.3 重点收敛任务与数据流：任务按最终数据分区定义；证券主数据直接读取本地已发布数据；每个来源抓取后立即执行来源专属标准化和校验，再计算缺失证券并切换下一来源；股票、ETF 和 LOF 日线目标口径统一为前复权；支持分红事件批量发现、人工历史重建、全量重做与断点重做；任务成功后归档来源证据，正式数据通过原子发布进入 `datasets`。
+> V1.3 重点收敛任务与数据流：任务按最终数据分区定义；证券主数据直接读取本地已发布数据；每个来源抓取后立即执行来源专属标准化和校验，再计算缺失证券并切换下一来源；股票、ETF 和 LOF 日线目标口径统一为前复权；支持分红事件批量发现、人工历史重建、全量重做与断点重做；任务成功后归档来源证据，正式数据通过原子发布进入 `data/canonical`。
 >
 > 核心术语、目录职责和逐来源数据变化以 [市场数据中心术语与数据流程规范](stock-data-terminology-and-data-flow.md) 为准。
 >
 > 前复权历史变化、分红事件发现和多日期统一切换以 [前复权日线与历史重建设计](stock-data-design-qfq-history-rebuild.md) 为准。当前代码尚未完整实现这条链路。
 >
 > Provider 能力声明、能力探针、证据生命周期、覆盖矩阵和 YAML 归一化规则以 [Provider 能力验证与归一化设计](provider-capability-verification-and-normalization.md) 为准。
+
+> 2026-10-09明确目录边界：`provider_validation/` 只承担正式实现前的来源可行性验证，包含当时的接口原始返回。进入业务开发后，代码、实现测试和说明分别位于 `src/`、`tests/`、`docs/`；业务响应、联调及验收新产物使用 `data/` 或 `tmp/` 下的隔离运行布局。已有验证证据只读引用。raw按“来源＋接口＋数据日期＋请求范围”每天唯一，正常、失败、重做和转正遵循 [任务流程](docs/pipeline/collection-tasks.md) 与 [存储说明](docs/storage/README.md)。这些按日路径和入口校正仍待代码实现；总体设计中的多来源、历史重建及管理能力不能据此视为已经上线。
 
 ## 1. 产品定位
 
@@ -639,48 +641,37 @@ BaoStock（主）/ AkShare（备）
 数据构建开始时创建：
 
 ```text
-task_workspace/
-└── stock_daily/
-    └── 2026-09-28/
-        └── task_1001/
-            ├── target_symbols.json
-            ├── sources/
-            │   ├── tencent/
-            │   │   ├── raw/
-            │   │   └── normalized.parquet
-            │   ├── baostock/
-            │   │   ├── raw/
-            │   │   └── normalized.parquet
-            │   └── akshare/
-            │       ├── raw/
-            │       └── normalized.parquet
-            ├── candidate/
-            │   └── stock_daily.parquet
-            ├── missing_symbols.json
-            ├── manifest.json
-            └── quality_report.json
+data/
+├── raw/_tmp/<数据日期>/<任务ID>/<单元哈希>/
+├── raw/<来源>/<接口>/<数据日期>/scope-<范围哈希>/
+├── task_workspace/<数据集>/<范围>/<运行ID>/sources/<来源>/<输入ID>/
+│   ├── raw_refs.json
+│   ├── parsed/
+│   └── normalized.parquet
+├── task_workspace/_tasks/<任务ID>/{prepared.parquet,coverage.json}
+├── task_archive/
+├── canonical/<数据集>/<既有业务分区>/
+└── metadata/metadata.duckdb
 ```
 
 其中：
 
-- `target_symbols.json`：本次冻结的目标证券集合。
-- `sources/<来源>/raw/`：该来源本次实际返回的原始响应。
-- `sources/<来源>/normalized.parquet`：该来源经过专属规则转换和基础校验后的标准数据。
-- `candidate/`：多来源标准数据合并后生成的唯一候选数据。
-- `missing_symbols.json`：根据有效来源标准数据计算出的当前缺失证券。
-- `manifest.json`：本次数据构建使用了哪些来源、记录数和最终发布文件。
-- `quality_report.json`：最终完整性和质量检查结果。
+- 原响应只保存在raw及既有稳定证据归档，来源工作区保存引用、解析和映射结果。
+- 本次冻结目标、单元状态、缺失原因及提交记录由现有任务定义和元数据库维护，用户不维护来源文件清单。
+- 来源工作区的 `normalized.parquet` 是该来源转换及基础校验后的候选数据。
+- 任务工作区的 `prepared.parquet`、`coverage.json` 及正式发布清单关联最终构建、检查、数量和来源引用；最终覆盖汇总在发布前生成，中间状态供重做使用。
+- 上述按日raw布局是目标，现存暂存和无日期转正路径仍需修正；其他最终数据仍使用既有业务分区，不在本次扩展证券历史服务或通用工作流。
 
 ### 12.5 全量重做与断点重做
 
-提供两种明确操作。
+提供全量、断点和指定证券三种操作，均限定到数据日期及任务冻结范围。来源不支持单证券请求时，指定证券重做明确拒绝；详细现状与目标以任务流程为准。
 
 #### 全量重做
 
 含义：不信任当前数据构建的采集结果，从源头重新生产。
 
 ```text
-创建新的数据构建和任务目录
+清空目标日期、当前任务的活动暂存及构建结果
     ↓
 从第一来源真正重新抓取
     ↓
@@ -693,7 +684,7 @@ task_workspace/
 合并、校验、发布
 ```
 
-已经发布过的旧数据构建及其任务归档不删除，用于历史追溯。
+成功后替换该日期及范围的结果；失败时保留此前正式数据，其他日期保持。既有审计归档保存必要原字节及引用，不让用户选择多份活动版本。
 
 #### 断点重做
 
@@ -797,10 +788,10 @@ candidate/stock_daily.parquet
       ↓
 原子发布
       ↓
-datasets/stock_daily/2026-09-28.parquet
+data/canonical/daily_bar/asset_type=stock/trade_date=2026-09-28/
 ```
 
-同时将本次数据构建中需要追溯的来源证据和报告从任务工作区移入任务归档：
+来源证据沿用既有 `data/task_archive/_raw_evidence/` 稳定引用。整份任务归档是后续由已发布任务调用既有归档入口的操作，当前不会随发布自动搬迁报告；目标关系如下：
 
 ```text
 task_workspace/.../task_1001/sources
@@ -810,14 +801,14 @@ quality_report.json
 task_archive/stock_daily/2026-09-28/task_1001/
 ```
 
-不需要追溯的临时计算文件不进入任务归档，发布成功后直接删除。
+临时计算文件的清理沿用明确的任务范围及审计策略；本次未新增发布后自动删除或整体归档能力。
 
 因此：
 
 ```text
 task_workspace = 正在采集、转换、补缺和检查的任务目录
 task_archive = 已成功发布任务的来源证据和报告
-datasets = 业务正式读取的数据
+canonical = 业务正式读取的数据
 ```
 
 失败任务工作区、来源原始响应、来源标准数据和任务归档第一版默认不自动清理。后续再增加人工清理和可配置保留策略；清理能力上线前只统计磁盘占用，不删除数据。
@@ -826,23 +817,12 @@ datasets = 业务正式读取的数据
 
 ```text
 data/
-│
-├── task_workspace/
-│   └── stock_daily/2026-09-28/task_1001/
-│
-├── task_archive/
-│   └── stock_daily/
-│       └── 2026-09-28/
-│           └── task_1001/
-│               ├── sources/
-│               ├── manifest.json
-│               └── quality_report.json
-│
-├── datasets/
-│   └── stock_daily/
-│       └── 2026-09-28.parquet
-│
-└── metadata.db
+├── raw/_tmp/<数据日期>/<任务>/<单元>/
+├── raw/<来源>/<接口>/<数据日期>/scope-<范围>/
+├── task_workspace/                          # 来源候选、任务及运行报告
+├── task_archive/                            # 来源稳定证据及执行追溯
+├── canonical/                              # 既有数据集业务分区
+└── metadata/metadata.duckdb
 ```
 
 ### 12.10 股票日线完整模拟
@@ -905,7 +885,7 @@ AkShare(SYMBOL) 拉 B
 任务工作区清理
 ```
 
-选择“全量重做”则创建新的数据构建和任务目录，从 Tencent 真正重新全量获取，不复用旧任务的数据。
+选择“全量重做”则清空目标日期及当前任务的活动暂存和构建结果，从源头真正重新采集；成功后替换当天范围，不复用旧候选填补新缺失，也不覆盖其他日期。上述多来源场景是总体设计示例，当前证券与日线任务的实际实现范围及未接通能力以模块流程文档为准。
 
 ### 12.11 第一版任务驱动
 

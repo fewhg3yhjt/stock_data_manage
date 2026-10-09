@@ -1,6 +1,8 @@
 # 代码目录与文件职责
 
-证券正式启用核验继续修改既有 `service/calendar_update.py`，校验归档在线输入及当前回放后导入正向交易日期；`tests/test_update_services.py` 验证时效、搬迁前证据、冲突保留和未知日期。原 `provider_validation/tests/verify_security_board_coverage.py` 增加可选交易所独立清单探针，响应在解析前留存，并保存代码快照、原响应哈希和派生结果；`tests/test_security_catalog.py` 验证探针留证、未来上市过滤及分页失败。实际证券覆盖结果保存于 `provider_validation/results/security-activation-20261009/coverage-review.json`；发现沪市ETF缺1只，未发布全量名单。日历仅完成本次核验导入，未增加自动刷新服务。
+2026-10-09目录职责对齐：`provider_validation/` 仅用于正式实现前的可行性脚本、原始响应及结论，进入业务开发后只读引用旧证据。业务实现归 `src/`，实现测试归 `tests/`，正式文档归 `docs/`；新业务响应、Provider联调、来源复核与验收产物使用 `data/` 或 `tmp/` 下独立运行根目录。raw按来源、接口、数据日期及范围每天唯一的规则已确认，当前路径尚待修正，不把文档目标写成现有实现。职责及差距见 [存储说明](docs/storage/README.md)、[任务流程](docs/pipeline/collection-tasks.md)、[验收基线](stock-data-test-design-acceptance-baseline.md)。
+
+证券正式启用核验此前修改既有 `service/calendar_update.py`，校验归档在线输入及当前回放后导入正向交易日期；`tests/test_update_services.py` 验证时效、搬迁前证据、冲突保留和未知日期。原 `provider_validation/tests/verify_security_board_coverage.py` 曾增加可选交易所独立清单探针，响应在解析前留存，`tests/test_security_catalog.py` 验证留证、未来上市及分页失败。历史核验保存于 `provider_validation/results/security-activation-20261009/coverage-review.json`；512390差异涉及清算，不能直接认定漏采，见 [来源说明](docs/providers/security-catalog.md)。该处后续不再生成正式开发的来源复核及端到端验收输出，现有脚本职责尚需整改。日历完成一次核验导入，未增加自动刷新服务；正式名单未发布。
 
 证券清单调度继续修改既有模块：`worker/scheduler.py` 从原采集配置读取每日频率，`routing/factory.py` 在来源请求前核验四层资格证据、请求范围、有效期和健康状态，`pipeline/inputs.py` 的原调度入口驱动同日持久化任务并复用回退和恢复，`cli.py` 增加原命令的证券清单选项。`collection.yaml` 是名单来源及频率依据，`schedules.yaml` 引用同一配置。新增正式说明 [证券清单定时更新](docs/worker/security-master.md)；没有增加管理层或后台服务，真实来源资格尚未核准。
 
@@ -33,8 +35,8 @@
 - 正式代码直接位于 `src/`，不再建立 `src/stock_data_manage/` 或 `src/stockdata/`。现有104个源码文件整体迁移，各模块职责不变。
 - `src/__init__.py` 是逻辑包 `stock_data_manage` 的初始化文件，`src/cli.py` 是命令入口。`pyproject.toml` 显式将逻辑包映射到 `src/`，列出当前28个 Python 包；新增含 `__init__.py` 的子包时同步更新该清单。
 - 根目录 `config/` 保存 YAML 参数、调度意图、字段模板和字段映射；`src/config/` 保存配置读取与校验代码。
-- `tests/` 保存实现测试；`provider_validation/` 保存来源可行性验证、原响应与派生证据；`docs/` 保存按职责归档的正式说明。
-- `data/` 统一保存 `raw/`、`task_workspace/`、`canonical/`、`task_archive/`、`metadata/` 和 `hot/`，按需生成。通用采集入口默认分层落盘；显式验证输出保持历史布局。来源候选成功不自动发布或归档，详见 [运行数据与归档](docs/storage/README.md)。
+- `tests/` 保存实现测试；`provider_validation/` 保存正式实现前的来源可行性验证、原返回与派生证据；`docs/` 保存按职责归档的正式说明。业务开发后不向验证区写入新代码、数据或验收结果。
+- `data/` 统一保存 `raw/`、`task_workspace/`、`canonical/`、`task_archive/`、`metadata/` 和 `hot/`，按需生成；实现回放与故障测试使用 `tmp/` 下的隔离运行根目录。按日raw目标路径与当前旧布局分别记录，来源候选成功不自动发布或归档，详见 [运行数据与归档](docs/storage/README.md)。
 - `tmp/` 用于本地临时工作与离线验收，`tmp_test/` 保留历史研究脚本和结果；不删除已有内容，新来源验证归入 `provider_validation/`。
 - 测试、命令及验证脚本在安装当前项目的同一环境中运行，不再通过 `PYTHONPATH=src` 暴露顶层 `providers`、`config` 等包。历史证据中的旧路径及哈希保留原样。
 
@@ -57,7 +59,7 @@ EastMoney 各数据域的范围和实现状态见 `eastmoney-data-domain-coverag
 
 Provider 的离线契约、实时探针和路由资格记录见仓库根目录的 `PROVIDER_CAPABILITY_MATRIX.md`。该文档是渠道验证事实记录，不是运行时配置。
 能力采集、证据生命周期和 YAML 归一化规则见 `provider-capability-verification-and-normalization.md`；它是 Provider 接入和后续验证的专项设计。
-Provider 接口验证资料统一位于 `provider_validation/`：`tests/` 保存探针、低频实时探针入口、BaoStock SDK低频探针、离线重放及逐接口覆盖报告生成脚本；`tests/source_snapshots/` 保存固定提交的上游源码/测试快照及哈希清单；`coverage/` 保存逐接口 CSV 和阅读版 XLSX；`docs/` 保存验证方法和报告；`results/` 保存原始响应、派生结果、逐接口 JSON 结论和摘要。原始 HTTP 清单及响应体位于 `provider_validation/results/raw/<run-id>/` 或对应探针批次的 `provider_validation/results/live-probes/<run-id>/_raw/`；SDK探针保存调用边界可见的解码字段和行，同时明确标记底层TCP帧不可见。历史探针摘要位于 `provider_validation/results/legacy/`。行业迁移证据可用 `provider_validation/tests/replay_sector_capability_archives.py` 离线重放。详细入口见 [Provider 验证目录说明](provider_validation/README.md) 和 [接口测试覆盖度说明](provider_validation/docs/interface-coverage-method.md)。
+正式实现前的Provider验证材料归 `provider_validation/`：验证脚本、原始响应、派生证据、覆盖报告及结论；现存后续联调和说明生成工具位置作为历史记录保留，其正式职责待在现有模块中整改。本文件下文各批次目录及脚本描述是历史证据索引，不能作为继续向验证区输出业务产物的依据。响应仍可按原清单及哈希核验，详细边界见 [Provider 验证目录说明](provider_validation/README.md) 和 [接口测试覆盖度说明](provider_validation/docs/interface-coverage-method.md)。
 
 输入能力第一阶段的设计与实现边界见 `provider_validation/docs/2026-10-03-input-capability-framework.md`。现有 `provider_validation/tests/prepare_capability_results.py --input-catalog` 离线生成 `coverage/successful-input-capabilities.csv` 和同名 JSON，关联源记录、原响应和哈希。该阶段回归证据保存于 `results/2026-10-03-input-capability-framework-tests.xml` 与 `results/2026-10-03-input-capability-framework-verification.json`，不属于生产数据。
 

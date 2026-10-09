@@ -4,6 +4,8 @@
 > 对应设计：[证券全量数据采集与管理平台设计方案](stock-data-design-realtime.md)  
 > 适用范围：Security Master、Trading Calendar、日线、Watchlist 1m/5m、快照、Raw/Hot/Canonical、来源切换与恢复
 
+> 2026-10-09补充：接口验证区只用于正式实现前的可行性验证；业务开发及验收使用正式模块和业务运行布局。raw每天唯一及真实任务验收要求见下文4.5；新增要求当前待代码实现及执行验收，不表示M1或M2已通过。
+
 ---
 
 # 1. 文档目标
@@ -153,9 +155,24 @@ Schema Contract
 
 ## 4.4 采集 At-least-once，发布必须幂等
 
-Raw 可以重复，采集任务可以重跑；Canonical 同一业务主键只能存在一条正式记录。
+采集任务可以重跑，精确响应字节可作为审计证据留存；raw同来源、接口、数据日期及请求范围只有一份活动结果，Canonical同一业务主键只能存在一条正式记录。
 
 ---
+
+## 4.5 开发目录、按日raw和真实任务验收补充
+
+| 用例 | 验收要求 |
+|---|---|
+| RAW-DATE-001 不同日期 | 同来源、接口及范围的两个数据日期分别保存，后一天不改变前一天文件及哈希 |
+| RAW-DATE-002 同日全量 | 清理目标任务暂存、强制从源头重采；成功后替换当天范围，失败不破坏已有正式记录 |
+| RAW-DATE-003 断点及指定证券 | 识别缺失和异常单元，补采后合并派生记录及去重，保留当天其他证券和其他日期；不修改拼接原响应字节 |
+| RAW-DATE-004 补采与回放日期 | 抓取时间和数据所属日期独立；历史日线按目标日保存，当前目录按原响应采集日保存，回放不改写数据日期 |
+| RUN-PATH-001 开发边界 | 实现前可行性探针可以输出验证区；进入业务开发后代码、数据、Provider联调及验收新产物均不写入该区，历史证据仅只读引用 |
+| RUN-TASK-001 正式执行 | 通过实际业务任务或调度入口生成任务状态、raw、来源候选及最终结果；资格阻断、只取得来源候选或未发布时据实报告，不能标记正式完成 |
+| RUN-TASK-002 自动报告 | 任务在发布前自动生成最终检查，包含范围、请求日期、实际日期、来源、数量、失败及回退原因和原始引用；恢复后报告与数据相符 |
+| RUN-TASK-003 覆盖口径 | 证券清单以已核准日期及状态口径核对；无独立分母只报告检查结果。日线按冻结目标集合计算覆盖，不以返回行数充当市场分母 |
+
+所有用例关联实际入口、参数、代码/配置版本、输入响应哈希、自动输出文件及验证结论。中间只维护基础合同和单元状态供重做使用，最终覆盖与有效性检查发生在正式发布前。人工汇总或刷新接口说明表不能代替真实任务报告。详细职责见 [存储说明](docs/storage/README.md) 和 [任务流程](docs/pipeline/collection-tasks.md)。
 
 # 5. 测试数据设计
 
@@ -547,10 +564,10 @@ soak_5d              # M2 验收
 所有测试使用隔离路径，例如：
 
 ```text
-data/test-runs/{test_run_id}/raw
-data/test-runs/{test_run_id}/hot
-data/test-runs/{test_run_id}/canonical
-data/test-runs/{test_run_id}/metadata
+tmp/test-runs/{test_run_id}/data/raw
+tmp/test-runs/{test_run_id}/data/hot
+tmp/test-runs/{test_run_id}/data/canonical
+tmp/test-runs/{test_run_id}/data/metadata
 ```
 
 不得直接对生产 Canonical 执行破坏性故障注入。
