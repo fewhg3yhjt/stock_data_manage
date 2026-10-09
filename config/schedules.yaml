@@ -2,7 +2,7 @@ timezone: Asia/Shanghai
 
 jobs:
   - name: security_master_update
-    time: "08:00"
+    collection_profile: security_master_daily
   - name: daily_reconciliation
     time: "08:30"
   - name: realtime_minute_start

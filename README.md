@@ -11,7 +11,7 @@
 - [代码目录与文件职责](CODE_STRUCTURE.md)
 - [原始暂存、任务重做与发布](docs/pipeline/collection-tasks.md)
 - [股票与 ETF 来源名单](docs/providers/security-catalog.md)
-- 证券名单的覆盖检查、前次有效名单回退与断点续采见上述任务流程；在线路由和定时采集尚未启用。
+- [证券清单定时更新与来源资格](docs/worker/security-master.md)：默认交易日08:00，沿用同日任务和失败续采；代码已接通，真实来源资格未齐全，在线采集尚未激活。
 - [Provider 能力验证与归一化设计](provider-capability-verification-and-normalization.md)
 - [EastMoney 数据域覆盖设计](eastmoney-data-domain-coverage.md)
 - [项目开发进度](PROJECT_PROGRESS.md)

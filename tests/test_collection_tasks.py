@@ -243,6 +243,169 @@ def master_manifest(root):
     return Manifest.load(root / "canonical/security_master/current/manifest.json")
 
 
+def save_fixture_qualification(root, input_id, context):
+    """Synthetic four-layer artifacts exercise gating; these are not live source evidence."""
+    from stock_data_manage.config.loader import load_input_capabilities
+    from stock_data_manage.routing.factory import build_input_provider
+    from stock_data_manage.providers.probes import ProbeEvidence
+    from stock_data_manage.storage.integrity import row_hash
+    from datetime import timedelta
+    import inspect
+    contract = next(c for c in load_input_capabilities(CONFIG / "providers.yaml") if c.input_id == input_id)
+    adapter = build_input_provider(contract, providers_path=CONFIG / "providers.yaml")
+    version = adapter.capability_version
+    if "trading_dates" in context.get("calendar",{}):
+        context["calendar"]["trading_dates"]=[date.fromisoformat(value) if isinstance(value,str) else value for value in context["calendar"]["trading_dates"]]
+    params = contract.bind_parameters(context)
+    work = root / "qualification-fixtures" / input_id
+    work.mkdir(parents=True, exist_ok=True)
+    raw_store = RawObjectStore(work / "raw")
+    event = raw_store.record_response(response=SimpleNamespace(content=b'{"synthetic_transport_fixture": true}',status_code=200,
+        headers={"Content-Type":"application/json"},encoding="utf-8"),url="https://fixture.invalid/catalog",method="GET",
+        request_headers={},provider=contract.provider,endpoint=contract.endpoint,scope={},code_version="fixture-v1",mode="live")
+    raw = raw_store.root / "manifest.ndjson"
+    report = {"input_id":input_id,"adapter_version":version,"status":"candidate_complete","mode":"live",
+        "parameters":{k: str(v) if isinstance(v,date) else v for k,v in params.items()},"code_version":"fixture-v1",
+        "validation_time_utc":datetime.now(timezone.utc).isoformat(),"live_http_calls":1,
+        "raw_manifest":{"path":str(raw),"sha256":file_hash(raw)},
+        "config_files":[{"path":str(CONFIG/name),"sha256":file_hash(CONFIG/name)} for name in ("providers.yaml","collection.yaml","datasets/security_snapshot.yaml","normalization/security_snapshot.yaml")],
+        "code_files":[{"path":str(path),"sha256":file_hash(path)} for path in (ROOT/"src/routing/factory.py",Path(inspect.getfile(type(adapter))))],
+        "synthetic_fixture":True}
+    rows = full_catalog_collector().catalog_rows["beijing" if input_id=="SECURITY-BSE-001" else "shenzhen-shanghai"]
+    groups = {row["exchange"]+"/"+row["asset_type"]:1 for row in rows}
+    semantic = {"input_id":input_id,"passed":True,"independent_full_market_coverage_verified":True,
+                "code_version":"fixture-v1","group_counts":groups,"source_response_hashes":[event["body_sha256"]],"synthetic_fixture":True}
+    for name, payload in (("live.json",report),("semantic.json",semantic)):
+        (work/name).write_text(json.dumps(payload),encoding="utf-8")
+    (work/"contract.xml").write_text('<testsuites><testsuite tests="1" failures="0" errors="0" skipped="0"/></testsuites>')
+    canonical_rows=[{"instrument_id":row["exchange"]+":"+row["stock_code"],"symbol":row["stock_code"],
+                     "exchange":row["exchange"],"asset_type":row["asset_type"],"status":row.get("status","active")} for row in rows]
+    pq.write_table(__import__('pyarrow').Table.from_pylist(canonical_rows),work/"data.parquet")
+    manifest = Manifest.from_file(work/"data.parquet",dataset="security_master",row_count=len(rows),first_key=None,last_key=None,
+        raw_refs=(str(raw),),publication_metadata={"coverage_passed":True,"fallback":False})
+    manifest.write_atomic(work/"manifest.json")
+    artifacts = {"contract_tests":"contract.xml","live_report":"live.json","semantic_check":"semantic.json","publication_manifest":"manifest.json"}
+    proof = {"input_id":input_id,"capability_version":version,
+             **{layer:{"path":str(work/name),"sha256":file_hash(work/name)} for layer,name in artifacts.items()}}
+    proof_path = work/"qualification.json"
+    proof_path.write_text(json.dumps(proof),encoding="utf-8")
+    now = datetime.now(timezone.utc)
+    scope = ("input:"+input_id,"parameters:"+row_hash({k:v for k,v in params.items() if k!="trade_date"}),"qualification:"+str(proof_path))
+    with MetadataStore(root/"metadata/metadata.duckdb") as metadata:
+        for group in groups:
+            exchange, asset = group.split('/')
+            metadata.save_probe_evidence(ProbeEvidence(provider=contract.provider,endpoint=contract.endpoint,capability_version=version,
+                validated_at=now,validation_expires_at=now+timedelta(days=1),status="complete",eligible_for_selection=True,
+                row_count=1,first_key=None,last_key=None,evidence_hash=file_hash(proof_path),request_scope=scope,
+                field_semantics=("stock_code","exchange","asset_type","trade_date","status"),units=("identity:exchange/code",)),
+                dataset="security_master",market=exchange,asset_type=asset,frequency="snapshot")
+    return contract, proof_path
+
+
+@pytest.mark.parametrize("failure", [None,"hash","expired","scope","semantic","cooldown","version","code","pending","replay","different_body"])
+def test_security_source_qualification_requires_verified_current_artifacts(tmp_path, failure):
+    from stock_data_manage.routing.factory import check_security_input_qualification
+    from datetime import timedelta
+    context = full_master_definition()["units"][0]["context"]
+    contract,path = save_fixture_qualification(tmp_path,"SDA-BOARD-005",context)
+    proof = json.loads(path.read_text())
+    with MetadataStore(tmp_path/"metadata/metadata.duckdb") as metadata:
+        now = datetime.now(timezone.utc)
+        if failure=="hash": path.write_text('{}')
+        if failure=="scope": context["request"]["symbols"]=["sh600001"]
+        if failure=="expired": now += timedelta(days=2)
+        if failure=="cooldown":
+            metadata.record_provider_failure(provider=contract.provider,endpoint=contract.endpoint,capability_version=proof["capability_version"],
+                market="XSHG",asset_type="stock",dataset="security_master",failure_class="rate_limited",error="fixture 429",now=now,cooldown_seconds=30)
+        if failure in {"semantic","version","code"}:
+            if failure=="version": proof["capability_version"]="old-fixture-version"
+            else:
+                layer = "semantic_check" if failure=="semantic" else "live_report"
+                artifact = Path(proof[layer]["path"])
+                doc = json.loads(artifact.read_text())
+                if failure=="semantic":doc["independent_full_market_coverage_verified"]=False
+                else: doc["code_files"][0]["sha256"]="wrong-fixture-code-hash"
+                artifact.write_text(json.dumps(doc))
+                proof[layer]["sha256"]=file_hash(artifact)
+            path.write_text(json.dumps(proof))
+            metadata.connection.execute("UPDATE capability_registry SET evidence_hash=?",[file_hash(path)])
+        if failure=="pending":(Path(proof["publication_manifest"]["path"]).parent/"task-commit.json").write_text('{}')
+        if failure in {"replay", "different_body"}:
+            # End-to-end replay stores its own manifest, but must retain the
+            # verified response bytes rather than a similarly shaped dataset.
+            manifest_path = Path(proof["publication_manifest"]["path"])
+            original = Manifest.load(manifest_path)
+            store = RawObjectStore(tmp_path / "replay-e2e")
+            body = b'{"synthetic_transport_fixture": true}' if failure == "replay" else b'{"different": true}'
+            store.record_response(response=SimpleNamespace(content=body,status_code=200,headers={},encoding="utf-8"),
+                url="https://fixture.invalid/replay",method="GET",request_headers={},provider=contract.provider,
+                endpoint=contract.endpoint,scope={},code_version="fixture-v1",mode="replay")
+            from dataclasses import replace
+            replace(original,raw_refs=(str(store.root / "manifest.ndjson"),)).write_atomic(manifest_path)
+            proof["publication_manifest"]["sha256"] = file_hash(manifest_path)
+            path.write_text(json.dumps(proof))
+            metadata.connection.execute("UPDATE capability_registry SET evidence_hash=?",[file_hash(path)])
+        result=check_security_input_qualification(contract,context,config_root=CONFIG,metadata=metadata,now=now)
+        assert result["eligible"] is (failure in {None, "replay"}), result
+
+
+def test_qualified_schedule_uses_same_task_for_idempotence_and_fallback_retry(tmp_path):
+    from stock_data_manage.pipeline.inputs import collect_due_inputs
+    from stock_data_manage.worker.scheduler import SHANGHAI
+    now = datetime.now(timezone.utc).astimezone(SHANGHAI).replace(hour=8,minute=0,second=0,microsecond=0)
+    # If tests run after 08:00, use an evaluation time later than fixture registration.
+    if now < datetime.now(timezone.utc).astimezone(SHANGHAI): now=datetime.now(timezone.utc).astimezone(SHANGHAI)
+    day=now.date().isoformat()
+    collector=full_catalog_collector();collector.source_date=day
+    collector.catalog_rows["SDA-BOARD-005"]=collector.catalog_rows["shenzhen-shanghai"]
+    collector.catalog_rows["SECURITY-BSE-001"]=collector.catalog_rows["beijing"]
+    definition=full_master_definition(day=day)
+    for unit in definition["units"]:save_fixture_qualification(tmp_path,unit["input_id"],unit["context"])
+    prior={**definition,"task_id":"earlier-publication"}
+    for unit in prior["units"]:unit["key"]=unit["input_id"]
+    assert run(tmp_path,prior,collector)["status"]=="published"
+    collector.fail.add("SECURITY-BSE-001")
+    now=max(now,datetime.now(timezone.utc).astimezone(SHANGHAI))
+    args=dict(now=now,config_root=CONFIG,data_root=tmp_path,dataset="security_master",execute=True,mode="live",
+              calendar_days=[{"trade_date":day,"is_trading_day":True}],collector=collector)
+    first=collect_due_inputs(**args)
+    assert first["jobs"][0]["status"]=="published",first
+    assert not first["jobs"][0]["complete_today"] and first["jobs"][0]["fallback_used"]
+    collector.fail.clear()
+    second=collect_due_inputs(**args)
+    assert second["jobs"][0]["complete_today"] and not second["jobs"][0]["fallback_used"]
+    assert len(collector.calls)==5
+    third=collect_due_inputs(**args)
+    assert third["jobs"][0]["no_op"] and len(collector.calls)==5
+    assert third["production_writes"]==0
+
+
+@pytest.mark.parametrize("http_status", [403, 429])
+def test_catalog_live_http_failure_blocks_later_calls(tmp_path, http_status):
+    collector = full_catalog_collector()
+    definition = full_master_definition()
+    contract, proof = save_fixture_qualification(tmp_path, "SDA-BOARD-005", definition["units"][0]["context"])
+    save_fixture_qualification(tmp_path, "SECURITY-BSE-001", definition["units"][1]["context"])
+
+    def forbidden(**options):
+        report = collector(**options)
+        if options["input_id"] == contract.input_id:
+            report.update(status="failed", responses=[{"mode": "live", "status_code": http_status}])
+        return report
+
+    assert run(tmp_path, definition, forbidden, mode="live")["status"] == "failed"
+    count = len(collector.calls)
+    assert run(tmp_path, definition, collector, mode="live")["status"] == "failed"
+    assert len(collector.calls) == count
+    with MetadataStore(tmp_path / "metadata/metadata.duckdb") as metadata:
+        health = metadata.provider_health(provider=contract.provider, endpoint=contract.endpoint,
+            capability_version=json.loads(proof.read_text())["capability_version"], dataset="security_master",
+            market="XSHG", asset_type="stock")
+        assert health.last_error == f"HTTP {http_status}"
+        assert health.http_403_count == int(http_status == 403)
+        assert health.http_429_count == int(http_status == 429)
+
+
 def test_five_groups_and_missing_etf_whole_fallback_then_resume(tmp_path):
     collector = full_catalog_collector()
     assert run(tmp_path, full_master_definition(), collector)["status"] == "published"

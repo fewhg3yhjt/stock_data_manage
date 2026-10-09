@@ -1,5 +1,7 @@
 # 代码目录与文件职责
 
+证券清单调度继续修改既有模块：`worker/scheduler.py` 从原采集配置读取每日频率，`routing/factory.py` 在来源请求前核验四层资格证据、请求范围、有效期和健康状态，`pipeline/inputs.py` 的原调度入口驱动同日持久化任务并复用回退和恢复，`cli.py` 增加原命令的证券清单选项。`collection.yaml` 是名单来源及频率依据，`schedules.yaml` 引用同一配置。新增正式说明 [证券清单定时更新](docs/worker/security-master.md)；没有增加管理层或后台服务，真实来源资格尚未核准。
+
 证券名单覆盖与回退继续修改既有模块：`quality/publication.py` 检查市场/资产组合及证券遗漏；`pipeline/inputs.py` 先检查当日候选，必要时整份回退，并保留实际日期、原因和断点续采状态；`storage/integrity.py` 在原发布清单中增加 `publication_metadata`，与数据一同恢复；`worker/recovery.py` 核对提交标记的任务归属。规则仍在原 `config/datasets/security_master.yaml`，没有增加管理层或新文件；正式流程说明见 [任务流程](docs/pipeline/collection-tasks.md)。
 
 本轮证券名单修正原 `providers/baostock/industry.py`，通过原查询响应补充ETF及302股票；原行业接口范围保持。北交所此前只有验证脚本，必要新增 `providers/exchanges/security.py` 承接同一官方目录、会话和分页方式，不新增包或任务系统。原 `providers/transport.py` 增加可选POST请求体哈希匹配，原 `routing/factory.py` 与 `pipeline/inputs.py` 绑定唯一北交所输入、来源日期与证据。字段定义继续放在现有 `security_snapshot` 和 `security_master` YAML。新增 `tests/test_security_catalog.py` 验证分类、分页、原生会话和请求体匹配；正式说明见 [证券名单来源](docs/providers/security-catalog.md)。原始来源探针在 `provider_validation/`，运行候选和检查在 `data/`，尚未发布全市场名单。
@@ -170,7 +172,7 @@ Excel、CSV、JSON 等说明属于从代码、YAML 和证据派生的文档，�
 | 文件 | 职责 |
 |---|---|
 | `pipeline/daily.py` | 日线按来源补缺、标准化、校验、候选生成和发布编排 |
-| `pipeline/inputs.py` | 单项输入及按周期触发的候选采集/回放；统一原始层和任务工作区、来源解析及类型化 Parquet、原始引用、任务/质量清单、既有 Attempt 幂等状态；共享限速和 YAML 映射，不注册正式路由或发布新输入 |
+| `pipeline/inputs.py` | 单项候选采集/回放、持久化业务任务及证券清单调度检查；统一原始暂存、来源解析、YAML映射、质量与覆盖、重做和发布恢复，名单在线请求受路由资格约束 |
 | `pipeline/daily_reconciliation.py` | 日线 provisional/final 合并、缺失统计和盘后校准 |
 | `pipeline/minute.py` | Watchlist 实时分钟采集和 Hot Store 写入 |
 | `pipeline/minute_reconciliation.py` | 分钟盘后校准、final 提升、冲突隔离和完整性处理 |
@@ -208,7 +210,7 @@ Excel、CSV、JSON 等说明属于从代码、YAML 和证据派生的文档，�
 |---|---|
 | `worker/attempts.py` | Collection Attempt 状态机和租约状态 |
 | `worker/recovery.py` | 中断后的临时文件、Canonical 和元数据恢复扫描；已发布任务的证据复查和原子归档 |
-| `worker/scheduler.py` | 既有 Phase 1 固定任务时间表；输入配置的天/分钟周期、交易日/交易时段槽位、证券范围绑定及容量门禁 |
+| `worker/scheduler.py` | 既有任务时间表；输入配置的天/分钟周期、交易日/交易时段槽位、证券范围绑定及容量门禁；从同一频率配置生成证券清单每日任务 |
 | `worker/acceptance.py` | 离线验收回放和容量/恢复验收证据 |
 | `worker/__init__.py` | Worker 包说明，不承载业务实现 |
 | `cli.py` | `collect-due-inputs`（默认保存计划）、`collect-input`（默认分层落盘，支持 JSON 参数上下文及隔离验证输出）、`probe-*`、`recover`、`acceptance-offline` 等入口，负责参数解析和现有流程组装 |

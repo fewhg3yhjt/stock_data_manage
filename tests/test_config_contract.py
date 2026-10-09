@@ -49,7 +49,8 @@ def test_input_catalog_covers_successful_rows_without_granting_production_routes
     assert len(original_inputs) == 77 and len(inputs) == 78
     assert len(successes) == 73
     assert all(c.collection_profile in profiles for c in inputs)
-    assert all(not p.scheduling_enabled for p in profiles.values())
+    assert all(not p.scheduling_enabled for p in profiles.values() if p.name != "security_master_daily")
+    assert profiles["security_master_daily"].scheduling_enabled
     by_id = {c.input_id: c for c in inputs}
     assert by_id["ASTOCK-049"].canonical_input == "ASTOCK-045"
     assert by_id["ASTOCK-050"].endpoint == "strong_stock_pool"

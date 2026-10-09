@@ -40,9 +40,54 @@ from stock_data_manage.domain.sessions import MarketSchedule
 from stock_data_manage.pipeline.inputs import collect_due_inputs
 from stock_data_manage.service.instruments import SecurityRecord
 from stock_data_manage.worker.scheduler import collection_slot, plan_input_collection
+from stock_data_manage.worker.scheduler import plan_security_master_collection
 
 ROOT = Path(__file__).resolve().parents[1]
 DAY = date(2026, 9, 30)
+
+
+def test_master_schedule_calendar_slot_and_single_frequency_source(tmp_path):
+    plan = lambda now, opened: plan_security_master_collection(ROOT / "config", now=now, is_trading_day=opened)
+    assert plan(stamp(7, 59), True)["status"] == "not_due"
+    assert plan(stamp(8, 0), False)["status"] == "not_due"
+    assert plan(stamp(8, 0), None)["status"] == "blocked"
+    job = plan(stamp(8, 0), True)
+    assert job["task_id"] == "security-master-20260930"
+    assert job["definition"]["units"][0]["context"]["config"]["include_etf"]
+    assert [u["input_id"] for u in job["definition"]["units"]] == ["SDA-BOARD-005", "SECURITY-BSE-001"]
+    root = edited_config(tmp_path, "security_master_daily", frequency={"unit": "day", "interval": 1, "at": "16:00"})
+    assert next(j for j in load_scheduled_jobs(root / "schedules.yaml") if j.name == "security_master_update").local_time == time(16)
+    assert plan_security_master_collection(root, now=stamp(8, 0), is_trading_day=True)["status"] == "not_due"
+
+
+def test_master_tick_without_evidence_does_not_call_sources_or_publish(tmp_path):
+    def forbidden(**kwargs):
+        raise AssertionError("unqualified source must not be called")
+    days = [{"trade_date": DAY.isoformat(), "is_trading_day": True}]
+    dry = collect_due_inputs(now=stamp(8, 0), config_root=ROOT / "config", data_root=tmp_path,
+        dataset="security_master", calendar_days=days)
+    assert dry["jobs"][0]["status"] == "blocked" and dry["production_writes"] == 0
+    actual = collect_due_inputs(now=stamp(8, 0), config_root=ROOT / "config", data_root=tmp_path,
+        dataset="security_master", calendar_days=days, execute=True, mode="live", collector=forbidden)
+    assert actual["jobs"][0]["status"] == "failed" and actual["production_writes"] == 0
+    assert not (tmp_path / "canonical").exists()
+    assert all(not q["eligible"] for q in actual["jobs"][0]["source_qualifications"])
+
+
+def test_master_tick_reads_existing_calendar_and_refuses_replay_publication(tmp_path):
+    from stock_data_manage.service.calendar import TradingCalendarStore, CalendarDay
+    missing = collect_due_inputs(now=stamp(8, 0), config_root=ROOT / "config", data_root=tmp_path, dataset="security_master")
+    assert "calendar coverage" in missing["jobs"][0]["reason"]
+    with TradingCalendarStore(str(tmp_path / "metadata/metadata.duckdb")) as calendar:
+        calendar.upsert([CalendarDay(DAY, False, "fixture", 1)])
+    closed = collect_due_inputs(now=stamp(8, 0), config_root=ROOT / "config", data_root=tmp_path, dataset="security_master")
+    assert closed["jobs"][0]["reason"] == "confirmed non-trading day"
+    with pytest.raises(ValueError, match="require live"):
+        collect_due_inputs(now=stamp(8, 0), config_root=ROOT / "config", data_root=tmp_path,
+            dataset="security_master", execute=True, mode="replay")
+    with pytest.raises(ValueError, match="is_trading_day"):
+        collect_due_inputs(now=stamp(8, 0), config_root=ROOT / "config", data_root=tmp_path,
+            dataset="security_master", calendar_days=[{"trade_date": DAY.isoformat()}])
 
 
 def profiles():
@@ -71,7 +116,7 @@ def test_tencent_profiles_separate_scope_frequency_and_request_speed():
     assert p["tencent_minute_5m"].refresh_interval_seconds == 300
     assert p["tencent_minute_1m"].refresh_interval_seconds == 60
     assert p["tencent_daily"].at_time == time(16, 20)
-    assert all(not v.scheduling_enabled for v in p.values())
+    assert all(not v.scheduling_enabled for name, v in p.items() if name != "security_master_daily")
 
 
 @pytest.mark.parametrize("hour,minute,second,expected", [

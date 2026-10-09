@@ -1,6 +1,23 @@
 from stock_data_manage.cli import main
 
 
+def test_security_due_cli_reports_calendar_and_qualification_blocks(tmp_path, capsys):
+    import json
+    from pathlib import Path
+    args = ["collect-due-inputs", "--dataset", "security_master", "--now", "2026-10-09T08:05:00+08:00",
+            "--data-root", str(tmp_path / "data")]
+    assert main(args) == 2
+    report = json.loads(capsys.readouterr().out)
+    assert report["mode"] == "live" and "calendar" in report["jobs"][0]["reason"]
+    calendar = tmp_path / "calendar.json"
+    calendar.write_text(json.dumps([{"trade_date": "2026-10-09", "is_trading_day": True}]))
+    assert main(args + ["--calendar-file", str(calendar)]) == 2
+    report = json.loads(capsys.readouterr().out)
+    assert all(not q["eligible"] for q in report["jobs"][0]["source_qualifications"])
+    assert Path(report["report_path"]).is_relative_to(tmp_path / "data/task_workspace")
+    assert not (tmp_path / "data/canonical").exists()
+
+
 def test_collect_task_defaults_to_configured_root_and_live_mode(tmp_path, monkeypatch, capsys):
     import json
     definition = {"task_id": "daily", "dataset": "daily_bar", "trade_date": "2026-09-30"}

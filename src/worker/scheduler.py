@@ -124,17 +124,57 @@ def load_scheduled_jobs(path: str | Path) -> tuple[ScheduledJob, ...]:
         raise ValueError("schedule config must contain a jobs list")
     jobs: list[ScheduledJob] = []
     for item in raw_jobs:
-        if not isinstance(item, dict) or not item.get("name") or not item.get("time"):
+        if not isinstance(item, dict) or not item.get("name") or not (item.get("time") or item.get("collection_profile")):
             raise ValueError("each schedule job requires name and time")
         if item.get("enabled", True) is False:
             continue
         try:
-            hour, minute, *second = str(item["time"]).split(":")
-            local_time = time(int(hour), int(minute), int(second[0]) if second else 0)
-        except (TypeError, ValueError) as exc:
+            if item.get("collection_profile"):
+                if item.get("time"):
+                    raise ValueError("profile schedule must not duplicate its time")
+                profile = next(p for p in load_collection_profiles(Path(path).parent / "collection.yaml")
+                               if p.name == item["collection_profile"])
+                if profile.frequency_unit != "day" or profile.at_time is None:
+                    raise ValueError("named daily job requires a daily profile")
+                if not profile.scheduling_enabled:
+                    continue
+                local_time = profile.at_time
+            else:
+                hour, minute, *second = str(item["time"]).split(":")
+                local_time = time(int(hour), int(minute), int(second[0]) if second else 0)
+        except (TypeError, ValueError, StopIteration) as exc:
             raise ValueError(f"invalid schedule time: {item.get('time')!r}") from exc
         jobs.append(ScheduledJob(str(item["name"]), local_time))
     return tuple(sorted(jobs, key=lambda job: (job.local_time, job.name)))
+
+
+def plan_security_master_collection(config_root, *, now, is_trading_day):
+    """Plan the business job with the same frequency calculator as source inputs."""
+    if now.tzinfo is None:
+        raise ValueError("schedule time must be timezone-aware")
+    root = Path(config_root)
+    payload = yaml.safe_load((root / "collection.yaml").read_text(encoding="utf-8"))
+    config = payload["security_master"]
+    profile = next(p for p in load_collection_profiles(root / "collection.yaml") if p.name == config["collection_profile"])
+    local = now.astimezone(SHANGHAI)
+    job = {"dataset": "security_master", "profile": profile.name, "trade_date": local.date().isoformat(),
+           "task_id": "security-master-" + local.strftime("%Y%m%d"), "status": "not_due", "slot": None}
+    if not profile.scheduling_enabled or not any(j.name == "security_master_update" for j in load_scheduled_jobs(root / "schedules.yaml")):
+        return {**job, "status": "disabled", "reason": "security master schedule is disabled"}
+    if is_trading_day is None:
+        return {**job, "status": "blocked", "reason": "calendar coverage is missing for the requested day"}
+    if not is_trading_day:
+        return {**job, "reason": "confirmed non-trading day"}
+    slot = collection_slot(profile, now, schedule=MarketSchedule(timezone=SHANGHAI), trading_dates=(local.date(),))
+    if slot is None:
+        return job
+    units = [{"key": input_id, "input_id": input_id, "context": {
+        "config": config.get("source_config", {}).get(input_id, {})}} for input_id in config["source_inputs"]]
+    if not units or len({u["key"] for u in units}) != len(units):
+        raise ValueError("security master requires unique source inputs")
+    return {**job, "slot": slot.isoformat(), "status": "ready",
+            "definition": {"task_id": job["task_id"], "dataset": "security_master",
+                           "trade_date": job["trade_date"], "units": units}}
 
 
 DEFAULT_JOBS = (

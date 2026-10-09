@@ -995,9 +995,12 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
             if not (str(request.get("start_date")) <= day.isoformat() <= str(request.get("end_date"))):
                 raise ValueError("daily source window must contain the task trading date")
         if mode == "live":
-            # Current source inputs are validation-only. Do not bypass qualification
-            # by calling the new publication path instead of the existing router.
-            raise ValueError("live task publication is blocked: inputs have no formal routing qualification")
+            # Catalog routes must pass evidence checks before each source call.
+            # Other datasets remain blocked pending their own qualification.
+            if dataset != "security_master":
+                raise ValueError("live task publication is blocked: inputs have no formal routing qualification")
+            if unit.get("replay_manifest"):
+                raise ValueError("live security tasks must not supply an external replay manifest")
     if redo == "selected":
         if dataset != "daily_bar" or not symbols:
             raise ValueError("selected redo requires a daily task and explicit symbols")
@@ -1040,6 +1043,11 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
                     archive_root=paths["archive_root"])
                 state["units"] = {}
             if redo == "resume" and state.get("status") == "failed":
+                if dataset == "security_master" and (work / "coverage.json").exists():
+                    # Failed checks are immutable evidence too. Archive the prior
+                    # generated workspace before recording the next conclusion.
+                    RawObjectStore.preserve_directory(work, permitted_root=paths["workspace_root"] / "_tasks",
+                        archive_root=paths["archive_root"])
                 effective_redo = state.get("redo", "resume")
                 effective_symbols = state.get("selected_symbols", [])
             else:
@@ -1075,7 +1083,26 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
                     data_root=paths["data_root"], mode=mode, replay_manifest=replay,
                     task_unit=(task_id, key), force_fetch=force)
                 try:
+                    if mode == "live" and dataset == "security_master":
+                        from ..routing.factory import check_security_input_qualification
+                        qualification = check_security_input_qualification(contracts[unit["input_id"]], unit["context"],
+                            config_root=config_root, metadata=metadata, now=datetime.now(timezone.utc))
+                        if not qualification["eligible"]:
+                            raise ValueError("formal routing qualification blocked: " + json.dumps(qualification["reasons"], ensure_ascii=False))
                     report = executor(**options)
+                    if mode == "live" and dataset == "security_master":
+                        # Only newly observed HTTP throttling/forbidden responses
+                        # affect health; qualification failures and replay do not.
+                        bad_http = next((event["status_code"] for event in report.get("responses", [])
+                            if event.get("mode") == "live" and event.get("status_code") in {403, 429}), None)
+                        if bad_http is not None:
+                            for group in qualification["verified_groups"]:
+                                exchange, asset = group.split("/")
+                                metadata.record_provider_failure(provider=contracts[unit["input_id"]].provider,
+                                    endpoint=contracts[unit["input_id"]].endpoint, capability_version=qualification["capability_version"],
+                                    dataset="security_master", market=exchange, asset_type=asset,
+                                    failure_class="rate_limited" if bad_http == 429 else "forbidden", error=f"HTTP {bad_http}",
+                                    now=datetime.now(timezone.utc), http_status=bad_http, cooldown_seconds=30)
                     result_dir = Path(report["run_directory"]).resolve()
                     if not result_dir.is_relative_to(paths["workspace_root"]):
                         raise ValueError("source result escaped task workspace")
@@ -1471,10 +1498,17 @@ def _finish_task_commit(state, paths, metadata, failure_hook=None):
     return state
 
 
-def collect_due_inputs(*, now, config_root, output_root=None, data_root=None, trading_dates, securities=(), symbols=(),
+def collect_due_inputs(*, now, config_root, output_root=None, data_root=None, trading_dates=(), securities=(), symbols=(),
                        execute=False, mode="replay", replay_manifest=None, evidence_root=None,
-                       dependency_paths=(), collector=None):
-    """One scheduler tick, with durable attempts in candidate storage, never production publication."""
+                       dependency_paths=(), collector=None, dataset="inputs", calendar_days=None):
+    """One durable tick: source candidates or the qualified security catalog task."""
+    if dataset == "security_master":
+        if output_root is not None or replay_manifest is not None or securities or symbols:
+            raise ValueError("security master scheduling uses configured storage and full source scope")
+        return _collect_due_security_master(now=now, config_root=config_root, data_root=data_root, execute=execute,
+            mode=mode, calendar_days=calendar_days, dependency_paths=dependency_paths, collector=collector)
+    if dataset != "inputs":
+        raise ValueError("unsupported scheduled dataset")
     from ..domain import AttemptStatus
     from ..storage.metadata import MetadataStore
     from ..worker.attempts import CollectionAttempt
@@ -1585,5 +1619,74 @@ def collect_due_inputs(*, now, config_root, output_root=None, data_root=None, tr
         if metadata is not None:
             metadata.close()
     saved = RawObjectStore(output).write_json(report, dataset="schedule_tick", provider="scheduler", endpoint="inputs",
+        fetched_at=datetime.now(timezone.utc), attempt_id=uuid4().hex)
+    return {**report, "report_path": str(saved.path.resolve())}
+
+
+def _collect_due_security_master(*, now, config_root, data_root, execute, mode, calendar_days, dependency_paths, collector):
+    """Existing tick entry drives one durable business task, without starting a daemon."""
+    import json
+    from datetime import date
+    from ..service.calendar import TradingCalendarStore
+    from ..storage.metadata import MetadataStore
+    from ..worker.scheduler import plan_security_master_collection, SHANGHAI
+    from ..routing.factory import check_security_input_qualification
+    from ..storage.integrity import file_hash
+    if now.tzinfo is None:
+        raise ValueError("schedule time must be timezone-aware")
+    root = Path(config_root).resolve()
+    paths = load_storage_paths(root, data_root=data_root)
+    if paths["data_root"].is_relative_to(Path(__file__).parents[2] / "provider_validation"):
+        raise ValueError("business task data must be outside provider_validation")
+    if execute and mode != "live":
+        raise ValueError("scheduled production tasks require live mode; use collect-task for isolated replay")
+    day = now.astimezone(SHANGHAI).date()
+    if calendar_days is None:
+        paths["metadata_path"].parent.mkdir(parents=True, exist_ok=True)
+        with TradingCalendarStore(str(paths["metadata_path"])) as calendar:
+            is_open = calendar.is_trading_day(day)
+    else:
+        days = {}
+        for row in calendar_days:
+            if type(row.get("is_trading_day")) is not bool:
+                raise ValueError("security schedule calendar rows require explicit is_trading_day")
+            row_day = date.fromisoformat(str(row["trade_date"]))
+            if row_day in days:
+                raise ValueError("duplicate security calendar date")
+            days[row_day] = row["is_trading_day"]
+        is_open = days.get(day)
+    job = plan_security_master_collection(root, now=now, is_trading_day=is_open)
+    contracts = {c.input_id: c for c in load_input_capabilities(root / "providers.yaml")}
+    if job["status"] == "ready":
+        for unit in job["definition"]["units"]:
+            contract = contracts[unit["input_id"]]
+            if contract.trading_date_parameter:
+                unit["context"]["request"] = {contract.trading_date_parameter: day.isoformat()}
+                unit["context"]["calendar"] = {"trading_dates": [day.isoformat()]}
+        with MetadataStore(paths["metadata_path"]) as metadata:
+            qualifications = [check_security_input_qualification(contracts[u["input_id"]], u["context"],
+                config_root=root, metadata=metadata, now=now) for u in job["definition"]["units"]]
+            job["source_qualifications"] = qualifications
+            previous = metadata.load_collection_task(job["task_id"])
+        # A previously published degraded task must retry; a complete task no-ops.
+        if not execute and any(not q["eligible"] for q in qualifications):
+            job.update(status="blocked", reason="formal routing qualification is missing")
+        elif execute:
+            if previous and previous["status"] == "committing":
+                # collect_task owns recovery and the same partition lock.
+                job["reason"] = "resume interrupted publication"
+            result = collect_task(definition=job["definition"], config_root=root, data_root=paths["data_root"],
+                                  mode="live", collector=collector)
+            job.update(status=result["status"], complete_today=result["complete_today"],
+                       data_date=result.get("data_date"), fallback_used=result.get("fallback_used", False),
+                       no_op=result.get("no_op", False), error=result.get("error"))
+    report = {"dataset": "security_master", "now": now.isoformat(), "execute": execute, "mode": mode,
+              "production_writes": int(job["status"] == "published" and not job.get("no_op")),
+              "eligible_for_production_routing": bool(job.get("source_qualifications")) and all(q["eligible"] for q in job.get("source_qualifications", [])),
+              "jobs": [job], "dependencies": [{"path": str(Path(p).resolve()), "sha256": file_hash(Path(p))} for p in dependency_paths],
+              "config_files": [{"path": str(root / p), "sha256": file_hash(root / p)}
+                               for p in ("collection.yaml", "schedules.yaml", "providers.yaml", "datasets/security_master.yaml")]}
+    output = paths["workspace_root"] / "_scheduler/security_master"
+    saved = RawObjectStore(output).write_json(report, dataset="schedule_tick", provider="scheduler", endpoint="security_master",
         fetched_at=datetime.now(timezone.utc), attempt_id=uuid4().hex)
     return {**report, "report_path": str(saved.path.resolve())}

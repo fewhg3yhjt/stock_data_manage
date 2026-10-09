@@ -35,6 +35,12 @@ markets:
     include_opening_auction: false
     include_closing_auction: true
 
+security_master:
+  collection_profile: security_master_daily
+  source_inputs: [SDA-BOARD-005, SECURITY-BSE-001]
+  source_config:
+    SDA-BOARD-005: {include_etf: true}
+
 # 通用模板保留为采集意图；腾讯专用模板供现有调度器执行候选采集。
 collection_profiles:
   market_intraday:
@@ -67,6 +73,12 @@ collection_profiles:
     mode: daily
     business_day: source_calendar
     scheduling_enabled: false
+
+  security_master_daily:
+    mode: daily
+    frequency: {unit: day, interval: 1, at: "08:00"}
+    business_day: trading_day
+    scheduling_enabled: true  # 实际执行仍须逐来源通过证据资格门禁。
 
   # frequency 是频率唯一来源；请求间隔仍由 providers.yaml 单独限制。
   # 天间隔按日历日计算，交易日门禁另行生效。interval > 1 时须配置 anchor_date。

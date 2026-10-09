@@ -26,6 +26,138 @@ from ..providers.ths import ThsBoardProvider
 from .capabilities import CapabilityRegistry
 
 
+def check_security_input_qualification(contract, context, *, config_root, metadata, now):
+    """Read existing probe evidence; declarations and offline reports never grant a route."""
+    import yaml
+    import xml.etree.ElementTree as ET
+    import inspect
+    import pyarrow.parquet as pq
+    from collections import Counter
+    from datetime import date
+    from .capabilities import ProviderCapability
+    from ..storage.integrity import file_hash, row_hash, Manifest
+    from ..storage.raw import RawObjectStore
+    root = Path(config_root)
+    context = {key: dict(value) for key, value in context.items()}
+    if "trading_dates" in context.get("calendar", {}):
+        context["calendar"]["trading_dates"] = [date.fromisoformat(value) if isinstance(value, str) else value
+                                                for value in context["calendar"]["trading_dates"]]
+    adapter = build_input_provider(contract, providers_path=root / "providers.yaml")
+    version = adapter.capability_version
+    parameters = {key: value for key, value in contract.bind_parameters(context).items() if key != "trade_date"}
+    # Exact non-date scope: filtered stock probes cannot qualify the full catalog.
+    scope = "parameters:" + row_hash(parameters)
+    policy = yaml.safe_load((root / "datasets/security_master.yaml").read_text(encoding="utf-8"))
+    groups = [tuple(group) for group in policy["dataset"]["publication"]["source_groups"].get(contract.input_id, ())
+              if group[1] != "etf" or parameters.get("include_etf")]
+    reasons, accepted = [], []
+    if contract.dataset != "security_snapshot" or contract.request_shape != "full_snapshot" or not groups:
+        return {"eligible": False, "input_id": contract.input_id, "reasons": ["unsupported catalog contract"]}
+    for exchange, asset in groups:
+        try:
+            evidence = metadata.latest_probe(provider=contract.provider, endpoint=contract.endpoint,
+                capability_version=version, dataset="security_master", market=exchange, asset_type=asset,
+                frequency="snapshot", adjustment="none")
+            if not evidence or not evidence["eligible_for_selection"] or evidence["status"] != "complete" or evidence["row_count"] <= 0:
+                raise ValueError("matching complete, routing-eligible evidence is missing")
+            fields = set(json.loads(evidence["field_semantics_json"]))
+            units = json.loads(evidence["units_json"])
+            if not {"stock_code", "exchange", "asset_type", "trade_date", "status"} <= fields or not units or any("unverified" in str(unit).lower() for unit in units):
+                raise ValueError("field semantics or units are unverified")
+            if evidence["validated_at"].tzinfo is None or evidence["validation_expires_at"].tzinfo is None or not evidence["validated_at"] <= now < evidence["validation_expires_at"]:
+                raise ValueError("qualification evidence is expired or not yet valid")
+            references = json.loads(evidence["request_scope_json"])
+            if scope not in references or "input:" + contract.input_id not in references:
+                raise ValueError("qualification request scope differs")
+            proof_path = Path(next(ref.removeprefix("qualification:") for ref in references if ref.startswith("qualification:")))
+            if file_hash(proof_path) != evidence["evidence_hash"]:
+                raise ValueError("qualification artifact hash differs")
+            proof = json.loads(proof_path.read_text(encoding="utf-8"))
+            if (proof.get("input_id"), proof.get("capability_version")) != (contract.input_id, version):
+                raise ValueError("qualification adapter version differs")
+            artifacts = {}
+            for layer in ("contract_tests", "live_report", "semantic_check", "publication_manifest"):
+                descriptor = proof[layer]
+                path = Path(descriptor["path"])
+                if file_hash(path) != descriptor["sha256"]:
+                    raise ValueError("qualification layer hash differs: " + layer)
+                artifacts[layer] = path
+            suites = ET.parse(artifacts["contract_tests"]).getroot()
+            suites = [suites] if suites.tag == "testsuite" else list(suites.iter("testsuite"))
+            if not suites or sum(int(s.get("tests", "0")) for s in suites) <= 0 or any(int(s.get("failures", "0")) or int(s.get("errors", "0")) or int(s.get("skipped", "0")) for s in suites):
+                raise ValueError("offline contract tests have not passed")
+            live = json.loads(artifacts["live_report"].read_text(encoding="utf-8"))
+            if live.get("input_id") != contract.input_id or live.get("adapter_version") != version or live.get("status") != "candidate_complete" or not (live.get("live_http_calls", 0) + live.get("live_sdk_calls", 0)):
+                raise ValueError("formal Provider live evidence is missing")
+            if live.get("mode") != "live" or "parameters:" + row_hash({k: v for k, v in live["parameters"].items() if k != "trade_date"}) != scope:
+                raise ValueError("live validation covers a different request scope")
+            for descriptor in (*live["config_files"], *live["code_files"]):
+                if file_hash(Path(descriptor["path"])) != descriptor["sha256"]:
+                    raise ValueError("live capability code or configuration has changed")
+            required_configs = {root / "providers.yaml", root / "collection.yaml", root / "datasets/security_snapshot.yaml", root / "normalization/security_snapshot.yaml"}
+            if not {str(p.resolve()) for p in required_configs} <= {str(Path(d["path"]).resolve()) for d in live["config_files"]}:
+                raise ValueError("live evidence omits current configuration files")
+            if str(Path(inspect.getfile(type(adapter))).resolve()) not in {str(Path(d["path"]).resolve()) for d in live["code_files"]}:
+                raise ValueError("live evidence omits the actual adapter code")
+            published = Manifest.load(artifacts["publication_manifest"])
+            raw_candidates = [(artifacts["live_report"].parent / live["raw_manifest"]["path"]).resolve(),
+                              *(Path(ref).resolve() for ref in published.raw_refs)]
+            raw = next(path for path in raw_candidates if path.exists() and file_hash(path) == live["raw_manifest"]["sha256"])
+            if RawObjectStore.verify_manifest(raw) != live["raw_manifest"]["sha256"]:
+                raise ValueError("live raw evidence hash differs")
+            responses = [json.loads(line) for line in raw.read_text(encoding="utf-8").splitlines()]
+            if not any(r.get("mode") == "live" and r.get("outcome") == "response" for r in responses):
+                raise ValueError("raw evidence contains no live source response")
+            validation_time = datetime.fromisoformat(live["validation_time_utc"])
+            if validation_time.tzinfo is None or not validation_time <= evidence["validated_at"]:
+                raise ValueError("qualification predates the actual Provider validation")
+            semantic = json.loads(artifacts["semantic_check"].read_text(encoding="utf-8"))
+            if semantic.get("input_id") != contract.input_id or semantic.get("code_version") != live.get("code_version"):
+                raise ValueError("semantic transformation version differs")
+            if not semantic.get("independent_full_market_coverage_verified") or not semantic.get("passed"):
+                raise ValueError("independent catalog coverage has not been verified")
+            if semantic["group_counts"].get(exchange + "/" + asset) != evidence["row_count"]:
+                raise ValueError("verified group count differs from evidence")
+            if semantic.get("source_response_hashes") != [r["body_sha256"] for r in responses if r.get("body_sha256")]:
+                raise ValueError("semantic evidence does not reference the live response")
+            if not published.verify(artifacts["publication_manifest"].parent / "data.parquet") or published.publication_metadata.get("fallback") or not published.publication_metadata.get("coverage_passed"):
+                raise ValueError("end-to-end publication verification is missing")
+            if (artifacts["publication_manifest"].parent / "task-commit.json").exists():
+                raise ValueError("end-to-end publication is still pending recovery")
+            # An isolated end-to-end replay rewrites request metadata and stores
+            # a different manifest, while retaining the exact original bodies.
+            published_hashes = Counter()
+            for reference in published.raw_refs:
+                RawObjectStore.verify_manifest(reference)
+                for line in Path(reference).read_text(encoding="utf-8").splitlines():
+                    event = json.loads(line)
+                    if event.get("provider") == contract.provider and event.get("body_sha256"):
+                        published_hashes[event["body_sha256"]] += 1
+            original_hashes = Counter(r["body_sha256"] for r in responses if r.get("body_sha256"))
+            if original_hashes - published_hashes:
+                raise ValueError("publication does not contain the verified live response bytes")
+            published_rows = pq.read_table(artifacts["publication_manifest"].parent / "data.parquet").to_pylist()
+            identities = [row["instrument_id"] for row in published_rows]
+            if len(set(identities)) != len(identities) or sum(row["exchange"] == exchange and row["asset_type"] == asset for row in published_rows) != evidence["row_count"]:
+                raise ValueError("end-to-end security identities or verified group count differ")
+            health = metadata.provider_health(provider=contract.provider, endpoint=contract.endpoint, capability_version=version,
+                dataset="security_master", market=exchange, asset_type=asset)
+            registry = CapabilityRegistry([ProviderCapability(provider=contract.provider, endpoint=contract.endpoint, version=version,
+                datasets=frozenset({Dataset.SECURITY_MASTER}), exchanges=frozenset({Exchange(exchange)}), asset_types=frozenset({AssetType(asset)}),
+                frequencies=frozenset(), adjustments=frozenset({Adjustment.NONE}), priority=100,
+                validated_at=evidence["validated_at"], validation_expires_at=evidence["validation_expires_at"],
+                validated_symbols=frozenset({scope}), request_shape=contract.request_shape)],
+                availability=lambda capability, timestamp: metadata.provider_available(health, timestamp))
+            if not registry.select(now=now, dataset=Dataset.SECURITY_MASTER, exchange=Exchange(exchange), asset_type=AssetType(asset),
+                                   symbol=scope, adjustment=Adjustment.NONE):
+                raise ValueError("provider is disabled or cooling down")
+            accepted.append(exchange + "/" + asset)
+        except (ValueError, KeyError, TypeError, AttributeError, OSError, StopIteration, ET.ParseError) as exc:
+            reasons.append({"group": exchange + "/" + asset, "reason": str(exc)})
+    return {"eligible": not reasons, "input_id": contract.input_id, "capability_version": version,
+            "verified_groups": accepted, "reasons": reasons}
+
+
 def build_input_provider(contract, *, providers_path, client=None):
     """Bind explicit validation inputs to existing adapters, outside production routing."""
     if contract.implementation_status != "implemented_validation_only":
