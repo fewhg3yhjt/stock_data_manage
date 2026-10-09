@@ -19,6 +19,92 @@ BAO = ROOT / "provider_validation/results/live-probes/baostock-industry-20260930
 BSE = ROOT / "provider_validation/results/raw/security-catalog-bse-20261007/manifest.ndjson"
 
 
+@pytest.fixture
+def official_baseline_probe(monkeypatch, tmp_path):
+    import importlib.util
+    monkeypatch.syspath_prepend(str(ROOT / "provider_validation/tests"))
+    spec = importlib.util.spec_from_file_location("catalog_baseline_probe", ROOT / "provider_validation/tests/verify_security_board_coverage.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    monkeypatch.setattr(module, "ROOT", tmp_path)
+    monkeypatch.setattr(module.time, "sleep", lambda _: None)
+    return module, tmp_path / "provider_validation/results/fixture"
+
+
+class OfficialBaselineSession:
+    trust_env = False
+
+    def __init__(self, replies):
+        self.replies = list(replies)
+        self.calls = []
+        self.closed = False
+
+    def request(self, method, url, **kwargs):
+        self.calls.append((method, url, kwargs))
+        response = requests.Response()
+        response.status_code, body = self.replies.pop(0)
+        response._content = body.encode("utf-8")
+        response.encoding = "utf-8"
+        response.headers["Content-Type"] = "application/json"
+        response.request = requests.Request(method, url, headers=kwargs["headers"],
+            params=kwargs["params"], data=kwargs["data"]).prepare()
+        return response
+
+    def close(self):
+        self.closed = True
+
+
+def test_official_baseline_archives_malformed_response_before_parsing(official_baseline_probe, monkeypatch):
+    from stock_data_manage.storage.raw import RawObjectStore
+    module, output = official_baseline_probe
+    session = OfficialBaselineSession([(200, "not-json")])
+    monkeypatch.setattr(module, "_proxy_session", lambda: session)
+    result = module.fetch_official_catalog_baselines(output, date(2026, 10, 9), ["sh-main-stock"])
+    assert "sh-main-stock" in result["failures"] and not result["results"]
+    manifest = Path(result["raw_manifest"])
+    event = json.loads(manifest.read_text().splitlines()[0])
+    assert RawObjectStore.read_response(manifest, event) == b"not-json"
+    assert result["raw_manifest_sha256"] == RawObjectStore.verify_manifest(manifest)
+    assert len(session.calls) == 1 and session.closed
+
+
+def test_official_baseline_excludes_future_listings_with_evidence(official_baseline_probe, monkeypatch):
+    module, output = official_baseline_probe
+    rows = [{"A_STOCK_CODE": "600001", "SEC_NAME_CN": "fixture", "LIST_DATE": "2020-01-01"},
+            {"A_STOCK_CODE": "600002", "SEC_NAME_CN": "future", "LIST_DATE": "2026-10-12"}]
+    session = OfficialBaselineSession([(200, json.dumps({"result": rows, "pageHelp": {"total": 2}}))])
+    monkeypatch.setattr(module, "_proxy_session", lambda: session)
+    result = module.fetch_official_catalog_baselines(output, date(2026, 10, 9), ["sh-main-stock"])
+    derived = json.loads(Path(result["results"]["sh-main-stock"]["path"]).read_text())
+    assert not result["failures"] and [r["code"] for r in derived["rows"]] == ["600001"]
+    assert derived["excluded"][0]["reason"] == "future_listing"
+    assert len(result["results"]["sh-main-stock"]["source_response_hashes"]) == 1
+
+
+def test_official_bse_refreshes_redirect_and_does_not_infer_listing_date(official_baseline_probe, monkeypatch):
+    module, output = official_baseline_probe
+    block = {"totalElements": 1, "number": 0, "lastPage": True,
+        "content": [{"xxzqdm": "920001", "xxzqjc": "fixture", "fxssrq": "20180101"}]}
+    session = OfficialBaselineSession([(302, "page"), (307, "refresh"), (302, "page"), (200, json.dumps([block]))])
+    monkeypatch.setattr(module, "_proxy_session", lambda: session)
+    result = module.fetch_official_catalog_baselines(output, date(2026, 10, 9), ["bse-listed-stock"])
+    assert not result["failures"] and result["results"]["bse-listed-stock"]["rows"] == 1
+    assert [c[0] for c in session.calls] == ["GET", "POST", "GET", "POST"]
+    assert session.calls[1] == session.calls[3]
+    derived = json.loads(Path(result["results"]["bse-listed-stock"]["path"]).read_text())
+    assert derived["rows"][0]["source_row"]["fxssrq"] == "20180101"
+    assert "listing_date" not in derived["rows"][0]
+
+
+def test_official_baseline_rejects_incomplete_declared_page(official_baseline_probe, monkeypatch):
+    module, output = official_baseline_probe
+    session = OfficialBaselineSession([(200, json.dumps({"result": [], "pageHelp": {"total": 2}}))])
+    monkeypatch.setattr(module, "_proxy_session", lambda: session)
+    result = module.fetch_official_catalog_baselines(output, date(2026, 10, 9), ["sh-fund-directory"])
+    assert "incomplete" in result["failures"]["sh-fund-directory"]
+    assert len(session.calls) == 1 and not result["results"]
+
+
 @pytest.mark.parametrize("code,name,expected", [
     ("sh.510300", "沪深300ETF", True), ("sh.530001", "示例ETF", True),
     ("sz.158001", "示例ETF", True), ("sz.159001", "示例ETF", True),

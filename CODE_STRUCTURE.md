@@ -1,5 +1,7 @@
 # 代码目录与文件职责
 
+证券正式启用核验继续修改既有 `service/calendar_update.py`，校验归档在线输入及当前回放后导入正向交易日期；`tests/test_update_services.py` 验证时效、搬迁前证据、冲突保留和未知日期。原 `provider_validation/tests/verify_security_board_coverage.py` 增加可选交易所独立清单探针，响应在解析前留存，并保存代码快照、原响应哈希和派生结果；`tests/test_security_catalog.py` 验证探针留证、未来上市过滤及分页失败。实际证券覆盖结果保存于 `provider_validation/results/security-activation-20261009/coverage-review.json`；发现沪市ETF缺1只，未发布全量名单。日历仅完成本次核验导入，未增加自动刷新服务。
+
 证券清单调度继续修改既有模块：`worker/scheduler.py` 从原采集配置读取每日频率，`routing/factory.py` 在来源请求前核验四层资格证据、请求范围、有效期和健康状态，`pipeline/inputs.py` 的原调度入口驱动同日持久化任务并复用回退和恢复，`cli.py` 增加原命令的证券清单选项。`collection.yaml` 是名单来源及频率依据，`schedules.yaml` 引用同一配置。新增正式说明 [证券清单定时更新](docs/worker/security-master.md)；没有增加管理层或后台服务，真实来源资格尚未核准。
 
 证券名单覆盖与回退继续修改既有模块：`quality/publication.py` 检查市场/资产组合及证券遗漏；`pipeline/inputs.py` 先检查当日候选，必要时整份回退，并保留实际日期、原因和断点续采状态；`storage/integrity.py` 在原发布清单中增加 `publication_metadata`，与数据一同恢复；`worker/recovery.py` 核对提交标记的任务归属。规则仍在原 `config/datasets/security_master.yaml`，没有增加管理层或新文件；正式流程说明见 [任务流程](docs/pipeline/collection-tasks.md)。
@@ -200,7 +202,7 @@ Excel、CSV、JSON 等说明属于从代码、YAML 和证据派生的文档，�
 | `service/instruments.py` | Security Master 本地存储、读取、合并和稳定 instrument ID |
 | `service/instruments_update.py` | Security Master 来源更新、缺失保留和变更审计 |
 | `service/calendar.py` | Trading Calendar 存储、读取和来源合并 |
-| `service/calendar_update.py` | Trading Calendar 来源更新和官方优先级处理 |
+| `service/calendar_update.py` | 交易日历来源更新、官方优先级，以及校验原在线证据后的正向日期导入 |
 | `service/market_data.py` | Canonical + Hot 的统一分钟查询服务 |
 | `service/__init__.py` | 服务包说明，不承载业务实现 |
 

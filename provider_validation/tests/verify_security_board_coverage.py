@@ -325,6 +325,189 @@ def probe_eastmoney_board_directories(
     return checks
 
 
+def fetch_official_catalog_baselines(output: Path, trade_date: dt.date, only=None) -> dict[str, Any]:
+    """Independent source probes only; preserve bytes before any JSON/XLSX parsing."""
+    import hashlib
+    import io
+    import pandas as pd
+    from stock_data_manage.storage.raw import RawObjectStore
+    output = output.resolve()
+    if not output.is_relative_to(ROOT / "provider_validation/results"):
+        raise ValueError("catalog probes must remain in provider_validation/results")
+    output.mkdir(parents=True, exist_ok=False)
+    store = RawObjectStore(output / "_raw")
+    code_bytes=Path(__file__).read_bytes()
+    code_version = hashlib.sha256(code_bytes).hexdigest()
+    (output/"verification-code.txt").write_bytes(code_bytes)
+    session = _proxy_session()
+    results, failures = {}, {}
+    enabled=lambda key: only is None or key in only
+    class NotSelected(Exception):
+        pass
+
+    def request(key, url, *, params=None, data=None, referer=None, permit_page_redirect=False):
+        headers = {"Referer": referer} if referer else {}
+        method = "POST" if data is not None else "GET"
+        scope = {"check": key, "as_of_date": trade_date.isoformat(), "params": params, "form": data}
+        try:
+            response = session.request(method, url, params=params, data=data, headers=headers,
+                timeout=30, allow_redirects=False)
+        except requests.RequestException as exc:
+            store.append_event({"event": "http_response", "provider": "official_catalog_baseline", "endpoint": key,
+                "method": method, "url": url, "scope": scope, "outcome": "transport_error", "mode": "live",
+                "fetched_at_utc": dt.datetime.now(dt.timezone.utc).isoformat(), "code_version": code_version,
+                "error_type": type(exc).__name__})
+            raise
+        store.record_response(response=response, url=response.request.url, method=method,
+            request_headers=response.request.headers, scope=scope, provider="official_catalog_baseline",
+            endpoint=key, code_version=code_version, mode="live",
+            request_options={"timeout":30,"allow_redirects":False,"trust_env":session.trust_env})
+        response.raise_for_status()
+        if 300 <= response.status_code < 400 and not permit_page_redirect:
+            raise ValueError("official baseline redirected; source contract requires investigation")
+        return response
+
+    def save(key, rows, code_column, name_column, date_column=None):
+        selected, excluded = [], []
+        for row in rows:
+            code = str(row[code_column]).split(".")[0].zfill(6)
+            if len(code) != 6 or not code.isdigit():
+                raise ValueError("official baseline security code changed")
+            if date_column:
+                listed = pd.to_datetime(row[date_column], errors="raise").date()
+                if listed > trade_date:
+                    excluded.append({**row,"reason":"future_listing"})
+                    continue
+            selected.append({"code":code,"name":str(row[name_column]),"source_row":row})
+        if not selected or len({r["code"] for r in selected}) != len(selected):
+            raise ValueError("official baseline is empty or has duplicate securities")
+        path = output / (key + ".json")
+        path.write_text(json.dumps({"rows":selected,"excluded":excluded},ensure_ascii=False,default=str,indent=2),encoding="utf-8")
+        results[key] = {"rows":len(selected),"excluded":len(excluded),"path":str(path),
+                        "sha256":hashlib.sha256(path.read_bytes()).hexdigest()}
+
+    try:
+        for key, kind in (("sh-main-stock","1"),("sh-star-stock","8")):
+            if not enabled(key): continue
+            try:
+                params={"STOCK_TYPE":kind,"REG_PROVINCE":"","CSRC_CODE":"","STOCK_CODE":"",
+                    "sqlId":"COMMON_SSE_CP_GPJCTPZ_GPLB_GP_L","COMPANY_STATUS":"2,4,5,7,8","type":"inParams",
+                    "isPagination":"true","pageHelp.cacheSize":"1","pageHelp.beginPage":"1",
+                    "pageHelp.pageSize":"10000","pageHelp.pageNo":"1","pageHelp.endPage":"1"}
+                doc=request(key,"https://query.sse.com.cn/sseQuery/commonQuery.do",params=params,
+                    referer="https://www.sse.com.cn/assortment/stock/list/share/").json()
+                rows=doc["result"]
+                if int(doc["pageHelp"]["total"]) != len(rows): raise ValueError("SSE stock page is incomplete")
+                save(key,rows,"A_STOCK_CODE","SEC_NAME_CN","LIST_DATE")
+            except Exception as exc: failures[key]=f"{type(exc).__name__}: {str(exc)[:500]}"
+        for key,url,params,referer,code_col,name_col,date_col in (
+            ("sz-stock","https://www.szse.cn/api/report/ShowReport",
+             {"SHOWTYPE":"xlsx","CATALOGID":"1110","TABKEY":"tab1","random":"0.6935816432433362"},
+             "https://www.szse.cn/market/product/stock/list/index.html","A股代码","A股简称","A股上市日期"),
+            ("sz-fund","https://fund.szse.cn/api/report/ShowReport",
+             {"SHOWTYPE":"xlsx","CATALOGID":"1000_lf","TABKEY":"tab1","random":"0.07610353191740105"},
+             "https://fund.szse.cn/marketdata/fundslist/index.html","基金代码","基金简称","上市日期")):
+            if not enabled(key): continue
+            try:
+                response=request(key,url,params=params,referer=referer)
+                frame=pd.read_excel(io.BytesIO(response.content),dtype={code_col:str})
+                save(key,frame.to_dict(orient="records"),code_col,name_col,date_col)
+            except Exception as exc: failures[key]=f"{type(exc).__name__}: {str(exc)[:500]}"
+        try:
+            key="sh-etf-scale"
+            if not enabled(key): raise NotSelected()
+            params={"isPagination":"true","pageHelp.pageSize":"10000","pageHelp.pageNo":"1","pageHelp.beginPage":"1",
+                "pageHelp.cacheSize":"1","pageHelp.endPage":"1","sqlId":"COMMON_SSE_ZQPZ_ETFZL_XXPL_ETFGM_SEARCH_L",
+                "STAT_DATE":trade_date.isoformat()}
+            doc=request(key,"https://query.sse.com.cn/commonQuery.do",params=params,referer="https://www.sse.com.cn/").json()
+            rows=doc["result"]
+            if int(doc["pageHelp"]["total"]) != len(rows): raise ValueError("SSE ETF scale page is incomplete")
+            if any(row["STAT_DATE"][:10] != trade_date.isoformat() for row in rows): raise ValueError("ETF scale date differs")
+            save(key,rows,"SEC_CODE","SEC_NAME")
+        except NotSelected: pass
+        except Exception as exc: failures["sh-etf-scale"]=f"{type(exc).__name__}: {str(exc)[:500]}"
+        try:
+            key="bse-listed-stock"
+            if not enabled(key): raise NotSelected()
+            page_url="https://www.bse.cn/nq/listedcompany.html"
+            request(key+"-page",page_url,permit_page_redirect=True)
+            rows=[]; total=None
+            for page in range(100):
+                form={"page":page,"typejb":"T","xxfcbj[]":"2","xxzqdm":"","sortfield":"xxzqdm","sorttype":"asc"}
+                response=request(key,"https://www.bse.cn/nqxxController/nqxxCnzq.do",data=form,referer=page_url,permit_page_redirect=True)
+                if 300 <= response.status_code < 400:
+                    request(key+"-page",page_url,permit_page_redirect=True)
+                    response=request(key,"https://www.bse.cn/nqxxController/nqxxCnzq.do",data=form,referer=page_url)
+                body=response.text.strip();match=re.fullmatch(r"[A-Za-z_$][\w$]*\((.*)\);?",body,re.S)
+                block=json.loads(match.group(1) if match else body)[0]
+                if total is None: total=int(block["totalElements"])
+                if int(block["totalElements"]) != total or block["number"] != page or not block["content"]:
+                    raise ValueError("BSE independent list pagination differs")
+                rows.extend(block["content"])
+                if len(rows)>=total:
+                    if len(rows)!=total or not block["lastPage"]: raise ValueError("BSE independent list is incomplete")
+                    break
+                time.sleep(1)
+            else: raise ValueError("BSE independent list exceeded 100 pages")
+            save(key,rows,"xxzqdm","xxzqjc")
+        except NotSelected: pass
+        except Exception as exc: failures["bse-listed-stock"]=f"{type(exc).__name__}: {str(exc)[:500]}"
+        if only and enabled("sh-fund-directory"):
+            try:
+                params={"isPagination":"true","sqlId":"COMMON_JJZWZ_JJLB_L","pageHelp.cacheSize":1,
+                    "pageHelp.pageSize":10000,"pageHelp.pageNo":1,"pageHelp.beginPage":1,"pageHelp.endPage":1,
+                    "FUND_CODE":"","COMPANY_NAME":"","INDEX_NAME":"","START_DATE":"","END_DATE":trade_date.strftime("%Y%m%d"),
+                    "CATEGORY":"F000","CATEGORY_ASC":1,"SUBCLASS":"","SWING_TRADE":"","type":"inParams"}
+                doc=request("sh-fund-directory","https://query.sse.com.cn/commonQuery.do",params=params,referer="https://etf.sse.com.cn/fundlist/").json()
+                rows=doc["result"]
+                if int(doc["pageHelp"]["total"]) != len(rows): raise ValueError("SSE fund list is incomplete")
+                save("sh-fund-directory",rows,"FUND_CODE","FUND_ABBR","LISTING_DATE")
+            except Exception as exc: failures["sh-fund-directory"]=f"{type(exc).__name__}: {str(exc)[:500]}"
+        if only and enabled("sh-fund-types"):
+            try:
+                params={"sqlId":"COMMON_JJZWZ_JJLB_JJLX_C","CATEGORY_PARENT_CODE":""}
+                doc=request("sh-fund-types","https://query.sse.com.cn/commonQuery.do",params=params,referer="https://etf.sse.com.cn/fundlist/").json()
+                path=output/"sh-fund-types.json"
+                path.write_text(json.dumps(doc,ensure_ascii=False,indent=2),encoding="utf-8")
+                results["sh-fund-types"]={"rows":len(doc["result"]),"path":str(path),"sha256":hashlib.sha256(path.read_bytes()).hexdigest()}
+            except Exception as exc: failures["sh-fund-types"]=f"{type(exc).__name__}: {str(exc)[:500]}"
+        if only and enabled("sh-etf-list-page"):
+            try:
+                response=request("sh-etf-list-page","https://etf.sse.com.cn/fundlist/")
+                scripts=re.findall(r'<script[^>]+src=[\"\x27]([^\"\x27]+)',response.text)
+                (output/"sh-etf-page-scripts.json").write_text(json.dumps(scripts,ensure_ascii=False,indent=2),encoding="utf-8")
+                results["sh-etf-list-page"]={"bytes":len(response.content),"scripts":scripts}
+            except Exception as exc: failures["sh-etf-list-page"]=f"{type(exc).__name__}: {str(exc)[:500]}"
+        resources={"sh-etf-list-data":"https://etf.sse.com.cn/fundlist/data.js",
+            "sh-etf-list-api":"https://etf.sse.com.cn/xhtml/js/api.js?v=V202103-01",
+            "sh-etf-list-view":"https://etf.sse.com.cn/xhtml/js/js.js?v=V202201-10",
+            "sh-etf-list-driver":"https://etf.sse.com.cn/xhtml/js/fundlist.js?v=V3.1.0_20260304"}
+        for key,url in resources.items():
+            if not only or not enabled(key): continue
+            try:
+                response=request(key,url,referer="https://etf.sse.com.cn/fundlist/")
+                path=output/(key+".txt")
+                path.write_bytes(response.content)
+                results[key]={"bytes":len(response.content),"path":str(path),"sha256":hashlib.sha256(response.content).hexdigest()}
+            except Exception as exc: failures[key]=f"{type(exc).__name__}: {str(exc)[:500]}"
+    finally:
+        session.close()
+    manifest = store.root / "manifest.ndjson"
+    events = [json.loads(line) for line in manifest.read_text(encoding="utf-8").splitlines()] if manifest.exists() else []
+    for key, result in results.items():
+        result["source_response_hashes"] = [event["body_sha256"] for event in events
+            if event.get("endpoint") == key and event.get("body_sha256")]
+        result["transformation_version"] = code_version
+    summary={"as_of_date":trade_date.isoformat(),"code_version":code_version,"results":results,"failures":failures,
+        "validated_at_utc":dt.datetime.now(dt.timezone.utc).isoformat(),
+        "raw_manifest_sha256":RawObjectStore.verify_manifest(manifest) if events else None,
+        "date_meaning":"Current official catalogs with listing-date cutoff where available; not a historical reconstruction",
+        "raw_manifest":str(store.root/"manifest.ndjson"),"routing_eligible":False,
+        "note":"Independent source evidence only; ETF scope and exact identities must still be compared."}
+    (output/"summary.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2),encoding="utf-8")
+    return summary
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -332,7 +515,17 @@ def main() -> int:
         action="store_true",
         help="make live requests and append raw responses; omitted means read the saved result only",
     )
+    parser.add_argument("--official-baselines",type=Path,help="new evidence directory for independent official catalogs")
+    parser.add_argument("--date",type=dt.date.fromisoformat,help="explicit baseline date")
+    parser.add_argument("--only",action="append",choices=("sh-main-stock","sh-star-stock","sz-stock","sz-fund",
+        "sh-etf-scale","bse-listed-stock","sh-etf-list-page","sh-etf-list-data","sh-etf-list-api","sh-etf-list-view","sh-etf-list-driver",
+        "sh-fund-directory","sh-fund-types"),help="probe only missing independent evidence")
     args = parser.parse_args()
+    if args.official_baselines:
+        if args.date is None: parser.error("official baselines require --date")
+        result=fetch_official_catalog_baselines(args.official_baselines,args.date,args.only)
+        print(json.dumps(result,ensure_ascii=False,indent=2))
+        return 2 if result["failures"] else 0
     if not args.refresh and OUTPUT.exists():
         saved = json.loads(OUTPUT.read_text(encoding="utf-8"))
         print("Saved evidence found; no network requests made.")

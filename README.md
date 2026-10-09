@@ -11,7 +11,7 @@
 - [代码目录与文件职责](CODE_STRUCTURE.md)
 - [原始暂存、任务重做与发布](docs/pipeline/collection-tasks.md)
 - [股票与 ETF 来源名单](docs/providers/security-catalog.md)
-- [证券清单定时更新与来源资格](docs/worker/security-master.md)：默认交易日08:00，沿用同日任务和失败续采；代码已接通，真实来源资格未齐全，在线采集尚未激活。
+- [证券清单定时更新与来源资格](docs/worker/security-master.md)：默认交易日08:00，沿用同日任务和失败续采；10月9日独立核验发现沪市ETF缺1只，尚未发布全量名单。已将留证校验的交易日历写入既有元数据库。
 - [Provider 能力验证与归一化设计](provider-capability-verification-and-normalization.md)
 - [EastMoney 数据域覆盖设计](eastmoney-data-domain-coverage.md)
 - [项目开发进度](PROJECT_PROGRESS.md)
