@@ -30,3 +30,19 @@ rules:
     version: bse-security-catalog-input-v1
     evidence_refs: [provider_validation/results/raw/security-catalog-bse-20261007/manifest.ndjson]
     notes: 北交所当前官方名单；名单日期为原响应在上海时区的采集日，不使用 hqjsrq 行情日期冒充历史名单。无可靠停牌状态，status=unknown。
+  - id: sse-etf-catalog-input-v1
+    input_id: SECURITY-SSE-ETF-001
+    provider: sse
+    endpoint: etf_security_snapshot
+    field_mapping:
+      stock_code: FUND_CODE
+      stock_name: FUND_ABBR
+      exchange: exchange
+      asset_type: asset_type
+      status: status
+      list_date: LISTING_DATE
+    context_fields: {trade_date: source_capture_date, source: provider}
+    status: pending_validation
+    version: sse-etf-catalog-input-v1
+    evidence_refs: [provider_validation/results/security-activation-20261009/official-sh-funds/_raw/manifest.ndjson]
+    notes: 按上市目录全量保留ETF，含进入清算但仍在目录的证券；交易状态unknown，LISTING_DATE只表示上市日。名单日期取原响应采集日。

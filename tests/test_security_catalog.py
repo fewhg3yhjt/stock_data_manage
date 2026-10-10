@@ -9,7 +9,7 @@ import requests
 from stock_data_manage.pipeline.inputs import collect_input
 from stock_data_manage.providers.baostock.industry import _a_share_code, _is_etf
 from stock_data_manage.providers.contracts import ProviderContractError
-from stock_data_manage.providers.exchanges.security import BseSecurityListProvider
+from stock_data_manage.providers.exchanges.security import BseSecurityListProvider, SseEtfListProvider
 from stock_data_manage.providers.transport import RequestPacer
 from stock_data_manage.service.instruments_update import prepare_security_publication
 
@@ -17,6 +17,66 @@ from stock_data_manage.service.instruments_update import prepare_security_public
 ROOT = Path(__file__).resolve().parents[1]
 BAO = ROOT / "provider_validation/results/live-probes/baostock-industry-20260930-20261003/_raw/baostock-industry/manifest.ndjson"
 BSE = ROOT / "provider_validation/results/raw/security-catalog-bse-20261007/manifest.ndjson"
+SSE_FUNDS = ROOT / "provider_validation/results/security-activation-20261009/official-sh-funds/_raw/manifest.ndjson"
+
+
+def sse_fund(code="512390", category="F112", listed="2018-07-13"):
+    return {"FUND_CODE": code, "FUND_ABBR": "fixture fund", "CATEGORY": category, "LISTING_DATE": listed}
+
+
+class SseCatalogSession:
+    def __init__(self, rows, total=None, status=200):
+        self.rows, self.total, self.status, self.calls = rows, len(rows) if total is None else total, status, []
+
+    def request(self, method, url, **options):
+        self.calls.append((method, url, options))
+        return CatalogSession.response(self.status, json.dumps({"result": self.rows, "pageHelp": {"total": self.total}}))
+
+
+def test_sse_catalog_preserves_listed_etfs_and_original_request_contract():
+    rows = [sse_fund(), sse_fund("511600", "F150"), sse_fund("501001", "F211"),
+            sse_fund("508001", "F600"), sse_fund("530001", "F111", "2026-10-12")]
+    client = SseCatalogSession(rows)
+    result = SseEtfListProvider(client=client).fetch_snapshot(date(2026, 10, 9))
+    assert [r["FUND_CODE"] for r in result.rows] == ["512390", "511600"]
+    assert all(r["status"] == "unknown" for r in result.rows)
+    assert result.source_rows == tuple(rows) and len(result.excluded_rows) == 3
+    method, url, options = client.calls[0]
+    assert method == "GET" and url == SseEtfListProvider.api_url
+    assert options["params"]["END_DATE"] == "20261009" and options["params"]["CATEGORY"] == "F000"
+    assert options["headers"] == {"Referer": "https://etf.sse.com.cn/fundlist/"}
+    assert options["timeout"] == 30 and options["allow_redirects"] is False and options["data"] is None
+
+
+@pytest.mark.parametrize("problem", ["partial", "duplicate", "unknown_etf_category", "bad_date", "missing_code", "redirect", "empty"])
+def test_sse_catalog_rejects_incomplete_or_changed_responses(problem):
+    rows, total, status = [sse_fund()], None, 200
+    if problem == "partial": total = 2
+    if problem == "duplicate": rows.append(sse_fund())
+    if problem == "unknown_etf_category": rows[0]["CATEGORY"] = "F199"
+    if problem == "bad_date": rows[0]["LISTING_DATE"] = "bad"
+    if problem == "missing_code": rows[0].pop("FUND_CODE")
+    if problem == "redirect": status = 302
+    if problem == "empty": rows = []
+    with pytest.raises(ProviderContractError):
+        SseEtfListProvider(client=SseCatalogSession(rows, total, status)).fetch_snapshot(date(2026, 10, 9))
+
+
+def test_sse_real_archive_uses_yaml_mapping_original_date_and_preserves_liquidating_etf(tmp_path):
+    from stock_data_manage.storage.raw import RawObjectStore
+    report = collect_input(input_id="SECURITY-SSE-ETF-001", config_root=ROOT / "config", data_root=tmp_path,
+        context={"request": {"trade_date": date(2026, 10, 9)}}, mode="replay", replay_manifest=SSE_FUNDS,
+        pacer=RequestPacer(wait=lambda _: None))
+    assert report["status"] == "candidate_complete", report.get("error")
+    rows = output_rows(report)
+    assert len(rows) == 944 and report["source_rows"]["row_count"] == 1125
+    assert report["excluded_rows"]["row_count"] == 181
+    assert {row["trade_date"] for row in rows} == {"2026-10-09"}
+    preserved = next(row for row in rows if row["stock_code"] == "512390")
+    assert preserved["list_date"] == "2018-07-13" and preserved["status"] == "unknown"
+    manifest = (Path(report["run_directory"]) / report["raw_manifest"]["path"]).resolve()
+    assert RawObjectStore.verify_manifest(manifest) == report["raw_manifest"]["sha256"]
+    assert not report["eligible_for_production_routing"] and report["live_http_calls"] == 0
 
 
 @pytest.fixture

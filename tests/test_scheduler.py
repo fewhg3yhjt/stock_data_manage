@@ -54,7 +54,7 @@ def test_master_schedule_calendar_slot_and_single_frequency_source(tmp_path):
     job = plan(stamp(8, 0), True)
     assert job["task_id"] == "security-master-20260930"
     assert job["definition"]["units"][0]["context"]["config"]["include_etf"]
-    assert [u["input_id"] for u in job["definition"]["units"]] == ["SDA-BOARD-005", "SECURITY-BSE-001"]
+    assert [u["input_id"] for u in job["definition"]["units"]] == ["SDA-BOARD-005", "SECURITY-BSE-001", "SECURITY-SSE-ETF-001"]
     root = edited_config(tmp_path, "security_master_daily", frequency={"unit": "day", "interval": 1, "at": "16:00"})
     assert next(j for j in load_scheduled_jobs(root / "schedules.yaml") if j.name == "security_master_update").local_time == time(16)
     assert plan_security_master_collection(root, now=stamp(8, 0), is_trading_day=True)["status"] == "not_due"

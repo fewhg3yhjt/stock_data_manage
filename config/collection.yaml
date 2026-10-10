@@ -37,7 +37,7 @@ markets:
 
 security_master:
   collection_profile: security_master_daily
-  source_inputs: [SDA-BOARD-005, SECURITY-BSE-001]
+  source_inputs: [SDA-BOARD-005, SECURITY-BSE-001, SECURITY-SSE-ETF-001]
   source_config:
     SDA-BOARD-005: {include_etf: true}
 

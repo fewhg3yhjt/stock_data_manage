@@ -2900,3 +2900,29 @@ input_capabilities:
     - 仅查询当前名单，按原响应采集日标记；行情日期单独留在源字段和报告中，不支持历史日期或单证券目录查询。
     - 逐页核对声明总数、页号、结束页及唯一证券；停牌状态未知，不推断上市日期；分页完整不等于独立市场总数证明。
     - 2026-10-07 来源实测18页348条；仍为验证资格，未启用正式路由或自动调度。
+
+  SECURITY-SSE-ETF-001:
+    provider: sse
+    endpoint: etf_security_snapshot
+    display_name: 上交所官方上市ETF目录
+    data_kind: snapshot
+    data_frequency: snapshot
+    request_shape: full_snapshot
+    collection_profile: reference_daily
+    parameters:
+      trade_date: {type: date, source: request.trade_date, required: true}
+    implementation_status: implemented_validation_only
+    dataset: security_snapshot
+    runtime_method: fetch_snapshot
+    runtime_endpoint: sse.etf_security_snapshot
+    forbidden_sources: [request.symbol, request.symbols, request.start_date, request.end_date]
+    evidence_refs: [provider_validation/results/security-activation-20261009/official-sh-funds/_raw/manifest.ndjson]
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    base_requests_per_fetch: 1
+    limitations:
+    - 保持已留证的基金目录GET参数、Session、代理、Referer、30秒超时；不自动重试、重定向或来源回退。
+    - trade_date仅筛选上市日期上限，名单日期取原响应上海时区采集日，不提供历史名单查询。
+    - 按官方F100分类子树保留ETF及交易型货币基金，排除LOF、其他货币基金和REITs；上市目录中的清算基金保留，交易状态unknown。
+    - 分页总数和唯一证券检查不等于独立全市场证明；生产资格尚未登记。

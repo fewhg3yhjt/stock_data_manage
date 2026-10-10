@@ -59,7 +59,8 @@ def _input_data_date(context, replay_manifest, *, provider, endpoint, data_date=
     from datetime import date
     from zoneinfo import ZoneInfo
     request = context.get("request", {})
-    value = data_date or request.get("trade_date") or request.get("end_date")
+    value = data_date or (None if (provider, endpoint) == ("sse", "etf_security_snapshot") else
+                         request.get("trade_date") or request.get("end_date"))
     if value is not None:
         value = value.isoformat() if isinstance(value, date) else str(value)
         if date.fromisoformat(value).isoformat() != value:
@@ -248,6 +249,8 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
     report["response_freshness_seconds"] = profile.refresh_interval_seconds or 86400
     is_baostock = input_id in {"SDA-BOARD-005", "SDA-BOARD-006", "ASTOCK-044"}
     is_bse_catalog = input_id == "SECURITY-BSE-001"
+    is_sse_etf_catalog = input_id == "SECURITY-SSE-ETF-001"
+    is_current_catalog = is_bse_catalog or is_sse_etf_catalog
     if is_bse_catalog:
         import requests
         import urllib3
@@ -663,21 +666,21 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                 returned_window={"first": parameters["date"].isoformat(), "last": parameters["date"].isoformat()},
                 coverage_basis="source tc and returned SDK rows for requested qdate; not independent whole-market proof",
                 universe_completeness_verified=False)
-        mapping_rows = fetched.rows if input_id == 'ASTOCK-044' or is_em_history or is_lpr or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_extension or is_repo_rate or is_cb or is_sina_futures else source_rows
+        mapping_rows = fetched.rows if input_id == 'ASTOCK-044' or is_sse_etf_catalog or is_em_history or is_lpr or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_extension or is_repo_rate or is_cb or is_sina_futures else source_rows
         if input_id == 'ASTOCK-044' or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_extension or is_repo_rate or is_cb or is_sina_futures:
             parsed_ref = write_result(_json_value(mapping_rows), dataset="parsed_rows", provider=contract.provider,
                 endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="parsed-rows")
             report["parsed_rows"] = {"path":relative_file(parsed_ref.path),
                 "sha256":parsed_ref.content_hash,"row_count":len(mapping_rows),"code_version":code_version,
                 "source_response_hashes":[event["body_sha256"] for event in response_events]}
-        if input_id == "SDA-BOARD-005":
+        if input_id == "SDA-BOARD-005" or is_sse_etf_catalog:
             excluded_ref = write_result(_json_value(fetched.excluded_rows), dataset="excluded_rows", provider=contract.provider,
                 endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="excluded-rows")
             report["excluded_rows"] = {"path": relative_file(excluded_ref.path), "sha256": excluded_ref.content_hash,
                 "row_count": len(fetched.excluded_rows), "code_version": code_version,
                 "source_response_hashes": [event["body_sha256"] for event in response_events]}
             report.update(source_metadata=_json_value(fetched.mapping_context), universe_completeness_verified=False,
-                asset_type_counts={kind: sum(row["asset_type"] == kind for row in source_rows) for kind in ("stock", "etf")})
+                asset_type_counts={kind: sum(row["asset_type"] == kind for row in mapping_rows) for kind in ("stock", "etf")})
         if is_factor:
             excluded_ref = write_result(_json_value(fetched.excluded_rows), dataset="excluded_rows", provider=contract.provider,
                 endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="excluded-rows")
@@ -754,10 +757,10 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
             raise NormalizationError("temporary empty input; not certified as a valid empty dataset")
         mapping_context = {"provider": contract.provider}
         mapping_context.update(getattr(fetched, "mapping_context", {}))
-        if is_bse_catalog or is_baostock or input_id.startswith("SDA-BOARD-") or is_tencent_snapshot or is_em_history or is_stock_pool or is_em_events or is_lpr or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_extension or is_repo_rate or is_cb or is_sina_futures:
+        if is_current_catalog or is_baostock or input_id.startswith("SDA-BOARD-") or is_tencent_snapshot or is_em_history or is_stock_pool or is_em_events or is_lpr or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_extension or is_repo_rate or is_cb or is_sina_futures:
             successful = [event for event in response_events if event.get("outcome") == "response" and (not (is_sdk_news or is_sdk_macro or is_market_events or is_reports_seats) or event["status_code"] == 200)]
-            if is_bse_catalog:
-                successful = [event for event in successful if event.get("method") == "POST" and event.get("status_code") == 200]
+            if is_current_catalog:
+                successful = [event for event in successful if event.get("method") == ("POST" if is_bse_catalog else "GET") and event.get("status_code") == 200]
             if not successful:
                 raise NormalizationError("source response evidence is required; an SDK memory cache alone is insufficient")
             source_times = []
@@ -770,11 +773,11 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
             if any(stamp.tzinfo is None for stamp in source_times):
                 raise NormalizationError("source capture time must be timezone-aware")
             mapping_context["source_snapshot_at"] = max(source_times)
-            if is_bse_catalog:
+            if is_current_catalog:
                 from zoneinfo import ZoneInfo
                 capture_days = {stamp.astimezone(ZoneInfo("Asia/Shanghai")).date() for stamp in source_times}
                 if len(capture_days) != 1:
-                    raise NormalizationError("BSE catalog pages crossed capture days; retry a complete snapshot")
+                    raise NormalizationError("official catalog pages crossed capture days; retry a complete snapshot")
                 mapping_context["source_capture_date"] = capture_days.pop()
                 report.update(source_metadata=_json_value(fetched.mapping_context),
                     source_total_count=fetched.mapping_context["source_total_count"],
@@ -785,7 +788,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                                      "meaning": "catalog capture day; not a historical security query"})
             report["source_capture_window"] = {"first": min(source_times).isoformat(), "last": max(source_times).isoformat(),
                                                "meaning": "source response capture times; not row-level market timestamps"}
-            if not is_bse_catalog and not is_tencent_snapshot and not is_em_history and not is_stock_pool and not is_em_events and not is_lpr and not is_news and not is_reports_calendar and not is_sdk_news and not is_sdk_macro and not is_factor and not is_market_events and not is_reports_seats and not is_source_extension and not is_repo_rate and not is_cb and not is_sina_futures:
+            if not is_current_catalog and not is_tencent_snapshot and not is_em_history and not is_stock_pool and not is_em_events and not is_lpr and not is_news and not is_reports_calendar and not is_sdk_news and not is_sdk_macro and not is_factor and not is_market_events and not is_reports_seats and not is_source_extension and not is_repo_rate and not is_cb and not is_sina_futures:
                 report["returned_window"] = {"first": fetched.returned_first_key, "last": fetched.returned_last_key}
                 report["source_units"] = list(fetched.units)
                 report["coverage_basis"] = "returned SDK rows; not an independently verified market universe"
@@ -912,7 +915,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
             if any(not (row["low"] <= min(row["open"], row["close"]) <= max(row["open"], row["close"]) <= row["high"]) for row in rows):
                 raise NormalizationError("invalid OHLC ordering")
         request_dates = context.get("request", {})
-        if runtime and task_unit is None and data_date is None and not (request_dates.get("trade_date") or request_dates.get("end_date")):
+        if runtime and task_unit is None and data_date is None and (is_sse_etf_catalog or not (request_dates.get("trade_date") or request_dates.get("end_date"))):
             # A cached response keeps its original capture day rather than the
             # day on which this candidate was reprocessed.
             actual_day = _input_data_date({}, raw_store.root / "manifest.ndjson",
@@ -1107,7 +1110,7 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
                 if not Manifest.load(published).verify(published.parent / "data.parquet"):
                     raise ValueError("published task data failed integrity verification")
                 if dataset != "security_master" or state.get("complete_today"):
-                    return {**state, "no_op": True}
+                    return {**_save_task_summary(state, paths, metadata), "no_op": True}
             if state is None:
                 state = {"task_id": task_id, "dataset": dataset, "definition_hash": definition_hash,
                          "definition": _json_value(immutable), "units": {}, "status": "collecting"}
@@ -1131,6 +1134,7 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
                          complete_today=False, verification_mode=mode)
             metadata.save_collection_task(state)
             work.mkdir(parents=True, exist_ok=True)
+            _save_task_summary(state, paths, metadata)
             executor = collector or collect_input
             for unit in units:
                 key = unit["key"]
@@ -1218,10 +1222,89 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
                         provider="pipeline", endpoint="coverage", fetched_at=datetime.now(timezone.utc),
                         attempt_id="coverage", relative_path="coverage.json")
                 metadata.save_collection_task(state)
-                return state
+                return _save_task_summary(state, paths, metadata)
             state["status"] = "committing"
             metadata.save_collection_task(state)
             return _finish_task_commit(state, paths, metadata, failure_hook)
+
+
+def _save_task_summary(state, paths, metadata):
+    """One generated task result; source evidence remains in the existing stores."""
+    import json
+    from ..storage.integrity import file_hash
+    definition = state["definition"]
+    final_status = state["status"] in {"failed", "committing", "published"}
+    check = state.get("security_check", {}) if final_status else {}
+    commit = state.get("commit", {}) if state["status"] in {"committing", "published"} else {}
+    publication = commit.get("publication_metadata", {})
+    units = []
+    for unit in definition["units"]:
+        entry = state["units"].get(unit["key"], {})
+        report = entry.get("report", {})
+        units.append({"key": unit["key"], "input_id": unit["input_id"], "symbol": unit.get("symbol"),
+            "status": entry.get("status", "pending"), "coverage_rejected": bool(entry.get("coverage_rejected")),
+            "request_scope": sanitized_metadata(unit["context"]),
+            "returned_window": report.get("returned_window"), "source_capture_window": report.get("source_capture_window"),
+            "row_count": report.get("row_count"), "failure_class": entry.get("failure_class") or report.get("failure_class"),
+            "error": entry.get("error") or report.get("error"),
+            "report_path": report.get("report_path"), "raw_manifest": entry.get("raw_manifest"),
+            "raw_hash": entry.get("raw_hash"), "current_raw": entry.get("current_raw"),
+            "code_version": report.get("code_version"), "adapter_version": report.get("adapter_version"),
+            "normalization_version": report.get("normalization_version"),
+            "source_response_hashes": [event["body_sha256"] for event in report.get("responses", []) if event.get("body_sha256")]})
+    missing_units = [unit["key"] for unit in units if unit["status"] != "candidate_complete" or unit["coverage_rejected"]]
+    target_symbols = sorted({unit["symbol"] for unit in units if unit["symbol"]})
+    if state["dataset"] == "security_master":
+        coverage = {"basis": check.get("basis"), "group_counts": check.get("group_counts", {}),
+                    "missing_groups": check.get("missing_groups", []),
+                    "missing_previous_securities": check.get("missing_previous_securities", []),
+                    "independent_full_market_coverage_verified": check.get("independent_full_market_coverage_verified", False),
+                    "denominator": None, "ratio": None}
+    else:
+        statuses = commit.get("item_statuses", {})
+        actual = sum(value == "success" for value in statuses.values()) if statuses else None
+        coverage = {"basis": "frozen task securities; not the entire canonical partition",
+                    "expected_count": len(target_symbols), "actual_count": actual,
+                    "ratio": actual / len(target_symbols) if actual is not None and target_symbols else None,
+                    "missing_securities": [unit["symbol"] for unit in units if unit["key"] in missing_units]}
+    if not final_status:
+        check_status = "pending"
+    elif state["status"] == "failed" or publication.get("fallback"):
+        check_status = "failed"
+    elif state["status"] == "published":
+        check_status = "passed"
+    else:
+        check_status = "ready_to_publish"
+    summary = {"version": 1, "task_id": state["task_id"], "dataset": state["dataset"],
+        "status": state["status"], "verification_mode": state.get("verification_mode"), "redo": state.get("redo"),
+        "requested_date": definition["trade_date"],
+        "data_date": (state.get("data_date") or definition["trade_date"]) if state["status"] == "published" else None,
+        "fallback_used": bool(publication.get("fallback")), "fallback_reason": publication.get("fallback_reason"),
+        "fallback_rejection": check.get("fallback_rejection"), "complete_today": bool(state.get("complete_today")),
+        "scope": {"universe": definition.get("universe"), "symbols": target_symbols,
+                  "required_groups": check.get("required_groups") or publication.get("required_groups") or definition.get("required_groups"),
+                  "selected_symbols": state.get("selected_symbols", [])},
+        "final_check": {"status": check_status,
+                        "error": state.get("error"), "coverage": coverage},
+        "source_units": units, "missing_units": missing_units,
+        "publication": {"published": state["status"] == "published", "pending_recovery": state["status"] == "committing",
+                        "manifest": state.get("published_manifest") if state["status"] == "published" else None,
+                        "manifest_sha256": state.get("published_hash") if state["status"] == "published" else None,
+                        "row_count": state.get("row_count") if state["status"] == "published" else None,
+                        "raw_refs": commit.get("raw_refs", [])},
+        "definition_hash": state["definition_hash"], "generated_at_utc": datetime.now(timezone.utc).isoformat()}
+    directory = paths["workspace_root"] / "_tasks" / state["task_id"]
+    directory.mkdir(parents=True, exist_ok=True)
+    target = directory / "summary.json"
+    temporary = directory / ("summary." + uuid4().hex[:12] + ".tmp")
+    with temporary.open("xb") as stream:
+        stream.write(json.dumps(summary, ensure_ascii=False, sort_keys=True, default=str).encode("utf-8"))
+        stream.flush()
+        os.fsync(stream.fileno())
+    os.replace(temporary, target)
+    state["summary"] = {"path": str(target), "sha256": file_hash(target)}
+    metadata.save_collection_task(state)
+    return state
 
 
 def _task_units(definition, paths):
@@ -1397,7 +1480,7 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
         records = merged.records
         comparable = previous if prior and prior.get("scope_hash") == scope_hash else ()
         check = check_security_coverage(records, required_groups=required_groups, previous=comparable)
-        check.update(missing_units=missing, requested_date=day.isoformat(),
+        check.update(missing_units=missing, requested_date=day.isoformat(), required_groups=sorted(required_groups),
                      classification_conflicts=[item.instrument_id for item in merged.classification_conflicts],
                      source_failures={key: {"failure_class": state["units"][key].get("failure_class"),
                                             "error": state["units"][key].get("error") or state["units"][key].get("report", {}).get("error")}
@@ -1498,6 +1581,7 @@ def _finish_task_commit(state, paths, metadata, failure_hook=None):
     from ..domain import Dataset, Adjustment, ItemStatus
     from ..storage.integrity import Manifest, file_hash
     from ..storage.parquet import CanonicalPartitionStore, _mapping_to_bar, _fsync_file
+    _save_task_summary(state, paths, metadata)
     commit = state["commit"]
     candidate = Path(commit["candidate"])
     if not candidate.resolve().is_relative_to(paths["workspace_root"]) or file_hash(candidate) != commit["candidate_hash"]:
@@ -1571,7 +1655,7 @@ def _finish_task_commit(state, paths, metadata, failure_hook=None):
     temporary_task = paths["raw_root"] / "_tmp" / state["definition"]["trade_date"] / state["task_id"]
     if temporary_task.exists() and not any(temporary_task.iterdir()):
         temporary_task.rmdir()
-    return state
+    return _save_task_summary(state, paths, metadata)
 
 
 def collect_due_inputs(*, now, config_root, output_root=None, data_root=None, trading_dates=(), securities=(), symbols=(),
@@ -1736,6 +1820,8 @@ def _collect_due_security_master(*, now, config_root, data_root, execute, mode, 
     if job["status"] == "ready":
         for unit in job["definition"]["units"]:
             contract = contracts[unit["input_id"]]
+            if any(binding.source == "request.trade_date" for binding in contract.parameters):
+                unit["context"]["request"] = {"trade_date": day.isoformat()}
             if contract.trading_date_parameter:
                 unit["context"]["request"] = {contract.trading_date_parameter: day.isoformat()}
                 unit["context"]["calendar"] = {"trading_dates": [day.isoformat()]}
@@ -1755,7 +1841,7 @@ def _collect_due_security_master(*, now, config_root, data_root, execute, mode, 
                                   mode="live", collector=collector)
             job.update(status=result["status"], complete_today=result["complete_today"],
                        data_date=result.get("data_date"), fallback_used=result.get("fallback_used", False),
-                       no_op=result.get("no_op", False), error=result.get("error"))
+                       no_op=result.get("no_op", False), error=result.get("error"), summary=result.get("summary"))
     report = {"dataset": "security_master", "now": now.isoformat(), "execute": execute, "mode": mode,
               "production_writes": int(job["status"] == "published" and not job.get("no_op")),
               "eligible_for_production_routing": bool(job.get("source_qualifications")) and all(q["eligible"] for q in job.get("source_qualifications", [])),

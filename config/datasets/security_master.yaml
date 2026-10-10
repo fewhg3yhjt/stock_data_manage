@@ -12,8 +12,9 @@ dataset:
       - [XSHE, etf]
     max_previous_age_days: 1
     source_groups:
-      SDA-BOARD-005: [[XSHG, stock], [XSHE, stock], [XSHG, etf], [XSHE, etf]]
+      SDA-BOARD-005: [[XSHG, stock], [XSHE, stock], [XSHE, etf]]
       SECURITY-BSE-001: [[BSE, stock]]
+      SECURITY-SSE-ETF-001: [[XSHG, etf]]
 fields:
   instrument_id: {type: string, required: true}
   symbol: {type: string, required: true}

@@ -82,6 +82,7 @@
 | `providers/baostock/__init__.py` | BaoStock 适配器导出 |
 | `providers/eastmoney/dividend.py` | 原批量分红事件及单证券 SDK 历史候选输入；已实施选择、预披露留证 |
 | `providers/eastmoney/security_list.py` | EastMoney 分页证券列表、市场和资产类型映射 |
+| `providers/exchanges/security.py` | 北交所证券目录与上交所上市ETF目录，保留原Session、代理及请求合同；检查完整返回与唯一证券，当前目录不伪装历史名单 |
 | `providers/eastmoney/realtime.py` | EastMoney 原行情/分时；三个历史输入复用的证券身份、来源计数校验及回放时钟恢复函数 |
 | `providers/eastmoney/fund_flow.py` | 原日级资金流解析及原 SDK 历史候选输入，修正大小单列对应 |
 | `providers/eastmoney/__init__.py` | EastMoney 适配器导出 |
@@ -128,7 +129,7 @@
 | 文件 | 职责 |
 |---|---|
 | `pipeline/daily.py` | 日线按来源补缺、标准化、校验、候选生成和发布编排 |
-| `pipeline/inputs.py` | 单项候选采集/回放、持久化业务任务及证券清单调度检查；统一按日原始暂存和正式输出边界、来源解析、YAML映射、质量与覆盖、重做和发布恢复，名单在线请求受路由资格约束 |
+| `pipeline/inputs.py` | 单项候选采集/回放、持久化业务任务及证券清单调度检查；统一按日原始暂存和正式输出边界、来源解析、YAML映射、质量与覆盖、重做和发布恢复；自动生成任务summary.json并将路径/哈希记入原元数据，名单在线请求受路由资格约束 |
 | `pipeline/daily_reconciliation.py` | 日线 provisional/final 合并、缺失统计和盘后校准 |
 | `pipeline/minute.py` | Watchlist 实时分钟采集和 Hot Store 写入 |
 | `pipeline/minute_reconciliation.py` | 分钟盘后校准、final 提升、冲突隔离和完整性处理 |

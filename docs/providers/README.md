@@ -61,7 +61,7 @@ node provider_validation/tests/build_interface_coverage_workbook.mjs --formal-sp
 
 ## 证券名单能力更新
 
-股票与ETF名单的实现、分类及北交所接入见 [证券名单来源](security-catalog.md)。现有Excel与配套JSON保留上次导出快照；新增输入与字段变化以模块说明及YAML为准，不将旧表视为已核准当前全量证券。当前只有部分回放候选在 `data/`，最新手工核验仍在历史验证区，真实任务发布尚未完成；后续业务采集与检查统一通过业务运行布局，已有接口可行性响应只读留存。
+股票与ETF名单的实现、分类、北交所及上交所ETF目录接入见 [证券名单来源](security-catalog.md)。现有Excel与配套JSON保留上次导出快照；新增输入与字段变化以模块说明及YAML为准，不将旧表视为已核准当前全量证券。最新正式适配器联调和五类证券回放使用 `tmp/` 隔离根目录，验收索引在 `data/task_workspace/_checks/`；真实生产名单尚未发布。已有接口可行性响应只读留存。
 
 ## 各来源数据域的边界
 

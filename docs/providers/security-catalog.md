@@ -1,14 +1,16 @@
 # 股票与 ETF 来源名单
 
-证券名单继续使用现有来源采集、YAML 字段映射及留证流程。沪深部分修改原 `BaoStockIndustryMembershipProvider.fetch_snapshot`；北交所原来只有验证脚本，必要新增 `providers/exchanges/security.py`，迁移其官方目录请求，不新增任务管理层。
+证券名单继续使用现有来源采集、YAML 字段映射及留证流程。沪深部分使用原 `BaoStockIndustryMembershipProvider.fetch_snapshot`；北交所及上交所ETF目录均在现有 `providers/exchanges/security.py` 中迁移已留证请求，不新增任务管理层。
 
 ## 当前能力与验证范围
 
 2026-10-09 既有 Provider 在线核验得到沪市股票2,320只、深市股票2,904只、深市ETF750只、沪市ETF943只、北交所股票349只，共7,266条。沪深股票、深市ETF及北交所股票与当次交易所目录逐代码匹配；沪市ETF目录944条，比BaoStock多 `512390`（中国低波ETF平安）。原SDK载荷没有该代码，差异不由本地映射或过滤产生。
 
-原核对把这个目录差异解释为漏采，结论需修正。[基金管理人2026-09-30公告](https://paper.cnstock.com/html/2026-09/30/content_2274033.htm)明确该基金最后运作日为9月8日、9月9日进入清算；公告没有给出实际终止上市生效日。目录数量、清算状态和当前上市范围尚未按同一日期口径核准，不能仅凭943与944的差异认定漏采，也不能为凑数把清算基金当正常交易ETF补入。历史 [逐代码核对](../../provider_validation/results/security-activation-20261009/coverage-review.json) 和 [核对代码](../../provider_validation/results/security-activation-20261009/coverage-review-code.txt)保留原样，其“漏采”解释由本段更正。
+原核对把这个目录差异解释为漏采，结论需修正。[基金管理人2026-09-30公告](https://paper.cnstock.com/html/2026-09/30/content_2274033.htm)明确该基金最后运作日为9月8日、9月9日进入清算；公告没有给出实际终止上市生效日。不能仅凭943与944的差异认定漏采，也不能把清算基金当正常交易ETF补入。当前按下文确认的上市目录口径保留该证券，交易状态为unknown。历史 [逐代码核对](../../provider_validation/results/security-activation-20261009/coverage-review.json) 和 [核对代码](../../provider_validation/results/security-activation-20261009/coverage-review-code.txt)保留原样，其“漏采”解释由本段更正。
 
-当前全量目标由 `security_master` 配置限定为沪市A股、深市A股、北交所股票、沪市ETF、深市ETF五组，含主板、创业板及科创板。B股、LOF、债券和港股等不在当前目标中。来源名单保留暂停交易证券，北交所状态为未知；上市、清算与退出状态口径尚未统一核准。配置要求五组存在、此前证券无异常消失，不等于全市场100%覆盖证明。
+2026-10-10用户确认ETF按上市目录全量保留；尚未确认实际退市且仍在目录中的清算基金保留，无法确认交易状态时为 `unknown`。上交所官方ETF目录已补接，不能将 `unknown` 理解为正常交易或保证有日线返回。历史“清算基金是否保留”的待确认项由本规则取代。
+
+当前全量目标由 `security_master` 配置限定为沪市A股、深市A股、北交所股票、沪市ETF、深市ETF五组，含主板、创业板及科创板。B股、LOF、债券和港股等不在当前目标中。来源名单保留暂停交易证券，北交所状态为未知。配置要求五组存在、此前证券无异常消失，不等于全市场100%覆盖证明。
 
 没有正式名单发布或完成真实业务任务验收；在线来源资格仍待补齐。后续通过正式任务自动记录日期、范围、分组数量及最终检查，源头可行性证据仅作为历史只读输入。
 
@@ -19,8 +21,9 @@
 | `SDA-BOARD-005` | 沪深股票名单，支持主板、创业板、科创板及302代码段 | 原响应日期2026-09-30，5,224只股票 | 已实现、原证据回放通过；生产路由和调度未启用 |
 | 同一输入，`config.include_etf=true` | 在同一原响应中保留沪深ETF，包括货币ETF | 1,692只ETF：沪市943、深市749；与股票合计6,916条 | 已实现、分类及映射回放通过；独立市场总数未核准 |
 | `SECURITY-BSE-001` | 北交所官方当前证券目录，完整翻页 | 2026-10-07采集，18页348条；各页总数与唯一证券数一致 | 原脚本在线取数、正式适配器离线对照通过；生产路由和调度未启用 |
+| `SECURITY-SSE-ETF-001` | 上交所官方上市ETF目录，含仍在目录的清算基金 | 2026-10-10正式适配器真实返回1,125条基金原行，按官方分类保留944条ETF | 已实现、候选取数成功；完整生产资格未登记 |
 
-这些是各自来源和日期的名单，不是已经发布的当日全量证券。市场与资产类型的五组检查及整份前次有效名单回退已接入原任务构建流程，见 [任务覆盖与回退](../pipeline/collection-tasks.md)。[定时更新与资格检查](../pipeline/collection-tasks.md#证券清单定时更新) 已接通现有任务入口；同日期状态口径、资格和真实任务发布验收尚未完成。
+这些是各自来源和日期的名单，不是已经发布的当日全量证券。市场与资产类型的五组检查及整份前次有效名单回退已接入原任务构建流程，见 [任务覆盖与回退](../pipeline/collection-tasks.md)。[定时更新与资格检查](../pipeline/collection-tasks.md#证券清单定时更新) 已接通现有任务入口；资格和真实任务发布验收尚未完成。
 
 ## 请求与分类
 
@@ -36,6 +39,10 @@
 
 ## 字段和日期
 
+上交所ETF输入保留原基金目录GET、Session、代理、`trust_env=false`、User-Agent、基金列表Referer、30秒超时和禁止自动重定向，无隐式重试或来源回退。请求仍查询 `CATEGORY=F000` 的基金目录，使用已有官方分类树中的ETF（F100）子类，含F150交易型货币基金；排除LOF、其他货币基金和REITs。未知ETF分类、重复证券、空返回或声明总数不符直接失败。原响应及全部基金行保留，排除行另列原因。
+
+来源字段 `FUND_CODE/FUND_ABBR/LISTING_DATE` 映射为 `stock_code/stock_name/list_date`，交易所 `XSHG`、资产类型 `etf`、状态 `unknown`。`trade_date` 请求参数只绑定 `END_DATE` 上市日上限，不是历史名单能力；标准名单日期及raw日期按原响应上海时区采集日保存。回放保持原日期，业务任务继续拒绝与目标日不一致的目录。
+
 [来源字段模板](../../config/datasets/security_snapshot.yaml) 与 [字段映射](../../config/normalization/security_snapshot.yaml) 共用 `stock_code`、`stock_name`、`exchange`、`status`、`trade_date`、`source`，补充 `asset_type`。旧股票候选没有该字段时仍按已有股票默认处理。最终名单仍使用 [security_master.yaml](../../config/datasets/security_master.yaml)。
 
 北交所字段对应 `hqzqdm`、`hqzqjc`，资产类型为 `stock`，交易所为 `BSE`。接口没有提供可靠的停牌状态，因此保存 `status=unknown`，不把存在报价当作正在交易；该状态不阻止已经在名单中的证券进入后续范围。
@@ -46,7 +53,7 @@
 
 - 原始接口探针：[北交所原响应清单](../../provider_validation/results/raw/security-catalog-bse-20261007/manifest.ndjson)。此处只有来源验证证据；原始响应在解析前留存。
 - 分类调查与原脚本结果：[分类核对](../../provider_validation/results/security-catalog-20261007/classification-review.json)、[北交所原脚本结果](../../provider_validation/results/security-catalog-20261007/bse-original-result.json)。
-- 当前旧检查的原响应：`data/raw/_tmp/<检查ID>/<单元哈希>/`；按日路径尚待代码修正，目标见 [存储说明](../storage/README.md)。
+- 正式原响应：先进入 `data/raw/_tmp/<数据日期>/<任务ID>/<单元哈希>/`，完整任务成功后转入对应来源、接口、日期和范围目录，见 [存储说明](../storage/README.md)。
 - 来源候选：`data/task_workspace/security_snapshot/<请求范围>/<运行ID>/sources/<来源>/<输入ID>/`，含来源行、映射JSON、Parquet和质量记录。
 - 检查索引和回归报告：`data/task_workspace/_checks/security-catalog/`；运行产物不提交Git。
 
@@ -55,3 +62,5 @@
 原脚本与正式适配器对照请求地址、方法、非秘密请求头、POST请求体哈希、状态、响应哈希和全部证券代码/名称。Cookie在归档中脱敏，无法从离线证据恢复实际值；另外以原生Session及适配器夹具验证Cookie传递、代理、超时和刷新重试。离线通过不等于正式适配器已完成持续在线运行验证。
 
 相关离线回归127项通过，另2项名单日期边界检查通过。独立核对来源响应、请求体与派生Parquet哈希，以及YAML和代码版本；本机索引为 `data/task_workspace/_checks/security-catalog/verification.json`。
+
+2026-10-10上交所目录接入及任务摘要验收见 [检查索引](../../data/task_workspace/_checks/summary-etf-20261010/verification.json)。同为10月9日的BaoStock、北交所和上交所原响应通过现有隔离任务合并并发布7,267条，与当日五组目录逐代码匹配，512390状态unknown。隔离名单及任务摘要位于 `tmp/summary-etf-20261010-e2e/`；10月10日上交所真实原响应和候选位于 `tmp/sse-etf-live-20261010/`。没有新增验证区业务产物、没有登记生产资格或发布生产名单。测试和日期限制统一记录在 [当前进度](../../PROJECT_PROGRESS.md)。

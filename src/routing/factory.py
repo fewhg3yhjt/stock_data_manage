@@ -49,7 +49,7 @@ def check_security_input_qualification(contract, context, *, config_root, metada
     scope = "parameters:" + row_hash(parameters)
     policy = yaml.safe_load((root / "datasets/security_master.yaml").read_text(encoding="utf-8"))
     groups = [tuple(group) for group in policy["dataset"]["publication"]["source_groups"].get(contract.input_id, ())
-              if group[1] != "etf" or parameters.get("include_etf")]
+              if group[1] != "etf" or contract.input_id != "SDA-BOARD-005" or parameters.get("include_etf")]
     reasons, accepted = [], []
     if contract.dataset != "security_snapshot" or contract.request_shape != "full_snapshot" or not groups:
         return {"eligible": False, "input_id": contract.input_id, "reasons": ["unsupported catalog contract"]}
@@ -187,7 +187,7 @@ def build_input_provider(contract, *, providers_path, client=None):
                         "SDA-BOARD-001": "fetch_industry_list", "SDA-BOARD-002": "fetch_industry_daily",
                         "SDA-BOARD-003": "fetch_fund_flow", "SDA-BOARD-004": "fetch_fund_flow",
                         "SDA-BOARD-005": "fetch_snapshot", "SDA-BOARD-006": "fetch_snapshot",
-                        "SECURITY-BSE-001": "fetch_snapshot"}
+                        "SECURITY-BSE-001": "fetch_snapshot", "SECURITY-SSE-ETF-001": "fetch_snapshot"}
     if contract.input_id not in expected_methods or contract.runtime_method != expected_methods[contract.input_id]:
         raise ValueError("input runtime method does not match its verified adapter")
     if contract.input_id == 'ASTOCK-014':
@@ -350,6 +350,9 @@ def build_input_provider(contract, *, providers_path, client=None):
     if contract.input_id == "SECURITY-BSE-001":
         from ..providers.exchanges.security import BseSecurityListProvider
         return BseSecurityListProvider(client=client)
+    if contract.input_id == "SECURITY-SSE-ETF-001":
+        from ..providers.exchanges.security import SseEtfListProvider
+        return SseEtfListProvider(client=client)
     if contract.input_id.startswith("SDA-BOARD-"):
         return AkShareBoardProvider(client=client, endpoint=contract.endpoint,
                                    normalization_root=Path(providers_path).parent / "normalization")

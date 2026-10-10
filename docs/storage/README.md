@@ -16,7 +16,7 @@ data/
 │   └── manifest.ndjson
 ├── task_workspace/<数据集>/scope-<请求范围哈希>/<运行ID>/
 │   └── sources/<来源>/<输入ID>/{parsed/,normalized.json,normalized.parquet}
-├── task_workspace/_tasks/<任务ID>/{prepared.parquet,coverage.json}
+├── task_workspace/_tasks/<任务ID>/{prepared.parquet,coverage.json,summary.json}
 ├── task_workspace/_scheduler/           # 计划及执行摘要
 ├── task_workspace/_checks/              # 正式开发的核对、联调及验收记录
 ├── canonical/security_master/current/{data.parquet,manifest.json}
@@ -34,7 +34,7 @@ data/
 | `collect-task` | raw先到 `_tmp/<数据日期>/<任务>/<单元>`，发布后转到来源、接口、日期和范围目录 | 同日更新对应范围，不同日期互不覆盖；转正校验暂存与目标日期一致 |
 | 显式 `--output-root` | 保留既有隔离候选布局，拒绝验证区和生产路径 | `collect-input`、任务及调度入口均拒绝向验证区输出；旧证据可只读引用 |
 | 任务发布 | 证券主数据、单交易日日线已有构建、重做及恢复代码；在线资格未完成 | 路径修正后以实际任务生成数据与自动报告验收，分别记录代码完成和发布完成 |
-| 任务摘要 | 已有单元状态、覆盖记录及发布清单，日期范围分散 | 在既有报告中汇总范围、请求日期、实际数据日期、采集时间、数量及回退原因 |
+| 任务摘要 | 流程自动写入 `_tasks/<任务ID>/summary.json`，路径和哈希记入原任务状态 | 失败、回退、发布恢复、完成及同任务重做更新同一摘要；回放文件只证明隔离验证 |
 
 ## 日期和范围
 
@@ -74,6 +74,8 @@ python -m stock_data_manage.cli collect-input --input ASTOCK-002-daily `
 故障注入及实现回归使用同样的隔离原则；真实业务的复核和验收报告放在 `data/task_workspace/_checks/`。新接口在正式实现前的可行性探针才写入验证区。正式开发即使调用同一个接口做小样本联调，也不改变产物归属。
 
 ## 现状、历史记录和验收
+
+2026-10-10自动任务摘要及上交所ETF接入验收见 [检查索引](../../data/task_workspace/_checks/summary-etf-20261010/verification.json)。隔离真实归档任务发布7,267条，活动raw按10月9日分区，正式清单关联稳定审计证据；新取得的上交所响应按10月10日暂存。任务摘要由流程写入各自运行根目录下的 `_tasks/<任务ID>/summary.json`，不是人工覆盖统计表。生产业务任务仍为0，生产名单未发布。
 
 2026-10-10按日存储代码及隔离验证完成：不同日期互不覆盖、同日全量替换、断点及指定证券重做、发布中断恢复、正式输出边界与原始字节核验通过；当前响应复用仍保留原采集日，重定位后的来源说明引用同步更新。结果见 [检查索引](../../data/task_workspace/_checks/daily-raw-20261010/verification.json)。没有执行真实全市场采集或正式发布。
 

@@ -63,7 +63,7 @@ class FaultCollector:
             code_version="fixture-v1", mode="fixture")
         if key in self.fail:
             raise RuntimeError("synthetic transport failure")
-        if options["input_id"] in {"SDA-BOARD-005", "SECURITY-BSE-001"}:
+        if options["input_id"] in {"SDA-BOARD-005", "SECURITY-BSE-001", "SECURITY-SSE-ETF-001"}:
             dataset = "security_snapshot"
             rows = [{"trade_date": date.fromisoformat(DAY), "stock_code": code, "stock_name": "fixture stock",
                      "exchange": "XSHG" if code.startswith("6") else "XSHE", "status": "active", "source": "fixture"}
@@ -89,8 +89,13 @@ class FaultCollector:
 
 def run(root, definition, collector, **options):
     options.setdefault("mode", "replay")
-    return collect_task(definition=definition, config_root=CONFIG, data_root=root,
-                        collector=collector, **options)
+    result = collect_task(definition=definition, config_root=CONFIG, data_root=root,
+                          collector=collector, **options)
+    summary = json.loads(Path(result["summary"]["path"]).read_text(encoding="utf-8"))
+    assert file_hash(Path(result["summary"]["path"])) == result["summary"]["sha256"]
+    assert summary["status"] == result["status"]
+    assert summary["publication"]["published"] is (result["status"] == "published")
+    return result
 
 
 def read_bars(root):
@@ -103,12 +108,20 @@ def test_restart_resumes_only_missing_and_publishes_raw(tmp_path):
     definition = daily_definition()
     first = run(tmp_path, definition, collector)
     assert first["status"] == "failed"
+    summary = json.loads(Path(first["summary"]["path"]).read_text(encoding="utf-8"))
+    assert summary["missing_units"] == ["sh600002"]
+    assert summary["final_check"]["status"] == "failed" and summary["data_date"] is None
+    assert "synthetic transport failure" in summary["source_units"][1]["error"]
     assert not read_bars(tmp_path)
     assert RawObjectStore.task_unit_path(tmp_path / "raw", "daily", "sh600001", data_date=DAY).exists()
     # Database is closed between runs, reproducing a process restart.
     collector.fail.clear()
     second = run(tmp_path, definition, collector)
     assert second["status"] == "published"
+    summary = json.loads(Path(second["summary"]["path"]).read_text(encoding="utf-8"))
+    assert summary["missing_units"] == [] and summary["data_date"] == DAY
+    assert summary["final_check"]["coverage"]["ratio"] == 1
+    assert summary["publication"]["row_count"] == 3
     assert [call[0] for call in collector.calls] == ["sh600001", "sh600002", "sh600003", "sh600002"]
     assert len(read_bars(tmp_path)) == 3
     for record in read_bars(tmp_path):
@@ -154,6 +167,9 @@ def test_failed_full_redo_cannot_hide_missing_using_old_publication(tmp_path):
     collector.fail.add("sh600002")
     failed = run(tmp_path, definition, collector, redo="full")
     assert failed["status"] == "failed"
+    summary = json.loads(Path(failed["summary"]["path"]).read_text(encoding="utf-8"))
+    assert summary["publication"]["manifest"] is None and not summary["publication"]["raw_refs"]
+    assert summary["final_check"]["coverage"]["actual_count"] is None
     assert read_bars(tmp_path) == prior
     assert all(call[1] for call in collector.calls[-3:])
     collector.fail.clear()
@@ -170,6 +186,9 @@ def test_commit_interruption_recovers_without_source_requests(tmp_path, stage):
             raise RuntimeError("simulated crash")
     with pytest.raises(RuntimeError, match="simulated crash"):
         run(tmp_path, daily_definition(), collector, failure_hook=crash)
+    summary = json.loads((tmp_path / "task_workspace/_tasks/daily/summary.json").read_text(encoding="utf-8"))
+    assert summary["status"] == "committing" and summary["publication"]["pending_recovery"]
+    assert not summary["publication"]["published"]
     with pytest.raises(InvalidPartitionError, match="pending"):
         read_bars(tmp_path)
     with MetadataStore(tmp_path / "metadata/metadata.duckdb") as metadata:
@@ -177,6 +196,8 @@ def test_commit_interruption_recovers_without_source_requests(tmp_path, stage):
         # Legacy recovery must not expose a task awaiting raw finalization.
         assert RecoveryScanner(tmp_path / "canonical", metadata).recover().repaired_metadata_partitions == 0
     assert recover_collection_tasks(config_root=CONFIG, data_root=tmp_path) == ("daily",)
+    summary = json.loads((tmp_path / "task_workspace/_tasks/daily/summary.json").read_text(encoding="utf-8"))
+    assert summary["status"] == "published" and not summary["publication"]["pending_recovery"]
     assert len(collector.calls) == 3
     assert len(read_bars(tmp_path)) == 3
     assert recover_collection_tasks(config_root=CONFIG, data_root=tmp_path) == ()
@@ -271,7 +292,9 @@ def save_fixture_qualification(root, input_id, context):
         "config_files":[{"path":str(CONFIG/name),"sha256":file_hash(CONFIG/name)} for name in ("providers.yaml","collection.yaml","datasets/security_snapshot.yaml","normalization/security_snapshot.yaml")],
         "code_files":[{"path":str(path),"sha256":file_hash(path)} for path in (ROOT/"src/routing/factory.py",Path(inspect.getfile(type(adapter))))],
         "synthetic_fixture":True}
-    rows = full_catalog_collector().catalog_rows["beijing" if input_id=="SECURITY-BSE-001" else "shenzhen-shanghai"]
+    rows = ([{"stock_code": "511600", "exchange": "XSHG", "asset_type": "etf", "status": "unknown"}]
+            if input_id == "SECURITY-SSE-ETF-001" else full_catalog_collector().catalog_rows[
+                "beijing" if input_id=="SECURITY-BSE-001" else "shenzhen-shanghai"])
     groups = {row["exchange"]+"/"+row["asset_type"]:1 for row in rows}
     semantic = {"input_id":input_id,"passed":True,"independent_full_market_coverage_verified":True,
                 "code_version":"fixture-v1","group_counts":groups,"source_response_hashes":[event["body_sha256"]],"synthetic_fixture":True}
@@ -359,7 +382,9 @@ def test_qualified_schedule_uses_same_task_for_idempotence_and_fallback_retry(tm
     collector=full_catalog_collector();collector.source_date=day
     collector.catalog_rows["SDA-BOARD-005"]=collector.catalog_rows["shenzhen-shanghai"]
     collector.catalog_rows["SECURITY-BSE-001"]=collector.catalog_rows["beijing"]
+    collector.catalog_rows["SECURITY-SSE-ETF-001"] = [{"stock_code": "511600", "exchange": "XSHG", "asset_type": "etf", "status": "unknown"}]
     definition=full_master_definition(day=day)
+    definition["units"].append({"key": "SECURITY-SSE-ETF-001", "input_id": "SECURITY-SSE-ETF-001", "context": {"request": {"trade_date": day}}})
     for unit in definition["units"]:save_fixture_qualification(tmp_path,unit["input_id"],unit["context"])
     prior={**definition,"task_id":"earlier-publication"}
     for unit in prior["units"]:unit["key"]=unit["input_id"]
@@ -374,9 +399,9 @@ def test_qualified_schedule_uses_same_task_for_idempotence_and_fallback_retry(tm
     collector.fail.clear()
     second=collect_due_inputs(**args)
     assert second["jobs"][0]["complete_today"] and not second["jobs"][0]["fallback_used"]
-    assert len(collector.calls)==5
+    assert len(collector.calls)==7
     third=collect_due_inputs(**args)
-    assert third["jobs"][0]["no_op"] and len(collector.calls)==5
+    assert third["jobs"][0]["no_op"] and len(collector.calls)==7
     assert third["production_writes"]==0
 
 
@@ -418,6 +443,10 @@ def test_five_groups_and_missing_etf_whole_fallback_then_resume(tmp_path):
     definition = full_master_definition("next", collector.source_date)
     fallback = run(tmp_path, definition, collector)
     assert fallback["status"] == "published" and not fallback["complete_today"]
+    summary = json.loads(Path(fallback["summary"]["path"]).read_text(encoding="utf-8"))
+    assert summary["requested_date"] == "2026-10-01" and summary["data_date"] == DAY
+    assert summary["fallback_used"] and summary["final_check"]["status"] == "failed"
+    assert summary["final_check"]["coverage"]["denominator"] is None
     assert fallback["security_check"]["missing_groups"] == ["XSHE/etf"]
     assert fallback["security_check"]["recollect_units"] == ["shenzhen-shanghai"]
     previous = master_manifest(tmp_path)
@@ -711,3 +740,41 @@ def test_real_archived_source_inputs_end_to_end(tmp_path):
     daily = collect_task(definition=definition, config_root=CONFIG, data_root=tmp_path, mode="replay")
     assert daily["status"] == "published", daily.get("error")
     assert daily["row_count"] == 1
+
+
+def test_same_day_real_catalog_task_adds_sse_etfs_without_duplicate_versions(tmp_path):
+    from stock_data_manage.providers.transport import RequestPacer
+    evidence = ROOT / "provider_validation/results/security-activation-20261009"
+    units = []
+    for input_id in ("SDA-BOARD-005", "SECURITY-BSE-001", "SECURITY-SSE-ETF-001"):
+        if input_id == "SECURITY-SSE-ETF-001":
+            archive = evidence / "official-sh-funds/_raw/manifest.ndjson"
+        else:
+            report = json.loads((evidence / (input_id + "-result.json")).read_text(encoding="utf-8"))
+            archive = (Path(report["run_directory"]) / report["raw_manifest"]["path"]).resolve()
+        context = {} if input_id == "SECURITY-BSE-001" else {"request": {"trade_date": "2026-10-09"}}
+        if input_id == "SDA-BOARD-005":
+            context.update(calendar={"trading_dates": ["2026-10-09"]}, config={"include_etf": True})
+        units.append({"key": input_id, "input_id": input_id, "context": context, "replay_manifest": str(archive)})
+    definition = {"task_id": "real-five-groups", "dataset": "security_master", "trade_date": "2026-10-09", "units": units}
+    result = collect_task(definition=definition, config_root=CONFIG, data_root=tmp_path, mode="replay",
+        collector_options={"pacer": RequestPacer(wait=lambda _: None)})
+    assert result["status"] == "published", result.get("error")
+    assert result["row_count"] == 7267 and result["complete_today"]
+    rows = pq.read_table(tmp_path / "canonical/security_master/current/data.parquet").to_pylist()
+    assert len({row["instrument_id"] for row in rows}) == 7267
+    preserved = next(row for row in rows if row["instrument_id"] == "XSHG:512390")
+    assert preserved["status"] == "unknown" and preserved["list_date"] == date(2018, 7, 13)
+    summary = json.loads(Path(result["summary"]["path"]).read_text(encoding="utf-8"))
+    assert summary["final_check"]["coverage"]["group_counts"] == {
+        "XSHG/stock": 2320, "XSHE/stock": 2904, "BSE/stock": 349, "XSHG/etf": 944, "XSHE/etf": 750}
+    assert summary["verification_mode"] == "replay"
+    assert summary["final_check"]["coverage"]["ratio"] is None
+    for ref in summary["publication"]["raw_refs"]:
+        assert Path(ref).is_relative_to(tmp_path / "task_archive/_raw_evidence")
+        assert RawObjectStore.verify_manifest(Path(ref))
+    for unit in summary["source_units"]:
+        current = Path(unit["current_raw"])
+        assert current.is_relative_to(tmp_path / "raw") and "2026-10-09" in current.parts
+        assert RawObjectStore.verify_manifest(current / "manifest.ndjson") == unit["raw_hash"]
+    assert collect_task(definition=definition, config_root=CONFIG, data_root=tmp_path, mode="replay")["no_op"]
