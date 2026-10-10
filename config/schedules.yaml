@@ -1,6 +1,8 @@
 timezone: Asia/Shanghai
 
 jobs:
+  # 证券主数据更新作业；频率引用 collection.yaml，不在本文件重复定义。
+  # 作业名称 security_master_update、频率配置 security_master_daily、数据集 security_master 职责不同。
   - name: security_master_update
     collection_profile: security_master_daily
   - name: daily_reconciliation

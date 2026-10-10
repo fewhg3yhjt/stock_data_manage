@@ -1,3 +1,6 @@
+# Security Master 是金融领域的“证券主数据”：security 在此表示证券，不是安全。
+# 本模板定义多个来源合并、检查后发布的证券清单；来源输入模板见 security_snapshot.yaml。
+# 采集来源与频率见 ../collection.yaml 的 security_master；字段值和发布规则以本文件为准。
 dataset:
   name: security_master
   display_name: 证券主数据
@@ -18,7 +21,9 @@ dataset:
 fields:
   instrument_id: {type: string, required: true}
   symbol: {type: string, required: true}
+  # 交易所：XSHG=上交所，XSHE=深交所，BSE=北交所；与来源 provider 的身份不同。
   exchange: {type: enum, values: [XSHG, XSHE, BSE], required: true}
+  # 证券类型：stock=股票，etf=ETF，lof=LOF，index=指数；不是数据来源或交易所。
   asset_type: {type: enum, values: [stock, etf, lof, index], required: true}
   name: {type: string, required: false}
   list_date: {type: date, required: false}

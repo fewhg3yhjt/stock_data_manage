@@ -606,6 +606,10 @@ providers:
         request_interval_seconds: 3
 
 # 已验证输入契约：声明采集意图，保留验证限制，不自动授予生产路由资格。
+# 名称职责：契约 ID 标识一项输入；provider 标识数据提供方；endpoint 标识该来源的逻辑接口。
+# dataset 引用 datasets/<名称>.yaml 的来源输入字段模板，不代表已发布业务数据集。
+# provider 中 baostock 是第三方来源，bse/sse 是北交所/上交所官方来源；均为数据提供方身份。
+# 证券所属交易所使用记录中的 exchange，证券类型使用 asset_type，不从 provider 名称推断。
 input_capabilities:
   ASTOCK-001:
     dataset: realtime_quote
@@ -2714,6 +2718,7 @@ input_capabilities:
     effective_concurrency: 1
     request_limit_enforcement: call_boundary_only
   SDA-BOARD-005:
+    # BaoStock 提供的证券名单快照；用于构建 security_master，字段模板为 security_snapshot。
     provider: baostock
     endpoint: security_snapshot
     display_name: BaoStock.query_all_stock(day='2026-09-30')
@@ -2877,6 +2882,7 @@ input_capabilities:
     - config.count
 
   SECURITY-BSE-001:
+    # bse 在 provider 中表示北交所官方来源；记录的 exchange=BSE 才表示所属交易所。
     provider: bse
     endpoint: security_snapshot
     display_name: 北交所官方当前证券名单
@@ -2902,6 +2908,8 @@ input_capabilities:
     - 2026-10-07 来源实测18页348条；仍为验证资格，未启用正式路由或自动调度。
 
   SECURITY-SSE-ETF-001:
+    # sse 在 provider 中表示上交所官方来源；etf_security_snapshot 是其 ETF 名单接口。
+    # dataset 仍为通用名单输入 security_snapshot，证券类型由记录的 asset_type=etf 表示。
     provider: sse
     endpoint: etf_security_snapshot
     display_name: 上交所官方上市ETF目录

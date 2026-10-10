@@ -35,6 +35,9 @@ markets:
     include_opening_auction: false
     include_closing_auction: true
 
+# 证券主数据采集：多个来源名单输入合并成正式证券清单（datasets/security_master.yaml）。
+# source_inputs 引用 providers.yaml/input_capabilities 的输入契约 ID，不是交易所或证券类型。
+# collection_profile 引用本文件 collection_profiles 的频率配置，不是数据集或目录名称。
 security_master:
   collection_profile: security_master_daily
   source_inputs: [SDA-BOARD-005, SECURITY-BSE-001, SECURITY-SSE-ETF-001]

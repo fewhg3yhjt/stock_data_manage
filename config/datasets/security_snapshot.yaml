@@ -1,3 +1,6 @@
+# Security Snapshot 在此表示“来源证券名单快照”，不是股票报价或盘口行情快照。
+# 本模板定义各来源经字段映射后的输入；合并发布模板见 security_master.yaml。
+# 原始响应仍保存为 raw；字段映射见 ../normalization/security_snapshot.yaml。
 dataset:
   name: security_snapshot
   display_name: 证券来源名单快照
@@ -5,11 +8,14 @@ dataset:
   allowed_asset_types: [stock, etf]
   allowed_exchanges: [XSHG, XSHE, BSE]
 fields:
+  # 名单所属日期：历史名单取明确请求日；当前目录取原响应采集日，不用任务目标日冒充。
   trade_date: {type: date, required: true}
   stock_code: {type: string, required: true}
   stock_name: {type: string, required: true}
+  # 交易所：XSHG=上交所，XSHE=深交所，BSE=北交所。
   exchange: {type: enum, values: [XSHG, XSHE, BSE], required: true}
   status: {type: enum, values: [active, suspended, unknown], required: true}
+  # 数据提供方标识，如 baostock、bse、sse；后两者在此表示交易所官方数据来源。
   source: {type: string, required: true}
   asset_type: {type: enum, values: [stock, etf], required: false}
   list_date: {type: date, required: false}
