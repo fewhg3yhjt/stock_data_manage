@@ -96,7 +96,6 @@ def recover_collection_tasks(*, config_root, data_root=None) -> tuple[str, ...]:
     """Finish durable task commits before the legacy partition scanner is run."""
     from ..config.loader import load_storage_paths
     from ..pipeline.inputs import _finish_task_commit
-    from ..storage.integrity import row_hash
     from ..storage.parquet import PartitionLock
     import json
     paths = load_storage_paths(config_root, data_root=data_root)
@@ -107,10 +106,7 @@ def recover_collection_tasks(*, config_root, data_root=None) -> tuple[str, ...]:
             owned_marker = (marker.exists() and json.loads(marker.read_text(encoding="utf-8")).get("task_id") == state["task_id"])
             if state["status"] != "committing" and not (state["status"] == "published" and owned_marker):
                 continue
-            definition = state["definition"]
-            scope = row_hash([state["dataset"], "current" if state["dataset"] == "security_master" else definition["trade_date"],
-                             "security" if state["dataset"] == "security_master" else definition.get("asset_type", "stock")])[:16]
-            with PartitionLock(paths["workspace_root"] / "_locks" / (scope + ".lock"), recover_stale=True):
+            with PartitionLock(paths["workspace_root"] / "_locks" / "collection.lock", recover_stale=True):
                 _finish_task_commit(state, paths, metadata)
             completed.append(state["task_id"])
     return tuple(completed)
@@ -134,8 +130,57 @@ def archive_published_task(task_directory: str | Path, *, workspace_root: str | 
     if task == workspace or not task.is_relative_to(workspace) or not task.is_dir():
         raise ValueError("task must be an existing directory inside task_workspace")
     relative = task.relative_to(workspace)
+    if len(relative.parts) == 2 and (task / "summary.json").is_file():
+        summary = json.loads((task / "summary.json").read_text(encoding="utf-8"))
+        state = metadata.load_collection_task(summary["task_id"])
+        if (not state or state["status"] != "published" or summary["status"] != "published"
+                or relative.parts != (state["definition"]["trade_date"], state["dataset"])
+                or file_hash(task / "summary.json") != state["summary"]["sha256"]):
+            raise ValueError("only the matching published dated task can be archived")
+        publication = Path(state["published_manifest"])
+        if (not publication.is_relative_to(canonical) or file_hash(publication) != state["published_hash"]
+                or not Manifest.load(publication).verify(publication.parent / "data.parquet")
+                or (publication.parent / "task-commit.json").exists()):
+            raise ValueError("canonical publication reference is invalid")
+        from ..storage.raw import RawObjectStore
+        for entry in state["units"].values():
+            if entry.get("raw_hash") and RawObjectStore.verify_manifest(entry["raw_manifest"]) != entry["raw_hash"]:
+                raise ValueError("task raw evidence changed")
+        destination = archive / relative
+        if destination.exists():
+            raise ValueError("archive destination already exists")
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        from ..storage.parquet import PartitionLock
+        with PartitionLock(workspace / "_locks" / "collection.lock", recover_stale=True):
+            fresh = metadata.load_collection_task(summary["task_id"])
+            if fresh != state or file_hash(task / "summary.json") != state["summary"]["sha256"]:
+                raise ValueError("task changed before archive lock was acquired")
+            if (file_hash(publication) != state["published_hash"]
+                    or not Manifest.load(publication).verify(publication.parent / "data.parquet")
+                    or (publication.parent / "task-commit.json").exists()):
+                raise ValueError("canonical publication changed before archive")
+            for entry in state["units"].values():
+                if entry.get("artifact") and file_hash(Path(entry["artifact"])) != entry.get("artifact_hash"):
+                    raise ValueError("task source candidate changed")
+                if entry.get("raw_hash") and RawObjectStore.verify_manifest(entry["raw_manifest"]) != entry["raw_hash"]:
+                    raise ValueError("task raw evidence changed")
+            os.rename(task, destination)
+            for entry in state["units"].values():
+                if entry.get("artifact") and Path(entry["artifact"]).is_relative_to(task):
+                    entry["artifact"] = str(destination / Path(entry["artifact"]).relative_to(task))
+                for key in ("run_directory", "report_path"):
+                    value = entry.get("report", {}).get(key)
+                    if value and Path(value).is_relative_to(task):
+                        entry["report"][key] = str(destination / Path(value).relative_to(task))
+            if state.get("commit", {}).get("candidate"):
+                state["commit"]["candidate"] = str(destination / Path(state["commit"]["candidate"]).relative_to(task))
+            state["summary"]["path"] = str(destination / "summary.json")
+            state["archived_workspace"] = str(destination)
+            from ..pipeline.inputs import _save_task_summary
+            _save_task_summary(state, {"workspace_root": workspace}, metadata)
+        return destination
     if len(relative.parts) != 3:
-        raise ValueError("task path must be dataset/scope/task-id")
+        raise ValueError("task path must be date/dataset")
     destination = (archive / relative).resolve()
     if not destination.is_relative_to(archive) or destination.exists():
         raise ValueError("archive destination must be new and inside task_archive")

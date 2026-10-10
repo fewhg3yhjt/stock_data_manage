@@ -48,11 +48,11 @@
 
 正式代码直接放在 `src/` 下，模块按职责分目录，不再套一层项目同名目录。Python 导入名仍为 `stock_data_manage`，由 `pyproject.toml` 将该包映射到 `src/`；`stock_data_manage.providers` 对应 `src/providers/`。根目录 `config/` 保存 YAML，`src/config/` 保存读取和校验配置的代码。
 
-来源可行性证据位于 `provider_validation/results/`。通用输入入口 `collect-input` 默认将原响应保存到 `data/raw/`，来源解析和标准化结果保存到 `data/task_workspace/`，元数据库保存到 `data/metadata/metadata.duckdb`。来源输入先生成候选；`collect-task` 对证券主数据和单交易日日线接通暂存、检查、重做及发布，正式执行默认使用配置中的 `data/`。三项证券来源已登记正式资格，首次真实任务因名单日期不一致失败，尚无正式名单发布；日线在线资格和后台调度仍未启用。离线回放须显式指定独立的 `--data-root`，业务任务输出禁止放入 `provider_validation/`。详见 [任务流程](docs/pipeline/collection-tasks.md) 和 [存储与归档说明](docs/storage/README.md)。显式 `--output-root` 保留隔离验证布局；历史报告中的旧路径及哈希不改写。
+来源可行性证据位于 `provider_validation/results/`。通用输入入口 `collect-input` 默认将原响应保存到 `data/raw/`，来源解析和标准化结果保存到 `data/task_workspace/`，元数据库保存到 `data/metadata/metadata.duckdb`。来源输入先生成候选；`collect-task` 对证券主数据和单交易日日线接通暂存、检查、重做及发布，正式执行默认使用配置中的 `data/`。三项证券来源此前登记过资格，本次代码及配置指纹变化后需复核；首次真实任务因名单日期不一致失败，尚无正式名单发布；日线在线资格和后台调度仍未启用。离线回放须显式指定独立的 `--data-root`，业务任务输出禁止放入 `provider_validation/`。详见 [任务流程](docs/pipeline/collection-tasks.md) 和 [存储与归档说明](docs/storage/README.md)。显式 `--output-root` 保留隔离验证布局；历史报告中的旧路径及哈希不改写。
 
 2026-10-09确认的开发边界进一步限定：`provider_validation/` 仅服务正式实现前的接口可行性确认；进入业务开发后，业务原始响应、Provider联调、来源复核及端到端验收都使用 `data/` 或 `tmp/` 下独立运行布局，不向该验证区新增产物。历史证据只读保留，业务代码位于 `src/`、实现测试位于 `tests/`。
 
-raw按“来源＋接口＋数据所属日期＋请求范围”每天唯一：不同日期保留，同日重做只更新目标范围。当前代码仍有独立采集按UTC抓取日生成多批次、业务任务转正路径缺日期、显式输出可回写验证区等差距，尚未修改。现有生产元数据库业务任务为0、未发布正式全量名单；10月9日手工来源候选不算真实任务完成。本次仅对齐设计、目录边界和验收文档，下一阶段需修改现有路径及任务摘要，再按正式入口验收。进度与代码差距见 [项目进度](PROJECT_PROGRESS.md)。
+2026-10-11已按确认的简化目录修改现有代码：raw为 `<日期>/<来源>/<接口>/`，请求以文件名区分；工作区为 `<日期>/<数据集>/`，自动保存任务参数和摘要；正式数据按日期发布，最新名单由元数据索引选择。当前目录接口按原捕获日落盘；回退仅引用旧发布，不改写旧日期文件。本阶段只做隔离验证，旧数据未迁移。此前来源资格因代码及配置指纹变化需要重新复核，首次真实同日名单发布仍待验收。详见 [存储规则](docs/storage/README.md) 与 [项目进度](PROJECT_PROGRESS.md)。
 
 ## 当前开发状态
 

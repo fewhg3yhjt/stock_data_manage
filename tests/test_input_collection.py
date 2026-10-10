@@ -4139,8 +4139,7 @@ def test_runtime_layered_storage_preserves_source_and_mapping(tmp_path, no_netwo
     assert report["row_count"] == count
     paths = load_storage_paths(ROOT / "config", data_root=data_root)
     task = Path(report["run_directory"])
-    assert task.is_relative_to(paths["workspace_root"] / report["dataset"])
-    assert task.parent.name.startswith("scope-")
+    assert task == paths["workspace_root"] / report["data_date"] / report["dataset"]
     raw_manifest = (task / report["raw_manifest"]["path"]).resolve()
     assert raw_manifest.is_relative_to(paths["raw_root"] / "_tmp" / report["data_date"])
     assert not (paths["raw_root"] / report["provider"] / report["endpoint"]).exists()
@@ -4168,17 +4167,19 @@ def test_runtime_layered_storage_preserves_source_and_mapping(tmp_path, no_netwo
                 assert value == Decimal(expected[name])
             else:
                 assert _json_value(value) == expected[name]
-    task_manifest = json.loads((task / "manifest.json").read_text(encoding="utf-8"))
-    quality = json.loads((task / "quality_report.json").read_text(encoding="utf-8"))
+    source = parquet.parent
+    request_key = raw_manifest.name.removeprefix("manifest.").removesuffix(".ndjson")
+    task_manifest = json.loads((source / (request_key + ".manifest.json")).read_text(encoding="utf-8"))
+    quality = json.loads((source / (request_key + ".quality.json")).read_text(encoding="utf-8"))
     assert task_manifest["status"] == quality["status"] == "candidate_complete"
     assert not task_manifest["publication_permitted"] and not task_manifest["canonical_refs"]
     assert task_manifest["source_response_hashes"] == report["output"]["source_response_hashes"]
     assert quality["coverage_denominator"] == report["coverage_denominator"]
-    source_refs = json.loads((parquet.parent / "raw_refs.json").read_text(encoding="utf-8"))
+    source_refs = json.loads((source / (request_key + ".raw_refs.json")).read_text(encoding="utf-8"))
     assert source_refs["raw_manifest"] == report["raw_manifest"]
     metadata = MetadataStore(paths["metadata_path"])
     try:
-        attempt = metadata.load_attempt(task.name)
+        attempt = metadata.load_attempt(task_manifest["task_id"])
         assert attempt.status == AttemptStatus.VALIDATED
         assert Path(attempt.raw_object_path) == raw_manifest
         assert attempt.raw_content_hash == report["raw_manifest"]["sha256"]
@@ -4204,8 +4205,11 @@ def test_runtime_failed_task_keeps_raw_without_publishing(tmp_path, no_network):
                            data_root=tmp_path / "data", replay_manifest=manifest)
     assert result["status"] == "failed"
     task = Path(result["run_directory"])
-    assert (task / result["raw_manifest"]["path"]).is_file()
-    assert json.loads((task / "manifest.json").read_text())["status"] == "failed"
+    raw_manifest = (task / result["raw_manifest"]["path"]).resolve()
+    assert raw_manifest.is_file()
+    request_key = raw_manifest.name.removeprefix("manifest.").removesuffix(".ndjson")
+    source = task / "sources" / result["provider"] / result["endpoint"]
+    assert json.loads((source / (request_key + ".manifest.json")).read_text())["status"] == "failed"
     assert not (tmp_path / "data/canonical").exists()
 
 

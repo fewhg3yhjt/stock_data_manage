@@ -438,6 +438,15 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
             return None
         return dict(zip([column[0] for column in cursor.description], row))
 
+    def latest_partition(self, *, dataset: str, asset_type: str, through_date: str) -> dict[str, object] | None:
+        """Locate a dated publication through the existing index, never a current-directory alias."""
+        cursor = self.connection.execute(
+            """SELECT * FROM partition_status WHERE dataset=? AND asset_type=?
+               AND partition_key <= ? AND status IN ('complete_clean', 'partial')
+               ORDER BY partition_key DESC LIMIT 1""", [dataset, asset_type, through_date])
+        row = cursor.fetchone()
+        return dict(zip([column[0] for column in cursor.description], row)) if row else None
+
     def record_conflicts(
         self,
         *,

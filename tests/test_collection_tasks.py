@@ -24,6 +24,17 @@ CONFIG = ROOT / "config"
 DAY = "2026-09-30"
 
 
+def raw_request(root, symbol, *, day=DAY, input_id="ASTOCK-002-daily", temporary=True):
+    from stock_data_manage.config.loader import load_input_capabilities
+    contract = next(c for c in load_input_capabilities(CONFIG / "providers.yaml") if c.input_id == input_id)
+    context = {"request": {"symbol": symbol, "start_date": day, "end_date": day}} if input_id == "ASTOCK-002-daily" else {
+        "request": {"trade_date": day}} if input_id != "SECURITY-BSE-001" else {}
+    parameters = contract.bind_parameters(context)
+    parent = RawObjectStore.task_unit_path(root / "raw", provider=contract.provider, endpoint=contract.endpoint, data_date=day) if temporary else RawObjectStore.current_path(
+        root / "raw", contract.provider, contract.endpoint, data_date=day, parameters=parameters)
+    return parent / RawObjectStore.request_manifest_name(parameters, input_id=input_id)
+
+
 def daily_definition(task_id="daily", symbols=("sh600001", "sh600002", "sh600003")):
     return {"task_id": task_id, "dataset": "daily_bar", "trade_date": DAY, "adjustment": "forward",
             "asset_type": "stock", "units": [{"key": symbol, "symbol": symbol, "input_id": "ASTOCK-002-daily",
@@ -51,11 +62,14 @@ class FaultCollector:
         task_id, key = options["task_unit"]
         self.calls.append((key, options["force_fetch"], options.get("replay_manifest")))
         root = Path(options["data_root"])
-        raw = RawObjectStore.task_unit_path(root / "raw", task_id, key, data_date=options["data_date"])
-        store = RawObjectStore(raw)
+        from stock_data_manage.config.loader import load_input_capabilities
+        contract = next(c for c in load_input_capabilities(CONFIG / "providers.yaml") if c.input_id == options["input_id"])
+        raw = RawObjectStore.task_unit_path(root / "raw", provider=contract.provider, endpoint=contract.endpoint, data_date=options["data_date"])
+        name = RawObjectStore.request_manifest_name(contract.bind_parameters(options["context"]), input_id=options["input_id"])
+        store = RawObjectStore(raw, manifest_name=name)
         store.write_json({"task_id": task_id, "unit_key": key}, dataset="task", provider="fixture",
                          endpoint="fixture", fetched_at=datetime.now(timezone.utc), attempt_id="owner",
-                         relative_path="_managed_task.json")
+                         relative_path="_managed_task." + name.removeprefix("manifest.").removesuffix(".ndjson") + ".json")
         body = json.dumps({"fixture": True, "security": key, "price": self.prices.get(key, "10")}).encode()
         store.record_response(response=SimpleNamespace(content=body, status_code=503 if key in self.fail else 200,
             headers={"Content-Type": "application/json"}, encoding="utf-8"), url="https://fixture.invalid/"+key,
@@ -81,7 +95,9 @@ class FaultCollector:
         work = root / "task_workspace" / "fixture" / uuid4().hex
         artifact = work / "normalized.parquet"
         output = write_normalized_rows(artifact, rows, fields)
+        RawObjectStore.refresh_index(store.manifest)
         return {"status": "candidate_complete", "run_directory": str(work),
+                "raw_manifest": {"path": str(store.manifest), "sha256": file_hash(store.manifest)},
                 "normalized_parquet": {"path": "normalized.parquet", **output},
                 "adapter_version": "fixture-v1", "normalization_version": "fixture-v1",
                 "validation_time_utc": datetime.now(timezone.utc).isoformat(), "verification_mode": "fixture"}
@@ -102,6 +118,107 @@ def read_bars(root):
     return CanonicalPartitionStore(root / "canonical").read(Dataset.DAILY_BAR, "stock", DAY)
 
 
+def test_pending_commit_blocks_other_asset_in_shared_workspace(tmp_path):
+    collector = FaultCollector()
+    def crash(stage):
+        if stage == "before_publish":
+            raise RuntimeError("simulated crash")
+    with pytest.raises(RuntimeError):
+        run(tmp_path, daily_definition(), collector, failure_hook=crash)
+    prepared = tmp_path / "task_workspace" / DAY / "daily_bar/prepared.parquet"
+    original_hash = file_hash(prepared)
+    other = daily_definition("other-asset")
+    other["asset_type"] = "etf"
+    with pytest.raises(ValueError, match="pending commit"):
+        run(tmp_path, other, collector)
+    assert file_hash(prepared) == original_hash and len(collector.calls) == 3
+    assert recover_collection_tasks(config_root=CONFIG, data_root=tmp_path) == ("daily",)
+
+
+def test_partial_published_daily_resumes_missing_security(tmp_path):
+    import shutil
+    isolated_config = tmp_path / "config"
+    shutil.copytree(CONFIG, isolated_config)
+    dataset_file = isolated_config / "datasets/daily_bar.yaml"
+    settings = yaml.safe_load(dataset_file.read_text(encoding="utf-8"))
+    settings["dataset"]["publication"].update(max_missing_ratio=0.5, max_missing_count=1)
+    dataset_file.write_text(yaml.safe_dump(settings, allow_unicode=True), encoding="utf-8")
+    collector = FaultCollector()
+    collector.fail.add("sh600002")
+    definition = daily_definition()
+    runtime_root = tmp_path / "run"
+    first = collect_task(definition=definition, config_root=isolated_config, data_root=runtime_root,
+                         mode="replay", collector=collector)
+    assert first["status"] == "published" and not first["complete_today"]
+    assert len(read_bars(runtime_root)) == 2
+    untouched = file_hash(raw_request(runtime_root, "sh600001", temporary=False))
+    collector.fail.clear()
+    second = collect_task(definition=definition, config_root=isolated_config, data_root=runtime_root,
+                          mode="replay", collector=collector)
+    assert second["status"] == "published" and second["complete_today"]
+    assert len(read_bars(runtime_root)) == 3 and len(collector.calls) == 4
+    assert collector.calls[-1][0] == "sh600002"
+    assert file_hash(raw_request(runtime_root, "sh600001", temporary=False)) == untouched
+
+
+@pytest.mark.parametrize("tampered", [False, True])
+def test_dated_task_archive_preserves_resume_and_checks_candidates(tmp_path, tampered):
+    from stock_data_manage.worker.recovery import archive_published_task
+    collector = FaultCollector()
+    result = run(tmp_path, daily_definition(), collector)
+    work = tmp_path / "task_workspace" / DAY / "daily_bar"
+    if tampered:
+        Path(next(iter(result["units"].values()))["artifact"]).write_bytes(b"corrupt")
+    with MetadataStore(tmp_path / "metadata/metadata.duckdb") as metadata:
+        options = dict(workspace_root=tmp_path / "task_workspace", archive_root=tmp_path / "task_archive",
+                       canonical_root=tmp_path / "canonical", raw_root=tmp_path / "raw", metadata=metadata)
+        if tampered:
+            with pytest.raises(ValueError, match="candidate changed"):
+                archive_published_task(work, **options)
+            assert work.exists()
+            return
+        archive = archive_published_task(work, **options)
+    assert not work.exists() and archive == tmp_path / "task_archive" / DAY / "daily_bar"
+    resumed = run(tmp_path, daily_definition(), collector)
+    assert resumed["no_op"] and len(collector.calls) == 3
+    assert Path(resumed["summary"]["path"]).parent == archive
+    assert not work.exists() and len(read_bars(tmp_path)) == 3
+
+
+def test_security_dates_remain_separate_and_latest_never_uses_future(tmp_path):
+    collector = full_catalog_collector()
+    first = run(tmp_path, full_master_definition(), collector)
+    old_manifest = Path(first["published_manifest"])
+    old_hash = file_hash(old_manifest)
+    collector.source_date = "2026-10-01"
+    second = run(tmp_path, full_master_definition("next-date", collector.source_date), collector)
+    assert second["status"] == "published" and second["complete_today"]
+    assert file_hash(old_manifest) == old_hash
+    with MetadataStore(tmp_path / "metadata/metadata.duckdb") as metadata:
+        assert metadata.latest_partition(dataset="security_master", asset_type="security", through_date=DAY)["manifest_path"] == str(old_manifest)
+        assert metadata.latest_partition(dataset="security_master", asset_type="security", through_date="2026-10-02")["partition_key"] == "2026-10-01"
+
+
+def test_another_task_failure_archives_old_build_and_keeps_its_summary(tmp_path):
+    collector = full_catalog_collector()
+    original = run(tmp_path, full_master_definition(), collector)
+    original_hash = file_hash(Path(original["published_manifest"]))
+    collector.catalog_rows["shenzhen-shanghai"].pop()
+    other = full_master_definition("different-task")
+    other["allow_previous"] = False
+    failed = run(tmp_path, other, collector)
+    assert failed["status"] == "failed"
+    assert file_hash(Path(original["published_manifest"])) == original_hash
+    with MetadataStore(tmp_path / "metadata/metadata.duckdb") as metadata:
+        prior = metadata.load_collection_task(original["task_id"])
+        previous_summary = Path(prior["summary"]["path"])
+        assert previous_summary.is_relative_to(tmp_path / "task_archive/_workspace_audit")
+        assert file_hash(previous_summary) == prior["summary"]["sha256"]
+    resumed = run(tmp_path, full_master_definition(), collector)
+    assert resumed["no_op"] and Path(resumed["summary"]["path"]) == previous_summary
+    assert json.loads((tmp_path / "task_workspace" / DAY / "security_master/summary.json").read_text())["task_id"] == "different-task"
+
+
 def test_restart_resumes_only_missing_and_publishes_raw(tmp_path):
     collector = FaultCollector()
     collector.fail.add("sh600002")
@@ -113,7 +230,7 @@ def test_restart_resumes_only_missing_and_publishes_raw(tmp_path):
     assert summary["final_check"]["status"] == "failed" and summary["data_date"] is None
     assert "synthetic transport failure" in summary["source_units"][1]["error"]
     assert not read_bars(tmp_path)
-    assert RawObjectStore.task_unit_path(tmp_path / "raw", "daily", "sh600001", data_date=DAY).exists()
+    assert raw_request(tmp_path, "sh600001").exists()
     # Database is closed between runs, reproducing a process restart.
     collector.fail.clear()
     second = run(tmp_path, definition, collector)
@@ -129,7 +246,7 @@ def test_restart_resumes_only_missing_and_publishes_raw(tmp_path):
         assert manifest.is_file()
         assert RawObjectStore.verify_manifest(manifest)
     assert not (tmp_path / "raw" / "_tmp" / DAY / "daily").exists()
-    assert len(list((tmp_path / "raw" / "tencent" / "kline_daily" / DAY).glob("scope-*"))) == 3
+    assert len(list((tmp_path / "raw" / DAY / "tencent" / "kline_daily").glob("manifest.*.ndjson"))) == 3
 
 
 def test_invalid_security_is_refetched_not_reused(tmp_path):
@@ -186,7 +303,7 @@ def test_commit_interruption_recovers_without_source_requests(tmp_path, stage):
             raise RuntimeError("simulated crash")
     with pytest.raises(RuntimeError, match="simulated crash"):
         run(tmp_path, daily_definition(), collector, failure_hook=crash)
-    summary = json.loads((tmp_path / "task_workspace/_tasks/daily/summary.json").read_text(encoding="utf-8"))
+    summary = json.loads((tmp_path / f"task_workspace/{DAY}/daily_bar/summary.json").read_text(encoding="utf-8"))
     assert summary["status"] == "committing" and summary["publication"]["pending_recovery"]
     assert not summary["publication"]["published"]
     with pytest.raises(InvalidPartitionError, match="pending"):
@@ -196,7 +313,7 @@ def test_commit_interruption_recovers_without_source_requests(tmp_path, stage):
         # Legacy recovery must not expose a task awaiting raw finalization.
         assert RecoveryScanner(tmp_path / "canonical", metadata).recover().repaired_metadata_partitions == 0
     assert recover_collection_tasks(config_root=CONFIG, data_root=tmp_path) == ("daily",)
-    summary = json.loads((tmp_path / "task_workspace/_tasks/daily/summary.json").read_text(encoding="utf-8"))
+    summary = json.loads((tmp_path / f"task_workspace/{DAY}/daily_bar/summary.json").read_text(encoding="utf-8"))
     assert summary["status"] == "published" and not summary["publication"]["pending_recovery"]
     assert len(collector.calls) == 3
     assert len(read_bars(tmp_path)) == 3
@@ -261,7 +378,7 @@ def full_catalog_collector():
 
 
 def master_manifest(root):
-    return Manifest.load(root / "canonical/security_master/current/manifest.json")
+    return Manifest.load(sorted(root.glob("canonical/*/security_master/manifest.json"))[-1])
 
 
 def save_fixture_qualification(root, input_id, context):
@@ -468,10 +585,11 @@ def test_five_groups_and_missing_etf_whole_fallback_then_resume(tmp_path):
     previous = master_manifest(tmp_path)
     assert previous.content_hash == original.content_hash and previous.raw_refs == original.raw_refs
     assert previous.publication_metadata["as_of_date"] == DAY
-    assert previous.publication_metadata["requested_date"] == "2026-10-01"
-    assert previous.publication_metadata["previous_age_days"] == 1
+    assert previous.publication_metadata["requested_date"] == DAY
+    assert not (tmp_path / "canonical/2026-10-01/security_master/data.parquet").exists()
+    assert summary["previous_age_days"] == 1
     assert fallback["commit"]["promotions"] == []
-    assert RawObjectStore.task_unit_path(tmp_path / "raw", "next", "beijing", data_date="2026-10-01").is_dir()
+    assert raw_request(tmp_path, "", day="2026-10-01", input_id="SECURITY-BSE-001").parent.is_dir()
     collector.catalog_rows["shenzhen-shanghai"].append(lost)
     before = len(collector.calls)
     resumed = run(tmp_path, definition, collector)
@@ -488,8 +606,8 @@ def test_first_incomplete_catalog_keeps_raw_and_blocks_publication(tmp_path):
     result = run(tmp_path, full_master_definition(), collector)
     assert result["status"] == "failed"
     assert result["security_check"]["missing_groups"] == ["XSHE/etf"]
-    assert not (tmp_path / "canonical/security_master/current/manifest.json").exists()
-    assert RawObjectStore.task_unit_path(tmp_path / "raw", "complete-master", "beijing", data_date=DAY).exists()
+    assert not (tmp_path / f"canonical/{DAY}/security_master/manifest.json").exists()
+    assert raw_request(tmp_path, "", input_id="SECURITY-BSE-001").parent.exists()
 
 
 def test_invalid_catalog_date_refetched_instead_of_reusing_stale_response(tmp_path):
@@ -509,7 +627,7 @@ def test_invalid_catalog_date_refetched_instead_of_reusing_stale_response(tmp_pa
 @pytest.mark.parametrize("redo", ["resume", "full"])
 def test_disappearing_security_is_not_hidden_by_previous_rows(tmp_path, redo):
     collector = full_catalog_collector()
-    run(tmp_path, full_master_definition(), collector)
+    assert run(tmp_path, full_master_definition(), collector)["status"] == "published"
     collector.catalog_rows["shenzhen-shanghai"][0]["stock_code"] = "600002"
     result = run(tmp_path, full_master_definition("replacement"), collector, redo=redo)
     assert result["security_check"]["missing_previous_securities"] == ["XSHG:600001"]
@@ -517,7 +635,7 @@ def test_disappearing_security_is_not_hidden_by_previous_rows(tmp_path, redo):
         assert result["status"] == "failed"
     else:
         assert result["status"] == "published" and not result["complete_today"]
-    rows = pq.read_table(tmp_path / "canonical/security_master/current/data.parquet").to_pylist()
+    rows = pq.read_table(tmp_path / f"canonical/{DAY}/security_master/data.parquet").to_pylist()
     assert {r["symbol"] for r in rows} == {"600001", "000001", "511600", "159003", "920001"}
 
 
@@ -535,7 +653,7 @@ def test_unusable_previous_catalog_is_rejected(tmp_path, reason):
     if reason == "disabled":
         definition["allow_previous"] = False
     if reason == "legacy":
-        manifest_path = tmp_path / "canonical/security_master/current/manifest.json"
+        manifest_path = tmp_path / f"canonical/{DAY}/security_master/manifest.json"
         payload = json.loads(manifest_path.read_text())
         payload.pop("publication_metadata")
         manifest_path.write_text(json.dumps(payload))
@@ -547,7 +665,7 @@ def test_unusable_previous_catalog_is_rejected(tmp_path, reason):
     assert master_manifest(tmp_path).content_hash == original.content_hash
 
 
-@pytest.mark.parametrize("stage", ["after_data_replace", "after_publish"])
+@pytest.mark.parametrize("stage", ["after_publish"])
 def test_master_fallback_commit_recovers_with_date_and_no_refetch(tmp_path, stage):
     collector = full_catalog_collector()
     run(tmp_path, full_master_definition(), collector)
@@ -561,7 +679,9 @@ def test_master_fallback_commit_recovers_with_date_and_no_refetch(tmp_path, stag
     calls = len(collector.calls)
     assert recover_collection_tasks(config_root=CONFIG, data_root=tmp_path) == ("retry",)
     manifest = master_manifest(tmp_path)
-    assert manifest.publication_metadata["as_of_date"] == DAY and manifest.publication_metadata["fallback"]
+    assert manifest.publication_metadata["as_of_date"] == DAY and not manifest.publication_metadata["fallback"]
+    with MetadataStore(tmp_path / "metadata/metadata.duckdb") as metadata:
+        assert metadata.load_collection_task("retry")["fallback_used"]
     assert len(collector.calls) == calls
 
 
@@ -588,17 +708,23 @@ def test_real_source_catalog_pairs_and_incompatible_dates(tmp_path):
     assert master_manifest(tmp_path).content_hash == manifest.content_hash
 
 
-def test_corrupt_raw_is_refetched_and_scope_change_is_rejected(tmp_path):
+@pytest.mark.parametrize("mutation", ["corrupt", "missing"])
+def test_corrupt_raw_is_refetched_and_scope_change_is_rejected(tmp_path, mutation):
     collector = FaultCollector()
     collector.fail.add("sh600002")
     definition = daily_definition()
     result = run(tmp_path, definition, collector)
     raw = Path(result["units"]["sh600001"]["raw_manifest"])
     event = json.loads(raw.read_text(encoding="utf-8").splitlines()[0])
-    (raw.parent / event["body_storage"]).write_bytes(b"corrupt")
+    body = raw.parent / event["body_storage"]
+    if mutation == "missing":
+        body.unlink()
+    else:
+        body.write_bytes(b"corrupt")
     collector.fail.clear()
     assert run(tmp_path, definition, collector)["status"] == "published"
     assert [call[0] for call in collector.calls].count("sh600001") == 2
+    assert list((tmp_path / "task_archive/_raw_audit").rglob("integrity_failure.json"))
     with pytest.raises(ValueError, match="scope changed"):
         run(tmp_path, daily_definition(symbols=("sh600001",)), collector)
 
@@ -650,7 +776,7 @@ def test_processing_retry_uses_saved_response_and_keeps_other_tasks_staging(tmp_
         return report
     first = run(tmp_path, definition, fail_mapping)
     assert first["status"] == "failed"
-    pending = RawObjectStore.task_unit_path(tmp_path / "raw", "other", "unit", data_date=DAY)
+    pending = tmp_path / "raw" / "_tmp" / DAY / "other" / "endpoint"
     pending.mkdir(parents=True)
     (pending / "user-evidence.txt").write_text("keep", encoding="utf-8")
     assert run(tmp_path, definition, collector)["status"] == "published"
@@ -664,29 +790,29 @@ def test_daily_raw_dates_are_isolated_during_failure_resume_and_full_redo(tmp_pa
     collector = FaultCollector()
     first = run(tmp_path, daily_definition(symbols=("sh600001",)), collector)
     old_raw = Path(first["units"]["sh600001"]["current_raw"])
-    old_hashes = {str(p.relative_to(old_raw)): file_hash(p) for p in old_raw.rglob("*") if p.is_file()}
+    old_hashes = {str(p.relative_to(old_raw.parent)): file_hash(p) for p in old_raw.parent.rglob("*") if p.is_file()}
     next_day = "2026-10-09"
     definition = daily_definition("next-day", symbols=("sh600001",))
     definition["trade_date"] = next_day
     definition["units"][0]["context"]["request"].update(start_date=next_day, end_date=next_day)
     collector.fail.add("sh600001")
     assert run(tmp_path, definition, collector)["status"] == "failed"
-    assert RawObjectStore.task_unit_path(tmp_path / "raw", "next-day", "sh600001", data_date=next_day).exists()
+    assert raw_request(tmp_path, "sh600001", day=next_day).exists()
     collector.fail.clear()
     published = run(tmp_path, definition, collector)
     new_raw = Path(published["units"]["sh600001"]["current_raw"])
-    assert old_raw.parent.name == DAY and new_raw.parent.name == next_day
+    assert DAY in old_raw.parts and next_day in new_raw.parts
     assert new_raw != old_raw
     # A full redo must clear only this task's target day, including when another
     # date has a same-named staging directory.
-    untouched = RawObjectStore.task_unit_path(tmp_path / "raw", "next-day", "pending", data_date=DAY)
+    untouched = tmp_path / "raw" / "_tmp" / DAY / "other" / "endpoint"
     untouched.mkdir(parents=True)
     (untouched / "sentinel.txt").write_text("keep", encoding="utf-8")
     collector.prices["sh600001"] = "20"
     assert run(tmp_path, definition, collector, redo="full")["status"] == "published"
-    assert {str(p.relative_to(old_raw)): file_hash(p) for p in old_raw.rglob("*") if p.is_file()} == old_hashes
+    assert {str(p.relative_to(old_raw.parent)): file_hash(p) for p in old_raw.parent.rglob("*") if p.is_file()} == old_hashes
     assert (untouched / "sentinel.txt").read_text(encoding="utf-8") == "keep"
-    assert len(list(new_raw.parent.glob("scope-*"))) == 1
+    assert len(list(new_raw.parent.glob("manifest.*.ndjson"))) == 1
     bars = CanonicalPartitionStore(tmp_path / "canonical").read(Dataset.DAILY_BAR, "stock", next_day)
     assert len(bars) == 1 and bars[0].close == Decimal("20")
 
@@ -695,16 +821,16 @@ def test_selected_redo_preserves_other_current_raw_scopes(tmp_path):
     collector = FaultCollector()
     definition = daily_definition()
     initial = run(tmp_path, definition, collector)
-    before = {key: RawObjectStore.verify_manifest(Path(entry["current_raw"]) / "manifest.ndjson")
+    before = {key: RawObjectStore.verify_manifest(Path(entry["current_raw"]))
               for key, entry in initial["units"].items()}
     collector.prices["sh600002"] = "20"
     updated = run(tmp_path, definition, collector, redo="selected", symbols=["sh600002"])
-    after = {key: RawObjectStore.verify_manifest(Path(entry["current_raw"]) / "manifest.ndjson")
+    after = {key: RawObjectStore.verify_manifest(Path(entry["current_raw"]))
              for key, entry in updated["units"].items()}
     assert before["sh600001"] == after["sh600001"]
     assert before["sh600003"] == after["sh600003"]
     assert before["sh600002"] != after["sh600002"]
-    assert len(list((tmp_path / "raw/tencent/kline_daily" / DAY).glob("scope-*"))) == 3
+    assert len(list((tmp_path / "raw" / DAY / "tencent/kline_daily").glob("manifest.*.ndjson"))) == 3
 
 
 def test_dead_process_lock_is_recovered_but_live_lock_is_preserved(tmp_path):
@@ -733,7 +859,7 @@ def test_pending_commit_rejects_another_writer_and_completed_data_corruption(tmp
         CanonicalPartitionStore(tmp_path / "canonical").publish(dataset=Dataset.DAILY_BAR,
             asset_type="stock", partition_key=DAY, new_records=[], expected_count=0, run_id="unrelated")
     recover_collection_tasks(config_root=CONFIG, data_root=tmp_path)
-    data = tmp_path / "canonical/daily_bar/asset_type=stock" / ("trade_date=" + DAY) / "data.parquet"
+    data = tmp_path / "canonical" / DAY / "daily_bar/stock/data.parquet"
     data.write_bytes(b"corrupt")
     with pytest.raises(ValueError, match="integrity"):
         run(tmp_path, daily_definition(), collector)
@@ -777,7 +903,7 @@ def test_same_day_real_catalog_task_adds_sse_etfs_without_duplicate_versions(tmp
         collector_options={"pacer": RequestPacer(wait=lambda _: None)})
     assert result["status"] == "published", result.get("error")
     assert result["row_count"] == 7267 and result["complete_today"]
-    rows = pq.read_table(tmp_path / "canonical/security_master/current/data.parquet").to_pylist()
+    rows = pq.read_table(tmp_path / "canonical/2026-10-09/security_master/data.parquet").to_pylist()
     assert len({row["instrument_id"] for row in rows}) == 7267
     preserved = next(row for row in rows if row["instrument_id"] == "XSHG:512390")
     assert preserved["status"] == "unknown" and preserved["list_date"] == date(2018, 7, 13)
@@ -792,5 +918,5 @@ def test_same_day_real_catalog_task_adds_sse_etfs_without_duplicate_versions(tmp
     for unit in summary["source_units"]:
         current = Path(unit["current_raw"])
         assert current.is_relative_to(tmp_path / "raw") and "2026-10-09" in current.parts
-        assert RawObjectStore.verify_manifest(current / "manifest.ndjson") == unit["raw_hash"]
+        assert RawObjectStore.verify_manifest(current) == unit["raw_hash"]
     assert collect_task(definition=definition, config_root=CONFIG, data_root=tmp_path, mode="replay")["no_op"]

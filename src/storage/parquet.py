@@ -199,7 +199,11 @@ class CanonicalPartitionStore:
         self.root = Path(root)
 
     def partition_directory(self, dataset: Dataset, asset_type: str, partition_key: str) -> Path:
-        return self.root / dataset.value / f"asset_type={asset_type}" / f"trade_date={partition_key}"
+        from datetime import date
+        import re
+        if date.fromisoformat(partition_key).isoformat() != partition_key or not re.fullmatch(r"[A-Za-z0-9_-]+", asset_type):
+            raise ValueError("invalid canonical date or asset type")
+        return self.root / partition_key / dataset.value / asset_type
 
     def read(self, dataset: Dataset, asset_type: str, partition_key: str, *, allow_pending: bool = False) -> list[BarRecord]:
         partition = self.partition_directory(dataset, asset_type, partition_key)

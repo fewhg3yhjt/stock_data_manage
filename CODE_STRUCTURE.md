@@ -129,7 +129,7 @@
 | 文件 | 职责 |
 |---|---|
 | `pipeline/daily.py` | 日线按来源补缺、标准化、校验、候选生成和发布编排 |
-| `pipeline/inputs.py` | 单项候选采集/回放、持久化业务任务及证券清单调度检查；统一按日原始暂存和正式输出边界、来源解析、YAML映射、质量与覆盖、重做和发布恢复；自动生成任务summary.json并将路径/哈希记入原元数据，名单在线请求受路由资格约束 |
+| `pipeline/inputs.py` | 既有候选、业务任务与调度；raw按日期/来源/接口，工作区按日期/数据集；请求文件隔离、YAML映射、检查、重做、发布恢复，自动保存task.json和summary.json；最新名单通过元数据读取，回退不改写旧发布 |
 | `pipeline/daily_reconciliation.py` | 日线 provisional/final 合并、缺失统计和盘后校准 |
 | `pipeline/minute.py` | Watchlist 实时分钟采集和 Hot Store 写入 |
 | `pipeline/minute_reconciliation.py` | 分钟盘后校准、final 提升、冲突隔离和完整性处理 |
@@ -143,10 +143,10 @@
 
 | 文件 | 职责 |
 |---|---|
-| `storage/raw.py` | 不覆盖的 Raw Object Store、按日暂存和来源范围路径、转正日期校验、解析前响应字节/清单、哈希复查、脱敏和匹配有效响应复用 |
+| `storage/raw.py` | 原响应字节、按日期/来源/接口暂存及转正；请求级清单和接口索引，按请求替换、审计及共享字节保护；当前目录在解析前按原捕获日落盘；哈希复查、脱敏与缓存 |
 | `storage/hot.py` | SQLite WAL Hot Minute Store 和即时查询数据 |
-| `storage/parquet.py` | 来源字段合同的候选 Parquet 精确类型写入；既有 Canonical Bar 分区、Manifest、文件锁和原子发布 |
-| `storage/metadata.py` | DuckDB 元数据、Attempt 及调度周期的原子占用、Provider 健康、Probe 验证记录、既有能力证据查询和冲突记录；不新增能力管理数据库 |
+| `storage/parquet.py` | 来源字段合同的候选精确类型写入；Canonical Bar按日期/数据集/资产类型分区，复权保留记录主键；清单、文件锁和原子发布 |
+| `storage/metadata.py` | 既有DuckDB任务、分区、Attempt、调度占用、来源健康、证据和冲突；查询不晚于目标日期的最新合格分区；不新增数据库 |
 | `storage/integrity.py` | 确定性 row hash、Manifest 生成和完整性校验 |
 | `storage/__init__.py` | 存储包说明，不承载业务实现 |
 
@@ -166,7 +166,7 @@
 | 文件 | 职责 |
 |---|---|
 | `worker/attempts.py` | Collection Attempt 状态机和租约状态 |
-| `worker/recovery.py` | 中断后的临时文件、Canonical 和元数据恢复扫描；已发布任务的证据复查和原子归档 |
+| `worker/recovery.py` | 既有提交、临时文件和元数据恢复；日期工作区归档前复核候选、原响应及发布，归档后更新元数据和摘要；保留旧材料归档校验 |
 | `worker/scheduler.py` | 既有任务时间表；输入配置的天/分钟周期、交易日/交易时段槽位、证券范围绑定及容量门禁；从同一频率配置生成证券清单每日任务 |
 | `worker/acceptance.py` | 离线验收回放和容量/恢复验收证据 |
 | `worker/__init__.py` | Worker 包说明，不承载业务实现 |

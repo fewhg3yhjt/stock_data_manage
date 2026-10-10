@@ -274,7 +274,7 @@ def test_bao_real_archived_snapshot_adds_etfs_without_reclassifying_indexes(tmp_
     assert not any(row["exchange"] == "XSHE" and row["stock_code"].startswith("399") for row in rows)
     records = prepare_security_publication({"baostock": rows}).records
     assert sum(record.asset_type.value == "etf" for record in records) == 1692
-    manifest = json.loads((Path(report["run_directory"]) / "manifest.json").read_text(encoding="utf-8"))
+    manifest = json.loads(next((Path(report["run_directory"]) / "sources").rglob("*.manifest.json")).read_text(encoding="utf-8"))
     assert manifest["publication_permitted"] is False
 
 
@@ -289,7 +289,7 @@ def test_bse_real_archived_catalog_uses_source_capture_day_and_yaml_mapping(tmp_
     assert {row["trade_date"] for row in rows} == {"2026-10-07"}
     assert report["source_metadata"]["quote_dates"] == ["2026-09-30"]
     assert all(row["asset_type"] == "stock" and row["status"] == "unknown" for row in rows)
-    manifest = json.loads((Path(report["run_directory"]) / "manifest.json").read_text(encoding="utf-8"))
+    manifest = json.loads(next((Path(report["run_directory"]) / "sources").rglob("*.manifest.json")).read_text(encoding="utf-8"))
     assert manifest["publication_permitted"] is False and report["live_http_calls"] == 0
     previous = json.loads((ROOT / "provider_validation/results/security-catalog-20261007/bse-original-result.json").read_text(encoding="utf-8"))
     assert [(row["stock_code"], row["stock_name"]) for row in rows] == [(row["code"], row["name"]) for row in previous["rows"]]
