@@ -11,6 +11,24 @@ from stock_data_manage.storage.raw import RawObjectStore
 from stock_data_manage.quality.resolution import resolve_records
 
 
+@pytest.mark.parametrize("data_date", ["20261001", "2026-1-1", "../2026-10-01", "2026-02-30"])
+def test_raw_date_paths_reject_invalid_dates(tmp_path, data_date):
+    with pytest.raises(ValueError):
+        RawObjectStore.task_unit_path(tmp_path, "task", "unit", data_date=data_date)
+    with pytest.raises(ValueError):
+        RawObjectStore.current_path(tmp_path, "provider", "endpoint", data_date=data_date, parameters={})
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_raw_promotion_rejects_cross_date_destination_before_writing(tmp_path):
+    temporary = RawObjectStore.task_unit_path(tmp_path, "task", "unit", data_date="2026-09-30")
+    current = RawObjectStore.current_path(tmp_path, "provider", "endpoint", data_date="2026-10-01", parameters={})
+    with pytest.raises(ValueError, match="matching data-date"):
+        RawObjectStore.promote_unit(temporary=temporary, current=current, raw_root=tmp_path,
+                                   archive_root=tmp_path.parent / "archive", expected_hash="unused")
+    assert list(tmp_path.iterdir()) == []
+
+
 def test_raw_objects_are_immutable_and_verifiable(tmp_path) -> None:
     store = RawObjectStore(tmp_path / "raw")
     fetched_at = datetime(2026, 9, 11, 16, tzinfo=timezone.utc)

@@ -30,6 +30,7 @@ def _json_value(value):
 def _validate_candidate_root(config_root, output_root):
     # Avoid accidental writes through the manual input path into configured production stores.
     import yaml
+    _validate_business_root(output_root, config_root)
     collection_document = yaml.safe_load((config_root / "collection.yaml").read_text(encoding="utf-8"))
     project_root = config_root.resolve().parent
     data_root = load_storage_paths(config_root)["data_root"]
@@ -45,8 +46,50 @@ def _validate_candidate_root(config_root, output_root):
     return project_root
 
 
+def _validate_business_root(root, config_root):
+    validation_roots = {Path(__file__).resolve().parents[2] / "provider_validation",
+                        Path(config_root).resolve().parent / "provider_validation"}
+    if any(Path(root).resolve().is_relative_to(path.resolve()) for path in validation_roots):
+        raise ValueError("business task data must be outside provider_validation; use data or an isolated tmp root")
+
+
+def _input_data_date(context, replay_manifest, *, provider, endpoint, data_date=None):
+    """Request day/window end for history; original Shanghai capture day for current inputs."""
+    import json
+    from datetime import date
+    from zoneinfo import ZoneInfo
+    request = context.get("request", {})
+    value = data_date or request.get("trade_date") or request.get("end_date")
+    if value is not None:
+        value = value.isoformat() if isinstance(value, date) else str(value)
+        if date.fromisoformat(value).isoformat() != value:
+            raise ValueError("data date must use YYYY-MM-DD")
+        return value
+    if replay_manifest:
+        events = [json.loads(line) for line in Path(replay_manifest).read_text(encoding="utf-8").splitlines()]
+        responses = [event for event in events if event.get("event") in {"http_response", "source_payload", "sdk_query_failure"}]
+        matching = [event for event in responses if event.get("provider") == provider and event.get("endpoint") == endpoint]
+        responses = matching or responses
+        if provider == "bse":
+            # Bootstrap may precede midnight; the catalog's data pages determine its day.
+            responses = [event for event in responses if event.get("method") == "POST"]
+        stamps = [(event.get("source_ref") or {}).get("fetched_at_utc") or event.get("fetched_at_utc")
+                  for event in responses]
+        times = [datetime.fromisoformat(stamp) for stamp in stamps if stamp]
+        if any(stamp.tzinfo is None for stamp in times):
+            raise ValueError("original source capture time must be timezone-aware")
+        days = {stamp.astimezone(ZoneInfo("Asia/Shanghai")).date().isoformat() for stamp in times}
+        if provider == "bse" and days:
+            # Existing Provider rejects catalog pages spanning multiple capture days.
+            return min(days)
+        if len(days) != 1:
+            raise ValueError("replay current data requires one unambiguous original capture date")
+        return days.pop()
+    return datetime.now(ZoneInfo("Asia/Shanghai")).date().isoformat()
+
+
 def collect_input(*, input_id, context, config_root, output_root=None, data_root=None, mode="replay", replay_manifest=None,
-                  evidence_root=None, fields=None, client=None, pacer=None, task_unit=None, force_fetch=False):
+                  evidence_root=None, fields=None, client=None, pacer=None, task_unit=None, force_fetch=False, data_date=None):
     """One explicit input, candidate output only. Existing Bar publication flows are unchanged."""
     import json
     import re
@@ -58,14 +101,21 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
         raise ValueError("task collection requires runtime storage layout")
     paths = load_storage_paths(config_root, data_root=data_root) if runtime else None
     output_root = paths["raw_root"] if runtime else Path(output_root)
+    _validate_business_root(paths["data_root"] if runtime else output_root, config_root)
     if mode not in {"live", "replay"} or (mode == "replay" and replay_manifest is None):
         raise ValueError("replay requires an explicit manifest; only live/replay modes are supported")
     project_root = config_root.resolve().parent if runtime else _validate_candidate_root(config_root, output_root)
+    if runtime and mode == "replay":
+        production_root = load_storage_paths(config_root)["data_root"]
+        if paths["data_root"].is_relative_to(production_root) or production_root.is_relative_to(paths["data_root"]):
+            raise ValueError("input replay requires an isolated --data-root or --output-root")
     contracts = {c.input_id: c for c in load_input_capabilities(config_root / "providers.yaml")}
     if input_id not in contracts:
         raise ValueError("unknown input ID")
     contract = contracts[input_id]
     parameters = contract.bind_parameters(context)
+    raw_data_date = _input_data_date(context, replay_manifest, provider=contract.provider,
+                                    endpoint=contract.endpoint, data_date=data_date) if runtime else None
     dataset, rule = load_input_field_contract(config_root, contract)
     schema_fields = dataset["fields"]
     selected = set(schema_fields) if fields is None else set(fields)
@@ -130,9 +180,9 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                (contract.dataset, contract.provider, contract.endpoint, input_id)):
             raise ValueError("unsafe input storage path component")
         directory = paths["workspace_root"] / contract.dataset / scope_key / task_id
-        raw_directory = paths["raw_root"] / contract.provider / contract.endpoint / datetime.now(timezone.utc).date().isoformat() / run_id
+        raw_directory = RawObjectStore.task_unit_path(paths["raw_root"], *(task_unit or (task_id, scope_key)),
+                                                     data_date=raw_data_date)
         if task_unit is not None:
-            raw_directory = RawObjectStore.task_unit_path(paths["raw_root"], *task_unit)
             if raw_directory.exists():
                 raise ValueError("task unit raw directory must be prepared before collection")
         source_directory = Path("sources") / contract.provider / input_id
@@ -144,7 +194,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
     if task_unit is not None:
         if not runtime:
             raise ValueError("task collection requires runtime storage layout")
-        raw_store.write_json({"task_id": task_unit[0], "unit_key": task_unit[1]}, dataset="task",
+        raw_store.write_json({"task_id": task_unit[0], "unit_key": task_unit[1], "data_date": raw_data_date}, dataset="task",
             provider=contract.provider, endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc),
             attempt_id="owner", relative_path="_managed_task.json")
 
@@ -161,6 +211,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
         return result_store.write_json(value, **kwargs)
 
     report = {"input_id": input_id, "dataset": contract.dataset, "mode": mode,
+        "data_date": raw_data_date,
         "parameters": sanitized_metadata(normalized_context), "provider": contract.provider, "endpoint": contract.endpoint,
         "collection_profile": _json_value(asdict(profile)),
         "request_interval_seconds": max(3, contract.request_interval_seconds),
@@ -860,6 +911,27 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
         if contract.dataset in {"daily_bar", "minute_bar_5m", "industry_index_daily"}:
             if any(not (row["low"] <= min(row["open"], row["close"]) <= max(row["open"], row["close"]) <= row["high"]) for row in rows):
                 raise NormalizationError("invalid OHLC ordering")
+        request_dates = context.get("request", {})
+        if runtime and task_unit is None and data_date is None and not (request_dates.get("trade_date") or request_dates.get("end_date")):
+            # A cached response keeps its original capture day rather than the
+            # day on which this candidate was reprocessed.
+            actual_day = _input_data_date({}, raw_store.root / "manifest.ndjson",
+                                          provider=contract.provider, endpoint=contract.endpoint)
+            if actual_day != raw_data_date:
+                actual_directory = RawObjectStore.task_unit_path(paths["raw_root"], task_id, scope_key, data_date=actual_day)
+                actual_directory.parent.mkdir(parents=True, exist_ok=True)
+                previous_directory = raw_store.root.resolve()
+                os.rename(raw_store.root, actual_directory)
+                raw_store = RawObjectStore(actual_directory)
+                sdk_dependency = report.get("sdk_dependency", {})
+                for item in [sdk_dependency, *sdk_dependency.get("dependencies", [])]:
+                    for name in ("path", "source_path"):
+                        if item.get(name):
+                            original_path = (directory / item[name]).resolve()
+                            if original_path.is_relative_to(previous_directory):
+                                item[name] = relative_file(actual_directory / original_path.relative_to(previous_directory))
+                raw_data_date = actual_day
+                report["data_date"] = actual_day
         projected = [{name: value for name, value in row.items() if name in selected} for row in rows]
         normalized_ref = write_result(_json_value(projected), dataset=contract.dataset, provider=contract.provider,
             endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="mapped-rows")
@@ -881,6 +953,10 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
     except Exception as exc:
         report.update(status="failed", failure_class=getattr(getattr(exc, "failure_class", None), "value", type(exc).__name__),
                       error=str(exc) if isinstance(exc, (ValueError, NormalizationError)) else type(exc).__name__)
+    if runtime:
+        raw_store.append_event({"event": "raw_partition", "data_date": raw_data_date,
+            "request_scope": sanitized_metadata(normalized_context),
+            "processed_at_utc": report["validation_time_utc"], "publication_permitted": False})
     raw_manifest = raw_store.root / "manifest.ndjson"
     if raw_manifest.exists():
         import json
@@ -920,9 +996,10 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
             endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="quality",
             relative_path="quality_report.json")
         manifest = {"version": 1, "task_id": task_id, "dataset": contract.dataset,
+            "data_date": raw_data_date,
             "provider": contract.provider, "input_id": input_id, "status": report["status"],
             "scope_key": scope_key, "scope": sanitized_metadata(normalized_context),
-            "partition_semantics": "canonical request scope; not a business-date partition",
+            "partition_semantics": "candidate workspace uses request scope; raw is partitioned by data_date",
             "publication_permitted": False, "canonical_refs": [],
             "raw_manifest": report.get("raw_manifest"), "output": report.get("normalized_parquet"),
             "report": {"path": "report.json", "sha256": report_ref.content_hash},
@@ -962,9 +1039,7 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
     paths = load_storage_paths(config_root, data_root=data_root)
     if redo not in {"full", "resume", "selected"} or mode not in {"replay", "live"}:
         raise ValueError("unsupported task execution mode")
-    validation_root = (Path(__file__).resolve().parents[2] / "provider_validation").resolve()
-    if paths["data_root"].is_relative_to(validation_root):
-        raise ValueError("business task data must be outside provider_validation; use configured data storage")
+    _validate_business_root(paths["data_root"], config_root)
     production_root = load_storage_paths(config_root)["data_root"]
     if mode == "replay" and (paths["data_root"].is_relative_to(production_root) or production_root.is_relative_to(paths["data_root"])):
         raise ValueError("task replay publication requires an isolated --data-root")
@@ -1037,7 +1112,7 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
                 state = {"task_id": task_id, "dataset": dataset, "definition_hash": definition_hash,
                          "definition": _json_value(immutable), "units": {}, "status": "collecting"}
             if redo == "full":
-                RawObjectStore.preserve_directory(paths["raw_root"] / "_tmp" / task_id,
+                RawObjectStore.preserve_directory(paths["raw_root"] / "_tmp" / day.isoformat() / task_id,
                     permitted_root=paths["raw_root"] / "_tmp", archive_root=paths["archive_root"])
                 RawObjectStore.preserve_directory(work, permitted_root=paths["workspace_root"] / "_tasks",
                     archive_root=paths["archive_root"])
@@ -1065,7 +1140,7 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
                     continue
                 if not force and old and _task_unit_valid(old):
                     continue
-                temporary = RawObjectStore.task_unit_path(paths["raw_root"], task_id, key)
+                temporary = RawObjectStore.task_unit_path(paths["raw_root"], task_id, key, data_date=day.isoformat())
                 replay = unit.get("replay_manifest")
                 # A transformation failure can continue from exact saved bytes.
                 if not force and old and (old.get("failure_class") == "NormalizationError" or old.get("status") == "candidate_complete"):
@@ -1075,13 +1150,13 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
                     except (ValueError, OSError, KeyError):
                         pass
                 preserved = RawObjectStore.preserve_directory(temporary,
-                    permitted_root=paths["raw_root"] / "_tmp" / task_id, archive_root=paths["archive_root"])
+                    permitted_root=paths["raw_root"] / "_tmp" / day.isoformat() / task_id, archive_root=paths["archive_root"])
                 if preserved and replay == str(temporary / "manifest.ndjson"):
                     replay = str(preserved / "manifest.ndjson")
                 options = dict(collector_options or {})
                 options.update(input_id=unit["input_id"], context=unit["context"], config_root=config_root,
                     data_root=paths["data_root"], mode=mode, replay_manifest=replay,
-                    task_unit=(task_id, key), force_fetch=force)
+                    task_unit=(task_id, key), force_fetch=force, data_date=day.isoformat())
                 try:
                     if mode == "live" and dataset == "security_master":
                         from ..routing.factory import check_security_input_qualification
@@ -1254,7 +1329,8 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
         parameters = contract.bind_parameters(unit["context"])
         if state["dataset"] == "security_master":
             parameters = {k: v for k, v in parameters.items() if k != "trade_date"}
-        current = paths["raw_root"] / contract.provider / contract.endpoint / ("scope-" + row_hash(parameters)[:16])
+        current = RawObjectStore.current_path(paths["raw_root"], contract.provider, contract.endpoint,
+                                             data_date=day.isoformat(), parameters=parameters)
         temporary = Path(entry["raw_manifest"]).parent
         # Stable immutable evidence references survive replacement of current raw.
         # Retain the full digest in metadata; short containers avoid Windows
@@ -1492,7 +1568,7 @@ def _finish_task_commit(state, paths, metadata, failure_hook=None):
                  published_hash=file_hash(manifest_path), row_count=manifest.row_count, error=None)
     metadata.save_collection_task(state)
     marker.unlink()
-    temporary_task = paths["raw_root"] / "_tmp" / state["task_id"]
+    temporary_task = paths["raw_root"] / "_tmp" / state["definition"]["trade_date"] / state["task_id"]
     if temporary_task.exists() and not any(temporary_task.iterdir()):
         temporary_task.rmdir()
     return state
@@ -1521,6 +1597,7 @@ def collect_due_inputs(*, now, config_root, output_root=None, data_root=None, tr
         raise ValueError("output_root and data_root are mutually exclusive")
     runtime = output_root is None
     paths = load_storage_paths(root, data_root=data_root) if runtime else None
+    _validate_business_root(paths["data_root"] if runtime else output_root, root)
     output = paths["workspace_root"] / "_scheduler" if runtime else Path(output_root)
     if now.tzinfo is None:
         raise ValueError("schedule time must be timezone-aware")
@@ -1636,8 +1713,7 @@ def _collect_due_security_master(*, now, config_root, data_root, execute, mode, 
         raise ValueError("schedule time must be timezone-aware")
     root = Path(config_root).resolve()
     paths = load_storage_paths(root, data_root=data_root)
-    if paths["data_root"].is_relative_to(Path(__file__).parents[2] / "provider_validation"):
-        raise ValueError("business task data must be outside provider_validation")
+    _validate_business_root(paths["data_root"], root)
     if execute and mode != "live":
         raise ValueError("scheduled production tasks require live mode; use collect-task for isolated replay")
     day = now.astimezone(SHANGHAI).date()

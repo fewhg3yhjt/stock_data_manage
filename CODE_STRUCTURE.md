@@ -8,7 +8,7 @@
 - `src/__init__.py` 是逻辑包 `stock_data_manage` 的初始化文件，`src/cli.py` 是命令入口。`pyproject.toml` 显式将逻辑包映射到 `src/` 并列出Python包；新增含 `__init__.py` 的子包时同步更新该清单。
 - 根目录 `config/` 保存 YAML 参数、调度意图、字段模板和字段映射；`src/config/` 保存配置读取与校验代码。
 - `tests/` 保存实现测试；`provider_validation/` 保存正式实现前的来源可行性验证、原返回与派生证据；`docs/` 保存按职责归档的正式说明。业务开发后不向验证区写入新代码、数据或验收结果。
-- `data/` 统一保存 `raw/`、`task_workspace/`、`canonical/`、`task_archive/`、`metadata/` 和 `hot/`，按需生成；实现回放与故障测试使用 `tmp/` 下的隔离运行根目录。按日raw目标路径与当前旧布局分别记录，来源候选成功不自动发布或归档，详见 [运行数据与归档](docs/storage/README.md)。
+- `data/` 统一保存 `raw/`、`task_workspace/`、`canonical/`、`task_archive/`、`metadata/` 和 `hot/`，按需生成；实现回放与故障测试使用 `tmp/` 下的隔离运行根目录。raw暂存及正式结果按数据日期分层，旧数据保留原位，来源候选成功不自动发布或归档，详见 [运行数据与归档](docs/storage/README.md)。
 - `tmp/` 用于本地临时工作与正式实现的隔离验收。原根目录 `tmp_test/` 已撤掉，历史研究材料完整归档到 `provider_validation/results/legacy/tmp_test/`；迁移清单保留原路径、相对目录、文件哈希及旧绝对路径说明。新来源验证归入 `provider_validation/`，正式开发产物按既有业务运行布局保存。
 - 测试、命令及验证脚本在安装当前项目的同一环境中运行，不再通过 `PYTHONPATH=src` 暴露顶层 `providers`、`config` 等包。历史证据中的旧路径及哈希保留原样。
 
@@ -128,7 +128,7 @@
 | 文件 | 职责 |
 |---|---|
 | `pipeline/daily.py` | 日线按来源补缺、标准化、校验、候选生成和发布编排 |
-| `pipeline/inputs.py` | 单项候选采集/回放、持久化业务任务及证券清单调度检查；统一原始暂存、来源解析、YAML映射、质量与覆盖、重做和发布恢复，名单在线请求受路由资格约束 |
+| `pipeline/inputs.py` | 单项候选采集/回放、持久化业务任务及证券清单调度检查；统一按日原始暂存和正式输出边界、来源解析、YAML映射、质量与覆盖、重做和发布恢复，名单在线请求受路由资格约束 |
 | `pipeline/daily_reconciliation.py` | 日线 provisional/final 合并、缺失统计和盘后校准 |
 | `pipeline/minute.py` | Watchlist 实时分钟采集和 Hot Store 写入 |
 | `pipeline/minute_reconciliation.py` | 分钟盘后校准、final 提升、冲突隔离和完整性处理 |
@@ -142,7 +142,7 @@
 
 | 文件 | 职责 |
 |---|---|
-| `storage/raw.py` | 不覆盖的 Raw Object Store、任务相对路径校验、解析前响应字节/清单、哈希复查、脱敏和匹配有效响应复用 |
+| `storage/raw.py` | 不覆盖的 Raw Object Store、按日暂存和来源范围路径、转正日期校验、解析前响应字节/清单、哈希复查、脱敏和匹配有效响应复用 |
 | `storage/hot.py` | SQLite WAL Hot Minute Store 和即时查询数据 |
 | `storage/parquet.py` | 来源字段合同的候选 Parquet 精确类型写入；既有 Canonical Bar 分区、Manifest、文件锁和原子发布 |
 | `storage/metadata.py` | DuckDB 元数据、Attempt 及调度周期的原子占用、Provider 健康、Probe 验证记录、既有能力证据查询和冲突记录；不新增能力管理数据库 |

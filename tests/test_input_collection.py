@@ -4142,7 +4142,10 @@ def test_runtime_layered_storage_preserves_source_and_mapping(tmp_path, no_netwo
     assert task.is_relative_to(paths["workspace_root"] / report["dataset"])
     assert task.parent.name.startswith("scope-")
     raw_manifest = (task / report["raw_manifest"]["path"]).resolve()
-    assert raw_manifest.is_relative_to(paths["raw_root"] / report["provider"] / report["endpoint"])
+    assert raw_manifest.is_relative_to(paths["raw_root"] / "_tmp" / report["data_date"])
+    assert not (paths["raw_root"] / report["provider"] / report["endpoint"]).exists()
+    raw_events = [json.loads(line) for line in raw_manifest.read_text(encoding="utf-8").splitlines()]
+    assert next(event for event in raw_events if event.get("event") == "raw_partition")["data_date"] == report["data_date"]
     assert not (task / "_raw").exists()
     assert not paths["canonical_root"].exists() and not paths["archive_root"].exists()
     assert report["live_http_calls"] == report["production_writes"] == 0
@@ -4204,3 +4207,61 @@ def test_runtime_failed_task_keeps_raw_without_publishing(tmp_path, no_network):
     assert (task / result["raw_manifest"]["path"]).is_file()
     assert json.loads((task / "manifest.json").read_text())["status"] == "failed"
     assert not (tmp_path / "data/canonical").exists()
+
+
+@pytest.mark.parametrize("argument", ["output_root", "data_root"])
+@pytest.mark.parametrize("mode", ["live", "replay"])
+def test_formal_input_rejects_validation_output_before_collection(argument, mode, no_network):
+    with pytest.raises(ValueError, match="outside provider_validation"):
+        collect_input(input_id="ASTOCK-001", context=QUOTE_CONTEXT, config_root=ROOT / "config",
+                      mode=mode, replay_manifest=QUOTE_ARCHIVE,
+                      **{argument: ROOT / "provider_validation/results/forbidden-business-output"})
+
+
+def test_input_replay_rejects_default_production_root(no_network):
+    with pytest.raises(ValueError, match="isolated"):
+        collect_input(input_id="ASTOCK-001", context=QUOTE_CONTEXT, config_root=ROOT / "config",
+                      replay_manifest=QUOTE_ARCHIVE)
+
+
+def test_input_date_uses_history_target_and_original_shanghai_capture(tmp_path):
+    from stock_data_manage.pipeline.inputs import _input_data_date
+    manifest = tmp_path / "manifest.ndjson"
+    manifest.write_text(json.dumps({"event": "http_response", "provider": "fixture", "endpoint": "current",
+        "fetched_at_utc": "2026-09-30T16:30:00+00:00"}) + "\n", encoding="utf-8")
+    assert _input_data_date({}, manifest, provider="fixture", endpoint="current") == "2026-10-01"
+    assert _input_data_date({"request": {"end_date": "2026-09-18"}}, manifest,
+                            provider="fixture", endpoint="daily") == "2026-09-18"
+    assert _input_data_date({"request": {"end_date": "2026-09-18"}}, manifest,
+                            provider="fixture", endpoint="daily", data_date="2026-09-15") == "2026-09-15"
+    manifest.write_text(json.dumps({"event": "http_response", "provider": "fixture", "endpoint": "current",
+        "fetched_at_utc": "2026-10-10T00:00:00+00:00", "source_ref": {
+            "fetched_at_utc": "2026-09-30T16:30:00+00:00"}}) + "\n", encoding="utf-8")
+    assert _input_data_date({}, manifest, provider="fixture", endpoint="current") == "2026-10-01"
+
+
+@pytest.mark.parametrize("input_id", ["ASTOCK-001", "ASTOCK-032"])
+def test_runtime_relocation_retains_original_day_and_dependency_references(tmp_path, monkeypatch, no_network, input_id):
+    # Simulate a current input starting today and discovering older cached bytes.
+    # Replay uses retained responses; this is an offline path/reference test.
+    import stock_data_manage.pipeline.inputs as inputs
+    original = inputs._input_data_date
+    calls = []
+    provisional = "2099-01-01"
+    def provisional_then_source(*args, **kwargs):
+        calls.append(True)
+        return provisional if len(calls) == 1 else original(*args, **kwargs)
+    monkeypatch.setattr(inputs, "_input_data_date", provisional_then_source)
+    _, context, manifest, count = RUNTIME_CASES[input_id]
+    report = collect_input(input_id=input_id, context=context, config_root=ROOT / "config",
+                           data_root=tmp_path / "data", replay_manifest=manifest)
+    assert report["status"] == "candidate_complete", report.get("error")
+    assert report["row_count"] == count and report["data_date"] != provisional
+    work = Path(report["run_directory"])
+    raw_manifest = (work / report["raw_manifest"]["path"]).resolve()
+    assert raw_manifest.is_relative_to(tmp_path / "data/raw/_tmp" / report["data_date"])
+    dependency = report.get("sdk_dependency", {})
+    for item in [dependency, *dependency.get("dependencies", [])]:
+        name = item.get("source_path") or item.get("path")
+        if name:
+            assert hashlib.sha256((work / name).resolve().read_bytes()).hexdigest() == item["sha256"]

@@ -51,7 +51,7 @@ class FaultCollector:
         task_id, key = options["task_unit"]
         self.calls.append((key, options["force_fetch"], options.get("replay_manifest")))
         root = Path(options["data_root"])
-        raw = RawObjectStore.task_unit_path(root / "raw", task_id, key)
+        raw = RawObjectStore.task_unit_path(root / "raw", task_id, key, data_date=options["data_date"])
         store = RawObjectStore(raw)
         store.write_json({"task_id": task_id, "unit_key": key}, dataset="task", provider="fixture",
                          endpoint="fixture", fetched_at=datetime.now(timezone.utc), attempt_id="owner",
@@ -74,7 +74,7 @@ class FaultCollector:
             dataset = "daily_bar"
             price = Decimal(self.prices.get(key, "10"))
             rows = [{"instrument_id": ("XSHG" if key.startswith("sh") else "XSHE")+":"+key[2:],
-                     "trade_date": date.fromisoformat(DAY), "adjustment": "forward", "open": price,
+                     "trade_date": date.fromisoformat(options["data_date"]), "adjustment": "forward", "open": price,
                      "high": price, "low": Decimal("0") if key in self.invalid else price,
                      "close": price, "volume": None, "amount": None}]
         fields = yaml.safe_load((CONFIG / "datasets" / (dataset+".yaml")).read_text(encoding="utf-8"))["fields"]
@@ -104,7 +104,7 @@ def test_restart_resumes_only_missing_and_publishes_raw(tmp_path):
     first = run(tmp_path, definition, collector)
     assert first["status"] == "failed"
     assert not read_bars(tmp_path)
-    assert RawObjectStore.task_unit_path(tmp_path / "raw", "daily", "sh600001").exists()
+    assert RawObjectStore.task_unit_path(tmp_path / "raw", "daily", "sh600001", data_date=DAY).exists()
     # Database is closed between runs, reproducing a process restart.
     collector.fail.clear()
     second = run(tmp_path, definition, collector)
@@ -115,8 +115,8 @@ def test_restart_resumes_only_missing_and_publishes_raw(tmp_path):
         manifest = Path(record.raw_object_path)
         assert manifest.is_file()
         assert RawObjectStore.verify_manifest(manifest)
-    assert not (tmp_path / "raw" / "_tmp" / "daily").exists()
-    assert len(list((tmp_path / "raw" / "tencent" / "kline_daily").glob("scope-*"))) == 3
+    assert not (tmp_path / "raw" / "_tmp" / DAY / "daily").exists()
+    assert len(list((tmp_path / "raw" / "tencent" / "kline_daily" / DAY).glob("scope-*"))) == 3
 
 
 def test_invalid_security_is_refetched_not_reused(tmp_path):
@@ -426,7 +426,7 @@ def test_five_groups_and_missing_etf_whole_fallback_then_resume(tmp_path):
     assert previous.publication_metadata["requested_date"] == "2026-10-01"
     assert previous.publication_metadata["previous_age_days"] == 1
     assert fallback["commit"]["promotions"] == []
-    assert RawObjectStore.task_unit_path(tmp_path / "raw", "next", "beijing").is_dir()
+    assert RawObjectStore.task_unit_path(tmp_path / "raw", "next", "beijing", data_date="2026-10-01").is_dir()
     collector.catalog_rows["shenzhen-shanghai"].append(lost)
     before = len(collector.calls)
     resumed = run(tmp_path, definition, collector)
@@ -444,7 +444,7 @@ def test_first_incomplete_catalog_keeps_raw_and_blocks_publication(tmp_path):
     assert result["status"] == "failed"
     assert result["security_check"]["missing_groups"] == ["XSHE/etf"]
     assert not (tmp_path / "canonical/security_master/current/manifest.json").exists()
-    assert RawObjectStore.task_unit_path(tmp_path / "raw", "complete-master", "beijing").exists()
+    assert RawObjectStore.task_unit_path(tmp_path / "raw", "complete-master", "beijing", data_date=DAY).exists()
 
 
 def test_invalid_catalog_date_refetched_instead_of_reusing_stale_response(tmp_path):
@@ -605,7 +605,7 @@ def test_processing_retry_uses_saved_response_and_keeps_other_tasks_staging(tmp_
         return report
     first = run(tmp_path, definition, fail_mapping)
     assert first["status"] == "failed"
-    pending = RawObjectStore.task_unit_path(tmp_path / "raw", "other", "unit")
+    pending = RawObjectStore.task_unit_path(tmp_path / "raw", "other", "unit", data_date=DAY)
     pending.mkdir(parents=True)
     (pending / "user-evidence.txt").write_text("keep", encoding="utf-8")
     assert run(tmp_path, definition, collector)["status"] == "published"
@@ -613,6 +613,53 @@ def test_processing_retry_uses_saved_response_and_keeps_other_tasks_staging(tmp_
     assert replay.is_file() and RawObjectStore.verify_manifest(replay)
     assert run(tmp_path, definition, collector, redo="full")["status"] == "published"
     assert (pending / "user-evidence.txt").read_text(encoding="utf-8") == "keep"
+
+
+def test_daily_raw_dates_are_isolated_during_failure_resume_and_full_redo(tmp_path):
+    collector = FaultCollector()
+    first = run(tmp_path, daily_definition(symbols=("sh600001",)), collector)
+    old_raw = Path(first["units"]["sh600001"]["current_raw"])
+    old_hashes = {str(p.relative_to(old_raw)): file_hash(p) for p in old_raw.rglob("*") if p.is_file()}
+    next_day = "2026-10-09"
+    definition = daily_definition("next-day", symbols=("sh600001",))
+    definition["trade_date"] = next_day
+    definition["units"][0]["context"]["request"].update(start_date=next_day, end_date=next_day)
+    collector.fail.add("sh600001")
+    assert run(tmp_path, definition, collector)["status"] == "failed"
+    assert RawObjectStore.task_unit_path(tmp_path / "raw", "next-day", "sh600001", data_date=next_day).exists()
+    collector.fail.clear()
+    published = run(tmp_path, definition, collector)
+    new_raw = Path(published["units"]["sh600001"]["current_raw"])
+    assert old_raw.parent.name == DAY and new_raw.parent.name == next_day
+    assert new_raw != old_raw
+    # A full redo must clear only this task's target day, including when another
+    # date has a same-named staging directory.
+    untouched = RawObjectStore.task_unit_path(tmp_path / "raw", "next-day", "pending", data_date=DAY)
+    untouched.mkdir(parents=True)
+    (untouched / "sentinel.txt").write_text("keep", encoding="utf-8")
+    collector.prices["sh600001"] = "20"
+    assert run(tmp_path, definition, collector, redo="full")["status"] == "published"
+    assert {str(p.relative_to(old_raw)): file_hash(p) for p in old_raw.rglob("*") if p.is_file()} == old_hashes
+    assert (untouched / "sentinel.txt").read_text(encoding="utf-8") == "keep"
+    assert len(list(new_raw.parent.glob("scope-*"))) == 1
+    bars = CanonicalPartitionStore(tmp_path / "canonical").read(Dataset.DAILY_BAR, "stock", next_day)
+    assert len(bars) == 1 and bars[0].close == Decimal("20")
+
+
+def test_selected_redo_preserves_other_current_raw_scopes(tmp_path):
+    collector = FaultCollector()
+    definition = daily_definition()
+    initial = run(tmp_path, definition, collector)
+    before = {key: RawObjectStore.verify_manifest(Path(entry["current_raw"]) / "manifest.ndjson")
+              for key, entry in initial["units"].items()}
+    collector.prices["sh600002"] = "20"
+    updated = run(tmp_path, definition, collector, redo="selected", symbols=["sh600002"])
+    after = {key: RawObjectStore.verify_manifest(Path(entry["current_raw"]) / "manifest.ndjson")
+             for key, entry in updated["units"].items()}
+    assert before["sh600001"] == after["sh600001"]
+    assert before["sh600003"] == after["sh600003"]
+    assert before["sh600002"] != after["sh600002"]
+    assert len(list((tmp_path / "raw/tencent/kline_daily" / DAY).glob("scope-*"))) == 3
 
 
 def test_dead_process_lock_is_recovered_but_live_lock_is_preserved(tmp_path):

@@ -6,7 +6,7 @@ import os
 import re
 import gzip
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
@@ -53,11 +53,23 @@ class RawObjectStore:
         self.root = Path(root)
 
     @staticmethod
-    def task_unit_path(raw_root: str | Path, task_id: str, unit_key: str) -> Path:
+    def task_unit_path(raw_root: str | Path, task_id: str, unit_key: str, *, data_date: str) -> Path:
+        if date.fromisoformat(data_date).isoformat() != data_date:
+            raise ValueError("data date must use YYYY-MM-DD")
         if not re.fullmatch(r"[A-Za-z0-9_-]{1,64}", task_id):
             raise ValueError("invalid task ID")
         key = hashlib.sha256(unit_key.encode("utf-8")).hexdigest()[:16]
-        return Path(raw_root).resolve() / "_tmp" / task_id / key
+        return Path(raw_root).resolve() / "_tmp" / data_date / task_id / key
+
+    @staticmethod
+    def current_path(raw_root: str | Path, provider: str, endpoint: str, *, data_date: str, parameters) -> Path:
+        """One active response set per source, data day and canonical request scope."""
+        from .integrity import row_hash
+        if date.fromisoformat(data_date).isoformat() != data_date:
+            raise ValueError("data date must use YYYY-MM-DD")
+        if any(not re.fullmatch(r"[A-Za-z0-9_-]+", part) for part in (provider, endpoint)):
+            raise ValueError("unsafe raw storage path component")
+        return Path(raw_root).resolve() / provider / endpoint / data_date / ("scope-" + row_hash(sanitized_metadata(parameters))[:16])
 
     @staticmethod
     def verify_manifest(manifest: str | Path) -> str:
@@ -97,6 +109,12 @@ class RawObjectStore:
             raise ValueError("raw promotion requires a scoped _tmp directory")
         if not current.is_relative_to(root) or current == root or current.is_relative_to(root / "_tmp"):
             raise ValueError("invalid current raw destination")
+        temporary_parts = temporary.relative_to(root / "_tmp").parts
+        current_parts = current.relative_to(root).parts
+        if (len(temporary_parts) != 3 or len(current_parts) != 4
+                or temporary_parts[0] != current_parts[2]
+                or date.fromisoformat(temporary_parts[0]).isoformat() != temporary_parts[0]):
+            raise ValueError("raw promotion requires matching data-date partitions")
         if not temporary.exists():
             if RawObjectStore.verify_manifest(current / "manifest.ndjson") != expected_hash:
                 raise ValueError("completed raw promotion does not match commit")
