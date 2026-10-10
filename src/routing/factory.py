@@ -106,7 +106,9 @@ def check_security_input_qualification(contract, context, *, config_root, metada
             if RawObjectStore.verify_manifest(raw) != live["raw_manifest"]["sha256"]:
                 raise ValueError("live raw evidence hash differs")
             responses = [json.loads(line) for line in raw.read_text(encoding="utf-8").splitlines()]
-            if not any(r.get("mode") == "live" and r.get("outcome") == "response" for r in responses):
+            source_responses = [r for r in responses if r.get("provider") == contract.provider
+                                and r.get("event") in {"http_response", "source_payload"} and r.get("body_sha256")]
+            if not any(r.get("mode") == "live" and r.get("outcome") == "response" for r in source_responses):
                 raise ValueError("raw evidence contains no live source response")
             validation_time = datetime.fromisoformat(live["validation_time_utc"])
             if validation_time.tzinfo is None or not validation_time <= evidence["validated_at"]:
@@ -118,7 +120,7 @@ def check_security_input_qualification(contract, context, *, config_root, metada
                 raise ValueError("independent catalog coverage has not been verified")
             if semantic["group_counts"].get(exchange + "/" + asset) != evidence["row_count"]:
                 raise ValueError("verified group count differs from evidence")
-            if semantic.get("source_response_hashes") != [r["body_sha256"] for r in responses if r.get("body_sha256")]:
+            if semantic.get("source_response_hashes") != [r["body_sha256"] for r in source_responses]:
                 raise ValueError("semantic evidence does not reference the live response")
             if not published.verify(artifacts["publication_manifest"].parent / "data.parquet") or published.publication_metadata.get("fallback") or not published.publication_metadata.get("coverage_passed"):
                 raise ValueError("end-to-end publication verification is missing")
@@ -131,9 +133,10 @@ def check_security_input_qualification(contract, context, *, config_root, metada
                 RawObjectStore.verify_manifest(reference)
                 for line in Path(reference).read_text(encoding="utf-8").splitlines():
                     event = json.loads(line)
-                    if event.get("provider") == contract.provider and event.get("body_sha256"):
+                    if (event.get("provider") == contract.provider and event.get("event") in {"http_response", "source_payload"}
+                            and event.get("body_sha256")):
                         published_hashes[event["body_sha256"]] += 1
-            original_hashes = Counter(r["body_sha256"] for r in responses if r.get("body_sha256"))
+            original_hashes = Counter(r["body_sha256"] for r in source_responses)
             if original_hashes - published_hashes:
                 raise ValueError("publication does not contain the verified live response bytes")
             published_rows = pq.read_table(artifacts["publication_manifest"].parent / "data.parquet").to_pylist()

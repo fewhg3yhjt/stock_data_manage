@@ -325,7 +325,7 @@ def save_fixture_qualification(root, input_id, context):
     return contract, proof_path
 
 
-@pytest.mark.parametrize("failure", [None,"hash","expired","scope","semantic","cooldown","version","code","pending","replay","different_body"])
+@pytest.mark.parametrize("failure", [None,"hash","expired","scope","semantic","cooldown","version","code","pending","replay","different_body","sdk_derived","sdk_derived_corrupt"])
 def test_security_source_qualification_requires_verified_current_artifacts(tmp_path, failure):
     from stock_data_manage.routing.factory import check_security_input_qualification
     from datetime import timedelta
@@ -353,6 +353,22 @@ def test_security_source_qualification_requires_verified_current_artifacts(tmp_p
             path.write_text(json.dumps(proof))
             metadata.connection.execute("UPDATE capability_registry SET evidence_hash=?",[file_hash(path)])
         if failure=="pending":(Path(proof["publication_manifest"]["path"]).parent/"task-commit.json").write_text('{}')
+        if failure in {"sdk_derived", "sdk_derived_corrupt"}:
+            live_path = Path(proof["live_report"]["path"])
+            live = json.loads(live_path.read_text())
+            raw = Path(live["raw_manifest"]["path"])
+            response = json.loads(raw.read_text().splitlines()[0])
+            # SDK cache/replay retains derived representations beside the actual
+            # response. They still need integrity checks, but are not extra calls.
+            RawObjectStore(raw.parent).append_event({"event": "sdk_derived",
+                "body_storage": response["body_storage"],
+                "body_sha256": response["body_sha256"] if failure == "sdk_derived" else "0" * 64,
+                "source_response_sha256": response["body_sha256"]})
+            live["raw_manifest"]["sha256"] = file_hash(raw)
+            live_path.write_text(json.dumps(live))
+            proof["live_report"]["sha256"] = file_hash(live_path)
+            path.write_text(json.dumps(proof))
+            metadata.connection.execute("UPDATE capability_registry SET evidence_hash=?", [file_hash(path)])
         if failure in {"replay", "different_body"}:
             # End-to-end replay stores its own manifest, but must retain the
             # verified response bytes rather than a similarly shaped dataset.
@@ -369,7 +385,7 @@ def test_security_source_qualification_requires_verified_current_artifacts(tmp_p
             path.write_text(json.dumps(proof))
             metadata.connection.execute("UPDATE capability_registry SET evidence_hash=?",[file_hash(path)])
         result=check_security_input_qualification(contract,context,config_root=CONFIG,metadata=metadata,now=now)
-        assert result["eligible"] is (failure in {None, "replay"}), result
+        assert result["eligible"] is (failure in {None, "replay", "sdk_derived"}), result
 
 
 def test_qualified_schedule_uses_same_task_for_idempotence_and_fallback_retry(tmp_path):
