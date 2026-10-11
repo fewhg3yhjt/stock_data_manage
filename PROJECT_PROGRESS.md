@@ -22,6 +22,8 @@
 
 ## 下一步主线
 
+2026-10-11日线阶段的小范围验收完成：从已验收的10月9日证券名单选取sh600519、sz000001、sh510300、sz159915，腾讯原响应真实采集后保存于tmp，四只证券当日OHLC与原响应逐项一致。名单自动展开得到5573只股票和1694只ETF，仅验证范围展开，未请求全市场日线。股票模拟缺失一只证券的回放证据时拒绝发布，恢复只处理缺失证券；ETF模拟发布前中断后由既有恢复入口完成发布，无需重新取数。股票、ETF全量重做、指定证券重做及再次执行均通过，业务值不变且无重复，未指定证券的原响应不变；既有CLI复验返回no-op。日线输出位于上一阶段同一个tmp业务根目录，生产data未写、业务代码和YAML未改。成交量单位未认证，规范volume/amount为空；北交所日线及全市场逐证券采集未验证，在线日线任务仍受资格限制。见 [日线验收](tmp/daily-master-20261011/verification.json)、[原响应与CLI独立检查](tmp/daily-master-20261011/independent-check.json)，股票和ETF任务参数均在该验收目录。下一阶段需明确全市场日线适用来源及在线资格，不能直接把这四只样本推广为全市场可用。
+
 2026-10-11按用户确认，以10月9日三份留存原响应运行当前证券主数据完整发布流程：失败暂存断点恢复、全量重做、再次断点执行均成功，三次规范数据哈希一致，7267条证券身份无重复，五组为沪股2320、深股2904、北交所349、沪ETF944、深ETF750。源响应哈希、日期、规范文件、原响应转正及稳定审计引用经独立回读核验；512390仍为unknown，再次执行为no-op，实时请求为0。结果发布于tmp隔离根目录，不写生产data；无需等待下一交易日进行历史发布验收。数量及身份与既有验收一致，不将组数量直接当作独立全市场覆盖率。见 [本次验收](tmp/security-history-publication-20261011/verification.json)、[独立回读检查](tmp/security-history-publication-20261011/independent-check.json) 和 [自动任务摘要](tmp/security-history-publication-20261011/business/task_workspace/2026-10-09/security_master/summary.json)。本次未修改业务代码或运行配置，生产目录发布仍未完成。
 
 2026-10-11当前版本正式资格复核及入口运行已完成：三项现时来源重新实际采集、与已留存独立目录逐代码对照、按各自数据日期完成隔离发布，再登记五个责任组；BaoStock核验10月9日6917条候选，北交所与上交所ETF核验10月11日349、944条，各自日期不能合计为同日全量。正式调度入口按真实时间运行，10月11日因日历缺记录返回blocked（退出码2），未执行证券业务采集或发布。10月12日08:00仅执行前预测通过，五组资格有效；未排队、未启动常驻调度，首次生产目录全量发布仍未完成；历史发布验收可以使用目标日留存原响应在之后执行，不受执行当天是否交易日限制。原响应及隔离发布在tmp，资格证明、正式入口结果及检查在data。见 [本阶段核验](data/task_workspace/_checks/security-qualification-20261011/verification.json)、[正式入口结果](data/task_workspace/_checks/security-qualification-20261011/formal-entry-result.json) 和 [下一交易日预测](data/task_workspace/_checks/security-qualification-20261011/next-session-preflight.json)。本阶段没有修改业务代码或运行配置。

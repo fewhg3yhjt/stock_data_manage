@@ -93,6 +93,8 @@
 
 已有真实来源证据的离线参数示例见 [沪深股票名单回放](examples/security-master-replay.json) 和 [单股票日线回放](examples/daily-replay.json)。示例直接引用保留的原始来源探针，运行结果生成到下面指定的 `tmp/`，不回写探针目录。名单示例仅包含沪深股票，日线示例只包含 `sh600519` 的一个交易日，均不能代表全量证券。
 
+2026-10-11已用10月9日发布名单中的沪深各一只股票、各一只ETF完成真实日线响应的隔离验收。原响应保存后，由既有任务入口解析、映射、检查并发布到同一隔离根目录的 `canonical/2026-10-09/daily_bar/stock/` 和 `daily_bar/etf/`。股票缺失回放证据时拒绝发布，断点执行只处理失败证券；ETF发布前模拟中断后从已保存候选恢复。两类任务全量、指定证券及重复执行通过；重做会更新采集时间和审计引用，因此以主键和业务字段比较结果，不要求Parquet文件字节一致。原响应价格与规范OHLC直接对照通过，成交量单位未认证时volume/amount保持空值。名单展开包含5573只股票和1694只ETF，但真实日线验收仅sh600519、sz000001、sh510300、sz159915四只，北交所及全市场日线未验证，在线日线资格未启用。任务定义、模拟故障、自动摘要快照和最终结果见 [日线验收](../../tmp/daily-master-20261011/verification.json) 与 [原响应及CLI检查](../../tmp/daily-master-20261011/independent-check.json)。
+
 ```powershell
 # 离线示例：首次执行或断点重做（默认 resume），显式声明回放模式
 python -m stock_data_manage.cli collect-task --task-file docs/pipeline/examples/daily-replay.json --mode replay --data-root tmp/collection-task-replay
@@ -189,7 +191,7 @@ python -m stock_data_manage.cli collect-due-inputs --dataset security_master
 | 2 | 修改现有来源与字段配置，补齐 ETF 与北交所名单能力 | 已完成 |
 | 3 | 按市场、资产类别检查覆盖，明确前次有效数据的回退日期与原因 | 已完成 |
 | 4 | 接通现有路由资格检查与证券主数据定时更新 | 三项来源资格已登记，正式失败任务留证完成；同日首次发布验收待完成 |
-| 5 | 以发布名单验证股票与 ETF 日线，以及三种重做流程 | 待前一阶段确认 |
+| 5 | 以发布名单验证股票与 ETF 日线，以及三种重做流程 | 四只真实样本、三种重做及发布恢复通过；全市场及在线资格待完成 |
 
 上述步骤是历史实施记录，不能视为全部正式验收完成。按日raw路径、正式输出入口和统一任务摘要已实现；再以真实证券清单任务验收。日线验收在名单发布后继续按阶段确认，不用手工接口候选代替业务任务结果。
 
