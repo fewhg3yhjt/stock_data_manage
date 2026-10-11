@@ -97,6 +97,7 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
         def send(session, request, **kwargs):
             native_call = kwargs.pop('_native_call', None)
             native_options = kwargs.pop('_native_options', None)
+            allow_redirects = kwargs.get('allow_redirects', True)
             request_scope = scope
             body_metadata = {}
             if match_request_body:
@@ -172,7 +173,10 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                     pacer.configure(host, 3, 1)
                     try:
                         with pacer.request(host):
-                            response = native_call() if native_call is not None else original_send(session, request, **kwargs)
+                            # Release the host permit before requests follows another hop.
+                            # Its native resolver retains cookies, proxy and method semantics.
+                            response = native_call() if native_call is not None else original_send(
+                                session, request, **{**kwargs, 'allow_redirects': False})
                     except Exception as exc:
                         transport_error()
                         store.append_event({"event": "http_response", "mode": "live", "outcome": "transport_error",
@@ -205,7 +209,13 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                         paused_hosts[host] = f"{consecutive_errors[host]} consecutive server errors"
                 else:
                     consecutive_errors[host] = 0
-            if response_validator is not None:
+            if native_call is None and allow_redirects:
+                redirect_options = {key: value for key, value in kwargs.items() if key != 'allow_redirects'}
+                history = [response, *session.resolve_redirects(response, request, **redirect_options)]
+                if len(history) > 1:
+                    response = history[-1]
+                    response.history = history[:-1]
+            if response_validator is not None and not (native_call is None and response.is_redirect):
                 response_validator(response)
             return response
 

@@ -481,3 +481,102 @@ def test_catalog_date_uses_data_pages_and_rejects_pages_across_midnight(tmp_path
     else:
         assert report["status"] == "candidate_complete", report.get("error")
         assert {row["trade_date"] for row in output_rows(report)} == {"2026-10-07"}
+
+
+@pytest.mark.parametrize('status', [302, 303, 307, 308])
+@pytest.mark.parametrize('cross_host', [False, True])
+def test_capture_redirects_keep_native_semantics_and_replay(tmp_path, status, cross_host):
+    import requests
+    from requests.adapters import HTTPAdapter
+    from stock_data_manage.providers.transport import captured_requests, RequestPacer
+    from stock_data_manage.storage.raw import RawObjectStore
+
+    calls = []
+    target = 'https://other.test/final' if cross_host else 'https://example.test/final'
+
+    class FixtureAdapter(HTTPAdapter):
+        def send(self, request, **kwargs):
+            calls.append((request.url, request.method, request.body, request.headers.get('Cookie'),
+                          request.headers.get('Authorization'), kwargs.get('proxies')))
+            response = requests.Response()
+            response.request, response.url = request, request.url
+            response.status_code = status if request.url.endswith('/first') else 200
+            response._content = b'redirect' if response.status_code != 200 else b'final'
+            response._content_consumed = True
+            if response.status_code != 200:
+                response.headers['Location'] = target
+                from email.message import Message
+                from types import SimpleNamespace
+                headers = Message()
+                headers['Set-Cookie'] = 'redirect_cookie=value; Path=/'
+                response.headers['Set-Cookie'] = headers['Set-Cookie']
+                response.raw = SimpleNamespace(_original_response=SimpleNamespace(msg=headers))
+            return response
+
+    def run():
+        with requests.Session() as session:
+            session.mount('https://', FixtureAdapter())
+            session.cookies.set('fixture', 'value', domain='example.test', path='/')
+            return session.post('https://example.test/first', data='payload',
+                                headers={'Authorization': 'fixture-secret'}, proxies={'https': 'http://proxy.test'},
+                                timeout=7)
+
+    expected = run()
+    original_calls = calls[:]
+    calls.clear()
+    store = RawObjectStore(tmp_path/'live')
+    options = dict(provider='fixture', endpoint='redirect', scope={}, code_version='fixture',
+                   pacer=RequestPacer(wait=lambda _: None))
+    with captured_requests(store, **options) as events:
+        actual = run()
+    assert calls == original_calls
+    if not cross_host:
+        assert 'redirect_cookie=value' in calls[-1][3]
+    assert actual.content == expected.content == b'final'
+    assert [r.status_code for r in actual.history] == [status]
+    assert [e['status_code'] for e in events] == [status, 200]
+    assert [RawObjectStore.read_response(store.manifest, e) for e in events] == [b'redirect', b'final']
+    calls.clear()
+    with captured_requests(RawObjectStore(tmp_path/'replay'), replay_manifest=store.manifest, **options) as replay_events:
+        replay = run()
+    assert not calls
+    assert replay.content == actual.content
+    assert [r.status_code for r in replay.history] == [status]
+    assert [e['status_code'] for e in replay_events] == [status, 200]
+
+
+@pytest.mark.parametrize('scenario', ['disabled', 'loop', 'transport_failure'])
+def test_capture_redirect_errors_retain_first_hop(tmp_path, scenario):
+    import requests
+    from requests.adapters import HTTPAdapter
+    from stock_data_manage.providers.transport import captured_requests, RequestPacer
+    from stock_data_manage.storage.raw import RawObjectStore
+
+    class FixtureAdapter(HTTPAdapter):
+        def send(self, request, **kwargs):
+            if scenario == 'transport_failure' and request.url.endswith('/final'):
+                raise requests.ConnectionError('fixture failure')
+            response = requests.Response()
+            response.request, response.url = request, request.url
+            response.status_code, response._content, response._content_consumed = 302, b'redirect', True
+            response.headers['Location'] = '/first' if scenario == 'loop' else '/final'
+            return response
+
+    store = RawObjectStore(tmp_path)
+    with captured_requests(store, provider='fixture', endpoint='redirect', scope={}, code_version='fixture',
+                           pacer=RequestPacer(wait=lambda _: None)) as events:
+        with requests.Session() as session:
+            session.mount('https://', FixtureAdapter())
+            session.max_redirects = 2
+            if scenario == 'disabled':
+                response = session.get('https://example.test/first', allow_redirects=False)
+                assert response.status_code == 302 and not response.history
+            else:
+                with pytest.raises(requests.TooManyRedirects if scenario == 'loop' else requests.ConnectionError):
+                    session.get('https://example.test/first')
+    assert events[0]['status_code'] == 302
+    assert RawObjectStore.read_response(store.manifest, events[0]) == b'redirect'
+    if scenario == 'transport_failure':
+        import json
+        records = [json.loads(line) for line in store.manifest.read_text(encoding='utf-8').splitlines()]
+        assert records[-1]['outcome'] == 'transport_error'

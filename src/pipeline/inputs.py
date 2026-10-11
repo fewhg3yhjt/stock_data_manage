@@ -656,7 +656,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                         scope={"input_id": input_id, "parameters": normalized_context}, code_version=code_version, pacer=pacer,
                         replay_manifest=replay_manifest if mode == "replay" else None,
                         evidence_roots=(evidence_root, output_root), max_age_seconds=0 if force_fetch else profile.refresh_interval_seconds or 86400,
-                        sdk_retry_policy=is_stock_pool or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_sdk or input_id in {"ASTOCK-001", "ASTOCK-045", "ASTOCK-070", "ASTOCK-026", "ASTOCK-027", "ASTOCK-028"},
+                        sdk_retry_policy=is_stock_pool or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or (is_source_sdk and not is_universe_sdk) or input_id in {"ASTOCK-001", "ASTOCK-045", "ASTOCK-070", "ASTOCK-026", "ASTOCK-027", "ASTOCK-028"},
                         probe_host_pause=is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_sdk,require_empty_post_body=input_id=="ASTOCK-061",response_validator=response_validator,
                         cache_ignored_query_parameters=("_",) if is_reportapi else (),
                          native_transport='curl_cffi' if input_id=='ASTOCK-031' else 'pandas_urllib' if input_id=='ASTOCK-069' else None,
