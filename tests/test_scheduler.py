@@ -47,14 +47,13 @@ ROOT = Path(__file__).resolve().parents[1]
 DAY = date(2026, 9, 30)
 
 
-def test_historical_master_selects_dated_etfs_and_explicit_four_group_scope():
+def test_historical_master_selects_typed_stocks_bse_candidates_and_dated_etfs():
     definition = build_security_master_definition(ROOT / 'config', trade_date=DAY,
         now=stamp(8, 0) + timedelta(days=1), is_trading_day=True)
-    assert [u['input_id'] for u in definition['units']] == ['SDA-BOARD-005',
+    assert [u['input_id'] for u in definition['units']] == ['SECURITY-BS-UNIVERSE-001', 'SECURITY-BSE-LIST-HISTORY-001',
         'SECURITY-SSE-ETF-HISTORY-001', 'SECURITY-SSE-MONEY-ETF-HISTORY-001', 'SECURITY-SZSE-ETF-HISTORY-001']
-    assert definition['units'][0]['context']['config']['include_etf'] is False
-    assert len(definition['required_groups']) == 4
-    assert all(group[0] != 'BSE' for group in definition['required_groups'])
+    assert len(definition['required_groups']) == 5
+    assert ['BSE', 'stock'] in definition['required_groups']
     assert definition['allow_previous'] is False
     assert all(u['context']['request']['trade_date'] == DAY.isoformat() for u in definition['units'])
 

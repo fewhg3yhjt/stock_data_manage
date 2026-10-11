@@ -41,6 +41,76 @@ class BaoStockIndustryMembershipProvider:
     client: Any | None = None
     normalization_root: Path | None = None
 
+    def fetch_universe(self, *, trade_date, raw_archive=None):
+        """Preserve the supplied script's calendar/all-stock/basic query order."""
+        from ..exchanges.security import script_date, script_stock_code
+        tables = {}
+        with logged_in_session(client=self.client) as bs:
+            for name, parameters in [('query_trade_dates', {'start_date': trade_date.isoformat(), 'end_date': trade_date.isoformat()}),
+                                     ('query_all_stock', {'day': trade_date.isoformat()}), ('query_stock_basic', {})]:
+                result = getattr(bs, name)(**parameters)
+                tables[name] = _read_success(result, name, raw_archive, trade_date)
+                _archive_sdk_rows(raw_archive, name, result, tables[name], trade_date)
+        calendar = tables['query_trade_dates']
+        if len(calendar) != 1 or calendar[0].get('calendar_date') != trade_date.isoformat() or calendar[0].get('is_trading_day') not in {'0', '1'}:
+            raise ValueError('BaoStock calendar date or status differs from request')
+        basic, selected, excluded, details = {}, {}, [], []
+        for row in tables['query_stock_basic']:
+            if not {'code','code_name','ipoDate','outDate','type','status'} <= set(row):
+                raise ValueError('BaoStock universe basic fields changed')
+            prefix, dot, code = str(row['code']).partition('.')
+            exchange = {'sh': 'XSHG', 'sz': 'XSHE', 'bj': 'BSE'}.get(prefix)
+            if not dot or not script_stock_code(code, exchange) or str(row['type']) != '1':
+                excluded.append({**row, 'reason': 'non-stock type or outside stock range'})
+                continue
+            if row['code'] in basic:
+                raise ValueError('duplicate BaoStock basic identity')
+            basic[row['code']] = row
+            listed, delisted = script_date(row['ipoDate']), script_date(row['outDate'])
+            if listed and listed <= trade_date and (delisted is None or trade_date < delisted):
+                item = {'trade_date': trade_date, 'stock_code': code, 'stock_name': row['code_name'],
+                    'exchange': exchange, 'asset_type': 'stock', 'status': 'unknown',
+                    'list_date': listed, 'delist_date': delisted,
+                    'date_basis': 'listing_termination_interval_candidate', 'script_sources': 'bs_stock_basic'}
+                selected[row['code']] = item
+                details.append(dict(item))
+            elif listed is None:
+                excluded.append({**row, 'reason': 'listing date unknown'})
+        for row in tables['query_all_stock']:
+            if not {'code','code_name','tradeStatus'} <= set(row):
+                raise ValueError('BaoStock all-stock fields changed')
+            meta = basic.get(row['code'])
+            if meta is None:
+                excluded.append({**row, 'reason': 'historical row has no matching stock type metadata'})
+                continue
+            prefix, _, code = row['code'].partition('.')
+            item = {'trade_date': trade_date, 'stock_code': code, 'stock_name': row['code_name'],
+                'exchange': {'sh':'XSHG','sz':'XSHE','bj':'BSE'}[prefix], 'asset_type':'stock', 'status':'unknown',
+                'list_date': script_date(meta['ipoDate']), 'delist_date': script_date(meta['outDate']),
+                'date_basis': 'direct_historical_type_checked', 'script_sources':'bs_all_stock'}
+            details.append(dict(item))
+            if row['code'] in selected:
+                item['script_sources'] = 'bs_stock_basic;bs_all_stock'
+            selected[row['code']] = item
+        if not selected:
+            raise ValueError('BaoStock universe has no stock candidates')
+        return BaoStockIndustryResult(tuple(selected.values()), (), trade_date, len(selected), (),
+            source_rows=tuple(tables['query_all_stock']), excluded_rows=tuple(excluded),
+            mapping_context={'script_queries': list(tables), 'calendar': calendar,
+                'source_total_count': len(tables['query_all_stock']), 'stock_evidence_detail': details,
+                'historical_universe_verified_complete': False,
+                'date_semantics': 'historical all-stock rows plus dated basic metadata candidates; type=1 verified'})
+
+    def fetch_universe_calendar(self, *, trade_date, raw_archive=None):
+        with logged_in_session(client=self.client) as bs:
+            result = bs.query_trade_dates(start_date=trade_date.isoformat(), end_date=trade_date.isoformat())
+            rows = _read_success(result, 'query_trade_dates', raw_archive, trade_date)
+            _archive_sdk_rows(raw_archive, 'query_trade_dates', result, rows, trade_date)
+        if len(rows) != 1 or rows[0].get('calendar_date') != trade_date.isoformat() or rows[0].get('is_trading_day') not in {'0','1'}:
+            raise ValueError('calendar response date or status differs')
+        mapped = ({'trade_date': trade_date, 'is_trading_day': rows[0]['is_trading_day']=='1'},)
+        return BaoStockIndustryResult(mapped, (), trade_date, 1, (), source_rows=tuple(rows))
+
     def fetch_st_list(self, *, raw_archive=None) -> BaoStockIndustryResult:
         with logged_in_session(client=self.client) as bs:
             result = bs.query_stock_basic(code_name='ST')

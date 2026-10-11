@@ -1,0 +1,34 @@
+dataset: market_statistics
+rules:
+- id: market-sse-stats-001-v1
+  input_id: MARKET-SSE-STATS-001
+  provider: sse
+  endpoint: market_statistics
+  field_mapping:
+    trade_date: trade_date
+    row_number: row_number
+    category: category
+    source_values: source_values
+  context_fields:
+    source: provider
+  status: pending_validation
+  version: market-sse-stats-001-v1
+  evidence_refs:
+  - D:/Project/PythonProgram/a_share_universe_check.py
+  notes: 源字段及脚本筛选语义保留，完整性独立核验；不因配置声明授予资格。
+- id: market-szse-stats-001-v1
+  input_id: MARKET-SZSE-STATS-001
+  provider: szse
+  endpoint: market_statistics
+  field_mapping:
+    trade_date: trade_date
+    row_number: row_number
+    category: category
+    source_values: source_values
+  context_fields:
+    source: provider
+  status: pending_validation
+  version: market-szse-stats-001-v1
+  evidence_refs:
+  - D:/Project/PythonProgram/a_share_universe_check.py
+  notes: 源字段及脚本筛选语义保留，完整性独立核验；不因配置声明授予资格。

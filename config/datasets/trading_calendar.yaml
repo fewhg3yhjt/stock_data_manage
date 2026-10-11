@@ -5,3 +5,4 @@ dataset:
 fields:
   trade_date: {type: date, required: true}
   source: {type: string, required: true}
+  is_trading_day: {type: boolean, required: false}

@@ -186,7 +186,7 @@ class RawObjectStore:
         import shutil
         from uuid import uuid4
         work = Path(work)
-        selected = [work / name for name in ("prepared.parquet", "coverage.json", "summary.json", "task.json")
+        selected = [work / name for name in ("prepared.parquet", "coverage.json", "summary.json", "task.json", "universe_review.json")
                     if (work / name).exists()]
         if selected:
             target = Path(archive_root) / "_workspace_audit" / uuid4().hex[:12]

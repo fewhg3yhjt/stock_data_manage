@@ -2887,6 +2887,7 @@ input_capabilities:
     provider: sse
     endpoint: etf_historical_shares
     display_name: 上交所指定统计日普通ETF名单
+    script_source_keys: [ak_sh_etf_history]
     dataset: security_snapshot
     runtime_method: fetch_etf_history
     parameters:
@@ -2935,6 +2936,7 @@ input_capabilities:
     provider: szse
     endpoint: etf_historical_shares
     display_name: 深交所指定统计日ETF名单
+    script_source_keys: [ak_sz_etf_history]
     dataset: security_snapshot
     runtime_method: fetch_etf_history
     parameters:
@@ -3009,3 +3011,323 @@ input_capabilities:
     - trade_date仅筛选上市日期上限，名单日期取原响应上海时区采集日，不提供历史名单查询。
     - 按官方F100分类子树保留ETF及交易型货币基金，排除LOF、其他货币基金和REITs；上市目录中的清算基金保留，交易状态unknown。
     - 分页总数和唯一证券检查不等于独立全市场证明；生产资格尚未登记。
+
+  # 用户证券清单脚本补齐；实际资格与配置声明分开。
+  SECURITY-BS-UNIVERSE-001:
+    provider: baostock
+    endpoint: typed_security_universe
+    display_name: 脚本证券历史候选
+    dataset: security_snapshot
+    runtime_method: fetch_universe
+    parameters:
+      trade_date:
+        type: date
+        source: request.trade_date
+        required: true
+    data_kind: snapshot
+    data_frequency: daily
+    request_shape: date_snapshot
+    collection_profile: reference_daily
+    trading_date_parameter: trade_date
+    implementation_status: implemented_validation_only
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    script_source_keys:
+    - bs_calendar
+    - bs_all_stock
+    - bs_stock_basic
+    evidence_refs:
+    - D:/Project/PythonProgram/a_share_universe_check.py
+    limitations:
+    - 沿用用户脚本SDK、参数、头、代理、Session和原生解析；先留存响应，不在Provider内回退。
+    - 候选日期与原响应采集时间分别记录；当前列表和日期事件推算不等于完整历史快照；统计不自动作为证券覆盖分母。
+  CALENDAR-BS-001:
+    provider: baostock
+    endpoint: trading_calendar
+    display_name: BaoStock指定日交易日历
+    dataset: trading_calendar
+    runtime_method: fetch_universe_calendar
+    parameters:
+      trade_date:
+        type: date
+        source: request.trade_date
+        required: true
+    data_kind: snapshot
+    data_frequency: daily
+    request_shape: date_snapshot
+    collection_profile: reference_daily
+    implementation_status: implemented_validation_only
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    script_source_keys:
+    - bs_calendar
+    evidence_refs:
+    - D:/Project/PythonProgram/a_share_universe_check.py
+    limitations:
+    - 沿用用户脚本SDK、参数、头、代理、Session和原生解析；先留存响应，不在Provider内回退。
+    - 候选日期与原响应采集时间分别记录；当前列表和日期事件推算不等于完整历史快照；统计不自动作为证券覆盖分母。
+  SECURITY-BSE-LIST-HISTORY-001:
+    provider: bse
+    endpoint: listed_company_history_candidates
+    display_name: 脚本证券历史候选
+    dataset: security_snapshot
+    runtime_method: fetch_listing_history
+    parameters:
+      trade_date:
+        type: date
+        source: request.trade_date
+        required: true
+    data_kind: snapshot
+    data_frequency: daily
+    request_shape: date_snapshot
+    collection_profile: reference_daily
+    trading_date_parameter: trade_date
+    implementation_status: implemented_validation_only
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    script_source_keys:
+    - ak_bj_current
+    evidence_refs:
+    - D:/Project/PythonProgram/a_share_universe_check.py
+    limitations:
+    - 沿用用户脚本SDK、参数、头、代理、Session和原生解析；先留存响应，不在Provider内回退。
+    - 候选日期与原响应采集时间分别记录；当前列表和日期事件推算不等于完整历史快照；统计不自动作为证券覆盖分母。
+  SECURITY-SSE-MAIN-HISTORY-001:
+    provider: sse
+    endpoint: main_stock_history_candidates
+    display_name: 脚本证券历史候选
+    dataset: security_snapshot
+    runtime_method: fetch_listing_history
+    parameters:
+      trade_date:
+        type: date
+        source: request.trade_date
+        required: true
+      kind:
+        type: string
+        source: config.kind
+        required: true
+        default: sh_main_current
+        choices:
+        - sh_main_current
+    data_kind: snapshot
+    data_frequency: daily
+    request_shape: date_snapshot
+    collection_profile: reference_daily
+    trading_date_parameter: trade_date
+    implementation_status: implemented_validation_only
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    script_source_keys:
+    - ak_sh_main_current
+    evidence_refs:
+    - D:/Project/PythonProgram/a_share_universe_check.py
+    limitations:
+    - 沿用用户脚本SDK、参数、头、代理、Session和原生解析；先留存响应，不在Provider内回退。
+    - 候选日期与原响应采集时间分别记录；当前列表和日期事件推算不等于完整历史快照；统计不自动作为证券覆盖分母。
+  SECURITY-SSE-STAR-HISTORY-001:
+    provider: sse
+    endpoint: star_stock_history_candidates
+    display_name: 脚本证券历史候选
+    dataset: security_snapshot
+    runtime_method: fetch_listing_history
+    parameters:
+      trade_date:
+        type: date
+        source: request.trade_date
+        required: true
+      kind:
+        type: string
+        source: config.kind
+        required: true
+        default: sh_star_current
+        choices:
+        - sh_star_current
+    data_kind: snapshot
+    data_frequency: daily
+    request_shape: date_snapshot
+    collection_profile: reference_daily
+    trading_date_parameter: trade_date
+    implementation_status: implemented_validation_only
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    script_source_keys:
+    - ak_sh_star_current
+    evidence_refs:
+    - D:/Project/PythonProgram/a_share_universe_check.py
+    limitations:
+    - 沿用用户脚本SDK、参数、头、代理、Session和原生解析；先留存响应，不在Provider内回退。
+    - 候选日期与原响应采集时间分别记录；当前列表和日期事件推算不等于完整历史快照；统计不自动作为证券覆盖分母。
+  SECURITY-SZSE-STOCK-HISTORY-001:
+    provider: szse
+    endpoint: stock_history_candidates
+    display_name: 脚本证券历史候选
+    dataset: security_snapshot
+    runtime_method: fetch_listing_history
+    parameters:
+      trade_date:
+        type: date
+        source: request.trade_date
+        required: true
+      kind:
+        type: string
+        source: config.kind
+        required: true
+        default: sz_current
+        choices:
+        - sz_current
+    data_kind: snapshot
+    data_frequency: daily
+    request_shape: date_snapshot
+    collection_profile: reference_daily
+    trading_date_parameter: trade_date
+    implementation_status: implemented_validation_only
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    script_source_keys:
+    - ak_sz_current
+    evidence_refs:
+    - D:/Project/PythonProgram/a_share_universe_check.py
+    limitations:
+    - 沿用用户脚本SDK、参数、头、代理、Session和原生解析；先留存响应，不在Provider内回退。
+    - 候选日期与原响应采集时间分别记录；当前列表和日期事件推算不等于完整历史快照；统计不自动作为证券覆盖分母。
+  SECURITY-SSE-DELIST-HISTORY-001:
+    provider: sse
+    endpoint: delisted_history_candidates
+    display_name: 脚本证券历史候选
+    dataset: security_snapshot
+    runtime_method: fetch_listing_history
+    parameters:
+      trade_date:
+        type: date
+        source: request.trade_date
+        required: true
+      kind:
+        type: string
+        source: config.kind
+        required: true
+        default: sh_delisted
+        choices:
+        - sh_delisted
+    data_kind: snapshot
+    data_frequency: daily
+    request_shape: date_snapshot
+    collection_profile: reference_daily
+    trading_date_parameter: trade_date
+    implementation_status: implemented_validation_only
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    script_source_keys:
+    - ak_sh_delisted
+    evidence_refs:
+    - D:/Project/PythonProgram/a_share_universe_check.py
+    limitations:
+    - 沿用用户脚本SDK、参数、头、代理、Session和原生解析；先留存响应，不在Provider内回退。
+    - 候选日期与原响应采集时间分别记录；当前列表和日期事件推算不等于完整历史快照；统计不自动作为证券覆盖分母。
+  SECURITY-SZSE-DELIST-HISTORY-001:
+    provider: szse
+    endpoint: delisted_history_candidates
+    display_name: 脚本证券历史候选
+    dataset: security_snapshot
+    runtime_method: fetch_listing_history
+    parameters:
+      trade_date:
+        type: date
+        source: request.trade_date
+        required: true
+      kind:
+        type: string
+        source: config.kind
+        required: true
+        default: sz_delisted
+        choices:
+        - sz_delisted
+    data_kind: snapshot
+    data_frequency: daily
+    request_shape: date_snapshot
+    collection_profile: reference_daily
+    trading_date_parameter: trade_date
+    implementation_status: implemented_validation_only
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    script_source_keys:
+    - ak_sz_delisted
+    evidence_refs:
+    - D:/Project/PythonProgram/a_share_universe_check.py
+    limitations:
+    - 沿用用户脚本SDK、参数、头、代理、Session和原生解析；先留存响应，不在Provider内回退。
+    - 候选日期与原响应采集时间分别记录；当前列表和日期事件推算不等于完整历史快照；统计不自动作为证券覆盖分母。
+  MARKET-SSE-STATS-001:
+    provider: sse
+    endpoint: market_statistics
+    display_name: 交易所指定日市场统计
+    dataset: market_statistics
+    runtime_method: fetch_market_statistics
+    parameters:
+      trade_date:
+        type: date
+        source: request.trade_date
+        required: true
+      kind:
+        type: string
+        source: config.kind
+        required: true
+        default: sh
+        choices:
+        - sh
+    data_kind: snapshot
+    data_frequency: daily
+    request_shape: date_snapshot
+    collection_profile: reference_daily
+    implementation_status: implemented_validation_only
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    script_source_keys:
+    - ak_sh_market_stats
+    evidence_refs:
+    - D:/Project/PythonProgram/a_share_universe_check.py
+    limitations:
+    - 沿用用户脚本SDK、参数、头、代理、Session和原生解析；先留存响应，不在Provider内回退。
+    - 候选日期与原响应采集时间分别记录；当前列表和日期事件推算不等于完整历史快照；统计不自动作为证券覆盖分母。
+  MARKET-SZSE-STATS-001:
+    provider: szse
+    endpoint: market_statistics
+    display_name: 交易所指定日市场统计
+    dataset: market_statistics
+    runtime_method: fetch_market_statistics
+    parameters:
+      trade_date:
+        type: date
+        source: request.trade_date
+        required: true
+      kind:
+        type: string
+        source: config.kind
+        required: true
+        default: sz
+        choices:
+        - sz
+    data_kind: snapshot
+    data_frequency: daily
+    request_shape: date_snapshot
+    collection_profile: reference_daily
+    implementation_status: implemented_validation_only
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    script_source_keys:
+    - ak_sz_market_stats
+    evidence_refs:
+    - D:/Project/PythonProgram/a_share_universe_check.py
+    limitations:
+    - 沿用用户脚本SDK、参数、头、代理、Session和原生解析；先留存响应，不在Provider内回退。
+    - 候选日期与原响应采集时间分别记录；当前列表和日期事件推算不等于完整历史快照；统计不自动作为证券覆盖分母。

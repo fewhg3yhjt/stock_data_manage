@@ -1,0 +1,23 @@
+dataset:
+  name: market_statistics
+  display_name: 交易所原口径市场统计
+  primary_key:
+  - trade_date
+  - source
+  - row_number
+fields:
+  trade_date:
+    type: date
+    required: true
+  source:
+    type: string
+    required: true
+  row_number:
+    type: integer
+    required: true
+  category:
+    type: string
+    required: true
+  source_values:
+    type: string
+    required: true

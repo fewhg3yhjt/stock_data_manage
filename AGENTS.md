@@ -20,6 +20,8 @@
 
 - A provider adapter existing in code is not evidence that the provider is production-ready.
 - User-provided runnable probes, scripts, or adapters with observed successful results are source behavior contracts.
+- 用户提供来源脚本后，先形成逐调用能力清单，将每项对应到现有Provider、YAML参数和字段映射、任务选源及实际验证证据。不能仅补当前被指出的接口而遗漏同一脚本的其他能力。
+- 宣称“没有来源”“不能获取”或安排暂缓前，必须复查用户脚本及结果、当前YAML、可执行实现和任务选源；区分未迁移、未配置选用、日期推算限制、验证失败和真正不支持。迁移后增加能力清单回归，并在正式说明中记录每项的验证范围与生产资格。
 - Migrating a verified script into a formal Provider must preserve request parameters, headers, Referer, Session behavior, proxy handling, retries, backoff, host fallback, response parsing, and business-validity checks.
 - Do not replace a verified script's transport layer merely to reuse a project abstraction without discussing it with the user and proving behavioral equivalence.
 - Before labeling a source unavailable, compare the original script and formal Provider request/response behavior; a migration mismatch is an implementation defect, not source evidence.

@@ -10,3 +10,17 @@ rules:
     version: sina-trading-calendar-input-v1
     evidence_refs: [ASTOCK-070]
     notes: 返回日期仅为新浪/SDK提供的正向交易日，不能标为官方来源，也不推断缺失日期的开闭市状态。
+  - id: calendar-bs-001-v1
+    input_id: CALENDAR-BS-001
+    provider: baostock
+    endpoint: trading_calendar
+    field_mapping:
+      trade_date: trade_date
+      is_trading_day: is_trading_day
+    context_fields:
+      source: provider
+    status: pending_validation
+    version: calendar-bs-001-v1
+    evidence_refs:
+    - D:/Project/PythonProgram/a_share_universe_check.py
+    notes: 源字段及脚本筛选语义保留，完整性独立核验；不因配置声明授予资格。

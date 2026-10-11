@@ -1,6 +1,38 @@
 # 股票与 ETF 来源名单
 
-证券名单继续使用现有来源采集、YAML 字段映射及留证流程。沪深部分使用原 `BaoStockIndustryMembershipProvider.fetch_snapshot`；北交所及上交所ETF目录均在现有 `providers/exchanges/security.py` 中迁移已留证请求，不新增任务管理层。
+证券名单继续使用现有来源采集、YAML字段映射及留证流程。当前目录保留原实现；用户证券核验脚本的全部来源调用补到现有BaoStock和交易所Provider，历史任务可选择经类型核验的沪深股票、北交所上市日期候选及沪深历史ETF，不新增任务管理层。
+
+## 用户脚本能力对应表
+
+依据 `D:/Project/PythonProgram/a_share_universe_check.py`（SHA-256：`006325c86c114aafe3c89d6f2010745dd23d55fc4b35dca9e6378dd785eea236`），逐调用13项均有可执行输入及YAML映射。运行配置见 [providers.yaml](../../config/providers.yaml)，`script_source_keys`用于关联脚本调用；已有ETF方法直接复用。
+
+| 脚本调用 | 正式输入ID | 原生调用与参数 | 用途 |
+| --- | --- | --- | --- |
+| bs_calendar | CALENDAR-BS-001；SECURITY-BS-UNIVERSE-001内部也调用 | query_trade_dates(start_date=end_date=目标日) | 当日交易日判断 |
+| bs_all_stock | SECURITY-BS-UNIVERSE-001 | query_all_stock(day=目标日) | 直接历史行，须类型核验 |
+| bs_stock_basic | SECURITY-BS-UNIVERSE-001 | query_stock_basic() | type=1及上市/终止区间核验 |
+| ak_sh_main_current | SECURITY-SSE-MAIN-HISTORY-001 | stock_info_sh_name_code(symbol=主板A股) | 上市日期候选与交叉核对 |
+| ak_sh_star_current | SECURITY-SSE-STAR-HISTORY-001 | stock_info_sh_name_code(symbol=科创板) | 上市日期候选与交叉核对 |
+| ak_sz_current | SECURITY-SZSE-STOCK-HISTORY-001 | stock_info_sz_name_code(symbol=A股列表) | 上市日期候选与交叉核对 |
+| ak_bj_current | SECURITY-BSE-LIST-HISTORY-001 | stock_info_bj_name_code() | 北交所上市日期候选；与旧行情目录区分 |
+| ak_sh_delisted | SECURITY-SSE-DELIST-HISTORY-001 | stock_info_sh_delist(symbol=全部) | 暂停上市区间候选，不能把暂停日当终止日 |
+| ak_sz_delisted | SECURITY-SZSE-DELIST-HISTORY-001 | stock_info_sz_delist(symbol=终止上市公司) | 上市≤目标日＜终止上市 |
+| ak_sh_etf_history | SECURITY-SSE-ETF-HISTORY-001 | fund_etf_scale_sse(date=YYYYMMDD) | 原有历史ETF身份输入 |
+| ak_sz_etf_history | SECURITY-SZSE-ETF-HISTORY-001 | fund_scale_daily_szse(start_date=end_date=YYYYMMDD,symbol=ETF) | 原有历史ETF身份输入 |
+| ak_sh_market_stats | MARKET-SSE-STATS-001 | stock_sse_deal_daily(date=YYYYMMDD) | 原始分类统计与对账参考 |
+| ak_sz_market_stats | MARKET-SZSE-STATS-001 | stock_szse_summary(date=YYYYMMDD) | 原始分类统计与对账参考 |
+
+原生SDK请求、请求头、代理环境、超时、分页和解析保留。北交所SDK带解析表内存缓存，调用其原函数体，避免无原响应的缓存结果；初始页及逐页请求均留证，并核对页号、页数及总记录数。BaoStock维持一次登录、交易日历→全证券→基础资料→退出的顺序，留存SDK公开的完整ResultSet，不宣称已捕获TCP线缆字节。
+
+这些输入是候选采集能力，不等同完整历史证券总表。`date_basis`说明直接历史行或区间推算依据；`trade_date`是候选归属日，原响应采集时间及真实请求另在manifest中。北交所当前上市目录不能恢复之后已退市的历史成员或历史代码，沪市暂停日也不能推断实际退市日。沿用项目已接受的302和689代码范围，避免照搬脚本前缀限制导致既有证券丢失；状态无法确认保持unknown。
+
+历史任务默认五项输入由 [collection.yaml](../../config/collection.yaml)定义；沪深参考名单、退市事件、市场统计为独立可采集输入，不因新增配置自动混入发布名单。市场统计模板保留分类名称与原始列JSON，不把不同类别、单位强行换算为统一覆盖分母。候选任务自动保存`universe_review.json`，包括来源引用、推算依据、排除证据及沪深差异；参考源未采集标为not_evaluated，不报告“零缺失”。
+
+实现核验与逐来源状态保存在 [迁移检查目录](../../tmp/universe-capability-migration-20261011/)。本次新增输入均保持implemented_validation_only及pending_validation；未授予实际生产路由资格、未启动常驻调度、未覆盖正式数据。完整资格仍需原响应、语义、独立范围和端到端证据匹配当前代码与配置，不能把候选日期推算当作直接历史快照证明。
+
+实际核验：新增9项输入已用真实返回完成候选处理（最终修正使用已留原响应离线复验）；北交所原生在线请求两次达到180秒验收限时，未据此认定来源不可用。其已留存18页原响应经原生SDK离线回放得到349条，19次逻辑调用包含初始页；10月8日候选348条与用户脚本逐代码一致。沪深参考目录只比脚本多保留项目既有范围302132、689009；退出事件原表159/208条，目标日筛选结果各0条，区分有效空候选和空原响应。沪深市场统计原表8/14行，保留原列及单位。
+
+五来源真实原响应隔离验收合并7267条：沪股2320、深股2904、北股349、沪ETF944、深ETF750。模拟北交所单元失败时拒绝发布，修复后断点恢复只执行该单元，四项已完成输入不重取；原始响应按既有暂存转正规则处理、规范数据无重复。见 [完整链路验收](../../tmp/universe-capability-migration-20261011/e2e-verification.json)、[用户脚本逐代码对照](../../tmp/universe-capability-migration-20261011/original-table-comparison.json)及 [北交所原字节回放](../../tmp/universe-capability-migration-20261011/bse-original-byte-replay.json)。这些是隔离实现验收，北交所新代码的在线传输及完整历史范围资格仍未通过，不是正式业务发布。
 
 ## 当前能力与验证范围
 

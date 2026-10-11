@@ -76,3 +76,157 @@ rules:
     version: sse-etf-catalog-input-v1
     evidence_refs: [provider_validation/results/security-activation-20261009/official-sh-funds/_raw/manifest.ndjson]
     notes: 按上市目录全量保留ETF，含进入清算但仍在目录的证券；交易状态unknown，LISTING_DATE只表示上市日。名单日期取原响应采集日。
+  - id: security-bs-universe-001-v1
+    input_id: SECURITY-BS-UNIVERSE-001
+    provider: baostock
+    endpoint: typed_security_universe
+    field_mapping:
+      trade_date: trade_date
+      stock_code: stock_code
+      stock_name: stock_name
+      exchange: exchange
+      asset_type: asset_type
+      status: status
+      list_date: list_date
+      delist_date: delist_date
+      date_basis: date_basis
+      script_sources: script_sources
+    context_fields:
+      source: provider
+    status: pending_validation
+    version: security-bs-universe-001-v1
+    evidence_refs:
+    - D:/Project/PythonProgram/a_share_universe_check.py
+    notes: 源字段及脚本筛选语义保留，完整性独立核验；不因配置声明授予资格。
+  - id: security-bse-list-history-001-v1
+    input_id: SECURITY-BSE-LIST-HISTORY-001
+    provider: bse
+    endpoint: listed_company_history_candidates
+    field_mapping:
+      trade_date: trade_date
+      stock_code: stock_code
+      stock_name: stock_name
+      exchange: exchange
+      asset_type: asset_type
+      status: status
+      list_date: list_date
+      delist_date: delist_date
+      date_basis: date_basis
+      script_sources: script_sources
+    context_fields:
+      source: provider
+    status: pending_validation
+    version: security-bse-list-history-001-v1
+    evidence_refs:
+    - D:/Project/PythonProgram/a_share_universe_check.py
+    notes: 源字段及脚本筛选语义保留，完整性独立核验；不因配置声明授予资格。
+  - id: security-sse-main-history-001-v1
+    input_id: SECURITY-SSE-MAIN-HISTORY-001
+    provider: sse
+    endpoint: main_stock_history_candidates
+    field_mapping:
+      trade_date: trade_date
+      stock_code: stock_code
+      stock_name: stock_name
+      exchange: exchange
+      asset_type: asset_type
+      status: status
+      list_date: list_date
+      delist_date: delist_date
+      date_basis: date_basis
+      script_sources: script_sources
+    context_fields:
+      source: provider
+    status: pending_validation
+    version: security-sse-main-history-001-v1
+    evidence_refs:
+    - D:/Project/PythonProgram/a_share_universe_check.py
+    notes: 源字段及脚本筛选语义保留，完整性独立核验；不因配置声明授予资格。
+  - id: security-sse-star-history-001-v1
+    input_id: SECURITY-SSE-STAR-HISTORY-001
+    provider: sse
+    endpoint: star_stock_history_candidates
+    field_mapping:
+      trade_date: trade_date
+      stock_code: stock_code
+      stock_name: stock_name
+      exchange: exchange
+      asset_type: asset_type
+      status: status
+      list_date: list_date
+      delist_date: delist_date
+      date_basis: date_basis
+      script_sources: script_sources
+    context_fields:
+      source: provider
+    status: pending_validation
+    version: security-sse-star-history-001-v1
+    evidence_refs:
+    - D:/Project/PythonProgram/a_share_universe_check.py
+    notes: 源字段及脚本筛选语义保留，完整性独立核验；不因配置声明授予资格。
+  - id: security-szse-stock-history-001-v1
+    input_id: SECURITY-SZSE-STOCK-HISTORY-001
+    provider: szse
+    endpoint: stock_history_candidates
+    field_mapping:
+      trade_date: trade_date
+      stock_code: stock_code
+      stock_name: stock_name
+      exchange: exchange
+      asset_type: asset_type
+      status: status
+      list_date: list_date
+      delist_date: delist_date
+      date_basis: date_basis
+      script_sources: script_sources
+    context_fields:
+      source: provider
+    status: pending_validation
+    version: security-szse-stock-history-001-v1
+    evidence_refs:
+    - D:/Project/PythonProgram/a_share_universe_check.py
+    notes: 源字段及脚本筛选语义保留，完整性独立核验；不因配置声明授予资格。
+  - id: security-sse-delist-history-001-v1
+    input_id: SECURITY-SSE-DELIST-HISTORY-001
+    provider: sse
+    endpoint: delisted_history_candidates
+    field_mapping:
+      trade_date: trade_date
+      stock_code: stock_code
+      stock_name: stock_name
+      exchange: exchange
+      asset_type: asset_type
+      status: status
+      list_date: list_date
+      delist_date: delist_date
+      date_basis: date_basis
+      script_sources: script_sources
+    context_fields:
+      source: provider
+    status: pending_validation
+    version: security-sse-delist-history-001-v1
+    evidence_refs:
+    - D:/Project/PythonProgram/a_share_universe_check.py
+    notes: 源字段及脚本筛选语义保留，完整性独立核验；不因配置声明授予资格。
+  - id: security-szse-delist-history-001-v1
+    input_id: SECURITY-SZSE-DELIST-HISTORY-001
+    provider: szse
+    endpoint: delisted_history_candidates
+    field_mapping:
+      trade_date: trade_date
+      stock_code: stock_code
+      stock_name: stock_name
+      exchange: exchange
+      asset_type: asset_type
+      status: status
+      list_date: list_date
+      delist_date: delist_date
+      date_basis: date_basis
+      script_sources: script_sources
+    context_fields:
+      source: provider
+    status: pending_validation
+    version: security-szse-delist-history-001-v1
+    evidence_refs:
+    - D:/Project/PythonProgram/a_share_universe_check.py
+    notes: 源字段及脚本筛选语义保留，完整性独立核验；不因配置声明授予资格。

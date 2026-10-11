@@ -8,7 +8,8 @@ dataset:
   allowed_asset_types: [stock, etf]
   allowed_exchanges: [XSHG, XSHE, BSE]
 fields:
-  # 名单所属日期：历史名单取明确请求日；当前目录取原响应采集日，不用任务目标日冒充。
+  # 名单所属日期：直接历史名单取明确请求日；当前快照取采集日。
+  # 脚本历史候选按上市/终止区间推算目标日，必须保留date_basis，不能称为直接历史快照。
   trade_date: {type: date, required: true}
   stock_code: {type: string, required: true}
   stock_name: {type: string, required: true}
@@ -19,3 +20,7 @@ fields:
   source: {type: string, required: true}
   asset_type: {type: enum, values: [stock, etf], required: false}
   list_date: {type: date, required: false}
+  delist_date: {type: date, required: false}
+  # 日期依据：直接历史结果经类型核验，或目录/事件区间推算；原响应采集时间另在manifest中。
+  date_basis: {type: string, required: false}
+  script_sources: {type: string, required: false}

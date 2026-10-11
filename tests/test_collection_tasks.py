@@ -525,15 +525,33 @@ def test_master_without_units_builds_historical_sources_from_yaml(tmp_path):
         calendar.upsert([CalendarDay(date.fromisoformat(DAY), True, 'fixture', 1)])
     collector = FaultCollector()
     collector.catalog_rows = {
-        'SDA-BOARD-005': [{'stock_code': '600001', 'exchange': 'XSHG', 'asset_type': 'stock'},
-                        {'stock_code': '000001', 'exchange': 'XSHE', 'asset_type': 'stock'}],
+        'SECURITY-BS-UNIVERSE-001': [{'stock_code': '600001', 'exchange': 'XSHG', 'asset_type': 'stock',
+                                    'date_basis': 'direct_historical_type_checked', 'script_sources': 'bs_all_stock'},
+                        {'stock_code': '000001', 'exchange': 'XSHE', 'asset_type': 'stock',
+                         'date_basis': 'direct_historical_type_checked', 'script_sources': 'bs_all_stock'}],
+        'SECURITY-BSE-LIST-HISTORY-001': [{'stock_code': '920001', 'exchange': 'BSE', 'asset_type': 'stock',
+                                         'date_basis': 'current_listing_date_candidate', 'script_sources': 'ak_bj_current'}],
         'SECURITY-SSE-ETF-HISTORY-001': [{'stock_code': '510300', 'exchange': 'XSHG', 'asset_type': 'etf'}],
         'SECURITY-SSE-MONEY-ETF-HISTORY-001': [{'stock_code': '511600', 'exchange': 'XSHG', 'asset_type': 'etf'}],
         'SECURITY-SZSE-ETF-HISTORY-001': [{'stock_code': '159001', 'exchange': 'XSHE', 'asset_type': 'etf'}]}
     result = run(tmp_path, {'task_id': 'configured-history', 'dataset': 'security_master', 'trade_date': DAY}, collector)
-    assert result['status'] == 'published' and result['row_count'] == 5
+    assert result['status'] == 'published' and result['row_count'] == 6
     assert set(result['units']) == set(collector.catalog_rows)
-    assert len(result['definition']['required_groups']) == 4
+    assert len(result['definition']['required_groups']) == 5
+    review_path = tmp_path/'task_workspace'/DAY/'security_master/universe_review.json'
+    review = json.loads(review_path.read_text(encoding='utf-8'))
+    assert len(review['candidates']) == 3 and not review['historical_universe_verified_complete']
+    assert all(item['status'] == 'not_evaluated' and item['missing_inputs'] for item in review['source_comparisons'])
+    assert master_manifest(tmp_path).publication_metadata['universe_review_sha256'] == file_hash(review_path)
+    collector.fail.add('SECURITY-BSE-LIST-HISTORY-001')
+    definition = {'task_id': 'configured-history', 'dataset': 'security_master', 'trade_date': DAY}
+    assert run(tmp_path, definition, collector, redo='full')['status'] == 'failed'
+    failed_review = json.loads(review_path.read_text(encoding='utf-8'))
+    assert len(failed_review['candidates']) == 2
+    collector.fail.clear()
+    assert run(tmp_path, definition, collector, redo='resume')['status'] == 'published'
+    assert len(json.loads(review_path.read_text(encoding='utf-8'))['candidates']) == 3
+    assert list((tmp_path/'task_archive').rglob('universe_review.json'))
 
 
 def test_dated_etf_qualification_checks_combined_publication_and_original_date(tmp_path):

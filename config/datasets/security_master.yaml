@@ -21,6 +21,13 @@ dataset:
       SECURITY-SSE-ETF-HISTORY-001: [[XSHG, etf]]
       SECURITY-SSE-MONEY-ETF-HISTORY-001: [[XSHG, etf]]
       SECURITY-SZSE-ETF-HISTORY-001: [[XSHE, etf]]
+      SECURITY-BS-UNIVERSE-001: [[XSHG, stock], [XSHE, stock]]
+      SECURITY-BSE-LIST-HISTORY-001: [[BSE, stock]]
+      SECURITY-SSE-MAIN-HISTORY-001: [[XSHG, stock]]
+      SECURITY-SSE-STAR-HISTORY-001: [[XSHG, stock]]
+      SECURITY-SZSE-STOCK-HISTORY-001: [[XSHE, stock]]
+      SECURITY-SSE-DELIST-HISTORY-001: [[XSHG, stock]]
+      SECURITY-SZSE-DELIST-HISTORY-001: [[XSHE, stock]]
 fields:
   instrument_id: {type: string, required: true}
   symbol: {type: string, required: true}

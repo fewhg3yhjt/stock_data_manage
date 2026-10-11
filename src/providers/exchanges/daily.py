@@ -438,6 +438,36 @@ class ExchangeDailyProvider:
     def __init__(self, client=None):
         self.client = client
 
+    def fetch_listing_history(self, *, kind, trade_date, source_responses):
+        from .security import fetch_script_listing
+        return fetch_script_listing(self, kind=kind, trade_date=trade_date, source_responses=source_responses)
+
+    def fetch_market_statistics(self, *, kind, trade_date, source_responses):
+        if kind not in {'sh', 'sz'}:
+            raise ValueError('unsupported script statistics kind')
+        from ..akshare.session import load_client
+        self.client = self.client or load_client()
+        function = self.client.stock_sse_deal_daily if kind == 'sh' else self.client.stock_szse_summary
+        frame = function(date=trade_date.strftime('%Y%m%d'))
+        if frame.empty:
+            raise ValueError('original market statistics source returned an empty table')
+        responses = list(source_responses())
+        if not responses:
+            raise ValueError('market statistics have no retained HTTP response')
+        field = '单日情况' if kind == 'sh' else '证券类别'
+        if field not in frame:
+            raise ValueError('original market statistics category field changed')
+        source_rows = tuple(frame.astype(object).where(frame.notna(), None).to_dict(orient='records'))
+        if any(row[field] is None or not str(row[field]).strip() for row in source_rows):
+            raise ValueError('original market statistics category is empty')
+        rows = tuple({'trade_date': trade_date, 'row_number': i, 'category': str(row[field]),
+                      'source_values': json.dumps(row, ensure_ascii=False, default=str, allow_nan=False)}
+                     for i, row in enumerate(source_rows, 1))
+        return InputFetchResult(rows, source_rows=source_rows, source_url=responses[-1]['url'],
+            mapping_context={'source_total_count': len(rows), 'date_semantics': 'explicit original SDK statistics request date',
+                             'units': 'source table values preserved; no cross-category equality or unit conversion',
+                             'historical_universe_verified_complete': False})
+
     def fetch_etf_history(self, *, trade_date, source_responses):
         """沿用深交所日频份额 SDK；在其删行、数值转换后核对原响应。"""
         from ..akshare.session import load_client

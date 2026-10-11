@@ -44,7 +44,9 @@ def check_security_input_qualification(contract, context, *, config_root, metada
                                                 for value in context["calendar"]["trading_dates"]]
     adapter = build_input_provider(contract, providers_path=root / "providers.yaml")
     version = adapter.capability_version
-    dated = contract.input_id in {'SECURITY-SSE-ETF-HISTORY-001', 'SECURITY-SSE-MONEY-ETF-HISTORY-001', 'SECURITY-SZSE-ETF-HISTORY-001'}
+    dated = contract.input_id in {'SECURITY-SSE-ETF-HISTORY-001', 'SECURITY-SSE-MONEY-ETF-HISTORY-001', 'SECURITY-SZSE-ETF-HISTORY-001',
+        'SECURITY-BSE-LIST-HISTORY-001','SECURITY-BS-UNIVERSE-001','SECURITY-SSE-MAIN-HISTORY-001',
+        'SECURITY-SSE-STAR-HISTORY-001','SECURITY-SZSE-STOCK-HISTORY-001','SECURITY-SSE-DELIST-HISTORY-001','SECURITY-SZSE-DELIST-HISTORY-001'}
     parameters = {key: value for key, value in contract.bind_parameters(context).items() if dated or key != "trade_date"}
     # Exact non-date scope: filtered stock probes cannot qualify the full catalog.
     scope = "parameters:" + row_hash(parameters)
@@ -297,8 +299,29 @@ def build_input_provider(contract, *, providers_path, client=None):
                         "SECURITY-SSE-ETF-HISTORY-001": "fetch_etf_history",
                         "SECURITY-SSE-MONEY-ETF-HISTORY-001": "fetch_money_etf_history",
                         "SECURITY-SZSE-ETF-HISTORY-001": "fetch_etf_history"}
+    expected_methods.update({'SECURITY-BSE-LIST-HISTORY-001':'fetch_listing_history',
+        'SECURITY-BS-UNIVERSE-001':'fetch_universe','CALENDAR-BS-001':'fetch_universe_calendar',
+        **{k:'fetch_listing_history' for k in ['SECURITY-SSE-MAIN-HISTORY-001','SECURITY-SSE-STAR-HISTORY-001',
+           'SECURITY-SZSE-STOCK-HISTORY-001','SECURITY-SSE-DELIST-HISTORY-001','SECURITY-SZSE-DELIST-HISTORY-001']},
+        'MARKET-SSE-STATS-001':'fetch_market_statistics','MARKET-SZSE-STATS-001':'fetch_market_statistics'})
     if contract.input_id not in expected_methods or contract.runtime_method != expected_methods[contract.input_id]:
         raise ValueError("input runtime method does not match its verified adapter")
+    if contract.input_id in {'SECURITY-BS-UNIVERSE-001','CALENDAR-BS-001'}:
+        return BaoStockIndustryMembershipProvider(client=client, endpoint=contract.endpoint,
+            capability_version='baostock-universe-script-v1')
+    if contract.input_id == 'SECURITY-BSE-LIST-HISTORY-001':
+        from ..providers.exchanges.security import BseSecurityListProvider
+        return BseSecurityListProvider(client=client, endpoint=contract.endpoint,
+            capability_version='bse-listed-company-script-v1')
+    if contract.input_id in {'SECURITY-SSE-MAIN-HISTORY-001','SECURITY-SSE-STAR-HISTORY-001',
+        'SECURITY-SZSE-STOCK-HISTORY-001','SECURITY-SSE-DELIST-HISTORY-001','SECURITY-SZSE-DELIST-HISTORY-001',
+        'MARKET-SSE-STATS-001','MARKET-SZSE-STATS-001'}:
+        from ..providers.exchanges.daily import ExchangeDailyProvider
+        provider = ExchangeDailyProvider(client=client)
+        provider.name, provider.endpoint = contract.provider, contract.endpoint
+        provider.capability_version = 'exchange-universe-script-v1'
+        provider.input_hosts = ('https://query.sse.com.cn','https://www.szse.cn','http://www.szse.cn')
+        return provider
     if contract.input_id == 'ASTOCK-014':
         provider = AkShareBoardProvider(client=client, endpoint=contract.endpoint)
         provider.capability_version = 'akshare-ths-concept-directory-input-v1'

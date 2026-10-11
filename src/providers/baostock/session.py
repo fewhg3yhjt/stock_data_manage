@@ -103,6 +103,9 @@ def captured_sdk_queries(store, *, mode, replay_manifest, evidence_roots, scope,
         last_payload_time = None
         query_scope = ({"trade_date": trade_date.isoformat(), "exchange_scope": "SH+SZ A shares"}
                        if trade_date else {"code_name": "ST", "exchange_scope": "SH+SZ"})
+        if query_requests and 'query_trade_dates' in query_requests:
+            query_scope = {'trade_date': trade_date.isoformat(),
+                           'query_scope': 'native calendar and unfiltered universe metadata; selection occurs after retention'}
         archive_records = []
         if mode == "replay":
             manifest = Path(replay_manifest).resolve()
@@ -145,8 +148,14 @@ def captured_sdk_queries(store, *, mode, replay_manifest, evidence_roots, scope,
             return path.resolve(), number, record, "cached"
 
         requests = query_requests or {"query_all_stock": {"day": trade_date.isoformat()}, "query_stock_industry": {"date": trade_date.isoformat()}}
-        if query_requests is not None and query_requests != {"query_stock_basic": {"code_name": "ST"}}:
-            raise ValueError('only the verified ST name query is supported as an additional SDK scope')
+        if query_requests is not None:
+            day = trade_date.isoformat() if trade_date else None
+            allowed = [{'query_stock_basic': {'code_name': 'ST'}},
+                {'query_trade_dates': {'start_date': day, 'end_date': day}},
+                {'query_trade_dates': {'start_date': day, 'end_date': day},
+                 'query_all_stock': {'day': day}, 'query_stock_basic': {}}]
+            if query_requests not in allowed or (day is None and query_requests != allowed[0]):
+                raise ValueError('SDK query scope is outside verified ST or universe script calls')
         # Search evidence before authenticating or issuing either live SDK query.
         cached = {name: lookup(name, parameters) for name, parameters in requests.items()}
         needs_live = mode == "live" and any(record is None for record in cached.values())

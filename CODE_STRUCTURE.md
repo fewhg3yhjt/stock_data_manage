@@ -184,6 +184,10 @@
 
 ## 维护约束
 
+用户证券脚本能力补齐仍修改现有模块：`providers/baostock/industry.py`保存交易日历、证券类型及区间筛选；`providers/exchanges/security.py`保存六类上市/退出事件候选及北交所原生分页核验；`providers/exchanges/daily.py`复用原生沪深统计。`pipeline/inputs.py`自动生成候选来源审查材料，`routing/factory.py`负责构建与资格门槛。新增`config/datasets/market_statistics.yaml`及`config/normalization/market_statistics.yaml`定义统计原列保留映射；新增`tests/test_universe_script.py`检查13项来源清单、参数、日期边界、证券类型、缓存与分页合同。
+
+`storage/raw.py`的既有工作材料归档也包含`universe_review.json`，重做及失败恢复保存旧审查结果后生成本次结论，原响应存储方式保持既有规则。
+
 - 新功能继续修改对应现有模块，不保留根级兼容转发或平行入口。
 - 前复权、事件发现、历史重建、范围、重做及回退在现有模块内扩展，不另建任务管理层。
 - 原始证据与历史哈希保持原样；文档合并不扩大验证范围或启用生产来源。

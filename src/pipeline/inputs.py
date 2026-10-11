@@ -286,7 +286,8 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                 dataset="task_start", provider=contract.provider, endpoint=contract.endpoint,
                 fetched_at=now, attempt_id="started", relative_path=source_directory / (request_key + ".started.json"))
         report["response_freshness_seconds"] = profile.refresh_interval_seconds or 86400
-        is_baostock = input_id in {"SDA-BOARD-005", "SDA-BOARD-006", "ASTOCK-044"}
+        is_universe_baostock = input_id in {'SECURITY-BS-UNIVERSE-001', 'CALENDAR-BS-001'}
+        is_baostock = input_id in {"SDA-BOARD-005", "SDA-BOARD-006", "ASTOCK-044"} or is_universe_baostock
         is_bse_catalog = input_id == "SECURITY-BSE-001"
         is_sse_etf_catalog = input_id == "SECURITY-SSE-ETF-001"
         is_current_catalog = is_bse_catalog or is_sse_etf_catalog
@@ -317,7 +318,10 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
         is_reportapi = input_id == "ASTOCK-008"
         is_seats = input_id == "ASTOCK-019"
         is_reports_seats = is_reportapi or is_seats
-        is_source_sdk = is_actual_data or input_id in {"ASTOCK-031","ASTOCK-039","ASTOCK-051","ASTOCK-055","ASTOCK-067","ASTOCK-068","ASTOCK-069","ASTOCK-085"}
+        is_universe_sdk = input_id in {'SECURITY-BSE-LIST-HISTORY-001','SECURITY-SSE-MAIN-HISTORY-001',
+            'SECURITY-SSE-STAR-HISTORY-001','SECURITY-SZSE-STOCK-HISTORY-001','SECURITY-SSE-DELIST-HISTORY-001',
+            'SECURITY-SZSE-DELIST-HISTORY-001','MARKET-SSE-STATS-001','MARKET-SZSE-STATS-001'}
+        is_source_sdk = is_actual_data or is_universe_sdk or input_id in {"ASTOCK-031","ASTOCK-039","ASTOCK-051","ASTOCK-055","ASTOCK-067","ASTOCK-068","ASTOCK-069","ASTOCK-085"}
         is_etf_history = input_id in {'SECURITY-SSE-ETF-HISTORY-001', 'SECURITY-SSE-MONEY-ETF-HISTORY-001', 'SECURITY-SZSE-ETF-HISTORY-001'}
         is_original_source = is_etf_history or input_id in {"ASTOCK-003","ASTOCK-004","ASTOCK-030","ASTOCK-063","ASTOCK-071","ASTOCK-072","ASTOCK-073","ASTOCK-077"}
         is_source_extension = is_source_sdk or is_original_source
@@ -401,7 +405,9 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                 report["sdk_dependency"] = {"version": (getattr(client, "__version__", "injected_fixture") if client is not None else
                                                          importlib.metadata.version("baostock") if sdk_module else "unavailable_offline"),
                                             "client_injected": client is not None, "dependencies": []}
-                for name in (("query_stock_basic", "login", "logout") if input_id == 'ASTOCK-044' else
+                for name in (('query_trade_dates','login','logout') if input_id == 'CALENDAR-BS-001' else
+                             ('query_trade_dates','query_all_stock','query_stock_basic','login','logout') if input_id == 'SECURITY-BS-UNIVERSE-001' else
+                             ("query_stock_basic", "login", "logout") if input_id == 'ASTOCK-044' else
                              ("query_all_stock", "query_stock_industry", "login", "logout")):
                     function = getattr(sdk, name, None)
                     if function is None:
@@ -436,6 +442,13 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                              "ASTOCK-028": "stock_individual_fund_flow",
                              "SECURITY-SSE-ETF-HISTORY-001": "fund_etf_scale_sse",
                              "SECURITY-SZSE-ETF-HISTORY-001": "fund_scale_daily_szse",
+                             'SECURITY-BSE-LIST-HISTORY-001':'stock_info_bj_name_code',
+                             'SECURITY-SSE-MAIN-HISTORY-001':'stock_info_sh_name_code',
+                             'SECURITY-SSE-STAR-HISTORY-001':'stock_info_sh_name_code',
+                             'SECURITY-SZSE-STOCK-HISTORY-001':'stock_info_sz_name_code',
+                             'SECURITY-SSE-DELIST-HISTORY-001':'stock_info_sh_delist',
+                             'SECURITY-SZSE-DELIST-HISTORY-001':'stock_info_sz_delist',
+                             'MARKET-SSE-STATS-001':'stock_sse_deal_daily','MARKET-SZSE-STATS-001':'stock_szse_summary',
                              "SDA-BOARD-001": "stock_board_industry_name_ths", "SDA-BOARD-002": "stock_board_industry_index_ths",
                              "SDA-BOARD-003": "stock_fund_flow_industry", "SDA-BOARD-004": "stock_fund_flow_concept"}
             if input_id in sdk_functions:
@@ -511,6 +524,14 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                         report["seats_sdk_transport_policy"].update(response_guard="after exact retention, before SDK positional parsing", source_fallback=False, implicit_date_selection=False)
                     if is_source_sdk:
                         report["source_sdk_transport_policy"] = report.pop("sdk_news_transport_policy")
+                        if is_universe_sdk:
+                            report['source_sdk_transport_policy'] = {
+                                'source_contract': 'original native SDK function and parameters',
+                                'transport': 'native requests; headers, proxy, timeout and session delegated unchanged',
+                                'capture_boundary': 'HTTP response bytes before native SDK parsing',
+                                'sdk_cache_policy': 'BSE underlying native function; parsed-table cache bypassed',
+                                'request_options': 'see retained request manifest',
+                                'requests_retry_policy_applies': False}
                         if input_id in {'ASTOCK-031','ASTOCK-069'}:
                             report['source_sdk_transport_policy']={'source_contract':'original native SDK transport',
                                 'transport':'curl_cffi' if input_id=='ASTOCK-031' else 'pandas urllib',
@@ -588,7 +609,10 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                         scope={"input_id": input_id, "parameters": normalized_context}, code_version=code_version,
                         trade_date=parameters.get("trade_date"), pacer=pacer, interval_seconds=max(3, contract.request_interval_seconds),
                         max_age_seconds=0 if force_fetch else profile.refresh_interval_seconds or 86400, client=client,
-                        query_requests={'query_stock_basic': {'code_name': 'ST'}} if input_id == 'ASTOCK-044' else None))
+                        query_requests={'query_stock_basic': {'code_name': 'ST'}} if input_id == 'ASTOCK-044' else
+                            {'query_trade_dates': {'start_date': parameters['trade_date'].isoformat(), 'end_date': parameters['trade_date'].isoformat()},
+                             'query_all_stock': {'day': parameters['trade_date'].isoformat()}, 'query_stock_basic': {}} if input_id == 'SECURITY-BS-UNIVERSE-001' else
+                            {'query_trade_dates': {'start_date': parameters['trade_date'].isoformat(), 'end_date': parameters['trade_date'].isoformat()}} if input_id == 'CALENDAR-BS-001' else None))
                     provider.client = sdk_client
                     runtime_parameters["raw_archive"] = sdk_archive
                 else:
@@ -636,7 +660,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                         probe_host_pause=is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_sdk,require_empty_post_body=input_id=="ASTOCK-061",response_validator=response_validator,
                         cache_ignored_query_parameters=("_",) if is_reportapi else (),
                          native_transport='curl_cffi' if input_id=='ASTOCK-031' else 'pandas_urllib' if input_id=='ASTOCK-069' else None,
-                         match_request_body=is_bse_catalog))
+                         match_request_body=is_bse_catalog or input_id == 'SECURITY-BSE-LIST-HISTORY-001'))
                 if is_source_sdk or input_id in {'SECURITY-SSE-ETF-HISTORY-001', 'SECURITY-SZSE-ETF-HISTORY-001'}:
                     def retained_responses():
                         for event in response_events:
@@ -748,21 +772,21 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                     returned_window={"first": parameters["date"].isoformat(), "last": parameters["date"].isoformat()},
                     coverage_basis="source tc and returned SDK rows for requested qdate; not independent whole-market proof",
                     universe_completeness_verified=False)
-            mapping_rows = fetched.rows if input_id == 'ASTOCK-044' or is_sse_etf_catalog or is_em_history or is_lpr or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_extension or is_repo_rate or is_cb or is_sina_futures else source_rows
-            if input_id == 'ASTOCK-044' or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_extension or is_repo_rate or is_cb or is_sina_futures:
+            mapping_rows = fetched.rows if is_universe_baostock or input_id == 'ASTOCK-044' or is_sse_etf_catalog or is_em_history or is_lpr or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_extension or is_repo_rate or is_cb or is_sina_futures else source_rows
+            if is_universe_baostock or input_id == 'ASTOCK-044' or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_extension or is_repo_rate or is_cb or is_sina_futures:
                 parsed_ref = write_result(_json_value(mapping_rows), dataset="parsed_rows", provider=contract.provider,
                     endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="parsed-rows")
                 report["parsed_rows"] = {"path":relative_file(parsed_ref.path),
                     "sha256":parsed_ref.content_hash,"row_count":len(mapping_rows),"code_version":code_version,
                     "source_response_hashes":[event["body_sha256"] for event in response_events]}
-            if input_id == "SDA-BOARD-005" or is_sse_etf_catalog:
+            if input_id == "SDA-BOARD-005" or is_sse_etf_catalog or is_universe_baostock or is_universe_sdk:
                 excluded_ref = write_result(_json_value(fetched.excluded_rows), dataset="excluded_rows", provider=contract.provider,
                     endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="excluded-rows")
                 report["excluded_rows"] = {"path": relative_file(excluded_ref.path), "sha256": excluded_ref.content_hash,
                     "row_count": len(fetched.excluded_rows), "code_version": code_version,
                     "source_response_hashes": [event["body_sha256"] for event in response_events]}
                 report.update(source_metadata=_json_value(fetched.mapping_context), universe_completeness_verified=False,
-                    asset_type_counts={kind: sum(row["asset_type"] == kind for row in mapping_rows) for kind in ("stock", "etf")})
+                    asset_type_counts={kind: sum(row.get("asset_type") == kind for row in mapping_rows) for kind in ("stock", "etf")})
             if is_factor:
                 excluded_ref = write_result(_json_value(fetched.excluded_rows), dataset="excluded_rows", provider=contract.provider,
                     endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="excluded-rows")
@@ -834,7 +858,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                               coverage_scope="explicit requested stock list; no independent whole-market completeness proof")
                 if any(day != parameters["as_of"].astimezone(ZoneInfo("Asia/Shanghai")).date() for day in quote_dates):
                     raise NormalizationError("source quote date differs from requested as_of date; snapshot cannot query history")
-            valid_empty = (is_em_events or is_cb or input_id=="ASTOCK-013") and fetched.empty_is_valid
+            valid_empty = (is_em_events or is_cb or is_universe_sdk or input_id=="ASTOCK-013") and fetched.empty_is_valid
             if (not source_rows or not mapping_rows) and not valid_empty:
                 raise NormalizationError("temporary empty input; not certified as a valid empty dataset")
             mapping_context = {"provider": contract.provider}
@@ -944,6 +968,12 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                     original_row_count=len(source_rows), selected_row_count=len(mapping_rows),
                     source_metadata=_json_value(fetched.mapping_context),
                     coverage_basis='returned actual source records; no independent universe proof')
+            elif is_universe_sdk:
+                report.update(returned_window={'first': parameters['trade_date'].isoformat(),
+                    'last': parameters['trade_date'].isoformat(), 'meaning': fetched.mapping_context['date_semantics']},
+                    source_fallback_enabled=False, implicit_date_selection=False, universe_completeness_verified=False,
+                    source_metadata=_json_value(fetched.mapping_context),
+                    coverage_basis='source rows and candidate selection; not independent historical census proof')
             elif is_source_extension:
                 key = '发布时间' if input_id=='ASTOCK-031' else '报告日' if input_id=='ASTOCK-039' else '时间' if input_id=='ASTOCK-051' else 'TRADE_DATE' if input_id=='ASTOCK-055' else '日期' if input_id in {'ASTOCK-067','ASTOCK-068','ASTOCK-069'} else 'trade_date' if input_id=='ASTOCK-085' else 'date'
                 days=[str(row[key]) for row in mapping_rows]
@@ -1672,6 +1702,8 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
     else:
         from datetime import date
         from ..quality.publication import check_security_coverage
+        if (work / 'prepared.parquet').exists() or (work / 'universe_review.json').exists():
+            RawObjectStore.preserve_work_files(work, archive_root=paths['archive_root'])
         current_dir = paths["canonical_root"] / day.isoformat() / "security_master"
         from ..storage.metadata import MetadataStore
         with MetadataStore(paths["metadata_path"]) as store:
@@ -1711,6 +1743,37 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
         # Inspect today's sources alone. Previous rows must not conceal omissions.
         merged = prepare_security_publication({key: value["rows"] for key, value in source_rows.items()})
         records = merged.records
+        scripted = {key: value for key, value in source_rows.items()
+                    if any(row.get('date_basis') for row in value['rows'])}
+        if scripted:
+            review = {
+                'target_date': day.isoformat(), 'historical_universe_verified_complete': False,
+                'meaning': 'candidate provenance; group coverage is not independent historical census proof',
+                'sources': {key: {'input_id': value['entry']['input_id'], 'raw_ref': value['raw_ref'],
+                    'raw_hash': value['entry']['raw_hash'], 'artifact_hash': value['entry']['artifact_hash'],
+                    'source_metadata': value['entry']['report'].get('source_metadata', {}),
+                    'excluded_rows': value['entry']['report'].get('excluded_rows'),
+                    'candidate_count': len(value['rows'])} for key, value in scripted.items()},
+                'candidates': [{'unit_key': key, 'symbol': row['stock_code'], 'exchange': row['exchange'],
+                    'date_basis': row.get('date_basis'), 'script_sources': row.get('script_sources')}
+                    for key, value in scripted.items() for row in value['rows']],
+                'source_comparisons': []}
+            for exchange, reference_ids in [('XSHG', {'SECURITY-SSE-MAIN-HISTORY-001', 'SECURITY-SSE-STAR-HISTORY-001'}),
+                                             ('XSHE', {'SECURITY-SZSE-STOCK-HISTORY-001'})]:
+                supplied = {v['entry']['input_id'] for v in scripted.values()}
+                ready = reference_ids <= supplied and 'SECURITY-BS-UNIVERSE-001' in supplied
+                comparison = {'exchange': exchange, 'status': 'evaluated' if ready else 'not_evaluated',
+                              'missing_inputs': sorted((reference_ids | {'SECURITY-BS-UNIVERSE-001'}) - supplied)}
+                if ready:
+                    reference = {r['stock_code'] for v in scripted.values() if v['entry']['input_id'] in reference_ids
+                                 for r in v['rows'] if r['exchange'] == exchange}
+                    primary = {r['stock_code'] for v in scripted.values() if v['entry']['input_id'] == 'SECURITY-BS-UNIVERSE-001'
+                               for r in v['rows'] if r['exchange'] == exchange}
+                    comparison.update(only_reference=sorted(reference-primary), only_primary=sorted(primary-reference))
+                review['source_comparisons'].append(comparison)
+            RawObjectStore(work).write_json(_json_value(review), dataset='universe_review', provider='pipeline',
+                endpoint='provenance', fetched_at=datetime.now(timezone.utc), attempt_id='universe-review',
+                relative_path='universe_review.json')
         comparable = previous if prior and prior.get("scope_hash") == scope_hash else ()
         check = check_security_coverage(records, required_groups=required_groups, previous=comparable)
         check.update(missing_units=missing, requested_date=day.isoformat(), required_groups=sorted(required_groups),
@@ -1788,13 +1851,14 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
                              "adapter_version": value["entry"]["report"].get("adapter_version"),
                              "normalization_version": value["entry"]["report"].get("normalization_version")}
                             for key, value in source_rows.items()]}
+            if scripted:
+                publication_metadata.update(historical_universe_verified_complete=False,
+                    universe_review_sha256=file_hash(work / 'universe_review.json'))
         rows = [{name: _json_value(getattr(item, name)) if name not in {"list_date", "delist_date"} else getattr(item, name)
                  for name in ("instrument_id", "symbol", "exchange", "asset_type", "name", "list_date", "delist_date", "status")}
                 for item in records]
         fields = yaml.safe_load((config_root / "datasets/security_master.yaml").read_text(encoding="utf-8"))["fields"]
         candidate = work / "prepared.parquet"
-        if candidate.exists():
-            RawObjectStore.preserve_work_files(work, archive_root=paths["archive_root"])
         if fallback:
             shutil.copyfile(previous_path, candidate)
         else:
