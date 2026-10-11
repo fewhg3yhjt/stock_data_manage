@@ -231,6 +231,8 @@ python -m stock_data_manage.cli collect-due-inputs --dataset security_master
 
 上述步骤是历史实施记录，不能视为全部正式验收完成。按日raw路径、正式输出入口和统一任务摘要已实现；再以真实证券清单任务验收。日线验收在名单发布后继续按阶段确认，不用手工接口候选代替业务任务结果。
 
+2026-10-12更新：正式证券名单已发布；元数据批量登记、默认UTF-8输出已在`f4db191`修复，55项回归通过。日线全量任务尚未运行。原生对照确认腾讯新地址可返回北交所样本日线，但该地址尚未接入、字段单位尚未认证，在线日线资格仍未接通；新代码不自动继承旧资格。后续按“确认接入范围→修改现有Provider与YAML→核验实际窗口及单位→取得资格→正式全量重做→覆盖与重做验收”推进。完整待办统一维护于 [项目进度](../../PROJECT_PROGRESS.md#待办事项)，本页不另建一份待办清单。
+
 首次正式发布以真实10月9日原响应运行现有CLI，执行参数为`--redo full --mode retained`；全部五项重新解析与检查，原响应转正，发布7267条。北交所原响应实际采集日为10月9日；不将当前目录改标为该日。完整核验见 [正式发布报告](../../data/task_workspace/_checks/security-release-20261012/verification.json)。Windows控制台可用`python -X utf8 -m stock_data_manage.cli collect-task --task-file data/task_workspace/_checks/security-release-20261012/task.json --redo resume --mode retained`确认已完成任务，已发布时返回no-op。该命令是确认而非再次采集；全量重建使用`--redo full`。后台调度和全市场日线仍待后续阶段。
 
 第一阶段相关离线测试 66 项通过，包含目录边界、三种重做、提交恢复和既有真实来源证据回放。原始来源清单与响应哈希核验通过；两份参数示例除任务ID外与原示例一致。删除上一轮错放的 57 个文件；本机检查记录位于 `data/task_workspace/_checks/directory-layout/{regression.xml,verification.json}`，不生成正式名单或日线，不作为在线资格证据。
