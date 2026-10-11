@@ -4,7 +4,7 @@
 
 接口响应先落入 `data/raw/_tmp`，来源解析、字段映射、检查与发布成功后，更新该来源、接口、数据日期及请求范围的当天原始结果；不同日期分别保留。任务支持全量重做、断点重做和指定证券重做。复用 `pipeline/inputs.py`、日线和证券主数据合并、现有元数据库、Parquet 发布及恢复模块，不增加服务、调度平台或 Provider 副本。
 
-2026-10-09确认：`provider_validation/` 仅用于正式实现前确认接口可行性，进入业务开发后的产物不再进入该目录。已有证据只读回放，实现测试使用 `tmp/` 下独立运行根目录。2026-10-11已进一步简化按日目录，旧数据未迁移；此前来源资格因代码和配置指纹变化需复核，本阶段未在线采集或发布生产名单。规则见 [存储说明](../storage/README.md)。
+2026-10-09确认：`provider_validation/` 仅用于正式实现前确认接口可行性，进入业务开发后的产物不再进入该目录。已有证据只读回放，实现测试使用 `tmp/` 下独立运行根目录。2026-10-11已进一步简化按日目录，完成旧业务数据迁移及当前版本三项来源资格复核；正式入口因当天日历覆盖缺失记录阻断，没有发布生产名单。规则见 [存储说明](../storage/README.md)。
 
 本次先接通证券主数据与指定交易日的日线流程；管理页面、后台定时运行、全市场在线启用不在本次范围。现有验证专用来源的声明不是生产资格。正式任务默认使用 `config/collection.yaml` 指定的 `data/`，默认模式为 `live`，在线来源资格检查仍在写入前阻断执行。离线回放必须显式使用 `--mode replay` 和隔离的 `--data-root`，不能发布到配置的生产目录。业务任务输出不能放入 `provider_validation/`。沪深股票、ETF 和北交所的完整来源覆盖需分别证明，来源缺失不得包装成全量完成。
 
@@ -132,7 +132,7 @@ python -m stock_data_manage.cli collect-due-inputs --dataset security_master
 5. 再次执行同一天的入口沿用同一任务：只补失败或不完整来源，合格当天单元复用；完整任务校验后直接返回。回退任务不会被误判为当天完成。
 6. 发布中断时沿用原提交恢复流程，不重新采集。全量与指定证券重做仍使用既有任务操作，详见 [本页操作方式](#操作方式)。
 
-以上描述当前任务逻辑；2026-10-11简化目录实现见 [存储说明](../storage/README.md)，旧数据未迁移。正式开发后的来源复核和发布验收通过业务运行布局留存，不向 `provider_validation/` 新增产物。
+以上描述当前任务逻辑；2026-10-11简化目录实现及已完成的旧业务迁移见 [存储说明](../storage/README.md)。正式开发后的来源复核和发布验收通过业务运行布局留存，不向 `provider_validation/` 新增产物。
 
 ### 自动任务摘要
 
@@ -152,7 +152,9 @@ python -m stock_data_manage.cli collect-due-inputs --dataset security_master
 
 核准登记复用 `MetadataStore.save_probe_evidence`；本阶段不新增登记后台或管理页面。正式Provider在线对照、独立覆盖基准及合格端到端证据未齐全时保持阻断。证据有效期或代码、配置变化后须重新核验，不能沿用旧资格。
 
-2026-10-10三项来源完成资格登记，五个责任组通过代码、范围、时效、真实载荷及隔离发布检查。用户明确允许正式写入data后，通过现有collect_task入口执行security-master-20261009，优先复用同版本响应。BaoStock10月9日6917条候选通过；北交所和上交所目录为10月10日，两个单元报日期不符。任务自动写入失败摘要及覆盖检查，没有合格前次名单可回退，没有发布或转正raw。须在同一个真实交易日完成首次发布验收，再进入日线阶段。详见 [本轮索引](../../data/task_workspace/_checks/security-production-20261010/verification.json) 和 [自动摘要](../../data/task_workspace/_tasks/security-master-20261009/summary.json)。
+2026-10-10三项来源完成资格登记，五个责任组通过代码、范围、时效、真实载荷及隔离发布检查。用户明确允许正式写入data后，通过现有collect_task入口执行security-master-20261009，优先复用同版本响应。BaoStock10月9日6917条候选通过；北交所和上交所目录为10月10日，两个单元报日期不符。任务自动写入失败摘要及覆盖检查，没有合格前次名单可回退，没有发布或转正raw。须在同一个真实交易日完成首次发布验收，再进入日线阶段。详见 [历史索引](../../data/task_workspace/_checks/security-production-20261010/verification.json) 和迁移后的 [自动摘要](../../data/task_workspace/2026-10-09/security_master/summary.json)。
+
+2026-10-11目录迁移后，修正来源资格检查解析相对路径时仍以报告父目录为基准的问题。三项来源按当前代码重新完成四层核验并登记，164项回归通过。正式 `collect-due-inputs --dataset security_master --execute --mode live` 使用真实当前时间执行一次，因日历缺少10月11日记录返回blocked，不发起业务采集或发布；没有用其他日期拼出全量证券。当前资格、迁移和自动调度结果见 [阶段索引](../../data/task_workspace/_checks/layout-production-20261011/verification.json)。
 
 ### 交易日历来源与当前状态
 

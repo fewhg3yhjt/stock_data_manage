@@ -2,7 +2,7 @@
 
 ## 目录约定
 
-2026-10-11按用户确认的结构修改现有代码。正式运行根目录为 `data/`；离线回放、故障注入及实现验收使用 `tmp/` 下独立运行根目录，内部结构相同。旧业务数据和验证证据本阶段保留原位，尚未迁移。
+2026-10-11按用户确认的结构修改现有代码并迁移旧业务目录。正式运行根目录为 `data/`；离线回放、故障注入及实现验收使用 `tmp/` 下独立运行根目录，内部结构相同。`provider_validation/` 中的历史验证证据保留原位，不新增业务产物。
 
 ```text
 data/
@@ -67,8 +67,10 @@ data/
 
 独立 `collect-input` 只生成候选，不自动转正。离线回放须指定独立 `--data-root`，禁止发布至生产根目录；显式 `--output-root` 保留既有隔离候选方式，禁止输出到验证区或生产路径。
 
-本阶段修改代码和文档，在 `tmp/` 验证，没有迁移旧生产目录、在线采集、注册新资格或发布生产名单。此前三项来源曾登记资格，但当前代码和配置指纹变化，需要重新复核。日线在线资格、常驻调度及管理页面仍未完成。
+旧业务目录的152个文件已逐字节保存在 `data/task_archive/_workspace_audit/layout-migration-20261011/`。三份真实候选及其原响应迁入按日期的活动目录，四份历史回放只留归档；元数据引用同步更新。BaoStock原响应所属日为10月9日，北交所和上交所当前目录所属日为10月10日。失败任务继续失败，raw仍在各自日期的 `_tmp`，没有生成正式证券名单。
+
+迁移清单同时记录旧路径、审计位置和当前位置，原JSON、原响应及原哈希可追溯；新位置的派生描述符重新核验，历史代码指纹不修改。SDK依赖快照也按原哈希核验。见 [迁移结果](../../data/task_workspace/_checks/layout-production-20261011/migration-result.json) 和 [迁移核验](../../data/task_workspace/_checks/layout-production-20261011/migration-verification.json)。新的来源复核在隔离 `tmp/` 执行，资格和正式入口检查见 [阶段索引](../../data/task_workspace/_checks/layout-production-20261011/verification.json)。日线在线资格、常驻调度及管理页面仍未完成。
 
 本轮276个不同测试用例的最终结果通过。聚合回归206项中曾有1项失败，发现同日不同任务的旧覆盖报告阻止失败保存；修复为先归档构建文件、更新旧摘要引用后，相关15项定向复验通过。运行布局67项、原响应缺失和恢复等7项补充检查通过。10月9日真实归档在隔离新布局发布7267条，包含五组证券和ETF；历史日线目标日提取也通过。原响应哈希、转正后暂存无文件及文档链接另行复查，结果见 [本轮核验索引](../../tmp/directory-layout-20261011/verification.json)。这些回放成果不代表生产发布或在线资格。
 
-旧正式任务 `security-master-20261009` 因两个当前目录采集日为10月10日失败，其 [旧摘要](../../data/task_workspace/_tasks/security-master-20261009/summary.json) 和 [检查索引](../../data/task_workspace/_checks/security-production-20261010/verification.json) 保留，不是新布局成果。此前隔离7267条名单见 [接入检查](../../data/task_workspace/_checks/summary-etf-20261010/verification.json)，按日raw验收见 [历史检查](../../data/task_workspace/_checks/daily-raw-20261010/verification.json)。历史路径及哈希不静默改写。
+旧正式任务 `security-master-20261009` 因两个当前目录采集日为10月10日失败，迁移后自动生成的 [任务摘要](../../data/task_workspace/2026-10-09/security_master/summary.json) 继续记录失败；原摘要在上述迁移审计副本中逐字节保存。[历史检查索引](../../data/task_workspace/_checks/security-production-20261010/verification.json) 保持原样，其旧路径通过迁移清单追踪。此前隔离7267条名单见 [接入检查](../../data/task_workspace/_checks/summary-etf-20261010/verification.json)，按日raw验收见 [历史检查](../../data/task_workspace/_checks/daily-raw-20261010/verification.json)。

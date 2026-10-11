@@ -505,6 +505,42 @@ def test_security_source_qualification_requires_verified_current_artifacts(tmp_p
         assert result["eligible"] is (failure in {None, "replay", "sdk_derived"}), result
 
 
+@pytest.mark.parametrize("missing_raw", [False, True])
+def test_qualification_resolves_dated_source_report_from_workspace(tmp_path, missing_raw):
+    from dataclasses import replace
+    from stock_data_manage.routing.factory import check_security_input_qualification
+    context = full_master_definition()["units"][0]["context"]
+    contract, proof_path = save_fixture_qualification(tmp_path, "SDA-BOARD-005", context)
+    proof = json.loads(proof_path.read_text())
+    original_report = Path(proof["live_report"]["path"])
+    live = json.loads(original_report.read_text())
+    raw = Path(live["raw_manifest"]["path"])
+    live["raw_manifest"]["path"] = "raw/manifest.ndjson"
+    nested = original_report.parent / "sources" / contract.provider / contract.endpoint / "all-fixture.report.json"
+    nested.parent.mkdir(parents=True)
+    nested.write_text(json.dumps(live), encoding="utf-8")
+    proof["live_report"] = {"path": str(nested), "sha256": file_hash(nested)}
+    # E2E replay has identical response bytes but a different manifest hash.
+    replay = RawObjectStore(tmp_path / "replay-response")
+    replay.record_response(response=SimpleNamespace(content=b'{"synthetic_transport_fixture": true}',
+        status_code=200, headers={}, encoding="utf-8"), url="https://fixture.invalid/replay", method="GET",
+        request_headers={}, provider=contract.provider, endpoint=contract.endpoint, scope={},
+        code_version="fixture-v1", mode="replay")
+    publication = Path(proof["publication_manifest"]["path"])
+    replace(Manifest.load(publication), raw_refs=(str(replay.manifest),)).write_atomic(publication)
+    proof["publication_manifest"]["sha256"] = file_hash(publication)
+    proof_path.write_text(json.dumps(proof), encoding="utf-8")
+    if missing_raw:
+        raw.unlink()
+    with MetadataStore(tmp_path / "metadata/metadata.duckdb") as metadata:
+        metadata.connection.execute("UPDATE capability_registry SET evidence_hash=?", [file_hash(proof_path)])
+        result = check_security_input_qualification(contract, context, config_root=CONFIG,
+                                                    metadata=metadata, now=datetime.now(timezone.utc))
+    assert result["eligible"] is not missing_raw, result
+    if missing_raw:
+        assert all("live raw manifest is missing" in r["reason"] for r in result["reasons"])
+
+
 def test_qualified_schedule_uses_same_task_for_idempotence_and_fallback_retry(tmp_path):
     from stock_data_manage.pipeline.inputs import collect_due_inputs
     from stock_data_manage.worker.scheduler import SHANGHAI

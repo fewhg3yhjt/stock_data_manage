@@ -100,9 +100,15 @@ def check_security_input_qualification(contract, context, *, config_root, metada
             if str(Path(inspect.getfile(type(adapter))).resolve()) not in {str(Path(d["path"]).resolve()) for d in live["code_files"]}:
                 raise ValueError("live evidence omits the actual adapter code")
             published = Manifest.load(artifacts["publication_manifest"])
-            raw_candidates = [(artifacts["live_report"].parent / live["raw_manifest"]["path"]).resolve(),
+            report_base = artifacts["live_report"].parent
+            if report_base.parts[-3:] == ("sources", contract.provider, contract.endpoint):
+                # Runtime descriptors are relative to the dated dataset workspace.
+                report_base = report_base.parents[2]
+            raw_candidates = [(report_base / live["raw_manifest"]["path"]).resolve(),
                               *(Path(ref).resolve() for ref in published.raw_refs)]
-            raw = next(path for path in raw_candidates if path.exists() and file_hash(path) == live["raw_manifest"]["sha256"])
+            raw = next((path for path in raw_candidates if path.exists() and file_hash(path) == live["raw_manifest"]["sha256"]), None)
+            if raw is None:
+                raise ValueError("verified live raw manifest is missing or its hash differs")
             if RawObjectStore.verify_manifest(raw) != live["raw_manifest"]["sha256"]:
                 raise ValueError("live raw evidence hash differs")
             responses = [json.loads(line) for line in raw.read_text(encoding="utf-8").splitlines()]
