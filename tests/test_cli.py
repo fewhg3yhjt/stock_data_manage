@@ -1,6 +1,38 @@
 from stock_data_manage.cli import main
 
 
+def test_cli_prints_unicode_result_and_progress_with_gbk_streams(tmp_path, monkeypatch):
+    import io
+    import json
+    stdout_bytes, stderr_bytes = io.BytesIO(), io.BytesIO()
+    stdout = io.TextIOWrapper(stdout_bytes, encoding="gbk")
+    stderr = io.TextIOWrapper(stderr_bytes, encoding="gbk")
+    monkeypatch.setattr("sys.stdout", stdout)
+    monkeypatch.setattr("sys.stderr", stderr)
+    task = tmp_path / "task.json"
+    task.write_text("{}", encoding="utf-8")
+    def collector(**kwargs):
+        import sys
+        sys.stderr.write("发布完成：证券 å\n")
+        return {"status": "published", "name": "证券 å"}
+    monkeypatch.setattr("stock_data_manage.pipeline.inputs.collect_task", collector)
+    assert main(["collect-task", "--task-file", str(task)]) == 0
+    stdout.flush()
+    stderr.flush()
+    assert json.loads(stdout_bytes.getvalue().decode("utf-8"))["name"] == "证券 å"
+    assert "发布完成：证券 å" in stderr_bytes.getvalue().decode("utf-8")
+
+
+def test_cli_accepts_in_memory_stream_without_reconfigure(monkeypatch):
+    import io
+    import pytest
+    stream = io.StringIO()
+    monkeypatch.setattr("sys.stdout", stream)
+    with pytest.raises(SystemExit) as exc:
+        main(["--help"])
+    assert exc.value.code == 0 and "stock-data" in stream.getvalue()
+
+
 def test_security_due_cli_reports_calendar_and_qualification_blocks(tmp_path, capsys):
     import json
     from pathlib import Path

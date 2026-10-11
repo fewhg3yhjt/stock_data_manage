@@ -404,10 +404,15 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
                     now,
                 ],
             )
-            for instrument_id, item_status in resolved_statuses.items():
+            if resolved_statuses:
+                # Aligned lists become one relation; keep the partition and all
+                # item updates in the same transaction, including partial redo.
+                instrument_ids = list(resolved_statuses)
                 self.connection.execute(
                     """
-                    INSERT INTO partition_item VALUES (?, ?, ?, ?, ?, ?)
+                    INSERT INTO partition_item
+                    SELECT ?, ?, unnest(?::VARCHAR[]), unnest(?::VARCHAR[]),
+                           unnest(?::VARCHAR[]), ?
                     ON CONFLICT (dataset, partition_key, instrument_id) DO UPDATE SET
                         status=excluded.status,
                         source_provider=excluded.source_provider,
@@ -416,9 +421,9 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
                     [
                         manifest.dataset,
                         manifest.partition_key,
-                        instrument_id,
-                        item_status.value,
-                        resolved_providers.get(instrument_id),
+                        instrument_ids,
+                        [resolved_statuses[key].value for key in instrument_ids],
+                        [resolved_providers.get(key) for key in instrument_ids],
                         now,
                     ],
                 )

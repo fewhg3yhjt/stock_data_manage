@@ -150,7 +150,7 @@
 | `storage/raw.py` | 原响应字节、按日期/来源/接口暂存及转正；请求级清单和接口索引，按请求替换、审计及共享字节保护；当前目录在解析前按原捕获日落盘；哈希复查、脱敏与缓存 |
 | `storage/hot.py` | SQLite WAL Hot Minute Store 和即时查询数据 |
 | `storage/parquet.py` | 来源字段合同的候选精确类型写入；Canonical Bar按日期/数据集/资产类型分区，复权保留记录主键；清单、文件锁和原子发布 |
-| `storage/metadata.py` | 既有DuckDB任务、分区、Attempt、调度占用、来源健康、证据和冲突；查询不晚于目标日期的最新合格分区；不新增数据库 |
+| `storage/metadata.py` | 既有DuckDB任务、分区、Attempt、调度占用、来源健康、证据和冲突；分区及证券状态同事务批量登记，保留未更新证券；查询不晚于目标日期的最新合格分区；不新增数据库 |
 | `storage/integrity.py` | 确定性 row hash、Manifest 生成和完整性校验 |
 | `storage/__init__.py` | 存储包说明，不承载业务实现 |
 
@@ -179,7 +179,7 @@
 任务入口 `pipeline/inputs.py` 支持正式留存响应模式及持久化进度；`cli.py` 提供 `--mode retained`、`--progress/--no-progress`。实现测试新增 `tests/test_task_progress.py`（进度、未知总量、失败和恢复计数）与 `tests/test_retained_daily.py`（合成四层资格、范围及哈希拒绝、零网络发布和恢复）；测试只写tmp，不作为真实来源资格。
 
 证券任务省略units时，`pipeline/inputs.py` 查询既有交易日历并调用 `worker/scheduler.py` 按collection.yaml构建来源；`routing/factory.py` 对历史ETF按完整日期参数及互补发布数量检查资格。新增行为在既有 `tests/test_scheduler.py`、`tests/test_collection_tasks.py` 验证，不新增任务管理模块。
-| `cli.py` | `collect-due-inputs`（默认保存计划）、`collect-input`（默认分层落盘，支持 JSON 参数上下文及隔离验证输出）、`probe-*`、`recover`、`acceptance-offline` 等入口，负责参数解析和现有流程组装 |
+| `cli.py` | `collect-due-inputs`（默认保存计划）、`collect-input`（默认分层落盘，支持 JSON 参数上下文及隔离验证输出）、`probe-*`、`recover`、`acceptance-offline` 等入口，负责参数解析、UTF-8结果与进度输出和现有流程组装 |
 | `__init__.py` | 包级公共领域模型导出 |
 
 ## 维护约束

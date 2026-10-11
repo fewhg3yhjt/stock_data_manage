@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from dataclasses import asdict
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -18,6 +19,11 @@ from .worker.recovery import RecoveryScanner
 
 
 def main(argv: list[str] | None = None) -> int:
+    # Windows consoles and redirected files must both accept source names and
+    # Chinese progress. In-memory/custom streams need no reconfiguration.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser(prog="stock-data")
     subcommands = parser.add_subparsers(dest="command", required=True)
 
@@ -105,7 +111,6 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if args.command == "collect-task":
         from .pipeline.inputs import collect_task
-        import sys
         from .worker.progress import ConsoleProgress
         try:
             definition = json.loads(args.task_file.read_text(encoding="utf-8"))

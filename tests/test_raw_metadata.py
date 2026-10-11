@@ -145,6 +145,39 @@ def test_conflict_log_is_deduplicated(tmp_path, minute_bar, final_minute_bar) ->
         assert metadata.conflict_count("minute_bar_1m", "2026-09-11") == len(conflicts)
 
 
+def test_partition_batch_updates_preserve_other_items_and_rollback(tmp_path):
+    now = datetime(2026, 10, 12, tzinfo=timezone.utc)
+    statuses = {f"XSHG:{i:06d}": "success" for i in range(7267)}
+    manifest = Manifest(dataset="daily_bar", asset_type="stock", partition_key="2026-10-09",
+                        row_count=7267, expected_count=7267, first_key=None, last_key=None,
+                        content_hash="original", size_bytes=0, raw_refs=(), item_statuses=statuses,
+                        source_providers={key: "tencent" for key in statuses})
+    with MetadataStore(tmp_path / "metadata.duckdb") as metadata:
+        metadata.record_partition_publish(manifest=manifest, manifest_path="manifest.json", updated_at=now)
+        assert len(metadata.item_statuses("daily_bar", "2026-10-09")) == 7267
+        key = "XSHG:000000"
+        metadata.record_partition_publish(manifest=manifest, manifest_path="manifest.json",
+            item_statuses={key: ItemStatus.NO_TRADE}, source_providers={key: None}, updated_at=now)
+        assert metadata.item_statuses("daily_bar", "2026-10-09")[key] == ItemStatus.NO_TRADE
+        assert metadata.connection.execute("SELECT source_provider FROM partition_item WHERE instrument_id=?", [key]).fetchone() == (None,)
+        assert metadata.item_statuses("daily_bar", "2026-10-09")["XSHG:000001"] == ItemStatus.SUCCESS
+        previous = metadata.partition("daily_bar", "stock", "2026-10-09")
+        with pytest.raises(AttributeError):
+            metadata.record_partition_publish(manifest=replace(manifest, content_hash="must-rollback"),
+                manifest_path="new.json", item_statuses={key: "invalid-enum"}, updated_at=now)
+        assert metadata.partition("daily_bar", "stock", "2026-10-09") == previous
+        assert len(metadata.item_statuses("daily_bar", "2026-10-09")) == 7267
+        import duckdb
+        with pytest.raises(duckdb.ConstraintException):
+            metadata.record_partition_publish(manifest=replace(manifest, content_hash="sql-rollback"),
+                manifest_path="new.json", item_statuses={None: ItemStatus.SUCCESS}, updated_at=now)
+        assert metadata.partition("daily_bar", "stock", "2026-10-09") == previous
+        assert len(metadata.item_statuses("daily_bar", "2026-10-09")) == 7267
+        # Empty updates must still record a partition, without deleting items.
+        metadata.record_partition_publish(manifest=manifest, manifest_path="manifest.json", item_statuses={})
+        assert len(metadata.item_statuses("daily_bar", "2026-10-09")) == 7267
+
+
 @pytest.mark.parametrize("relative", ["../escape.json", "/absolute.json", "nested/../../escape.json", "."])
 def test_raw_compact_path_rejects_escape(tmp_path, relative):
     store = RawObjectStore(tmp_path)

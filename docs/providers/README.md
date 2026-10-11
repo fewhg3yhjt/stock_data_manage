@@ -61,7 +61,9 @@ node provider_validation/tests/build_interface_coverage_workbook.mjs --formal-sp
 
 ## 证券名单能力更新
 
-股票与ETF名单的实现、分类、北交所及上交所ETF目录接入见 [证券名单来源](security-catalog.md)。现有Excel与配套JSON保留上次导出快照；新增输入与字段变化以模块说明及YAML为准，不将旧表视为已核准当前全量证券。最新正式适配器联调和五类证券回放使用 `tmp/` 隔离根目录，验收索引在 `data/task_workspace/_checks/`；真实生产名单尚未发布。已有接口可行性响应只读留存。
+股票与ETF名单的实现、分类、北交所及上交所ETF目录接入见 [证券名单来源](security-catalog.md)。现有Excel与配套JSON保留上次导出快照；新增输入与字段变化以模块说明及YAML为准，不将旧表视为已核准当前全量证券。10月9日的7267条正式证券名单已发布于 `data/canonical/2026-10-09/security_master/`，原响应位于 `data/raw/2026-10-09/`，验收索引在 `data/task_workspace/_checks/security-release-20261012/`。已有接口可行性响应只读留存。
+
+日线仍未获得全市场在线任务资格。现有腾讯窗口输入主动排除北交所；2026-10-12小范围原生对照发现原地址指定窗口为空但最近窗口可返回北交所日线，另一地址 `/appstock/app/newfqkline/get` 可返回bj920001的10月9日日线。新地址同时存在返回区间超出请求区间的现象；尚未接入Provider或配置，不能继承旧接口字段单位和路由资格。原始返回、请求参数、窗口差异与结论见 [请求对照](../../tmp/daily-next-stage-20261012/native-comparison.json)。
 
 ## 各来源数据域的边界
 
