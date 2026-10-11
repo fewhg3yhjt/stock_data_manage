@@ -211,7 +211,7 @@ python -m stock_data_manage.cli collect-due-inputs --dataset security_master
 ### 结果位置
 
 - 调度检查报告：`data/task_workspace/_scheduler/security_master/`，包含任务状态、来源资格原因、实际数据日期、是否回退及配置证据引用。
-- 任务结果与覆盖检查：既有 `data/task_workspace/` 任务工作区；正式名单在 `data/canonical/security_master/current/`。
+- 任务结果与覆盖检查：`data/task_workspace/<数据日期>/security_master/`；正式名单在 `data/canonical/<数据日期>/security_master/`，原响应在 `data/raw/<数据日期>/<来源>/<接口>/`。
 - 任务及资格元数据：`data/metadata/metadata.duckdb`。
 - 本机离线回归与检查索引：`data/task_workspace/_checks/security-schedule/`；不作为真实在线资格证据。
 - 实现前的接口可行性原响应及现存历史证据保留在 `provider_validation/`，正式开发只读引用；业务复核与资格验收新响应和报告归业务运行根目录或 `tmp/` 下的隔离测试根目录，参见 [存储说明](../storage/README.md)。
@@ -226,10 +226,12 @@ python -m stock_data_manage.cli collect-due-inputs --dataset security_master
 | 1 | 统一任务运行目录、删除上一轮错放产物、修正入口与文档、离线核验 | 按日唯一及正式输出边界已修正；旧数据未自动搬迁，实际发布待验收 |
 | 2 | 修改现有来源与字段配置，补齐 ETF 与北交所名单能力 | 已完成 |
 | 3 | 按市场、资产类别检查覆盖，明确前次有效数据的回退日期与原因 | 已完成 |
-| 4 | 接通现有路由资格检查与证券主数据定时更新 | 三项来源资格已登记，正式失败任务留证完成；同日首次发布验收待完成 |
+| 4 | 接通现有路由资格检查与证券主数据定时更新 | 2026-10-12五项历史来源通过限定10月9日资格，并正式发布7267条；常驻自动运行仍未接通 |
 | 5 | 以发布名单验证股票与 ETF 日线，以及三种重做流程 | 四只真实样本、三种重做及发布恢复通过；全市场及在线资格待完成 |
 
 上述步骤是历史实施记录，不能视为全部正式验收完成。按日raw路径、正式输出入口和统一任务摘要已实现；再以真实证券清单任务验收。日线验收在名单发布后继续按阶段确认，不用手工接口候选代替业务任务结果。
+
+首次正式发布以真实10月9日原响应运行现有CLI，执行参数为`--redo full --mode retained`；全部五项重新解析与检查，原响应转正，发布7267条。北交所原响应实际采集日为10月9日；不将当前目录改标为该日。完整核验见 [正式发布报告](../../data/task_workspace/_checks/security-release-20261012/verification.json)。Windows控制台可用`python -X utf8 -m stock_data_manage.cli collect-task --task-file data/task_workspace/_checks/security-release-20261012/task.json --redo resume --mode retained`确认已完成任务，已发布时返回no-op。该命令是确认而非再次采集；全量重建使用`--redo full`。后台调度和全市场日线仍待后续阶段。
 
 第一阶段相关离线测试 66 项通过，包含目录边界、三种重做、提交恢复和既有真实来源证据回放。原始来源清单与响应哈希核验通过；两份参数示例除任务ID外与原示例一致。删除上一轮错放的 57 个文件；本机检查记录位于 `data/task_workspace/_checks/directory-layout/{regression.xml,verification.json}`，不生成正式名单或日线，不作为在线资格证据。
 
