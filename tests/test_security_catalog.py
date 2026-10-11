@@ -20,6 +20,73 @@ BSE = ROOT / "provider_validation/results/raw/security-catalog-bse-20261007/mani
 SSE_FUNDS = ROOT / "provider_validation/results/security-activation-20261009/official-sh-funds/_raw/manifest.ndjson"
 
 
+@pytest.mark.parametrize('kind,count', [('sse', 920), ('money', 24), ('szse', 750)])
+def test_dated_etf_real_response_yaml_contract(tmp_path, kind, count):
+    """Replay retained Oct 9 bytes, never call the network or production root."""
+    root = ROOT / 'tmp/universe-history-probe-20261011'
+    archive = root / ('money/raw' if kind == 'money' else kind + '/network/raw') / 'manifest.ndjson'
+    if not archive.exists():
+        pytest.skip('local dated ETF investigation evidence is not bundled')
+    identifier = {'sse': 'SECURITY-SSE-ETF-HISTORY-001', 'money': 'SECURITY-SSE-MONEY-ETF-HISTORY-001',
+                  'szse': 'SECURITY-SZSE-ETF-HISTORY-001'}[kind]
+    result = collect_input(input_id=identifier, context={'request': {'trade_date': '2026-10-09'},
+        'calendar': {'trading_dates': [date(2026, 10, 9)]}}, config_root=ROOT / 'config',
+        output_root=tmp_path, mode='replay', replay_manifest=archive,
+        pacer=RequestPacer(wait=lambda seconds: None))
+    assert result['status'] == 'candidate_complete', result.get('error')
+    assert result['live_http_calls'] == 0
+    rows = output_rows(result)
+    assert len(rows) == count
+    assert {row['trade_date'] for row in rows} == {'2026-10-09'}
+    assert {row['status'] for row in rows} == {'unknown'}
+    assert all(row['list_date'] is None for row in rows)
+
+
+@pytest.mark.parametrize('change', ['date', 'total', 'duplicate', 'code', 'shares'])
+def test_sse_dated_etf_rejects_bad_source(change):
+    from stock_data_manage.providers.sse.market import _dated_etf_rows
+    rows = [{'STAT_DATE': '2026-10-09', 'SEC_CODE': '510300', 'SEC_NAME': 'ETF', 'TOT_VOL': '100'}]
+    payload = {'result': rows, 'pageHelp': {'total': 1}}
+    if change == 'date':
+        rows[0]['STAT_DATE'] = '2026-10-08'
+    elif change == 'total':
+        payload['pageHelp']['total'] = 2
+    elif change == 'duplicate':
+        rows.append(dict(rows[0]))
+        payload['pageHelp']['total'] = 2
+    elif change == 'code':
+        rows[0]['SEC_CODE'] = 'bad'
+    else:
+        rows[0]['TOT_VOL'] = '-1'
+    with pytest.raises(ValueError):
+        _dated_etf_rows(payload, date(2026, 10, 9))
+
+
+@pytest.mark.parametrize('change', ['date', 'code', 'duplicate', 'discard', 'shares'])
+def test_szse_dated_etf_rejects_sdk_hidden_source_damage(change):
+    import io
+    import pandas as pd
+    from types import SimpleNamespace
+    from stock_data_manage.providers.exchanges.daily import ExchangeDailyProvider
+    row = {'日期': '2026-10-09', '基金代码': 159001, '基金简称': 'ETF', '基金规模(份)': '1,000'}
+    if change == 'date':
+        row['日期'] = '2026-10-08'
+    elif change == 'code':
+        row['基金代码'] = 159001.5
+    elif change == 'shares':
+        row['基金规模(份)'] = 'bad'
+    raw = pd.DataFrame([row, dict(row)] if change in {'duplicate', 'discard'} else [row])
+    sdk = pd.DataFrame([{'日期': date(2026, 10, 9), '基金代码': '159001', '基金简称': 'ETF', '基金份额': 1000}]
+        * (2 if change == 'duplicate' else 1))
+    body = io.BytesIO()
+    raw.to_excel(body, index=False)
+    client = SimpleNamespace(fund_scale_daily_szse=lambda **params: sdk)
+    with pytest.raises(ValueError):
+        ExchangeDailyProvider(client).fetch_etf_history(trade_date=date(2026, 10, 9),
+            source_responses=lambda: [{'body': body.getvalue(), 'url': 'https://fixture.invalid/'}])
+
+
+
 def sse_fund(code="512390", category="F112", listed="2018-07-13"):
     return {"FUND_CODE": code, "FUND_ABBR": "fixture fund", "CATEGORY": category, "LISTING_DATE": listed}
 

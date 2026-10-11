@@ -18,6 +18,9 @@ dataset:
       SDA-BOARD-005: [[XSHG, stock], [XSHE, stock], [XSHE, etf]]
       SECURITY-BSE-001: [[BSE, stock]]
       SECURITY-SSE-ETF-001: [[XSHG, etf]]
+      SECURITY-SSE-ETF-HISTORY-001: [[XSHG, etf]]
+      SECURITY-SSE-MONEY-ETF-HISTORY-001: [[XSHG, etf]]
+      SECURITY-SZSE-ETF-HISTORY-001: [[XSHE, etf]]
 fields:
   instrument_id: {type: string, required: true}
   symbol: {type: string, required: true}

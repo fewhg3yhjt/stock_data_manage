@@ -196,7 +196,10 @@ def build_input_provider(contract, *, providers_path, client=None):
                         "SDA-BOARD-001": "fetch_industry_list", "SDA-BOARD-002": "fetch_industry_daily",
                         "SDA-BOARD-003": "fetch_fund_flow", "SDA-BOARD-004": "fetch_fund_flow",
                         "SDA-BOARD-005": "fetch_snapshot", "SDA-BOARD-006": "fetch_snapshot",
-                        "SECURITY-BSE-001": "fetch_snapshot", "SECURITY-SSE-ETF-001": "fetch_snapshot"}
+                        "SECURITY-BSE-001": "fetch_snapshot", "SECURITY-SSE-ETF-001": "fetch_snapshot",
+                        "SECURITY-SSE-ETF-HISTORY-001": "fetch_etf_history",
+                        "SECURITY-SSE-MONEY-ETF-HISTORY-001": "fetch_money_etf_history",
+                        "SECURITY-SZSE-ETF-HISTORY-001": "fetch_etf_history"}
     if contract.input_id not in expected_methods or contract.runtime_method != expected_methods[contract.input_id]:
         raise ValueError("input runtime method does not match its verified adapter")
     if contract.input_id == 'ASTOCK-014':
@@ -289,6 +292,18 @@ def build_input_provider(contract, *, providers_path, client=None):
         from ..providers.sse.market import SseMarketProvider
         provider=SseMarketProvider()
         provider.capability_version='sse-etf-input-v1'
+        return provider
+    if contract.input_id in {'SECURITY-SSE-ETF-HISTORY-001', 'SECURITY-SSE-MONEY-ETF-HISTORY-001'}:
+        from ..providers.sse.market import SseMarketProvider
+        provider = SseMarketProvider(client=client)
+        provider.capability_version = 'sse-dated-etf-identity-input-v1'
+        provider.input_hosts = ('https://query.sse.com.cn',)
+        return provider
+    if contract.input_id == 'SECURITY-SZSE-ETF-HISTORY-001':
+        from ..providers.exchanges.daily import ExchangeDailyProvider
+        provider = ExchangeDailyProvider(client=client)
+        provider.capability_version = 'szse-dated-etf-identity-input-v1'
+        provider.input_hosts = ('https://www.szse.cn',)
         return provider
     if contract.input_id == "ASTOCK-063":
         from ..providers.chinabond.yield_curve import ChinaBondYieldProvider

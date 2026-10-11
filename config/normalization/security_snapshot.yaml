@@ -1,5 +1,35 @@
 dataset: security_snapshot
 rules:
+  - id: sse-etf-history-identity-v1
+    input_id: SECURITY-SSE-ETF-HISTORY-001
+    provider: sse
+    endpoint: etf_historical_shares
+    field_mapping: {trade_date: STAT_DATE, stock_code: SEC_CODE, stock_name: SEC_NAME, exchange: exchange, asset_type: asset_type, status: status}
+    context_fields: {source: provider}
+    status: pending_validation
+    version: sse-etf-history-identity-v1
+    evidence_refs: [tmp/universe-history-probe-20261011/sse/network/raw/manifest.ndjson]
+    notes: 日期来自原响应统计日；保留份额记录中的ETF身份；状态unknown，不推断上市日期。
+  - id: sse-money-etf-history-identity-v1
+    input_id: SECURITY-SSE-MONEY-ETF-HISTORY-001
+    provider: sse
+    endpoint: money_etf_historical_shares
+    field_mapping: {trade_date: STAT_DATE, stock_code: SEC_CODE, stock_name: SEC_NAME, exchange: exchange, asset_type: asset_type, status: status}
+    context_fields: {source: provider}
+    status: pending_validation
+    version: sse-money-etf-history-identity-v1
+    evidence_refs: [tmp/universe-history-probe-20261011/money/raw/manifest.ndjson]
+    notes: 交易型货币ETF，与普通ETF名单互补；响应统计日，不使用采集日冒充。
+  - id: szse-etf-history-identity-v1
+    input_id: SECURITY-SZSE-ETF-HISTORY-001
+    provider: szse
+    endpoint: etf_historical_shares
+    field_mapping: {trade_date: 日期, stock_code: 基金代码, stock_name: 基金简称, exchange: exchange, asset_type: asset_type, status: status}
+    context_fields: {source: provider}
+    status: pending_validation
+    version: szse-etf-history-identity-v1
+    evidence_refs: [tmp/universe-history-probe-20261011/szse/network/raw/manifest.ndjson]
+    notes: 原XLSX非空行与SDK逐项核验；日期来自响应；状态unknown，不推断上市日期。
   - id: baostock-security-snapshot-input-v2
     input_id: SDA-BOARD-005
     provider: baostock

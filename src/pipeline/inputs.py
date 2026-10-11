@@ -302,7 +302,8 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
         is_seats = input_id == "ASTOCK-019"
         is_reports_seats = is_reportapi or is_seats
         is_source_sdk = is_actual_data or input_id in {"ASTOCK-031","ASTOCK-039","ASTOCK-051","ASTOCK-055","ASTOCK-067","ASTOCK-068","ASTOCK-069","ASTOCK-085"}
-        is_original_source = input_id in {"ASTOCK-003","ASTOCK-004","ASTOCK-030","ASTOCK-063","ASTOCK-071","ASTOCK-072","ASTOCK-073","ASTOCK-077"}
+        is_etf_history = input_id in {'SECURITY-SSE-ETF-HISTORY-001', 'SECURITY-SSE-MONEY-ETF-HISTORY-001', 'SECURITY-SZSE-ETF-HISTORY-001'}
+        is_original_source = is_etf_history or input_id in {"ASTOCK-003","ASTOCK-004","ASTOCK-030","ASTOCK-063","ASTOCK-071","ASTOCK-072","ASTOCK-073","ASTOCK-077"}
         is_source_extension = is_source_sdk or is_original_source
         is_repo_rate = input_id == "ASTOCK-064"
         is_cb = input_id == "ASTOCK-084"
@@ -417,6 +418,8 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                              "ASTOCK-048": "stock_zt_pool_previous_em", "ASTOCK-050": "stock_zt_pool_strong_em",
                              "ASTOCK-026": "stock_zh_a_gdhs_detail_em", "ASTOCK-027": "stock_fhps_detail_em",
                              "ASTOCK-028": "stock_individual_fund_flow",
+                             "SECURITY-SSE-ETF-HISTORY-001": "fund_etf_scale_sse",
+                             "SECURITY-SZSE-ETF-HISTORY-001": "fund_scale_daily_szse",
                              "SDA-BOARD-001": "stock_board_industry_name_ths", "SDA-BOARD-002": "stock_board_industry_index_ths",
                              "SDA-BOARD-003": "stock_fund_flow_industry", "SDA-BOARD-004": "stock_fund_flow_concept"}
             if input_id in sdk_functions:
@@ -589,6 +592,26 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                         def response_validator(response):
                             validate_seat_response(response.content, response.url, response.status_code,
                                 code=history_stock_identity(parameters["code"])[0], date=parameters["date"])
+                    if is_etf_history:
+                        import requests
+                        import urllib3
+                        import pandas
+                        import openpyxl
+                        report['transport_dependency'] = {'requests': requests.__version__, 'urllib3': urllib3.__version__,
+                            'pandas': pandas.__version__, 'openpyxl': openpyxl.__version__}
+                        code_version = hashlib.sha256((code_version + str(sorted(report['transport_dependency'].items()))).encode()).hexdigest()
+                        if input_id == 'SECURITY-SZSE-ETF-HISTORY-001':
+                            helper_source = inspect.getsource(function.__globals__['_parse_date']).encode('utf-8')
+                            helper_ref = raw_store.write_bytes(helper_source, dataset='source_code', provider=contract.provider,
+                                endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id='sdk-date-helper', content_addressed=True)
+                            report['sdk_dependency']['dependencies'] = [{'name': '_parse_date', 'path': relative_file(helper_ref.path), 'sha256': helper_ref.content_hash}]
+                            code_version = hashlib.sha256((code_version + helper_ref.content_hash).encode()).hexdigest()
+                        report['code_version'] = code_version
+                        report['dated_etf_transport_policy'] = {'source_contract': 'retained successful SDK or money ETF probe',
+                            'trust_env': True, 'retry_total': 0, 'allow_redirects': True, 'source_fallback': False,
+                            'timeout_seconds': 15 if contract.provider == 'szse' else 25 if 'MONEY' in input_id else None,
+                            'headers': 'original Windows Chrome/132 for SZSE; Chrome/88 for SSE; original Referer',
+                            'outer_capture_interval_seconds': 3}
                     response_events = stack.enter_context(captured_requests(raw_store, provider=contract.provider, endpoint=contract.endpoint,
                         scope={"input_id": input_id, "parameters": normalized_context}, code_version=code_version, pacer=pacer,
                         replay_manifest=replay_manifest if mode == "replay" else None,
@@ -598,13 +621,29 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                         cache_ignored_query_parameters=("_",) if is_reportapi else (),
                          native_transport='curl_cffi' if input_id=='ASTOCK-031' else 'pandas_urllib' if input_id=='ASTOCK-069' else None,
                          match_request_body=is_bse_catalog))
-                if is_source_sdk:
+                if is_source_sdk or input_id in {'SECURITY-SSE-ETF-HISTORY-001', 'SECURITY-SZSE-ETF-HISTORY-001'}:
                     def retained_responses():
                         for event in response_events:
                             if event.get("outcome")=="response" and event["status_code"]==200:
                                 yield {"url":event["url"],"body":RawObjectStore.read_response(raw_store.manifest,event),
                                        "encoding":event.get("encoding")}
                     runtime_parameters["source_responses"]=retained_responses
+                if input_id == 'SECURITY-SZSE-ETF-HISTORY-001' and mode == 'replay':
+                    # Replay only the archived random cache-buster; never alter the live SDK or global RNG.
+                    from types import SimpleNamespace
+                    import json
+                    from unittest.mock import patch
+                    from urllib.parse import urlparse, parse_qs
+                    archived = [json.loads(line) for line in Path(replay_manifest).read_text(encoding='utf-8').splitlines() if line.strip()]
+                    nonces = [parse_qs(urlparse(event.get('url', '')).query)['random'][0] for event in archived
+                        if '/api/report/ShowReport?' in event.get('url', '')
+                        and parse_qs(urlparse(event['url']).query).get('txtStart') == [parameters['trade_date'].isoformat()]
+                        and parse_qs(urlparse(event['url']).query).get('txtEnd') == [parameters['trade_date'].isoformat()]
+                        and parse_qs(urlparse(event['url']).query).get('jjlb') == ['ETF']]
+                    if len(nonces) != 1:
+                        raise ValueError('replay requires one matching dated SZSE request nonce')
+                    stack.enter_context(patch.dict(function.__globals__, {'random': SimpleNamespace(random=lambda: nonces[0])}))
+                    report['replay_cache_busters'] = {'random': nonces[0]}
                 if is_reportapi and mode == "replay":
                     from ..providers.eastmoney.financial import reportapi_replay_clock
                     from ..providers.eastmoney.realtime import history_stock_identity
@@ -1591,11 +1630,20 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
                 if item.instrument_id in old_types and item.asset_type != old_types[item.instrument_id])
         check["passed"] = check["passed"] and not missing and not check["classification_conflicts"]
         check["recollect_units"] = []
+        responsibilities = {key: {tuple(pair) for pair in policy['dataset']['publication']['source_groups'].get(
+            value['entry']['input_id'], ())} & required_groups for key, value in source_rows.items()}
         for key, value in source_rows.items():
             source_records = prepare_security_publication({key: value["rows"]}).records
-            declared_groups = {tuple(pair) for pair in policy["dataset"]["publication"]["source_groups"].get(value["entry"]["input_id"], ())} & required_groups
-            source_previous = [item for item in comparable if (item.exchange.value, item.asset_type.value) in declared_groups]
-            unit_check = check_security_coverage(source_records, required_groups=declared_groups, previous=source_previous)
+            declared_groups = responsibilities[key]
+            # A market/asset group can be supplied by complementary interfaces.
+            # Compare their union to yesterday, while still checking each required unit.
+            unit_check = check_security_coverage(source_records, required_groups=declared_groups)
+            for group in declared_groups:
+                group_records = prepare_security_publication({other: source_rows[other]['rows']
+                    for other, groups in responsibilities.items() if group in groups}).records
+                source_previous = [item for item in comparable if (item.exchange.value, item.asset_type.value) == group]
+                if not check_security_coverage(group_records, required_groups={group}, previous=source_previous)['passed']:
+                    unit_check['passed'] = False
             conflicted_ids = set(check["classification_conflicts"])
             if not unit_check["passed"] or any(item.instrument_id in conflicted_ids for item in source_records):
                 value["entry"]["coverage_rejected"] = True

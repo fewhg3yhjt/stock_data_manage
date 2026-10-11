@@ -48,6 +48,62 @@ def master_definition(task_id="master"):
                 "request": {"trade_date": DAY}, "calendar": {"trading_dates": [DAY]}}}]}
 
 
+def dated_etf_definition():
+    return {'task_id': 'dated-etf', 'dataset': 'security_master', 'trade_date': DAY,
+        'required_groups': [['XSHG', 'etf'], ['XSHE', 'etf']], 'allow_previous': False,
+        'units': [{'key': key, 'input_id': input_id, 'context': {'request': {'trade_date': DAY},
+            'calendar': {'trading_dates': [DAY]}}} for key, input_id in (
+                ('sse', 'SECURITY-SSE-ETF-HISTORY-001'), ('money', 'SECURITY-SSE-MONEY-ETF-HISTORY-001'),
+                ('szse', 'SECURITY-SZSE-ETF-HISTORY-001'))]}
+
+
+@pytest.mark.parametrize('redo', ['full', 'resume'])
+def test_complementary_etf_sources_repeat_without_false_coverage_loss(tmp_path, redo):
+    collector = FaultCollector()
+    collector.catalog_rows = {
+        'sse': [{'stock_code': '510300', 'exchange': 'XSHG', 'asset_type': 'etf'}],
+        'money': [{'stock_code': '511600', 'exchange': 'XSHG', 'asset_type': 'etf'}],
+        'szse': [{'stock_code': '159001', 'exchange': 'XSHE', 'asset_type': 'etf'}]}
+    definition = dated_etf_definition()
+    assert run(tmp_path, definition, collector)['status'] == 'published'
+    assert run(tmp_path, definition, collector, redo=redo)['status'] == 'published'
+    rows = pq.read_table(tmp_path / 'canonical' / DAY / 'security_master' / 'data.parquet').to_pylist()
+    assert len(rows) == 3 and len({row['instrument_id'] for row in rows}) == 3
+
+
+def test_missing_money_etf_unit_blocks_then_resumes_only_failed_unit(tmp_path):
+    collector = FaultCollector()
+    collector.catalog_rows = {
+        'sse': [{'stock_code': '510300', 'exchange': 'XSHG', 'asset_type': 'etf'}],
+        'money': [{'stock_code': '511600', 'exchange': 'XSHG', 'asset_type': 'etf'}],
+        'szse': [{'stock_code': '159001', 'exchange': 'XSHE', 'asset_type': 'etf'}]}
+    collector.fail.add('money')
+    definition = dated_etf_definition()
+    assert run(tmp_path, definition, collector)['status'] != 'published'
+    assert not (tmp_path / 'canonical' / DAY / 'security_master' / 'data.parquet').exists()
+    collector.fail.clear()
+    collector.calls.clear()
+    assert run(tmp_path, definition, collector)['status'] == 'published'
+    assert [call[0] for call in collector.calls] == ['money']
+
+
+def test_complementary_etf_union_still_rejects_missing_previous_security(tmp_path):
+    collector = FaultCollector()
+    collector.catalog_rows = {
+        'sse': [{'stock_code': '510300', 'exchange': 'XSHG', 'asset_type': 'etf'}],
+        'money': [{'stock_code': code, 'exchange': 'XSHG', 'asset_type': 'etf'} for code in ('511600', '511620')],
+        'szse': [{'stock_code': '159001', 'exchange': 'XSHE', 'asset_type': 'etf'}]}
+    definition = dated_etf_definition()
+    assert run(tmp_path, definition, collector)['status'] == 'published'
+    current = tmp_path / 'canonical' / DAY / 'security_master' / 'data.parquet'
+    original_hash = file_hash(current)
+    collector.catalog_rows['money'] = collector.catalog_rows['money'][:1]
+    result = run(tmp_path, definition, collector, redo='full')
+    assert result['status'] != 'published'
+    assert result['security_check']['missing_previous_securities'] == ['XSHG:511620']
+    assert file_hash(current) == original_hash
+
+
 class FaultCollector:
     def __init__(self):
         self.calls = []
@@ -77,7 +133,7 @@ class FaultCollector:
             code_version="fixture-v1", mode="fixture")
         if key in self.fail:
             raise RuntimeError("synthetic transport failure")
-        if options["input_id"] in {"SDA-BOARD-005", "SECURITY-BSE-001", "SECURITY-SSE-ETF-001"}:
+        if contract.dataset == 'security_snapshot':
             dataset = "security_snapshot"
             rows = [{"trade_date": date.fromisoformat(DAY), "stock_code": code, "stock_name": "fixture stock",
                      "exchange": "XSHG" if code.startswith("6") else "XSHE", "status": "active", "source": "fixture"}

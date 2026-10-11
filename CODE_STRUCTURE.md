@@ -88,6 +88,8 @@
 | `providers/eastmoney/__init__.py` | EastMoney 适配器导出 |
 | `providers/akshare/session.py` | AkShare 可选依赖加载和代码转换 |
 | `providers/akshare/daily.py` | AkShare 股票、ETF、LOF、指数函数级历史日线 |
+| `providers/sse/market.py` | 上交所既有风险指标和ETF份额；复用原SDK接入指定统计日普通ETF身份，复用已验证官网请求接入交易型货币ETF身份；原份额接口不变 |
+| `providers/exchanges/daily.py` | 交易所期货、期权和排名日数据；复用深交所原SDK接入指定统计日ETF身份，逐项核对原XLSX以防SDK删行掩盖问题 |
 | `providers/akshare/boards.py` | 原 AkShare 同花顺行业目录、行业指数日线和行业/概念资金流快照；YAML 名称映射、保留旧返回并提供 SDK 原列与身份上下文 |
 | `providers/akshare/__init__.py` | AkShare 适配器导出 |
 | `providers/ths/boards.py` | 同花顺行业/概念板块列表、分页和成分页面适配器；输出可写入 Raw 的关系快照，不伪装成行情 Bar |
@@ -129,7 +131,7 @@
 | 文件 | 职责 |
 |---|---|
 | `pipeline/daily.py` | 日线按来源补缺、标准化、校验、候选生成和发布编排 |
-| `pipeline/inputs.py` | 既有候选、业务任务与调度；raw按日期/来源/接口，工作区按日期/数据集；请求文件隔离、YAML映射、检查、重做、发布恢复，自动保存task.json和summary.json；最新名单通过元数据读取，回退不改写旧发布 |
+| `pipeline/inputs.py` | 既有候选、业务任务与调度；raw按日期/来源/接口，工作区按日期/数据集；请求文件隔离、YAML映射、互补来源合并覆盖检查、重做、发布恢复，自动保存task.json和summary.json；历史ETF保留原SDK请求、依赖证据和离线随机参数；最新名单通过元数据读取，回退不改写旧发布 |
 | `pipeline/daily_reconciliation.py` | 日线 provisional/final 合并、缺失统计和盘后校准 |
 | `pipeline/minute.py` | Watchlist 实时分钟采集和 Hot Store 写入 |
 | `pipeline/minute_reconciliation.py` | 分钟盘后校准、final 提升、冲突隔离和完整性处理 |

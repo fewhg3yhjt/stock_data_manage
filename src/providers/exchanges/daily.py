@@ -435,6 +435,46 @@ def futures_position_rank(date, exchange, symbol=None):
 class ExchangeDailyProvider:
     capability_version='official-derivatives-input-v1'
     input_hosts=('https://www.shfe.com.cn','https://www.ine.cn','https://www.czce.com.cn','http://www.cffex.com.cn','http://www.gfex.com.cn')
+    def __init__(self, client=None):
+        self.client = client
+
+    def fetch_etf_history(self, *, trade_date, source_responses):
+        """沿用深交所日频份额 SDK；在其删行、数值转换后核对原响应。"""
+        from ..akshare.session import load_client
+        self.client = self.client or load_client()
+        frame = self.client.fund_scale_daily_szse(start_date=trade_date.strftime('%Y%m%d'),
+            end_date=trade_date.strftime('%Y%m%d'), symbol='ETF')
+        responses = list(source_responses())
+        if len(responses) != 1:
+            raise ValueError('one dated SZSE ETF response is required')
+        raw = pd.read_excel(io.BytesIO(responses[0]['body']), engine='openpyxl').dropna(how='all')
+        columns = {'日期', '基金代码', '基金简称', '基金规模(份)'}
+        if raw.empty or not columns <= set(raw.columns) or len(raw) != len(frame):
+            raise ValueError('SZSE source fields changed, empty, or SDK discarded rows')
+        source_rows = []
+        for row in raw.to_dict(orient='records'):
+            value = row['基金代码']
+            number = float(value)
+            if not math.isfinite(number) or number != int(number) or not 0 <= number <= 999999:
+                raise ValueError('invalid SZSE ETF code')
+            code = str(int(number)).zfill(6)
+            day = pd.Timestamp(row['日期'])
+            if pd.isna(day) or day.date() != trade_date or not str(row['基金简称'] or '').strip() or pd.isna(row['基金简称']):
+                raise ValueError('SZSE identity or returned date is invalid')
+            shares = float(str(row['基金规模(份)']).replace(',', ''))
+            if not math.isfinite(shares) or shares < 0:
+                raise ValueError('SZSE source shares are invalid')
+            source_rows.append({**row, '日期': day.date(), '基金代码': code, '基金规模(份)': shares})
+        if len({row['基金代码'] for row in source_rows}) != len(source_rows):
+            raise ValueError('duplicate SZSE ETF identity')
+        expected = {(row['日期'], row['基金代码'], row['基金简称'], row['基金规模(份)']) for row in source_rows}
+        actual = set(frame[['日期', '基金代码', '基金简称', '基金份额']].itertuples(index=False, name=None))
+        if actual != expected:
+            raise ValueError('SZSE SDK values differ from retained response')
+        mapped = tuple({**row, 'date': row['日期'], 'exchange': 'XSHE',
+                        'asset_type': 'etf', 'status': 'unknown'} for row in source_rows)
+        return InputFetchResult(mapped, source_rows=tuple(source_rows), source_url=responses[0]['url'],
+            mapping_context={'source_total_count': len(mapped), 'date_semantics': 'dated fund shares; not a historical listing directory'})
     @staticmethod
     def result(frame):
         rows=tuple(frame.drop(columns=['source','source_url','fetched_at']).astype(object).where(frame.drop(columns=['source','source_url','fetched_at']).notna(),None).to_dict(orient='records'))

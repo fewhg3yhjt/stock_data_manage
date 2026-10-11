@@ -2881,6 +2881,81 @@ input_capabilities:
     - config.limit
     - config.count
 
+  # 历史份额记录中的ETF身份；日期来自响应，不能等同于历史上市目录。
+  # 仅隔离验证接入；collection.yaml 的正式来源选择保持不变。
+  SECURITY-SSE-ETF-HISTORY-001:
+    provider: sse
+    endpoint: etf_historical_shares
+    display_name: 上交所指定统计日普通ETF名单
+    dataset: security_snapshot
+    runtime_method: fetch_etf_history
+    parameters:
+      trade_date: {type: date, source: request.trade_date, required: true}
+    data_kind: snapshot
+    data_frequency: daily
+    request_shape: date_snapshot
+    collection_profile: reference_daily
+    trading_date_parameter: trade_date
+    implementation_status: implemented_validation_only
+    evidence_refs: [tmp/universe-history-probe-20261011/sse/network/raw/manifest.ndjson]
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    base_requests_per_fetch: 1
+    forbidden_sources: [request.symbol, request.symbols, request.start_date, request.end_date]
+    limitations:
+    - 保持fund_etf_scale_sse原SDK的GET参数、Windows Chrome88、Referer、默认Session/代理、无超时、零重试；不回退。
+    - 检查响应STAT_DATE、自报总数、代码唯一性和原字段；与SDK名单逐项核对；不包含交易型货币ETF。
+    - 2026-10-09原响应920条；仅证明该日份额记录，未知交易状态；不推断上市日、不授予独立全量历史目录资格。
+  SECURITY-SSE-MONEY-ETF-HISTORY-001:
+    provider: sse
+    endpoint: money_etf_historical_shares
+    display_name: 上交所指定统计日交易型货币ETF名单
+    dataset: security_snapshot
+    runtime_method: fetch_money_etf_history
+    parameters:
+      trade_date: {type: date, source: request.trade_date, required: true}
+    data_kind: snapshot
+    data_frequency: daily
+    request_shape: date_snapshot
+    collection_profile: reference_daily
+    trading_date_parameter: trade_date
+    implementation_status: implemented_validation_only
+    evidence_refs: [tmp/universe-history-probe-20261011/money/raw/manifest.ndjson]
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    base_requests_per_fetch: 1
+    forbidden_sources: [request.symbol, request.symbols, request.start_date, request.end_date]
+    limitations:
+    - 保持官网JS参数和已成功探针GET/JSONP请求，Windows Chrome88、原Referer、25秒超时、默认Session/代理、零重试；不回退。
+    - 检查STAT_DATE、总数和代码；超过当前单次返回容量直接拒绝不完整结果，不隐式扩大分页。
+    - 2026-10-09原响应24条；和普通ETF互补；未知交易状态，不推断上市日或独立历史上市目录完整性。
+  SECURITY-SZSE-ETF-HISTORY-001:
+    provider: szse
+    endpoint: etf_historical_shares
+    display_name: 深交所指定统计日ETF名单
+    dataset: security_snapshot
+    runtime_method: fetch_etf_history
+    parameters:
+      trade_date: {type: date, source: request.trade_date, required: true}
+    data_kind: snapshot
+    data_frequency: daily
+    request_shape: date_snapshot
+    collection_profile: reference_daily
+    trading_date_parameter: trade_date
+    implementation_status: implemented_validation_only
+    evidence_refs: [tmp/universe-history-probe-20261011/szse/network/raw/manifest.ndjson]
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    base_requests_per_fetch: 1
+    forbidden_sources: [request.symbol, request.symbols, request.start_date, request.end_date]
+    limitations:
+    - 保持fund_scale_daily_szse原SDK的同日窗口、ETF类别、随机查询值、Host/Referer/Windows Chrome132、15秒超时、默认Session/代理、零重试。
+    - 校验原XLSX完整非空行与SDK转换结果，拒绝日期不符、异常代码、SDK删行、重复证券和无效份额。
+    - 2026-10-09原响应750条；只证明指定日份额记录，未知交易状态，不推断上市日。
+
   SECURITY-BSE-001:
     # bse 在 provider 中表示北交所官方来源；记录的 exchange=BSE 才表示所属交易所。
     provider: bse
