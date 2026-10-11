@@ -90,11 +90,21 @@ def _input_data_date(context, replay_manifest, *, provider, endpoint, data_date=
 
 
 def collect_input(*, input_id, context, config_root, output_root=None, data_root=None, mode="replay", replay_manifest=None,
-                  evidence_root=None, fields=None, client=None, pacer=None, task_unit=None, force_fetch=False, data_date=None):
+                  evidence_root=None, fields=None, client=None, pacer=None, task_unit=None, force_fetch=False, data_date=None,
+                  retained_asset_type=None, progress=None):
     """One explicit input, candidate output only. Existing Bar publication flows are unchanged."""
     import json
     import re
     config_root = Path(config_root)
+    retained = mode == 'retained'
+    progress_key = task_unit[1] if task_unit else input_id
+    raw_finished = False
+    if progress:
+        progress.begin('raw')
+    if retained:
+        if output_root is not None or task_unit is None or replay_manifest is None:
+            raise ValueError('retained responses require the formal task entry and an explicit manifest')
+        mode = 'replay'  # Retain strict offline request matching; never permit network fallback.
     if output_root is not None and data_root is not None:
         raise ValueError("output_root and data_root are mutually exclusive")
     runtime = output_root is None
@@ -106,7 +116,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
     if mode not in {"live", "replay"} or (mode == "replay" and replay_manifest is None):
         raise ValueError("replay requires an explicit manifest; only live/replay modes are supported")
     project_root = config_root.resolve().parent if runtime else _validate_candidate_root(config_root, output_root)
-    if runtime and mode == "replay":
+    if runtime and mode == "replay" and not retained:
         production_root = load_storage_paths(config_root)["data_root"]
         if paths["data_root"].is_relative_to(production_root) or production_root.is_relative_to(paths["data_root"]):
             raise ValueError("input replay requires an isolated --data-root or --output-root")
@@ -115,6 +125,11 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
         raise ValueError("unknown input ID")
     contract = contracts[input_id]
     parameters = contract.bind_parameters(context)
+    if retained:
+        from ..storage.metadata import MetadataStore
+        with MetadataStore(paths['metadata_path']) as qualification_metadata:
+            _check_retained_input(contract, context, retained_asset_type, config_root,
+                                  qualification_metadata, replay_manifest)
     from zoneinfo import ZoneInfo
     if (task_unit is not None and mode == "live" and input_id in {"SECURITY-BSE-001", "SECURITY-SSE-ETF-001"}
             and data_date != datetime.now(ZoneInfo("Asia/Shanghai")).date().isoformat()):
@@ -138,6 +153,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                   Path(__file__).parents[1] / "storage/parquet.py",
                   Path(__file__).parents[1] / "storage/metadata.py",
                   Path(__file__).parents[1] / "worker/attempts.py",
+                  Path(__file__).parents[1] / "worker/progress.py",
                   Path(__file__).parents[1] / "routing/factory.py",
                   Path(__file__).parents[1] / "providers/tencent/daily.py",
                   Path(__file__).parents[1] / "providers/tencent/minute.py",
@@ -706,6 +722,10 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                     helper = getattr(function, "__globals__", {}).get("_get_stock_board_industry_name_ths")
                     if helper is not None:
                         actual_code = helper()[parameters["board_name"]]
+            raw_finished = True
+            if progress:
+                progress.finish('raw', progress_key, 'reused' if mode == 'replay' else 'success')
+                progress.begin('processing')
             report["responses"] = response_events
             if runtime:
                 raw_manifest = raw_store.manifest
@@ -1020,7 +1040,13 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
             report.update(status="candidate_complete", row_count=len(projected),
                           coverage_denominator=fetched.coverage_denominator if is_baostock or is_tencent_snapshot else len(mapping_rows),
                           first_key=_json_value(keys[0]) if keys else None, last_key=_json_value(keys[-1]) if keys else None)
+            if progress:
+                progress.finish('processing', progress_key)
         except Exception as exc:
+            if progress:
+                progress.finish('processing' if raw_finished else 'raw', progress_key, 'failed')
+                if not raw_finished:
+                    progress.finish('processing', progress_key, 'skipped')
             report.update(status="failed", failure_class=getattr(getattr(exc, "failure_class", None), "value", type(exc).__name__),
                           error=str(exc) if isinstance(exc, (ValueError, NormalizationError)) else type(exc).__name__)
         if runtime:
@@ -1132,8 +1158,28 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
         return {**report, "run_directory": str(directory.resolve()), "report_path": str(report_ref.path.resolve())}
 
 
+def _check_retained_input(contract, context, asset_type, config_root, metadata, manifest):
+    import json
+    from ..routing.factory import check_security_input_qualification, check_daily_input_qualification
+    now = datetime.now(timezone.utc)
+    if contract.dataset == 'security_snapshot':
+        qualification = check_security_input_qualification(contract, context, config_root=config_root, metadata=metadata, now=now)
+    else:
+        qualification = check_daily_input_qualification(contract, context, asset_type=asset_type,
+            config_root=config_root, metadata=metadata, now=now)
+    if not qualification['eligible']:
+        raise ValueError('formal retained qualification blocked: '+json.dumps(qualification['reasons'],ensure_ascii=False))
+    RawObjectStore.verify_manifest(manifest)
+    if contract.dataset == 'daily_bar':
+        events = [json.loads(line) for line in Path(manifest).read_text(encoding='utf-8').splitlines() if line.strip()]
+        hashes = [e['body_sha256'] for e in events if e.get('event')=='http_response' and e.get('status_code')==200]
+        if hashes != qualification['source_response_hashes']:
+            raise ValueError('retained response bytes differ from qualified daily evidence')
+    return qualification
+
+
 def collect_task(*, definition, config_root, data_root=None, redo="resume", symbols=(),
-                 mode="live", collector=None, collector_options=None, failure_hook=None):
+                 mode="live", collector=None, collector_options=None, failure_hook=None, progress_callback=None):
     """One durable source-to-publication task, using the existing input executor."""
     import json
     import re
@@ -1143,13 +1189,15 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
 
     config_root = Path(config_root).resolve()
     paths = load_storage_paths(config_root, data_root=data_root)
-    if redo not in {"full", "resume", "selected"} or mode not in {"replay", "live"}:
+    if redo not in {"full", "resume", "selected"} or mode not in {"replay", "live", "retained"}:
         raise ValueError("unsupported task execution mode")
     _validate_business_root(paths["data_root"], config_root)
     production_root = load_storage_paths(config_root)["data_root"]
     if mode == "replay" and (paths["data_root"].is_relative_to(production_root) or production_root.is_relative_to(paths["data_root"])):
         raise ValueError("task replay publication requires an isolated --data-root")
     task_id = definition["task_id"]
+    if mode == 'retained' and collector is not None:
+        raise ValueError('formal retained tasks must use the existing input executor')
     if not re.fullmatch(r"[A-Za-z0-9_-]{1,64}", task_id):
         raise ValueError("invalid task ID")
     dataset = definition["dataset"]
@@ -1169,6 +1217,8 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
         if contract.dataset != ("security_snapshot" if dataset == "security_master" else "daily_bar"):
             raise ValueError("input dataset does not match business task")
         contract.bind_parameters(unit["context"])
+        if mode == 'retained' and not unit.get('replay_manifest'):
+            raise ValueError('retained task units require explicit original response manifests')
         if dataset == "daily_bar":
             if contract.request_shape != "single_symbol" or not unit.get("symbol"):
                 raise ValueError("daily tasks require one explicit security per unit")
@@ -1228,6 +1278,8 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
                 if not Manifest.load(published).verify(published.parent / "data.parquet"):
                     raise ValueError("published task data failed integrity verification")
                 if state.get("complete_today"):
+                    if progress_callback:
+                        progress_callback({'no_op': True})
                     return {**_save_task_summary(state, paths, metadata), "no_op": True}
             if state is None:
                 state = {"task_id": task_id, "dataset": dataset, "definition_hash": definition_hash,
@@ -1255,6 +1307,17 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
             state.update(status="collecting", redo=effective_redo, selected_symbols=effective_symbols, error=None,
                          complete_today=False, verification_mode=mode)
             state.pop("archived_workspace", None)
+            from ..worker.progress import TaskProgress
+            active_units = [u for u in units if effective_redo != 'selected' or u.get('symbol') in effective_symbols]
+            reused = [u['key'] for u in active_units if redo == 'resume' and _task_unit_valid(state['units'].get(u['key'], {}))]
+            def update_progress(snapshot):
+                state['progress'] = snapshot
+                metadata.save_collection_task(state)
+                _save_task_summary(state, paths, metadata)
+                if progress_callback:
+                    progress_callback(snapshot)
+            progress = TaskProgress(len(active_units), reused=reused, callback=update_progress)
+            progress.emit(force=True)
             metadata.save_collection_task(state)
             work.mkdir(parents=True, exist_ok=True)
             _save_task_summary(state, paths, metadata)
@@ -1288,9 +1351,16 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
                 options.update(input_id=unit["input_id"], context=unit["context"], config_root=config_root,
                     data_root=paths["data_root"], mode=mode, replay_manifest=replay,
                     task_unit=(task_id, key), force_fetch=force, data_date=day.isoformat())
+                if mode == 'retained':
+                    options['retained_asset_type'] = definition.get('asset_type')
+                if collector is None:
+                    options['progress'] = progress
                 try:
                     report = None
                     raw_manifest = temporary
+                    if mode == 'retained':
+                        _check_retained_input(contracts[unit['input_id']], unit['context'], definition.get('asset_type'),
+                            config_root, metadata, replay)
                     if mode == "live" and dataset == "security_master":
                         from ..routing.factory import check_security_input_qualification
                         qualification = check_security_input_qualification(contracts[unit["input_id"]], unit["context"],
@@ -1338,13 +1408,26 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
                         "report": report or {},
                         "failure_class": type(exc).__name__, "error": str(exc),
                         "coverage_rejected": dataset == "security_master" and isinstance(exc, ValueError)}
+                    if key not in progress.stages['raw']['items']:
+                        progress.finish('raw', key, 'failed')
+                    progress.finish('processing', key, 'failed')
+                if collector is not None:
+                    success = state['units'][key]['status'] == 'candidate_complete'
+                    progress.finish('raw', key, 'success' if success else 'failed')
+                    progress.finish('processing', key, 'success' if success else 'failed')
+                progress.emit(force=True)
                 metadata.save_collection_task(state)
             state["status"] = "checking"
             state.pop("security_check", None)
             metadata.save_collection_task(state)
             try:
+                progress.begin('publication')
                 _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
+                progress.finish('publication', 'check')
+                progress.emit(force=True)
             except Exception as exc:
+                progress.finish('publication', 'check', 'failed')
+                progress.emit(force=True)
                 state.update(status="failed", error=str(exc))
                 if state.get("security_check"):
                     RawObjectStore(work).write_json(state["security_check"], dataset="security_master",
@@ -1354,7 +1437,7 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
                 return _save_task_summary(state, paths, metadata)
             state["status"] = "committing"
             metadata.save_collection_task(state)
-            return _finish_task_commit(state, paths, metadata, failure_hook)
+            return _finish_task_commit(state, paths, metadata, failure_hook, progress=progress)
 
 
 def _save_task_summary(state, paths, metadata):
@@ -1423,6 +1506,7 @@ def _save_task_summary(state, paths, metadata):
                         "row_count": state.get("row_count") if state["status"] == "published" else None,
                         "raw_refs": commit.get("raw_refs", [])},
         "definition_hash": state["definition_hash"], "generated_at_utc": datetime.now(timezone.utc).isoformat()}
+    summary['progress'] = state.get('progress')
     directory = Path(state["archived_workspace"]) if state.get("archived_workspace") else paths["workspace_root"] / definition["trade_date"] / state["dataset"]
     directory.mkdir(parents=True, exist_ok=True)
     (directory / "task.json").write_text(json.dumps(sanitized_metadata(state.get("execution_definition", definition)), ensure_ascii=False, indent=2), encoding="utf-8")
@@ -1723,12 +1807,19 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
         state["fallback_used"] = prepared["publication_metadata"]["fallback"]
 
 
-def _finish_task_commit(state, paths, metadata, failure_hook=None):
+def _finish_task_commit(state, paths, metadata, failure_hook=None, progress=None):
     import json
     import pyarrow.parquet as pq
     from ..domain import Dataset, Adjustment, ItemStatus
     from ..storage.integrity import Manifest, file_hash
     from ..storage.parquet import CanonicalPartitionStore, _mapping_to_bar, _fsync_file
+    if progress is None and state.get('progress'):
+        from ..worker.progress import TaskProgress
+        def recovered_progress(snapshot):
+            state['progress'] = snapshot
+            metadata.save_collection_task(state)
+            _save_task_summary(state, paths, metadata)
+        progress = TaskProgress.restore(state['progress'], callback=recovered_progress)
     _save_task_summary(state, paths, metadata)
     commit = state["commit"]
     candidate = Path(commit["candidate"])
@@ -1743,6 +1834,10 @@ def _finish_task_commit(state, paths, metadata, failure_hook=None):
         if failure_hook:
             failure_hook("after_publish")
         state.update(status="published", published_manifest=str(prior_path), published_hash=file_hash(prior_path), row_count=prior.row_count, error=None)
+        if progress:
+            for step in ['canonical','raw_promote','metadata']:
+                progress.finish('publication', step, 'reused')
+            progress.emit(force=True)
         metadata.save_collection_task(state)
         return _save_task_summary(state, paths, metadata)
     if not partition.resolve().is_relative_to(paths["canonical_root"]):
@@ -1796,6 +1891,8 @@ def _finish_task_commit(state, paths, metadata, failure_hook=None):
         os.replace(temporary_manifest, manifest_path)
     if failure_hook:
         failure_hook("after_publish")
+    if progress:
+        progress.finish('publication', 'canonical')
     for promotion in commit["promotions"]:
         RawObjectStore.promote_unit(temporary=promotion["temporary"], current=promotion["current"],
             raw_root=paths["raw_root"], archive_root=paths["archive_root"], expected_hash=promotion["raw_hash"])
@@ -1803,6 +1900,8 @@ def _finish_task_commit(state, paths, metadata, failure_hook=None):
             failure_hook("after_raw_promote")
         entry = state["units"][promotion["key"]]
         entry.update(raw_manifest=promotion["audit_manifest"], current_raw=promotion["current"], promoted=True)
+    if progress:
+        progress.finish('publication', 'raw_promote')
     if not manifest.verify(partition / "data.parquet"):
         raise ValueError("completed task publication is corrupt")
     metadata.record_partition_publish(manifest=manifest, manifest_path=manifest_path)
@@ -1810,6 +1909,9 @@ def _finish_task_commit(state, paths, metadata, failure_hook=None):
                  published_hash=file_hash(manifest_path), row_count=manifest.row_count, error=None)
     metadata.save_collection_task(state)
     marker.unlink()
+    if progress:
+        progress.finish('publication', 'metadata')
+        progress.emit(force=True)
     return _save_task_summary(state, paths, metadata)
 
 

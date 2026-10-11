@@ -167,6 +167,99 @@ def check_security_input_qualification(contract, context, *, config_root, metada
             "verified_groups": accepted, "reasons": reasons}
 
 
+def check_daily_input_qualification(contract, context, *, asset_type, config_root, metadata, now):
+    """Qualify one exact retained daily request, never extrapolate a sample universe."""
+    from datetime import date
+    import xml.etree.ElementTree as ET
+    import pyarrow.parquet as pq
+    from ..storage.integrity import file_hash, row_hash, Manifest
+    from ..storage.raw import RawObjectStore
+    from ..providers.tencent.daily import tencent_symbol
+    try:
+        if contract.input_id != 'ASTOCK-002-daily' or asset_type not in {'stock', 'etf'}:
+            raise ValueError('unsupported daily input or asset type')
+        parameters = contract.bind_parameters(context)
+        symbol = tencent_symbol(parameters['code'])
+        exchange = 'XSHG' if symbol.startswith('sh') else 'XSHE'
+        identity = exchange + ':' + symbol[2:]
+        adapter = build_input_provider(contract, providers_path=Path(config_root)/'providers.yaml')
+        evidence = metadata.latest_probe(provider=contract.provider, endpoint=contract.endpoint,
+            capability_version=adapter.capability_version, dataset='daily_bar', market=exchange,
+            asset_type=asset_type, code_prefix=symbol, frequency='daily', adjustment='forward')
+        if not evidence or not evidence['eligible_for_selection'] or evidence['status'] != 'complete':
+            raise ValueError('matching routing-eligible daily evidence is missing')
+        if not {'trade_date','open','high','low','close','adjustment'} <= set(json.loads(evidence['field_semantics_json'])) or 'price:CNY' not in json.loads(evidence['units_json']):
+            raise ValueError('daily required price/date semantics are unverified')
+        if not evidence['validated_at'] <= now < evidence['validation_expires_at']:
+            raise ValueError('daily qualification is expired or not yet valid')
+        scope = json.loads(evidence['request_scope_json'])
+        if 'parameters:' + row_hash(parameters) not in scope or 'input:' + contract.input_id not in scope:
+            raise ValueError('daily request scope differs')
+        proof_path = Path(next(s.removeprefix('qualification:') for s in scope if s.startswith('qualification:')))
+        if file_hash(proof_path) != evidence['evidence_hash']:
+            raise ValueError('daily qualification hash differs')
+        proof = json.loads(proof_path.read_text(encoding='utf-8'))
+        if (proof['input_id'],proof['capability_version'],proof['asset_type']) != (contract.input_id,adapter.capability_version,asset_type):
+            raise ValueError('daily qualification identity differs')
+        artifacts = {}
+        for layer in ['contract_tests','live_report','revalidation_report','semantic_check','publication_manifest','raw_manifest']:
+            descriptor = proof[layer]; path = Path(descriptor['path'])
+            if file_hash(path) != descriptor['sha256']:
+                raise ValueError('daily qualification layer hash differs: '+layer)
+            artifacts[layer]=path
+        suites=list(ET.parse(artifacts['contract_tests']).getroot().iter('testsuite'))
+        if not suites or sum(int(s.get('tests','0')) for s in suites)==0 or any(int(s.get(k,'0')) for s in suites for k in ['failures','errors','skipped']):
+            raise ValueError('daily contract tests have not passed')
+        live=json.loads(artifacts['live_report'].read_text(encoding='utf-8'))
+        current=json.loads(artifacts['revalidation_report'].read_text(encoding='utf-8'))
+        serialized={k:v.isoformat() if isinstance(v,date) else v for k,v in parameters.items()}
+        for report in [live,current]:
+            if report['input_id']!=contract.input_id or report['adapter_version']!=adapter.capability_version or report['status']!='candidate_complete' or report['parameters']!=serialized:
+                raise ValueError('daily Provider report scope differs')
+        if live['mode']!='live' or not live.get('live_http_calls'):
+            raise ValueError('daily live source evidence is missing')
+        for descriptor in (*current['config_files'],*current['code_files']):
+            if file_hash(Path(descriptor['path']))!=descriptor['sha256']:
+                raise ValueError('daily capability code or configuration changed')
+        required={str((Path(config_root)/p).resolve()) for p in ['providers.yaml','collection.yaml','datasets/daily_bar.yaml','normalization/daily_bar.yaml']}
+        if not required <= {str(Path(d['path']).resolve()) for d in current['config_files']}:
+            raise ValueError('daily revalidation omits configuration files')
+        import inspect
+        if str(Path(inspect.getfile(type(adapter))).resolve()) not in {str(Path(d['path']).resolve()) for d in current['code_files']}:
+            raise ValueError('daily revalidation omits actual adapter code')
+        raw=artifacts['raw_manifest']; RawObjectStore.verify_manifest(raw)
+        events=[json.loads(line) for line in raw.read_text(encoding='utf-8').splitlines() if line.strip()]
+        responses=[e for e in events if e.get('event')=='http_response' and e.get('mode')=='live' and e.get('status_code')==200]
+        hashes=[r['body_sha256'] for r in responses]
+        if not hashes or hashes!=live['output']['source_response_hashes'] or hashes!=current['output']['source_response_hashes']:
+            raise ValueError('daily revalidation does not retain live response bytes')
+        semantic=json.loads(artifacts['semantic_check'].read_text(encoding='utf-8'))
+        if not semantic.get('passed') or semantic.get('instrument_id')!=identity or semantic.get('asset_type')!=asset_type or semantic.get('parameters')!=serialized or semantic.get('source_response_hashes')!=hashes or semantic.get('code_version')!=current['code_version']:
+            raise ValueError('daily price/date semantics have not been verified')
+        published=Manifest.load(artifacts['publication_manifest'])
+        partition=artifacts['publication_manifest'].parent
+        if not published.verify(partition/'data.parquet') or (partition/'task-commit.json').exists():
+            raise ValueError('daily end-to-end publication is missing or pending')
+        rows=pq.read_table(partition/'data.parquet').to_pylist()
+        wanted=[r for r in rows if r['instrument_id']==identity and r['adjustment']=='forward' and str(parameters['start'])<=r['trade_date'].isoformat()<=str(parameters['end'])]
+        if not wanted or len(wanted)!=evidence['row_count']:
+            raise ValueError('daily publication scope differs')
+        published_hashes=set()
+        for reference in published.raw_refs:
+            RawObjectStore.verify_manifest(reference)
+            published_hashes.update(json.loads(line).get('body_sha256') for line in Path(reference).read_text(encoding='utf-8').splitlines() if line.strip())
+        if not set(hashes)<=published_hashes:
+            raise ValueError('daily publication source bytes differ')
+        health=metadata.provider_health(provider=contract.provider,endpoint=contract.endpoint,capability_version=adapter.capability_version,
+            dataset='daily_bar',market=exchange,asset_type=asset_type)
+        if not metadata.provider_available(health,now):
+            raise ValueError('daily provider is cooling down')
+        return {'eligible':True,'input_id':contract.input_id,'capability_version':adapter.capability_version,
+                'symbol':symbol,'asset_type':asset_type,'source_response_hashes':hashes,'reasons':[]}
+    except (ValueError,KeyError,TypeError,AttributeError,OSError,StopIteration,ET.ParseError) as exc:
+        return {'eligible':False,'input_id':contract.input_id,'reasons':[str(exc)]}
+
+
 def build_input_provider(contract, *, providers_path, client=None):
     """Bind explicit validation inputs to existing adapters, outside production routing."""
     if contract.implementation_status != "implemented_validation_only":

@@ -67,6 +67,8 @@ data/
 
 独立 `collect-input` 只生成候选，不自动转正。离线回放须指定独立 `--data-root`，禁止发布至生产根目录；显式 `--output-root` 保留既有隔离候选方式，禁止输出到验证区或生产路径。
 
+已通过资格、日期和范围检查的留存原响应可由正式 `collect-task --mode retained` 重新解析及发布到data；它与隔离 `replay` 明确区分，不通过复制规范文件绕过检查。资格证据、原响应及四层核验材料保存在 `task_workspace/_checks/`，正式活动raw和发布审计仍使用上面的统一布局。三阶段进度位于既有任务摘要与元数据，不再增加进度目录或数据库，详见 [任务进度](../pipeline/collection-tasks.md#三阶段进度)。
+
 旧业务目录的152个文件已逐字节保存在 `data/task_archive/_workspace_audit/layout-migration-20261011/`。三份真实候选及其原响应迁入按日期的活动目录，四份历史回放只留归档；元数据引用同步更新。BaoStock原响应所属日为10月9日，北交所和上交所当前目录所属日为10月10日。失败任务继续失败，raw仍在各自日期的 `_tmp`，没有生成正式证券名单。
 
 迁移清单同时记录旧路径、审计位置和当前位置，原JSON、原响应及原哈希可追溯；新位置的派生描述符重新核验，历史代码指纹不修改。SDK依赖快照也按原哈希核验。见 [迁移结果](../../data/task_workspace/_checks/layout-production-20261011/migration-result.json) 和 [迁移核验](../../data/task_workspace/_checks/layout-production-20261011/migration-verification.json)。新的来源复核在隔离 `tmp/` 执行，资格和正式入口检查见 [阶段索引](../../data/task_workspace/_checks/layout-production-20261011/verification.json)。日线在线资格、常驻调度及管理页面仍未完成。

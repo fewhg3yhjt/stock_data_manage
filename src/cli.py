@@ -83,7 +83,10 @@ def main(argv: list[str] | None = None) -> int:
     task.add_argument("--data-root", type=Path, help="override configured data root; replay requires an isolated root outside provider_validation")
     task.add_argument("--redo", choices=("resume", "full", "selected"), default="resume")
     task.add_argument("--symbol", action="append", default=[])
-    task.add_argument("--mode", choices=("replay", "live"), default="live")
+    task.add_argument("--mode", choices=("replay", "live", "retained"), default="live",
+                      help="retained reuses qualified original responses in configured formal storage; replay stays isolated")
+    task.add_argument('--progress', action=argparse.BooleanOptionalAction, default=True,
+                      help='show stage counts, percentages and elapsed time on stderr')
 
     due = subcommands.add_parser("collect-due-inputs", help="plan one scheduler tick, or explicitly execute candidate collection")
     due.add_argument("--config-root", type=Path, default=Path("config"))
@@ -102,10 +105,13 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if args.command == "collect-task":
         from .pipeline.inputs import collect_task
+        import sys
+        from .worker.progress import ConsoleProgress
         try:
             definition = json.loads(args.task_file.read_text(encoding="utf-8"))
             report = collect_task(definition=definition, config_root=args.config_root, data_root=args.data_root,
-                                  redo=args.redo, symbols=args.symbol, mode=args.mode)
+                                  redo=args.redo, symbols=args.symbol, mode=args.mode,
+                                  progress_callback=ConsoleProgress(sys.stderr) if args.progress else None)
         except (ValueError, KeyError, TypeError, OSError) as exc:
             parser.error(str(exc))
         print(json.dumps(report, ensure_ascii=False, default=_json_default, indent=2))

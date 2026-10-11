@@ -107,6 +107,8 @@
 | `config/loader.py` | 加载来源、输入契约、参数来源、采集意图、字段模板、路由与映射/状态/范围配置；参数绑定与类型/范围校验、统一运行路径及隔离层校验；配置不生成验证有效期 |
 | `routing/factory.py` | 按现有端点创建 Provider，保留来源传输并共享限速；按实际范围、有效期及四层证据检查资格和冷却。日期工作区的来源报告按工作区基准解析原响应引用，缺失或哈希不符明确拒绝；原响应与SDK派生载荷分别核验 |
 
+日线留存资格在同一文件按证券、资产类别和完整参数精确核验，保存真实来源、当前版本复核、语义及端到端证据，不推广样本资格。
+
 ## 能力路由器
 
 | 文件 | 职责 |
@@ -168,10 +170,13 @@
 | 文件 | 职责 |
 |---|---|
 | `worker/attempts.py` | Collection Attempt 状态机和租约状态 |
+| `worker/progress.py` | 公共三阶段计数、失败与复用、耗时、节流及提交恢复计数；CLI stderr展示，不管理调度或业务数据 |
 | `worker/recovery.py` | 既有提交、临时文件和元数据恢复；日期工作区归档前复核候选、原响应及发布，归档后更新元数据和摘要；保留旧材料归档校验 |
 | `worker/scheduler.py` | 既有任务时间表；输入配置的天/分钟周期、交易日/交易时段槽位、证券范围绑定及容量门禁；从同一频率配置生成证券清单每日任务 |
 | `worker/acceptance.py` | 离线验收回放和容量/恢复验收证据 |
 | `worker/__init__.py` | Worker 包说明，不承载业务实现 |
+
+任务入口 `pipeline/inputs.py` 支持正式留存响应模式及持久化进度；`cli.py` 提供 `--mode retained`、`--progress/--no-progress`。实现测试新增 `tests/test_task_progress.py`（进度、未知总量、失败和恢复计数）与 `tests/test_retained_daily.py`（合成四层资格、范围及哈希拒绝、零网络发布和恢复）；测试只写tmp，不作为真实来源资格。
 | `cli.py` | `collect-due-inputs`（默认保存计划）、`collect-input`（默认分层落盘，支持 JSON 参数上下文及隔离验证输出）、`probe-*`、`recover`、`acceptance-offline` 等入口，负责参数解析和现有流程组装 |
 | `__init__.py` | 包级公共领域模型导出 |
 
