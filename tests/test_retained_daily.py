@@ -86,7 +86,7 @@ def test_interrupted_retained_publication_recovers_all_four_progress_steps(quali
     with MetadataStore(root/'metadata/metadata.duckdb') as metadata:
         result=metadata.load_collection_task(definition['task_id'])
     assert result['status']=='published'
-    assert result['progress']['stages']['publication']['completed']==4
+    assert result['progress']['stages']['publication']['completed']==1
     assert result['progress']['stages']['raw']['reused']==1
 
 

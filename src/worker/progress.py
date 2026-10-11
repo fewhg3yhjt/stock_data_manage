@@ -9,7 +9,7 @@ class TaskProgress:
         self.started = clock()
         self.started_at = datetime.now(timezone.utc).isoformat()
         self.stages = {name: {'total': count, 'items': {}, 'started': None, 'ended': None}
-                       for name, count in [('raw', total), ('processing', total), ('publication', 4)]}
+                       for name, count in [('raw', total), ('processing', total), ('publication', total)]}
         for name in ('raw', 'processing'):
             self.stages[name]['items'].update({key: 'reused' for key in reused})
         self.last_emit = float('-inf')
@@ -22,7 +22,12 @@ class TaskProgress:
     def finish(self, stage, key, status='success'):
         self.begin(stage) if self.stages[stage]['started'] is None else None
         self.stages[stage]['items'][key] = status
-        if (stage == 'publication' and status == 'failed') or (self.stages[stage]['total'] is not None and len(self.stages[stage]['items']) >= self.stages[stage]['total']):
+        if stage == 'publication':
+            self.stages[stage]['current_action'] = key
+            done = status == 'failed' or key == 'metadata'
+        else:
+            done = self.stages[stage]['total'] is not None and len(self.stages[stage]['items']) >= self.stages[stage]['total']
+        if done:
             self.stages[stage]['ended'] = self.clock()
         self.emit()
 
@@ -44,8 +49,19 @@ class TaskProgress:
                 'success_percent': round(100 * (counts['success'] + counts['reused']) / total, 2) if total else None,
                 'elapsed_seconds': round((stage['ended'] if stage['ended'] is not None else now) - stage['started'], 3) if stage['started'] is not None else 0}
             if name == 'publication':
-                stages[name]['steps'] = dict(stage['items'])
-        return {'version': 1, 'started_at_utc': self.started_at,
+                steps = dict(stage['items'])
+                failed = 'failed' in steps.values()
+                committed = steps.get('metadata') in {'success', 'reused'} and not failed
+                reused = committed and steps.get('canonical') == 'reused'
+                completed = (total or 0) if committed else 0
+                stages[name].update(status='failed' if failed else 'completed' if committed else
+                    'pending' if stage['started'] is None else 'running', completed=completed,
+                    success=completed if not reused else 0, reused=completed if reused else 0,
+                    failed=(total or 0) if failed else 0, skipped=0,
+                    percent=(100 if committed else 0) if total else None,
+                    success_percent=(100 if committed else 0) if total else None,
+                    steps=steps, current_action=stage.get('current_action'))
+        return {'version': 2, 'started_at_utc': self.started_at,
                 'elapsed_seconds': round(now - self.started, 3), 'stages': stages}
 
     @classmethod
@@ -56,9 +72,11 @@ class TaskProgress:
         now = progress.clock()
         for name, previous in snapshot['stages'].items():
             stage = progress.stages[name]
-            stage['total'] = previous['total']
+            # Legacy snapshots counted commit actions; use the source-unit total.
+            stage['total'] = snapshot['stages']['raw']['total'] if name == 'publication' else previous['total']
             if name == 'publication':
                 stage['items'] = dict(previous.get('steps', {}))
+                stage['current_action'] = previous.get('current_action')
             else:
                 stage['items'] = {f'{status}-{index}': status for status in ('success','failed','skipped','reused')
                                   for index in range(previous[status])}
@@ -98,8 +116,12 @@ class ConsoleProgress:
             seconds = int(stage['elapsed_seconds'])
             elapsed = f"{stage['elapsed_seconds']:.1f}秒" if seconds < 60 else f"{seconds//60:02d}:{seconds%60:02d}"
             status_text = {'pending':'等待','running':'进行中','failed':'失败','completed':'完成'}[stage['status']]
+            action = ''
+            if name == 'publication' and stage.get('current_action'):
+                action = ' 最近动作：' + {'check':'检查', 'canonical':'写入规范文件',
+                    'raw_promote':'原响应归位', 'metadata':'登记结果'}.get(stage['current_action'], stage['current_action'])
             lines.append(f"{title} {bar} {count} {ratio} 成功{stage['success']} 失败{stage['failed']} "
-                         f"复用{stage['reused']} 跳过{stage['skipped']} 耗时{elapsed} {status_text}")
+                         f"复用{stage['reused']} 跳过{stage['skipped']} 耗时{elapsed} {status_text}{action}")
         tty = self.stream.isatty()
         prefix = '\x1b[3A' if tty and self.drawn else ''
         self.stream.write(prefix + '\n'.join(('\x1b[2K' if tty else '') + line for line in lines) + '\n')
