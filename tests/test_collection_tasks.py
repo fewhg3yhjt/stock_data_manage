@@ -465,12 +465,16 @@ def save_fixture_qualification(root, input_id, context):
         "config_files":[{"path":str(CONFIG/name),"sha256":file_hash(CONFIG/name)} for name in ("providers.yaml","collection.yaml","datasets/security_snapshot.yaml","normalization/security_snapshot.yaml")],
         "code_files":[{"path":str(path),"sha256":file_hash(path)} for path in (ROOT/"src/routing/factory.py",Path(inspect.getfile(type(adapter))))],
         "synthetic_fixture":True}
-    rows = ([{"stock_code": "511600", "exchange": "XSHG", "asset_type": "etf", "status": "unknown"}]
-            if input_id == "SECURITY-SSE-ETF-001" else full_catalog_collector().catalog_rows[
+    dated = input_id in {'SECURITY-SSE-ETF-HISTORY-001', 'SECURITY-SSE-MONEY-ETF-HISTORY-001', 'SECURITY-SZSE-ETF-HISTORY-001'}
+    rows = ([{"stock_code": "159001" if input_id == 'SECURITY-SZSE-ETF-HISTORY-001' else "511600",
+              "exchange": "XSHE" if input_id == 'SECURITY-SZSE-ETF-HISTORY-001' else "XSHG", "asset_type": "etf", "status": "unknown"}]
+            if dated or input_id == "SECURITY-SSE-ETF-001" else full_catalog_collector().catalog_rows[
                 "beijing" if input_id=="SECURITY-BSE-001" else "shenzhen-shanghai"])
     groups = {row["exchange"]+"/"+row["asset_type"]:1 for row in rows}
     semantic = {"input_id":input_id,"passed":True,"independent_full_market_coverage_verified":True,
                 "code_version":"fixture-v1","group_counts":groups,"source_response_hashes":[event["body_sha256"]],"synthetic_fixture":True}
+    if dated:
+        semantic['publication_group_counts'] = groups
     for name, payload in (("live.json",report),("semantic.json",semantic)):
         (work/name).write_text(json.dumps(payload),encoding="utf-8")
     (work/"contract.xml").write_text('<testsuites><testsuite tests="1" failures="0" errors="0" skipped="0"/></testsuites>')
@@ -478,7 +482,8 @@ def save_fixture_qualification(root, input_id, context):
                      "exchange":row["exchange"],"asset_type":row["asset_type"],"status":row.get("status","active")} for row in rows]
     pq.write_table(__import__('pyarrow').Table.from_pylist(canonical_rows),work/"data.parquet")
     manifest = Manifest.from_file(work/"data.parquet",dataset="security_master",row_count=len(rows),first_key=None,last_key=None,
-        raw_refs=(str(raw),),publication_metadata={"coverage_passed":True,"fallback":False})
+        raw_refs=(str(raw),),publication_metadata={"coverage_passed":True,"fallback":False,
+            **({'as_of_date': str(params['trade_date'])} if dated else {})})
     manifest.write_atomic(work/"manifest.json")
     artifacts = {"contract_tests":"contract.xml","live_report":"live.json","semantic_check":"semantic.json","publication_manifest":"manifest.json"}
     proof = {"input_id":input_id,"capability_version":version,
@@ -486,7 +491,7 @@ def save_fixture_qualification(root, input_id, context):
     proof_path = work/"qualification.json"
     proof_path.write_text(json.dumps(proof),encoding="utf-8")
     now = datetime.now(timezone.utc)
-    scope = ("input:"+input_id,"parameters:"+row_hash({k:v for k,v in params.items() if k!="trade_date"}),"qualification:"+str(proof_path))
+    scope = ("input:"+input_id,"parameters:"+row_hash({k:v for k,v in params.items() if dated or k!="trade_date"}),"qualification:"+str(proof_path))
     with MetadataStore(root/"metadata/metadata.duckdb") as metadata:
         for group in groups:
             exchange, asset = group.split('/')
@@ -496,6 +501,67 @@ def save_fixture_qualification(root, input_id, context):
                 field_semantics=("stock_code","exchange","asset_type","trade_date","status"),units=("identity:exchange/code",)),
                 dataset="security_master",market=exchange,asset_type=asset,frequency="snapshot")
     return contract, proof_path
+
+
+@pytest.mark.parametrize('input_id', ['SECURITY-SSE-ETF-HISTORY-001', 'SECURITY-SSE-MONEY-ETF-HISTORY-001', 'SECURITY-SZSE-ETF-HISTORY-001'])
+def test_dated_etf_qualification_accepts_exact_day_and_rejects_other_day(tmp_path, input_id):
+    from stock_data_manage.routing.factory import check_security_input_qualification
+    context = {'request': {'trade_date': DAY}, 'calendar': {'trading_dates': [DAY]}}
+    contract, proof = save_fixture_qualification(tmp_path, input_id, context)
+    with MetadataStore(tmp_path/'metadata/metadata.duckdb') as metadata:
+        assert check_security_input_qualification(contract, context, config_root=CONFIG,
+            metadata=metadata, now=datetime.now(timezone.utc))['eligible']
+        context = {'request': {'trade_date': '2026-09-29'}, 'calendar': {'trading_dates': ['2026-09-29']}}
+        result = check_security_input_qualification(contract, context, config_root=CONFIG,
+            metadata=metadata, now=datetime.now(timezone.utc))
+        assert not result['eligible']
+        assert 'scope differs' in result['reasons'][0]['reason']
+
+
+def test_master_without_units_builds_historical_sources_from_yaml(tmp_path):
+    from stock_data_manage.service.calendar import TradingCalendarStore, CalendarDay
+    directory = tmp_path/'metadata'; directory.mkdir()
+    with TradingCalendarStore(str(directory/'metadata.duckdb')) as calendar:
+        calendar.upsert([CalendarDay(date.fromisoformat(DAY), True, 'fixture', 1)])
+    collector = FaultCollector()
+    collector.catalog_rows = {
+        'SDA-BOARD-005': [{'stock_code': '600001', 'exchange': 'XSHG', 'asset_type': 'stock'},
+                        {'stock_code': '000001', 'exchange': 'XSHE', 'asset_type': 'stock'}],
+        'SECURITY-SSE-ETF-HISTORY-001': [{'stock_code': '510300', 'exchange': 'XSHG', 'asset_type': 'etf'}],
+        'SECURITY-SSE-MONEY-ETF-HISTORY-001': [{'stock_code': '511600', 'exchange': 'XSHG', 'asset_type': 'etf'}],
+        'SECURITY-SZSE-ETF-HISTORY-001': [{'stock_code': '159001', 'exchange': 'XSHE', 'asset_type': 'etf'}]}
+    result = run(tmp_path, {'task_id': 'configured-history', 'dataset': 'security_master', 'trade_date': DAY}, collector)
+    assert result['status'] == 'published' and result['row_count'] == 5
+    assert set(result['units']) == set(collector.catalog_rows)
+    assert len(result['definition']['required_groups']) == 4
+
+
+def test_dated_etf_qualification_checks_combined_publication_and_original_date(tmp_path):
+    from stock_data_manage.routing.factory import check_security_input_qualification
+    from stock_data_manage.storage.integrity import Manifest
+    context = {'request': {'trade_date': DAY}, 'calendar': {'trading_dates': [DAY]}}
+    contract, proof_path = save_fixture_qualification(tmp_path, 'SECURITY-SSE-ETF-HISTORY-001', context)
+    work = proof_path.parent
+    rows = pq.read_table(work/'data.parquet').to_pylist()
+    rows.append({**rows[0], 'instrument_id': 'XSHG:510300', 'symbol': '510300'})
+    pq.write_table(__import__('pyarrow').Table.from_pylist(rows), work/'data.parquet')
+    semantic = json.loads((work/'semantic.json').read_text(encoding='utf-8'))
+    semantic['publication_group_counts']['XSHG/etf'] = 2
+    (work/'semantic.json').write_text(json.dumps(semantic), encoding='utf-8')
+    for day, eligible in [(DAY, True), ('2026-09-29', False)]:
+        manifest = Manifest.from_file(work/'data.parquet', dataset='security_master', row_count=2,
+            first_key=None, last_key=None, raw_refs=(str(work/'raw/manifest.ndjson'),),
+            publication_metadata={'coverage_passed': True, 'fallback': False, 'as_of_date': day})
+        manifest.write_atomic(work/'manifest.json')
+        proof = json.loads(proof_path.read_text(encoding='utf-8'))
+        for layer in ['semantic_check', 'publication_manifest']:
+            proof[layer]['sha256'] = file_hash(Path(proof[layer]['path']))
+        proof_path.write_text(json.dumps(proof), encoding='utf-8')
+        with MetadataStore(tmp_path/'metadata/metadata.duckdb') as metadata:
+            metadata.connection.execute('UPDATE capability_registry SET evidence_hash=?', [file_hash(proof_path)])
+            result = check_security_input_qualification(contract, context, config_root=CONFIG,
+                metadata=metadata, now=datetime.now(timezone.utc))
+        assert result['eligible'] is eligible
 
 
 @pytest.mark.parametrize("failure", [None,"hash","expired","scope","semantic","cooldown","version","code","pending","replay","different_body","sdk_derived","sdk_derived_corrupt"])

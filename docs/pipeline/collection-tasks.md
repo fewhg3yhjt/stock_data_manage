@@ -24,6 +24,22 @@
 
 断点重做在同一数据日期、任务范围内根据哈希、字段合同、处理版本、单元检查和任务阶段判断：响应合格而后续失败的继续处理；请求失败、缺失或响应损坏的补采；合格处理结果直接复用。指定证券重做只重采该日期的指定证券，名单接口不支持单证券请求时拒绝该操作。新响应先进入该日期的暂存区，提取、合并并按业务主键去重后重新检查；合并的是派生记录和响应引用，不拼接修改原始响应字节。成功后替换受影响单元的当天引用，保留当天未重采部分及其他日期。
 
+## 按配置构建历史证券任务
+
+`collect-task` 的任务文件对 `security_master` 可只提供 `task_id`、`dataset`、`trade_date`，省略 `units`。入口读取业务根目录的既有交易日历，确认目标日为交易日，再由现有调度模块构建并保存实际执行定义；缺日历时拒绝，不把用户输入日期自动当作交易日。显式提供 `units` 的既有任务仍按原定义执行。
+
+任务目标早于上海时区执行当天时，选择 `collection.yaml/security_master.historical`：BaoStock只负责沪深股票，上交所普通ETF、货币ETF及深交所ETF分别取指定日，合并检查四组。北交所历史采集暂缓，不称为含北交所的全市场名单。历史任务默认禁止以前次数据回退。当前日期任务与日常定时任务使用原 `source_inputs`，不将当前目录标为历史日期。
+
+历史ETF资格绑定完整请求参数（含日期），仅放行已有三个 `date_snapshot` 契约；语义证据仍要求独立范围核验，`group_counts` 记录单接口数量，`publication_group_counts` 记录互补合并后的数量，发布清单 `as_of_date` 必须匹配请求日。配置、代码、测试、原响应及冷却检查不省略；1694条历史份额身份样本不自动成为完整上市目录资格。
+
+示例任务内容：
+
+```json
+{"task_id":"security-master-hs-20261009","dataset":"security_master","trade_date":"2026-10-09"}
+```
+
+准备好目标日的日历和正式来源资格后，沿用 `collect-task --task-file <任务文件> --mode live --redo full`。该命令实际联网并写入配置的data，本次开发未执行。失败重做、raw暂存和转正、去重及发布继续复用现有流程。
+
 ## 三阶段进度
 
 既有任务统一使用 `worker/progress.py` 的 `TaskProgress`，不新增调度服务或状态数据库。`summary.json.progress` 和元数据库任务状态保存原响应、解析映射、检查发布三阶段的 `total`、`completed`、`success`、`failed`、`skipped`、`reused`、`percent`、`success_percent`、`elapsed_seconds`，并保存本次执行总耗时和开始时间。

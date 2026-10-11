@@ -148,6 +148,42 @@ def load_scheduled_jobs(path: str | Path) -> tuple[ScheduledJob, ...]:
     return tuple(sorted(jobs, key=lambda job: (job.local_time, job.name)))
 
 
+def build_security_master_definition(config_root, *, trade_date, now, is_trading_day, task_id=None):
+    """Select configured current or dated inputs; never fabricate snapshot dates."""
+    if now.tzinfo is None:
+        raise ValueError('task time must be timezone-aware')
+    day = date.fromisoformat(trade_date) if isinstance(trade_date, str) else trade_date
+    today = now.astimezone(SHANGHAI).date()
+    if day > today:
+        raise ValueError('security task date cannot be in the future')
+    if is_trading_day is not True:
+        raise ValueError('security task requires a confirmed trading calendar date')
+    root = Path(config_root)
+    config = yaml.safe_load((root / 'collection.yaml').read_text(encoding='utf-8'))['security_master']
+    selected = config['historical'] if day < today else config
+    contracts = {c.input_id: c for c in load_input_capabilities(root / 'providers.yaml')}
+    units = []
+    for input_id in selected['source_inputs']:
+        contract = contracts[input_id]
+        if contract.dataset != 'security_snapshot':
+            raise ValueError('security task source must be a security snapshot input')
+        if day < today and contract.input_id in {'SECURITY-BSE-001', 'SECURITY-SSE-ETF-001'}:
+            raise ValueError('current catalog cannot be selected for a historical task')
+        context = {'config': dict(selected.get('source_config', {}).get(input_id, {}))}
+        if any(binding.source == 'request.trade_date' for binding in contract.parameters):
+            context['request'] = {'trade_date': day.isoformat()}
+        if contract.trading_date_parameter:
+            context['calendar'] = {'trading_dates': [day.isoformat()]}
+        units.append({'key': input_id, 'input_id': input_id, 'context': context})
+    if not units or len({u['key'] for u in units}) != len(units):
+        raise ValueError('security master requires unique source inputs')
+    definition = {'task_id': task_id or 'security-master-' + day.strftime('%Y%m%d'),
+                  'dataset': 'security_master', 'trade_date': day.isoformat(), 'units': units}
+    if day < today:
+        definition.update(required_groups=selected['required_groups'], allow_previous=False)
+    return definition
+
+
 def plan_security_master_collection(config_root, *, now, is_trading_day):
     """Plan the business job with the same frequency calculator as source inputs."""
     if now.tzinfo is None:
@@ -168,13 +204,8 @@ def plan_security_master_collection(config_root, *, now, is_trading_day):
     slot = collection_slot(profile, now, schedule=MarketSchedule(timezone=SHANGHAI), trading_dates=(local.date(),))
     if slot is None:
         return job
-    units = [{"key": input_id, "input_id": input_id, "context": {
-        "config": config.get("source_config", {}).get(input_id, {})}} for input_id in config["source_inputs"]]
-    if not units or len({u["key"] for u in units}) != len(units):
-        raise ValueError("security master requires unique source inputs")
     return {**job, "slot": slot.isoformat(), "status": "ready",
-            "definition": {"task_id": job["task_id"], "dataset": "security_master",
-                           "trade_date": job["trade_date"], "units": units}}
+            "definition": build_security_master_definition(root, trade_date=job['trade_date'], now=now, is_trading_day=True)}
 
 
 DEFAULT_JOBS = (

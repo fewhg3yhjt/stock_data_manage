@@ -27,7 +27,7 @@ def test_schedule_yaml_skips_disabled_tdx_delayed_jobs() -> None:
 
 
 from dataclasses import replace
-from datetime import date, time
+from datetime import date, time, timedelta
 from pathlib import Path
 import json
 import shutil
@@ -41,9 +41,29 @@ from stock_data_manage.pipeline.inputs import collect_due_inputs
 from stock_data_manage.service.instruments import SecurityRecord
 from stock_data_manage.worker.scheduler import collection_slot, plan_input_collection
 from stock_data_manage.worker.scheduler import plan_security_master_collection
+from stock_data_manage.worker.scheduler import build_security_master_definition
 
 ROOT = Path(__file__).resolve().parents[1]
 DAY = date(2026, 9, 30)
+
+
+def test_historical_master_selects_dated_etfs_and_explicit_four_group_scope():
+    definition = build_security_master_definition(ROOT / 'config', trade_date=DAY,
+        now=stamp(8, 0) + timedelta(days=1), is_trading_day=True)
+    assert [u['input_id'] for u in definition['units']] == ['SDA-BOARD-005',
+        'SECURITY-SSE-ETF-HISTORY-001', 'SECURITY-SSE-MONEY-ETF-HISTORY-001', 'SECURITY-SZSE-ETF-HISTORY-001']
+    assert definition['units'][0]['context']['config']['include_etf'] is False
+    assert len(definition['required_groups']) == 4
+    assert all(group[0] != 'BSE' for group in definition['required_groups'])
+    assert definition['allow_previous'] is False
+    assert all(u['context']['request']['trade_date'] == DAY.isoformat() for u in definition['units'])
+
+
+@pytest.mark.parametrize('opened', [False, None])
+def test_historical_master_requires_confirmed_calendar(opened):
+    with pytest.raises(ValueError, match='confirmed trading calendar'):
+        build_security_master_definition(ROOT / 'config', trade_date=DAY,
+            now=stamp(8, 0) + timedelta(days=1), is_trading_day=opened)
 
 
 def test_master_schedule_calendar_slot_and_single_frequency_source(tmp_path):

@@ -43,6 +43,13 @@ security_master:
   source_inputs: [SDA-BOARD-005, SECURITY-BSE-001, SECURITY-SSE-ETF-001]
   source_config:
     SDA-BOARD-005: {include_etf: true}
+  # 历史任务使用指定日数据，不将当前上市目录改写成历史日期。
+  # 北交所历史来源暂缓，因此此范围明确为沪深股票与ETF四组。
+  historical:
+    source_inputs: [SDA-BOARD-005, SECURITY-SSE-ETF-HISTORY-001, SECURITY-SSE-MONEY-ETF-HISTORY-001, SECURITY-SZSE-ETF-HISTORY-001]
+    source_config:
+      SDA-BOARD-005: {include_etf: false}
+    required_groups: [[XSHG, stock], [XSHE, stock], [XSHG, etf], [XSHE, etf]]
 
 # 通用模板保留为采集意图；腾讯专用模板供现有调度器执行候选采集。
 collection_profiles:

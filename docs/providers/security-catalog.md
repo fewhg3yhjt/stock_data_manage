@@ -28,7 +28,7 @@
 
 ### 指定日期的ETF输入
 
-复用现有 `SseMarketProvider` 和 `ExchangeDailyProvider`，不增加平行Provider或任务管理层。参数及限制定义在 [providers.yaml](../../config/providers.yaml)，字段映射在 [security_snapshot.yaml](../../config/normalization/security_snapshot.yaml)，来源承担的市场/类型在 [security_master.yaml](../../config/datasets/security_master.yaml)。以下三项仅接入隔离验证，未加入正式调度来源配置或授予生产路由资格。
+复用现有 `SseMarketProvider` 和 `ExchangeDailyProvider`，不增加平行Provider或任务管理层。参数及限制定义在 [providers.yaml](../../config/providers.yaml)，字段映射在 [security_snapshot.yaml](../../config/normalization/security_snapshot.yaml)，来源承担的市场/类型在 [security_master.yaml](../../config/datasets/security_master.yaml)。以下三项已加入 `collection.yaml/security_master.historical` 历史任务选源；当日定时任务仍使用当前目录。配置接通不自动授予生产路由资格，真实证据、有效期、冷却、日期和完整范围仍须通过检查。
 
 | 输入ID | 原始接口及日期 | 10月9日留存响应 | 映射 |
 |---|---|---:|---|
@@ -44,7 +44,7 @@
 
 隔离验收使用 [任务参数](../../tmp/etf-history-integration-20261011/task.json)，合并沪市944条、深市750条，合计1694条；全量重做和再次断点执行验证一致、无重复、零网络调用。成果和哈希见 [验收索引](../../tmp/etf-history-integration-20261011/verification.json)。均在tmp下，不写正式data或新增provider_validation材料。
 
-历史ETF接入改变了Provider、工厂、流程及YAML指纹，当次未重登记资格。后续已按当前版本重新复核三项现时目录来源，见上述当前资格索引；历史ETF输入仍未授予生产资格或进入默认调度。
+历史ETF接入改变了Provider、工厂、流程及YAML指纹，当次未重登记资格。后续已按当时版本重新复核三项现时目录来源，见上述当前资格索引；历史ETF输入的实际生产资格尚未授予。当前历史选源和日期资格检查已接通，运行前仍需当前版本的真实证据复核，不将隔离回放当作资格登记。
 
 沪深输入保留原 BaoStock 登录/退出、`query_all_stock(day)`、`query_stock_industry(date)` 两次查询及SDK留证边界；没有替换传输方式。参数仍由 [providers.yaml](../../config/providers.yaml) 定义：`trade_date` 来自请求并需要已知交易日，`symbols` 是本地筛选，`include_etf` 来自配置，默认 `false`，保持原股票调用方式。全量股票与ETF名单显式配置 `include_etf: true`。
 

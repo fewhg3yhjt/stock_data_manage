@@ -1195,6 +1195,16 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
     production_root = load_storage_paths(config_root)["data_root"]
     if mode == "replay" and (paths["data_root"].is_relative_to(production_root) or production_root.is_relative_to(paths["data_root"])):
         raise ValueError("task replay publication requires an isolated --data-root")
+    if definition.get('dataset') == 'security_master' and definition.get('units') is None:
+        from ..worker.scheduler import build_security_master_definition
+        from ..service.calendar import TradingCalendarStore
+        target_day = datetime.strptime(definition['trade_date'], '%Y-%m-%d').date()
+        paths['metadata_path'].parent.mkdir(parents=True, exist_ok=True)
+        with TradingCalendarStore(str(paths['metadata_path'])) as calendar:
+            is_open = calendar.is_trading_day(target_day)
+        generated = build_security_master_definition(config_root, trade_date=target_day,
+            now=datetime.now(timezone.utc), is_trading_day=is_open, task_id=definition['task_id'])
+        definition = {**generated, **definition, 'units': generated['units']}
     task_id = definition["task_id"]
     if mode == 'retained' and collector is not None:
         raise ValueError('formal retained tasks must use the existing input executor')
@@ -1651,7 +1661,7 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
         rows = pq.read_table(entry["artifact"]).to_pylist()
         if state["dataset"] == "daily_bar":
             rows = [row for row in rows if row["trade_date"] == day]
-        source_rows[key] = {"rows": rows, "entry": entry, "contract": contract,
+        source_rows[key] = {"rows": rows, "entry": entry, "contract": contract, "parameters": parameters,
                             "raw_ref": str(audit / "manifest.ndjson"), "symbol": unit.get("symbol")}
     if state["dataset"] == "daily_bar":
         prepared = prepare_daily_task_publication(state, units, source_rows, paths, config_root, day)
@@ -1715,7 +1725,9 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
         check["passed"] = check["passed"] and not missing and not check["classification_conflicts"]
         check["recollect_units"] = []
         responsibilities = {key: {tuple(pair) for pair in policy['dataset']['publication']['source_groups'].get(
-            value['entry']['input_id'], ())} & required_groups for key, value in source_rows.items()}
+            value['entry']['input_id'], ()) if not (value['entry']['input_id'] == 'SDA-BOARD-005' and pair[1] == 'etf'
+                and not value['parameters'].get('include_etf'))}
+            & required_groups for key, value in source_rows.items()}
         for key, value in source_rows.items():
             source_records = prepare_security_publication({key: value["rows"]}).records
             declared_groups = responsibilities[key]

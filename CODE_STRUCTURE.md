@@ -172,11 +172,13 @@
 | `worker/attempts.py` | Collection Attempt 状态机和租约状态 |
 | `worker/progress.py` | 三阶段统一采集单元计数，发布整批完成后计入；内部动作和旧快照恢复、失败与复用、耗时及节流；CLI stderr展示，不管理调度或业务数据 |
 | `worker/recovery.py` | 既有提交、临时文件和元数据恢复；日期工作区归档前复核候选、原响应及发布，归档后更新元数据和摘要；保留旧材料归档校验 |
-| `worker/scheduler.py` | 既有任务时间表；输入配置的天/分钟周期、交易日/交易时段槽位、证券范围绑定及容量门禁；从同一频率配置生成证券清单每日任务 |
+| `worker/scheduler.py` | 既有任务时间表及频率计算；构建证券任务时按目标日期选择当前或历史来源，绑定请求日期、日历和检查范围；定时名单继续使用当前目录 |
 | `worker/acceptance.py` | 离线验收回放和容量/恢复验收证据 |
 | `worker/__init__.py` | Worker 包说明，不承载业务实现 |
 
 任务入口 `pipeline/inputs.py` 支持正式留存响应模式及持久化进度；`cli.py` 提供 `--mode retained`、`--progress/--no-progress`。实现测试新增 `tests/test_task_progress.py`（进度、未知总量、失败和恢复计数）与 `tests/test_retained_daily.py`（合成四层资格、范围及哈希拒绝、零网络发布和恢复）；测试只写tmp，不作为真实来源资格。
+
+证券任务省略units时，`pipeline/inputs.py` 查询既有交易日历并调用 `worker/scheduler.py` 按collection.yaml构建来源；`routing/factory.py` 对历史ETF按完整日期参数及互补发布数量检查资格。新增行为在既有 `tests/test_scheduler.py`、`tests/test_collection_tasks.py` 验证，不新增任务管理模块。
 | `cli.py` | `collect-due-inputs`（默认保存计划）、`collect-input`（默认分层落盘，支持 JSON 参数上下文及隔离验证输出）、`probe-*`、`recover`、`acceptance-offline` 等入口，负责参数解析和现有流程组装 |
 | `__init__.py` | 包级公共领域模型导出 |
 

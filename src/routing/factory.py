@@ -44,14 +44,15 @@ def check_security_input_qualification(contract, context, *, config_root, metada
                                                 for value in context["calendar"]["trading_dates"]]
     adapter = build_input_provider(contract, providers_path=root / "providers.yaml")
     version = adapter.capability_version
-    parameters = {key: value for key, value in contract.bind_parameters(context).items() if key != "trade_date"}
+    dated = contract.input_id in {'SECURITY-SSE-ETF-HISTORY-001', 'SECURITY-SSE-MONEY-ETF-HISTORY-001', 'SECURITY-SZSE-ETF-HISTORY-001'}
+    parameters = {key: value for key, value in contract.bind_parameters(context).items() if dated or key != "trade_date"}
     # Exact non-date scope: filtered stock probes cannot qualify the full catalog.
     scope = "parameters:" + row_hash(parameters)
     policy = yaml.safe_load((root / "datasets/security_master.yaml").read_text(encoding="utf-8"))
     groups = [tuple(group) for group in policy["dataset"]["publication"]["source_groups"].get(contract.input_id, ())
               if group[1] != "etf" or contract.input_id != "SDA-BOARD-005" or parameters.get("include_etf")]
     reasons, accepted = [], []
-    if contract.dataset != "security_snapshot" or contract.request_shape != "full_snapshot" or not groups:
+    if contract.dataset != "security_snapshot" or (contract.request_shape != "full_snapshot" and not (dated and contract.request_shape == 'date_snapshot')) or not groups:
         return {"eligible": False, "input_id": contract.input_id, "reasons": ["unsupported catalog contract"]}
     for exchange, asset in groups:
         try:
@@ -89,7 +90,7 @@ def check_security_input_qualification(contract, context, *, config_root, metada
             live = json.loads(artifacts["live_report"].read_text(encoding="utf-8"))
             if live.get("input_id") != contract.input_id or live.get("adapter_version") != version or live.get("status") != "candidate_complete" or not (live.get("live_http_calls", 0) + live.get("live_sdk_calls", 0)):
                 raise ValueError("formal Provider live evidence is missing")
-            if live.get("mode") != "live" or "parameters:" + row_hash({k: v for k, v in live["parameters"].items() if k != "trade_date"}) != scope:
+            if live.get("mode") != "live" or "parameters:" + row_hash({k: v for k, v in live["parameters"].items() if dated or k != "trade_date"}) != scope:
                 raise ValueError("live validation covers a different request scope")
             for descriptor in (*live["config_files"], *live["code_files"]):
                 if file_hash(Path(descriptor["path"])) != descriptor["sha256"]:
@@ -147,7 +148,10 @@ def check_security_input_qualification(contract, context, *, config_root, metada
                 raise ValueError("publication does not contain the verified live response bytes")
             published_rows = pq.read_table(artifacts["publication_manifest"].parent / "data.parquet").to_pylist()
             identities = [row["instrument_id"] for row in published_rows]
-            if len(set(identities)) != len(identities) or sum(row["exchange"] == exchange and row["asset_type"] == asset for row in published_rows) != evidence["row_count"]:
+            expected_published = semantic['publication_group_counts'][exchange + '/' + asset] if dated else evidence['row_count']
+            if dated and (expected_published < evidence['row_count'] or published.publication_metadata.get('as_of_date') != parameters['trade_date'].isoformat()):
+                raise ValueError('dated publication scope or date differs from source evidence')
+            if len(set(identities)) != len(identities) or sum(row["exchange"] == exchange and row["asset_type"] == asset for row in published_rows) != expected_published:
                 raise ValueError("end-to-end security identities or verified group count differ")
             health = metadata.provider_health(provider=contract.provider, endpoint=contract.endpoint, capability_version=version,
                 dataset="security_master", market=exchange, asset_type=asset)
