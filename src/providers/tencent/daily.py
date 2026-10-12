@@ -34,6 +34,8 @@ class TencentDailyProvider:
     supported_asset_types: frozenset[AssetType] = field(default_factory=lambda: frozenset(AssetType))
     input_hosts: tuple[str, ...] = ("https://web.ifzq.gtimg.cn", "https://proxy.finance.qq.com/ifzqgtimg", "https://ifzq.gtimg.cn")
     host_down_until: dict[str, float] = field(default_factory=dict)
+    # Only this host was used in the independently retained alternative probes.
+    alternative_input_hosts: tuple[str, ...] = ("https://proxy.finance.qq.com/ifzqgtimg",)
 
     def __post_init__(self) -> None:
         if self.adjustment is Adjustment.BACKWARD:
@@ -101,44 +103,71 @@ class TencentDailyProvider:
             str(returned_rows[-1]["trade_date"]) if returned_rows else None, self.adjustment,
         )
 
-    def fetch_window(self, code: str, start: date, end: date, adjust: str = "qfq") -> InputFetchResult:
+    def fetch_window(self, code: str, start: date, end: date, adjust: str = "qfq", api: str = "fqkline") -> InputFetchResult:
         """Verified historical request shape; returns source positional fields for YAML mapping."""
-        symbol = tencent_symbol(code)
+        if api not in {"fqkline", "newfqkline"}:
+            raise ValueError("unsupported Tencent daily API")
+        symbol = tencent_symbol(code, allow_bse=api == "newfqkline")
         if adjust != "qfq" or end < start:
             raise ValueError("only an ordered qfq window is supported by this input")
-        cursor, by_date, hosts = start, {}, []
+        cursor, by_date, hosts, source_rows = start, {}, [], []
+        path = f"/appstock/app/{api}/get"
+        input_hosts = self.alternative_input_hosts if api == "newfqkline" else self.input_hosts
         while cursor <= end:
-            stop = min(cursor + timedelta(days=699), end)
-            data, host = tencent_kline_call(self.transport, "/appstock/app/fqkline/get",
-                f"{symbol},day,{cursor.isoformat()},{stop.isoformat()},640,qfq", self.input_hosts, self.host_down_until)
+            # The alternative may return its recent 640 bars regardless of the
+            # requested dates. Repeating segments does not extend that history.
+            stop = end if api == "newfqkline" else min(cursor + timedelta(days=699), end)
+            data, host = tencent_kline_call(self.transport, path,
+                f"{symbol},day,{cursor.isoformat()},{stop.isoformat()},640,qfq", input_hosts, self.host_down_until)
             node = data.get(symbol)
             if not isinstance(node, dict) or not isinstance(node.get("qfqday", node.get("day")), list):
                 raise ProviderContractError("Tencent daily list changed", FailureClass.SCHEMA_CHANGED, retryable=False)
             items = node.get("qfqday", node.get("day"))
             if "qfqday" in node and not items and node.get("day"):
                 raise ProviderContractError("empty adjusted list cannot use unadjusted prices", FailureClass.SCHEMA_CHANGED, retryable=False)
+            if len(items) > 640:
+                raise ProviderContractError("Tencent daily row limit changed", FailureClass.TRUNCATED, retryable=False)
+            segment_dates = set()
             for item in items:
                 if not isinstance(item, list) or len(item) < 6:
                     raise ProviderContractError("Tencent daily row changed", FailureClass.SCHEMA_CHANGED, retryable=False)
+                if api == "newfqkline" and len(item) not in {10, 11}:
+                    raise ProviderContractError("alternative Tencent daily row changed", FailureClass.SCHEMA_CHANGED, retryable=False)
                 try:
                     text = str(item[0]).strip()
                     stamp = datetime.strptime(text, "%Y%m%d" if len(text) == 8 and text.isdigit() else "%Y-%m-%d").date()
                 except ValueError as exc:
                     raise ProviderContractError("Tencent daily date changed", FailureClass.SCHEMA_CHANGED, retryable=False) from exc
-                if not cursor <= stamp <= stop:
+                if stamp in segment_dates:
+                    raise ProviderContractError("duplicate Tencent daily date", FailureClass.SCHEMA_CHANGED, retryable=False)
+                segment_dates.add(stamp)
+                source = {"symbol": symbol, **{str(i): value for i, value in enumerate(item)}}
+                if api == "newfqkline":
+                    source.update(source_api=api, source_bar_key="qfqday" if "qfqday" in node else "day")
+                source_rows.append(source)
+                if not cursor <= stamp <= stop and api == "fqkline":
                     raise ProviderContractError("Tencent daily returned a date outside its requested segment", FailureClass.SCHEMA_CHANGED, retryable=False)
+                if not cursor <= stamp <= stop:
+                    continue
                 if stamp in by_date:
                     raise ProviderContractError("duplicate Tencent daily date", FailureClass.SCHEMA_CHANGED, retryable=False)
-                by_date[stamp] = {"symbol": symbol, **{str(i): value for i, value in enumerate(item)}}
+                by_date[stamp] = source
+            if api == "newfqkline" and len(items) == 640 and segment_dates and start < min(segment_dates):
+                raise ProviderContractError("requested Tencent history exceeds retained 640-bar window", FailureClass.TRUNCATED, retryable=False)
             hosts.append(host)
             cursor = stop + timedelta(days=1)
         if not by_date:
             raise ProviderContractError("Tencent window has zero bars", FailureClass.TEMPORARY_EMPTY, retryable=True)
         return InputFetchResult(tuple(by_date[stamp] for stamp in sorted(by_date)),
-                                " | ".join(host + "/appstock/app/fqkline/get" for host in dict.fromkeys(hosts)))
+                                " | ".join(host + path for host in dict.fromkeys(hosts)),
+                                source_rows=tuple(source_rows) if api == "newfqkline" else None,
+                                mapping_context={"source_api": api,
+                                    "source_total_count": len(source_rows),
+                                    "selected_row_count": len(by_date),
+                                    "history_completeness_verified": False})
 
 
-def tencent_symbol(code: str) -> str:
+def tencent_symbol(code: str, *, allow_bse: bool = False) -> str:
     import re
     match = re.fullmatch(r"(?:(sh|sz|bj))?(\d{6})", str(code).lower())
     if match is None:
@@ -147,7 +176,7 @@ def tencent_symbol(code: str) -> str:
     inferred = "bj" if digits.startswith(("4", "8", "92")) else "sh" if digits.startswith(("5", "6", "9")) else "sz"
     if prefix and prefix != inferred:
         raise ValueError("security code and exchange prefix disagree")
-    if inferred == "bj":
+    if inferred == "bj" and not allow_bse:
         raise ValueError("this verified Tencent input excludes BSE")
     return inferred + digits
 

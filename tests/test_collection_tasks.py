@@ -390,6 +390,10 @@ def test_master_then_dynamic_daily_scope_and_new_listings(tmp_path):
     assert run(tmp_path, definition, collector)["no_op"]
     new_definition = {**definition, "task_id": "all-new"}
     assert run(tmp_path, new_definition, collector)["row_count"] == 3
+    configured = run(tmp_path, {**definition, "task_id": "all-alternative", "config": {"api": "newfqkline"}}, collector)
+    assert configured["row_count"] == 3
+    assert all(unit["context"]["config"] == {"api": "newfqkline"}
+               for unit in configured["definition"]["units"])
 
 
 def test_master_whole_source_failure_falls_back_without_claiming_today_complete(tmp_path):

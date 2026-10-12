@@ -66,7 +66,7 @@
 | `providers/base.py` | 日线、分钟等 Provider 协议以及 Fixture Provider 基础实现 |
 | `providers/contracts.py` | HTTP 响应、失败分类、返回窗口和 Provider Contract |
 | `providers/transport.py` | 公共 HTTP 传输、共享请求组限速、单项输入会话捕获与严格回放、快照和 TDX 行解析；保留来源会话/代理并复用原验证重试策略 |
-| `providers/tencent/daily.py` | Tencent 既有日线采集与明确日期窗口的前复权候选输入；共享源码合同的主机回退 |
+| `providers/tencent/daily.py` | Tencent既有日线与窗口输入；参数api显式选择fqkline/newfqkline，后者支持北交所，完整保存10/11列来源行后提取日期，640条不足时报截断；不在Provider内部回退其他接口 |
 | `providers/tencent/snapshot.py` | Tencent 指定证券分批快照、原脚本来源字段、代码/格式/重复验证及请求范围覆盖；GBK解码和旧行情行保留，全市场在线验证待完成 |
 | `providers/tencent/minute.py` | Tencent 原生 1m 分钟线与最近 5m 候选输入 |
 | `providers/sina/calendar.py` | 原 SDK 新浪交易日历来源适配，返回明确的正向日期并复用现有日历协议 |
@@ -177,6 +177,8 @@
 | `worker/__init__.py` | Worker 包说明，不承载业务实现 |
 
 任务入口 `pipeline/inputs.py` 支持正式留存响应模式及持久化进度；`cli.py` 提供 `--mode retained`、`--progress/--no-progress`。实现测试新增 `tests/test_task_progress.py`（进度、未知总量、失败和恢复计数）与 `tests/test_retained_daily.py`（合成四层资格、范围及哈希拒绝、零网络发布和恢复）；测试只写tmp，不作为真实来源资格。
+
+腾讯窗口输入沿用同一输入ID：`pipeline/inputs.py`保留完整来源行、只映射请求日期，并将动态日线任务顶层config传到冻结的各证券单元；`routing/factory.py`按显式api识别北交所及精确参数资格，仍不放开在线日线门禁。相关合同和配置传递测试补入现有`tests/test_provider_contract_adapters.py`、`tests/test_collection_tasks.py`。
 
 证券任务省略units时，`pipeline/inputs.py` 查询既有交易日历并调用 `worker/scheduler.py` 按collection.yaml构建来源；`routing/factory.py` 对历史ETF按完整日期参数及互补发布数量检查资格。新增行为在既有 `tests/test_scheduler.py`、`tests/test_collection_tasks.py` 验证，不新增任务管理模块。
 | `cli.py` | `collect-due-inputs`（默认保存计划）、`collect-input`（默认分层落盘，支持 JSON 参数上下文及隔离验证输出）、`probe-*`、`recover`、`acceptance-offline` 等入口，负责参数解析、UTF-8结果与进度输出和现有流程组装 |

@@ -63,11 +63,21 @@ node provider_validation/tests/build_interface_coverage_workbook.mjs --formal-sp
 
 股票与ETF名单的实现、分类、北交所及上交所ETF目录接入见 [证券名单来源](security-catalog.md)。现有Excel与配套JSON保留上次导出快照；新增输入与字段变化以模块说明及YAML为准，不将旧表视为已核准当前全量证券。10月9日的7267条正式证券名单已发布于 `data/canonical/2026-10-09/security_master/`，原响应位于 `data/raw/2026-10-09/`，验收索引在 `data/task_workspace/_checks/security-release-20261012/`。已有接口可行性响应只读留存。
 
-日线仍未获得全市场在线任务资格。现有腾讯窗口输入主动排除北交所；2026-10-12小范围原生对照发现原地址指定窗口为空但最近窗口可返回北交所日线，另一地址 `/appstock/app/newfqkline/get` 可返回bj920001的10月9日日线。新地址同时存在返回区间超出请求区间的现象；尚未接入Provider或配置，不能继承旧接口字段单位和路由资格。原始返回、请求参数、窗口差异与结论见 [请求对照](../../tmp/daily-next-stage-20261012/native-comparison.json)。
+日线仍未获得全市场在线任务资格。现有腾讯Provider现已按用户确认接入两个窗口接口，保留输入ID `ASTOCK-002-daily`，能力版本为 `tencent-window-input-v2`。`config.api=fqkline` 是原接口及已有任务默认行为，仍排除北交所；显式 `config.api=newfqkline` 使用已验证的proxy主机，支持北交所，原响应和10/11列来源行完整保留，字段映射只使用请求日期内的记录。日期重复、异常行结构、空调整列表、请求日期内没有数据或640条不能覆盖请求历史时明确失败。不自动切换另一个接口，原分钟和快照适配器不改变。原生对照见 [请求对照](../../tmp/daily-next-stage-20261012/native-comparison.json)。
+
+参数来源在 `config/providers.yaml`，标准字段沿用 `config/datasets/daily_bar.yaml`，位置映射在 `config/normalization/daily_bar.yaml`：前6列仍为日期、开、收、高、低、成交量，新增接口成交额位置8仅保留候选映射；单位尚未独立核验，标准volume/amount保持空值。实际day/qfqday标签保存于来源行，不因一致性样本推定任意除权情形。旧数据不改写，新任务的参数哈希和代码资格须重新核验。
+
+单接口或显式任务单元通过现有context传递：
+
+```json
+{"request":{"symbol":"bj920001","start_date":"2026-10-09","end_date":"2026-10-09"},"config":{"api":"newfqkline"}}
+```
+
+动态全量任务可在任务定义顶层设置 `"config":{"api":"newfqkline"}`，展开证券时复制到各单元context，断点恢复沿用冻结参数。此参数配置不授予生产路由资格，正式在线任务仍受现有门禁控制。8只真实原响应回放及股票/ETF全量、断点、指定证券、发布恢复与缺失补齐隔离验收见 [接入核验](../../tmp/tencent-alternative-integration-20261012/verification.json)，北交所及科创板新Provider真实在线各1次请求通过，见 [在线核验](../../tmp/tencent-alternative-integration-20261012/live-verification.json)。这些结果不是全市场采集或生产资格。
 
 ### 两个腾讯日线接口的一致性核验（2026-10-12）
 
-“现有接口”指 `/appstock/app/fqkline/get`，“另一个接口”指 `/appstock/app/newfqkline/get`；不是已经确认的官方新旧版本关系。本次只核验原生接口，不修改Provider、YAML、正式路由资格或生产数据。现有接口使用项目主机web.ifzq.gtimg.cn，另一个接口使用proxy.finance.qq.com/ifzqgtimg；北交所增加同一proxy主机的现有接口对照，结果仍为空窗口，因此该样本差异不能归因于主机不同。
+“现有接口”指 `/appstock/app/fqkline/get`，“另一个接口”指 `/appstock/app/newfqkline/get`；不是已经确认的官方新旧版本关系。本节记录正式接入前的原生接口核验，当时未修改Provider、YAML、正式路由资格或生产数据；之后的接入状态以上文为准。现有接口使用项目主机web.ifzq.gtimg.cn，另一个接口使用proxy.finance.qq.com/ifzqgtimg；北交所增加同一proxy主机的现有接口对照，结果仍为空窗口，因此该样本差异不能归因于主机不同。
 
 | 类别与证券 | 日期范围 | 对齐后的日期、开收高低、成交量 |
 |---|---|---|

@@ -210,6 +210,54 @@ def test_tencent_forward_daily_is_qualified_only_for_stock_and_etf() -> None:
     assert provider.supported_asset_types == frozenset({AssetType.STOCK, AssetType.ETF})
 
 
+@pytest.mark.parametrize('symbol,length', [('bj920001',10),('sh688981',11)])
+def test_tencent_alternative_window_keeps_source_rows_and_selects_dates(symbol,length):
+    bars=[[day,'10','11','12','9','100',{},'1','1000','']+(['extra'] if length==11 else [])
+          for day in ['2026-10-08','2026-10-09','2026-10-12']]
+    transport=FakeTransport([response({'code':0,'data':{symbol:{'qfqday':bars}}})])
+    provider=TencentDailyProvider(transport)
+    result=provider.fetch_window(symbol,date(2026,10,9),date(2026,10,9),api='newfqkline')
+    assert len(result.rows)==1 and result.rows[0]['0']=='2026-10-09'
+    assert len(result.source_rows)==3 and result.source_rows[0]['6']=={}
+    assert result.rows[0]['8']=='1000' and result.rows[0]['source_api']=='newfqkline'
+    assert transport.calls[0][0]=='https://proxy.finance.qq.com/ifzqgtimg/appstock/app/newfqkline/get'
+    assert result.mapping_context['history_completeness_verified'] is False
+
+
+@pytest.mark.parametrize('damage,expected', [('duplicate',FailureClass.SCHEMA_CHANGED),
+    ('shape',FailureClass.SCHEMA_CHANGED),('empty_qfq',FailureClass.SCHEMA_CHANGED),('outside_only',FailureClass.TEMPORARY_EMPTY)])
+def test_tencent_alternative_rejects_bad_or_empty_window(damage,expected):
+    bar=['2026-10-09','10','11','12','9','100',{},'1','1000','']
+    node={'qfqday':[bar]}
+    if damage=='duplicate': node['qfqday'].append(bar)
+    elif damage=='shape': node['qfqday']=[bar[:6]]
+    elif damage=='empty_qfq': node={'qfqday':[],'day':[bar]}
+    else: node['qfqday'][0][0]='2026-10-08'
+    provider=TencentDailyProvider(FakeTransport([response({'code':0,'data':{'bj920001':node}})]))
+    with pytest.raises(ProviderContractError) as exc:
+        provider.fetch_window('bj920001',date(2026,10,9),date(2026,10,9),api='newfqkline')
+    assert exc.value.failure_class is expected
+
+
+def test_tencent_alternative_rejects_unrecoverable_history_limit():
+    days=[date(2024,1,1)+timedelta(days=i) for i in range(640)]
+    bars=[[d.isoformat(),'10','11','12','9','100',{},'1','1000',''] for d in days]
+    provider=TencentDailyProvider(FakeTransport([response({'code':0,'data':{'sh600519':{'qfqday':bars}}})]))
+    with pytest.raises(ProviderContractError) as exc:
+        provider.fetch_window('sh600519',date(2023,1,1),date(2026,10,9),api='newfqkline')
+    assert exc.value.failure_class is FailureClass.TRUNCATED and not exc.value.retryable
+
+
+def test_tencent_existing_and_minute_symbol_contract_stay_restricted():
+    from stock_data_manage.providers.tencent.daily import tencent_symbol
+    with pytest.raises(ValueError,match='excludes BSE'): tencent_symbol('bj920001')
+    assert tencent_symbol('920001',allow_bse=True)=='bj920001'
+    with pytest.raises(ValueError,match='disagree'): tencent_symbol('sz920001',allow_bse=True)
+    provider=TencentDailyProvider(FakeTransport([]))
+    with pytest.raises(ValueError,match='excludes BSE'):
+        provider.fetch_window('bj920001',date(2026,10,9),date(2026,10,9))
+
+
 def test_daily_adapter_reports_the_full_returned_window() -> None:
     transport = FakeTransport(
         [

@@ -185,8 +185,8 @@ def check_daily_input_qualification(contract, context, *, asset_type, config_roo
         if contract.input_id != 'ASTOCK-002-daily' or asset_type not in {'stock', 'etf'}:
             raise ValueError('unsupported daily input or asset type')
         parameters = contract.bind_parameters(context)
-        symbol = tencent_symbol(parameters['code'])
-        exchange = 'XSHG' if symbol.startswith('sh') else 'XSHE'
+        symbol = tencent_symbol(parameters['code'], allow_bse=parameters.get('api') == 'newfqkline')
+        exchange = {'sh':'XSHG','sz':'XSHE','bj':'BSE'}[symbol[:2]]
         identity = exchange + ':' + symbol[2:]
         adapter = build_input_provider(contract, providers_path=Path(config_root)/'providers.yaml')
         evidence = metadata.latest_probe(provider=contract.provider, endpoint=contract.endpoint,
@@ -353,7 +353,7 @@ def build_input_provider(contract, *, providers_path, client=None):
                                        max_symbols_per_request=config.max_symbols_per_request)
     if contract.input_id == "ASTOCK-002-daily":
         provider = TencentDailyProvider(RequestsTransport(headers), adjustment=Adjustment.FORWARD)
-        provider.endpoint, provider.capability_version = contract.endpoint, "tencent-window-input-v1"
+        provider.endpoint, provider.capability_version = contract.endpoint, "tencent-window-input-v2"
         return provider
     if contract.input_id == "ASTOCK-002-5m":
         config = next(c for c in load_provider_configs(providers_path) if c.provider == "tencent" and c.endpoint == "native_1m")

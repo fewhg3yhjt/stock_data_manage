@@ -772,7 +772,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                     returned_window={"first": parameters["date"].isoformat(), "last": parameters["date"].isoformat()},
                     coverage_basis="source tc and returned SDK rows for requested qdate; not independent whole-market proof",
                     universe_completeness_verified=False)
-            mapping_rows = fetched.rows if is_universe_baostock or input_id == 'ASTOCK-044' or is_sse_etf_catalog or is_em_history or is_lpr or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_extension or is_repo_rate or is_cb or is_sina_futures else source_rows
+            mapping_rows = fetched.rows if input_id == 'ASTOCK-002-daily' or is_universe_baostock or input_id == 'ASTOCK-044' or is_sse_etf_catalog or is_em_history or is_lpr or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_extension or is_repo_rate or is_cb or is_sina_futures else source_rows
             if is_universe_baostock or input_id == 'ASTOCK-044' or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_extension or is_repo_rate or is_cb or is_sina_futures:
                 parsed_ref = write_result(_json_value(mapping_rows), dataset="parsed_rows", provider=contract.provider,
                     endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="parsed-rows")
@@ -1015,9 +1015,14 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                 mapping_context["trade_date"] = parameters["date"]
             if input_id.startswith("ASTOCK-002"):
                 from ..providers.tencent.daily import tencent_symbol
-                symbol = tencent_symbol(parameters["code"])
-                mapping_context.update(instrument_id=f"{'XSHG' if symbol.startswith('sh') else 'XSHE'}:{symbol[2:]}",
+                symbol = tencent_symbol(parameters["code"], allow_bse=parameters.get("api") == "newfqkline")
+                exchange = {"sh": "XSHG", "sz": "XSHE", "bj": "BSE"}[symbol[:2]]
+                mapping_context.update(instrument_id=f"{exchange}:{symbol[2:]}",
                                        adjustment="forward" if input_id.endswith("daily") else "none")
+                if input_id == "ASTOCK-002-daily":
+                    report.update(source_metadata=_json_value(fetched.mapping_context),
+                        original_row_count=len(source_rows), selected_row_count=len(mapping_rows),
+                        coverage_basis="requested dates selected from returned source rows; not independently complete history")
             rows = [Normalizer.normalize_fields(row, rule=rule, fields=schema_fields,
                                                 context=mapping_context, allow_pending=True) for row in mapping_rows]
             keys = [tuple(row[name] for name in dataset["dataset"]["primary_key"]) for row in rows]
@@ -1603,6 +1608,10 @@ def _task_units(definition, paths):
         symbol = prefix + row["symbol"]
         selected.append({"key": symbol, "symbol": symbol, "input_id": definition["input_id"],
             "context": {"request": {"symbol": symbol, "start_date": day.isoformat(), "end_date": day.isoformat()}}})
+        if "config" in definition:
+            if not isinstance(definition["config"], dict):
+                raise ValueError("daily task config must be a parameter mapping")
+            selected[-1]["context"]["config"] = dict(definition["config"])
     return selected
 
 
