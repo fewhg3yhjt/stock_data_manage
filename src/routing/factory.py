@@ -173,8 +173,8 @@ def check_security_input_qualification(contract, context, *, config_root, metada
             "verified_groups": accepted, "reasons": reasons}
 
 
-def check_daily_input_qualification(contract, context, *, asset_type, config_root, metadata, now, execution_mode='retained'):
-    """Qualify one exact request and execution mode, never extrapolate a sample universe."""
+def check_daily_input_qualification(contract, context, *, asset_type, config_root, metadata, now, execution_mode='retained', _allow_scope=True):
+    """Check exact evidence, or an explicitly granted live scope backed by samples."""
     from datetime import date
     import xml.etree.ElementTree as ET
     import pyarrow.parquet as pq
@@ -193,6 +193,36 @@ def check_daily_input_qualification(contract, context, *, asset_type, config_roo
             capability_version=adapter.capability_version, dataset='daily_bar', market=exchange,
             asset_type=asset_type, code_prefix=symbol, frequency='daily', adjustment='forward')
         if not evidence or not evidence['eligible_for_selection'] or evidence['status'] != 'complete':
+            if execution_mode == 'live' and _allow_scope:
+                for candidate in metadata.capability_evidence(provider=contract.provider, endpoint=contract.endpoint,
+                        capability_version=adapter.capability_version):
+                    if candidate['market'] != exchange or candidate['asset_type'] != asset_type or candidate['dataset'] != 'daily_bar':
+                        continue
+                    try:
+                        entries = json.loads(candidate['request_scope_json'])
+                        path = Path(next(s.removeprefix('qualification:') for s in entries if s.startswith('qualification:')))
+                        if file_hash(path) != candidate['evidence_hash']:
+                            continue
+                        grant = json.loads(path.read_text(encoding='utf-8')).get('live_scope', {})
+                        if grant.get('market') != exchange or grant.get('asset_type') != asset_type:
+                            continue
+                        prefixes = grant.get('symbol_prefixes')
+                        if not isinstance(prefixes, list) or not prefixes or not all(isinstance(p, str) and len(p) >= 3 for p in prefixes) or not symbol.startswith(tuple(prefixes)):
+                            continue
+                        sample_context = grant['sample_context']
+                        sample_parameters = contract.bind_parameters(sample_context)
+                        # Only security identity may vary; API, adjustment and exact
+                        # window stay bound to the independently checked sample.
+                        if {k:v for k,v in sample_parameters.items() if k != 'code'} != {k:v for k,v in parameters.items() if k != 'code'}:
+                            continue
+                        sample = check_daily_input_qualification(contract, sample_context, asset_type=asset_type,
+                            config_root=config_root, metadata=metadata, now=now, execution_mode='live', _allow_scope=False)
+                        if sample['eligible'] and sample['market'] == exchange:
+                            return {**sample, 'symbol':symbol, 'market':exchange, 'qualification_scope':'market_asset_window',
+                                    'sample_symbol':sample['symbol'], 'security_observed':False,
+                                    'source_response_hashes':[], 'sample_response_hashes':sample['source_response_hashes']}
+                    except (ValueError, KeyError, TypeError, OSError, StopIteration):
+                        continue
             raise ValueError('matching routing-eligible daily evidence is missing')
         if not {'trade_date','open','high','low','close','adjustment'} <= set(json.loads(evidence['field_semantics_json'])) or 'price:CNY' not in json.loads(evidence['units_json']):
             raise ValueError('daily required price/date semantics are unverified')

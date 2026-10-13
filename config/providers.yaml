@@ -721,8 +721,8 @@ input_capabilities:
     - 两接口8只证券12组窗口核验，共同日期的76条开收高低与成交量数值一致；不是全市场或单位认证。
     - newfqkline可能返回最近640条而忽略日期范围；原响应和来源行完整保存，规范候选只提取请求日期，超出640条历史窗口明确报截断。
     - 成交量和成交额单位未认证，标准输出置空；实际day/qfqday标签保留，不由样本推定任意除权场景。
-    - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
-    request_interval_seconds: 3
+    - 请求间隔0.3秒、单并发；参考原项目节流，不代表持续容量已验证，不自动启用路由
+    request_interval_seconds: 0.3
     effective_concurrency: 1
     request_limit_enforcement: call_boundary_only
   ASTOCK-003:

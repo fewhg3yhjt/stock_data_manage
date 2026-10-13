@@ -133,7 +133,7 @@
 | 文件 | 职责 |
 |---|---|
 | `pipeline/daily.py` | 日线按来源补缺、标准化、校验、候选生成和发布编排；规范记录保留单位语义及来源舍入标记 |
-| `pipeline/inputs.py` | 既有候选、业务任务与调度；raw按日期/来源/接口，工作区按日期/数据集；请求文件隔离、YAML映射、互补来源合并覆盖检查、重做、发布恢复，自动保存task.json和summary.json；任务共用现有限速器，在线门禁保留模式与精确范围；历史ETF保留原SDK请求、依赖证据和离线随机参数；最新名单通过元数据读取，回退不改写旧发布 |
+| `pipeline/inputs.py` | 既有候选、业务任务与调度；raw按日期/来源/接口，工作区按日期/数据集；请求文件隔离、YAML映射、互补来源合并覆盖检查、重做、发布恢复，自动保存task.json和summary.json；任务共用现有限速器，在线门禁区分精确留存与显式市场/资产/窗口授权，请求间隔由各接口YAML控制；历史ETF保留原SDK请求、依赖证据和离线随机参数；最新名单通过元数据读取，回退不改写旧发布 |
 | `pipeline/daily_reconciliation.py` | 日线 provisional/final 合并、缺失统计和盘后校准 |
 | `pipeline/minute.py` | Watchlist 实时分钟采集和 Hot Store 写入 |
 | `pipeline/minute_reconciliation.py` | 分钟盘后校准、final 提升、冲突隔离和完整性处理 |
@@ -178,7 +178,7 @@
 
 任务入口 `pipeline/inputs.py` 支持正式留存响应模式及持久化进度；`cli.py` 提供 `--mode retained`、`--progress/--no-progress`。实现测试新增 `tests/test_task_progress.py`（进度、未知总量、失败和恢复计数）与 `tests/test_retained_daily.py`（合成四层资格、范围及哈希拒绝、零网络发布和恢复）；测试只写tmp，不作为真实来源资格。
 
-腾讯窗口输入沿用同一输入ID：`pipeline/inputs.py`保留完整来源行、只映射请求日期，并将动态日线任务顶层config传到冻结的各证券单元；`routing/factory.py`按显式api识别北交所及精确参数资格，在线日线按精确范围和显式模式授权放行，并在创建任务前及每个单元执行前检查，未认证范围保持阻断。相关合同和配置传递测试补入现有`tests/test_provider_contract_adapters.py`、`tests/test_collection_tasks.py`。
+腾讯窗口输入沿用同一输入ID：`pipeline/inputs.py`保留完整来源行、只映射请求日期，并将动态日线任务顶层config传到冻结的各证券单元；`routing/factory.py`按显式api识别北交所及精确参数资格，在线日线按精确范围或显式市场/资产/窗口授权放行，四层样本证据仍核验，并在创建任务前及每个单元执行前检查，未认证范围保持阻断。相关合同和配置传递测试补入现有`tests/test_provider_contract_adapters.py`、`tests/test_collection_tasks.py`。
 
 证券任务省略units时，`pipeline/inputs.py` 查询既有交易日历并调用 `worker/scheduler.py` 按collection.yaml构建来源；`routing/factory.py` 对历史ETF按完整日期参数及互补发布数量检查资格。新增行为在既有 `tests/test_scheduler.py`、`tests/test_collection_tasks.py` 验证，不新增任务管理模块。
 | `cli.py` | `collect-due-inputs`（默认保存计划）、`collect-input`（默认分层落盘，支持 JSON 参数上下文及隔离验证输出）、`probe-*`、`recover`、`acceptance-offline` 等入口，负责参数解析、UTF-8结果与进度输出和现有流程组装 |
@@ -197,3 +197,5 @@
 - 原始证据与历史哈希保持原样；文档合并不扩大验证范围或启用生产来源。
 - 目录职责变动同步维护本文与README；阶段收尾检查重复设计、过期状态和失效引用。
 - `provider_validation/results/legacy/tmp_test/` 只保存历史研究脚本、合同和结果；原11个跟踪文件继续纳入Git，原本忽略的大体积结果保持本地保存。`archive-manifest.json` 是逐文件迁移索引，旧脚本与响应字节不改写，不作为正式运行入口。
+
+请求捕获模块`providers/transport.py`接收输入契约的请求间隔，任务模块不再统一抬升到3秒；直接调用捕获工具的默认保守间隔仍为3秒。

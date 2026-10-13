@@ -254,7 +254,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
             "data_date": raw_data_date,
             "parameters": sanitized_metadata(normalized_context), "provider": contract.provider, "endpoint": contract.endpoint,
             "collection_profile": _json_value(asdict(profile)),
-            "request_interval_seconds": max(3, contract.request_interval_seconds),
+            "request_interval_seconds": contract.request_interval_seconds,
             "effective_concurrency": 1, "request_limit_enforcement": "call_boundary_only",
             "adapter_version": provider.capability_version, "code_version": code_version,
             "code_files": [{"path": str(path.resolve()), "sha256": hashlib.sha256(path.read_bytes()).hexdigest()} for path in code_files],
@@ -338,7 +338,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
             report[policy_key] = {"source_contract": "successful runnable original source",
                 "headers": "original Chrome/126 User-Agent and finance.sina.com.cn Referer" if is_sina_futures else "original Chrome/126 User-Agent and Chinamoney bkfrr Referer" if is_repo_rate else "original Chrome/126 User-Agent; requests defaults otherwise", "trust_env": True,
                 "timeout_seconds": [10, 40], "allow_redirects": True, "retry_total": 0,
-                "outer_capture_interval_seconds": 3}
+                "outer_capture_interval_seconds": contract.request_interval_seconds}
             if input_id=="ASTOCK-013":
                 report[policy_key].update(headers="original Chrome/126 User-Agent and finance.sina.com.cn Referer",
                     original_report_min_interval_seconds=6,empty_page_attempts=2,encoding="GBK")
@@ -352,7 +352,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                 "headers": "requests Session defaults", "trust_env": True, "timeout_seconds": 20,
                 "retry_total": 3, "retry_connect": 3, "backoff_factor": 0.6,
                 "status_forcelist": [429, 500, 502, 503, 504], "minimum_interval_seconds": 1,
-                "conditional_wait_jitter_seconds": [0.1, 0.5], "outer_capture_interval_seconds": 3,
+                "conditional_wait_jitter_seconds": [0.1, 0.5], "outer_capture_interval_seconds": contract.request_interval_seconds,
                 "physical_retry_count_observable": False}
         if is_reportapi:
             import requests
@@ -363,7 +363,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
             report["reportapi_transport_policy"] = {"source_contract":"successful original rate-limited source Session",
                 "headers":"original Chrome/154 User-Agent, Accept/Accept-Language and data.eastmoney.com Referer", "timeout_seconds":30,
                 "trust_env":True, "allow_redirects":True, "retry_total":2, "minimum_backoff_seconds":5,
-                "host_pause":"403/429 immediately; two consecutive transport or server errors", "outer_capture_interval_seconds":3,
+                "host_pause":"403/429 immediately; two consecutive transport or server errors", "outer_capture_interval_seconds":contract.request_interval_seconds,
                 "page_size":100, "page_pause_seconds":0.25, "cache_ignored_query_parameters":["_"], "source_fallback":False,
                 "physical_retry_count_observable":False}
         is_stock_pool = input_id in {"ASTOCK-045", "ASTOCK-046", "ASTOCK-047", "ASTOCK-048", "ASTOCK-050"}
@@ -391,7 +391,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
         # Host intervals configured before execution; tuple timeout and SDK retry behavior are retained.
         from urllib.parse import urlsplit
         for host in getattr(provider, "input_hosts", ()):
-            pacer.configure(urlsplit(host).hostname, max(3, contract.request_interval_seconds), 1)
+            pacer.configure(urlsplit(host).hostname, contract.request_interval_seconds, 1)
         evidence_root = Path(evidence_root) if evidence_root else (paths["raw_root"] if runtime else project_root / "provider_validation/results")
         try:
             if is_baostock:
@@ -511,7 +511,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                         "timeout_seconds": None, "trust_env": True, "allow_redirects": True,
                         "headers": "original Chrome/114 User-Agent" if input_id == "ASTOCK-032" else "requests defaults",
                         "adapter_retry_total": 2, "adapter_backoff_min_seconds": 5,
-                        "status_forcelist": [500, 502, 503, 504], "outer_capture_interval_seconds": 3,
+                        "status_forcelist": [500, 502, 503, 504], "outer_capture_interval_seconds": contract.request_interval_seconds,
                         "sdk_outer_attempts": 10 if input_id == "ASTOCK-032" else 1,
                         "sdk_outer_delays_seconds": [1,2,4,8,16,32,64,128,256] if input_id == "ASTOCK-032" else [],
                         "host_pause": "403/429 immediately; two consecutive transport or server errors",
@@ -545,7 +545,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                             "timeout_seconds":None,"trust_env":True,"allow_redirects":True,"headers":"requests defaults",
                             "method":"POST" if input_id=="ASTOCK-061" else "GET",
                             "https_adapter":"original SDK TLSAdapter, retry_total=0" if input_id=="ASTOCK-061" else "original probe conservative retry_total=2, minimum backoff=5",
-                            "outer_capture_interval_seconds":3,"sdk_outer_attempts":1,
+                            "outer_capture_interval_seconds":contract.request_interval_seconds,"sdk_outer_attempts":1,
                             "host_pause":"403/429 immediately; two consecutive transport or server errors",
                             "physical_retry_count_observable":False}
                         dependency=namespace.get("TLSAdapter") if input_id=="ASTOCK-061" else None
@@ -607,7 +607,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                     sdk_client, sdk_archive, response_events = stack.enter_context(captured_sdk_queries(raw_store, mode=mode,
                         replay_manifest=replay_manifest, evidence_roots=(evidence_root, output_root),
                         scope={"input_id": input_id, "parameters": normalized_context}, code_version=code_version,
-                        trade_date=parameters.get("trade_date"), pacer=pacer, interval_seconds=max(3, contract.request_interval_seconds),
+                        trade_date=parameters.get("trade_date"), pacer=pacer, interval_seconds=contract.request_interval_seconds,
                         max_age_seconds=0 if force_fetch else profile.refresh_interval_seconds or 86400, client=client,
                         query_requests={'query_stock_basic': {'code_name': 'ST'}} if input_id == 'ASTOCK-044' else
                             {'query_trade_dates': {'start_date': parameters['trade_date'].isoformat(), 'end_date': parameters['trade_date'].isoformat()},
@@ -651,9 +651,10 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                             'trust_env': True, 'retry_total': 0, 'allow_redirects': True, 'source_fallback': False,
                             'timeout_seconds': 15 if contract.provider == 'szse' else 25 if 'MONEY' in input_id else None,
                             'headers': 'original Windows Chrome/132 for SZSE; Chrome/88 for SSE; original Referer',
-                            'outer_capture_interval_seconds': 3}
+                            'outer_capture_interval_seconds': contract.request_interval_seconds}
                     response_events = stack.enter_context(captured_requests(raw_store, provider=contract.provider, endpoint=contract.endpoint,
                         scope={"input_id": input_id, "parameters": normalized_context}, code_version=code_version, pacer=pacer,
+                        interval_seconds=contract.request_interval_seconds,
                         replay_manifest=replay_manifest if mode == "replay" else None,
                         evidence_roots=(evidence_root, output_root), max_age_seconds=0 if force_fetch else profile.refresh_interval_seconds or 86400,
                         sdk_retry_policy=is_stock_pool or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or (is_source_sdk and not is_universe_sdk) or input_id in {"ASTOCK-001", "ASTOCK-045", "ASTOCK-070", "ASTOCK-026", "ASTOCK-027", "ASTOCK-028"},
@@ -2094,7 +2095,7 @@ def collect_due_inputs(*, now, config_root, output_root=None, data_root=None, tr
     output.mkdir(parents=True, exist_ok=True)
     pacer = RequestPacer()
     # All enabled Tencent Kline inputs share one host pacing policy before any call starts.
-    interval = max([3] + [contracts[j.input_id].request_interval_seconds for j in jobs if j.status == "ready"])
+    interval = max([0] + [contracts[j.input_id].request_interval_seconds for j in jobs if j.status == "ready"])
     for host in ("web.ifzq.gtimg.cn", "proxy.finance.qq.com", "ifzq.gtimg.cn", "qt.gtimg.cn"):
         pacer.configure(host, interval, 1)
     collector = collector or collect_input

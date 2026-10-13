@@ -61,7 +61,7 @@ class HostPausedError(ConnectionError):
 def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                       replay_manifest=None, evidence_roots=(), max_age_seconds=0, sdk_retry_policy=False,
                       probe_host_pause=False, require_empty_post_body=False, response_validator=None, cache_ignored_query_parameters=(),
-                      native_transport=None, match_request_body=False):
+                      native_transport=None, match_request_body=False, interval_seconds=3):
     """Serialized single-input capture/replay. Session identity, proxies and request arguments are retained.
 
     SDK session policy matches the saved conservative probe. Internal urllib3 retries
@@ -170,7 +170,7 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                                         "fetched_at_utc": record.get("fetched_at_utc")}, "cached"
                 else:
                     host = urlsplit(request.url).hostname or "unknown"
-                    pacer.configure(host, 3, 1)
+                    pacer.configure(host, interval_seconds, 1)
                     try:
                         with pacer.request(host):
                             # Release the host permit before requests follows another hop.

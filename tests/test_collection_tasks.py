@@ -951,6 +951,8 @@ def test_task_defaults_use_configured_storage_and_keep_live_qualification_gate(m
         return paths
 
     monkeypatch.setattr("stock_data_manage.pipeline.inputs.load_storage_paths", resolve_paths)
+    monkeypatch.setattr("stock_data_manage.routing.factory.check_daily_input_qualification",
+        lambda *args, **kwargs: {"eligible": False, "reasons": ["fixture scope is not authorized"]})
     collector = FaultCollector()
     with pytest.raises(ValueError, match="formal routing qualification"):
         collect_task(definition=daily_definition(), config_root=CONFIG, collector=collector)

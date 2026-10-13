@@ -77,6 +77,57 @@ def test_exact_live_task_publishes_and_blocks_retained_only_qualification(qualif
         collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='live',redo='full')
 
 
+def test_daily_input_uses_yaml_interval_across_requests(qualified,monkeypatch):
+    contract,root,definition,raw,proof=qualified
+    clock=[0.0];starts=[];send=requests.Session.send
+    def observed(session,request,**kwargs):
+        starts.append(clock[0])
+        return send(session,request,**kwargs)
+    monkeypatch.setattr(requests.Session,'send',observed)
+    pacer=RequestPacer(clock=lambda:clock[0],wait=lambda n:clock.__setitem__(0,clock[0]+n))
+    for n in range(2):
+        result=collect_input(input_id=contract.input_id,context=CONTEXT,config_root=CONFIG,
+            output_root=root.parent/('paced-'+str(n)),mode='live',evidence_root=root.parent/'empty',
+            pacer=pacer,force_fetch=True)
+        assert result['status']=='candidate_complete' and result['request_interval_seconds']==0.3
+    assert starts==[0.0,0.3]
+
+
+@pytest.mark.parametrize('boundary',['allowed','date','api','market','asset','symbol_type','retained','expired','hash','cooldown','code'])
+def test_live_market_scope_preserves_evidence_and_request_boundaries(qualified,boundary):
+    contract,root,definition,raw,path=qualified
+    proof=json.loads(path.read_text())
+    proof['live_scope']={'market':'XSHG','asset_type':'stock','symbol_prefixes':['sh6'],'sample_context':CONTEXT}
+    path.write_text(json.dumps(proof),encoding='utf-8')
+    context={'request':{'symbol':'sh600000','start_date':'2026-10-09','end_date':'2026-10-09'}}
+    asset='stock';mode='live';now=datetime.now(timezone.utc)
+    with MetadataStore(root/'metadata/metadata.duckdb') as metadata:
+        metadata.connection.execute('UPDATE capability_registry SET evidence_hash=?',[file_hash(path)])
+        if boundary=='date':context['request']['start_date']='2026-10-08'
+        elif boundary=='api':context['config']={'api':'newfqkline'}
+        elif boundary=='market':context['request']['symbol']='sz000001'
+        elif boundary=='asset':asset='etf'
+        elif boundary=='symbol_type':context['request']['symbol']='sh510300'
+        elif boundary=='retained':mode='retained'
+        elif boundary=='expired':now+=timedelta(days=2)
+        elif boundary=='hash':path.write_text('{}')
+        elif boundary=='code':
+            report=Path(proof['revalidation_report']['path']);r=json.loads(report.read_text())
+            r['code_files'][0]['sha256']='bad';report.write_text(json.dumps(r))
+            proof['revalidation_report']['sha256']=file_hash(report);path.write_text(json.dumps(proof))
+            metadata.connection.execute('UPDATE capability_registry SET evidence_hash=?',[file_hash(path)])
+        elif boundary=='cooldown':
+            metadata.record_provider_failure(provider=contract.provider,endpoint=contract.endpoint,
+                capability_version=proof['capability_version'],dataset='daily_bar',market='XSHG',asset_type='stock',
+                failure_class='forbidden',error='fixture',now=now,cooldown_seconds=300,failure_threshold=1)
+        result=check_daily_input_qualification(contract,context,asset_type=asset,config_root=CONFIG,
+            metadata=metadata,now=now,execution_mode=mode)
+    assert result['eligible']==(boundary=='allowed')
+    if result['eligible']:
+        assert result['symbol']=='sh600000' and not result['security_observed']
+        assert result['source_response_hashes']==[] and result['sample_response_hashes']
+
+
 def test_live_throttling_opens_existing_cooldown_and_blocks_next_call(qualified,monkeypatch):
     contract,root,definition,raw,proof=qualified
     definition['units'][0].pop('replay_manifest')
