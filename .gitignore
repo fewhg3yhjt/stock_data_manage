@@ -12,7 +12,8 @@ venv/
 .idea/
 .vscode/
 
-# Generated probe data (keep the probe scripts and reports)
+# Generated probe results (retain local evidence and already tracked history)
+provider_validation/results/
 provider_validation/results/legacy/tmp_test/etf_daily_probe/
 provider_validation/results/legacy/tmp_test/etf_full_probe/
 provider_validation/results/legacy/tmp_test/historical_daily_probe/

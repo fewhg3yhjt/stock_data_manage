@@ -40,6 +40,7 @@
 | `stock-data-test-design-acceptance-baseline.md` | 测试层次、故障场景和验收门槛 |
 | `provider-capability-verification-and-normalization.md` | 来源证据、资格及YAML归一化规则 |
 | `docs/providers/README.md` | 正式源头接口说明、各数据域边界及说明表依据 |
+| `docs/providers/源头采集接口说明.xlsx.inspect.ndjson` | 既有接口说明表的逐行 JSON 检查快照，记录工作表、单元格样式与公式，不作为当前配置或生产资格依据 |
 | `docs/providers/security-catalog.md` | 当前股票和ETF来源范围、日期、分类与差异 |
 | `docs/pipeline/collection-tasks.md` | 获取、检查、发布、重做、证券清单调度和恢复 |
 | `docs/storage/README.md` | 数据分层、日期唯一、原始引用和归档 |

@@ -18,6 +18,13 @@
 
 ## Provider Verification
 
+- Treat AI-generated analyses, code, summaries, and data transformations as unverified hypotheses until independently checked against source data, executable code, authoritative documentation, or reproducible validation.
+- Preserve evidence at every investigation stage: the capability inventory, source requests, original responses, parsed outputs, validation findings, and final conclusions must be saved and linked to one another. Never rely on ephemeral terminal output as the only evidence.
+- Before parsing, normalizing, filtering, or otherwise transforming a live provider response, persist its exact response bytes. Save a manifest with provider, endpoint, method, sanitized request parameters and headers, request scope/date/window, fetch time, status, response headers/content type/encoding, byte length, and SHA-256. Compressed storage is allowed if the exact original bytes can be recovered and their hash is recorded. If a response contains credentials or secrets, do not persist those values; save a redacted representation or hash, mark the evidence as redacted, and state why exact retention was suppressed.
+- Persist each derived dataset and validation result with the source-response hash, transformation/code version, row counts, coverage denominator, and validation time. Persist transport failures and empty responses as evidence too; distinguish them from a valid empty dataset.
+- Before making a live request, search the evidence archive by provider, endpoint, canonical request parameters, scope/date/window, and code version. Reuse a matching response when it satisfies the requested freshness and completeness requirements; do not repeat calls solely to recreate an artifact or summary.
+- Do not report a capability as verified when only documentation, an HTTP success status, a sample, or an AI-generated summary exists. State the exact tested scope and whether evidence is live, offline, partial, or blocked.
+- Keep raw probe evidence in a persistent, queryable location outside production datasets. Do not automatically delete it as temporary data. Never persist credentials, authorization tokens, private keys, or unredacted secrets in request metadata.
 - A provider adapter existing in code is not evidence that the provider is production-ready.
 - User-provided runnable probes, scripts, or adapters with observed successful results are source behavior contracts.
 - 用户提供来源脚本后，先形成逐调用能力清单，将每项对应到现有Provider、YAML参数和字段映射、任务选源及实际验证证据。不能仅补当前被指出的接口而遗漏同一脚本的其他能力。
