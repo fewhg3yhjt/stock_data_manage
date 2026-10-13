@@ -86,6 +86,10 @@ def prepare_daily_task_publication(state, units, source_rows, paths, config_root
                 field_level="full_bar" if row.get("amount") is not None else "ohlcv" if row.get("volume") is not None else "ohlc",
                 capability_priority=0, capability_version=report.get("adapter_version", "unknown"),
                 normalizer_version=report.get("normalization_version", "unknown"),
+                volume_semantics="share" if row.get('volume') is not None else "unverified",
+                flags=tuple(dict.fromkeys(flag for scope in report.get('verified_unit_scopes', ())
+                    if row['instrument_id'] in scope['instrument_ids'] and str(row['trade_date']) in scope['dates']
+                    for flag in scope.get('precision_flags', ()))),
                 raw_object_path=source["raw_ref"], fetch_time=datetime.fromisoformat(report["validation_time_utc"]))
             if not validate_bar(record).valid:
                 raise ValueError("normalized daily candidate failed business validity")

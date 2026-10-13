@@ -1025,6 +1025,15 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                         coverage_basis="requested dates selected from returned source rows; not independently complete history")
             rows = [Normalizer.normalize_fields(row, rule=rule, fields=schema_fields,
                                                 context=mapping_context, allow_pending=True) for row in mapping_rows]
+            if input_id == 'ASTOCK-002-daily':
+                scopes = [scope for scope in rule.get('verified_unit_scopes', ())
+                    if mapping_context['instrument_id'] in scope['instrument_ids']
+                    and mapping_context.get('source_api') == scope['source_api']
+                    and any(str(row['trade_date']) in scope['dates'] for row in rows)]
+                report['verified_unit_scopes'] = _json_value(scopes)
+                for name in ('volume', 'amount'):
+                    if rows and all(row.get(name) is not None for row in rows):
+                        report['field_units'][name] = schema_fields[name]['unit'] + '; rounded source precision recorded in flags'
             keys = [tuple(row[name] for name in dataset["dataset"]["primary_key"]) for row in rows]
             if len(set(keys)) != len(keys):
                 raise NormalizationError("duplicate dataset primary key")
@@ -1271,12 +1280,24 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
             if not (str(request.get("start_date")) <= day.isoformat() <= str(request.get("end_date"))):
                 raise ValueError("daily source window must contain the task trading date")
         if mode == "live":
-            # Catalog routes must pass evidence checks before each source call.
-            # Other datasets remain blocked pending their own qualification.
-            if dataset != "security_master":
-                raise ValueError("live task publication is blocked: inputs have no formal routing qualification")
+            # Both supported datasets pass their exact qualification before each call.
             if unit.get("replay_manifest"):
-                raise ValueError("live security tasks must not supply an external replay manifest")
+                raise ValueError("live tasks must not supply an external replay manifest")
+    if mode == 'live' and dataset == 'daily_bar':
+        # Reject unauthorized scope before creating a task or its workspace.
+        # Repeat the full check per unit, since health may change during a run.
+        if not paths['metadata_path'].exists():
+            raise ValueError('formal routing qualification blocked: daily metadata is missing')
+        from ..routing.factory import check_daily_input_qualification
+        with MetadataStore(paths['metadata_path']) as preflight_metadata:
+            for unit in units:
+                if redo == 'selected' and unit.get('symbol') not in symbols:
+                    continue
+                gate = check_daily_input_qualification(contracts[unit['input_id']], unit['context'],
+                    asset_type=definition.get('asset_type'), config_root=config_root,
+                    metadata=preflight_metadata, now=datetime.now(timezone.utc), execution_mode='live')
+                if not gate['eligible']:
+                    raise ValueError('formal routing qualification blocked: '+json.dumps(gate['reasons'],ensure_ascii=False))
     if redo == "selected":
         if dataset != "daily_bar" or not symbols:
             raise ValueError("selected redo requires a daily task and explicit symbols")
@@ -1367,6 +1388,9 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
             work.mkdir(parents=True, exist_ok=True)
             _save_task_summary(state, paths, metadata)
             executor = collector or collect_input
+            from ..providers.transport import RequestPacer
+            task_options = dict(collector_options or {})
+            task_options.setdefault('pacer', RequestPacer())
             for unit in units:
                 key = unit["key"]
                 old = state["units"].get(key)
@@ -1392,7 +1416,7 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
                     permitted_root=paths["raw_root"] / "_tmp", archive_root=paths["archive_root"])
                 if preserved and replay == str(temporary):
                     replay = str(preserved)
-                options = dict(collector_options or {})
+                options = dict(task_options)
                 options.update(input_id=unit["input_id"], context=unit["context"], config_root=config_root,
                     data_root=paths["data_root"], mode=mode, replay_manifest=replay,
                     task_unit=(task_id, key), force_fetch=force, data_date=day.isoformat())
@@ -1412,7 +1436,23 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
                             config_root=config_root, metadata=metadata, now=datetime.now(timezone.utc))
                         if not qualification["eligible"]:
                             raise ValueError("formal routing qualification blocked: " + json.dumps(qualification["reasons"], ensure_ascii=False))
+                    elif mode == "live" and dataset == "daily_bar":
+                        from ..routing.factory import check_daily_input_qualification
+                        qualification = check_daily_input_qualification(contract, unit['context'],
+                            asset_type=definition.get('asset_type'), config_root=config_root, metadata=metadata,
+                            now=datetime.now(timezone.utc), execution_mode='live')
+                        if not qualification['eligible']:
+                            raise ValueError("formal routing qualification blocked: " + json.dumps(qualification['reasons'], ensure_ascii=False))
                     report = executor(**options)
+                    if mode == "live" and dataset == "daily_bar":
+                        bad_http = next((e['status_code'] for e in report.get('responses', [])
+                            if e.get('mode') == 'live' and e.get('status_code') in {403, 429}), None)
+                        if bad_http is not None:
+                            metadata.record_provider_failure(provider=contract.provider, endpoint=contract.endpoint,
+                                capability_version=qualification['capability_version'], dataset='daily_bar',
+                                market=qualification['market'], asset_type=definition.get('asset_type'),
+                                failure_class='rate_limited' if bad_http == 429 else 'forbidden', error=f'HTTP {bad_http}',
+                                now=datetime.now(timezone.utc), http_status=bad_http, cooldown_seconds=300)
                     if mode == "live" and dataset == "security_master":
                         # Only newly observed HTTP throttling/forbidden responses
                         # affect health; qualification failures and replay do not.

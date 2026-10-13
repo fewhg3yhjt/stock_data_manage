@@ -47,6 +47,7 @@ def qualified(tmp_path, monkeypatch):
         'live_report':Path(live['report_path']),'revalidation_report':Path(current['report_path']),
         'publication_manifest':Path(result['published_manifest']),'raw_manifest':raw}
     proof={'input_id':contract.input_id,'capability_version':version,'asset_type':'stock',
+        'allowed_modes':['retained','live'],
         **{k:{'path':str(p),'sha256':file_hash(p)} for k,p in artifacts.items()}}
     proof_path=tmp_path/'qualification.json';proof_path.write_text(json.dumps(proof),encoding='utf-8')
     now=datetime.now(timezone.utc)
@@ -60,6 +61,61 @@ def qualified(tmp_path, monkeypatch):
         metadata.save_probe_evidence(evidence,dataset='daily_bar',market='XSHG',asset_type='stock',
             code_prefix='sh600519',adjustment='forward')
     return contract, root, definition, raw, proof_path
+
+
+def test_exact_live_task_publishes_and_blocks_retained_only_qualification(qualified):
+    contract,root,definition,raw,proof=qualified
+    definition['units'][0].pop('replay_manifest')
+    result=collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='live',redo='full',
+        collector_options={'pacer':RequestPacer(wait=lambda _:None)})
+    assert result['status']=='published'
+    assert result['units']['sh600519']['report']['live_http_calls']==1
+    p=json.loads(proof.read_text());p['allowed_modes']=['retained'];proof.write_text(json.dumps(p))
+    with MetadataStore(root/'metadata/metadata.duckdb') as metadata:
+        metadata.connection.execute('UPDATE capability_registry SET evidence_hash=?',[file_hash(proof)])
+    with pytest.raises(ValueError,match='execution mode'):
+        collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='live',redo='full')
+
+
+def test_live_throttling_opens_existing_cooldown_and_blocks_next_call(qualified,monkeypatch):
+    contract,root,definition,raw,proof=qualified
+    definition['units'][0].pop('replay_manifest')
+    count=[]
+    def denied(session,request,**kwargs):
+        count.append(request.url)
+        response=requests.Response();response.status_code=429;response._content=b'{}'
+        response.headers={'Content-Type':'application/json'};response.encoding='utf-8'
+        response.url=request.url;response.request=request
+        return response
+    monkeypatch.setattr(requests.Session,'send',denied)
+    result=collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='live',redo='full',
+        collector_options={'pacer':RequestPacer(wait=lambda _:None)})
+    assert result['status']=='failed' and count
+    previous=len(count)
+    with pytest.raises(ValueError,match='cooling down'):
+        collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='live',redo='resume')
+    assert len(count)==previous
+
+
+def test_selected_live_preflight_checks_only_selected_security(qualified,monkeypatch):
+    contract,root,definition,raw,proof=qualified
+    definition['task_id']='selected-scope'
+    definition['units'][0].pop('replay_manifest')
+    other={'key':'sh600000','symbol':'sh600000','input_id':'ASTOCK-002-daily',
+        'context':{'request':{'symbol':'sh600000','start_date':'2026-10-09','end_date':'2026-10-09'}}}
+    definition['units'].append(other)
+    import stock_data_manage.routing.factory as factory
+    original=factory.check_daily_input_qualification
+    checked=[]
+    def observed(contract,context,**kwargs):
+        checked.append(context['request']['symbol'])
+        return original(contract,context,**kwargs)
+    monkeypatch.setattr(factory,'check_daily_input_qualification',observed)
+    result=collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='live',redo='selected',
+        symbols=['sh600519'],collector_options={'pacer':RequestPacer(wait=lambda _:None)})
+    assert checked==['sh600519','sh600519']
+    assert result['units']['sh600519']['status']=='candidate_complete'
+    assert 'sh600000' not in result['units']
 
 
 def test_qualified_retained_task_publishes_with_zero_network_and_complete_progress(qualified, monkeypatch):

@@ -122,7 +122,7 @@
 
 | 文件 | 职责 |
 |---|---|
-| `quality/normalization.py` | 执行 YAML 来源字段映射、字段类型/倍率/时区/空值、规则状态与来源范围；支持各数据域的候选字段合同 |
+| `quality/normalization.py` | 执行 YAML 来源字段映射、字段类型/倍率/时区/空值、规则状态与来源范围；支持各数据域的候选字段合同；verified_unit_scopes按证券、接口和日期选择经验证的单位倍率，未知范围保持空值 |
 | `quality/validation.py` | OHLC、日期、时间键和基础记录质量校验 |
 | `quality/resolution.py` | 来源优先级、字段完整度、冲突识别和记录仲裁 |
 | `quality/publication.py` | 日线发布门槛和数据集发布策略加载 |
@@ -132,8 +132,8 @@
 
 | 文件 | 职责 |
 |---|---|
-| `pipeline/daily.py` | 日线按来源补缺、标准化、校验、候选生成和发布编排 |
-| `pipeline/inputs.py` | 既有候选、业务任务与调度；raw按日期/来源/接口，工作区按日期/数据集；请求文件隔离、YAML映射、互补来源合并覆盖检查、重做、发布恢复，自动保存task.json和summary.json；历史ETF保留原SDK请求、依赖证据和离线随机参数；最新名单通过元数据读取，回退不改写旧发布 |
+| `pipeline/daily.py` | 日线按来源补缺、标准化、校验、候选生成和发布编排；规范记录保留单位语义及来源舍入标记 |
+| `pipeline/inputs.py` | 既有候选、业务任务与调度；raw按日期/来源/接口，工作区按日期/数据集；请求文件隔离、YAML映射、互补来源合并覆盖检查、重做、发布恢复，自动保存task.json和summary.json；任务共用现有限速器，在线门禁保留模式与精确范围；历史ETF保留原SDK请求、依赖证据和离线随机参数；最新名单通过元数据读取，回退不改写旧发布 |
 | `pipeline/daily_reconciliation.py` | 日线 provisional/final 合并、缺失统计和盘后校准 |
 | `pipeline/minute.py` | Watchlist 实时分钟采集和 Hot Store 写入 |
 | `pipeline/minute_reconciliation.py` | 分钟盘后校准、final 提升、冲突隔离和完整性处理 |
@@ -178,7 +178,7 @@
 
 任务入口 `pipeline/inputs.py` 支持正式留存响应模式及持久化进度；`cli.py` 提供 `--mode retained`、`--progress/--no-progress`。实现测试新增 `tests/test_task_progress.py`（进度、未知总量、失败和恢复计数）与 `tests/test_retained_daily.py`（合成四层资格、范围及哈希拒绝、零网络发布和恢复）；测试只写tmp，不作为真实来源资格。
 
-腾讯窗口输入沿用同一输入ID：`pipeline/inputs.py`保留完整来源行、只映射请求日期，并将动态日线任务顶层config传到冻结的各证券单元；`routing/factory.py`按显式api识别北交所及精确参数资格，仍不放开在线日线门禁。相关合同和配置传递测试补入现有`tests/test_provider_contract_adapters.py`、`tests/test_collection_tasks.py`。
+腾讯窗口输入沿用同一输入ID：`pipeline/inputs.py`保留完整来源行、只映射请求日期，并将动态日线任务顶层config传到冻结的各证券单元；`routing/factory.py`按显式api识别北交所及精确参数资格，在线日线按精确范围和显式模式授权放行，并在创建任务前及每个单元执行前检查，未认证范围保持阻断。相关合同和配置传递测试补入现有`tests/test_provider_contract_adapters.py`、`tests/test_collection_tasks.py`。
 
 证券任务省略units时，`pipeline/inputs.py` 查询既有交易日历并调用 `worker/scheduler.py` 按collection.yaml构建来源；`routing/factory.py` 对历史ETF按完整日期参数及互补发布数量检查资格。新增行为在既有 `tests/test_scheduler.py`、`tests/test_collection_tasks.py` 验证，不新增任务管理模块。
 | `cli.py` | `collect-due-inputs`（默认保存计划）、`collect-input`（默认分层落盘，支持 JSON 参数上下文及隔离验证输出）、`probe-*`、`recover`、`acceptance-offline` 等入口，负责参数解析、UTF-8结果与进度输出和现有流程组装 |

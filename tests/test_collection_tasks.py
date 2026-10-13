@@ -396,6 +396,17 @@ def test_master_then_dynamic_daily_scope_and_new_listings(tmp_path):
                for unit in configured["definition"]["units"])
 
 
+def test_task_shares_existing_request_pacer_between_securities(tmp_path):
+    collector=FaultCollector()
+    pacers=[]
+    def observed(**kwargs):
+        pacers.append(kwargs['pacer'])
+        return collector(**kwargs)
+    result=run(tmp_path,daily_definition(),observed)
+    assert result['status']=='published' and len(pacers)==3
+    assert all(p is pacers[0] for p in pacers)
+
+
 def test_master_whole_source_failure_falls_back_without_claiming_today_complete(tmp_path):
     collector = FaultCollector()
     run(tmp_path, master_definition(), collector)

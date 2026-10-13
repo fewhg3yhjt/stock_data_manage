@@ -173,8 +173,8 @@ def check_security_input_qualification(contract, context, *, config_root, metada
             "verified_groups": accepted, "reasons": reasons}
 
 
-def check_daily_input_qualification(contract, context, *, asset_type, config_root, metadata, now):
-    """Qualify one exact retained daily request, never extrapolate a sample universe."""
+def check_daily_input_qualification(contract, context, *, asset_type, config_root, metadata, now, execution_mode='retained'):
+    """Qualify one exact request and execution mode, never extrapolate a sample universe."""
     from datetime import date
     import xml.etree.ElementTree as ET
     import pyarrow.parquet as pq
@@ -205,6 +205,8 @@ def check_daily_input_qualification(contract, context, *, asset_type, config_roo
         if file_hash(proof_path) != evidence['evidence_hash']:
             raise ValueError('daily qualification hash differs')
         proof = json.loads(proof_path.read_text(encoding='utf-8'))
+        if execution_mode not in {'retained', 'live'} or execution_mode not in proof.get('allowed_modes', ['retained']):
+            raise ValueError('daily qualification does not authorize the requested execution mode')
         if (proof['input_id'],proof['capability_version'],proof['asset_type']) != (contract.input_id,adapter.capability_version,asset_type):
             raise ValueError('daily qualification identity differs')
         artifacts = {}
@@ -261,7 +263,8 @@ def check_daily_input_qualification(contract, context, *, asset_type, config_roo
         if not metadata.provider_available(health,now):
             raise ValueError('daily provider is cooling down')
         return {'eligible':True,'input_id':contract.input_id,'capability_version':adapter.capability_version,
-                'symbol':symbol,'asset_type':asset_type,'source_response_hashes':hashes,'reasons':[]}
+                'symbol':symbol,'market':exchange,'asset_type':asset_type,'execution_mode':execution_mode,
+                'source_response_hashes':hashes,'reasons':[]}
     except (ValueError,KeyError,TypeError,AttributeError,OSError,StopIteration,ET.ParseError) as exc:
         return {'eligible':False,'input_id':contract.input_id,'reasons':[str(exc)]}
 

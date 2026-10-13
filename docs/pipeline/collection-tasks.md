@@ -8,7 +8,9 @@
 
 本次先接通证券主数据与指定交易日的日线流程；管理页面、后台定时运行、全市场在线启用不在本次范围。现有验证专用来源的声明不是生产资格。正式任务默认使用 `config/collection.yaml` 指定的 `data/`，默认模式为 `live`，在线来源资格检查仍在写入前阻断执行。离线回放必须显式使用 `--mode replay` 和隔离的 `--data-root`，不能发布到配置的生产目录。业务任务输出不能放入 `provider_validation/`。沪深股票、ETF 和北交所的完整来源覆盖需分别证明，来源缺失不得包装成全量完成。
 
-`collect-task --mode retained` 是正式使用留存原响应的入口：各单元必须指定 `replay_manifest`，通过当前版本来源资格、范围、日期与哈希检查后，仍由原Provider、YAML映射和发布流程写入配置的 `data/`。底层严格回放，不允许缺失证据时联网补取，不直接搬运隔离目录的规范文件。证券名单沿用原资格检查；日线暂时仅支持腾讯前复权已核验的证券及完整请求窗口，资格按证券、资产类别及参数精确绑定，不能扩大成全市场或实时采集资格。`replay` 模式的隔离限制保持；独立 `collect-input` 不提供正式留存发布。当前四只日线的原响应、资格包和来源复核均已保存在data，资格包不依赖可清理的tmp产物。
+`collect-task --mode retained` 是正式使用留存原响应的入口：各单元必须指定 `replay_manifest`，通过当前版本来源资格、范围、日期与哈希检查后，仍由原Provider、YAML映射和发布流程写入配置的 `data/`。底层严格回放，不允许缺失证据时联网补取，不直接搬运隔离目录的规范文件。证券名单沿用原资格检查；日线暂时仅支持腾讯前复权已核验的证券及完整请求窗口，资格按证券、资产类别及参数精确绑定，不能扩大成全市场或实时采集资格。`replay` 模式的隔离限制保持；独立 `collect-input` 不提供正式留存发布。此前四只留存日线的证据保存在data。当前8只newfqkline精确请求已获显式live/retained模式资格，正式在线发布5只股票、3只ETF；旧留存资格不自动获得在线权限。当前资格包及独立单位对照保存在data/task_workspace/_checks/daily-online-20261012/，不由样本推出全市场范围。
+
+在线日线先检查全部请求资格，再创建任务；每单元执行前重复检查，403/429进入既有冷却记录。任务共用同一个RequestPacer，间隔不会在每只证券开始时重置。实时响应先进入raw/_tmp，检查和发布完成才转正；来源解析异常的断点可沿用已留存字节，缺失或业务无效单元再补采。正式CLI参数、真实请求数量、进度日志及独立回读见 [小范围在线验收](../../data/task_workspace/_checks/daily-online-20261012/formal-verification.json)。单位规则及精度主要维护于 [来源说明](../providers/README.md#单位核验与正式小范围运行2026-10-13)，本页不维护第二份倍率表。
 
 ## 原始数据与任务的边界
 
@@ -38,7 +40,7 @@
 {"task_id":"security-master-hs-20261009","dataset":"security_master","trade_date":"2026-10-09"}
 ```
 
-准备好目标日的日历和正式来源资格后，沿用 `collect-task --task-file <任务文件> --mode live --redo full`。该命令实际联网并写入配置的data，本次开发未执行。失败重做、raw暂存和转正、去重及发布继续复用现有流程。
+准备好目标日的日历和正式来源资格后，沿用 `collect-task --task-file <任务文件> --mode live --redo full`。该命令实际联网并写入配置的data，2026-10-13已用8只精确证券请求执行；全市场尚未执行。失败重做、raw暂存和转正、去重及发布继续复用现有流程。
 
 ## 三阶段进度
 
@@ -56,7 +58,7 @@ CLI默认显示进度到stderr，stdout仍是完整任务JSON；`--no-progress` 
 python -m stock_data_manage.cli collect-task --task-file data/task_workspace/_checks/daily-retained-final-20261011/etf-task.json --mode retained --progress
 ```
 
-该命令对已完成ETF任务返回no-op。当前正式结果是10月9日两只股票、两只ETF；原响应在 `data/raw/2026-10-09/tencent/kline_daily/`，规范日线在 `data/canonical/2026-10-09/daily_bar/{stock,etf}/`。来源单位未认证时volume/amount保持为空。最终版本的全量与指定重做在tmp隔离验证，正式分区没有再次覆盖。实际状态和进度从 [独立回读检查](../../data/task_workspace/_checks/daily-retained-final-20261011/independent-check.json) 定位，显示样例见 [实际进度输出](../../data/task_workspace/_checks/daily-retained-final-20261011/progress-demo.txt)。全市场和北交所日线、日线实时路由及常驻调度仍未开启。
+该命令对已完成ETF任务返回no-op。该留存命令属于此前四只样本任务。当前正式结果是10月9日5只股票、3只ETF；原响应在 `data/raw/2026-10-09/tencent/kline_daily/`，规范日线在 `data/canonical/2026-10-09/daily_bar/{stock,etf}/`。来源单位未认证时volume/amount保持为空。该段10月11日留存验收的全量与指定重做在tmp隔离验证。10月13日正式在线full与selected已运行，旧规范文件留在task_archive审计，最新结果以上文和最新阶段验收为准。实际状态和进度从 [独立回读检查](../../data/task_workspace/_checks/daily-retained-final-20261011/independent-check.json) 定位，显示样例见 [实际进度输出](../../data/task_workspace/_checks/daily-retained-final-20261011/progress-demo.txt)。北交所bj920001精确日线请求已正式发布；全市场资格及常驻调度仍未开启。
 
 ## 持久化记录
 

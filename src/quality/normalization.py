@@ -114,16 +114,25 @@ class Normalizer:
             if name not in fields or context is None or key not in context:
                 raise NormalizationError(f"missing field context: {name}")
             values[name] = context[key]
+        unit_scopes = [scope for scope in rule.get('verified_unit_scopes', ())
+            if context and context.get('instrument_id') in scope['instrument_ids']
+            and context.get('source_api') == scope['source_api']
+            and str(values.get('trade_date')) in scope['dates']]
+        if len(unit_scopes) > 1:
+            raise NormalizationError('overlapping verified unit scopes')
+        unit_multipliers = unit_scopes[0]['multipliers'] if unit_scopes else {}
         result = {}
         for name, definition in fields.items():
             value = values.get(name)
-            if name in rule.get("unverified_fields", ()):
+            if name in rule.get("unverified_fields", ()) and name not in unit_multipliers:
                 if definition.get("required", False):
                     raise NormalizationError(f"required field semantics are unverified: {name}")
                 # Retained in source rows; do not label an unknown unit as the dataset's canonical unit.
                 result[name] = None
                 continue
-            transform = rule.get("transforms", {}).get(name, {})
+            transform = dict(rule.get("transforms", {}).get(name, {}))
+            if name in unit_multipliers:
+                transform['multiplier'] = unit_multipliers[name]
             if set(transform) - {"format", "timezone", "multiplier", "remove_commas", "nonfinite_is_null", "fallback_source", "value_mapping", "zero_is_null"}:
                 raise NormalizationError(f"unsupported transform for {name}")
             if value is None and "fallback_source" in transform:

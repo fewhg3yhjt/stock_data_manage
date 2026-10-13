@@ -21,6 +21,20 @@ rules:
       close: {remove_commas: true}
     positive_fields: [open, high, low, close]
     unverified_fields: [volume, amount]
+    # 仅认证独立对照过的证券、接口和数据日期；其他记录保持空值。
+    verified_unit_scopes:
+      - instrument_ids: ["XSHG:600519", "XSHE:000001", "XSHE:300750", "XSHG:510300", "XSHE:159915", "XSHG:511880"]
+        source_api: newfqkline
+        dates: ["2026-10-09"]
+        multipliers: {volume: "100", amount: "10000"}
+        precision_flags: [source_volume_rounded_to_100_shares, source_amount_rounded_to_100_CNY]
+        evidence: tmp/daily-online-20261012/independent-units.json
+      - instrument_ids: ["XSHG:688981"]
+        source_api: newfqkline
+        dates: ["2026-10-09"]
+        multipliers: {volume: "1", amount: "10000"}
+        precision_flags: [source_amount_rounded_to_100_CNY]
+        evidence: tmp/daily-online-20261012/independent-units.json
     volume_multiplier: "1"
     amount_multiplier: "1"
     volume_semantics: unverified

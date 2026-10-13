@@ -63,9 +63,9 @@ node provider_validation/tests/build_interface_coverage_workbook.mjs --formal-sp
 
 股票与ETF名单的实现、分类、北交所及上交所ETF目录接入见 [证券名单来源](security-catalog.md)。现有Excel与配套JSON保留上次导出快照；新增输入与字段变化以模块说明及YAML为准，不将旧表视为已核准当前全量证券。10月9日的7267条正式证券名单已发布于 `data/canonical/2026-10-09/security_master/`，原响应位于 `data/raw/2026-10-09/`，验收索引在 `data/task_workspace/_checks/security-release-20261012/`。已有接口可行性响应只读留存。
 
-日线仍未获得全市场在线任务资格。现有腾讯Provider现已按用户确认接入两个窗口接口，保留输入ID `ASTOCK-002-daily`，能力版本为 `tencent-window-input-v2`。`config.api=fqkline` 是原接口及已有任务默认行为，仍排除北交所；显式 `config.api=newfqkline` 使用已验证的proxy主机，支持北交所，原响应和10/11列来源行完整保留，字段映射只使用请求日期内的记录。日期重复、异常行结构、空调整列表、请求日期内没有数据或640条不能覆盖请求历史时明确失败。不自动切换另一个接口，原分钟和快照适配器不改变。原生对照见 [请求对照](../../tmp/daily-next-stage-20261012/native-comparison.json)。
+日线已完成8只证券2026-10-09/newfqkline精确在线资格与正式发布，尚未取得全市场资格。现有腾讯Provider现已按用户确认接入两个窗口接口，保留输入ID `ASTOCK-002-daily`，能力版本为 `tencent-window-input-v2`。`config.api=fqkline` 是原接口及已有任务默认行为，仍排除北交所；显式 `config.api=newfqkline` 使用已验证的proxy主机，支持北交所，原响应和10/11列来源行完整保留，字段映射只使用请求日期内的记录。日期重复、异常行结构、空调整列表、请求日期内没有数据或640条不能覆盖请求历史时明确失败。不自动切换另一个接口，原分钟和快照适配器不改变。原生对照见 [请求对照](../../tmp/daily-next-stage-20261012/native-comparison.json)。
 
-参数来源在 `config/providers.yaml`，标准字段沿用 `config/datasets/daily_bar.yaml`，位置映射在 `config/normalization/daily_bar.yaml`：前6列仍为日期、开、收、高、低、成交量，新增接口成交额位置8仅保留候选映射；单位尚未独立核验，标准volume/amount保持空值。实际day/qfqday标签保存于来源行，不因一致性样本推定任意除权情形。旧数据不改写，新任务的参数哈希和代码资格须重新核验。
+参数来源在 `config/providers.yaml`，标准字段沿用 `config/datasets/daily_bar.yaml`，位置映射在 `config/normalization/daily_bar.yaml`：前6列仍为日期、开、收、高、低、成交量，新增接口成交额位置8仅保留候选映射；单位尚未独立核验，标准volume/amount保持空值。实际day/qfqday标签保存于来源行，不因一致性样本推定任意除权情形。旧原响应不改写，新任务的参数哈希和代码资格须重新核验。7只已独立验证的证券、接口及日期由verified_unit_scopes选择倍率；其他记录保持未认证字段为空，见下文。
 
 单接口或显式任务单元通过现有context传递：
 
@@ -73,7 +73,15 @@ node provider_validation/tests/build_interface_coverage_workbook.mjs --formal-sp
 {"request":{"symbol":"bj920001","start_date":"2026-10-09","end_date":"2026-10-09"},"config":{"api":"newfqkline"}}
 ```
 
-动态全量任务可在任务定义顶层设置 `"config":{"api":"newfqkline"}`，展开证券时复制到各单元context，断点恢复沿用冻结参数。此参数配置不授予生产路由资格，正式在线任务仍受现有门禁控制。8只真实原响应回放及股票/ETF全量、断点、指定证券、发布恢复与缺失补齐隔离验收见 [接入核验](../../tmp/tencent-alternative-integration-20261012/verification.json)，北交所及科创板新Provider真实在线各1次请求通过，见 [在线核验](../../tmp/tencent-alternative-integration-20261012/live-verification.json)。这些结果不是全市场采集或生产资格。
+动态全量任务可在任务定义顶层设置 `"config":{"api":"newfqkline"}`，展开证券时复制到各单元context，断点恢复沿用冻结参数。此参数配置不授予生产路由资格，正式在线任务需同时通过精确范围资格、allowed_modes中的live授权、当前代码配置、有效期及冷却检查；没有权限时在创建任务工作区前拒绝。旧证明未写allowed_modes时仅允许retained，不能自动升级为在线资格。8只真实原响应回放及股票/ETF全量、断点、指定证券、发布恢复与缺失补齐隔离验收见 [接入核验](../../tmp/tencent-alternative-integration-20261012/verification.json)，北交所及科创板新Provider真实在线各1次请求通过，见 [在线核验](../../tmp/tencent-alternative-integration-20261012/live-verification.json)。这些结果不是全市场采集或生产资格。
+
+### 单位核验与正式小范围运行（2026-10-13）
+
+以BaoStock原生SDK同日数据作独立对照，TCP原字节在SDK解码前留存；登录及请求凭据未保存。[BaoStock主仓库字段文档](https://github.com/zxygithub/baostock/blob/master/docs/pythonAPI.md)定义成交量为股、成交额为人民币元，并说明不同系统的历史复权算法可能不同。本轮7只样本当日OHLC一致，不据此认证任意除权历史。
+
+单位规则主要维护于config/normalization/daily_bar.yaml的verified_unit_scopes：sh600519、sz000001、sz300750、sh510300、sz159915、sh511880的成交量乘100，sh688981乘1，成交额均乘10000。规则严格绑定newfqkline和2026-10-09，不推广为板块或全市场规则。腾讯源数量与金额存在舍入，规范记录保留source_volume_rounded_to_100_shares和/或source_amount_rounded_to_100_CNY标记；乘倍率后的股/元不是更高精度的原始数值。bj920001未独立认证单位，volume/amount仍为空。
+
+正式CLI实际执行5只股票、3只ETF的full、resume和selected：full分别5/3次真实采集，resume返回no-op且不请求，selected各重采1只。原响应成功后转正至data/raw/2026-10-09/tencent/kline_daily；规范文件分别5/3条，源价格、单位倍率、日期、去重、精度标记及元数据独立回读通过。见 [正式验收与实际入口参数](../../data/task_workspace/_checks/daily-online-20261012/formal-verification.json) 和 [8只精确资格](../../data/task_workspace/_checks/daily-online-20261012/gates.json)。单位对照及原字节同时保存在该核验目录。全部证据归业务核验区或隔离tmp，不写provider_validation。
 
 ### 两个腾讯日线接口的一致性核验（2026-10-12）
 
