@@ -6,6 +6,7 @@ from dataclasses import asdict, replace
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from uuid import uuid4
+from time import monotonic
 
 from ..config.loader import load_input_capabilities, load_input_field_contract, load_collection_profiles, load_storage_paths
 from ..providers.transport import captured_requests, RequestPacer
@@ -1379,15 +1380,13 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
             reused = [u['key'] for u in active_units if redo == 'resume' and _task_unit_valid(state['units'].get(u['key'], {}))]
             def update_progress(snapshot):
                 state['progress'] = snapshot
-                metadata.save_collection_task(state)
-                _save_task_summary(state, paths, metadata)
                 if progress_callback:
                     progress_callback(snapshot)
             progress = TaskProgress(len(active_units), reused=reused, callback=update_progress)
             progress.emit(force=True)
-            metadata.save_collection_task(state)
             work.mkdir(parents=True, exist_ok=True)
             _save_task_summary(state, paths, metadata)
+            last_summary_at = monotonic()
             executor = collector or collect_input
             from ..providers.transport import RequestPacer
             task_options = dict(collector_options or {})
@@ -1502,10 +1501,17 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
                     progress.finish('raw', key, 'success' if success else 'failed')
                     progress.finish('processing', key, 'success' if success else 'failed')
                 progress.emit(force=True)
-                metadata.save_collection_task(state)
+                # One durable checkpoint per completed security. Display callbacks
+                # only update memory; full summaries are periodic, or immediate
+                # for a failed unit and phase transitions.
+                if state['units'][key]['status'] != 'candidate_complete' or monotonic() - last_summary_at >= 5:
+                    _save_task_summary(state, paths, metadata)
+                    last_summary_at = monotonic()
+                else:
+                    metadata.save_collection_task(state)
             state["status"] = "checking"
             state.pop("security_check", None)
-            metadata.save_collection_task(state)
+            _save_task_summary(state, paths, metadata)
             try:
                 progress.begin('publication')
                 _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
@@ -1519,10 +1525,8 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
                     RawObjectStore(work).write_json(state["security_check"], dataset="security_master",
                         provider="pipeline", endpoint="coverage", fetched_at=datetime.now(timezone.utc),
                         attempt_id="coverage", relative_path="coverage.json")
-                metadata.save_collection_task(state)
                 return _save_task_summary(state, paths, metadata)
             state["status"] = "committing"
-            metadata.save_collection_task(state)
             return _finish_task_commit(state, paths, metadata, failure_hook, progress=progress)
 
 
@@ -1551,6 +1555,7 @@ def _save_task_summary(state, paths, metadata):
             "normalization_version": report.get("normalization_version"),
             "source_response_hashes": [event["body_sha256"] for event in report.get("responses", []) if event.get("body_sha256")]})
     missing_units = [unit["key"] for unit in units if unit["status"] != "candidate_complete" or unit["coverage_rejected"]]
+    missing_unit_keys = set(missing_units)
     target_symbols = sorted({unit["symbol"] for unit in units if unit["symbol"]})
     if state["dataset"] == "security_master":
         coverage = {"basis": check.get("basis"), "group_counts": check.get("group_counts", {}),
@@ -1564,7 +1569,7 @@ def _save_task_summary(state, paths, metadata):
         coverage = {"basis": "frozen task securities; not the entire canonical partition",
                     "expected_count": len(target_symbols), "actual_count": actual,
                     "ratio": actual / len(target_symbols) if actual is not None and target_symbols else None,
-                    "missing_securities": [unit["symbol"] for unit in units if unit["key"] in missing_units]}
+                    "missing_securities": [unit["symbol"] for unit in units if unit["key"] in missing_unit_keys]}
     if not final_status:
         check_status = "pending"
     elif state["status"] == "failed" or publication.get("fallback"):
@@ -1660,6 +1665,23 @@ def _task_unit_valid(entry):
     from ..storage.integrity import file_hash
     try:
         report = entry.get("report", {})
+        if entry.get('revalidation_report'):
+            descriptor = entry['revalidation_report']
+            if file_hash(Path(descriptor['path'])) != descriptor['sha256']:
+                return False
+            import json
+            import pyarrow.parquet as pq
+            current = json.loads(Path(descriptor['path']).read_text(encoding='utf-8'))
+            if (current['status'] != 'candidate_complete' or current['input_id'] != report['input_id']
+                    or current['parameters'] != report['parameters']
+                    or current['output']['source_response_hashes'] != report['output']['source_response_hashes']):
+                return False
+            artifact = Path(current['run_directory']) / current['output']['path']
+            if file_hash(artifact) != current['output']['sha256']:
+                return False
+            if json.loads(artifact.read_text(encoding='utf-8')) != _json_value(pq.read_table(entry['artifact']).to_pylist()):
+                return False
+            report = current
         config_ok = all(file_hash(Path(item["path"])) == item["sha256"]
                         for item in (*report.get("config_files", ()), *report.get("code_files", ())))
         return (config_ok and not entry.get("coverage_rejected") and entry["status"] == "candidate_complete"
@@ -1943,8 +1965,6 @@ def _finish_task_commit(state, paths, metadata, failure_hook=None, progress=None
         from ..worker.progress import TaskProgress
         def recovered_progress(snapshot):
             state['progress'] = snapshot
-            metadata.save_collection_task(state)
-            _save_task_summary(state, paths, metadata)
         progress = TaskProgress.restore(state['progress'], callback=recovered_progress)
     _save_task_summary(state, paths, metadata)
     commit = state["commit"]
@@ -2019,6 +2039,7 @@ def _finish_task_commit(state, paths, metadata, failure_hook=None, progress=None
         failure_hook("after_publish")
     if progress:
         progress.finish('publication', 'canonical')
+        _save_task_summary(state, paths, metadata)
     for promotion in commit["promotions"]:
         RawObjectStore.promote_unit(temporary=promotion["temporary"], current=promotion["current"],
             raw_root=paths["raw_root"], archive_root=paths["archive_root"], expected_hash=promotion["raw_hash"])
@@ -2028,17 +2049,18 @@ def _finish_task_commit(state, paths, metadata, failure_hook=None, progress=None
         entry.update(raw_manifest=promotion["audit_manifest"], current_raw=promotion["current"], promoted=True)
     if progress:
         progress.finish('publication', 'raw_promote')
+        _save_task_summary(state, paths, metadata)
     if not manifest.verify(partition / "data.parquet"):
         raise ValueError("completed task publication is corrupt")
     metadata.record_partition_publish(manifest=manifest, manifest_path=manifest_path)
     state.update(status="published", published_manifest=str(manifest_path),
                  published_hash=file_hash(manifest_path), row_count=manifest.row_count, error=None)
-    metadata.save_collection_task(state)
-    marker.unlink()
     if progress:
         progress.finish('publication', 'metadata')
         progress.emit(force=True)
-    return _save_task_summary(state, paths, metadata)
+    _save_task_summary(state, paths, metadata)
+    marker.unlink()
+    return state
 
 
 def collect_due_inputs(*, now, config_root, output_root=None, data_root=None, trading_dates=(), securities=(), symbols=(),

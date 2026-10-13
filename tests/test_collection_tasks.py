@@ -407,6 +407,63 @@ def test_task_shares_existing_request_pacer_between_securities(tmp_path):
     assert all(p is pacers[0] for p in pacers)
 
 
+def test_display_does_not_save_and_each_security_has_one_checkpoint(tmp_path,monkeypatch):
+    saved=[];summaries=[];shown=[]
+    original=MetadataStore.save_collection_task
+    import stock_data_manage.pipeline.inputs as inputs
+    summary=inputs._save_task_summary
+    monkeypatch.setattr(inputs,'monotonic',lambda:0)
+    def observed(metadata,state):
+        original(metadata,state)
+        if state['status']=='collecting':
+            stored=metadata.load_collection_task(state['task_id'])
+            saved.append(len(stored['units']))
+            assert stored['progress']['stages']['processing']['completed']==len(stored['units'])
+    def observed_summary(state,*args,**kwargs):
+        summaries.append((state['status'],len(state['units'])))
+        return summary(state,*args,**kwargs)
+    monkeypatch.setattr(MetadataStore,'save_collection_task',observed)
+    monkeypatch.setattr(inputs,'_save_task_summary',observed_summary)
+    result=collect_task(definition=daily_definition(),config_root=CONFIG,data_root=tmp_path,
+        mode='replay',collector=FaultCollector(),progress_callback=shown.append)
+    assert result['status']=='published'
+    assert saved==[0,1,2,3]
+    assert [n for status,n in summaries if status=='collecting']==[0]
+    assert len(shown)>len(saved)
+    assert summaries[-1]==('published',3)
+
+
+def test_unit_failure_writes_summary_immediately(tmp_path,monkeypatch):
+    import stock_data_manage.pipeline.inputs as inputs
+    monkeypatch.setattr(inputs,'monotonic',lambda:0)
+    collector=FaultCollector();collector.fail.add('sh600001');seen=[]
+    original=inputs._save_task_summary
+    def observed(state,*args,**kwargs):
+        result=original(state,*args,**kwargs)
+        if state['status']=='collecting' and state['units']:
+            seen.append(json.loads(Path(state['summary']['path']).read_text())['source_units'][0]['status'])
+        return result
+    monkeypatch.setattr(inputs,'_save_task_summary',observed)
+    result=run(tmp_path,daily_definition(),collector)
+    assert result['status']=='failed' and seen[0]=='failed'
+
+
+def test_summary_refreshes_after_five_seconds_without_extra_checkpoint(tmp_path,monkeypatch):
+    import stock_data_manage.pipeline.inputs as inputs
+    clock=[0.0];sizes=[];original=inputs._save_task_summary
+    monkeypatch.setattr(inputs,'monotonic',lambda:clock[0])
+    def observed(state,*args,**kwargs):
+        if state['status']=='collecting':sizes.append(len(state['units']))
+        return original(state,*args,**kwargs)
+    monkeypatch.setattr(inputs,'_save_task_summary',observed)
+    base=FaultCollector()
+    def collector(**kwargs):
+        clock[0]=6.0
+        return base(**kwargs)
+    result=run(tmp_path,daily_definition(),collector)
+    assert result['status']=='published' and sizes==[0,1]
+
+
 def test_master_whole_source_failure_falls_back_without_claiming_today_complete(tmp_path):
     collector = FaultCollector()
     run(tmp_path, master_definition(), collector)

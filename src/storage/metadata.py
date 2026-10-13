@@ -204,8 +204,10 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
         from .raw import sanitized_metadata
         if state["status"] not in {"collecting", "checking", "committing", "failed", "published"}:
             raise ValueError("invalid collection task status")
-        previous = self.load_collection_task(state["task_id"])
-        if previous and previous["definition_hash"] != state["definition_hash"]:
+        previous = self.connection.execute(
+            "SELECT definition_hash FROM collection_task WHERE task_id=?", [state["task_id"]]
+        ).fetchone()
+        if previous and previous[0] != state["definition_hash"]:
             raise ValueError("task definition is immutable; use a new task ID")
         self.connection.execute(
             """INSERT INTO collection_task VALUES (?, ?, ?, ?, ?, ?)

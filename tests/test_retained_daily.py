@@ -93,6 +93,26 @@ def test_daily_input_uses_yaml_interval_across_requests(qualified,monkeypatch):
     assert starts==[0.0,0.3]
 
 
+@pytest.mark.parametrize('damage',['none','hash','source','parameters','code','artifact'])
+def test_checkpoint_revalidation_requires_same_source_output_and_current_code(qualified,damage):
+    from stock_data_manage.pipeline.inputs import _task_unit_valid
+    contract,root,definition,raw,proof=qualified
+    with MetadataStore(root.parent/'replayed/metadata/metadata.duckdb') as metadata:
+        entry=metadata.load_collection_task(definition['task_id'])['units']['sh600519']
+    p=json.loads(proof.read_text());report=Path(p['revalidation_report']['path'])
+    current=json.loads(report.read_text())
+    current['run_directory']=str(report.parents[4])
+    entry['report']['code_files'][0]['sha256']='prior-runtime-code'
+    if damage=='source':current['output']['source_response_hashes']=['different-response']
+    elif damage=='parameters':current['parameters']['code']='sh600000'
+    elif damage=='code':current['code_files'][0]['sha256']='different-code'
+    elif damage=='artifact':current['output']['sha256']='different-artifact'
+    path=root.parent/'checkpoint-revalidation.json';path.write_text(json.dumps(current))
+    entry['revalidation_report']={'path':str(path),'sha256':file_hash(path)}
+    if damage=='hash':path.write_text('{}')
+    assert _task_unit_valid(entry)==(damage=='none')
+
+
 @pytest.mark.parametrize('boundary',['allowed','date','api','market','asset','symbol_type','retained','expired','hash','cooldown','code'])
 def test_live_market_scope_preserves_evidence_and_request_boundaries(qualified,boundary):
     contract,root,definition,raw,path=qualified
