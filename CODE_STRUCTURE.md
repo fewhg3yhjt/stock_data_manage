@@ -43,7 +43,7 @@
 | `docs/providers/源头采集接口说明.xlsx.inspect.ndjson` | 既有接口说明表的逐行 JSON 检查快照，记录工作表、单元格样式与公式，不作为当前配置或生产资格依据 |
 | `docs/providers/security-catalog.md` | 当前股票和ETF来源范围、日期、分类与差异 |
 | `docs/pipeline/collection-tasks.md` | 获取、检查、发布、重做、证券清单调度和恢复 |
-| `docs/storage/README.md` | 数据分层、日期唯一、原始引用和归档 |
+| `docs/storage/README.md` | 数据分层、日期唯一、实际文件名与内容示例、字段解读、生成/读取/保留规则、原始引用与归档；精简方向与当前实现分开标注 |
 | `PROVIDER_CAPABILITY_MATRIX.md` | 2026-10-03历史抽样及证据索引，不是当前能力清单 |
 
 源头接口阅读版与同名JSON位于 `docs/providers/`，是代码、YAML和证据的派生快照，不是运行配置；`docs/pipeline/examples/` 是离线任务参数示例，不保存运行数据。合并删除的5份旧文档内容已由上述文件承接，不建立兼容副本。

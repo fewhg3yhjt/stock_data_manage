@@ -8,7 +8,7 @@
 | 现有目录和代码负责什么 | [代码结构](CODE_STRUCTURE.md) |
 | 输入参数、采集字段、映射及范围 | [源头接口说明](docs/providers/README.md)、[股票与ETF来源](docs/providers/security-catalog.md) |
 | 原始暂存、检查、发布、重做和证券清单调度 | [任务流程](docs/pipeline/collection-tasks.md) |
-| 数据在哪里、日期如何区分和归档 | [存储说明](docs/storage/README.md) |
+| 数据在哪里、文件名与内容示例、字段解读及归档 | [存储文件说明](docs/storage/README.md) |
 | 来源资格、证据与归一化设计 | [来源专项设计](provider-capability-verification-and-normalization.md) |
 | 前复权变化后如何重建历史 | [历史重建设计](stock-data-design-qfq-history-rebuild.md) |
 | 怎么判断功能完成和数据可用 | [验收基线](stock-data-test-design-acceptance-baseline.md) |
