@@ -272,8 +272,6 @@ class DashboardReader:
         if start_date and end_date and start_date > end_date:
             raise HTTPException(status_code=422, detail="开始日期不能晚于结束日期")
         _component(dataset)
-        if (dataset == "daily_bar" or dataset.startswith("minute_bar")) and not security.strip():
-            raise HTTPException(status_code=422, detail="行情查询请先输入证券代码或名称，再选择日期区间")
         schema_path = self.config_root / "normalization" / f"{dataset}.yaml"
         rules = (yaml.safe_load(schema_path.read_text(encoding="utf-8")) or {}).get("rules", []) if schema_path.is_file() else []
         catalog = self._security_catalog()

@@ -360,7 +360,8 @@ def test_record_query_snapshot_date_is_explicit_and_integrity_failure_visible(tm
         assert result["total"] == 0 and "哈希" in result["issues"][0]["reason"]
         assert client.get("/api/data?dataset=daily_bar&start_date=2026-10-10&end_date=2026-10-09").status_code == 422
         assert client.get("/api/data?dataset=daily_bar&start_date=bad").status_code == 422
-        assert client.get("/api/data?dataset=daily_bar").status_code == 422
+        all_rows = client.get("/api/data?dataset=daily_bar").json()
+        assert all_rows["total"] == 3
         assert client.get("/api/data?dataset=../../metadata").status_code == 404
 
 

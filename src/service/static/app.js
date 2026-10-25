@@ -247,17 +247,14 @@ async function renderData() {
   const params = new URLSearchParams({page:state.pages.data,page_size:25});
   for (const [key, value] of Object.entries(filters)) if (value) params.set(key, value);
   const choice = options.datasets.find(item => item.id === filters.dataset);
-  const needsSecurity = choice?.requires_security && !filters.security.trim();
   let data = {items:[],columns:[],issues:[],total:0,page:1,pages:0};
-  if (!needsSecurity) {
-    try { data = await api(`/api/data?${params}`); }
-    catch (error) { data.issues = [{provider:'查询条件',reason:error.message}]; }
-  }
+  try { data = await api(`/api/data?${params}`); }
+  catch (error) { data.issues = [{provider:'查询条件',reason:error.message}]; }
   if (sequence !== renderSequence || state.view !== 'data') return;
   const valueText = value => value === null || value === undefined ? '—' : typeof value === 'object' ? JSON.stringify(value) : String(value);
   app.innerHTML = `<form class="filters data-filters" id="data-filters">
     <label>数据类型<select name="dataset">${options.datasets.map(item => `<option value="${esc(item.id)}">${esc(item.label)}</option>`).join('')}</select></label>
-    <label>证券<input name="security" placeholder="600519、sh600519 或贵州茅台"></label>
+    <label>证券（可选）<input name="security" placeholder="留空查询全部；也可输入代码或名称"></label>
     <label>开始日期<input type="date" name="start_date"></label><label>结束日期<input type="date" name="end_date"></label>
     <label>来源<select name="provider"><option value="">全部来源</option>${(choice?.providers || []).map(item => `<option>${esc(item)}</option>`).join('')}</select></label>
     <label>资产类型<select name="asset_type"><option value="">全部类型</option><option value="stock">股票</option><option value="etf">ETF</option><option value="lof">LOF</option><option value="index">指数</option></select></label>
@@ -267,7 +264,7 @@ async function renderData() {
   ${data.issues.length ? `<p class="notice">${prettyNumber(data.issues.length)} 份来源文件未通过读取或完整性检查，已排除。${esc(data.issues.map(item => `${item.provider}: ${item.reason}`).join('；'))}</p>` : ''}
   <section class="panel"><div class="panel-head"><h2>来源数据预览</h2><small>${prettyNumber(data.total)} 条匹配记录 · 点击查看详情</small></div>
   <div class="table-wrap"><table class="data-table"><thead><tr><th>查询日期</th><th>证券</th><th>来源</th>${data.columns.map(col => `<th>${esc(col.label)}</th>`).join('')}</tr></thead><tbody>
-  ${data.items.length ? data.items.map((row,index) => `<tr class="clickable data-row" data-index="${index}"><td>${esc(row.record_date || '未提供')}</td><td><strong>${esc(row.symbol)}</strong><br>${esc(row.security_name)}</td><td>${esc(row.provider)}</td>${data.columns.map(col => `<td title="${esc(valueText(row.values[col.key]))}">${esc(valueText(row.values[col.key]).slice(0,180))}</td>`).join('')}</tr>`).join('') : `<tr><td colspan="${data.columns.length+3}">${needsSecurity ? '请输入证券代码或名称，再点击“查询数据”。' : '没有匹配的本地留存记录。可调整证券、日期或来源；查询不会触发联网采集。'}</td></tr>`}
+  ${data.items.length ? data.items.map((row,index) => `<tr class="clickable data-row" data-index="${index}"><td>${esc(row.record_date || '未提供')}</td><td><strong>${esc(row.symbol)}</strong><br>${esc(row.security_name)}</td><td>${esc(row.provider)}</td>${data.columns.map(col => `<td title="${esc(valueText(row.values[col.key]))}">${esc(valueText(row.values[col.key]).slice(0,180))}</td>`).join('')}</tr>`).join('') : `<tr><td colspan="${data.columns.length+3}">没有匹配的本地留存记录。可调整证券、日期或来源；查询不会触发联网采集。</td></tr>`}
   </tbody></table></div>${pager('data',data)}</section>`;
   const form = document.querySelector('#data-filters');
   for (const [key,value] of Object.entries(filters)) form.elements.namedItem(key).value = value;
