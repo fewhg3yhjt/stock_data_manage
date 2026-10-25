@@ -9,6 +9,7 @@
 | 输入参数、采集字段、映射及范围 | [源头接口说明](docs/providers/README.md)、[股票与ETF来源](docs/providers/security-catalog.md) |
 | 原始暂存、检查、发布、重做和证券清单调度 | [任务流程](docs/pipeline/collection-tasks.md) |
 | 数据在哪里、文件名与内容示例、字段解读及归档 | [存储文件说明](docs/storage/README.md) |
+| 在本机查看任务、原始证据和发布结果 | [只读运行台](docs/service/read-only-web.md) |
 | 来源资格、证据与归一化设计 | [来源专项设计](provider-capability-verification-and-normalization.md) |
 | 前复权变化后如何重建历史 | [历史重建设计](stock-data-design-qfq-history-rebuild.md) |
 | 怎么判断功能完成和数据可用 | [验收基线](stock-data-test-design-acceptance-baseline.md) |
@@ -129,6 +130,15 @@ python -m pip install -e .
 ```
 
 安装登记现有源码及 `stock-data` 命令入口。执行命令、测试和来源验证脚本时使用同一个 Python 环境；不再依靠将 `src/` 添加到 `PYTHONPATH` 启动。目录迁移后，已有开发环境也需重新执行上述安装命令。需要安装测试依赖时使用 `python -m pip install -e ".[test]"`。
+
+只读查看现有任务、原始响应和发布结果时，安装 Web 可选依赖并启动本机运行台：
+
+```powershell
+python -m pip install -e ".[web]"
+stock-data-web
+```
+
+浏览器访问 `http://127.0.0.1:8765`。该页面只读取现有 `data/` 产物，不启动、停止或修改采集任务；状态解释、原始响应脱敏及后续云端部署边界见[只读运行台说明](docs/service/read-only-web.md)。
 
 ```powershell
 python -m pytest

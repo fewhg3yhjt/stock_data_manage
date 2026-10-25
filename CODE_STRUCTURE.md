@@ -22,7 +22,7 @@
 | 数据质量 | `src/quality/` | 标准化、基础校验、冲突解决和发布门槛 |
 | 数据生产与发布 | `src/pipeline/` | 日线、分钟、快照、重采样和盘后校准流程 |
 | 数据存储 | `src/storage/` | Raw、Hot、Canonical、Metadata 和完整性证据 |
-| 数据访问服务 | `src/service/` | Security Master、Trading Calendar 和统一分钟查询 |
+| 数据访问服务 | `src/service/` | Security Master、Trading Calendar、统一分钟查询，以及任务与证据的只读本机页面 |
 | Worker | `src/worker/` | 调度、执行记录、恢复和离线验收 |
 
 
@@ -44,11 +44,12 @@
 | `docs/providers/security-catalog.md` | 当前股票和ETF来源范围、日期、分类与差异 |
 | `docs/pipeline/collection-tasks.md` | 获取、检查、发布、重做、证券清单调度和恢复 |
 | `docs/storage/README.md` | 数据分层、日期唯一、实际文件名与内容示例、字段解读、生成/读取/保留规则、原始引用与归档；精简方向与当前实现分开标注 |
+| `docs/service/read-only-web.md` | 本机只读运行台的用途、读取来源、启动方式、状态语义、安全边界与云端部署前置条件 |
 | `PROVIDER_CAPABILITY_MATRIX.md` | 2026-10-03历史抽样及证据索引，不是当前能力清单 |
 
 源头接口阅读版与同名JSON位于 `docs/providers/`，是代码、YAML和证据的派生快照，不是运行配置；`docs/pipeline/examples/` 是离线任务参数示例，不保存运行数据。合并删除的5份旧文档内容已由上述文件承接，不建立兼容副本。
 
-目前正式模块文档目录为 `docs/providers/`、`docs/pipeline/`、`docs/storage/`。后续路由、质量、查询或Worker文档按实际需要创建，不预建空目录；当前证券清单调度在任务流程中维护，避免单独重复说明。
+目前正式模块文档目录为 `docs/providers/`、`docs/pipeline/`、`docs/storage/`、`docs/service/`。后续路由、质量或Worker文档按实际需要创建，不预建空目录；当前证券清单调度在任务流程中维护，避免单独重复说明。
 
 验证区保存正式实现前的原响应、脚本和历史结论；已有业务联调或说明生成工具错放位置作为待整改项，不据此新增业务产物。当前正式说明生成器仍为 `provider_validation/tests/build_interface_coverage.py` 和 `build_interface_coverage_workbook.mjs` 的 `--formal-spec` 模式，本次不移动工具或刷新说明表。详细阶段边界见 [存储说明](docs/storage/README.md) 和 [验证目录](provider_validation/README.md)。
 
@@ -164,6 +165,8 @@
 | `service/calendar.py` | Trading Calendar 存储、读取和来源合并 |
 | `service/calendar_update.py` | 交易日历来源更新、官方优先级，以及校验原在线证据后的正向日期导入 |
 | `service/market_data.py` | Canonical + Hot 的统一分钟查询服务 |
+| `service/web.py` | 只读运行台入口；从现有任务摘要、Raw manifest/body 和 Canonical manifest 生成分页、脱敏的展示接口，不读写任务数据库 |
+| `service/static/` | 只读运行台的原生 HTML、CSS 和 JavaScript 页面资源，无独立前端构建或持久化状态 |
 | `service/__init__.py` | 服务包说明，不承载业务实现 |
 
 ## Worker 与命令行

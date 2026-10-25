@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>证券数据运行台</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23163f35'/%3E%3Ctext x='9' y='24' fill='%23b9ead7' font-size='24'%3ES%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-mark">S</span>
+        <div><strong>证券数据运行台</strong><small>READ-ONLY CONSOLE</small></div>
+      </div>
+      <nav aria-label="主导航">
+        <button class="nav-item active" data-view="overview"><span>⌂</span>总览</button>
+        <button class="nav-item" data-view="tasks"><span>◫</span>任务</button>
+        <button class="nav-item" data-view="raw"><span>◇</span>原始数据</button>
+        <button class="nav-item" data-view="publications"><span>▤</span>发布结果</button>
+      </nav>
+      <div class="sidebar-note">
+        <span class="live-dot"></span>
+        <div><strong>本机只读模式</strong><small>不修改任务与数据</small></div>
+      </div>
+    </aside>
+
+    <section class="workspace">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow" id="page-eyebrow">OPERATIONS OVERVIEW</p>
+          <h1 id="page-title">运行总览</h1>
+        </div>
+        <div class="top-actions">
+          <span class="refresh-time" id="refresh-time">尚未刷新</span>
+          <button class="secondary" id="refresh-button">刷新数据</button>
+        </div>
+      </header>
+      <main id="app" aria-live="polite">
+        <div class="loading"><span></span>正在读取现有运行记录…</div>
+      </main>
+    </section>
+  </div>
+
+  <dialog id="detail-dialog">
+    <button class="dialog-close" aria-label="关闭">×</button>
+    <div id="dialog-content"></div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status"></div>
+  <script src="/static/app.js" defer></script>
+</body>
+</html>
