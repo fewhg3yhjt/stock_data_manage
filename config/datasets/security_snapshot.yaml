@@ -5,7 +5,7 @@ dataset:
   name: security_snapshot
   display_name: 证券来源名单快照
   primary_key: [trade_date, exchange, stock_code]
-  allowed_asset_types: [stock, etf]
+  allowed_asset_types: [stock, etf, index]
   allowed_exchanges: [XSHG, XSHE, BSE]
 fields:
   # 名单所属日期：直接历史名单取明确请求日；当前快照取采集日。
@@ -18,7 +18,7 @@ fields:
   status: {type: enum, values: [active, suspended, unknown], required: true}
   # 数据提供方标识，如 baostock、bse、sse；后两者在此表示交易所官方数据来源。
   source: {type: string, required: true}
-  asset_type: {type: enum, values: [stock, etf], required: false}
+  asset_type: {type: enum, values: [stock, etf, index], required: false}
   list_date: {type: date, required: false}
   delist_date: {type: date, required: false}
   # 日期依据：直接历史结果经类型核验，或目录/事件区间推算；原响应采集时间另在manifest中。

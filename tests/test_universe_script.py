@@ -13,6 +13,8 @@ from stock_data_manage.config.loader import load_input_capabilities, load_input_
 from stock_data_manage.providers.exchanges.security import BseSecurityListProvider, select_script_listing
 from stock_data_manage.providers.exchanges.daily import ExchangeDailyProvider
 from stock_data_manage.providers.baostock.industry import BaoStockIndustryMembershipProvider
+from stock_data_manage.providers.baostock.session import read_rows
+from stock_data_manage.providers.contracts import FailureClass, ProviderContractError
 from stock_data_manage.routing.factory import build_input_provider
 from stock_data_manage.quality.normalization import Normalizer
 
@@ -21,6 +23,68 @@ DAY = date(2026, 10, 9)
 SCRIPT_KEYS = {'bs_calendar', 'bs_all_stock', 'bs_stock_basic', 'ak_sh_main_current',
     'ak_sh_star_current', 'ak_sz_current', 'ak_bj_current', 'ak_sh_delisted', 'ak_sz_delisted',
     'ak_sh_etf_history', 'ak_sz_etf_history', 'ak_sh_market_stats', 'ak_sz_market_stats'}
+
+
+class PagedBaoStockResult:
+    def __init__(self, pages, *, fail_after_page=None, error_code='0'):
+        self.fields = ['code']
+        self.pages = pages
+        self.page_index = 0
+        self.data = pages[0]
+        self.cur_page_num = '1'
+        self.per_page_count = len(pages[0])
+        self.cur_row_num = 0
+        self.error_code = '0'
+        self.error_msg = ''
+        self.fail_after_page = fail_after_page
+        self.next_error_code = error_code
+
+    def next(self):
+        if self.cur_row_num < len(self.data):
+            return True
+        if len(self.data) < self.per_page_count:
+            return False
+        if self.fail_after_page == int(self.cur_page_num):
+            self.error_code = self.next_error_code
+            self.error_msg = 'simulated next-page failure' if self.next_error_code != '0' else ''
+            return False
+        if self.page_index + 1 >= len(self.pages):
+            self.cur_page_num = str(int(self.cur_page_num) + 1)
+            self.data = []
+            return False
+        self.page_index += 1
+        self.cur_page_num = str(int(self.cur_page_num) + 1)
+        self.data = self.pages[self.page_index]
+        self.cur_row_num = 0
+        return bool(self.data)
+
+    def get_row_data(self):
+        row = self.data[self.cur_row_num]
+        self.cur_row_num += 1
+        return [row]
+
+
+def test_baostock_read_rows_accepts_later_pages_and_normal_short_final_page():
+    result = PagedBaoStockResult([['a', 'b'], ['c']])
+    result.per_page_count = 2
+    assert [row['code'] for row in read_rows(result)] == ['a', 'b', 'c']
+
+
+def test_baostock_read_rows_rejects_silent_full_page_truncation():
+    result = PagedBaoStockResult([['a', 'b']], fail_after_page=1)
+    result.per_page_count = 2
+    with pytest.raises(ProviderContractError, match='without advancing') as error:
+        read_rows(result)
+    assert error.value.failure_class is FailureClass.CONNECTION
+    assert error.value.retryable
+
+
+def test_baostock_read_rows_preserves_explicit_later_page_error():
+    result = PagedBaoStockResult([['a', 'b']], fail_after_page=1, error_code='10002007')
+    result.per_page_count = 2
+    with pytest.raises(ProviderContractError, match='10002007') as error:
+        read_rows(result)
+    assert error.value.failure_class is FailureClass.CONNECTION
 
 
 def test_script_inventory_has_executable_yaml_and_mapping_contracts():
@@ -101,7 +165,7 @@ def test_market_statistics_preserve_original_units_and_date_parameter():
     assert json.loads(result.rows[0]['source_values'])['股票'] == '12.34亿元'
 
 
-def test_baostock_script_order_type_filter_and_archive_before_selection():
+def test_baostock_script_order_keeps_stock_and_index_types_and_archives_before_selection():
     calls, archived = [], []
     def result(rows):
         fields = list(rows[0]); position = -1
@@ -128,6 +192,8 @@ def test_baostock_script_order_type_filter_and_archive_before_selection():
     fetched = BaoStockIndustryMembershipProvider(client=client).fetch_universe(trade_date=DAY, raw_archive=archive)
     assert [name for name, _ in calls] == ['login','query_trade_dates','query_all_stock','query_stock_basic','logout']
     assert len(archived) == 3
-    assert {r['stock_code'] for r in fetched.rows} == {'600001','302132'}
+    assert {r['stock_code'] for r in fetched.rows} == {'600001','000001','302132'}
+    assert next(r for r in fetched.rows if r['stock_code'] == '000001')['asset_type'] == 'index'
+    assert fetched.mapping_context['asset_type_mapping'] == {'1': 'stock', '2': 'index'}
     assert fetched.mapping_context['historical_universe_verified_complete'] is False
     assert fetched.rows[0]['script_sources'] == 'bs_stock_basic;bs_all_stock'

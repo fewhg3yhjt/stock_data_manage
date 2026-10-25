@@ -120,13 +120,16 @@ def write_normalized_rows(path: str | Path, rows: Iterable[Mapping], fields: Map
         arrow_fields.append(pa.field(name, arrow_type, nullable=not definition.get("required", False)))
     table = pa.Table.from_pylist(records, schema=pa.schema(arrow_fields))
     path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_name(f"{path.name}.{uuid4().hex[:12]}.tmp")
+    temporary = path.with_name(f".tmp-{uuid4().hex[:12]}.parquet")
     try:
         pq.write_table(table, temporary)
         with temporary.open("r+b") as stream:
             os.fsync(stream.fileno())
-        # Link is an atomic, no-overwrite publication within this task directory.
-        os.link(temporary, path)
+        # Each candidate path belongs to one run. Publish the completed file
+        # with a same-directory atomic rename; no hard-link capability needed.
+        if path.exists():
+            raise FileExistsError(path)
+        os.rename(temporary, path)
     finally:
         temporary.unlink(missing_ok=True)
     return {"sha256": hashlib.sha256(path.read_bytes()).hexdigest(), "row_count": len(records),
@@ -198,15 +201,26 @@ class CanonicalPartitionStore:
     def __init__(self, root: str | Path) -> None:
         self.root = Path(root)
 
-    def partition_directory(self, dataset: Dataset, asset_type: str, partition_key: str) -> Path:
+    def partition_directory(self, dataset: Dataset, asset_type: str, partition_key: str,
+                            adjustment: Adjustment = Adjustment.NONE) -> Path:
         from datetime import date
         import re
         if date.fromisoformat(partition_key).isoformat() != partition_key or not re.fullmatch(r"[A-Za-z0-9_-]+", asset_type):
             raise ValueError("invalid canonical date or asset type")
-        return self.root / partition_key / dataset.value / asset_type
+        partition = self.root / partition_key / dataset.value / asset_type
+        if dataset is Dataset.DAILY_BAR:
+            adjustment = Adjustment(adjustment)
+            partition = partition / f"adjustment={adjustment.value}"
+        return partition
 
-    def read(self, dataset: Dataset, asset_type: str, partition_key: str, *, allow_pending: bool = False) -> list[BarRecord]:
-        partition = self.partition_directory(dataset, asset_type, partition_key)
+    def read(self, dataset: Dataset, asset_type: str, partition_key: str, *,
+             adjustment: Adjustment | None = None, allow_pending: bool = False) -> list[BarRecord]:
+        if dataset is Dataset.DAILY_BAR and adjustment is None:
+            return [record for adjustment_value in Adjustment
+                    for record in self.read(dataset, asset_type, partition_key,
+                                            adjustment=adjustment_value, allow_pending=allow_pending)]
+        selected_adjustment = Adjustment(adjustment) if adjustment is not None else Adjustment.NONE
+        partition = self.partition_directory(dataset, asset_type, partition_key, selected_adjustment)
         if not allow_pending and (partition / "task-commit.json").exists():
             raise InvalidPartitionError("task publication is pending raw finalization; recover the task first")
         path = partition / "data.parquet"
@@ -219,9 +233,14 @@ class CanonicalPartitionStore:
             manifest = Manifest.load(manifest_path)
         except Exception as exc:
             raise InvalidPartitionError(f"canonical manifest is invalid: {manifest_path}") from exc
+        if dataset is Dataset.DAILY_BAR and manifest.adjustment != selected_adjustment.value:
+            raise InvalidPartitionError(f"daily manifest adjustment differs from its partition: {partition}")
         if not manifest.verify(path):
             raise InvalidPartitionError(f"canonical content does not match manifest: {partition}")
-        return [_mapping_to_bar(item) for item in pq.read_table(path).to_pylist()]
+        records = [_mapping_to_bar(item) for item in pq.read_table(path).to_pylist()]
+        if dataset is Dataset.DAILY_BAR and any(record.adjustment is not selected_adjustment for record in records):
+            raise InvalidPartitionError(f"daily adjustment differs from its partition: {partition}")
+        return records
 
     def publish(
         self,
@@ -239,8 +258,21 @@ class CanonicalPartitionStore:
         failure_hook: Callable[[str], None] | None = None,
         replace_instrument_ids: frozenset[str] | None = None,
         replace_adjustment: Adjustment | None = None,
+        adjustment: Adjustment | None = None,
     ) -> PublishResult:
-        partition = self.partition_directory(dataset, asset_type, partition_key)
+        incoming = list(new_records)
+        if dataset is Dataset.DAILY_BAR:
+            record_adjustments = {record.adjustment for record in incoming}
+            if adjustment is None:
+                if len(record_adjustments) > 1:
+                    raise ValueError("daily publication must contain one adjustment")
+                adjustment = next(iter(record_adjustments), Adjustment.NONE)
+            adjustment = Adjustment(adjustment)
+            if any(record.adjustment is not adjustment for record in incoming):
+                raise ValueError("daily records do not match publication adjustment")
+        else:
+            adjustment = Adjustment.NONE
+        partition = self.partition_directory(dataset, asset_type, partition_key, adjustment)
         partition.mkdir(parents=True, exist_ok=True)
         marker = partition / "task-commit.json"
         if marker.exists():
@@ -248,13 +280,14 @@ class CanonicalPartitionStore:
             if json.loads(marker.read_text(encoding="utf-8"))["task_id"] != run_id:
                 raise InvalidPartitionError("another task publication is pending")
         with PartitionLock(partition / ".publish.lock", recover_stale=marker.exists()):
-            existing = self.read(dataset, asset_type, partition_key, allow_pending=True)
+            existing = self.read(dataset, asset_type, partition_key, adjustment=adjustment,
+                                 allow_pending=True)
             if replace_instrument_ids is not None:
                 if replace_adjustment is None:
                     raise ValueError("scoped replacement requires an adjustment")
                 existing = [record for record in existing if not (
                     record.instrument_id in replace_instrument_ids and record.adjustment is replace_adjustment)]
-            merged, conflicts, quarantined = _merge(existing, list(new_records))
+            merged, conflicts, quarantined = _merge(existing, incoming)
             invalid = [record for record in merged if not validate_bar(record).valid]
             if invalid:
                 raise ValueError(f"refusing to publish {len(invalid)} invalid canonical records")
@@ -321,6 +354,7 @@ class CanonicalPartitionStore:
                 quarantined_count=total_quarantined,
                 item_statuses={key: value.value for key, value in resolved_item_statuses.items()},
                 source_providers=resolved_source_providers,
+                adjustment=adjustment.value,
             )
             manifest.write_atomic(temp_manifest)
             if not manifest.verify(temp_data):

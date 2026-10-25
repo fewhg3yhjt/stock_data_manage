@@ -65,9 +65,9 @@ node provider_validation/tests/build_interface_coverage_workbook.mjs --formal-sp
 
 股票与ETF名单的实现、分类、北交所及上交所ETF目录接入见 [证券名单来源](security-catalog.md)。现有Excel与配套JSON保留上次导出快照；新增输入与字段变化以模块说明及YAML为准，不将旧表视为已核准当前全量证券。10月9日的7267条正式证券名单已发布于 `data/canonical/2026-10-09/security_master/`，原响应位于 `data/raw/2026-10-09/`，验收索引在 `data/task_workspace/_checks/security-release-20261012/`。已有接口可行性响应只读留存。
 
-日线已完成8只证券2026-10-09/newfqkline精确在线资格与正式发布，尚未取得全市场资格。现有腾讯Provider现已按用户确认接入两个窗口接口，保留输入ID `ASTOCK-002-daily`，能力版本为 `tencent-window-input-v2`。`config.api=fqkline` 是原接口及已有任务默认行为，仍排除北交所；显式 `config.api=newfqkline` 使用已验证的proxy主机，支持北交所，原响应和10/11列来源行完整保留，字段映射只使用请求日期内的记录。日期重复、异常行结构、空调整列表、请求日期内没有数据或640条不能覆盖请求历史时明确失败。不自动切换另一个接口，原分钟和快照适配器不改变。原生对照见 [请求对照](../../tmp/daily-next-stage-20261012/native-comparison.json)。
+日线已有8只证券2026-10-09/newfqkline前复权在线资格与正式发布，但尚未取得全市场资格。`ASTOCK-002-daily` 当前适配三种口径：`collect-task` 指定不复权 `adjustment=none` 且单元未指定 `api` 时，入口自动配对 `adjust=none`、`api=kline`；直接使用 `collect-input` 时仍须显式配对。腾讯不复权请求 `/appstock/app/kline/kline` 最近1024条并读取 `day`；前复权、后复权分别读取 `qfqday`、`hfqday`，沿用 `fqkline/newfqkline`。来源行保留，规范候选只选择请求日期内记录；最近1024条之外的旧窗口明确报截断。默认仍为 `qfq` 和原 `fqkline`，保持旧任务行为。三种口径均有单证券日期的接口探测，但不复权和后复权尚未取得生产路由资格，字段单位也未扩展认证。API 与口径不匹配、接口参数拒绝、日期重复、异常结构和窗口截断均明确失败；不自动切换接口，原分钟和快照适配器不改变。原生对照见 [请求对照](../../tmp/daily-next-stage-20261012/native-comparison.json)。
 
-参数来源在 `config/providers.yaml`，标准字段沿用 `config/datasets/daily_bar.yaml`，位置映射在 `config/normalization/daily_bar.yaml`：前6列仍为日期、开、收、高、低、成交量，新增接口成交额位置8仅保留候选映射；单位尚未独立核验，标准volume/amount保持空值。实际day/qfqday标签保存于来源行，不因一致性样本推定任意除权情形。旧原响应不改写，新任务的参数哈希和代码资格须重新核验。7只已独立验证的证券、接口及日期由verified_unit_scopes选择倍率；其他记录保持未认证字段为空，见下文。
+参数来源在 `config/providers.yaml`，标准字段沿用 `config/datasets/daily_bar.yaml`，位置映射在 `config/normalization/daily_bar.yaml`：前6列仍为日期、开、收、高、低、成交量；不复权接口不含成交额字段，复权接口的位置8也仅保留候选映射。单位未独立核验时，标准volume/amount保持空值。实际 `day/qfqday/hfqday` 序列标识保存在来源行和采集报告中，不因一致性样本推定任意除权情形。旧原响应不改写，新任务的参数范围和代码资格须重新核验。已认证倍率仍严格限于 `verified_unit_scopes` 列明的来源与日期；其他记录保持未认证字段为空，见下文。
 
 单接口或显式任务单元通过现有context传递：
 

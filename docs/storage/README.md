@@ -1,6 +1,6 @@
 # 运行数据目录与归档
 
-本文记录 **2026-10-14 核对的现有实现**。示例取自数据日期 `2026-10-09` 的已发布证券名单及其 BaoStock 来源文件；本机业务文件不随文档复制。文末精简方向尚未实施，不是新的运行规则。
+本文记录 **2026-10-25 核对的现有实现**。示例取自数据日期 `2026-10-09` 的已发布证券名单及其 BaoStock 来源文件；本机业务文件不随文档复制。历史文件保持原路径；新生成的原始响应和 SDK 证据文件使用可读名称，完整 SHA-256 仍记录在清单中。
 
 阅读入口：[文件名与校验值](#文件名与校验值)、[原响应实例](#原响应实例)、[来源工作文件](#来源工作文件)、[任务文件](#任务文件)、[正式数据与数据库](#正式数据与数据库)、[重复内容与待实施方向](#重复内容与待实施方向)。运行命令、重做和进度规则见 [任务流程](../pipeline/collection-tasks.md)，本文解释实际落盘文件。
 
@@ -13,8 +13,8 @@ data/
 ├── raw/
 │   ├── _tmp/<数据日期>/<来源>/<接口>/   # 日期已确定、流程未完成
 │   └── <数据日期>/<来源>/<接口>/        # 完整流程成功后的原响应
-│       ├── bodies/<SHA256>.bin
-│       ├── manifest.<请求标识>.ndjson   # 一个请求范围的响应与字节引用
+│       ├── bodies/<数据日期>_<输入标识>_<证券/日期/口径>_<采集时刻>.bin
+│       ├── manifest.<可读请求标识>.ndjson # 一个请求范围的响应与字节引用
 │       └── manifest.ndjson             # 本接口请求清单索引
 ├── task_workspace/
 │   ├── <数据日期>/<数据集>/
@@ -28,7 +28,7 @@ data/
 │   └── _locks/                         # 既有文件锁
 ├── canonical/<数据日期>/
 │   ├── security_master/{data.parquet,manifest.json}
-│   └── daily_bar/<资产类型>/{data.parquet,manifest.json}
+│   └── daily_bar/<资产类型>/adjustment=<none|forward|backward>/{data.parquet,manifest.json}
 ├── task_archive/
 │   ├── _raw_evidence/<清单哈希>/        # 发布引用的不可变原响应
 │   ├── _raw_audit/<审计标识>/           # 被替换或损坏的原响应证据
@@ -39,21 +39,21 @@ data/
 
 不增加任务ID、范围哈希或 `full_market` 目录层。`security_master` 表示证券主数据，`security_snapshot` 表示来源证券快照；`bse`、`sse` 分别是北交所、上交所数据来源。定义和中文说明位于 `config/providers.yaml`、`config/collection.yaml`、`config/datasets/` 与 `config/normalization/`。
 
-同接口可能请求不同证券、窗口、粒度或复权。文件名使用证券代码或 `all` 加参数指纹区分，例如 `manifest.sh600519-<指纹>.ndjson`。来源文件使用相同标识：`<标识>.normalized.parquet`、`<标识>.report.json`、`<标识>.manifest.json` 等。指纹只区分请求内容，不代表版本；完整参数保存在清单与来源报告中。接口层 `manifest.ndjson` 是索引，响应事件位于其指向的各请求清单。
+同接口可能请求不同证券、窗口、粒度或复权。新请求文件名使用输入标识及可读参数区分，例如 `manifest.ASTOCK-002-daily_symbol-sh600519_start-date-2026-10-01_end-date-2026-10-23_adjustment-qfq.ndjson`；较长的单值参数会缩短显示，列表参数显示条数和首尾项，完整值仍保存在 manifest。新正文文件名包含数据日期、输入标识、证券/日期/复权口径及采集时刻，来源和接口由父目录标明。名称不嵌入摘要。此前生成的带参数指纹文件名保留原样。接口层 `manifest.ndjson` 是索引，响应事件位于其指向的各请求清单。
 
-日线复权由记录字段和业务主键区分，没有新增复权目录；Bar存储统一使用 `<日期>/<数据集>/<资产类型>/`。既有分钟热数据 `data/hot/minute_hot.db` 保留。证券名单不再新写 `security_master/current`，通过既有元数据选择不晚于目标日的最新合格分区。
+日线按复权口径独立存储和发布，路径为 `<日期>/daily_bar/<资产类型>/adjustment=<none|forward|backward>/`；对应规范字段值分别是 `none`、`forward`、`backward`，来源参数 `qfq/hfq` 在规范化时映射到后两者。每个口径有独立的 `data.parquet`、`manifest.json`、锁和恢复状态。`CanonicalPartitionStore.read` 指定口径时只读该分区，未指定时聚合读取三个口径。旧版混合日线目录不自动迁移，也不作为新版读取回退；旧元数据中的混合分区状态保留为 `legacy_mixed`，不参与新口径查询。清理旧数据目录后再以新结构重新生成。既有分钟热数据 `data/hot/minute_hot.db` 保留。证券名单不再新写 `security_master/current`，通过既有元数据选择不晚于目标日的最新合格分区。
 
 ## 文件名与校验值
 
 | 标识 | 实际例子 | 含义 |
 |---|---|---|
-| 文件内容校验值 | `751c5d0399f8558e99d517a9c06a6d2ac2d3e613afb342a0f2dbb4e1032b47bc` | 文件字节的 SHA-256，当前 raw 用它作为 `.bin` 文件名 |
-| 请求标识 | `all-3f363376e304` | `all` 表示未限定单只证券；后缀由输入标识、脱敏请求参数计算，取摘要前12位，区分请求范围 |
+| 文件内容校验值 | `751c5d0399f8558e99d517a9c06a6d2ac2d3e613afb342a0f2dbb4e1032b47bc` | 文件字节的完整 SHA-256，写入 manifest 用于完整性校验；新生成的原始文件名不含摘要 |
+| 请求标识 | `ASTOCK-002-daily_symbol-sh600519_adjustment-qfq` | 输入标识及可读请求参数，用于区分请求范围；不含摘要 |
 | 范围标识 | `scope-ba08f4d3f1725a05` | 绑定参数的确定性 JSON 摘要前16位，用于执行记录，不是响应内容摘要 |
 
-命名实现见 [storage/raw.py](../../src/storage/raw.py) 的 `request_manifest_name`，摘要实现见 [storage/integrity.py](../../src/storage/integrity.py)。`manifest.all-3f363376e304.ndjson` 和 `all-3f363376e304.normalized.parquet` 关联同一请求范围；后缀不是版本号、日期或执行次数。
+请求清单命名实现见 [storage/raw.py](../../src/storage/raw.py) 的 `request_manifest_name`；新 HTTP 响应正文命名见同文件的 `response_body_path`，SDK 及派生响应正文命名见 `_archived_body_path`，均在 `write_bytes` 保存。摘要实现见 [storage/integrity.py](../../src/storage/integrity.py)，仅作为完整性元数据，不放入新文件名。下方 `manifest.all-3f363376e304.ndjson` 是历史示例，保留其原名。
 
-校验值根据内容计算，不是根据文件名计算：仅改名不改变它，改内容后须重新核验。该例 `751c5d03…bin` 已重新计算 SHA-256，与文件名及清单一致。校验只能发现内容变化，不能证明价格、证券身份、日期或市场覆盖正确；也不要求文件名必须是摘要。
+校验值根据内容计算，不是根据文件名计算：仅改名不改变它，改内容后须重新核验。已有哈希命名的历史文件保持原名；新生成的 HTTP 响应、SDK 函数快照及其他原始正文文件均使用日期、来源、接口、请求范围或用途、采集时刻等可读信息命名，完整 SHA-256 仅保存在 manifest 中。校验只能发现内容变化，不能证明价格、证券身份、日期或市场覆盖正确。
 
 `.json` 是完整 JSON 文档或数组；`.ndjson` 每行一条 JSON，不能整体当一个 JSON 文档读取；`.parquet` 是有字段类型的列式表，不能当文本查看；`.bin` 是按字节保存，不代表特定业务格式。本例数据 `.bin` 为 JSON，SDK 快照为源码文本，其他接口可能是 HTML 等内容，须结合清单的类型与编码判断。
 
@@ -76,7 +76,7 @@ raw/2026-10-09/baostock/typed_security_universe/
     └── 3fcfcedd…bin   logout 源码快照
 ```
 
-省略号只用于展示，实际文件名是完整64位摘要。这八份文件不是八份证券清单，只有三份为查询结果，另五份为经脱敏的 SDK 函数源码证据，其名字与路径记录于来源工作目录的 `raw_refs.json`。不能把整个 `bodies/` 都称为网络原始响应。
+省略号只用于展示，这些是既有历史文件，实际文件名仍是完整64位摘要。它们不会因新命名规则而迁移或改名。这八份文件不是八份证券清单，只有三份为查询结果，另五份为经脱敏的 SDK 函数源码证据，其名字与路径记录于来源工作目录的 `raw_refs.json`。不能把整个 `bodies/` 都称为网络原始响应。
 
 | 实际查询 | 返回条数 | 范围 |
 |---|---:|---|
@@ -224,7 +224,7 @@ raw 在解析前写入，恢复、解析和最终提交读取。全流程成功�
 
 ## 正式数据与数据库
 
-正式路径为 `canonical/<日期>/security_master/{data.parquet,manifest.json}`、`canonical/<日期>/daily_bar/<资产类型>/{data.parquet,manifest.json}`。前者是业务规范表，后者说明该表的范围、来源和完整性。名单 [正式清单](../../data/canonical/2026-10-09/security_master/manifest.json) 的实际节选：
+正式路径为 `canonical/<日期>/security_master/{data.parquet,manifest.json}`、`canonical/<日期>/daily_bar/<资产类型>/adjustment=<口径>/{data.parquet,manifest.json}`。前者是业务规范表，后者说明该口径数据的范围、来源和完整性。名单 [正式清单](../../data/canonical/2026-10-09/security_master/manifest.json) 的实际节选：
 
 ```json
 {
@@ -259,11 +259,10 @@ raw 在解析前写入，恢复、解析和最终提交读取。全流程成功�
 
 ## 重复内容与待实施方向
 
-以下方向尚未实施，本文不授权自动清理，不改变现有代码、字段或路由资格：
+以下方向尚未实施，本文不授权自动清理，不改变现有代码、字段或路由资格：原始证据文件的可读命名已实现，历史哈希命名文件保留原位。
 
 | 当前事实 | 讨论中的精简方向 |
 |---|---|
-| raw 数据与 SDK 源码混放，摘要充当文件名 | 可读的接口/证券/窗口/复权文件名，摘要留在清单；源码按版本集中保留 |
 | raw、source-rows、parsed-rows 重复保存记录 | 从 raw 转换到来源汇总表，不长期保留每层 JSON |
 | 标准候选同时保存 JSON 和逐证券 Parquet | 保留来源汇总 Parquet，不逐证券生成八份工作文件 |
 | report、quality、raw_refs、工作 manifest 重复部分内容 | 合并到原响应清单、轻量断点、任务摘要 |

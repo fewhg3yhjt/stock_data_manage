@@ -56,8 +56,46 @@ def read_rows(result_set: object) -> list[dict[str, object]]:
     fields = getattr(result_set, "fields", [])
     fields = fields if isinstance(fields, list) else str(fields).split(",")
     rows: list[dict[str, object]] = []
-    while result_set.next():
-        rows.append(dict(zip(fields, result_set.get_row_data())))
+    while True:
+        page_before = getattr(result_set, "cur_page_num", None)
+        page_rows = getattr(result_set, "data", None)
+        page_row_count = len(page_rows) if isinstance(page_rows, list) else None
+        try:
+            has_row = result_set.next()
+        except Exception as exc:
+            raise ProviderContractError(
+                f"BaoStock pagination failed while reading page {page_before}: {type(exc).__name__}: {exc}",
+                FailureClass.CONNECTION,
+                retryable=True,
+            ) from exc
+
+        if has_row:
+            rows.append(dict(zip(fields, result_set.get_row_data())))
+            continue
+
+        error_code = getattr(result_set, "error_code", None)
+        error_msg = getattr(result_set, "error_msg", "")
+        if error_code != "0":
+            raise ProviderContractError(
+                f"BaoStock pagination failed after page {page_before}: {error_code} {error_msg}",
+                FailureClass.CONNECTION,
+                retryable=True,
+            )
+
+        page_after = getattr(result_set, "cur_page_num", None)
+        page_size = getattr(result_set, "per_page_count", None)
+        try:
+            full_page = page_row_count is not None and int(page_size) > 0 and page_row_count >= int(page_size)
+        except (TypeError, ValueError):
+            full_page = False
+        if full_page and page_after == page_before:
+            raise ProviderContractError(
+                f"BaoStock pagination stopped after full page {page_before} without advancing; "
+                "the SDK may have hidden a failed or empty next-page response",
+                FailureClass.CONNECTION,
+                retryable=True,
+            )
+        break
     return rows
 
 
@@ -179,7 +217,7 @@ def captured_sdk_queries(store, *, mode, replay_manifest, evidence_roots, scope,
                 events.append(failure)
                 raise ValueError("SDK payload secret retention suppressed; only hash/metadata saved")
             saved = store.write_bytes(payload, dataset="sdk_response", provider="baostock", endpoint=name,
-                                      fetched_at=datetime.now(timezone.utc), attempt_id="sdk-payload", content_addressed=True)
+                                      fetched_at=datetime.now(timezone.utc), attempt_id="sdk-payload", body_archive=True)
             outcome = metadata.get("outcome")
             error = outcome.get("error_code", "0") if isinstance(outcome, dict) else "0"
             event = {"event": "source_payload", "provider": "baostock", "endpoint": name, "method": name,
@@ -251,7 +289,7 @@ def captured_sdk_queries(store, *, mode, replay_manifest, evidence_roots, scope,
             if endpoint in selected:
                 event = selected[endpoint]
                 reference = store.write_bytes(payload, dataset="sdk_derived", provider=provider, endpoint=endpoint,
-                                              fetched_at=datetime.now(timezone.utc), attempt_id="sdk-derived", content_addressed=True)
+                                              fetched_at=datetime.now(timezone.utc), attempt_id="sdk-derived", body_archive=True)
                 store.append_event({"event": "sdk_derived", "endpoint": endpoint, "code_version": code_version,
                                     "fetched_at_utc": datetime.now(timezone.utc).isoformat(), "row_count": metadata["row_count"],
                                     "body_storage": reference.path.relative_to(store.root).as_posix(), "body_sha256": reference.content_hash,

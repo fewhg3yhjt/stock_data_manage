@@ -92,7 +92,7 @@ def _input_data_date(context, replay_manifest, *, provider, endpoint, data_date=
 
 def collect_input(*, input_id, context, config_root, output_root=None, data_root=None, mode="replay", replay_manifest=None,
                   evidence_root=None, fields=None, client=None, pacer=None, task_unit=None, force_fetch=False, data_date=None,
-                  retained_asset_type=None, progress=None):
+                  retained_asset_type=None, security_asset_type=None, progress=None):
     """One explicit input, candidate output only. Existing Bar publication flows are unchanged."""
     import json
     import re
@@ -188,8 +188,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                   Path(__file__).parents[1] / "providers/cninfo/profile.py",
                   Path(__file__).parents[1] / "providers/baostock/session.py"]
     code_version = hashlib.sha256(b"".join(path.read_bytes() for path in code_files)).hexdigest()
-    # Response filenames contain a full SHA-256 plus a temporary suffix. Keep the
-    # run component short for Windows paths; UTC times remain in every evidence record.
+    # Keep the run component short for Windows paths; UTC times remain in every evidence record.
     run_id = uuid4().hex[:12]
     # The input identity already lives in the source directory and manifest.
     # Avoid repeating it in runtime paths near the Windows filename limit.
@@ -421,7 +420,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                     import re
                     snapshot = re.sub(rb'''(?i)((?:password|user_id|token|api_key)\s*=\s*["'])[^"']*(["'])''', rb'\1<redacted>\2', source)
                     sdk_ref = raw_store.write_bytes(snapshot, dataset="source_code", provider=contract.provider, endpoint=contract.endpoint,
-                        fetched_at=datetime.now(timezone.utc), attempt_id="sdk-function", content_addressed=True)
+                        fetched_at=datetime.now(timezone.utc), attempt_id=name, body_archive=True)
                     report["sdk_dependency"]["dependencies"].append({"name": name, "path": relative_file(sdk_ref.path),
                         "sha256": sdk_ref.content_hash, "original_source_sha256": digest, "redacted": snapshot != source})
                     code_version = hashlib.sha256((code_version + name + digest).encode()).hexdigest()
@@ -467,7 +466,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                 sdk_snapshot = re.sub(rb'''(?i)(["'](?:ut|token|access_token|api_key|password|secret|cookie)["']\s*:\s*["'])[^"']*(["'])''',
                                       rb'\1<redacted>\2', sdk_source)
                 sdk_ref = raw_store.write_bytes(sdk_snapshot, dataset="source_code", provider=contract.provider,
-                    endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="sdk-function", content_addressed=True)
+                    endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id=function.__name__, body_archive=True)
                 report["sdk_dependency"] = {"version": getattr(provider.client, "__version__", "injected_fixture"),
                     "function": function.__name__, "source_path": relative_file(sdk_ref.path), "sha256": sdk_ref.content_hash,
                     "original_source_sha256": sdk_source_hash, "redacted": sdk_snapshot != sdk_source}
@@ -504,7 +503,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                         if helper is not None:
                             source = inspect.getsource(helper).encode("utf-8")
                             ref = raw_store.write_bytes(source, dataset="source_code", provider=contract.provider,
-                                endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="sdk-retry-helper", content_addressed=True)
+                                endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id=helper.__name__, body_archive=True)
                             report["sdk_dependency"]["dependencies"].append({"name": helper.__name__,
                                 "path": relative_file(ref.path), "sha256": ref.content_hash})
                             code_version = hashlib.sha256((code_version + ref.content_hash).encode()).hexdigest()
@@ -553,7 +552,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                         if dependency is not None:
                             body=inspect.getsource(dependency).encode("utf-8")
                             ref=raw_store.write_bytes(body,dataset="source_code",provider=contract.provider,endpoint=contract.endpoint,
-                                fetched_at=datetime.now(timezone.utc),attempt_id="sdk-tls-adapter",content_addressed=True)
+                                fetched_at=datetime.now(timezone.utc),attempt_id=dependency.__name__,body_archive=True)
                             report["sdk_dependency"]["dependencies"].append({"name":"TLSAdapter","path":relative_file(ref.path),"sha256":ref.content_hash})
                             code_version=hashlib.sha256((code_version+ref.content_hash).encode()).hexdigest()
                     if is_factor:
@@ -583,7 +582,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                         snapshot = re.sub(rb'''(?i)(["'](?:ut|token|access_token|api_key|password|secret)["']\s*:\s*["'])[^"']*(["'])''',
                                           rb'\1<redacted>\2', body)
                         ref = raw_store.write_bytes(snapshot, dataset="source_code", provider=contract.provider, endpoint=contract.endpoint,
-                                                   fetched_at=datetime.now(timezone.utc), attempt_id="sdk-dependency", content_addressed=True)
+                                                   fetched_at=datetime.now(timezone.utc), attempt_id=name, body_archive=True)
                         report["sdk_dependency"]["dependencies"].append({"name": name, "path": relative_file(ref.path),
                             "sha256": ref.content_hash, "original_source_sha256": digest, "redacted": snapshot != body})
                         code_version = hashlib.sha256((code_version + name + digest).encode()).hexdigest()
@@ -644,7 +643,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                         if input_id == 'SECURITY-SZSE-ETF-HISTORY-001':
                             helper_source = inspect.getsource(function.__globals__['_parse_date']).encode('utf-8')
                             helper_ref = raw_store.write_bytes(helper_source, dataset='source_code', provider=contract.provider,
-                                endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id='sdk-date-helper', content_addressed=True)
+                                endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id='sdk-date-helper', body_archive=True)
                             report['sdk_dependency']['dependencies'] = [{'name': '_parse_date', 'path': relative_file(helper_ref.path), 'sha256': helper_ref.content_hash}]
                             code_version = hashlib.sha256((code_version + helper_ref.content_hash).encode()).hexdigest()
                         report['code_version'] = code_version
@@ -1017,12 +1016,24 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                 mapping_context["trade_date"] = parameters["date"]
             if input_id.startswith("ASTOCK-002"):
                 from ..providers.tencent.daily import tencent_symbol
-                symbol = tencent_symbol(parameters["code"], allow_bse=parameters.get("api") == "newfqkline")
+                symbol = tencent_symbol(parameters["code"], allow_bse=parameters.get("api") in {"kline", "newfqkline"},
+                                        asset_type=security_asset_type)
                 exchange = {"sh": "XSHG", "sz": "XSHE", "bj": "BSE"}[symbol[:2]]
+                adjustment = "none"
+                if input_id == "ASTOCK-002-daily":
+                    parameter_name = rule.get("adjustment_parameter", "adjust")
+                    adjustment_mapping = rule.get("adjustment_mapping", {})
+                    requested_adjustment = parameters.get(parameter_name)
+                    adjustment = adjustment_mapping.get(requested_adjustment)
+                    if adjustment is None or adjustment != fetched.mapping_context.get("adjustment"):
+                        raise NormalizationError("requested adjustment and returned series do not match the normalization contract")
                 mapping_context.update(instrument_id=f"{exchange}:{symbol[2:]}",
-                                       adjustment="forward" if input_id.endswith("daily") else "none")
+                                       adjustment=adjustment)
                 if input_id == "ASTOCK-002-daily":
                     report.update(source_metadata=_json_value(fetched.mapping_context),
+                        requested_adjustment=parameters[parameter_name],
+                        normalized_adjustment=adjustment,
+                        source_bar_key=fetched.mapping_context.get("source_bar_key"),
                         original_row_count=len(source_rows), selected_row_count=len(mapping_rows),
                         coverage_basis="requested dates selected from returned source rows; not independently complete history")
             rows = [Normalizer.normalize_fields(row, rule=rule, fields=schema_fields,
@@ -1264,6 +1275,55 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
     units = _task_units(definition, paths)
     if not units or len({unit["key"] for unit in units}) != len(units):
         raise ValueError("task requires nonempty, unique source units")
+    if dataset == "daily_bar":
+        from ..domain import Adjustment
+        universe_asset_types = {"all_stock": "stock", "all_etf": "etf", "all_index": "index"}
+        universe = definition.get("universe")
+        if universe in universe_asset_types:
+            expected_asset_type = universe_asset_types[universe]
+            declared_asset_type = definition.get("asset_type")
+            if declared_asset_type is not None and declared_asset_type != expected_asset_type:
+                raise ValueError("daily task asset_type conflicts with its universe")
+            definition = {**definition, "asset_type": expected_asset_type}
+        unit_asset_types = {unit["asset_type"] for unit in units if unit.get("asset_type")}
+        if len(unit_asset_types) > 1:
+            raise ValueError("daily task units must use one asset_type")
+        if unit_asset_types:
+            unit_asset_type = next(iter(unit_asset_types))
+            if definition.get("asset_type") not in (None, unit_asset_type):
+                raise ValueError("daily task asset_type conflicts with its units")
+            definition = {**definition, "asset_type": unit_asset_type}
+        token_to_adjustment = {"none": Adjustment.NONE, "qfq": Adjustment.FORWARD, "hfq": Adjustment.BACKWARD}
+        adjustment_to_token = {value: key for key, value in token_to_adjustment.items()}
+        declared_adjustment = definition.get("adjustment")
+        if declared_adjustment is not None:
+            task_adjustment = Adjustment(declared_adjustment)
+        else:
+            configured_tokens = {unit.get("context", {}).get("config", {}).get("adjust")
+                                 for unit in units if unit.get("input_id") == "ASTOCK-002-daily"
+                                 and unit.get("context", {}).get("config", {}).get("adjust") is not None}
+            if len(configured_tokens) > 1 or any(token not in token_to_adjustment for token in configured_tokens):
+                raise ValueError("all daily task units must use one supported adjustment")
+            task_adjustment = token_to_adjustment[next(iter(configured_tokens))] if configured_tokens else Adjustment.NONE
+        task_token = adjustment_to_token[task_adjustment]
+        for unit in units:
+            if unit.get("input_id") != "ASTOCK-002-daily":
+                continue
+            context_config = unit.setdefault("context", {}).setdefault("config", {})
+            configured_token = context_config.get("adjust")
+            if configured_token is not None and configured_token != task_token:
+                raise ValueError("daily task adjustment conflicts with its source request configuration")
+            context_config["adjust"] = task_token
+            configured_api = context_config.get("api")
+            if task_token == "none":
+                if configured_api is not None and configured_api != "kline":
+                    raise ValueError("daily task adjustment=none requires api=kline")
+                context_config["api"] = "kline"
+            elif configured_api == "kline":
+                raise ValueError("api=kline requires daily task adjustment=none")
+            elif configured_api is None:
+                context_config["api"] = "fqkline"
+        definition = {**definition, "adjustment": task_adjustment.value}
     for unit in units:
         calendar = unit["context"].get("calendar", {})
         if "trading_dates" in calendar:
@@ -1420,6 +1480,8 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
                 options.update(input_id=unit["input_id"], context=unit["context"], config_root=config_root,
                     data_root=paths["data_root"], mode=mode, replay_manifest=replay,
                     task_unit=(task_id, key), force_fetch=force, data_date=day.isoformat())
+                if dataset == "daily_bar":
+                    options["security_asset_type"] = unit.get("asset_type", definition.get("asset_type", "stock"))
                 if mode == 'retained':
                     options['retained_asset_type'] = definition.get('asset_type')
                 if collector is None:
@@ -1614,7 +1676,7 @@ def _save_task_summary(state, paths, metadata):
 
 
 def _task_units(definition, paths):
-    """Resolve all_stock/all_etf against published master once, then freeze in the task."""
+    """Resolve a typed security universe against published master once, then freeze it."""
     import json
     from datetime import date
     from ..storage.metadata import MetadataStore
@@ -1642,9 +1704,10 @@ def _task_units(definition, paths):
         raise ValueError("published security master is unavailable or pending")
     day = date.fromisoformat(definition["trade_date"])
     selected = []
-    wanted = "etf" if definition.get("universe") == "all_etf" else "stock"
-    if definition.get("universe") not in {"all_stock", "all_etf"}:
-        raise ValueError("supported dynamic universes are all_stock and all_etf")
+    universe_asset_types = {"all_stock": "stock", "all_etf": "etf", "all_index": "index"}
+    wanted = universe_asset_types.get(definition.get("universe"))
+    if wanted is None:
+        raise ValueError("supported dynamic universes are all_stock, all_etf, and all_index")
     for row in pq.read_table(source).to_pylist():
         if row["asset_type"] != wanted or row["status"] == "prelisted":
             continue
@@ -1652,7 +1715,7 @@ def _task_units(definition, paths):
             continue
         prefix = {"XSHG": "sh", "XSHE": "sz", "BSE": "bj"}[row["exchange"]]
         symbol = prefix + row["symbol"]
-        selected.append({"key": symbol, "symbol": symbol, "input_id": definition["input_id"],
+        selected.append({"key": symbol, "symbol": symbol, "asset_type": wanted, "input_id": definition["input_id"],
             "context": {"request": {"symbol": symbol, "start_date": day.isoformat(), "end_date": day.isoformat()}}})
         if "config" in definition:
             if not isinstance(definition["config"], dict):
@@ -1787,14 +1850,21 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
         prior = None
         previous_path = previous_dir / "data.parquet"
         policy = yaml.safe_load((config_root / "datasets/security_master.yaml").read_text(encoding="utf-8"))
-        allowed_groups = {tuple(pair) for pair in policy["dataset"]["publication"]["required_groups"]}
+        publication_policy = policy["dataset"]["publication"]
+        allowed_groups = {
+            tuple(pair)
+            for pair in (
+                publication_policy["required_groups"]
+                + publication_policy.get("allowed_additional_groups", [])
+            )
+        }
         definition = state["definition"]
         if "required_groups" in definition:
             required_groups = {tuple(pair) for pair in definition["required_groups"]}
         else:
             exchanges = set(definition.get("required_exchanges", ["XSHG", "XSHE", "BSE"]))
             assets = set(definition.get("required_asset_types", ["stock", "etf"]))
-            if not exchanges <= {"XSHG", "XSHE", "BSE"} or not assets <= {"stock", "etf"}:
+            if not exchanges <= {"XSHG", "XSHE", "BSE"} or not assets <= {"stock", "etf", "index"}:
                 raise ValueError("unsupported security coverage scope")
             required_groups = {pair for pair in allowed_groups if pair[0] in exchanges and pair[1] in assets}
         if not required_groups or not required_groups <= allowed_groups:
@@ -2015,6 +2085,7 @@ def _finish_task_commit(state, paths, metadata, failure_hook=None, progress=None
             expected_count=commit["expected_count"], run_id=state["task_id"],
             item_statuses={key: ItemStatus(value) for key, value in commit["item_statuses"].items()},
             replace_instrument_ids=frozenset(commit["replace_ids"]), replace_adjustment=Adjustment(commit["adjustment"]),
+            adjustment=Adjustment(commit["adjustment"]),
             failure_hook=failure_hook)
         manifest_path, manifest = result.manifest_path, result.manifest
         if result.quarantined_keys:

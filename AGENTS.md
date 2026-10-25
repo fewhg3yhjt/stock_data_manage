@@ -13,8 +13,19 @@
 - Stage only files changed for the current request. Never stage `.env` files, credentials, tokens, private keys, or unrelated user changes.
 - If unrelated pre-existing changes are present, leave them untouched and do not include them in the commit.
 - Create a focused commit after verification. Use a concise message describing the change.
-- The repository `post-commit` hook automatically pushes successful commits on `main` to `origin/main`. Do not run a second push unless the hook fails.
+- Once the user explicitly approves a defined change or confirms its implementation scope, complete and verify that scope, then commit and push it without asking for another approval. This authorization covers only the approved scope; leave unrelated or unverified working-tree changes untouched.
+- Check whether the repository has an active `post-commit` push hook. If it does, do not push a second time unless the hook fails. If no such hook is active, push the authorized commit to its intended remote directly.
 - If commit or push fails, preserve the local changes and report the exact failure; do not create duplicate commits or silently retry with a different remote.
+
+## 需求与方案思考
+
+- 讨论需求、报告、日志、数据产物或架构改造时，先回答“是什么、为什么、怎么样”：说明对象和用途、当前问题及必要性、拟议实现及其理由。
+- 明确谁会读取或消费产物、由什么入口生成、与现有报告/原始证据/运行日志的关系，以及它解决的具体问题。先检查现有机制是否已经满足需求，避免只因某种格式或抽象可用就新增文件、服务或流程。
+- 项目运行时的标识和行为必须由项目自身的任务、配置及输入定义；不得让采集、存储、日志或恢复依赖 Codex/Agent 对话标题、线程标识或其他协作环境元数据，除非用户明确提出并批准了产品级接口需求。
+- 评估方案本身是否必要，并说明成本、重复信息、维护负担和验证方式。若现有产物足够，应直接说明无需新增；若保留机器记录并新增人读报告，必须指出各自独立消费者及为什么不能由现有记录承担，避免形成两份互相漂移的事实来源。
+- 报告的组织粒度应由用户任务和实际阅读场景决定。不同 Provider 有不同接口不自动意味着每个 Provider 都要一份 Markdown；说明采用单份任务报告、按来源分节或独立报告的依据。
+- 区分原始来源响应、结构化机器审计记录、面向人的报告和执行日志。说明每类记录保存什么、供谁使用、是否已经存在；不得把文件指纹或机器字段称作业务数据或运行日志。
+- 方案说明按“是什么、为什么、怎么样、必要性与取舍”组织，再列实施范围、验证标准、风险和检查点。没有用户确认时，不把讨论中的方案当作已批准的实施范围。
 
 ## Provider Verification
 
@@ -23,6 +34,7 @@
 - Before parsing, normalizing, filtering, or otherwise transforming a live provider response, persist its exact response bytes. Save a manifest with provider, endpoint, method, sanitized request parameters and headers, request scope/date/window, fetch time, status, response headers/content type/encoding, byte length, and SHA-256. Compressed storage is allowed if the exact original bytes can be recovered and their hash is recorded. If a response contains credentials or secrets, do not persist those values; save a redacted representation or hash, mark the evidence as redacted, and state why exact retention was suppressed.
 - Persist each derived dataset and validation result with the source-response hash, transformation/code version, row counts, coverage denominator, and validation time. Persist transport failures and empty responses as evidence too; distinguish them from a valid empty dataset.
 - Before making a live request, search the evidence archive by provider, endpoint, canonical request parameters, scope/date/window, and code version. Reuse a matching response when it satisfies the requested freshness and completeness requirements; do not repeat calls solely to recreate an artifact or summary.
+- When a request fails before an HTTP response, classify it as a transport failure and leave provider support unresolved. For `ProxyError`, connection-refused, or proxy timeout, inspect the process proxy variables (`HTTP_PROXY`, `HTTPS_PROXY`, `ALL_PROXY`, `NO_PROXY`), the Windows proxy setting, and whether the configured local listener is reachable; record the effective proxy address with credentials redacted. A proxy URL in the environment does not prove a proxy client is listening, and a local proxy failure is not evidence that the provider rejected the endpoint or parameters. Loopback (`127.0.0.1`/`localhost`) is scoped to the current network namespace: an isolated Codex process may not be able to reach a proxy listening on the Windows host. A prior case is recorded in [phase-4-adjustment-probe.md](data/task_workspace/_checks/security-daily-20261023/phase-4-adjustment-probe.md): V2RayN's host listener was reachable from host execution even though isolated execution raised `ProxyError`; its `20171` port is historical evidence, not a current setting. Do not bypass or replace the configured proxy silently; preserve the original transport contract and retry a small sample only after the proxy path is understood or changed.
 - Do not report a capability as verified when only documentation, an HTTP success status, a sample, or an AI-generated summary exists. State the exact tested scope and whether evidence is live, offline, partial, or blocked.
 - Keep raw probe evidence in a persistent, queryable location outside production datasets. Do not automatically delete it as temporary data. Never persist credentials, authorization tokens, private keys, or unredacted secrets in request metadata.
 - A provider adapter existing in code is not evidence that the provider is production-ready.
@@ -50,6 +62,7 @@
 
 ## 文档管理
 
+- 面向人的阶段报告、方案说明和验收结论默认使用 Markdown（`.md`）；JSON、YAML、CSV 等格式用于程序读取或结构化数据。机器可读文件只有在存在明确的人类阅读场景时才配套 Markdown 说明，不因生成 JSON 就机械增加第二份报告；说明其用途、消费者、必要性及文件路径即可。
 - 定期审视设计文档：每个开发阶段收尾，以及架构、目录或需求变更后，检查文档职责、重复内容、过期状态和实现差距；同一主题已经有文档时优先修改原文档，不为每个批次新增长期设计说明。
 - 同一规则只保留一个主要维护位置：总体设计说明模块边界，模块文档说明具体规则，验收文档说明验证标准；其他文档通过链接引用，不复制整段设计或多处维护能力状态。
 - 合并或清理前列明旧文件、独有内容的承接位置、历史结论与原始证据的区别；在用户确认的范围内执行，先保存有效内容及证据引用，再删除被替代文件。存在未确认的语义冲突时记录差异，不借文档清理改变业务规则。

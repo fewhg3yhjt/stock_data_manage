@@ -9,8 +9,9 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from pathlib import Path
 from typing import Any
-from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
+from urllib.parse import parse_qsl, quote, urlencode, urlsplit, urlunsplit
 from datetime import timezone
+from zoneinfo import ZoneInfo
 
 
 _SECRET_NAME = re.compile(r"token|secret|password|api[-_]?key|authorization|cookie|credential|signature|enckey|^sign$|^ut$|^hexin-v$", re.I)
@@ -39,6 +40,53 @@ def sanitized_metadata(value):
     return sanitized_url(value) if isinstance(value, str) and value.startswith(("http://", "https://")) else value
 
 
+def _safe_filename_part(value: object, *, limit: int = 32) -> str:
+    return re.sub(r"[^A-Za-z0-9-]+", "-", str(value)).strip("-")[:limit] or "unknown"
+
+
+def _local_capture_stamp(fetched_at: datetime) -> tuple[str, str]:
+    local = fetched_at.astimezone(ZoneInfo("Asia/Shanghai"))
+    return local.date().isoformat(), local.strftime("%H%M%S%f")
+
+
+def response_body_path(*, scope, fetched_at: datetime) -> Path:
+    """Build a readable, timestamped path for an HTTP body without a digest in its name."""
+    scope = scope if isinstance(scope, dict) else {}
+    parameters = scope.get("parameters") if isinstance(scope.get("parameters"), dict) else scope
+    stamp, clock = _local_capture_stamp(fetched_at)
+    label = [stamp]
+    if scope.get("input_id"):
+        label.append(f"i-{_safe_filename_part(scope['input_id'], limit=18)}")
+    symbols = parameters.get("symbols")
+    symbol = parameters.get("symbol") or parameters.get("code")
+    if symbol:
+        label.append(f"s-{_safe_filename_part(symbol, limit=12)}")
+    elif isinstance(symbols, (list, tuple)) and symbols:
+        label.append(f"s-{len(symbols)}-{_safe_filename_part(symbols[0], limit=8)}-{_safe_filename_part(symbols[-1], limit=8)}")
+    elif symbols:
+        label.append(f"s-{_safe_filename_part(symbols, limit=12)}")
+    trade_date = parameters.get("trade_date") or parameters.get("day")
+    start_date, end_date = parameters.get("start_date"), parameters.get("end_date")
+    if trade_date:
+        label.append(f"d-{_safe_filename_part(trade_date, limit=10)}")
+    elif start_date or end_date:
+        label.append(f"w-{_safe_filename_part(start_date or 'start', limit=10)}-{_safe_filename_part(end_date or 'end', limit=10)}")
+    adjustment = parameters.get("adjustment") or parameters.get("adjust")
+    if adjustment:
+        label.append(f"a-{_safe_filename_part(adjustment, limit=8)}")
+    if len(label) == 1:
+        label.append(_safe_filename_part(scope.get("input_id", "all"), limit=18))
+    label.append(clock[:6])
+    return Path("bodies", "_".join(label) + ".bin")
+
+
+def _archived_body_path(*, dataset: str, provider: str, endpoint: str, attempt_id: str,
+                        fetched_at: datetime, suffix: str) -> Path:
+    stamp, clock = _local_capture_stamp(fetched_at)
+    label = (stamp, provider, endpoint, dataset, attempt_id, clock)
+    return Path("bodies", "_".join(_safe_filename_part(part) for part in label) + f".{suffix}")
+
+
 @dataclass(frozen=True, slots=True)
 class RawObjectRef:
     path: Path
@@ -52,7 +100,7 @@ class RawObjectStore:
     def __init__(self, root: str | Path, *, manifest_name: str = "manifest.ndjson", capture_root: str | Path | None = None,
                  capture_archive_root: str | Path | None = None) -> None:
         self.root = Path(root)
-        if not re.fullmatch(r"manifest(?:\.[A-Za-z0-9_-]+)?\.ndjson", manifest_name):
+        if not re.fullmatch(r"manifest(?:\.[A-Za-z0-9_.%~-]+)?\.ndjson", manifest_name):
             raise ValueError("invalid request manifest name")
         self.manifest = self.root / manifest_name
         self.capture_root = Path(capture_root) if capture_root else None
@@ -79,9 +127,24 @@ class RawObjectStore:
     @staticmethod
     def request_manifest_name(parameters, *, input_id: str) -> str:
         """Different requests share an interface directory, never an active manifest."""
-        from .integrity import row_hash
-        label = re.sub(r"[^A-Za-z0-9_-]", "_", str(parameters.get("symbol") or parameters.get("code") or "all"))[:20]
-        return f"manifest.{label}-{row_hash([input_id, sanitized_metadata(parameters)])[:12]}.ndjson"
+        parameters = sanitized_metadata(parameters)
+        parts = [quote(str(input_id), safe="-_.")]
+        for key, value in sorted(parameters.items()):
+            if isinstance(value, (list, tuple)):
+                first = _safe_filename_part(value[0], limit=12) if value else "empty"
+                last = _safe_filename_part(value[-1], limit=12) if value else "empty"
+                encoded = f"{len(value)}-items-{first}-to-{last}"
+            else:
+                plain = value if isinstance(value, str) else json.dumps(value, ensure_ascii=True, sort_keys=True,
+                                                                         separators=(",", ":"), default=str)
+                encoded = quote(plain, safe="-_.")
+                if len(encoded) > 80:
+                    encoded = f"{encoded[:48]}~{encoded[-20:]}~len{len(encoded)}"
+            parts.append(f"{quote(str(key), safe='-_.')}-{encoded}")
+        label = "_".join(parts)
+        if len(label) > 220:
+            raise ValueError("request scope is too long for a readable manifest filename")
+        return f"manifest.{label}.ndjson"
 
     @staticmethod
     def copy_request(manifest: str | Path, destination: str | Path, *, verify: bool = True) -> Path:
@@ -279,17 +342,18 @@ class RawObjectStore:
                                 fetched_at=fetched_at, attempt_id=attempt_id, suffix="json", relative_path=relative_path)
 
     def write_bytes(self, content: bytes, *, dataset: str, provider: str, endpoint: str,
-                    fetched_at: datetime, attempt_id: str, suffix: str = "bin", content_addressed: bool = False,
+                    fetched_at: datetime, attempt_id: str, suffix: str = "bin", body_archive: bool = False,
                     relative_path: str | Path | None = None) -> RawObjectRef:
+        from uuid import uuid4
+
         for component in (dataset, provider, endpoint, attempt_id, suffix):
             if not component or component in {".", ".."} or any(c in component for c in ("/", "\\", ":")):
                 raise ValueError("invalid raw object path component")
-        relative = Path("bodies", hashlib.sha256(content).hexdigest() + ".bin") if content_addressed else Path(
+        relative = _archived_body_path(dataset=dataset, provider=provider, endpoint=endpoint,
+                                       attempt_id=attempt_id, fetched_at=fetched_at, suffix=suffix) if body_archive else Path(
             fetched_at.date().isoformat(), dataset, provider, endpoint, f"{attempt_id}.{suffix}"
         )
         if relative_path is not None:
-            if content_addressed:
-                raise ValueError("content-addressed bodies must retain their hash path")
             relative = Path(relative_path)
             if relative.is_absolute() or ".." in relative.parts or not relative.parts:
                 raise ValueError("artifact path must stay within its store")
@@ -298,21 +362,30 @@ class RawObjectStore:
         target = self.root / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         expected_hash = hashlib.sha256(content).hexdigest()
+        if body_archive and target.exists() and hashlib.sha256(target.read_bytes()).hexdigest() != expected_hash:
+            base = target
+            suffix_number = 2
+            while target.exists() and hashlib.sha256(target.read_bytes()).hexdigest() != expected_hash:
+                target = base.with_name(f"{base.stem}_{suffix_number}{base.suffix}")
+                suffix_number += 1
+        relative = target.relative_to(self.root)
         if target.exists():
             existing_hash = hashlib.sha256(target.read_bytes()).hexdigest()
             if existing_hash != expected_hash:
                 raise FileExistsError(f"immutable raw object already exists with different content: {target}")
-            if content_addressed and self.manifest.name != "manifest.ndjson":
+            if body_archive and self.manifest.name != "manifest.ndjson":
                 self.append_event({"event": "stored_artifact", "body_storage": relative.as_posix(), "body_sha256": existing_hash})
             return RawObjectRef(target, existing_hash, target.stat().st_size)
 
-        temporary = target.with_name(f"{target.name}.{os.getpid()}.tmp")
+        # Keep the temporary basename short: appending a PID to a readable
+        # request name can exceed Windows' path limit in deeply nested runs.
+        temporary = target.with_name(f".tmp-{uuid4().hex}.part")
         with temporary.open("xb") as stream:
             stream.write(content)
             stream.flush()
             os.fsync(stream.fileno())
         os.replace(temporary, target)
-        if content_addressed and self.manifest.name != "manifest.ndjson":
+        if body_archive and self.manifest.name != "manifest.ndjson":
             self.append_event({"event": "stored_artifact", "body_storage": relative.as_posix(), "body_sha256": expected_hash})
         return RawObjectRef(target, expected_hash, len(content))
 
@@ -327,11 +400,12 @@ class RawObjectStore:
                         code_version, mode="live", source_ref=None, fetched_at=None, request_options=None):
         """Persist application response bytes before the SDK/provider parser runs."""
         fetched_at = fetched_at or datetime.now(timezone.utc)
+        capture_time = fetched_at
         if self.capture_root is not None:
-            from zoneinfo import ZoneInfo
             stamp = datetime.fromisoformat(source_ref["fetched_at_utc"]) if source_ref and source_ref.get("fetched_at_utc") else fetched_at
             if stamp.tzinfo is None:
                 raise ValueError("original source capture time must be timezone-aware")
+            capture_time = stamp
             actual = stamp.astimezone(ZoneInfo("Asia/Shanghai")).date().isoformat()
             destination = self.task_unit_path(self.capture_root, provider=provider, endpoint=endpoint, data_date=actual)
             next_manifest = destination / self.manifest.name
@@ -346,7 +420,9 @@ class RawObjectStore:
         redacted = bool(_SECRET_BODY.search(body))
         reference = None if redacted else self.write_bytes(
             body, dataset="input_response", provider=provider, endpoint=endpoint,
-            fetched_at=fetched_at, attempt_id=digest, content_addressed=True,
+            fetched_at=fetched_at, attempt_id="http-response", body_archive=True, relative_path=response_body_path(
+                scope=scope, fetched_at=capture_time
+            ),
         )
         event = {
             "event": "http_response", "method": method, "url": sanitized_url(url),

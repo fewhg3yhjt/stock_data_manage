@@ -182,7 +182,7 @@ def remaining_invalid_fixture(tmp_path, input_id, mutation):
                     data["report_list"][key]["data"][0]["item_value"] = "not-a-number"
             body = json.dumps(payload, ensure_ascii=False).encode()
         ref = store.write_bytes(body, dataset="fixture", provider="source", endpoint=input_id,
-            fetched_at=datetime.now(timezone.utc), attempt_id=str(i), content_addressed=True)
+            fetched_at=datetime.now(timezone.utc), attempt_id=str(i), body_archive=True)
         store.append_event({**parent, "body_storage": ref.path.relative_to(store.root).as_posix(),
             "body_sha256": ref.content_hash, "body_bytes": len(body), "mode": "offline_mutation_fixture",
             "status_code": 403 if mutation=="http403" and i==0 else parent["status_code"],
@@ -243,7 +243,7 @@ def test_remaining_native_invalid_payload_rejects_candidate(tmp_path,no_network,
         elif mutation=='index' or (mutation=='inconsistent' and i==1):
             frame=pd.read_excel(io.BytesIO(body));frame.iloc[0,1]=905
             buffer=io.BytesIO();frame.to_excel(buffer,index=False);body=buffer.getvalue()
-        ref=store.write_bytes(body,dataset='fixture',provider='native',endpoint=id,fetched_at=datetime.now(timezone.utc),attempt_id=str(i),content_addressed=True)
+        ref=store.write_bytes(body,dataset='fixture',provider='native',endpoint=id,fetched_at=datetime.now(timezone.utc),attempt_id=str(i),body_archive=True)
         store.append_event({**parent,'body_storage':ref.path.relative_to(store.root).as_posix(),'body_sha256':ref.content_hash,'body_bytes':len(body),
             'derived_from_sha256':parent['body_sha256'],'mutation':mutation,'transformation_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest()})
     context=next(c[1] for c in REMAINING_CASES if c[0]==id)
@@ -460,7 +460,7 @@ def actual_data_invalid_fixture(tmp_path,input_id,mutation):
                         for r in p['rows']:r.pop('code_name')
                 body=json.dumps(p,ensure_ascii=False,separators=(',',':')).encode()
         ref=store.write_bytes(body,dataset='fixture',provider='source',endpoint=input_id,
-            fetched_at=datetime.now(timezone.utc),attempt_id=str(i),content_addressed=True)
+            fetched_at=datetime.now(timezone.utc),attempt_id=str(i),body_archive=True)
         store.append_event({**e,'body_storage':ref.path.relative_to(store.root).as_posix(),'body_sha256':ref.content_hash,
             'body_bytes':len(body),'derived_from_sha256':e['body_sha256'],'mutation':mutation,'mode':'offline_mutation_fixture',
             'transformation_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest()})
@@ -3316,7 +3316,7 @@ def quote_fixture_manifest(tmp_path, symbols, *, mutation=None):
             body = b'v_sh600519="";'
         event = deepcopy(original)
         ref = store.write_bytes(body, dataset="fixture_payload", provider="tencent", endpoint="single_quote",
-                                fetched_at=datetime.now(timezone.utc), attempt_id=str(offset), content_addressed=True)
+                                fetched_at=datetime.now(timezone.utc), attempt_id=str(offset), body_archive=True)
         event.update(url="https://qt.gtimg.cn/q=" + ",".join(batch), mode="offline_fixture", synthetic=True,
                      body_storage=ref.path.relative_to(store.root).as_posix(), body_sha256=ref.content_hash,
                      requests_decoded_body_bytes=len(body), fixture_parent_sha256=original["body_sha256"], mutation=mutation)
@@ -3351,7 +3351,7 @@ def test_quote_multi_batch_yaml_and_partial_scope(tmp_path, no_network):
     partial_event = deepcopy(event)
     _, body = quote_source()
     ref = RawObjectStore(partial_manifest.parent).write_bytes(body, dataset="partial", provider="tencent", endpoint="single_quote",
-        fetched_at=datetime.now(timezone.utc), attempt_id="partial", content_addressed=True)
+        fetched_at=datetime.now(timezone.utc), attempt_id="partial", body_archive=True)
     partial_event.update(body_storage=ref.path.relative_to(partial_manifest.parent).as_posix(), body_sha256=ref.content_hash,
                          requests_decoded_body_bytes=len(body))
     assert partial_event["requests_decoded_body_bytes"] == len(RawObjectStore.read_response(partial_manifest, partial_event))
@@ -3588,7 +3588,7 @@ def _sdk_fixture_archive(path, documents):
     for name, document in documents.items():
         payload = json.dumps(document, ensure_ascii=False, separators=(",", ":")).encode()
         ref = store.write_bytes(payload, dataset="sdk_response", provider="baostock", endpoint=name,
-                                fetched_at=datetime.now(timezone.utc), attempt_id="fixture", content_addressed=True)
+                                fetched_at=datetime.now(timezone.utc), attempt_id="fixture", body_archive=True)
         store.append_event({"event": "source_payload", "provider": "baostock", "endpoint": name,
                             "metadata": {"trade_date": "2026-09-30", "row_count": len(document["rows"]),
                                          "outcome": document.get("result", "success")},
@@ -4031,7 +4031,7 @@ def test_exact_response_is_saved_before_json_parser_and_secrets_are_redacted(tmp
     response._content = b'{"access_token":"sensitive"}'
     with pytest.raises(ValueError, match="retention suppressed"):
         destination.record_response(response=response, url=request.url, method="GET", request_headers={}, scope={}, provider="fixture", endpoint="input", code_version="fixture")
-    assert not (destination.root / "bodies" / (hashlib.sha256(response.content).hexdigest() + ".bin")).exists()
+    assert not (destination.root / "bodies").exists()
 
 
 @pytest.mark.parametrize("mutation", ["duplicate", "outside_window", "empty_adjusted", "malformed_volume"])

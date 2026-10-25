@@ -182,16 +182,24 @@ def check_daily_input_qualification(contract, context, *, asset_type, config_roo
     from ..storage.raw import RawObjectStore
     from ..providers.tencent.daily import tencent_symbol
     try:
-        if contract.input_id != 'ASTOCK-002-daily' or asset_type not in {'stock', 'etf'}:
+        if contract.input_id != 'ASTOCK-002-daily' or asset_type not in {'stock', 'etf', 'index'}:
             raise ValueError('unsupported daily input or asset type')
         parameters = contract.bind_parameters(context)
-        symbol = tencent_symbol(parameters['code'], allow_bse=parameters.get('api') == 'newfqkline')
+        adjustment_values = {"none": "none", "qfq": "forward", "hfq": "backward"}
+        requested_adjustment = parameters.get("adjust", "qfq")
+        adjustment = adjustment_values.get(requested_adjustment)
+        if adjustment is None:
+            raise ValueError("unsupported daily adjustment parameter")
+        if asset_type == 'index' and adjustment != 'none':
+            raise ValueError('Tencent index daily input is qualified only for unadjusted bars')
+        symbol = tencent_symbol(parameters['code'], allow_bse=parameters.get('api') in {'kline', 'newfqkline'},
+                                asset_type=asset_type)
         exchange = {'sh':'XSHG','sz':'XSHE','bj':'BSE'}[symbol[:2]]
         identity = exchange + ':' + symbol[2:]
         adapter = build_input_provider(contract, providers_path=Path(config_root)/'providers.yaml')
         evidence = metadata.latest_probe(provider=contract.provider, endpoint=contract.endpoint,
             capability_version=adapter.capability_version, dataset='daily_bar', market=exchange,
-            asset_type=asset_type, code_prefix=symbol, frequency='daily', adjustment='forward')
+            asset_type=asset_type, code_prefix=symbol, frequency='daily', adjustment=adjustment)
         if not evidence or not evidence['eligible_for_selection'] or evidence['status'] != 'complete':
             if execution_mode == 'live' and _allow_scope:
                 for candidate in metadata.capability_evidence(provider=contract.provider, endpoint=contract.endpoint,
@@ -279,7 +287,7 @@ def check_daily_input_qualification(contract, context, *, asset_type, config_roo
         if not published.verify(partition/'data.parquet') or (partition/'task-commit.json').exists():
             raise ValueError('daily end-to-end publication is missing or pending')
         rows=pq.read_table(partition/'data.parquet').to_pylist()
-        wanted=[r for r in rows if r['instrument_id']==identity and r['adjustment']=='forward' and str(parameters['start'])<=r['trade_date'].isoformat()<=str(parameters['end'])]
+        wanted=[r for r in rows if r['instrument_id']==identity and r['adjustment']==adjustment and str(parameters['start'])<=r['trade_date'].isoformat()<=str(parameters['end'])]
         if not wanted or len(wanted)!=evidence['row_count']:
             raise ValueError('daily publication scope differs')
         published_hashes=set()
@@ -385,8 +393,8 @@ def build_input_provider(contract, *, providers_path, client=None):
                                        endpoint=contract.endpoint, timeout_seconds=20,
                                        max_symbols_per_request=config.max_symbols_per_request)
     if contract.input_id == "ASTOCK-002-daily":
-        provider = TencentDailyProvider(RequestsTransport(headers), adjustment=Adjustment.FORWARD)
-        provider.endpoint, provider.capability_version = contract.endpoint, "tencent-window-input-v2"
+        provider = TencentDailyProvider(RequestsTransport(headers))
+        provider.endpoint, provider.capability_version = contract.endpoint, "tencent-window-input-v4"
         return provider
     if contract.input_id == "ASTOCK-002-5m":
         config = next(c for c in load_provider_configs(providers_path) if c.provider == "tencent" and c.endpoint == "native_1m")
@@ -551,7 +559,7 @@ def build_provider(config: ProviderConfig, transport: HttpTransport | None = Non
     )
     transport = PacedTransport(base_transport, pacer, group)
     if config.provider == "tencent" and config.endpoint in {"daily_history", "recent_history", "forward_history"}:
-        adjustment = Adjustment.FORWARD if Adjustment.FORWARD in config.adjustments else Adjustment.NONE
+        adjustment = _selected_adjustment(config, capability)
         provider = TencentDailyProvider(transport, adjustment=adjustment)
         provider.endpoint = config.endpoint
         provider.capability_version = config.capability_version
@@ -573,11 +581,7 @@ def build_provider(config: ProviderConfig, transport: HttpTransport | None = Non
         return BaoStockDailyProvider(
             capability_priority=config.priority,
             capability_version=config.capability_version,
-            adjustment=next(
-                (adjustment for adjustment in (Adjustment.NONE, Adjustment.FORWARD, Adjustment.BACKWARD)
-                 if adjustment in config.adjustments),
-                Adjustment.NONE,
-            ),
+            adjustment=_selected_adjustment(config, capability),
             supported_asset_types=config.asset_types,
         )
     if config.provider == "baostock" and config.endpoint == "minute_5m":
@@ -622,7 +626,7 @@ def build_provider(config: ProviderConfig, transport: HttpTransport | None = Non
         }[config.endpoint]
         return AkShareDailyProvider(
             asset_type=asset_type,
-            adjustment=next(iter(config.adjustments), Adjustment.NONE),
+            adjustment=_selected_adjustment(config, capability),
             capability_version=config.capability_version,
         )
     if config.provider == "akshare" and config.endpoint in {
@@ -638,6 +642,17 @@ def build_provider(config: ProviderConfig, transport: HttpTransport | None = Non
             request_interval_seconds=config.request_interval_seconds,
         )
     raise ValueError(f"no provider factory for {config.provider}.{config.endpoint}")
+
+
+def _selected_adjustment(config, capability):
+    """Bind the exact evidence-selected adjustment; config-only construction stays deterministic."""
+    if capability is not None and len(capability.adjustments) == 1:
+        selected = next(iter(capability.adjustments))
+        if selected not in config.adjustments:
+            raise ValueError("selected adjustment is outside the provider configuration")
+        return selected
+    return next((value for value in (Adjustment.NONE, Adjustment.FORWARD, Adjustment.BACKWARD)
+                 if value in config.adjustments), Adjustment.NONE)
 
 
 def _evidence_capability(config, evidence, *, now, priority, role, metadata):

@@ -37,7 +37,8 @@ class DailyReconciliation:
         run_id: str = "daily-reconciliation",
     ) -> DailyReconciliationResult:
         expected_ids = tuple(dict.fromkeys(str(item) for item in expected_instrument_ids))
-        existing = self.canonical.read(Dataset.DAILY_BAR, asset_type, trade_date.isoformat())
+        existing = self.canonical.read(Dataset.DAILY_BAR, asset_type, trade_date.isoformat(),
+                                       adjustment=adjustment)
         candidates: dict[tuple[object, ...], list[BarRecord]] = {}
         for record in [*existing, *history_records]:
             if (
@@ -98,6 +99,7 @@ class DailyReconciliation:
             quarantined_count=len(hard_keys),
             item_statuses=statuses,
             source_providers=source_providers,
+            adjustment=adjustment,
         )
         now = datetime.now(timezone.utc)
         self.metadata.record_partition_publish(

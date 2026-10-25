@@ -101,7 +101,7 @@ def prepare_daily_task_publication(state, units, source_rows, paths, config_root
             raise ValueError("new daily candidates have a hard source conflict")
         accepted.append(resolved.selected)
     store = CanonicalPartitionStore(paths["canonical_root"])
-    existing = store.read(Dataset.DAILY_BAR, asset_type, trade_date.isoformat())
+    existing = store.read(Dataset.DAILY_BAR, asset_type, trade_date.isoformat(), adjustment=adjustment)
     available = {record.instrument_id for record in accepted}
     if state["redo"] != "full":
         available.update(record.instrument_id for record in existing if record.adjustment is adjustment
@@ -115,10 +115,10 @@ def prepare_daily_task_publication(state, units, source_rows, paths, config_root
     if not policy.allows(expected_count=len(expected), actual_count=len(available & set(expected.values()))):
         raise PublicationThresholdExceeded("daily task coverage rejected; missing=" + ",".join(
             sorted(set(expected.values()) - available)))
-    outside = [record for record in existing if record.adjustment is not adjustment or record.instrument_id not in expected.values()]
-    return {"records": accepted, "partition_directory": str(store.partition_directory(Dataset.DAILY_BAR, asset_type, trade_date.isoformat())),
+    return {"records": accepted, "partition_directory": str(store.partition_directory(
+                Dataset.DAILY_BAR, asset_type, trade_date.isoformat(), adjustment)),
             "asset_type": asset_type, "partition_key": trade_date.isoformat(), "adjustment": adjustment.value,
-            "expected_count": len(expected) + len(outside), "item_statuses": statuses,
+            "expected_count": len(expected), "item_statuses": statuses,
             "replace_ids": sorted(target_ids)}
 
 
@@ -173,23 +173,14 @@ class DailyCollectionService:
         if len(by_symbol) != len(universe):
             raise ValueError("source_symbol must be unique within a provider collection partition")
 
-        stored_statuses = self.metadata.item_statuses(Dataset.DAILY_BAR.value, partition_key)
-        statuses = (
-            {
-                instrument_id: status
-                for instrument_id, status in stored_statuses.items()
-                if instrument_id in by_id
-            }
-            if adjustment is Adjustment.NONE
-            else {}
+        stored_statuses = self.metadata.item_statuses(
+            Dataset.DAILY_BAR.value, partition_key, adjustment=adjustment.value
         )
-        all_existing = self.canonical_store.read(Dataset.DAILY_BAR, asset_type.value, partition_key)
-        existing = [
-            record
-            for record in all_existing
-            if record.adjustment is adjustment
-        ]
-        other_adjustment_count = len(all_existing) - len(existing)
+        statuses = {instrument_id: status for instrument_id, status in stored_statuses.items()
+                    if instrument_id in by_id}
+        existing = self.canonical_store.read(
+            Dataset.DAILY_BAR, asset_type.value, partition_key, adjustment=adjustment
+        )
         providers_by_item: dict[str, str | None] = {
             record.instrument_id: record.source_provider for record in existing
         }
@@ -414,10 +405,11 @@ class DailyCollectionService:
             asset_type=asset_type.value,
             partition_key=partition_key,
             new_records=accepted,
-            expected_count=len(universe) + other_adjustment_count,
+            expected_count=len(universe),
             run_id=run_id,
             item_statuses=statuses,
             source_providers=providers_by_item,
+            adjustment=adjustment,
         )
         self.metadata.record_partition_publish(
             manifest=publish.manifest,

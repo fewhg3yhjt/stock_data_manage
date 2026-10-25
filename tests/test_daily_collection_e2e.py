@@ -344,11 +344,14 @@ def test_forward_collection_does_not_reuse_unadjusted_metadata_or_break_partitio
             adjustment=Adjustment.FORWARD,
         )
         records = canonical.read(Dataset.DAILY_BAR, "stock", "2026-09-11")
-        manifest = metadata.partition("daily_bar", "stock", "2026-09-11")
+        qfq_manifest = metadata.partition("daily_bar", "stock", "2026-09-11", adjustment="forward")
+        none_manifest = metadata.partition("daily_bar", "stock", "2026-09-11", adjustment="none")
 
     assert qfq.requested_by_provider == {"fixture-qfq": ("sh600519",)}
     assert {record.adjustment for record in records} == {Adjustment.NONE, Adjustment.FORWARD}
-    assert manifest is not None and manifest["actual_count"] == 2 and manifest["expected_count"] == 2
+    assert qfq_manifest is not None and qfq_manifest["actual_count"] == 1 and qfq_manifest["expected_count"] == 1
+    assert none_manifest is not None and none_manifest["actual_count"] == 1 and none_manifest["expected_count"] == 1
+    assert qfq_manifest["manifest_path"] != none_manifest["manifest_path"]
 
 
 def test_forward_collection_rejects_index_unconditionally(tmp_path) -> None:

@@ -11,7 +11,7 @@ import pyarrow.parquet as pq
 import pytest
 import yaml
 
-from stock_data_manage.domain import Dataset
+from stock_data_manage.domain import Dataset, ItemStatus
 from stock_data_manage.pipeline.inputs import collect_task
 from stock_data_manage.storage.integrity import Manifest, file_hash
 from stock_data_manage.storage.metadata import MetadataStore
@@ -27,7 +27,8 @@ DAY = "2026-09-30"
 def raw_request(root, symbol, *, day=DAY, input_id="ASTOCK-002-daily", temporary=True):
     from stock_data_manage.config.loader import load_input_capabilities
     contract = next(c for c in load_input_capabilities(CONFIG / "providers.yaml") if c.input_id == input_id)
-    context = {"request": {"symbol": symbol, "start_date": day, "end_date": day}} if input_id == "ASTOCK-002-daily" else {
+    context = {"request": {"symbol": symbol, "start_date": day, "end_date": day},
+               "config": {"adjust": "qfq", "api": "fqkline"}} if input_id == "ASTOCK-002-daily" else {
         "request": {"trade_date": day}} if input_id != "SECURITY-BSE-001" else {}
     parameters = contract.bind_parameters(context)
     parent = RawObjectStore.task_unit_path(root / "raw", provider=contract.provider, endpoint=contract.endpoint, data_date=day) if temporary else RawObjectStore.current_path(
@@ -143,8 +144,10 @@ class FaultCollector:
         else:
             dataset = "daily_bar"
             price = Decimal(self.prices.get(key, "10"))
+            adjustment = options.get("context", {}).get("config", {}).get("adjust", "qfq")
             rows = [{"instrument_id": ("XSHG" if key.startswith("sh") else "XSHE")+":"+key[2:],
-                     "trade_date": date.fromisoformat(options["data_date"]), "adjustment": "forward", "open": price,
+                     "trade_date": date.fromisoformat(options["data_date"]),
+                     "adjustment": {"none": "none", "qfq": "forward", "hfq": "backward"}[adjustment], "open": price,
                      "high": price, "low": Decimal("0") if key in self.invalid else price,
                      "close": price, "volume": None, "amount": None}]
         fields = yaml.safe_load((CONFIG / "datasets" / (dataset+".yaml")).read_text(encoding="utf-8"))["fields"]
@@ -215,6 +218,39 @@ def test_partial_published_daily_resumes_missing_security(tmp_path):
     assert len(read_bars(runtime_root)) == 3 and len(collector.calls) == 4
     assert collector.calls[-1][0] == "sh600002"
     assert file_hash(raw_request(runtime_root, "sh600001", temporary=False)) == untouched
+
+
+def test_daily_adjustments_publish_and_resume_in_separate_partitions(tmp_path):
+    collector = FaultCollector()
+    canonical = CanonicalPartitionStore(tmp_path / "canonical")
+    task_defs = [
+        {**daily_definition("none", ("sh600001",)), "adjustment": "none"},
+        daily_definition("qfq", ("sh600001",)),
+        {**daily_definition("hfq", ("sh600001",)), "adjustment": "backward"},
+    ]
+    for definition in task_defs:
+        assert run(tmp_path, definition, collector)["status"] == "published"
+
+    for adjustment in ("none", "forward", "backward"):
+        path = (tmp_path / "canonical" / DAY / "daily_bar" / "stock"
+                / f"adjustment={adjustment}" / "data.parquet")
+        assert path.is_file()
+        records = canonical.read(Dataset.DAILY_BAR, "stock", DAY, adjustment=adjustment)
+        assert len(records) == 1 and records[0].adjustment.value == adjustment
+    assert {record.adjustment.value for record in canonical.read(Dataset.DAILY_BAR, "stock", DAY)} == {
+        "none", "forward", "backward"}
+
+    resumed = run(tmp_path, task_defs[1], collector)
+    assert resumed["no_op"]
+    with MetadataStore(tmp_path / "metadata/metadata.duckdb") as metadata:
+        manifests = {adjustment: metadata.partition("daily_bar", "stock", DAY,
+                    adjustment=adjustment)["manifest_path"]
+                     for adjustment in ("none", "forward", "backward")}
+        for adjustment in ("none", "forward", "backward"):
+            assert metadata.item_statuses("daily_bar", DAY, adjustment=adjustment) == {
+                "XSHG:600001": ItemStatus.SUCCESS
+            }
+    assert len(set(manifests.values())) == 3
 
 
 @pytest.mark.parametrize("tampered", [False, True])
@@ -385,6 +421,8 @@ def test_master_then_dynamic_daily_scope_and_new_listings(tmp_path):
                   "universe": "all_stock", "asset_type": "stock", "adjustment": "forward", "input_id": "ASTOCK-002-daily"}
     daily = run(tmp_path, definition, collector)
     assert daily["row_count"] == 2
+    assert all(unit["context"]["config"] == {"adjust": "qfq", "api": "fqkline"}
+               for unit in daily["definition"]["units"])
     collector.source_stock_codes = ("600001", "000001", "600002")
     run(tmp_path, master_definition(), collector, redo="full")
     assert run(tmp_path, definition, collector)["no_op"]
@@ -392,8 +430,104 @@ def test_master_then_dynamic_daily_scope_and_new_listings(tmp_path):
     assert run(tmp_path, new_definition, collector)["row_count"] == 3
     configured = run(tmp_path, {**definition, "task_id": "all-alternative", "config": {"api": "newfqkline"}}, collector)
     assert configured["row_count"] == 3
-    assert all(unit["context"]["config"] == {"api": "newfqkline"}
+    assert all(unit["context"]["config"] == {"adjust": "qfq", "api": "newfqkline"}
                for unit in configured["definition"]["units"])
+
+
+def test_all_index_daily_task_defaults_to_unadjusted_tencent_api(tmp_path):
+    collector = FaultCollector()
+    collector.catalog_rows["shenzhen-shanghai"] = [
+        {"stock_code": "600001", "stock_name": "fixture stock", "exchange": "XSHG", "asset_type": "stock"},
+        {"stock_code": "000001", "stock_name": "fixture index", "exchange": "XSHG", "asset_type": "index"},
+        {"stock_code": "000001", "stock_name": "fixture stock", "exchange": "XSHE", "asset_type": "stock"},
+    ]
+    assert run(tmp_path, master_definition(), collector)["status"] == "published"
+    definition = {"task_id": "all-index", "dataset": "daily_bar", "trade_date": DAY,
+                  "universe": "all_index", "input_id": "ASTOCK-002-daily"}
+    result = run(tmp_path, definition, collector)
+    assert result["status"] == "published" and result["row_count"] == 1
+    unit = result["definition"]["units"][0]
+    assert unit["symbol"] == "sh000001" and unit["asset_type"] == "index"
+    assert unit["context"]["config"] == {"adjust": "none", "api": "kline"}
+    assert result["definition"]["adjustment"] == "none"
+
+
+def test_all_index_universe_expands_only_published_index_rows(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+    import stock_data_manage.storage.integrity as integrity
+    import stock_data_manage.storage.metadata as metadata_module
+
+    canonical = tmp_path / "canonical"
+    manifest_path = canonical / DAY / "security_master" / "manifest.json"
+
+    class FakeMetadataStore:
+        def __init__(self, path):
+            pass
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            return False
+        def load_collection_task(self, task_id):
+            return None
+        def latest_partition(self, **kwargs):
+            return {"manifest_path": str(manifest_path)}
+
+    class FakeManifest:
+        @classmethod
+        def load(cls, path):
+            return cls()
+        def verify(self, path):
+            return True
+
+    monkeypatch.setattr(metadata_module, "MetadataStore", FakeMetadataStore)
+    monkeypatch.setattr(integrity, "Manifest", FakeManifest)
+    monkeypatch.setattr("pyarrow.parquet.read_table", lambda path: SimpleNamespace(to_pylist=lambda: [
+        {"asset_type": "stock", "status": "active", "exchange": "XSHG", "symbol": "600519"},
+        {"asset_type": "index", "status": "active", "exchange": "XSHG", "symbol": "000001"},
+        {"asset_type": "index", "status": "active", "exchange": "XSHE", "symbol": "399001"},
+    ]))
+    definition = {"task_id": "index-expansion", "dataset": "daily_bar", "trade_date": DAY, "universe": "all_index",
+                  "input_id": "ASTOCK-002-daily"}
+    units = __import__("stock_data_manage.pipeline.inputs", fromlist=["_task_units"])._task_units(
+        definition, {"metadata_path": tmp_path / "metadata.duckdb", "canonical_root": canonical})
+    assert [(unit["symbol"], unit["asset_type"]) for unit in units] == [
+        ("sh000001", "index"), ("sz399001", "index")]
+
+
+def test_none_adjustment_selects_tencent_kline_before_collection(tmp_path):
+    observed = []
+    def stop_after_observing(**options):
+        observed.append(options["context"]["config"].copy())
+        raise RuntimeError("stop after checking request parameters")
+
+    definition = daily_definition("none-adjustment", symbols=("sh600001",))
+    definition["adjustment"] = "none"
+    result = run(tmp_path, definition, stop_after_observing)
+    assert result["status"] != "published"
+    assert observed == [{"adjust": "none", "api": "kline"}]
+
+
+def test_omitted_daily_adjustment_defaults_to_tencent_kline(tmp_path):
+    observed = []
+    def stop_after_observing(**options):
+        observed.append(options["context"]["config"].copy())
+        raise RuntimeError("stop after checking default request parameters")
+
+    definition = daily_definition("default-adjustment", symbols=("sh600001",))
+    definition.pop("adjustment")
+    result = run(tmp_path, definition, stop_after_observing)
+    assert result["status"] != "published"
+    assert observed == [{"adjust": "none", "api": "kline"}]
+
+
+def test_none_adjustment_rejects_explicit_conflicting_api_before_collection(tmp_path):
+    definition = daily_definition("none-conflicting-api", symbols=("sh600001",))
+    definition["adjustment"] = "none"
+    definition["units"][0]["context"]["config"] = {"api": "fqkline"}
+    collector = FaultCollector()
+    with pytest.raises(ValueError, match="adjustment=none requires api=kline"):
+        run(tmp_path, definition, collector)
+    assert collector.calls == []
 
 
 def test_task_shares_existing_request_pacer_between_securities(tmp_path):
@@ -1107,9 +1241,10 @@ def test_pending_commit_rejects_another_writer_and_completed_data_corruption(tmp
         run(tmp_path, daily_definition(), collector, failure_hook=crash)
     with pytest.raises(InvalidPartitionError, match="another task"):
         CanonicalPartitionStore(tmp_path / "canonical").publish(dataset=Dataset.DAILY_BAR,
-            asset_type="stock", partition_key=DAY, new_records=[], expected_count=0, run_id="unrelated")
+            asset_type="stock", partition_key=DAY, new_records=[], expected_count=0, run_id="unrelated",
+            adjustment="forward")
     recover_collection_tasks(config_root=CONFIG, data_root=tmp_path)
-    data = tmp_path / "canonical" / DAY / "daily_bar/stock/data.parquet"
+    data = tmp_path / "canonical" / DAY / "daily_bar/stock/adjustment=forward/data.parquet"
     data.write_bytes(b"corrupt")
     with pytest.raises(ValueError, match="integrity"):
         run(tmp_path, daily_definition(), collector)

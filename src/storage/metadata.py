@@ -53,6 +53,7 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
                 dataset VARCHAR NOT NULL,
                 asset_type VARCHAR NOT NULL,
                 partition_key VARCHAR NOT NULL,
+                adjustment VARCHAR NOT NULL DEFAULT 'none',
                 expected_count BIGINT NOT NULL,
                 actual_count BIGINT NOT NULL,
                 status VARCHAR NOT NULL,
@@ -61,16 +62,17 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
                 conflict_count BIGINT NOT NULL,
                 quarantined_count BIGINT NOT NULL,
                 updated_at TIMESTAMPTZ NOT NULL,
-                PRIMARY KEY (dataset, asset_type, partition_key)
+                PRIMARY KEY (dataset, asset_type, partition_key, adjustment)
             );
             CREATE TABLE IF NOT EXISTS partition_item (
                 dataset VARCHAR NOT NULL,
                 partition_key VARCHAR NOT NULL,
+                adjustment VARCHAR NOT NULL DEFAULT 'none',
                 instrument_id VARCHAR NOT NULL,
                 status VARCHAR NOT NULL,
                 source_provider VARCHAR,
                 updated_at TIMESTAMPTZ NOT NULL,
-                PRIMARY KEY (dataset, partition_key, instrument_id)
+                PRIMARY KEY (dataset, partition_key, adjustment, instrument_id)
             );
             CREATE TABLE IF NOT EXISTS collection_attempt (
                 attempt_id VARCHAR PRIMARY KEY,
@@ -189,6 +191,7 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
             );
             """
         )
+        self._migrate_partition_adjustment_dimension()
         for statement in (
             "ALTER TABLE capability_registry ADD COLUMN IF NOT EXISTS request_scope_json VARCHAR DEFAULT '[]'",
             "ALTER TABLE capability_registry ADD COLUMN IF NOT EXISTS response_status INTEGER",
@@ -335,11 +338,62 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
             raw_content_hash=row[6],
         )
 
-    def item_statuses(self, dataset: str, partition_key: str) -> dict[str, ItemStatus]:
+    def _migrate_partition_adjustment_dimension(self) -> None:
+        """Preserve old status rows while marking mixed daily partitions as legacy."""
+        status_columns = {row[1] for row in self.connection.execute(
+            "PRAGMA table_info('partition_status')").fetchall()}
+        if "adjustment" not in status_columns:
+            self.connection.execute("BEGIN TRANSACTION")
+            try:
+                self.connection.execute("ALTER TABLE partition_status RENAME TO partition_status_legacy_adjustment_v1")
+                self.connection.execute("""
+                    CREATE TABLE partition_status (
+                        dataset VARCHAR NOT NULL, asset_type VARCHAR NOT NULL, partition_key VARCHAR NOT NULL,
+                        adjustment VARCHAR NOT NULL DEFAULT 'none', expected_count BIGINT NOT NULL,
+                        actual_count BIGINT NOT NULL, status VARCHAR NOT NULL, manifest_path VARCHAR NOT NULL,
+                        content_hash VARCHAR NOT NULL, conflict_count BIGINT NOT NULL, quarantined_count BIGINT NOT NULL,
+                        updated_at TIMESTAMPTZ NOT NULL,
+                        PRIMARY KEY (dataset, asset_type, partition_key, adjustment))""")
+                self.connection.execute("""
+                    INSERT INTO partition_status SELECT dataset, asset_type, partition_key,
+                        CASE WHEN dataset='daily_bar' THEN 'legacy_mixed' ELSE 'none' END,
+                        expected_count, actual_count, status, manifest_path, content_hash,
+                        conflict_count, quarantined_count, updated_at
+                    FROM partition_status_legacy_adjustment_v1""")
+                self.connection.execute("DROP TABLE partition_status_legacy_adjustment_v1")
+                self.connection.execute("COMMIT")
+            except Exception:
+                self.connection.execute("ROLLBACK")
+                raise
+
+        item_columns = {row[1] for row in self.connection.execute(
+            "PRAGMA table_info('partition_item')").fetchall()}
+        if "adjustment" not in item_columns:
+            self.connection.execute("BEGIN TRANSACTION")
+            try:
+                self.connection.execute("ALTER TABLE partition_item RENAME TO partition_item_legacy_adjustment_v1")
+                self.connection.execute("""
+                    CREATE TABLE partition_item (
+                        dataset VARCHAR NOT NULL, partition_key VARCHAR NOT NULL,
+                        adjustment VARCHAR NOT NULL DEFAULT 'none', instrument_id VARCHAR NOT NULL,
+                        status VARCHAR NOT NULL, source_provider VARCHAR, updated_at TIMESTAMPTZ NOT NULL,
+                        PRIMARY KEY (dataset, partition_key, adjustment, instrument_id))""")
+                self.connection.execute("""
+                    INSERT INTO partition_item SELECT dataset, partition_key,
+                        CASE WHEN dataset='daily_bar' THEN 'legacy_mixed' ELSE 'none' END,
+                        instrument_id, status, source_provider, updated_at
+                    FROM partition_item_legacy_adjustment_v1""")
+                self.connection.execute("DROP TABLE partition_item_legacy_adjustment_v1")
+                self.connection.execute("COMMIT")
+            except Exception:
+                self.connection.execute("ROLLBACK")
+                raise
+
+    def item_statuses(self, dataset: str, partition_key: str, *, adjustment: str = "none") -> dict[str, ItemStatus]:
         rows = self.connection.execute(
             """SELECT instrument_id, status FROM partition_item
-               WHERE dataset=? AND partition_key=?""",
-            [dataset, partition_key],
+               WHERE dataset=? AND partition_key=? AND adjustment=?""",
+            [dataset, partition_key, adjustment],
         ).fetchall()
         return {instrument_id: ItemStatus(status) for instrument_id, status in rows}
 
@@ -381,8 +435,11 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
         try:
             self.connection.execute(
                 """
-                INSERT INTO partition_status VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ON CONFLICT (dataset, asset_type, partition_key) DO UPDATE SET
+                INSERT INTO partition_status (
+                    dataset, asset_type, partition_key, adjustment, expected_count, actual_count,
+                    status, manifest_path, content_hash, conflict_count, quarantined_count, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT (dataset, asset_type, partition_key, adjustment) DO UPDATE SET
                     expected_count=excluded.expected_count,
                     actual_count=excluded.actual_count,
                     status=excluded.status,
@@ -396,6 +453,7 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
                     manifest.dataset,
                     manifest.asset_type,
                     manifest.partition_key,
+                    manifest.adjustment,
                     manifest.expected_count,
                     manifest.row_count,
                     status,
@@ -412,10 +470,10 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
                 instrument_ids = list(resolved_statuses)
                 self.connection.execute(
                     """
-                    INSERT INTO partition_item
-                    SELECT ?, ?, unnest(?::VARCHAR[]), unnest(?::VARCHAR[]),
+                    INSERT INTO partition_item (dataset, partition_key, adjustment, instrument_id, status, source_provider, updated_at)
+                    SELECT ?, ?, ?, unnest(?::VARCHAR[]), unnest(?::VARCHAR[]),
                            unnest(?::VARCHAR[]), ?
-                    ON CONFLICT (dataset, partition_key, instrument_id) DO UPDATE SET
+                    ON CONFLICT (dataset, partition_key, adjustment, instrument_id) DO UPDATE SET
                         status=excluded.status,
                         source_provider=excluded.source_provider,
                         updated_at=excluded.updated_at
@@ -423,6 +481,7 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
                     [
                         manifest.dataset,
                         manifest.partition_key,
+                        manifest.adjustment,
                         instrument_ids,
                         [resolved_statuses[key].value for key in instrument_ids],
                         [resolved_providers.get(key) for key in instrument_ids],
@@ -434,23 +493,25 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
             self.connection.execute("ROLLBACK")
             raise
 
-    def partition(self, dataset: str, asset_type: str, partition_key: str) -> dict[str, object] | None:
+    def partition(self, dataset: str, asset_type: str, partition_key: str,
+                  *, adjustment: str = "none") -> dict[str, object] | None:
         cursor = self.connection.execute(
             """SELECT * FROM partition_status
-               WHERE dataset=? AND asset_type=? AND partition_key=?""",
-            [dataset, asset_type, partition_key],
+               WHERE dataset=? AND asset_type=? AND partition_key=? AND adjustment=?""",
+            [dataset, asset_type, partition_key, adjustment],
         )
         row = cursor.fetchone()
         if row is None:
             return None
         return dict(zip([column[0] for column in cursor.description], row))
 
-    def latest_partition(self, *, dataset: str, asset_type: str, through_date: str) -> dict[str, object] | None:
+    def latest_partition(self, *, dataset: str, asset_type: str, through_date: str,
+                         adjustment: str = "none") -> dict[str, object] | None:
         """Locate a dated publication through the existing index, never a current-directory alias."""
         cursor = self.connection.execute(
             """SELECT * FROM partition_status WHERE dataset=? AND asset_type=?
                AND partition_key <= ? AND status IN ('complete_clean', 'partial')
-               ORDER BY partition_key DESC LIMIT 1""", [dataset, asset_type, through_date])
+               AND adjustment=? ORDER BY partition_key DESC LIMIT 1""", [dataset, asset_type, through_date, adjustment])
         row = cursor.fetchone()
         return dict(zip([column[0] for column in cursor.description], row)) if row else None
 

@@ -178,6 +178,36 @@ def test_partition_batch_updates_preserve_other_items_and_rollback(tmp_path):
         assert len(metadata.item_statuses("daily_bar", "2026-10-09")) == 7267
 
 
+def test_metadata_schema_upgrade_preserves_legacy_mixed_daily_status(tmp_path):
+    import duckdb
+
+    path = tmp_path / "legacy-metadata.duckdb"
+    connection = duckdb.connect(str(path))
+    connection.execute("""
+        CREATE TABLE partition_status (
+            dataset VARCHAR NOT NULL, asset_type VARCHAR NOT NULL, partition_key VARCHAR NOT NULL,
+            expected_count BIGINT NOT NULL, actual_count BIGINT NOT NULL, status VARCHAR NOT NULL,
+            manifest_path VARCHAR NOT NULL, content_hash VARCHAR NOT NULL, conflict_count BIGINT NOT NULL,
+            quarantined_count BIGINT NOT NULL, updated_at TIMESTAMPTZ NOT NULL,
+            PRIMARY KEY (dataset, asset_type, partition_key))""")
+    connection.execute("""
+        CREATE TABLE partition_item (
+            dataset VARCHAR NOT NULL, partition_key VARCHAR NOT NULL, instrument_id VARCHAR NOT NULL,
+            status VARCHAR NOT NULL, source_provider VARCHAR, updated_at TIMESTAMPTZ NOT NULL,
+            PRIMARY KEY (dataset, partition_key, instrument_id))""")
+    now = datetime.now(timezone.utc)
+    connection.execute("INSERT INTO partition_status VALUES ('daily_bar','stock','2026-10-09',1,1,'complete_clean','old.json','hash',0,0,?)", [now])
+    connection.execute("INSERT INTO partition_item VALUES ('daily_bar','2026-10-09','XSHG:600001','success','tencent',?)", [now])
+    connection.close()
+
+    with MetadataStore(path) as metadata:
+        assert metadata.partition("daily_bar", "stock", "2026-10-09", adjustment="legacy_mixed")["manifest_path"] == "old.json"
+        assert metadata.item_statuses("daily_bar", "2026-10-09", adjustment="legacy_mixed") == {
+            "XSHG:600001": ItemStatus.SUCCESS
+        }
+        assert metadata.partition("daily_bar", "stock", "2026-10-09", adjustment="none") is None
+
+
 @pytest.mark.parametrize("relative", ["../escape.json", "/absolute.json", "nested/../../escape.json", "."])
 def test_raw_compact_path_rejects_escape(tmp_path, relative):
     store = RawObjectStore(tmp_path)

@@ -1,14 +1,16 @@
 dataset: daily_bar
 
 rules:
-  - id: tencent-window-input-v2
+  - id: tencent-window-input-v4
     input_id: ASTOCK-002-daily
     provider: tencent
     endpoint: kline_daily
     exchange: XSHG
     asset_type: stock
     frequency: null
-    adjustment: forward
+    adjustment: parameterized
+    adjustment_parameter: adjust
+    adjustment_mapping: {none: none, qfq: forward, hfq: backward}
     code_prefixes: [sh, sz, bj]
     field_mapping: {trade_date: "0", open: "1", high: "3", low: "4", close: "2", volume: "5", amount: "8"}
     context_fields: {instrument_id: instrument_id, adjustment: adjustment}
@@ -39,9 +41,9 @@ rules:
     amount_multiplier: "1"
     volume_semantics: unverified
     status: pending_validation
-    version: tencent-window-input-v2
+    version: tencent-window-input-v4
     evidence_refs: [ASTOCK-002]
-    notes: 两接口共同前6列映射相同；newfqkline的10/11列来源行完整保留，成交额位置8仅为候选映射，单位未独立核验时volume/amount置空。fqkline没有位置8时保持空值。
+    notes: 不复权api=kline读取最近1024条day；qfq/hfq使用复权接口并读取对应qfqday/hfqday，不在本地重算复权价格。adjustment字段按请求参数映射为none/forward/backward。来源行完整保留，成交额位置8仅为候选映射，单位未独立核验时volume/amount置空。
 
   - id: fixture-daily-v1
     provider: fixture

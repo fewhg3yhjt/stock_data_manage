@@ -44,6 +44,7 @@ class Manifest:
     item_statuses: dict[str, str] = field(default_factory=dict)
     source_providers: dict[str, str | None] = field(default_factory=dict)
     publication_metadata: dict[str, Any] = field(default_factory=dict)
+    adjustment: str = "none"
 
     @classmethod
     def from_file(
@@ -64,6 +65,7 @@ class Manifest:
         item_statuses: dict[str, str] | None = None,
         source_providers: dict[str, str | None] | None = None,
         publication_metadata: dict[str, Any] | None = None,
+        adjustment: str = "none",
     ) -> "Manifest":
         if row_count < 0:
             raise ValueError("row_count cannot be negative")
@@ -84,6 +86,7 @@ class Manifest:
             item_statuses=dict(item_statuses or {}),
             source_providers=dict(source_providers or {}),
             publication_metadata=dict(publication_metadata or {}),
+            adjustment=adjustment,
         )
 
     def verify(self, path: Path) -> bool:

@@ -60,8 +60,20 @@ class BaoStockIndustryMembershipProvider:
                 raise ValueError('BaoStock universe basic fields changed')
             prefix, dot, code = str(row['code']).partition('.')
             exchange = {'sh': 'XSHG', 'sz': 'XSHE', 'bj': 'BSE'}.get(prefix)
-            if not dot or not script_stock_code(code, exchange) or str(row['type']) != '1':
-                excluded.append({**row, 'reason': 'non-stock type or outside stock range'})
+            source_type = str(row['type'])
+            if source_type == '1':
+                asset_type = 'stock'
+                valid_code = script_stock_code(code, exchange)
+            elif source_type == '2':
+                # BaoStock type 2 denotes index records; their code ranges do
+                # not follow A-share stock prefixes (for example sh.000001).
+                asset_type = 'index'
+                valid_code = bool(code and len(code) == 6 and code.isdigit())
+            else:
+                asset_type = None
+                valid_code = False
+            if not dot or exchange is None or not valid_code:
+                excluded.append({**row, 'reason': 'unsupported BaoStock type or invalid security code'})
                 continue
             if row['code'] in basic:
                 raise ValueError('duplicate BaoStock basic identity')
@@ -69,7 +81,7 @@ class BaoStockIndustryMembershipProvider:
             listed, delisted = script_date(row['ipoDate']), script_date(row['outDate'])
             if listed and listed <= trade_date and (delisted is None or trade_date < delisted):
                 item = {'trade_date': trade_date, 'stock_code': code, 'stock_name': row['code_name'],
-                    'exchange': exchange, 'asset_type': 'stock', 'status': 'unknown',
+                    'exchange': exchange, 'asset_type': asset_type, 'status': 'unknown',
                     'list_date': listed, 'delist_date': delisted,
                     'date_basis': 'listing_termination_interval_candidate', 'script_sources': 'bs_stock_basic'}
                 selected[row['code']] = item
@@ -85,7 +97,7 @@ class BaoStockIndustryMembershipProvider:
                 continue
             prefix, _, code = row['code'].partition('.')
             item = {'trade_date': trade_date, 'stock_code': code, 'stock_name': row['code_name'],
-                'exchange': {'sh':'XSHG','sz':'XSHE','bj':'BSE'}[prefix], 'asset_type':'stock', 'status':'unknown',
+                'exchange': {'sh':'XSHG','sz':'XSHE','bj':'BSE'}[prefix], 'asset_type': 'index' if str(meta['type']) == '2' else 'stock', 'status':'unknown',
                 'list_date': script_date(meta['ipoDate']), 'delist_date': script_date(meta['outDate']),
                 'date_basis': 'direct_historical_type_checked', 'script_sources':'bs_all_stock'}
             details.append(dict(item))
@@ -99,7 +111,8 @@ class BaoStockIndustryMembershipProvider:
             mapping_context={'script_queries': list(tables), 'calendar': calendar,
                 'source_total_count': len(tables['query_all_stock']), 'stock_evidence_detail': details,
                 'historical_universe_verified_complete': False,
-                'date_semantics': 'historical all-stock rows plus dated basic metadata candidates; type=1 verified'})
+                'asset_type_mapping': {'1': 'stock', '2': 'index'},
+                'date_semantics': 'historical all-stock rows plus dated basic metadata candidates; BaoStock basic type verified'})
 
     def fetch_universe_calendar(self, *, trade_date, raw_archive=None):
         with logged_in_session(client=self.client) as bs:

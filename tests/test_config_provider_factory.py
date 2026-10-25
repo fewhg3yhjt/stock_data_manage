@@ -132,6 +132,10 @@ def test_provider_yaml_declares_tencent_qfq_and_routes() -> None:
     assert qfq.adjustments == frozenset({Adjustment.FORWARD})
     assert qfq.datasets == frozenset({Dataset.DAILY_BAR})
     assert qfq.capability_version == "tencent-qfq-kline-v1"
+    hfq = next(item for item in configs if item.provider == "tencent" and item.endpoint == "backward_history")
+    assert hfq.adjustments == frozenset({Adjustment.BACKWARD})
+    assert hfq.datasets == frozenset({Dataset.DAILY_BAR})
+    assert hfq.capability_version == "tencent-hfq-kline-v1"
 
     routes = load_capability_routes(ROOT / "config" / "capabilities.yaml")
     assert routes[Dataset.DAILY_BAR][0]["endpoint"] == "forward_history"

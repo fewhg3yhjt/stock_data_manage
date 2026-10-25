@@ -58,6 +58,31 @@ providers:
         max_rows_per_request: 640
         supports_pagination: false
         request_interval_seconds: 0.5
+      backward_history:
+        implementation_status: implemented
+        request_group: tencent.kline
+        request_shape: single_symbol
+        parameters:
+          symbols:
+            type: strings
+            source: request.symbols
+            required: true
+          trade_date:
+            type: date
+            source: request.trade_date
+            required: true
+        request_limit_enforcement: physical_request
+        enabled: true
+        role: primary
+        datasets: [daily_bar]
+        adjustments: [backward]
+        asset_types: [stock, etf]
+        exchanges: [XSHG, XSHE]
+        capability_version: tencent-hfq-kline-v1
+        max_symbols_per_request: 1
+        max_rows_per_request: 640
+        supports_pagination: false
+        request_interval_seconds: 0.5
       native_1m:
         implementation_status: implemented
         request_group: tencent.kline
@@ -682,7 +707,7 @@ input_capabilities:
     runtime_method: fetch_window
     provider: tencent
     endpoint: kline_daily
-    display_name: 腾讯前复权日线
+    display_name: 腾讯日线（复权口径可选）
     data_kind: time_series
     data_frequency: daily
     request_shape: single_symbol
@@ -700,27 +725,29 @@ input_capabilities:
         type: string
         source: config.adjust
         required: true
-        default: qfq
-        choices:
-        - qfq
-      # 同一Provider按参数选择接口；已有任务默认保持fqkline。
-      # newfqkline支持北交所，但实际返回日期可能超出请求。
+        default: none
+        choices: [none, qfq, hfq]
+      # none使用独立kline接口；qfq/hfq沿用两个复权接口。
       api:
         type: string
         source: config.api
         required: true
-        default: fqkline
-        choices: [fqkline, newfqkline]
+        default: kline
+        choices: [kline, fqkline, newfqkline]
     collection_profile: tencent_daily
     implementation_status: implemented_validation_only
-    runtime_endpoint: tencent.forward_history
+    # This input dynamically selects daily_history, forward_history, or
+    # backward_history from config.adjust and config.api; no single runtime_endpoint applies.
     evidence_refs:
     - ASTOCK-002
     limitations:
-    - api=fqkline保留现有行为；api=newfqkline使用已核验的proxy主机，支持北交所代码，不自动回退另一接口。
+    - 日线任务adjustment=none且未配置api时自动选择kline；显式接口必须为kline。kline请求/appstock/app/kline/kline的最近1024条day；qfq/hfq使用fqkline或newfqkline及对应后缀，接口间不自动回退。
+    - kline窗口按返回日期在本地筛选；返回满1024条且请求起日早于最早返回日时明确报截断。当前证据不证明全市场覆盖或生产路由资格。
+    - api=fqkline保留现有行为；api=newfqkline使用已核验的proxy主机并支持北交所代码，但实际返回日期可能超出请求日期。
+    - adjust支持none/qfq/hfq并映射到day/qfqday/hfqday；三种口径均有单证券日期探测，尚不构成全市场资格或生产路由资格。
     - 两接口8只证券12组窗口核验，共同日期的76条开收高低与成交量数值一致；不是全市场或单位认证。
     - newfqkline可能返回最近640条而忽略日期范围；原响应和来源行完整保存，规范候选只提取请求日期，超出640条历史窗口明确报截断。
-    - 成交量和成交额单位未认证，标准输出置空；实际day/qfqday标签保留，不由样本推定任意除权场景。
+    - 成交量和成交额单位未认证，标准输出置空；复权价格使用来源返回序列，不在本地重算。
     - 请求间隔0.3秒、单并发；参考原项目节流，不代表持续容量已验证，不自动启用路由
     request_interval_seconds: 0.3
     effective_concurrency: 1
