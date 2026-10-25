@@ -11,6 +11,7 @@ venv/
 !.env.example
 .idea/
 .vscode/
+.obsidian/
 
 # Generated probe results (retain local evidence and already tracked history)
 provider_validation/results/
