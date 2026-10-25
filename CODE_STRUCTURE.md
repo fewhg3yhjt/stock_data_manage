@@ -165,7 +165,7 @@
 | `service/calendar.py` | Trading Calendar 存储、读取和来源合并 |
 | `service/calendar_update.py` | 交易日历来源更新、官方优先级，以及校验原在线证据后的正向日期导入 |
 | `service/market_data.py` | Canonical + Hot 的统一分钟查询服务 |
-| `service/web.py` | 只读运行台入口；从现有任务摘要、Raw manifest/body 和 Canonical manifest 生成分页、脱敏的展示接口，不读写任务数据库 |
+| `service/web.py` | 只读运行台入口；从现有任务摘要、Raw manifest/body 和 Canonical manifest 生成展示接口；按类型、证券及业务日期查询已核验来源行，复用 YAML 字段说明和已发布证券名称辅助检索，不读写任务数据库 |
 | `service/static/` | 只读运行台的原生 HTML、CSS 和 JavaScript 页面资源，无独立前端构建或持久化状态 |
 | `service/__init__.py` | 服务包说明，不承载业务实现 |
 

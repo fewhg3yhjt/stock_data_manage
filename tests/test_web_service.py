@@ -1,6 +1,6 @@
 import hashlib
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -279,3 +279,115 @@ def test_sdk_payload_is_not_labeled_as_http_or_transport_bytes(tmp_path):
     assert item["sdk_status_code"] == "0" and item["body_bytes"] == len(payload)
     assert item["response"]["original_transport_bytes_available"] is False
     assert reader.raw_body(item["id"])[0].read_bytes() == payload
+
+
+def source_query_fixture(tmp_path):
+    reader, app, data, _ = web_fixture(tmp_path)
+    config = tmp_path / "config"
+    (config / "normalization").mkdir()
+    (config / "normalization/daily_bar.yaml").write_text(
+        "rules:\n  - input_id: DAILY-TEST\n    version: test-v1\n"
+        "    field_mapping: {trade_date: '0', close: '2', volume: '5'}\n", encoding="utf-8")
+    import pyarrow as arrow
+    import pyarrow.parquet as parquet
+    master = data / "canonical/2026-10-09/security_master/data.parquet"
+    master.parent.mkdir(parents=True)
+    parquet.write_table(arrow.Table.from_pylist([
+        {"instrument_id":"XSHG:600519", "symbol": "600519", "name": "贵州茅台", "asset_type": "stock"},
+        {"symbol": "sh000001", "name": "上证指数", "asset_type": "index"},
+        {"symbol": "sz000001", "name": "平安银行", "asset_type": "stock"},
+    ]), master)
+
+    def add(symbol, rows, *, dataset="daily_bar", parameters=None):
+        directory = data / f"task_workspace/2026-10-09/{dataset}/sources/tencent/kline_daily"
+        directory.mkdir(parents=True, exist_ok=True)
+        source = directory / f"{symbol}.source-rows.json"
+        write_json(source, rows)
+        descriptor = {"path": f"sources/tencent/kline_daily/{source.name}",
+                      "sha256": hashlib.sha256(source.read_bytes()).hexdigest(), "row_count": len(rows)}
+        report = {"dataset": dataset, "input_id": "DAILY-TEST", "provider": "tencent", "endpoint": "kline_daily",
+                  "data_date": "2026-10-09", "parameters": parameters if parameters is not None else {"code": symbol,"adjust":"qfq"},
+                  "source_rows": descriptor, "normalization_version": "test-v1", "code_version": "fixture",
+                  "raw_manifest": {"path": str(data / "raw/2026-10-09/tencent/kline_daily/manifest.sh600519.ndjson")}}
+        write_json(directory / f"{symbol}.report.json", report)
+        return source
+    add("sh600519", [{"0":day,"2":price,"5":"7061.00","symbol":"sh600519"}
+                     for day,price in [("2026-10-08","100.00"),("2026-10-09","101.00"),("2026-10-10","102.00")]])
+    return reader, app, data, add
+
+
+def test_record_query_filters_business_date_name_and_keeps_source_values(tmp_path):
+    _, app, _, _ = source_query_fixture(tmp_path)
+    with TestClient(app) as client:
+        options = client.get("/api/data/options").json()
+        assert [item["id"] for item in options["datasets"]] == ["daily_bar"]
+        query = {"dataset":"daily_bar","security":"贵州茅台","start_date":"2026-10-09",
+                 "end_date":"2026-10-10","asset_type":"stock","adjustment":"qfq","page_size":1}
+        first = client.get("/api/data", params=query).json()
+        assert first["total"] == 2
+        row = first["items"][0]
+        assert row["record_date"] == "2026-10-10"  # Not the workspace date or capture time.
+        assert row["values"]["2"] == "102.00" and row["values"]["5"] == "7061.00"
+        assert row["symbol"] == "sh600519" and row["evidence"]
+        second = client.get("/api/data", params={**query,"page":2}).json()
+        assert second["items"][0]["record_date"] == "2026-10-09"
+        assert client.get("/api/data",params={**query,"provider":"missing"}).json()["total"] == 0
+        assert client.get("/api/data",params={**query,"adjustment":"hfq"}).json()["total"] == 0
+
+
+def test_record_query_distinguishes_exchanges_and_does_not_use_capture_date(tmp_path):
+    reader, _, _, add = source_query_fixture(tmp_path)
+    add("sh000001", [{"date":"2026-10-09","symbol":"sh000001","close":"3000"}])
+    add("sz000001", [{"date":"2026-10-09","symbol":"sz000001","close":"12"}])
+    assert reader.data_records(dataset="daily_bar",security="XSHG:000001")["total"] == 1
+    assert reader.data_records(dataset="daily_bar",security="000001")["total"] == 2
+    add("sh600000", [{"symbol":"sh600000","close":"20"}])
+    result = reader.data_records(dataset="daily_bar",security="sh600000",start_date=date(2026,10,9))
+    assert result["total"] == 0 and result["excluded_unknown_date_count"] == 1
+
+
+def test_record_query_snapshot_date_is_explicit_and_integrity_failure_visible(tmp_path):
+    reader, app, _, add = source_query_fixture(tmp_path)
+    add("snapshot", [{"code":"sz.000001","code_name":"平安银行"}], dataset="security_snapshot",
+        parameters={"trade_date":"2026-10-09"})
+    result = reader.data_records(dataset="security_snapshot",security="000001",start_date=date(2026,10,9))
+    assert result["total"] == 1
+    assert result["items"][0]["date_basis"].startswith("请求快照日期")
+    source = add("sh600001", [{"date":"2026-10-09","code":"sh600001"}])
+    source.write_bytes(b"[]")
+    with TestClient(app) as client:
+        result = client.get("/api/data?dataset=daily_bar&security=sh600001").json()
+        assert result["total"] == 0 and "哈希" in result["issues"][0]["reason"]
+        assert client.get("/api/data?dataset=daily_bar&start_date=2026-10-10&end_date=2026-10-09").status_code == 422
+        assert client.get("/api/data?dataset=daily_bar&start_date=bad").status_code == 422
+        assert client.get("/api/data?dataset=daily_bar").status_code == 422
+        assert client.get("/api/data?dataset=../../metadata").status_code == 404
+
+
+def test_record_query_retains_historical_tencent_date_without_new_unit_mapping(tmp_path):
+    reader, _, _, add = source_query_fixture(tmp_path)
+    source = add("sh600002", [{"0":"2026-10-09","2":"12.000","5":"77.00","symbol":"sh600002"}])
+    report_path = source.with_name("sh600002.report.json")
+    report = json.loads(report_path.read_bytes())
+    report["normalization_version"] = "tencent-window-input-v1"
+    write_json(report_path, report)
+    result = reader.data_records(dataset="daily_bar",security="sh600002",start_date=date(2026,10,9))
+    assert result["total"] == 1
+    row = result["items"][0]
+    assert row["record_date"] == "2026-10-09" and "字段0" in row["date_basis"]
+    assert row["values"]["2"] == "12.000" and row["values"]["5"] == "77.00"
+
+
+def test_record_query_is_read_only_and_sees_changed_source_report(tmp_path):
+    reader, app, data, add = source_query_fixture(tmp_path)
+    before = {path.relative_to(data):path.read_bytes() for path in data.rglob("*") if path.is_file()}
+    with TestClient(app) as client:
+        client.get("/api/data/options")
+        response = client.get("/api/data?dataset=daily_bar&security=600519&start_date=2026-10-09&end_date=2026-10-09")
+        assert response.json()["total"] == 1
+        assert client.post("/api/data").status_code == 405
+    after = {path.relative_to(data):path.read_bytes() for path in data.rglob("*") if path.is_file()}
+    assert before == after
+    add("sh600519", [{"0":"2026-10-09","2":"999.00","symbol":"sh600519"}])
+    result = reader.data_records(dataset="daily_bar",security="600519")
+    assert result["total"] == 1 and result["items"][0]["values"]["2"] == "999.00"

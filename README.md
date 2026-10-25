@@ -138,7 +138,7 @@ python -m pip install -e ".[web]"
 stock-data-web
 ```
 
-浏览器访问 `http://127.0.0.1:8765`。该页面只读取现有 `data/` 产物，不启动、停止或修改采集任务；状态解释、原始响应脱敏及后续云端部署边界见[只读运行台说明](docs/service/read-only-web.md)。
+浏览器访问 `http://127.0.0.1:8765`。“数据查询”可按数据类型、证券代码或名称、日期区间预览来源记录，并查看对应原始响应。该页面只读取现有 `data/` 产物，不启动、停止或修改采集任务；状态解释、日期口径、原始响应脱敏及后续云端部署边界见[只读运行台说明](docs/service/read-only-web.md)。
 
 ```powershell
 python -m pytest

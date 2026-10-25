@@ -123,6 +123,11 @@ progress::-webkit-progress-value { border-radius: 999px; background: var(--green
 .filters { padding: 14px; display: grid; grid-template-columns: repeat(4, minmax(130px, 1fr)) auto; gap: 10px; border: 1px solid var(--line); border-radius: 13px; background: white; margin-bottom: 18px; }
 .filters input, .filters select { width: 100%; padding: 9px 10px; border: 1px solid #d7e0dc; border-radius: 8px; color: var(--ink); background: #fbfcfb; font-size: 12px; }
 .filters input:focus, .filters select:focus { outline: 2px solid rgba(19,121,91,.17); border-color: var(--green); }
+.data-filters { grid-template-columns: repeat(4,minmax(0,1fr)); align-items: end; }
+.data-filters label { display: grid; gap: 7px; color: var(--muted); font-size: 11px; }
+.data-table { white-space: nowrap; }
+.data-table td { max-width: 260px; overflow: hidden; text-overflow: ellipsis; }
+.query-description { font-size: 12px; line-height: 1.8; }
 .pagination { padding: 13px 18px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #edf1ef; color: var(--muted); font-size: 11px; }
 .pagination div { display: flex; gap: 7px; }
 .pagination button { padding: 6px 10px; border: 1px solid var(--line); border-radius: 7px; background: white; }
@@ -168,6 +173,7 @@ dialog::backdrop { background: rgba(9,31,25,.48); backdrop-filter: blur(3px); }
   .sidebar { position: static; width: 100%; height: auto; padding: 12px; flex-direction: row; align-items: center; }
   .brand { padding: 0; margin-right: auto; }
   .brand div { display: block; }
+  .brand small { display: none; }
   nav { display: flex; }
   .nav-item { width: 40px; }
   .sidebar-note { display: none; }

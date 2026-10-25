@@ -7,10 +7,12 @@ import codecs
 import hashlib
 import json
 import re
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
+
+import yaml
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse
@@ -174,6 +176,247 @@ class DashboardReader:
 
     def __init__(self, config_root: str | Path, data_root: str | Path | None = None) -> None:
         self.paths = load_storage_paths(config_root, data_root=data_root)
+        self.config_root = Path(config_root).resolve()
+        self._query_cache: dict[Path, tuple[tuple[int, int], dict[str, Any]]] = {}
+
+    def _query_reports(self) -> list[tuple[Path, dict[str, Any]]]:
+        """Index only existing source reports in memory; never create a query database."""
+        result = []
+        seen = set()
+        keys = {"dataset", "input_id", "provider", "endpoint", "data_date", "parameters",
+                "source_rows", "raw_manifest", "normalization_version", "code_version"}
+        for root in (self.paths["workspace_root"], self.paths["archive_root"]):
+            for path in root.glob("*/*/sources/*/*/*.report.json"):
+                if not _within(path, root):
+                    continue
+                first = path.relative_to(root).parts[0]
+                if first.startswith("_") and not (root == self.paths["archive_root"] and first == "_workspace_audit"):
+                    continue
+                try:
+                    stat = path.stat()
+                    stamp = (stat.st_mtime_ns, stat.st_size)
+                    cached = self._query_cache.get(path)
+                    if cached is None or cached[0] != stamp:
+                        report = _read_json(path)
+                        report = {key: value for key, value in report.items() if key in keys}
+                        self._query_cache[path] = (stamp, report)
+                    else:
+                        report = cached[1]
+                    if not isinstance(report.get("source_rows"), dict):
+                        continue
+                    source = (path.parents[3] / str(report["source_rows"].get("path", ""))).resolve()
+                    if not _within(source, path.parents[3]) or not source.is_file():
+                        continue
+                    seen.add(path)
+                    result.append((path, report))
+                except (ValueError, OSError):
+                    continue
+        self._query_cache = {path: value for path, value in self._query_cache.items() if path in seen}
+        return result
+
+    def data_options(self) -> dict[str, Any]:
+        groups: dict[str, dict[str, Any]] = {}
+        for _, report in self._query_reports():
+            dataset = report.get("dataset")
+            if not isinstance(dataset, str) or not re.fullmatch(r"[a-z0-9_]+", dataset):
+                continue
+            if dataset not in groups:
+                label = dataset
+                schema_path = self.config_root / "datasets" / f"{dataset}.yaml"
+                if schema_path.is_file():
+                    schema = yaml.safe_load(schema_path.read_text(encoding="utf-8")) or {}
+                    label = schema.get("dataset", {}).get("display_name", dataset)
+                groups[dataset] = {"id": dataset, "label": label, "providers": set(), "dates": set(),
+                                   "requires_security": dataset == "daily_bar" or dataset.startswith("minute_bar")}
+            group = groups[dataset]
+            group["providers"].add(str(report.get("provider", "")))
+            if report.get("data_date"):
+                group["dates"].add(str(report["data_date"]))
+        return {"datasets": [{**group, "providers": sorted(group["providers"]),
+                              "dates": sorted(group["dates"])} for group in groups.values()]}
+
+    @staticmethod
+    def _security_code(value: Any) -> tuple[str, str]:
+        text = str(value or "").strip().lower()
+        match = re.fullmatch(r"(?:(xshg|xshe|bse|sh|sz|bj)[.:]?)?(\d{6})", text)
+        if not match:
+            return "", ""
+        market = {"xshg": "sh", "xshe": "sz", "bse": "bj"}.get(match[1], match[1] or "")
+        return market, match[2]
+
+    def _security_catalog(self) -> dict[tuple[str, str], dict[str, str]]:
+        import pyarrow.parquet as parquet
+
+        catalog = {}
+        root = self.paths["canonical_root"]
+        candidates = sorted(root.glob("*/security_master/data.parquet"), reverse=True)
+        for path in candidates:
+            if not _within(path, root):
+                continue
+            try:
+                for row in parquet.read_table(path).to_pylist():
+                    code = self._security_code(row.get("instrument_id") or row.get("symbol"))
+                    if not code[0]:
+                        market = {"XSHG": "sh", "XSHE": "sz", "BSE": "bj"}.get(row.get("exchange"), "")
+                        code = (market, code[1])
+                    if code[1] and code not in catalog:
+                        catalog[code] = {"name": str(row.get("name") or ""),
+                                         "asset_type": str(row.get("asset_type") or "")}
+            except (OSError, ValueError):
+                continue
+        return catalog
+
+    def data_records(self, *, dataset: str, security: str = "", start_date: date | None = None,
+                     end_date: date | None = None, provider: str = "", asset_type: str = "",
+                     adjustment: str = "", page: int = 1, page_size: int = 50) -> dict[str, Any]:
+        if start_date and end_date and start_date > end_date:
+            raise HTTPException(status_code=422, detail="开始日期不能晚于结束日期")
+        _component(dataset)
+        if (dataset == "daily_bar" or dataset.startswith("minute_bar")) and not security.strip():
+            raise HTTPException(status_code=422, detail="行情查询请先输入证券代码或名称，再选择日期区间")
+        schema_path = self.config_root / "normalization" / f"{dataset}.yaml"
+        rules = (yaml.safe_load(schema_path.read_text(encoding="utf-8")) or {}).get("rules", []) if schema_path.is_file() else []
+        catalog = self._security_catalog()
+        target_market, target_code = self._security_code(security)
+        references = {}
+        for document, _, _ in self._task_documents():
+            for unit in document.get("source_units", []):
+                if isinstance(unit, dict) and unit.get("report_path"):
+                    references[str(Path(unit["report_path"]).resolve())] = unit
+        matches = []
+        issues = []
+        seen = set()
+        unknown_dates = 0
+        column_labels = {}
+        titles = {"trade_date": "日期", "bar_time": "时间", "stock_code": "证券代码",
+                  "stock_name": "证券名称", "open": "开盘价", "close": "收盘价",
+                  "high": "最高价", "low": "最低价", "volume": "成交量（来源单位）",
+                  "amount": "成交额（来源单位）"}
+        for report_path, report in self._query_reports():
+            if report.get("dataset") != dataset or (provider and report.get("provider") != provider):
+                continue
+            parameters = report.get("parameters") or {}
+            request_symbol = parameters.get("symbol") or parameters.get("code") or ""
+            request_market, request_code = self._security_code(request_symbol)
+            # A declared single-security request cannot contain a different security.
+            if target_code and request_code and (target_code != request_code or
+                    (target_market and request_market and target_market != request_market)):
+                continue
+            if security and not target_code and request_code:
+                requested_security = catalog.get((request_market, request_code), {})
+                if requested_security.get("name") and security.casefold() not in requested_security["name"].casefold():
+                    continue
+            source_adjustment = str(parameters.get("adjust") or parameters.get("adjustment") or "")
+            comparable_adjustment = {"forward": "qfq", "backward": "hfq"}.get(source_adjustment, source_adjustment)
+            if adjustment and comparable_adjustment != adjustment:
+                continue
+            descriptor = report["source_rows"]
+            identity = (dataset, report.get("input_id"), report.get("data_date"),
+                        descriptor.get("sha256"), json.dumps(parameters, sort_keys=True))
+            if identity in seen:
+                continue
+            seen.add(identity)
+            source = (report_path.parents[3] / str(descriptor["path"])).resolve()
+            try:
+                payload = source.read_bytes()
+                if not descriptor.get("sha256") or hashlib.sha256(payload).hexdigest() != descriptor["sha256"]:
+                    raise ValueError("来源行文件哈希不匹配")
+                rows = json.loads(payload)
+                if not isinstance(rows, list) or not all(isinstance(row, dict) for row in rows):
+                    raise ValueError("来源行文件不是对象数组")
+                if descriptor.get("row_count") is not None and len(rows) != descriptor["row_count"]:
+                    raise ValueError("来源行数与报告不一致")
+            except (OSError, ValueError) as exc:
+                issues.append({"provider": report.get("provider"), "input_id": report.get("input_id"),
+                               "reason": _redact(str(exc))})
+                continue
+            rule = next((rule for rule in rules if rule.get("input_id") == report.get("input_id")
+                         and rule.get("version") == report.get("normalization_version")), {})
+            mapping = rule.get("field_mapping", {})
+            for canonical, original in mapping.items():
+                if canonical in titles and isinstance(original, str):
+                    column_labels[original] = f"{original} · {titles[canonical]}"
+
+            def value(row, canonical, aliases):
+                keys = [mapping.get(canonical), *aliases]
+                return next((row[key] for key in keys if key in row and row[key] not in (None, "")), None)
+
+            evidence = None
+            for index, row in enumerate(rows):
+                symbol = value(row, "stock_code", ["instrument_id", "symbol", "code", "stock_code", "证券代码", "基金代码", "SEC_CODE", "FUND_CODE", "hqzqdm"])
+                row_market, row_code = self._security_code(symbol or request_symbol)
+                exchange = str(row.get("exchange") or "").lower()
+                if not row_market:
+                    row_market = {"xshg": "sh", "xshe": "sz", "bse": "bj"}.get(exchange, request_market)
+                if not row_market:
+                    row_market = {"sse": "sh", "szse": "sz", "bse": "bj"}.get(str(report.get("provider")), "")
+                if not row_market:
+                    markets = {market for market, code in catalog if code == row_code}
+                    if len(markets) == 1:
+                        row_market = markets.pop()
+                known = catalog.get((row_market, row_code), {})
+                name = value(row, "stock_name", ["stock_name", "code_name", "name", "证券简称", "基金简称", "SEC_NAME", "FUND_ABBR", "hqzqjc"]) or known.get("name", "")
+                if target_code:
+                    if row_code != target_code or (target_market and row_market != target_market):
+                        continue
+                elif security and security.casefold() not in str(name).casefold():
+                    continue
+                row_asset = str(row.get("asset_type") or known.get("asset_type") or "")
+                if asset_type and row_asset != asset_type:
+                    continue
+                raw_date = value(row, "trade_date", ["trade_date", "bar_time", "date", "日期", "交易日期", "STAT_DATE"])
+                record_date = None
+                date_basis = "来源行日期"
+                # Archived Tencent v1/v2 rows retain the native date at index 0,
+                # although their retired normalization rule is no longer in YAML.
+                # Recognize only this established source format; do not apply a
+                # newer price/unit mapping to the historical source values.
+                if raw_date is None and dataset == "daily_bar" and report.get("provider") == "tencent" and report.get("endpoint") == "kline_daily":
+                    raw_date = row.get("0")
+                    if raw_date is not None:
+                        date_basis = "来源行字段0（腾讯日线原始日期）"
+                        column_labels.setdefault("0", "0 · 来源日期")
+                if raw_date is not None:
+                    try:
+                        text = str(raw_date)
+                        record_date = date.fromisoformat(text[:10]) if "-" in text[:10] else datetime.strptime(text[:8], "%Y%m%d").date()
+                    except ValueError:
+                        pass
+                if record_date is None and dataset == "security_snapshot" and parameters.get("trade_date"):
+                    record_date = date.fromisoformat(str(parameters["trade_date"])[:10])
+                    date_basis = "请求快照日期（来源行无日期，不代表独立历史状态证明）"
+                if (start_date or end_date) and record_date is None:
+                    unknown_dates += 1
+                    continue
+                if record_date and ((start_date and record_date < start_date) or (end_date and record_date > end_date)):
+                    continue
+                if evidence is None:
+                    unit = references.get(str(report_path.resolve()), {})
+                    evidence_path = None
+                    for reference in (unit.get("raw_manifest"), unit.get("current_raw")):
+                        if reference and (evidence_path := self._evidence_path(str(reference))):
+                            break
+                    if not evidence_path and isinstance(report.get("raw_manifest"), dict):
+                        reference = report["raw_manifest"].get("path")
+                        if reference:
+                            evidence_path = self._evidence_path(str(report_path.parents[3] / reference))
+                    evidence = self._manifest_records(evidence_path) if evidence_path else []
+                matches.append({"record_date": record_date.isoformat() if record_date else None,
+                                "date_basis": date_basis if record_date else "未提供可筛选业务日期",
+                                "symbol": (row_market + row_code) if row_code else str(symbol or request_symbol),
+                                "security_name": str(name), "asset_type": row_asset,
+                                "provider": report.get("provider"), "endpoint": report.get("endpoint"),
+                                "adjustment": source_adjustment, "values": _redact(row),
+                                "source_row_index": index, "source_rows_sha256": descriptor["sha256"],
+                                "code_version": report.get("code_version"),
+                                "normalization_version": report.get("normalization_version"), "evidence": evidence})
+        matches.sort(key=lambda row: (row["record_date"] or "", row["symbol"], row["provider"] or ""), reverse=True)
+        result = _page(matches, page, page_size)
+        columns = list(dict.fromkeys(key for row in result["items"] for key in row["values"]))
+        result.update(columns=[{"key": key, "label": column_labels.get(key, key)} for key in columns],
+                      issues=issues[:50], excluded_unknown_date_count=unknown_dates,
+                      dataset=dataset, representation="来源行提取结果；保留来源字段和原值，不是完整原始响应字节")
+        return result
 
     def _task_documents(self) -> list[tuple[dict[str, Any], Path, str]]:
         candidates: list[tuple[dict[str, Any], Path, str]] = []
@@ -657,6 +900,19 @@ def create_app(
     @app.get("/api/overview")
     def overview():
         return reader.overview()
+
+    @app.get("/api/data/options")
+    def data_options():
+        return reader.data_options()
+
+    @app.get("/api/data")
+    def data_records(dataset: str, security: str = "", start_date: date | None = None,
+                     end_date: date | None = None, provider: str = "", asset_type: str = "",
+                     adjustment: str = "", page: int = Query(1, ge=1),
+                     page_size: int = Query(50, ge=1, le=100)):
+        return reader.data_records(dataset=dataset, security=security, start_date=start_date,
+                                   end_date=end_date, provider=provider, asset_type=asset_type,
+                                   adjustment=adjustment, page=page, page_size=page_size)
 
     @app.get("/api/tasks")
     def tasks(

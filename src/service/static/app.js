@@ -4,13 +4,14 @@ const dialogContent = document.querySelector('#dialog-content');
 const refreshTime = document.querySelector('#refresh-time');
 const pageTitle = document.querySelector('#page-title');
 const pageEyebrow = document.querySelector('#page-eyebrow');
-const state = { view: 'overview', pages: { tasks: 1, raw: 1, publications: 1 }, rawDate: '', rawSources: [],
-  filters: { tasks: { q: '', status: '', dataset: '' }, raw: { provider: '', endpoint: '', q: '' }, publications: { dataset: '' } } };
+const state = { view: 'overview', pages: { tasks: 1, data: 1, raw: 1, publications: 1 }, rawDate: '', rawSources: [],
+  filters: { data: {dataset:'', security:'', start_date:'', end_date:'', provider:'', asset_type:'', adjustment:''}, tasks: { q: '', status: '', dataset: '' }, raw: { provider: '', endpoint: '', q: '' }, publications: { dataset: '' } } };
 let renderSequence = 0;
 
 const labels = {
   overview: ['运行总览', 'OPERATIONS OVERVIEW'],
   tasks: ['任务中心', 'TASK EXECUTION'],
+  data: ['数据查询', '按类型、证券和日期查询来源记录'],
   raw: ['原始数据', 'RAW EVIDENCE'],
   publications: ['发布结果', 'CANONICAL PUBLICATIONS'],
 };
@@ -228,12 +229,72 @@ async function renderPublications() {
   form.addEventListener('submit', event => { event.preventDefault(); state.filters.publications = Object.fromEntries(new FormData(form)); state.pages.publications = 1; renderPublications().catch(fail); });
 }
 
+async function renderData() {
+  const sequence = ++renderSequence;
+  const pendingButton = document.querySelector('#data-filters button');
+  if (pendingButton) { pendingButton.disabled = true; pendingButton.textContent = '查询中…'; }
+  const options = await api('/api/data/options');
+  if (sequence !== renderSequence || state.view !== 'data') return;
+  const filters = state.filters.data;
+  if (!filters.dataset && options.datasets.length) {
+    filters.dataset = options.datasets.find(item => item.id === 'daily_bar')?.id || options.datasets[0].id;
+    const dates = options.datasets.find(item => item.id === filters.dataset)?.dates || [];
+    filters.start_date = dates.at(-1) || ''; filters.end_date = dates.at(-1) || '';
+  }
+  if (!filters.dataset) {
+    app.innerHTML = '<div class="empty">尚无可查询的来源行文件。采集任务保存来源行后，可在这里按证券和日期查看。</div>'; return;
+  }
+  const params = new URLSearchParams({page:state.pages.data,page_size:25});
+  for (const [key, value] of Object.entries(filters)) if (value) params.set(key, value);
+  const choice = options.datasets.find(item => item.id === filters.dataset);
+  const needsSecurity = choice?.requires_security && !filters.security.trim();
+  let data = {items:[],columns:[],issues:[],total:0,page:1,pages:0};
+  if (!needsSecurity) {
+    try { data = await api(`/api/data?${params}`); }
+    catch (error) { data.issues = [{provider:'查询条件',reason:error.message}]; }
+  }
+  if (sequence !== renderSequence || state.view !== 'data') return;
+  const valueText = value => value === null || value === undefined ? '—' : typeof value === 'object' ? JSON.stringify(value) : String(value);
+  app.innerHTML = `<form class="filters data-filters" id="data-filters">
+    <label>数据类型<select name="dataset">${options.datasets.map(item => `<option value="${esc(item.id)}">${esc(item.label)}</option>`).join('')}</select></label>
+    <label>证券<input name="security" placeholder="600519、sh600519 或贵州茅台"></label>
+    <label>开始日期<input type="date" name="start_date"></label><label>结束日期<input type="date" name="end_date"></label>
+    <label>来源<select name="provider"><option value="">全部来源</option>${(choice?.providers || []).map(item => `<option>${esc(item)}</option>`).join('')}</select></label>
+    <label>资产类型<select name="asset_type"><option value="">全部类型</option><option value="stock">股票</option><option value="etf">ETF</option><option value="lof">LOF</option><option value="index">指数</option></select></label>
+    <label>复权口径<select name="adjustment"><option value="">全部口径</option><option value="none">不复权</option><option value="qfq">前复权</option><option value="hfq">后复权</option></select></label><button class="primary" type="submit">查询数据</button>
+  </form><p class="subtle query-description">展示来源字段与原值，成交量和成交额保留来源单位。点击记录查看日期依据、完整字段和原始响应。</p>
+  ${data.excluded_unknown_date_count ? `<p class="notice">${prettyNumber(data.excluded_unknown_date_count)} 条记录缺少明确业务日期，未纳入本次日期筛选。</p>` : ''}
+  ${data.issues.length ? `<p class="notice">${prettyNumber(data.issues.length)} 份来源文件未通过读取或完整性检查，已排除。${esc(data.issues.map(item => `${item.provider}: ${item.reason}`).join('；'))}</p>` : ''}
+  <section class="panel"><div class="panel-head"><h2>来源数据预览</h2><small>${prettyNumber(data.total)} 条匹配记录 · 点击查看详情</small></div>
+  <div class="table-wrap"><table class="data-table"><thead><tr><th>查询日期</th><th>证券</th><th>来源</th>${data.columns.map(col => `<th>${esc(col.label)}</th>`).join('')}</tr></thead><tbody>
+  ${data.items.length ? data.items.map((row,index) => `<tr class="clickable data-row" data-index="${index}"><td>${esc(row.record_date || '未提供')}</td><td><strong>${esc(row.symbol)}</strong><br>${esc(row.security_name)}</td><td>${esc(row.provider)}</td>${data.columns.map(col => `<td title="${esc(valueText(row.values[col.key]))}">${esc(valueText(row.values[col.key]).slice(0,180))}</td>`).join('')}</tr>`).join('') : `<tr><td colspan="${data.columns.length+3}">${needsSecurity ? '请输入证券代码或名称，再点击“查询数据”。' : '没有匹配的本地留存记录。可调整证券、日期或来源；查询不会触发联网采集。'}</td></tr>`}
+  </tbody></table></div>${pager('data',data)}</section>`;
+  const form = document.querySelector('#data-filters');
+  for (const [key,value] of Object.entries(filters)) form.elements.namedItem(key).value = value;
+  form.addEventListener('submit',event => {event.preventDefault();state.filters.data = Object.fromEntries(new FormData(form));state.pages.data=1;renderData().catch(fail);});
+  form.elements.namedItem('dataset').addEventListener('change',() => {
+    state.filters.data = {...Object.fromEntries(new FormData(form)),provider:'',adjustment:''};state.pages.data=1;renderData().catch(fail);
+  });
+  document.querySelectorAll('.data-row').forEach(element => element.addEventListener('click',() => {
+    const row = data.items[Number(element.dataset.index)];
+    dialogContent.innerHTML = `<h2 class="dialog-title">${esc(row.symbol)} ${esc(row.security_name)}</h2><p class="dialog-subtitle">${esc(row.provider)} · ${esc(row.endpoint)}</p>
+    <div class="facts-grid"><div class="fact"><span>查询日期及依据</span><strong>${esc(row.record_date || '未提供')} · ${esc(row.date_basis)}</strong></div><div class="fact"><span>来源文件内行号（从1开始）</span><strong>${row.source_row_index+1}</strong></div><div class="fact"><span>资产类型 / 请求复权</span><strong>${esc(row.asset_type || '未提供')} / ${esc(row.adjustment || '未提供')}</strong></div></div>
+    <h3>来源字段与原值</h3><pre class="code-block">${esc(JSON.stringify(row.values,null,2))}</pre>
+    <h3>来源行文件 SHA-256</h3><pre class="code-block">${esc(row.source_rows_sha256)}</pre>
+    <h3>关联原始响应</h3>${row.evidence.map((record,index) => `<button class="secondary query-evidence" data-id="${esc(record.id)}">${esc(record.provider)} · 响应 ${index+1} · ${esc(formatTime(record.fetched_at_utc))}</button>`).join('') || '<p class="subtle">当前没有可读取的关联原始响应。</p>'}
+    <p class="subtle query-description">${esc(data.representation)}。辅助证券名称和资产类型可来自已发布证券名单，不改变上方来源字段。</p>`;
+    if(!dialog.open) dialog.showModal();
+    dialogContent.querySelectorAll('.query-evidence').forEach(button => button.addEventListener('click',() => showRaw(button.dataset.id)));
+  }));
+}
+
 async function render() {
   loading(); const [title, eyebrow] = labels[state.view]; pageTitle.textContent = title; pageEyebrow.textContent = eyebrow;
   document.querySelectorAll('.nav-item').forEach(item => item.classList.toggle('active', item.dataset.view === state.view));
   try {
     if (state.view === 'overview') await renderOverview();
     if (state.view === 'tasks') await renderTasks();
+    if (state.view === 'data') await renderData();
     if (state.view === 'raw') await renderRaw();
     if (state.view === 'publications') await renderPublications();
     refreshTime.textContent = `刷新于 ${new Date().toLocaleTimeString('zh-CN', { hour12: false })}`;
