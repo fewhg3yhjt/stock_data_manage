@@ -56,6 +56,8 @@ stock-data-web
 stock-data-web --config-root config --data-root tmp/example-runtime --port 8766
 ```
 
+Docker/Compose 部署及无需重建镜像的代码更新方式见[容器部署说明](container-deployment.md)。
+
 默认只允许绑定本机地址。绑定非本机地址必须增加 `--allow-network`；该参数只表示明确允许监听网络，不提供用户认证、HTTPS 或访问控制。部署云服务器前仍须使用反向代理配置 HTTPS 和认证，并限制原始响应下载权限。
 
 ## 状态解释

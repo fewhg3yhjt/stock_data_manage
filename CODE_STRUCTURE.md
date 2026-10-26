@@ -45,6 +45,7 @@
 | `docs/pipeline/collection-tasks.md` | 获取、检查、发布、重做、证券清单调度和恢复 |
 | `docs/storage/README.md` | 数据分层、日期唯一、实际文件名与内容示例、字段解读、生成/读取/保留规则、原始引用与归档；精简方向与当前实现分开标注 |
 | `docs/service/read-only-web.md` | 本机只读运行台的用途、读取来源、启动方式、状态语义、安全边界与云端部署前置条件 |
+| `docs/service/container-deployment.md` | 只读运行台的 Docker/Compose 部署、代码挂载更新、持久数据只读挂载及网络安全边界 |
 | `PROVIDER_CAPABILITY_MATRIX.md` | 2026-10-03历史抽样及证据索引，不是当前能力清单 |
 
 源头接口阅读版与同名JSON位于 `docs/providers/`，是代码、YAML和证据的派生快照，不是运行配置；`docs/pipeline/examples/` 是离线任务参数示例，不保存运行数据。合并删除的5份旧文档内容已由上述文件承接，不建立兼容副本。

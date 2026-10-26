@@ -10,6 +10,7 @@
 | 原始暂存、检查、发布、重做和证券清单调度 | [任务流程](docs/pipeline/collection-tasks.md) |
 | 数据在哪里、文件名与内容示例、字段解读及归档 | [存储文件说明](docs/storage/README.md) |
 | 在本机查看任务、原始证据和发布结果 | [只读运行台](docs/service/read-only-web.md) |
+| 用 Docker 部署只读运行台并更新代码 | [Docker 部署说明](docs/service/container-deployment.md) |
 | 来源资格、证据与归一化设计 | [来源专项设计](provider-capability-verification-and-normalization.md) |
 | 前复权变化后如何重建历史 | [历史重建设计](stock-data-design-qfq-history-rebuild.md) |
 | 怎么判断功能完成和数据可用 | [验收基线](stock-data-test-design-acceptance-baseline.md) |

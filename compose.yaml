@@ -1,0 +1,54 @@
+services:
+  stock-data-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: stock-data-manage-web:local
+    container_name: stock-data-manage-web
+    working_dir: /opt/stock_data_manage
+    command:
+      - stock-data-web
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8765"
+      - --allow-network
+      - --config-root
+      - /opt/stock_data_manage/config
+      - --data-root
+      - /opt/stock_data_manage/data
+    ports:
+      - "${STOCK_DATA_WEB_BIND:-127.0.0.1}:${STOCK_DATA_WEB_PORT:-8765}:8765"
+    volumes:
+      - type: bind
+        source: .
+        target: /opt/stock_data_manage
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ./data
+        target: /opt/stock_data_manage/data
+        read_only: true
+        bind:
+          create_host_path: false
+    user: "${STOCK_DATA_WEB_UID:-1000}:${STOCK_DATA_WEB_GID:-1000}"
+    environment:
+      TZ: Asia/Shanghai
+      PYTHONDONTWRITEBYTECODE: "1"
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8765/', timeout=5)"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
