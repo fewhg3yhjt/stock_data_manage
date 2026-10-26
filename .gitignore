@@ -28,6 +28,7 @@ provider_validation/results/legacy/tmp_test/security_comparison/
 *.lock
 data/
 tmp/
+tmp_test/
 metadata/*.duckdb
 metadata/*.duckdb.wal
 

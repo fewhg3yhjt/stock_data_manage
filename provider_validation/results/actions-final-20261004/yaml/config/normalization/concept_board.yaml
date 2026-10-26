@@ -1,8 +1,0 @@
-dataset: concept_board
-rules:
-  - id: ths-concept-members-v1
-    provider: ths
-    endpoint: board_members
-    board_type: concept
-    status: pending_validation
-    version: ths-concept-members-v1
