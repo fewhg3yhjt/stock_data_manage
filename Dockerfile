@@ -10,7 +10,9 @@ WORKDIR /opt/stock_data_manage
 COPY pyproject.toml README.md ./
 COPY src ./src
 
-RUN pip install --no-cache-dir --editable '.[web]' \
+ARG PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
+
+RUN pip install --no-cache-dir --index-url "${PIP_INDEX_URL}" --editable '.[web]' \
     && useradd --create-home --uid 1000 app
 
 EXPOSE 8765
