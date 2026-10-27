@@ -35,14 +35,14 @@
 | `README.md` | 项目安装、运行与文档导航 |
 | `AGENTS.md` | 协作、验证、权限及定期文档整理要求 |
 | `PROJECT_PROGRESS.md` | 当前实现、差距和下一步，不重复历史批次流水账 |
-| `STOCK_ANALYSIS_V2_MARKET_DATA_CENTER_ARCHITECTURE_V1.md` | 总体架构、术语、模块边界及合并保留的分钟规则；顶部维护带日期的现状评审、功能与模块框图、核查依据及待讨论优化 |
+| `STOCK_ANALYSIS_V2_MARKET_DATA_CENTER_ARCHITECTURE_V1.md` | 总体架构、术语、模块边界及合并保留的分钟规则；顶部维护现状评审，第4、5章维护待确认的对象职责、YAML合同、迁移与验收设计，明确区别于当前实现 |
 | `stock-data-design-qfq-history-rebuild.md` | 前复权历史变化与人工重建规则 |
 | `stock-data-test-design-acceptance-baseline.md` | 测试层次、故障场景和验收门槛 |
 | `provider-capability-verification-and-normalization.md` | 来源证据、资格及YAML归一化规则 |
 | `docs/providers/README.md` | 正式源头接口说明、各数据域边界及说明表依据 |
 | `docs/providers/源头采集接口说明.xlsx.inspect.ndjson` | 既有接口说明表的逐行 JSON 检查快照，记录工作表、单元格样式与公式，不作为当前配置或生产资格依据 |
 | `docs/providers/security-catalog.md` | 当前股票和ETF来源范围、日期、分类与差异 |
-| `docs/pipeline/collection-tasks.md` | 获取、检查、发布、重做、证券清单调度和恢复；维护当前入口与名单、日线、分钟及恢复流程框图 |
+| `docs/pipeline/collection-tasks.md` | 获取、检查、发布、重做、证券清单调度和恢复；分别维护待确认任务流程与当前入口、名单、日线、分钟及恢复流程框图 |
 | `docs/storage/README.md` | 数据分层、日期唯一、实际文件名与内容示例、字段解读、生成/读取/保留规则、原始引用与归档；精简方向与当前实现分开标注 |
 | `docs/service/read-only-web.md` | 本机只读运行台的用途、读取来源、启动方式、状态语义、安全边界与云端部署前置条件 |
 | `docs/service/container-deployment.md` | 只读运行台的 Docker/Compose 部署、代码挂载更新、持久数据只读挂载及网络安全边界 |

@@ -277,173 +277,163 @@ Python 接口 / HTTP 接口
 
 第一版保持有效记录和缺失集合，不新增停牌、确认无数据等证券逐阶段管理状态，也不建立跨任务依赖图。来源无返回不等于停牌或退市。任务断点、原始引用和发布记录由现有流程自动维护。
 
-## 4. 内部模块划分
+## 4. 对象、职责与执行设计（2026-10-28，待确认）
 
-第一版拆成 8 个模块：
+本章与第5章是基于 `3f2c7bd` 代码核对形成的重构提案，供用户确认后实施；不是当前实现或配置加载合同。本轮只更新设计，不增加代码、配置文件、数据库或运行数据。现状仍见本文开头的2026-10-27评审；成功、失败及恢复的拟议流程见[任务流程提案](docs/pipeline/collection-tasks.md#设计提案任务定义与运行流程2026-10-28待确认)。
 
-1. 配置中心
-2. 数据源适配器
-3. 能力路由器
-4. 标准化处理
-5. 数据质量
-6. 数据存储
-7. 数据生产与发布
-8. 数据访问服务
+### 4.1 是什么、为什么、怎么样
 
-这 8 个模块属于同一个代码库，不做微服务拆分。
+目标是让维护者通过 YAML 定义“生产什么、何时生产、允许从哪里生产”，由有明确职责的对象执行；消费方继续读取已发布数据，不消费任务中间态。调度、手工命令和未来页面只能通过同一正式任务入口发起运行。首批限于证券名单与单交易日日线，不把分钟、新闻、财务等全部改造成新体系。
+
+当前任务定义是动态字典，`collect_task()` 同时编排来源、断点和发布；`DailyCollectionService` 又持有另一套日线采集与发布生命周期。简单包装成类会保留两套事实。建议先定义对象合同，再把现有职责归位：保留已验证传输与业务规则，删除被替代的编排代码，不用兼容包装维持旧调用。
+
+### 4.2 对象不是功能菜单
+
+| 对象或值 | 唯一职责与核心内容 | 现有承接位置与调整 |
+|---|---|---|
+| 数据集定义 | 标准字段、主键、分区维度、发布门槛；不包含某次任务日期或状态 | `config/datasets/`、`config/loader.py`；`Dataset` 枚举仅是标识，不能充当完整定义。先使用校验后的配置值，不强制新增数据集父类 |
+| 来源输入合同 | 输入标识、接口、参数、请求形态、来源结果语义和传输限制 | 复用 `InputCapabilityConfig`、`ParameterBinding` 和各 Provider；能力、资格证据及健康仍分开 |
+| 任务定义 `TaskDefinition` | 可重复使用的生产意图：名称、数据集、资产类别、复权口径、范围及来源策略引用 | 在现有 `domain/models.py` 定义不可变值对象，`config/loader.py` 从 YAML 加载；不包含运行进度，不携带内联来源执行单元 |
+| 调度规则 | 对一个任务的触发条件：时间、频率、时区、日历 | 修改现有 `ScheduledJob` 与频率计算，引用任务名；不再从正式来源输入反推业务任务 |
+| 运行实例 `TaskRun` | 一次固定业务目标、展开单元和执行状态；包含来源/规则/名单引用及指纹 | 在现有领域模块定义，使用 `MetadataStore.collection_task` 持久化；保留现有 `task_id` 作为运行ID，不再新增同义主键或第二张任务表 |
+| 采集尝试与单元结果 | 一次来源单元的请求结果、失败类别、原响应及候选引用 | 复用现有单元记录和 `CollectionAttempt`；两者粒度明确，不新增与其竞争的运行级尝试状态机 |
+| 数据记录 | 名单身份或标准日线值及其来源语义 | 复用 `SecurityRecord`、`BarRecord` 和现有校验；不为统一类型把所有研究数据塞入 Bar 模型 |
+| 构建结果与分区标识 | 候选记录、覆盖及冲突结论、原始引用、替换范围；目标分区由数据集维度确定 | 复用现有发布准备结果合同、`Manifest`、`PublishResult`；日线分区含日期、资产和复权，名单分区含日期。运行ID不是数据主键或分区键 |
+
+运行实例中的来源单元是执行细节，不由用户为每只证券重复编写。全量范围首次从已发布名单解析，保存名单清单引用、内容指纹和证券集合。名单更新不会改写已有实例。首次资格未通过时不创建可执行运行；计划检查返回原因即可，不另建计划记录库。
+
+### 4.3 通过组合分工，不建立通用框架
+
+| 职责 | 允许做什么 | 不承担什么 | 拟议代码归属 |
+|---|---|---|---|
+| 配置解析 | 校验字段、引用与参数类型，形成任务定义 | 动态请求、运行状态、自动猜测旧格式 | `config/loader.py` |
+| 调度 | 计算到期任务及目标日期，调用正式入口 | 来源解析、价格判断、发布和无限重试 | `worker/scheduler.py` |
+| 任务执行 | 加锁、加载或创建运行、推进单元、保存断点、驱动构建与发布恢复 | 腾讯列位置、ETF分类、字段倍率和来源特例 | 从 `pipeline/inputs.py` 迁入现有 `worker/attempts.py`，保留原采集尝试职责；不新建任务管理服务 |
+| 来源采集 | 参数绑定、原始留存、调用适配器，产出来源候选及报告 | 业务任务调度、跨来源补缺及正式分区发布 | `pipeline/inputs.py::collect_input` 与 `providers/`；来源特有语义按来源归位，通用字段映射留在 `quality/` |
+| 数据构建 | 标准候选合并、缺失计算、业务检查，给出可发布结果 | 网络会话、任务状态机、数据库连接生命周期 | 日线在 `pipeline/daily.py`，名单在 `service/instruments_update.py`；复用现有函数，只有必要时提供小接口，不预建注册中心 |
+| 发布与恢复 | 校验候选、写规范文件、转正raw、登记元数据、恢复中断 | 绕过覆盖检查、改写任务范围、切换来源 | 复用 `storage/parquet.py`、`storage/raw.py`、`storage/metadata.py` 与 `worker/recovery.py`；先保持现有发布顺序与锁粒度 |
+
+名单与日线通过两个明确构建实现选择即可，不用反射加载 YAML 中的任意类名。任务执行器只依赖构建和发布的结果合同，不按输入编号判断来源业务。`DailyCollectionService.collect()` 中可复用的补缺/仲裁逻辑下沉为构建能力；独立采集、Attempt和发布编排在迁移验收后删除，旧测试改测新正式入口，不保留转发包装。
+
+首批日线正式策略仍只选现有腾讯输入，不新增线上来源、资格授权或自动补缺来源；现有多来源算法的合同和离线用例随职责迁移保留，真实第二来源接入另行验收。名单仍按互补来源合并及既有覆盖、整份旧名单回退规则执行，不因改造删去已确认的业务规则。
+
+### 4.4 运行与数据分别管理
+
+`resume` 先按运行ID读取 `TaskRun`，再验证其持久化范围和引用，不重新从当前名单展开。缺少必要记录就明确拒绝；不搜索其他工作区、不猜一个“最近任务”、不把缺记录包装成空范围成功。
+
+冻结的是业务目标与所用规则版本，不是永久生产许可。每次恢复仍复查当前来源资格、有效期、冷却以及代码/配置合同；不满足时阻断。业务相关规则已变更时要求显式创建新运行并重验，不静默套用新规则，也不动态执行归档旧代码。
+
+建议 `full` 和 `selected` 建立新运行ID并记录 `parent_task_id`，保留原运行状态；`selected` 只接受原范围内证券，分区合并与缺失分母沿用明确的业务合同，不因子集重做伪造原全量任务完成。`resume` 延续原运行ID；已完整且文件检查通过的运行返回 `no_op`。新运行对同分区仍受现有任务锁与待提交标记保护。
+
+继续使用现有运行状态 `collecting → checking → committing → published`，失败记录 `failed` 与失败阶段。已进入 `committing` 的恢复直接校验准备结果并续接发布，不重新采集。`published` 与是否完整分别表达；不为每个页面另造状态字段。状态与规范文件跨存储介质恢复，不宣称为一个数据库事务。
+
+### 4.5 必要性、取舍与不做事项
+
+增加两个明确的任务值对象及配置引用校验，用来替换隐式字典合同和中央分支；不引入队列、工作流引擎、依赖图、事件总线、第二数据库或新后端。短期成本是修改当前调用点、测试与旧任务入口；收益是配置归属明确、运行可复现、来源与任务生命周期解耦。
+
+不承诺“新增任何数据集都只改 YAML”：已有合同内调整频率、范围、来源顺序及字段映射可配置；新协议、新数据语义或新发布方式需要实现相应行为并先确认设计。配置不能生成尚不存在的能力。
 
 ---
 
-## 5. 配置中心：YAML 是静态策略的唯一事实源
+## 5. YAML 配置合同提案（2026-10-28，待确认）
 
-YAML 只保存“系统应该怎样运行”，运行时状态不写回 YAML。
+本章替换旧版配置示意，使用实际已有文件承接，不另建 `tasks.yaml`。删除的是未落地的旧示例，不改任何运行 YAML；分红报告名称、5日回看及历史重建规则继续由[前复权专项设计](stock-data-design-qfq-history-rebuild.md)维护，不据此启用前复权或改变默认不复权。
 
-### 5.1 数据源配置
+### 5.1 每类规则只定义一次
 
-`config/providers.yaml`
+| 现有文件 | 首批拟议职责 | 从哪里收敛、哪些内容不放入 |
+|---|---|---|
+| `collection.yaml` | 存储根、市场时段及 `tasks` 任务定义；目标范围与日期参数合同 | 将名单专用选源与临时JSON的生产意图移入任务引用；频率移至调度。现有分钟策略本批不迁移 |
+| `schedules.yaml` | 启用状态、任务引用、时区、频率、交易日要求；一条任务可无调度而仅手工运行 | 名单正式频率不再同时维护在 `collection_profiles`；非首批作业明确保持原状，不自动启用 |
+| `capabilities.yaml` | 以来源输入ID引用的业务选源策略：名单互补合并、日线单来源 | 首批任务不再同时维护内联来源、来源端点路由及默认猜选。当前目录与历史目录的选择在策略中显式表达，运行时冻结实际选择 |
+| `providers.yaml` | 具体来源合同、参数、传输与限速 | 不决定正式业务任务何时运行；首批正式入口不通过来源的 `collection_profile` 反推任务。其他候选任务原合同本批不改，不新增双轨正式任务 |
+| `datasets/<数据集>.yaml` | 字段、主键、资产及分区维度、质量要求、发布门槛 | `datasets.yaml` 与按数据集文件存在重叠；首批数据集只保留按数据集文件为正式构建依据，迁移全部调用点，撤掉被替代重复定义，不用失败后回读旧文件 |
+| `normalization/<数据集>.yaml` | 唯一来源字段映射、单位与参数化复权规则 | 修正旧加载器的参数化合同，不能同时维护旧枚举版与新版映射；未认证单位仍空 |
 
-```yaml
-providers:
-  tencent:
-    name: 腾讯
-    enabled: true
-    capabilities:
-      stock_daily: true
-      realtime_quote: true
-    timeout_seconds: 5
-    rate_limit:
-      requests_per_second: 5
-    circuit_breaker:
-      failure_threshold: 5
-      recovery_seconds: 60
+`providers.yaml` 现有 `providers` 与 `input_capabilities` 两组声明也有交叠。首批业务选源统一引用现有输入ID，相关传输合同只取一个权威位置；审计与非首批消费者逐项列出后再删除重复字段，不能为了配置整齐重写已经验证的SDK会话。保留其他数据集的独立合同不算对同一任务保留兼容通路。
 
-  baostock:
-    name: BaoStock
-    enabled: true
-    capabilities:
-      stock_daily: true
-      stock_basic: true
-      trade_calendar: true
+### 5.2 示例是待实现合同，不是可执行配置
 
-  akshare:
-    name: AkShare
-    enabled: true
-    capabilities:
-      stock_daily: true
-      stock_basic: true
-      fundamentals: true
-```
-
-### 5.2 数据能力配置
-
-`config/capabilities.yaml`
+下面展示同一个股票不复权日线任务如何被三份已有文件引用。这里只定义最小合同，不新增动态步骤列表、脚本表达式或任意类加载；当前加载器不支持这些新字段，不能复制到运行配置执行。
 
 ```yaml
-capabilities:
-  stock_daily:
-    name: 股票日线
-    price_adjustment: qfq
-    routes:
-      - provider: tencent
-        priority: 10
-        acquisition: full
-      - provider: baostock
-        priority: 20
-        acquisition: symbol
-      - provider: akshare
-        priority: 30
-        acquisition: symbol
-    quality:
-      required_fields:
-        - symbol
-        - trade_date
-        - open
-        - high
-        - low
-        - close
-        - volume
-
-  realtime_quote:
-    name: 实时行情
-    routes:
-      - provider: pytdx
-        priority: 10
-      - provider: sina
-        priority: 20
-      - provider: tencent
-        priority: 30
-    quality:
-      max_staleness_seconds: 15
+# collection.yaml：生产意图，不含运行ID和进度
+# name 由 tasks 下的键定义；目标日由手工参数或调度槽位传入。
+tasks:
+  stock_daily_none:
+    dataset: daily_bar
+    asset_type: stock
+    adjustment: none
+    universe: all_stock
+    source_policy: stock_daily_none
 ```
-
-### 5.3 数据集配置
-
-`config/datasets.yaml`
 
 ```yaml
-datasets:
-  instruments:
-    name: 证券主数据
-    acquisition:
-      mode: full
-    publish:
-      mode: replace
-
-  stock_daily:
-    name: 股票日线
-    universe:
-      source: instruments
-      asset_type: stock
-    grain:
-      - symbol
-      - trade_date
-    primary_key:
-      - symbol
-      - trade_date
-    partition:
-      - trade_date
-    acquisition:
-      mode: routed
-    publish:
-      mode: atomic_replace
-      max_missing_ratio: 0.01
-      max_missing_count: 50
-    history_rebuild:
-      enabled: false
-      require_manual_approval: true
-    dividend_event:
-      provider: eastmoney
-      report_name: RPT_SHAREBONUS_DET
-      lookback_calendar_days: 5
-    storage:
-      type: parquet
+# capabilities.yaml：只选明确的来源输入，不因其存在就授予资格。
+source_policies:
+  stock_daily_none:
+    dataset: daily_bar
+    mode: single
+    inputs:
+      - input_id: ASTOCK-002-daily
+        parameters: {api: kline, adjust: none}
 ```
 
-以上是目标配置结构。当前运行配置在前复权来源探针、历史重建和统一切换实现完成前，不得提前改成前复权，避免配置与实际数据口径不一致。
+```yaml
+# schedules.yaml：示例默认关闭，不构成启用生产的授权。
+timezone: Asia/Shanghai
+jobs:
+  - name: stock_daily_none_after_close
+    task: stock_daily_none
+    enabled: false
+    business_day: trading_day
+    frequency: {unit: day, interval: 1, at: '16:20'}
+```
 
-### 5.4 配置原则
+任务使用标准复权值 `none/forward/backward`；来源策略参数经已有 `ParameterBinding` 校验并映射到来源命名空间，不开放任意 context 注入。任务与来源参数冲突直接报错，不自动换接口。发布门槛继续只读日线数据集文件，不在任务中再抄一份。名单策略使用固定的互补合并方式，并为当前/历史日期显式列出来源集合；不由通用流程硬编码这两套输入ID，也不开放任意条件脚本。
+
+### 5.3 加载、创建与续跑合同
+
+1. 配置加载先查未知字段、重复定义、缺失引用、支持的任务数据集、资产/复权/范围组合及来源参数。静态校验不联网、不创建任务或业务文件；成功也不表示生产资格通过。
+2. 创建运行时解析明确目标日期，核对交易日历，读取相应已发布名单并冻结范围；当前目录不能伪装历史目录。缺依赖时返回阻断；仅复用现有单日历更新策略，不自动补采证券名单或构建依赖图。
+3. 范围、来源请求及处理规则解析完成后检查资格，通过后在现有任务锁内重读状态、核对重复运行并持久化运行定义。调度与手工入口以“任务定义、槽位/日期、资产与复权”识别默认重复触发；默认复用已有相同运行的冻结目标，显式重做才分配新ID；若用户明确请求的定义与已有运行冲突则阻断，不猜测合并。
+4. 运行ID用任务名、业务日期与必要序号表达，例如 `stock-daily-none-20261028-01`，由项目自身输入生成；原子创建及现有锁避免冲突，不用聊天元数据。规则变更或范围不同不能悄悄复用同一运行ID。
+5. 续跑入口只需运行ID和运行根目录，不要求用户再次传同一来源清单。元数据为状态事实源；`task.json`、`summary.json` 继续作为自动生成快照和人读视图，缺失可从已验证元数据重建，不能在多个文件中任意挑一份作为更“方便”的状态。
+
+拟议命令合同如下，仅说明接口，当前命令尚不支持，不在本轮执行：
 
 ```text
-YAML   = 我希望系统怎么运行
-DuckDB = 元数据、任务与来源运行状态
-SQLite WAL = 当天分钟 Hot 数据
-Web    = 让人看得懂并能操作
+# 从任务配置创建或复用当天运行；并不授权本例真实联网。
+stock-data collect-task --task stock_daily_none --trade-date 2026-10-28 --mode live
+# 续跑原实例，不重新指定日期、名单或来源。
+stock-data collect-task --run-id stock-daily-none-20261028-01 --redo resume
+# 全量/指定证券重做，以该运行作为父运行，返回新的运行ID。
+stock-data collect-task --run-id stock-daily-none-20261028-01 --redo full
+stock-data collect-task --run-id stock-daily-none-20261028-01 --redo selected --symbol sh600519
 ```
 
-README、能力矩阵、管理页面都应从 YAML 和运行时数据生成，避免多处维护造成漂移。
+`--task` 与 `--run-id` 互斥；创建模式必须提供明确日期，续跑不能覆盖冻结参数。`live/retained/replay` 的既有资格、精确证据和隔离合同保留；留存或回放必须在执行定义中绑定明确响应清单，未绑定时拒绝，不能模糊寻找一份可用响应或缺失时联网。证据绑定是运行输入，不回填任务 YAML，也不借此恢复旧任务定义文件入口。
 
-### 5.5 能力事实与运行策略分离
+### 5.4 当前到目标的迁移与退出条件
 
-Provider、Endpoint、Capability、Evidence、Health 和 Routing Role 必须分开管理：
+| 当前内容 | 保留、调整或退出 | 条件和证据保护 |
+|---|---|---|
+| `collect-task` 生产命令及原 `--task-file` | 保留命令名，改为任务名加日期创建、运行ID续跑；首批不同时支持两套正式任务定义输入 | 需用户确认命令合同；旧文件仍是历史证据，不自动转换或执行。提供明确的操作说明，不增加兼容入口 |
+| `collect-input`、探针命令 | 保留明确的候选采集和可行性验证用途 | 不能借此绕过正式任务或发布；与正式任务共享来源行为，不形成第二条正式发布路径 |
+| `collect-due-inputs` 正式名单分支 | 到期计划改为引用任务后调用同一执行入口 | 删除被替代的名单编排分支；其他候选输入调度暂不迁移，不扩大首批范围 |
+| `DailyCollectionService.collect()` 及原 `collect_task` 编排 | 收敛到一个正式执行器，构建及发布分别归位 | 迁移有效算法和离线用例后删除旧编排；不为了旧测试导入路径保留代理类或包装函数 |
+| DuckDB `collection_task` 与历史 `state_json` | 继续使用原库；新增定义引用与规则指纹等必要字段，不建第二状态库 | 历史记录、原始响应、旧发布均保留；旧未完成运行默认只读，不能无确认重置或丢弃 |
+| 已发布旧数据、旧任务产物及历史日线混合目录 | 本批不迁移、不删除、不以它们填补新复权分区 | 是否续完旧任务或创建新任务须先确认；旧记录不因新类型加载失败被当成“任务不存在” |
 
-```text
-Capability = 来源理论上能提供什么
-Evidence = 最近是否用探针证明过
-Health = 当前是否健康、是否冷却
-Routing Role = 当前希望如何使用
-```
+这是一次明确切换，不能用旧格式自动猜测、静默迁移或加载失败后兜底来掩盖差异。若需要恢复本机10月9日未完成任务，应先决定是否在旧版本完成它，或另行批准一次明确转换；默认不额外开发转换器。
 
-适配器存在、配置已声明或单次 HTTP 成功，都不能单独证明能力具备正式路由资格。能力必须按数据集、市场、资产类型、复权方式和频率细分。详细的能力采集、证据和归一化规则见 [Provider 能力验证与归一化设计](provider-capability-verification-and-normalization.md)。
+### 5.5 首批实施顺序、验收与确认点
+
+首批拟按三个可验证步骤提交：先实现并验证任务值对象及配置合同，再迁移单一执行器与名单/日线构建，最后切换正式CLI/名单调度与恢复并删除被替代路径。每个步骤保持可核验，最终验收前不启用新调度，不进行线上取数或旧数据迁移。新任务配置装载器不会与旧任务装载器同时作为同一正式入口的可选兜底。
+
+验收场景：未知或冲突配置必须拒绝；调度与手工相同目标不重复采集；名单更新后续跑范围不变；规则变更不静默续跑；资格失效仍阻断；不同复权不混分区；失败不覆盖旧发布；发布各中断点可恢复；`full/selected` 保留原运行审计；同一留存响应迁移前后主键、业务值、单位空值、冲突及覆盖结论一致。业务字段等价不要求新Parquet字节完全相同，原响应字节及历史文件哈希保持可核验。
+
+实施前请确认三项：①首批仅名单与单日日线，按本章职责迁移并删除被替代编排；②运行配置采用现有文件的上述唯一归属，正式任务入口退出旧 `--task-file` 合同；③`resume` 沿用运行，`full/selected` 建立关联新运行，旧未完成任务先保留，不自动转换。具体命令参数、名单当前/历史策略和受影响调用点须随实施补齐可执行合同测试，不临场增加数据语义或兼容路径。
 
 ---
 
