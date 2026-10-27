@@ -31,6 +31,18 @@
 - 持久化文件和目录必须使用能表达业务内容、日期或范围的可读名称；不得将 UUID、随机串或内容哈希作为唯一可见文件名。随机ID可用于数据库主键、并发控制及短暂原子写入临时文件；被替换内容需要保留时，审计路径也须使用可读来源/日期/任务标识并处理同名冲突。
 - 方案说明按“是什么、为什么、怎么样、必要性与取舍”组织，再列实施范围、验证标准、风险和检查点。没有用户确认时，不把讨论中的方案当作已批准的实施范围。
 
+## 设计先行与领域建模
+
+- 正式开发遵循“明确业务目标与对象 → 明确职责和配置合同 → 确认端到端任务流程 → 实现 → 验证”的顺序。新增能力或架构调整前，先检查现有设计及实现差距，在已有设计文档中说明对象关系、成功与失败路径、数据落点、恢复行为和验收标准，经用户确认后实施。已确认设计范围内的常规实现和缺陷修复连续执行，不机械重复完整设计或要求再次批准。
+- 不采用面向零散功能堆分支的开发方式：不得因为增加一个接口、命令或页面，就直接在中央流程持续追加来源判断、数据集特例或重复执行逻辑。先判断需求属于哪个领域对象和职责，再修改对应模块；不能用“先把功能做出来，后面再设计”替代正式设计。
+- 明确区分数据集、来源输入、任务定义、调度规则、任务运行实例、数据分区与发布结果。数据集定义数据内容与质量，来源输入定义获取合同，任务定义生产目标，调度规则定义何时触发，运行实例记录某次实际执行，发布结果记录交付的数据；不能把一次接口调用等同于业务任务，也不能把候选完成等同于正式发布。
+- YAML 管理声明式策略：数据字段、主键、分区与发布门槛，来源参数与限速，字段映射，任务范围与来源策略，以及调度频率与日历。优先明确现有配置的职责和引用关系；调度引用任务，任务引用数据集及来源策略，避免同一规则在多份配置或代码中重复维护。配置声明必须有对应执行实现与校验，不因写入 YAML 就视为能力完成。
+- 代码实现协议、解析、业务构建与恢复等行为，不把 YAML 扩展为包含任意脚本和复杂控制流的编程语言。运行状态、断点、资格与健康信息保存在现有运行记录和元数据中，不回写 YAML。
+- 调度器负责到期判断与触发；任务执行器负责运行生命周期、互斥、断点与恢复；来源适配器负责来源传输及解析；数据构建模块负责标准候选的业务合并、补缺与检查；存储模块负责持久化与发布。来源专属规则不散落到通用执行器，数据集差异不靠中央函数无限扩充分支承载。
+- 任务首次执行时解析并持久化目标日期、证券范围、来源策略及相关规则版本；续跑使用已冻结的运行定义，不因名单或当前配置变化静默扩大、缩小或替换任务范围。需要变更范围或规则时，显式生成新运行或按经确认的重做规则处理；运行记录中的原始目标和证据保持可追溯。
+- 面向对象设计以职责、合同和组合关系为依据，优先复用现有模型与模块；不以类数量、继承层次或框架数量衡量设计质量。不为统一外观建立庞大父类、通用管理器或另一套任务系统。验收应证明配置可驱动行为、职责可独立验证、恢复范围稳定及生产结果可追溯。
+- 可行性测试允许在正式设计确认前，以最小探针验证接口、传输或数据语义，但必须明确测试问题、范围和证据，遵守既有验证区及业务运行目录边界，不写生产数据、不自动启用正式路由或调度。探针成功不等于正式功能完成；转入正式开发时仍须先确认设计与任务流程，不将探针直接扩展成平行业务入口。
+
 ## Provider Verification
 
 - Treat AI-generated analyses, code, summaries, and data transformations as unverified hypotheses until independently checked against source data, executable code, authoritative documentation, or reproducible validation.
@@ -58,11 +70,19 @@
 ## Development Structure
 
 - Modify the existing architecture modules before creating new modules.
-- Do not create parallel implementations, compatibility shims, or temporary duplicate entry points unless an external contract requires them and the exception is documented.
+- 不为假设中的兼容性创建平行实现、兼容层或临时重复入口。确有外部合同要求时，先列明实际消费者、必须保留的行为、适用范围、维护成本和退出条件，经用户确认并记录后才实施；不能仅以“可能有人使用”或“为了让旧测试通过”为依据。
 - Do not create a new service, manager, registry, backend, UI, configuration system, or abstraction layer merely to organize an existing feature unless that expansion is explicitly discussed and approved by the user.
 - If the requested work can be completed with existing configuration, metadata, routing, or storage modules, prefer that minimal implementation.
 - New provider functionality belongs under `providers/`; routing under `routing/`; normalization and quality rules under `quality/`; production flows under `pipeline/`; persistence under `storage/`.
 - Update `CODE_STRUCTURE.md` whenever a file is added, moved, merged, or its responsibility changes.
+
+### 兼容与兜底的复杂度约束
+
+- 不以兼容、兜底、鲁棒性或避免报错为由叠加隐式分支、双轨配置、多套解析、重复状态或无边界重试。每条额外路径必须对应已确认的业务场景；先评估能否通过修正正式合同或显式迁移解决，不能默认永久保留新旧两套行为。
+- 已设计并配置的来源补缺、有限重试、整份旧数据回退和发布恢复可在其明确合同内执行；不得因此增加未经确认的自动切源、换接口、猜单位、猜日期、降质量或绕过资格与发布门槛。可选来源不存在或不满足条件时，按设计返回失败、阻断或明确降级结果，不隐藏原因或伪装成功。
+- 不捕获所有异常后静默返回默认值、空数据或成功状态。恢复措施必须针对明确故障类别，保留原错误与证据，并说明对业务结果的影响；程序缺陷不得被归类为来源不可用后绕过。
+- 替换旧实现时先明确保留合同、迁移范围及删除清单，经确认后收敛为一个正式执行路径。历史证据与仍需保留的数据不随代码清理删除；不能为消除旧代码而擅自修改数据语义、覆盖用户文件或迁移生产数据。
+- 评审除功能正确性外，还须检查是否增加重复事实来源、隐藏默认行为、兼容分支及维护成本；不需要的扩展不实现，无法说明边界和退出条件的临时兜底不进入正式代码。
 
 ## 文档管理
 
