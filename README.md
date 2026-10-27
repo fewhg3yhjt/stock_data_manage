@@ -5,6 +5,7 @@
 | 需要了解什么 | 文档入口 |
 |---|---|
 | 总体架构、术语和模块边界 | [总体设计](STOCK_ANALYSIS_V2_MARKET_DATA_CENTER_ARCHITECTURE_V1.md) |
+| 当前功能、实际架构框图与优化议题（2026-10-27） | [当前实现评审](STOCK_ANALYSIS_V2_MARKET_DATA_CENTER_ARCHITECTURE_V1.md#当前实现与优化评审2026-10-27)、[核心流程框图](docs/pipeline/collection-tasks.md#当前实现流程图2026-10-27) |
 | 现有目录和代码负责什么 | [代码结构](CODE_STRUCTURE.md) |
 | 输入参数、采集字段、映射及范围 | [源头接口说明](docs/providers/README.md)、[股票与ETF来源](docs/providers/security-catalog.md) |
 | 原始暂存、检查、发布、重做和证券清单调度 | [任务流程](docs/pipeline/collection-tasks.md) |
