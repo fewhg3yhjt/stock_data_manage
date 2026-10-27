@@ -148,3 +148,57 @@ def test_calendar_update_does_not_create_holiday_from_single_empty_source(tmp_pa
         ).update(start=trade_day, end=trade_day)
         assert result.merge.days == ()
         assert store.is_trading_day(trade_day) is None
+
+
+def test_light_calendar_day_update_saves_source_result_and_keeps_readable_paths(tmp_path):
+    from types import SimpleNamespace
+    from stock_data_manage.providers.baostock.industry import BaoStockIndustryMembershipProvider
+
+    class Result:
+        fields = ["calendar_date", "is_trading_day"]
+        error_code = "0"
+        error_msg = ""
+        cur_page_num = 1
+        per_page_count = 100
+
+        def __init__(self, day, opened):
+            self.data = [[day.isoformat(), "1" if opened else "0"]]
+            self.position = -1
+
+        def next(self):
+            self.position += 1
+            return self.position < len(self.data)
+
+        def get_row_data(self):
+            return self.data[self.position]
+
+    class Client:
+        def __init__(self, day, opened):
+            self.result = Result(day, opened)
+            self.calls = []
+
+        def login(self):
+            return SimpleNamespace(error_code="0", error_msg="")
+
+        def logout(self):
+            return SimpleNamespace(error_code="0", error_msg="")
+
+        def query_trade_dates(self, *, start_date, end_date):
+            self.calls.append((start_date, end_date))
+            return self.result
+
+    day = date(2026, 11, 1)
+    client = Client(day, False)
+    provider = BaoStockIndustryMembershipProvider(client=client)
+    evidence = tmp_path / "task_workspace" / "trading_calendar"
+    with TradingCalendarStore(str(tmp_path / "metadata.duckdb")) as store:
+        result = TradingCalendarUpdater(store, [], evidence_root=evidence).update_baostock_day(
+            trade_date=day, provider=provider)
+        saved = store.all()[0]
+        assert result.merge.days[0].is_trading_day is False
+        assert store.is_trading_day(day) is False
+        assert client.calls == [(day.isoformat(), day.isoformat())]
+        assert "2026-11-01" in saved.evidence
+        manifests = list(evidence.glob("2026-11-01/baostock/query_trade_dates/refresh-*/manifest.ndjson"))
+        assert len(manifests) == 1
+        assert "uuid" not in saved.evidence.lower()

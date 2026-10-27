@@ -108,7 +108,35 @@ def main(argv: list[str] | None = None) -> int:
     due.add_argument("--replay-manifest", type=Path)
     due.add_argument("--evidence-root", type=Path)
 
+    calendar_update = subcommands.add_parser("update-trading-calendar", help="refresh one date in the trading calendar store")
+    calendar_update.add_argument("--trade-date", type=date.fromisoformat)
+    calendar_update.add_argument("--config-root", type=Path, default=Path("config"))
+    calendar_update.add_argument("--data-root", type=Path, help="override configured data root")
+
     args = parser.parse_args(argv)
+    if args.command == "update-trading-calendar":
+        from zoneinfo import ZoneInfo
+        target_day = args.trade_date or datetime.now(ZoneInfo("Asia/Shanghai")).date()
+        from .config.loader import load_storage_paths
+        from .providers.baostock.industry import BaoStockIndustryMembershipProvider
+        from .service.calendar import TradingCalendarStore
+        from .service.calendar_update import TradingCalendarUpdater
+        paths = load_storage_paths(args.config_root, data_root=args.data_root)
+        paths["metadata_path"].parent.mkdir(parents=True, exist_ok=True)
+        try:
+            with TradingCalendarStore(str(paths["metadata_path"])) as store:
+                result = TradingCalendarUpdater(store, []).update_baostock_day(
+                    trade_date=target_day, provider=BaoStockIndustryMembershipProvider(),
+                    evidence_root=paths["workspace_root"] / "trading_calendar")
+                is_open = store.is_trading_day(target_day)
+        except (ValueError, OSError, RuntimeError) as exc:
+            parser.error(f"trading calendar update failed: {exc}")
+        print(json.dumps({"task": "update-trading-calendar", "trade_date": target_day.isoformat(),
+                          "is_trading_day": is_open, "source": "baostock",
+                          "updated_rows": len(result.merge.days), "source_evidence": str(result.source_manifest),
+                          "status": "updated"},
+                         ensure_ascii=False, indent=2))
+        return 0
     if args.command == "collect-task":
         from .pipeline.inputs import collect_task
         from .worker.progress import ConsoleProgress

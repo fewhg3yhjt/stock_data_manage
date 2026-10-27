@@ -136,7 +136,7 @@
 | 文件 | 职责 |
 |---|---|
 | `pipeline/daily.py` | 日线按来源补缺、标准化、校验、候选生成和发布编排；规范记录保留单位语义及来源舍入标记 |
-| `pipeline/inputs.py` | 既有候选、业务任务与调度；raw按日期/来源/接口，工作区按日期/数据集；请求文件隔离、YAML映射、互补来源合并覆盖检查、重做、发布恢复，自动保存task.json和summary.json；任务共用现有限速器，在线门禁区分精确留存与显式市场/资产/窗口授权，请求间隔由各接口YAML控制；历史ETF保留原SDK请求、依赖证据和离线随机参数；最新名单通过元数据读取，回退不改写旧发布 |
+| `pipeline/inputs.py` | 既有候选、业务任务与调度；raw按日期/来源/接口，工作区按日期/数据集；请求文件隔离、YAML映射、互补来源合并覆盖检查、重做、发布恢复，自动保存task.json和summary.json；证券名单执行前在日历未知时复用轻量日历更新；调度计划直接返回，不另存副本；任务共用现有限速器，在线门禁区分精确留存与显式市场/资产/窗口授权，请求间隔由各接口YAML控制；最新名单通过元数据读取，回退不改写旧发布 |
 | `pipeline/daily_reconciliation.py` | 日线 provisional/final 合并、缺失统计和盘后校准 |
 | `pipeline/minute.py` | Watchlist 实时分钟采集和 Hot Store 写入 |
 | `pipeline/minute_reconciliation.py` | 分钟盘后校准、final 提升、冲突隔离和完整性处理 |
@@ -164,7 +164,7 @@
 | `service/instruments.py` | Security Master 本地存储、读取、合并和稳定 instrument ID |
 | `service/instruments_update.py` | Security Master 来源更新、缺失保留和变更审计 |
 | `service/calendar.py` | Trading Calendar 存储、读取和来源合并 |
-| `service/calendar_update.py` | 交易日历来源更新、官方优先级，以及校验原在线证据后的正向日期导入 |
+| `service/calendar_update.py` | 交易日历来源更新、单日开市/休市轻量采集及证据引用、官方优先级，以及校验原在线证据后的正向日期导入 |
 | `service/market_data.py` | Canonical + Hot 的统一分钟查询服务 |
 | `service/web.py` | 只读运行台入口；从现有任务摘要、Raw manifest/body 和 Canonical manifest 生成展示接口；按类型、证券及业务日期查询已核验来源行，复用 YAML 字段说明和已发布证券名称辅助检索，不读写任务数据库 |
 | `service/static/` | 只读运行台的原生 HTML、CSS 和 JavaScript 页面资源，无独立前端构建或持久化状态 |

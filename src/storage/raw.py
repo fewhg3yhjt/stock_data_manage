@@ -224,13 +224,21 @@ class RawObjectStore:
 
     @staticmethod
     def preserve_request(manifest: str | Path, *, permitted_root: str | Path, archive_root: str | Path) -> Path | None:
-        from uuid import uuid4
         path, permitted = Path(manifest).resolve(), Path(permitted_root).resolve()
         if not path.is_relative_to(permitted) or path == permitted:
             raise ValueError("cleanup path escapes its permitted scope")
         if not path.exists():
             return None
-        target = Path(archive_root).resolve() / "_raw_audit" / uuid4().hex[:16] / "manifest.ndjson"
+        source_root = path.parent
+        label = "_".join(_safe_filename_part(part, limit=48) for part in
+                         (*path.relative_to(permitted).parts[:-1], path.stem))
+        directory = Path(archive_root).resolve() / "_raw_audit" / label
+        suffix = 2
+        base = directory
+        while directory.exists():
+            directory = base.with_name(f"{base.name}_{suffix}")
+            suffix += 1
+        target = directory / "manifest.ndjson"
         try:
             RawObjectStore.verify_manifest(path)
             integrity_error = None
@@ -247,12 +255,17 @@ class RawObjectStore:
     def preserve_work_files(work: str | Path, *, archive_root: str | Path) -> Path | None:
         """Keep prior build conclusions without moving still-valid source candidates."""
         import shutil
-        from uuid import uuid4
         work = Path(work)
         selected = [work / name for name in ("prepared.parquet", "coverage.json", "summary.json", "task.json", "universe_review.json")
                     if (work / name).exists()]
         if selected:
-            target = Path(archive_root) / "_workspace_audit" / uuid4().hex[:12]
+            target = Path(archive_root) / "_workspace_audit" / _safe_filename_part(
+                f"{work.parent.name}_{work.name}", limit=96)
+            suffix = 2
+            base = target
+            while target.exists():
+                target = base.with_name(f"{base.name}_{suffix}")
+                suffix += 1
             target.mkdir(parents=True)
             for path in selected:
                 shutil.move(str(path), target / path.name)
@@ -278,7 +291,6 @@ class RawObjectStore:
     def preserve_directory(directory: str | Path, *, permitted_root: str | Path,
                            archive_root: str | Path) -> Path | None:
         """Remove a managed working directory from active use, retaining exact evidence."""
-        from uuid import uuid4
         directory, permitted = Path(directory).resolve(), Path(permitted_root).resolve()
         archive = Path(archive_root).resolve()
         if directory == permitted or not directory.is_relative_to(permitted):
@@ -287,7 +299,14 @@ class RawObjectStore:
             raise ValueError("evidence archive overlaps cleanup scope")
         if not directory.exists():
             return None
-        destination = archive / "_raw_audit" / uuid4().hex[:16]
+        relative = directory.relative_to(permitted)
+        label = _safe_filename_part("_".join(relative.parts), limit=120)
+        destination = archive / "_raw_audit" / label
+        suffix = 2
+        base = destination
+        while destination.exists():
+            destination = base.with_name(f"{base.name}_{suffix}")
+            suffix += 1
         destination.parent.mkdir(parents=True, exist_ok=True)
         os.rename(directory, destination)
         return destination

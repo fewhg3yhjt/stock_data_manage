@@ -35,7 +35,6 @@ def test_cli_accepts_in_memory_stream_without_reconfigure(monkeypatch):
 
 def test_security_due_cli_reports_calendar_and_qualification_blocks(tmp_path, capsys):
     import json
-    from pathlib import Path
     args = ["collect-due-inputs", "--dataset", "security_master", "--now", "2026-10-09T08:05:00+08:00",
             "--data-root", str(tmp_path / "data")]
     assert main(args) == 2
@@ -46,7 +45,7 @@ def test_security_due_cli_reports_calendar_and_qualification_blocks(tmp_path, ca
     assert main(args + ["--calendar-file", str(calendar)]) == 2
     report = json.loads(capsys.readouterr().out)
     assert all(not q["eligible"] for q in report["jobs"][0]["source_qualifications"])
-    assert Path(report["report_path"]).is_relative_to(tmp_path / "data/task_workspace")
+    assert "report_path" not in report
     assert not (tmp_path / "data/canonical").exists()
 
 

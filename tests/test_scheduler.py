@@ -93,7 +93,7 @@ def test_master_tick_without_evidence_does_not_call_sources_or_publish(tmp_path)
     assert all(not q["eligible"] for q in actual["jobs"][0]["source_qualifications"])
 
 
-def test_master_tick_reads_existing_calendar_and_refuses_replay_publication(tmp_path):
+def test_master_tick_reads_existing_calendar_refreshes_unknown_day_and_refuses_replay_publication(tmp_path):
     from stock_data_manage.service.calendar import TradingCalendarStore, CalendarDay
     missing = collect_due_inputs(now=stamp(8, 0), config_root=ROOT / "config", data_root=tmp_path, dataset="security_master")
     assert "calendar coverage" in missing["jobs"][0]["reason"]
@@ -237,10 +237,10 @@ def test_candidate_tick_survives_restart_and_uses_existing_collector_and_shared_
     assert report["production_writes"] == 0 and not report["eligible_for_production_routing"]
     again = collect_due_inputs(now=stamp(9, 35, 6), **args)
     assert again["jobs"][0]["status"] == "already_attempted" and len(calls) == 2
-    assert Path(again["jobs"][0]["previous_report_path"]).exists()
+    assert "previous_report_path" not in again["jobs"][0]
     collect_due_inputs(now=stamp(9, 40, 5), **args)
     assert len(calls) == 4
-    assert Path(report["report_path"]).exists()
+    assert "report_path" not in report
 
 
 def test_failed_slot_does_not_hammer_source_on_every_tick(tmp_path):
@@ -275,7 +275,7 @@ def test_planning_does_not_create_database_or_call_collector(tmp_path):
                                trading_dates=[DAY], collector=forbidden)
     assert report["jobs"][0]["status"] == "disabled"
     assert not (tmp_path / "out/schedule-attempts.duckdb").exists()
-    assert Path(report["report_path"]).exists()
+    assert "report_path" not in report
 
 
 def test_scheduler_cannot_write_production_outputs():
@@ -321,5 +321,5 @@ def test_runtime_scheduler_uses_unified_metadata_and_survives_restart(tmp_path):
     assert first["jobs"][0]["status"]=="candidate_complete"
     assert second["jobs"][0]["status"]=="already_attempted" and len(calls)==1
     assert (tmp_path/"data/metadata/metadata.duckdb").exists()
-    assert Path(first["report_path"]).is_relative_to(tmp_path/"data/task_workspace/_scheduler")
+    assert "report_path" not in first
     assert not (tmp_path/"data/task_archive").exists() and not (tmp_path/"data/canonical").exists()

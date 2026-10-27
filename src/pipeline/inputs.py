@@ -5,8 +5,8 @@ import os
 from dataclasses import asdict, replace
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from uuid import uuid4
 from time import monotonic
+from uuid import uuid4
 
 from ..config.loader import load_input_capabilities, load_input_field_contract, load_collection_profiles, load_storage_paths
 from ..providers.transport import captured_requests, RequestPacer
@@ -95,7 +95,6 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                   retained_asset_type=None, security_asset_type=None, progress=None):
     """One explicit input, candidate output only. Existing Bar publication flows are unchanged."""
     import json
-    import re
     config_root = Path(config_root)
     retained = mode == 'retained'
     progress_key = task_unit[1] if task_unit else input_id
@@ -229,7 +228,12 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
             owned = list(source.glob(request_key + ".*")) if source.exists() else []
             if owned:
                 import shutil
-                archive = paths["archive_root"] / "_workspace_audit" / uuid4().hex[:12]
+                archive = paths["archive_root"] / "_workspace_audit" / f"{raw_data_date}_{input_id}_{request_key}"
+                suffix = 2
+                base = archive
+                while archive.exists():
+                    archive = base.with_name(f"{base.name}_{suffix}")
+                    suffix += 1
                 archive.mkdir(parents=True)
                 for item in owned:
                     shutil.move(str(item), archive / item.name)
@@ -1144,7 +1148,12 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
             for item in (previous_work / source_directory).glob(request_key + ".*"):
                 target = destination / item.name
                 if target.exists():
-                    archive = paths["archive_root"] / "_workspace_audit" / uuid4().hex[:12]
+                    archive = paths["archive_root"] / "_workspace_audit" / f"{raw_data_date}_{input_id}_{request_key}"
+                    suffix = 2
+                    base = archive
+                    while archive.exists():
+                        archive = base.with_name(f"{base.name}_{suffix}")
+                        suffix += 1
                     archive.mkdir(parents=True)
                     shutil.move(str(target), archive / target.name)
                 shutil.move(str(item), target)
@@ -2185,7 +2194,8 @@ def collect_due_inputs(*, now, config_root, output_root=None, data_root=None, tr
                                  Path(__file__).parents[1] / "config/loader.py")],
         "scope_context": _json_value({"trading_dates": trading_dates, "securities": [asdict(s) for s in securities],
                                       "symbols": symbols}), "jobs": []}
-    output.mkdir(parents=True, exist_ok=True)
+    if execute:
+        output.mkdir(parents=True, exist_ok=True)
     pacer = RequestPacer()
     # All enabled Tencent Kline inputs share one host pacing policy before any call starts.
     interval = max([0] + [contracts[j.input_id].request_interval_seconds for j in jobs if j.status == "ready"])
@@ -2210,8 +2220,7 @@ def collect_due_inputs(*, now, config_root, output_root=None, data_root=None, tr
             # Persist the reservation before calling any source; a restart cannot repeat the same slot.
             if not metadata.claim_attempt(attempt, updated_at=now):
                 previous = metadata.load_attempt(attempt_id)
-                entry.update(status="already_attempted", reason=previous.status.value,
-                             previous_report_path=previous.raw_object_path)
+                entry.update(status="already_attempted", reason=previous.status.value)
                 continue
             started = monotonic()
             budget = (profile.refresh_interval_seconds - (now - job.slot).total_seconds()
@@ -2242,11 +2251,6 @@ def collect_due_inputs(*, now, config_root, output_root=None, data_root=None, tr
                 entry["coverage_semantics"] = "candidate results per requested security; bar freshness/completeness not certified"
             except Exception as exc:
                 entry.update(status="failed", reason=type(exc).__name__)
-            entry_bytes = json.dumps(entry, ensure_ascii=False, indent=2).encode("utf-8")
-            saved = RawObjectStore(output).write_bytes(entry_bytes, dataset="schedule_attempt", provider="scheduler",
-                endpoint=job.input_id, fetched_at=datetime.now(timezone.utc), attempt_id=uuid4().hex)
-            attempt = replace(attempt, raw_object_path=str(saved.path.resolve()), raw_content_hash=saved.content_hash)
-            entry["attempt_record"] = {"path": str(saved.path.resolve()), "sha256": saved.content_hash}
             if entry["status"] == "candidate_complete":
                 attempt = attempt.transition(AttemptStatus.RAW_COMMITTED).transition(AttemptStatus.NORMALIZED).transition(AttemptStatus.VALIDATED)
             else:
@@ -2255,9 +2259,7 @@ def collect_due_inputs(*, now, config_root, output_root=None, data_root=None, tr
     finally:
         if metadata is not None:
             metadata.close()
-    saved = RawObjectStore(output).write_json(report, dataset="schedule_tick", provider="scheduler", endpoint="inputs",
-        fetched_at=datetime.now(timezone.utc), attempt_id=uuid4().hex)
-    return {**report, "report_path": str(saved.path.resolve())}
+    return report
 
 
 def _collect_due_security_master(*, now, config_root, data_root, execute, mode, calendar_days, dependency_paths, collector):
@@ -2265,6 +2267,8 @@ def _collect_due_security_master(*, now, config_root, data_root, execute, mode, 
     import json
     from datetime import date
     from ..service.calendar import TradingCalendarStore
+    from ..service.calendar_update import TradingCalendarUpdater
+    from ..providers.baostock.industry import BaoStockIndustryMembershipProvider
     from ..storage.metadata import MetadataStore
     from ..worker.scheduler import plan_security_master_collection, SHANGHAI
     from ..routing.factory import check_security_input_qualification
@@ -2277,10 +2281,22 @@ def _collect_due_security_master(*, now, config_root, data_root, execute, mode, 
     if execute and mode != "live":
         raise ValueError("scheduled production tasks require live mode; use collect-task for isolated replay")
     day = now.astimezone(SHANGHAI).date()
+    calendar_error = None
     if calendar_days is None:
         paths["metadata_path"].parent.mkdir(parents=True, exist_ok=True)
+        update = None
         with TradingCalendarStore(str(paths["metadata_path"])) as calendar:
             is_open = calendar.is_trading_day(day)
+            planned_if_open = plan_security_master_collection(root, now=now, is_trading_day=True)
+            if execute and planned_if_open["status"] == "ready" and is_open is None:
+                try:
+                    update = TradingCalendarUpdater(calendar, []).update_baostock_day(
+                        trade_date=day, provider=BaoStockIndustryMembershipProvider(),
+                        evidence_root=paths["workspace_root"] / "trading_calendar")
+                    is_open = calendar.is_trading_day(day)
+                except Exception as exc:
+                    is_open = None
+                    calendar_error = str(exc)
     else:
         days = {}
         for row in calendar_days:
@@ -2292,6 +2308,10 @@ def _collect_due_security_master(*, now, config_root, data_root, execute, mode, 
             days[row_day] = row["is_trading_day"]
         is_open = days.get(day)
     job = plan_security_master_collection(root, now=now, is_trading_day=is_open)
+    if calendar_days is None and execute and calendar_error:
+        job.update(status="blocked", reason="trading calendar update failed: " + calendar_error)
+    elif calendar_days is None and execute and update.source_manifest:
+        job["calendar_evidence"] = str(update.source_manifest)
     contracts = {c.input_id: c for c in load_input_capabilities(root / "providers.yaml")}
     if job["status"] == "ready":
         for unit in job["definition"]["units"]:
@@ -2324,7 +2344,4 @@ def _collect_due_security_master(*, now, config_root, data_root, execute, mode, 
               "jobs": [job], "dependencies": [{"path": str(Path(p).resolve()), "sha256": file_hash(Path(p))} for p in dependency_paths],
               "config_files": [{"path": str(root / p), "sha256": file_hash(root / p)}
                                for p in ("collection.yaml", "schedules.yaml", "providers.yaml", "datasets/security_master.yaml")]}
-    output = paths["workspace_root"] / "_scheduler/security_master"
-    saved = RawObjectStore(output).write_json(report, dataset="schedule_tick", provider="scheduler", endpoint="security_master",
-        fetched_at=datetime.now(timezone.utc), attempt_id=uuid4().hex)
-    return {**report, "report_path": str(saved.path.resolve())}
+    return report

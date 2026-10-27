@@ -204,15 +204,17 @@ python -m stock_data_manage.cli collect-due-inputs --dataset security_master
 
 ### 交易日历来源与当前状态
 
+`update-trading-calendar` 是独立轻量任务，按指定日期调用 BaoStock `query_trade_dates`，只写入现有 `metadata.duckdb` 的交易日历表，并在 `task_workspace/trading_calendar/<日期>/baostock/query_trade_dates/refresh-<时分秒>/` 留下可读命名的 SDK 解码响应清单以便核对；不创建行情式候选目录、覆盖报告或 Canonical 发布分区。日历更新成功后返回日期、开市状态和证据路径。证券名单正式周期在本地当天未知时先执行同一更新逻辑；来源失败或返回日期/状态无效时阻断名单请求。手工计划检查不联网，也不另存调度JSON。
+
 既有 `TradingCalendarUpdater.update_from_input_report` 接收正式输入 `ASTOCK-070` 的候选报告和原在线报告，校验原响应、SDK与适配器合同、当前转换代码/配置、输出哈希以及来源时效后，写入既有日历库。旧归档目录搬迁与报告字段差异仅在可验证原代码字节相同的情况下接受，不重新请求来源来重建说明。
 
 本次复用10月3日新浪真实响应，当前代码回放得到相同8,797个正向交易日期；按需要将10月9日至12月31日的60个日期写入 `data/metadata/metadata.duckdb`。其中未来日期是来源提供的计划日期，不是未来交易已经发生的证据。来源标记为 `sina`，优先级10；更高优先级的既有交易所记录保留。来源未返回的日期保持未知，不能据此生成休市记录。
 
-本次是经过留证核验的一次日历导入，尚未接入自动刷新或后台进程。导入时原响应不能超过30天；现有日历读取不自动重新请求来源。导入保留原在线报告、当前回放报告及原响应哈希。实际导入结果见 [日历检查](../../data/task_workspace/_checks/security-activation/calendar-import.json)。
+历史上曾执行过一次经过留证核验的日历导入，见 [日历检查](../../data/task_workspace/_checks/security-activation/calendar-import.json)。当前日历更新任务按需刷新指定日期；尚未部署常驻后台进程。历史新浪导入规则仍要求来源证据不超过30天，不能据此覆盖 BaoStock 单日任务的运行行为。
 
 ### 结果位置
 
-- 调度检查报告：`data/task_workspace/_scheduler/security_master/`，包含任务状态、来源资格原因、实际数据日期、是否回退及配置证据引用。
+- 调度检查结果由 `collect-due-inputs` 直接返回；正式证券名单运行状态保存在既有任务摘要和元数据中，不重复写调度检查JSON。
 - 任务结果与覆盖检查：`data/task_workspace/<数据日期>/security_master/`；正式名单在 `data/canonical/<数据日期>/security_master/`，原响应在 `data/raw/<数据日期>/<来源>/<接口>/`。
 - 任务及资格元数据：`data/metadata/metadata.duckdb`。
 - 本机离线回归与检查索引：`data/task_workspace/_checks/security-schedule/`；不作为真实在线资格证据。
