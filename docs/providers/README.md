@@ -71,7 +71,11 @@ node provider_validation/tests/build_interface_coverage_workbook.mjs --formal-sp
 
 股票与ETF名单的实现、分类、北交所及上交所ETF目录接入见 [证券名单来源](security-catalog.md)。现有Excel与配套JSON保留上次导出快照；新增输入与字段变化以模块说明及YAML为准，不将旧表视为已核准当前全量证券。10月9日的7267条正式证券名单已发布于 `data/canonical/2026-10-09/security_master/`，原响应位于 `data/raw/2026-10-09/`，验收索引在 `data/task_workspace/_checks/security-release-20261012/`。已有接口可行性响应只读留存。
 
-日线已有8只证券2026-10-09/newfqkline前复权在线资格与正式发布，但尚未取得全市场资格。`ASTOCK-002-daily` 当前适配三种口径：`collect-task` 指定不复权 `adjustment=none` 且单元未指定 `api` 时，入口自动配对 `adjust=none`、`api=kline`；直接使用 `collect-input` 时仍须显式配对。腾讯不复权请求 `/appstock/app/kline/kline` 最近1024条并读取 `day`；前复权、后复权分别读取 `qfqday`、`hfqday`，沿用 `fqkline/newfqkline`。来源行保留，规范候选只选择请求日期内记录；最近1024条之外的旧窗口明确报截断。默认仍为 `qfq` 和原 `fqkline`，保持旧任务行为。三种口径均有单证券日期的接口探测，但不复权和后复权尚未取得生产路由资格，字段单位也未扩展认证。API 与口径不匹配、接口参数拒绝、日期重复、异常结构和窗口截断均明确失败；不自动切换接口，原分钟和快照适配器不改变。原生对照见 [请求对照](../../tmp/daily-next-stage-20261012/native-comparison.json)。
+日线已有8只证券2026-10-09/newfqkline前复权在线资格与正式发布，但尚未取得全市场资格。`ASTOCK-002-daily` 当前正式采集策略在 `config/capabilities.yaml` 中固定为不复权 `kline`、前复权和后复权 `newfqkline`；`collect-task` 按策略展开三个来源请求。腾讯不复权请求 `/appstock/app/kline/kline` 最近1024条并读取 `day`；前复权、后复权分别读取 `qfqday`、`hfqday`，规范候选只选择请求日期内记录；最近1024条之外的旧窗口明确报截断。直接使用 `collect-input` 时仍须显式配对 `adjust` 与 `api`。三种口径虽有单证券日期探测，但不复权、后复权尚未取得生产路由资格，字段单位也未扩展认证。
+
+当前策略与保留的原始脚本尚未证明完全等价：原脚本日线三种口径都请求 `/appstock/app/fqkline/get`。2026-10-27 `sh600519` 单样本中，原脚本与当前 Provider 的不复权、前复权目标日开高低收及成交量数值相同；后复权开高低收不同，成交量相同。来源差异及完整原始响应见[原脚本对照记录](../../data/task_workspace/_checks/tencent-daily-original-provider-2026-10-27/README.md)。本证据只覆盖一只股票、一个日期，差异原因和其他证券适用范围待查，不能据此判定某接口更准确；目前不调整来源策略或生产资格。
+
+原脚本会在空响应、响应结构异常等情形继续尝试其他主机；当前Provider仅对连接、超时和HTTP 5xx执行有限主机回退，解析/质量异常不触发回退。该边界需与历史来源行为分开说明。API 与口径不匹配、接口参数拒绝、日期重复、异常结构和窗口截断均明确失败，原分钟和快照适配器不改变。既有小范围原生接口验证见[历史请求对照](../../tmp/daily-next-stage-20261012/native-comparison.json)。
 
 参数来源在 `config/providers.yaml`，标准字段沿用 `config/datasets/daily_bar.yaml`，位置映射在 `config/normalization/daily_bar.yaml`：前6列仍为日期、开、收、高、低、成交量；不复权接口不含成交额字段，复权接口的位置8也仅保留候选映射。单位未独立核验时，标准volume/amount保持空值。实际 `day/qfqday/hfqday` 序列标识保存在来源行和采集报告中，不因一致性样本推定任意除权情形。旧原响应不改写，新任务的参数范围和代码资格须重新核验。已认证倍率仍严格限于 `verified_unit_scopes` 列明的来源与日期；其他记录保持未认证字段为空，见下文。
 
