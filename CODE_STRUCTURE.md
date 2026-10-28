@@ -36,7 +36,7 @@
 | `AGENTS.md` | 协作、验证、权限及定期文档整理要求 |
 | `PROJECT_PROGRESS.md` | 当前实现、差距和下一步，不重复历史批次流水账 |
 | `STOCK_ANALYSIS_V2_MARKET_DATA_CENTER_ARCHITECTURE_V1.md` | 总体架构、术语、模块边界及合并保留的分钟规则；顶部维护现状评审，第4、5章维护逻辑架构、UML对象关联、策略与适配器模式、阶段合同及YAML设计稿，明确区别于当前实现 |
-| `stock-data-design-qfq-history-rebuild.md` | 前复权历史变化与人工重建规则 |
+| `stock-data-design-qfq-history-rebuild.md` | 多口径日线聚合记录、证券类型与价格/点位语义、口径适用状态、默认消费及人工历史重建规则；保留原文件路径 |
 | `stock-data-test-design-acceptance-baseline.md` | 测试层次、故障场景和验收门槛 |
 | `provider-capability-verification-and-normalization.md` | 来源证据、资格及YAML归一化规则 |
 | `docs/providers/README.md` | 正式源头接口说明、各数据域边界及说明表依据 |

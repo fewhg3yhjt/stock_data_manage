@@ -14,7 +14,7 @@
 | 在本机查看任务、原始证据和发布结果 | [只读运行台](docs/service/read-only-web.md) |
 | 用 Docker 部署只读运行台并更新代码 | [Docker 部署说明](docs/service/container-deployment.md) |
 | 来源资格、证据与归一化设计 | [来源专项设计](provider-capability-verification-and-normalization.md) |
-| 前复权变化后如何重建历史 | [历史重建设计](stock-data-design-qfq-history-rebuild.md) |
+| 日线各复权口径聚合、价格/点位类型、消费与历史重建 | [多口径日线设计](stock-data-design-qfq-history-rebuild.md) |
 | 怎么判断功能完成和数据可用 | [验收基线](stock-data-test-design-acceptance-baseline.md) |
 | 开发协作与文档维护要求 | [AGENTS.md](AGENTS.md) |
 

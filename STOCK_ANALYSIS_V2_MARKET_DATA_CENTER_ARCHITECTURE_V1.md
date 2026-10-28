@@ -143,7 +143,7 @@ flowchart TB
 >
 > 本文统一核心术语与模块边界；具体采集、重做和调度见 [任务流程](docs/pipeline/collection-tasks.md)，实际目录与实现差距见 [存储说明](docs/storage/README.md)。
 >
-> 前复权历史变化、分红事件发现和多日期统一切换以 [前复权日线与历史重建设计](stock-data-design-qfq-history-rebuild.md) 为准。当前代码尚未完整实现这条链路。
+> 前复权历史变化、分红事件发现和多日期统一切换以 [三口径日线聚合与历史重建设计](stock-data-design-qfq-history-rebuild.md) 为准。当前代码尚未完整实现这条链路。
 >
 > Provider 能力声明、能力探针、证据生命周期、覆盖矩阵和 YAML 归一化规则以 [Provider 能力验证与归一化设计](provider-capability-verification-and-normalization.md) 为准。
 
@@ -357,7 +357,7 @@ classDiagram
     RawResponse "0..*" --> "1" SourceContract : 来自
 ```
 
-`DataRecord` 由现有 `SecurityRecord`、`BarRecord` 等领域记录承接，不建立通用巨型记录父类。范围与分区是值，任务ID是执行标识，不能混入数据业务主键。`RawResponse` 可以被回放复用，故执行记录对它是引用；失败发生于收到响应之前时可以没有原响应，仍有采集尝试与错误记录。
+`DataRecord`表达具体数据集记录：名单复用 `SecurityRecord`，最终日线按第12.12节组合各口径，现有 `BarRecord`仍表达单口径候选；不建立通用巨型记录父类。范围与分区是值，任务ID是执行标识，不能混入数据业务主键。`RawResponse` 可以被回放复用，故执行记录对它是引用；失败发生于收到响应之前时可以没有原响应，仍有采集尝试与错误记录。
 
 ### 4.3 设计模式：策略与适配器的组合
 
@@ -472,10 +472,9 @@ HTTP 200但HTML错误页、无效JSON、空业务数组、重复日期或价格�
 ```yaml
 # collection.yaml：任务以数据结果为目标。
 tasks:
-  stock_daily_none:
+  stock_daily_complete:
     dataset: daily_bar
     asset_type: stock
-    adjustment: none
     universe: all_stock
     acquisition_policy: daily_fixed
 ```
@@ -487,14 +486,22 @@ acquisition_policies:
     mode: fixed
     inputs:
       - input_id: ASTOCK-002-daily
-        parameters: {api: kline, adjust: none}
+        adjustment_requests:
+          none: {api: kline, adjust: none}
+          forward: {api: newfqkline, adjust: qfq}
+          backward: {api: newfqkline, adjust: hfq}
   daily_failover:
     mode: failover
     inputs:
       - input_id: ASTOCK-002-daily
-        parameters: {api: kline, adjust: none}
+        adjustment_requests:
+          none: {api: kline, adjust: none}
+          forward: {api: newfqkline, adjust: qfq}
+          backward: {api: newfqkline, adjust: hfq}
     switch_on: [connection, timeout, http_5xx]
 ```
+
+示例为股票完整日线，一个任务声明三种源头参数映射，不创建三个业务任务；`adjustment_requests`是待实现示意，不能直接当当前运行配置使用，也不授予任何请求资格。其他资产只按已核验的必需/适用口径展开。
 
 `fixed` 只允许一个来源；`failover` 按 `inputs` 顺序选择请求前满足资格的来源，采集故障才尝试下一个。示例仅有一项，因此失败后明确结束；有第二个已核准来源时再加入，不能暗设一个备用接口。名单任务可声明多个互补输入，各自指定采集策略，不因后续覆盖不足生成新输入。
 
@@ -504,8 +511,8 @@ acquisition_policies:
 # schedules.yaml：调度只引用任务。
 timezone: Asia/Shanghai
 jobs:
-  - name: stock_daily_none_after_close
-    task: stock_daily_none
+  - name: stock_daily_complete_after_close
+    task: stock_daily_complete
     enabled: false
     business_day: trading_day
     frequency: {unit: day, interval: 1, at: '16:20'}
@@ -615,20 +622,18 @@ BaoStock → AkShare
 
 外部来源最终必须进入统一内部模型。
 
-股票日线示例：
+日线最终对象的逻辑字段示意（详细合同见第12.12节所引专项设计）：
 
 ```text
-symbol
-trade_date
-open
-high
-low
-close
-pre_close
-volume
-amount
-pct_change
+instrument_id + trade_date     最终业务主键
+asset_type                     stock / etf / lof / index
+value_kind + quote_unit        价格或指数点数及单位
+quotes.none                    不复权组及状态、来源
+quotes.forward                 前复权组及状态、来源
+quotes.backward                后复权组及状态、来源
 ```
+
+股票三组必需；ETF和指数按已核验适用范围填充，不把“不适用”“未核验”和“应有但缺失”混为一谈。当前 `BarRecord` 是单口径标准记录，适合表示来源候选，不等同于新的最终聚合对象；不改动分钟记录合同。价格组中的OHLC整组来自同一来源记录，不跨组拼接。
 
 必须统一：
 
@@ -805,28 +810,9 @@ data/
 
 ### 12.7 合并与唯一结果
 
-临时来源文件可以重叠，但正式结果不能重叠。
+来源候选键包含 `instrument_id + trade_date + adjustment`，以免不同口径互相覆盖；最终日线键为 `instrument_id + trade_date`，将各适用口径聚合在同一条记录内。重复候选仍按明确来源合同、质量和冲突规则处理，不写死全局来源优先级，更不因合并发现缺失自动追加请求。
 
-股票日线主键：
-
-```text
-symbol + trade_date
-```
-
-合并时按固定来源优先级保留先取得的有效数据：
-
-```text
-Tencent > BaoStock > AkShare
-```
-
-例如 Tencent 已经有效取得 `600519 / 2026-09-28`，该证券会从缺失集合移除，BaoStock 不再请求或接收这条记录；只有 Tencent 缺失时才使用 BaoStock。即使全量接口额外返回已有证券，也只接收当前缺失证券对应的数据。
-
-最终正式文件只保留一条记录，并建议保留轻量来源字段：
-
-```text
-source
-source_time
-```
+某组来源、请求日期、证券身份、口径标签必须一致可追溯；不能把不复权、前复权、后复权数值合并成一个OHLC或复制一组补另一组。完整性及证券类型状态由第12.12节所引专项设计维护，最终仅发布通过该合同的完整记录。
 
 ### 12.8 发布与任务归档
 
@@ -910,39 +896,17 @@ Publish
 
 第一版“清理”只指人工确认后的清理入口和磁盘占用展示，默认不自动删除任务数据。
 
-### 12.12 前复权历史变化与重建
+### 12.12 多口径日线聚合、历史变化与重建
 
-股票、ETF 和 LOF 的正式日线统一使用前复权，指数保存指数发布方点位。由于前复权历史会在除权除息后变化，系统增加独立于普通日线补数的历史重建流程。
+2026-10-28调整：最终日线面向“同一证券 + 同一交易日”的一条完整记录。股票包含源头取得的不复权、前复权、后复权三组；ETF、指数及其他已支持资产按实际核验的适用口径保存，能取得的都保留。`asset_type`区分证券类型，`value_kind`和单位区分价格与指数点数；不额外建立重复的ETF价格字段，不复制其他口径填空。
 
-```text
-东方财富 RPT_SHAREBONUS_DET
-    ↓
-按最近若干自然日批量查询全市场除权事件
-    ↓
-得到可能变化的证券集合
-    ↓
-从计划使用的前复权历史来源获取重叠历史
-    ↓
-同来源历史值确实变化？
-    ├── 否：稍后重查
-    └── 是：进入人工历史重建清单
-            ↓
-       人工批准并开启历史覆盖
-            ↓
-       整只证券重新获取前复权历史
-            ↓
-       按日期生成全部候选分区
-            ↓
-       全部完成后统一切换正式版本
-```
+来源候选仍按证券、日期、口径区分，在解析和质量阶段按证券与日期聚合。最终主键不含 `adjustment`；三种口径成为同一记录内的固定槽位及其可用状态。股票三组必需，其他资产不能因一次空返回就判断不适用。缺失必需口径的证券不计为完整记录，数据集原发布门槛不放宽。采集策略仍只因明确的传输故障切源，质量缺失不反向采集。
 
-第一版不自动执行历史重建，不依赖独立复权因子，也不逐只查询全市场分红。分红事件接口与东方财富行情接口分开配置和健康管理。
+字段结构、各口径状态、价格/点位解释、完整记录覆盖及前台消费，以[三口径日线聚合与历史重建设计](stock-data-design-qfq-history-rebuild.md)为唯一详细合同。页面默认不复权，切换只投影该记录已有且可用的对应组，不重新抓取或本地计算复权。当前代码仍按单口径主键和分区工作，此目标尚未实现，不迁移旧数据。
 
-前复权历史主来源需要通过真实探针确定，不能在架构文档中预先写死。历史重建优先整段使用同一个来源；第一来源业务结果不完整时保留明细，由用户显式决定整段重采；本轮不因检查结果自动换源。
+前复权事件发现和同来源重叠历史比较继续用于确认是否需要重建。人工确认后，取得授权范围的全部适用口径（股票三种），重新生成完整日线记录；全部受影响日期候选检查通过后统一切换。不得只更新前复权独立文件或逐日直接覆盖，不能以本轮默认展示不复权掩盖其他必需口径缺失。
 
-历史重建可能影响多个日期分区，禁止逐日直接覆盖。所有候选分区准备并校验完成后，通过版本指针一次切换，保证业务不会读取到新旧历史混合结果。
-
-第一版不做通用工作流引擎、复杂步骤状态机或证券级错误状态系统。
+第一版仍不自动执行历史重建，不依赖独立因子计算价格，不逐只查询全市场分红，不增加通用工作流引擎。分红接口与行情来源分别配置、验证和健康管理。三口径源头能力及历史窗口必须按实际范围验证，不能由本稿推定生产资格。
 
 ---
 
@@ -1516,7 +1480,7 @@ FULL / SYMBOL / APPEND / REALTIME
 
 业务时间统一为 `Asia/Shanghai`，数据日期、请求窗口和采集时间分别保存。分钟统一结束时间语义，例如09:31表示09:30之后至09:31结束的一根；开始时间标记的来源先转换再比较。交易时段、午间边界、集合竞价和盘后时段由配置定义。
 
-日线业务键包含证券身份、交易日期、复权口径；分钟包含证券身份、结束时间、间隔和复权口径。整条记录选择一个来源，禁止把不同来源的开收盘价和量额拼成一条行情。前复权与不复权、1m与5m、final历史与provisional快照不能静默替代。
+日线来源候选键包含证券身份、交易日期、复权口径，最终聚合记录键只含证券身份与交易日期，各组位于记录内；分钟仍含证券身份、结束时间、间隔和复权口径。整条记录选择一个来源，禁止把不同来源的开收盘价和量额拼成一条行情。前复权与不复权、1m与5m、final历史与provisional快照不能静默替代。
 
 合格 final 优于 provisional，同级比较字段完整度和能力优先级；不能让缺字段的新记录降低旧记录质量。同来源重复内容按行哈希幂等，同来源修订需重新校验。跨来源差异保留双方原始引用与规则版本，软冲突按确定性规则处理，硬冲突隔离对应记录；阈值按数据集、来源组合、市场、资产、频率和字段配置，不预设某个来源恒正确。有效候选之间的修订和冲突按现有质量模块处理；质量问题不在本轮自动触发其他来源采集。
 
