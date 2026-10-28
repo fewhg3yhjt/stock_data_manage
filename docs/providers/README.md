@@ -77,6 +77,8 @@ node provider_validation/tests/build_interface_coverage_workbook.mjs --formal-sp
 
 原脚本会在空响应、响应结构异常等情形继续尝试其他主机；当前Provider仅对连接、超时和HTTP 5xx执行有限主机回退，解析/质量异常不触发回退。该边界需与历史来源行为分开说明。API 与口径不匹配、接口参数拒绝、日期重复、异常结构和窗口截断均明确失败，原分钟和快照适配器不改变。既有小范围原生接口验证见[历史请求对照](../../tmp/daily-next-stage-20261012/native-comparison.json)。
 
+ETF `sh510300` 的三口径证据仅覆盖2026-10-27来源采集与解析，尚无ETF聚合发布；当前日线数据集要求ETF不复权，复权口径未确认，标准化规则也只有待验证的ETF前复权单项。指数方面，腾讯在2026-10-23对 `sh000001` 与 `sz399001` 的不复权请求返回目标日行情；前/后复权请求虽HTTP成功、响应码为0，但没有对应调整序列，股票对照则返回了前/后复权序列。上证综指两份复权响应字节哈希相同；深证成指哈希不同，但差异仅为 `qt.market` 行情快照时间相差9秒，日线序列相同。[原始响应与逐项摘要](../../tmp/security-daily-20261023/phase-13-index-adjustment/phase-13-index-adjustment.md)只证明这两个指数和该窗口。现有日线结构包含 `index_points/point`，但没有指数标准化规则，当前 `stock_daily` 任务仅覆盖股票，指数来源路由仍为验证状态，因此还没有正式指数日线生产路径。LOF日线的来源适用性尚无验证证据。
+
 参数来源在 `config/providers.yaml`，标准字段沿用 `config/datasets/daily_bar.yaml`，位置映射在 `config/normalization/daily_bar.yaml`：前6列仍为日期、开、收、高、低、成交量；不复权接口不含成交额字段，复权接口的位置8也仅保留候选映射。单位未独立核验时，标准volume/amount保持空值。实际 `day/qfqday/hfqday` 序列标识保存在来源行和采集报告中，不因一致性样本推定任意除权情形。旧原响应不改写，新任务的参数范围和代码资格须重新核验。已认证倍率仍严格限于 `verified_unit_scopes` 列明的来源与日期；其他记录保持未认证字段为空，见下文。
 
 单接口或显式任务单元通过现有context传递：
