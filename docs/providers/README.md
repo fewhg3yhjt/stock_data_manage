@@ -53,13 +53,19 @@ node provider_validation/tests/build_interface_coverage_workbook.mjs --formal-sp
 
 两步分别刷新配套JSON和XLSX。它们仅复用已提交审计索引中有哈希关联的成功执行报告，不采集新数据。原测试覆盖报告的默认导出模式及存放位置保持不变；旧证据哈希不匹配时不授予新的验证结论。
 
-本次目录迁移后的导出核对记录见 [正式接口说明核对结果](../../provider_validation/results/source-layout-20261005/formal/verification.json)，迁移与安装验证见 [目录整理核对结果](../../provider_validation/results/source-layout-20261005/verification.json)。2026-10-04 的原导出核对记录保留原样。
+本次目录迁移记录曾引用 `provider_validation/results/source-layout-20261005/formal/verification.json` 与 `provider_validation/results/source-layout-20261005/verification.json`；两份核验文件当前不在工作区，不能据此推断本次目录迁移已复核。2026-10-04 的原导出核对记录保留原样。
 
 ## 运行输出与历史验证证据
 
 接口总览新增运行原始响应路径、任务工作区路径、来源标准化文件、最终数据与发布状态、任务归档条件五列。它们描述当前代码和配置的默认落盘位置；原有验证报告及原始证据清单列继续指向历史来源验证材料。历史材料没有搬迁，历史样本成功不等于当前全量生产验证。
 
 当前默认运行输出统一进入 `data/`，详细职责、命令和归档门禁见 [运行数据目录与归档](../storage/README.md)。标准化成功仍为候选完成，保留在工作区；63种输入数据集的正式发布和多来源构建尚未接通，生产路由与自动调度不因目录配置而启用。
+
+### 当前聚合版本小范围在线验证（2026-10-28）
+
+股票 `sh600519`、数据日 `2026-10-27` 的 `kline` 不复权及 `newfqkline` 前/后复权各取得一份真实响应；响应解析前留存并按哈希精确离线重放，之后通过现有 `stock_daily` 任务在隔离目录发布并回读一条完整聚合记录。来源返回窗口为1024/640/640条；本次只证明该证券、日期和三次接口请求。成交量单位未验证，成交额字段不可用；不因此扩展旧单位资格或开启生产路由。原始响应、请求清单、代码/配置指纹和验证结果见[验证报告](../../tmp/provider-probes/tencent-daily/2026-10-27/600519/run-2026-10-28-2158/README.md)。
+
+同日沪市ETF `sh510300` 也完成了三口径来源响应和当前Provider解析的小样本核验；三份HTTP响应均已先留存，随后用当前解析器从原始字节离线解析。该次只验证来源数据，不经过ETF聚合任务，也不认证其他ETF或单位；详细清单、原响应及派生行见[ETF验证报告](../../data/task_workspace/_checks/tencent-daily-etf-2026-10-27/README.md)。
 
 ## 证券名单能力更新
 
