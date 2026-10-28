@@ -73,7 +73,7 @@ node provider_validation/tests/build_interface_coverage_workbook.mjs --formal-sp
 
 日线已有8只证券2026-10-09/newfqkline前复权在线资格与正式发布，但尚未取得全市场资格。`ASTOCK-002-daily` 当前正式采集策略在 `config/capabilities.yaml` 中固定为不复权 `kline`、前复权和后复权 `newfqkline`；`collect-task` 按策略展开三个来源请求。腾讯不复权请求 `/appstock/app/kline/kline` 最近1024条并读取 `day`；前复权、后复权分别读取 `qfqday`、`hfqday`，规范候选只选择请求日期内记录；最近1024条之外的旧窗口明确报截断。直接使用 `collect-input` 时仍须显式配对 `adjust` 与 `api`。三种口径虽有单证券日期探测，但不复权、后复权尚未取得生产路由资格，字段单位也未扩展认证。
 
-当前策略与保留的原始脚本尚未证明完全等价：原脚本日线三种口径都请求 `/appstock/app/fqkline/get`。2026-10-27 `sh600519` 单样本中，原脚本与当前 Provider 的不复权、前复权目标日开高低收及成交量数值相同；后复权开高低收不同，成交量相同。来源差异及完整原始响应见[原脚本对照记录](../../data/task_workspace/_checks/tencent-daily-original-provider-2026-10-27/README.md)。本证据只覆盖一只股票、一个日期，差异原因和其他证券适用范围待查，不能据此判定某接口更准确；目前不调整来源策略或生产资格。
+当前策略与保留的原始脚本仍不完全等价：原脚本三种口径都请求 `/appstock/app/fqkline/get`，当前策略前/后复权使用 `newfqkline/get`。扩样覆盖 `sh600519`、`sh601318`、`sz000001` 各两个交易日；原脚本与Provider直接调用旧 `fqkline` 的30个目标日字段文本及数值全部一致，而 `newfqkline` 的OHLC仅返回两位小数，旧接口返回三位，24个OHLC值中23个数值不同（最大差0.005），六组成交量数值相同。Provider解析保留原始响应精度；差异已在 `newfqkline` 响应体中，尚不能判断接口算法等价或哪组更准确。逐项请求、响应、解析与哈希见[后复权扩样证据](../../data/task_workspace/_checks/tencent-daily-hfq-expanded-2026-10-28/README.md)和[完整性核验](../../data/task_workspace/_checks/tencent-daily-hfq-expanded-2026-10-28/evidence_validation.json)。早先[单样本三口径记录](../../data/task_workspace/_checks/tencent-daily-original-provider-2026-10-27/README.md)的不复权/前复权结论仍只适用于 `sh600519`、2026-10-27。这里仅定位样本差异，未调整路由、资格或数据语义，也不代表生产认证。
 
 原脚本会在空响应、响应结构异常等情形继续尝试其他主机；当前Provider仅对连接、超时和HTTP 5xx执行有限主机回退，解析/质量异常不触发回退。该边界需与历史来源行为分开说明。API 与口径不匹配、接口参数拒绝、日期重复、异常结构和窗口截断均明确失败，原分钟和快照适配器不改变。既有小范围原生接口验证见[历史请求对照](../../tmp/daily-next-stage-20261012/native-comparison.json)。
 
