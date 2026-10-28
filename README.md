@@ -5,7 +5,7 @@
 | 需要了解什么 | 文档入口 |
 |---|---|
 | 总体架构、术语和模块边界 | [总体设计](STOCK_ANALYSIS_V2_MARKET_DATA_CENTER_ARCHITECTURE_V1.md) |
-| 任务与数据对象重构设计（2026-10-28，待确认） | [对象职责与 YAML 合同](STOCK_ANALYSIS_V2_MARKET_DATA_CENTER_ARCHITECTURE_V1.md#4-对象职责与执行设计2026-10-28待确认)、[拟议任务流程](docs/pipeline/collection-tasks.md#设计提案任务定义与运行流程2026-10-28待确认) |
+| 任务与数据对象设计（2026-10-28，设计稿） | [逻辑架构、UML关联与策略模式](STOCK_ANALYSIS_V2_MARKET_DATA_CENTER_ARCHITECTURE_V1.md#4-对象职责与执行设计2026-10-28待确认)、[阶段时序与故障决策](docs/pipeline/collection-tasks.md#设计提案任务定义与运行流程2026-10-28待确认) |
 | 当前功能、实际架构框图与优化议题（2026-10-27） | [当前实现评审](STOCK_ANALYSIS_V2_MARKET_DATA_CENTER_ARCHITECTURE_V1.md#当前实现与优化评审2026-10-27)、[核心流程框图](docs/pipeline/collection-tasks.md#当前实现流程图2026-10-27) |
 | 现有目录和代码负责什么 | [代码结构](CODE_STRUCTURE.md) |
 | 输入参数、采集字段、映射及范围 | [源头接口说明](docs/providers/README.md)、[股票与ETF来源](docs/providers/security-catalog.md) |
