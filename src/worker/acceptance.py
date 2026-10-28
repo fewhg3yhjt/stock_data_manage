@@ -6,7 +6,7 @@ from decimal import Decimal
 from pathlib import Path
 from uuid import uuid4
 
-from ..domain import Adjustment, AssetType, BarRecord, Dataset, Exchange, ItemStatus, QualityStatus
+from ..domain import Adjustment, AssetType, DailyRecord, QuoteGroup, QuoteStatus, Dataset, Exchange, ItemStatus
 from ..routing.capabilities import ProviderCapability
 from ..routing.router import plan_realtime_collection
 from ..storage.metadata import MetadataStore
@@ -151,28 +151,11 @@ def _weekdays_ending(end_date: date, count: int) -> tuple[date, ...]:
     return tuple(reversed(result))
 
 
-def _acceptance_bar(trade_date: date, instrument_id: str) -> BarRecord:
-    return BarRecord(
-        dataset=Dataset.DAILY_BAR,
-        instrument_id=instrument_id,
-        source_symbol="sh" + instrument_id[-6:],
-        trade_date=trade_date,
-        bar_time=None,
-        interval_minutes=None,
-        adjustment=Adjustment.NONE,
-        open=Decimal("10"),
-        high=Decimal("10.5"),
-        low=Decimal("9.5"),
-        close=Decimal("10.2"),
-        volume=Decimal("1000"),
-        amount=Decimal("10000"),
-        source_provider="fixture",
-        endpoint="history",
-        source_method="daily_history",
-        quality_status=QualityStatus.FINAL,
-        field_level="full_bar",
-        capability_priority=100,
-        capability_version="acceptance-v1",
-        raw_object_path="fixture/acceptance.json",
-        fetch_time=datetime.combine(trade_date, time(16), tzinfo=timezone.utc),
-    )
+def _acceptance_bar(trade_date: date, instrument_id: str) -> DailyRecord:
+    def group(price):
+        return QuoteGroup(QuoteStatus.AVAILABLE, open=Decimal(price), high=Decimal(price),
+            low=Decimal(price), close=Decimal(price), volume=Decimal("1000"), amount=Decimal("10000"),
+            source_provider="fixture", endpoint="history", capability_version="acceptance-v1",
+            normalizer_version="acceptance-v1", raw_object_path="fixture/acceptance.json",
+            fetch_time=datetime.combine(trade_date, time(16), tzinfo=timezone.utc))
+    return DailyRecord(instrument_id, trade_date, AssetType.STOCK, group("10"), group("9"), group("11"))

@@ -128,6 +128,14 @@ class RawObjectStore:
     def request_manifest_name(parameters, *, input_id: str) -> str:
         """Different requests share an interface directory, never an active manifest."""
         parameters = sanitized_metadata(parameters)
+        # Daily quote groups multiply source requests by three. Keep their persisted,
+        # scope-readable names short enough for Windows archive/workspace paths.
+        if (parameters.get("code") and parameters.get("adjust") in {"none", "qfq", "hfq"}
+                and parameters.get("start") and parameters.get("end") and parameters.get("api")):
+            code = _safe_filename_part(parameters["code"], limit=12)
+            start = _safe_filename_part(parameters["start"], limit=10)
+            end = _safe_filename_part(parameters["end"], limit=10)
+            return f"manifest.{_safe_filename_part(input_id, limit=24)}_{code}_{parameters['adjust']}_{start}_{end}.ndjson"
         parts = [quote(str(input_id), safe="-_.")]
         for key, value in sorted(parameters.items()):
             if isinstance(value, (list, tuple)):
@@ -229,9 +237,20 @@ class RawObjectStore:
             raise ValueError("cleanup path escapes its permitted scope")
         if not path.exists():
             return None
-        source_root = path.parent
-        label = "_".join(_safe_filename_part(part, limit=48) for part in
-                         (*path.relative_to(permitted).parts[:-1], path.stem))
+        relative = path.relative_to(permitted)
+        parts = relative.parts
+        if (len(parts) == 4 and parts[2] == "kline_daily" and path.stem.startswith("manifest.ASTOCK-002-daily_")):
+            # Daily redo archives need a compact but business-readable path on Windows.
+            request_parts = path.stem.removeprefix("manifest.").split("_")
+            if (len(request_parts) == 5 and request_parts[2] in {"none", "qfq", "hfq"}
+                    and all(request_parts[index] for index in (1, 2, 3, 4))):
+                date_key, provider, endpoint = parts[0], parts[1], parts[2]
+                label = _safe_filename_part("_".join((date_key, provider, endpoint, request_parts[1],
+                    request_parts[2], request_parts[3], request_parts[4])), limit=80)
+            else:
+                label = _safe_filename_part("_".join(parts[:-1]) + "_" + path.stem, limit=80)
+        else:
+            label = "_".join(_safe_filename_part(part, limit=48) for part in (*parts[:-1], path.stem))
         directory = Path(archive_root).resolve() / "_raw_audit" / label
         suffix = 2
         base = directory

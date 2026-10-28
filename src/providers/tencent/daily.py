@@ -102,9 +102,9 @@ class TencentDailyProvider:
             str(returned_rows[-1]["trade_date"]) if returned_rows else None, self.adjustment,
         )
 
-    def fetch_window(self, code: str, start: date, end: date, adjust: str = "qfq", api: str = "fqkline",
-                     asset_type: str | None = None) -> InputFetchResult:
-        """Verified historical request shape; returns source positional fields for YAML mapping."""
+    def capture_window(self, code: str, start: date, end: date, adjust: str = "qfq", api: str = "fqkline",
+                       asset_type: str | None = None):
+        """Acquire response packages only; business contents never trigger host fallback."""
         if api not in {"kline", "fqkline", "newfqkline"}:
             raise ValueError("unsupported Tencent daily API")
         if adjust not in {"none", "qfq", "hfq"}:
@@ -119,23 +119,33 @@ class TencentDailyProvider:
         symbol = tencent_symbol(code, allow_bse=api in {"kline", "newfqkline"}, asset_type=asset_type)
         if end < start:
             raise ValueError("daily window end must not precede start")
-        bar_key = _adjustment_bar_key(adjustment)
-        cursor, by_date, hosts, source_rows = start, {}, [], []
+        cursor, segments = start, []
         path = "/appstock/app/kline/kline" if api == "kline" else f"/appstock/app/{api}/get"
         input_hosts = self.alternative_input_hosts if api == "newfqkline" else self.input_hosts
         while cursor <= end:
-            # kline and newfqkline may return a rolling recent window regardless
-            # of requested dates; repeating segments cannot extend that history.
             stop = end if api in {"kline", "newfqkline"} else min(cursor + timedelta(days=699), end)
-            if api == "kline":
-                param = f"{symbol},day,,,1024"
-                row_limit = 1024
-            else:
-                adjustment_suffix = f",{adjust}"
-                param = f"{symbol},day,{cursor.isoformat()},{stop.isoformat()},640{adjustment_suffix}"
-                row_limit = 640
-            data, host = tencent_kline_call(self.transport, path,
-                param, input_hosts, self.host_down_until)
+            param = f"{symbol},day,,,1024" if api == "kline" else f"{symbol},day,{cursor.isoformat()},{stop.isoformat()},640,{adjust}"
+            response, host = tencent_kline_call(self.transport, path, param, input_hosts, self.host_down_until)
+            segments.append((cursor, stop, response, host))
+            cursor = stop + timedelta(days=1)
+        return {"symbol": symbol, "start": start, "end": end, "adjust": adjust,
+                "api": api, "path": path, "segments": tuple(segments)}
+
+    def parse_window(self, captured):
+        """Pure interpretation of previously retained responses; never calls a transport."""
+        symbol, start, end = captured["symbol"], captured["start"], captured["end"]
+        api, adjust, path = captured["api"], captured["adjust"], captured["path"]
+        adjustment = _adjustment_from_token(adjust)
+        bar_key = _adjustment_bar_key(adjustment)
+        by_date, hosts, source_rows = {}, [], []
+        for cursor, stop, response, host in captured["segments"]:
+            payload = EndpointContract(frozenset()).parse_json(response)
+            if not isinstance(payload, dict) or not isinstance(payload.get("data"), dict):
+                raise ProviderContractError("Tencent daily envelope changed", FailureClass.SCHEMA_CHANGED, retryable=False)
+            if payload.get("code", 0) != 0:
+                raise ProviderContractError("Tencent rejected the daily request parameters: " + str(payload.get("msg", "unknown")), FailureClass.SCHEMA_CHANGED, retryable=False)
+            data = payload["data"]
+            row_limit = 1024 if api == "kline" else 640
             node = data.get(symbol)
             if not isinstance(node, dict) or not isinstance(node.get(bar_key), list):
                 raise ProviderContractError("Tencent daily list changed", FailureClass.SCHEMA_CHANGED, retryable=False)
@@ -175,19 +185,13 @@ class TencentDailyProvider:
             if api == "kline" and len(items) == 1024 and segment_dates and start < min(segment_dates):
                 raise ProviderContractError("requested Tencent history exceeds retained 1024-bar window", FailureClass.TRUNCATED, retryable=False)
             hosts.append(host)
-            cursor = stop + timedelta(days=1)
         if not by_date:
-            raise ProviderContractError("Tencent window has zero bars", FailureClass.TEMPORARY_EMPTY, retryable=True)
+            raise ProviderContractError("Tencent window has zero bars", FailureClass.TEMPORARY_EMPTY, retryable=False)
         return InputFetchResult(tuple(by_date[stamp] for stamp in sorted(by_date)),
-                                " | ".join(host + path for host in dict.fromkeys(hosts)),
-                                source_rows=tuple(source_rows),
-                                mapping_context={"source_api": api,
-                                    "adjustment": adjustment.value,
-                                    "adjustment_parameter": adjust,
-                                    "source_bar_key": bar_key,
-                                    "source_total_count": len(source_rows),
-                                    "selected_row_count": len(by_date),
-                                    "history_completeness_verified": False})
+            " | ".join(host + path for host in dict.fromkeys(hosts)), source_rows=tuple(source_rows),
+            mapping_context={"source_api": api, "adjustment": adjustment.value, "adjustment_parameter": adjust,
+                "source_bar_key": bar_key, "source_total_count": len(source_rows),
+                "selected_row_count": len(by_date), "history_completeness_verified": False})
 
 
 def _adjustment_from_token(value: str) -> Adjustment:
@@ -223,32 +227,28 @@ def tencent_symbol(code: str, *, allow_bse: bool = False, asset_type: str | None
 
 
 def tencent_kline_call(transport, path, param, hosts, down_until):
-    """Keep the source helper's host order, 120s cooldown, param-error and empty checks."""
-    errors = []
+    """Preserve host order/timeouts/cooldown; only explicit acquisition failures switch hosts."""
+    from ...routing.retry import acquisition_failure
+    last_error = None
     for host in hosts:
         if down_until.get(host, 0) > time():
             continue
         try:
             response = transport.get(host + path, params={"param": param}, timeout_seconds=(8, 20))
-            payload = EndpointContract(frozenset()).parse_json(response) if response.body.strip() else {}
+            if response.status_code >= 400:
+                failure = FailureClass.HTTP_5XX if response.status_code >= 500 else FailureClass.HTTP_ERROR
+                raise ProviderContractError(f"Tencent HTTP {response.status_code}", failure,
+                                           retryable=response.status_code >= 500, http_status=response.status_code)
+            return response, host
         except Exception as exc:
-            # Missing archive entries / persistence failures are execution failures, never a source fallback.
-            from requests import RequestException
-            if isinstance(exc, ValueError) or (isinstance(exc, OSError) and not isinstance(exc, RequestException)):
+            failure = acquisition_failure(exc)
+            if failure not in {FailureClass.CONNECTION, FailureClass.TIMEOUT, FailureClass.HTTP_5XX}:
                 raise
-            errors.append(type(exc).__name__)
             down_until[host] = time() + 120
-            continue
-        if not isinstance(payload, dict):
-            down_until[host] = time() + 120
-            continue
-        message = str(payload.get("msg") or "").strip().lower()
-        if message in {"param error", "bad params"}:
-            raise ValueError(f"Tencent rejected the daily request parameters: {message}")
-        if isinstance(payload.get("data"), dict) and payload["data"]:
-            return payload["data"], host
-        down_until[host] = time() + 120
-    raise ProviderContractError(f"Tencent hosts failed: {','.join(errors)}", FailureClass.CONNECTION, retryable=True)
+            last_error = exc
+    if last_error is not None:
+        raise last_error
+    raise ProviderContractError("Tencent hosts are cooling down", FailureClass.CONNECTION, retryable=True)
 
 
 def _combined_status(statuses: list[WindowStatus], target_rows_found: bool) -> WindowStatus:

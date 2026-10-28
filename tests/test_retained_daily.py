@@ -14,58 +14,75 @@ from stock_data_manage.storage.metadata import MetadataStore
 
 ROOT=Path(__file__).resolve().parents[1]
 CONFIG=ROOT/'config'
-CONTEXT={'request':{'symbol':'sh600519','start_date':'2026-10-09','end_date':'2026-10-09'}}
+CONTEXT={'request':{'symbol':'sh600519','start_date':'2026-10-09','end_date':'2026-10-09'},'config':{'api':'newfqkline','adjust':'qfq'}}
+
+
+@pytest.fixture
+def tmp_path(tmp_path_factory):
+    return tmp_path_factory.mktemp("d")
 
 
 @pytest.fixture
 def qualified(tmp_path, monkeypatch):
+    from urllib.parse import urlsplit, parse_qs
     def send(session, request, **kwargs):
+        param=parse_qs(urlsplit(request.url).query)['param'][0]
+        key='day' if '/kline/kline' in request.url else 'qfqday' if param.endswith(',qfq') else 'hfqday'
         response=requests.Response();response.status_code=200
-        response._content=b'{"code":0,"data":{"sh600519":{"qfqday":[["2026-10-09","10","11","12","9","100"]]}}}'
+        row=['2026-10-09','10','11','12','9','100']
+        if key!='day': row+=['0','0','10','0']
+        response._content=json.dumps({'code':0,'data':{'sh600519':{key:[row]}}}).encode()
         response.headers={'Content-Type':'application/json'};response.encoding='utf-8'
         response.url=request.url;response.request=request
         return response
     monkeypatch.setattr(requests.Session,'send',send)
-    live=collect_input(input_id='ASTOCK-002-daily',context=CONTEXT,config_root=CONFIG,
-        output_root=tmp_path/'live',mode='live',pacer=RequestPacer(wait=lambda _:None))
-    raw=Path(live['run_directory'])/live['raw_manifest']['path']
-    current=collect_input(input_id='ASTOCK-002-daily',context=CONTEXT,config_root=CONFIG,
-        output_root=tmp_path/'current',mode='replay',replay_manifest=raw,pacer=RequestPacer(wait=lambda _:None))
-    definition={'task_id':'fixture-retained','dataset':'daily_bar','trade_date':'2026-10-09','asset_type':'stock',
-        'adjustment':'forward','units':[{'key':'sh600519','symbol':'sh600519','input_id':'ASTOCK-002-daily',
-        'context':CONTEXT,'replay_manifest':str(raw)}]}
+    pairs={}
+    units=[]
+    for name,api,token in [('forward','newfqkline','qfq'),('none','kline','none'),('backward','newfqkline','hfq')]:
+        context={'request':dict(CONTEXT['request']),'config':{'api':api,'adjust':token}}
+        live=collect_input(input_id='ASTOCK-002-daily',context=context,config_root=CONFIG,
+            output_root=tmp_path/(name+'-live'),mode='live',pacer=RequestPacer(wait=lambda _:None))
+        raw=Path(live['run_directory'])/live['raw_manifest']['path']
+        current=collect_input(input_id='ASTOCK-002-daily',context=context,config_root=CONFIG,
+            output_root=tmp_path/(name+'-current'),mode='replay',replay_manifest=raw,pacer=RequestPacer(wait=lambda _:None))
+        assert live['status']==current['status']=='candidate_complete'
+        pairs[name]=(context,live,current,raw)
+        units.append({'key':'sh600519' if name=='forward' else 'sh600519__'+name,
+            'symbol':'sh600519','input_id':'ASTOCK-002-daily','context':context,'adjustment':name,'replay_manifest':str(raw)})
+    definition={'task_id':'fixture-retained','dataset':'daily_bar','trade_date':'2026-10-09','asset_type':'stock','units':units}
     result=collect_task(definition=definition,config_root=CONFIG,data_root=tmp_path/'replayed',mode='replay',
         collector_options={'pacer':RequestPacer(wait=lambda _:None)})
-    assert result['status']=='published'
+    assert result['status']=='published',result.get('error')
     contract=next(c for c in load_input_capabilities(CONFIG/'providers.yaml') if c.input_id=='ASTOCK-002-daily')
     version=build_input_provider(contract,providers_path=CONFIG/'providers.yaml').capability_version
-    semantic={'passed':True,'instrument_id':'XSHG:600519','asset_type':'stock','parameters':live['parameters'],
-        'source_response_hashes':live['output']['source_response_hashes'],'code_version':current['code_version']}
-    (tmp_path/'semantic.json').write_text(json.dumps(semantic),encoding='utf-8')
-    (tmp_path/'contract.xml').write_text('<testsuites><testsuite tests="1" failures="0" errors="0" skipped="0"/></testsuites>')
-    artifacts={'contract_tests':tmp_path/'contract.xml','semantic_check':tmp_path/'semantic.json',
-        'live_report':Path(live['report_path']),'revalidation_report':Path(current['report_path']),
-        'publication_manifest':Path(result['published_manifest']),'raw_manifest':raw}
-    proof={'input_id':contract.input_id,'capability_version':version,'asset_type':'stock',
-        'allowed_modes':['retained','live'],
-        **{k:{'path':str(p),'sha256':file_hash(p)} for k,p in artifacts.items()}}
-    proof_path=tmp_path/'qualification.json';proof_path.write_text(json.dumps(proof),encoding='utf-8')
-    now=datetime.now(timezone.utc)
-    evidence=ProbeEvidence(provider=contract.provider,endpoint=contract.endpoint,capability_version=version,
-        validated_at=now,validation_expires_at=now+timedelta(hours=1),status='complete',eligible_for_selection=True,
-        row_count=1,first_key=None,last_key=None,evidence_hash=file_hash(proof_path),adjustment='forward',
-        request_scope=('input:'+contract.input_id,'parameters:'+row_hash(contract.bind_parameters(CONTEXT)),
-                       'qualification:'+str(proof_path)),field_semantics=('trade_date','open','high','low','close','adjustment'),units=('price:CNY',))
-    root=tmp_path/'formal'
-    with MetadataStore(root/'metadata/metadata.duckdb') as metadata:
-        metadata.save_probe_evidence(evidence,dataset='daily_bar',market='XSHG',asset_type='stock',
-            code_prefix='sh600519',adjustment='forward')
-    return contract, root, definition, raw, proof_path
+    for name,(context,live,current,raw) in pairs.items():
+        semantic={'passed':True,'instrument_id':'XSHG:600519','asset_type':'stock','parameters':live['parameters'],
+            'source_response_hashes':live['output']['source_response_hashes'],'code_version':current['code_version']}
+        (tmp_path/(name+'-semantic.json')).write_text(json.dumps(semantic),encoding='utf-8')
+        (tmp_path/'contract.xml').write_text('<testsuites><testsuite tests="1" failures="0" errors="0" skipped="0"/></testsuites>')
+        artifacts={'contract_tests':tmp_path/'contract.xml','semantic_check':tmp_path/(name+'-semantic.json'),
+            'live_report':Path(live['report_path']),'revalidation_report':Path(current['report_path']),
+            'publication_manifest':Path(result['published_manifest']),'raw_manifest':raw}
+        proof={'input_id':contract.input_id,'capability_version':version,'asset_type':'stock',
+            'allowed_modes':['retained','live'],
+            **{k:{'path':str(p),'sha256':file_hash(p)} for k,p in artifacts.items()}}
+        proof_path=tmp_path/(name+'-qualification.json');proof_path.write_text(json.dumps(proof),encoding='utf-8')
+        now=datetime.now(timezone.utc)
+        evidence=ProbeEvidence(provider=contract.provider,endpoint=contract.endpoint,capability_version=version,
+            validated_at=now,validation_expires_at=now+timedelta(hours=1),status='complete',eligible_for_selection=True,
+            row_count=1,first_key=None,last_key=None,evidence_hash=file_hash(proof_path),adjustment=name,
+            request_scope=('input:'+contract.input_id,'parameters:'+row_hash(contract.bind_parameters(context)),
+                           'qualification:'+str(proof_path)),field_semantics=('trade_date','open','high','low','close','adjustment'),units=('price:CNY',))
+        root=tmp_path/'formal'
+        with MetadataStore(root/'metadata/metadata.duckdb') as metadata:
+            metadata.save_probe_evidence(evidence,dataset='daily_bar',market='XSHG',asset_type='stock',
+                code_prefix='sh600519',adjustment=name)
+    return contract,root,definition,pairs['forward'][3],tmp_path/'forward-qualification.json'
 
 
 def test_exact_live_task_publishes_and_blocks_retained_only_qualification(qualified):
     contract,root,definition,raw,proof=qualified
-    definition['units'][0].pop('replay_manifest')
+    [unit.pop('replay_manifest',None) for unit in definition['units']]
     result=collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='live',redo='full',
         collector_options={'pacer':RequestPacer(wait=lambda _:None)})
     assert result['status']=='published'
@@ -119,12 +136,12 @@ def test_live_market_scope_preserves_evidence_and_request_boundaries(qualified,b
     proof=json.loads(path.read_text())
     proof['live_scope']={'market':'XSHG','asset_type':'stock','symbol_prefixes':['sh6'],'sample_context':CONTEXT}
     path.write_text(json.dumps(proof),encoding='utf-8')
-    context={'request':{'symbol':'sh600000','start_date':'2026-10-09','end_date':'2026-10-09'}}
+    context={'request':{'symbol':'sh600000','start_date':'2026-10-09','end_date':'2026-10-09'},'config':dict(CONTEXT['config'])}
     asset='stock';mode='live';now=datetime.now(timezone.utc)
     with MetadataStore(root/'metadata/metadata.duckdb') as metadata:
-        metadata.connection.execute('UPDATE capability_registry SET evidence_hash=?',[file_hash(path)])
+        metadata.connection.execute("UPDATE capability_registry SET evidence_hash=? WHERE adjustment='forward'",[file_hash(path)])
         if boundary=='date':context['request']['start_date']='2026-10-08'
-        elif boundary=='api':context['config']={'api':'newfqkline'}
+        elif boundary=='api':context['config']={'api':'fqkline','adjust':'qfq'}
         elif boundary=='market':context['request']['symbol']='sz000001'
         elif boundary=='asset':asset='etf'
         elif boundary=='symbol_type':context['request']['symbol']='sh510300'
@@ -135,14 +152,14 @@ def test_live_market_scope_preserves_evidence_and_request_boundaries(qualified,b
             report=Path(proof['revalidation_report']['path']);r=json.loads(report.read_text())
             r['code_files'][0]['sha256']='bad';report.write_text(json.dumps(r))
             proof['revalidation_report']['sha256']=file_hash(report);path.write_text(json.dumps(proof))
-            metadata.connection.execute('UPDATE capability_registry SET evidence_hash=?',[file_hash(path)])
+            metadata.connection.execute("UPDATE capability_registry SET evidence_hash=? WHERE adjustment='forward'",[file_hash(path)])
         elif boundary=='cooldown':
             metadata.record_provider_failure(provider=contract.provider,endpoint=contract.endpoint,
                 capability_version=proof['capability_version'],dataset='daily_bar',market='XSHG',asset_type='stock',
                 failure_class='forbidden',error='fixture',now=now,cooldown_seconds=300,failure_threshold=1)
         result=check_daily_input_qualification(contract,context,asset_type=asset,config_root=CONFIG,
             metadata=metadata,now=now,execution_mode=mode)
-    assert result['eligible']==(boundary=='allowed')
+    assert result['eligible']==(boundary=='allowed'),result
     if result['eligible']:
         assert result['symbol']=='sh600000' and not result['security_observed']
         assert result['source_response_hashes']==[] and result['sample_response_hashes']
@@ -150,7 +167,7 @@ def test_live_market_scope_preserves_evidence_and_request_boundaries(qualified,b
 
 def test_live_throttling_opens_existing_cooldown_and_blocks_next_call(qualified,monkeypatch):
     contract,root,definition,raw,proof=qualified
-    definition['units'][0].pop('replay_manifest')
+    [unit.pop('replay_manifest',None) for unit in definition['units']]
     count=[]
     def denied(session,request,**kwargs):
         count.append(request.url)
@@ -171,7 +188,7 @@ def test_live_throttling_opens_existing_cooldown_and_blocks_next_call(qualified,
 def test_selected_live_preflight_checks_only_selected_security(qualified,monkeypatch):
     contract,root,definition,raw,proof=qualified
     definition['task_id']='selected-scope'
-    definition['units'][0].pop('replay_manifest')
+    [unit.pop('replay_manifest',None) for unit in definition['units']]
     other={'key':'sh600000','symbol':'sh600000','input_id':'ASTOCK-002-daily',
         'context':{'request':{'symbol':'sh600000','start_date':'2026-10-09','end_date':'2026-10-09'}}}
     definition['units'].append(other)
@@ -184,7 +201,7 @@ def test_selected_live_preflight_checks_only_selected_security(qualified,monkeyp
     monkeypatch.setattr(factory,'check_daily_input_qualification',observed)
     result=collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='live',redo='selected',
         symbols=['sh600519'],collector_options={'pacer':RequestPacer(wait=lambda _:None)})
-    assert checked==['sh600519','sh600519']
+    assert checked==['sh600519']*6
     assert result['units']['sh600519']['status']=='candidate_complete'
     assert 'sh600000' not in result['units']
 
@@ -213,8 +230,8 @@ def test_interrupted_retained_publication_recovers_all_four_progress_steps(quali
     with MetadataStore(root/'metadata/metadata.duckdb') as metadata:
         result=metadata.load_collection_task(definition['task_id'])
     assert result['status']=='published'
-    assert result['progress']['stages']['publication']['completed']==1
-    assert result['progress']['stages']['raw']['reused']==1
+    assert result['progress']['stages']['publication']['completed']==3
+    assert result['progress']['stages']['raw']['reused']==3
 
 
 @pytest.mark.parametrize('damage',['expired','scope','hash','current_code','cooldown'])
@@ -222,7 +239,7 @@ def test_retained_qualification_rejects_invalid_evidence_before_raw_writes(quali
     contract,root,definition,raw,proof=qualified
     with MetadataStore(root/'metadata/metadata.duckdb') as metadata:
         if damage=='expired':metadata.connection.execute("UPDATE capability_registry SET validation_expires_at=?",[datetime.now(timezone.utc)-timedelta(seconds=1)])
-        elif damage=='scope':definition['units'][0]['context']={'request':{'symbol':'sh600519','start_date':'2026-10-08','end_date':'2026-10-09'}}
+        elif damage=='scope':definition['units'][0]['context']={'request':{'symbol':'sh600519','start_date':'2026-10-08','end_date':'2026-10-09'},'config':dict(CONTEXT['config'])}
         elif damage=='hash':proof.write_text('{}')
         elif damage=='current_code':
             p=json.loads(proof.read_text());current=Path(p['revalidation_report']['path']);r=json.loads(current.read_text());r['code_files'][0]['sha256']='bad'
@@ -233,7 +250,9 @@ def test_retained_qualification_rejects_invalid_evidence_before_raw_writes(quali
                 capability_version=build_input_provider(contract,providers_path=CONFIG/'providers.yaml').capability_version,
                 dataset='daily_bar',market='XSHG',asset_type='stock',failure_class='forbidden',error='fixture',
                 now=datetime.now(timezone.utc),cooldown_seconds=300,failure_threshold=1)
-    result=collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='retained')
-    assert result['status']=='failed'
-    assert not list((root/'raw').rglob('*.bin'))
+    reasons = {'expired':'expired or not yet valid','scope':'scope differs','hash':'hash differs',
+        'current_code':'code or configuration changed','cooldown':'cooling down'}
+    with pytest.raises(ValueError,match=reasons[damage]):
+        collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='retained')
+    assert not list((root/'raw').rglob('*a-qfq*.bin'))
     assert not (root/'canonical/2026-10-09/daily_bar/stock/manifest.json').exists()

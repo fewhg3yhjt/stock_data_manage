@@ -4,11 +4,11 @@
 
 阅读入口：[文件名与校验值](#文件名与校验值)、[原响应实例](#原响应实例)、[来源工作文件](#来源工作文件)、[任务文件](#任务文件)、[正式数据与数据库](#正式数据与数据库)、[重复内容与待实施方向](#重复内容与待实施方向)。运行命令、重做和进度规则见 [任务流程](../pipeline/collection-tasks.md)，本文解释实际落盘文件。
 
-## 日线聚合存储目标（2026-10-28，待实施）
+## 日线聚合存储实现（2026-10-28）
 
-新的日线目标是证券与交易日期唯一的一条聚合记录，记录内保存证券类型、价格或指数点数的语义，以及各适用复权组的值、状态和证据引用。最终发布不再按复权口径拆成互不关联的业务记录；来源候选仍保留口径以避免互相覆盖。字段和完整性以[专项设计](../../stock-data-design-qfq-history-rebuild.md)为准，不在本文维护第二套schema。
+新规范日线按证券与交易日期保存一条聚合记录，内含证券类型、价格或指数点数语义，以及不复权、前复权、后复权组的数值、状态和证据引用。候选与来源清单仍按证券、日期、口径留存；最终 Parquet 物理分区不再按口径拆开。字段和完整性以[专项设计](../../stock-data-design-qfq-history-rebuild.md)为准，不在本文维护第二套 schema。
 
-这是目标与当前实现的差距：现有 `adjustment=...` 规范分区、旧清单及历史字节原位保留，当前读写不改。物理嵌套列、分区路径和旧数据迁移需要在实现范围中明确；本轮不自动合并旧文件，也不添加聚合读取失败后回退旧单口径文件的兼容路径。
+规范路径为 `canonical/<日期>/daily_bar/<资产类型>/{data.parquet,manifest.json}`。文件中 `quotes.none/forward/backward` 是固定嵌套组；manifest 标记 `daily-aggregate-v1` 与 `adjustment=aggregate`。恢复复用现有任务提交标记和原子发布流程。旧 `adjustment=...` 分区与业务数据保持原位，不自动合并、不迁移，也不作为新查询的回退路径。
 
 ## 目录约定
 
@@ -34,7 +34,7 @@ data/
 │   └── _locks/                         # 既有文件锁
 ├── canonical/<数据日期>/
 │   ├── security_master/{data.parquet,manifest.json}
-│   └── daily_bar/<资产类型>/adjustment=<none|forward|backward>/{data.parquet,manifest.json}
+│   └── daily_bar/<资产类型>/{data.parquet,manifest.json} # 一证券一日一条，三组嵌套
 ├── task_archive/
 │   ├── _raw_evidence/<清单哈希>/        # 发布引用的不可变原响应
 │   ├── _raw_audit/<来源_日期_接口_范围>/ # 被替换或损坏的原响应证据
@@ -47,7 +47,7 @@ data/
 
 同接口可能请求不同证券、窗口、粒度或复权。新请求文件名使用输入标识及可读参数区分，例如 `manifest.ASTOCK-002-daily_symbol-sh600519_start-date-2026-10-01_end-date-2026-10-23_adjustment-qfq.ndjson`；较长的单值参数会缩短显示，列表参数显示条数和首尾项，完整值仍保存在 manifest。新正文文件名包含数据日期、输入标识、证券/日期/复权口径及采集时刻，来源和接口由父目录标明。名称不嵌入摘要。此前生成的带参数指纹文件名保留原样。接口层 `manifest.ndjson` 是索引，响应事件位于其指向的各请求清单。
 
-日线按复权口径独立存储和发布，路径为 `<日期>/daily_bar/<资产类型>/adjustment=<none|forward|backward>/`；对应规范字段值分别是 `none`、`forward`、`backward`，来源参数 `qfq/hfq` 在规范化时映射到后两者。每个口径有独立的 `data.parquet`、`manifest.json`、锁和恢复状态。`CanonicalPartitionStore.read` 指定口径时只读该分区，未指定时聚合读取三个口径。旧版混合日线目录不自动迁移，也不作为新版读取回退；旧元数据中的混合分区状态保留为 `legacy_mixed`，不参与新口径查询。清理旧数据目录后再以新结构重新生成。既有分钟热数据 `data/hot/minute_hot.db` 保留。证券名单不再新写 `security_master/current`，通过既有元数据选择不晚于目标日的最新合格分区。
+新规范日线存储路径为 `<日期>/daily_bar/<资产类型>/`，业务键是证券与交易日期；查询从同一条记录投影所选口径。来源参数 `qfq/hfq` 在候选映射为 `forward/backward`。历史 `adjustment=...` 文件和旧混合目录不自动迁移，也不参与新聚合查询；不存在聚合结果时不回退旧单口径文件。分钟热数据 `data/hot/minute_hot.db` 保持原结构。证券名单不再新写 `security_master/current`，通过既有元数据选择不晚于目标日的最新合格分区。
 
 ## 文件名与校验值
 
@@ -230,7 +230,7 @@ raw 在解析前写入，恢复、解析和最终提交读取。全流程成功�
 
 ## 正式数据与数据库
 
-正式路径为 `canonical/<日期>/security_master/{data.parquet,manifest.json}`、`canonical/<日期>/daily_bar/<资产类型>/adjustment=<口径>/{data.parquet,manifest.json}`。前者是业务规范表，后者说明该口径数据的范围、来源和完整性。名单 [正式清单](../../data/canonical/2026-10-09/security_master/manifest.json) 的实际节选：
+以下清单实例是本机历史名单与旧布局的留档示例，不代表新的聚合日线布局。当前规范日线位于 `canonical/<日期>/daily_bar/<资产类型>/`，其 manifest 记录整条聚合记录范围、来源和完整性。名单 [正式清单](../../data/canonical/2026-10-09/security_master/manifest.json) 的实际节选：
 
 ```json
 {

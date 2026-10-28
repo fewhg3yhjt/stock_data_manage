@@ -232,7 +232,7 @@ def check_daily_input_qualification(contract, context, *, asset_type, config_roo
                     except (ValueError, KeyError, TypeError, OSError, StopIteration):
                         continue
             raise ValueError('matching routing-eligible daily evidence is missing')
-        if not {'trade_date','open','high','low','close','adjustment'} <= set(json.loads(evidence['field_semantics_json'])) or 'price:CNY' not in json.loads(evidence['units_json']):
+        if not {'trade_date','open','high','low','close','adjustment'} <= set(json.loads(evidence['field_semantics_json'])) or ('index_points:point' if asset_type == 'index' else 'price:CNY') not in json.loads(evidence['units_json']):
             raise ValueError('daily required price/date semantics are unverified')
         if not evidence['validated_at'] <= now < evidence['validation_expires_at']:
             raise ValueError('daily qualification is expired or not yet valid')
@@ -286,8 +286,22 @@ def check_daily_input_qualification(contract, context, *, asset_type, config_roo
         partition=artifacts['publication_manifest'].parent
         if not published.verify(partition/'data.parquet') or (partition/'task-commit.json').exists():
             raise ValueError('daily end-to-end publication is missing or pending')
+        if published.schema_version != 'daily-aggregate-v1' or published.adjustment != 'aggregate':
+            raise ValueError('daily qualification requires aggregate publication evidence')
+        from ..storage.parquet import mapping_to_daily
         rows=pq.read_table(partition/'data.parquet').to_pylist()
-        wanted=[r for r in rows if r['instrument_id']==identity and r['adjustment']==adjustment and str(parameters['start'])<=r['trade_date'].isoformat()<=str(parameters['end'])]
+        for row in rows:
+            mapping_to_daily(row)
+        wanted=[r for r in rows if r['instrument_id']==identity and r['quotes'][adjustment]['status']=='available'
+                and str(parameters['start'])<=r['trade_date'].isoformat()<=str(parameters['end'])]
+        for row in wanted:
+            quote = row['quotes'][adjustment]
+            if quote['source_provider'] != contract.provider or quote['endpoint'] != contract.endpoint:
+                raise ValueError('daily publication quote source differs')
+            RawObjectStore.verify_manifest(quote['raw_object_path'])
+            quote_hashes={json.loads(line).get('body_sha256') for line in Path(quote['raw_object_path']).read_text(encoding='utf-8').splitlines() if line.strip()}
+            if not set(hashes) <= quote_hashes:
+                raise ValueError('daily published adjustment source bytes differ')
         if not wanted or len(wanted)!=evidence['row_count']:
             raise ValueError('daily publication scope differs')
         published_hashes=set()
@@ -313,7 +327,7 @@ def build_input_provider(contract, *, providers_path, client=None):
         raise ValueError("input adapter is not implemented for validation")
     expected_methods = {"ASTOCK-087": "fetch_announcements", "ASTOCK-014": "fetch_concept_list", "ASTOCK-044": "fetch_st_list",
                         "ASTOCK-037-profile": "fetch", "ASTOCK-037-events": "fetch_company_events",
-                        "ASTOCK-001": "fetch_snapshot", "ASTOCK-002-daily": "fetch_window", "ASTOCK-002-5m": "fetch_recent",
+                        "ASTOCK-001": "fetch_snapshot", "ASTOCK-002-daily": "capture_window", "ASTOCK-002-5m": "fetch_recent",
                         "ASTOCK-045": "fetch", "ASTOCK-070": "fetch",
                         "ASTOCK-026": "fetch_history", "ASTOCK-027": "fetch_history", "ASTOCK-028": "fetch_history",
                         "ASTOCK-046": "fetch", "ASTOCK-047": "fetch", "ASTOCK-048": "fetch", "ASTOCK-050": "fetch",
@@ -394,7 +408,7 @@ def build_input_provider(contract, *, providers_path, client=None):
                                        max_symbols_per_request=config.max_symbols_per_request)
     if contract.input_id == "ASTOCK-002-daily":
         provider = TencentDailyProvider(RequestsTransport(headers))
-        provider.endpoint, provider.capability_version = contract.endpoint, "tencent-window-input-v4"
+        provider.endpoint, provider.capability_version = contract.endpoint, "tencent-window-capture-v5"
         return provider
     if contract.input_id == "ASTOCK-002-5m":
         config = next(c for c in load_provider_configs(providers_path) if c.provider == "tencent" and c.endpoint == "native_1m")

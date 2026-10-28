@@ -912,6 +912,20 @@ def create_app(
                                    end_date=end_date, provider=provider, asset_type=asset_type,
                                    adjustment=adjustment, page=page, page_size=page_size)
 
+    @app.get("/api/daily")
+    def daily_records(security: str = "", start_date: date | None = None, end_date: date | None = None,
+                      asset_type: str = "", adjustment: str = "none", page: int = Query(1, ge=1),
+                      page_size: int = Query(50, ge=1, le=100)):
+        from .market_data import query_daily
+        from ..storage.parquet import InvalidPartitionError
+        try:
+            return query_daily(reader.paths["canonical_root"], security=security, start_date=start_date,
+                end_date=end_date, asset_type=asset_type, adjustment=adjustment, page=page, page_size=page_size)
+        except ValueError as exc:
+            raise HTTPException(400, str(exc)) from exc
+        except (InvalidPartitionError, OSError) as exc:
+            raise HTTPException(409, "规范日线分区未通过完整性检查") from exc
+
     @app.get("/api/tasks")
     def tasks(
         status: str | None = None,

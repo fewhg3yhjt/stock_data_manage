@@ -11,7 +11,7 @@ from typing import Callable, Iterable, Mapping
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from ..domain import Adjustment, BarRecord, Dataset, ItemStatus, QualityStatus
+from ..domain import Adjustment, BarRecord, DailyRecord, QuoteGroup, QuoteStatus, AssetType, Dataset, ItemStatus, QualityStatus
 from ..quality.resolution import Conflict, resolve_records
 from ..quality.validation import validate_bar
 from .integrity import Manifest, row_hash
@@ -50,6 +50,61 @@ BAR_SCHEMA = pa.schema(
         ("flags", pa.list_(pa.string())),
     ]
 )
+
+
+DAILY_SCHEMA_VERSION = "daily-aggregate-v1"
+QUOTE_SCHEMA = pa.struct([
+    ("status", pa.string()), *[(name, pa.decimal128(38, 8)) for name in ("open", "high", "low", "close", "volume", "amount")],
+    *[(name, pa.string()) for name in ("source_provider", "endpoint", "raw_object_path")],
+    ("fetch_time", pa.timestamp("us", tz="Asia/Shanghai")),
+    *[(name, pa.string()) for name in ("normalizer_version", "capability_version", "reason", "evidence_ref")],
+    ("flags", pa.list_(pa.string())),
+])
+DAILY_SCHEMA = pa.schema([
+    ("instrument_id", pa.string()), ("trade_date", pa.date32()), ("asset_type", pa.string()),
+    ("value_kind", pa.string()), ("quote_unit", pa.string()),
+    ("quotes", pa.struct([(a.value, QUOTE_SCHEMA) for a in Adjustment])),
+])
+
+
+def daily_records_to_table(records):
+    from dataclasses import asdict
+    rows = []
+    for record in records:
+        if not isinstance(record, DailyRecord) or not record.complete:
+            raise ValueError("only complete aggregate daily records can be stored")
+        rows.append({"instrument_id": record.instrument_id, "trade_date": record.trade_date,
+            "asset_type": record.asset_type.value, "value_kind": record.value_kind, "quote_unit": record.quote_unit,
+            "quotes": {name: {**asdict(q), "status": q.status.value} for name, q in record.quotes.items()}})
+    return pa.Table.from_pylist(rows, schema=DAILY_SCHEMA)
+
+
+def mapping_to_daily(row):
+    quotes = {name: QuoteGroup(**{**value, "status": QuoteStatus(value["status"]),
+                                 "flags": tuple(value.get("flags", ()))}) for name, value in row["quotes"].items()}
+    record = DailyRecord(row["instrument_id"], row["trade_date"], AssetType(row["asset_type"]), **quotes)
+    if row["value_kind"] != record.value_kind or row["quote_unit"] != record.quote_unit or not record.complete:
+        raise InvalidPartitionError("daily aggregate type, unit or completeness differs")
+    return record
+
+
+def _write_partition(table, partition, run_id, manifest_fields, failure_hook=None):
+    """One atomic file-pair writer shared by bars and aggregate daily results."""
+    temp_data = partition / f"data.{run_id}.tmp.parquet"
+    temp_manifest = partition / f"manifest.{run_id}.tmp.json"
+    pq.write_table(table, temp_data, compression="zstd")
+    _fsync_file(temp_data)
+    _call_hook(failure_hook, "after_temp_data")
+    manifest = Manifest.from_file(temp_data, **manifest_fields)
+    manifest.write_atomic(temp_manifest)
+    if not manifest.verify(temp_data):
+        raise OSError("temporary canonical file failed manifest verification")
+    _call_hook(failure_hook, "after_temp_manifest")
+    os.replace(temp_data, partition / "data.parquet")
+    _call_hook(failure_hook, "after_data_replace")
+    os.replace(temp_manifest, partition / "manifest.json")
+    _call_hook(failure_hook, "after_manifest_replace")
+    return manifest
 
 
 @dataclass(frozen=True, slots=True)
@@ -213,12 +268,72 @@ class CanonicalPartitionStore:
             partition = partition / f"adjustment={adjustment.value}"
         return partition
 
+    def daily_directory(self, asset_type, partition_key):
+        # Reuse date/asset validation; aggregate identity has no adjustment dimension.
+        return self.partition_directory(Dataset.DAILY_BAR, asset_type, partition_key).parent
+
+    def read_daily(self, asset_type, partition_key, *, allow_pending=False):
+        partition = self.daily_directory(asset_type, partition_key)
+        if not allow_pending and (partition / "task-commit.json").exists():
+            raise InvalidPartitionError("daily publication is pending task finalization")
+        data, descriptor = partition / "data.parquet", partition / "manifest.json"
+        if not data.exists() and not descriptor.exists():
+            return []
+        if not data.exists() or not descriptor.exists():
+            raise InvalidPartitionError("daily aggregate partition is incomplete")
+        manifest = Manifest.load(descriptor)
+        if (manifest.schema_version != DAILY_SCHEMA_VERSION or manifest.adjustment != "aggregate"
+                or manifest.dataset != "daily_bar" or manifest.asset_type != asset_type or manifest.partition_key != partition_key
+                or not manifest.verify(data)):
+            raise InvalidPartitionError("daily aggregate manifest is incompatible or corrupt")
+        table = pq.read_table(data)
+        if not table.schema.equals(DAILY_SCHEMA) or len(table) != manifest.row_count:
+            raise InvalidPartitionError("daily aggregate schema or row count differs")
+        records = [mapping_to_daily(row) for row in table.to_pylist()]
+        if len({r.key for r in records}) != len(records) or any(r.trade_date.isoformat() != partition_key or r.asset_type.value != asset_type for r in records):
+            raise InvalidPartitionError("daily aggregate keys escaped partition")
+        return records
+
+    def publish_daily(self, *, asset_type, partition_key, new_records, expected_count, run_id,
+                      item_statuses=None, replace_instrument_ids=None, failure_hook=None):
+        incoming = list(new_records)
+        daily_records_to_table(incoming)
+        if len({r.key for r in incoming}) != len(incoming):
+            raise ValueError("duplicate aggregate daily keys")
+        if any(r.trade_date.isoformat() != partition_key or r.asset_type.value != asset_type for r in incoming):
+            raise ValueError("daily aggregate outside target partition")
+        partition = self.daily_directory(asset_type, partition_key)
+        partition.mkdir(parents=True, exist_ok=True)
+        marker = partition / "task-commit.json"
+        if marker.exists():
+            import json
+            if json.loads(marker.read_text(encoding="utf-8"))["task_id"] != run_id:
+                raise InvalidPartitionError("another daily task publication is pending")
+        with PartitionLock(partition / ".publish.lock", recover_stale=marker.exists()):
+            existing = self.read_daily(asset_type, partition_key, allow_pending=True)
+            merged = {r.key: r for r in existing if replace_instrument_ids is None or r.instrument_id not in replace_instrument_ids}
+            merged.update({r.key: r for r in incoming})
+            records = sorted(merged.values(), key=lambda r: r.key)
+            statuses = {k: v.value if isinstance(v, ItemStatus) else v for k, v in (item_statuses or {}).items()}
+            providers = {r.instrument_id: "|".join(dict.fromkeys(q.source_provider for q in r.quotes.values() if q.status is QuoteStatus.AVAILABLE)) for r in records}
+            descriptor = partition / "manifest.json"
+            old = Manifest.load(descriptor) if descriptor.exists() else None
+            if old and row_hash(records) == row_hash(existing) and old.expected_count == expected_count and old.item_statuses == statuses:
+                return PublishResult(old, descriptor, tuple(existing), (), (), True)
+            raw_refs = tuple(dict.fromkeys(q.raw_object_path for r in records for q in r.quotes.values() if q.raw_object_path))
+            manifest = _write_partition(daily_records_to_table(records), partition, run_id, dict(
+                dataset="daily_bar", asset_type=asset_type, partition_key=partition_key, schema_version=DAILY_SCHEMA_VERSION,
+                adjustment="aggregate", row_count=len(records), expected_count=expected_count,
+                first_key=str(records[0].key) if records else None, last_key=str(records[-1].key) if records else None,
+                raw_refs=raw_refs, item_statuses=statuses, source_providers=providers), failure_hook)
+            return PublishResult(manifest, descriptor, tuple(records), (), (), False)
+
     def read(self, dataset: Dataset, asset_type: str, partition_key: str, *,
              adjustment: Adjustment | None = None, allow_pending: bool = False) -> list[BarRecord]:
-        if dataset is Dataset.DAILY_BAR and adjustment is None:
-            return [record for adjustment_value in Adjustment
-                    for record in self.read(dataset, asset_type, partition_key,
-                                            adjustment=adjustment_value, allow_pending=allow_pending)]
+        if dataset is Dataset.DAILY_BAR:
+            if adjustment is not None:
+                raise ValueError("daily aggregates have no adjustment partition; project a quote group at query time")
+            return self.read_daily(asset_type, partition_key, allow_pending=allow_pending)
         selected_adjustment = Adjustment(adjustment) if adjustment is not None else Adjustment.NONE
         partition = self.partition_directory(dataset, asset_type, partition_key, selected_adjustment)
         if not allow_pending and (partition / "task-commit.json").exists():
@@ -260,18 +375,14 @@ class CanonicalPartitionStore:
         replace_adjustment: Adjustment | None = None,
         adjustment: Adjustment | None = None,
     ) -> PublishResult:
-        incoming = list(new_records)
         if dataset is Dataset.DAILY_BAR:
-            record_adjustments = {record.adjustment for record in incoming}
-            if adjustment is None:
-                if len(record_adjustments) > 1:
-                    raise ValueError("daily publication must contain one adjustment")
-                adjustment = next(iter(record_adjustments), Adjustment.NONE)
-            adjustment = Adjustment(adjustment)
-            if any(record.adjustment is not adjustment for record in incoming):
-                raise ValueError("daily records do not match publication adjustment")
-        else:
-            adjustment = Adjustment.NONE
+            if adjustment is not None or replace_adjustment is not None:
+                raise ValueError("daily publication requires a complete aggregate, not an adjustment partition")
+            return self.publish_daily(asset_type=asset_type, partition_key=partition_key,
+                new_records=new_records, expected_count=expected_count, run_id=run_id,
+                item_statuses=item_statuses, replace_instrument_ids=replace_instrument_ids, failure_hook=failure_hook)
+        incoming = list(new_records)
+        adjustment = Adjustment.NONE
         partition = self.partition_directory(dataset, asset_type, partition_key, adjustment)
         partition.mkdir(parents=True, exist_ok=True)
         marker = partition / "task-commit.json"
@@ -326,22 +437,8 @@ class CanonicalPartitionStore:
                     True,
                 )
 
-            temp_data = partition / f"data.{run_id}.tmp.parquet"
-            temp_manifest = partition / f"manifest.{run_id}.tmp.json"
-            pq.write_table(_records_to_table(merged), temp_data, compression="zstd")
-            _fsync_file(temp_data)
-            _call_hook(failure_hook, "after_temp_data")
-
-            raw_refs = tuple(
-                dict.fromkeys(
-                    path
-                    for record in merged
-                    for path in record.raw_object_path.split("|")
-                    if path
-                )
-            )
-            manifest = Manifest.from_file(
-                temp_data,
+            raw_refs = tuple(dict.fromkeys(path for record in merged for path in record.raw_object_path.split("|") if path))
+            manifest = _write_partition(_records_to_table(merged), partition, run_id, dict(
                 dataset=dataset.value,
                 asset_type=asset_type,
                 partition_key=partition_key,
@@ -355,15 +452,7 @@ class CanonicalPartitionStore:
                 item_statuses={key: value.value for key, value in resolved_item_statuses.items()},
                 source_providers=resolved_source_providers,
                 adjustment=adjustment.value,
-            )
-            manifest.write_atomic(temp_manifest)
-            if not manifest.verify(temp_data):
-                raise OSError("temporary canonical file failed manifest verification")
-            _call_hook(failure_hook, "after_temp_manifest")
-            os.replace(temp_data, final_data)
-            _call_hook(failure_hook, "after_data_replace")
-            os.replace(temp_manifest, final_manifest)
-            _call_hook(failure_hook, "after_manifest_replace")
+            ), failure_hook)
             return PublishResult(
                 manifest,
                 final_manifest,

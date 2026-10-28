@@ -704,7 +704,7 @@ input_capabilities:
     request_limit_enforcement: call_boundary_only
   ASTOCK-002-daily:
     dataset: daily_bar
-    runtime_method: fetch_window
+    runtime_method: capture_window
     provider: tencent
     endpoint: kline_daily
     display_name: 腾讯日线（复权口径可选）

@@ -132,3 +132,11 @@ collection_profiles:
     settle_delay_seconds: 2
     trigger_grace_seconds: 30
     scheduling_enabled: false  # 1分钟输入未独立验证，尚无新输入契约绑定。
+
+# Business production targets; no scheduler is enabled by these declarations.
+tasks:
+  stock_daily:
+    dataset: daily_bar
+    asset_type: stock
+    universe: static
+    acquisition_policy: daily_fixed

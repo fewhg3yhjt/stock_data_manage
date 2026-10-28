@@ -4,13 +4,14 @@ const dialogContent = document.querySelector('#dialog-content');
 const refreshTime = document.querySelector('#refresh-time');
 const pageTitle = document.querySelector('#page-title');
 const pageEyebrow = document.querySelector('#page-eyebrow');
-const state = { view: 'overview', pages: { tasks: 1, data: 1, raw: 1, publications: 1 }, rawDate: '', rawSources: [],
-  filters: { data: {dataset:'', security:'', start_date:'', end_date:'', provider:'', asset_type:'', adjustment:''}, tasks: { q: '', status: '', dataset: '' }, raw: { provider: '', endpoint: '', q: '' }, publications: { dataset: '' } } };
+const state = { view: 'overview', pages: { tasks: 1, data: 1, daily: 1, raw: 1, publications: 1 }, rawDate: '', rawSources: [],
+  filters: { daily: {security:'',start_date:'',end_date:'',asset_type:'',adjustment:'none'}, data: {dataset:'', security:'', start_date:'', end_date:'', provider:'', asset_type:'', adjustment:''}, tasks: { q: '', status: '', dataset: '' }, raw: { provider: '', endpoint: '', q: '' }, publications: { dataset: '' } } };
 let renderSequence = 0;
 
 const labels = {
   overview: ['运行总览', 'OPERATIONS OVERVIEW'],
   tasks: ['任务中心', 'TASK EXECUTION'],
+  daily: ['规范日线', '同一记录的源头口径投影'],
   data: ['数据查询', '按类型、证券和日期查询来源记录'],
   raw: ['原始数据', 'RAW EVIDENCE'],
   publications: ['发布结果', 'CANONICAL PUBLICATIONS'],
@@ -285,12 +286,40 @@ async function renderData() {
   }));
 }
 
+async function renderDaily() {
+  const sequence = ++renderSequence;
+  const filters=state.filters.daily;
+  const params=new URLSearchParams({page:state.pages.daily,page_size:50});
+  for(const [key,value] of Object.entries(filters)) if(value) params.set(key,value);
+  const data=await api(`/api/daily?${params}`);
+  if(sequence!==renderSequence || state.view!=='daily') return;
+  const names={none:'不复权',forward:'前复权',backward:'后复权'};
+  const kinds={stock:'股票',etf:'ETF',lof:'LOF',index:'指数'};
+  const modes=Object.entries(names).map(([key,label])=>`<option value="${key}" ${data.available_adjustments.includes(key)||!data.total?'':'disabled'}>${label}</option>`).join('');
+  app.innerHTML=`<form class="filters" id="daily-filters">
+    <label>证券代码<input name="security" placeholder="例如 sh600519"></label>
+    <label>开始日期<input type="date" name="start_date"></label><label>结束日期<input type="date" name="end_date"></label>
+    <label>证券类型<select name="asset_type"><option value="">全部类型</option>${Object.entries(kinds).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></label>
+    <label>展示口径<select name="adjustment">${modes}</select></label><button class="primary">查询</button></form>
+    <p class="subtle">默认展示不复权。切换只读取同一条已发布记录，指数显示点位，股票与ETF显示价格；没有数据时不会请求上游或回退其他口径。</p>
+    <section class="panel"><div class="panel-head"><h2>已发布规范日线</h2><small>${prettyNumber(data.total)} 条记录</small></div>
+    <div class="table-wrap"><table><thead><tr><th>证券 / 类型</th><th>日期</th><th>口径 / 单位</th><th>开</th><th>高</th><th>低</th><th>收</th><th>来源 / 状态</th></tr></thead><tbody>
+    ${data.items.map(row=>`<tr><td>${esc(row.symbol)} / ${esc(kinds[row.asset_type])}</td><td>${esc(row.trade_date)}</td><td>${esc(names[row.adjustment])} / ${row.value_kind==='index_points'?'点':esc(row.quote_unit)}</td>${['open','high','low','close'].map(k=>`<td>${esc(row.values[k]??'—')}</td>`).join('')}<td>${esc(row.provider||'—')} / ${esc({available:'可用',not_applicable:'不适用',missing:'缺失',unverified:'未核验'}[row.status])}<br>${esc(row.reason)}</td></tr>`).join('')||'<tr><td colspan="8">没有已发布的聚合日线。旧单口径数据不自动替代新结构。</td></tr>'}
+    </tbody></table></div>${pager('daily',data)}</section>`;
+  const form=document.querySelector('#daily-filters');
+  for(const [key,value] of Object.entries(filters)) form.elements.namedItem(key).value=value;
+  const submit=event=>{event.preventDefault();state.filters.daily=Object.fromEntries(new FormData(form));state.pages.daily=1;renderDaily().catch(fail);};
+  form.addEventListener('submit',submit);
+  form.elements.namedItem('adjustment').addEventListener('change',submit);
+}
+
 async function render() {
   loading(); const [title, eyebrow] = labels[state.view]; pageTitle.textContent = title; pageEyebrow.textContent = eyebrow;
   document.querySelectorAll('.nav-item').forEach(item => item.classList.toggle('active', item.dataset.view === state.view));
   try {
     if (state.view === 'overview') await renderOverview();
     if (state.view === 'tasks') await renderTasks();
+    if (state.view === 'daily') await renderDaily();
     if (state.view === 'data') await renderData();
     if (state.view === 'raw') await renderRaw();
     if (state.view === 'publications') await renderPublications();

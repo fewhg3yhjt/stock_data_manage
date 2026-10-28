@@ -93,7 +93,8 @@ def _input_data_date(context, replay_manifest, *, provider, endpoint, data_date=
 def collect_input(*, input_id, context, config_root, output_root=None, data_root=None, mode="replay", replay_manifest=None,
                   evidence_root=None, fields=None, client=None, pacer=None, task_unit=None, force_fetch=False, data_date=None,
                   retained_asset_type=None, security_asset_type=None, progress=None):
-    """One explicit input, candidate output only. Existing Bar publication flows are unchanged."""
+    """One explicit input, candidate output only. Raw is retained before interpretation."""
+    import re
     import json
     config_root = Path(config_root)
     retained = mode == 'retained'
@@ -228,7 +229,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
             owned = list(source.glob(request_key + ".*")) if source.exists() else []
             if owned:
                 import shutil
-                archive = paths["archive_root"] / "_workspace_audit" / f"{raw_data_date}_{input_id}_{request_key}"
+                archive = paths["archive_root"] / "_workspace_audit" / (f"{raw_data_date}_{contract.provider}_{parameters.get('code', input_id)}_{parameters.get('adjust', '')}" if contract.dataset == "daily_bar" else f"{raw_data_date}_{input_id}_{request_key}")
                 suffix = 2
                 base = archive
                 while archive.exists():
@@ -659,7 +660,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                     response_events = stack.enter_context(captured_requests(raw_store, provider=contract.provider, endpoint=contract.endpoint,
                         scope={"input_id": input_id, "parameters": normalized_context}, code_version=code_version, pacer=pacer,
                         interval_seconds=contract.request_interval_seconds,
-                        replay_manifest=replay_manifest if mode == "replay" else None,
+                        replay_manifest=replay_manifest,
                         evidence_roots=(evidence_root, output_root), max_age_seconds=0 if force_fetch else profile.refresh_interval_seconds or 86400,
                         sdk_retry_policy=is_stock_pool or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or (is_source_sdk and not is_universe_sdk) or input_id in {"ASTOCK-001", "ASTOCK-045", "ASTOCK-070", "ASTOCK-026", "ASTOCK-027", "ASTOCK-028"},
                         probe_host_pause=is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_sdk,require_empty_post_body=input_id=="ASTOCK-061",response_validator=response_validator,
@@ -766,6 +767,10 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                 finally:
                     metadata.close()
             report["live_http_calls"] = sum(event["mode"] == "live" and event.get("event") == "http_response" for event in response_events)
+            report["acquisition_complete"] = True
+            if input_id == "ASTOCK-002-daily":
+                # Requests have left the capture scope and raw is committed before parsing.
+                fetched = provider.parse_window(fetched)
             source_rows = getattr(fetched, "source_rows", None) or fetched.rows
             source_ref = write_result(_json_value(source_rows), dataset="source_rows", provider=contract.provider,
                 endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="source-rows")
@@ -1040,8 +1045,15 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                         source_bar_key=fetched.mapping_context.get("source_bar_key"),
                         original_row_count=len(source_rows), selected_row_count=len(mapping_rows),
                         coverage_basis="requested dates selected from returned source rows; not independently complete history")
-            rows = [Normalizer.normalize_fields(row, rule=rule, fields=schema_fields,
-                                                context=mapping_context, allow_pending=True) for row in mapping_rows]
+            rows = []
+            for source_row_index, row in enumerate(mapping_rows):
+                try:
+                    rows.append(Normalizer.normalize_fields(row, rule=rule, fields=schema_fields,
+                        context=mapping_context, allow_pending=True))
+                except NormalizationError as exc:
+                    exc.record_locator = {"source_row_index": source_row_index,
+                        "instrument_id": mapping_context.get("instrument_id"), "trade_date": str(row.get("0", ""))}
+                    raise
             if input_id == 'ASTOCK-002-daily':
                 scopes = [scope for scope in rule.get('verified_unit_scopes', ())
                     if mapping_context['instrument_id'] in scope['instrument_ids']
@@ -1110,10 +1122,18 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                     progress.finish('processing', progress_key, 'skipped')
             report.update(status="failed", failure_class=getattr(getattr(exc, "failure_class", None), "value", type(exc).__name__),
                           error=str(exc) if isinstance(exc, (ValueError, NormalizationError)) else type(exc).__name__)
+            report.update(record_locator=getattr(exc, "record_locator", None), error_field=getattr(exc, "field", None))
         if runtime:
             raw_store.append_event({"event": "raw_partition", "data_date": raw_data_date,
                 "request_scope": sanitized_metadata(normalized_context),
                 "processed_at_utc": report["validation_time_utc"], "publication_permitted": False})
+        report["failure_stage"] = None if report.get("status") == "candidate_complete" else ("processing" if report.get("acquisition_complete") else "acquisition")
+        if report.get("status") != "candidate_complete":
+            report["issues"] = [{"stage": report["failure_stage"], "provider": contract.provider,
+                "endpoint": contract.endpoint, "input_id": input_id, "request_scope": _json_value(sanitized_metadata(parameters)),
+                "code": report.get("failure_class"), "reason": report.get("error"), "impact": "source_candidate_rejected",
+                "record_locator": report.get("record_locator"), "field": report.get("error_field")}]
+
         raw_manifest = raw_store.manifest
         if raw_manifest.exists():
             import json
@@ -1148,7 +1168,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
             for item in (previous_work / source_directory).glob(request_key + ".*"):
                 target = destination / item.name
                 if target.exists():
-                    archive = paths["archive_root"] / "_workspace_audit" / f"{raw_data_date}_{input_id}_{request_key}"
+                    archive = paths["archive_root"] / "_workspace_audit" / (f"{raw_data_date}_{contract.provider}_{parameters.get('code', input_id)}_{parameters.get('adjust', '')}" if contract.dataset == "daily_bar" else f"{raw_data_date}_{input_id}_{request_key}")
                     suffix = 2
                     base = archive
                     while archive.exists():
@@ -1271,6 +1291,9 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
         generated = build_security_master_definition(config_root, trade_date=target_day,
             now=datetime.now(timezone.utc), is_trading_day=is_open, task_id=definition['task_id'])
         definition = {**generated, **definition, 'units': generated['units']}
+    if "task" in definition:
+        from .daily import resolve_daily_definition
+        definition = resolve_daily_definition(definition, config_root)
     task_id = definition["task_id"]
     if mode == 'retained' and collector is not None:
         raise ValueError('formal retained tasks must use the existing input executor')
@@ -1281,58 +1304,26 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
         raise ValueError("only security_master and daily_bar tasks are supported")
     day = datetime.strptime(definition["trade_date"], "%Y-%m-%d").date()
     contracts = {item.input_id: item for item in load_input_capabilities(config_root / "providers.yaml")}
+    if dataset == "daily_bar":
+        from .daily import resolve_daily_definition, expand_daily_units
+        previous = None
+        if paths["metadata_path"].exists():
+            with MetadataStore(paths["metadata_path"]) as existing_metadata:
+                previous = existing_metadata.load_collection_task(definition["task_id"])
+        if previous and previous["definition"].get("schema_version") != "daily-aggregate-v1":
+            raise ValueError("old single-adjustment task is preserved; use a new aggregate task ID")
+        requested = definition
+        definition = resolve_daily_definition(definition, config_root)
+        if previous:
+            frozen = previous["definition"]
+            for name in ("source_policy", "quote_contract", "contract_versions", "publication_policy"):
+                if definition[name] != frozen[name]:
+                    raise ValueError("frozen daily rules changed; create a new task ID")
     units = _task_units(definition, paths)
+    if dataset == "daily_bar":
+        units = expand_daily_units(units, definition)
     if not units or len({unit["key"] for unit in units}) != len(units):
         raise ValueError("task requires nonempty, unique source units")
-    if dataset == "daily_bar":
-        from ..domain import Adjustment
-        universe_asset_types = {"all_stock": "stock", "all_etf": "etf", "all_index": "index"}
-        universe = definition.get("universe")
-        if universe in universe_asset_types:
-            expected_asset_type = universe_asset_types[universe]
-            declared_asset_type = definition.get("asset_type")
-            if declared_asset_type is not None and declared_asset_type != expected_asset_type:
-                raise ValueError("daily task asset_type conflicts with its universe")
-            definition = {**definition, "asset_type": expected_asset_type}
-        unit_asset_types = {unit["asset_type"] for unit in units if unit.get("asset_type")}
-        if len(unit_asset_types) > 1:
-            raise ValueError("daily task units must use one asset_type")
-        if unit_asset_types:
-            unit_asset_type = next(iter(unit_asset_types))
-            if definition.get("asset_type") not in (None, unit_asset_type):
-                raise ValueError("daily task asset_type conflicts with its units")
-            definition = {**definition, "asset_type": unit_asset_type}
-        token_to_adjustment = {"none": Adjustment.NONE, "qfq": Adjustment.FORWARD, "hfq": Adjustment.BACKWARD}
-        adjustment_to_token = {value: key for key, value in token_to_adjustment.items()}
-        declared_adjustment = definition.get("adjustment")
-        if declared_adjustment is not None:
-            task_adjustment = Adjustment(declared_adjustment)
-        else:
-            configured_tokens = {unit.get("context", {}).get("config", {}).get("adjust")
-                                 for unit in units if unit.get("input_id") == "ASTOCK-002-daily"
-                                 and unit.get("context", {}).get("config", {}).get("adjust") is not None}
-            if len(configured_tokens) > 1 or any(token not in token_to_adjustment for token in configured_tokens):
-                raise ValueError("all daily task units must use one supported adjustment")
-            task_adjustment = token_to_adjustment[next(iter(configured_tokens))] if configured_tokens else Adjustment.NONE
-        task_token = adjustment_to_token[task_adjustment]
-        for unit in units:
-            if unit.get("input_id") != "ASTOCK-002-daily":
-                continue
-            context_config = unit.setdefault("context", {}).setdefault("config", {})
-            configured_token = context_config.get("adjust")
-            if configured_token is not None and configured_token != task_token:
-                raise ValueError("daily task adjustment conflicts with its source request configuration")
-            context_config["adjust"] = task_token
-            configured_api = context_config.get("api")
-            if task_token == "none":
-                if configured_api is not None and configured_api != "kline":
-                    raise ValueError("daily task adjustment=none requires api=kline")
-                context_config["api"] = "kline"
-            elif configured_api == "kline":
-                raise ValueError("api=kline requires daily task adjustment=none")
-            elif configured_api is None:
-                context_config["api"] = "fqkline"
-        definition = {**definition, "adjustment": task_adjustment.value}
     for unit in units:
         calendar = unit["context"].get("calendar", {})
         if "trading_dates" in calendar:
@@ -1354,7 +1345,7 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
             # Both supported datasets pass their exact qualification before each call.
             if unit.get("replay_manifest"):
                 raise ValueError("live tasks must not supply an external replay manifest")
-    if mode == 'live' and dataset == 'daily_bar':
+    if mode in {'live', 'retained'} and dataset == 'daily_bar':
         # Reject unauthorized scope before creating a task or its workspace.
         # Repeat the full check per unit, since health may change during a run.
         if not paths['metadata_path'].exists():
@@ -1366,7 +1357,7 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
                     continue
                 gate = check_daily_input_qualification(contracts[unit['input_id']], unit['context'],
                     asset_type=definition.get('asset_type'), config_root=config_root,
-                    metadata=preflight_metadata, now=datetime.now(timezone.utc), execution_mode='live')
+                    metadata=preflight_metadata, now=datetime.now(timezone.utc), execution_mode=mode)
                 if not gate['eligible']:
                     raise ValueError('formal routing qualification blocked: '+json.dumps(gate['reasons'],ensure_ascii=False))
     if redo == "selected":
@@ -1415,9 +1406,12 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
                 if not Manifest.load(published).verify(published.parent / "data.parquet"):
                     raise ValueError("published task data failed integrity verification")
                 if state.get("complete_today"):
-                    if progress_callback:
-                        progress_callback({'no_op': True})
-                    return {**_save_task_summary(state, paths, metadata), "no_op": True}
+                    frozen_units = state.get("execution_definition", {}).get("units", ())
+                    evidence_valid = all(_task_unit_valid(state["units"].get(unit["key"], {})) for unit in frozen_units)
+                    if evidence_valid:
+                        if progress_callback:
+                            progress_callback({'no_op': True})
+                        return {**_save_task_summary(state, paths, metadata), "no_op": True}
             if state is None:
                 state = {"task_id": task_id, "dataset": dataset, "definition_hash": definition_hash,
                          "definition": _json_value(immutable), "execution_definition": _json_value({**definition, "units": units}),
@@ -1475,7 +1469,7 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
                 temporary = raw_directory / name
                 replay = unit.get("replay_manifest")
                 # A transformation failure can continue from exact saved bytes.
-                if not force and old and (old.get("failure_class") == "NormalizationError" or old.get("status") == "candidate_complete"):
+                if not force and old and (old.get("report", {}).get("acquisition_complete") or old.get("failure_class") == "NormalizationError" or old.get("status") == "candidate_complete"):
                     try:
                         RawObjectStore.verify_manifest(old["raw_manifest"])
                         replay = old["raw_manifest"]
@@ -1554,7 +1548,7 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
                         if file_hash(artifact) != report["normalized_parquet"]["sha256"]:
                             raise ValueError("normalized artifact does not match the source report")
                         _validate_task_candidate(artifact, unit, contracts[unit["input_id"]], dataset, day,
-                                                 definition.get("adjustment", "forward"))
+                                                 unit.get("adjustment"))
                         entry.update(artifact=str(artifact), artifact_hash=file_hash(artifact))
                     state["units"][key] = entry
                 except Exception as exc:
@@ -1635,12 +1629,12 @@ def _save_task_summary(state, paths, metadata):
                     "independent_full_market_coverage_verified": check.get("independent_full_market_coverage_verified", False),
                     "denominator": None, "ratio": None}
     else:
-        statuses = commit.get("item_statuses", {})
+        statuses = commit.get("item_statuses", {}) or state.get("daily_check", {}).get("item_statuses", {})
         actual = sum(value == "success" for value in statuses.values()) if statuses else None
         coverage = {"basis": "frozen task securities; not the entire canonical partition",
                     "expected_count": len(target_symbols), "actual_count": actual,
                     "ratio": actual / len(target_symbols) if actual is not None and target_symbols else None,
-                    "missing_securities": [unit["symbol"] for unit in units if unit["key"] in missing_unit_keys]}
+                    "missing_securities": sorted({unit["symbol"] for unit in units if unit["key"] in missing_unit_keys})}
     if not final_status:
         check_status = "pending"
     elif state["status"] == "failed" or publication.get("fallback"):
@@ -1660,7 +1654,8 @@ def _save_task_summary(state, paths, metadata):
                   "required_groups": check.get("required_groups") or publication.get("required_groups") or definition.get("required_groups"),
                   "selected_symbols": state.get("selected_symbols", [])},
         "final_check": {"status": check_status,
-                        "error": state.get("error"), "coverage": coverage},
+                        "error": state.get("error"), "coverage": coverage,
+                        "issues": state.get("daily_check", {}).get("issues", [])},
         "source_units": units, "missing_units": missing_units,
         "publication": {"published": state["status"] == "published", "pending_recovery": state["status"] == "committing",
                         "manifest": state.get("published_manifest") if state["status"] == "published" else None,
@@ -1804,8 +1799,6 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
     import yaml
 
     valid = {key: entry for key, entry in state["units"].items() if _task_unit_valid(entry)}
-    if not valid and state["dataset"] == "daily_bar":
-        raise ValueError("no valid source units; raw stays in _tmp")
     promotions, source_rows = [], {}
     for unit in units:
         key = unit["key"]
@@ -1824,7 +1817,9 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
         # Stable immutable evidence references survive replacement of current raw.
         # Retain the full digest in metadata; short containers avoid Windows
         # MAX_PATH failures when the response body itself has a SHA-256 name.
-        audit = paths["archive_root"] / "_raw_evidence" / entry["raw_hash"][:12]
+        audit_label = (f"{day:%Y%m%d}_{source_symbol}_{unit.get('adjustment', 'snapshot')}_{entry['raw_hash'][:8]}"
+                       if (source_symbol := unit.get("symbol")) else entry["raw_hash"][:12])
+        audit = paths["archive_root"] / "_raw_evidence" / audit_label
         if not (audit / "manifest.ndjson").exists():
             RawObjectStore.copy_request(temporary, audit / "manifest.ndjson")
         if RawObjectStore.verify_manifest(audit / "manifest.ndjson") != entry["raw_hash"]:
@@ -1842,7 +1837,8 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
         candidate = work / "prepared.parquet"
         if candidate.exists():
             RawObjectStore.preserve_work_files(work, archive_root=paths["archive_root"])
-        pq.write_table(_records_to_table(prepared.pop("records")), candidate, compression="zstd")
+        from ..storage.parquet import daily_records_to_table
+        pq.write_table(daily_records_to_table(prepared.pop("records")), candidate, compression="zstd")
     else:
         from datetime import date
         from ..quality.publication import check_security_coverage
@@ -2088,14 +2084,13 @@ def _finish_task_commit(state, paths, metadata, failure_hook=None, progress=None
             elif not pending.verify(partition / "data.parquet"):
                 raise ValueError("interrupted task publication failed integrity verification")
             os.replace(pending_manifest, partition / "manifest.json")
-        result = CanonicalPartitionStore(paths["canonical_root"]).publish(dataset=Dataset.DAILY_BAR,
+        from ..storage.parquet import mapping_to_daily
+        result = CanonicalPartitionStore(paths["canonical_root"]).publish_daily(
             asset_type=commit["asset_type"], partition_key=commit["partition_key"],
-            new_records=[_mapping_to_bar(row) for row in pq.read_table(candidate).to_pylist()],
+            new_records=[mapping_to_daily(row) for row in pq.read_table(candidate).to_pylist()],
             expected_count=commit["expected_count"], run_id=state["task_id"],
             item_statuses={key: ItemStatus(value) for key, value in commit["item_statuses"].items()},
-            replace_instrument_ids=frozenset(commit["replace_ids"]), replace_adjustment=Adjustment(commit["adjustment"]),
-            adjustment=Adjustment(commit["adjustment"]),
-            failure_hook=failure_hook)
+            replace_instrument_ids=frozenset(commit["replace_ids"]), failure_hook=failure_hook)
         manifest_path, manifest = result.manifest_path, result.manifest
         if result.quarantined_keys:
             raise ValueError("publication contains quarantined source conflicts")

@@ -438,7 +438,15 @@ def load_capability_routes(path: str | Path) -> dict[Dataset, tuple[dict[str, ob
 def load_normalization_rules(path: str | Path) -> tuple[NormalizationRule, ...]:
     payload = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
     rules = []
-    for item in payload.get("rules", []):
+    source_rules = payload.get("rules", [])
+    resolved_rules = []
+    for item in source_rules:
+        if item.get("adjustment") == "parameterized":
+            values = tuple(dict.fromkeys(item["adjustment_mapping"].values()))
+            resolved_rules.extend({**item, "adjustment": value} for value in values)
+        else:
+            resolved_rules.append(item)
+    for item in resolved_rules:
         rules.append(
             NormalizationRule(
                 provider=str(item["provider"]),
@@ -478,6 +486,8 @@ def load_input_field_contract(root: str | Path, capability: InputCapabilityConfi
         raise ValueError("input has no valid dataset field contract")
     root = Path(root)
     dataset = yaml.safe_load((root / "datasets" / f"{capability.dataset}.yaml").read_text(encoding="utf-8"))
+    if capability.dataset == "daily_bar":
+        dataset = dataset["candidate"]
     document = load_normalization_document(root / "normalization", capability.dataset)
     matches = [rule for rule in document.get("rules", ()) if rule.get("input_id") == capability.input_id
                and rule.get("provider") == capability.provider and rule.get("endpoint") == capability.endpoint]

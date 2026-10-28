@@ -151,3 +151,14 @@ capabilities:
         priority: 40
         adjustments: [none]
         role: validation_only
+
+# Explicit acquisition policy. One formal provider is enabled; no implied second source.
+acquisition_policies:
+  daily_fixed:
+    mode: fixed
+    inputs:
+      - input_id: ASTOCK-002-daily
+        adjustment_requests:
+          none: {api: kline, adjust: none}
+          forward: {api: newfqkline, adjust: qfq}
+          backward: {api: newfqkline, adjust: hfq}

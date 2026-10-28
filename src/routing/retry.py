@@ -36,6 +36,24 @@ class RetryResult:
     attempts: tuple[RetryAttempt, ...]
 
 
+def acquisition_failure(exc):
+    """A programming/storage/parse error is never implicitly a connection failure."""
+    import socket
+    from requests.exceptions import Timeout, ConnectionError as RequestConnectionError, HTTPError
+    if isinstance(exc, ProviderContractError):
+        return exc.failure_class if exc.failure_class in {
+            FailureClass.CONNECTION, FailureClass.TIMEOUT, FailureClass.HTTP_5XX,
+            FailureClass.HTTP_ERROR, FailureClass.RATE_LIMITED, FailureClass.AUTH_REQUIRED} else None
+    if isinstance(exc, (Timeout, TimeoutError, socket.timeout)):
+        return FailureClass.TIMEOUT
+    if isinstance(exc, (ConnectionError, RequestConnectionError)):
+        return FailureClass.CONNECTION
+    if isinstance(exc, HTTPError) and exc.response is not None:
+        status = exc.response.status_code
+        return FailureClass.HTTP_5XX if status >= 500 else FailureClass.RATE_LIMITED if status == 429 else FailureClass.HTTP_ERROR
+    return None
+
+
 def execute_with_retry(
     operation: Callable[[], T],
     *,
@@ -53,8 +71,11 @@ def execute_with_retry(
                 failure_class = exc.failure_class.value
                 retryable = exc.retryable
             else:
-                failure_class = FailureClass.CONNECTION.value
-                retryable = True
+                classified = acquisition_failure(exc)
+                if classified is None:
+                    raise
+                failure_class = classified.value
+                retryable = classified in {FailureClass.CONNECTION, FailureClass.TIMEOUT, FailureClass.HTTP_5XX}
             failure = RetryAttempt(attempt_number, failure_class, str(exc))
             failures.append(failure)
             if on_failure is not None:
@@ -86,6 +107,8 @@ def execute_with_fallback(
             result = execute_with_retry(operation, policy=retry_policy, sleep=sleep)
             attempts.extend(result.attempts)
             return FallbackResult(provider, result.value, tuple(attempts), tuple(failures))
-        except Exception:
+        except Exception as exc:
+            if acquisition_failure(exc) not in {FailureClass.CONNECTION, FailureClass.TIMEOUT, FailureClass.HTTP_5XX}:
+                raise
             failures.append(provider)
     raise RuntimeError(f"all providers failed: {', '.join(failures)}")

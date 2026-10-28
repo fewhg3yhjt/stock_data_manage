@@ -216,7 +216,7 @@ def test_tencent_alternative_window_keeps_source_rows_and_selects_dates(symbol,l
           for day in ['2026-10-08','2026-10-09','2026-10-12']]
     transport=FakeTransport([response({'code':0,'data':{symbol:{'qfqday':bars}}})])
     provider=TencentDailyProvider(transport)
-    result=provider.fetch_window(symbol,date(2026,10,9),date(2026,10,9),api='newfqkline')
+    result=provider.parse_window(provider.capture_window(symbol,date(2026,10,9),date(2026,10,9),api='newfqkline'))
     assert len(result.rows)==1 and result.rows[0]['0']=='2026-10-09'
     assert len(result.source_rows)==3 and result.source_rows[0]['6']=={}
     assert result.rows[0]['8']=='1000' and result.rows[0]['source_api']=='newfqkline'
@@ -231,9 +231,9 @@ def test_tencent_unadjusted_window_uses_kline_and_selects_requested_date():
         ["2026-10-26", "1335", "1336", "1337", "1334", "200"],
     ]
     transport = FakeTransport([response({"code": 0, "msg": "", "data": {"sh600519": {"day": bars}}})])
-    result = TencentDailyProvider(transport).fetch_window(
+    result = TencentDailyProvider(transport).parse_window(TencentDailyProvider(transport).capture_window(
         "sh600519", date(2026, 10, 23), date(2026, 10, 23), adjust="none", api="kline"
-    )
+    ))
     assert len(result.rows) == 1
     assert result.rows[0]["0"] == "2026-10-23"
     assert result.rows[0]["source_api"] == "kline"
@@ -249,9 +249,9 @@ def test_tencent_unadjusted_window_uses_kline_and_selects_requested_date():
 def test_tencent_unadjusted_index_window_accepts_explicit_exchange_prefix():
     bars = [["2026-10-23", "3623.570", "3690.480", "3691.400", "3574.270", "552842912.000"]]
     transport = FakeTransport([response({"code": 0, "data": {"sh000001": {"day": bars}}})])
-    result = TencentDailyProvider(transport).fetch_window(
+    result = TencentDailyProvider(transport).parse_window(TencentDailyProvider(transport).capture_window(
         "sh000001", date(2026, 10, 23), date(2026, 10, 23), adjust="none", api="kline", asset_type="index"
-    )
+    ))
     assert result.rows[0]["0"] == "2026-10-23"
     assert result.mapping_context["adjustment"] == "none"
     assert transport.calls[0][1]["param"] == "sh000001,day,,,1024"
@@ -260,9 +260,9 @@ def test_tencent_unadjusted_index_window_accepts_explicit_exchange_prefix():
 def test_tencent_index_rejects_adjusted_series_before_http_call():
     transport = FakeTransport([])
     with pytest.raises(ValueError, match="index daily data is available only without adjustment"):
-        TencentDailyProvider(transport).fetch_window(
+        TencentDailyProvider(transport).parse_window(TencentDailyProvider(transport).capture_window(
             "sh000001", date(2026, 10, 23), date(2026, 10, 23), adjust="qfq", api="fqkline", asset_type="index"
-        )
+        ))
     assert transport.calls == []
 
 
@@ -284,9 +284,9 @@ def test_tencent_daily_api_and_adjustment_must_match():
     transport = FakeTransport([])
     provider = TencentDailyProvider(transport)
     with pytest.raises(ValueError, match="adjust=none requires api=kline"):
-        provider.fetch_window("sh600519", date(2026, 10, 23), date(2026, 10, 23), adjust="none", api="newfqkline")
+        provider.parse_window(provider.capture_window("sh600519", date(2026, 10, 23), date(2026, 10, 23), adjust="none", api="newfqkline"))
     with pytest.raises(ValueError, match="api=kline"):
-        provider.fetch_window("sh600519", date(2026, 10, 23), date(2026, 10, 23), adjust="qfq", api="kline")
+        provider.parse_window(provider.capture_window("sh600519", date(2026, 10, 23), date(2026, 10, 23), adjust="qfq", api="kline"))
     assert transport.calls == []
 
 
@@ -298,14 +298,14 @@ def test_tencent_unadjusted_window_reports_retained_history_truncation():
     ]
     provider = TencentDailyProvider(FakeTransport([response({"code": 0, "data": {"sh600519": {"day": bars}}})]))
     with pytest.raises(ProviderContractError) as exc:
-        provider.fetch_window("sh600519", first - timedelta(days=1), first + timedelta(days=1023), adjust="none", api="kline")
+        provider.parse_window(provider.capture_window("sh600519", first - timedelta(days=1), first + timedelta(days=1023), adjust="none", api="kline"))
     assert exc.value.failure_class is FailureClass.TRUNCATED
 
 
 def test_tencent_bad_params_is_reported_as_request_rejection():
     provider = TencentDailyProvider(FakeTransport([response({"code": 1, "msg": "bad params", "data": {"sh600519": {"version": "16"}}})]))
-    with pytest.raises(ValueError, match="rejected the daily request parameters: bad params"):
-        provider.fetch_window("sh600519", date(2026, 10, 23), date(2026, 10, 23), adjust="none", api="kline")
+    with pytest.raises(ProviderContractError, match="rejected the daily request parameters: bad params"):
+        provider.parse_window(provider.capture_window("sh600519", date(2026, 10, 23), date(2026, 10, 23), adjust="none", api="kline"))
 
 
 @pytest.mark.parametrize('damage,expected', [('duplicate',FailureClass.SCHEMA_CHANGED),
@@ -319,7 +319,7 @@ def test_tencent_alternative_rejects_bad_or_empty_window(damage,expected):
     else: node['qfqday'][0][0]='2026-10-08'
     provider=TencentDailyProvider(FakeTransport([response({'code':0,'data':{'bj920001':node}})]))
     with pytest.raises(ProviderContractError) as exc:
-        provider.fetch_window('bj920001',date(2026,10,9),date(2026,10,9),api='newfqkline')
+        provider.parse_window(provider.capture_window('bj920001',date(2026,10,9),date(2026,10,9),api='newfqkline'))
     assert exc.value.failure_class is expected
 
 
@@ -328,7 +328,7 @@ def test_tencent_alternative_rejects_unrecoverable_history_limit():
     bars=[[d.isoformat(),'10','11','12','9','100',{},'1','1000',''] for d in days]
     provider=TencentDailyProvider(FakeTransport([response({'code':0,'data':{'sh600519':{'qfqday':bars}}})]))
     with pytest.raises(ProviderContractError) as exc:
-        provider.fetch_window('sh600519',date(2023,1,1),date(2026,10,9),api='newfqkline')
+        provider.parse_window(provider.capture_window('sh600519',date(2023,1,1),date(2026,10,9),api='newfqkline'))
     assert exc.value.failure_class is FailureClass.TRUNCATED and not exc.value.retryable
 
 
@@ -344,7 +344,7 @@ def test_tencent_existing_and_minute_symbol_contract_stay_restricted():
         tencent_symbol('sh000001')
     provider=TencentDailyProvider(FakeTransport([]))
     with pytest.raises(ValueError,match='excludes BSE'):
-        provider.fetch_window('bj920001',date(2026,10,9),date(2026,10,9))
+        provider.parse_window(provider.capture_window('bj920001',date(2026,10,9),date(2026,10,9)))
 
 
 def test_daily_adapter_reports_the_full_returned_window() -> None:

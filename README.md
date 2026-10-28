@@ -5,7 +5,7 @@
 | 需要了解什么 | 文档入口 |
 |---|---|
 | 总体架构、术语和模块边界 | [总体设计](STOCK_ANALYSIS_V2_MARKET_DATA_CENTER_ARCHITECTURE_V1.md) |
-| 任务与数据对象设计（2026-10-28，设计稿） | [逻辑架构、UML关联与策略模式](STOCK_ANALYSIS_V2_MARKET_DATA_CENTER_ARCHITECTURE_V1.md#4-对象职责与执行设计2026-10-28待确认)、[阶段时序与故障决策](docs/pipeline/collection-tasks.md#设计提案任务定义与运行流程2026-10-28待确认) |
+| 已确认的任务与数据对象设计及当前日线实现 | [逻辑架构和对象关系](STOCK_ANALYSIS_V2_MARKET_DATA_CENTER_ARCHITECTURE_V1.md#4-对象职责与执行设计2026-10-28已确认)、[日线聚合实现状态](stock-data-design-qfq-history-rebuild.md#实施现状2026-10-28)、[任务流程](docs/pipeline/collection-tasks.md#已确认设计与当前实现2026-10-28) |
 | 当前功能、实际架构框图与优化议题（2026-10-27） | [当前实现评审](STOCK_ANALYSIS_V2_MARKET_DATA_CENTER_ARCHITECTURE_V1.md#当前实现与优化评审2026-10-27)、[核心流程框图](docs/pipeline/collection-tasks.md#当前实现流程图2026-10-27) |
 | 现有目录和代码负责什么 | [代码结构](CODE_STRUCTURE.md) |
 | 输入参数、采集字段、映射及范围 | [源头接口说明](docs/providers/README.md)、[股票与ETF来源](docs/providers/security-catalog.md) |
@@ -57,6 +57,10 @@
 2026-10-09确认的开发边界进一步限定：`provider_validation/` 仅服务正式实现前的接口可行性确认；进入业务开发后，业务原始响应、Provider联调、来源复核及端到端验收都使用 `data/` 或 `tmp/` 下独立运行布局，不向该验证区新增产物。历史证据只读保留，业务代码位于 `src/`、实现测试位于 `tests/`。
 
 已按确认的简化目录修改现有代码：raw为 `<日期>/<来源>/<接口>/`，请求以文件名区分；工作区为 `<日期>/<数据集>/`，自动保存任务参数和摘要；正式数据按日期发布，最新名单由元数据索引选择。当前目录接口按原捕获日落盘；回退仅引用旧发布，不改写旧日期文件。旧业务目录已迁移并保留152个原文件的审计副本，10月9日五来源名单已完成正式留存流程发布。代码或配置变化后，后续任务必须重新复核来源资格。详见 [存储规则](docs/storage/README.md) 与 [项目进度](PROJECT_PROGRESS.md)。
+
+## 日线当前实现范围（2026-10-28）
+
+股票日线由 YAML 声明任务和采集策略，分别保留不复权、前复权、后复权响应，再聚合成“证券+交易日”一条记录；页面默认显示不复权，可切换已存口径。端到端闭环目前以本地合成响应完成离线验证，不代表来源生产资格或在线发布。ETF、LOF、指数的复权适用性仍待来源证据确认，当前不会复制数值或宣称完整。旧单口径数据及正式数据文件保持原样。详见[聚合设计和实施现状](stock-data-design-qfq-history-rebuild.md)及[任务流程](docs/pipeline/collection-tasks.md)。
 
 ## 当前开发状态
 

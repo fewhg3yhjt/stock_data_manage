@@ -16,7 +16,7 @@
 
 | 设计模块 | 当前目录 | 职责边界 |
 |---|---|---|
-| 领域模型 | `src/domain/` | 数据集、证券类型、状态、标准 Bar 记录和交易时段模型 |
+| 领域模型 | `src/domain/` | 数据集、证券类型、状态、三口径日线聚合记录、标准 Bar 记录和交易时段模型 |
 | 数据源适配器 | `src/providers/` | Provider 接口、Fixture/HTTP 适配器、响应契约和能力探针 |
 | 能力路由器 | `src/routing/` | 来源能力注册、缺失集合、实时采集计划和重试策略 |
 | 数据质量 | `src/quality/` | 标准化、基础校验、冲突解决和发布门槛 |
@@ -58,7 +58,7 @@
 
 | 文件 | 职责 |
 |---|---|
-| `domain/models.py` | `Dataset`、`AssetType`、`BarRecord`、任务状态、记录状态和复权口径等核心模型 |
+| `domain/models.py` | `Dataset`、`AssetType`、`DailyRecord` 三口径聚合对象、`BarRecord` 分钟/历史对象、任务状态、记录状态和复权口径 |
 | `domain/sessions.py` | A 股交易时段、市场日程和应有分钟点计算 |
 | `domain/__init__.py` | 对外导出稳定的领域模型入口 |
 
@@ -69,7 +69,7 @@
 | `providers/base.py` | 日线、分钟等 Provider 协议以及 Fixture Provider 基础实现 |
 | `providers/contracts.py` | HTTP 响应、失败分类、返回窗口和 Provider Contract |
 | `providers/transport.py` | 公共 HTTP 传输、共享请求组限速、单项输入会话捕获与严格回放、快照和 TDX 行解析；保留来源会话/代理并复用原验证重试策略 |
-| `providers/tencent/daily.py` | Tencent既有日线与窗口输入；参数api显式选择fqkline/newfqkline，后者支持北交所，完整保存10/11列来源行后提取日期，640条不足时报截断；不在Provider内部回退其他接口 |
+| `providers/tencent/daily.py` | 腾讯日线响应采集与纯解析分离；保留来源窗口原行和失败合同，采集只因明确的连接、超时或5xx故障按原主机顺序切换，不因业务内容问题换源 |
 | `providers/tencent/snapshot.py` | Tencent 指定证券分批快照、原脚本来源字段、代码/格式/重复验证及请求范围覆盖；GBK解码和旧行情行保留，全市场在线验证待完成 |
 | `providers/tencent/minute.py` | Tencent 原生 1m 分钟线与最近 5m 候选输入 |
 | `providers/sina/calendar.py` | 原 SDK 新浪交易日历来源适配，返回明确的正向日期并复用现有日历协议 |
@@ -135,9 +135,9 @@
 
 | 文件 | 职责 |
 |---|---|
-| `pipeline/daily.py` | 日线按来源补缺、标准化、校验、候选生成和发布编排；规范记录保留单位语义及来源舍入标记 |
-| `pipeline/inputs.py` | 既有候选、业务任务与调度；raw按日期/来源/接口，工作区按日期/数据集；请求文件隔离、YAML映射、互补来源合并覆盖检查、重做、发布恢复，自动保存task.json和summary.json；证券名单执行前在日历未知时复用轻量日历更新；调度计划直接返回，不另存副本；任务共用现有限速器，在线门禁区分精确留存与显式市场/资产/窗口授权，请求间隔由各接口YAML控制；最新名单通过元数据读取，回退不改写旧发布 |
-| `pipeline/daily_reconciliation.py` | 日线 provisional/final 合并、缺失统计和盘后校准 |
+| `pipeline/daily.py` | 日线策略冻结、来源口径单元展开、完整记录聚合及发布覆盖检查；不进行网络请求 |
+| `pipeline/inputs.py` | 现有来源候选、数据集任务、调度触发和统一运行恢复入口；日线负责按 YAML 任务定义展开三口径来源单元、先留原响应再解析、按完整聚合记录发布；分钟和证券主数据继续原有合同；任务范围及采集策略进入运行冻结定义，调度默认关闭 |
+| `pipeline/daily_reconciliation.py` | 只接收范围完整的三口径日线记录，并复用规范分区发布；快照候选不在此提升为正式日线 |
 | `pipeline/minute.py` | Watchlist 实时分钟采集和 Hot Store 写入 |
 | `pipeline/minute_reconciliation.py` | 分钟盘后校准、final 提升、冲突隔离和完整性处理 |
 | `pipeline/snapshot_daily.py` | 收盘快照构建 provisional 日线 |

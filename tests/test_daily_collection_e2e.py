@@ -1,618 +1,242 @@
+"""Aggregate daily contracts using synthetic HTTP fixtures, never live provider evidence."""
 from datetime import date, datetime, timezone
 from decimal import Decimal
 from pathlib import Path
-from zoneinfo import ZoneInfo
+from types import SimpleNamespace
+import json
 
 import pytest
+import requests
 
-from stock_data_manage.storage.parquet import CanonicalPartitionStore
-from stock_data_manage.pipeline.daily import (
-    DailyCollectionService,
-    Instrument,
-    PublicationThresholdExceeded,
-)
-from stock_data_manage.domain import Adjustment, AssetType, Dataset, Exchange, ItemStatus
-from stock_data_manage.routing.capabilities import ProviderCapability
-from stock_data_manage.providers.tencent import TencentSnapshotProvider
-from stock_data_manage.storage.metadata import MetadataStore
-from stock_data_manage.quality.normalization import NormalizationRule, Normalizer
-from stock_data_manage.providers.base import FixtureDailyProvider
-from stock_data_manage.providers.contracts import FailureClass, ProviderContractError, HttpResponse
+from stock_data_manage.domain import Adjustment, AssetType, DailyRecord, QuoteGroup, QuoteStatus
+from stock_data_manage.pipeline.inputs import collect_task
+from stock_data_manage.providers.tencent.daily import TencentDailyProvider
+from stock_data_manage.providers.contracts import HttpResponse, ProviderContractError
+from stock_data_manage.providers.transport import RequestPacer
+from stock_data_manage.routing.retry import execute_with_fallback, RetryPolicy
 from stock_data_manage.storage.raw import RawObjectStore
-from stock_data_manage.quality.publication import load_publication_policy
+from stock_data_manage.storage.parquet import CanonicalPartitionStore, InvalidPartitionError
+from stock_data_manage.storage.integrity import file_hash, Manifest
+from stock_data_manage.storage.metadata import MetadataStore
+
+CONFIG = Path(__file__).resolve().parents[1] / "config"
+DAY = "2026-10-09"
 
 
-SHANGHAI = ZoneInfo("Asia/Shanghai")
-DATASETS_CONFIG = Path(__file__).resolve().parents[1] / "config" / "datasets.yaml"
-DAILY_PUBLICATION_POLICY = load_publication_policy(DATASETS_CONFIG, "daily_bar")
+@pytest.fixture
+def tmp_path(tmp_path_factory):
+    # Windows file-path length is a recorded constraint; use a short isolated root.
+    return tmp_path_factory.mktemp("d")
 
 
-def row(symbol: str, close: str) -> dict[str, str]:
-    return {
-        "symbol": symbol,
-        "trade_date": "2026-09-11",
-        "open": close,
-        "high": close,
-        "low": close,
-        "close": close,
-        "volume": "10",
-        "amount": "100",
-    }
+def quote(value="10"):
+    return QuoteGroup(QuoteStatus.AVAILABLE, *[Decimal(value)] * 4,
+        source_provider="fixture", endpoint="daily", raw_object_path="fixture-evidence",
+        fetch_time=datetime(2026, 10, 9, 16, tzinfo=timezone.utc))
 
 
-def test_partial_primary_falls_back_only_for_missing_and_rerun_is_noop(tmp_path) -> None:
-    primary = FixtureDailyProvider(
-        "primary",
-        "history",
-        {"sh600001": row("sh600001", "10"), "sh600002": row("sh600002", "20")},
-        capability_priority=100,
-    )
-    fallback = FixtureDailyProvider(
-        "fallback",
-        "history",
-        {"sh600003": row("sh600003", "30")},
-        capability_priority=80,
-    )
-    rules = [
-        NormalizationRule(
-            provider=provider,
-            endpoint="history",
-            exchange=Exchange.XSHG,
-            asset_type=AssetType.STOCK,
-            frequency=None,
-            volume_multiplier=Decimal("100"),
-            amount_multiplier=Decimal("1"),
-            version="fixture-rules-v1",
-        )
-        for provider in ("primary", "fallback")
-    ]
-    instruments = [
-        Instrument(f"XSHG:60000{index}", f"sh60000{index}", Exchange.XSHG, AssetType.STOCK)
-        for index in (1, 2, 3)
-    ]
-    canonical = CanonicalPartitionStore(tmp_path / "canonical")
-    fixed_now = datetime(2026, 9, 11, 16, 30, tzinfo=SHANGHAI)
-    with MetadataStore(tmp_path / "metadata.duckdb") as metadata:
-        service = DailyCollectionService(
-            providers=[primary, fallback],
-            normalizer=Normalizer(rules),
-            raw_store=RawObjectStore(tmp_path / "raw"),
-            canonical_store=canonical,
-            metadata=metadata,
-            publication_policy=DAILY_PUBLICATION_POLICY,
-            clock=lambda: fixed_now,
-        )
-        first = service.collect(
-            instruments=instruments, trade_date=date(2026, 9, 11), run_id="run-1"
-        )
-        second = service.collect(
-            instruments=instruments, trade_date=date(2026, 9, 11), run_id="run-2"
-        )
-        partition = metadata.partition("daily_bar", "stock", "2026-09-11")
-
-    assert primary.requests == [("sh600001", "sh600002", "sh600003")]
-    assert fallback.requests == [("sh600003",)]
-    assert first.requested_by_provider == {
-        "primary": ("sh600001", "sh600002", "sh600003"),
-        "fallback": ("sh600003",),
-    }
-    assert second.requested_by_provider == {}
-    assert second.publish.no_op
-    assert set(first.item_statuses.values()) == {ItemStatus.SUCCESS}
-    assert partition is not None and partition["status"] == "complete_clean"
-    records = canonical.read(Dataset.DAILY_BAR, "stock", "2026-09-11")
-    assert len(records) == 3
-    assert len({record.key for record in records}) == 3
-    assert {record.volume for record in records} == {Decimal("1000.00000000")}
+def record(asset=AssetType.STOCK):
+    return DailyRecord("XSHG:600001", date.fromisoformat(DAY), asset, quote("10"), quote("9"), quote("11"))
 
 
-@pytest.mark.parametrize(
-    ("asset_type", "symbol", "instrument_id"),
-    [
-        (AssetType.STOCK, "sh600519", "XSHG:600519"),
-        (AssetType.ETF, "sh510300", "XSHG:510300"),
-        (AssetType.LOF, "sh501018", "XSHG:501018"),
-    ],
-)
-def test_forward_adjusted_daily_collection_publishes_stock_etf_and_lof(
-    tmp_path, asset_type: AssetType, symbol: str, instrument_id: str
-) -> None:
-    provider = FixtureDailyProvider(
-        "tencent",
-        "forward_history",
-        {symbol: row(symbol, "10")},
-        capability_version="tencent-qfq-kline-v1",
-        adjustment=Adjustment.FORWARD,
-    )
-    normalizer = Normalizer(
-        [
-            NormalizationRule(
-                provider="tencent",
-                endpoint="forward_history",
-                exchange=Exchange.XSHG,
-                asset_type=asset_type,
-                frequency=None,
-                volume_multiplier=Decimal("1"),
-                amount_multiplier=Decimal("1"),
-                version="tencent-qfq-v1",
-                adjustment=Adjustment.FORWARD,
-            )
-        ]
-    )
-    instrument = Instrument(instrument_id, symbol, Exchange.XSHG, asset_type)
-    canonical = CanonicalPartitionStore(tmp_path / "canonical")
-    with MetadataStore(tmp_path / "metadata.duckdb") as metadata:
-        result = DailyCollectionService(
-            providers=[provider],
-            normalizer=normalizer,
-            raw_store=RawObjectStore(tmp_path / "raw"),
-            canonical_store=canonical,
-            metadata=metadata,
-            publication_policy=DAILY_PUBLICATION_POLICY,
-        ).collect(
-            instruments=[instrument],
-            trade_date=date(2026, 9, 11),
-            run_id=f"qfq-{asset_type.value}",
-            adjustment=Adjustment.FORWARD,
-        )
-
-    assert result.item_statuses[instrument_id] is ItemStatus.SUCCESS
-    record = canonical.read(Dataset.DAILY_BAR, asset_type.value, "2026-09-11")[0]
-    assert record.adjustment is Adjustment.FORWARD
-    assert record.source_provider == "tencent"
+def source_task(tmp_path, *, corrupt=None, symbols=("sh600001",), task_id="aggregate"):
+    units = []
+    for symbol in symbols:
+        manifests = {}
+        for adjustment in Adjustment:
+            name = adjustment.value
+            params = f"{symbol},day,,,1024" if name == "none" else f"{symbol},day,{DAY},{DAY},640,{'qfq' if name == 'forward' else 'hfq'}"
+            host = "https://web.ifzq.gtimg.cn" if name == "none" else "https://proxy.finance.qq.com/ifzqgtimg"
+            endpoint = "/appstock/app/kline/kline" if name == "none" else "/appstock/app/newfqkline/get"
+            price = {"none": "10", "forward": "9", "backward": "11"}[name]
+            row = [DAY, price, price, price, price, "100"]
+            if name != "none":
+                row += ["0", "0", "10", "0"]
+            body = json.dumps({"code": 0, "data": {symbol: { {"none":"day","forward":"qfqday","backward":"hfqday"}[name]: [row]}}}).encode()
+            if corrupt == name:
+                body = b"<html>source error, still HTTP 200</html>"
+            store = RawObjectStore(tmp_path / "fixture-responses" / symbol / name)
+            url = requests.Request("GET", host + endpoint, params={"param": params}).prepare().url
+            store.record_response(response=SimpleNamespace(content=body, status_code=200,
+                headers={"Content-Type":"application/json"}, encoding="utf-8"), url=url,
+                method="GET", request_headers={}, scope={"symbol": symbol, "adjustment": name},
+                provider="tencent", endpoint="kline_daily", code_version="synthetic-contract-v1", mode="fixture")
+            manifests[name] = str(store.manifest)
+        units.append({"key": symbol, "symbol": symbol, "input_id": "ASTOCK-002-daily",
+            "context": {"request": {"symbol": symbol, "start_date": DAY, "end_date": DAY}},
+            "replay_manifests": manifests})
+    return {"task_id": task_id, "dataset":"daily_bar", "asset_type":"stock", "trade_date":DAY, "units":units}
 
 
-def test_forward_adjusted_collection_does_not_use_unadjusted_provider(tmp_path) -> None:
-    provider = FixtureDailyProvider(
-        "sina",
-        "full_history",
-        {"sh600519": row("sh600519", "10")},
-        adjustment=Adjustment.NONE,
-    )
-    instrument = Instrument("XSHG:600519", "sh600519", Exchange.XSHG, AssetType.STOCK)
-    normalizer = Normalizer(
-        [
-            NormalizationRule(
-                provider="sina",
-                endpoint="full_history",
-                exchange=Exchange.XSHG,
-                asset_type=AssetType.STOCK,
-                frequency=None,
-                volume_multiplier=Decimal("1"),
-                amount_multiplier=Decimal("1"),
-                version="sina-v1",
-            )
-        ]
-    )
-    with MetadataStore(tmp_path / "metadata.duckdb") as metadata:
-        service = DailyCollectionService(
-            providers=[provider],
-            normalizer=normalizer,
-            raw_store=RawObjectStore(tmp_path / "raw"),
-            canonical_store=CanonicalPartitionStore(tmp_path / "canonical"),
-            metadata=metadata,
-            publication_policy=DAILY_PUBLICATION_POLICY,
-        )
-        with pytest.raises(PublicationThresholdExceeded):
-            service.collect(
-                instruments=[instrument],
-                trade_date=date(2026, 9, 11),
-                run_id="qfq-reject-none",
-                adjustment=Adjustment.FORWARD,
-            )
-    assert provider.requests == []
+def execute(root, definition, **kwargs):
+    return collect_task(definition=definition, config_root=CONFIG, data_root=root / "business", mode="replay",
+        collector_options={"pacer": RequestPacer(wait=lambda _: None)}, **kwargs)
 
 
-def test_forward_adjusted_collection_skips_provider_without_asset_qualification(tmp_path) -> None:
-    provider = FixtureDailyProvider(
-        "tencent",
-        "forward_history",
-        {"sh501018": row("sh501018", "10")},
-        adjustment=Adjustment.FORWARD,
-        supported_asset_types=frozenset({AssetType.STOCK, AssetType.ETF}),
-    )
-    instrument = Instrument("XSHG:501018", "sh501018", Exchange.XSHG, AssetType.LOF)
-    normalizer = Normalizer(
-        [
-            NormalizationRule(
-                provider="tencent",
-                endpoint="forward_history",
-                exchange=Exchange.XSHG,
-                asset_type=AssetType.LOF,
-                frequency=None,
-                volume_multiplier=Decimal("1"),
-                amount_multiplier=Decimal("1"),
-                version="tencent-qfq-v1",
-                adjustment=Adjustment.FORWARD,
-            )
-        ]
-    )
-    with MetadataStore(tmp_path / "metadata.duckdb") as metadata:
-        service = DailyCollectionService(
-            providers=[provider],
-            normalizer=normalizer,
-            raw_store=RawObjectStore(tmp_path / "raw"),
-            canonical_store=CanonicalPartitionStore(tmp_path / "canonical"),
-            metadata=metadata,
-            publication_policy=DAILY_PUBLICATION_POLICY,
-        )
-        with pytest.raises(PublicationThresholdExceeded):
-            service.collect(
-                instruments=[instrument],
-                trade_date=date(2026, 9, 11),
-                run_id="qfq-skip-lof",
-                adjustment=Adjustment.FORWARD,
-            )
-    assert provider.requests == []
+def test_aggregate_nested_roundtrip_and_noop(tmp_path):
+    store = CanonicalPartitionStore(tmp_path)
+    result = store.publish_daily(asset_type="stock", partition_key=DAY, new_records=[record()], expected_count=1,
+        run_id="first", item_statuses={"XSHG:600001":"success"})
+    read = store.read_daily("stock", DAY)
+    assert read == [record()]
+    assert read[0].key == ("XSHG:600001", date.fromisoformat(DAY))
+    assert result.manifest.adjustment == "aggregate"
+    assert result.manifest.schema_version == "daily-aggregate-v1"
+    assert store.publish_daily(asset_type="stock", partition_key=DAY, new_records=[], expected_count=1,
+        run_id="again", item_statuses={"XSHG:600001":"success"}).no_op
 
 
-def test_forward_adjusted_collection_rejects_mismatched_provider_response(tmp_path) -> None:
-    provider = FixtureDailyProvider(
-        "tencent",
-        "forward_history",
-        {"sh600519": row("sh600519", "10")},
-        adjustment=Adjustment.NONE,
-    )
-    instrument = Instrument("XSHG:600519", "sh600519", Exchange.XSHG, AssetType.STOCK)
-    normalizer = Normalizer(
-        [
-            NormalizationRule(
-                provider="tencent",
-                endpoint="forward_history",
-                exchange=Exchange.XSHG,
-                asset_type=AssetType.STOCK,
-                frequency=None,
-                volume_multiplier=Decimal("1"),
-                amount_multiplier=Decimal("1"),
-                version="tencent-qfq-v1",
-            )
-        ]
-    )
-    with MetadataStore(tmp_path / "metadata.duckdb") as metadata:
-        service = DailyCollectionService(
-            providers=[provider],
-            normalizer=normalizer,
-            raw_store=RawObjectStore(tmp_path / "raw"),
-            canonical_store=CanonicalPartitionStore(tmp_path / "canonical"),
-            metadata=metadata,
-            publication_policy=DAILY_PUBLICATION_POLICY,
-        )
-        with pytest.raises(PublicationThresholdExceeded):
-            service.collect(
-                instruments=[instrument],
-                trade_date=date(2026, 9, 11),
-                run_id="qfq-reject-response",
-                adjustment=Adjustment.FORWARD,
-            )
-    assert provider.requests == []
+def test_unknown_applicability_and_copied_prices_cannot_be_published(tmp_path):
+    with pytest.raises(ValueError, match="copied"):
+        QuoteGroup(QuoteStatus.NOT_APPLICABLE, close=Decimal("10"), reason="no", evidence_ref="fixture")
+    unknown = QuoteGroup(QuoteStatus.UNVERIFIED, reason="not verified")
+    index = DailyRecord("XSHG:000001", date.fromisoformat(DAY), AssetType.INDEX, quote(), unknown, unknown)
+    assert index.value_kind == "index_points" and index.quote_unit == "point" and not index.complete
+    with pytest.raises(ValueError, match="complete"):
+        CanonicalPartitionStore(tmp_path).publish_daily(asset_type="index", partition_key=DAY,
+            new_records=[index], expected_count=1, run_id="index")
 
 
-def test_forward_collection_does_not_reuse_unadjusted_metadata_or_break_partition_count(tmp_path) -> None:
-    instrument = Instrument("XSHG:600519", "sh600519", Exchange.XSHG, AssetType.STOCK)
-    rules = [
-        NormalizationRule(
-            provider="fixture",
-            endpoint="history",
-            exchange=Exchange.XSHG,
-            asset_type=AssetType.STOCK,
-            frequency=None,
-            volume_multiplier=Decimal("1"),
-            amount_multiplier=Decimal("1"),
-            version="fixture-v1",
-        ),
-        NormalizationRule(
-            provider="fixture-qfq",
-            endpoint="forward_history",
-            exchange=Exchange.XSHG,
-            asset_type=AssetType.STOCK,
-            frequency=None,
-            volume_multiplier=Decimal("1"),
-            amount_multiplier=Decimal("1"),
-            version="fixture-qfq-v1",
-            adjustment=Adjustment.FORWARD,
-        ),
-    ]
-    normalizer = Normalizer(rules)
-    canonical = CanonicalPartitionStore(tmp_path / "canonical")
-    with MetadataStore(tmp_path / "metadata.duckdb") as metadata:
-        service = DailyCollectionService(
-            providers=[
-                FixtureDailyProvider("fixture", "history", {"sh600519": row("sh600519", "1")}),
-                FixtureDailyProvider(
-                    "fixture-qfq",
-                    "forward_history",
-                    {"sh600519": row("sh600519", "10")},
-                    adjustment=Adjustment.FORWARD,
-                ),
-            ],
-            normalizer=normalizer,
-            raw_store=RawObjectStore(tmp_path / "raw"),
-            canonical_store=canonical,
-            metadata=metadata,
-            publication_policy=DAILY_PUBLICATION_POLICY,
-        )
-        service.collect(
-            instruments=[instrument],
-            trade_date=date(2026, 9, 11),
-            run_id="none-first",
-            adjustment=Adjustment.NONE,
-        )
-        qfq = service.collect(
-            instruments=[instrument],
-            trade_date=date(2026, 9, 11),
-            run_id="qfq-second",
-            adjustment=Adjustment.FORWARD,
-        )
-        records = canonical.read(Dataset.DAILY_BAR, "stock", "2026-09-11")
-        qfq_manifest = metadata.partition("daily_bar", "stock", "2026-09-11", adjustment="forward")
-        none_manifest = metadata.partition("daily_bar", "stock", "2026-09-11", adjustment="none")
-
-    assert qfq.requested_by_provider == {"fixture-qfq": ("sh600519",)}
-    assert {record.adjustment for record in records} == {Adjustment.NONE, Adjustment.FORWARD}
-    assert qfq_manifest is not None and qfq_manifest["actual_count"] == 1 and qfq_manifest["expected_count"] == 1
-    assert none_manifest is not None and none_manifest["actual_count"] == 1 and none_manifest["expected_count"] == 1
-    assert qfq_manifest["manifest_path"] != none_manifest["manifest_path"]
+def test_verified_nonapplicable_index_roundtrip(tmp_path):
+    na = QuoteGroup(QuoteStatus.NOT_APPLICABLE, reason="synthetic semantic fixture", evidence_ref="fixture-only")
+    index = DailyRecord("XSHG:000001", date.fromisoformat(DAY), AssetType.INDEX, quote(), na, na)
+    store = CanonicalPartitionStore(tmp_path)
+    store.publish_daily(asset_type="index", partition_key=DAY, new_records=[index], expected_count=1, run_id="index")
+    assert store.read_daily("index", DAY)[0].value_kind == "index_points"
 
 
-def test_forward_collection_rejects_index_unconditionally(tmp_path) -> None:
-    instrument = Instrument("XSHG:000001", "sh000001", Exchange.XSHG, AssetType.INDEX)
-    with MetadataStore(tmp_path / "metadata.duckdb") as metadata:
-        service = DailyCollectionService(
-            providers=[],
-            normalizer=Normalizer([]),
-            raw_store=RawObjectStore(tmp_path / "raw"),
-            canonical_store=CanonicalPartitionStore(tmp_path / "canonical"),
-            metadata=metadata,
-            publication_policy=DAILY_PUBLICATION_POLICY,
-        )
-        with pytest.raises(ValueError, match="index daily bars"):
-            service.collect(
-                instruments=[instrument],
-                trade_date=date(2026, 9, 11),
-                run_id="qfq-index-reject",
-                adjustment=Adjustment.FORWARD,
-            )
+def test_formal_task_three_responses_one_record_and_resume(tmp_path):
+    definition = source_task(tmp_path)
+    state = execute(tmp_path, definition)
+    assert state["status"] == "published", state.get("error")
+    assert len(state["units"]) == 3
+    assert state["row_count"] == 1
+    rows = CanonicalPartitionStore(tmp_path / "business/canonical").read_daily("stock", DAY)
+    assert [rows[0].quotes[a.value].close for a in Adjustment] == [Decimal("10"), Decimal("9"), Decimal("11")]
+    assert all(Path(q.raw_object_path).exists() for q in rows[0].quotes.values())
+    assert all(q.fetch_time is not None for q in rows[0].quotes.values())
+    assert execute(tmp_path, definition)["no_op"]
+    with MetadataStore(tmp_path / "business/metadata/metadata.duckdb") as metadata:
+        assert metadata.partition("daily_bar", "stock", DAY, adjustment="aggregate")["actual_count"] == 1
 
 
-def test_rate_limited_primary_is_cooled_and_fallback_completes_partition(tmp_path) -> None:
-    primary = FixtureDailyProvider(
-        "primary",
-        "history",
-        {"sh600001": row("sh600001", "10")},
-        failures=[
-            ProviderContractError(
-                "HTTP 429",
-                FailureClass.RATE_LIMITED,
-                retryable=False,
-                http_status=429,
-            )
-        ],
-    )
-    fallback = FixtureDailyProvider(
-        "fallback", "history", {"sh600001": row("sh600001", "10")}, capability_priority=80
-    )
-    rules = [
-        NormalizationRule(
-            provider=provider,
-            endpoint="history",
-            exchange=Exchange.XSHG,
-            asset_type=AssetType.STOCK,
-            frequency=None,
-            volume_multiplier=Decimal("1"),
-            amount_multiplier=Decimal("1"),
-            version="v1",
-        )
-        for provider in ("primary", "fallback")
-    ]
-    instrument = Instrument("XSHG:600001", "sh600001", Exchange.XSHG, AssetType.STOCK)
-    now = datetime(2026, 9, 11, 16, 30, tzinfo=SHANGHAI)
-    with MetadataStore(tmp_path / "metadata.duckdb") as metadata:
-        service = DailyCollectionService(
-            providers=[primary, fallback],
-            normalizer=Normalizer(rules),
-            raw_store=RawObjectStore(tmp_path / "raw"),
-            canonical_store=CanonicalPartitionStore(tmp_path / "canonical"),
-            metadata=metadata,
-            publication_policy=DAILY_PUBLICATION_POLICY,
-            clock=lambda: now,
-        )
-        result = service.collect(
-            instruments=[instrument], trade_date=date(2026, 9, 11), run_id="rate-limit"
-        )
-        health = metadata.provider_health(
-            provider="primary",
-            endpoint="history",
-            market="XSHG",
-            asset_type="stock",
-            dataset="daily_bar",
-            capability_version="fixture-v1",
-        )
-    assert primary.requests == [("sh600001",)]
-    assert fallback.requests == [("sh600001",)]
-    assert result.item_statuses[instrument.instrument_id] is ItemStatus.SUCCESS
-    assert health is not None and health.http_429_count == 1
-    assert health.open_until is not None
+def test_http_success_bad_body_stops_at_processing_and_does_not_publish(tmp_path):
+    definition = source_task(tmp_path, corrupt="backward")
+    state = execute(tmp_path, definition)
+    assert state["status"] == "failed"
+    assert not (tmp_path / "business/canonical" / DAY / "daily_bar/stock/data.parquet").exists()
+    assert len(state["units"]) == 3
+    summary = json.loads(Path(state["summary"]["path"]).read_text(encoding="utf-8"))
+    assert any(issue["adjustment"] == "backward" for issue in summary["final_check"]["issues"])
+    assert summary["final_check"]["coverage"]["actual_count"] == 0
+    failed = state["units"]["sh600001__backward"]
+    assert failed["report"]["failure_stage"] == "processing"
+    assert failed["report"]["acquisition_complete"]
+    assert len(failed["report"]["responses"]) == 1
 
 
-def test_snapshot_provider_publishes_provisional_and_final_provider_can_replace_it(tmp_path) -> None:
-    parts = ["-"] * 38
-    parts[1] = "贵州茅台"
-    parts[2] = "600519"
-    parts[3:7] = ["1275.16", "1285.15", "1285.15", "34801"]
-    parts[30] = "20260911150003"
-    parts[33] = "1286.15"
-    parts[34] = "1263.01"
-    parts[37] = "445001.2"
-    body = f'v_sh600519="{"~".join(parts)}";\n'.encode("gbk")
-
-    class SnapshotTransport:
-        def get(self, url, *, params, timeout_seconds):
-            return HttpResponse(200, {"content-type": "text/plain"}, body)
-
-    capability = ProviderCapability(
-        provider="tencent",
-        endpoint="bulk_snapshot",
-        version="snapshot-v1",
-        datasets=frozenset({Dataset.SNAPSHOT, Dataset.DAILY_BAR}),
-        exchanges=frozenset({Exchange.XSHG}),
-        asset_types=frozenset({AssetType.STOCK}),
-        frequencies=frozenset(),
-        adjustments=frozenset(),
-        priority=50,
-        validated_at=datetime(2026, 9, 1, tzinfo=timezone.utc),
-        validation_expires_at=datetime(2026, 10, 1, tzinfo=timezone.utc),
-    )
-    snapshot = TencentSnapshotProvider(SnapshotTransport(), capability)
-    final_row = row("sh600519", "1275.16")
-    final_row.update({"open": "1285.15", "high": "1286.15", "low": "1263.01"})
-    final_row["volume"] = "3480100"
-    final_row["amount"] = "4450012000"
-    final = FixtureDailyProvider("history", "history", {"sh600519": final_row})
-    rules = Normalizer(
-        [
-            NormalizationRule(
-                provider="tencent",
-                endpoint="bulk_snapshot",
-                exchange=Exchange.XSHG,
-                asset_type=AssetType.STOCK,
-                frequency=None,
-                volume_multiplier=Decimal("100"),
-                amount_multiplier=Decimal("10000"),
-                version="snapshot-v1",
-            ),
-            NormalizationRule(
-                provider="history",
-                endpoint="history",
-                exchange=Exchange.XSHG,
-                asset_type=AssetType.STOCK,
-                frequency=None,
-                volume_multiplier=Decimal("1"),
-                amount_multiplier=Decimal("1"),
-                version="history-v1",
-            ),
-        ]
-    )
-    instrument = Instrument("XSHG:600519", "sh600519", Exchange.XSHG, AssetType.STOCK)
-    with MetadataStore(tmp_path / "metadata.duckdb") as metadata:
-        service = DailyCollectionService(
-            providers=[snapshot],
-            normalizer=rules,
-            raw_store=RawObjectStore(tmp_path / "raw"),
-            canonical_store=CanonicalPartitionStore(tmp_path / "canonical"),
-            metadata=metadata,
-            publication_policy=DAILY_PUBLICATION_POLICY,
-            clock=lambda: datetime(2026, 9, 11, 16, 30, tzinfo=SHANGHAI),
-        )
-        provisional = service.collect(
-            instruments=[instrument], trade_date=date(2026, 9, 11), run_id="snapshot"
-        )
-        assert provisional.item_statuses[instrument.instrument_id] is ItemStatus.TEMPORARY_EMPTY
-        service.providers = (snapshot, final)
-        completed = service.collect(
-            instruments=[instrument], trade_date=date(2026, 9, 11), run_id="history"
-        )
-    assert completed.item_statuses[instrument.instrument_id] is ItemStatus.SUCCESS
-    record = CanonicalPartitionStore(tmp_path / "canonical").read(
-        Dataset.DAILY_BAR, "stock", "2026-09-11"
-    )[0]
-    assert record.quality_status.value == "final"
-    assert record.source_provider == "history"
+@pytest.mark.parametrize("stage", ["after_data_replace", "after_publish", "after_raw_promote"])
+def test_aggregate_task_recovery_never_fetches_again(tmp_path, stage):
+    from stock_data_manage.worker.recovery import recover_collection_tasks
+    definition = source_task(tmp_path)
+    def interrupt(point):
+        if point == stage:
+            raise RuntimeError("simulated power loss")
+    with pytest.raises(RuntimeError, match="power loss"):
+        execute(tmp_path, definition, failure_hook=interrupt)
+    assert recover_collection_tasks(config_root=CONFIG, data_root=tmp_path / "business") == ("aggregate",)
+    assert len(CanonicalPartitionStore(tmp_path / "business/canonical").read_daily("stock", DAY)) == 1
+    assert execute(tmp_path, definition)["no_op"]
 
 
-def test_daily_collection_allows_publication_at_configured_missing_limit(tmp_path) -> None:
-    rows = {
-        f"sh600{index:03d}": row(f"sh600{index:03d}", "10")
-        for index in range(1, 100)
-    }
-    provider = FixtureDailyProvider("primary", "history", rows)
-    normalizer = Normalizer(
-        [
-            NormalizationRule(
-                provider="primary",
-                endpoint="history",
-                exchange=Exchange.XSHG,
-                asset_type=AssetType.STOCK,
-                frequency=None,
-                volume_multiplier=Decimal("1"),
-                amount_multiplier=Decimal("1"),
-                version="v1",
-            )
-        ]
-    )
-    instruments = [
-        Instrument(
-            f"XSHG:600{index:03d}",
-            f"sh600{index:03d}",
-            Exchange.XSHG,
-            AssetType.STOCK,
-        )
-        for index in range(1, 101)
-    ]
-    canonical = CanonicalPartitionStore(tmp_path / "canonical")
-    with MetadataStore(tmp_path / "metadata.duckdb") as metadata:
-        service = DailyCollectionService(
-            providers=[provider],
-            normalizer=normalizer,
-            raw_store=RawObjectStore(tmp_path / "raw"),
-            canonical_store=canonical,
-            metadata=metadata,
-            publication_policy=DAILY_PUBLICATION_POLICY,
-        )
-
-        service.collect(
-            instruments=instruments,
-            trade_date=date(2026, 9, 11),
-            run_id="at-missing-limit",
-        )
-
-    assert len(canonical.read(Dataset.DAILY_BAR, "stock", "2026-09-11")) == 99
+@pytest.mark.parametrize("body", [b"<html>error</html>", b"{}", b'{"data":{}}'])
+def test_capture_does_not_parse_or_switch_on_bad_business_payload(body):
+    class Transport:
+        calls = 0
+        def get(self, *args, **kwargs):
+            self.calls += 1
+            return HttpResponse(200, {}, body)
+    transport = Transport()
+    provider = TencentDailyProvider(transport)
+    captured = provider.capture_window("sh600001", date.fromisoformat(DAY), date.fromisoformat(DAY), adjust="none", api="kline")
+    assert transport.calls == 1
+    with pytest.raises(ProviderContractError):
+        provider.parse_window(captured)
+    assert transport.calls == 1
 
 
-def test_daily_collection_rejects_publication_above_configured_missing_limit(tmp_path) -> None:
-    rows = {
-        f"sh600{index:03d}": row(f"sh600{index:03d}", "10")
-        for index in range(1, 99)
-    }
-    provider = FixtureDailyProvider("primary", "history", rows)
-    normalizer = Normalizer(
-        [
-            NormalizationRule(
-                provider="primary",
-                endpoint="history",
-                exchange=Exchange.XSHG,
-                asset_type=AssetType.STOCK,
-                frequency=None,
-                volume_multiplier=Decimal("1"),
-                amount_multiplier=Decimal("1"),
-                version="v1",
-            )
-        ]
-    )
-    instruments = [
-        Instrument(
-            f"XSHG:600{index:03d}",
-            f"sh600{index:03d}",
-            Exchange.XSHG,
-            AssetType.STOCK,
-        )
-        for index in range(1, 101)
-    ]
-    canonical = CanonicalPartitionStore(tmp_path / "canonical")
-    with MetadataStore(tmp_path / "metadata.duckdb") as metadata:
-        service = DailyCollectionService(
-            providers=[provider],
-            normalizer=normalizer,
-            raw_store=RawObjectStore(tmp_path / "raw"),
-            canonical_store=canonical,
-            metadata=metadata,
-            publication_policy=DAILY_PUBLICATION_POLICY,
-        )
+def test_failover_only_catches_acquisition_faults():
+    calls=[]
+    def first():
+        calls.append("first")
+        raise requests.ConnectionError("synthetic connection")
+    def second():
+        calls.append("second")
+        return "retained bytes"
+    assert execute_with_fallback([("a",first),("b",second)], retry_policy=RetryPolicy(1)).value == "retained bytes"
+    assert calls == ["first","second"]
+    def bug():
+        raise TypeError("programming error")
+    with pytest.raises(TypeError):
+        execute_with_fallback([("a",bug),("b",second)])
+    assert calls == ["first","second"]
 
-        with pytest.raises(PublicationThresholdExceeded):
-            service.collect(
-                instruments=instruments,
-                trade_date=date(2026, 9, 11),
-                run_id="too-many-missing",
-            )
 
-    assert canonical.read(Dataset.DAILY_BAR, "stock", "2026-09-11") == []
+def test_full_redo_missing_group_preserves_published_data_and_current_raw(tmp_path):
+    definition = source_task(tmp_path)
+    first = execute(tmp_path, definition)
+    data = Path(first["published_manifest"]).with_name("data.parquet")
+    before = file_hash(data)
+    changed = source_task(tmp_path / "changed", corrupt="forward")
+    assert execute(tmp_path, changed, redo="full")["status"] == "failed"
+    assert file_hash(data) == before
+
+
+def test_selected_redo_keeps_other_security_and_uses_three_units(tmp_path):
+    definition = source_task(tmp_path, symbols=("sh600001", "sh600002"))
+    first = execute(tmp_path, definition)
+    original = CanonicalPartitionStore(tmp_path / "business/canonical").read_daily("stock", DAY)
+    second = execute(tmp_path, definition, redo="selected", symbols=["sh600001"])
+    assert first["status"] == second["status"] == "published"
+    assert second["selected_symbols"] == ["sh600001"]
+    rows = CanonicalPartitionStore(tmp_path / "business/canonical").read_daily("stock", DAY)
+    assert len(rows) == 2 and rows[1] == original[1]
+
+
+def test_daily_query_defaults_to_none_and_switches_without_provider_calls(tmp_path, monkeypatch):
+    from stock_data_manage.service.market_data import query_daily
+    definition = source_task(tmp_path)
+    assert execute(tmp_path, definition)["status"] == "published"
+    def no_network(*args, **kwargs):
+        raise AssertionError("query attempted network")
+    monkeypatch.setattr(requests.Session, "send", no_network)
+    root = tmp_path / "business/canonical"
+    normal = query_daily(root)
+    assert normal["adjustment"] == "none" and Decimal(normal["items"][0]["values"]["close"]) == Decimal("10")
+    assert normal["items"][0]["has_source_evidence"] and "raw_ref" not in normal["items"][0]
+    assert Decimal(query_daily(root, adjustment="forward")["items"][0]["values"]["close"]) == Decimal("9")
+    assert Decimal(query_daily(root, adjustment="backward")["items"][0]["values"]["close"]) == Decimal("11")
+    assert query_daily(root, security="600002")["total"] == 0
+
+
+def test_daily_web_defaults_validation_and_corrupt_partition(tmp_path):
+    from fastapi.testclient import TestClient
+    from stock_data_manage.service.web import create_app
+    definition = source_task(tmp_path)
+    state = execute(tmp_path, definition)
+    client = TestClient(create_app(config_root=CONFIG, data_root=tmp_path / "business"))
+    normal = client.get("/api/daily")
+    assert normal.status_code == 200 and normal.json()["adjustment"] == "none"
+    assert normal.json()["items"][0]["has_source_evidence"] and "raw_ref" not in normal.json()["items"][0]
+    assert client.get("/api/daily?adjustment=backward").json()["items"][0]["values"]["close"] == "11.00000000"
+    assert client.get("/api/daily?adjustment=invalid").status_code == 400
+    assert client.get("/api/daily?start_date=invalid").status_code == 422
+    Path(state["published_manifest"]).with_name("data.parquet").write_bytes(b"corrupt fixture")
+    assert client.get("/api/daily").status_code == 409
+
+
+def test_old_single_adjustment_task_is_explicitly_rejected(tmp_path):
+    definition = source_task(tmp_path)
+    definition["adjustment"] = "forward"
+    with pytest.raises(ValueError, match="aggregate"):
+        execute(tmp_path, definition)

@@ -150,3 +150,92 @@ class BarRecord:
 
     def with_flags(self, *flags: str) -> "BarRecord":
         return replace(self, flags=tuple(dict.fromkeys((*self.flags, *flags))))
+
+
+class QuoteStatus(StrEnum):
+    AVAILABLE = "available"
+    NOT_APPLICABLE = "not_applicable"
+    MISSING = "missing"
+    UNVERIFIED = "unverified"
+
+
+@dataclass(frozen=True, slots=True)
+class QuoteGroup:
+    """One source's indivisible price/point group, never a locally adjusted price."""
+    status: QuoteStatus
+    open: Decimal | None = None
+    high: Decimal | None = None
+    low: Decimal | None = None
+    close: Decimal | None = None
+    volume: Decimal | None = None
+    amount: Decimal | None = None
+    source_provider: str = ""
+    endpoint: str = ""
+    raw_object_path: str = ""
+    fetch_time: datetime | None = None
+    normalizer_version: str = ""
+    capability_version: str = ""
+    reason: str = ""
+    evidence_ref: str = ""
+    flags: tuple[str, ...] = ()
+
+    def __post_init__(self):
+        if not isinstance(self.status, QuoteStatus):
+            raise ValueError("quote status must be explicit")
+        values = (self.open, self.high, self.low, self.close)
+        if self.status is QuoteStatus.AVAILABLE:
+            if not all(isinstance(v, Decimal) and v.is_finite() and v > 0 for v in values):
+                raise ValueError("available quote requires finite positive OHLC")
+            if not self.low <= min(self.open, self.close) <= max(self.open, self.close) <= self.high:
+                raise ValueError("invalid OHLC ordering")
+            if not self.source_provider or not self.endpoint or not self.raw_object_path or self.fetch_time is None or self.fetch_time.utcoffset() is None:
+                raise ValueError("available quote requires source evidence and aware fetch time")
+            if any(v is not None and (not isinstance(v, Decimal) or not v.is_finite() or v < 0) for v in (self.volume, self.amount)):
+                raise ValueError("invalid quote volume or amount")
+        elif any(v is not None for v in (*values, self.volume, self.amount)):
+            raise ValueError("unavailable quote cannot contain copied prices")
+        elif not self.reason:
+            raise ValueError("unavailable quote requires a reason")
+        if self.status is QuoteStatus.NOT_APPLICABLE and not self.evidence_ref:
+            raise ValueError("not-applicable quote requires applicability evidence")
+
+
+@dataclass(frozen=True, slots=True)
+class DailyRecord:
+    instrument_id: str
+    trade_date: date
+    asset_type: AssetType
+    none: QuoteGroup
+    forward: QuoteGroup
+    backward: QuoteGroup
+
+    def __post_init__(self):
+        import re
+        if not isinstance(self.asset_type, AssetType) or not re.fullmatch(r"(?:XSHG|XSHE|BSE):[0-9]{6}", self.instrument_id):
+            raise ValueError("daily record requires typed asset and market-qualified identity")
+        if type(self.trade_date) is not date or not all(isinstance(q, QuoteGroup) for q in (self.none, self.forward, self.backward)):
+            raise ValueError("daily record requires a date and all three explicit quote slots")
+
+    @property
+    def key(self):
+        return self.instrument_id, self.trade_date
+
+    @property
+    def quotes(self):
+        return {"none": self.none, "forward": self.forward, "backward": self.backward}
+
+    @property
+    def value_kind(self):
+        return "index_points" if self.asset_type is AssetType.INDEX else "price"
+
+    @property
+    def quote_unit(self):
+        return "point" if self.asset_type is AssetType.INDEX else "CNY"
+
+    @property
+    def complete(self):
+        if self.none.status is not QuoteStatus.AVAILABLE:
+            return False
+        if self.asset_type is AssetType.STOCK:
+            return all(q.status is QuoteStatus.AVAILABLE for q in self.quotes.values())
+        return all(q.status in {QuoteStatus.AVAILABLE, QuoteStatus.NOT_APPLICABLE} for q in self.quotes.values())
