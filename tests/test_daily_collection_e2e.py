@@ -40,14 +40,20 @@ def record(asset=AssetType.STOCK):
 
 
 def source_task(tmp_path, *, corrupt=None, symbols=("sh600001",), task_id="aggregate"):
+    from stock_data_manage.pipeline.daily import resolve_daily_definition
+
+    policy = resolve_daily_definition({"task": "stock_daily"}, CONFIG)["source_policy"]["inputs"][0]["market_adjustment_requests"]
+    market_by_prefix = {"sh": "XSHG", "sz": "XSHE", "bj": "BSE"}
     units = []
     for symbol in symbols:
         manifests = {}
         for adjustment in Adjustment:
             name = adjustment.value
-            params = f"{symbol},day,,,1024" if name == "none" else f"{symbol},day,{DAY},{DAY},640,{'qfq' if name == 'forward' else 'hfq'}"
-            host = "https://web.ifzq.gtimg.cn" if name == "none" else "https://proxy.finance.qq.com/ifzqgtimg"
-            endpoint = "/appstock/app/kline/kline" if name == "none" else "/appstock/app/newfqkline/get"
+            request = policy[market_by_prefix[symbol[:2]]][name]
+            api, token = request["api"], request["adjust"]
+            params = f"{symbol},day,,,1024" if api == "kline" else f"{symbol},day,{DAY},{DAY},640,{token}"
+            host = "https://proxy.finance.qq.com/ifzqgtimg" if api == "newfqkline" else "https://web.ifzq.gtimg.cn"
+            endpoint = "/appstock/app/kline/kline" if api == "kline" else f"/appstock/app/{api}/get"
             price = {"none": "10", "forward": "9", "backward": "11"}[name]
             row = [DAY, price, price, price, price, "100"]
             if name != "none":
@@ -240,3 +246,45 @@ def test_old_single_adjustment_task_is_explicitly_rejected(tmp_path):
     definition["adjustment"] = "forward"
     with pytest.raises(ValueError, match="aggregate"):
         execute(tmp_path, definition)
+
+
+def test_daily_route_expansion_uses_market_and_adjustment_policy():
+    from stock_data_manage.pipeline.daily import resolve_daily_definition, expand_daily_units
+
+    definition = resolve_daily_definition({"task": "stock_daily"}, CONFIG)
+    routes = definition["source_policy"]["inputs"][0]["market_adjustment_requests"]
+    for market in ("XSHG", "XSHE"):
+        routes[market]["forward"] = {"api": "fqkline", "adjust": "qfq"}
+        routes[market]["backward"] = {"api": "fqkline", "adjust": "hfq"}
+    units = [{"key": symbol, "symbol": symbol, "input_id": "ASTOCK-002-daily",
+              "context": {"request": {"symbol": symbol, "start_date": DAY, "end_date": DAY}}}
+             for symbol in ("sh600519", "sz000001", "bj920001")]
+
+    expanded = expand_daily_units(units, definition)
+    routes_by_quote = {(unit["symbol"], unit["adjustment"]): unit["context"]["config"]
+                       for unit in expanded}
+    assert len(expanded) == 9
+    assert routes_by_quote[("sh600519", "none")] == {"api": "kline", "adjust": "none"}
+    assert routes_by_quote[("sh600519", "forward")] == {"api": "fqkline", "adjust": "qfq"}
+    assert routes_by_quote[("sh600519", "backward")] == {"api": "fqkline", "adjust": "hfq"}
+    assert routes_by_quote[("sz000001", "forward")] == {"api": "fqkline", "adjust": "qfq"}
+    assert routes_by_quote[("bj920001", "forward")] == {"api": "newfqkline", "adjust": "qfq"}
+    assert routes_by_quote[("bj920001", "backward")] == {"api": "newfqkline", "adjust": "hfq"}
+
+
+def test_daily_route_expansion_never_falls_back_for_missing_market_or_conflicting_unit():
+    from copy import deepcopy
+    from stock_data_manage.pipeline.daily import resolve_daily_definition, expand_daily_units
+
+    definition = resolve_daily_definition({"task": "stock_daily"}, CONFIG)
+    unit = {"key": "bj920001", "symbol": "bj920001", "input_id": "ASTOCK-002-daily",
+            "context": {"request": {"symbol": "bj920001", "start_date": DAY, "end_date": DAY}}}
+    missing_market = deepcopy(definition)
+    del missing_market["source_policy"]["inputs"][0]["market_adjustment_requests"]["BSE"]
+    with pytest.raises(ValueError, match="no route for market BSE"):
+        expand_daily_units([unit], missing_market)
+
+    conflicting = expand_daily_units([unit], definition)
+    conflicting[1]["context"]["config"] = {"api": "fqkline", "adjust": "qfq"}
+    with pytest.raises(ValueError, match="conflicts with frozen acquisition policy"):
+        expand_daily_units(conflicting, definition)

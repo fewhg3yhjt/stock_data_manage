@@ -158,7 +158,16 @@ acquisition_policies:
     mode: fixed
     inputs:
       - input_id: ASTOCK-002-daily
-        adjustment_requests:
-          none: {api: kline, adjust: none}
-          forward: {api: newfqkline, adjust: qfq}
-          backward: {api: newfqkline, adjust: hfq}
+        market_adjustment_requests:
+          XSHG:
+            none: {api: kline, adjust: none}
+            forward: {api: fqkline, adjust: qfq}
+            backward: {api: fqkline, adjust: hfq}
+          XSHE:
+            none: {api: kline, adjust: none}
+            forward: {api: fqkline, adjust: qfq}
+            backward: {api: fqkline, adjust: hfq}
+          BSE:
+            none: {api: kline, adjust: none}
+            forward: {api: newfqkline, adjust: qfq}
+            backward: {api: newfqkline, adjust: hfq}

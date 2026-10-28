@@ -20,6 +20,17 @@ class PublicationThresholdExceeded(ValueError):
     pass
 
 
+_DAILY_MARKET_BY_PREFIX = {"sh": "XSHG", "sz": "XSHE", "bj": "BSE"}
+_DAILY_ADJUSTMENT_TOKEN = {"none": "none", "forward": "qfq", "backward": "hfq"}
+
+
+def _daily_market(symbol):
+    try:
+        return _DAILY_MARKET_BY_PREFIX[str(symbol)[:2].lower()]
+    except KeyError as exc:
+        raise ValueError(f"daily source policy cannot identify the market for {symbol!r}") from exc
+
+
 def resolve_daily_definition(definition, config_root):
     definition = deepcopy(definition)
     tasks = yaml.safe_load((config_root / "collection.yaml").read_text(encoding="utf-8")).get("tasks", {})
@@ -52,6 +63,16 @@ def resolve_daily_definition(definition, config_root):
     source = policy["inputs"][0]
     if source["input_id"] != "ASTOCK-002-daily":
         raise ValueError("daily formal input is not implemented")
+    market_requests = source.get("market_adjustment_requests")
+    if not isinstance(market_requests, dict) or set(market_requests) != set(_DAILY_MARKET_BY_PREFIX.values()):
+        raise ValueError("daily source policy must explicitly cover XSHG, XSHE and BSE")
+    for market, requests in market_requests.items():
+        if not isinstance(requests, dict) or set(requests) != set(_DAILY_ADJUSTMENT_TOKEN):
+            raise ValueError(f"daily source policy for {market} must declare all three adjustment requests")
+        for adjustment, request in requests.items():
+            if (not isinstance(request, dict) or set(request) != {"api", "adjust"}
+                    or request["adjust"] != _DAILY_ADJUSTMENT_TOKEN[adjustment]):
+                raise ValueError(f"daily source policy has an invalid {market}/{adjustment} request")
     if definition.get("input_id", source["input_id"]) != source["input_id"]:
         raise ValueError("forced source is outside the configured acquisition policy")
     return {**definition, "asset_type": asset, "input_id": source["input_id"],
@@ -65,12 +86,16 @@ def resolve_daily_definition(definition, config_root):
 
 
 def expand_daily_units(units, definition):
-    requests = definition["source_policy"]["inputs"][0]["adjustment_requests"]
+    requests_by_market = definition["source_policy"]["inputs"][0]["market_adjustment_requests"]
     expanded = []
     target_limit = definition["source_policy"].get("max_symbols")
     if target_limit is not None and len({u.get("symbol") for u in units}) > int(target_limit):
         raise ValueError(f"daily task exceeds configured symbol limit {target_limit}")
     for unit in units:
+        market = _daily_market(unit.get("symbol", ""))
+        requests = requests_by_market.get(market)
+        if requests is None:
+            raise ValueError(f"daily source policy has no route for market {market}")
         if "adjustment" in unit:
             expanded.append(unit)
             continue
@@ -89,8 +114,10 @@ def expand_daily_units(units, definition):
                 item["replay_manifest"] = manifests[name]
             expanded.append(item)
     for unit in expanded:
+        market_requests = requests_by_market.get(_daily_market(unit.get("symbol", "")))
+        expected_request = market_requests.get(unit["adjustment"]) if market_requests else None
         if (unit["input_id"] != definition["input_id"] or definition["quote_contract"].get(unit["adjustment"]) != "required"
-                or unit["context"].get("config", {}) != requests[unit["adjustment"]]):
+                or expected_request is None or unit["context"].get("config", {}) != expected_request):
             raise ValueError("daily source unit conflicts with frozen acquisition policy")
     return expanded
 
