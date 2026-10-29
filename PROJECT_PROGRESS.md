@@ -8,7 +8,7 @@
 
 随后使用保存的原响应在隔离数据根目录回放完整 `stock_daily` 任务：9个来源单元成功聚合为沪市、深市、北交所各一条三口径记录，任务状态 `published`；所有口径OHLC回读与原始目标行数值相等，Parquet保留三位小数，`production_writes=0`。结果见[端到端回放](data/task_workspace/_checks/tencent-daily-route-validation-2026-10-29/e2e-results.json)。通过后，正式YAML已配置为沪深复权使用 `fqkline`、北交所复权使用 `newfqkline`；任务代码按市场映射并冻结接口与复权参数，缺失映射和冲突单元明确失败，不隐式回退。
 
-针对性日线、配置合同及Provider工厂用例通过；测试尝试中未纳入的两项是：页面用例因环境缺少可选 `fastapi` 依赖，另一项历史来源清单断言因仓库现有 `evidence_refs` 与旧CSV快照不一致。这两项不属于本次路由改动，未通过修改无关配置来消除。
+针对性日线、配置合同及Provider工厂用例通过（52项）。页面用例未补跑，原因是测试运行环境不完整，不是这台机器没有FastAPI：本轮pytest使用 `D:\tools\miniconda3\python.exe`（Python 3.13.12，具备pytest、DuckDB和PyArrow，但该解释器没有FastAPI）；当前激活的 `D:\Program Files\miniconda3\python.exe`（Python 3.9.21）有FastAPI，但没有pytest、DuckDB和PyArrow，且低于项目要求的Python 3.11；`ailearn`环境虽有pytest和FastAPI，也缺DuckDB、PyArrow。另一项未纳入用例是历史来源清单断言，其仓库现有 `evidence_refs` 与旧CSV快照不一致。没有为补测安装依赖或改动环境。
 
 配置切换不等于生产在线资格。元数据中可匹配的旧资格均已过期，且仅覆盖 `newfqkline` 前复权；`kline/none`、沪深 `fqkline` 前/后复权以及北交所 `newfqkline` 前/后复权均无当前有效资格，正式 `tencent_daily` 任务仍会在资格门禁处阻断。该任务的 `scheduling_enabled` 仍为 `false`，没有生产数据写入。下一步应扩大市场、证券与日期样本，继续核实接口差异、历史窗口和成交量单位，再为精确范围登记当前有效资格，之后单独验收生产任务与调度。
 
