@@ -4,6 +4,8 @@
 
 - Before starting a non-trivial task, state the target outcome, current situation, scope, execution plan, verification standard, risks, and confirmation points.
 - After the user explicitly confirms the plan, execute the confirmed scope continuously without repeatedly asking for approval on ordinary implementation details.
+- 按“明确设计与职责合同 → 按设计实现 → 按验收标准验证 → 对照设计复核 → 更新 `PROJECT_PROGRESS.md`”完成开发闭环。每完成一个已确认的功能或阶段，都在该阶段收尾时同步更新现有进度文档，记录实际范围、验证层级与证据、实现是否符合设计、偏差/风险及剩余事项；不等到多个阶段全部结束后再补记。
+- 设计对照发现偏差时，若能在已确认范围内修正，应先修复并重新验证，再记录完成；若需要改变设计、数据语义或范围，先说明偏差及影响并取得用户确认，不得把偏差静默记为完成。
 - Do not expand the confirmed scope, add adjacent features, introduce new management layers, or change data semantics without discussing the expansion with the user and receiving explicit confirmation.
 - Pause and ask again when the scope must expand, a destructive or sensitive operation is required, user changes conflict with the task, an external side effect was not covered by the plan, a data-semantic decision cannot be inferred safely, or execution is blocked.
 - At task completion, report the actual changes, verification results, residual risks, and any intentionally unimplemented items.
