@@ -17,6 +17,15 @@
 - Check whether the repository has an active `post-commit` push hook. If it does, do not push a second time unless the hook fails. If no such hook is active, push the authorized commit to its intended remote directly.
 - If commit or push fails, preserve the local changes and report the exact failure; do not create duplicate commits or silently retry with a different remote.
 
+## 项目Python环境与测试执行
+
+- 项目 `pyproject.toml` 要求 Python `>=3.11`。每次测试前必须在即将运行测试的同一个解释器中记录 `sys.executable`、Python版本，并检查该次测试所需依赖；不能仅凭已激活环境、其他终端或机器上某个环境安装了依赖，就假定当前解释器可用。
+- 最近核验的核心测试解释器为 `D:\tools\miniconda3\python.exe`（Python 3.13.12），有 pytest、DuckDB、PyArrow、PyYAML 和 requests，但没有 FastAPI。可用于不导入Web服务的日线与配置定向测试；依赖FastAPI的测试不得因此解释为“机器没有FastAPI”。
+- `D:\Program Files\miniconda3\python.exe`（Python 3.9.21）安装了 FastAPI，但不满足项目Python版本要求，且没有 pytest、DuckDB 和 PyArrow；不要把它用作本项目测试环境。
+- `D:\Program Files\miniconda3\envs\ailearn\python.exe`（Python 3.11.15）有 pytest 和 FastAPI，但最近核验时缺少 DuckDB 与 PyArrow，不能单独运行完整的日线测试集。
+- 不要混用不同Python版本的 `site-packages`，也不要为绕过环境差异擅自安装依赖。若没有单一兼容解释器包含本次测试所需依赖，准确报告解释器、已验证的依赖和未能运行的测试；只有用户确认环境安装或调整后再补跑。
+- 以上路径和包状态是最近一次实机核验结果，不视为永久状态。后续每次任务仍须复核当前解释器与依赖，并优先遵守用户明确指定的项目环境。
+
 ## 需求与方案思考
 
 - 讨论需求、报告、日志、数据产物或架构改造时，先回答“是什么、为什么、怎么样”：说明对象和用途、当前问题及必要性、拟议实现及其理由。
