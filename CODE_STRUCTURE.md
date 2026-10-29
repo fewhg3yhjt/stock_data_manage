@@ -2,6 +2,8 @@
 
 本文维护当前目录、模块和文件职责，不记录逐批开发过程；当前完成状态见 [项目进度](PROJECT_PROGRESS.md)，历史迁移和验证解释见既有证据。下文代码文件路径均相对于 `src/`。
 
+业务验收证据由既有 `data/task_workspace/_checks/` 保存；本次三只股票v7验收包中的 `run_acceptance.py` 与 `audit_publication.py` 只复现已确认样本的分阶段验收和独立回读，不是正式采集入口。它们与机器核验、JUnit、来源证据的索引见[验收报告](data/task_workspace/_checks/tencent-v7-formal-three-stock-2026-10-28/README.md)；正式执行仍由 `src/pipeline/inputs.py` 的任务入口承接，没有新增业务模块。
+
 ## 当前目录约定
 
 - 正式代码直接位于 `src/`，不再建立 `src/stock_data_manage/` 或 `src/stockdata/`，各模块职责不变。

@@ -1,5 +1,29 @@
 # 项目开发进度
 
+## 2026-10-29 v7 三只股票验证收尾与正式验收
+
+### 已确认范围与验证收尾
+
+用户确认沿用2026-10-28的 `sh600519`、`sz000001`、`bj920001`，每只包含不复权、前复权和后复权；不扩展全市场、ETF、指数或持续调度。正式发布优先使用已经核验的原响应，以现有 `collect-task` 留存模式完成，不为重复验收重新请求来源；资格只覆盖这9个精确请求的留存执行，不授予在线或市场级范围。成交量和成交额按现有合同保持为空。
+
+当前版本来源证据已补齐：先搜索可读的历史响应和报告，复用3份v7不复权在线响应，新采6份v7前/后复权响应；9份均经当前代码零联网重放和独立原响应解析，目标日各1行，OHLC逐值一致。北交所本次前/后复权响应各1行，另外7份各640行，不把窗口长度当作目标证券覆盖率。部分历史测试目录无读取权限，搜索限制与错误保存在 `data/task_workspace/_checks/tencent-v7-formal-three-stock-2026-10-28/archive-search.json`；没有更改其权限或内容。
+
+指定解释器Python 3.13.0rc3完成147项相关定向测试，0失败、0错误、0跳过；测试前在同一解释器记录依赖，见[测试环境](data/task_workspace/_checks/tencent-v7-formal-three-stock-2026-10-28/test-environment.json)和[JUnit结果](data/task_workspace/_checks/tencent-v7-formal-three-stock-2026-10-28/contract-tests.xml)。隔离正式任务验证3条完整聚合记录、9组价格及查询投影；断点no-op、指定证券重做、全量重做、发布中断后恢复均通过，见[隔离核验](data/task_workspace/_checks/tencent-v7-formal-three-stock-2026-10-28/isolated-validation.json)。重做会产生新的证据清单引用，因此不要求Parquet字节哈希相同；核验业务字段、来源响应哈希及未选证券，首次过严的文件哈希断言失败与逐字段差异另行保留。验收脚本的编码、路径类型和手工输出目录检查错误亦保留，不将这些错误归为来源故障。
+
+设计复核：沿用YAML策略、响应先保存、Provider解析、三口径聚合和现有发布恢复流程，没有修改业务代码、字段语义或运行配置。验证收尾阶段生产业务数据写入为0；下一步是通过既有四层证据检查登记精确留存资格，并完成已确认范围的正式发布。完整证据目录为 `data/task_workspace/_checks/tencent-v7-formal-three-stock-2026-10-28/`，来源报告和响应的持久副本为 `data/task_workspace/_checks/v7-20261028/`。
+
+### 正式留存发布与独立验收
+
+随后完成9个精确请求的四层资格核验，先在隔离登记库检查通过，再写入现有生产元数据库；只允许 `retained`，不授予 `live` 或市场范围。12项边界检查全部拒绝未授权模式、证券、日期和接口，见[资格边界](data/task_workspace/_checks/tencent-v7-formal-three-stock-2026-10-28/qualification-boundaries.json)。有效期沿用来源在线验证时间加配置的7天，复用响应不刷新到期日。最终资格包引用本次正式发布清单，全部直接依赖均在data中；隔离资格包及其历史证明保留以追溯。
+
+实际入口为 `collect_task`，冻结任务 `v7-three-stock-formal-20261028`，参数见[正式任务定义](data/task_workspace/_checks/tencent-v7-formal-three-stock-2026-10-28/formal-task-definition.json)。任务通过现有 `stock_daily`/`daily_fixed` 留存执行，9/9来源单元完成、3/3证券完整，`published`、`complete_today=true`、无待恢复提交。规范数据位于 `data/canonical/2026-10-28/daily_bar/stock/`，9份活动请求清单位于 `data/raw/2026-10-28/tencent/kline_daily/`；正式阶段0次联网，resume返回no-op，旧正式文件逐个哈希不变。见[自动任务摘要](data/task_workspace/2026-10-28/daily_bar/summary.json)、[正式验收](data/task_workspace/_checks/tencent-v7-formal-three-stock-2026-10-28/formal-validation.json)和[最终资格检查](data/task_workspace/_checks/tencent-v7-formal-three-stock-2026-10-28/published-qualification-gates.json)。
+
+独立脚本从原响应JSON直接提取目标行，与正式Parquet及本地只读 `/api/daily` 查询逐项对照，3条记录无重复，9组OHLC及9次查询投影一致，量额为空，正式响应报告的在线调用合计为0。见[独立发布回读](data/task_workspace/_checks/tencent-v7-formal-three-stock-2026-10-28/independent-publication-audit.json)。指定证券重做的原始回合也独立回读，未选证券全部字段不变，被选证券仅证据路径改变，见[重做差异](data/task_workspace/_checks/tencent-v7-formal-three-stock-2026-10-28/redo-validation.json)。
+
+本阶段按设计交付小范围正式聚合数据，无业务代码或YAML改动。保留现有设计和历史原响应，更新README、现有模块说明和本页，未增加长期设计文件或平行业务入口；验收脚本仅保存在业务核验目录。仍未实现或未验收：全市场/其他日期、ETF/指数/LOF聚合发布、成交量和成交额单位、持续调度、历史重建及旧全量任务收尾；本次147项定向通过不代表全套测试完成，也没有修改此前来源清单引用不一致问题。下文各阶段的“无v7资格/未发布”是更早检查点，当前精确范围以上述正式验收为准。
+
+文档收尾复核：27处新增或修改的本地链接及锚点通过，验收索引引用的文件均存在，`git diff --check` 通过。现有总体设计、专项设计和模块文档各自保留职责，历史原始证据和旧任务未删除；未将运行数据或核验区脚本加入Git提交。
+
 ## 2026-10-29 腾讯日线不复权来源切换到 `newfqkline`（v7）
 
 ### 目标和合同

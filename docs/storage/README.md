@@ -10,6 +10,8 @@
 
 规范路径为 `canonical/<日期>/daily_bar/<资产类型>/{data.parquet,manifest.json}`。文件中 `quotes.none/forward/backward` 是固定嵌套组；manifest 标记 `daily-aggregate-v1` 与 `adjustment=aggregate`。恢复复用现有任务提交标记和原子发布流程。旧 `adjustment=...` 分区与业务数据保持原位，不自动合并、不迁移，也不作为新查询的回退路径。
 
+2026-10-29已在 `data/canonical/2026-10-28/daily_bar/stock/` 正式发布3条v7三口径样本，9份活动原响应请求清单位于 `data/raw/2026-10-28/tencent/kline_daily/`。精确资格的直接证据依赖位于data，隔离重做与故障验收仍在tmp；具体范围、哈希和回读结论由[项目进度](../../PROJECT_PROGRESS.md#2026-10-29-v7-三只股票验证收尾与正式验收)维护。重做可以更新被重做证券的审计引用，业务值与源响应哈希需独立检查，不能以Parquet字节不变替代业务验收。
+
 ## 目录约定
 
 2026-10-11按用户确认的结构修改现有代码并迁移旧业务目录。正式运行根目录为 `data/`；离线回放、故障注入及实现验收使用 `tmp/` 下独立运行根目录，内部结构相同。`provider_validation/` 中的历史验证证据保留原位，不新增业务产物。
