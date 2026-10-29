@@ -20,10 +20,11 @@
 ## 项目Python环境与测试执行
 
 - 项目 `pyproject.toml` 要求 Python `>=3.11`。每次测试前必须在即将运行测试的同一个解释器中记录 `sys.executable`、Python版本，并检查该次测试所需依赖；不能仅凭已激活环境、其他终端或机器上某个环境安装了依赖，就假定当前解释器可用。
-- 最近核验的核心测试解释器为 `D:\tools\miniconda3\python.exe`（Python 3.13.12），有 pytest、DuckDB、PyArrow、PyYAML 和 requests，但没有 FastAPI。可用于不导入Web服务的日线与配置定向测试；依赖FastAPI的测试不得因此解释为“机器没有FastAPI”。
-- `D:\Program Files\miniconda3\python.exe`（Python 3.9.21）安装了 FastAPI，但不满足项目Python版本要求，且没有 pytest、DuckDB 和 PyArrow；不要把它用作本项目测试环境。
-- `D:\Program Files\miniconda3\envs\ailearn\python.exe`（Python 3.11.15）有 pytest 和 FastAPI，但最近核验时缺少 DuckDB 与 PyArrow，不能单独运行完整的日线测试集。
-- 不要混用不同Python版本的 `site-packages`，也不要为绕过环境差异擅自安装依赖。若没有单一兼容解释器包含本次测试所需依赖，准确报告解释器、已验证的依赖和未能运行的测试；只有用户确认环境安装或调整后再补跑。
+- 最近核验可完整运行本项目定向测试的解释器是 `D:\Program Files\Python\python.exe`（Python 3.13.0rc3）；该解释器同时具备 pytest、FastAPI、DuckDB、PyArrow、PyYAML 和 requests，并满足项目最低版本要求。运行项目测试时显式调用该绝对路径。它是预发布版本；若之后发现依赖齐全的稳定版项目环境，应先核对并更新本条约定。
+- Windows机器级 `PATH` 已包含 `D:\Program Files\Python`，无需为了此次问题修改系统 PATH。但Codex的PowerShell执行进程在登录与非登录模式下都未继承任何Python/Conda PATH项，虽然进程变量 `CONDA_PREFIX` 指向 `D:\Program Files\miniconda3`；因此 `Get-Command python` 无法解析。Codex命令必须显式使用上面的解释器路径，不以进程默认 `python` 或 `CONDA_PREFIX` 推断实际解释器。
+- `D:\tools\miniconda3\python.exe`（Python 3.13.12）有 pytest、DuckDB、PyArrow、PyYAML 和 requests，但没有 FastAPI；它是核心测试依赖不完整的另一解释器，不作为完整日线测试的默认环境。
+- `D:\Program Files\miniconda3\python.exe`（Python 3.9.21）有 FastAPI，但低于项目要求，且没有 pytest、DuckDB 和 PyArrow；不要用它运行项目测试。`D:\Program Files\miniconda3\envs\ailearn\python.exe`（Python 3.11.15）有 pytest 和 FastAPI，但缺少 DuckDB 与 PyArrow，也不能单独运行完整日线测试。
+- 不要混用不同Python版本的 `site-packages`，也不要为绕过环境差异擅自安装依赖。若上述完整解释器不可用，准确报告解释器、已验证的依赖和未能运行的测试；只有用户确认环境安装或调整后再补跑。
 - 以上路径和包状态是最近一次实机核验结果，不视为永久状态。后续每次任务仍须复核当前解释器与依赖，并优先遵守用户明确指定的项目环境。
 
 ## 需求与方案思考
