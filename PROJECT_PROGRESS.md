@@ -20,6 +20,16 @@
 
 测试和验证均使用项目指定解释器 `D:\Program Files\Python\python.exe`（Python 3.13.0rc3；pytest、FastAPI、DuckDB、PyArrow、PyYAML、requests及BaoStock可导入）。BaoStock Provider与工厂定向测试26项通过，缓存/节流用例另1项通过。腾讯 Provider解析、三口径聚合及资格门禁的定向测试11项通过，JUnit结果见[测试记录](data/task_workspace/_checks/tencent-daily-v6-qualification-2026-10-29/contract-tests-focused.xml)。另一次包含配置清单的宽测试有1项失败：历史 `provider_validation/coverage/interface-coverage.csv` 未包含 `providers.yaml` 中额外引用的 `D:/Project/PythonProgram/a_share_universe_check.py`；该清单问题与本轮Provider执行无关，完整结果保留于[宽测试记录](data/task_workspace/_checks/tencent-daily-v6-qualification-2026-10-29/contract-tests.xml)。
 
+### 2026-10-29 腾讯请求范围与北交所验证时间线复核（只读审计）
+
+本次 v6 探测把任务日期设为2026-10-28，却在2026-10-29中午执行。`config/collection.yaml` 中 `tencent_daily` 的计划是交易日16:20收盘后，且 `scheduling_enabled=false`；因此本次历史日期探测不能代替按计划时点的当日采集验收。此前把北交所结果概括成“该接口只能取最新”超出证据：已观察到的是同一URL和参数在北京时间10月29日00:08返回10月28日一行，在12:34返回10月29日一行；“返回窗口随时点推进”是合理推断，尚非已确认的接口合同。
+
+北交所接口验证需按口径和接口区分。2026-10-12的在线证据对 `bj920001`、2026-10-09调用 `newfqkline` 指定日期请求，HTTP 200并返回一条 `qfqday`；同日期旧 `fqkline` 返回0行。两份派生结果分别见[北交所 newfqkline 指定日结果](tmp/tencent-daily-consistency-20261012/verified-parsed/bj920001-alternative-2026-10-09-2026-10-09.json)与[旧 fqkline 空结果](tmp/tencent-daily-consistency-20261012/verified-parsed/bj920001-existing-2026-10-09-2026-10-09.json)。该证据只覆盖前复权替代接口。2026-10-26提交 `696891c` 将项目的 `kline` 不复权入口扩展到北交所代码；在该提交的测试中没有找到北交所 `kline` 的真实响应证据。当前归档中首份可复核的北交所 `kline` 在线响应在10月29日00:08：`param=bj920001,day,,,1024` 返回2026-10-28一行；12:34同参数响应返回2026-10-29一行。故腾讯 `kline` 接口本身不是新接口，项目新增北交所 `kline` 支持时缺少同期实测，实测证据后补；`newfqkline` 的早期验证不能替代 `kline` 验证。
+
+当前请求与解析的设计差距也已明确：单日任务输入有目标日期，但 `capture_window()` 对 `kline` 发送 `{code},day,,,1024`，不把目标日期发给来源；完整原始响应先保存，`parse_window()` 再解析。本轮沪深各响应1025行且含目标行，解析器在日期筛选前因 `len(items)>1024` 报 `truncated`。1024是每只证券的历史日线窗口参数，不是证券数；供应商对参数计数的正式语义尚未验证。现有模拟测试验证了请求参数和1024行历史截断，没有覆盖“响应多于1024行但唯一目标日存在”的情形。于是代码满足现有滚动窗口合同，却没有满足“单日任务从已留存完整响应中提取目标日期”这一业务预期。完整请求、真实响应行和逐项边界见[腾讯 v6 核验报告](data/task_workspace/_checks/tencent-daily-v6-qualification-2026-10-29/README.md)及[10月29日路由验证报告](data/task_workspace/_checks/tencent-daily-route-validation-2026-10-29/README.md)。
+
+此复核未发起新来源请求，也未改代码、路由、资格或调度。后续先明确 `kline` 滚动响应对单日任务与历史补取的验收合同，再修正解析门槛与对应测试；在合同及匹配时点的证据完成前，不登记来源资格、不启用调度，也不声称北交所历史回补能力。
+
 ### 按设计对照实现
 
 - **BaoStock 日线：实现符合设计，窄范围验证通过。** [会话捕获器](src/providers/baostock/session.py)只接受完整冻结的日线参数和18字段列表；它在每次SDK `recv` 时先持久化原始字节，ResultSet耗尽后关联响应哈希；[日线Provider](src/providers/baostock/daily.py)再归档全部解码来源列并提取标准候选。两只沪深股票、2026-10-28前复权样本的原始字节重组哈希和SDK来源行独立复核通过；同一清单离线回放得到两条一致目标行，SDK网络调用为0。Provider仍要求外层显式传入捕获会话，因此不是正式任务路由；证据范围不代表其他证券、日期或历史窗口。
