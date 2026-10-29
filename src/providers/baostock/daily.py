@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date
+import json
 from typing import Any, Sequence
 
 from ...domain import Adjustment, AssetType
@@ -23,6 +24,7 @@ class BaoStockDailyProvider:
     endpoint: str = "daily_history"
     capability_priority: int = 200
     capability_version: str = "baostock-daily-v2-all-fields"
+    client: Any | None = None
     adjustment: Adjustment = Adjustment.NONE
     supported_asset_types: frozenset[AssetType] = frozenset(
         {AssetType.STOCK, AssetType.ETF, AssetType.INDEX}
@@ -34,24 +36,44 @@ class BaoStockDailyProvider:
         if self.field_selection_policy != "all_supported_daily":
             raise ValueError("BaoStock daily requests require the complete supported daily field set")
 
-    def fetch_daily(self, symbols: Sequence[str], trade_date: date) -> FetchResult:
+    def fetch_daily(self, symbols: Sequence[str], trade_date: date, *, raw_archive=None) -> FetchResult:
+        if raw_archive is None or not getattr(raw_archive, "captures_tcp_wire", False):
+            raise ValueError("BaoStock daily validation requires captured_sdk_queries and its raw archive")
+        if self.client is None:
+            raise ValueError("BaoStock daily validation requires the SDK client supplied by captured_sdk_queries")
         requested = tuple(symbols)
         rows: list[dict[str, Any]] = []
         returned_rows: list[dict[str, Any]] = []
         source_rows: list[dict[str, Any]] = []
-        with logged_in_session() as bs:
+        with logged_in_session(client=self.client) as bs:
             for symbol in requested:
                 code = source_code(symbol)
-                result = bs.query_history_k_data_plus(
-                    code,
-                    ",".join(BAOSTOCK_DAILY_SOURCE_FIELDS),
-                    start_date=self.start_date.isoformat(),
-                    end_date=trade_date.isoformat(),
-                    frequency="d",
-                    adjustflag=_adjustflag(self.adjustment),
+                request_parameters = {
+                    "code": code,
+                    "fields": ",".join(BAOSTOCK_DAILY_SOURCE_FIELDS),
+                    "start_date": self.start_date.isoformat(),
+                    "end_date": trade_date.isoformat(),
+                    "frequency": "d",
+                    "adjustflag": _adjustflag(self.adjustment),
+                }
+                result = bs.query_history_k_data_plus(**request_parameters)
+                source_items = read_rows(result)
+                source_fields = result.fields if isinstance(result.fields, list) else str(result.fields).split(",")
+                decoded_payload = json.dumps(
+                    {"fields": source_fields, "rows": source_items,
+                     "result": {"error_code": str(result.error_code), "error_msg": str(getattr(result, "error_msg", ""))}},
+                    ensure_ascii=False, separators=(",", ":"), default=str,
+                ).encode("utf-8")
+                raw_archive.store_source_payload(
+                    decoded_payload, provider="baostock", endpoint="query_history_k_data_plus",
+                    representation="SDK-decoded ResultSet fields and rows; exact socket recv byte stream archived separately",
+                    metadata={
+                        "row_count": len(source_items), "trade_date": trade_date.isoformat(), "symbol": symbol,
+                        "request_parameters": request_parameters, "outcome": "success",
+                    },
                 )
                 parsed = []
-                for item in read_rows(result):
+                for item in source_items:
                     source_rows.append({"symbol": symbol, **item})
                     parsed.append({
                         "symbol": symbol,

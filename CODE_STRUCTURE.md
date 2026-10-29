@@ -78,8 +78,8 @@
 | `providers/sina/snapshot.py` | Sina 批量收盘快照 |
 | `providers/sina/minute.py` | Sina 原生 5m 分钟线 |
 | `providers/tdx/minute.py` | 注入式 TDX 延迟 1m 分钟线 |
-| `providers/baostock/session.py` | BaoStock SDK 登录至登出的会话串行、代码映射和结果集读取；两查询解码载荷留证、严格回放、缓存及查询边界限速 |
-| `providers/baostock/daily.py` | BaoStock 历史日线；按完整日线字段策略请求并保留SDK解码来源行，初始角色为校验来源 |
+| `providers/baostock/session.py` | BaoStock SDK 登录至登出的会话串行、代码映射和结果集读取；已验证查询的解码载荷留证、严格回放、缓存及查询边界限速；日线验证路径还捕获 socket `recv` 字节并与解码结果关联 |
+| `providers/baostock/daily.py` | BaoStock 历史日线；按完整日线字段策略请求，捕获/回放原始接收字节与完整SDK解码来源行后再生成标准候选，初始角色为校验来源 |
 | `providers/baostock/minute.py` | BaoStock 原生 5m，初始角色为校验来源 |
 | `providers/baostock/industry.py` | 原 BaoStock 两查询、沪深A股筛选与行业合并；分别提供证券快照/行业归属的 YAML 映射候选，保留旧默认返回与覆盖缺失；TCP帧不可见 |
 | `providers/baostock/__init__.py` | BaoStock 适配器导出 |

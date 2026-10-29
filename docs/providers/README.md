@@ -71,13 +71,25 @@ node provider_validation/tests/build_interface_coverage_workbook.mjs --formal-sp
 
 股票与ETF名单的实现、分类、北交所及上交所ETF目录接入见 [证券名单来源](security-catalog.md)。现有Excel与配套JSON保留上次导出快照；新增输入与字段变化以模块说明及YAML为准，不将旧表视为已核准当前全量证券。10月9日的7267条正式证券名单已发布于 `data/canonical/2026-10-09/security_master/`，原响应位于 `data/raw/2026-10-09/`，验收索引在 `data/task_workspace/_checks/security-release-20261012/`。已有接口可行性响应只读留存。
 
-日线曾有8只证券2026-10-09、`newfqkline` 前复权在线资格与正式发布；这些资格已过期，不能作为当前在线授权。当前 `ASTOCK-002-daily` 正式采集策略在 `config/capabilities.yaml` 中按市场固定为：三地不复权 `kline`，前/后复权统一 `newfqkline`。`collect-task` 按策略和证券市场展开三个来源请求。腾讯不复权请求 `/appstock/app/kline/kline` 最近1024条并读取 `day`；复权请求读取 `qfqday`、`hfqday`，规范候选只选择请求日期内记录；超过来源返回窗口的旧日期明确报截断。`newfqkline` 的额外返回列保留在原始响应和来源行中，标准日线仍仅映射合同字段；成交量、成交额单位未核验范围内仍为空。直接使用 `collect-input` 时仍须显式配对 `adjust` 与 `api`。2026-10-29 的市场小样本和隔离任务回放通过，但不构成生产资格；本次适配器版本升级后，仍需按新版本、市场、接口和口径取得有效资格。
+日线曾有8只证券2026-10-09、`newfqkline` 前复权在线资格与正式发布；这些资格已过期，不能作为当前在线授权。当前 `ASTOCK-002-daily` 正式采集策略在 `config/capabilities.yaml` 中按市场固定为：三地不复权 `kline`，前/后复权统一 `newfqkline`。`collect-task` 按策略和证券市场展开三个来源请求。腾讯不复权请求 `/appstock/app/kline/kline` 最近1024条并读取 `day`；复权请求读取 `qfqday`、`hfqday`，规范候选只选择请求日期内记录；超过来源返回窗口的旧日期明确报截断。`newfqkline` 的额外返回列保留在原始响应和来源行中，标准日线仍仅映射合同字段；成交量、成交额单位未核验范围内仍为空。直接使用 `collect-input` 时仍须显式配对 `adjust` 与 `api`。旧版市场矩阵的在线小样本和隔离任务回放曾通过，但不构成当前 `tencent-window-capture-v6` 的生产资格；按新适配器版本、市场、接口和口径重新验证的结果见下节。
 
-BaoStock 日线配置的 `field_selection_policy: all_supported_daily` 请求其日线接口公开的完整字段集合，并在 `FetchResult.source_rows` 保留 SDK 解码后的全部来源列；标准日线候选仍按数据集合同提取需要的字段。字段集合依据 [BaoStock Python API 日线字段说明](https://github.com/baostock/baostock/blob/master/docs/pythonAPI.md)（2026-10-29核对）。BaoStock SDK 不暴露 TCP 原始报文；该来源行是完整字段的 SDK 解码表示。BaoStock 日线仍为 `validation_only`，当前三口径正式任务不使用它；它尚未接入正式任务的原始证据持久化链路，不能据此宣称该 Provider 已具备生产采集能力。
+BaoStock 日线配置的 `field_selection_policy: all_supported_daily` 请求其日线接口公开的18个字段，并在 `FetchResult.source_rows` 保留 SDK 解码后的全部来源列；标准日线候选仍按数据集合同提取需要的字段。字段集合依据 [BaoStock Python API 日线字段说明](https://github.com/baostock/baostock/blob/master/docs/pythonAPI.md)（2026-10-29核对）。
+
+BaoStock SDK返回的是解码后的 `ResultSet`，本身不提供可直接保存的 TCP 原始响应。不过，2026-10-29成交量探针曾用透明 socket 包装器在SDK解码前保存 `recv` 返回字节；该历史证据仅覆盖 `sh600519`、`sz000001`、2026-10-28和9个字段。当前日线验证Provider要求通过现有 `captured_sdk_queries` 会话边界执行：捕获器在每次完整查询的 `recv` 字节交给SDK前留存，再由Provider在来源字段映射前归档SDK `fields/rows`；两种表示通过完整请求参数及哈希关联。`recv` 字节是SDK从 socket 读取的有序字节流，不是网络分组抓包。离线回放严格匹配证券、日期窗口、频率、复权标记及18字段，只从归档SDK解码结果重建 `ResultSet`，缺少匹配记录时失败且不联网。当前代码已对沪深两只股票、2026-10-28、前复权和18字段完成在线捕获、独立哈希重组校验及零网络隔离回放；详细原始证据见[本轮核验报告](../../data/task_workspace/_checks/baostock-daily-wire-capture-2026-10-29/README.md)。该验证不覆盖其他市场和窗口，BaoStock日线仍为 `validation_only`，不等同生产资格或正式任务启用。
+
+当前实现差距及阶段状态见[项目进度](../../PROJECT_PROGRESS.md)。BaoStock 日线仍为 `validation_only`，当前三口径正式任务不使用它；捕获与回放验收通过也不等于生产路由资格或调度已启用。
 
 2026-10-28 的扩样当时比较了原脚本、旧 `fqkline` 与原策略中的 `newfqkline`：覆盖 `sh600519`、`sh601318`、`sz000001` 各两个交易日；原脚本与Provider直接调用旧 `fqkline` 的30个目标日字段文本及数值全部一致，而 `newfqkline` 的OHLC仅返回两位小数，旧接口返回三位，24个OHLC值中23个数值不同（最大差0.005），六组成交量数值相同。Provider解析保留原始响应精度；差异已存在于 `newfqkline` 响应体中，尚不能判断接口算法等价或哪组更准确。该对照是本次改路由的重要背景，不应解读为旧接口在所有证券和日期都更准确。逐项请求、响应、解析与哈希见[后复权扩样证据](../../data/task_workspace/_checks/tencent-daily-hfq-expanded-2026-10-28/README.md)和[完整性核验](../../data/task_workspace/_checks/tencent-daily-hfq-expanded-2026-10-28/evidence_validation.json)。早先[单样本三口径记录](../../data/task_workspace/_checks/tencent-daily-original-provider-2026-10-27/README.md)的不复权/前复权结论仍只适用于 `sh600519`、2026-10-27。
 
-2026-10-29 来源验证使用2026-10-28数据日：沪市 `sh600519`、深市 `sz000001`、北交所 `bj920001`，三种口径共9个目标请求，并对沪深复权接口补做4个对照请求。13份响应均为HTTPS HTTP 200；响应原字节哈希经独立复核，13个目标行均与Provider解析值一致。样本中沪深 `fqkline` OHLC为三位小数，`newfqkline` 为两位；前复权样本数值一致，后复权部分数值不同；北交所 `newfqkline` 前、后复权在该样本均返回三位小数。验证只覆盖这些证券、口径、接口和日期，不判断精度差异的准确性，也不推及其他日期或全市场。原始响应、请求清单及校验见[市场选源探针](../../data/task_workspace/_checks/tencent-daily-route-validation-2026-10-29/README.md)。
+2026-10-29 的旧版来源验证使用2026-10-28数据日：沪市 `sh600519`、深市 `sz000001`、北交所 `bj920001`，三种口径共9个目标请求，并对沪深复权接口补做4个对照请求。13份响应均为HTTPS HTTP 200；响应原字节哈希经独立复核，13个目标行均与当时Provider解析值一致。样本中沪深 `fqkline` OHLC为三位小数，`newfqkline` 为两位；前复权样本数值一致，后复权部分数值不同；北交所 `newfqkline` 前、后复权在该样本均返回三位小数。该矩阵早于当前 `tencent-window-capture-v6`，只保留为历史接口对照，不能作为当前资格证据。原始响应、请求清单及校验见[市场选源探针](../../data/task_workspace/_checks/tencent-daily-route-validation-2026-10-29/README.md)。
+
+### 腾讯日线当前 v6 资格复核（2026-10-29）
+
+对当前 `daily_fixed` 配置及 `tencent-window-capture-v6` 重新核验2026-10-28数据日的三只样本、三种口径。九份响应均HTTP 200并在解析前保存，之后由当前代码离线重放。六条 `newfqkline` 复权候选通过，独立对照确认OHLC与原始目标行相同；未核验的成交量和成交额仍为空。
+
+三条不复权候选未通过：沪深 `kline` 均返回1025行，超过请求参数1024，但原始响应含目标日行；当前 Provider 按明确的1024行合同报 `truncated`。北交所 `kline` 只返回2026-10-29一条，未返回请求的2026-10-28目标行，Provider报 `temporary_empty`。隔离股票日线任务因此在覆盖检查处失败，0条完整记录、无发布清单。没有放宽行数门槛、切换接口/来源、登记 v6 资格或启用调度。
+
+需先确认沪深 `kline` 超过声明行数时的合同，以及北交所目标日缺失后是否允许做替代接口的独立可行性探针。九条逐项请求、响应哈希、当前代码重放、独立语义核验和隔离任务摘要见[当前 v6 核验报告](../../data/task_workspace/_checks/tencent-daily-v6-qualification-2026-10-29/README.md)。
 
 随后对当时沪深路由做成交量单位小样本：BaoStock同日两条原始TCP响应在SDK解码前留存，与已保存的腾讯六条三口径目标行逐项比较。2026-10-28的 `sh600519` 为38805，`sz000001` 为1687009；乘100后分别与BaoStock股数相差−7股、+27股，符合腾讯按100股整数手返回的样本表现。[BaoStock API文档](https://github.com/baostock/baostock/blob/master/docs/pythonAPI.md)定义成交量单位为股；本结果只支持这两只股票、一个日期和当时的 `kline/fqkline` 三接口，不是市场级单位资格。当前腾讯复权接口 `newfqkline` 的成交量单位仍未扩展资格，旧接口样本不能直接迁移为新接口资格；成交额也未认证。原始响应、SHA-256及独立复核见[成交量小样本记录](../../data/task_workspace/_checks/tencent-daily-volume-units-2026-10-29/README.md)。
 

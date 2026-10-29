@@ -2,27 +2,40 @@
 
 ## 2026-10-29 本轮实现后复核与下一步
 
+### 已确认设计合同
+
+用户已确认继续按“BaoStock捕获/回放 → 腾讯v6资格验证”实施。BaoStock日线复用现有 `captured_sdk_queries` 与 `RawObjectStore`：每条请求固定证券代码、开始/结束日期、频率、复权标记和完整18字段；socket包装器在每次 `recv` 字节交给SDK解码前落盘，随后在Provider字段提取前保存SDK解码的完整 `fields/rows`，清单以请求参数和哈希关联两种表示。这里的“原始字节”是SDK从socket读取的有序字节流，不是网络分组抓包。证据记录捕获时的代码与SDK版本；缓存资格按当前代码/范围匹配，显式离线重放则严格匹配清单内的完整请求参数，从该清单的解码载荷重建 `ResultSet`，缺档或不匹配即失败、不回落联网，允许当前解析代码重新处理历史解码记录。验收包括原始字节重组哈希、18字段来源行、精确范围重放、零SDK网络调用及设计复核；探针只写独立 `_checks` 证据目录。该合同不会把BaoStock加入正式路由，`validation_only`、生产资格门禁和关闭的调度保持不变。
+
+此合同来自对历史探针的复核：2026-10-29检查脚本已在SDK解码前保存BaoStock socket `recv` 字节，但仅覆盖沪深两只股票、2026-10-28、9个字段；这证明技术边界可行，不能替代本轮正式Provider代码或18字段验证。原始脚本及独立哈希证据见[历史成交量探针](data/task_workspace/_checks/tencent-daily-volume-units-2026-10-29/README.md)。
+
+本阶段已修正文档中“SDK本身不暴露TCP字节”与“历史探针已能留存原始字节”之间的边界混淆，并按合同在现有会话与Provider模块完成捕获/回放。腾讯v6沿用已确认的市场/证券/接口/复权/窗口资格边界，以离线重放、少量当前代码在线探针、语义核验和隔离端到端生产验证逐层验收；任一精确范围证据不齐时不登记资格、不启用调度。
+
 ### 当前状态
 
-上一项代码变更为已推送的 `b3cc3ac`（`Switch daily adjustment route and request full BaoStock fields`）。腾讯 [`daily_fixed` 配置](config/capabilities.yaml)的不复权继续走 `kline`，沪市、深市和北交所的前/后复权现都显式走 `newfqkline`；[BaoStock日线Provider](src/providers/baostock/daily.py)请求其SDK支持的18个字段，并在本次抓取结果对象中保留完整来源行。`tencent_daily` 的 `scheduling_enabled` 仍是 `false`，没有启用生产调度或写入生产数据。
+上一项代码变更为已推送的 `b3cc3ac`（`Switch daily adjustment route and request full BaoStock fields`）。腾讯 [`daily_fixed` 配置](config/capabilities.yaml)的不复权继续走 `kline`，沪市、深市和北交所的前/后复权现都显式走 `newfqkline`；[BaoStock日线Provider](src/providers/baostock/daily.py)请求SDK支持的18个字段，并将完整来源行归档后再提取标准候选。日线验证调用现在必须经[`SDK捕获/回放会话`](src/providers/baostock/session.py)，在SDK解码前保存socket `recv`字节，并以请求参数和哈希关联解码载荷。两只沪深股票、一个数据日的18字段在线捕获、独立哈希重组验证及零网络回放均通过，见[本轮核验报告](data/task_workspace/_checks/baostock-daily-wire-capture-2026-10-29/README.md)。BaoStock仍为 `validation_only`，没有加入正式日线任务。`tencent_daily` 的 `scheduling_enabled` 仍是 `false`，未启用生产调度或写入生产数据。
 
-本轮按当前路由版本只读查询了 `data/metadata/metadata.duckdb`：`tencent/kline_daily/daily_bar`能力登记有12条，属于 `tencent-window-input-v1/v2`，只覆盖前复权，且有效期分别在2026-10-18或2026-10-21结束；没有与当前输入适配器版本 `tencent-window-capture-v6` 匹配的资格记录。资格检查要求证据版本精确匹配，见[日线资格门禁](src/routing/factory.py#L176)；因此新路由尚无可用生产资格，正式在线任务仍会被阻断。此次没有发起网络请求或登记资格。
+本轮按当前路由版本只读查询了 `data/metadata/metadata.duckdb`：`tencent/kline_daily/daily_bar`能力登记有12条，属于 `tencent-window-input-v1/v2`，只覆盖前复权，且有效期分别在2026-10-18或2026-10-21结束；没有与当前输入适配器版本 `tencent-window-capture-v6` 匹配的资格记录。资格检查要求证据版本精确匹配，见[日线资格门禁](src/routing/factory.py#L176)。本轮按已确认范围补做了 v6 验证，但不完整的来源/合同证据没有登记；正式在线资格仍阻断。
 
-最新代码验证记录来自上一轮实现：使用项目指定解释器 `D:\Program Files\Python\python.exe`（Python 3.13.0rc3），两个定向用例组分别为92项通过、109项通过且2项跳过；合计201项通过、2项跳过。本次仅做设计/进度文档更新，没有重跑业务测试，也没有改变代码与配置。
+腾讯 v6 当前验证覆盖 `sh600519`、`sz000001`、`bj920001`，数据日为2026-10-28，共9条真实请求，HTTP均为200并保留响应原字节。六条 `newfqkline` 复权候选通过独立OHLC对照及当前代码离线重放；三条不复权候选未通过：沪深各返回1025行（请求参数为1024，目标日仍在响应中），当前 Provider 按现有上限报 `truncated`；北交所返回的唯一行属于2026-10-29，缺少目标日，报 `temporary_empty`。隔离任务因必需口径缺失而失败，0条canonical记录、无发布清单。原始响应、独立复核及任务摘要见[腾讯 v6 核验报告](data/task_workspace/_checks/tencent-daily-v6-qualification-2026-10-29/README.md)。
+
+测试和验证均使用项目指定解释器 `D:\Program Files\Python\python.exe`（Python 3.13.0rc3；pytest、FastAPI、DuckDB、PyArrow、PyYAML、requests及BaoStock可导入）。BaoStock Provider与工厂定向测试26项通过，缓存/节流用例另1项通过。腾讯 Provider解析、三口径聚合及资格门禁的定向测试11项通过，JUnit结果见[测试记录](data/task_workspace/_checks/tencent-daily-v6-qualification-2026-10-29/contract-tests-focused.xml)。另一次包含配置清单的宽测试有1项失败：历史 `provider_validation/coverage/interface-coverage.csv` 未包含 `providers.yaml` 中额外引用的 `D:/Project/PythonProgram/a_share_universe_check.py`；该清单问题与本轮Provider执行无关，完整结果保留于[宽测试记录](data/task_workspace/_checks/tencent-daily-v6-qualification-2026-10-29/contract-tests.xml)。
 
 ### 按设计对照实现
 
-- **腾讯 HTTP 来源：基本符合。** YAML明确给出三市场的接口与复权参数；正式输入按冻结的请求参数采集，原始HTTP响应在解析前进入现有raw留存路径，随后才执行解析/标准化，见[任务输入实现](src/pipeline/inputs.py#L660)。路由切换后资格版本更新，旧资格没有被错误继承；当前阻断是预期的安全门禁结果，不是新路由已完成生产验收。接口对照和保存原响应的隔离回放证据见[路由验证报告](data/task_workspace/_checks/tencent-daily-route-validation-2026-10-29/README.md)及[端到端结果](data/task_workspace/_checks/tencent-daily-route-validation-2026-10-29/e2e-results.json)。
-- **BaoStock 日线：仍有明确偏差。** 当前适配器请求18个支持字段并返回 `source_rows`，但[日线Provider](src/providers/baostock/daily.py)只经 `logged_in_session()` 读取，完整行目前随进程内结果返回，没有接入已存在的 `RawObjectStore` 捕获/回放路径；所以不能按设计宣称已完成可追溯的来源留存和离线重放。BaoStock SDK不暴露TCP原始字节；现有[SDK捕获/回放实现](src/providers/baostock/session.py#L126)可保存并回放明确标注为SDK解码后的字段与行，但当前允许的查询合同不包含日线查询。应评估对现有模块的最小扩展，不新建另一套归档系统。
-- **阶段结论：** 最近代码变更完成了全字段请求及腾讯路由配置，但BaoStock可回放留存和腾讯新版本资格验证尚未完成；二者都不能写成正式生产能力已验收。
+- **BaoStock 日线：实现符合设计，窄范围验证通过。** [会话捕获器](src/providers/baostock/session.py)只接受完整冻结的日线参数和18字段列表；它在每次SDK `recv` 时先持久化原始字节，ResultSet耗尽后关联响应哈希；[日线Provider](src/providers/baostock/daily.py)再归档全部解码来源列并提取标准候选。两只沪深股票、2026-10-28前复权样本的原始字节重组哈希和SDK来源行独立复核通过；同一清单离线回放得到两条一致目标行，SDK网络调用为0。Provider仍要求外层显式传入捕获会话，因此不是正式任务路由；证据范围不代表其他证券、日期或历史窗口。
+- **腾讯 HTTP 采集：捕获职责符合设计，源数据和现有行数合同不一致。** `collect_input`先保存原始HTTP响应，再解析/标准化，见[任务输入实现](src/pipeline/inputs.py#L660)。当前代码按 `kline` 的1024行合同处理；沪深来源实际各返回1025行，虽含目标日仍被有意拒绝，避免静默接受超合同返回。北交所HTTP 200响应只有当前日期记录，不能生成请求日候选。没有隐式切接口或降级，错误与原始来源行都可追溯。
+- **端到端发布：未通过，资格不登记。** 当前任务要求每只股票同时具备三种口径；不复权候选失败后，隔离任务在覆盖检查处阻断，未发布不完整记录。六条复权候选的 OHLC 与各自原始响应一致，成交量/成交额仍为空。生产资格数据库、正式配置和调度都未更新；`tencent-window-capture-v6` 仍不具备资格。
+- **待确认的设计合同：** 对“请求1024、来源返回1025且目标日存在”，需要明确继续按现状报截断，还是调整来源行数合同并只提取请求日期；对北交所“不复权接口成功但无目标日”，需要明确保持失败，还是授权做替代接口/来源的最小可行性探针。确认前不改解析限制、不换源、不登记资格。
+- **阶段结论：** BaoStock捕获/回放阶段已完成；腾讯 v6 验证得到可复核阻断，未达到资格标准。两者均未启用生产调度，BaoStock仍是 `validation_only`。
 
 ### 后续计划
 
-1. 先把BaoStock日线的捕获/回放合同设计清楚：使用哪个现有入口、如何限定完整查询参数与数据窗口、如何将SDK解码后的完整ResultSet在业务字段提取前归档、清单如何标注其非TCP原文属性、重放怎样严格匹配且不回落到网络。优先评估 `captured_sdk_queries` 与 `RawObjectStore` 的复用；设计和验收标准明确后再实现，不增加并行入口。
-2. 按已配置的市场、证券类型、接口、复权口径和请求窗口，为 `tencent-window-capture-v6` 建立匹配的新资格证据；遵循离线合同、少量在线探针、语义核验、隔离端到端生产验证四层标准。资格未登记前保持在线正式任务阻断，生产调度继续关闭。
-3. 每完成一个确认阶段，按本文件开头的复核结果更新规则回写进度：说明实际验证层级，对照设计标明符合项和偏差项，未解决偏差保留为待办，不用成功样本推定超出其范围的能力。
+1. **BaoStock阶段完成。** 两只沪深股票、一个数据日、前复权和18字段在线探针已保存原始接收字节及完整SDK解码ResultSet；独立重组哈希/长度校验和同清单零网络回放通过。证据、首次校验器误报及修正结果见[核验报告](data/task_workspace/_checks/baostock-daily-wire-capture-2026-10-29/README.md)。不扩大为其他市场、日期或生产资格。
+2. **先确认腾讯不复权来源合同。** 决定是否保持 `kline` 1024行硬上限，以及是否授权在隔离验证区探测北交所不复权替代接口；在用户确认前不改变API、行数语义、路由或兜底逻辑。
+3. 合同确认后只重跑受影响的精确范围，完成当前版本的离线合同、在线探针、独立字段语义和隔离端到端发布验证。只有所有必需口径证据通过后才讨论资格登记；调度保持关闭。
+4. 每完成一个确认阶段，按本文件开头的复核结果更新规则回写进度：说明实际验证层级，对照设计标明符合项和偏差项，未解决偏差保留为待办，不用成功样本推定超出其范围的能力。
 
-本次文档变更只修改 `AGENTS.md` 与本文件；未实施BaoStock归档、未发起腾讯请求、未启用路由资格或调度。
+本轮按已确认范围完成BaoStock现有会话与Provider的修改和定向验证；随后对腾讯 v6 执行九条小样本真实请求、当前代码回放、独立语义对照和隔离端到端任务。由于不复权来源/合同未通过，未登记资格、未改路由或调度、未写生产数据。具体证据与剩余决策见[腾讯 v6 核验报告](data/task_workspace/_checks/tencent-daily-v6-qualification-2026-10-29/README.md)。
 
 ## 2026-10-29 股票日线市场路由验证与配置（较早检查点，后续状态见上节）
 
