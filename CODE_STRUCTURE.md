@@ -69,7 +69,7 @@
 | `providers/base.py` | 日线、分钟等 Provider 协议以及 Fixture Provider 基础实现 |
 | `providers/contracts.py` | HTTP 响应、失败分类、返回窗口和 Provider Contract |
 | `providers/transport.py` | 公共 HTTP 传输、共享请求组限速、单项输入会话捕获与严格回放、快照和 TDX 行解析；保留来源会话/代理并复用原验证重试策略 |
-| `providers/tencent/daily.py` | 腾讯日线响应采集与纯解析分离；保留来源窗口原行和失败合同，采集只因明确的连接、超时或5xx故障按原主机顺序切换，不因业务内容问题换源 |
+| `providers/tencent/daily.py` | 腾讯日线响应采集与纯解析分离；保留来源窗口原行和失败合同，默认复权探测使用`newfqkline`；窗口采集只因明确的连接、超时或5xx故障按接口对应主机顺序切换，不因业务内容问题换源 |
 | `providers/tencent/snapshot.py` | Tencent 指定证券分批快照、原脚本来源字段、代码/格式/重复验证及请求范围覆盖；GBK解码和旧行情行保留，全市场在线验证待完成 |
 | `providers/tencent/minute.py` | Tencent 原生 1m 分钟线与最近 5m 候选输入 |
 | `providers/sina/calendar.py` | 原 SDK 新浪交易日历来源适配，返回明确的正向日期并复用现有日历协议 |
@@ -79,7 +79,7 @@
 | `providers/sina/minute.py` | Sina 原生 5m 分钟线 |
 | `providers/tdx/minute.py` | 注入式 TDX 延迟 1m 分钟线 |
 | `providers/baostock/session.py` | BaoStock SDK 登录至登出的会话串行、代码映射和结果集读取；两查询解码载荷留证、严格回放、缓存及查询边界限速 |
-| `providers/baostock/daily.py` | BaoStock 历史日线，初始角色为校验来源 |
+| `providers/baostock/daily.py` | BaoStock 历史日线；按完整日线字段策略请求并保留SDK解码来源行，初始角色为校验来源 |
 | `providers/baostock/minute.py` | BaoStock 原生 5m，初始角色为校验来源 |
 | `providers/baostock/industry.py` | 原 BaoStock 两查询、沪深A股筛选与行业合并；分别提供证券快照/行业归属的 YAML 映射候选，保留旧默认返回与覆盖缺失；TCP帧不可见 |
 | `providers/baostock/__init__.py` | BaoStock 适配器导出 |
@@ -107,7 +107,7 @@
 
 | 文件 | 职责 |
 |---|---|
-| `config/loader.py` | 加载来源、输入契约、参数来源、采集意图、字段模板、路由与映射/状态/范围配置；参数绑定与类型/范围校验、统一运行路径及隔离层校验；配置不生成验证有效期 |
+| `config/loader.py` | 加载来源、输入契约、参数来源、字段选择策略、采集意图、字段模板、路由与映射/状态/范围配置；参数绑定与类型/范围校验、统一运行路径及隔离层校验；配置不生成验证有效期 |
 | `routing/factory.py` | 按现有端点创建 Provider，保留来源传输并共享限速；按实际范围、有效期及四层证据检查资格和冷却。日期工作区的来源报告按工作区基准解析原响应引用，缺失或哈希不符明确拒绝；原响应与SDK派生载荷分别核验 |
 
 日线留存资格在同一文件按证券、资产类别和完整参数精确核验，保存真实来源、当前版本复核、语义及端到端证据，不推广样本资格。

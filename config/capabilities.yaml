@@ -161,12 +161,12 @@ acquisition_policies:
         market_adjustment_requests:
           XSHG:
             none: {api: kline, adjust: none}
-            forward: {api: fqkline, adjust: qfq}
-            backward: {api: fqkline, adjust: hfq}
+            forward: {api: newfqkline, adjust: qfq}
+            backward: {api: newfqkline, adjust: hfq}
           XSHE:
             none: {api: kline, adjust: none}
-            forward: {api: fqkline, adjust: qfq}
-            backward: {api: fqkline, adjust: hfq}
+            forward: {api: newfqkline, adjust: qfq}
+            backward: {api: newfqkline, adjust: hfq}
           BSE:
             none: {api: kline, adjust: none}
             forward: {api: newfqkline, adjust: qfq}

@@ -20,6 +20,7 @@ class FetchResult:
     returned_first_key: str | None = None
     returned_last_key: str | None = None
     adjustment: Adjustment = Adjustment.NONE
+    source_rows: tuple[Mapping[str, Any], ...] | None = None
 
     @property
     def returned_symbols(self) -> frozenset[str]:

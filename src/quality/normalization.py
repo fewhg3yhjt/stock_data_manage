@@ -117,6 +117,7 @@ class Normalizer:
         unit_scopes = [scope for scope in rule.get('verified_unit_scopes', ())
             if context and context.get('instrument_id') in scope['instrument_ids']
             and context.get('source_api') == scope['source_api']
+            and ('adjustments' not in scope or context.get('adjustment') in scope['adjustments'])
             and str(values.get('trade_date')) in scope['dates']]
         if len(unit_scopes) > 1:
             raise NormalizationError('overlapping verified unit scopes')

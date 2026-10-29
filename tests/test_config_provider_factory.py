@@ -27,7 +27,7 @@ NOW = datetime(2026, 10, 3, tzinfo=timezone.utc)
 
 def routing_evidence(**overrides):
     values = dict(
-        provider="tencent", endpoint="forward_history", capability_version="tencent-qfq-kline-v1",
+        provider="tencent", endpoint="forward_history", capability_version="tencent-qfq-newfqkline-v2",
         validated_at=NOW - timedelta(hours=1), validation_expires_at=NOW + timedelta(hours=1),
         status="complete", eligible_for_selection=True, row_count=1,
         first_key="2026-09-30", last_key="2026-09-30", evidence_hash="offline-fixture-hash",
@@ -100,7 +100,7 @@ def test_selection_rechecks_cooldown_and_revoked_evidence(tmp_path):
         save_routing_evidence(metadata, routing_evidence())
         registry, _ = load_provider_registry(ROOT / "config/providers.yaml", now=NOW, metadata=metadata)
         assert len(select_qfq(registry)) == 1
-        key = dict(provider="tencent", endpoint="forward_history", capability_version="tencent-qfq-kline-v1",
+        key = dict(provider="tencent", endpoint="forward_history", capability_version="tencent-qfq-newfqkline-v2",
                    market="XSHG", asset_type="stock", dataset="daily_bar")
         metadata.record_provider_failure(**key, failure_class="rate_limited", error="offline 429",
                                          now=NOW, cooldown_seconds=30, http_status=429)
@@ -131,11 +131,11 @@ def test_provider_yaml_declares_tencent_qfq_and_routes() -> None:
     qfq = next(item for item in configs if item.provider == "tencent" and item.endpoint == "forward_history")
     assert qfq.adjustments == frozenset({Adjustment.FORWARD})
     assert qfq.datasets == frozenset({Dataset.DAILY_BAR})
-    assert qfq.capability_version == "tencent-qfq-kline-v1"
+    assert qfq.capability_version == "tencent-qfq-newfqkline-v2"
     hfq = next(item for item in configs if item.provider == "tencent" and item.endpoint == "backward_history")
     assert hfq.adjustments == frozenset({Adjustment.BACKWARD})
     assert hfq.datasets == frozenset({Dataset.DAILY_BAR})
-    assert hfq.capability_version == "tencent-hfq-kline-v1"
+    assert hfq.capability_version == "tencent-hfq-newfqkline-v2"
 
     routes = load_capability_routes(ROOT / "config" / "capabilities.yaml")
     assert routes[Dataset.DAILY_BAR][0]["endpoint"] == "forward_history"
@@ -159,7 +159,10 @@ def test_provider_factory_builds_configured_qfq_provider() -> None:
     )
     qfq = next(provider for provider in providers if isinstance(provider, TencentDailyProvider) and provider.adjustment is Adjustment.FORWARD)
     assert qfq.endpoint == "forward_history"
-    assert qfq.capability_version == "tencent-qfq-kline-v1"
+    assert qfq.capability_version == "tencent-qfq-newfqkline-v2"
+    hfq = next(provider for provider in providers if isinstance(provider, TencentDailyProvider) and provider.adjustment is Adjustment.BACKWARD)
+    assert hfq.endpoint == "backward_history"
+    assert hfq.capability_version == "tencent-hfq-newfqkline-v2"
     assert registry.select(
         now=qfq.capability_version and __import__("datetime").datetime.now(__import__("datetime").timezone.utc),
         dataset=Dataset.DAILY_BAR,
@@ -178,7 +181,8 @@ def test_provider_factory_registers_baostock_validation_provider() -> None:
     )
     provider = next(item for item in providers if isinstance(item, BaoStockDailyProvider))
     assert provider.endpoint == "daily_history"
-    assert provider.capability_version == "baostock-daily-v1"
+    assert provider.capability_version == "baostock-daily-v2-all-fields"
+    assert provider.field_selection_policy == "all_supported_daily"
     assert provider.adjustment is Adjustment.NONE
 
 

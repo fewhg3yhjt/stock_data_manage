@@ -10,28 +10,41 @@ from ..contracts import FailureClass, ProviderContractError, WindowStatus
 from .session import logged_in_session, read_rows, source_code
 
 
+BAOSTOCK_DAILY_SOURCE_FIELDS = (
+    "date", "code", "open", "high", "low", "close", "preclose", "volume", "amount",
+    "adjustflag", "turn", "tradestatus", "pctChg", "peTTM", "pbMRQ", "psTTM",
+    "pcfNcfTTM", "isST",
+)
+
+
 @dataclass(slots=True)
 class BaoStockDailyProvider:
     name: str = "baostock"
     endpoint: str = "daily_history"
     capability_priority: int = 200
-    capability_version: str = "baostock-daily-v1"
+    capability_version: str = "baostock-daily-v2-all-fields"
     adjustment: Adjustment = Adjustment.NONE
     supported_asset_types: frozenset[AssetType] = frozenset(
         {AssetType.STOCK, AssetType.ETF, AssetType.INDEX}
     )
     start_date: date = date(1990, 1, 1)
+    field_selection_policy: str = "all_supported_daily"
+
+    def __post_init__(self) -> None:
+        if self.field_selection_policy != "all_supported_daily":
+            raise ValueError("BaoStock daily requests require the complete supported daily field set")
 
     def fetch_daily(self, symbols: Sequence[str], trade_date: date) -> FetchResult:
         requested = tuple(symbols)
         rows: list[dict[str, Any]] = []
         returned_rows: list[dict[str, Any]] = []
+        source_rows: list[dict[str, Any]] = []
         with logged_in_session() as bs:
             for symbol in requested:
                 code = source_code(symbol)
                 result = bs.query_history_k_data_plus(
                     code,
-                    "date,code,open,high,low,close,preclose,volume,amount,adjustflag,turn,tradestatus,pctChg",
+                    ",".join(BAOSTOCK_DAILY_SOURCE_FIELDS),
                     start_date=self.start_date.isoformat(),
                     end_date=trade_date.isoformat(),
                     frequency="d",
@@ -39,6 +52,7 @@ class BaoStockDailyProvider:
                 )
                 parsed = []
                 for item in read_rows(result):
+                    source_rows.append({"symbol": symbol, **item})
                     parsed.append({
                         "symbol": symbol,
                         "trade_date": item.get("date"),
@@ -56,11 +70,11 @@ class BaoStockDailyProvider:
         status = WindowStatus.COMPLETE if rows else WindowStatus.TEMPORARY_EMPTY
         return FetchResult(
             tuple(rows), requested, status, (),
-            ("trade_date", "open", "high", "low", "close", "volume", "amount", "adjustflag"),
+            BAOSTOCK_DAILY_SOURCE_FIELDS,
             ("volume:share", "amount:cny"), len(returned_rows),
             str(returned_rows[0]["trade_date"]) if returned_rows else None,
             str(returned_rows[-1]["trade_date"]) if returned_rows else None,
-            self.adjustment,
+            self.adjustment, tuple(source_rows),
         )
 
 

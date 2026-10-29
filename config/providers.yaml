@@ -53,7 +53,7 @@ providers:
         adjustments: [forward]
         asset_types: [stock, etf]
         exchanges: [XSHG, XSHE]
-        capability_version: tencent-qfq-kline-v1
+        capability_version: tencent-qfq-newfqkline-v2
         max_symbols_per_request: 1
         max_rows_per_request: 640
         supports_pagination: false
@@ -78,7 +78,7 @@ providers:
         adjustments: [backward]
         asset_types: [stock, etf]
         exchanges: [XSHG, XSHE]
-        capability_version: tencent-hfq-kline-v1
+        capability_version: tencent-hfq-newfqkline-v2
         max_symbols_per_request: 1
         max_rows_per_request: 640
         supports_pagination: false
@@ -341,6 +341,7 @@ providers:
         implementation_status: implemented
         request_group: baostock.sdk
         request_shape: single_symbol
+        field_selection_policy: all_supported_daily
         parameters:
           symbols:
             type: strings
@@ -357,7 +358,7 @@ providers:
         adjustments: [none, forward, backward]
         asset_types: [stock, etf, index]
         exchanges: [XSHG, XSHE]
-        capability_version: baostock-daily-v1
+        capability_version: baostock-daily-v2-all-fields
         max_symbols_per_request: 1
         request_interval_seconds: 0.5
       minute_5m:
@@ -727,7 +728,7 @@ input_capabilities:
         required: true
         default: none
         choices: [none, qfq, hfq]
-      # none使用独立kline接口；qfq/hfq沿用两个复权接口。
+      # none使用独立kline接口；daily_fixed策略将qfq/hfq明确路由到newfqkline。
       api:
         type: string
         source: config.api
@@ -741,12 +742,12 @@ input_capabilities:
     evidence_refs:
     - ASTOCK-002
     limitations:
-    - 日线任务adjustment=none且未配置api时自动选择kline；显式接口必须为kline。kline请求/appstock/app/kline/kline的最近1024条day；qfq/hfq使用fqkline或newfqkline及对应后缀，接口间不自动回退。
+    - 日线任务adjustment=none且未配置api时自动选择kline；显式接口必须为kline。kline请求/appstock/app/kline/kline的最近1024条day；当前daily_fixed策略的qfq/hfq统一使用newfqkline及对应后缀，接口间不自动回退。
     - kline窗口按返回日期在本地筛选；返回满1024条且请求起日早于最早返回日时明确报截断。当前证据不证明全市场覆盖或生产路由资格。
-    - api=fqkline保留现有行为；api=newfqkline使用已核验的proxy主机并支持北交所代码，但实际返回日期可能超出请求日期。
+    - api=newfqkline使用已核验的proxy主机并支持沪深及北交所代码；返回价格及历史窗口可能与fqkline不同，实际返回日期可能超出请求日期。
     - adjust支持none/qfq/hfq并映射到day/qfqday/hfqday；三种口径均有单证券日期探测，尚不构成全市场资格或生产路由资格。
-    - 两接口8只证券12组窗口核验，共同日期的76条开收高低与成交量数值一致；不是全市场或单位认证。
-    - newfqkline可能返回最近640条而忽略日期范围；原响应和来源行完整保存，规范候选只提取请求日期，超出640条历史窗口明确报截断。
+    - fqkline与newfqkline的比较仅覆盖8只证券、12组窗口和76条共同日期记录；数值差异、字段差异及精度已记录，不构成全市场或单位认证。
+    - newfqkline可能返回最近640条而忽略日期范围；原响应和全部返回来源行完整保存，规范候选只提取请求日期，超出640条历史窗口明确报截断。
     - 成交量和成交额单位未认证，标准输出置空；复权价格使用来源返回序列，不在本地重算。
     - 请求间隔0.3秒、单并发；参考原项目节流，不代表持续容量已验证，不自动启用路由
     request_interval_seconds: 0.3

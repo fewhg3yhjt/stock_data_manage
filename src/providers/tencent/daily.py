@@ -40,8 +40,8 @@ class TencentDailyProvider:
     def __post_init__(self) -> None:
         if self.adjustment is not Adjustment.NONE:
             self.endpoint = "forward_history" if self.adjustment is Adjustment.FORWARD else "backward_history"
-            self.capability_version = f"tencent-{_adjustment_token(self.adjustment)}-kline-v1"
-            self.url = "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get"
+            self.capability_version = f"tencent-{_adjustment_token(self.adjustment)}-newfqkline-v2"
+            self.url = "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/newfqkline/get"
             self.max_rows = 640
             self.contract = EndpointContract(
                 frozenset({"symbol", "trade_date", "open", "high", "low", "close", "volume"}),
@@ -54,19 +54,19 @@ class TencentDailyProvider:
         requested = tuple(symbols)
         rows: list[dict[str, Any]] = []
         returned_rows: list[dict[str, Any]] = []
+        source_rows: list[dict[str, Any]] = []
         statuses: list[WindowStatus] = []
         response_statuses: list[int] = []
         for symbol in requested:
             adjust = _adjustment_token(self.adjustment)
+            param = (
+                f"{symbol},day,{trade_date.isoformat()},{trade_date.isoformat()},{self.max_rows},{adjust}"
+                if adjust != "none"
+                else f"{symbol},day,,,{self.max_rows}"
+            )
             response = self.transport.get(
                 self.url,
-                params={
-                    "param": (
-                        f"{symbol},day,,,{self.max_rows},{adjust}"
-                        if adjust != "none"
-                        else f"{symbol},day,,,{self.max_rows}"
-                    )
-                },
+                params={"param": param},
                 timeout_seconds=self.timeout_seconds,
             )
             response_statuses.append(response.status_code)
@@ -77,32 +77,52 @@ class TencentDailyProvider:
                 )
             stock = ((payload.get("data") or {}).get(symbol) or {})
             bars = stock.get(_adjustment_bar_key(self.adjustment)) or []
-            parsed = [
-                {
+            parsed = []
+            for item in bars:
+                if not isinstance(item, list) or len(item) < 6:
+                    raise ProviderContractError(
+                        "Tencent daily row changed", FailureClass.SCHEMA_CHANGED, retryable=False
+                    )
+                if adjust != "none" and len(item) not in {10, 11}:
+                    raise ProviderContractError(
+                        "alternative Tencent daily row changed", FailureClass.SCHEMA_CHANGED, retryable=False
+                    )
+                source = {"symbol": symbol, **{str(index): value for index, value in enumerate(item)}}
+                source.update(source_api="kline" if adjust == "none" else "newfqkline",
+                              source_bar_key=_adjustment_bar_key(self.adjustment))
+                source_rows.append(source)
+                date_text = str(item[0]).strip()
+                try:
+                    row_date = datetime.strptime(
+                        date_text, "%Y%m%d" if len(date_text) == 8 and date_text.isdigit() else "%Y-%m-%d"
+                    ).date()
+                except ValueError as exc:
+                    raise ProviderContractError(
+                        "Tencent daily date changed", FailureClass.SCHEMA_CHANGED, retryable=False
+                    ) from exc
+                parsed.append({
                     "symbol": symbol,
-                    "trade_date": item[0],
+                    "trade_date": row_date.isoformat(),
                     "open": item[1],
                     "close": item[2],
                     "high": item[3],
                     "low": item[4],
                     "volume": item[5],
                     "amount": None,
-                }
-                for item in bars
-                if isinstance(item, list) and len(item) >= 6
-            ]
+                })
             statuses.append(self.contract.validate_rows(parsed))
             returned_rows.extend(parsed)
-            rows.extend(item for item in parsed if str(item["trade_date"]) == trade_date.isoformat())
+            rows.extend(item for item in parsed if item["trade_date"] == trade_date.isoformat())
         return FetchResult(
             tuple(rows), requested, _combined_status(statuses, bool(rows)), tuple(response_statuses),
             ("trade_date", "open", "high", "low", "close", "volume", "amount"),
             ("volume:unverified", "amount:unverified"), len(returned_rows),
             str(returned_rows[0]["trade_date"]) if returned_rows else None,
             str(returned_rows[-1]["trade_date"]) if returned_rows else None, self.adjustment,
+            tuple(source_rows),
         )
 
-    def capture_window(self, code: str, start: date, end: date, adjust: str = "qfq", api: str = "fqkline",
+    def capture_window(self, code: str, start: date, end: date, adjust: str = "qfq", api: str = "newfqkline",
                        asset_type: str | None = None):
         """Acquire response packages only; business contents never trigger host fallback."""
         if api not in {"kline", "fqkline", "newfqkline"}:

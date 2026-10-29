@@ -7,12 +7,12 @@ from stock_data_manage.quality.normalization import NormalizationRule, Normalize
 from stock_data_manage.quality.validation import validate_bar
 
 
-def test_verified_units_are_limited_by_security_api_and_date():
+def test_verified_units_are_limited_by_security_api_adjustment_and_date():
     from pathlib import Path
     import yaml
     root=Path(__file__).resolve().parents[1]/'config'
     rule=yaml.safe_load((root/'normalization/daily_bar.yaml').read_text(encoding='utf-8'))['rules'][0]
-    fields=yaml.safe_load((root/'datasets/daily_bar.yaml').read_text(encoding='utf-8'))['fields']
+    fields=yaml.safe_load((root/'datasets/daily_bar.yaml').read_text(encoding='utf-8'))['candidate']['fields']
     raw={'0':'2026-10-09','1':'10','2':'11','3':'12','4':'9','5':'100','8':'20'}
     context={'instrument_id':'XSHG:600519','source_api':'newfqkline','adjustment':'forward'}
     row=Normalizer.normalize_fields(raw,rule=rule,fields=fields,context=context,allow_pending=True)
@@ -21,6 +21,7 @@ def test_verified_units_are_limited_by_security_api_and_date():
         context={**context,'instrument_id':'XSHG:688981'},allow_pending=True)
     assert star['volume']==Decimal('100')
     for other_context,other_raw in [({**context,'instrument_id':'BSE:920001'},raw),
+        ({**context,'adjustment':'backward'},raw),
         ({**context,'source_api':'fqkline'},raw),(context,{**raw,'0':'2026-10-12'})]:
         other=Normalizer.normalize_fields(other_raw,rule=rule,fields=fields,context=other_context,allow_pending=True)
         assert other['volume'] is None and other['amount'] is None

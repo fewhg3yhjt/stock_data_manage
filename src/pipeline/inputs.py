@@ -1058,6 +1058,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                 scopes = [scope for scope in rule.get('verified_unit_scopes', ())
                     if mapping_context['instrument_id'] in scope['instrument_ids']
                     and mapping_context.get('source_api') == scope['source_api']
+                    and ('adjustments' not in scope or mapping_context.get('adjustment') in scope['adjustments'])
                     and any(str(row['trade_date']) in scope['dates'] for row in rows)]
                 report['verified_unit_scopes'] = _json_value(scopes)
                 for name in ('volume', 'amount'):

@@ -14,6 +14,7 @@ class FakeResult:
     fields = [
         "date", "code", "open", "high", "low", "close", "preclose",
         "volume", "amount", "adjustflag", "turn", "tradestatus", "pctChg",
+        "peTTM", "pbMRQ", "psTTM", "pcfNcfTTM", "isST",
     ]
 
     def __init__(self, rows):
@@ -42,7 +43,7 @@ class FakeBaoStock:
         self.calls.append((args, kwargs))
         if kwargs["frequency"] == "d":
             return FakeResult([
-                ["2026-09-11", "sh.600519", "10", "11", "9", "10.5", "9.8", "100", "1000", "3", "1", "1", "2"]
+                ["2026-09-11", "sh.600519", "10", "11", "9", "10.5", "9.8", "100", "1000", "3", "1", "1", "2", "12", "3", "4", "5", "0"]
             ])
         return FakeMinuteResult([
             ["2026-09-11", "093100", "sh.600519", "10", "11", "9", "10.5", "100", "1000", "3"]
@@ -62,6 +63,8 @@ def test_baostock_daily_normalizes_rows_and_adjustflag(monkeypatch):
     assert result.rows[0]["close"] == "10.5"
     assert result.adjustment is Adjustment.FORWARD
     assert client.calls[0][1]["adjustflag"] == "2"
+    assert client.calls[0][0][1] == ",".join(daily_module.BAOSTOCK_DAILY_SOURCE_FIELDS)
+    assert result.source_rows[0]["peTTM"] == "12"
 
 
 def test_baostock_5m_normalizes_rows_and_closes_to_response_shape(monkeypatch):

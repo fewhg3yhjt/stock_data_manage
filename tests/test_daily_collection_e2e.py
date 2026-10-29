@@ -253,9 +253,6 @@ def test_daily_route_expansion_uses_market_and_adjustment_policy():
 
     definition = resolve_daily_definition({"task": "stock_daily"}, CONFIG)
     routes = definition["source_policy"]["inputs"][0]["market_adjustment_requests"]
-    for market in ("XSHG", "XSHE"):
-        routes[market]["forward"] = {"api": "fqkline", "adjust": "qfq"}
-        routes[market]["backward"] = {"api": "fqkline", "adjust": "hfq"}
     units = [{"key": symbol, "symbol": symbol, "input_id": "ASTOCK-002-daily",
               "context": {"request": {"symbol": symbol, "start_date": DAY, "end_date": DAY}}}
              for symbol in ("sh600519", "sz000001", "bj920001")]
@@ -265,9 +262,9 @@ def test_daily_route_expansion_uses_market_and_adjustment_policy():
                        for unit in expanded}
     assert len(expanded) == 9
     assert routes_by_quote[("sh600519", "none")] == {"api": "kline", "adjust": "none"}
-    assert routes_by_quote[("sh600519", "forward")] == {"api": "fqkline", "adjust": "qfq"}
-    assert routes_by_quote[("sh600519", "backward")] == {"api": "fqkline", "adjust": "hfq"}
-    assert routes_by_quote[("sz000001", "forward")] == {"api": "fqkline", "adjust": "qfq"}
+    assert routes_by_quote[("sh600519", "forward")] == {"api": "newfqkline", "adjust": "qfq"}
+    assert routes_by_quote[("sh600519", "backward")] == {"api": "newfqkline", "adjust": "hfq"}
+    assert routes_by_quote[("sz000001", "forward")] == {"api": "newfqkline", "adjust": "qfq"}
     assert routes_by_quote[("bj920001", "forward")] == {"api": "newfqkline", "adjust": "qfq"}
     assert routes_by_quote[("bj920001", "backward")] == {"api": "newfqkline", "adjust": "hfq"}
 

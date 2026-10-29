@@ -408,7 +408,7 @@ def build_input_provider(contract, *, providers_path, client=None):
                                        max_symbols_per_request=config.max_symbols_per_request)
     if contract.input_id == "ASTOCK-002-daily":
         provider = TencentDailyProvider(RequestsTransport(headers))
-        provider.endpoint, provider.capability_version = contract.endpoint, "tencent-window-capture-v5"
+        provider.endpoint, provider.capability_version = contract.endpoint, "tencent-window-capture-v6"
         return provider
     if contract.input_id == "ASTOCK-002-5m":
         config = next(c for c in load_provider_configs(providers_path) if c.provider == "tencent" and c.endpoint == "native_1m")
@@ -572,7 +572,7 @@ def build_provider(config: ProviderConfig, transport: HttpTransport | None = Non
         } else UrlLibTransport()
     )
     transport = PacedTransport(base_transport, pacer, group)
-    if config.provider == "tencent" and config.endpoint in {"daily_history", "recent_history", "forward_history"}:
+    if config.provider == "tencent" and config.endpoint in {"daily_history", "recent_history", "forward_history", "backward_history"}:
         adjustment = _selected_adjustment(config, capability)
         provider = TencentDailyProvider(transport, adjustment=adjustment)
         provider.endpoint = config.endpoint
@@ -597,6 +597,7 @@ def build_provider(config: ProviderConfig, transport: HttpTransport | None = Non
             capability_version=config.capability_version,
             adjustment=_selected_adjustment(config, capability),
             supported_asset_types=config.asset_types,
+            field_selection_policy=config.field_selection_policy or "all_supported_daily",
         )
     if config.provider == "baostock" and config.endpoint == "minute_5m":
         return BaoStockMinuteProvider(

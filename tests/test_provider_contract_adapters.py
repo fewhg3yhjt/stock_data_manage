@@ -180,7 +180,7 @@ def test_tencent_forward_daily_adapter_requires_qfq_envelope() -> None:
                     "code": 0,
                     "data": {
                         "sh600519": {
-                            "qfqday": [["2026-09-11", "10", "10", "10", "10", "100"]],
+                            "qfqday": [["2026-09-11", "10", "10", "10", "10", "100", {}, "1", "1000", ""]],
                             "day": [["2026-09-11", "1", "1", "1", "1", "100"]],
                         }
                     },
@@ -192,7 +192,24 @@ def test_tencent_forward_daily_adapter_requires_qfq_envelope() -> None:
     result = provider.fetch_daily(["sh600519"], date(2026, 9, 11))
     assert result.adjustment is Adjustment.FORWARD
     assert result.rows[0]["close"] == "10"
-    assert transport.calls[0][1]["param"] == "sh600519,day,,,640,qfq"
+    assert transport.calls[0][0] == "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/newfqkline/get"
+    assert transport.calls[0][1]["param"] == "sh600519,day,2026-09-11,2026-09-11,640,qfq"
+    assert result.source_rows[0]["source_api"] == "newfqkline"
+    assert len(result.source_rows[0]) == 13
+
+
+def test_tencent_backward_daily_adapter_uses_newfqkline_hfq_envelope() -> None:
+    transport = FakeTransport([response({
+        "code": 0,
+        "data": {"sh600519": {"hfqday": [["2026-09-11", "10", "10", "10", "10", "100", {}, "1", "1000", ""]]}},
+    })])
+    provider = TencentDailyProvider(transport, adjustment=Adjustment.BACKWARD)
+    result = provider.fetch_daily(["sh600519"], date(2026, 9, 11))
+    assert result.adjustment is Adjustment.BACKWARD
+    assert result.rows[0]["close"] == "10"
+    assert transport.calls[0][0] == "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/newfqkline/get"
+    assert transport.calls[0][1]["param"] == "sh600519,day,2026-09-11,2026-09-11,640,hfq"
+    assert result.source_rows[0]["source_bar_key"] == "hfqday"
 
 
 def test_tencent_forward_daily_does_not_fallback_to_unadjusted_day() -> None:
@@ -344,7 +361,7 @@ def test_tencent_existing_and_minute_symbol_contract_stay_restricted():
         tencent_symbol('sh000001')
     provider=TencentDailyProvider(FakeTransport([]))
     with pytest.raises(ValueError,match='excludes BSE'):
-        provider.parse_window(provider.capture_window('bj920001',date(2026,10,9),date(2026,10,9)))
+        provider.parse_window(provider.capture_window('bj920001',date(2026,10,9),date(2026,10,9),api='fqkline'))
 
 
 def test_daily_adapter_reports_the_full_returned_window() -> None:
@@ -462,7 +479,7 @@ def test_forward_probe_persists_forward_adjustment(tmp_path) -> None:
                         "code": 0,
                         "data": {
                             "sh600519": {
-                                "qfqday": [["2026-09-11", "10", "10", "10", "10", "100"]]
+                                "qfqday": [["2026-09-11", "10", "10", "10", "10", "100", {}, "1", "1000", ""]]
                             }
                         },
                     }
@@ -490,7 +507,7 @@ def test_forward_probe_persists_forward_adjustment(tmp_path) -> None:
         saved = metadata.latest_probe(
             provider="tencent",
             endpoint="forward_history",
-            capability_version="tencent-qfq-kline-v1",
+            capability_version="tencent-qfq-newfqkline-v2",
             dataset="daily_bar",
             market="XSHG",
             asset_type="stock",

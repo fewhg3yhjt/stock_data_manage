@@ -315,6 +315,7 @@ class ProviderConfig:
     parameters: tuple[ParameterBinding, ...] = ()
     implementation_status: str = "implemented"
     request_limit_enforcement: str = "unimplemented"
+    field_selection_policy: str | None = None
 
     def __post_init__(self) -> None:
         if self.max_symbols_per_request < 1 or self.effective_concurrency < 1 or self.base_requests_per_fetch < 1:
@@ -418,6 +419,10 @@ def load_provider_configs(path: str | Path) -> tuple[ProviderConfig, ...]:
                     parameters=_parameter_bindings(endpoint_payload.get("parameters", {})),
                     implementation_status=str(endpoint_payload.get("implementation_status", "implemented")),
                     request_limit_enforcement=str(endpoint_payload.get("request_limit_enforcement", "unimplemented")),
+                    field_selection_policy=(
+                        None if endpoint_payload.get("field_selection_policy") is None
+                        else str(endpoint_payload["field_selection_policy"])
+                    ),
                 )
             )
     return tuple(result)
