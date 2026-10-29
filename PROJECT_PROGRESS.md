@@ -22,7 +22,23 @@
 
 本轮使用 `D:\Program Files\Python\python.exe`（Python 3.13.0rc3；pytest、FastAPI、DuckDB、PyArrow、PyYAML、requests均可导入）执行Provider、任务路由、日线端到端、配置合同和留存日线定向测试。变更相关测试通过；宽测试唯一失败仍为 `test_input_catalog_covers_successful_rows_without_granting_production_routes`：现有 `providers.yaml` 引用了 `D:/Project/PythonProgram/a_share_universe_check.py`，历史 `interface-coverage.csv` 未登记该引用，属于来源清单问题，与本轮接口实现无关。
 
-当前 `daily_fixed` 仍是 `implemented_validation_only`，v7没有有效资格记录，调度继续关闭；本轮真实响应解析只验证沪市单候选，未执行三市场完整聚合发布。后续如需启用在线生产，必须按v7版本、市场、证券范围及口径完成资格验证；不得沿用v6证明。成交量/成交额单位、全市场覆盖、640条窗口内完整性仍未验证。
+当前 `daily_fixed` 仍是 `implemented_validation_only`，v7没有有效资格记录，调度继续关闭；本路由实现阶段收尾时只验证了沪市单候选。之后的三市场完整聚合结果记录在下一节。后续如需启用在线生产，必须按v7版本、市场、证券范围及口径完成资格验证；不得沿用v6证明。成交量/成交额单位、全市场覆盖、640条窗口内完整性仍未验证。
+
+## 2026-10-29 腾讯日线 v7 三市场三口径隔离端到端验收
+
+### 目标与实际流程
+
+验证已确认的日线生产合同能否经现有任务入口，从三地来源输入构建出每只证券一条含不复权、前复权和后复权的发布结果。本次日期为2026-10-28，证券为 `sh600519`、`sz000001`、`bj920001`；使用当前 v7 Provider 和 `collect_task(mode="replay")`，任务数据根目录放在 `tmp/tencent-v7-daily-aggregate-e2e-2026-10-28/isolated-task-data/`，未启用调度或写生产数据。
+
+### 验收结果与证据
+
+三条不复权输入使用当前 v7 路由各进行一次 `newfqkline + none` 实时请求，每次一个证券、目标日期起止相同，HTTP 200并返回640行，解析后各取到1条目标行。六条前/后复权输入复用此前已归档的同证券、同日期、同参数原始响应，由当前 v7 Provider 离线解析；因此本次不是六条复权接口的 v7 实时验证。任务共9个来源单元，9/9为 `candidate_complete`，三条聚合记录在隔离根发布；三种口径各自的开、高、低、收均与对应原始响应目标行逐值一致。成交量和成交额未认证，标准结果保持为空；未使用备用来源。实时采集共3次请求，任务重放0次联网，生产写入0次。
+
+设计对照：任务仍负责冻结目标和来源策略，Provider负责保留完整来源响应并解析，现有构建/存储路径负责合并三种口径并发布隔离结果；没有增加并行流程或自动切源。逐项输入、原始响应哈希和字段比对见[端到端验收报告](data/task_workspace/_checks/tencent-v7-daily-aggregate-e2e-2026-10-28/README.md)及[机器校验记录](data/task_workspace/_checks/tencent-v7-daily-aggregate-e2e-2026-10-28/e2e_validation.json)，实际任务摘要见 `tmp/tencent-v7-daily-aggregate-e2e-2026-10-28/isolated-task-data/task_workspace/2026-10-28/daily_bar/summary.json`。
+
+### 结论与剩余事项
+
+该结果证明三只证券、一个数据日可通过现有 v7 任务流程生成三口径记录，不代表全市场覆盖或生产资格。复权原始响应来自 v6 时期，不能授予 v7 资格；`daily_fixed` 仍为 `implemented_validation_only`，当前无匹配资格，`tencent_daily` 调度继续关闭。成交量/成交额单位、全市场窗口覆盖和发布资格仍待各自验证。下一阶段如涉及启用生产路由或调度，需另按已确认流程完成相应范围验证；本次未执行启用。
 
 ## 2026-10-29 腾讯 `newfqkline` 不复权历史单日请求核验
 
