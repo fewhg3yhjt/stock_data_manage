@@ -56,7 +56,7 @@ def source_task(tmp_path, *, corrupt=None, symbols=("sh600001",), task_id="aggre
             endpoint = "/appstock/app/kline/kline" if api == "kline" else f"/appstock/app/{api}/get"
             price = {"none": "10", "forward": "9", "backward": "11"}[name]
             row = [DAY, price, price, price, price, "100"]
-            if name != "none":
+            if api == "newfqkline":
                 row += ["0", "0", "10", "0"]
             body = json.dumps({"code": 0, "data": {symbol: { {"none":"day","forward":"qfqday","backward":"hfqday"}[name]: [row]}}}).encode()
             if corrupt == name:
@@ -158,17 +158,20 @@ def test_aggregate_task_recovery_never_fetches_again(tmp_path, stage):
 @pytest.mark.parametrize("body", [b"<html>error</html>", b"{}", b'{"data":{}}'])
 def test_capture_does_not_parse_or_switch_on_bad_business_payload(body):
     class Transport:
-        calls = 0
+        calls = []
         def get(self, *args, **kwargs):
-            self.calls += 1
+            self.calls.append((args[0], kwargs["params"]["param"]))
             return HttpResponse(200, {}, body)
     transport = Transport()
     provider = TencentDailyProvider(transport)
-    captured = provider.capture_window("sh600001", date.fromisoformat(DAY), date.fromisoformat(DAY), adjust="none", api="kline")
-    assert transport.calls == 1
+    captured = provider.capture_window("sh600001", date.fromisoformat(DAY), date.fromisoformat(DAY), adjust="none", api="newfqkline")
+    assert transport.calls == [(
+        "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/newfqkline/get",
+        "sh600001,day,2026-10-09,2026-10-09,640,none",
+    )]
     with pytest.raises(ProviderContractError):
         provider.parse_window(captured)
-    assert transport.calls == 1
+    assert len(transport.calls) == 1
 
 
 def test_failover_only_catches_acquisition_faults():
@@ -261,7 +264,7 @@ def test_daily_route_expansion_uses_market_and_adjustment_policy():
     routes_by_quote = {(unit["symbol"], unit["adjustment"]): unit["context"]["config"]
                        for unit in expanded}
     assert len(expanded) == 9
-    assert routes_by_quote[("sh600519", "none")] == {"api": "kline", "adjust": "none"}
+    assert routes_by_quote[("sh600519", "none")] == {"api": "newfqkline", "adjust": "none"}
     assert routes_by_quote[("sh600519", "forward")] == {"api": "newfqkline", "adjust": "qfq"}
     assert routes_by_quote[("sh600519", "backward")] == {"api": "newfqkline", "adjust": "hfq"}
     assert routes_by_quote[("sz000001", "forward")] == {"api": "newfqkline", "adjust": "qfq"}

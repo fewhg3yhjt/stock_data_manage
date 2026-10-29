@@ -27,10 +27,10 @@ def qualified(tmp_path, monkeypatch):
     from urllib.parse import urlsplit, parse_qs
     def send(session, request, **kwargs):
         param=parse_qs(urlsplit(request.url).query)['param'][0]
-        key='day' if '/kline/kline' in request.url else 'qfqday' if param.endswith(',qfq') else 'hfqday'
+        key='day' if '/kline/kline' in request.url or param.endswith(',none') else 'qfqday' if param.endswith(',qfq') else 'hfqday'
         response=requests.Response();response.status_code=200
         row=['2026-10-09','10','11','12','9','100']
-        if key!='day': row+=['0','0','10','0']
+        if '/newfqkline/get' in request.url: row+=['0','0','10','0']
         response._content=json.dumps({'code':0,'data':{'sh600519':{key:[row]}}}).encode()
         response.headers={'Content-Type':'application/json'};response.encoding='utf-8'
         response.url=request.url;response.request=request
@@ -38,7 +38,7 @@ def qualified(tmp_path, monkeypatch):
     monkeypatch.setattr(requests.Session,'send',send)
     pairs={}
     units=[]
-    for name,api,token in [('forward','newfqkline','qfq'),('none','kline','none'),('backward','newfqkline','hfq')]:
+    for name,api,token in [('forward','newfqkline','qfq'),('none','newfqkline','none'),('backward','newfqkline','hfq')]:
         context={'request':dict(CONTEXT['request']),'config':{'api':api,'adjust':token}}
         live=collect_input(input_id='ASTOCK-002-daily',context=context,config_root=CONFIG,
             output_root=tmp_path/(name+'-live'),mode='live',pacer=RequestPacer(wait=lambda _:None))

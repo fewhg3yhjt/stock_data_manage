@@ -1,5 +1,45 @@
 # 项目开发进度
 
+## 2026-10-29 腾讯日线不复权来源切换到 `newfqkline`（v7）
+
+### 目标和合同
+
+用户确认将 `daily_fixed` 股票任务的不复权来源改为腾讯 `newfqkline`，显式传 `none`。采集阶段留存接口完整响应；解析阶段读取 `day` 并按请求日期筛选目标候选。来源解析失败仍按失败处理，不增加自动切源、重试或质量降级。本轮只覆盖该股票任务在沪市、深市和北交所的 `ASTOCK-002-daily` 输入，不扩展ETF、LOF、指数或通用 `fetch_daily` 的来源范围。
+
+### 实现与设计复核
+
+`config/capabilities.yaml` 已将三地 `none` 路由改为 `{api: newfqkline, adjust: none}`；`config/providers.yaml` 更新日线输入默认接口和窗口合同；`TencentDailyProvider.capture_window()` 接受 `newfqkline + none` 并由 `parse_window()` 读取 `day`、保留全部来源行、筛选请求日期；`daily_bar.yaml` 与输入适配器版本升为 v7。`kline` 仍保留显式调用，但不再是 `daily_fixed` 不复权路线。成交量和成交额未获单位核验，标准候选继续置空。没有写入来源资格、没有启用调度，也没有发布生产数据。
+
+对照设计，职责顺序符合“按YAML策略构造请求 → 原始响应先留存 → Provider解析和目标日筛选 → 字段合同标准化”；额外列仍保留在原始响应/来源行，不被猜测映射为标准成交额。640条窗口外的目标日继续明确报截断。旧 v6 资格不会匹配新 v7 版本。
+
+### 验证证据
+
+对 `sh600519`、`sz000001`、`bj920001` 各请求2026-10-20一个历史目标日。`newfqkline` 显式 `none` 三份响应均为HTTP 200、业务码0，均返回640条并含目标日；沪深旧 `kline` 对照的OHLCV数值相等，北交所 `kline` 对照为空而 `newfqkline` 返回目标行。范围仅是三只样本、一个日期，不能证明全市场覆盖或生产资格。请求参数、原响应和哈希见[路由对照报告](data/task_workspace/_checks/tencent-unadjusted-route-parity-2026-10-29/README.md)与[独立校验](data/task_workspace/_checks/tencent-unadjusted-route-parity-2026-10-29/parity_validation.json)。
+
+沪市真实gzip实体SHA-256为 `a89c0a658f2d90b912af53cee0ad571d51d8a7132adf8a570d74afa6793a38f8`。第一次将压缩实体直接交给回放 `Response` 时，因正式请求库通常先解压再向Provider提供内容而报 `html_response`；这属于回放载荷形式不匹配，不是腾讯返回错误，失败报告保留在隔离目录。之后离线回放脚本保留该实体不变，按原 `Content-Encoding` 另生成与实体哈希及原始清单关联的应用载荷回放清单；经当前 `collect_input` 得到 `candidate_complete`：640条来源行、筛出1条 `2026-10-20` 候选，`newfqkline/day`，开高低收与原始目标行一致，成交量/成交额为空，0次联网、0次生产写入。脚本、派生校验和隔离候选见[回放脚本](data/task_workspace/_checks/tencent-unadjusted-route-parity-2026-10-29/replay_current_unadjusted_adapter.py)、[回放结果](data/task_workspace/_checks/tencent-unadjusted-route-parity-2026-10-29/current_adapter_replay_validation.json)及 `tmp/tencent-newfqkline-none-current-adapter-replay-2026-10-29/`。
+
+### 测试结论与剩余事项
+
+本轮使用 `D:\Program Files\Python\python.exe`（Python 3.13.0rc3；pytest、FastAPI、DuckDB、PyArrow、PyYAML、requests均可导入）执行Provider、任务路由、日线端到端、配置合同和留存日线定向测试。变更相关测试通过；宽测试唯一失败仍为 `test_input_catalog_covers_successful_rows_without_granting_production_routes`：现有 `providers.yaml` 引用了 `D:/Project/PythonProgram/a_share_universe_check.py`，历史 `interface-coverage.csv` 未登记该引用，属于来源清单问题，与本轮接口实现无关。
+
+当前 `daily_fixed` 仍是 `implemented_validation_only`，v7没有有效资格记录，调度继续关闭；本轮真实响应解析只验证沪市单候选，未执行三市场完整聚合发布。后续如需启用在线生产，必须按v7版本、市场、证券范围及口径完成资格验证；不得沿用v6证明。成交量/成交额单位、全市场覆盖、640条窗口内完整性仍未验证。
+
+## 2026-10-29 腾讯 `newfqkline` 不复权历史单日请求核验
+
+### 验证目标和输入
+
+为明确“`newfqkline` 是否能按日期取得不复权数据”，补做历史日而非最新日测试，避免最新返回日与请求结束日重合造成误判。检查现有证据后未找到同参请求。本次单次请求 `sh600519,day,2026-10-20,2026-10-20,640,none`，使用项目指定 Python 3.13.0rc3、Tencent Provider 请求头和系统代理；没有重试或重定向。该日期为历史日期，执行时来源最新日线已晚于它。
+
+### 真实响应和结论
+
+接口返回HTTP 200、腾讯业务码0，`data.sh600519`含 `day`，不含 `qfqday` / `hfqday`。尽管 `start=end=2026-10-20`，仍返回640行，范围为2024-02-28至2026-10-20；目标日期有且仅有一行 `[2026-10-20,1321.01,1331.88,1335.00,1316.14,34136.00,{},0.27,452539.90,0.00,0.00]`。响应的最后日期随请求结束日回到历史日期，证明该样本支持用日期参数把不复权历史窗口截止到目标日；返回内容仍是640行窗口，并非只返回单日。下游可以按目标日筛选，但不能假设接口已按起始日裁剪。
+
+完整请求和HTTP响应记录、原始压缩实体与哈希见[单日请求核验报告](data/task_workspace/_checks/tencent-newfqkline-single-date-2026-10-20/README.md)；[独立离线核验](data/task_workspace/_checks/tencent-newfqkline-single-date-2026-10-20/single_date_validation.json)重新计算实体哈希并核对参数、节点、行数和日期。HTTP实体SHA-256为 `a89c0a658f2d90b912af53cee0ad571d51d8a7132adf8a570d74afa6793a38f8`。首次尝试测试最近日时，原始响应体已写入临时文件，但最终归档路径过长导致原子改名失败；响应体已保存并在报告中标为部分证据，HTTP状态和响应头未知，未用它作主结论。正式路由、配置、资格、调度和生产数据均未改动。
+
+### 与当前实现的对照和后续
+
+该次探针结束时只确认来源能力，尚未改合同；后续用户确认切换路线后，已按本文件最上方的 v7 阶段完成实现与验证。探针结论仍成立：历史日期可作为窗口结束日，但响应仍有640行，解析时需筛选目标日期；该样本不认证额外字段单位。调度保持关闭。
+
 ## 2026-10-29 腾讯 `kline` 日期区间与 `newfqkline` 不复权能力核验
 
 ### 验证目标和实际输入

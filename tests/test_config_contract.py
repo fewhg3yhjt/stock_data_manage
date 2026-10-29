@@ -120,14 +120,14 @@ def test_snapshot_requires_known_trading_date_and_separates_local_filter():
 def test_window_validation_and_unsupported_scheduling_are_explicit(tmp_path):
     contract = next(c for c in load_input_capabilities(PROJECT_ROOT / "config/providers.yaml") if c.input_id == "ASTOCK-002-daily")
     defaults = contract.bind_parameters({"request": {"symbol": "sh600519", "start_date": "2026-09-30", "end_date": "2026-09-30"}})
-    assert defaults["adjust"] == "none" and defaults["api"] == "kline"
+    assert defaults["adjust"] == "none" and defaults["api"] == "newfqkline"
     with pytest.raises(ValueError, match="end must not precede"):
         contract.bind_parameters({"request": {"symbol": "sh600519", "start_date": "2026-09-30", "end_date": "2026-09-01"}})
     unadjusted = contract.bind_parameters({
         "request": {"symbol": "sh600519", "start_date": "2026-10-23", "end_date": "2026-10-23"},
-        "config": {"adjust": "none", "api": "kline"},
+        "config": {"adjust": "none", "api": "newfqkline"},
     })
-    assert unadjusted["adjust"] == "none" and unadjusted["api"] == "kline"
+    assert unadjusted["adjust"] == "none" and unadjusted["api"] == "newfqkline"
     profile_path = tmp_path / "collection.yaml"
     profile_path.write_text("collection_profiles:\n  news:\n    mode: intraday\n    business_day: calendar_day\n    scheduling_enabled: true\n", encoding="utf-8")
     with pytest.raises(ValueError, match="not implemented"):

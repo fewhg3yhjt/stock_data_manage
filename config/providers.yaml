@@ -728,12 +728,12 @@ input_capabilities:
         required: true
         default: none
         choices: [none, qfq, hfq]
-      # none使用独立kline接口；daily_fixed策略将qfq/hfq明确路由到newfqkline。
+      # daily_fixed策略将三种口径显式路由到newfqkline，并按none/qfq/hfq选择day序列。
       api:
         type: string
         source: config.api
         required: true
-        default: kline
+        default: newfqkline
         choices: [kline, fqkline, newfqkline]
     collection_profile: tencent_daily
     implementation_status: implemented_validation_only
@@ -742,12 +742,12 @@ input_capabilities:
     evidence_refs:
     - ASTOCK-002
     limitations:
-    - 日线任务adjustment=none且未配置api时自动选择kline；显式接口必须为kline。kline请求/appstock/app/kline/kline的最近1024条day；当前daily_fixed策略的qfq/hfq统一使用newfqkline及对应后缀，接口间不自动回退。
+    - 日线任务daily_fixed将none/qfq/hfq显式路由到newfqkline，并分别读取day/qfqday/hfqday；none请求必须显式带none后缀。kline保留为显式输入接口，不作为daily_fixed的不复权路线或自动回退。
     - kline窗口按返回日期在本地筛选；返回满1024条且请求起日早于最早返回日时明确报截断。当前证据不证明全市场覆盖或生产路由资格。
     - api=newfqkline使用已核验的proxy主机并支持沪深及北交所代码；返回价格及历史窗口可能与fqkline不同，实际返回日期可能超出请求日期。
     - adjust支持none/qfq/hfq并映射到day/qfqday/hfqday；三种口径均有单证券日期探测，尚不构成全市场资格或生产路由资格。
     - fqkline与newfqkline的比较仅覆盖8只证券、12组窗口和76条共同日期记录；数值差异、字段差异及精度已记录，不构成全市场或单位认证。
-    - newfqkline可能返回最近640条而忽略日期范围；原响应和全部返回来源行完整保存，规范候选只提取请求日期，超出640条历史窗口明确报截断。
+    - newfqkline显式none的历史单日样本以请求结束日为窗口边界，但仍返回640条日线，开始日期不裁剪响应；Provider保留原响应全部来源行，仅筛选目标日期。若请求起日早于640条返回窗口，明确报截断。
     - 成交量和成交额单位未认证，标准输出置空；复权价格使用来源返回序列，不在本地重算。
     - 请求间隔0.3秒、单并发；参考原项目节流，不代表持续容量已验证，不自动启用路由
     request_interval_seconds: 0.3

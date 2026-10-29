@@ -420,7 +420,7 @@ def test_master_then_dynamic_daily_scope_and_new_listings(tmp_path):
     daily = run(tmp_path, definition, collector)
     assert daily["row_count"] == 2
     assert len(daily["units"].values()) == 6
-    assert {tuple(sorted(unit["context"]["config"].items())) for unit in daily["execution_definition"]["units"]} == {tuple(sorted(x.items())) for x in ({"adjust":"none","api":"kline"},{"adjust":"qfq","api":"newfqkline"},{"adjust":"hfq","api":"newfqkline"})}
+    assert {tuple(sorted(unit["context"]["config"].items())) for unit in daily["execution_definition"]["units"]} == {tuple(sorted(x.items())) for x in ({"adjust":"none","api":"newfqkline"},{"adjust":"qfq","api":"newfqkline"},{"adjust":"hfq","api":"newfqkline"})}
     collector.source_stock_codes = ("600001", "000001", "600002")
     run(tmp_path, master_definition(), collector, redo="full")
     assert run(tmp_path, definition, collector)["no_op"]
@@ -487,20 +487,20 @@ def test_all_index_universe_expands_only_published_index_rows(tmp_path, monkeypa
         ("sh000001", "index"), ("sz399001", "index")]
 
 
-def test_none_adjustment_selects_tencent_kline_before_collection(tmp_path):
+def test_none_adjustment_selects_tencent_newfqkline_before_collection(tmp_path):
     observed = []
     def stop(**options):
         observed.append(options["context"]["config"].copy())
         raise RuntimeError("fixture stop")
     result = run(tmp_path, daily_definition("policy", ("sh600001",)), stop)
     assert result["status"] == "failed"
-    assert observed == [{"adjust":"none","api":"kline"},{"adjust":"qfq","api":"newfqkline"},{"adjust":"hfq","api":"newfqkline"}]
+    assert observed == [{"adjust":"none","api":"newfqkline"},{"adjust":"qfq","api":"newfqkline"},{"adjust":"hfq","api":"newfqkline"}]
 
 
-def test_omitted_daily_adjustment_defaults_to_tencent_kline(tmp_path):
+def test_omitted_daily_adjustment_defaults_to_tencent_newfqkline(tmp_path):
     result = run(tmp_path, daily_definition("policy-default", ("sh600001",)), FaultCollector())
     assert result["status"] == "published"
-    assert {tuple(sorted(unit["context"]["config"].items())) for unit in result["execution_definition"]["units"]} == {tuple(sorted(x.items())) for x in ({"adjust":"none","api":"kline"},{"adjust":"qfq","api":"newfqkline"},{"adjust":"hfq","api":"newfqkline"})}
+    assert {tuple(sorted(unit["context"]["config"].items())) for unit in result["execution_definition"]["units"]} == {tuple(sorted(x.items())) for x in ({"adjust":"none","api":"newfqkline"},{"adjust":"qfq","api":"newfqkline"},{"adjust":"hfq","api":"newfqkline"})}
 
 
 def test_none_adjustment_rejects_explicit_conflicting_api_before_collection(tmp_path):

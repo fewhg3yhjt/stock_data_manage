@@ -408,7 +408,7 @@ def build_input_provider(contract, *, providers_path, client=None):
                                        max_symbols_per_request=config.max_symbols_per_request)
     if contract.input_id == "ASTOCK-002-daily":
         provider = TencentDailyProvider(RequestsTransport(headers))
-        provider.endpoint, provider.capability_version = contract.endpoint, "tencent-window-capture-v6"
+        provider.endpoint, provider.capability_version = contract.endpoint, "tencent-window-capture-v7"
         return provider
     if contract.input_id == "ASTOCK-002-5m":
         config = next(c for c in load_provider_configs(providers_path) if c.provider == "tencent" and c.endpoint == "native_1m")

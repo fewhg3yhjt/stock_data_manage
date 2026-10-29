@@ -1,7 +1,7 @@
 dataset: daily_bar
 
 rules:
-  - id: tencent-window-input-v6
+  - id: tencent-window-input-v7
     input_id: ASTOCK-002-daily
     provider: tencent
     endpoint: kline_daily
@@ -43,9 +43,9 @@ rules:
     amount_multiplier: "1"
     volume_semantics: unverified
     status: pending_validation
-    version: tencent-window-input-v6
+    version: tencent-window-input-v7
     evidence_refs: [ASTOCK-002]
-    notes: 不复权api=kline读取最近1024条day；daily_fixed策略的qfq/hfq使用newfqkline并读取对应qfqday/hfqday，不在本地重算复权价格。接口额外返回列由来源行保留；标准化仅按field_mapping抽取目标字段。成交额位置8为候选映射；现有单位证据仅覆盖指定证券、newfqkline、前复权和2026-10-09，其他口径与范围保持空值。
+    notes: daily_fixed策略三种口径均使用newfqkline，并以none/qfq/hfq读取day/qfqday/hfqday；不在本地重算复权价格。none的来源响应按结束日返回最多640条窗口，标准候选按目标日期筛选。接口额外返回列由来源行保留；标准化仅按field_mapping抽取目标字段。成交额位置8为候选映射；现有单位证据仅覆盖指定证券、newfqkline、前复权和2026-10-09，其他口径与范围保持空值。
 
   - id: fixture-daily-v1
     provider: fixture

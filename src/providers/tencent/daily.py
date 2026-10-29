@@ -131,8 +131,8 @@ class TencentDailyProvider:
             raise ValueError("unsupported Tencent daily adjustment")
         if api == "kline" and adjust != "none":
             raise ValueError("api=kline requires adjust=none")
-        if api != "kline" and adjust == "none":
-            raise ValueError("adjust=none requires api=kline")
+        if api == "fqkline" and adjust == "none":
+            raise ValueError("api=fqkline does not provide an unadjusted series")
         adjustment = _adjustment_from_token(adjust)
         if asset_type == "index" and adjustment is not Adjustment.NONE:
             raise ValueError("Tencent index daily data is available only without adjustment")
