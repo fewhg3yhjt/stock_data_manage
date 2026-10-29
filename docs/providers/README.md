@@ -77,7 +77,9 @@ node provider_validation/tests/build_interface_coverage_workbook.mjs --formal-sp
 
 2026-10-29 来源验证使用2026-10-28数据日：沪市 `sh600519`、深市 `sz000001`、北交所 `bj920001`，三种口径共9个目标请求，并对沪深复权接口补做4个对照请求。13份响应均为HTTPS HTTP 200；响应原字节哈希经独立复核，13个目标行均与Provider解析值一致。样本中沪深 `fqkline` OHLC为三位小数，`newfqkline` 为两位；前复权样本数值一致，后复权部分数值不同；北交所 `newfqkline` 前、后复权在该样本均返回三位小数。验证只覆盖这些证券、口径、接口和日期，不判断精度差异的准确性，也不推及其他日期或全市场。原始响应、请求清单及校验见[市场选源探针](../../data/task_workspace/_checks/tencent-daily-route-validation-2026-10-29/README.md)。
 
-探针之后，以留存响应完成隔离端到端任务：9个来源单元生成3条完整日线记录，状态为 `published`，所有口径OHLC与响应目标行数值相等，Parquet回读保留三位小数，`production_writes=0`。结果见[隔离端到端回放](../../data/task_workspace/_checks/tencent-daily-route-validation-2026-10-29/e2e-results.json)。据此，配置已切换到沪深 `fqkline`、北交所 `newfqkline` 的市场路由。当前股票日线资格记录均已过期，且仅有 `newfqkline` 前复权范围；`kline/none`、沪深 `fqkline` 前/后复权及北交所 `newfqkline` 前/后复权均没有当前有效资格。正式 `tencent_daily` 调度仍关闭，在线任务须先取得各市场、接口、口径和范围匹配的有效资格。该样本也未认证成交量单位。
+随后对当前沪深路由做成交量单位小样本：BaoStock同日两条原始TCP响应在SDK解码前留存，与已保存的腾讯六条三口径目标行逐项比较。2026-10-28的 `sh600519` 为38805，`sz000001` 为1687009；乘100后分别与BaoStock股数相差−7股、+27股，符合腾讯按100股整数手返回的样本表现。[BaoStock API文档](https://github.com/zxygithub/baostock/blob/master/docs/pythonAPI.md)定义成交量单位为股；本结果只支持这两只股票、一个日期和 `kline/fqkline` 三接口，不是市场级单位资格。当前腾讯目标行均为6列，没有成交额字段，不能从中映射或认证成交额。未扩展 `verified_unit_scopes`，标准量额仍按资格门禁处理。原始响应、SHA-256及独立复核见[成交量小样本记录](../../data/task_workspace/_checks/tencent-daily-volume-units-2026-10-29/README.md)。
+
+探针之后，以留存响应完成隔离端到端任务：9个来源单元生成3条完整日线记录，状态为 `published`，所有口径OHLC与响应目标行数值相等，Parquet回读保留三位小数，`production_writes=0`。结果见[隔离端到端回放](../../data/task_workspace/_checks/tencent-daily-route-validation-2026-10-29/e2e-results.json)。据此，配置已切换到沪深 `fqkline`、北交所 `newfqkline` 的市场路由。当前股票日线资格记录均已过期，且仅有 `newfqkline` 前复权范围；`kline/none`、沪深 `fqkline` 前/后复权及北交所 `newfqkline` 前/后复权均没有当前有效资格。正式 `tencent_daily` 调度仍关闭，在线任务须先取得各市场、接口、口径和范围匹配的有效资格。上述市场选源样本本身未认证成交量单位；单位对照只在前述两只股票样本范围内成立。
 
 原脚本会在空响应、响应结构异常等情形继续尝试其他主机；当前Provider仅对连接、超时和HTTP 5xx执行有限主机回退，解析/质量异常不触发回退。该边界需与历史来源行为分开说明。API 与口径不匹配、接口参数拒绝、日期重复、异常结构和窗口截断均明确失败，原分钟和快照适配器不改变。既有小范围原生接口验证见[历史请求对照](../../tmp/daily-next-stage-20261012/native-comparison.json)。
 
