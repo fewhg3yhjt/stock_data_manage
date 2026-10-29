@@ -1,7 +1,7 @@
 dataset: daily_bar
 
 rules:
-  - id: tencent-window-input-v7
+  - id: tencent-window-input-v8
     input_id: ASTOCK-002-daily
     provider: tencent
     endpoint: kline_daily
@@ -23,29 +23,52 @@ rules:
       close: {remove_commas: true}
     positive_fields: [open, high, low, close]
     unverified_fields: [volume, amount]
-    # 仅认证独立对照过的证券、接口、口径和数据日期；其他记录保持空值。
-    verified_unit_scopes:
-      - instrument_ids: ["XSHG:600519", "XSHE:000001", "XSHE:300750", "XSHG:510300", "XSHE:159915", "XSHG:511880"]
+    # 按代表样本确认的来源/市场/证券类型/代码段/实际序列应用单位合同。
+    # 日期不是单位边界；这不授予来源资格，也不证明全代码段逐证券覆盖。
+    unit_contracts:
+      - id: tencent-newfqkline-main-growth-stock-units-v1
+        provider: tencent
+        endpoint: kline_daily
         source_api: newfqkline
-        adjustments: [forward]
-        dates: ["2026-10-09"]
+        exchanges: [XSHG, XSHE]
+        asset_type: stock
+        instrument_prefixes: ["XSHG:60", "XSHE:00", "XSHE:30"]
+        series_adjustments: {day: none, qfqday: forward, hfqday: backward}
         multipliers: {volume: "100", amount: "10000"}
-        precision_flags: [source_volume_rounded_to_100_shares, source_amount_rounded_to_100_CNY]
-        evidence: tmp/daily-online-20261012/independent-units.json
-      - instrument_ids: ["XSHG:688981"]
+        precision_flags: {volume: source_volume_rounded_to_100_shares, amount: source_amount_rounded_to_100_CNY}
+        evidence:
+          - data/task_workspace/_checks/unit-review-20261030/unit-comparison.json
+      - id: tencent-newfqkline-star-day-units-v1
+        provider: tencent
+        endpoint: kline_daily
         source_api: newfqkline
-        adjustments: [forward]
-        dates: ["2026-10-09"]
+        exchanges: [XSHG]
+        asset_type: stock
+        instrument_prefixes: ["XSHG:688"]
+        series_adjustments: {day: none}
         multipliers: {volume: "1", amount: "10000"}
-        precision_flags: [source_amount_rounded_to_100_CNY]
-        evidence: tmp/daily-online-20261012/independent-units.json
+        precision_flags: {amount: source_amount_rounded_to_100_CNY}
+        evidence:
+          - data/task_workspace/_checks/unit-review-20261030/unit-comparison.json
+      - id: tencent-newfqkline-etf-forward-units-v1
+        provider: tencent
+        endpoint: kline_daily
+        source_api: newfqkline
+        exchanges: [XSHG, XSHE]
+        asset_type: etf
+        instrument_prefixes: ["XSHG:51", "XSHE:159"]
+        series_adjustments: {qfqday: forward}
+        multipliers: {volume: "100", amount: "10000"}
+        precision_flags: {volume: source_volume_rounded_to_100_units, amount: source_amount_rounded_to_100_CNY}
+        evidence:
+          - data/task_workspace/_checks/unit-review-20261030/unit-comparison.json
     volume_multiplier: "1"
     amount_multiplier: "1"
     volume_semantics: unverified
     status: pending_validation
-    version: tencent-window-input-v7
+    version: tencent-window-input-v8
     evidence_refs: [ASTOCK-002]
-    notes: daily_fixed策略三种口径均使用newfqkline，并以none/qfq/hfq读取day/qfqday/hfqday；不在本地重算复权价格。none的来源响应按结束日返回最多640条窗口，标准候选按目标日期筛选。接口额外返回列由来源行保留；标准化仅按field_mapping抽取目标字段。成交额位置8为候选映射；现有单位证据仅覆盖指定证券、newfqkline、前复权和2026-10-09，其他口径与范围保持空值。
+    notes: daily_fixed策略三种口径使用newfqkline，并以none/qfq/hfq读取day/qfqday/hfqday；不在本地重算复权价格。单位合同只匹配显式证券类型及已配置代码段和实际序列，日期不再是白名单；类型未知、北交所、LOF、指数、其他接口/代码段/序列仍为空。单位合同基于代表样本，不是市场覆盖或生产资格；源值舍入标记随字段保留。none最多640条窗口，原响应完整留存，候选仅筛选目标日期。
 
   - id: fixture-daily-v1
     provider: fixture

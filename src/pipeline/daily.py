@@ -175,9 +175,7 @@ def prepare_daily_task_publication(state, units, source_rows, paths, config_root
             source_provider=source["contract"].provider, endpoint=source["contract"].endpoint,
             raw_object_path=source["raw_ref"], fetch_time=_source_capture_time(source["raw_ref"]),
             normalizer_version=report["normalization_version"], capability_version=report["adapter_version"],
-            flags=tuple(dict.fromkeys(flag for scope in report.get("verified_unit_scopes", ())
-                if row["instrument_id"] in scope["instrument_ids"] and str(row["trade_date"]) in scope["dates"]
-                for flag in scope.get("precision_flags", ()))))
+            flags=tuple(report.get("unit_precision_flags", ())))
     records = []
     for symbol, identity in expected.items():
         if selected and symbol not in selected:

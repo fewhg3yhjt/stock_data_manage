@@ -510,6 +510,8 @@ def load_input_field_contract(root: str | Path, capability: InputCapabilityConfi
         raise ValueError("context targets contain undefined fields")
     if rule.get("status") not in {"validated", "pending_validation", "disabled", "expired"}:
         raise ValueError("invalid input rule status")
+    from ..quality.normalization import Normalizer
+    Normalizer.validate_unit_contracts(rule)
     return dataset, rule
 
 

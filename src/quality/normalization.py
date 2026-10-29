@@ -87,6 +87,86 @@ class Normalizer:
         return {name: None if value in null_values else value for name, value in values.items()}
 
     @staticmethod
+    def validate_unit_contracts(rule):
+        """Validate declarative source units before acquisition or normalization."""
+        if 'verified_unit_scopes' in rule:
+            raise NormalizationError('replace dated unit scopes with explicit unit contracts')
+        contracts = rule.get('unit_contracts', [])
+        if not isinstance(contracts, list):
+            raise NormalizationError('unit_contracts must be a list')
+        required = {'id', 'provider', 'endpoint', 'source_api', 'exchanges', 'asset_type',
+                    'instrument_prefixes', 'series_adjustments', 'multipliers', 'precision_flags', 'evidence'}
+        ids = set()
+        for contract in contracts:
+            if not isinstance(contract, Mapping) or set(contract) != required:
+                raise NormalizationError('invalid unit contract fields')
+            if any(not isinstance(contract[k], str) or not contract[k] for k in
+                   ('id', 'provider', 'endpoint', 'source_api', 'asset_type')):
+                raise NormalizationError('unit contract identity must be explicit')
+            if contract['id'] in ids:
+                raise NormalizationError('duplicate unit contract id')
+            ids.add(contract['id'])
+            if contract['asset_type'] not in {a.value for a in AssetType}:
+                raise NormalizationError('invalid unit contract asset type')
+            for name in ('exchanges', 'instrument_prefixes', 'evidence'):
+                values = contract[name]
+                if not isinstance(values, list) or not values or any(not isinstance(v, str) or not v for v in values):
+                    raise NormalizationError('unit contract requires nonempty ' + name)
+            if any(exchange not in {e.value for e in Exchange} for exchange in contract['exchanges']):
+                raise NormalizationError('invalid unit contract exchange')
+            for prefix in contract['instrument_prefixes']:
+                market, separator, digits = prefix.partition(':')
+                if market not in contract['exchanges'] or separator != ':' or not digits.isascii() or not digits.isdigit() or not 2 <= len(digits) < 6:
+                    raise NormalizationError('unit contract requires market-qualified code segments')
+            pairs = contract['series_adjustments']
+            if not isinstance(pairs, Mapping) or not pairs or any(
+                    k not in {'day', 'qfqday', 'hfqday'} or
+                    {'day': 'none', 'qfqday': 'forward', 'hfqday': 'backward'}[k] != v
+                    for k, v in pairs.items()):
+                raise NormalizationError('invalid unit contract series/adjustment binding')
+            multipliers = contract['multipliers']
+            if not isinstance(multipliers, Mapping) or not multipliers or set(multipliers) - {'volume', 'amount'}:
+                raise NormalizationError('invalid unit contract multiplier fields')
+            for value in multipliers.values():
+                try:
+                    number = Decimal(str(value))
+                    if isinstance(value, bool) or not number.is_finite() or number <= 0:
+                        raise ValueError('positive finite multiplier required')
+                except (InvalidOperation, ValueError) as exc:
+                    raise NormalizationError('invalid unit contract multiplier') from exc
+            flags = contract['precision_flags']
+            if not isinstance(flags, Mapping) or set(flags) - set(multipliers) or any(
+                    not isinstance(flag, str) or not flag for flag in flags.values()):
+                raise NormalizationError('invalid unit contract precision flags')
+        for index, left in enumerate(contracts):
+            for right in contracts[index + 1:]:
+                same_source = all(left[k] == right[k] for k in ('provider', 'endpoint', 'source_api', 'asset_type'))
+                common_series = set(left['series_adjustments']) & set(right['series_adjustments'])
+                common_segment = any(a.startswith(b) or b.startswith(a)
+                    for a in left['instrument_prefixes'] for b in right['instrument_prefixes'])
+                if same_source and common_series and common_segment:
+                    raise NormalizationError('overlapping unit contracts')
+
+    @staticmethod
+    def match_unit_contract(rule, context):
+        Normalizer.validate_unit_contracts(rule)
+        required = ('provider', 'endpoint', 'source_api', 'exchange', 'asset_type',
+                    'instrument_id', 'source_bar_key', 'adjustment')
+        if not context or any(not context.get(k) for k in required):
+            return None
+        identity = context['instrument_id']
+        digits = identity.partition(':')[2]
+        if len(digits) != 6 or not digits.isascii() or not digits.isdigit():
+            raise NormalizationError('unit contract requires a valid security identity')
+        matches = [c for c in rule.get('unit_contracts', ())
+            if all(context[k] == c[k] for k in ('provider', 'endpoint', 'source_api', 'asset_type'))
+            and context['exchange'] in c['exchanges']
+            and context['instrument_id'].partition(':')[0] == context['exchange']
+            and context['instrument_id'].startswith(tuple(c['instrument_prefixes']))
+            and c['series_adjustments'].get(context['source_bar_key']) == context['adjustment']]
+        return matches[0] if matches else None
+
+    @staticmethod
     def normalize_fields(raw, *, rule, fields, context=None, allow_pending=False):
         """Execute a dataset's existing YAML field/transform contract, including non-bar rows."""
         status = rule.get("status", "pending_validation")
@@ -114,14 +194,8 @@ class Normalizer:
             if name not in fields or context is None or key not in context:
                 raise NormalizationError(f"missing field context: {name}")
             values[name] = context[key]
-        unit_scopes = [scope for scope in rule.get('verified_unit_scopes', ())
-            if context and context.get('instrument_id') in scope['instrument_ids']
-            and context.get('source_api') == scope['source_api']
-            and ('adjustments' not in scope or context.get('adjustment') in scope['adjustments'])
-            and str(values.get('trade_date')) in scope['dates']]
-        if len(unit_scopes) > 1:
-            raise NormalizationError('overlapping verified unit scopes')
-        unit_multipliers = unit_scopes[0]['multipliers'] if unit_scopes else {}
+        unit_contract = Normalizer.match_unit_contract(rule, context)
+        unit_multipliers = unit_contract['multipliers'] if unit_contract else {}
         result = {}
         for name, definition in fields.items():
             value = values.get(name)

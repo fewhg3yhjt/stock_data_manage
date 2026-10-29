@@ -71,7 +71,7 @@ node provider_validation/tests/build_interface_coverage_workbook.mjs --formal-sp
 
 股票与ETF名单的实现、分类、北交所及上交所ETF目录接入见 [证券名单来源](security-catalog.md)。现有Excel与配套JSON保留上次导出快照；新增输入与字段变化以模块说明及YAML为准，不将旧表视为已核准当前全量证券。10月9日的7267条正式证券名单已发布于 `data/canonical/2026-10-09/security_master/`，原响应位于 `data/raw/2026-10-09/`，验收索引在 `data/task_workspace/_checks/security-release-20261012/`。已有接口可行性响应只读留存。
 
-日线曾有8只证券2026-10-09、`newfqkline` 前复权在线资格与正式发布；这些资格已过期，不能作为当前在线授权。当前 `ASTOCK-002-daily` 的 `daily_fixed` 采集策略在 `config/capabilities.yaml` 中按市场固定为：沪市、深市和北交所的三种口径均走 `newfqkline`。不复权请求显式带 `none` 并读取 `day`，前/后复权分别读取 `qfqday`、`hfqday`；响应完整留存后，Provider 按目标日期筛选，原始来源行仍保留完整窗口。`newfqkline` 最多返回640条，若所需历史早于返回窗口则明确报截断。标准日线只按字段合同提取，成交量和成交额在未核验范围内仍为空。`kline` 保留为显式接口，不作为此策略的不复权路线或自动回退；通用 `fetch_daily` 与ETF、LOF、指数的其他接口范围未随本次变更调整。直接使用 `collect-input` 时仍须显式配对 `adjust` 与 `api`。当前v7已有2026-10-28三只股票、三种口径的精确留存资格及正式发布；不允许在线采集或市场范围推广。在线小样本和隔离回放本身不授予资格，最终四层证据与精确边界见[项目进度](../../PROJECT_PROGRESS.md#2026-10-29-v7-三只股票验证收尾与正式验收)。
+日线曾有8只证券2026-10-09、`newfqkline` 前复权在线资格与正式发布；这些资格已过期，不能作为当前在线授权。当前 `ASTOCK-002-daily` 的 `daily_fixed` 采集策略在 `config/capabilities.yaml` 中按市场固定为：沪市、深市和北交所的三种口径均走 `newfqkline`。不复权请求显式带 `none` 并读取 `day`，前/后复权分别读取 `qfqday`、`hfqday`；响应完整留存后，Provider 按目标日期筛选，原始来源行仍保留完整窗口。`newfqkline` 最多返回640条，若所需历史早于返回窗口则明确报截断。标准日线只按字段合同提取，成交量和成交额在未核验范围内仍为空。`kline` 保留为显式接口，不作为此策略的不复权路线或自动回退；通用 `fetch_daily` 与ETF、LOF、指数的其他接口范围未随本次变更调整。直接使用 `collect-input` 时仍须显式配对 `adjust` 与 `api`。2026-10-29的v7已有2026-10-28三只股票、三种口径的精确留存资格及正式发布；2026-10-30规范化升级v8后，旧资格因指纹变化需复核，不允许在线采集或市场范围推广。在线小样本和隔离回放本身不授予资格，最终四层证据与精确边界见[项目进度](../../PROJECT_PROGRESS.md#2026-10-29-v7-三只股票验证收尾与正式验收)。
 
 BaoStock 日线配置的 `field_selection_policy: all_supported_daily` 请求其日线接口公开的18个字段，并在 `FetchResult.source_rows` 保留 SDK 解码后的全部来源列；标准日线候选仍按数据集合同提取需要的字段。字段集合依据 [BaoStock Python API 日线字段说明](https://github.com/baostock/baostock/blob/master/docs/pythonAPI.md)（2026-10-29核对）。
 
@@ -111,7 +111,7 @@ BaoStock SDK返回的是解码后的 `ResultSet`，本身不提供可直接保�
 
 ETF `sh510300` 的三口径证据仅覆盖2026-10-27来源采集与解析，尚无ETF聚合发布；当前日线数据集要求ETF不复权，复权口径未确认，标准化规则也只有待验证的ETF前复权单项。指数方面，腾讯在2026-10-23对 `sh000001` 与 `sz399001` 的不复权请求返回目标日行情；前/后复权请求虽HTTP成功、响应码为0，但没有对应调整序列，股票对照则返回了前/后复权序列。上证综指两份复权响应字节哈希相同；深证成指哈希不同，但差异仅为 `qt.market` 行情快照时间相差9秒，日线序列相同。[原始响应与逐项摘要](../../tmp/security-daily-20261023/phase-13-index-adjustment/phase-13-index-adjustment.md)只证明这两个指数和该窗口。现有日线结构包含 `index_points/point`，但没有指数标准化规则，当前 `stock_daily` 任务仅覆盖股票，指数来源路由仍为验证状态，因此还没有正式指数日线生产路径。LOF日线的来源适用性尚无验证证据。
 
-参数来源在 `config/providers.yaml`，标准字段沿用 `config/datasets/daily_bar.yaml`，位置映射在 `config/normalization/daily_bar.yaml`：前6列仍为日期、开、收、高、低、成交量；不复权接口不含成交额字段，复权接口的位置8也仅保留候选映射。单位未独立核验时，标准volume/amount保持空值。实际 `day/qfqday/hfqday` 序列标识保存在来源行和采集报告中，不因一致性样本推定任意除权情形。旧原响应不改写，新任务的参数范围和代码资格须重新核验。已认证倍率仍严格限于 `verified_unit_scopes` 列明的来源与日期；其他记录保持未认证字段为空，见下文。
+参数来源在 `config/providers.yaml`，标准字段沿用 `config/datasets/daily_bar.yaml`，位置映射在 `config/normalization/daily_bar.yaml`：前6列仍为日期、开、收、高、低、成交量；旧kline不复权接口不含成交额字段；当前newfqkline的三种口径均保留位置8，按已配置单位合同决定是否换算。单位未独立核验时，标准volume/amount保持空值。实际 `day/qfqday/hfqday` 序列标识保存在来源行和采集报告中，不因一致性样本推定任意除权情形。旧原响应不改写，新任务的参数范围和代码资格须重新核验。当前单位倍率由 `unit_contracts` 按来源、市场、显式证券类型、代码段和实际序列匹配，不再以日期为白名单；适用表、证据边界与升级影响统一见[单位合同](../../stock-data-design-qfq-history-rebuild.md#22-来源单位合同2026-10-30)。北交所及其他未覆盖组合仍为空。
 
 单接口或显式任务单元通过现有context传递：
 
@@ -125,7 +125,7 @@ ETF `sh510300` 的三口径证据仅覆盖2026-10-27来源采集与解析，尚�
 
 以BaoStock原生SDK同日数据作独立对照，TCP原字节在SDK解码前留存；登录及请求凭据未保存。[BaoStock主仓库字段文档](https://github.com/zxygithub/baostock/blob/master/docs/pythonAPI.md)定义成交量为股、成交额为人民币元，并说明不同系统的历史复权算法可能不同。本轮7只样本当日OHLC一致，不据此认证任意除权历史。
 
-单位规则主要维护于config/normalization/daily_bar.yaml的verified_unit_scopes：sh600519、sz000001、sz300750、sh510300、sz159915、sh511880的成交量乘100，sh688981乘1，成交额均乘10000。现有独立对照使用BaoStock `adjustflag=2`，范围严格绑定newfqkline、前复权和2026-10-09；本次只允许该口径沿用，后复权仍为空。规则不推广为板块或全市场规则。腾讯源数量与金额存在舍入，规范记录保留source_volume_rounded_to_100_shares和/或source_amount_rounded_to_100_CNY标记；乘倍率后的股/元不是更高精度的原始数值。bj920001未独立认证单位，volume/amount仍为空。
+当时单位规则维护于config/normalization/daily_bar.yaml的verified_unit_scopes（2026-10-30已由unit_contracts替换，历史响应不改写）：sh600519、sz000001、sz300750、sh510300、sz159915、sh511880的成交量乘100，sh688981乘1，成交额均乘10000。现有独立对照使用BaoStock `adjustflag=2`，范围严格绑定newfqkline、前复权和2026-10-09；本次只允许该口径沿用，后复权仍为空。规则不推广为板块或全市场规则。腾讯源数量与金额存在舍入，规范记录保留source_volume_rounded_to_100_shares和/或source_amount_rounded_to_100_CNY标记；乘倍率后的股/元不是更高精度的原始数值。bj920001未独立认证单位，volume/amount仍为空。
 
 正式CLI实际执行5只股票、3只ETF的full、resume和selected：full分别5/3次真实采集，resume返回no-op且不请求，selected各重采1只。原响应成功后转正至data/raw/2026-10-09/tencent/kline_daily；规范文件分别5/3条，源价格、单位倍率、日期、去重、精度标记及元数据独立回读通过。见 [正式验收与实际入口参数](../../data/task_workspace/_checks/daily-online-20261012/formal-verification.json) 和 [8只精确资格](../../data/task_workspace/_checks/daily-online-20261012/gates.json)。单位对照及原字节同时保存在该核验目录。全部证据归业务核验区或隔离tmp，不写provider_validation。
 

@@ -871,7 +871,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
             valid_empty = (is_em_events or is_cb or is_universe_sdk or input_id=="ASTOCK-013") and fetched.empty_is_valid
             if (not source_rows or not mapping_rows) and not valid_empty:
                 raise NormalizationError("temporary empty input; not certified as a valid empty dataset")
-            mapping_context = {"provider": contract.provider}
+            mapping_context = {"provider": contract.provider, "endpoint": contract.endpoint}
             mapping_context.update(getattr(fetched, "mapping_context", {}))
             if is_current_catalog or is_baostock or input_id.startswith("SDA-BOARD-") or is_tencent_snapshot or is_em_history or is_stock_pool or is_em_events or is_lpr or is_news or is_reports_calendar or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_extension or is_repo_rate or is_cb or is_sina_futures:
                 successful = [event for event in response_events if event.get("outcome") == "response" and (not (is_sdk_news or is_sdk_macro or is_market_events or is_reports_seats) or event["status_code"] == 200)]
@@ -1037,7 +1037,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                     if adjustment is None or adjustment != fetched.mapping_context.get("adjustment"):
                         raise NormalizationError("requested adjustment and returned series do not match the normalization contract")
                 mapping_context.update(instrument_id=f"{exchange}:{symbol[2:]}",
-                                       adjustment=adjustment)
+                                       adjustment=adjustment, exchange=exchange, asset_type=security_asset_type)
                 if input_id == "ASTOCK-002-daily":
                     report.update(source_metadata=_json_value(fetched.mapping_context),
                         requested_adjustment=parameters[parameter_name],
@@ -1055,15 +1055,17 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                         "instrument_id": mapping_context.get("instrument_id"), "trade_date": str(row.get("0", ""))}
                     raise
             if input_id == 'ASTOCK-002-daily':
-                scopes = [scope for scope in rule.get('verified_unit_scopes', ())
-                    if mapping_context['instrument_id'] in scope['instrument_ids']
-                    and mapping_context.get('source_api') == scope['source_api']
-                    and ('adjustments' not in scope or mapping_context.get('adjustment') in scope['adjustments'])
-                    and any(str(row['trade_date']) in scope['dates'] for row in rows)]
-                report['verified_unit_scopes'] = _json_value(scopes)
+                unit_contract = Normalizer.match_unit_contract(rule, mapping_context)
+                report['applied_unit_contract'] = _json_value(unit_contract)
+                report['unit_precision_flags'] = [flag for name, flag in
+                    (unit_contract['precision_flags'].items() if unit_contract else ())
+                    if any(row.get(name) is not None for row in rows)]
                 for name in ('volume', 'amount'):
                     if rows and all(row.get(name) is not None for row in rows):
-                        report['field_units'][name] = schema_fields[name]['unit'] + '; rounded source precision recorded in flags'
+                        rounded = unit_contract and name in unit_contract['precision_flags']
+                        report['field_units'][name] = schema_fields[name]['unit'] + (
+                            '; rounded source precision recorded in flags' if rounded else '; source precision retained')
+                        report['unverified_fields'] = [field for field in report['unverified_fields'] if field != name]
             keys = [tuple(row[name] for name in dataset["dataset"]["primary_key"]) for row in rows]
             if len(set(keys)) != len(keys):
                 raise NormalizationError("duplicate dataset primary key")

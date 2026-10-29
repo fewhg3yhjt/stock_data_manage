@@ -41,10 +41,10 @@ def qualified(tmp_path, monkeypatch):
     for name,api,token in [('forward','newfqkline','qfq'),('none','newfqkline','none'),('backward','newfqkline','hfq')]:
         context={'request':dict(CONTEXT['request']),'config':{'api':api,'adjust':token}}
         live=collect_input(input_id='ASTOCK-002-daily',context=context,config_root=CONFIG,
-            output_root=tmp_path/(name+'-live'),mode='live',pacer=RequestPacer(wait=lambda _:None))
+            output_root=tmp_path/(name+'-live'),mode='live',security_asset_type='stock',pacer=RequestPacer(wait=lambda _:None))
         raw=Path(live['run_directory'])/live['raw_manifest']['path']
         current=collect_input(input_id='ASTOCK-002-daily',context=context,config_root=CONFIG,
-            output_root=tmp_path/(name+'-current'),mode='replay',replay_manifest=raw,pacer=RequestPacer(wait=lambda _:None))
+            output_root=tmp_path/(name+'-current'),mode='replay',replay_manifest=raw,security_asset_type='stock',pacer=RequestPacer(wait=lambda _:None))
         assert live['status']==current['status']=='candidate_complete'
         pairs[name]=(context,live,current,raw)
         units.append({'key':'sh600519' if name=='forward' else 'sh600519__'+name,

@@ -6,6 +6,8 @@
 
 ## 日线聚合存储实现（2026-10-28）
 
+2026-10-30单位规则v8只改变新候选的单位合同匹配与换算，未迁移或重写旧正式分区。新候选报告中的 `applied_unit_contract` 记录匹配条件、倍率和证据；`unit_precision_flags` 按实际非空字段生成并进入聚合记录。旧报告的 `verified_unit_scopes` 是历史格式，不再作为新任务的匹配依据；详细规则由[单位合同](../../stock-data-design-qfq-history-rebuild.md#22-来源单位合同2026-10-30)维护。
+
 新规范日线按证券与交易日期保存一条聚合记录，内含证券类型、价格或指数点数语义，以及不复权、前复权、后复权组的数值、状态和证据引用。候选与来源清单仍按证券、日期、口径留存；最终 Parquet 物理分区不再按口径拆开。字段和完整性以[专项设计](../../stock-data-design-qfq-history-rebuild.md)为准，不在本文维护第二套 schema。
 
 规范路径为 `canonical/<日期>/daily_bar/<资产类型>/{data.parquet,manifest.json}`。文件中 `quotes.none/forward/backward` 是固定嵌套组；manifest 标记 `daily-aggregate-v1` 与 `adjustment=aggregate`。恢复复用现有任务提交标记和原子发布流程。旧 `adjustment=...` 分区与业务数据保持原位，不自动合并、不迁移，也不作为新查询的回退路径。

@@ -119,11 +119,63 @@ def test_formal_task_three_responses_one_record_and_resume(tmp_path):
     assert state["row_count"] == 1
     rows = CanonicalPartitionStore(tmp_path / "business/canonical").read_daily("stock", DAY)
     assert [rows[0].quotes[a.value].close for a in Adjustment] == [Decimal("10"), Decimal("9"), Decimal("11")]
+    for quote in rows[0].quotes.values():
+        assert quote.volume == Decimal('10000') and quote.amount == Decimal('100000')
+        assert set(quote.flags) == {'source_volume_rounded_to_100_shares', 'source_amount_rounded_to_100_CNY'}
     assert all(Path(q.raw_object_path).exists() for q in rows[0].quotes.values())
     assert all(q.fetch_time is not None for q in rows[0].quotes.values())
     assert execute(tmp_path, definition)["no_op"]
     with MetadataStore(tmp_path / "business/metadata/metadata.duckdb") as metadata:
         assert metadata.partition("daily_bar", "stock", DAY, adjustment="aggregate")["actual_count"] == 1
+
+
+@pytest.mark.parametrize('asset_type', [None, 'stock'])
+def test_input_units_require_explicit_asset_and_report_actual_conversion(tmp_path, asset_type):
+    from stock_data_manage.pipeline.inputs import collect_input
+    definition = source_task(tmp_path)
+    manifest = definition['units'][0]['replay_manifests']['forward']
+    result = collect_input(input_id='ASTOCK-002-daily', config_root=CONFIG,
+        context={'request': {'symbol': 'sh600001', 'start_date': DAY, 'end_date': DAY},
+                 'config': {'api': 'newfqkline', 'adjust': 'qfq'}},
+        output_root=tmp_path/'input', mode='replay', replay_manifest=manifest, security_asset_type=asset_type)
+    assert result['status'] == 'candidate_complete'
+    report = json.loads(Path(result['report_path']).read_text(encoding='utf-8'))
+    output = json.loads((Path(result['run_directory'])/report['output']['path']).read_text(encoding='utf-8'))[0]
+    if asset_type is None:
+        assert output['volume'] is output['amount'] is None
+        assert report['applied_unit_contract'] is None and report['unit_precision_flags'] == []
+    else:
+        assert Decimal(output['volume']) == 10000 and Decimal(output['amount']) == 100000
+        assert report['applied_unit_contract']['id'] == 'tencent-newfqkline-main-growth-stock-units-v1'
+        assert report['unverified_fields'] == [] and len(report['unit_precision_flags']) == 2
+
+
+@pytest.mark.parametrize('damage', ['multiplier', 'overlapping'])
+def test_invalid_unit_configuration_is_rejected_before_acquisition(tmp_path, monkeypatch, damage):
+    from stock_data_manage.pipeline.inputs import collect_input
+    from stock_data_manage.quality.normalization import NormalizationError
+    import shutil
+    import yaml
+    config = tmp_path/'config'
+    shutil.copytree(CONFIG, config)
+    path = config/'normalization/daily_bar.yaml'
+    document = yaml.safe_load(path.read_text(encoding='utf-8'))
+    if damage == 'multiplier':
+        document['rules'][0]['unit_contracts'][0]['multipliers']['volume'] = 'NaN'
+    else:
+        from copy import deepcopy
+        duplicate = deepcopy(document['rules'][0]['unit_contracts'][0])
+        duplicate['id'] = 'overlapping-contract'
+        document['rules'][0]['unit_contracts'].append(duplicate)
+    path.write_text(yaml.safe_dump(document), encoding='utf-8')
+    def forbidden(*args, **kwargs):
+        raise AssertionError('invalid configuration must not reach transport')
+    monkeypatch.setattr(requests.Session, 'send', forbidden)
+    with pytest.raises(NormalizationError, match=damage):
+        collect_input(input_id='ASTOCK-002-daily', config_root=config, mode='live',
+            output_root=tmp_path/'invalid-input', context={'request': {'symbol':'sh600001', 'start_date':DAY, 'end_date':DAY},
+            'config': {'api':'newfqkline', 'adjust':'qfq'}}, security_asset_type='stock')
+    assert not (tmp_path/'invalid-input').exists()
 
 
 def test_http_success_bad_body_stops_at_processing_and_does_not_publish(tmp_path):
