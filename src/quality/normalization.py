@@ -98,7 +98,7 @@ class Normalizer:
                     'instrument_prefixes', 'series_adjustments', 'multipliers', 'precision_flags', 'evidence'}
         ids = set()
         for contract in contracts:
-            if not isinstance(contract, Mapping) or set(contract) != required:
+            if not isinstance(contract, Mapping) or not required <= set(contract) or set(contract) - required - {'source_units'}:
                 raise NormalizationError('invalid unit contract fields')
             if any(not isinstance(contract[k], str) or not contract[k] for k in
                    ('id', 'provider', 'endpoint', 'source_api', 'asset_type')):
@@ -127,6 +127,13 @@ class Normalizer:
             multipliers = contract['multipliers']
             if not isinstance(multipliers, Mapping) or not multipliers or set(multipliers) - {'volume', 'amount'}:
                 raise NormalizationError('invalid unit contract multiplier fields')
+            if 'source_units' in contract:
+                units = contract['source_units']
+                if not isinstance(units, Mapping) or set(units) != set(multipliers) or any(
+                        not isinstance(value, str) or value not in (
+                            {'CNY', 'ten_thousand_CNY'} if field == 'amount' else {'lot', 'share', 'fund_unit', 'lot_fund_units'})
+                        for field, value in units.items()):
+                    raise NormalizationError('invalid source unit descriptions')
             for value in multipliers.values():
                 try:
                     number = Decimal(str(value))
@@ -134,6 +141,10 @@ class Normalizer:
                         raise ValueError('positive finite multiplier required')
                 except (InvalidOperation, ValueError) as exc:
                     raise NormalizationError('invalid unit contract multiplier') from exc
+            if 'source_units' in contract:
+                factors = {'lot': 100, 'share': 1, 'fund_unit': 1, 'lot_fund_units': 100, 'CNY': 1, 'ten_thousand_CNY': 10000}
+                if any(Decimal(str(multipliers[field])) != factors[unit] for field, unit in units.items()):
+                    raise NormalizationError('source unit description conflicts with multiplier')
             flags = contract['precision_flags']
             if not isinstance(flags, Mapping) or set(flags) - set(multipliers) or any(
                     not isinstance(flag, str) or not flag for flag in flags.values()):

@@ -175,7 +175,9 @@ def prepare_daily_task_publication(state, units, source_rows, paths, config_root
             source_provider=source["contract"].provider, endpoint=source["contract"].endpoint,
             raw_object_path=source["raw_ref"], fetch_time=_source_capture_time(source["raw_ref"]),
             normalizer_version=report["normalization_version"], capability_version=report["adapter_version"],
-            flags=tuple(report.get("unit_precision_flags", ())))
+            flags=tuple(report.get("unit_precision_flags", ())) + tuple(
+                "unit_unverified:" + field for field in report.get("unverified_fields", ())
+                if field in {"volume", "amount"}))
     records = []
     for symbol, identity in expected.items():
         if selected and symbol not in selected:

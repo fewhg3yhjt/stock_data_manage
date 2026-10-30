@@ -94,6 +94,9 @@ main { padding: 30px 42px 56px; max-width: 1580px; margin: 0 auto; }
 .panel-head small { color: var(--muted); }
 .panel-body { padding: 20px; }
 .table-wrap { overflow: auto; }
+.daily-table th, .daily-table td { white-space: nowrap; padding: 10px; }
+.daily-table td { max-width: none; overflow: visible; }
+.cell-note { display: block; margin-top: 4px; font-size: 10px; color: var(--muted); }
 table { width: 100%; border-collapse: collapse; font-size: 12px; }
 th { padding: 11px 14px; color: var(--muted); background: #f8faf9; font-size: 10px; letter-spacing: .08em; text-align: left; white-space: nowrap; }
 td { padding: 13px 14px; border-top: 1px solid #edf1ef; vertical-align: middle; }

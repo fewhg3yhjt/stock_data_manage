@@ -18,6 +18,7 @@ def write_json(path: Path, value: dict) -> None:
 def web_fixture(tmp_path: Path):
     config = tmp_path / "config"
     config.mkdir()
+    (config / "presentation.yaml").write_bytes((Path(__file__).resolve().parents[1] / "config/presentation.yaml").read_bytes())
     (config / "collection.yaml").write_text(
         """storage:
   data_root: data
@@ -361,6 +362,85 @@ def test_source_type_uses_frozen_task_without_catalog_or_prefix_guess(tmp_path):
     write_json(summary_path.with_name("task.json"), {"asset_type": "etf", "units": []})
     assert reader.data_records(dataset="daily_bar", security="bj920001", asset_type="stock")["total"] == 0
     assert reader.data_records(dataset="daily_bar", security="bj920001", asset_type="etf")["total"] == 1
+
+
+@pytest.mark.parametrize("damage", ["duplicate", "field", "format", "path", "missing_path", "decimals", "source_values"])
+def test_presentation_rejects_invalid_contract(tmp_path, damage):
+    import yaml
+    from stock_data_manage.service.web import _presentation
+    _, _, _, _ = source_query_fixture(tmp_path)
+    config = tmp_path / "config"
+    path = config / "presentation.yaml"
+    document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    if damage == "duplicate": document["views"]["daily"]["columns"].append("symbol")
+    if damage == "field": document["views"]["daily"]["columns"].append("secret")
+    if damage == "format": document["fields"]["open"]["format"] = "eval"
+    if damage == "path": document["views"]["daily"]["values"]["open"] = "__class__"
+    if damage == "missing_path": document["views"]["daily"]["values"].pop("open")
+    if damage == "decimals": document["fields"]["open"]["min_decimals"] = -1
+    if damage == "source_values": document["views"]["daily_source"]["preserve_source_values"] = False
+    path.write_text(yaml.safe_dump(document, allow_unicode=True), encoding="utf-8")
+    with pytest.raises(HTTPException, match="展示配置错误"):
+        _presentation(config, "daily")
+    if damage == "format":
+        document["fields"]["open"]["format"] = []
+        path.write_text(yaml.safe_dump(document, allow_unicode=True), encoding="utf-8")
+        with pytest.raises(HTTPException, match="展示配置错误"):
+            _presentation(config, "daily")
+
+
+def test_source_projection_preserves_values_and_uses_config_order(tmp_path):
+    import yaml
+    reader, _, data, add = source_query_fixture(tmp_path)
+    source = add("sh600519", [{"0":"2026-10-09","2":"10.150","5":"0.00","9":"unchanged","symbol":"sh600519"}])
+    report_path = source.with_name("sh600519.report.json")
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    report["applied_unit_contract"] = {"source_units": {"volume":"lot"}}
+    write_json(report_path, report)
+    result = reader.data_records(dataset="daily_bar")
+    assert len(result["columns"]) == 12
+    row = result["items"][0]
+    assert row["values"]["9"] == "unchanged" and row["display_values"]["close"] == "10.150"
+    assert row["source_field_labels"]["9"] == "来源字段9（含义未核验）"
+    assert row["display_values"]["volume"] == "0.00" and row["field_metadata"]["volume"]["unit"] == "lot"
+    assert row["field_metadata"]["amount"]["status"] == "unverified"
+    assert row["name_source_date"] == "2026-10-09"
+    config_path = tmp_path / "config/presentation.yaml"
+    config = yaml.safe_load(config_path.read_text(encoding="utf-8"))
+    config["views"]["daily_source"]["columns"] = ["close", "symbol"]
+    config_path.write_text(yaml.safe_dump(config, allow_unicode=True), encoding="utf-8")
+    assert [column["key"] for column in reader.data_records(dataset="daily_bar")["columns"]] == ["close", "symbol"]
+
+
+def test_published_optional_field_status_is_not_guessed_from_market():
+    from stock_data_manage.service.web import _daily_field_metadata
+    row = {"asset_type":"stock","quote_unit":"CNY","values":dict(open="10",high="10",low="10",close="10",volume=None,amount="0"),"flags":[]}
+    assert _daily_field_metadata(row)["volume"]["status"] == "missing"
+    assert _daily_field_metadata(row)["amount"]["status"] == "available"
+    row["flags"] = ["unit_unverified:volume"]
+    assert _daily_field_metadata(row)["volume"]["reason"] == "单位未核验"
+
+
+def test_presentation_edit_does_not_change_frozen_daily_contract(tmp_path):
+    import shutil
+    import yaml
+    from stock_data_manage.pipeline.daily import resolve_daily_definition
+    config = tmp_path / "config"
+    shutil.copytree(Path(__file__).resolve().parents[1] / "config", config)
+    before = resolve_daily_definition({"task":"stock_daily"}, config)
+    path = config / "presentation.yaml"
+    document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    document["views"]["daily"]["columns"] = ["close", "symbol"]
+    path.write_text(yaml.safe_dump(document, allow_unicode=True), encoding="utf-8")
+    after = resolve_daily_definition({"task":"stock_daily"}, config)
+    assert after == before
+
+
+def test_source_query_rejects_conflicting_asset_metadata(tmp_path):
+    reader, _, data, add = source_query_fixture(tmp_path)
+    add("sh600519", [{"0":"2026-10-09", "2":"10", "asset_type":"etf", "symbol":"sh600519"}])
+    with pytest.raises(HTTPException, match="证券类型上下文冲突"):
+        reader.data_records(dataset="daily_bar")
 
 
 def test_record_query_snapshot_date_is_explicit_and_integrity_failure_visible(tmp_path):

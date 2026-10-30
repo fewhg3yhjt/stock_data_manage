@@ -15,6 +15,8 @@
 - `tmp/` 用于本地临时工作与正式实现的隔离验收。原根目录 `tmp_test/` 已撤掉，历史研究材料完整归档到 `provider_validation/results/legacy/tmp_test/`；迁移清单保留原路径、相对目录、文件哈希及旧绝对路径说明。新来源验证归入 `provider_validation/`，正式开发产物按既有业务运行布局保存。
 - 测试、命令及验证脚本在安装当前项目的同一环境中运行，不再通过 `PYTHONPATH=src` 暴露顶层 `providers`、`config` 等包。历史证据中的旧路径及哈希保留原样。
 
+`tests/presentation_acceptance.py`用原三股9份响应在`tmp/presentation-20261029/`零联网重放，显式复用已发布名单，核验查询与生产文件边界；`tests/daily_flow_browser.cjs`验证当前配置列、宽窄窗口、原值保留及类型渲染，不作为业务入口。
+
 ## 设计模块映射
 
 | 设计模块 | 当前目录 | 职责边界 |
@@ -31,9 +33,9 @@
 
 ## 配置与文档职责
 
-`service/web.py`的来源查询复用受管冻结任务补充证券类型元信息；`service/market_data.py`将已发布精度flags投影到日线API。拟议`config/presentation.yaml`尚未创建，当前仅在[页面设计](docs/service/read-only-web.md#展示字段合同与整改设计2026-10-30新增配置方案待确认)明确其职责，不能作为已有配置或实现使用。
+`service/web.py`校验并返回`config/presentation.yaml`的列说明，复用同根证券名单和冻结任务补齐查询元信息；`service/market_data.py`投影已发布flags，`pipeline/daily.py`承接量额未核验标记。前端只执行固定精确格式器，不计算业务单位倍率。展示配置不进入生产合同冻结，职责见[页面设计](docs/service/read-only-web.md#展示字段合同与整改实现2026-10-30已确认并验收)。
 
-根目录 `config/`：`providers.yaml` 保存来源和输入契约，`collection.yaml` 保存参数来源、范围与刷新频率，`capabilities.yaml` 保存路由策略，`datasets/` 保存字段模板，`normalization/` 保存来源映射，`schedules.yaml` 引用任务时间表。运行状态由现有存储维护，不回写YAML。
+根目录 `config/`：`presentation.yaml`只维护日线业务/来源两个视图的列说明、路径、顺序和格式；`providers.yaml` 保存来源和输入契约，`collection.yaml` 保存参数来源、范围与刷新频率，`capabilities.yaml` 保存路由策略，`datasets/` 保存字段模板，`normalization/` 保存来源映射，`schedules.yaml` 引用任务时间表。运行状态由现有存储维护，不回写YAML。
 
 | 文档 | 主要职责 |
 |---|---|

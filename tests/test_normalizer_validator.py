@@ -58,6 +58,16 @@ def test_unit_contract_reuses_dates_without_mutating_source_values():
     assert raw['5']=='100' and raw['8']=='20'
 
 
+@pytest.mark.parametrize('units', [ {'volume':'CNY','amount':'ten_thousand_CNY'},
+    {'volume':[],'amount':'ten_thousand_CNY'}, {'volume':'share','amount':'ten_thousand_CNY'} ])
+def test_source_unit_description_cannot_change_or_mislabel_conversion(units):
+    from stock_data_manage.quality.normalization import NormalizationError
+    rule,fields,raw,context=daily_unit_fixture()
+    rule['unit_contracts'][0]['source_units']=units
+    with pytest.raises(NormalizationError):
+        Normalizer.normalize_fields(raw,rule=rule,fields=fields,context=context,allow_pending=True)
+
+
 @pytest.mark.parametrize('change', [
     {'provider':'other'}, {'endpoint':'other'}, {'source_api':'fqkline'}, {'asset_type':None},
     {'exchange':'XSHE'}, {'source_bar_key':'day'}, {'adjustment':'backward'},

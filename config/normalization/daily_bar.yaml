@@ -35,6 +35,7 @@ rules:
         instrument_prefixes: ["XSHG:60", "XSHE:00", "XSHE:30"]
         series_adjustments: {day: none, qfqday: forward, hfqday: backward}
         multipliers: {volume: "100", amount: "10000"}
+        source_units: {volume: lot, amount: ten_thousand_CNY}
         precision_flags: {volume: source_volume_rounded_to_100_shares, amount: source_amount_rounded_to_100_CNY}
         evidence:
           - data/task_workspace/_checks/unit-review-20261030/unit-comparison.json
@@ -47,6 +48,7 @@ rules:
         instrument_prefixes: ["XSHG:688"]
         series_adjustments: {day: none}
         multipliers: {volume: "1", amount: "10000"}
+        source_units: {volume: share, amount: ten_thousand_CNY}
         precision_flags: {amount: source_amount_rounded_to_100_CNY}
         evidence:
           - data/task_workspace/_checks/unit-review-20261030/unit-comparison.json
@@ -59,6 +61,7 @@ rules:
         instrument_prefixes: ["XSHG:51", "XSHE:159"]
         series_adjustments: {qfqday: forward}
         multipliers: {volume: "100", amount: "10000"}
+        source_units: {volume: lot_fund_units, amount: ten_thousand_CNY}
         precision_flags: {volume: source_volume_rounded_to_100_units, amount: source_amount_rounded_to_100_CNY}
         evidence:
           - data/task_workspace/_checks/unit-review-20261030/unit-comparison.json

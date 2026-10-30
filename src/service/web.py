@@ -31,6 +31,64 @@ SENSITIVE_KEY = re.compile(
     re.IGNORECASE,
 )
 ASSET_ROOT = Path(__file__).with_name("static")
+DISPLAY_FIELDS = frozenset({"symbol", "security_name", "asset_type", "trade_date", "adjustment",
+    "open", "high", "low", "close", "volume", "amount", "provider", "status"})
+DISPLAY_NUMBERS = frozenset({"open", "high", "low", "close", "volume", "amount"})
+
+
+def _presentation(config_root: Path, view: str) -> list[dict[str, Any]]:
+    """Validate the small declared view contract; never evaluate expressions."""
+    try:
+        document = yaml.safe_load((config_root / "presentation.yaml").read_text(encoding="utf-8"))
+        if not isinstance(document, dict) or set(document) != {"fields", "views"}:
+            raise ValueError("必须定义fields和views")
+        fields, views = document["fields"], document["views"]
+        if not isinstance(fields, dict) or set(fields) - DISPLAY_FIELDS or not isinstance(views, dict) or set(views) != {"daily", "daily_source"}:
+            raise ValueError("未知字段或视图")
+        for key, field in fields.items():
+            if not isinstance(field, dict) or set(field) - {"label", "format", "min_decimals", "trim_trailing_zeros"}:
+                raise ValueError("非法字段说明: " + key)
+            if not isinstance(field.get("label"), str) or not field["label"].strip() or not isinstance(field.get("format"), str) or field.get("format") not in {
+                    "text", "date", "asset_type", "adjustment", "decimal", "quantity", "status"}:
+                raise ValueError("非法标题或格式: " + key)
+            if "min_decimals" in field and (type(field["min_decimals"]) is not int or not 0 <= field["min_decimals"] <= 8):
+                raise ValueError("非法小数位: " + key)
+            if "trim_trailing_zeros" in field and type(field["trim_trailing_zeros"]) is not bool:
+                raise ValueError("非法尾零设置: " + key)
+        for name, spec in views.items():
+            allowed = {"columns", "values"} if name == "daily" else {"columns", "preserve_source_values", "technical_fields", "unknown_fields"}
+            if not isinstance(spec, dict) or set(spec) - allowed:
+                raise ValueError("非法视图设置: " + name)
+            columns = spec.get("columns")
+            if not isinstance(columns, list) or not columns or any(not isinstance(k, str) or k not in fields for k in columns) or len(set(columns)) != len(columns):
+                raise ValueError("未知或重复列: " + name)
+            paths = spec.get("values", {})
+            if not isinstance(paths, dict) or any(k not in DISPLAY_NUMBERS or p != "values." + k for k, p in paths.items()):
+                raise ValueError("非法数据路径: " + name)
+            if name == "daily" and set(paths) != DISPLAY_NUMBERS:
+                raise ValueError("业务数值列必须声明全部已知取值路径")
+            if name == "daily_source" and (spec.get("preserve_source_values") is not True or
+                    spec.get("technical_fields") != "details" or spec.get("unknown_fields") != "details"):
+                raise ValueError("来源原值和详情边界不能修改")
+        spec = views[view]
+        return [{"key": key, **fields[key], "path": ("display_values." + key if view == "daily_source" else
+                    spec.get("values", {}).get(key, "values." + key if key in DISPLAY_NUMBERS else key)),
+                 "preserve_source": view == "daily_source"} for key in spec["columns"]]
+    except (OSError, yaml.YAMLError, ValueError, KeyError) as exc:
+        raise HTTPException(422, "展示配置错误: " + str(exc)) from exc
+
+
+def _daily_field_metadata(row: dict[str, Any]) -> dict[str, Any]:
+    flags = row["flags"]
+    result = {}
+    for field in DISPLAY_NUMBERS:
+        unit = row["quote_unit"] if field in {"open", "high", "low", "close"} else (
+            "CNY" if field == "amount" else {"stock": "share", "etf": "fund_unit", "lof": "fund_unit"}.get(row["asset_type"], ""))
+        state = "unverified" if "unit_unverified:" + field in flags else ("missing" if row["values"][field] is None else "available")
+        related = [flag for flag in flags if flag.startswith("source_" + field + "_rounded")]
+        result[field] = {"unit": unit, "status": state, "reason": "单位未核验" if state == "unverified" else
+            ("未提供标准值" if state == "missing" else ""), "precision_flags": related}
+    return result
 
 
 class SecurityHeadersMiddleware:
@@ -184,7 +242,7 @@ class DashboardReader:
         result = []
         seen = set()
         keys = {"dataset", "input_id", "provider", "endpoint", "data_date", "parameters",
-                "source_rows", "raw_manifest", "normalization_version", "code_version"}
+                "source_rows", "raw_manifest", "normalization_version", "code_version", "applied_unit_contract"}
         for root in (self.paths["workspace_root"], self.paths["archive_root"]):
             for path in root.glob("*/*/sources/*/*/*.report.json"):
                 if not _within(path, root):
@@ -261,7 +319,7 @@ class DashboardReader:
                         code = (market, code[1])
                     if code[1] and code not in catalog:
                         catalog[code] = {"name": str(row.get("name") or ""),
-                                         "asset_type": str(row.get("asset_type") or "")}
+                                         "asset_type": str(row.get("asset_type") or ""), "name_source_date": path.parent.parent.name}
             except (OSError, ValueError):
                 continue
         return catalog
@@ -275,6 +333,7 @@ class DashboardReader:
         schema_path = self.config_root / "normalization" / f"{dataset}.yaml"
         rules = (yaml.safe_load(schema_path.read_text(encoding="utf-8")) or {}).get("rules", []) if schema_path.is_file() else []
         catalog = self._security_catalog()
+        presentation_columns = _presentation(self.config_root, "daily_source") if dataset == "daily_bar" else None
         target_market, target_code = self._security_code(security)
         references = {}
         for document, summary_path, _ in self._task_documents():
@@ -297,6 +356,8 @@ class DashboardReader:
                   "stock_name": "证券名称", "open": "开盘价", "close": "收盘价",
                   "high": "最高价", "low": "最低价", "volume": "成交量（来源单位）",
                   "amount": "成交额（来源单位）"}
+        if presentation_columns is not None:
+            titles.update({column["key"]: column["label"] for column in presentation_columns})
         for report_path, report in self._query_reports():
             if report.get("dataset") != dataset or (provider and report.get("provider") != provider):
                 continue
@@ -367,6 +428,9 @@ class DashboardReader:
                 elif security and security.casefold() not in str(name).casefold():
                     continue
                 task_context = references.get(str(report_path.resolve()), {})
+                declared_assets = {kind for kind in (row.get("asset_type"), known.get("asset_type"), task_context.get("frozen_asset_type")) if kind}
+                if len(declared_assets) > 1:
+                    raise HTTPException(409, "证券类型上下文冲突: " + (row_market + row_code))
                 row_asset = str(row.get("asset_type") or known.get("asset_type") or task_context.get("frozen_asset_type") or "")
                 if asset_type and row_asset != asset_type:
                     continue
@@ -407,12 +471,30 @@ class DashboardReader:
                         if reference:
                             evidence_path = self._evidence_path(str(report_path.parents[3] / reference))
                     evidence = self._manifest_records(evidence_path) if evidence_path else []
+                display_values = {field: value(row, field, []) for field in DISPLAY_NUMBERS}
+                display_values.update(trade_date=record_date.isoformat() if record_date else None,
+                    symbol=(row_market + row_code) if row_code else str(symbol or request_symbol),
+                    security_name=str(name), asset_type=row_asset, adjustment=source_adjustment, provider=report.get("provider"))
+                source_units = (report.get("applied_unit_contract") or {}).get("source_units", {})
+                field_metadata = {field: {"unit": source_units.get(field, ""),
+                    "status": "available" if field in source_units else "unverified", "reason": "" if field in source_units else "单位未核验"}
+                    for field in ("volume", "amount")}
+                field_metadata.update({field: {"unit": "point" if row_asset == "index" else "CNY", "status": "available"}
+                    for field in ("open", "high", "low", "close")})
+                if presentation_columns is None:
+                    field_metadata = {}
                 matches.append({"record_date": record_date.isoformat() if record_date else None,
                                 "date_basis": date_basis if record_date else "未提供可筛选业务日期",
                                 "symbol": (row_market + row_code) if row_code else str(symbol or request_symbol),
                                 "security_name": str(name), "asset_type": row_asset,
                                 "provider": report.get("provider"), "endpoint": report.get("endpoint"),
                                 "adjustment": source_adjustment, "values": _redact(row),
+                                "name_source_date": known.get("name_source_date", ""),
+                                "display_values": _redact(display_values), "field_metadata": field_metadata,
+                                "source_field_labels": {key: next((titles[canonical] for canonical, original in mapping.items()
+                                    if original == key and canonical in titles),
+                                    {"source_api":"来源接口", "source_bar_key":"来源价格序列", "symbol":"证券代码"}.get(key,
+                                        "来源字段" + key + "（含义未核验）")) for key in row},
                                 "source_row_index": index, "source_rows_sha256": descriptor["sha256"],
                                 "code_version": report.get("code_version"),
                                 "normalization_version": report.get("normalization_version"), "evidence": evidence})
@@ -422,6 +504,9 @@ class DashboardReader:
         result.update(columns=[{"key": key, "label": column_labels.get(key, key)} for key in columns],
                       issues=issues[:50], excluded_unknown_date_count=unknown_dates,
                       dataset=dataset, representation="来源行提取结果；保留来源字段和原值，不是完整原始响应字节")
+        if presentation_columns is not None:
+            result["columns"] = presentation_columns
+            result["presentation"] = "daily_source"
         return result
 
     def _task_documents(self) -> list[tuple[dict[str, Any], Path, str]]:
@@ -927,8 +1012,15 @@ def create_app(
         from .market_data import query_daily
         from ..storage.parquet import InvalidPartitionError
         try:
-            return query_daily(reader.paths["canonical_root"], security=security, start_date=start_date,
+            result = query_daily(reader.paths["canonical_root"], security=security, start_date=start_date,
                 end_date=end_date, asset_type=asset_type, adjustment=adjustment, page=page, page_size=page_size)
+            catalog = reader._security_catalog()
+            for row in result["items"]:
+                known = catalog.get(reader._security_code(row["instrument_id"]), {})
+                row.update(security_name=known.get("name", ""), name_source_date=known.get("name_source_date", ""),
+                           field_metadata=_daily_field_metadata(row))
+            result["columns"] = _presentation(reader.config_root, "daily")
+            return result
         except ValueError as exc:
             raise HTTPException(400, str(exc)) from exc
         except (InvalidPartitionError, OSError) as exc:

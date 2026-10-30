@@ -42,6 +42,44 @@ function ageText(seconds) {
   return `${Math.floor(seconds / 86400)} 天前更新`;
 }
 function status(value) { return `<span class="status ${esc(value || 'unknown')}">${esc(statusLabels[value] || value || '未知')}</span>`; }
+function decimalText(value, minimum = 2, trim = true) {
+  const text = String(value), match = /^(-?\d+)(?:\.(\d+))?$/.exec(text);
+  if (!match) return text;
+  let fraction = match[2] || '';
+  if (trim) fraction = fraction.replace(/0+$/, '');
+  fraction = fraction.padEnd(minimum, '0');
+  return match[1] + (fraction ? '.' + fraction : '');
+}
+function displayCell(row, column) {
+  const value = column.path ? column.path.split('.').reduce((item,key) => item?.[key], row) : row.values?.[column.key];
+  const meta = row.field_metadata?.[column.key];
+  if (value === null || value === undefined || value === '') return `<span>${column.key==='security_name'?'未关联名称':'—'}</span>${meta?.reason?`<small class="cell-note">${esc(meta.reason)}</small>`:''}`;
+  const mappings = {asset_type:{stock:'股票',etf:'ETF',lof:'LOF',index:'指数'},
+    adjustment:{none:'不复权',forward:'前复权',backward:'后复权',qfq:'前复权',hfq:'后复权'},
+    status:{available:'价格可用',not_applicable:'不适用',missing:'缺失',unverified:'未核验'}};
+  let text = mappings[column.format]?.[value] || (typeof value==='object'?JSON.stringify(value):String(value));
+  if (!column.path) text = text.slice(0,180);
+  if (!column.preserve_source && ['decimal','quantity'].includes(column.format))
+    text = decimalText(value, column.min_decimals ?? (column.format==='quantity'?0:2), column.trim_trailing_zeros ?? true);
+  const units={CNY:'元',point:'点',share:'股',fund_unit:'份',lot:'手',lot_fund_units:'手（100份）',ten_thousand_CNY:'万元'};
+  let unit = meta?.status==='unverified'?'单位未核验':(units[meta?.unit] || '');
+  if (meta?.unit==='CNY' && ['open','high','low','close'].includes(column.key))
+    unit = {stock:'元/股',etf:'元/份',lof:'元/份'}[row.asset_type] || unit;
+  const notes=[];
+  if (unit) notes.push(unit);
+  if (meta?.precision_flags?.length) notes.push(...meta.precision_flags.map(flag=>({
+    source_volume_rounded_to_100_shares:'来源舍入至100股', source_amount_rounded_to_100_CNY:'来源舍入至100元',
+    source_volume_rounded_to_100_units:'来源舍入至100份'}[flag] || '来源舍入')));
+  if (column.key==='security_name' && row.name_source_date) notes.push('名单 '+row.name_source_date);
+  if (column.key==='status' && Object.values(row.field_metadata || {}).some(item=>item.status==='unverified')) notes.push('量额单位未核验');
+  return `<span>${esc(text)}</span>${notes.length?`<small class="cell-note">${esc(notes.join(' · '))}</small>`:''}`;
+}
+function displayTable(data, source = false) {
+  const columns = data.presentation ? data.columns : [
+    {key:'trade_date',label:'查询日期',path:'record_date'}, {key:'symbol',label:'证券代码',path:'symbol'},
+    {key:'provider',label:'来源',path:'provider'}, ...data.columns];
+  return `<div class="table-wrap"><table class="data-table daily-table"><thead><tr>${columns.map(col=>`<th data-column="${esc(col.key)}">${esc(col.label)}</th>`).join('')}</tr></thead><tbody>${data.items.map((row,index)=>`<tr ${source?`class="clickable data-row" data-index="${index}"`:''}>${columns.map(col=>`<td data-column="${esc(col.key)}">${displayCell(row,col)}</td>`).join('')}</tr>`).join('')||`<tr><td colspan="${columns.length}">没有匹配的本地记录。查询不会触发联网采集。</td></tr>`}</tbody></table></div>`;
+}
 function showToast(message) {
   const toast = document.querySelector('#toast'); toast.textContent = message; toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 2200);
@@ -252,7 +290,6 @@ async function renderData() {
   try { data = await api(`/api/data?${params}`); }
   catch (error) { data.issues = [{provider:'查询条件',reason:error.message}]; }
   if (sequence !== renderSequence || state.view !== 'data') return;
-  const valueText = value => value === null || value === undefined ? '—' : typeof value === 'object' ? JSON.stringify(value) : String(value);
   app.innerHTML = `<form class="filters data-filters" id="data-filters">
     <label>数据类型<select name="dataset">${options.datasets.map(item => `<option value="${esc(item.id)}">${esc(item.label)}</option>`).join('')}</select></label>
     <label>证券（可选）<input name="security" placeholder="留空查询全部；也可输入代码或名称"></label>
@@ -264,9 +301,7 @@ async function renderData() {
   ${data.excluded_unknown_date_count ? `<p class="notice">${prettyNumber(data.excluded_unknown_date_count)} 条记录缺少明确业务日期，未纳入本次日期筛选。</p>` : ''}
   ${data.issues.length ? `<p class="notice">${prettyNumber(data.issues.length)} 份来源文件未通过读取或完整性检查，已排除。${esc(data.issues.map(item => `${item.provider}: ${item.reason}`).join('；'))}</p>` : ''}
   <section class="panel"><div class="panel-head"><h2>来源数据预览</h2><small>${prettyNumber(data.total)} 条匹配记录 · 点击查看详情</small></div>
-  <div class="table-wrap"><table class="data-table"><thead><tr><th>查询日期</th><th>证券</th><th>来源</th>${data.columns.map(col => `<th>${esc(col.label)}</th>`).join('')}</tr></thead><tbody>
-  ${data.items.length ? data.items.map((row,index) => `<tr class="clickable data-row" data-index="${index}"><td>${esc(row.record_date || '未提供')}</td><td><strong>${esc(row.symbol)}</strong><br>${esc(row.security_name)}</td><td>${esc(row.provider)}</td>${data.columns.map(col => `<td title="${esc(valueText(row.values[col.key]))}">${esc(valueText(row.values[col.key]).slice(0,180))}</td>`).join('')}</tr>`).join('') : `<tr><td colspan="${data.columns.length+3}">没有匹配的本地留存记录。可调整证券、日期或来源；查询不会触发联网采集。</td></tr>`}
-  </tbody></table></div>${pager('data',data)}</section>`;
+  ${displayTable(data,true)}${pager('data',data)}</section>`;
   const form = document.querySelector('#data-filters');
   for (const [key,value] of Object.entries(filters)) form.elements.namedItem(key).value = value;
   form.addEventListener('submit',event => {event.preventDefault();state.filters.data = Object.fromEntries(new FormData(form));state.pages.data=1;renderData().catch(fail);});
@@ -276,8 +311,8 @@ async function renderData() {
   document.querySelectorAll('.data-row').forEach(element => element.addEventListener('click',() => {
     const row = data.items[Number(element.dataset.index)];
     dialogContent.innerHTML = `<h2 class="dialog-title">${esc(row.symbol)} ${esc(row.security_name)}</h2><p class="dialog-subtitle">${esc(row.provider)} · ${esc(row.endpoint)}</p>
-    <div class="facts-grid"><div class="fact"><span>查询日期及依据</span><strong>${esc(row.record_date || '未提供')} · ${esc(row.date_basis)}</strong></div><div class="fact"><span>来源文件内行号（从1开始）</span><strong>${row.source_row_index+1}</strong></div><div class="fact"><span>资产类型 / 请求复权</span><strong>${esc(row.asset_type || '未提供')} / ${esc(row.adjustment || '未提供')}</strong></div></div>
-    <h3>来源字段与原值</h3><pre class="code-block">${esc(JSON.stringify(row.values,null,2))}</pre>
+    <div class="facts-grid"><div class="fact"><span>查询日期及依据</span><strong>${esc(row.record_date || '未提供')} · ${esc(row.date_basis)}</strong></div><div class="fact"><span>来源文件内行号（从1开始）</span><strong>${row.source_row_index+1}</strong></div><div class="fact"><span>资产类型 / 请求复权</span><strong>${displayCell(row,{key:'asset_type',path:'asset_type',format:'asset_type'})} / ${displayCell(row,{key:'adjustment',path:'adjustment',format:'adjustment'})}</strong></div></div>
+    <h3>来源字段与原值</h3><p class="subtle">${Object.entries(row.source_field_labels||{}).map(([key,label])=>`${esc(key)}：${esc(label)}`).join('；')}。保留原编号和原值。</p><pre class="code-block">${esc(JSON.stringify(row.values,null,2))}</pre>
     <h3>来源行文件 SHA-256</h3><pre class="code-block">${esc(row.source_rows_sha256)}</pre>
     <h3>关联原始响应</h3>${row.evidence.map((record,index) => `<button class="secondary query-evidence" data-id="${esc(record.id)}">${esc(record.provider)} · 响应 ${index+1} · ${esc(formatTime(record.fetched_at_utc))}</button>`).join('') || '<p class="subtle">当前没有可读取的关联原始响应。</p>'}
     <p class="subtle query-description">${esc(data.representation)}。辅助证券名称和资产类型可来自已发布证券名单，不改变上方来源字段。</p>`;
@@ -303,9 +338,7 @@ async function renderDaily() {
     <label>展示口径<select name="adjustment">${modes}</select></label><button class="primary">查询</button></form>
     <p class="subtle">默认展示不复权。切换只读取同一条已发布记录，指数显示点位，股票与ETF显示价格；没有数据时不会请求上游或回退其他口径。</p>
     <section class="panel"><div class="panel-head"><h2>已发布规范日线</h2><small>${prettyNumber(data.total)} 条记录</small></div>
-    <div class="table-wrap"><table><thead><tr><th>证券 / 类型</th><th>日期</th><th>口径 / 单位</th><th>开</th><th>高</th><th>低</th><th>收</th><th>来源 / 状态</th></tr></thead><tbody>
-    ${data.items.map(row=>`<tr><td>${esc(row.symbol)} / ${esc(kinds[row.asset_type])}</td><td>${esc(row.trade_date)}</td><td>${esc(names[row.adjustment])} / ${row.value_kind==='index_points'?'点':esc(row.quote_unit)}</td>${['open','high','low','close'].map(k=>`<td>${esc(row.values[k]??'—')}</td>`).join('')}<td>${esc(row.provider||'—')} / ${esc({available:'可用',not_applicable:'不适用',missing:'缺失',unverified:'未核验'}[row.status])}<br>${esc(row.reason)}</td></tr>`).join('')||'<tr><td colspan="8">没有已发布的聚合日线。旧单口径数据不自动替代新结构。</td></tr>'}
-    </tbody></table></div>${pager('daily',data)}</section>`;
+    ${displayTable({...data,presentation:'daily'})}${pager('daily',data)}</section>`;
   const form=document.querySelector('#daily-filters');
   for(const [key,value] of Object.entries(filters)) form.elements.namedItem(key).value=value;
   const submit=event=>{event.preventDefault();state.filters.daily=Object.fromEntries(new FormData(form));state.pages.daily=1;renderDaily().catch(fail);};
