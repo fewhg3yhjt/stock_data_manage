@@ -36,9 +36,11 @@
 |---|---|
 | `README.md` | 项目安装、运行与文档导航 |
 | `AGENTS.md` | 协作、验证、权限及定期文档整理要求 |
-| `PROJECT_PROGRESS.md` | 当前实现、差距和下一步，不重复历史批次流水账 |
-| `STOCK_ANALYSIS_V2_MARKET_DATA_CENTER_ARCHITECTURE_V1.md` | 总体架构、术语、模块边界及合并保留的分钟规则；顶部维护现状评审，第4、5章维护逻辑架构、UML对象关联、策略与适配器模式、阶段合同及YAML设计稿，明确区别于当前实现 |
-| `stock-data-design-qfq-history-rebuild.md` | 多口径日线聚合记录、证券类型与价格/点位语义、口径适用状态、默认消费及人工历史重建规则；保留原文件路径 |
+| `PROJECT_PROGRESS.md` | 当前交付、开发任务依赖、状态、验收证据及未关闭问题；历史决策另见docs/engineering-decisions.md |
+| `docs/engineering-decisions.md` | 重要决策与被替代合同、原证据索引及本次文档承接关系，不维护运行状态 |
+| `docs/pipeline/daily-history-rebuild.md` | 历史事件、换版确认、人工三口径重建及多日期统一切换的待实现合同 |
+| `STOCK_ANALYSIS_V2_MARKET_DATA_CENTER_ARCHITECTURE_V1.md` | 总体架构、术语、模块边界、对象关联、阶段合同与配置职责；具体分钟规则见任务流程，当前交付见进度，历史取舍见工程决策 |
+| `stock-data-design-qfq-history-rebuild.md` | 多口径日线聚合记录、证券类型与价格/点位语义、口径适用状态及默认消费；历史重建另见docs/pipeline/daily-history-rebuild.md，原路径保留 |
 | `stock-data-test-design-acceptance-baseline.md` | 测试层次、故障场景和验收门槛 |
 | `provider-capability-verification-and-normalization.md` | 来源证据、资格及YAML归一化规则 |
 | `docs/providers/README.md` | 正式源头接口说明、各数据域边界及说明表依据 |
@@ -180,7 +182,7 @@
 | `worker/progress.py` | 三阶段统一采集单元计数，发布整批完成后计入；内部动作和旧快照恢复、失败与复用、耗时及节流；CLI stderr展示，不管理调度或业务数据 |
 | `worker/recovery.py` | 既有提交、临时文件和元数据恢复；日期工作区归档前复核候选、原响应及发布，归档后更新元数据和摘要；保留旧材料归档校验 |
 | `worker/scheduler.py` | 既有任务时间表及频率计算；构建证券任务时按目标日期选择当前或历史来源，绑定请求日期、日历和检查范围；定时名单继续使用当前目录 |
-| `worker/acceptance.py` | 离线验收回放和容量/恢复验收证据 |
+| `worker/acceptance.py` | 合成组件的存储重放、恢复和容量估算自检；逐项预期/实际值、范围、实现哈希和证据，不能签署项目M1/M2 |
 | `worker/__init__.py` | Worker 包说明，不承载业务实现 |
 
 任务入口 `pipeline/inputs.py` 支持正式留存响应模式及持久化进度；`cli.py` 提供 `--mode retained`、`--progress/--no-progress`。实现测试新增 `tests/test_task_progress.py`（进度、未知总量、失败和恢复计数）与 `tests/test_retained_daily.py`（合成四层资格、范围及哈希拒绝、零网络发布和恢复）；测试只写tmp，不作为真实来源资格。
@@ -188,7 +190,7 @@
 腾讯窗口输入沿用同一输入ID：`pipeline/inputs.py`保留完整来源行、只映射请求日期，并将动态日线任务顶层config传到冻结的各证券单元；`routing/factory.py`按显式api识别北交所及精确参数资格，在线日线按精确范围或显式市场/资产/窗口授权放行，四层样本证据仍核验，并在创建任务前及每个单元执行前检查，未认证范围保持阻断。相关合同和配置传递测试补入现有`tests/test_provider_contract_adapters.py`、`tests/test_collection_tasks.py`。
 
 证券任务省略units时，`pipeline/inputs.py` 查询既有交易日历并调用 `worker/scheduler.py` 按collection.yaml构建来源；`routing/factory.py` 对历史ETF按完整日期参数及互补发布数量检查资格。新增行为在既有 `tests/test_scheduler.py`、`tests/test_collection_tasks.py` 验证，不新增任务管理模块。
-| `cli.py` | `collect-due-inputs`（默认保存计划）、`collect-input`（默认分层落盘，支持 JSON 参数上下文及隔离验证输出）、`probe-*`、`recover`、`acceptance-offline` 等入口，负责参数解析、UTF-8结果与进度输出和现有流程组装 |
+| `cli.py` | `collect-due-inputs`（默认返回单次计划）、`collect-input`（默认分层落盘，支持 JSON 参数上下文及隔离验证输出）、`probe-*`、`recover`、`acceptance-offline` 等入口，负责参数解析、UTF-8结果与进度输出和现有流程组装 |
 | `__init__.py` | 包级公共领域模型导出 |
 
 ## 维护约束

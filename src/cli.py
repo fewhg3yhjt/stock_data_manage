@@ -60,7 +60,7 @@ def main(argv: list[str] | None = None) -> int:
                          help="archive an explicitly selected, verified published task")
 
     acceptance = subcommands.add_parser(
-        "acceptance-offline", help="run deterministic offline M1 acceptance evidence"
+        "acceptance-offline", help="check synthetic offline components; does not certify project M1/M2"
     )
     acceptance.add_argument("--root", type=Path, required=True)
     acceptance.add_argument("--end-date", type=date.fromisoformat, default=date(2026, 9, 11))
@@ -294,7 +294,7 @@ def main(argv: list[str] | None = None) -> int:
             args.output.parent.mkdir(parents=True, exist_ok=True)
             args.output.write_text(payload + "\n", encoding="utf-8")
         print(payload)
-        return 0
+        return 0 if all(check["status"] == "PASS" for check in report.checks.values()) else 2
 
     from .config.loader import load_storage_paths
     from .worker.recovery import archive_published_task, recover_collection_tasks

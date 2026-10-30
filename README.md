@@ -1,12 +1,12 @@
 # Stock Data Manage
 
-证券数据采集与管理项目。当前股票日线以“证券+交易日”一条聚合记录保存不复权、前复权和后复权三组数据，旧单口径数据保持原样。2026-10-28的沪深北三只样本已完成v7正式留存发布与只读查询验收。2026-10-30单位规则升级为v8并完成留存响应隔离验收；旧正式文件保留，旧资格因代码与配置变化需复核，未启用在线采集或调度。指数名单及其他资产的正式能力仍待核验。现有运行台只读，任务操作与覆盖质量页面尚待开发。最新状态和验收证据见[项目进度与待办](PROJECT_PROGRESS.md#2026-10-30-按来源与证券类别匹配单位合同)。
+证券数据采集与管理项目。当前股票日线以“证券+交易日”一条聚合记录保存不复权、前复权和后复权三组数据，旧单口径数据保持原样。2026-10-28的沪深北三只样本已完成v7正式留存发布与只读查询验收。2026-10-30单位规则升级为v8并完成留存响应隔离验收；旧正式文件保留，旧资格因代码与配置变化需复核，未启用在线采集或调度。指数名单及其他资产的正式能力仍待核验。现有运行台只读，任务操作与覆盖质量页面尚待开发。最新状态和验收证据见[项目进度与待办](PROJECT_PROGRESS.md#当前业务交付状态)。
 
 | 需要了解什么 | 文档入口 |
 |---|---|
 | 总体架构、术语和模块边界 | [总体设计](STOCK_ANALYSIS_V2_MARKET_DATA_CENTER_ARCHITECTURE_V1.md) |
-| 已确认的任务与数据对象设计及当前日线实现 | [逻辑架构和对象关系](STOCK_ANALYSIS_V2_MARKET_DATA_CENTER_ARCHITECTURE_V1.md#4-对象职责与执行设计2026-10-28已确认)、[日线聚合实现状态](stock-data-design-qfq-history-rebuild.md#实施现状2026-10-30)、[任务流程](docs/pipeline/collection-tasks.md#已确认设计与当前实现2026-10-28) |
-| 当前功能、实际架构框图与优化议题（2026-10-27） | [当前实现评审](STOCK_ANALYSIS_V2_MARKET_DATA_CENTER_ARCHITECTURE_V1.md#当前实现与优化评审2026-10-27)、[核心流程框图](docs/pipeline/collection-tasks.md#当前实现流程图2026-10-27) |
+| 已确认的任务与数据对象设计及当前日线实现 | [逻辑架构和对象关系](STOCK_ANALYSIS_V2_MARKET_DATA_CENTER_ARCHITECTURE_V1.md#职责对象关系与阶段合同)、[日线聚合实现状态](stock-data-design-qfq-history-rebuild.md#实施现状2026-10-30)、[任务流程](docs/pipeline/collection-tasks.md#已确认设计与当前实现2026-10-28) |
+| 当前交付状态、对象关系及执行合同 | [当前交付](PROJECT_PROGRESS.md#当前业务交付状态)、[核心流程框图](docs/pipeline/collection-tasks.md#已确认设计与当前实现2026-10-28) |
 | 现有目录和代码负责什么 | [代码结构](CODE_STRUCTURE.md) |
 | 输入参数、采集字段、映射及范围 | [源头接口说明](docs/providers/README.md)、[股票与ETF来源](docs/providers/security-catalog.md) |
 | 原始暂存、检查、发布、重做和证券清单调度 | [任务流程](docs/pipeline/collection-tasks.md) |
@@ -14,7 +14,9 @@
 | 在本机查看任务、原始证据和发布结果 | [只读运行台](docs/service/read-only-web.md) |
 | 用 Docker 部署只读运行台并更新代码 | [Docker 部署说明](docs/service/container-deployment.md) |
 | 来源资格、证据与归一化设计 | [来源专项设计](provider-capability-verification-and-normalization.md) |
-| 日线各复权口径聚合、价格/点位类型、消费与历史重建 | [多口径日线设计](stock-data-design-qfq-history-rebuild.md) |
+| 日线记录、价格/点位类型及消费 | [多口径日线合同](stock-data-design-qfq-history-rebuild.md) |
+| 历史变化、人工重建与跨日期切换（待实现） | [历史重建合同](docs/pipeline/daily-history-rebuild.md) |
+| 为什么改变设计、旧合同由什么替代 | [工程决策](docs/engineering-decisions.md) |
 | 怎么判断功能完成和数据可用 | [验收基线](stock-data-test-design-acceptance-baseline.md) |
 | 开发协作与文档维护要求 | [AGENTS.md](AGENTS.md) |
 
@@ -62,71 +64,19 @@
 
 股票日线由 YAML 声明任务和采集策略，分别保留三口径响应，再聚合成“证券+交易日”一条记录；页面默认显示不复权，可切换已存口径。当前已使用真实v7响应完成2026-10-28三只股票的隔离重做、恢复和正式留存发布，规范日线查询逐组回读通过；历史正式数据的量额仍为空；v8已按来源、证券类型/代码段和实际序列换算覆盖范围内的量额，完成留存回放及隔离聚合验收，尚未重做正式数据或登记新资格，持续调度关闭。ETF、LOF、指数的适用口径和聚合发布仍待验收。旧单口径数据及其他正式文件保持原样。详见[聚合设计和实施现状](stock-data-design-qfq-history-rebuild.md)及[项目进度](PROJECT_PROGRESS.md)。
 
-## 当前开发状态
+## 开发与验收入口
 
-第一批基础能力已实现：
+当前交付、任务依赖、阻断和实际证据统一见[项目进度](PROJECT_PROGRESS.md)；本页不另维护组件完成长列表。源头候选成功、隔离回放、正式发布、当前资格及常驻运行须分别判断。
 
-- Provider Capability 的范围、有效期、角色和吞吐量筛选；
-- 日线/分钟统一领域模型与 Canonical 主键；
-- 基于明确状态的 Missing Set；
-- Provider 维度的单位和分钟时间戳标准化；
-- OHLC、成交量、时间键校验；
-- final/provisional、字段完整度和来源优先级仲裁；
-- soft/hard conflict 识别及单条隔离；
-- Collection Attempt 状态机、租约过期和 Raw 复用判定；
-- 确定性 row hash、文件 manifest 生成和篡改校验；
-- 按 A 股 Session 边界从完整 1m 派生 5m；
-- SQLite WAL Hot Minute UPSERT、质量降级保护和即时查询。
-- DuckDB Partition/Item/Attempt/Conflict 元数据；
-- 不覆盖的 Raw Object Store；
-- Canonical Parquet 合并、文件锁、Manifest 与原子替换；
-- 中断后的临时文件隔离、发布续接和元数据恢复；
-- Fixture Provider 驱动的日线端到端 Missing Set/Fallback 链路。
-- Provider Contract 对 HTML 200、403/429、5xx、空返回、Schema 漂移和静默截断分类；
-- Capability Probe 证据与有效期持久化；
-- Endpoint/市场/资产粒度的失败计数、冷却及 Probe 恢复门槛；
-- 按天数和最大行数约束拆分历史请求窗口；
-- Sina、Tencent 日线 HTTP 请求与响应解析适配器。
-- A 股连续竞价 Session 配置与 240 根 Expected Minute 计算；
-- Watchlist 实时分钟吞吐预算、闭合延迟过滤和 Hot Store 写入；
-- 累计快照差分生成 provisional 1m，并标记采样不足/跨日重置；
-- Canonical + Hot 统一分钟查询；
-- 盘后 Minute Reconciliation、final 提升、冲突隔离和分钟完整性统计。
-- Phase 1 配置化任务时间表与按日幂等的 due-job 调度器。
-- Security Master 与 Trading Calendar 更新服务，支持来源缺失保留、历史变更审计和官方优先级。
-- Tencent 原生 1m、Sina 原生 5m 与可注入 TDX 延迟 1m 适配器；TDX 因公共主站不稳定默认禁用。
-- Tencent/Sina 批量快照文本响应适配器，保留原始成交量/成交额单位标记供后续 Normalization Rule 使用。
-- 收盘快照到 provisional 日线的构建服务，单位换算和来源语义由 Normalization Rule 控制。
-- 日线 Reconciliation：按主键合并 provisional/final、提升质量状态并记录缺失与冲突。
-- 独立的 `config/schedules.yaml` 调度配置；已禁用的 TDX 延迟分钟任务不会进入运行计划。
-
-默认测试只使用离线 Fixture，不会访问第三方行情接口；显式执行 `probe-*` 命令才会访问对应来源，探针证据不写入生产数据目录。
-
-显式执行一次小流量能力探针（会访问对应行情来源）：
+运行合成组件自检（仅写独立tmp根目录，不访问来源）：
 
 ```powershell
-python -m stock_data_manage.cli probe-daily --provider sina --symbol sh600519 --trade-date 2026-09-11
+& 'D:\Program Files\Python\python.exe' -m stock_data_manage.cli acceptance-offline --root tmp/offline-components --output tmp/offline-components/report.json
 ```
 
-分钟来源探针：
+该报告只检查20个模拟工作日的单股存储重放、一处发布恢复和200只观察池预算。逐项检查成功不等于项目Gate C/D/E全部通过；源码与静态检查、真实来源、全资产回放、完整故障矩阵、实测时效及连续交易日均需各自证据。组件失败时CLI返回非零码。
 
-```powershell
-python -m stock_data_manage.cli probe-minute --provider tencent --symbol sh600519 --frequency 1 --as-of 2026-09-11T13:02:00+08:00
-```
-
-进程中断后的 Canonical 与元数据恢复：
-
-```powershell
-python -m stock_data_manage.cli recover --canonical-root data/canonical --metadata data/metadata/metadata.duckdb
-```
-
-运行可重复的离线 M1 验收证据：
-
-```powershell
-python -m stock_data_manage.cli acceptance-offline --root tmp/acceptance-m1 --output tmp/acceptance-m1/report.json
-```
-
-该报告覆盖 20 个工作日回放、Canonical 幂等、断电恢复和 200 只 Watchlist 容量；旧 Provider Probe 样本见 [历史能力矩阵](PROVIDER_CAPABILITY_MATRIX.md)，当前资格不能由旧矩阵推导，连续交易日试运行仍需在目标运行环境执行。
+工程决策见[决策记录](docs/engineering-decisions.md)，未来历史重建见[独立合同](docs/pipeline/daily-history-rebuild.md)。历史能力矩阵仅为指定日期证据索引。
 
 ## 本地验证
 
@@ -148,7 +98,7 @@ stock-data-web
 浏览器访问 `http://127.0.0.1:8765`。“数据查询”可按数据类型、证券代码或名称、日期区间预览来源记录，并查看对应原始响应。该页面只读取现有 `data/` 产物，不启动、停止或修改采集任务；状态解释、日期口径、原始响应脱敏及后续云端部署边界见[只读运行台说明](docs/service/read-only-web.md)。
 
 ```powershell
-python -m pytest
+& 'D:\Program Files\Python\python.exe' -m pytest
 ```
 
-当前实现已覆盖 Phase 1 的离线核心链路与 Provider 契约适配；Tencent、Sina、BaoStock、THS、EastMoney 分红事件/证券列表/实时行情、AkShare 日线适配器已按来源拆分。数据集标准定义位于 `config/datasets/`，数据集专用归一化规则位于 `config/normalization/`，Endpoint 静态配置位于 `config/providers.yaml`，能力路线位于 `config/capabilities.yaml`。AkShare 是可选依赖，建议使用 `python -m pip install -e .[akshare]` 安装；当前股票、ETF、LOF、指数代表样本和 THS 行业/概念代表板块已完成真实探针，但仍保持 `validation_only`。EastMoney 实时行情和证券列表本次正式探针为 `RemoteDisconnected`，前复权完整历史来源、TDX 真实客户端、EastMoney 分红事件/证券列表/实时行情完整覆盖仍未完成。未验证或未实现的来源不会自动进入生产候选。
+数据集合同位于 `config/datasets/`，来源映射位于 `config/normalization/`，接口参数位于 `config/providers.yaml`，采集策略位于 `config/capabilities.yaml`。各来源的历史样本、当前实现、生产资格和调度状态分别查看[来源说明](docs/providers/README.md)与[项目进度](PROJECT_PROGRESS.md)，不由适配器存在或安装成功推定可生产。当前指定解释器与每次测试前的依赖核对要求见[项目环境](AGENTS.md#项目python环境与测试执行)；本轮全套回归的依赖兼容阻断见项目进度。

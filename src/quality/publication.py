@@ -33,7 +33,10 @@ class PublicationPolicy:
 
 def load_publication_policy(path: str | Path, dataset: str) -> PublicationPolicy:
     payload = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
-    publication = payload["datasets"][dataset]["publish"]
+    contract = payload["dataset"]
+    if contract["name"] != dataset:
+        raise ValueError("publication policy dataset does not match its contract")
+    publication = contract["publication"]
     return PublicationPolicy(
         max_missing_ratio=Decimal(str(publication["max_missing_ratio"])),
         max_missing_count=int(publication["max_missing_count"]),

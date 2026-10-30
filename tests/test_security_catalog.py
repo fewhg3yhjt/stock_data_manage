@@ -332,7 +332,10 @@ def test_bao_real_archived_snapshot_adds_etfs_without_reclassifying_indexes(tmp_
         mode="replay", replay_manifest=BAO, pacer=RequestPacer(wait=lambda _: None))
     assert report["status"] == "candidate_complete", report.get("error")
     rows = output_rows(report)
-    assert report["asset_type_counts"] == {"stock": 5224, "etf": 1692, "index": 0}
+    # This snapshot reports stock/ETF counts. Check index exclusion directly
+    # against every candidate instead of inventing a third report field.
+    assert report["asset_type_counts"] == {"stock": 5224, "etf": 1692}
+    assert {row["asset_type"] for row in rows} == {"stock", "etf"}
     assert len(rows) == 6916 and report["excluded_rows"]["row_count"] == 507
     assert any(row["stock_code"] == "302132" and row["asset_type"] == "stock" for row in rows)
     assert any(row["stock_code"] == "511600" and row["asset_type"] == "etf" for row in rows)

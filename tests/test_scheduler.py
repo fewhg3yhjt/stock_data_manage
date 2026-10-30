@@ -113,6 +113,41 @@ def profiles():
     return {p.name: p for p in load_collection_profiles(ROOT / "config/collection.yaml")}
 
 
+@pytest.mark.parametrize("opened,hour,expected", [(True, 8, "failed"), (False, 8, "not_due"), (True, 7, "not_due")])
+def test_master_execute_with_known_calendar_never_refreshes(tmp_path, monkeypatch, opened, hour, expected):
+    from stock_data_manage.service.calendar import TradingCalendarStore, CalendarDay
+    from stock_data_manage.service.calendar_update import TradingCalendarUpdater
+    (tmp_path / "metadata").mkdir()
+    with TradingCalendarStore(str(tmp_path / "metadata/metadata.duckdb")) as calendar:
+        calendar.upsert([CalendarDay(DAY, opened, "fixture", 1)])
+    def forbidden(*args, **kwargs):
+        raise AssertionError("known calendar must not be refreshed")
+    monkeypatch.setattr(TradingCalendarUpdater, "update_baostock_day", forbidden)
+    report = collect_due_inputs(now=stamp(hour, 0), config_root=ROOT / "config", data_root=tmp_path,
+        dataset="security_master", execute=True, mode="live", collector=forbidden)
+    assert report["jobs"][0]["status"] == expected
+    assert "calendar_evidence" not in report["jobs"][0]
+    assert report["production_writes"] == 0
+
+
+def test_master_execute_unknown_due_calendar_refreshes_once(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+    from stock_data_manage.service.calendar import CalendarDay
+    from stock_data_manage.service.calendar_update import TradingCalendarUpdater
+    calls = []
+    def update(self, *, trade_date, **kwargs):
+        calls.append(trade_date)
+        self.store.upsert([CalendarDay(trade_date, False, "fixture", 1)])
+        return SimpleNamespace(source_manifest=tmp_path / "calendar-evidence.json")
+    monkeypatch.setattr(TradingCalendarUpdater, "update_baostock_day", update)
+    report = collect_due_inputs(now=stamp(8, 0), config_root=ROOT / "config", data_root=tmp_path,
+        dataset="security_master", execute=True, mode="live")
+    assert calls == [DAY]
+    assert report["jobs"][0]["reason"] == "confirmed non-trading day"
+    assert report["jobs"][0]["calendar_evidence"].endswith("calendar-evidence.json")
+    assert report["production_writes"] == 0
+
+
 def stamp(hour, minute, second=0, day=DAY):
     return datetime.combine(day, time(hour, minute, second), SHANGHAI)
 

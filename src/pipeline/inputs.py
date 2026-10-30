@@ -2308,7 +2308,7 @@ def _collect_due_security_master(*, now, config_root, data_root, execute, mode, 
     job = plan_security_master_collection(root, now=now, is_trading_day=is_open)
     if calendar_days is None and execute and calendar_error:
         job.update(status="blocked", reason="trading calendar update failed: " + calendar_error)
-    elif calendar_days is None and execute and update.source_manifest:
+    elif calendar_days is None and execute and update is not None and update.source_manifest:
         job["calendar_evidence"] = str(update.source_manifest)
     contracts = {c.input_id: c for c in load_input_capabilities(root / "providers.yaml")}
     if job["status"] == "ready":

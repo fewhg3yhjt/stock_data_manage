@@ -4,11 +4,11 @@ from dataclasses import asdict, dataclass
 from datetime import date, datetime, time, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
-from uuid import uuid4
 
 from ..domain import Adjustment, AssetType, DailyRecord, QuoteGroup, QuoteStatus, Dataset, Exchange, ItemStatus
 from ..routing.capabilities import ProviderCapability
 from ..routing.router import plan_realtime_collection
+from ..storage.integrity import file_hash
 from ..storage.metadata import MetadataStore
 from ..storage.parquet import CanonicalPartitionStore
 from .recovery import RecoveryScanner
@@ -19,6 +19,9 @@ class OfflineAcceptanceReport:
     test_run_id: str
     started_at: str
     finished_at: str
+    scope: dict[str, object]
+    implementation: dict[str, str]
+    checks: dict[str, dict[str, object]]
     gates: dict[str, str]
     metrics: dict[str, object]
     known_gaps: tuple[str, ...]
@@ -35,13 +38,16 @@ def run_offline_acceptance(
     test_run_id: str | None = None,
 ) -> OfflineAcceptanceReport:
     started = datetime.now(timezone.utc)
-    run_id = test_run_id or f"offline-m1-{uuid4().hex[:10]}"
+    run_id = test_run_id or f"offline-components-{started:%Y%m%d-%H%M%S-%f}"
     root_path = Path(root)
     canonical = CanonicalPartitionStore(root_path / "canonical")
-    recovery_root = root_path / "recovery-canonical"
+    # Keep a fresh fault-injection partition per run; never clear prior evidence.
+    recovery_root = root_path / f"recovery-{started:%Y%m%d-%H%M%S-%f}"
     replay_dates = _weekdays_ending(end_date, 20)
     instrument_id = "XSHG:600519"
     replay_no_ops = 0
+    replay_mismatches = 0
+    manifests = []
     with MetadataStore(root_path / "metadata.duckdb") as metadata:
         for trade_date in replay_dates:
             record = _acceptance_bar(trade_date, instrument_id)
@@ -56,6 +62,8 @@ def run_offline_acceptance(
             canonical.publish(new_records=[record], run_id=f"{run_id}-{trade_date}", **kwargs)
             rerun = canonical.publish(new_records=[], run_id=f"{run_id}-rerun-{trade_date}", **kwargs)
             replay_no_ops += int(rerun.no_op)
+            replay_mismatches += int(canonical.read_daily(AssetType.STOCK.value, trade_date.isoformat()) != [record])
+            manifests.append({"path": str(rerun.manifest_path), "sha256": file_hash(rerun.manifest_path)})
             metadata.record_partition_publish(
                 manifest=rerun.manifest,
                 manifest_path=rerun.manifest_path,
@@ -65,9 +73,14 @@ def run_offline_acceptance(
 
         recovery_record = _acceptance_bar(end_date, "XSHG:600520")
 
+        class ExpectedPowerLoss(RuntimeError):
+            pass
+
+        interrupted = False
+
         def interrupt(stage: str) -> None:
             if stage == "after_data_replace":
-                raise RuntimeError("simulated acceptance power loss")
+                raise ExpectedPowerLoss("simulated acceptance power loss")
 
         try:
             canonical_recovery = CanonicalPartitionStore(recovery_root)
@@ -82,8 +95,8 @@ def run_offline_acceptance(
                 source_providers={recovery_record.instrument_id: "fixture"},
                 failure_hook=interrupt,
             )
-        except RuntimeError:
-            pass
+        except ExpectedPowerLoss:
+            interrupted = True
         recovery_report = RecoveryScanner(recovery_root, metadata).recover()
 
     capability = ProviderCapability(
@@ -111,22 +124,54 @@ def run_offline_acceptance(
         cycle_deadline_seconds=50,
     )
     finished = datetime.now(timezone.utc)
+    checks = {
+        "storage_replay": {
+            "expected": {"no_op_partitions": len(replay_dates), "readback_mismatches": 0},
+            "actual": {"no_op_partitions": replay_no_ops, "readback_mismatches": replay_mismatches},
+            "status": "PASS" if replay_no_ops == len(replay_dates) and replay_mismatches == 0 else "FAIL",
+            "evidence": manifests,
+        },
+        "publication_recovery": {
+            "expected": {"injected_interruption": True, "recovered_partitions_min": 1, "invalid_final_partitions": 0},
+            "actual": {"injected_interruption": interrupted,
+                       "recovered_partitions": recovery_report.promoted_temporary_partitions + recovery_report.repaired_metadata_partitions,
+                       "invalid_final_partitions": len(recovery_report.invalid_final_partitions)},
+            "status": "PASS" if interrupted and not recovery_report.invalid_final_partitions and (
+                recovery_report.promoted_temporary_partitions + recovery_report.repaired_metadata_partitions >= 1) else "FAIL",
+            "evidence": {"root": str(recovery_root), "invalid_final_partitions": list(recovery_report.invalid_final_partitions)},
+        },
+        "minute_capacity_estimate": {
+            "expected": {"watchlist_symbols": 200, "cycle_deadline_seconds": 50},
+            "actual": {"watchlist_symbols": len(watchlist), "estimated_cycle_seconds": capacity_plan.estimated_cycle_seconds},
+            "status": "PASS" if len(watchlist) == 200 and capacity_plan.estimated_cycle_seconds <= 50 else "FAIL",
+            "evidence": {"provider": "fixture", "max_symbols_per_request": 100, "request_interval_seconds": 1},
+        },
+    }
+    implementation_files = (Path(__file__), Path(__file__).parents[1] / "storage/parquet.py",
+                            Path(__file__).with_name("recovery.py"), Path(__file__).parents[1] / "routing/router.py")
     return OfflineAcceptanceReport(
         test_run_id=run_id,
         started_at=started.isoformat(),
         finished_at=finished.isoformat(),
+        scope={"data_origin": "synthetic", "network_calls": 0,
+               "replay_dates": [day.isoformat() for day in replay_dates],
+               "date_basis": "weekdays, not exchange trading calendar", "replay_instruments": [instrument_id],
+               "adjustments": [item.value for item in Adjustment], "capacity_mode": "planner estimate only",
+               "runtime_root": str(root_path)},
+        implementation={str(path.relative_to(Path(__file__).parents[1])): file_hash(path) for path in implementation_files},
+        checks=checks,
         gates={
-            "A": "PASS",
+            "A": "NOT_RUN_TEST_SUITE_AND_STATIC_CHECKS_REQUIRED",
             "B": "NOT_RUN_LIVE_PROVIDER_REQUIRED",
-            "C": "PASS_OFFLINE",
-            "D": "PASS_OFFLINE",
-            "E": "PASS_OFFLINE",
+            "C": "PARTIAL_COMPONENT_ONLY" if checks["storage_replay"]["status"] == "PASS" else "FAIL_COMPONENT_CHECK",
+            "D": "PARTIAL_COMPONENT_ONLY" if checks["publication_recovery"]["status"] == "PASS" else "FAIL_COMPONENT_CHECK",
+            "E": "PARTIAL_ESTIMATE_ONLY" if checks["minute_capacity_estimate"]["status"] == "PASS" else "FAIL_COMPONENT_CHECK",
             "F": "NOT_STARTED_REAL_TRADING_DAYS_REQUIRED",
         },
         metrics={
-            "replay_trading_days": len(replay_dates),
+            "replay_weekdays": len(replay_dates),
             "replay_partition_no_ops": replay_no_ops,
-            "replay_missing_items": 0,
+            "replay_readback_mismatches": replay_mismatches,
             "watchlist_symbols": len(watchlist),
             "estimated_cycle_seconds": capacity_plan.estimated_cycle_seconds,
             "recovery_promoted_temporary_partitions": recovery_report.promoted_temporary_partitions,
@@ -134,10 +179,14 @@ def run_offline_acceptance(
             "recovery_invalid_final_partitions": len(recovery_report.invalid_final_partitions),
         },
         known_gaps=(
+            "A Gate requires actual test-suite and static-check evidence",
             "B Gate requires live Sina/Tencent/TDX probes and verified Normalization Rules",
+            "C/D Gates require full business scope and the complete fault matrix",
+            "E Gate requires measured throughput and latency, not a synthetic budget estimate",
             "F Gate requires five consecutive real trading days",
         ),
-        conclusion="M1_OFFLINE_EVIDENCE_READY_LIVE_PROVIDER_GATE_PENDING",
+        conclusion=("OFFLINE_COMPONENT_CHECKS_PASS_PROJECT_GATES_PENDING" if all(
+            check["status"] == "PASS" for check in checks.values()) else "OFFLINE_COMPONENT_CHECKS_FAILED"),
     )
 
 

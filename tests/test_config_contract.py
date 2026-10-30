@@ -23,7 +23,7 @@ def test_yaml_configuration_is_parseable_and_keeps_minute_scope_bounded() -> Non
 
     allowed = set(datasets["datasets"]["minute_bar_1m"]["allowed_universes"])
     daily_policy = load_publication_policy(
-        PROJECT_ROOT / "config" / "datasets.yaml", "daily_bar"
+        PROJECT_ROOT / "config" / "datasets" / "daily_bar.yaml", "daily_bar"
     )
     assert allowed == {"watchlist", "strategy_candidate", "static"}
     assert collection["realtime_minute"]["reject_full_market_universe"] is True
@@ -44,12 +44,18 @@ def test_input_catalog_covers_successful_rows_without_granting_production_routes
         rows = list(csv.DictReader(f))
     successes = {r["接口ID"] for r in rows if r["接口取数结果"] in {"通过", "部分通过"}}
     # Preserve the original 87-interface investigation as a historical inventory.
-    original_inputs = [c for c in inputs if not c.input_id.startswith('SECURITY-')]
+    catalog = json.loads((PROJECT_ROOT / "provider_validation/coverage/successful-input-capabilities.json").read_text(encoding="utf-8"))
+    historical_ids = {row["contract"]["input_id"] for row in catalog["catalog"]}
+    original_inputs = [c for c in inputs if c.input_id in historical_ids]
+    assert {c.input_id for c in original_inputs} == historical_ids
     assert {ref for c in original_inputs for ref in c.evidence_refs} == successes
     assert len(original_inputs) == 77
-    added_inputs = [c for c in inputs if c.input_id.startswith('SECURITY-')]
-    assert {c.input_id for c in added_inputs} == {'SECURITY-BSE-001', 'SECURITY-SSE-ETF-001',
-        'SECURITY-SSE-ETF-HISTORY-001', 'SECURITY-SSE-MONEY-ETF-HISTORY-001', 'SECURITY-SZSE-ETF-HISTORY-001'}
+    added_inputs = [c for c in inputs if c.input_id not in historical_ids]
+    declarations = yaml.safe_load((PROJECT_ROOT / "config/providers.yaml").read_text(encoding="utf-8"))["input_capabilities"]
+    script_inputs = {name for name, item in declarations.items() if item.get("script_source_keys")}
+    assert {c.input_id for c in added_inputs} == script_inputs | {
+        'SECURITY-BSE-001', 'SECURITY-SSE-ETF-001', 'SECURITY-SSE-MONEY-ETF-HISTORY-001'}
+    assert all(c.evidence_refs for c in added_inputs)
     assert all(c.implementation_status == 'implemented_validation_only' for c in added_inputs)
     assert len(successes) == 73
     assert all(c.collection_profile in profiles for c in inputs)
@@ -63,7 +69,6 @@ def test_input_catalog_covers_successful_rows_without_granting_production_routes
     assert by_id["ASTOCK-086"].implementation_status == "blocked"
     assert by_id["ASTOCK-052"].data_kind == "derived"
     assert by_id["ASTOCK-002-daily"].evidence_refs == by_id["ASTOCK-002-5m"].evidence_refs == ("ASTOCK-002",)
-    catalog = json.loads((PROJECT_ROOT / "provider_validation/coverage/successful-input-capabilities.json").read_text(encoding="utf-8"))
     assert {row["contract"]["input_id"] for row in catalog["catalog"]} == {c.input_id for c in original_inputs}
     bse = by_id["SECURITY-BSE-001"]
     assert bse.implementation_status == "implemented_validation_only"
