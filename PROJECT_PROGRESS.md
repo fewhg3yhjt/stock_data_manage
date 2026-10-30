@@ -54,3 +54,5 @@
 当前职责见[总体设计](STOCK_ANALYSIS_V2_MARKET_DATA_CENTER_ARCHITECTURE_V1.md)，重要取舍和被替代合同见[工程决策](docs/engineering-decisions.md)。2026-10-09至30日的完整历史过程保存在Git提交 `78208bc`；原始响应和验收报告不删除、不改写。历史通过数只证明对应版本及样本，不计入本轮测试。
 
 用户答复证据与独立判断偏好已在 `78208bc` 记录于[AGENTS](AGENTS.md#答复形式与独立判断)，当前整改范围后经用户明确确认。原工程审查基线为05bb3ae，见[脚本](tmp/engineering-review-20261030/review.py)和[结果](tmp/engineering-review-20261030/report.json)。
+
+2026-10-30按用户明确要求补充的防止过度设计、设计缺口先举例讨论及分层验证约束，已持久化于[协作约定](AGENTS.md#设计先行与领域建模)。本次仅记录约束，核对文档差异及格式，不改业务代码或运行机制；现有代码指纹机制的整改仍待具体方案确认。
