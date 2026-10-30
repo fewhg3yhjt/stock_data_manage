@@ -10,6 +10,7 @@
 - `src/__init__.py` 是逻辑包 `stock_data_manage` 的初始化文件，`src/cli.py` 是命令入口。`pyproject.toml` 显式将逻辑包映射到 `src/` 并列出Python包；新增含 `__init__.py` 的子包时同步更新该清单。
 - 根目录 `config/` 保存 YAML 参数、调度意图、字段模板和字段映射；`src/config/` 保存配置读取与校验代码。
 - `tests/` 保存实现测试；`provider_validation/` 保存正式实现前的来源可行性验证、原返回与派生证据；`docs/` 保存按职责归档的正式说明。业务开发后不向验证区写入新代码、数据或验收结果。
+- `tests/daily_flow_acceptance.py` 显式执行2026-10-29三股三口径验收，调用现有采集、处理、资格、发布和查询接口；`tests/daily_flow_browser.cjs` 验证现有页面和保存截图，均非业务入口。证据只写`tmp/daily-flow-20261029/`，模块测试使用`tmp/df29-*`独立目录；[执行顺序](docs/pipeline/collection-tasks.md#本次验收的执行与复现入口)及[单份结果](tmp/daily-flow-20261029/README.md)不替代自动运行记录。
 - `data/` 统一保存 `raw/`、`task_workspace/`、`canonical/`、`task_archive/`、`metadata/` 和 `hot/`，按需生成；实现回放与故障测试使用 `tmp/` 下的隔离运行根目录。raw暂存及正式结果按数据日期分层，旧数据保留原位，来源候选成功不自动发布或归档，详见 [运行数据与归档](docs/storage/README.md)。
 - `tmp/` 用于本地临时工作与正式实现的隔离验收。原根目录 `tmp_test/` 已撤掉，历史研究材料完整归档到 `provider_validation/results/legacy/tmp_test/`；迁移清单保留原路径、相对目录、文件哈希及旧绝对路径说明。新来源验证归入 `provider_validation/`，正式开发产物按既有业务运行布局保存。
 - 测试、命令及验证脚本在安装当前项目的同一环境中运行，不再通过 `PYTHONPATH=src` 暴露顶层 `providers`、`config` 等包。历史证据中的旧路径及哈希保留原样。

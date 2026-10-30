@@ -1,5 +1,71 @@
 # 原始暂存、数据构建与重做
 
+## 已确认的三股日线完整流程验收（2026-10-29）
+
+用户2026-10-30确认以sh600519、sz000001、bj920001三只股票、2026-10-29一个交易日、none/forward/backward三口径验证现有流程。隔离根为`tmp/daily-flow-20261029/`，采集、候选、隔离发布、API和页面引用同批来源证据，现有正式data只读。业务入口继续使用`collect-input`、`collect-task`和只读运行台，不增加任务系统或人工暂停机制。
+
+| 阶段 | 输入与交付 | 验收边界 |
+|---|---|---|
+| 采集 | 当前来源配置和9组精确请求，先检索可复用原响应，再留存本次实际请求结果 | 采集/原响应模块测试及真实小范围请求；HTTP成功不等于行情正确 |
+| 解析处理 | 同批原响应、当前字段和单位合同，生成来源行、标准候选及问题明细 | 模块及采集→处理联调，目标日唯一、价格逐值对应；未认证量额为空，不猜单位 |
+| 发布 | 三股完整候选、冻结任务与既有发布门槛，输出隔离Canonical、自动摘要和清单 | 3条聚合记录含9组；验证续跑、失败保护及流程；在线/留存资格仅在隔离库按实际证据登记 |
+| 页面与完整链路 | 同一运行根的已发布记录，默认不复权及三口径切换 | 本地API及真实浏览器对照、完整任务入口贯通；另在新根按原响应零网络重放，比较业务字段而非整文件字节 |
+
+每阶段收尾展示实际分母、结果、路径和未检查项并更新项目进度。前两阶段由现有输入入口自动衔接，但分别验收，不把一次调用成功视为两个阶段全部通过。完整原响应、正式报告、原配置和生产数据不改写；发现设计或数据语义缺口另行讨论。本次结果集中在[验收说明](../../tmp/daily-flow-20261029/README.md)，当前状态在项目进度维护。
+
+### 本次验收的执行与复现入口
+
+`tests/daily_flow_acceptance.py`是本次固定样本的显式验收脚本，调用现有输入、任务、存储和查询接口；不是新增业务入口、调度规则或管理平台。`tests/daily_flow_browser.cjs`只操作现有页面并保存测试截图。日期、样本和隔离根是本次已确认范围，不把它们扩展为新的配置系统。
+
+| 对象/文件 | 输入→输出与依赖 | 验收标准及本次结果 |
+|---|---|---|
+| 现有`pipeline/inputs.py`与腾讯Provider | `ASTOCK-002-daily`、三股/日期/口径→raw、来源行、标准候选；依赖原传输及映射合同 | 9组真实响应先留存再解析；未修改业务源码 |
+| 现有归一化与质量模块 | 同批原响应和当前单位合同→9条标准候选 | 独立核对36个价格及18个量额值；北交所量额为空；未扩大认证范围 |
+| 现有来源资格、任务与发布模块 | 原有四层证据和`live-task.json`→隔离元数据、冻结任务、3条/9组发布结果 | 只在隔离库授予精确范围资格；任务复用新鲜响应；续跑无操作 |
+| 现有`service/web.py`及静态页面 | `run`根内发布结果→API和只读页面 | 三口径各3条、36个可见价格一致；量额通过API核验，页面未新增量额列 |
+| 新增两个验收脚本 | 自动产物→独立检查、JUnit及浏览器证据 | 同环境新根重放业务字段一致、零联网；不替代业务实现或自动摘要 |
+
+当前环境执行以下命令，每次调用先在同一解释器记录版本和依赖，缺包时停止、不自动安装。固定目录已有成功任务时按现有续跑合同复用，不清理原始证据；资格过期或原响应不匹配时不得为重跑而扩大授权。
+
+```powershell
+$flowPython = 'D:\Program Files\Python\python.exe'
+& $flowPython -B -X utf8 tests/daily_flow_acceptance.py preflight
+& $flowPython -B -X utf8 tests/daily_flow_acceptance.py module-tests
+& $flowPython -B -X utf8 tests/daily_flow_acceptance.py collect
+& $flowPython -B -X utf8 tests/daily_flow_acceptance.py processing-tests
+& $flowPython -B -X utf8 tests/daily_flow_acceptance.py process
+& $flowPython -B -X utf8 tests/daily_flow_acceptance.py pipeline-tests
+& $flowPython -B -X utf8 tests/daily_flow_acceptance.py publish-proof
+& $flowPython -B -X utf8 tests/daily_flow_acceptance.py qualify
+& $flowPython -B -X utf8 tests/daily_flow_acceptance.py task-run
+& $flowPython -B -X utf8 tests/daily_flow_acceptance.py web-tests
+& $flowPython -B -X utf8 tests/daily_flow_acceptance.py web-checks
+& $flowPython -B -X utf8 tests/daily_flow_acceptance.py reproduce
+```
+
+原始实时报告固定为首次9次真实采集；正式任务在`run`根执行live模式检查和发布，但复用这9份新鲜响应，新增HTTP为0。`proof`根先用原响应离线产出四层证据所需的流程验证；`reproduction`是本次实际从空目录零联网重建的第二份结果。上述根职责分别是预验证、可展示运行和独立复现，不存在平行业务实现。
+
+现有业务命令也可直接重放同一冻结定义；下例对已完成的独立重放根作命令行续跑烟测，预期`published`且`no_op`，原执行及重放结果保留。显式数据根必须保持隔离：
+
+```powershell
+& $flowPython -B -X utf8 -m stock_data_manage.cli collect-task --task-file tmp/daily-flow-20261029/reproduction-task.json --config-root config --data-root tmp/daily-flow-20261029/reproduction --mode replay --no-progress
+```
+
+页面使用现有服务；先检查端口空闲，再在单独终端运行，保持此终端以供查看。若端口占用，选择空闲端口并将浏览器验收地址同步调整，不停止已有进程：
+
+```powershell
+& $flowPython -B -X utf8 -m stock_data_manage.service.web --config-root config --data-root tmp/daily-flow-20261029/run --port 18766
+```
+
+本次使用已安装的Node、Playwright和Chrome，没有下载浏览器或修改用户浏览器配置。路径属于当前机器环境记录，不能据此声称跨机器环境可复建：
+
+```powershell
+& 'C:\Users\sp181\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe' tests/daily_flow_browser.cjs 'C:\Users\sp181\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\node_modules\playwright' 'C:\Program Files\Google\Chrome\Application\chrome.exe' 'http://127.0.0.1:18766'
+& $flowPython -B -X utf8 tests/daily_flow_acceptance.py review
+```
+
+本次131次测试执行、去重127项通过；首次端口占用的浏览器失败与后续通过分别留存。5份既有生产文件字节未变。未测全市场、其他日期、持续调度和第二来源对账；旧问题与环境复现继续待办。详情与截图只在上述单份任务验收说明汇总，不新增长期报告体系。
+
 ## 已确认设计与当前实现（2026-10-28）
 
 任务生产数据集结果，数据对象与任务解耦；自动切源属于采集策略，解析及检查问题不反向驱动采集。实现以 [三口径日线设计](../../stock-data-design-qfq-history-rebuild.md) 中的对象关系和数据合同为准；该文件是本主题主要维护位置。
