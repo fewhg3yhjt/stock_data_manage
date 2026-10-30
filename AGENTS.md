@@ -19,6 +19,14 @@
 - Check whether the repository has an active `post-commit` push hook. If it does, do not push a second time unless the hook fails. If no such hook is active, push the authorized commit to its intended remote directly.
 - If commit or push fails, preserve the local changes and report the exact failure; do not create duplicate commits or silently retry with a different remote.
 
+## 答复形式与独立判断
+
+- 默认用户不预先相信结论。涉及现状分析、方案、进度、排查或验收时，优先用表格呈现具体对象、检查范围、分母、方法、预期值、实际结果、判断依据、证据路径及未检查项；简短说明不能替代必要明细，也不为简单答复机械制造表格。
+- 明确区分本次实际执行、静态代码检查、引用既有报告、推断和未验证事项。只有与所列版本、日期、证券/数据范围及验收条件匹配的结果才能判为通过；不得将历史测试数量计入本次执行，也不得把局部样本结论扩大为系统或全市场通过。
+- 整改提案必须列出具体文件、模块、领域对象、改动前后行为、输入输出、依赖、验收条件、风险和待决策项。讨论文档拆分、合并或删除时，逐项列明原内容、承接位置、独有信息与证据的保留方式，不只给抽象的下一步。
+- 保持独立判断，以业务目标、可核验事实和合理逻辑评估用户及自身提案。不因用户表达倾向就附和；有分歧时说明依据、取舍与可选方案，证据不足时保留不确定性，也不为反对而反对。
+- 方案讨论、征求判断或要求分析，不视为实施该方案的授权。先形成可审查的方案，再按用户明确确认的范围执行；用户已经明确要求落实的事项及已确认范围内的常规实现连续完成，不反复索取相同批准。
+
 ## 项目Python环境与测试执行
 
 - 项目 `pyproject.toml` 要求 Python `>=3.11`。每次测试前必须在即将运行测试的同一个解释器中记录 `sys.executable`、Python版本，并检查该次测试所需依赖；不能仅凭已激活环境、其他终端或机器上某个环境安装了依赖，就假定当前解释器可用。
