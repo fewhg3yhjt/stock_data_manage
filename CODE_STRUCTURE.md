@@ -31,6 +31,8 @@
 
 ## 配置与文档职责
 
+`service/web.py`的来源查询复用受管冻结任务补充证券类型元信息；`service/market_data.py`将已发布精度flags投影到日线API。拟议`config/presentation.yaml`尚未创建，当前仅在[页面设计](docs/service/read-only-web.md#展示字段合同与整改设计2026-10-30新增配置方案待确认)明确其职责，不能作为已有配置或实现使用。
+
 根目录 `config/`：`providers.yaml` 保存来源和输入契约，`collection.yaml` 保存参数来源、范围与刷新频率，`capabilities.yaml` 保存路由策略，`datasets/` 保存字段模板，`normalization/` 保存来源映射，`schedules.yaml` 引用任务时间表。运行状态由现有存储维护，不回写YAML。
 
 | 文档 | 主要职责 |

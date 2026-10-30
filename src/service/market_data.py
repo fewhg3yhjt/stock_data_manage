@@ -101,6 +101,7 @@ def query_daily(canonical_root, *, security="", start_date=None, end_date=None, 
                 "values": {name: str(getattr(quote,name)) if getattr(quote,name) is not None else None
                            for name in ("open","high","low","close","volume","amount")},
                 "provider": quote.source_provider, "has_source_evidence": bool(quote.raw_object_path),
+                "flags": list(quote.flags),
                 "quote_states": {name:q.status.value for name,q in record.quotes.items()}})
     start = (page-1)*page_size
     return {"items": items[start:start+page_size], "total": len(items), "page": page, "page_size": page_size,

@@ -346,6 +346,23 @@ def test_record_query_distinguishes_exchanges_and_does_not_use_capture_date(tmp_
     assert result["total"] == 0 and result["excluded_unknown_date_count"] == 1
 
 
+def test_source_type_uses_frozen_task_without_catalog_or_prefix_guess(tmp_path):
+    reader, _, data, add = source_query_fixture(tmp_path)
+    source = add("bj920001", [{"0": "2026-10-09", "2": "9.59", "5": "11829.00", "symbol": "bj920001"}])
+    summary_path = data / "task_workspace/2026-10-09/daily_bar/summary.json"
+    summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    summary["source_units"] = [{"key": "bj920001", "report_path": str(source.with_name("bj920001.report.json"))}]
+    write_json(summary_path, summary)
+    result = reader.data_records(dataset="daily_bar", security="bj920001", asset_type="stock")
+    assert result["total"] == 1
+    assert result["items"][0]["asset_type"] == "stock"
+    assert result["items"][0]["values"]["5"] == "11829.00"
+    # The same symbol must not be guessed as stock after its explicit context changes.
+    write_json(summary_path.with_name("task.json"), {"asset_type": "etf", "units": []})
+    assert reader.data_records(dataset="daily_bar", security="bj920001", asset_type="stock")["total"] == 0
+    assert reader.data_records(dataset="daily_bar", security="bj920001", asset_type="etf")["total"] == 1
+
+
 def test_record_query_snapshot_date_is_explicit_and_integrity_failure_visible(tmp_path):
     reader, app, _, add = source_query_fixture(tmp_path)
     add("snapshot", [{"code":"sz.000001","code_name":"平安银行"}], dataset="security_snapshot",

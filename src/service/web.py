@@ -277,10 +277,17 @@ class DashboardReader:
         catalog = self._security_catalog()
         target_market, target_code = self._security_code(security)
         references = {}
-        for document, _, _ in self._task_documents():
+        for document, summary_path, _ in self._task_documents():
+            definition_path = summary_path.with_name("task.json")
+            if _within(definition_path, summary_path.parent) and definition_path.is_file():
+                definition = _read_json(definition_path)
+            else:
+                definition = {}
+            frozen_units = {unit.get("key"): unit for unit in definition.get("units", []) if isinstance(unit, dict)}
             for unit in document.get("source_units", []):
                 if isinstance(unit, dict) and unit.get("report_path"):
-                    references[str(Path(unit["report_path"]).resolve())] = unit
+                    frozen_asset = frozen_units.get(unit.get("key"), {}).get("asset_type") or definition.get("asset_type")
+                    references[str(Path(unit["report_path"]).resolve())] = {**unit, "frozen_asset_type": frozen_asset}
         matches = []
         issues = []
         seen = set()
@@ -359,7 +366,8 @@ class DashboardReader:
                         continue
                 elif security and security.casefold() not in str(name).casefold():
                     continue
-                row_asset = str(row.get("asset_type") or known.get("asset_type") or "")
+                task_context = references.get(str(report_path.resolve()), {})
+                row_asset = str(row.get("asset_type") or known.get("asset_type") or task_context.get("frozen_asset_type") or "")
                 if asset_type and row_asset != asset_type:
                     continue
                 raw_date = value(row, "trade_date", ["trade_date", "bar_time", "date", "日期", "交易日期", "STAT_DATE"])

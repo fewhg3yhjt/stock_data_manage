@@ -275,6 +275,7 @@ def test_daily_query_defaults_to_none_and_switches_without_provider_calls(tmp_pa
     normal = query_daily(root)
     assert normal["adjustment"] == "none" and Decimal(normal["items"][0]["values"]["close"]) == Decimal("10")
     assert normal["items"][0]["has_source_evidence"] and "raw_ref" not in normal["items"][0]
+    assert normal["items"][0]["flags"] == ["source_volume_rounded_to_100_shares", "source_amount_rounded_to_100_CNY"]
     assert Decimal(query_daily(root, adjustment="forward")["items"][0]["values"]["close"]) == Decimal("9")
     assert Decimal(query_daily(root, adjustment="backward")["items"][0]["values"]["close"]) == Decimal("11")
     assert query_daily(root, security="600002")["total"] == 0
