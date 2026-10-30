@@ -20,7 +20,6 @@ class OfflineAcceptanceReport:
     started_at: str
     finished_at: str
     scope: dict[str, object]
-    implementation: dict[str, str]
     checks: dict[str, dict[str, object]]
     gates: dict[str, str]
     metrics: dict[str, object]
@@ -147,8 +146,6 @@ def run_offline_acceptance(
             "evidence": {"provider": "fixture", "max_symbols_per_request": 100, "request_interval_seconds": 1},
         },
     }
-    implementation_files = (Path(__file__), Path(__file__).parents[1] / "storage/parquet.py",
-                            Path(__file__).with_name("recovery.py"), Path(__file__).parents[1] / "routing/router.py")
     return OfflineAcceptanceReport(
         test_run_id=run_id,
         started_at=started.isoformat(),
@@ -158,7 +155,6 @@ def run_offline_acceptance(
                "date_basis": "weekdays, not exchange trading calendar", "replay_instruments": [instrument_id],
                "adjustments": [item.value for item in Adjustment], "capacity_mode": "planner estimate only",
                "runtime_root": str(root_path)},
-        implementation={str(path.relative_to(Path(__file__).parents[1])): file_hash(path) for path in implementation_files},
         checks=checks,
         gates={
             "A": "NOT_RUN_TEST_SUITE_AND_STATIC_CHECKS_REQUIRED",

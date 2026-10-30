@@ -288,7 +288,13 @@ def test_security_dates_remain_separate_and_latest_never_uses_future(tmp_path):
         assert metadata.latest_partition(dataset="security_master", asset_type="security", through_date="2026-10-02")["partition_key"] == "2026-10-01"
 
 
-def test_another_task_failure_archives_old_build_and_keeps_its_summary(tmp_path):
+def test_another_task_failure_archives_old_build_and_keeps_its_summary(tmp_path, monkeypatch):
+    read_bytes = Path.read_bytes
+    def without_source_reads(path):
+        if path.resolve().is_relative_to((ROOT / "src").resolve()):
+            raise AssertionError("task execution must not fingerprint project source")
+        return read_bytes(path)
+    monkeypatch.setattr(Path, "read_bytes", without_source_reads)
     collector = full_catalog_collector()
     original = run(tmp_path, full_master_definition(), collector)
     original_hash = file_hash(Path(original["published_manifest"]))
@@ -649,7 +655,6 @@ def save_fixture_qualification(root, input_id, context):
         "validation_time_utc":datetime.now(timezone.utc).isoformat(),"live_http_calls":1,
         "raw_manifest":{"path":str(raw),"sha256":file_hash(raw)},
         "config_files":[{"path":str(CONFIG/name),"sha256":file_hash(CONFIG/name)} for name in ("providers.yaml","collection.yaml","datasets/security_snapshot.yaml","normalization/security_snapshot.yaml")],
-        "code_files":[{"path":str(path),"sha256":file_hash(path)} for path in (ROOT/"src/routing/factory.py",Path(inspect.getfile(type(adapter))))],
         "synthetic_fixture":True}
     dated = input_id in {'SECURITY-SSE-ETF-HISTORY-001', 'SECURITY-SSE-MONEY-ETF-HISTORY-001', 'SECURITY-SZSE-ETF-HISTORY-001'}
     rows = ([{"stock_code": "159001" if input_id == 'SECURITY-SZSE-ETF-HISTORY-001' else "511600",
@@ -790,7 +795,7 @@ def test_security_source_qualification_requires_verified_current_artifacts(tmp_p
                 artifact = Path(proof[layer]["path"])
                 doc = json.loads(artifact.read_text())
                 if failure=="semantic":doc["independent_full_market_coverage_verified"]=False
-                else: doc["code_files"][0]["sha256"]="wrong-fixture-code-hash"
+                else: doc["code_files"]=[{"path":"missing-old-source.py","sha256":"wrong-fixture-code-hash"}]
                 artifact.write_text(json.dumps(doc))
                 proof[layer]["sha256"]=file_hash(artifact)
             path.write_text(json.dumps(proof))
@@ -828,7 +833,7 @@ def test_security_source_qualification_requires_verified_current_artifacts(tmp_p
             path.write_text(json.dumps(proof))
             metadata.connection.execute("UPDATE capability_registry SET evidence_hash=?",[file_hash(path)])
         result=check_security_input_qualification(contract,context,config_root=CONFIG,metadata=metadata,now=now)
-        assert result["eligible"] is (failure in {None, "replay", "sdk_derived"}), result
+        assert result["eligible"] is (failure in {None, "replay", "sdk_derived", "code"}), result
 
 
 @pytest.mark.parametrize("missing_raw", [False, True])

@@ -238,7 +238,7 @@ def captured_sdk_queries(store, *, mode, replay_manifest, evidence_roots, scope,
                         try:
                             record = json.loads(line)
                             if ((path.resolve(), number) in used or not matches(record, name, parameters) or record.get("mode") != "live"
-                                    or record.get("code_version") != code_version or record.get("scope") != query_scope
+                                    or record.get("scope") != query_scope
                                     or record.get("sdk_status_code") != "0" or record.get("outcome") != "response"):
                                 continue
                             age = (now - datetime.fromisoformat(record["fetched_at_utc"])).total_seconds()

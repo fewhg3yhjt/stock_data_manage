@@ -111,7 +111,7 @@ def test_daily_input_uses_yaml_interval_across_requests(qualified,monkeypatch):
 
 
 @pytest.mark.parametrize('damage',['none','hash','source','parameters','code','artifact'])
-def test_checkpoint_revalidation_requires_same_source_output_and_current_code(qualified,damage):
+def test_checkpoint_revalidation_checks_data_and_ignores_old_code_fingerprints(qualified,damage):
     from stock_data_manage.pipeline.inputs import _task_unit_valid
     contract,root,definition,raw,proof=qualified
     with MetadataStore(root.parent/'replayed/metadata/metadata.duckdb') as metadata:
@@ -119,15 +119,15 @@ def test_checkpoint_revalidation_requires_same_source_output_and_current_code(qu
     p=json.loads(proof.read_text());report=Path(p['revalidation_report']['path'])
     current=json.loads(report.read_text())
     current['run_directory']=str(report.parents[4])
-    entry['report']['code_files'][0]['sha256']='prior-runtime-code'
+    entry['report']['code_files']=[{'path':'missing-old-source.py','sha256':'prior-runtime-code'}]
     if damage=='source':current['output']['source_response_hashes']=['different-response']
     elif damage=='parameters':current['parameters']['code']='sh600000'
-    elif damage=='code':current['code_files'][0]['sha256']='different-code'
+    elif damage=='code':current['code_files']=[{'path':'missing-source.py','sha256':'different-code'}]
     elif damage=='artifact':current['output']['sha256']='different-artifact'
     path=root.parent/'checkpoint-revalidation.json';path.write_text(json.dumps(current))
     entry['revalidation_report']={'path':str(path),'sha256':file_hash(path)}
     if damage=='hash':path.write_text('{}')
-    assert _task_unit_valid(entry)==(damage=='none')
+    assert _task_unit_valid(entry)==(damage in {'none','code'})
 
 
 @pytest.mark.parametrize('boundary',['allowed','date','api','market','asset','symbol_type','retained','expired','hash','cooldown','code'])
@@ -150,7 +150,7 @@ def test_live_market_scope_preserves_evidence_and_request_boundaries(qualified,b
         elif boundary=='hash':path.write_text('{}')
         elif boundary=='code':
             report=Path(proof['revalidation_report']['path']);r=json.loads(report.read_text())
-            r['code_files'][0]['sha256']='bad';report.write_text(json.dumps(r))
+            r['code_files']=[{'path':'missing-source.py','sha256':'bad'}];report.write_text(json.dumps(r))
             proof['revalidation_report']['sha256']=file_hash(report);path.write_text(json.dumps(proof))
             metadata.connection.execute("UPDATE capability_registry SET evidence_hash=? WHERE adjustment='forward'",[file_hash(path)])
         elif boundary=='cooldown':
@@ -159,7 +159,7 @@ def test_live_market_scope_preserves_evidence_and_request_boundaries(qualified,b
                 failure_class='forbidden',error='fixture',now=now,cooldown_seconds=300,failure_threshold=1)
         result=check_daily_input_qualification(contract,context,asset_type=asset,config_root=CONFIG,
             metadata=metadata,now=now,execution_mode=mode)
-    assert result['eligible']==(boundary=='allowed'),result
+    assert result['eligible']==(boundary in {'allowed','code'}),result
     if result['eligible']:
         assert result['symbol']=='sh600000' and not result['security_observed']
         assert result['source_response_hashes']==[] and result['sample_response_hashes']
@@ -234,15 +234,15 @@ def test_interrupted_retained_publication_recovers_all_four_progress_steps(quali
     assert result['progress']['stages']['raw']['reused']==3
 
 
-@pytest.mark.parametrize('damage',['expired','scope','hash','current_code','cooldown'])
+@pytest.mark.parametrize('damage',['expired','scope','hash','configuration','cooldown'])
 def test_retained_qualification_rejects_invalid_evidence_before_raw_writes(qualified, damage):
     contract,root,definition,raw,proof=qualified
     with MetadataStore(root/'metadata/metadata.duckdb') as metadata:
         if damage=='expired':metadata.connection.execute("UPDATE capability_registry SET validation_expires_at=?",[datetime.now(timezone.utc)-timedelta(seconds=1)])
         elif damage=='scope':definition['units'][0]['context']={'request':{'symbol':'sh600519','start_date':'2026-10-08','end_date':'2026-10-09'},'config':dict(CONTEXT['config'])}
         elif damage=='hash':proof.write_text('{}')
-        elif damage=='current_code':
-            p=json.loads(proof.read_text());current=Path(p['revalidation_report']['path']);r=json.loads(current.read_text());r['code_files'][0]['sha256']='bad'
+        elif damage=='configuration':
+            p=json.loads(proof.read_text());current=Path(p['revalidation_report']['path']);r=json.loads(current.read_text());r['config_files'][0]['sha256']='bad'
             current.write_text(json.dumps(r));p['revalidation_report']['sha256']=file_hash(current);proof.write_text(json.dumps(p))
             metadata.connection.execute('UPDATE capability_registry SET evidence_hash=?',[file_hash(proof)])
         else:
@@ -251,7 +251,7 @@ def test_retained_qualification_rejects_invalid_evidence_before_raw_writes(quali
                 dataset='daily_bar',market='XSHG',asset_type='stock',failure_class='forbidden',error='fixture',
                 now=datetime.now(timezone.utc),cooldown_seconds=300,failure_threshold=1)
     reasons = {'expired':'expired or not yet valid','scope':'scope differs','hash':'hash differs',
-        'current_code':'code or configuration changed','cooldown':'cooling down'}
+        'configuration':'configuration changed','cooldown':'cooling down'}
     with pytest.raises(ValueError,match=reasons[damage]):
         collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='retained')
     assert not list((root/'raw').rglob('*a-qfq*.bin'))

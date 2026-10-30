@@ -146,48 +146,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
     profiles = {p.name: p for p in load_collection_profiles(config_root / "collection.yaml")}
     profile = profiles[contract.collection_profile]
     provider = build_input_provider(contract, providers_path=config_root / "providers.yaml", client=client)
-    code_files = [Path(__file__), Path(__file__).parents[1] / "cli.py", Path(__file__).parents[1] / "config/loader.py",
-                  Path(__file__).parents[1] / "providers/contracts.py",
-                  Path(__file__).parents[1] / "quality/normalization.py",
-                  Path(__file__).parents[1] / "providers/transport.py",
-                  Path(__file__).parents[1] / "storage/raw.py",
-                  Path(__file__).parents[1] / "storage/parquet.py",
-                  Path(__file__).parents[1] / "storage/metadata.py",
-                  Path(__file__).parents[1] / "worker/attempts.py",
-                  Path(__file__).parents[1] / "worker/progress.py",
-                  Path(__file__).parents[1] / "routing/factory.py",
-                  Path(__file__).parents[1] / "providers/tencent/daily.py",
-                  Path(__file__).parents[1] / "providers/tencent/minute.py",
-                  Path(__file__).parents[1] / "providers/tencent/snapshot.py",
-                  Path(__file__).parents[1] / "providers/eastmoney/limit_pool.py",
-                  Path(__file__).parents[1] / "providers/eastmoney/shareholder.py",
-                  Path(__file__).parents[1] / "providers/eastmoney/financial.py",
-                  Path(__file__).parents[1] / "providers/eastmoney/news.py",
-                  Path(__file__).parents[1] / "providers/wallstreetcn/news.py",
-                  Path(__file__).parents[1] / "providers/cctv/news.py",
-                  Path(__file__).parents[1] / "providers/cls/news.py",
-                  Path(__file__).parents[1] / "providers/sina/news.py",
-                  Path(__file__).parents[1] / "providers/sina/financial.py",
-                  Path(__file__).parents[1] / "providers/sse/market.py",
-                  Path(__file__).parents[1] / "providers/csindex/indices.py",
-                  Path(__file__).parents[1] / "providers/tdx/minute.py",
-                  Path(__file__).parents[1] / "providers/chinabond/yield_curve.py",
-                  Path(__file__).parents[1] / "providers/exchanges/daily.py",
-                  Path(__file__).parents[1] / "providers/exchanges/security.py",
-                  Path(__file__).parents[1] / "providers/sge/spot.py",
-                  Path(__file__).parents[1] / "providers/mofcom/social_financing.py",
-                  Path(__file__).parents[1] / "providers/chinamoney/rates.py",
-                  Path(__file__).parents[1] / "providers/eastmoney/dividend.py",
-                  Path(__file__).parents[1] / "providers/eastmoney/fund_flow.py",
-                  Path(__file__).parents[1] / "providers/eastmoney/realtime.py",
-                  Path(__file__).parents[1] / "providers/sina/calendar.py",
-                  Path(__file__).parents[1] / "providers/sina/snapshot.py",
-                  Path(__file__).parents[1] / "providers/sina/daily.py",
-                  Path(__file__).parents[1] / "providers/akshare/boards.py",
-                  Path(__file__).parents[1] / "providers/baostock/industry.py",
-                  Path(__file__).parents[1] / "providers/cninfo/profile.py",
-                  Path(__file__).parents[1] / "providers/baostock/session.py"]
-    code_version = hashlib.sha256(b"".join(path.read_bytes() for path in code_files)).hexdigest()
+    code_version = provider.capability_version
     # Keep the run component short for Windows paths; UTC times remain in every evidence record.
     run_id = uuid4().hex[:12]
     # The input identity already lives in the source directory and manifest.
@@ -262,7 +221,6 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
             "request_interval_seconds": contract.request_interval_seconds,
             "effective_concurrency": 1, "request_limit_enforcement": "call_boundary_only",
             "adapter_version": provider.capability_version, "code_version": code_version,
-            "code_files": [{"path": str(path.resolve()), "sha256": hashlib.sha256(path.read_bytes()).hexdigest()} for path in code_files],
             "config_files": [{"path": str(path.resolve()), "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
                 for path in (config_root / "providers.yaml", config_root / "collection.yaml",
                              config_root / "datasets" / f"{contract.dataset}.yaml",
@@ -300,8 +258,6 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
             import requests
             import urllib3
             report["transport_dependency"] = {"requests": requests.__version__, "urllib3": urllib3.__version__}
-            code_version = hashlib.sha256((code_version + requests.__version__ + urllib3.__version__).encode()).hexdigest()
-            report["code_version"] = code_version
             report["catalog_transport_policy"] = {"source_contract": "retained BSE official catalog probe",
                 "session": "reuse page session and cookies", "trust_env": False,
                 "proxy_reference": "STOCK_DATA_HTTP_PROXY; original local proxy default",
@@ -337,8 +293,6 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
             import requests
             import urllib3
             report["transport_dependency"] = {"requests": requests.__version__, "urllib3": urllib3.__version__}
-            code_version = hashlib.sha256((code_version + requests.__version__ + urllib3.__version__).encode()).hexdigest()
-            report["code_version"] = code_version
             policy_key = "sina_futures_transport_policy" if is_sina_futures else "fixing_transport_policy" if is_repo_rate else "news_transport_policy"
             report[policy_key] = {"source_contract": "successful runnable original source",
                 "headers": "original Chrome/126 User-Agent and finance.sina.com.cn Referer" if is_sina_futures else "original Chrome/126 User-Agent and Chinamoney bkfrr Referer" if is_repo_rate else "original Chrome/126 User-Agent; requests defaults otherwise", "trust_env": True,
@@ -351,8 +305,6 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
             import requests
             import urllib3
             report["transport_dependency"] = {"requests": requests.__version__, "urllib3": urllib3.__version__}
-            code_version = hashlib.sha256((code_version + requests.__version__ + urllib3.__version__).encode()).hexdigest()
-            report["code_version"] = code_version
             report["event_transport_policy"] = {"source_contract": "successful runnable V3.9 test loader",
                 "headers": "requests Session defaults", "trust_env": True, "timeout_seconds": 20,
                 "retry_total": 3, "retry_connect": 3, "backoff_factor": 0.6,
@@ -363,8 +315,6 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
             import requests
             import urllib3
             report["transport_dependency"] = {"requests":requests.__version__, "urllib3":urllib3.__version__}
-            code_version = hashlib.sha256((code_version+requests.__version__+urllib3.__version__).encode()).hexdigest()
-            report["code_version"] = code_version
             report["reportapi_transport_policy"] = {"source_contract":"successful original rate-limited source Session",
                 "headers":"original Chrome/154 User-Agent, Accept/Accept-Language and data.eastmoney.com Referer", "timeout_seconds":30,
                 "trust_env":True, "allow_redirects":True, "retry_total":2, "minimum_backoff_seconds":5,
@@ -400,37 +350,14 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
         evidence_root = Path(evidence_root) if evidence_root else (paths["raw_root"] if runtime else project_root / "provider_validation/results")
         try:
             if is_baostock:
-                import inspect
                 import importlib.metadata
                 try:
                     import baostock as sdk_module
                 except ImportError:
                     sdk_module = None
-                sdk = client or sdk_module
                 report["sdk_dependency"] = {"version": (getattr(client, "__version__", "injected_fixture") if client is not None else
                                                          importlib.metadata.version("baostock") if sdk_module else "unavailable_offline"),
-                                            "client_injected": client is not None, "dependencies": []}
-                for name in (('query_trade_dates','login','logout') if input_id == 'CALENDAR-BS-001' else
-                             ('query_trade_dates','query_all_stock','query_stock_basic','login','logout') if input_id == 'SECURITY-BS-UNIVERSE-001' else
-                             ("query_stock_basic", "login", "logout") if input_id == 'ASTOCK-044' else
-                             ("query_all_stock", "query_stock_industry", "login", "logout")):
-                    function = getattr(sdk, name, None)
-                    if function is None:
-                        continue
-                    try:
-                        source = inspect.getsource(function).encode("utf-8")
-                    except (TypeError, OSError):
-                        source = repr(type(sdk)).encode("utf-8")
-                    digest = hashlib.sha256(source).hexdigest()
-                    import re
-                    snapshot = re.sub(rb'''(?i)((?:password|user_id|token|api_key)\s*=\s*["'])[^"']*(["'])''', rb'\1<redacted>\2', source)
-                    sdk_ref = raw_store.write_bytes(snapshot, dataset="source_code", provider=contract.provider, endpoint=contract.endpoint,
-                        fetched_at=datetime.now(timezone.utc), attempt_id=name, body_archive=True)
-                    report["sdk_dependency"]["dependencies"].append({"name": name, "path": relative_file(sdk_ref.path),
-                        "sha256": sdk_ref.content_hash, "original_source_sha256": digest, "redacted": snapshot != source})
-                    code_version = hashlib.sha256((code_version + name + digest).encode()).hexdigest()
-                code_version = hashlib.sha256((code_version + report["sdk_dependency"]["version"]).encode()).hexdigest()
-                report["code_version"] = code_version
+                                            "client_injected": client is not None}
                 report["evidence_representation"] = "SDK-decoded ResultSet fields and rows; BaoStock TCP wire bytes are not exposed"
                 report["request_limit_enforcement"] = "sdk_query_boundary_only"
             sdk_functions = {"ASTOCK-087": "stock_notice_report", "ASTOCK-014": "stock_board_concept_name_ths", "ASTOCK-037-profile": "stock_profile_cninfo",
@@ -457,25 +384,11 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                              "SDA-BOARD-001": "stock_board_industry_name_ths", "SDA-BOARD-002": "stock_board_industry_index_ths",
                              "SDA-BOARD-003": "stock_fund_flow_industry", "SDA-BOARD-004": "stock_fund_flow_concept"}
             if input_id in sdk_functions:
-                import inspect
                 from ..providers.akshare.session import load_client
                 provider.client = provider.client or load_client()
                 function = getattr(provider.client, sdk_functions[input_id])
-                try:
-                    sdk_source = inspect.getsource(function).encode("utf-8")
-                except (TypeError, OSError):
-                    sdk_source = repr(type(provider.client)).encode("utf-8")
-                sdk_source_hash = hashlib.sha256(sdk_source).hexdigest()
-                # The SDK embeds a public client selector; keep its hash, redact token-like literals in the snapshot.
-                import re
-                sdk_snapshot = re.sub(rb'''(?i)(["'](?:ut|token|access_token|api_key|password|secret|cookie)["']\s*:\s*["'])[^"']*(["'])''',
-                                      rb'\1<redacted>\2', sdk_source)
-                sdk_ref = raw_store.write_bytes(sdk_snapshot, dataset="source_code", provider=contract.provider,
-                    endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id=function.__name__, body_archive=True)
                 report["sdk_dependency"] = {"version": getattr(provider.client, "__version__", "injected_fixture"),
-                    "function": function.__name__, "source_path": relative_file(sdk_ref.path), "sha256": sdk_ref.content_hash,
-                    "original_source_sha256": sdk_source_hash, "redacted": sdk_snapshot != sdk_source}
-                code_version = hashlib.sha256((code_version + sdk_source_hash + report["sdk_dependency"]["version"]).encode()).hexdigest()
+                                            "function": function.__name__}
                 if is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_seats or is_source_sdk:
                     import requests
                     import urllib3
@@ -487,31 +400,6 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                             import curl_cffi
                             report['transport_dependency']['curl_cffi']=curl_cffi.__version__
                         import json
-                        code_version=hashlib.sha256((code_version+json.dumps(report['transport_dependency'],sort_keys=True)).encode()).hexdigest()
-                    code_version = hashlib.sha256((code_version + requests.__version__ + urllib3.__version__).encode()).hexdigest()
-                    namespace = getattr(function, "__globals__", {})
-                    report["sdk_dependency"]["dependencies"] = []
-                    if is_factor:
-                        constants = {name: namespace[name] for name in ("zh_sina_a_stock_qfq_url", "zh_sina_a_stock_hfq_url") if name in namespace}
-                        import json
-                        digest = hashlib.sha256(json.dumps(constants, sort_keys=True).encode()).hexdigest()
-                        report["sdk_dependency"].update(url_constants=constants, url_constants_sha256=digest)
-                        code_version = hashlib.sha256((code_version + digest).encode()).hexdigest()
-                    if input_id == "ASTOCK-032":
-                        sdk_headers = sanitized_metadata(namespace.get("headers", {}))
-                        import json
-                        header_hash = hashlib.sha256(json.dumps(sdk_headers,sort_keys=True).encode()).hexdigest()
-                        report["sdk_dependency"]["headers"] = sdk_headers
-                        report["sdk_dependency"]["headers_sha256"] = header_hash
-                        code_version = hashlib.sha256((code_version + header_hash).encode()).hexdigest()
-                        helper = namespace.get("make_request_with_retry_json")
-                        if helper is not None:
-                            source = inspect.getsource(helper).encode("utf-8")
-                            ref = raw_store.write_bytes(source, dataset="source_code", provider=contract.provider,
-                                endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id=helper.__name__, body_archive=True)
-                            report["sdk_dependency"]["dependencies"].append({"name": helper.__name__,
-                                "path": relative_file(ref.path), "sha256": ref.content_hash})
-                            code_version = hashlib.sha256((code_version + ref.content_hash).encode()).hexdigest()
                     report["sdk_news_transport_policy"] = {"source_contract": "successful rate-limited original SDK probe",
                         "timeout_seconds": None, "trust_env": True, "allow_redirects": True,
                         "headers": "original Chrome/114 User-Agent" if input_id == "ASTOCK-032" else "requests defaults",
@@ -553,45 +441,9 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                             "outer_capture_interval_seconds":contract.request_interval_seconds,"sdk_outer_attempts":1,
                             "host_pause":"403/429 immediately; two consecutive transport or server errors",
                             "physical_retry_count_observable":False}
-                        dependency=namespace.get("TLSAdapter") if input_id=="ASTOCK-061" else None
-                        if dependency is not None:
-                            body=inspect.getsource(dependency).encode("utf-8")
-                            ref=raw_store.write_bytes(body,dataset="source_code",provider=contract.provider,endpoint=contract.endpoint,
-                                fetched_at=datetime.now(timezone.utc),attempt_id=dependency.__name__,body_archive=True)
-                            report["sdk_dependency"]["dependencies"].append({"name":"TLSAdapter","path":relative_file(ref.path),"sha256":ref.content_hash})
-                            code_version=hashlib.sha256((code_version+ref.content_hash).encode()).hexdigest()
                     if is_factor:
                         report["factor_sdk_transport_policy"] = report.pop("sdk_news_transport_policy")
                         report["factor_sdk_transport_policy"].update(method="GET", literal_gate="after exact raw retention, before original SDK eval")
-                if input_id.startswith("SDA-BOARD-") or input_id in {'ASTOCK-014', 'ASTOCK-037-profile', 'ASTOCK-087'}:
-                    namespace = getattr(function, "__globals__", {})
-                    dependencies = []
-                    for name in ("_get_stock_board_industry_name_ths", "_get_stock_board_concept_name_ths", "_get_file_content_ths", "get_ths_js"):
-                        dependency = namespace.get(name)
-                        if dependency is not None:
-                            dependencies.append((name, inspect.getsource(dependency).encode("utf-8")))
-                    if namespace.get("get_ths_js"):
-                        dependencies.append(("ths.js", Path(namespace["get_ths_js"]("ths.js")).read_bytes()))
-                    if input_id == 'ASTOCK-014':
-                        helper = namespace['_get_stock_board_concept_name_ths']
-                        child = helper.__wrapped__.__globals__['__stock_board_concept_summary_ths']
-                        dependencies.append(('__stock_board_concept_summary_ths', inspect.getsource(child).encode('utf-8')))
-                        dependencies.append(('ths.js', helper.__wrapped__.__globals__['_get_file_content_ths']('ths.js').encode('utf-8')))
-                    if input_id == 'ASTOCK-037-profile':
-                        dependencies.append(('cninfo.js', namespace['_get_file_content_ths']('cninfo.js').encode('utf-8')))
-                    if input_id == 'ASTOCK-087':
-                        dependencies.append(('_stock_notice_report', inspect.getsource(namespace['_stock_notice_report']).encode('utf-8')))
-                    report["sdk_dependency"]["dependencies"] = []
-                    for name, body in dependencies:
-                        digest = hashlib.sha256(body).hexdigest()
-                        snapshot = re.sub(rb'''(?i)(["'](?:ut|token|access_token|api_key|password|secret)["']\s*:\s*["'])[^"']*(["'])''',
-                                          rb'\1<redacted>\2', body)
-                        ref = raw_store.write_bytes(snapshot, dataset="source_code", provider=contract.provider, endpoint=contract.endpoint,
-                                                   fetched_at=datetime.now(timezone.utc), attempt_id=name, body_archive=True)
-                        report["sdk_dependency"]["dependencies"].append({"name": name, "path": relative_file(ref.path),
-                            "sha256": ref.content_hash, "original_source_sha256": digest, "redacted": snapshot != body})
-                        code_version = hashlib.sha256((code_version + name + digest).encode()).hexdigest()
-                report["code_version"] = code_version
             from contextlib import ExitStack
             actual_code = None
             with ExitStack() as stack:
@@ -644,14 +496,6 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                         import openpyxl
                         report['transport_dependency'] = {'requests': requests.__version__, 'urllib3': urllib3.__version__,
                             'pandas': pandas.__version__, 'openpyxl': openpyxl.__version__}
-                        code_version = hashlib.sha256((code_version + str(sorted(report['transport_dependency'].items()))).encode()).hexdigest()
-                        if input_id == 'SECURITY-SZSE-ETF-HISTORY-001':
-                            helper_source = inspect.getsource(function.__globals__['_parse_date']).encode('utf-8')
-                            helper_ref = raw_store.write_bytes(helper_source, dataset='source_code', provider=contract.provider,
-                                endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id='sdk-date-helper', body_archive=True)
-                            report['sdk_dependency']['dependencies'] = [{'name': '_parse_date', 'path': relative_file(helper_ref.path), 'sha256': helper_ref.content_hash}]
-                            code_version = hashlib.sha256((code_version + helper_ref.content_hash).encode()).hexdigest()
-                        report['code_version'] = code_version
                         report['dated_etf_transport_policy'] = {'source_contract': 'retained successful SDK or money ETF probe',
                             'trust_env': True, 'retry_total': 0, 'allow_redirects': True, 'source_fallback': False,
                             'timeout_seconds': 15 if contract.provider == 'szse' else 25 if 'MONEY' in input_id else None,
@@ -1089,13 +933,6 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                         RawObjectStore.refresh_index(actual_directory / request_manifest_name)
                         RawObjectStore.remove_request(raw_store.manifest)
                         raw_store = RawObjectStore(actual_directory, manifest_name=request_manifest_name)
-                    sdk_dependency = report.get("sdk_dependency", {})
-                    for item in [sdk_dependency, *sdk_dependency.get("dependencies", [])]:
-                        for name in ("path", "source_path"):
-                            if item.get(name):
-                                original_path = (directory / item[name]).resolve()
-                                if original_path.is_relative_to(previous_directory):
-                                    item[name] = relative_file(actual_directory / original_path.relative_to(previous_directory))
                     raw_data_date = actual_day
                     report["data_date"] = actual_day
             projected = [{name: value for name, value in row.items() if name in selected} for row in rows]
@@ -1203,7 +1040,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
             source_refs = {"raw_manifest": report.get("raw_manifest"),
                 "source_response_hashes": [event.get("body_sha256") for event in report.get("responses", [])
                                            if event.get("body_sha256")],
-                "sdk_source_snapshots": report.get("sdk_dependency", {}),
+                "sdk_dependency": report.get("sdk_dependency", {}),
                 "code_version": code_version}
             result_store.write_json(source_refs, dataset="raw_refs", provider=contract.provider,
                 endpoint=contract.endpoint, fetched_at=datetime.now(timezone.utc), attempt_id="raw-refs",
@@ -1753,7 +1590,7 @@ def _task_unit_valid(entry):
                 return False
             report = current
         config_ok = all(file_hash(Path(item["path"])) == item["sha256"]
-                        for item in (*report.get("config_files", ()), *report.get("code_files", ())))
+                        for item in report.get("config_files", ()))
         return (config_ok and not entry.get("coverage_rejected") and entry["status"] == "candidate_complete"
                 and RawObjectStore.verify_manifest(entry["raw_manifest"]) == entry["raw_hash"]
                 and file_hash(Path(entry["artifact"])) == entry["artifact_hash"])
@@ -1960,7 +1797,6 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
                 check["passed"] = False
         check.update(validated_at_utc=datetime.now(timezone.utc).isoformat(),
                      policy_sha256=file_hash(config_root / "datasets/security_master.yaml"),
-                     code_sha256=file_hash(Path(__file__).parents[1] / "quality/publication.py"),
                      source_response_hashes={key: value["entry"]["raw_hash"] for key, value in source_rows.items()})
         state["security_check"] = check
         max_age = policy["dataset"]["publication"]["max_previous_age_days"]
@@ -2187,9 +2023,6 @@ def collect_due_inputs(*, now, config_root, output_root=None, data_root=None, tr
                          for p in dependency_paths],
         "config_files": [{"path": str((root / name).resolve()), "sha256": hashlib.sha256((root / name).read_bytes()).hexdigest()}
                          for name in ("collection.yaml", "providers.yaml")],
-        "code_files": [{"path": str(p.resolve()), "sha256": hashlib.sha256(p.read_bytes()).hexdigest()}
-                       for p in (Path(__file__), Path(__file__).parents[1] / "worker/scheduler.py",
-                                 Path(__file__).parents[1] / "config/loader.py")],
         "scope_context": _json_value({"trading_dates": trading_dates, "securities": [asdict(s) for s in securities],
                                       "symbols": symbols}), "jobs": []}
     if execute:
@@ -2205,7 +2038,7 @@ def collect_due_inputs(*, now, config_root, output_root=None, data_root=None, tr
         for job in jobs:
             entry = {**_json_value(asdict(job)), "coverage_denominator": len(job.symbols), "results": [],
                      "validation_time_utc": datetime.now(timezone.utc).isoformat(),
-                     "config_files": report["config_files"], "code_files": report["code_files"],
+                     "config_files": report["config_files"],
                      "universe_completeness_verified": False}
             report["jobs"].append(entry)
             if not execute or job.status != "ready":

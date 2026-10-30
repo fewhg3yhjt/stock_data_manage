@@ -11,6 +11,33 @@ from stock_data_manage.storage.raw import RawObjectStore
 from stock_data_manage.quality.resolution import resolve_records
 
 
+def test_http_capture_reuses_source_bytes_across_code_versions(tmp_path, monkeypatch):
+    import requests
+    from stock_data_manage.providers.transport import captured_requests, RequestPacer
+    calls = []
+    def send(session, request, **options):
+        calls.append(request.url)
+        assert options["allow_redirects"] is False
+        response = requests.Response()
+        response.status_code = 200
+        response._content = b'{"retained":true}'
+        response.url = request.url
+        response.request = request
+        return response
+    monkeypatch.setattr(requests.Session, "send", send)
+    original = RawObjectStore(tmp_path / "original")
+    for store, version, roots in ((original, "old-code-version", ()),
+                                  (RawObjectStore(tmp_path / "cached"), "new-code-version", (original.root,))):
+        with captured_requests(store, provider="fixture", endpoint="daily", scope={"symbol":"sh600519"},
+                code_version=version, pacer=RequestPacer(wait=lambda _: None), evidence_roots=roots,
+                max_age_seconds=86400) as events:
+            response = requests.get("https://fixture.invalid/daily?symbol=sh600519")
+            assert response.content == b'{"retained":true}'
+        assert RawObjectStore.verify_manifest(store.manifest)
+    assert calls == ["https://fixture.invalid/daily?symbol=sh600519"]
+    assert events[-1]["mode"] == "cached"
+
+
 @pytest.mark.parametrize("data_date", ["20261001", "2026-1-1", "../2026-10-01", "2026-02-30"])
 def test_raw_date_paths_reject_invalid_dates(tmp_path, data_date):
     with pytest.raises(ValueError):

@@ -164,7 +164,7 @@ raw 在解析前写入，恢复、解析和最终提交读取。全流程成功�
 | `.normalized.parquet` | 同批5,224条标准候选，有日期等字段类型 | 后续任务合并实际读取的来源表；与 JSON 是同批数据的两种表示 |
 | `.report.json` | `input_id`、`parameters`、`status="candidate_complete"`、`row_count=5224`、输出引用及版本 | 完整来源报告，恢复、摘要、发布读取；本例约2.76 MB，不是简短任务状态 |
 | `.quality.json` | `status="candidate_complete"`、`row_count=5224`、`coverage_denominator=5224`、`failure_class=null`、`error=null` | 来源阶段检查结论；分母是来源候选，不是独立全市场数量 |
-| `.raw_refs.json` | `raw_manifest={"path":"…manifest.all-3f363376e304.ndjson","sha256":"0d797a…"}`、`source_response_hashes`、`sdk_source_snapshots` | 原响应与 SDK 证据的位置及摘要，引用本身不复制字节 |
+| `.raw_refs.json` | `raw_manifest={"path":"…manifest.all-3f363376e304.ndjson","sha256":"0d797a…"}`、`source_response_hashes`、`sdk_dependency` | 原响应引用与SDK包版本；不再生成SDK源码快照，引用本身不复制响应字节 |
 | `.manifest.json` | `scope`、`scope_key`、`raw_manifest`、`output`、`report`、`quality_report`、`status` | 来源处理汇总清单，区别于 raw 清单和正式数据清单 |
 
 旧输入也可能使用 `.parsed.source-rows.json`、`.parsed.excluded-rows.json`、`.quality_report.json` 等后缀；以其报告路径为准，不代表新增业务阶段。`source-rows`、`parsed-rows`、`excluded-rows` 并非每个接口都有。日线常见八种为 started、source-rows、normalized JSON/Parquet、report、quality、raw_refs、manifest，当前逐证券生成，尚未合并为来源汇总表。
@@ -322,7 +322,7 @@ raw 在解析前写入，恢复、解析和最终提交读取。全流程成功�
 
 旧业务目录的152个文件已逐字节保存在 `data/task_archive/_workspace_audit/layout-migration-20261011/`。三份真实候选及其原响应迁入按日期的活动目录，四份历史回放只留归档；元数据引用同步更新。BaoStock原响应所属日为10月9日，北交所和上交所当前目录所属日为10月10日。当时失败任务继续失败，raw仍在各自日期的 `_tmp`，没有通过该次迁移生成正式证券名单。
 
-迁移清单同时记录旧路径、审计位置和当前位置，原JSON、原响应及原哈希可追溯；新位置的派生描述符重新核验，历史代码指纹不修改。SDK依赖快照也按原哈希核验。见 [迁移结果](../../data/task_workspace/_checks/layout-production-20261011/migration-result.json) 和 [迁移核验](../../data/task_workspace/_checks/layout-production-20261011/migration-verification.json)。新的来源复核在隔离 `tmp/` 执行，资格和正式入口检查见 [阶段索引](../../data/task_workspace/_checks/layout-production-20261011/verification.json)。日线在线资格、常驻调度及管理页面仍未完成。
+迁移清单同时记录旧路径、审计位置和当前位置，原JSON、原响应及原哈希可追溯；新位置的派生描述符重新核验，历史代码指纹不修改。历史SDK源码快照保留原位，不再作为当前运行资格或复用依据。见 [迁移结果](../../data/task_workspace/_checks/layout-production-20261011/migration-result.json) 和 [迁移核验](../../data/task_workspace/_checks/layout-production-20261011/migration-verification.json)。新的来源复核在隔离 `tmp/` 执行，资格和正式入口检查见 [阶段索引](../../data/task_workspace/_checks/layout-production-20261011/verification.json)。日线在线资格、常驻调度及管理页面仍未完成。
 
 本轮276个不同测试用例的最终结果通过。聚合回归206项中曾有1项失败，发现同日不同任务的旧覆盖报告阻止失败保存；修复为先归档构建文件、更新旧摘要引用后，相关15项定向复验通过。运行布局67项、原响应缺失和恢复等7项补充检查通过。10月9日真实归档在隔离新布局发布7267条，包含五组证券和ETF；历史日线目标日提取也通过。原响应哈希、转正后暂存无文件及文档链接另行复查，结果见 [本轮核验索引](../../tmp/directory-layout-20261011/verification.json)。这些回放成果不代表生产发布或在线资格。
 

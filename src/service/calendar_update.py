@@ -111,7 +111,6 @@ class TradingCalendarUpdater:
                                  max_source_age_days: int = 30) -> CalendarUpdateResult:
         """Import revalidated positive dates; retain the original live provenance."""
         import json
-        import inspect
         from collections import Counter
         from ..providers.sina.calendar import SinaTradingCalendarProvider
         from ..storage.integrity import file_hash
@@ -150,22 +149,12 @@ class TradingCalendarUpdater:
                  if e.get("mode")=="live" and e.get("outcome")=="response" and e.get("status_code")==200]
         if not fetched or any(t.tzinfo is None or not timedelta(0)<=now-t<=timedelta(days=max_source_age_days) for t in fetched):
             raise ValueError("calendar source evidence is expired or future-dated")
-        old_dependency=original["sdk_dependency"]
-        old_source_hash=old_dependency.get("original_source_sha256")
-        if old_source_hash is None and not old_dependency.get("redacted"):
-            # Earlier reports used sha256 for the unredacted SDK source bytes.
-            old_source_hash=old_dependency["sha256"]
-        if original["adapter_version"] != current["adapter_version"] or old_source_hash != current["sdk_dependency"]["original_source_sha256"]:
-            raise ValueError("calendar source adapter or SDK parsing contract changed")
         adapter=SinaTradingCalendarProvider()
-        adapter_path=Path(inspect.getfile(type(adapter))).resolve()
-        if current["adapter_version"] != adapter.capability_version or not any(
-                str(d["path"]).replace("\\","/").endswith("/providers/sina/calendar.py")
-                and d["sha256"]==file_hash(adapter_path) for d in original["code_files"]):
-            raise ValueError("calendar original live adapter code differs")
-        for descriptor in (*current["code_files"],*current["config_files"]):
+        if original["adapter_version"] != current["adapter_version"] or current["adapter_version"] != adapter.capability_version:
+            raise ValueError("calendar source adapter contract changed")
+        for descriptor in current["config_files"]:
             if file_hash(Path(descriptor["path"])) != descriptor["sha256"]:
-                raise ValueError("calendar revalidation code or configuration changed")
+                raise ValueError("calendar revalidation configuration changed")
         original_hashes=Counter(e["body_sha256"] for e in original_events if e.get("body_sha256"))
         current_hashes=Counter(e["body_sha256"] for e in events if e.get("body_sha256"))
         if not original_hashes or original_hashes != current_hashes:

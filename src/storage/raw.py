@@ -492,7 +492,7 @@ class RawObjectStore:
         return body
 
     @staticmethod
-    def find_cached_response(roots, *, url, method, scope, code_version, max_age_seconds, ignored_query_parameters=()):
+    def find_cached_response(roots, *, url, method, scope, max_age_seconds, ignored_query_parameters=()):
         now = datetime.now(timezone.utc)
         def cache_url(value):
             cleaned = sanitized_url(value)
@@ -509,7 +509,7 @@ class RawObjectStore:
                         event = json.loads(line)
                         stamp = datetime.fromisoformat(event["fetched_at_utc"])
                         age = (now - stamp).total_seconds()
-                        if (event.get("mode") == "live" and event.get("code_version") == code_version
+                        if (event.get("mode") == "live"
                             and event.get("scope") == scope and event.get("method") == method
                             and cache_url(event["url"]) == cache_url(url)
                             and event.get("status_code") == 200 and event.get("body_storage")

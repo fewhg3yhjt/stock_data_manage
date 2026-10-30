@@ -298,7 +298,7 @@ HTTP 200但HTML错误页、无效JSON、空业务数组、重复日期或价格�
 | `collection.yaml` | 任务目标数据集、证券范围和策略引用；现有 `collection_profiles` 另定义频率、交易日条件及是否调度 |
 | `capabilities.yaml` | Provider 能力目录及显式采集策略；当前 `daily_fixed` 只绑定一个正式来源和三种口径参数 |
 
-静态配置与运行状态分开。选择了某来源不等于该来源已获得生产资格；本次配置和代码指纹变化后，原日线资格需要重新核验。
+静态配置与运行状态分开。选择了某来源不等于该来源已获得生产资格；资格依实际接口、参数、配置、时效与业务证据判断，不再比较源码指纹。
 
 
 日线正式合同由 `config/datasets/daily_bar.yaml` 唯一声明。任务引用采集策略并冻结规则，后续处理使用冻结值；不能在续跑时静默换配置。当前 `daily_fixed` 的具体API参数直接查 `config/capabilities.yaml`，不在本文复制另一份参数表。来源资格仍取决于当前版本、请求范围、时效及健康证据。
@@ -326,7 +326,7 @@ HTTP 200但HTML错误页、无效JSON、空业务数组、重复日期或价格�
 | 查询与观察 | 现有FastAPI只读运行台、规范日线与分钟查询 |
 | 调度 | 到期判断与单次触发；配置启用不表示已部署常驻进程 |
 
-源码职责见[代码结构](CODE_STRUCTURE.md)，实际依赖以 `pyproject.toml` 为准，测试解释器以[协作约定](AGENTS.md#项目python环境与测试执行)为准。中央输入流程和共享指纹依赖仍需按[来源专项设计](provider-capability-verification-and-normalization.md#代码指纹与资格失效范围)评估，不能通过撤掉检查使旧资格继续有效。
+源码职责见[代码结构](CODE_STRUCTURE.md)，实际依赖以 `pyproject.toml` 为准，测试解释器以[协作约定](AGENTS.md#项目python环境与测试执行)为准。版本记录、资格、缓存及候选复用的职责见[来源专项设计](provider-capability-verification-and-normalization.md#实现版本记录与验证范围)。源码正确性按实际影响分层测试，不以文件摘要变化判定其他模块失效。
 
 ## 后续统一访问目标（未全部实现）
 

@@ -695,16 +695,16 @@ def test_reports_seats_session_headers_timeout_retry_cache_and_local_clock(tmp_p
     (tmp_path/"fixture-mode.json").write_text(json.dumps(dict(mode="injected Session; not real live validation",real_http_calls=0,fixture_send_calls=3)),encoding="utf-8")
 
 
-def test_report_cache_nonce_does_not_relax_scope_window_version_or_age(tmp_path,no_network):
+def test_report_cache_ignores_code_version_but_keeps_scope_window_and_age(tmp_path,no_network):
     from datetime import timedelta
     original=reports_seats_records("ASTOCK-008")[0]
     response=requests.Response();response.status_code=200;response._content=RawObjectStore.read_response(SDK_ARCHIVE,original);response.encoding="utf-8"
     store=RawObjectStore(tmp_path/"cache");store.record_response(response=response,url=original["url"],method="GET",request_headers={},provider="eastmoney",endpoint="report_list",scope={"input_id":"ASTOCK-008"},code_version="current",mode="live")
     url=original["url"].replace("1791020798080","1791020800000")
-    kwargs=dict(roots=(store.root,),url=url,method="GET",scope={"input_id":"ASTOCK-008"},code_version="current",max_age_seconds=86400)
+    kwargs=dict(roots=(store.root,),url=url,method="GET",scope={"input_id":"ASTOCK-008"},max_age_seconds=86400)
     assert RawObjectStore.find_cached_response(**kwargs) is None
     assert RawObjectStore.find_cached_response(**kwargs,ignored_query_parameters=("_",)) is not None
-    for change in ({"code_version":"different"},{"scope":{"input_id":"other"}},{"method":"POST"},{"max_age_seconds":0},
+    for change in ({"scope":{"input_id":"other"}},{"method":"POST"},{"max_age_seconds":0},
         {"url":url.replace("600519","000001")},{"url":url.replace("2026-09-01","2026-09-02")},{"url":url.replace("pageNo=1","pageNo=2")},
         {"url":url.replace("reportapi.eastmoney.com","other.example.com")}):
         assert RawObjectStore.find_cached_response(**{**kwargs,**change},ignored_query_parameters=("_",)) is None
@@ -4242,6 +4242,27 @@ def test_input_date_uses_history_target_and_original_shanghai_capture(tmp_path):
         "fetched_at_utc": "2026-10-10T00:00:00+00:00", "source_ref": {
             "fetched_at_utc": "2026-09-30T16:30:00+00:00"}}) + "\n", encoding="utf-8")
     assert _input_data_date({}, manifest, provider="fixture", endpoint="current") == "2026-10-01"
+
+
+@pytest.mark.parametrize("input_id,context,manifest,count", [("ASTOCK-001", QUOTE_CONTEXT, QUOTE_ARCHIVE, 1), CASES[-1]])
+def test_input_collects_without_reading_project_or_sdk_source(tmp_path, monkeypatch, no_network, input_id, context, manifest, count):
+    import inspect
+    original_read = Path.read_bytes
+    def read_bytes(path):
+        if path.resolve().is_relative_to((ROOT / "src").resolve()):
+            raise AssertionError("collection must not fingerprint project source")
+        return original_read(path)
+    def source_forbidden(*args, **kwargs):
+        raise AssertionError("collection must not snapshot SDK source")
+    monkeypatch.setattr(Path, "read_bytes", read_bytes)
+    monkeypatch.setattr(inspect, "getsource", source_forbidden)
+    report = collect_input(input_id=input_id, context=context, config_root=ROOT / "config",
+                           output_root=tmp_path, replay_manifest=manifest)
+    assert report["status"] == "candidate_complete", report.get("error")
+    assert report["row_count"] == count
+    assert "code_files" not in report
+    assert report["code_version"] == report["adapter_version"]
+    assert not list(tmp_path.rglob("source_code"))
 
 
 @pytest.mark.parametrize("input_id", ["ASTOCK-001", "ASTOCK-032"])

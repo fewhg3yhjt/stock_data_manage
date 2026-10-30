@@ -30,7 +30,6 @@ def check_security_input_qualification(contract, context, *, config_root, metada
     """Read existing probe evidence; declarations and offline reports never grant a route."""
     import yaml
     import xml.etree.ElementTree as ET
-    import inspect
     import pyarrow.parquet as pq
     from collections import Counter
     from datetime import date
@@ -94,14 +93,12 @@ def check_security_input_qualification(contract, context, *, config_root, metada
                 raise ValueError("formal Provider live evidence is missing")
             if live.get("mode") != "live" or "parameters:" + row_hash({k: v for k, v in live["parameters"].items() if dated or k != "trade_date"}) != scope:
                 raise ValueError("live validation covers a different request scope")
-            for descriptor in (*live["config_files"], *live["code_files"]):
+            for descriptor in live["config_files"]:
                 if file_hash(Path(descriptor["path"])) != descriptor["sha256"]:
-                    raise ValueError("live capability code or configuration has changed")
+                    raise ValueError("live capability configuration has changed")
             required_configs = {root / "providers.yaml", root / "collection.yaml", root / "datasets/security_snapshot.yaml", root / "normalization/security_snapshot.yaml"}
             if not {str(p.resolve()) for p in required_configs} <= {str(Path(d["path"]).resolve()) for d in live["config_files"]}:
                 raise ValueError("live evidence omits current configuration files")
-            if str(Path(inspect.getfile(type(adapter))).resolve()) not in {str(Path(d["path"]).resolve()) for d in live["code_files"]}:
-                raise ValueError("live evidence omits the actual adapter code")
             published = Manifest.load(artifacts["publication_manifest"])
             report_base = artifacts["live_report"].parent
             if report_base.parts[-3:] == ("sources", contract.provider, contract.endpoint):
@@ -123,7 +120,7 @@ def check_security_input_qualification(contract, context, *, config_root, metada
             if validation_time.tzinfo is None or not validation_time <= evidence["validated_at"]:
                 raise ValueError("qualification predates the actual Provider validation")
             semantic = json.loads(artifacts["semantic_check"].read_text(encoding="utf-8"))
-            if semantic.get("input_id") != contract.input_id or semantic.get("code_version") != live.get("code_version"):
+            if semantic.get("input_id") != contract.input_id:
                 raise ValueError("semantic transformation version differs")
             if not semantic.get("independent_full_market_coverage_verified") or not semantic.get("passed"):
                 raise ValueError("independent catalog coverage has not been verified")
@@ -264,15 +261,12 @@ def check_daily_input_qualification(contract, context, *, asset_type, config_roo
                 raise ValueError('daily Provider report scope differs')
         if live['mode']!='live' or not live.get('live_http_calls'):
             raise ValueError('daily live source evidence is missing')
-        for descriptor in (*current['config_files'],*current['code_files']):
+        for descriptor in current['config_files']:
             if file_hash(Path(descriptor['path']))!=descriptor['sha256']:
-                raise ValueError('daily capability code or configuration changed')
+                raise ValueError('daily capability configuration changed')
         required={str((Path(config_root)/p).resolve()) for p in ['providers.yaml','collection.yaml','datasets/daily_bar.yaml','normalization/daily_bar.yaml']}
         if not required <= {str(Path(d['path']).resolve()) for d in current['config_files']}:
             raise ValueError('daily revalidation omits configuration files')
-        import inspect
-        if str(Path(inspect.getfile(type(adapter))).resolve()) not in {str(Path(d['path']).resolve()) for d in current['code_files']}:
-            raise ValueError('daily revalidation omits actual adapter code')
         raw=artifacts['raw_manifest']; RawObjectStore.verify_manifest(raw)
         events=[json.loads(line) for line in raw.read_text(encoding='utf-8').splitlines() if line.strip()]
         responses=[e for e in events if e.get('event')=='http_response' and e.get('mode')=='live' and e.get('status_code')==200]
@@ -280,7 +274,7 @@ def check_daily_input_qualification(contract, context, *, asset_type, config_roo
         if not hashes or hashes!=live['output']['source_response_hashes'] or hashes!=current['output']['source_response_hashes']:
             raise ValueError('daily revalidation does not retain live response bytes')
         semantic=json.loads(artifacts['semantic_check'].read_text(encoding='utf-8'))
-        if not semantic.get('passed') or semantic.get('instrument_id')!=identity or semantic.get('asset_type')!=asset_type or semantic.get('parameters')!=serialized or semantic.get('source_response_hashes')!=hashes or semantic.get('code_version')!=current['code_version']:
+        if not semantic.get('passed') or semantic.get('instrument_id')!=identity or semantic.get('asset_type')!=asset_type or semantic.get('parameters')!=serialized or semantic.get('source_response_hashes')!=hashes:
             raise ValueError('daily price/date semantics have not been verified')
         published=Manifest.load(artifacts['publication_manifest'])
         partition=artifacts['publication_manifest'].parent

@@ -16,7 +16,8 @@ def test_offline_acceptance_report_covers_replay_capacity_and_recovery(tmp_path)
     assert report.gates["E"] == "PARTIAL_ESTIMATE_ONLY"
     assert all(check["status"] == "PASS" for check in report.checks.values())
     assert len(report.checks["storage_replay"]["evidence"]) == 20
-    assert report.implementation and report.scope["data_origin"] == "synthetic"
+    assert report.scope["data_origin"] == "synthetic"
+    assert "implementation" not in report.to_dict()
     assert report.scope["replay_instruments"] == ["XSHG:600519"]
     assert report.metrics["replay_weekdays"] == 20
     assert report.metrics["replay_partition_no_ops"] == 20

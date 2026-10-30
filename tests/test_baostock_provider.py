@@ -127,6 +127,18 @@ def test_baostock_daily_captures_wire_and_full_sdk_rows_then_replays_without_net
     assert saved_result["fields"] == list(daily_module.BAOSTOCK_DAILY_SOURCE_FIELDS)
     assert len(saved_result["rows"]) == 1
 
+    cached_client = FakeBaoStock()
+    with captured_sdk_queries(
+        RawObjectStore(tmp_path / "cached"), mode="live", replay_manifest=None,
+        evidence_roots=(source.root,), scope=scope, code_version="different-adapter-version",
+        trade_date=trade_date, pacer=RequestPacer(wait=lambda _: None), interval_seconds=3,
+        max_age_seconds=86400, client=cached_client, query_requests={"query_history_k_data_plus": [request]},
+    ) as (sdk_client, archive, cached_events):
+        cached_result = BaoStockDailyProvider(adjustment=Adjustment.FORWARD, start_date=trade_date, client=sdk_client).fetch_daily(
+            ["sh600519"], trade_date, raw_archive=archive)
+    assert cached_result.rows == result.rows and cached_client.calls == []
+    assert any(event.get("mode") == "cached" for event in cached_events)
+
     replay_client = FakeBaoStock()
     replay = RawObjectStore(tmp_path / "replay")
     with captured_sdk_queries(

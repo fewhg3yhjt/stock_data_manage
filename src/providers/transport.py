@@ -161,7 +161,7 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                 mode = "replay"
             else:
                 cached = RawObjectStore.find_cached_response(evidence_roots, url=request.url, method=request.method,
-                    scope=request_scope, code_version=code_version, max_age_seconds=max_age_seconds,
+                    scope=request_scope, max_age_seconds=max_age_seconds,
                     ignored_query_parameters=cache_ignored_query_parameters)
                 if cached:
                     manifest, record, body = cached

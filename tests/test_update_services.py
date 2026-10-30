@@ -30,15 +30,12 @@ def calendar_import_fixture(root, legacy=False):
         report={'input_id':'ASTOCK-070','dataset':'trading_calendar','provider':'sina','endpoint':'trading_calendar',
             'parameters':{},'status':'candidate_complete','run_directory':str(work),'mode':mode,'row_count':2,
             'live_http_calls':int(mode=='live'),'adapter_version':adapter.capability_version,
-            'sdk_dependency':{'original_source_sha256':'synthetic-fixture'},
-            'code_files':[{'path':str(adapter_path),'sha256':file_hash(adapter_path)}],'config_files':[],
+            'config_files':[],
             'raw_manifest':{'path':'raw/manifest.ndjson','sha256':file_hash(store.root/'manifest.ndjson')},
             'output':{'path':'dates.json','sha256':file_hash(dates),'row_count':2,'source_response_hashes':[event['body_sha256']]}}
         saved=work/'report.json'
         if legacy and mode=='live':
             report.pop('run_directory')
-            report['sdk_dependency']={'sha256':report['sdk_dependency']['original_source_sha256']}
-            report['code_files'][0]['path']=str(root/'old/providers/sina/calendar.py')
             saved=work/'2026-10-09/input_report/sina/trading_calendar/report.json'
             saved.parent.mkdir(parents=True)
         saved.write_text(json.dumps(report));paths.append(saved)
@@ -68,9 +65,9 @@ def test_calendar_import_rejects_stale_or_changed_evidence_before_writing(tmp_pa
         args=dict(live_report_path=paths[0],start=date(2026,10,9),end=date(2026,10,12))
         with pytest.raises(ValueError,match='expired'):
             updater.update_from_input_report(paths[1],now=now+timedelta(days=31),**args)
-        current=json.loads(paths[1].read_text());current['code_files'][0]['sha256']='wrong'
+        current=json.loads(paths[1].read_text());current['output']['sha256']='wrong'
         paths[1].write_text(json.dumps(current))
-        with pytest.raises(ValueError,match='code or configuration'):
+        with pytest.raises(ValueError,match='derived dates differ'):
             updater.update_from_input_report(paths[1],now=now,**args)
         assert store.all()==()
 
