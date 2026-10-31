@@ -189,7 +189,7 @@ def prepare_daily_task_publication(state, units, source_rows, paths, config_root
                 reason="required source quote missing" if requirement == "required" else "applicability has not been verified")
             if requirement == "unverified":
                 issues.append({"stage": "quality", "symbol": symbol, "adjustment": name, "code": "unverified_applicability",
-                               "reason": "asset/source applicability is unverified", "impact": "incomplete_daily_record"})
+                               "reason": "asset/source applicability is unverified", "impact": "unverified_quote_group"})
         record = DailyRecord(identity, trade_date, asset, **quotes)
         if record.complete:
             records.append(record)

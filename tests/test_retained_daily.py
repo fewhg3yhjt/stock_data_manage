@@ -80,6 +80,51 @@ def qualified(tmp_path, monkeypatch):
     return contract,root,definition,pairs['forward'][3],tmp_path/'forward-qualification.json'
 
 
+@pytest.mark.parametrize('symbol', ['sh000001', 'sz399001'])
+def test_typed_index_daily_input_preserves_exchange_and_retains_response(tmp_path, monkeypatch, symbol):
+    from urllib.parse import parse_qs, urlsplit
+    from stock_data_manage.storage.raw import RawObjectStore
+    calls = []
+
+    def send(session, request, **kwargs):
+        param = parse_qs(urlsplit(request.url).query)['param'][0]
+        calls.append(param)
+        response = requests.Response()
+        response.status_code = 200
+        response._content = json.dumps({'code': 0, 'data': {symbol: {
+            'day': [['2026-10-09', '3000', '3001', '3002', '2999', '100', {}, '0', '200', '0', '0']]
+        }}}).encode()
+        response.headers = {'Content-Type': 'application/json'}
+        response.encoding = 'utf-8'
+        response.url = request.url
+        response.request = request
+        return response
+
+    monkeypatch.setattr(requests.Session, 'send', send)
+    context = {'request': {'symbol': symbol, 'start_date': '2026-10-09', 'end_date': '2026-10-09'},
+               'config': {'api': 'newfqkline', 'adjust': 'none'}}
+    report = collect_input(input_id='ASTOCK-002-daily', context=context, config_root=CONFIG,
+                           output_root=tmp_path/'index', mode='live', security_asset_type='index',
+                           pacer=RequestPacer(wait=lambda _: None))
+    assert report['status'] == 'candidate_complete', report.get('error')
+    assert calls == [f'{symbol},day,2026-10-09,2026-10-09,640,none']
+    raw = Path(report['run_directory'])/report['raw_manifest']['path']
+    RawObjectStore.verify_manifest(raw)
+    rows = json.loads((Path(report['run_directory'])/report['output']['path']).read_text(encoding='utf-8'))
+    assert rows[0]['instrument_id'] == ('XSHG:' if symbol.startswith('sh') else 'XSHE:') + symbol[2:]
+    assert rows[0]['open'] == '3000' and rows[0]['volume'] is None
+
+
+def test_typed_index_daily_input_rejects_adjusted_capture_before_network(tmp_path, monkeypatch):
+    monkeypatch.setattr(requests.Session, 'send', lambda *a, **kw: pytest.fail('index adjustment reached network'))
+    report = collect_input(input_id='ASTOCK-002-daily',
+        context={'request': {'symbol': 'sh000001', 'start_date': '2026-10-09', 'end_date': '2026-10-09'},
+                 'config': {'api': 'newfqkline', 'adjust': 'qfq'}},
+        config_root=CONFIG, output_root=tmp_path/'adjusted-index', mode='live', security_asset_type='index')
+    assert report['status'] == 'failed'
+    assert 'only without adjustment' in report['error']
+
+
 def test_exact_live_task_publishes_and_blocks_retained_only_qualification(qualified):
     contract,root,definition,raw,proof=qualified
     [unit.pop('replay_manifest',None) for unit in definition['units']]

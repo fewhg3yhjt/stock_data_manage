@@ -238,4 +238,9 @@ class DailyRecord:
             return False
         if self.asset_type is AssetType.STOCK:
             return all(q.status is QuoteStatus.AVAILABLE for q in self.quotes.values())
-        return all(q.status in {QuoteStatus.AVAILABLE, QuoteStatus.NOT_APPLICABLE} for q in self.quotes.values())
+        allowed = {QuoteStatus.AVAILABLE, QuoteStatus.NOT_APPLICABLE}
+        if self.asset_type in {AssetType.ETF, AssetType.INDEX}:
+            # Their required default quote is publishable while optional
+            # adjustment slots explicitly retain unverified applicability.
+            allowed.add(QuoteStatus.UNVERIFIED)
+        return all(q.status in allowed for q in self.quotes.values())

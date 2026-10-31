@@ -92,15 +92,35 @@ def test_aggregate_nested_roundtrip_and_noop(tmp_path):
         run_id="again", item_statuses={"XSHG:600001":"success"}).no_op
 
 
-def test_unknown_applicability_and_copied_prices_cannot_be_published(tmp_path):
+def test_unavailable_quote_cannot_contain_copied_prices():
     with pytest.raises(ValueError, match="copied"):
         QuoteGroup(QuoteStatus.NOT_APPLICABLE, close=Decimal("10"), reason="no", evidence_ref="fixture")
+
+
+@pytest.mark.parametrize('asset', [AssetType.ETF, AssetType.INDEX])
+def test_nonstock_default_quote_publishes_without_certifying_optional_adjustments(tmp_path, asset):
     unknown = QuoteGroup(QuoteStatus.UNVERIFIED, reason="not verified")
-    index = DailyRecord("XSHG:000001", date.fromisoformat(DAY), AssetType.INDEX, quote(), unknown, unknown)
-    assert index.value_kind == "index_points" and index.quote_unit == "point" and not index.complete
+    identity = 'XSHG:000001' if asset is AssetType.INDEX else 'XSHG:510300'
+    item = DailyRecord(identity, date.fromisoformat(DAY), asset, quote(), unknown, unknown)
+    assert item.complete
+    store = CanonicalPartitionStore(tmp_path)
+    store.publish_daily(asset_type=asset.value, partition_key=DAY, new_records=[item], expected_count=1, run_id=asset.value)
+    restored = store.read_daily(asset.value, DAY)[0]
+    assert restored == item
+    assert restored.forward.status is QuoteStatus.UNVERIFIED and restored.forward.close is None
+    assert restored.backward.status is QuoteStatus.UNVERIFIED and restored.backward.close is None
+    assert restored.quote_unit == ('point' if asset is AssetType.INDEX else 'CNY')
+    missing = QuoteGroup(QuoteStatus.MISSING, reason='required source missing')
+    invalid = DailyRecord(identity, date.fromisoformat(DAY), asset, missing, unknown, unknown)
+    assert not invalid.complete
     with pytest.raises(ValueError, match="complete"):
-        CanonicalPartitionStore(tmp_path).publish_daily(asset_type="index", partition_key=DAY,
-            new_records=[index], expected_count=1, run_id="index")
+        store.publish_daily(asset_type=asset.value, partition_key=DAY, new_records=[invalid], expected_count=1, run_id='missing')
+
+
+def test_stock_and_lof_do_not_inherit_unverified_adjustment_publication():
+    unknown = QuoteGroup(QuoteStatus.UNVERIFIED, reason='not verified')
+    for asset in [AssetType.STOCK, AssetType.LOF]:
+        assert not DailyRecord('XSHG:600001', date.fromisoformat(DAY), asset, quote(), unknown, unknown).complete
 
 
 def test_verified_nonapplicable_index_roundtrip(tmp_path):

@@ -35,6 +35,8 @@ applicability:
     forward: required
     backward: required
   etf:
+    # ETF/index may publish a valid required none quote while the optional
+    # adjustment slots remain explicitly unverified; no copied prices.
     none: required
     forward: unverified
     backward: unverified

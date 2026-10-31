@@ -448,6 +448,8 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
             actual_code = None
             with ExitStack() as stack:
                 runtime_parameters = dict(parameters)
+                if input_id == "ASTOCK-002-daily":
+                    runtime_parameters["asset_type"] = security_asset_type
                 if is_em_events or is_lpr or is_cb:
                     stack.callback(provider.close_event_session)
                 if is_reportapi:
