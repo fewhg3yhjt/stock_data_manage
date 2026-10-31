@@ -183,95 +183,14 @@ def read_bars(root):
     return CanonicalPartitionStore(root / "canonical").read_daily("stock", DAY)
 
 
-def test_pending_commit_blocks_other_asset_in_shared_workspace(tmp_path):
-    collector = FaultCollector()
-    def crash(stage):
-        if stage == "before_publish":
-            raise RuntimeError("simulated crash")
-    with pytest.raises(RuntimeError):
-        run(tmp_path, daily_definition(), collector, failure_hook=crash)
-    prepared = tmp_path / "task_workspace" / DAY / "daily_bar/prepared.parquet"
-    original_hash = file_hash(prepared)
-    other = daily_definition("other-asset")
-    other["asset_type"] = "etf"
-    with pytest.raises(ValueError, match="pending commit"):
-        run(tmp_path, other, collector)
-    assert file_hash(prepared) == original_hash and len(collector.calls) == 9
-    assert recover_collection_tasks(config_root=CONFIG, data_root=tmp_path) == ("daily",)
 
 
-def test_partial_published_daily_resumes_missing_security(tmp_path):
-    import shutil
-    isolated_config = tmp_path / "config"
-    shutil.copytree(CONFIG, isolated_config)
-    dataset_file = isolated_config / "datasets/daily_bar.yaml"
-    settings = yaml.safe_load(dataset_file.read_text(encoding="utf-8"))
-    settings["dataset"]["publication"].update(max_missing_ratio=0.5, max_missing_count=1)
-    dataset_file.write_text(yaml.safe_dump(settings, allow_unicode=True), encoding="utf-8")
-    collector = FaultCollector()
-    collector.fail.add("sh600002")
-    definition = daily_definition()
-    runtime_root = tmp_path / "run"
-    first = collect_task(definition=definition, config_root=isolated_config, data_root=runtime_root,
-                         mode="replay", collector=collector)
-    assert first["status"] == "published" and not first["complete_today"]
-    assert len(read_bars(runtime_root)) == 2
-    untouched = file_hash(raw_request(runtime_root, "sh600001", temporary=False))
-    collector.fail.clear()
-    second = collect_task(definition=definition, config_root=isolated_config, data_root=runtime_root,
-                          mode="replay", collector=collector)
-    assert second["status"] == "published" and second["complete_today"]
-    assert len(read_bars(runtime_root)) == 3 and len(collector.calls) == 12
-    assert collector.calls[-3][0].startswith("sh600002__")
-    assert file_hash(raw_request(runtime_root, "sh600001", temporary=False)) == untouched
 
 
-def test_daily_adjustments_publish_and_resume_in_separate_partitions(tmp_path):
-    collector = FaultCollector()
-    result = run(tmp_path, daily_definition("aggregate", ("sh600001",)), collector)
-    assert result["status"] == "published" and result["row_count"] == 1
-    row = read_bars(tmp_path)[0]
-    assert row.key == ("XSHG:600001", date.fromisoformat(DAY))
-    assert {name: group.status.value for name, group in row.quotes.items()} == {"none":"available", "forward":"available", "backward":"available"}
-    assert run(tmp_path, daily_definition("aggregate", ("sh600001",)), collector)["no_op"]
-    with MetadataStore(tmp_path / "metadata/metadata.duckdb") as metadata:
-        assert metadata.partition("daily_bar", "stock", DAY, adjustment="aggregate")["actual_count"] == 1
 
 
-def test_yaml_task_supplies_daily_contract_for_explicit_scope(tmp_path):
-    definition = {"task_id": "yaml-stock", "task": "stock_daily", "trade_date": DAY,
-        "units": [{"key": "sh600001", "symbol": "sh600001", "input_id": "ASTOCK-002-daily",
-            "context": {"request": {"symbol": "sh600001", "start_date": DAY, "end_date": DAY}}}]}
-    result = run(tmp_path, definition, FaultCollector())
-    assert result["status"] == "published" and result["row_count"] == 1
-    frozen = result["execution_definition"]
-    assert frozen["asset_type"] == "stock" and frozen["universe"] == "static"
-    assert frozen["acquisition_policy"] == "daily_fixed"
-    assert {unit["context"]["config"]["adjust"] for unit in frozen["units"]} == {"none", "qfq", "hfq"}
 
 
-@pytest.mark.parametrize("tampered", [False, True])
-def test_dated_task_archive_preserves_resume_and_checks_candidates(tmp_path, tampered):
-    from stock_data_manage.worker.recovery import archive_published_task
-    collector = FaultCollector()
-    result = run(tmp_path, daily_definition(), collector)
-    work = tmp_path / "task_workspace" / DAY / "daily_bar"
-    if tampered:
-        Path(next(iter(result["units"].values()))["artifact"]).write_bytes(b"corrupt")
-    with MetadataStore(tmp_path / "metadata/metadata.duckdb") as metadata:
-        options = dict(workspace_root=tmp_path / "task_workspace", archive_root=tmp_path / "task_archive",
-                       canonical_root=tmp_path / "canonical", raw_root=tmp_path / "raw", metadata=metadata)
-        if tampered:
-            with pytest.raises(ValueError, match="candidate changed"):
-                archive_published_task(work, **options)
-            assert work.exists()
-            return
-        archive = archive_published_task(work, **options)
-    assert not work.exists() and archive == tmp_path / "task_archive" / DAY / "daily_bar"
-    resumed = run(tmp_path, daily_definition(), collector)
-    assert resumed["no_op"] and len(collector.calls) == 9
-    assert Path(resumed["summary"]["path"]).parent == archive
-    assert not work.exists() and len(read_bars(tmp_path)) == 3
 
 
 def test_security_dates_remain_separate_and_latest_never_uses_future(tmp_path):
@@ -314,141 +233,18 @@ def test_another_task_failure_archives_old_build_and_keeps_its_summary(tmp_path,
     assert json.loads((tmp_path / "task_workspace" / DAY / "security_master/summary.json").read_text())["task_id"] == "different-task"
 
 
-def test_restart_resumes_only_missing_and_publishes_raw(tmp_path):
-    collector = FaultCollector()
-    collector.fail.add("sh600002")
-    definition = daily_definition()
-    first = run(tmp_path, definition, collector)
-    assert first["status"] == "failed"
-    summary = json.loads(Path(first["summary"]["path"]).read_text(encoding="utf-8"))
-    assert summary["missing_units"] == ["sh600002__none", "sh600002__forward", "sh600002__backward"]
-    assert summary["final_check"]["status"] == "failed" and summary["data_date"] is None
-    assert "synthetic transport failure" in next(u["error"] for u in summary["source_units"] if u["key"] == "sh600002__none")
-    assert not read_bars(tmp_path)
-    assert raw_request(tmp_path, "sh600001").exists()
-    # Database is closed between runs, reproducing a process restart.
-    collector.fail.clear()
-    second = run(tmp_path, definition, collector)
-    assert second["status"] == "published"
-    summary = json.loads(Path(second["summary"]["path"]).read_text(encoding="utf-8"))
-    assert summary["missing_units"] == [] and summary["data_date"] == DAY
-    assert summary["final_check"]["coverage"]["ratio"] == 1
-    assert summary["publication"]["row_count"] == 3
-    assert [call[0].split("__")[0] for call in collector.calls] == ["sh600001"]*3 + ["sh600002"]*3 + ["sh600003"]*3 + ["sh600002"]*3
-    assert len(read_bars(tmp_path)) == 3
-    for record in read_bars(tmp_path):
-        for group in record.quotes.values():
-            manifest = Path(group.raw_object_path)
-            assert manifest.is_file()
-            assert RawObjectStore.verify_manifest(manifest)
-    assert not (tmp_path / "raw" / "_tmp" / DAY / "daily").exists()
-    assert len(list((tmp_path / "raw" / DAY / "tencent" / "kline_daily").glob("manifest.*.ndjson"))) == 9
 
 
-def test_invalid_security_is_refetched_not_reused(tmp_path):
-    collector = FaultCollector()
-    collector.invalid.add("sh600002")
-    assert run(tmp_path, daily_definition(), collector)["status"] == "failed"
-    collector.invalid.clear()
-    assert run(tmp_path, daily_definition(), collector)["status"] == "published"
-    assert sum(call[0].startswith("sh600002__") for call in collector.calls) == 6
-    assert sum(call[0].startswith("sh600001__") for call in collector.calls) == 3
 
 
-def test_selected_redo_updates_only_target_without_duplicates(tmp_path):
-    collector = FaultCollector()
-    definition = daily_definition()
-    run(tmp_path, definition, collector)
-    original = {row.instrument_id: row for row in read_bars(tmp_path)}
-    collector.prices["sh600002"] = "20"
-    run(tmp_path, definition, collector, redo="selected", symbols=["sh600002"])
-    updated = {row.instrument_id: row for row in read_bars(tmp_path)}
-    assert len(updated) == 3
-    assert {q.close for q in updated["XSHG:600002"].quotes.values()} == {Decimal("20")}
-    assert updated["XSHG:600001"] == original["XSHG:600001"]
-    assert collector.calls[-3][0].startswith("sh600002__") and all(call[1] for call in collector.calls[-3:])
-    assert all(Path(group.raw_object_path).is_file() for group in original["XSHG:600002"].quotes.values())
-    run(tmp_path, definition, collector, redo="selected", symbols=["sh600002"])
-    assert len(read_bars(tmp_path)) == 3
 
 
-def test_failed_full_redo_cannot_hide_missing_using_old_publication(tmp_path):
-    collector = FaultCollector()
-    definition = daily_definition()
-    run(tmp_path, definition, collector)
-    prior = read_bars(tmp_path)
-    collector.fail.add("sh600002")
-    failed = run(tmp_path, definition, collector, redo="full")
-    assert failed["status"] == "failed"
-    summary = json.loads(Path(failed["summary"]["path"]).read_text(encoding="utf-8"))
-    assert summary["publication"]["manifest"] is None and not summary["publication"]["raw_refs"]
-    assert summary["final_check"]["coverage"]["actual_count"] == 2
-    assert read_bars(tmp_path) == prior
-    assert all(call[1] for call in collector.calls[-9:])
-    collector.fail.clear()
-    resumed = run(tmp_path, definition, collector)
-    assert resumed["status"] == "published"
-    assert collector.calls[-3][0].startswith("sh600002__")
 
 
-@pytest.mark.parametrize("stage", ["before_publish", "after_data_replace", "after_publish", "after_raw_promote"])
-def test_commit_interruption_recovers_without_source_requests(tmp_path, stage):
-    collector = FaultCollector()
-    def crash(current):
-        if current == stage:
-            raise RuntimeError("simulated crash")
-    with pytest.raises(RuntimeError, match="simulated crash"):
-        run(tmp_path, daily_definition(), collector, failure_hook=crash)
-    summary = json.loads((tmp_path / f"task_workspace/{DAY}/daily_bar/summary.json").read_text(encoding="utf-8"))
-    assert summary["status"] == "committing" and summary["publication"]["pending_recovery"]
-    assert not summary["publication"]["published"]
-    with pytest.raises(InvalidPartitionError, match="pending"):
-        read_bars(tmp_path)
-    with MetadataStore(tmp_path / "metadata/metadata.duckdb") as metadata:
-        assert metadata.load_collection_task("daily")["status"] == "committing"
-        # Legacy recovery must not expose a task awaiting raw finalization.
-        assert RecoveryScanner(tmp_path / "canonical", metadata).recover().repaired_metadata_partitions == 0
-    assert recover_collection_tasks(config_root=CONFIG, data_root=tmp_path) == ("daily",)
-    summary = json.loads((tmp_path / f"task_workspace/{DAY}/daily_bar/summary.json").read_text(encoding="utf-8"))
-    assert summary["status"] == "published" and not summary["publication"]["pending_recovery"]
-    assert len(collector.calls) == 9
-    assert len(read_bars(tmp_path)) == 3
-    assert recover_collection_tasks(config_root=CONFIG, data_root=tmp_path) == ()
 
 
-def test_master_then_dynamic_daily_scope_and_new_listings(tmp_path):
-    collector = FaultCollector()
-    master = run(tmp_path, master_definition(), collector)
-    assert master["status"] == "published"
-    assert master["row_count"] == 2
-    definition = {"task_id": "all", "dataset": "daily_bar", "trade_date": DAY,
-                  "universe": "all_stock", "asset_type": "stock", "input_id": "ASTOCK-002-daily"}
-    daily = run(tmp_path, definition, collector)
-    assert daily["row_count"] == 2
-    assert len(daily["units"].values()) == 6
-    assert {tuple(sorted(unit["context"]["config"].items())) for unit in daily["execution_definition"]["units"]} == {tuple(sorted(x.items())) for x in ({"adjust":"none","api":"newfqkline"},{"adjust":"qfq","api":"newfqkline"},{"adjust":"hfq","api":"newfqkline"})}
-    collector.source_stock_codes = ("600001", "000001", "600002")
-    run(tmp_path, master_definition(), collector, redo="full")
-    assert run(tmp_path, definition, collector)["no_op"]
-    new_definition = {**definition, "task_id": "all-new"}
-    assert run(tmp_path, new_definition, collector)["row_count"] == 3
-    configured = {**definition, "task_id": "all-alternative", "config": {"api": "newfqkline"}}
-    with pytest.raises(ValueError, match="parameters belong to the acquisition policy"):
-        run(tmp_path, configured, collector)
 
 
-def test_all_index_daily_task_defaults_to_unadjusted_tencent_api(tmp_path):
-    collector = FaultCollector()
-    collector.catalog_rows["shenzhen-shanghai"] = [
-        {"stock_code":"600001","stock_name":"fixture stock","exchange":"XSHG","asset_type":"stock"},
-        {"stock_code":"000001","stock_name":"fixture index","exchange":"XSHG","asset_type":"index"},
-        {"stock_code":"000001","stock_name":"fixture stock","exchange":"XSHE","asset_type":"stock"}]
-    assert run(tmp_path, master_definition(), collector)["status"] == "published"
-    result = run(tmp_path, {"task_id":"all-index","dataset":"daily_bar","trade_date":DAY,"universe":"all_index","input_id":"ASTOCK-002-daily"}, collector)
-    assert result["status"] == "failed"
-    summary = json.loads(Path(result["summary"]["path"]).read_text(encoding="utf-8"))
-    assert any(issue["code"] == "unverified_applicability" for issue in summary["final_check"]["issues"])
-    assert not read_bars(tmp_path)
 
 
 def test_all_index_universe_expands_only_published_index_rows(tmp_path, monkeypatch):
@@ -493,95 +289,18 @@ def test_all_index_universe_expands_only_published_index_rows(tmp_path, monkeypa
         ("sh000001", "index"), ("sz399001", "index")]
 
 
-def test_none_adjustment_selects_tencent_newfqkline_before_collection(tmp_path):
-    observed = []
-    def stop(**options):
-        observed.append(options["context"]["config"].copy())
-        raise RuntimeError("fixture stop")
-    result = run(tmp_path, daily_definition("policy", ("sh600001",)), stop)
-    assert result["status"] == "failed"
-    assert observed == [{"adjust":"none","api":"newfqkline"},{"adjust":"qfq","api":"newfqkline"},{"adjust":"hfq","api":"newfqkline"}]
 
 
-def test_omitted_daily_adjustment_defaults_to_tencent_newfqkline(tmp_path):
-    result = run(tmp_path, daily_definition("policy-default", ("sh600001",)), FaultCollector())
-    assert result["status"] == "published"
-    assert {tuple(sorted(unit["context"]["config"].items())) for unit in result["execution_definition"]["units"]} == {tuple(sorted(x.items())) for x in ({"adjust":"none","api":"newfqkline"},{"adjust":"qfq","api":"newfqkline"},{"adjust":"hfq","api":"newfqkline"})}
 
 
-def test_none_adjustment_rejects_explicit_conflicting_api_before_collection(tmp_path):
-    definition = daily_definition("old-single-mode", ("sh600001",))
-    definition["adjustment"] = "none"
-    with pytest.raises(ValueError, match="aggregate"):
-        run(tmp_path, definition, FaultCollector())
 
 
-def test_task_shares_existing_request_pacer_between_securities(tmp_path):
-    collector=FaultCollector()
-    pacers=[]
-    def observed(**kwargs):
-        pacers.append(kwargs['pacer'])
-        return collector(**kwargs)
-    result=run(tmp_path,daily_definition(),observed)
-    assert result['status']=='published' and len(pacers)==9
-    assert all(p is pacers[0] for p in pacers)
 
 
-def test_display_does_not_save_and_each_security_has_one_checkpoint(tmp_path,monkeypatch):
-    saved=[];summaries=[];shown=[]
-    original=MetadataStore.save_collection_task
-    import stock_data_manage.pipeline.inputs as inputs
-    summary=inputs._save_task_summary
-    monkeypatch.setattr(inputs,'monotonic',lambda:0)
-    def observed(metadata,state):
-        original(metadata,state)
-        if state['status']=='collecting':
-            stored=metadata.load_collection_task(state['task_id'])
-            saved.append(len(stored['units']))
-            assert stored['progress']['stages']['processing']['completed']==len(stored['units'])
-    def observed_summary(state,*args,**kwargs):
-        summaries.append((state['status'],len(state['units'])))
-        return summary(state,*args,**kwargs)
-    monkeypatch.setattr(MetadataStore,'save_collection_task',observed)
-    monkeypatch.setattr(inputs,'_save_task_summary',observed_summary)
-    result=collect_task(definition=daily_definition(),config_root=CONFIG,data_root=tmp_path,
-        mode='replay',collector=FaultCollector(),progress_callback=shown.append)
-    assert result['status']=='published'
-    assert saved==list(range(10))
-    assert [n for status,n in summaries if status=='collecting']==[0]
-    assert len(shown)>len(saved)
-    assert summaries[-1]==('published',9)
 
 
-def test_unit_failure_writes_summary_immediately(tmp_path,monkeypatch):
-    import stock_data_manage.pipeline.inputs as inputs
-    monkeypatch.setattr(inputs,'monotonic',lambda:0)
-    collector=FaultCollector();collector.fail.add('sh600001');seen=[]
-    original=inputs._save_task_summary
-    def observed(state,*args,**kwargs):
-        result=original(state,*args,**kwargs)
-        if state['status']=='collecting' and state['units']:
-            seen.append(json.loads(Path(state['summary']['path']).read_text())['source_units'][0]['status'])
-        return result
-    monkeypatch.setattr(inputs,'_save_task_summary',observed)
-    result=run(tmp_path,daily_definition(),collector)
-    assert result['status']=='failed' and seen[0]=='failed'
 
 
-def test_summary_refreshes_after_five_seconds_without_extra_checkpoint(tmp_path,monkeypatch):
-    import stock_data_manage.pipeline.inputs as inputs
-    clock=[0.0];sizes=[];original=inputs._save_task_summary
-    monkeypatch.setattr(inputs,'monotonic',lambda:clock[0])
-    def observed(state,*args,**kwargs):
-        if state['status']=='collecting':sizes.append(len(state['units']))
-        return original(state,*args,**kwargs)
-    monkeypatch.setattr(inputs,'_save_task_summary',observed)
-    base=FaultCollector()
-    def collector(**kwargs):
-        clock[0]=6.0
-        return base(**kwargs)
-    result=run(tmp_path,daily_definition(),collector)
-    assert result['status']=='published' and sizes==[0,1]
 
 
 def test_master_whole_source_failure_falls_back_without_claiming_today_complete(tmp_path):
@@ -1079,31 +798,8 @@ def test_real_source_catalog_pairs_and_incompatible_dates(tmp_path):
     assert master_manifest(tmp_path).content_hash == manifest.content_hash
 
 
-@pytest.mark.parametrize("mutation", ["corrupt", "missing"])
-def test_corrupt_or_missing_raw_invalidates_published_noop(tmp_path, mutation):
-    collector = FaultCollector()
-    definition = daily_definition()
-    result = run(tmp_path, definition, collector)
-    failed_key = "sh600001__forward"
-    raw = Path(result["units"][failed_key]["raw_manifest"])
-    if mutation == "missing":
-        raw.unlink()
-    else:
-        raw.write_text("corrupt fixture")
-    resumed = collect_task(definition=definition, config_root=CONFIG, data_root=tmp_path, mode="replay", collector=collector)
-    assert resumed["status"] == "published" and resumed.get("no_op") is not True
-    assert all(Path(group.raw_object_path).is_file() for row in read_bars(tmp_path) for group in row.quotes.values())
 
 
-def test_selected_scope_and_live_production_gate(tmp_path):
-    with pytest.raises(ValueError, match="outside"):
-        run(tmp_path, daily_definition(), FaultCollector(), redo="selected", symbols=["sh999999"])
-    with pytest.raises(ValueError, match="blocked"):
-        run(tmp_path, daily_definition(), FaultCollector(), mode="live")
-    with pytest.raises(ValueError, match="isolated"):
-        collect_task(definition=daily_definition(), config_root=CONFIG, data_root=ROOT / "data", mode="replay")
-    with pytest.raises(ValueError, match="invalid task"):
-        run(tmp_path, daily_definition(task_id="../raw"), FaultCollector())
 
 
 @pytest.mark.parametrize("mode", ["replay", "live"])
@@ -1116,89 +812,12 @@ def test_business_tasks_reject_provider_validation_output_before_execution(mode,
     assert collector.calls == []
 
 
-def test_task_defaults_use_configured_storage_and_keep_live_qualification_gate(monkeypatch):
-    from stock_data_manage.config.loader import load_storage_paths
-    paths_used = []
-
-    def resolve_paths(config_root, **kwargs):
-        paths = load_storage_paths(config_root, **kwargs)
-        paths_used.append(paths)
-        return paths
-
-    monkeypatch.setattr("stock_data_manage.pipeline.inputs.load_storage_paths", resolve_paths)
-    monkeypatch.setattr("stock_data_manage.routing.factory.check_daily_input_qualification",
-        lambda *args, **kwargs: {"eligible": False, "reasons": ["fixture scope is not authorized"]})
-    collector = FaultCollector()
-    with pytest.raises(ValueError, match="formal routing qualification"):
-        collect_task(definition=daily_definition(), config_root=CONFIG, collector=collector)
-    assert paths_used and all(paths["data_root"] == ROOT / "data" for paths in paths_used)
-    assert collector.calls == []
 
 
-def test_processing_retry_uses_saved_response_and_keeps_other_tasks_staging(tmp_path):
-    collector = FaultCollector()
-    definition = daily_definition(symbols=("sh600001",))
-    def fail_mapping(**options):
-        report = collector(**options)
-        report.update(status="failed", failure_class="NormalizationError")
-        return report
-    first = run(tmp_path, definition, fail_mapping)
-    assert first["status"] == "failed"
-    pending = tmp_path / "raw" / "_tmp" / DAY / "other" / "endpoint"
-    pending.mkdir(parents=True)
-    (pending / "user-evidence.txt").write_text("keep", encoding="utf-8")
-    assert run(tmp_path, definition, collector)["status"] == "published"
-    replay = Path(collector.calls[-1][2])
-    assert replay.is_file() and RawObjectStore.verify_manifest(replay)
-    assert run(tmp_path, definition, collector, redo="full")["status"] == "published"
-    assert (pending / "user-evidence.txt").read_text(encoding="utf-8") == "keep"
 
 
-def test_daily_raw_dates_are_isolated_during_failure_resume_and_full_redo(tmp_path):
-    collector = FaultCollector()
-    first = run(tmp_path, daily_definition(symbols=("sh600001",)), collector)
-    old_raw = Path(first["units"]["sh600001__forward"]["current_raw"])
-    old_hashes = {str(p.relative_to(old_raw.parent)): file_hash(p) for p in old_raw.parent.rglob("*") if p.is_file()}
-    next_day = "2026-10-09"
-    definition = daily_definition("next-day", symbols=("sh600001",))
-    definition["trade_date"] = next_day
-    definition["units"][0]["context"]["request"].update(start_date=next_day, end_date=next_day)
-    collector.fail.add("sh600001")
-    assert run(tmp_path, definition, collector)["status"] == "failed"
-    assert raw_request(tmp_path, "sh600001", day=next_day).exists()
-    collector.fail.clear()
-    published = run(tmp_path, definition, collector)
-    new_raw = Path(published["units"]["sh600001__forward"]["current_raw"])
-    assert DAY in old_raw.parts and next_day in new_raw.parts
-    assert new_raw != old_raw
-    # A full redo must clear only this task's target day, including when another
-    # date has a same-named staging directory.
-    untouched = tmp_path / "raw" / "_tmp" / DAY / "other" / "endpoint"
-    untouched.mkdir(parents=True)
-    (untouched / "sentinel.txt").write_text("keep", encoding="utf-8")
-    collector.prices["sh600001"] = "20"
-    assert run(tmp_path, definition, collector, redo="full")["status"] == "published"
-    assert {str(p.relative_to(old_raw.parent)): file_hash(p) for p in old_raw.parent.rglob("*") if p.is_file()} == old_hashes
-    assert (untouched / "sentinel.txt").read_text(encoding="utf-8") == "keep"
-    assert len(list(new_raw.parent.glob("manifest.*.ndjson"))) == 3
-    bars = CanonicalPartitionStore(tmp_path / "canonical").read(Dataset.DAILY_BAR, "stock", next_day)
-    assert len(bars) == 1 and bars[0].quotes["none"].close == Decimal("20")
 
 
-def test_selected_redo_preserves_other_current_raw_scopes(tmp_path):
-    collector = FaultCollector()
-    definition = daily_definition()
-    initial = run(tmp_path, definition, collector)
-    before = {key: RawObjectStore.verify_manifest(Path(entry["current_raw"]))
-              for key, entry in initial["units"].items()}
-    collector.prices["sh600002"] = "20"
-    updated = run(tmp_path, definition, collector, redo="selected", symbols=["sh600002"])
-    after = {key: RawObjectStore.verify_manifest(Path(entry["current_raw"]))
-             for key, entry in updated["units"].items()}
-    assert before["sh600001__forward"] == after["sh600001__forward"]
-    assert before["sh600003__forward"] == after["sh600003__forward"]
-    assert before["sh600002__forward"] != after["sh600002__forward"]
-    assert len(list((tmp_path / "raw" / DAY / "tencent/kline_daily").glob("manifest.*.ndjson"))) == 9
 
 
 def test_dead_process_lock_is_recovered_but_live_lock_is_preserved(tmp_path):
@@ -1216,19 +835,6 @@ def test_dead_process_lock_is_recovered_but_live_lock_is_preserved(tmp_path):
     assert not lock.exists()
 
 
-def test_pending_commit_rejects_another_writer_and_completed_data_corruption(tmp_path):
-    collector = FaultCollector()
-    def crash(stage):
-        if stage == "before_publish": raise RuntimeError("stop")
-    with pytest.raises(RuntimeError): run(tmp_path, daily_definition(), collector, failure_hook=crash)
-    with pytest.raises(InvalidPartitionError, match="another daily task"):
-        CanonicalPartitionStore(tmp_path / "canonical").publish_daily(
-            asset_type="stock", partition_key=DAY, new_records=[], expected_count=0, run_id="unrelated")
-    recover_collection_tasks(config_root=CONFIG, data_root=tmp_path)
-    data = tmp_path / "canonical" / DAY / "daily_bar/stock/data.parquet"
-    data.write_bytes(b"corrupt")
-    with pytest.raises(InvalidPartitionError, match="manifest"):
-        CanonicalPartitionStore(tmp_path / "canonical").read_daily("stock", DAY)
 
 
 def test_real_archived_source_inputs_end_to_end(tmp_path):

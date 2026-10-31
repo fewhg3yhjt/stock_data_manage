@@ -241,10 +241,12 @@ class DashboardReader:
         """Index only existing source reports in memory; never create a query database."""
         result = []
         seen = set()
-        keys = {"dataset", "input_id", "provider", "endpoint", "data_date", "parameters",
+        keys = {"dataset", "input_id", "provider", "endpoint", "data_date", "parameters", "asset_type",
                 "source_rows", "raw_manifest", "normalization_version", "code_version", "applied_unit_contract"}
         for root in (self.paths["workspace_root"], self.paths["archive_root"]):
-            for path in root.glob("*/*/sources/*/*/*.report.json"):
+            for path in root.rglob("*.report.json"):
+                if len(path.parts) < 5 or path.parents[2].name != 'sources':
+                    continue
                 if not _within(path, root):
                     continue
                 first = path.relative_to(root).parts[0]
@@ -428,10 +430,10 @@ class DashboardReader:
                 elif security and security.casefold() not in str(name).casefold():
                     continue
                 task_context = references.get(str(report_path.resolve()), {})
-                declared_assets = {kind for kind in (row.get("asset_type"), known.get("asset_type"), task_context.get("frozen_asset_type")) if kind}
+                declared_assets = {kind for kind in (row.get("asset_type"), known.get("asset_type"), report.get('asset_type'), task_context.get("frozen_asset_type")) if kind}
                 if len(declared_assets) > 1:
                     raise HTTPException(409, "证券类型上下文冲突: " + (row_market + row_code))
-                row_asset = str(row.get("asset_type") or known.get("asset_type") or task_context.get("frozen_asset_type") or "")
+                row_asset = str(row.get("asset_type") or known.get("asset_type") or report.get('asset_type') or task_context.get("frozen_asset_type") or "")
                 if asset_type and row_asset != asset_type:
                     continue
                 raw_date = value(row, "trade_date", ["trade_date", "bar_time", "date", "日期", "交易日期", "STAT_DATE"])
@@ -576,7 +578,9 @@ class DashboardReader:
             "completed_units": raw.get("completed"),
             "total_units": raw.get("total"),
             "missing_count": len(missing) if isinstance(missing, list) else 0,
-            "source_unit_count": len(source_units) if isinstance(source_units, list) else 0,
+            "source_unit_count": len(source_units) if isinstance(source_units, list) else document.get('source_unit_count', 0),
+            "phase": document.get('phase'),
+            "partitions": _redact(document.get('partitions', {})),
             "error": _redact(document.get("error") or (document.get("final_check") or {}).get("error")),
             "location": location,
         }
@@ -624,6 +628,8 @@ class DashboardReader:
             saved_definition = _read_json(definition_path)
         except ValueError:
             saved_definition = {}
+        if document.get('format_version') == 'daily-batch-v1':
+            saved_definition = saved_definition.get('definition', {})
         definition = {
             key: value
             for key, value in saved_definition.items()
@@ -638,6 +644,16 @@ class DashboardReader:
             if isinstance(value, list) and len(value) > 200:
                 coverage[key] = {"count": len(value), "sample": value[:200]}
         final_check = {**final_check, "coverage": coverage}
+        partition_results = []
+        if document.get('format_version') == 'daily-batch-v1':
+            for asset, result in document.get('partitions', {}).items():
+                coverage_path = path.with_name(f'coverage.{asset}.json')
+                check = _read_json(coverage_path) if _within(coverage_path, path.parent) and coverage_path.is_file() else {}
+                partition_results.append({'asset_type': asset, 'status': result['status'],
+                    'expected_count': check.get('expected_count'), 'actual_count': check.get('actual_count'),
+                    'issue_count': len(check.get('issues', [])),
+                    'unverified_count': sum(i.get('code') == 'unverified_applicability' for i in check.get('issues', [])),
+                    'error': result.get('error')})
         return {
             **card,
             "definition": _redact(definition),
@@ -650,6 +666,7 @@ class DashboardReader:
             "fallback_used": document.get("fallback_used"),
             "fallback_reason": document.get("fallback_reason"),
             "published_hash": publication.get("manifest_sha256", document.get("published_hash")),
+            "partition_results": partition_results,
         }
 
     def task_units(
@@ -661,8 +678,27 @@ class DashboardReader:
         page: int = 1,
         page_size: int = 50,
     ) -> dict[str, Any]:
-        document, _, _ = self._find_task(task_id)
+        document, summary_path, _ = self._find_task(task_id)
         units = document.get("source_units")
+        batch_total = None
+        batch_offset = 0
+        if document.get('format_version') == 'daily-batch-v1':
+            from ..pipeline.daily import daily_unit_paths
+            frozen = _read_json(summary_path.with_name('task.json'))
+            plan = frozen['units']
+            if query:
+                needle = query.casefold()
+                plan = [u for u in plan if any(needle in str(u.get(k, '')).casefold() for k in ('key', 'symbol', 'input_id'))]
+            if not status:
+                batch_total = len(plan)
+                batch_offset = (page - 1) * page_size
+                plan = plan[batch_offset:batch_offset + page_size]
+            units = []
+            for unit in plan:
+                path = daily_unit_paths(summary_path.parent, unit)['manifest']
+                if not _within(path, summary_path.parent):
+                    raise HTTPException(409, '任务明细路径越界')
+                units.append(_read_json(path) if path.is_file() else {**unit, 'status': 'pending'})
         if not isinstance(units, list):
             units = []
         matching = [(index, item) for index, item in enumerate(units) if isinstance(item, dict)]
@@ -672,8 +708,8 @@ class DashboardReader:
             needle = query.casefold()
             matching = [(index, item) for index, item in matching if any(
                 needle in str(item.get(name, "")).casefold() for name in ("key", "symbol", "input_id", "error"))]
-        total = len(matching)
-        matching = matching[(page - 1) * page_size:page * page_size]
+        total = batch_total if batch_total is not None else len(matching)
+        matching = [(batch_offset + index, item) for index, item in matching] if batch_total is not None else matching[(page - 1) * page_size:page * page_size]
         safe: list[dict[str, Any]] = []
         allowed = {
             "key", "symbol", "input_id", "status", "provider", "endpoint", "row_count",

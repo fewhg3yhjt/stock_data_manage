@@ -332,7 +332,7 @@ class RawObjectStore:
 
     @staticmethod
     def promote_unit(*, temporary: str | Path, current: str | Path, raw_root: str | Path,
-                     archive_root: str | Path, expected_hash: str) -> None:
+                     archive_root: str | Path, expected_hash: str, defer_cleanup: bool = False) -> None:
         """Idempotent finalization; current data is a single managed source result."""
         temporary, current, root = Path(temporary).resolve(), Path(current).resolve(), Path(raw_root).resolve()
         if not temporary.is_relative_to(root / "_tmp") or temporary == root / "_tmp":
@@ -355,12 +355,57 @@ class RawObjectStore:
         from .parquet import PartitionLock
         with PartitionLock(current.parent / ".raw.lock", recover_stale=True):
             if current.exists():
+                if RawObjectStore.verify_manifest(current) == expected_hash:
+                    if not defer_cleanup:
+                        RawObjectStore.refresh_index(current)
+                        RawObjectStore.remove_request(temporary)
+                    return
                 if not (current.parent / "manifest.ndjson").is_file():
                     raise ValueError("refusing to replace unmanaged existing raw data")
                 RawObjectStore.preserve_request(current, permitted_root=root, archive_root=archive_root)
             RawObjectStore.copy_request(temporary, current)
-            RawObjectStore.refresh_index(current)
-            RawObjectStore.remove_request(temporary)
+            if not defer_cleanup:
+                RawObjectStore.refresh_index(current)
+                RawObjectStore.remove_request(temporary)
+
+    @staticmethod
+    def finalize_promotions(promotions, *, raw_root):
+        """Rebuild derived indexes and clean owned temporary requests once per directory."""
+        root = Path(raw_root).resolve()
+        removals = {}
+        current_directories = set()
+        for promotion in promotions:
+            temporary, current = Path(promotion['temporary']).resolve(), Path(promotion['current']).resolve()
+            if not temporary.is_relative_to(root / '_tmp') or not current.is_relative_to(root) or current.is_relative_to(root / '_tmp'):
+                raise ValueError('batch raw finalization escaped raw storage')
+            if RawObjectStore.verify_manifest(current) != promotion['raw_hash']:
+                raise ValueError('batch raw finalization has no matching promoted response')
+            removals.setdefault(temporary.parent, set()).add(temporary)
+            current_directories.add(current.parent)
+        for directory, owned in removals.items():
+            retained_bodies, removed_bodies = set(), set()
+            for manifest in directory.glob('manifest.*.ndjson'):
+                bodies = {event['body_storage'] for event in map(json.loads, manifest.read_text(encoding='utf-8').splitlines()) if event.get('body_storage')}
+                (removed_bodies if manifest.resolve() in owned else retained_bodies).update(bodies)
+            for manifest in owned:
+                manifest.unlink(missing_ok=True)
+                label = manifest.name.removeprefix('manifest.').removesuffix('.ndjson')
+                (directory / ('_managed_task.' + label + '.json')).unlink(missing_ok=True)
+            for relative in removed_bodies - retained_bodies:
+                body = (directory / relative).resolve()
+                if not body.is_relative_to(directory):
+                    raise ValueError('temporary response body escaped its directory')
+                body.unlink(missing_ok=True)
+        for directory in current_directories | set(removals):
+            manifests = sorted(directory.glob('manifest.*.ndjson'))
+            target = directory / 'manifest.ndjson'
+            if manifests:
+                temporary = directory / 'manifest.index.tmp'
+                temporary.write_text(''.join(json.dumps({'event': 'request_manifest', 'request_manifest': p.name,
+                    'sha256': hashlib.sha256(p.read_bytes()).hexdigest()}) + '\n' for p in manifests), encoding='utf-8')
+                os.replace(temporary, target)
+            else:
+                target.unlink(missing_ok=True)
 
     def write_json(
         self,
@@ -490,6 +535,37 @@ class RawObjectStore:
         if hashlib.sha256(body).hexdigest() != event["body_sha256"]:
             raise ValueError("archived response hash mismatch")
         return body
+
+    @staticmethod
+    def batch_cache_lookup(roots):
+        """Scan evidence once for a task, keeping the existing exact/fresh live-cache contract."""
+        index = {}
+        unique_roots = sorted({Path(root).resolve() for root in roots}, key=lambda p: len(p.parts))
+        selected = []
+        for root in unique_roots:
+            if not any(root.is_relative_to(parent) for parent in selected):
+                selected.append(root)
+        for root in selected:
+            for manifest in root.rglob('manifest*.ndjson') if root.exists() else ():
+                for line in manifest.read_text(encoding='utf-8').splitlines():
+                    event = json.loads(line)
+                    if (event.get('mode') == 'live' and event.get('outcome') == 'response'
+                            and event.get('status_code') == 200 and event.get('body_storage') and event.get('body_bytes', 0) > 0):
+                        key = (event['method'], sanitized_url(event['url']),
+                               json.dumps(event.get('scope'), sort_keys=True, default=str))
+                        index.setdefault(key, []).append((manifest, event))
+        def lookup(_roots, *, url, method, scope, max_age_seconds, ignored_query_parameters=()):
+            if ignored_query_parameters:
+                raise ValueError('daily batch cache requires exact request URL matching')
+            now = datetime.now(timezone.utc)
+            key = (method, sanitized_url(url), json.dumps(sanitized_metadata(scope), sort_keys=True, default=str))
+            matches = sorted(index.get(key, ()), key=lambda pair: pair[1]['fetched_at_utc'], reverse=True)
+            for manifest, event in matches:
+                age = (now - datetime.fromisoformat(event['fetched_at_utc'])).total_seconds()
+                if 0 <= age <= max_age_seconds:
+                    return manifest, event, RawObjectStore.read_response(manifest, event)
+            return None
+        return lookup
 
     @staticmethod
     def find_cached_response(roots, *, url, method, scope, max_age_seconds, ignored_query_parameters=()):

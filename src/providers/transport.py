@@ -61,7 +61,7 @@ class HostPausedError(ConnectionError):
 def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                       replay_manifest=None, evidence_roots=(), max_age_seconds=0, sdk_retry_policy=False,
                       probe_host_pause=False, require_empty_post_body=False, response_validator=None, cache_ignored_query_parameters=(),
-                      native_transport=None, match_request_body=False, interval_seconds=3):
+                      native_transport=None, match_request_body=False, interval_seconds=3, cache_lookup=None):
     """Serialized single-input capture/replay. Session identity, proxies and request arguments are retained.
 
     SDK session policy matches the saved conservative probe. Internal urllib3 retries
@@ -160,7 +160,8 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                 response = make_response(request, record, RawObjectStore.read_response(replay_manifest, record))
                 mode = "replay"
             else:
-                cached = RawObjectStore.find_cached_response(evidence_roots, url=request.url, method=request.method,
+                lookup = cache_lookup or RawObjectStore.find_cached_response
+                cached = lookup(evidence_roots, url=request.url, method=request.method,
                     scope=request_scope, max_age_seconds=max_age_seconds,
                     ignored_query_parameters=cache_ignored_query_parameters)
                 if cached:

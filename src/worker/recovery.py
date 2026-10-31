@@ -95,13 +95,19 @@ class RecoveryScanner:
 def recover_collection_tasks(*, config_root, data_root=None) -> tuple[str, ...]:
     """Finish durable task commits before the legacy partition scanner is run."""
     from ..config.loader import load_storage_paths
-    from ..pipeline.inputs import _finish_task_commit
+    from ..pipeline.inputs import _finish_task_commit, _finish_daily_batch
     from ..storage.parquet import PartitionLock
     import json
     paths = load_storage_paths(config_root, data_root=data_root)
     completed = []
     with MetadataStore(paths["metadata_path"]) as metadata:
         for state in metadata.collection_tasks():
+            if state.get('format_version') == 'daily-batch-v1':
+                if state['status'] == 'committing':
+                    with PartitionLock(paths['workspace_root'] / '_locks' / 'collection.lock', recover_stale=True):
+                        _finish_daily_batch(state, paths, metadata)
+                    completed.append(state['task_id'])
+                continue
             marker = Path(state.get("published_manifest", "missing")).parent / "task-commit.json"
             owned_marker = (marker.exists() and json.loads(marker.read_text(encoding="utf-8")).get("task_id") == state["task_id"])
             if state["status"] != "committing" and not (state["status"] == "published" and owned_marker):
@@ -130,6 +136,58 @@ def archive_published_task(task_directory: str | Path, *, workspace_root: str | 
     if task == workspace or not task.is_relative_to(workspace) or not task.is_dir():
         raise ValueError("task must be an existing directory inside task_workspace")
     relative = task.relative_to(workspace)
+    if (task / 'summary.json').is_file():
+        document = json.loads((task / 'summary.json').read_text(encoding='utf-8'))
+        if document.get('format_version') == 'daily-batch-v1':
+            from ..pipeline.inputs import _save_daily_batch
+            from ..pipeline.daily import daily_unit_paths, save_batch_json
+            from ..storage.raw import RawObjectStore
+            from ..storage.parquet import PartitionLock
+            with PartitionLock(workspace / '_locks' / 'collection.lock', recover_stale=True):
+                state = metadata.load_collection_task(document['task_id'])
+                if (not state or state['status'] != 'published' or not state.get('complete_today')
+                        or file_hash(task / 'summary.json') != state['summary']['sha256']
+                        or Path(state['definition_ref']['path']).resolve() != task / 'task.json'
+                        or file_hash(task / 'task.json') != state['definition_ref']['sha256']):
+                    raise ValueError('only the matching complete daily batch can be archived')
+                frozen = json.loads((task / 'task.json').read_text(encoding='utf-8'))
+                entries = []
+                for unit in frozen['units']:
+                    index = daily_unit_paths(task, unit)['manifest']
+                    entry = json.loads(index.read_text(encoding='utf-8'))
+                    if (not Path(entry['artifact']).resolve().is_relative_to(task)
+                            or not Path(entry['report_path']).resolve().is_relative_to(task)
+                            or file_hash(Path(entry['artifact'])) != entry['artifact_hash']
+                            or file_hash(Path(entry['report_path'])) != entry['report_hash']):
+                        raise ValueError('task source candidate changed')
+                    if RawObjectStore.verify_manifest(entry['raw_manifest']) != entry['raw_hash']:
+                        raise ValueError('task raw evidence changed')
+                    entries.append((index, entry))
+                for partition in state['partitions'].values():
+                    publication = Path(partition['published_manifest']).resolve()
+                    if (not publication.is_relative_to(canonical)
+                            or file_hash(publication) != partition['published_hash']
+                            or not Manifest.load(publication).verify(publication.parent / 'data.parquet')
+                            or (publication.parent / 'task-commit.json').exists()):
+                        raise ValueError('canonical publication reference is invalid')
+                destination = archive / relative
+                if destination.exists():
+                    raise ValueError('archive destination already exists')
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                os.rename(task, destination)
+                for index, entry in entries:
+                    for field in ('artifact', 'report_path'):
+                        entry[field] = str(destination / Path(entry[field]).relative_to(task))
+                    if entry.get('qualification_ref'):
+                        entry['qualification_ref']['path'] = str(destination / Path(entry['qualification_ref']['path']).relative_to(task))
+                    save_batch_json(destination / index.relative_to(task), entry)
+                state['definition_ref']['path'] = str(destination / 'task.json')
+                if state.get('qualification_ref'):
+                    state['qualification_ref']['path'] = str(destination / Path(state['qualification_ref']['path']).relative_to(task))
+                for partition in state['partitions'].values():
+                    partition['commit_ref']['path'] = str(destination / Path(partition['commit_ref']['path']).relative_to(task))
+                _save_daily_batch(state, {'archive_root': archive, 'workspace_root': workspace}, metadata)
+                return destination
     if len(relative.parts) == 2 and (task / "summary.json").is_file():
         summary = json.loads((task / "summary.json").read_text(encoding="utf-8"))
         state = metadata.load_collection_task(summary["task_id"])

@@ -10,6 +10,7 @@
 | 现有目录和代码负责什么 | [代码结构](CODE_STRUCTURE.md) |
 | 输入参数、采集字段、映射及范围 | [源头接口说明](docs/providers/README.md)、[股票与ETF来源](docs/providers/security-catalog.md) |
 | 原始暂存、检查、发布、重做和证券清单调度 | [任务流程](docs/pipeline/collection-tasks.md) |
+| 日线整批准备、采集、处理与按类型发布 | [批次阶段合同](docs/pipeline/collection-tasks.md#日线批任务阶段合同2026-10-31用户确认)、[本轮进度与验证](PROJECT_PROGRESS.md#日线整批分阶段改造2026-10-31实施中) |
 | 数据在哪里、文件名与内容示例、字段解读及归档 | [存储文件说明](docs/storage/README.md) |
 | 在本机查看任务、原始证据和发布结果 | [只读运行台](docs/service/read-only-web.md) |
 | 用 Docker 部署只读运行台并更新代码 | [Docker 部署说明](docs/service/container-deployment.md) |

@@ -1,4 +1,4 @@
-"""Daily result contracts, source-unit expansion and aggregation; no network or task loop."""
+"""Daily batch contracts and the independent capture, interpretation and build operations."""
 from __future__ import annotations
 
 from copy import deepcopy
@@ -14,6 +14,145 @@ from ..quality.publication import PublicationPolicy
 from ..storage.integrity import file_hash, row_hash
 from ..storage.parquet import CanonicalPartitionStore, DAILY_SCHEMA_VERSION
 from ..config.loader import load_input_capabilities
+
+
+def save_batch_json(path, value):
+    """Atomic durable artifact replacement; persistent names describe their contents."""
+    import json
+    import os
+    from .inputs import _json_value
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    with temporary.open("wb") as stream:
+        stream.write(json.dumps(_json_value(value), ensure_ascii=False, sort_keys=True).encode("utf-8"))
+        stream.flush()
+        os.fsync(stream.fileno())
+    os.replace(temporary, path)
+
+
+def daily_unit_paths(work, unit):
+    base = Path(work) / "sources" / "tencent" / "kline_daily" / unit["key"]
+    return {name: base.with_name(base.name + suffix) for name, suffix in
+            {"manifest": ".manifest.json", "report": ".report.json", "candidate": ".normalized.parquet",
+             "source": ".source_rows.json"}.items()}
+
+
+def capture_daily_unit(*, unit, contract, provider, paths, task_id, trade_date, pacer, replay_manifest=None,
+                       cache_lookup=None, max_age_seconds=0, attempt=1):
+    """Save exact responses only. This operation never interprets prices or source lists."""
+    from datetime import timezone
+    from ..providers.transport import captured_requests
+    from ..storage.raw import RawObjectStore
+    parameters = contract.bind_parameters(unit["context"])
+    directory = RawObjectStore.task_unit_path(paths["raw_root"], provider=contract.provider,
+        endpoint=contract.endpoint, data_date=trade_date)
+    temporary = directory / RawObjectStore.request_manifest_name(parameters, input_id=contract.input_id)
+    audit = paths["archive_root"] / "_raw_evidence" / task_id / unit["key"] / f"attempt-{attempt}" / "manifest.ndjson"
+    import json
+    request_key = temporary.name.removeprefix('manifest.').removesuffix('.ndjson')
+    owner_path = directory / ('_managed_task.' + request_key + '.json')
+    owner = {'task_id': task_id, 'unit_key': unit['key'], 'attempt': attempt, 'data_date': trade_date}
+    if temporary.exists() and (not owner_path.exists() or json.loads(owner_path.read_text(encoding='utf-8')) != owner):
+        raise ValueError('temporary daily response belongs to another task/attempt; use a new isolated root')
+    # A response can have reached disk just before the process stopped, before its
+    # unit index was written. Recover it without repeating the request.
+    if audit.exists():
+        RawObjectStore.verify_manifest(audit)
+    else:
+        if not temporary.exists():
+            save_batch_json(owner_path, owner)
+            store = RawObjectStore(directory, manifest_name=temporary.name)
+            with captured_requests(store, provider=contract.provider, endpoint=contract.endpoint,
+                    scope={"input_id": contract.input_id, "parameters": parameters},
+                    code_version=provider.capability_version, pacer=pacer,
+                    replay_manifest=replay_manifest, evidence_roots=(), interval_seconds=contract.request_interval_seconds,
+                    cache_lookup=cache_lookup, max_age_seconds=max_age_seconds):
+                provider.capture_window(**parameters, asset_type=unit["asset_type"])
+        RawObjectStore.copy_request(temporary, audit)
+    events = [json.loads(line) for line in audit.read_text(encoding="utf-8").splitlines()]
+    responses = [e for e in events if e.get("outcome") == "response"]
+    if not responses or responses[-1].get('status_code', 500) >= 400:
+        from ..providers.contracts import ProviderContractError, FailureClass
+        raise ProviderContractError('daily capture did not finish with a successful transport response',
+            FailureClass.HTTP_ERROR, retryable=False)
+    return {"task_id": task_id, "unit_key": unit["key"], "attempt": attempt,
+        "attempt_id": task_id + ":" + unit["key"] + f":attempt-{attempt}",
+        "key": unit["key"], "symbol": unit["symbol"], "asset_type": unit["asset_type"],
+        "input_id": contract.input_id, "provider": contract.provider, "endpoint": contract.endpoint,
+        "capture_status": "captured", "process_status": "pending", "status": "captured",
+        "raw_manifest": str(audit), "raw_hash": RawObjectStore.verify_manifest(audit),
+        "temporary_raw": str(temporary), "source_response_hashes": [responses[-1]["body_sha256"]],
+        "live_http_calls": sum(e.get('event') == 'http_response' and e.get("mode") == "live" for e in events),
+        "captured_at_utc": datetime.now(timezone.utc).isoformat()}
+
+
+def process_daily_unit(*, unit, entry, provider, contract, field_contract, rule, work):
+    """Interpret retained bytes, normalize and check one candidate; no transport is used."""
+    import json
+    from datetime import timezone
+    from urllib.parse import urlsplit
+    from ..providers.contracts import HttpResponse
+    from ..quality.normalization import Normalizer, NormalizationError
+    from ..storage.raw import RawObjectStore
+    from ..storage.parquet import write_normalized_rows
+    parameters = contract.bind_parameters(unit["context"])
+    manifest = Path(entry["raw_manifest"])
+    if RawObjectStore.verify_manifest(manifest) != entry["raw_hash"]:
+        raise ValueError("daily response evidence changed before processing")
+    events = [json.loads(line) for line in manifest.read_text(encoding="utf-8").splitlines()]
+    responses = [e for e in events if e.get("outcome") == "response"]
+    if not responses:
+        raise ValueError('daily processing has no completed transport response')
+    # The last retained response is the one returned by the verified transport
+    # after native redirects/allowed host fallback. Earlier failures stay raw.
+    event = responses[-1]
+    url = urlsplit(event["url"])
+    captured = {"symbol": unit["symbol"], "start": parameters["start"], "end": parameters["end"],
+        "adjust": parameters["adjust"], "api": parameters["api"], "path": url.path,
+        "segments": ((parameters["start"], parameters["end"], HttpResponse(event["status_code"],
+            event.get("response_headers", {}), RawObjectStore.read_response(manifest, event)), url.netloc),)}
+    fetched = provider.parse_window(captured)
+    exchange = _daily_market(unit["symbol"])
+    context = {"provider": contract.provider, "endpoint": contract.endpoint, **fetched.mapping_context,
+        "instrument_id": exchange + ":" + unit["symbol"][2:], "exchange": exchange,
+        "asset_type": unit["asset_type"], "adjustment": unit["adjustment"]}
+    if fetched.mapping_context.get("adjustment") != unit["adjustment"]:
+        raise NormalizationError("requested adjustment differs from returned source series")
+    rows = [Normalizer.normalize_fields(row, rule=rule, fields=field_contract["fields"],
+        context=context, allow_pending=True) for row in fetched.rows]
+    if len(rows) != 1 or rows[0]["trade_date"] != parameters["start"]:
+        raise NormalizationError("one daily unit must yield exactly its frozen target date")
+    row = rows[0]
+    if not (row["low"] <= min(row["open"], row["close"]) <= max(row["open"], row["close"]) <= row["high"]):
+        raise NormalizationError("invalid OHLC ordering")
+    unit_contract = Normalizer.match_unit_contract(rule, context)
+    artifact_paths = daily_unit_paths(work, unit)
+    if artifact_paths["candidate"].exists():
+        import pyarrow.parquet as pq
+        if pq.read_table(artifact_paths["candidate"]).to_pylist() != rows:
+            raise ValueError("retained daily candidate differs from reprocessed source bytes")
+        descriptor = {"sha256": file_hash(artifact_paths["candidate"])}
+    else:
+        descriptor = write_normalized_rows(artifact_paths["candidate"], rows, field_contract["fields"])
+    save_batch_json(artifact_paths["source"], fetched.source_rows)
+    report = {"dataset": "daily_bar", "data_date": parameters['start'].isoformat(), "asset_type": unit['asset_type'],
+        "input_id": contract.input_id, "provider": contract.provider, "endpoint": contract.endpoint,
+        "status": "candidate_complete", "row_count": len(rows), "parameters": parameters,
+        "adapter_version": provider.capability_version, "normalization_version": rule["version"],
+        "source_response_hashes": entry["source_response_hashes"], "raw_manifest": str(manifest),
+        "source_rows": {"path": str(artifact_paths['source'].relative_to(work)),
+            "sha256": file_hash(artifact_paths['source']), "row_count": len(fetched.source_rows)},
+        "applied_unit_contract": unit_contract,
+        "unit_precision_flags": [flag for name, flag in (unit_contract["precision_flags"].items()
+            if unit_contract else ()) if row.get(name) is not None],
+        "unverified_fields": [name for name in rule.get("unverified_fields", ()) if row.get(name) is None],
+        "original_row_count": len(fetched.source_rows), "selected_row_count": len(rows),
+        "coverage_denominator": 1, "validated_at_utc": datetime.now(timezone.utc), "processing_http_calls": 0}
+    save_batch_json(artifact_paths["report"], report)
+    return {**entry, "process_status": "candidate_complete", "status": "candidate_complete",
+        "artifact": str(artifact_paths["candidate"]), "artifact_hash": descriptor["sha256"],
+        "report_path": str(artifact_paths["report"]), "report_hash": file_hash(artifact_paths["report"]), "row_count": 1}
 
 
 class PublicationThresholdExceeded(ValueError):
@@ -43,6 +182,18 @@ def resolve_daily_definition(definition, config_root):
         definition = {**target, **definition}
     if "adjustment" in definition:
         raise ValueError("daily tasks now produce aggregate records; single-adjustment task definitions require a new explicit task")
+    if "asset_types" in definition:
+        assets = definition["asset_types"]
+        if (not isinstance(assets, list) or not assets or len(set(assets)) != len(assets)
+                or set(assets) - {"stock", "etf", "index"} or "asset_type" in definition
+                or definition.get("universe") not in {"static", "all"}):
+            raise ValueError("daily batch requires explicit unique asset_types and universe static/all")
+        resolved = {asset: resolve_daily_definition({**{k: v for k, v in definition.items()
+                    if k not in {"asset_types", "task"}}, "asset_type": asset, "universe": "static"}, config_root)
+                    for asset in assets}
+        first = next(iter(resolved.values()))
+        return {**{k: v for k, v in first.items() if k not in {"asset_type", "quote_contract"}},
+                **definition, "quote_contracts": {a: r["quote_contract"] for a, r in resolved.items()}}
     asset = {"all_stock": "stock", "all_etf": "etf", "all_index": "index"}.get(definition.get("universe"), definition.get("asset_type", "stock"))
     if definition.get("asset_type", asset) != asset:
         raise ValueError("daily asset_type conflicts with universe")
@@ -86,6 +237,18 @@ def resolve_daily_definition(definition, config_root):
 
 
 def expand_daily_units(units, definition):
+    if "asset_types" in definition:
+        expanded = []
+        for asset in definition["asset_types"]:
+            group = [u for u in units if u.get("asset_type") == asset]
+            if not group:
+                raise ValueError(f"daily batch has no securities for {asset}")
+            typed = {k: v for k, v in definition.items() if k != "asset_types"}
+            typed.update(asset_type=asset, quote_contract=definition["quote_contracts"][asset])
+            expanded.extend(expand_daily_units(group, typed))
+        if len({u["key"] for u in expanded}) != len(expanded):
+            raise ValueError("daily batch source units must be unique")
+        return expanded
     requests_by_market = definition["source_policy"]["inputs"][0]["market_adjustment_requests"]
     expanded = []
     target_limit = definition["source_policy"].get("max_symbols")

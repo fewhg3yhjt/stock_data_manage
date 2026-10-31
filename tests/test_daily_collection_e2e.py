@@ -79,6 +79,18 @@ def execute(root, definition, **kwargs):
         collector_options={"pacer": RequestPacer(wait=lambda _: None)}, **kwargs)
 
 
+def batch_entries(state):
+    """Read current unit facts from durable files, not the thin checkpoint."""
+    work = Path(state['definition_ref']['path']).parent
+    entries = {}
+    for path in work.rglob('*.manifest.json'):
+        entry = json.loads(path.read_text(encoding='utf-8'))
+        if entry.get('report_path'):
+            entry['report'] = json.loads(Path(entry['report_path']).read_text(encoding='utf-8'))
+        entries[entry['unit_key']] = entry
+    return entries
+
+
 def test_aggregate_nested_roundtrip_and_noop(tmp_path):
     store = CanonicalPartitionStore(tmp_path)
     result = store.publish_daily(asset_type="stock", partition_key=DAY, new_records=[record()], expected_count=1,
@@ -135,7 +147,7 @@ def test_formal_task_three_responses_one_record_and_resume(tmp_path):
     definition = source_task(tmp_path)
     state = execute(tmp_path, definition)
     assert state["status"] == "published", state.get("error")
-    assert len(state["units"]) == 3
+    assert len(batch_entries(state)) == 3 and 'units' not in state
     assert state["row_count"] == 1
     rows = CanonicalPartitionStore(tmp_path / "business/canonical").read_daily("stock", DAY)
     assert [rows[0].quotes[a.value].close for a in Adjustment] == [Decimal("10"), Decimal("9"), Decimal("11")]
@@ -203,14 +215,13 @@ def test_http_success_bad_body_stops_at_processing_and_does_not_publish(tmp_path
     state = execute(tmp_path, definition)
     assert state["status"] == "failed"
     assert not (tmp_path / "business/canonical" / DAY / "daily_bar/stock/data.parquet").exists()
-    assert len(state["units"]) == 3
-    summary = json.loads(Path(state["summary"]["path"]).read_text(encoding="utf-8"))
-    assert any(issue["adjustment"] == "backward" for issue in summary["final_check"]["issues"])
-    assert summary["final_check"]["coverage"]["actual_count"] == 0
-    failed = state["units"]["sh600001__backward"]
-    assert failed["report"]["failure_stage"] == "processing"
-    assert failed["report"]["acquisition_complete"]
-    assert len(failed["report"]["responses"]) == 1
+    assert len(batch_entries(state)) == 3
+    coverage = json.loads(Path(state['definition_ref']['path']).with_name('coverage.stock.json').read_text(encoding='utf-8'))
+    assert any(issue['adjustment'] == 'backward' for issue in coverage['issues'])
+    assert coverage['actual_count'] == 0
+    failed = batch_entries(state)['sh600001__backward']
+    assert failed['process_status'] == 'failed' and failed['capture_status'] == 'captured'
+    assert len(failed['source_response_hashes']) == 1
 
 
 @pytest.mark.parametrize("stage", ["after_data_replace", "after_publish", "after_raw_promote"])
@@ -269,6 +280,7 @@ def test_full_redo_missing_group_preserves_published_data_and_current_raw(tmp_pa
     data = Path(first["published_manifest"]).with_name("data.parquet")
     before = file_hash(data)
     changed = source_task(tmp_path / "changed", corrupt="forward")
+    changed['task_id'] = 'changed-source-run'
     assert execute(tmp_path, changed, redo="full")["status"] == "failed"
     assert file_hash(data) == before
 

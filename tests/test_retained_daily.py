@@ -1,9 +1,11 @@
 """Synthetic transport fixtures validate exact scope and production-write guards."""
 import json
+from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import requests
 import pytest
+from test_daily_collection_e2e import batch_entries
 from stock_data_manage.config.loader import load_input_capabilities
 from stock_data_manage.pipeline.inputs import collect_input, collect_task
 from stock_data_manage.providers.probes import ProbeEvidence
@@ -131,10 +133,10 @@ def test_exact_live_task_publishes_and_blocks_retained_only_qualification(qualif
     result=collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='live',redo='full',
         collector_options={'pacer':RequestPacer(wait=lambda _:None)})
     assert result['status']=='published'
-    assert result['units']['sh600519']['report']['live_http_calls']==1
+    assert batch_entries(result)['sh600519']['live_http_calls']==1
     p=json.loads(proof.read_text());p['allowed_modes']=['retained'];proof.write_text(json.dumps(p))
     with MetadataStore(root/'metadata/metadata.duckdb') as metadata:
-        metadata.connection.execute('UPDATE capability_registry SET evidence_hash=?',[file_hash(proof)])
+        metadata.connection.execute("UPDATE capability_registry SET evidence_hash=? WHERE adjustment='forward'",[file_hash(proof)])
     with pytest.raises(ValueError,match='execution mode'):
         collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='live',redo='full')
 
@@ -160,10 +162,11 @@ def test_checkpoint_revalidation_checks_data_and_ignores_old_code_fingerprints(q
     from stock_data_manage.pipeline.inputs import _task_unit_valid
     contract,root,definition,raw,proof=qualified
     with MetadataStore(root.parent/'replayed/metadata/metadata.duckdb') as metadata:
-        entry=metadata.load_collection_task(definition['task_id'])['units']['sh600519']
+        entry=batch_entries(metadata.load_collection_task(definition['task_id']))['sh600519']
     p=json.loads(proof.read_text());report=Path(p['revalidation_report']['path'])
     current=json.loads(report.read_text())
     current['run_directory']=str(report.parents[4])
+    entry['report'] = deepcopy(current)
     entry['report']['code_files']=[{'path':'missing-old-source.py','sha256':'prior-runtime-code'}]
     if damage=='source':current['output']['source_response_hashes']=['different-response']
     elif damage=='parameters':current['parameters']['code']='sh600000'
@@ -246,9 +249,9 @@ def test_selected_live_preflight_checks_only_selected_security(qualified,monkeyp
     monkeypatch.setattr(factory,'check_daily_input_qualification',observed)
     result=collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='live',redo='selected',
         symbols=['sh600519'],collector_options={'pacer':RequestPacer(wait=lambda _:None)})
-    assert checked==['sh600519']*6
-    assert result['units']['sh600519']['status']=='candidate_complete'
-    assert 'sh600000' not in result['units']
+    assert checked==['sh600519']*3
+    assert batch_entries(result)['sh600519']['status']=='candidate_complete'
+    assert 'sh600000' not in batch_entries(result)
 
 
 def test_qualified_retained_task_publishes_with_zero_network_and_complete_progress(qualified, monkeypatch):
@@ -258,7 +261,7 @@ def test_qualified_retained_task_publishes_with_zero_network_and_complete_progre
     result=collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='retained',
         collector_options={'pacer':RequestPacer(wait=lambda _:None)})
     assert result['status']=='published' and result['verification_mode']=='retained'
-    assert result['units']['sh600519']['report']['live_http_calls']==0
+    assert batch_entries(result)['sh600519']['live_http_calls']==0
     summary=json.loads(Path(result['summary']['path']).read_text(encoding='utf-8'))
     assert all(s['percent']==100 for s in summary['progress']['stages'].values())
     assert (root/'raw/2026-10-09/tencent/kline_daily/manifest.ndjson').exists()
@@ -275,7 +278,7 @@ def test_interrupted_retained_publication_recovers_all_four_progress_steps(quali
     with MetadataStore(root/'metadata/metadata.duckdb') as metadata:
         result=metadata.load_collection_task(definition['task_id'])
     assert result['status']=='published'
-    assert result['progress']['stages']['publication']['completed']==3
+    assert result['progress']['stages']['publication']['completed']==1
     assert result['progress']['stages']['raw']['reused']==3
 
 
@@ -295,9 +298,81 @@ def test_retained_qualification_rejects_invalid_evidence_before_raw_writes(quali
                 capability_version=build_input_provider(contract,providers_path=CONFIG/'providers.yaml').capability_version,
                 dataset='daily_bar',market='XSHG',asset_type='stock',failure_class='forbidden',error='fixture',
                 now=datetime.now(timezone.utc),cooldown_seconds=300,failure_threshold=1)
-    reasons = {'expired':'expired or not yet valid','scope':'scope differs','hash':'hash differs',
+    reasons = {'expired':'expired or not yet valid','scope':'single frozen date','hash':'hash differs',
         'configuration':'configuration changed','cooldown':'cooling down'}
     with pytest.raises(ValueError,match=reasons[damage]):
         collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='retained')
     assert not list((root/'raw').rglob('*a-qfq*.bin'))
     assert not (root/'canonical/2026-10-09/daily_bar/stock/manifest.json').exists()
+
+
+def test_processing_resume_uses_existing_capture_qualification_without_renewing_it(qualified, monkeypatch):
+    contract,root,definition,raw,proof=qualified
+    def interrupt(stage):
+        if stage=='after_candidate_before_checkpoint':
+            raise RuntimeError('synthetic processing interruption')
+    with pytest.raises(RuntimeError):
+        collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='retained',failure_hook=interrupt)
+    with MetadataStore(root/'metadata/metadata.duckdb') as metadata:
+        state=metadata.load_collection_task(definition['task_id'])
+        original=dict(state['qualification_ref'])
+        metadata.connection.execute('UPDATE capability_registry SET validation_expires_at=?',[datetime.now(timezone.utc)-timedelta(seconds=1)])
+    def forbidden(*args,**kwargs):raise AssertionError('processing resume must never send HTTP')
+    monkeypatch.setattr(requests.Session,'send',forbidden)
+    result=collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='retained')
+    assert result['status']=='published' and result['qualification_ref']==original
+    assert file_hash(Path(original['path']))==original['sha256']
+
+
+def test_existing_archive_preserves_retained_qualification_references(qualified):
+    from stock_data_manage.worker.recovery import archive_published_task
+    from stock_data_manage.config.loader import load_storage_paths
+    contract,root,definition,raw,proof=qualified
+    state=collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='retained')
+    paths=load_storage_paths(CONFIG,data_root=root)
+    with MetadataStore(paths['metadata_path']) as metadata:
+        archive_published_task(Path(state['definition_ref']['path']).parent,metadata=metadata,
+            **{name:paths[name] for name in ['workspace_root','archive_root','canonical_root','raw_root']})
+    resumed=collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='retained')
+    assert resumed['no_op']
+    for entry in batch_entries(resumed).values():
+        reference=entry['qualification_ref']
+        assert file_hash(Path(reference['path']))==reference['sha256']
+
+
+@pytest.mark.parametrize('grant_scope',['valid','wrong_market','wrong_asset','short_prefix'])
+def test_live_batch_checks_each_market_grant_once_then_matches_all_units(qualified, monkeypatch, grant_scope):
+    import stock_data_manage.routing.factory as factory
+    contract,root,definition,raw,proof=qualified
+    units=[]
+    with MetadataStore(root/'metadata/metadata.duckdb') as metadata:
+        for unit in definition['units']:
+            name=unit['adjustment']
+            path=root.parent/(name+'-qualification.json')
+            document=json.loads(path.read_text())
+            document['live_scope']={'market':'XSHG','asset_type':'stock','symbol_prefixes':['sh6'],'sample_context':unit['context']}
+            if grant_scope=='wrong_market':document['live_scope']['market']='XSHE'
+            elif grant_scope=='wrong_asset':document['live_scope']['asset_type']='etf'
+            elif grant_scope=='short_prefix':document['live_scope']['symbol_prefixes']=['sh']
+            path.write_text(json.dumps(document))
+            metadata.connection.execute('UPDATE capability_registry SET evidence_hash=? WHERE adjustment=?',[file_hash(path),name])
+            for symbol in ['sh600519','sh600000']:
+                current=deepcopy(unit)
+                current.update(key=symbol+'__'+name,symbol=symbol,asset_type='stock')
+                current['context']['request']['symbol']=symbol
+                units.append(current)
+        checked=[]
+        original=factory.check_daily_input_qualification
+        def observed(*args,**kwargs):
+            checked.append(args[1]['request']['symbol'])
+            return original(*args,**kwargs)
+        monkeypatch.setattr(factory,'check_daily_input_qualification',observed)
+        if grant_scope!='valid':
+            with pytest.raises(ValueError,match='qualification blocked'):
+                factory.check_daily_batch_qualification(contract,units,config_root=CONFIG,metadata=metadata,
+                    now=datetime.now(timezone.utc),execution_mode='live')
+            return
+        result=factory.check_daily_batch_qualification(contract,units,config_root=CONFIG,metadata=metadata,
+            now=datetime.now(timezone.utc),execution_mode='live')
+    assert len(result['grants'])==3 and len(result['unit_grants'])==6
+    assert checked==['sh600519']*3

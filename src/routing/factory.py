@@ -315,6 +315,74 @@ def check_daily_input_qualification(contract, context, *, asset_type, config_roo
         return {'eligible':False,'input_id':contract.input_id,'reasons':[str(exc)]}
 
 
+def check_daily_batch_qualification(contract, units, *, config_root, metadata, now, execution_mode):
+    """Validate each evidence grant once, then check frozen units against its explicit scope."""
+    import json
+    from ..storage.integrity import file_hash
+    adapter = build_input_provider(contract, providers_path=Path(config_root) / "providers.yaml")
+    candidates = metadata.capability_evidence(provider=contract.provider, endpoint=contract.endpoint,
+        capability_version=adapter.capability_version)
+    grants = []
+    seen = set()
+    needed = {({'sh': 'XSHG', 'sz': 'XSHE', 'bj': 'BSE'}[u['symbol'][:2]], u['asset_type'], u['adjustment']) for u in units}
+    for candidate in candidates:
+        if execution_mode != 'live':
+            break
+        if (candidate['market'], candidate['asset_type'], candidate['adjustment']) not in needed:
+            continue
+        if not candidate['validated_at'] <= now < candidate['validation_expires_at']:
+            continue
+        scope = json.loads(candidate['request_scope_json'])
+        references = [s.removeprefix('qualification:') for s in scope if s.startswith('qualification:')]
+        if not references or references[0] in seen:
+            continue
+        seen.add(references[0])
+        path = Path(references[0])
+        if file_hash(path) != candidate['evidence_hash']:
+            raise ValueError('daily qualification evidence changed: ' + str(path))
+        proof = json.loads(path.read_text(encoding='utf-8'))
+        grant = proof.get('live_scope', {})
+        context = grant.get('sample_context')
+        if not context:
+            # Exact retained evidence is still checked by the existing contract.
+            continue
+        sample = check_daily_input_qualification(contract, context, asset_type=proof['asset_type'],
+            config_root=config_root, metadata=metadata, now=now, execution_mode=execution_mode, _allow_scope=False)
+        if (sample['eligible'] and grant.get('market') == sample['market']
+                and grant.get('asset_type') == proof['asset_type']):
+            parameters = contract.bind_parameters(context)
+            grants.append({'proof': str(path), 'proof_hash': candidate['evidence_hash'],
+                'asset_type': proof['asset_type'], 'market': sample['market'],
+                'symbol_prefixes': grant.get('symbol_prefixes', []), 'sample_symbol': parameters['code'],
+                'parameters': {k: v for k, v in parameters.items() if k != 'code'},
+                'expires_at': candidate['validation_expires_at'].isoformat()})
+    matches = {}
+    for unit in units:
+        parameters = contract.bind_parameters(unit['context'])
+        market = {'sh': 'XSHG', 'sz': 'XSHE', 'bj': 'BSE'}[unit['symbol'][:2]]
+        match = next((index for index, grant in enumerate(grants)
+            if grant['asset_type'] == unit['asset_type'] and grant['market'] == market
+            and {k: v for k, v in parameters.items() if k != 'code'} == grant.get('parameters')
+            and (parameters['code'] == grant['sample_symbol'] or
+                 execution_mode == 'live' and grant['symbol_prefixes']
+                 and all(isinstance(p, str) and len(p) >= 3 for p in grant['symbol_prefixes'])
+                 and parameters['code'].startswith(tuple(grant['symbol_prefixes'])))), None)
+        if match is None:
+            gate = check_daily_input_qualification(contract, unit['context'], asset_type=unit['asset_type'],
+                config_root=config_root, metadata=metadata, now=now, execution_mode=execution_mode, _allow_scope=False)
+            if not gate['eligible']:
+                raise ValueError('formal routing qualification blocked for ' + unit['key'] + ': ' + str(gate['reasons']))
+            evidence = metadata.latest_probe(provider=contract.provider, endpoint=contract.endpoint,
+                capability_version=adapter.capability_version, dataset='daily_bar', market=market,
+                asset_type=unit['asset_type'], code_prefix=unit['symbol'], frequency='daily', adjustment=unit['adjustment'])
+            grants.append({'asset_type': unit['asset_type'], 'market': market,
+                'expires_at': evidence['validation_expires_at'].isoformat(), 'exact_symbol': unit['symbol'],
+                'source_response_hashes': gate['source_response_hashes']})
+            match = len(grants) - 1
+        matches[unit['key']] = match
+    return {'grants': grants, 'unit_grants': matches, 'validated_at_utc': now.isoformat()}
+
+
 def build_input_provider(contract, *, providers_path, client=None):
     """Bind explicit validation inputs to existing adapters, outside production routing."""
     if contract.implementation_status != "implemented_validation_only":

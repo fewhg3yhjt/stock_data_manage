@@ -252,3 +252,21 @@ def test_raw_compact_path_retains_immutable_write_contract(tmp_path):
     with pytest.raises(FileExistsError):
         store.write_json({"value":2}, **kwargs)
     assert store.verify(first)
+
+
+def test_interrupted_raw_copy_rebuilds_index_before_removing_temporary(tmp_path):
+    from types import SimpleNamespace
+    root=tmp_path/'raw'
+    temporary=root/'_tmp/2026-10-29/tencent/kline_daily/manifest.request.ndjson'
+    current=root/'2026-10-29/tencent/kline_daily/manifest.request.ndjson'
+    store=RawObjectStore(temporary.parent,manifest_name=temporary.name)
+    store.record_response(response=SimpleNamespace(content=b'{}',status_code=200,headers={},encoding='utf-8'),
+        url='https://fixture.invalid/daily',method='GET',request_headers={},scope={},
+        provider='fixture',endpoint='daily',code_version='fixture-v1',mode='fixture')
+    expected=RawObjectStore.verify_manifest(temporary)
+    RawObjectStore.copy_request(temporary,current)
+    assert not current.with_name('manifest.ndjson').exists()
+    RawObjectStore.promote_unit(temporary=temporary,current=current,raw_root=root,
+        archive_root=tmp_path/'archive',expected_hash=expected)
+    assert current.with_name('manifest.ndjson').is_file()
+    assert not temporary.exists() and RawObjectStore.verify_manifest(current)==expected

@@ -135,6 +135,11 @@ collection_profiles:
 
 # Business production targets; no scheduler is enabled by these declarations.
 tasks:
+  market_daily:
+    dataset: daily_bar
+    asset_types: [stock, etf, index]
+    universe: all
+    acquisition_policy: daily_fixed
   stock_daily:
     dataset: daily_bar
     asset_type: stock

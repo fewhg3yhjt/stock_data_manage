@@ -20,9 +20,10 @@ const statusLabels = {
   published: '已发布', completed: '已完成', collecting: '采集中', checking: '检查中',
   committing: '发布中', running: '进行中', failed: '失败', stale: '疑似中断',
   blocked: '阻塞', partial: '部分完成', pending: '等待', unknown: '未知',
-  candidate_complete: '候选完成', reused: '已复用', skipped: '已跳过',
+  candidate_complete: '候选完成', captured: '响应已保存', reused: '已复用', skipped: '已跳过',
 };
-const stageLabels = { raw: '原响应采集', processing: '解析与映射', publication: '检查与发布' };
+const stageLabels = { raw: '整批原响应采集', processing: '整批解析与映射', publication: '按类型检查与发布' };
+const phaseLabels = { prepare: '冻结范围与资格准备', capture: '整批采集', process: '整批处理', build: '按类型构建', publish: '按类型发布', finished: '执行结束' };
 
 function esc(value) {
   return String(value ?? '').replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
@@ -174,13 +175,15 @@ async function showTask(taskId, unitPage = 1, unitQuery = '', unitStatus = '') {
       api(`/api/tasks/${encodeURIComponent(taskId)}/units?${new URLSearchParams({page: unitPage, page_size: 25, q: unitQuery, status: unitStatus})}`),
     ]);
     const facts = [
-      ['数据集', task.dataset], ['请求日期 / 数据日期', `${task.requested_date || '—'} / ${task.data_date || '未发布'}`], ['运行模式', task.verification_mode || '—'],
+      ['数据集', {daily_bar:'规范日线',security_master:'证券名单'}[task.dataset] || task.dataset], ['请求日期 / 数据日期', `${task.requested_date || '—'} / ${task.data_date || '未发布'}`], ['运行模式', {live:'在线采集',replay:'离线重放',retained:'留存响应处理'}[task.verification_mode] || task.verification_mode || '—'],
       ['状态', statusLabels[task.display_status] || task.display_status], ['发布行数', prettyNumber(task.row_count)], ['缺失单元', prettyNumber(task.missing_count)],
+      ['当前阶段', phaseLabels[task.phase] || '—'],
     ];
     dialogContent.innerHTML = `<h2 class="dialog-title">${esc(task.task_id)}</h2><p class="dialog-subtitle">${formatTime(task.generated_at_utc)} · ${esc(ageText(task.age_seconds))}</p>
       ${task.stale ? '<p class="notice">持久化状态仍在执行阶段，但已超过 5 分钟没有更新；这不代表进程仍然存活。</p>' : ''}
       <div class="stack"><section><h3>任务信息</h3><div class="facts-grid">${facts.map(([a,b]) => `<div class="fact"><span>${esc(a)}</span><strong>${esc(b)}</strong></div>`).join('')}</div></section>
       <section><h3>阶段进度</h3><div class="stage-list">${stageList(task.progress)}</div></section>
+      ${(task.partition_results || []).length ? `<section><h3>按证券类型验收</h3><table><thead><tr><th>类型</th><th>状态</th><th>合格 / 应有证券数</th><th>异常 / 未验证提示</th><th>原因</th></tr></thead><tbody>${task.partition_results.map(p => `<tr><td>${esc({stock:'股票',etf:'ETF',index:'指数'}[p.asset_type] || p.asset_type)}</td><td>${status(p.status)}</td><td>${prettyNumber(p.actual_count)} / ${prettyNumber(p.expected_count)}</td><td>${prettyNumber(p.issue_count-p.unverified_count)} / ${prettyNumber(p.unverified_count)}</td><td>${esc(p.error === 'daily aggregate coverage rejected; see per-adjustment issues' ? '合格证券数未达到发布门槛' : p.error || '—')}</td></tr>`).join('')}</tbody></table></section>` : ''}
       ${task.error ? `<section><h3>任务错误</h3><div class="notice">${esc(task.error)}</div></section>` : ''}
       <section><h3>执行单元</h3><form id="unit-filters" class="filters"><input name="q" placeholder="证券或错误" value="${esc(unitQuery)}"><select name="status"><option value="">全部状态</option><option value="failed">失败</option><option value="pending">等待</option><option value="candidate_complete">候选完成</option></select><button class="primary">查询</button></form>
       <div class="table-wrap"><table><thead><tr><th>单元</th><th>状态</th><th>行数</th><th>错误</th><th>原始响应</th></tr></thead><tbody>

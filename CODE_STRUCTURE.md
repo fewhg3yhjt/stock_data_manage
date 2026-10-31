@@ -144,8 +144,8 @@
 
 | 文件 | 职责 |
 |---|---|
-| `pipeline/daily.py` | 日线策略冻结、来源口径单元展开、完整记录聚合及发布覆盖检查；承接来源报告的单位精度标记，不重复匹配单位规则或进行网络请求 |
-| `pipeline/inputs.py` | 现有来源候选、数据集任务、调度触发和统一运行恢复入口；日线负责按 YAML 任务定义展开三口径来源单元、先留原响应再解析、按完整聚合记录发布；分钟和证券主数据继续原有合同；任务范围及采集策略进入运行冻结定义，调度默认关闭 |
+| `pipeline/daily.py` | 日线规则冻结、按类型/口径展开；独立的响应采集操作和零联网解析/归一化操作；逐单元产物命名与原子保存；完整记录聚合和覆盖检查 |
+| `pipeline/inputs.py` | 正式日线批执行入口：一次准备、整批采集、整批处理、按类型发布；小型检查点引用冻结定义与分区提交文件，复用现有发布恢复；单输入诊断、证券名单与其他流程保留各自职责 |
 | `pipeline/daily_reconciliation.py` | 只接收范围完整的三口径日线记录，并复用规范分区发布；快照候选不在此提升为正式日线 |
 | `pipeline/minute.py` | Watchlist 实时分钟采集和 Hot Store 写入 |
 | `pipeline/minute_reconciliation.py` | 分钟盘后校准、final 提升、冲突隔离和完整性处理 |
@@ -192,7 +192,7 @@
 
 任务入口 `pipeline/inputs.py` 支持正式留存响应模式及持久化进度；`cli.py` 提供 `--mode retained`、`--progress/--no-progress`。实现测试新增 `tests/test_task_progress.py`（进度、未知总量、失败和恢复计数）与 `tests/test_retained_daily.py`（合成四层资格、范围及哈希拒绝、零网络发布和恢复）；测试只写tmp，不作为真实来源资格。
 
-腾讯窗口输入沿用同一输入ID：`pipeline/inputs.py`保留完整来源行、只映射请求日期，并将动态日线任务顶层config传到冻结的各证券单元；`routing/factory.py`按显式api识别北交所及精确参数资格，在线日线按精确范围或显式市场/资产/窗口授权放行，四层样本证据仍核验，并在创建任务前及每个单元执行前检查，未认证范围保持阻断。相关合同和配置传递测试补入现有`tests/test_provider_contract_adapters.py`、`tests/test_collection_tasks.py`。
+腾讯窗口输入沿用同一输入ID。单输入诊断保留来源完整行及请求日期映射；日线批次的来源参数由冻结的采集策略决定。`routing/factory.py`按精确样本或显式市场/资产/窗口授权准备一次，物理请求前检查到期与健康；已采齐后的纯处理不要求重新取得采集资格。`tests/test_daily_batch.py`和`tests/test_retained_daily.py`承接批范围、恢复及原传输回退合同，逐项旧测试承接见本轮验收记录。
 
 证券任务省略units时，`pipeline/inputs.py` 查询既有交易日历并调用 `worker/scheduler.py` 按collection.yaml构建来源；`routing/factory.py` 对历史ETF按完整日期参数及互补发布数量检查资格。新增行为在既有 `tests/test_scheduler.py`、`tests/test_collection_tasks.py` 验证，不新增任务管理模块。
 | `cli.py` | `collect-due-inputs`（默认返回单次计划）、`collect-input`（默认分层落盘，支持 JSON 参数上下文及隔离验证输出）、`probe-*`、`recover`、`acceptance-offline` 等入口，负责参数解析、UTF-8结果与进度输出和现有流程组装 |
@@ -214,4 +214,4 @@
 
 请求捕获模块`providers/transport.py`接收输入契约的请求间隔，任务模块不再统一抬升到3秒；直接调用捕获工具的默认保守间隔仍为3秒。
 
-`pipeline/inputs.py`将显示回调与持久化分离，每证券一次断点、5秒摘要及关键阶段立即保存；候选续跑按冻结任务、配置、原响应和候选完整性判断，不以源码指纹阻断，也不改写原始报告。`storage/metadata.py`只读取定义哈希作不可变检查，避免反复加载旧任务JSON。既有任务、进度和留存日线测试覆盖保存次数与恢复边界。
+日线批任务以`task.json`保存一次冻结规则和范围；逐单元manifest保存结果，小型summary每5秒及阶段边界更新，不再嵌入全量报告。`routing/factory.py`按证据授权范围一次核验并匹配整批，请求前只检查有效期与健康状态；`storage/raw.py`一次构建原文复用索引、整批发布收尾更新目录索引。`tests/test_daily_batch.py`覆盖阶段交接、零联网处理、断点恢复和薄检查点；现有日线与页面测试按新合同读取逐单元产物。没有新增业务执行模块或管理服务。
