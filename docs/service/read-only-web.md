@@ -190,6 +190,8 @@ Docker/Compose 部署及无需重建镜像的代码更新方式见[容器部署�
 
 ## 本次展示验收与复现（2026-10-30）
 
+该节保留v8首次展示验收；2026-10-31补北交所单位后当前运行台已读取下节v9新根，旧目录及证据未重写。
+
 真实样本仅为2026-10-29的sh600519、sz000001、bj920001三股/9组；名单显式复用2026-10-09快照7267条，不声称已更新目标日名单。当前地址[18766](http://127.0.0.1:18766)读取`tmp/presentation-20261029/run`，原`tmp/daily-flow-20261029`证据保持。
 
 本轮模块/上下游用例去重116项通过，完整重放原9份响应零联网，3条/9组的36个价格与18个量额值保持一致；浏览器1440、1024各三口径与来源视图共8场景通过。ETF/LOF/指数仅为渲染合成验证，未授予来源或生产资格。结果与截图集中在[单份验收记录](../../tmp/presentation-20261029/README.md)。
@@ -202,4 +204,19 @@ Docker/Compose 部署及无需重建镜像的代码更新方式见[容器部署�
 & 'D:\Program Files\Python\python.exe' -B -X utf8 -m stock_data_manage.service.web --config-root config --data-root tmp/presentation-20261029/run --port 18766
 # 使用本机已安装运行时与浏览器，不下载新浏览器
 & 'C:\Users\sp181\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe' tests/daily_flow_browser.cjs 'C:\Users\sp181\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\node_modules\playwright' 'C:\Program Files\Google\Chrome\Application\chrome.exe' 'http://127.0.0.1:18766'
+```
+
+## 北交所量额补证与展示（2026-10-31）
+
+依据用户截图和“11829为手（100股）”明确确认，纬达光电2026-10-29三序列分别与原响应核对，当前规范量额为1182900股、11671400元；金额源值1167.14万元，与截图1167.1万元在其显示精度内吻合。当前接口/页面不再标该样本量额单位未核验，而显示股/元及来源舍入至100股/100元。来源视图仍显示11829.00手、1167.14万元，不覆盖原值。
+
+归一化版本v9只补现有单位规则，页面与采集逻辑不变。规则范围为腾讯newfqkline、stock、BSE92段、day/qfqday/hfqday，实际量额核验仅1股1日3序列，不代表全市场或生产资格。截图价格只用于前复权对照。原图、用户单位确认和三份原响应引用见[补证](../../tmp/bse-unit-review-20261031/verification.json)，测试及截图见[验收说明](../../tmp/bse-unit-review-20261031/README.md)。
+
+当前18766读取`tmp/bse-unit-review-20261031/acceptance/run`，旧根及生产文件不改写。规则升级后用显式新任务和新根重放，不在旧目录覆盖历史结果：
+
+```powershell
+& 'D:\Program Files\Python\python.exe' -B -X utf8 tests/presentation_acceptance.py --root tmp/bse-unit-review-20261031/acceptance --task-id three-stock-bse-units-20261029
+# 在未启动的独立终端运行；当前18766已服务时无需重复启动
+& 'D:\Program Files\Python\python.exe' -B -X utf8 -m stock_data_manage.service.web --config-root config --data-root tmp/bse-unit-review-20261031/acceptance/run --port 18766
+& 'C:\Users\sp181\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe' tests/daily_flow_browser.cjs 'C:\Users\sp181\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\node_modules\playwright' 'C:\Program Files\Google\Chrome\Application\chrome.exe' 'http://127.0.0.1:18766' 'D:\Project\PythonProgram\stock_data_manage\tmp\bse-unit-review-20261031\acceptance'
 ```

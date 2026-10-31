@@ -1,7 +1,7 @@
 dataset: daily_bar
 
 rules:
-  - id: tencent-window-input-v8
+  - id: tencent-window-input-v9
     input_id: ASTOCK-002-daily
     provider: tencent
     endpoint: kline_daily
@@ -26,6 +26,19 @@ rules:
     # 按代表样本确认的来源/市场/证券类型/代码段/实际序列应用单位合同。
     # 日期不是单位边界；这不授予来源资格，也不证明全代码段逐证券覆盖。
     unit_contracts:
+      - id: tencent-newfqkline-bse-stock-units-v1
+        provider: tencent
+        endpoint: kline_daily
+        source_api: newfqkline
+        exchanges: [BSE]
+        asset_type: stock
+        instrument_prefixes: ["BSE:92"]
+        series_adjustments: {day: none, qfqday: forward, hfqday: backward}
+        multipliers: {volume: "100", amount: "10000"}
+        source_units: {volume: lot, amount: ten_thousand_CNY}
+        precision_flags: {volume: source_volume_rounded_to_100_shares, amount: source_amount_rounded_to_100_CNY}
+        evidence:
+          - tmp/bse-unit-review-20261031/verification.json
       - id: tencent-newfqkline-main-growth-stock-units-v1
         provider: tencent
         endpoint: kline_daily
@@ -69,9 +82,9 @@ rules:
     amount_multiplier: "1"
     volume_semantics: unverified
     status: pending_validation
-    version: tencent-window-input-v8
+    version: tencent-window-input-v9
     evidence_refs: [ASTOCK-002]
-    notes: daily_fixed策略三种口径使用newfqkline，并以none/qfq/hfq读取day/qfqday/hfqday；不在本地重算复权价格。单位合同只匹配显式证券类型及已配置代码段和实际序列，日期不再是白名单；类型未知、北交所、LOF、指数、其他接口/代码段/序列仍为空。单位合同基于代表样本，不是市场覆盖或生产资格；源值舍入标记随字段保留。none最多640条窗口，原响应完整留存，候选仅筛选目标日期。
+    notes: daily_fixed三口径使用newfqkline的day/qfqday/hfqday，不重算复权价格。单位合同匹配来源、类型、市场、代码段和实际序列，日期不是白名单；BSE92股票单位基于920001的2026-10-29用户截图、量为手的明确确认及三序列原响应对照，金额只在截图显示精度内吻合。类型未知、未配置代码段、LOF、指数和其他接口/序列仍为空。代表样本不证明全代码段覆盖或生产资格；数量与金额保留来源舍入标记。none最多640条，原响应完整保留，候选只筛目标日期。
 
   - id: fixture-daily-v1
     provider: fixture

@@ -15,7 +15,7 @@
 - `tmp/` 用于本地临时工作与正式实现的隔离验收。原根目录 `tmp_test/` 已撤掉，历史研究材料完整归档到 `provider_validation/results/legacy/tmp_test/`；迁移清单保留原路径、相对目录、文件哈希及旧绝对路径说明。新来源验证归入 `provider_validation/`，正式开发产物按既有业务运行布局保存。
 - 测试、命令及验证脚本在安装当前项目的同一环境中运行，不再通过 `PYTHONPATH=src` 暴露顶层 `providers`、`config` 等包。历史证据中的旧路径及哈希保留原样。
 
-`tests/presentation_acceptance.py`用原三股9份响应在`tmp/presentation-20261029/`零联网重放，显式复用已发布名单，核验查询与生产文件边界；`tests/daily_flow_browser.cjs`验证当前配置列、宽窄窗口、原值保留及类型渲染，不作为业务入口。
+`tests/presentation_acceptance.py`用原三股9份响应零联网重放，显式复用已发布名单，核验查询与生产文件边界；支持`--root/--task-id`指定新隔离运行，规则变化时不覆盖历史根。`tests/daily_flow_browser.cjs`接受对应证据根，验证配置列、宽窄窗口、原值及字段状态，不按证券代码猜单位状态。当前v9根见[北交所补证入口](docs/service/read-only-web.md#北交所量额补证与展示2026-10-31)，两者均非业务入口。
 
 ## 设计模块映射
 

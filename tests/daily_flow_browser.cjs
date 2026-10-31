@@ -38,7 +38,7 @@ async function main(){
     for(const item of expected.items){
      const row=rows.find(r=>r.symbol.text===item.symbol);assert(row);assert.equal(row.security_name.text,item.security_name);assert.equal(row.asset_type.text,'股票');assert.equal(row.trade_date.text,'2026-10-29');assert.equal(row.trade_date.nowrap,'nowrap');
      for(const key of ['open','high','low','close'])assert.equal(row[key].text,format(item.values[key],2));
-     if(item.symbol==='bj920001'){assert.equal(row.volume.text,'—');assert(row.volume.all.includes('单位未核验'));}else assert(row.volume.all.includes('股')&&row.volume.all.includes('来源舍入'));
+     if(item.field_metadata.volume.status==='unverified'){assert.equal(row.volume.text,'—');assert(row.volume.all.includes('单位未核验'));}else {assert.equal(row.volume.text,format(item.values.volume,0));assert.equal(row.amount.text,format(item.values.amount,2));assert(row.volume.all.includes('股')&&row.volume.all.includes('来源舍入'));}
      assert(row.open.all.includes('元/股'));assert(row.security_name.all.includes('2026-10-09'));
     }
     await page.screenshot({path:path.join(output,`daily-${width}-${adjustment}.png`),fullPage:true});
@@ -53,12 +53,12 @@ async function main(){
    await page.waitForFunction(()=>document.querySelectorAll('#app tbody tr').length===9&&!document.querySelector('#data-filters button')?.disabled&&document.querySelector('#data-filters [name="asset_type"]')?.value==='stock');
    assert.equal(await page.locator('#app th').count(),12);assert(!(await page.locator('#app thead').innerText()).includes('source_api'));
    const rows=await page.locator('#app tbody tr').evaluateAll(items=>items.map(tr=>Object.fromEntries([...tr.querySelectorAll('td')].map(td=>[td.dataset.column,td.textContent]))));
-   const bj=rows.find(row=>row.symbol==='bj920001');assert(bj.volume.includes('11829.00')&&bj.volume.includes('单位未核验'));const sh=rows.find(row=>row.symbol==='sh600519');assert(sh.volume.includes('42992.00')&&sh.volume.includes('手')&&sh.amount.includes('万元'));
+   const bj=rows.find(row=>row.symbol==='bj920001');assert(bj.volume.includes('11829.00'));const sh=rows.find(row=>row.symbol==='sh600519');assert(sh.volume.includes('42992.00')&&sh.volume.includes('手')&&sh.amount.includes('万元'));
    const sourceExpected=JSON.parse(fs.readFileSync(path.join(root,'checks/source-api.json'),'utf8'));
    const spans=await page.locator('#app tbody tr').evaluateAll(items=>items.map(tr=>Object.fromEntries([...tr.querySelectorAll('td')].map(td=>[td.dataset.column,td.querySelector('span')?.textContent]))));
    for(let i=0;i<spans.length;i++){
     for(const [field,key] of Object.entries({open:'1',high:'3',low:'4',close:'2',volume:'5',amount:'8'}))assert.equal(spans[i][field],sourceExpected.items[i].values[key]);
-    if(!rows[i].symbol.startsWith('bj'))assert(rows[i].volume.includes('手')&&rows[i].amount.includes('万元'));
+    if(sourceExpected.items[i].field_metadata.volume.status==='available')assert(rows[i].volume.includes('手')&&rows[i].amount.includes('万元'));
    }
    await page.screenshot({path:path.join(output,`source-${width}.png`),fullPage:true});await page.locator('#app .table-wrap').evaluate(el=>el.scrollLeft=el.scrollWidth);await page.screenshot({path:path.join(output,`source-${width}-right.png`),fullPage:true});
    await page.locator('#app tbody tr').first().click();await page.locator('#detail-dialog').waitFor();const detail=await page.locator('#dialog-content').innerText();assert(detail.includes('来源字段9（含义未核验）')&&detail.includes('source_bar_key'));await page.screenshot({path:path.join(output,`source-details-${width}.png`),fullPage:true});await page.locator('.dialog-close').click();
