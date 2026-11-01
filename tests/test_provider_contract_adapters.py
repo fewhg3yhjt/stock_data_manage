@@ -769,3 +769,75 @@ def test_tencent_snapshot_batches_entire_requested_scope_without_dropping_remain
     provider.max_symbols_per_request = 0
     with pytest.raises(ValueError, match="batch size"):
         provider.fetch_snapshot(symbols, datetime(2026, 9, 30, tzinfo=timezone.utc))
+
+
+def test_captured_requests_keep_live_concurrent_responses_in_their_own_contexts(tmp_path, monkeypatch):
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Barrier
+    import requests
+    from stock_data_manage.providers.transport import captured_requests
+    from stock_data_manage.storage.raw import RawObjectStore
+
+    simultaneous_send = Barrier(2, timeout=5)
+
+    def fake_send(session, request, **kwargs):
+        simultaneous_send.wait()
+        response = requests.Response()
+        response.status_code = 200
+        response.headers["Content-Type"] = "application/json"
+        response._content = request.url.rsplit("/", 1)[-1].encode("utf-8")
+        response._content_consumed = True
+        response.url, response.request = request.url, request
+        return response
+
+    monkeypatch.setattr(requests.Session, "send", fake_send)
+    pacer = RequestPacer(wait=lambda _: None)
+
+    def fetch(provider, host):
+        store = RawObjectStore(tmp_path / provider)
+        with captured_requests(store, provider=provider, endpoint="daily", scope={"symbol": provider},
+                code_version="fixture", pacer=pacer, interval_seconds=0):
+            response = requests.get(f"https://{host}.fixture.test/daily/{provider}", timeout=2)
+            assert response.status_code == 200
+        return store.manifest
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        manifests = list(executor.map(lambda args: fetch(*args), (("tencent", "tencent"), ("csindex", "csindex"))))
+
+    captured = {}
+    for manifest in manifests:
+        events = [json.loads(line) for line in Path(manifest).read_text(encoding="utf-8").splitlines()]
+        response_event = next(event for event in events if event.get("outcome") == "response")
+        body = RawObjectStore.read_response(manifest, response_event)
+        captured[response_event["provider"]] = (response_event["url"], body)
+    assert set(captured) == {"tencent", "csindex"}
+    assert captured["tencent"][0].endswith("/daily/tencent") and captured["tencent"][1] == b"tencent"
+    assert captured["csindex"][0].endswith("/daily/csindex") and captured["csindex"][1] == b"csindex"
+    assert requests.Session.send is fake_send
+
+
+def test_shared_pacer_policy_cannot_be_replaced_while_request_waits():
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Event
+
+    waiting, resume = Event(), Event()
+
+    def wait_for_slot(_seconds):
+        waiting.set()
+        assert resume.wait(timeout=5)
+
+    pacer = RequestPacer(clock=lambda: 0, wait=wait_for_slot)
+    pacer.configure("shared-host", interval_seconds=1, concurrency=1)
+    pacer._groups["shared-host"]["last_start"] = 0
+
+    def issue_request():
+        with pacer.request("shared-host"):
+            pass
+
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(issue_request)
+        assert waiting.wait(timeout=5)
+        with pytest.raises(ValueError, match="configure shared request policies before issuing requests"):
+            pacer.configure("shared-host", interval_seconds=2, concurrency=1)
+        resume.set()
+        future.result(timeout=5)

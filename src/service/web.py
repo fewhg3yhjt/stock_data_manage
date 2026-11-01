@@ -88,6 +88,8 @@ def _daily_field_metadata(row: dict[str, Any]) -> dict[str, Any]:
         related = [flag for flag in flags if flag.startswith("source_" + field + "_rounded")]
         result[field] = {"unit": unit, "status": state, "reason": "单位未核验" if state == "unverified" else
             ("未提供标准值" if state == "missing" else ""), "precision_flags": related}
+        if row.get("value_contract") == "close_only" and field in {"open", "high", "low"}:
+            result[field].update(status="missing", reason="该指数按收盘序列合同交付，不包含此价格")
     return result
 
 
@@ -628,7 +630,7 @@ class DashboardReader:
             saved_definition = _read_json(definition_path)
         except ValueError:
             saved_definition = {}
-        if document.get('format_version') == 'daily-batch-v1':
+        if document.get('format_version') in {'daily-batch-v1', 'daily-batch-v2'}:
             saved_definition = saved_definition.get('definition', {})
         definition = {
             key: value
@@ -645,7 +647,7 @@ class DashboardReader:
                 coverage[key] = {"count": len(value), "sample": value[:200]}
         final_check = {**final_check, "coverage": coverage}
         partition_results = []
-        if document.get('format_version') == 'daily-batch-v1':
+        if document.get('format_version') in {'daily-batch-v1', 'daily-batch-v2'}:
             for asset, result in document.get('partitions', {}).items():
                 coverage_path = path.with_name(f'coverage.{asset}.json')
                 check = _read_json(coverage_path) if _within(coverage_path, path.parent) and coverage_path.is_file() else {}
@@ -682,7 +684,7 @@ class DashboardReader:
         units = document.get("source_units")
         batch_total = None
         batch_offset = 0
-        if document.get('format_version') == 'daily-batch-v1':
+        if document.get('format_version') in {'daily-batch-v1', 'daily-batch-v2'}:
             from ..pipeline.daily import daily_unit_paths
             frozen = _read_json(summary_path.with_name('task.json'))
             plan = frozen['units']

@@ -6,8 +6,9 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Mapping, Protocol, Sequence
 from threading import Lock, BoundedSemaphore
+from contextvars import ContextVar
 from time import monotonic, sleep
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from math import isfinite
 import json
 from pathlib import Path
@@ -50,7 +51,56 @@ class RequestsTransport:
             self._session = None
 
 
-_REQUEST_CAPTURE_LOCK = Lock()
+_REQUEST_CAPTURE_PATCH_LOCK = Lock()
+_NATIVE_TRANSPORT_LOCK = Lock()
+_REQUEST_CAPTURE_CONTEXT = ContextVar("request_capture_context", default=None)
+_REQUEST_CAPTURE_ACTIVE = 0
+_REQUEST_CAPTURE_ORIGINALS = None
+
+
+def _dispatch_captured_send(session, request, **kwargs):
+    context = _REQUEST_CAPTURE_CONTEXT.get()
+    if context is not None:
+        handler = context[0]
+    else:
+        with _REQUEST_CAPTURE_PATCH_LOCK:
+            handler = _REQUEST_CAPTURE_ORIGINALS[0]
+    return handler(session, request, **kwargs)
+
+
+def _dispatch_captured_init(session, *args, **kwargs):
+    context = _REQUEST_CAPTURE_CONTEXT.get()
+    if context is not None:
+        handler = context[1]
+    else:
+        with _REQUEST_CAPTURE_PATCH_LOCK:
+            handler = _REQUEST_CAPTURE_ORIGINALS[1]
+    return handler(session, *args, **kwargs)
+
+
+@contextmanager
+def _request_capture_scope(requests, send_handler, init_handler):
+    """Dispatch requests.Session hooks through the calling thread's capture context."""
+    global _REQUEST_CAPTURE_ACTIVE, _REQUEST_CAPTURE_ORIGINALS
+    with _REQUEST_CAPTURE_PATCH_LOCK:
+        if _REQUEST_CAPTURE_ACTIVE == 0:
+            _REQUEST_CAPTURE_ORIGINALS = (requests.Session.send, requests.Session.__init__)
+            requests.Session.send = _dispatch_captured_send
+            requests.Session.__init__ = _dispatch_captured_init
+        _REQUEST_CAPTURE_ACTIVE += 1
+        originals = _REQUEST_CAPTURE_ORIGINALS
+    token = _REQUEST_CAPTURE_CONTEXT.set((send_handler, init_handler))
+    try:
+        yield originals
+    finally:
+        _REQUEST_CAPTURE_CONTEXT.reset(token)
+        with _REQUEST_CAPTURE_PATCH_LOCK:
+            _REQUEST_CAPTURE_ACTIVE -= 1
+            if _REQUEST_CAPTURE_ACTIVE == 0:
+                if requests.Session.send is _dispatch_captured_send:
+                    requests.Session.send = _REQUEST_CAPTURE_ORIGINALS[0]
+                if requests.Session.__init__ is _dispatch_captured_init:
+                    requests.Session.__init__ = _REQUEST_CAPTURE_ORIGINALS[1]
 
 
 class HostPausedError(ConnectionError):
@@ -62,10 +112,11 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                       replay_manifest=None, evidence_roots=(), max_age_seconds=0, sdk_retry_policy=False,
                       probe_host_pause=False, require_empty_post_body=False, response_validator=None, cache_ignored_query_parameters=(),
                       native_transport=None, match_request_body=False, interval_seconds=3, cache_lookup=None):
-    """Serialized single-input capture/replay. Session identity, proxies and request arguments are retained.
+    """Capture one input's requests without mixing concurrent request contexts.
 
     SDK session policy matches the saved conservative probe. Internal urllib3 retries
-    remain opaque: this scope must never be labeled physical_request enforcement.
+    remain opaque: this scope must never be labeled physical_request enforcement. SDKs
+    whose native request method must be patched remain serialized with one another.
     """
     import requests
     from requests.adapters import HTTPAdapter
@@ -81,8 +132,9 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                 replay_records.append((number, record))
     used = set()
     consecutive_errors, paused_hosts = {}, {}
-    with _REQUEST_CAPTURE_LOCK:
-        original_send, original_init = requests.Session.send, requests.Session.__init__
+    original_methods = {}
+    # Keep the capture setup in its existing local scope without serializing inputs.
+    with nullcontext():
         scope = sanitized_metadata(scope)
         def make_response(request, record, body):
             response = requests.Response()
@@ -176,7 +228,7 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                         with pacer.request(host):
                             # Release the host permit before requests follows another hop.
                             # Its native resolver retains cookies, proxy and method semantics.
-                            response = native_call() if native_call is not None else original_send(
+                            response = native_call() if native_call is not None else original_methods['send'](
                                 session, request, **{**kwargs, 'allow_redirects': False})
                     except Exception as exc:
                         transport_error()
@@ -228,7 +280,7 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                 return False if status_code in {403, 429} else super().is_retry(method, status_code, has_retry_after)
 
         def init(session, *args, **kwargs):
-            original_init(session, *args, **kwargs)
+            original_methods['init'](session, *args, **kwargs)
             if sdk_retry_policy:
                 policy = ConservativeRetry(total=2, connect=2, read=2, status=2, backoff_factor=5,
                     backoff_max=300, status_forcelist=(500, 502, 503, 504), allowed_methods=frozenset({"GET", "POST"}),
@@ -236,6 +288,7 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                 session.mount("https://", HTTPAdapter(max_retries=policy))
                 session.mount("http://", HTTPAdapter(max_retries=policy))
         native_restore = None
+        native_lock_acquired = False
         if native_transport == 'curl_cffi':
             import curl_cffi.requests as curl_requests
             from types import SimpleNamespace
@@ -246,6 +299,8 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                 return send(SimpleNamespace(trust_env=getattr(session,'trust_env',True)),prepared,
                     _native_call=lambda:original_native(session,method,url,**kwargs),
                     _native_options=dict(transport='original curl_cffi SDK request boundary',**sanitized_metadata(kwargs)))
+            _NATIVE_TRANSPORT_LOCK.acquire()
+            native_lock_acquired = True
             curl_requests.Session.request = curl_request
             native_restore = lambda: setattr(curl_requests.Session,'request',original_native)
         elif native_transport == 'pandas_urllib':
@@ -263,17 +318,19 @@ def captured_requests(store, *, provider, endpoint, scope, code_version, pacer,
                 if response.status_code>=400:raise HTTPError(request.full_url,response.status_code,'archived HTTP failure',response.headers,None)
                 buffered=io.BytesIO(response.content);buffered.headers=response.headers
                 return buffered
+            _NATIVE_TRANSPORT_LOCK.acquire()
+            native_lock_acquired = True
             common.urlopen = excel_urlopen
             native_restore = lambda: setattr(common,'urlopen',original_native)
         elif native_transport is not None:
             raise ValueError('unsupported original SDK transport')
-        requests.Session.send = send
-        requests.Session.__init__ = init
-        try:
-            yield events
-        finally:
-            if native_restore is not None: native_restore()
-            requests.Session.send, requests.Session.__init__ = original_send, original_init
+        with _request_capture_scope(requests, send, init) as original_methods_pair:
+            original_methods.update(send=original_methods_pair[0], init=original_methods_pair[1])
+            try:
+                yield events
+            finally:
+                if native_restore is not None: native_restore()
+                if native_lock_acquired: _NATIVE_TRANSPORT_LOCK.release()
 
 
 class RequestPacer:
@@ -283,26 +340,32 @@ class RequestPacer:
         self.clock = clock
         self.wait = wait
         self._groups = {}
+        self._configuration_lock = Lock()
 
     def configure(self, group: str, interval_seconds: float, concurrency: int = 1) -> None:
         if not group or not isfinite(interval_seconds) or interval_seconds < 0 or concurrency < 1:
             raise ValueError("invalid request pacing policy")
-        if group in self._groups:
-            current = self._groups[group]
-            if current["started"]:
-                if interval_seconds > current["interval"] or concurrency < current["concurrency"]:
-                    raise ValueError("configure shared request policies before issuing requests")
-                return
-            interval_seconds = max(interval_seconds, current["interval"])
-            concurrency = min(concurrency, current["concurrency"])
-        self._groups[group] = {
-            "interval": interval_seconds, "concurrency": concurrency,
-            "lock": Lock(), "semaphore": BoundedSemaphore(concurrency), "last_start": None, "started": False,
-        }
+        with self._configuration_lock:
+            if group in self._groups:
+                current = self._groups[group]
+                if current["started"]:
+                    if interval_seconds > current["interval"] or concurrency < current["concurrency"]:
+                        raise ValueError("configure shared request policies before issuing requests")
+                    return
+                interval_seconds = max(interval_seconds, current["interval"])
+                concurrency = min(concurrency, current["concurrency"])
+            self._groups[group] = {
+                "interval": interval_seconds, "concurrency": concurrency,
+                "lock": Lock(), "semaphore": BoundedSemaphore(concurrency), "last_start": None, "started": False,
+            }
 
     @contextmanager
     def request(self, group: str):
-        policy = self._groups[group]
+        with self._configuration_lock:
+            policy = self._groups[group]
+            # Freeze the shared policy before another thread can replace it while
+            # this request is waiting for the semaphore or interval slot.
+            policy["started"] = True
         with policy["semaphore"]:
             with policy["lock"]:
                 if policy["last_start"] is not None:
@@ -310,7 +373,6 @@ class RequestPacer:
                     if remaining > 0:
                         self.wait(remaining)
                 policy["last_start"] = self.clock()
-                policy["started"] = True
             yield
 
 

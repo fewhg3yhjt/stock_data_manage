@@ -25,7 +25,7 @@ dataset:
     mode: atomic_replace
     max_missing_ratio: 0.01
     max_missing_count: 50
-  schema_version: daily-aggregate-v1
+  schema_version: daily-aggregate-v2
   partition_dimensions:
   - trade_date
   - asset_type
@@ -105,19 +105,19 @@ candidate:
       required: true
     open:
       type: decimal
-      unit: CNY
-      required: true
+      unit: asset_quote_unit
+      required: false
     high:
       type: decimal
-      unit: CNY
-      required: true
+      unit: asset_quote_unit
+      required: false
     low:
       type: decimal
-      unit: CNY
-      required: true
+      unit: asset_quote_unit
+      required: false
     close:
       type: decimal
-      unit: CNY
+      unit: asset_quote_unit
       required: true
     volume:
       type: decimal
@@ -127,6 +127,10 @@ candidate:
       type: decimal
       unit: CNY
       required: false
+    value_contract:
+      type: enum
+      values: [full_ohlc, close_only]
+      required: true
 quality:
   reject_if:
   - missing_required_ohlc

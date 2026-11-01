@@ -97,7 +97,7 @@ def query_daily(canonical_root, *, security="", start_date=None, end_date=None, 
             quote = record.quotes[adjustment]
             items.append({"instrument_id": record.instrument_id, "symbol": symbol, "trade_date": day.isoformat(),
                 "asset_type": record.asset_type.value, "value_kind": record.value_kind, "quote_unit": record.quote_unit,
-                "adjustment": adjustment, "status": quote.status.value, "reason": quote.reason,
+                "adjustment": adjustment, "status": quote.status.value, "value_contract": quote.value_contract, "reason": quote.reason,
                 "values": {name: str(getattr(quote,name)) if getattr(quote,name) is not None else None
                            for name in ("open","high","low","close","volume","amount")},
                 "provider": quote.source_provider, "has_source_evidence": bool(quote.raw_object_path),

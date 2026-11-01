@@ -146,7 +146,7 @@ classDiagram
 
 ## 3. 日常采集、聚合与消费（已实现离线股票闭环）
 
-2026-10-31用户确认按同日证券类型集合组织日线批任务。整批采集结束后处理全部已保存响应，再按类型构建并进入统一发布阶段；各类型分母和门槛独立，整批状态报告分区失败，不增加跨类型原子事务。股票、ETF与指数共用现有记录结构，适用口径与单位规则不变。批阶段与恢复主合同见[任务流程](docs/pipeline/collection-tasks.md#日线批任务阶段合同2026-10-31用户确认)。
+2026-10-31用户确认按同日证券类型集合组织日线批任务。整批采集结束后处理全部已保存响应，再按类型构建并进入统一发布阶段；各类型分母和门槛独立，整批状态报告分区失败，不增加跨类型原子事务。股票、ETF与指数共用现有记录结构，适用口径与单位规则不变。2026-11-01用户进一步确认来源组并发方案，现已在采集阶段按冻结`input_id`并发运行，不同来源仍分别请求、分别解析，再进入同一个标准候选集合及发布入口。实现范围和证据见本节3.3与[任务流程](docs/pipeline/collection-tasks.md#按来源并发采集2026-11-01已实现验证范围见下)。
 
 ```mermaid
 flowchart TD
@@ -178,6 +178,51 @@ flowchart TD
 ### 3.2 采集策略与来源合同
 
 任务引用 `config/capabilities.yaml` 的 `daily_fixed`，按市场与口径冻结请求。当前股票三口径均使用newfqkline，none/qfq/hfq分别读取day/qfqday/hfqday；详细API、640条窗口、原请求及适用性见[来源说明](docs/providers/README.md#证券名单能力更新)。kline保留为显式来源接口，不作为该策略的隐式回退。来源选用与资格不由本数据对象决定。
+
+### 3.3 新来源并行采集并汇入共同发布（已实现，验证范围有限）
+
+用户确认腾讯和中证的网络请求在同一采集阶段运行。业务目标是让不同来源的请求等待重叠，同时保持一个标准日线候选集合和一个共同发布入口；来源仍分别请求、分别按接口解析，不是腾讯发布一份、中证再发布一份，也不让来源之间互相回退。本节中的图是当前实现架构，下面单独列出未获证明的在线能力。
+
+```mermaid
+flowchart LR
+    TASK[collect-task<br/>冻结本次证券、日期、口径和来源合同] --> COORD[pipeline.inputs<br/>批任务协调与采集屏障]
+    COORD --> GROUP[按冻结input_id/provider/endpoint分组<br/>资格在发请求前核验]
+    GROUP --> DISPATCH[现有批任务协调器<br/>按来源组并发派发]
+    DISPATCH -->|并发工作线程| TREQ[TencentDailyProvider<br/>腾讯来源组内顺序请求]
+    DISPATCH -->|并发工作线程| CREQ[CsindexDailyProvider<br/>中证来源组内顺序请求]
+    TREQ --> TRANS[providers.transport<br/>线程隔离的请求捕获<br/>按主机共享限速]
+    CREQ --> TRANS
+    TRANS --> RAW[storage.raw / RawObjectStore<br/>逐请求保存各自原始响应及清单]
+    RAW --> BARRIER[批采集屏障<br/>确认全部冻结单元已有终态]
+    BARRIER --> PARSE[批任务按冻结单元顺序分派解析]
+    PARSE -->|腾讯单元| TP[腾讯接口解析]
+    PARSE -->|中证单元| CP[中证接口解析]
+    TP --> TC[腾讯标准候选]
+    CP --> CC[中证标准候选]
+    TC --> BUILD[pipeline.daily<br/>prepare_daily_task_publication]
+    CC --> BUILD
+    BUILD --> MODEL[DailyRecord / QuoteGroup<br/>证券与日期聚合，来源可追溯]
+    MODEL --> PUBLISH[按股票、ETF、指数分区统一检查和发布]
+    PUBLISH --> STORE[Canonical存储]
+    STORE --> QUERY[market_data查询API与页面]
+```
+
+| 组件 | 现有职责 | 本设计里的职责变化 |
+|---|---|---|
+| `src/pipeline/inputs.py::_collect_daily_batch` | 冻结日线单元并拥有任务检查点、处理与发布阶段 | 保留入口和批任务所有者；采集时按冻结`input_id`各启动一个工作线程，组内顺序抓取；协调器预建共享原文目录、检查请求资格/冷却状态、串行记录结果并等待采集屏障 |
+| `src/pipeline/daily.py` | `capture_daily_unit`保存单元原文；`process_daily_unit`调用对应Provider；`prepare_daily_task_publication`聚合标准候选 | 继续承担单元捕获、解析、公共业务聚合；不新增来源专属发布模块 |
+| `src/providers/tencent/`、`src/providers/csindex/` | 各自封装来源请求和接口解析 | 仍只处理本来源协议；产出统一候选，不互相调用、不负责合并 |
+| `src/providers/transport.py`与`src/storage/raw.py` | 传输限速与原文留证 | `requests.Session`钩子将调用派发到所属线程的捕获上下文；所有来源共用批任务的主机限速器；响应仍按单元分别留存。不能让不同来源组各自新建同主机限速器 |
+| `DailyRecord` / `QuoteGroup` | 保存证券日线聚合值及每个口径的来源证据 | 继续作为唯一发布业务对象；`source_provider`、`endpoint`、`raw_object_path`和`fetch_time`承载溯源，不另加重复来源字段 |
+| 存储与查询 | 按类型发布Canonical并由查询API和页面读取 | 保持单一发布和查询路径；不按来源拆数据集或页面 |
+
+`_collect_daily_batch`仍保留整批阶段顺序：所有来源组捕获终态落盘后，才开始`process_daily_unit`解析；解析循环按冻结单元顺序调用对应Provider，不启动并发解析线程；处理完再由`prepare_daily_task_publication`统一聚合，最后按证券类型发布。并发只发生在采集阶段的不同`input_id`组之间。批协调器通过事件队列接收线程结果并串行写检查点；请求钩子使用线程上下文区分捕获归属，避免响应写入其他组的manifest。`RequestPacer`按主机共享，当前两个来源的有效并发均为1，因此同一组内仍逐个请求。
+
+本次没有提高单个来源的请求速率：腾讯日线当前配置为0.3秒间隔、单并发，中证为3秒间隔、单并发。两个来源组可以同时请求；每组中的证券仍顺序处理。若来源合同未授权或资格失效，该组单元在请求前阻断，其他合格组可完成采集；随后共同覆盖门槛决定证券类型能否发布。中证当前仍标记为`implemented_validation_only`，正式资格完成前在线请求仍会被拦截。
+
+**本次已验证（离线）**：`tests/test_provider_contract_adapters.py::test_captured_requests_keep_live_concurrent_responses_in_their_own_contexts`覆盖并发调用与响应归属；另一个限速器回归验证请求等待时共享策略不会被替换。`tests/test_daily_collection_e2e.py::test_daily_batch_runs_tencent_and_csindex_capture_groups_before_shared_processing`用腾讯和中证留存响应验证两个来源组同时进入采集、全部完成后才解析、最终汇入同一指数分区并保留各自来源。第一次扩大测试发现两个工作线程会竞争创建Windows临时原文父目录；批协调器现已在派发线程前创建这些父目录，混合来源用例及59项日线批次/端到端测试复跑通过。扩大范围未执行一个此前在本机TestClient处卡住的Web校验用例。详细结果见[任务流程验收表](docs/pipeline/collection-tasks.md#实现验证与未覆盖项)。
+
+**尚未验证**：本次没有发起实时中证请求，也没有让中证取得正式资格；离线回放证明的是并发调度、原文隔离和共同发布路径，不是两个真实Provider的在线可用性证明。真实中证资格、实时请求参数/返回语义以及在线混合来源整批发布仍待既有Provider验证流程完成。并发改造沿用此前确认的CSI精确路由、`close_only`语义及发布门槛，没有扩大它们；正式`data/`未修改。
 
 ## 历史重建与后续管理能力
 

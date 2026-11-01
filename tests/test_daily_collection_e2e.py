@@ -15,7 +15,7 @@ from stock_data_manage.providers.contracts import HttpResponse, ProviderContract
 from stock_data_manage.providers.transport import RequestPacer
 from stock_data_manage.routing.retry import execute_with_fallback, RetryPolicy
 from stock_data_manage.storage.raw import RawObjectStore
-from stock_data_manage.storage.parquet import CanonicalPartitionStore, InvalidPartitionError
+from stock_data_manage.storage.parquet import CanonicalPartitionStore, InvalidPartitionError, DAILY_SCHEMA_V1, _write_partition
 from stock_data_manage.storage.integrity import file_hash, Manifest
 from stock_data_manage.storage.metadata import MetadataStore
 
@@ -99,7 +99,7 @@ def test_aggregate_nested_roundtrip_and_noop(tmp_path):
     assert read == [record()]
     assert read[0].key == ("XSHG:600001", date.fromisoformat(DAY))
     assert result.manifest.adjustment == "aggregate"
-    assert result.manifest.schema_version == "daily-aggregate-v1"
+    assert result.manifest.schema_version == "daily-aggregate-v2"
     assert store.publish_daily(asset_type="stock", partition_key=DAY, new_records=[], expected_count=1,
         run_id="again", item_statuses={"XSHG:600001":"success"}).no_op
 
@@ -141,6 +141,47 @@ def test_verified_nonapplicable_index_roundtrip(tmp_path):
     store = CanonicalPartitionStore(tmp_path)
     store.publish_daily(asset_type="index", partition_key=DAY, new_records=[index], expected_count=1, run_id="index")
     assert store.read_daily("index", DAY)[0].value_kind == "index_points"
+
+
+def test_index_close_only_contract_roundtrip_and_v1_partitions_remain_readable(tmp_path):
+    import pyarrow as pa
+    from stock_data_manage.storage.parquet import DAILY_SCHEMA_VERSION
+    close = QuoteGroup(QuoteStatus.AVAILABLE, close=Decimal("2061.10"),
+        source_provider="csindex", endpoint="index-perf", raw_object_path="fixture-evidence",
+        fetch_time=datetime(2026, 10, 29, 16, tzinfo=timezone.utc), value_contract="close_only")
+    unknown = QuoteGroup(QuoteStatus.UNVERIFIED, reason="not verified")
+    index = DailyRecord("XSHG:000816", date(2026, 10, 29), AssetType.INDEX, close, unknown, unknown)
+    assert index.complete
+    assert not DailyRecord("XSHG:600001", date(2026, 10, 29), AssetType.STOCK, close, close, close).complete
+    assert not DailyRecord("XSHG:510300", date(2026, 10, 29), AssetType.ETF, close, unknown, unknown).complete
+
+    store = CanonicalPartitionStore(tmp_path / "canonical")
+    published = store.publish_daily(asset_type="index", partition_key="2026-10-29", new_records=[index],
+        expected_count=1, run_id="close-only")
+    assert published.manifest.schema_version == DAILY_SCHEMA_VERSION
+    restored = store.read_daily("index", "2026-10-29")[0]
+    assert restored.none.value_contract == "close_only"
+    assert restored.none.close == Decimal("2061.10") and restored.none.open is None
+
+    for field in ("volume", "amount"):
+        with pytest.raises(ValueError, match="close-only quote requires only"):
+            QuoteGroup(QuoteStatus.AVAILABLE, close=Decimal("2061.10"), **{field: Decimal("10")},
+                source_provider="csindex", endpoint="index-perf", raw_object_path="fixture-evidence",
+                fetch_time=datetime(2026, 10, 29, 16, tzinfo=timezone.utc), value_contract="close_only")
+
+    # A real v1 layout has no value_contract field. It must keep its original meaning.
+    old = record()
+    old_row = __import__("stock_data_manage.storage.parquet", fromlist=["daily_records_to_table"]).daily_records_to_table([old]).to_pylist()
+    for group in old_row[0]["quotes"].values():
+        group.pop("value_contract", None)
+    old_table = pa.Table.from_pylist(old_row, schema=DAILY_SCHEMA_V1)
+    old_store = CanonicalPartitionStore(tmp_path / "legacy")
+    partition = old_store.daily_directory("stock", DAY)
+    partition.mkdir(parents=True)
+    _write_partition(old_table, partition, "legacy-v1", dict(dataset="daily_bar", asset_type="stock",
+        partition_key=DAY, schema_version="daily-aggregate-v1", adjustment="aggregate", row_count=1,
+        expected_count=1, first_key=str(old.key), last_key=str(old.key), raw_refs=(), item_statuses={}, source_providers={}))
+    assert old_store.read_daily("stock", DAY) == [old]
 
 
 def test_formal_task_three_responses_one_record_and_resume(tmp_path):
@@ -373,3 +414,121 @@ def test_daily_route_expansion_never_falls_back_for_missing_market_or_conflictin
     conflicting[1]["context"]["config"] = {"api": "fqkline", "adjust": "qfq"}
     with pytest.raises(ValueError, match="conflicts with frozen acquisition policy"):
         expand_daily_units(conflicting, definition)
+
+
+def csi_response_manifest(root, *, symbol="sh000816", day="2026-10-29"):
+    code = symbol[2:]
+    body = json.dumps({"code": "200", "success": True, "data": [{
+        "tradeDate": day.replace("-", ""), "indexCode": code, "indexNameCn": "细分地产",
+        "open": None, "high": None, "low": None, "close": 2061.1,
+        "tradingVol": 1977524357, "tradingValue": 99.14,
+    }]}).encode("utf-8")
+    params = {"indexCode": code, "startDate": day.replace("-", ""), "endDate": day.replace("-", "")}
+    url = requests.Request("GET", "https://www.csindex.com.cn/csindex-home/perf/index-perf", params=params).prepare().url
+    store = RawObjectStore(root)
+    store.record_response(response=SimpleNamespace(content=body, status_code=200,
+        headers={"Content-Type": "application/json;charset=UTF-8"}, encoding="utf-8"),
+        url=url, method="GET", request_headers={}, scope={"parameters": params},
+        provider="csindex", endpoint="index-perf", code_version="fixture-v1", mode="fixture")
+    return str(store.manifest)
+
+
+def csi_task(manifest=None, *, task_id="csi-close-only"):
+    symbol, day = "sh000816", "2026-10-29"
+    unit = {"key": symbol, "symbol": symbol, "asset_type": "index", "instrument_id": "XSHG:000816",
+        "input_id": "ASTOCK-002-daily",
+        "context": {"request": {"symbol": symbol, "start_date": day, "end_date": day}}}
+    if manifest:
+        unit["replay_manifests"] = {"none": manifest}
+    return {"task_id": task_id, "dataset": "daily_bar", "asset_type": "index", "universe": "static",
+        "trade_date": day, "units": [unit]}
+
+
+def test_csi_close_only_runs_through_existing_daily_batch_and_publishes_index_points(tmp_path):
+    from stock_data_manage.service.market_data import query_daily
+    manifest = csi_response_manifest(tmp_path / "source")
+    result = collect_task(definition=csi_task(manifest), config_root=CONFIG, data_root=tmp_path / "business",
+        mode="replay", collector_options={"pacer": RequestPacer(wait=lambda _: None)})
+    assert result["status"] == "published" and result["complete_today"]
+    records = CanonicalPartitionStore(tmp_path / "business/canonical").read_daily("index", "2026-10-29")
+    assert len(records) == 1
+    quote = records[0].none
+    assert (quote.source_provider, quote.endpoint, quote.value_contract) == ("csindex", "index-perf", "close_only")
+    assert quote.close == Decimal("2061.1") and all(getattr(quote, name) is None for name in ("open", "high", "low", "volume", "amount"))
+    assert records[0].quote_unit == "point"
+    response = query_daily(tmp_path / "business/canonical", asset_type="index")
+    assert response["items"][0]["value_contract"] == "close_only"
+    assert response["items"][0]["values"]["close"] == "2061.10000000"
+
+
+def test_csi_live_route_is_blocked_before_any_provider_request(tmp_path, monkeypatch):
+    def forbidden(*args, **kwargs):
+        raise AssertionError("unqualified CSI route attempted online capture")
+    monkeypatch.setattr(requests.Session, "send", forbidden)
+    result = collect_task(definition=csi_task(task_id="csi-live-blocked"), config_root=CONFIG,
+        data_root=tmp_path / "business", mode="live", collector_options={"pacer": RequestPacer(wait=lambda _: None)})
+    assert result["status"] == "failed"
+    work = Path(result["definition_ref"]["path"]).parent
+    gate = json.loads((work / "qualification.prepare-1.json").read_text(encoding="utf-8"))
+    assert gate["CSI-INDEX-DAILY-001"]["eligible"] is False
+    entry = next(json.loads(path.read_text(encoding="utf-8")) for path in work.rglob("*.manifest.json"))
+    assert entry["failure_class"] == "qualification_blocked" and entry["capture_status"] == "blocked"
+
+
+def test_daily_batch_runs_tencent_and_csindex_capture_groups_before_shared_processing(tmp_path, monkeypatch):
+    from threading import Barrier, Lock
+    import stock_data_manage.pipeline.daily as daily
+    from stock_data_manage.providers.csindex.indices import CsindexDailyProvider
+
+    day, tencent_symbol = "2026-10-29", "sh399001"
+    csi_manifest = csi_response_manifest(tmp_path / "csi-source")
+    tencent_body = json.dumps({"code": 0, "data": {tencent_symbol: {"day": [[
+        day, "100", "100", "100", "100", "100", "0", "0", "100", "0"]]}}}).encode("utf-8")
+    tencent_params = {"param": f"{tencent_symbol},day,{day},{day},640,none"}
+    tencent_url = "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/newfqkline/get"
+    tencent_url = requests.Request("GET", tencent_url, params=tencent_params).prepare().url
+    tencent_store = RawObjectStore(tmp_path / "tencent-source")
+    tencent_store.record_response(response=SimpleNamespace(content=tencent_body, status_code=200,
+        headers={"Content-Type": "application/json"}, encoding="utf-8"), url=tencent_url,
+        method="GET", request_headers={}, scope={"parameters": tencent_params},
+        provider="tencent", endpoint="kline_daily", code_version="fixture-v1", mode="fixture")
+
+    definition = csi_task(csi_manifest, task_id="mixed-source-concurrent-capture")
+    definition["units"].append({"key": tencent_symbol, "symbol": tencent_symbol, "asset_type": "index",
+        "input_id": "ASTOCK-002-daily", "context": {"request": {"symbol": tencent_symbol,
+            "start_date": day, "end_date": day}}, "replay_manifests": {"none": str(tencent_store.manifest)}})
+
+    both_sources_entered_capture = Barrier(2, timeout=5)
+    completion_lock = Lock()
+    completed_sources = set()
+    original_tencent_capture = TencentDailyProvider.capture_window
+    original_csindex_capture = CsindexDailyProvider.capture_window
+    original_process = daily.process_daily_unit
+
+    def record_source_capture(name, original):
+        def capture(self, *args, **kwargs):
+            both_sources_entered_capture.wait()
+            result = original(self, *args, **kwargs)
+            with completion_lock:
+                completed_sources.add(name)
+            return result
+        return capture
+
+    def process_after_capture_barrier(**kwargs):
+        assert completed_sources == {"tencent", "csindex"}
+        return original_process(**kwargs)
+
+    monkeypatch.setattr(TencentDailyProvider, "capture_window", record_source_capture("tencent", original_tencent_capture))
+    monkeypatch.setattr(CsindexDailyProvider, "capture_window", record_source_capture("csindex", original_csindex_capture))
+    monkeypatch.setattr(daily, "process_daily_unit", process_after_capture_barrier)
+
+    result = collect_task(definition=definition, config_root=CONFIG, data_root=tmp_path / "business",
+        mode="replay", collector_options={"pacer": RequestPacer(wait=lambda _: None)})
+
+    assert result["status"] == "published" and result["row_count"] == 2
+    records = CanonicalPartitionStore(tmp_path / "business/canonical").read_daily("index", day)
+    by_id = {record.instrument_id: record for record in records}
+    assert by_id["XSHG:000816"].none.source_provider == "csindex"
+    assert by_id["XSHG:000816"].none.value_contract == "close_only"
+    assert by_id["XSHG:399001"].none.source_provider == "tencent"
+    assert completed_sources == {"tencent", "csindex"}

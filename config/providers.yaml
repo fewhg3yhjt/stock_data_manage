@@ -1999,6 +1999,50 @@ input_capabilities:
     - request.end_date
     - request.trade_date
     base_requests_per_fetch: 2
+  CSI-INDEX-DAILY-001:
+    dataset: daily_bar
+    runtime_method: capture_window
+    provider: csindex
+    endpoint: index-perf
+    display_name: 中证指数日线收盘序列
+    data_kind: time_series
+    data_frequency: daily
+    request_shape: single_symbol
+    parameters:
+      code:
+        type: string
+        source: request.symbol
+        required: true
+      start:
+        type: date
+        source: request.start_date
+        required: true
+      end:
+        type: date
+        source: request.end_date
+        required: true
+      adjust:
+        type: string
+        source: config.adjust
+        required: true
+        default: none
+        choices: [none]
+      api:
+        type: string
+        source: config.api
+        required: true
+        default: index-perf
+        choices: [index-perf]
+    collection_profile: market_after_close
+    implementation_status: implemented_validation_only
+    evidence_refs: [tmp/batch-remediation-20261029/interface-review/raw/csi-daily-sh000816/manifest.ndjson]
+    limitations:
+    - 仅用于daily_fixed中显式列出的11个上海中证指数；来源只返回收盘点位，开高低及量额均保留空值
+    - 该接口有已保存的目标日原始响应；尚未完成正式Provider资格验证，不允许live/retained正式采集
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    base_requests_per_fetch: 1
   ASTOCK-070:
     dataset: trading_calendar
     runtime_method: fetch

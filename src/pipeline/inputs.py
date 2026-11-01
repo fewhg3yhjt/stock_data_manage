@@ -1181,6 +1181,9 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
     import re
     import pyarrow.parquet as pq
     import requests
+    from concurrent.futures import ThreadPoolExecutor
+    from queue import Queue
+    from threading import Event
     from ..config.loader import InputCapabilityConfig, ParameterBinding
     from ..storage.integrity import row_hash, file_hash
     from ..storage.metadata import MetadataStore
@@ -1211,7 +1214,7 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                     raise ValueError('recover the pending commit before starting another daily batch for this date')
             state = metadata.load_collection_task(task_id)
             if state:
-                if state.get('format_version') != 'daily-batch-v1':
+                if state.get('format_version') not in {'daily-batch-v1', 'daily-batch-v2'}:
                     raise ValueError('historical daily checkpoints are read-only; create a new batch task ID/root')
                 frozen = _load_daily_batch_definition(state, paths)
                 # An explicit new scope cannot be smuggled into a resume operation.
@@ -1235,29 +1238,37 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                 units = expand_daily_units(base, resolved)
                 if not units:
                     raise ValueError('daily batch requires a nonempty security scope')
-                contract = next(c for c in load_input_capabilities(config_root / 'providers.yaml') if c.input_id == resolved['input_id'])
+                available_contracts = {c.input_id: c for c in load_input_capabilities(config_root / 'providers.yaml')}
+                used_input_ids = {unit['input_id'] for unit in units}
+                contracts = {input_id: available_contracts[input_id] for input_id in used_input_ids}
                 for unit in units:
                     if not re.fullmatch(r'[A-Za-z0-9_-]{1,96}', unit['key']) or not re.fullmatch(r'(sh|sz|bj)[0-9]{6}', unit['symbol']):
                         raise ValueError('daily unit requires a safe key and explicit exchange-prefixed security code')
+                    contract = contracts[unit['input_id']]
                     parameters = contract.bind_parameters(unit['context'])
-                    if parameters['code'] != unit['symbol'] or parameters['start'].isoformat() != resolved['trade_date'] or parameters['end'] != parameters['start']:
+                    if (parameters.get('code') != unit['symbol'] or parameters.get('start').isoformat() != resolved['trade_date']
+                            or parameters.get('end') != parameters.get('start')):
                         raise ValueError('daily batch units must match the single frozen date and security')
                     if mode in {'replay', 'retained'} and not unit.get('replay_manifest'):
                         raise ValueError('offline daily batch requires an explicit original response manifest for every unit')
                     if mode == 'live' and unit.get('replay_manifest'):
                         raise ValueError('live daily batch uses matching fresh evidence, not explicit offline response overrides')
-                field_contract, rule = load_input_field_contract(config_root, contract)
-                profile = next(p for p in load_collection_profiles(config_root / 'collection.yaml') if p.name == contract.collection_profile)
+                processing_contracts = {}
+                profiles = {p.name: p for p in load_collection_profiles(config_root / 'collection.yaml')}
+                for input_id, contract in contracts.items():
+                    field_contract, rule = load_input_field_contract(config_root, contract)
+                    profile = profiles[contract.collection_profile]
+                    processing_contracts[input_id] = {'field_contract': field_contract, 'rule': rule,
+                        'cache_max_age_seconds': profile.refresh_interval_seconds or 86400}
                 frozen = {'request': {k: v for k, v in definition.items() if k != 'units'},
                     'request_hash': row_hash(definition), 'definition': {k: v for k, v in resolved.items() if k != 'units'},
-                    'units': units, 'contract': asdict(contract),
-                    'field_contract': field_contract, 'rule': rule, 'mode': mode,
-                    'cache_max_age_seconds': profile.refresh_interval_seconds or 86400}
+                    'units': units, 'contracts': {input_id: asdict(contract) for input_id, contract in contracts.items()},
+                    'processing_contracts': processing_contracts, 'mode': mode}
                 work = paths['workspace_root'] / resolved['trade_date'] / 'daily_bar' / task_id
                 if work.exists():
                     raise ValueError('unmanaged daily workspace exists; use a new task ID/root')
                 save_batch_json(work / 'task.json', frozen)
-                state = {'format_version': 'daily-batch-v1', 'task_id': task_id, 'dataset': 'daily_bar',
+                state = {'format_version': 'daily-batch-v2', 'task_id': task_id, 'dataset': 'daily_bar',
                     'definition_hash': row_hash(frozen), 'definition_ref': {'path': str(work / 'task.json'), 'sha256': file_hash(work / 'task.json')},
                     'status': 'collecting', 'phase': 'prepare', 'requested_date': resolved['trade_date'],
                     'verification_mode': mode, 'source_unit_count': len(units), 'partitions': {}}
@@ -1266,10 +1277,23 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
             work = Path(state['definition_ref']['path']).parent
             if work.is_relative_to(paths['archive_root']) and redo != 'resume':
                 raise ValueError('archived daily batch is read-only; create a new task ID/root for redo')
-            contract_values = dict(frozen['contract'])
-            contract_values['parameters'] = tuple(ParameterBinding(**p) for p in contract_values['parameters'])
-            contract = InputCapabilityConfig(**contract_values)
-            provider = build_input_provider(contract, providers_path=config_root / 'providers.yaml')
+            raw_contracts = frozen.get('contracts') or {frozen['contract']['input_id']: frozen['contract']}
+            contracts = {}
+            for input_id, raw_contract in raw_contracts.items():
+                contract_values = dict(raw_contract)
+                contract_values['parameters'] = tuple(ParameterBinding(**p) for p in contract_values['parameters'])
+                contracts[input_id] = InputCapabilityConfig(**contract_values)
+            if 'processing_contracts' not in frozen:
+                legacy_id = next(iter(contracts))
+                frozen['processing_contracts'] = {legacy_id: {'field_contract': frozen['field_contract'],
+                    'rule': frozen['rule'], 'cache_max_age_seconds': frozen.get('cache_max_age_seconds', 86400)}}
+            for unit in units:
+                contract = contracts[unit['input_id']]
+                unit.setdefault('provider', contract.provider)
+                unit.setdefault('endpoint', contract.endpoint)
+                unit.setdefault('value_contract', 'full_ohlc')
+            providers = {input_id: build_input_provider(contract, providers_path=config_root / 'providers.yaml')
+                for input_id, contract in contracts.items()}
             if redo == 'selected':
                 if not symbols or set(symbols) - {u['symbol'] for u in units}:
                     raise ValueError('selected securities must belong to the frozen scope')
@@ -1341,11 +1365,22 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
             try:
                 # Qualification artifacts and configuration are examined once per
                 # evidence grant. Per-request checks below only inspect expiry/health.
-                qualifications = None
+                qualifications = {}
                 pending_capture = [u for u in active_units if entries.get(u['key'], {}).get('capture_status') != 'captured']
                 if mode != 'replay' and pending_capture:
-                    qualifications = check_daily_batch_qualification(contract, pending_capture, config_root=config_root,
-                        metadata=metadata, now=datetime.now(timezone.utc), execution_mode=mode)
+                    for input_id in sorted({unit['input_id'] for unit in pending_capture}):
+                        grouped = [unit for unit in pending_capture if unit['input_id'] == input_id]
+                        if input_id == 'CSI-INDEX-DAILY-001':
+                            try:
+                                result = check_daily_batch_qualification(contracts[input_id], grouped, config_root=config_root,
+                                    metadata=metadata, now=datetime.now(timezone.utc), execution_mode=mode)
+                                qualifications[input_id] = {'eligible': True, **result}
+                            except (ValueError, KeyError, TypeError, OSError) as exc:
+                                qualifications[input_id] = {'eligible': False, 'input_id': input_id, 'reasons': [str(exc)]}
+                        else:
+                            result = check_daily_batch_qualification(contracts[input_id], grouped, config_root=config_root,
+                                metadata=metadata, now=datetime.now(timezone.utc), execution_mode=mode)
+                            qualifications[input_id] = {'eligible': True, **result}
                     preparation = int(state.get('qualification_attempt', 0)) + 1
                     qualification_path = work / f'qualification.prepare-{preparation}.json'
                     while qualification_path.exists():
@@ -1359,67 +1394,206 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                 state.update(status='collecting', phase='capture', error=None)
                 progress.begin('raw')
                 checkpoint(True)
+                capture_groups, grants_by_key, capture_entries_by_key = {}, {}, {}
                 for unit in active_units:
+                    contract = contracts[unit['input_id']]
+                    provider = providers[unit['input_id']]
+                    qualification = qualifications.get(unit['input_id'])
                     entry = entries.get(unit['key'], {})
                     if entry.get('capture_status') == 'captured':
                         if RawObjectStore.verify_manifest(entry['raw_manifest']) != entry['raw_hash']:
                             raise ValueError('retained daily unit response changed')
                         progress.finish('raw', unit['key'], 'reused')
                         continue
-                    if qualifications:
-                        grant = qualifications['grants'][qualifications['unit_grants'][unit['key']]]
-                        now = datetime.now(timezone.utc)
-                        health = metadata.provider_health(provider=contract.provider, endpoint=contract.endpoint,
-                            capability_version=provider.capability_version, dataset='daily_bar', market=grant['market'], asset_type=unit['asset_type'])
-                        if now >= datetime.fromisoformat(grant['expires_at']) or not metadata.provider_available(health, now):
-                            entry = {'task_id': task_id, 'unit_key': unit['key'], 'key': unit['key'],
-                                'symbol': unit['symbol'], 'asset_type': unit['asset_type'], 'input_id': contract.input_id,
-                                'capture_status': 'blocked', 'process_status': 'blocked', 'status': 'failed',
-                                'error': 'daily qualification expired or source is cooling down', 'failure_class': 'qualification_blocked'}
-                            entries[unit['key']] = entry
-                            save_batch_json(daily_unit_paths(work, unit)['manifest'], entry)
-                            progress.finish('raw', unit['key'], 'failed')
-                            checkpoint()
-                            continue
+                    if qualification and not qualification.get('eligible', False):
+                        entry = {'task_id': task_id, 'unit_key': unit['key'], 'key': unit['key'],
+                            'symbol': unit['symbol'], 'asset_type': unit['asset_type'], 'input_id': unit['input_id'],
+                            'provider': contract.provider, 'endpoint': contract.endpoint,
+                            'capture_status': 'blocked', 'process_status': 'blocked', 'status': 'failed',
+                            'error': '; '.join(qualification.get('reasons', ())), 'failure_class': 'qualification_blocked'}
+                        entries[unit['key']] = entry
+                        save_batch_json(daily_unit_paths(work, unit)['manifest'], entry)
+                        progress.finish('raw', unit['key'], 'failed')
+                        checkpoint()
+                        continue
+                    grant = (qualification['grants'][qualification['unit_grants'][unit['key']]]
+                        if qualification else None)
+                    grants_by_key[unit['key']] = grant
+                    capture_entries_by_key[unit['key']] = entry
+                    capture_groups.setdefault(unit['input_id'], []).append(unit)
+
+                capture_events = Queue()
+                stop_capture = Event()
+                redo_attempt_number = int(state.get('redo_attempt', 0)) + 1
+
+                def capture_source_group(input_id, group_units):
+                    contract = contracts[input_id]
+                    provider = providers[input_id]
                     try:
-                        attempt = max(entry.get('attempt', 0) + 1, state.get('redo_attempt', 0) + 1)
-                        if entry.get('capture_status') == 'failed' and entry.get('temporary_raw'):
-                            RawObjectStore.preserve_request(entry['temporary_raw'], permitted_root=paths['raw_root'] / '_tmp', archive_root=paths['archive_root'])
-                        entry = capture_daily_unit(unit=unit, contract=contract, provider=provider, paths=paths,
-                            task_id=task_id, attempt=attempt,
-                            trade_date=resolved['trade_date'], pacer=pacer, replay_manifest=unit.get('replay_manifest'),
-                            cache_lookup=cache_lookup, max_age_seconds=frozen['cache_max_age_seconds'])
-                        if mode == 'retained' and entry['source_response_hashes'] != grant.get('source_response_hashes'):
-                            raise ValueError('retained response bytes differ from qualified daily evidence')
-                        if qualifications:
-                            entry.update(qualification_ref=state['qualification_ref'],
-                                qualification_grant=qualifications['unit_grants'][unit['key']])
-                        if failure_hook:
-                            failure_hook('after_raw_before_unit_index')
-                    except (ProviderContractError, requests.RequestException) as exc:
-                        parameters = contract.bind_parameters(unit['context'])
-                        temporary = RawObjectStore.task_unit_path(paths['raw_root'], provider=contract.provider,
-                            endpoint=contract.endpoint, data_date=resolved['trade_date']) / RawObjectStore.request_manifest_name(parameters, input_id=contract.input_id)
-                        entry = {'task_id': task_id, 'unit_key': unit['key'], 'key': unit['key'], 'symbol': unit['symbol'],
-                            'asset_type': unit['asset_type'], 'input_id': contract.input_id, 'capture_status': 'failed',
-                            'process_status': 'blocked', 'status': 'failed', 'error': str(exc), 'failure_class': type(exc).__name__,
-                            'attempt': attempt, 'temporary_raw': str(temporary), 'raw_manifest': str(temporary) if temporary.exists() else None}
-                        if mode == 'live' and temporary.exists():
-                            events = [json.loads(line) for line in temporary.read_text(encoding='utf-8').splitlines()]
-                            throttled = next((e['status_code'] for e in events if e.get('mode') == 'live' and e.get('status_code') in {403, 429}), None)
-                            if throttled:
-                                metadata.record_provider_failure(provider=contract.provider, endpoint=contract.endpoint,
-                                    capability_version=provider.capability_version, dataset='daily_bar', market=grant['market'],
-                                    asset_type=unit['asset_type'], failure_class='rate_limited' if throttled == 429 else 'forbidden',
-                                    error=f'HTTP {throttled}', now=datetime.now(timezone.utc), http_status=throttled, cooldown_seconds=300)
-                    entries[unit['key']] = entry
-                    save_batch_json(daily_unit_paths(work, unit)['manifest'], entry)
-                    progress.finish('raw', unit['key'], 'failed' if entry['capture_status'] == 'failed' else
-                        'success' if entry.get('live_http_calls') else 'reused')
-                    checkpoint(entry['capture_status'] == 'failed')
+                        for unit in group_units:
+                            if stop_capture.is_set():
+                                break
+                            permit, decision = Event(), {}
+                            capture_events.put(('before', unit, permit, decision))
+                            permit.wait()
+                            if not decision.get('capture'):
+                                if stop_capture.is_set():
+                                    break
+                                continue
+                            grant = grants_by_key[unit['key']]
+                            entry = capture_entries_by_key[unit['key']]
+                            attempt = max(entry.get('attempt', 0) + 1, redo_attempt_number)
+                            try:
+                                if entry.get('capture_status') == 'failed' and entry.get('temporary_raw'):
+                                    RawObjectStore.preserve_request(entry['temporary_raw'],
+                                        permitted_root=paths['raw_root'] / '_tmp', archive_root=paths['archive_root'])
+                                entry = capture_daily_unit(unit=unit, contract=contract, provider=provider, paths=paths,
+                                    task_id=task_id, attempt=attempt, trade_date=resolved['trade_date'], pacer=pacer,
+                                    replay_manifest=unit.get('replay_manifest'), cache_lookup=cache_lookup,
+                                    max_age_seconds=frozen['processing_contracts'][input_id]['cache_max_age_seconds'])
+                                if mode == 'retained' and entry['source_response_hashes'] != (grant or {}).get('source_response_hashes'):
+                                    raise ValueError('retained response bytes differ from qualified daily evidence')
+                                if grant:
+                                    entry.update(qualification_ref=state['qualification_ref'],
+                                        qualification_grant=qualifications[input_id]['unit_grants'][unit['key']])
+                                if failure_hook:
+                                    failure_hook('after_raw_before_unit_index')
+                                capture_error = None
+                            except (ProviderContractError, requests.RequestException) as exc:
+                                parameters = contract.bind_parameters(unit['context'])
+                                temporary = RawObjectStore.task_unit_path(paths['raw_root'], provider=contract.provider,
+                                    endpoint=contract.endpoint, data_date=resolved['trade_date']) / RawObjectStore.request_manifest_name(
+                                        parameters, input_id=contract.input_id)
+                                entry = {'task_id': task_id, 'unit_key': unit['key'], 'key': unit['key'],
+                                    'symbol': unit['symbol'], 'asset_type': unit['asset_type'], 'input_id': contract.input_id,
+                                    'capture_status': 'failed', 'process_status': 'blocked', 'status': 'failed',
+                                    'error': str(exc), 'failure_class': type(exc).__name__, 'attempt': attempt,
+                                    'temporary_raw': str(temporary), 'raw_manifest': str(temporary) if temporary.exists() else None}
+                                capture_error = exc
+                            except Exception as exc:
+                                capture_events.put(('fatal', unit, exc))
+                                stop_capture.set()
+                                break
+                            acknowledged = Event()
+                            capture_events.put(('result', unit, entry, capture_error, grant, acknowledged))
+                            acknowledged.wait()
+                            if stop_capture.is_set():
+                                break
+                    finally:
+                        capture_events.put(('done', input_id))
+
+                source_groups = sorted(capture_groups.items())
+                if source_groups:
+                    # Create shared raw/archive parents on the coordinator before
+                    # workers start; simultaneous recursive mkdir is unreliable
+                    # on Windows when the isolated run root is still empty.
+                    for input_id, _group_units in source_groups:
+                        contract = contracts[input_id]
+                        raw_directory = RawObjectStore.task_unit_path(paths['raw_root'],
+                            provider=contract.provider, endpoint=contract.endpoint,
+                            data_date=resolved['trade_date'])
+                        (raw_directory / 'bodies').mkdir(parents=True, exist_ok=True)
+                    (paths['archive_root'] / '_raw_evidence' / task_id).mkdir(parents=True, exist_ok=True)
+                    with ThreadPoolExecutor(max_workers=len(source_groups), thread_name_prefix='daily-source') as executor:
+                        futures = [executor.submit(capture_source_group, input_id, group_units)
+                            for input_id, group_units in source_groups]
+                        completed_groups, fatal_error = 0, None
+                        pending_signals = set()
+                        try:
+                            while completed_groups < len(source_groups):
+                                message = capture_events.get()
+                                kind = message[0]
+                                if kind == 'before':
+                                    _, unit, permit, decision = message
+                                    pending_signals.add(permit)
+                                    try:
+                                        grant = grants_by_key[unit['key']]
+                                        if fatal_error is not None or stop_capture.is_set():
+                                            decision['capture'] = False
+                                        elif grant:
+                                            contract, provider = contracts[unit['input_id']], providers[unit['input_id']]
+                                            now = datetime.now(timezone.utc)
+                                            health = metadata.provider_health(provider=contract.provider, endpoint=contract.endpoint,
+                                                capability_version=provider.capability_version, dataset='daily_bar',
+                                                market=grant['market'], asset_type=unit['asset_type'])
+                                            if now >= datetime.fromisoformat(grant['expires_at']) or not metadata.provider_available(health, now):
+                                                entry = {'task_id': task_id, 'unit_key': unit['key'], 'key': unit['key'],
+                                                    'symbol': unit['symbol'], 'asset_type': unit['asset_type'], 'input_id': contract.input_id,
+                                                    'capture_status': 'blocked', 'process_status': 'blocked', 'status': 'failed',
+                                                    'error': 'daily qualification expired or source is cooling down',
+                                                    'failure_class': 'qualification_blocked'}
+                                                entries[unit['key']] = entry
+                                                save_batch_json(daily_unit_paths(work, unit)['manifest'], entry)
+                                                progress.finish('raw', unit['key'], 'failed')
+                                                checkpoint()
+                                                decision['capture'] = False
+                                            else:
+                                                decision['capture'] = True
+                                        else:
+                                            decision['capture'] = True
+                                    finally:
+                                        permit.set()
+                                        pending_signals.discard(permit)
+                                elif kind == 'result':
+                                    _, unit, entry, capture_error, grant, acknowledged = message
+                                    pending_signals.add(acknowledged)
+                                    try:
+                                        contract, provider = contracts[unit['input_id']], providers[unit['input_id']]
+                                        if capture_error is not None and mode == 'live' and entry.get('temporary_raw'):
+                                            temporary = Path(entry['temporary_raw'])
+                                            if temporary.exists():
+                                                raw_events = [json.loads(line) for line in temporary.read_text(encoding='utf-8').splitlines()]
+                                                throttled = next((event['status_code'] for event in raw_events
+                                                    if event.get('mode') == 'live' and event.get('status_code') in {403, 429}), None)
+                                                if throttled and grant:
+                                                    metadata.record_provider_failure(provider=contract.provider, endpoint=contract.endpoint,
+                                                        capability_version=provider.capability_version, dataset='daily_bar', market=grant['market'],
+                                                        asset_type=unit['asset_type'], failure_class='rate_limited' if throttled == 429 else 'forbidden',
+                                                        error=f'HTTP {throttled}', now=datetime.now(timezone.utc),
+                                                        http_status=throttled, cooldown_seconds=300)
+                                        entries[unit['key']] = entry
+                                        save_batch_json(daily_unit_paths(work, unit)['manifest'], entry)
+                                        progress.finish('raw', unit['key'], 'failed' if entry['capture_status'] == 'failed' else
+                                            'success' if entry.get('live_http_calls') else 'reused')
+                                        checkpoint(entry['capture_status'] == 'failed')
+                                    finally:
+                                        acknowledged.set()
+                                        pending_signals.discard(acknowledged)
+                                elif kind == 'fatal':
+                                    _, unit, exc = message
+                                    if fatal_error is None:
+                                        fatal_error = exc
+                                    stop_capture.set()
+                                elif kind == 'done':
+                                    completed_groups += 1
+                        except Exception:
+                            stop_capture.set()
+                            for signal in tuple(pending_signals):
+                                signal.set()
+                            while completed_groups < len(source_groups):
+                                message = capture_events.get()
+                                if message[0] == 'before':
+                                    message[3]['capture'] = False
+                                    message[2].set()
+                                elif message[0] == 'result':
+                                    message[-1].set()
+                                elif message[0] == 'done':
+                                    completed_groups += 1
+                            for future in futures:
+                                try:
+                                    future.result()
+                                except Exception:
+                                    pass
+                            raise
+                        for future in futures:
+                            future.result()
+                    if fatal_error is not None:
+                        raise fatal_error
                 state.update(status='checking', phase='process')
                 checkpoint(True)
                 for unit in active_units:
+                    contract = contracts[unit['input_id']]
+                    provider = providers[unit['input_id']]
                     entry = entries[unit['key']]
                     if entry.get('process_status') == 'candidate_complete':
                         if file_hash(Path(entry['artifact'])) != entry['artifact_hash'] or file_hash(Path(entry['report_path'])) != entry['report_hash']:
@@ -1430,8 +1604,9 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                         progress.finish('processing', unit['key'], 'skipped')
                         continue
                     try:
+                        processing = frozen['processing_contracts'][unit['input_id']]
                         entry = process_daily_unit(unit=unit, entry=entry, provider=provider, contract=contract,
-                            field_contract=frozen['field_contract'], rule=frozen['rule'], work=work)
+                            field_contract=processing['field_contract'], rule=processing['rule'], work=work)
                         if failure_hook:
                             failure_hook('after_candidate_before_checkpoint')
                     except (ProviderContractError, NormalizationError) as exc:
@@ -1448,6 +1623,7 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                     group = [u for u in units if u['asset_type'] == asset]
                     source_rows, promotions = {}, []
                     for unit in group:
+                        contract = contracts[unit['input_id']]
                         entry = entries.get(unit['key'], {})
                         if entry.get('process_status') != 'candidate_complete':
                             continue

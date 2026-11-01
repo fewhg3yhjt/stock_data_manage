@@ -152,12 +152,14 @@ capabilities:
         adjustments: [none]
         role: validation_only
 
-# Explicit acquisition policy. One formal provider is enabled; no implied second source.
+# Daily routes are explicit: Tencent is the default, and each override names a
+# bounded code set and data contract. No unconfigured source fallback is implied.
 acquisition_policies:
   daily_fixed:
     mode: fixed
     inputs:
       - input_id: ASTOCK-002-daily
+        default: true
         market_adjustment_requests:
           XSHG:
             none: {api: newfqkline, adjust: none}
@@ -171,3 +173,10 @@ acquisition_policies:
             none: {api: newfqkline, adjust: none}
             forward: {api: newfqkline, adjust: qfq}
             backward: {api: newfqkline, adjust: hfq}
+      - input_id: CSI-INDEX-DAILY-001
+        asset_type: index
+        symbols: [sh000816, sh000833, sh000842, sh000939, sh000940, sh000950, sh000951, sh000957, sh000958, sh000963, sh000975]
+        value_contract: close_only
+        market_adjustment_requests:
+          XSHG:
+            none: {api: index-perf, adjust: none}

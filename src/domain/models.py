@@ -178,16 +178,24 @@ class QuoteGroup:
     reason: str = ""
     evidence_ref: str = ""
     flags: tuple[str, ...] = ()
+    value_contract: str = "full_ohlc"
 
     def __post_init__(self):
         if not isinstance(self.status, QuoteStatus):
             raise ValueError("quote status must be explicit")
+        if self.value_contract not in {"full_ohlc", "close_only"}:
+            raise ValueError("daily value contract must be full_ohlc or close_only")
         values = (self.open, self.high, self.low, self.close)
         if self.status is QuoteStatus.AVAILABLE:
-            if not all(isinstance(v, Decimal) and v.is_finite() and v > 0 for v in values):
-                raise ValueError("available quote requires finite positive OHLC")
-            if not self.low <= min(self.open, self.close) <= max(self.open, self.close) <= self.high:
-                raise ValueError("invalid OHLC ordering")
+            if self.value_contract == "full_ohlc":
+                if not all(isinstance(v, Decimal) and v.is_finite() and v > 0 for v in values):
+                    raise ValueError("full OHLC quote requires finite positive OHLC")
+                if not self.low <= min(self.open, self.close) <= max(self.open, self.close) <= self.high:
+                    raise ValueError("invalid OHLC ordering")
+            elif (any(value is not None for value in (self.open, self.high, self.low))
+                    or not isinstance(self.close, Decimal) or not self.close.is_finite() or self.close <= 0
+                    or self.volume is not None or self.amount is not None):
+                raise ValueError("close-only quote requires only a finite positive close")
             if not self.source_provider or not self.endpoint or not self.raw_object_path or self.fetch_time is None or self.fetch_time.utcoffset() is None:
                 raise ValueError("available quote requires source evidence and aware fetch time")
             if any(v is not None and (not isinstance(v, Decimal) or not v.is_finite() or v < 0) for v in (self.volume, self.amount)):
@@ -196,6 +204,8 @@ class QuoteGroup:
             raise ValueError("unavailable quote cannot contain copied prices")
         elif not self.reason:
             raise ValueError("unavailable quote requires a reason")
+        elif self.value_contract != "full_ohlc":
+            raise ValueError("unavailable quote cannot declare a delivered value contract")
         if self.status is QuoteStatus.NOT_APPLICABLE and not self.evidence_ref:
             raise ValueError("not-applicable quote requires applicability evidence")
 
@@ -237,10 +247,16 @@ class DailyRecord:
         if self.none.status is not QuoteStatus.AVAILABLE:
             return False
         if self.asset_type is AssetType.STOCK:
-            return all(q.status is QuoteStatus.AVAILABLE for q in self.quotes.values())
+            return all(q.status is QuoteStatus.AVAILABLE and q.value_contract == "full_ohlc" for q in self.quotes.values())
         allowed = {QuoteStatus.AVAILABLE, QuoteStatus.NOT_APPLICABLE}
         if self.asset_type in {AssetType.ETF, AssetType.INDEX}:
             # Their required default quote is publishable while optional
             # adjustment slots explicitly retain unverified applicability.
             allowed.add(QuoteStatus.UNVERIFIED)
-        return all(q.status in allowed for q in self.quotes.values())
+        if not all(q.status in allowed for q in self.quotes.values()):
+            return False
+        if self.none.value_contract == "close_only":
+            return (self.asset_type is AssetType.INDEX and self.none.status is QuoteStatus.AVAILABLE
+                and all(self.quotes[name].status in {QuoteStatus.UNVERIFIED, QuoteStatus.NOT_APPLICABLE}
+                        for name in ("forward", "backward")))
+        return all(q.status is not QuoteStatus.AVAILABLE or q.value_contract == "full_ohlc" for q in self.quotes.values())

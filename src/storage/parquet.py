@@ -52,13 +52,21 @@ BAR_SCHEMA = pa.schema(
 )
 
 
-DAILY_SCHEMA_VERSION = "daily-aggregate-v1"
-QUOTE_SCHEMA = pa.struct([
-    ("status", pa.string()), *[(name, pa.decimal128(38, 8)) for name in ("open", "high", "low", "close", "volume", "amount")],
+DAILY_SCHEMA_V1_VERSION = "daily-aggregate-v1"
+DAILY_SCHEMA_VERSION = "daily-aggregate-v2"
+_QUOTE_VALUE_FIELDS = [(name, pa.decimal128(38, 8)) for name in ("open", "high", "low", "close", "volume", "amount")]
+_QUOTE_EVIDENCE_FIELDS = [
     *[(name, pa.string()) for name in ("source_provider", "endpoint", "raw_object_path")],
     ("fetch_time", pa.timestamp("us", tz="Asia/Shanghai")),
     *[(name, pa.string()) for name in ("normalizer_version", "capability_version", "reason", "evidence_ref")],
     ("flags", pa.list_(pa.string())),
+]
+QUOTE_SCHEMA_V1 = pa.struct([("status", pa.string()), *_QUOTE_VALUE_FIELDS, *_QUOTE_EVIDENCE_FIELDS])
+QUOTE_SCHEMA = pa.struct([("status", pa.string()), ("value_contract", pa.string()), *_QUOTE_VALUE_FIELDS, *_QUOTE_EVIDENCE_FIELDS])
+DAILY_SCHEMA_V1 = pa.schema([
+    ("instrument_id", pa.string()), ("trade_date", pa.date32()), ("asset_type", pa.string()),
+    ("value_kind", pa.string()), ("quote_unit", pa.string()),
+    ("quotes", pa.struct([(a.value, QUOTE_SCHEMA_V1) for a in Adjustment])),
 ])
 DAILY_SCHEMA = pa.schema([
     ("instrument_id", pa.string()), ("trade_date", pa.date32()), ("asset_type", pa.string()),
@@ -282,12 +290,13 @@ class CanonicalPartitionStore:
         if not data.exists() or not descriptor.exists():
             raise InvalidPartitionError("daily aggregate partition is incomplete")
         manifest = Manifest.load(descriptor)
-        if (manifest.schema_version != DAILY_SCHEMA_VERSION or manifest.adjustment != "aggregate"
+        expected_schema = {DAILY_SCHEMA_V1_VERSION: DAILY_SCHEMA_V1, DAILY_SCHEMA_VERSION: DAILY_SCHEMA}.get(manifest.schema_version)
+        if (expected_schema is None or manifest.adjustment != "aggregate"
                 or manifest.dataset != "daily_bar" or manifest.asset_type != asset_type or manifest.partition_key != partition_key
                 or not manifest.verify(data)):
             raise InvalidPartitionError("daily aggregate manifest is incompatible or corrupt")
         table = pq.read_table(data)
-        if not table.schema.equals(DAILY_SCHEMA) or len(table) != manifest.row_count:
+        if not table.schema.equals(expected_schema) or len(table) != manifest.row_count:
             raise InvalidPartitionError("daily aggregate schema or row count differs")
         records = [mapping_to_daily(row) for row in table.to_pylist()]
         if len({r.key for r in records}) != len(records) or any(r.trade_date.isoformat() != partition_key or r.asset_type.value != asset_type for r in records):

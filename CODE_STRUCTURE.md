@@ -77,7 +77,7 @@
 |---|---|
 | `providers/base.py` | 日线、分钟等 Provider 协议以及 Fixture Provider 基础实现 |
 | `providers/contracts.py` | HTTP 响应、失败分类、返回窗口和 Provider Contract |
-| `providers/transport.py` | 公共 HTTP 传输、共享请求组限速、单项输入会话捕获与严格回放、快照和 TDX 行解析；保留来源会话/代理并复用原验证重试策略 |
+| `providers/transport.py` | 公共 HTTP 传输、线程隔离的请求捕获、共享主机限速与严格回放；保留来源会话/代理并复用原验证重试策略 |
 | `providers/tencent/daily.py` | 腾讯日线响应采集与纯解析分离；保留来源窗口原行和失败合同，默认复权探测使用`newfqkline`；窗口采集只因明确的连接、超时或5xx故障按接口对应主机顺序切换，不因业务内容问题换源 |
 | `providers/tencent/snapshot.py` | Tencent 指定证券分批快照、原脚本来源字段、代码/格式/重复验证及请求范围覆盖；GBK解码和旧行情行保留，全市场在线验证待完成 |
 | `providers/tencent/minute.py` | Tencent 原生 1m 分钟线与最近 5m 候选输入 |
@@ -100,6 +100,7 @@
 | `providers/eastmoney/__init__.py` | EastMoney 适配器导出 |
 | `providers/akshare/session.py` | AkShare 可选依赖加载和代码转换 |
 | `providers/akshare/daily.py` | AkShare 股票、ETF、LOF、指数函数级历史日线 |
+| `providers/csindex/indices.py` | CSIndex 指数收盘序列和既有成分/估值工作簿适配；日线只接收明确配置的上海中证指数，在线资格尚未启用 |
 | `providers/sse/market.py` | 上交所既有风险指标和ETF份额；复用原SDK接入指定统计日普通ETF身份，复用已验证官网请求接入交易型货币ETF身份；原份额接口不变 |
 | `providers/exchanges/daily.py` | 交易所期货、期权和排名日数据；复用深交所原SDK接入指定统计日ETF身份，逐项核对原XLSX以防SDK删行掩盖问题 |
 | `providers/akshare/boards.py` | 原 AkShare 同花顺行业目录、行业指数日线和行业/概念资金流快照；YAML 名称映射、保留旧返回并提供 SDK 原列与身份上下文 |
@@ -144,8 +145,8 @@
 
 | 文件 | 职责 |
 |---|---|
-| `pipeline/daily.py` | 日线规则冻结、按类型/口径展开；独立的响应采集操作和零联网解析/归一化操作；逐单元产物命名与原子保存；完整记录聚合和覆盖检查 |
-| `pipeline/inputs.py` | 正式日线批执行入口：一次准备、整批采集、整批处理、按类型发布；小型检查点引用冻结定义与分区提交文件，复用现有发布恢复；单输入诊断、证券名单与其他流程保留各自职责 |
+| `pipeline/daily.py` | 日线规则冻结、按证券单元选用配置来源和显式 `full_ohlc/close_only` 合同；独立响应采集与零联网解析/归一化；逐单元产物命名和原子保存；完整记录聚合和覆盖检查 |
+| `pipeline/inputs.py` | 正式日线批执行入口：一次准备、按来源组并发采集、整批处理、按类型发布；检查点按输入来源冻结合同并复用现有发布恢复；单输入诊断、证券名单与其他流程保留各自职责 |
 | `pipeline/daily_reconciliation.py` | 只接收范围完整的三口径日线记录，并复用规范分区发布；快照候选不在此提升为正式日线 |
 | `pipeline/minute.py` | Watchlist 实时分钟采集和 Hot Store 写入 |
 | `pipeline/minute_reconciliation.py` | 分钟盘后校准、final 提升、冲突隔离和完整性处理 |

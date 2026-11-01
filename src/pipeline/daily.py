@@ -32,7 +32,7 @@ def save_batch_json(path, value):
 
 
 def daily_unit_paths(work, unit):
-    base = Path(work) / "sources" / "tencent" / "kline_daily" / unit["key"]
+    base = Path(work) / "sources" / unit.get("provider", "tencent") / unit.get("endpoint", "kline_daily") / unit["key"]
     return {name: base.with_name(base.name + suffix) for name, suffix in
             {"manifest": ".manifest.json", "report": ".report.json", "candidate": ".normalized.parquet",
              "source": ".source_rows.json"}.items()}
@@ -114,9 +114,10 @@ def process_daily_unit(*, unit, entry, provider, contract, field_contract, rule,
             event.get("response_headers", {}), RawObjectStore.read_response(manifest, event)), url.netloc),)}
     fetched = provider.parse_window(captured)
     exchange = _daily_market(unit["symbol"])
+    value_contract = unit.get("value_contract", "full_ohlc")
     context = {"provider": contract.provider, "endpoint": contract.endpoint, **fetched.mapping_context,
-        "instrument_id": exchange + ":" + unit["symbol"][2:], "exchange": exchange,
-        "asset_type": unit["asset_type"], "adjustment": unit["adjustment"]}
+        "instrument_id": unit.get("instrument_id") or exchange + ":" + unit["symbol"][2:], "exchange": exchange,
+        "asset_type": unit["asset_type"], "adjustment": unit["adjustment"], "value_contract": value_contract}
     if fetched.mapping_context.get("adjustment") != unit["adjustment"]:
         raise NormalizationError("requested adjustment differs from returned source series")
     rows = [Normalizer.normalize_fields(row, rule=rule, fields=field_contract["fields"],
@@ -124,8 +125,18 @@ def process_daily_unit(*, unit, entry, provider, contract, field_contract, rule,
     if len(rows) != 1 or rows[0]["trade_date"] != parameters["start"]:
         raise NormalizationError("one daily unit must yield exactly its frozen target date")
     row = rows[0]
-    if not (row["low"] <= min(row["open"], row["close"]) <= max(row["open"], row["close"]) <= row["high"]):
-        raise NormalizationError("invalid OHLC ordering")
+    if row.get("value_contract") != value_contract:
+        raise NormalizationError("normalized value contract differs from the frozen source unit")
+    if value_contract == "full_ohlc":
+        if not all(isinstance(row.get(name), Decimal) and row[name] > 0 for name in ("open", "high", "low", "close")):
+            raise NormalizationError("full OHLC unit is missing a positive price field")
+        if not (row["low"] <= min(row["open"], row["close"]) <= max(row["open"], row["close"]) <= row["high"]):
+            raise NormalizationError("invalid OHLC ordering")
+    elif (value_contract != "close_only" or unit["asset_type"] != "index" or unit["adjustment"] != "none"
+            or any(row.get(name) is not None for name in ("open", "high", "low"))
+            or row.get("volume") is not None or row.get("amount") is not None
+            or not isinstance(row.get("close"), Decimal) or row["close"] <= 0):
+        raise NormalizationError("close-only data is permitted only for a positive index close with empty OHLC and volume/amount")
     unit_contract = Normalizer.match_unit_contract(rule, context)
     artifact_paths = daily_unit_paths(work, unit)
     if artifact_paths["candidate"].exists():
@@ -139,6 +150,7 @@ def process_daily_unit(*, unit, entry, provider, contract, field_contract, rule,
     report = {"dataset": "daily_bar", "data_date": parameters['start'].isoformat(), "asset_type": unit['asset_type'],
         "input_id": contract.input_id, "provider": contract.provider, "endpoint": contract.endpoint,
         "status": "candidate_complete", "row_count": len(rows), "parameters": parameters,
+        "value_contract": value_contract,
         "adapter_version": provider.capability_version, "normalization_version": rule["version"],
         "source_response_hashes": entry["source_response_hashes"], "raw_manifest": str(manifest),
         "source_rows": {"path": str(artifact_paths['source'].relative_to(work)),
@@ -209,30 +221,50 @@ def resolve_daily_definition(definition, config_root):
     policy_name = definition.get("acquisition_policy", "daily_fixed")
     policies = yaml.safe_load((config_root / "capabilities.yaml").read_text(encoding="utf-8"))["acquisition_policies"]
     policy = deepcopy(policies[policy_name])
-    if policy["mode"] not in {"fixed", "failover"} or len(policy["inputs"]) != 1:
-        raise ValueError("first offline daily integration permits one explicitly configured formal input")
-    source = policy["inputs"][0]
-    if source["input_id"] != "ASTOCK-002-daily":
-        raise ValueError("daily formal input is not implemented")
-    market_requests = source.get("market_adjustment_requests")
-    if not isinstance(market_requests, dict) or set(market_requests) != set(_DAILY_MARKET_BY_PREFIX.values()):
-        raise ValueError("daily source policy must explicitly cover XSHG, XSHE and BSE")
-    for market, requests in market_requests.items():
-        if not isinstance(requests, dict) or set(requests) != set(_DAILY_ADJUSTMENT_TOKEN):
-            raise ValueError(f"daily source policy for {market} must declare all three adjustment requests")
-        for adjustment, request in requests.items():
-            if (not isinstance(request, dict) or set(request) != {"api", "adjust"}
-                    or request["adjust"] != _DAILY_ADJUSTMENT_TOKEN[adjustment]):
-                raise ValueError(f"daily source policy has an invalid {market}/{adjustment} request")
-    if definition.get("input_id", source["input_id"]) != source["input_id"]:
-        raise ValueError("forced source is outside the configured acquisition policy")
-    return {**definition, "asset_type": asset, "input_id": source["input_id"],
+    if policy["mode"] not in {"fixed", "failover"} or not isinstance(policy.get("inputs"), list) or not policy["inputs"]:
+        raise ValueError("daily source policy requires an explicit nonempty input list")
+    contracts = {item.input_id: item for item in load_input_capabilities(config_root / "providers.yaml")}
+    defaults = [item for item in policy["inputs"] if item.get("default") is True]
+    if len(defaults) != 1 or defaults[0]["input_id"] != "ASTOCK-002-daily":
+        raise ValueError("daily source policy requires exactly one Tencent default route")
+    seen_symbols = set()
+    for source in policy["inputs"]:
+        input_id = source.get("input_id")
+        capability = contracts.get(input_id)
+        if capability is None or capability.dataset != "daily_bar" or capability.implementation_status != "implemented_validation_only":
+            raise ValueError(f"daily route has no implemented validation-only input: {input_id}")
+        if input_id == "ASTOCK-002-daily":
+            market_requests = source.get("market_adjustment_requests")
+            if not isinstance(market_requests, dict) or set(market_requests) != set(_DAILY_MARKET_BY_PREFIX.values()):
+                raise ValueError("daily Tencent route must explicitly cover XSHG, XSHE and BSE")
+            for market, requests in market_requests.items():
+                if not isinstance(requests, dict) or set(requests) != set(_DAILY_ADJUSTMENT_TOKEN):
+                    raise ValueError(f"daily source policy for {market} must declare all three adjustment requests")
+                for adjustment, request in requests.items():
+                    if (not isinstance(request, dict) or set(request) != {"api", "adjust"}
+                            or request["adjust"] != _DAILY_ADJUSTMENT_TOKEN[adjustment]):
+                        raise ValueError(f"daily source policy has an invalid {market}/{adjustment} request")
+        else:
+            symbols = source.get("symbols")
+            if (input_id != "CSI-INDEX-DAILY-001" or not isinstance(symbols, list) or not symbols
+                    or source.get("asset_type") != "index" or source.get("value_contract") != "close_only"):
+                raise ValueError("non-default daily routes require explicit code scope and value contract")
+            if set(source.get("market_adjustment_requests", {})) != {"XSHG"} or set(source["market_adjustment_requests"]["XSHG"]) != {"none"}:
+                raise ValueError("CSI daily route must explicitly cover only XSHG unadjusted close")
+            for symbol in symbols:
+                if not isinstance(symbol, str) or not symbol.startswith("sh") or not symbol[2:].isdigit() or len(symbol) != 8 or symbol in seen_symbols:
+                    raise ValueError("CSI daily route symbols must be unique six-digit Shanghai codes")
+                seen_symbols.add(symbol)
+        source["provider"], source["endpoint"] = capability.provider, capability.endpoint
+    default = defaults[0]
+    if definition.get("input_id", default["input_id"]) != default["input_id"]:
+        raise ValueError("forced source is outside the configured default acquisition policy")
+    return {**definition, "asset_type": asset, "input_id": default["input_id"],
             "acquisition_policy": policy_name, "source_policy": policy,
             "quote_contract": contract, "schema_version": DAILY_SCHEMA_VERSION,
             "contract_versions": {name: file_hash(config_root / name) for name in
                 ("datasets/daily_bar.yaml", "normalization/daily_bar.yaml")},
-            "source_contract_version": row_hash(asdict(next(c for c in load_input_capabilities(config_root / "providers.yaml")
-                if c.input_id == source["input_id"]))),
+            "source_contract_version": row_hash(asdict(contracts[default["input_id"]])),
             "publication_policy": deepcopy(document["dataset"]["publication"])}
 
 
@@ -249,18 +281,30 @@ def expand_daily_units(units, definition):
         if len({u["key"] for u in expanded}) != len(expanded):
             raise ValueError("daily batch source units must be unique")
         return expanded
-    requests_by_market = definition["source_policy"]["inputs"][0]["market_adjustment_requests"]
+    units = [deepcopy(unit) for unit in units]
+    sources = definition["source_policy"]["inputs"]
+    default_source = next(source for source in sources if source.get("default") is True)
+    override_by_symbol = {symbol: source for source in sources if source is not default_source
+                          for symbol in source["symbols"]}
     expanded = []
     target_limit = definition["source_policy"].get("max_symbols")
     if target_limit is not None and len({u.get("symbol") for u in units}) > int(target_limit):
         raise ValueError(f"daily task exceeds configured symbol limit {target_limit}")
     for unit in units:
+        source = override_by_symbol.get(unit.get("symbol"), default_source)
+        if source is not default_source and unit.get("asset_type", definition["asset_type"]) != source.get("asset_type"):
+            raise ValueError(f"daily source route for {unit.get('symbol')} is restricted to {source.get('asset_type')}")
+        requests_by_market = source["market_adjustment_requests"]
         market = _daily_market(unit.get("symbol", ""))
         requests = requests_by_market.get(market)
         if requests is None:
             raise ValueError(f"daily source policy has no route for market {market}")
+        value_contract = source.get("value_contract", "full_ohlc")
         if "adjustment" in unit:
-            expanded.append(unit)
+            item = deepcopy(unit)
+            item.update(input_id=source["input_id"], provider=source["provider"], endpoint=source["endpoint"],
+                        value_contract=value_contract)
+            expanded.append(item)
             continue
         if set(unit.get("context", {}).get("config", {})) & {"api", "adjust"}:
             raise ValueError("daily adjustment request parameters belong to the acquisition policy")
@@ -270,17 +314,21 @@ def expand_daily_units(units, definition):
             if state != "required":
                 continue
             item = deepcopy(unit)
-            item.update(key=unit["symbol"] + "__" + name, adjustment=name, asset_type=definition["asset_type"])
+            item.update(key=unit["symbol"] + "__" + name, adjustment=name, asset_type=definition["asset_type"],
+                        input_id=source["input_id"], provider=source["provider"], endpoint=source["endpoint"],
+                        value_contract=value_contract)
             item["context"].setdefault("config", {}).update(requests[name])
             manifests = item.pop("replay_manifests", {})
             if name in manifests:
                 item["replay_manifest"] = manifests[name]
             expanded.append(item)
     for unit in expanded:
-        market_requests = requests_by_market.get(_daily_market(unit.get("symbol", "")))
+        source = next((item for item in sources if item["input_id"] == unit["input_id"]), None)
+        market_requests = source["market_adjustment_requests"].get(_daily_market(unit.get("symbol", ""))) if source else None
         expected_request = market_requests.get(unit["adjustment"]) if market_requests else None
-        if (unit["input_id"] != definition["input_id"] or definition["quote_contract"].get(unit["adjustment"]) != "required"
-                or expected_request is None or unit["context"].get("config", {}) != expected_request):
+        if (definition["quote_contract"].get(unit["adjustment"]) != "required"
+                or expected_request is None or unit["context"].get("config", {}) != expected_request
+                or unit.get("provider") != source["provider"] or unit.get("endpoint") != source["endpoint"]):
             raise ValueError("daily source unit conflicts with frozen acquisition policy")
     return expanded
 
@@ -338,6 +386,7 @@ def prepare_daily_task_publication(state, units, source_rows, paths, config_root
             source_provider=source["contract"].provider, endpoint=source["contract"].endpoint,
             raw_object_path=source["raw_ref"], fetch_time=_source_capture_time(source["raw_ref"]),
             normalizer_version=report["normalization_version"], capability_version=report["adapter_version"],
+            value_contract=row.get("value_contract", unit.get("value_contract", "full_ohlc")),
             flags=tuple(report.get("unit_precision_flags", ())) + tuple(
                 "unit_unverified:" + field for field in report.get("unverified_fields", ())
                 if field in {"volume", "amount"}))

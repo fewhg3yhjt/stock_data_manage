@@ -13,7 +13,7 @@ rules:
     adjustment_mapping: {none: none, qfq: forward, hfq: backward}
     code_prefixes: [sh, sz, bj]
     field_mapping: {trade_date: "0", open: "1", high: "3", low: "4", close: "2", volume: "5", amount: "8"}
-    context_fields: {instrument_id: instrument_id, adjustment: adjustment}
+    context_fields: {instrument_id: instrument_id, adjustment: adjustment, value_contract: value_contract}
     null_values: [null, "", "-", "--", "None", "null"]
     source_required_numeric: ["1", "2", "3", "4", "5"]
     transforms:
@@ -85,6 +85,28 @@ rules:
     version: tencent-window-input-v9
     evidence_refs: [ASTOCK-002]
     notes: daily_fixed三口径使用newfqkline的day/qfqday/hfqday，不重算复权价格。单位合同匹配来源、类型、市场、代码段和实际序列，日期不是白名单；BSE92股票单位基于920001的2026-10-29用户截图、量为手的明确确认及三序列原响应对照，金额只在截图显示精度内吻合。类型未知、未配置代码段、LOF、指数和其他接口/序列仍为空。代表样本不证明全代码段覆盖或生产资格；数量与金额保留来源舍入标记。none最多640条，原响应完整保留，候选只筛目标日期。
+
+  - id: csindex-index-perf-close-v1
+    input_id: CSI-INDEX-DAILY-001
+    provider: csindex
+    endpoint: index-perf
+    exchange: XSHG
+    asset_type: index
+    frequency: null
+    adjustment: none
+    field_mapping: {trade_date: trade_date, open: open, high: high, low: low, close: close, volume: volume, amount: amount}
+    context_fields: {instrument_id: instrument_id, adjustment: adjustment, value_contract: value_contract}
+    null_values: [null, "", "-", "--", "None", "null"]
+    source_required_numeric: [close]
+    positive_fields: [close]
+    unverified_fields: [volume, amount]
+    volume_multiplier: "1"
+    amount_multiplier: "1"
+    volume_semantics: unverified
+    status: pending_validation
+    version: csindex-index-perf-close-v1
+    evidence_refs: [tmp/batch-remediation-20261029/interface-review/raw/csi-daily-sh000816/manifest.ndjson]
+    notes: 仅映射返回的close为指数点位；开高低、成交量和成交额不填，原始响应单独完整留存。
 
   - id: fixture-daily-v1
     provider: fixture

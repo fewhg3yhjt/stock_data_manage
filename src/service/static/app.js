@@ -58,7 +58,8 @@ function displayCell(row, column) {
   const mappings = {asset_type:{stock:'股票',etf:'ETF',lof:'LOF',index:'指数'},
     adjustment:{none:'不复权',forward:'前复权',backward:'后复权',qfq:'前复权',hfq:'后复权'},
     status:{available:'价格可用',not_applicable:'不适用',missing:'缺失',unverified:'未核验'}};
-  let text = mappings[column.format]?.[value] || (typeof value==='object'?JSON.stringify(value):String(value));
+  let text = column.key==='status' && row.value_contract==='close_only' ? '收盘序列（收盘值可用）' :
+    (mappings[column.format]?.[value] || (typeof value==='object'?JSON.stringify(value):String(value)));
   if (!column.path) text = text.slice(0,180);
   if (!column.preserve_source && ['decimal','quantity'].includes(column.format))
     text = decimalText(value, column.min_decimals ?? (column.format==='quantity'?0:2), column.trim_trailing_zeros ?? true);
@@ -335,12 +336,14 @@ async function renderDaily() {
   const kinds={stock:'股票',etf:'ETF',lof:'LOF',index:'指数'};
   const modes=Object.entries(names).map(([key,label])=>`<option value="${key}" ${data.available_adjustments.includes(key)||!data.total?'':'disabled'}>${label}</option>`).join('');
   const unverified=Object.entries(names).filter(([key])=>data.items.some(row=>row.quote_states?.[key]==='unverified')).map(([,label])=>label);
+  const closeOnly=data.items.filter(row=>row.value_contract==='close_only').length;
   app.innerHTML=`<form class="filters" id="daily-filters">
     <label>证券代码<input name="security" placeholder="例如 sh600519"></label>
     <label>开始日期<input type="date" name="start_date"></label><label>结束日期<input type="date" name="end_date"></label>
     <label>证券类型<select name="asset_type"><option value="">全部类型</option>${Object.entries(kinds).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></label>
     <label>展示口径<select name="adjustment">${modes}</select></label><button class="primary">查询</button></form>
     <p class="subtle">默认展示不复权。切换只读取同一条已发布记录，指数显示点位，股票与ETF显示价格；没有数据时不会请求上游或回退其他口径。</p>
+    ${closeOnly?`<p class="subtle" data-role="close-only-contract">本页有 ${prettyNumber(closeOnly)} 条指数按“收盘序列”合同交付；开高低及未核验量额保留为空。</p>`:''}
     ${unverified.length?`<p class="subtle" data-role="unverified-adjustments">当前页存在尚未核验的口径：${esc(unverified.join('、'))}；相应记录保留空值。</p>`:''}
     <section class="panel"><div class="panel-head"><h2>已发布规范日线</h2><small>${prettyNumber(data.total)} 条记录</small></div>
     ${displayTable({...data,presentation:'daily'})}${pager('daily',data)}</section>`;
