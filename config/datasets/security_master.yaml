@@ -46,9 +46,41 @@ symbol_successions:
       - tmp/batch-remediation-20261029/interface-review/raw/cni-patent-code-revision-20240423/manifest.ndjson
       - tmp/batch-remediation-20261029/interface-review/raw/cni-daily-980070/manifest.ndjson
 
+# 用户确认的指数历史有效期覆盖：delist_date 是最后有效行情日（含当日）；
+# 后续名单快照标记为 delisted。证据等级与不确定性记录在 docs/providers/security-catalog.md。
+symbol_lifecycle_overrides:
+  - market: XSHE
+    asset_type: index
+    symbol: "399946"
+    name: "中证内地金融主题指数"
+    delist_date: "2016-06-03"
+    evidence_refs:
+      - https://www.ricequant.com/doc/rqdata/python/indices-mod
+      - tmp/batch-remediation-20261029/status-policy-simulation-20261029.json
+      - tmp/batch-remediation-20261029/interface-review/raw/csi-daily-sh000946/manifest.ndjson
+  - market: XSHE
+    asset_type: index
+    symbol: "399961"
+    name: "中证上游资源产业指数"
+    delist_date: "2019-01-25"
+    evidence_refs:
+      - https://emt.18.cn/api/quant-help/data/indices.html
+      - tmp/batch-remediation-20261029/status-policy-simulation-20261029.json
+      - tmp/batch-remediation-20261029/interface-review/raw/csi-daily-sh000961/manifest.ndjson
+  - market: XSHE
+    asset_type: index
+    symbol: "399963"
+    name: "中证下游消费与服务产业指数"
+    delist_date: "2019-01-25"
+    evidence_refs:
+      - https://emt.18.cn/api/quant-help/data/indices.html
+      - tmp/batch-remediation-20261029/status-policy-simulation-20261029.json
+      - tmp/batch-remediation-20261029/interface-review/raw/csi-daily-sh000963/manifest.ndjson
+
 # 同一指数的跨市场并列行情代码，不代表退市、代码承接或证券主数据状态。
 # pairs 的键保留在证券名单中的业务身份，值为采集请求使用的完整来源代码；
-# 只有来源文件明确列出两种代码的关系才登记。来源接口输入和日线运行合同见 capabilities.yaml。
+# 仅登记官方材料明确配对或用户明确确认先按来源线索记录的关系；证据等级逐项列出。
+# 来源接口输入和日线运行合同见 capabilities.yaml。
 symbol_parallel_codes:
   - logical_market: XSHE
     asset_type: index
@@ -143,6 +175,14 @@ symbol_parallel_codes:
       - https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/20231208175400-000977_Index_Methodology_cn.pdf
       - https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/20231208175437-000978_Index_Methodology_cn.pdf
       - https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000979hbook.pdf
+
+  - logical_market: XSHE
+    asset_type: index
+    request_market: XSHG
+    pairs: {"399980": sh000980}
+    evidence_refs:
+      - https://doc.xuehai.net/b9ba26d479cf79e15d9993a67.html
+      - tmp/batch-remediation-20261029/interface-review/raw/csi-daily-sh000980/manifest.ndjson
 
 fields:
   instrument_id: {type: string, required: true}

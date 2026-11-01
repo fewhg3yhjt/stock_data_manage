@@ -182,7 +182,7 @@ acquisition_policies:
             none: {api: index-perf, adjust: none}
       - input_id: CSI-INDEX-DAILY-OHLC-001
         asset_type: index
-        symbols: [sz399904, sz399907, sz399908, sz399909, sz399910, sz399911, sz399912, sz399915, sz399916, sz399917, sz399918, sz399919, sz399922, sz399923, sz399925, sz399926, sz399927, sz399929, sz399930, sz399931, sz399936, sz399937, sz399941, sz399942, sz399944, sz399945, sz399948, sz399949, sz399952, sz399964, sz399969, sz399977, sz399978, sz399979]
+        symbols: [sz399904, sz399907, sz399908, sz399909, sz399910, sz399911, sz399912, sz399915, sz399916, sz399917, sz399918, sz399919, sz399922, sz399923, sz399925, sz399926, sz399927, sz399929, sz399930, sz399931, sz399936, sz399937, sz399941, sz399942, sz399944, sz399945, sz399948, sz399949, sz399952, sz399964, sz399969, sz399977, sz399978, sz399979, sz399980]
         value_contract: full_ohlc
         market_adjustment_requests:
           XSHG:

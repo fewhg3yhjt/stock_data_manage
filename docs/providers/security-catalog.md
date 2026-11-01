@@ -14,6 +14,14 @@
 
 上述为已确认设计边界，不代表代码解析、名单每日更新、有效范围、历史补采或发布验收已完成；股票复权核验与管理台阈值编辑仍按现有进度计划后续执行。
 
+## 指数历史有效期与`399980`并列代码（2026-11-02，按用户确认接入）
+
+用户确认将第三方目录有历史终止/数据结束记录、且本项目最后行情日相符的三项记为失效：`sz399946`的最后行情日为`2016-06-03`；`sz399961`和`sz399963`的最后行情日为`2019-01-25`（第三方目录终止日列为`2019-01-28`）。配置中的`delist_date`取最后实际行情日，作为含当日的有效截止日；只有名单快照日期晚于该日才输出`status=delisted`，日线任务不再把它们列入之后日期的请求范围。证据分别见[状态核验记录](../../tmp/batch-remediation-20261029/status-policy-simulation-20261029.json)、[CSI目标日响应](../../tmp/batch-remediation-20261029/interface-review/raw/csi-daily-sh000946/manifest.ndjson)、[第三方399946历史目录](https://www.ricequant.com/doc/rqdata/python/indices-mod)及[第三方指数目录](https://emt.18.cn/api/quant-help/data/indices.html)。第三方日期不是交易所终止公告；此处按用户授权作为项目有效期，来源等级保持明确。
+
+`sz399980`仍保留名单身份`XSHE:399980`，新增并列行情请求码`sh000980`，合同为`full_ohlc`，不改为代码承接。中证原响应在目标日包含同名指数及完整四价，见[000980原始响应](../../tmp/batch-remediation-20261029/interface-review/raw/csi-daily-sh000980/manifest.ndjson)；代码配对线索来自[第三方转载的编制方案](https://doc.xuehai.net/b9ba26d479cf79e15d9993a67.html)，用户确认先按该线索记录。该关系目前是项目内接受的配对线索，不宣称已取得官方一手配对文件；CSI正式在线资格仍由现有资格门禁控制。
+
+其余`sh000999`、`sz399332`、`sz399960`虽有目标日空响应或历史行情较旧，但目前没有匹配到第三方历史终止日期，因此不在本次生命周期覆盖项内。当前`data/canonical`没有证券主数据分区；本次配置会在下一次正常证券名单发布时生成相应失效记录，不改写或伪造既有正式名单，也不改变已冻结任务。旧任务如需采用新名单，必须显式创建新任务。
+
 ## 用户脚本能力对应表
 
 依据 `D:/Project/PythonProgram/a_share_universe_check.py`（SHA-256：`006325c86c114aafe3c89d6f2010745dd23d55fc4b35dca9e6378dd785eea236`），逐调用13项均有可执行输入及YAML映射。运行配置见 [providers.yaml](../../config/providers.yaml)，`script_source_keys`用于关联脚本调用；已有ETF方法直接复用。

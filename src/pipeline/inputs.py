@@ -2222,6 +2222,7 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
     previous_path = previous_dir / "data.parquet"
     policy = yaml.safe_load((config_root / "datasets/security_master.yaml").read_text(encoding="utf-8"))
     publication_policy = policy["dataset"]["publication"]
+    lifecycle_overrides = policy.get("symbol_lifecycle_overrides", [])
     allowed_groups = {
         tuple(pair)
         for pair in (
@@ -2254,7 +2255,8 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
             raise ValueError("cannot replace a newer security master with an older task")
     missing = [unit["key"] for unit in units if unit["key"] not in valid]
     # Inspect today's sources alone. Previous rows must not conceal omissions.
-    merged = prepare_security_publication({key: value["rows"] for key, value in source_rows.items()})
+    merged = prepare_security_publication({key: value["rows"] for key, value in source_rows.items()},
+        lifecycle_overrides=lifecycle_overrides, as_of_date=day)
     records = merged.records
     scripted = {key: value for key, value in source_rows.items()
                 if any(row.get('date_basis') for row in value['rows'])}
@@ -2305,14 +2307,16 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
             and not value['parameters'].get('include_etf'))}
         & required_groups for key, value in source_rows.items()}
     for key, value in source_rows.items():
-        source_records = prepare_security_publication({key: value["rows"]}).records
+        source_records = prepare_security_publication({key: value["rows"]},
+            lifecycle_overrides=lifecycle_overrides, as_of_date=day).records
         declared_groups = responsibilities[key]
         # A market/asset group can be supplied by complementary interfaces.
         # Compare their union to yesterday, while still checking each required unit.
         unit_check = check_security_coverage(source_records, required_groups=declared_groups)
         for group in declared_groups:
             group_records = prepare_security_publication({other: source_rows[other]['rows']
-                for other, groups in responsibilities.items() if group in groups}).records
+                for other, groups in responsibilities.items() if group in groups},
+                lifecycle_overrides=lifecycle_overrides, as_of_date=day).records
             source_previous = [item for item in comparable if (item.exchange.value, item.asset_type.value) == group]
             if not check_security_coverage(group_records, required_groups={group}, previous=source_previous)['passed']:
                 unit_check['passed'] = False
@@ -2352,7 +2356,8 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
                                 "previous_manifest_hash": file_hash(previous_dir / "manifest.json")}
     else:
         # Retain trusted descriptive fields, but never retain omitted identities.
-        records = prepare_security_publication({key: value["rows"] for key, value in source_rows.items()}, comparable).records
+        records = prepare_security_publication({key: value["rows"] for key, value in source_rows.items()}, comparable,
+            lifecycle_overrides=lifecycle_overrides, as_of_date=day).records
         publication_metadata = {"as_of_date": day.isoformat(), "requested_date": day.isoformat(),
             "scope_hash": scope_hash, "coverage_passed": True, "fallback": False,
             "required_groups": sorted(required_groups), "coverage": check,

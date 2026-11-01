@@ -348,6 +348,37 @@ def test_bao_real_archived_snapshot_adds_etfs_without_reclassifying_indexes(tmp_
     assert manifest["publication_permitted"] is False
 
 
+def test_user_confirmed_index_lifecycle_overrides_use_last_quote_as_inclusive_end():
+    import yaml
+    from datetime import date
+
+    from stock_data_manage.service.instruments_update import prepare_security_publication
+
+    policy = yaml.safe_load((ROOT / "config/datasets/security_master.yaml").read_text(encoding="utf-8"))
+    overrides = policy["symbol_lifecycle_overrides"]
+    current_rows = [
+        {"exchange": "XSHE", "symbol": "399946", "asset_type": "index", "name": "中证内地金融主题指数", "status": "active"},
+        {"exchange": "XSHE", "symbol": "399961", "asset_type": "index", "name": "中证上游资源产业指数", "status": "active"},
+        {"exchange": "XSHE", "symbol": "399963", "asset_type": "index", "name": "中证下游消费与服务产业指数", "status": "active"},
+    ]
+    current = prepare_security_publication({"snapshot": current_rows}, lifecycle_overrides=overrides,
+        as_of_date=date(2026, 10, 29)).records
+    by_symbol = {row.symbol: row for row in current}
+    assert {symbol: by_symbol[symbol].delist_date.isoformat() for symbol in by_symbol} == {
+        "399946": "2016-06-03", "399961": "2019-01-25", "399963": "2019-01-25"}
+    assert all(by_symbol[symbol].status == "delisted" for symbol in by_symbol)
+    assert all(not by_symbol[symbol].is_expected_on(date(2026, 10, 29)) for symbol in by_symbol)
+
+    last_day = prepare_security_publication({"snapshot": [current_rows[1]]}, lifecycle_overrides=overrides,
+        as_of_date=date(2019, 1, 25)).records
+    after_last_day = prepare_security_publication({}, lifecycle_overrides=overrides,
+        as_of_date=date(2019, 1, 26)).records
+    seeded = next(row for row in after_last_day if row.symbol == "399961")
+    last_day_record = next(row for row in last_day if row.symbol == "399961")
+    assert last_day_record.status == "active" and last_day_record.is_expected_on(date(2019, 1, 25))
+    assert seeded.status == "delisted" and not seeded.is_expected_on(date(2019, 1, 26))
+
+
 def test_bse_real_archived_catalog_uses_source_capture_day_and_yaml_mapping(tmp_path, monkeypatch):
     monkeypatch.setattr("stock_data_manage.providers.exchanges.security.sleep", lambda _: None)
     report = collect_input(input_id="SECURITY-BSE-001", config_root=ROOT / "config", data_root=tmp_path,

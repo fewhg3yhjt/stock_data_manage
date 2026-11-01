@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import date
 from typing import Any, Mapping, Protocol
 
@@ -56,6 +56,64 @@ def parse_security_row(row: Mapping[str, Any], *, source: str) -> SecurityRecord
     )
 
 
+def apply_security_lifecycle_overrides(records, overrides, *, as_of_date):
+    """Apply the small, user-confirmed lifecycle exception list to a dated master."""
+    from collections.abc import Mapping as MappingABC
+
+    records = list(records)
+    overrides = tuple(overrides or ())
+    if not overrides:
+        return tuple(records)
+    if as_of_date is None:
+        raise ValueError("security lifecycle overrides require a dated master snapshot")
+    snapshot_date = _as_date(as_of_date)
+    seen = set()
+    positions = {(item.exchange, item.asset_type, item.symbol): index for index, item in enumerate(records)}
+    ids = {item.instrument_id: item for item in records}
+    for item in overrides:
+        if not isinstance(item, MappingABC):
+            raise ValueError("security lifecycle override must be a mapping")
+        exchange = Exchange(str(item.get("market", "")).upper())
+        asset_type = AssetType(str(item.get("asset_type", "")).lower())
+        symbol = str(item.get("symbol", ""))
+        if len(symbol) != 6 or not symbol.isdigit():
+            raise ValueError("security lifecycle override requires a six-digit symbol")
+        key = (exchange, asset_type, symbol)
+        if key in seen:
+            raise ValueError("duplicate security lifecycle override")
+        seen.add(key)
+        delist_date = _as_date(item.get("delist_date"))
+        name = str(item.get("name", "")).strip()
+        evidence_refs = item.get("evidence_refs")
+        if delist_date is None or not name or not isinstance(evidence_refs, (list, tuple)) or not evidence_refs:
+            raise ValueError("security lifecycle override requires a name, inclusive delist_date and evidence references")
+        if any(not isinstance(ref, str) or not ref.strip() for ref in evidence_refs):
+            raise ValueError("security lifecycle override evidence reference is empty")
+
+        index = positions.get(key)
+        if index is not None:
+            record = records[index]
+            records[index] = replace(record, delist_date=delist_date,
+                status="delisted" if snapshot_date > delist_date else record.status,
+                name=record.name or name,
+                evidence_sources=tuple(dict.fromkeys((*record.evidence_sources, "user_confirmed_lifecycle_override"))))
+            continue
+        if snapshot_date <= delist_date:
+            continue
+        instrument_id = stable_instrument_id(exchange, symbol)
+        collision = ids.get(instrument_id)
+        if collision is not None:
+            raise ValueError("security lifecycle override conflicts with another asset type at the same market code")
+        record = SecurityRecord(instrument_id=instrument_id, symbol=symbol, exchange=exchange,
+            asset_type=asset_type, name=name, delist_date=delist_date, status="delisted",
+            lot_size=1 if asset_type is AssetType.INDEX else 100,
+            evidence_sources=("user_confirmed_lifecycle_override",))
+        positions[key] = len(records)
+        ids[instrument_id] = record
+        records.append(record)
+    return tuple(sorted(records, key=lambda item: item.instrument_id))
+
+
 class SecurityMasterUpdater:
     def __init__(self, store: SecurityMasterStore, providers: list[SecurityListProvider]) -> None:
         self.store = store
@@ -90,7 +148,7 @@ class SecurityMasterUpdater:
         return SecurityMasterUpdateResult(merged, errors, len(changes))
 
 
-def prepare_security_publication(source_rows, previous=()):
+def prepare_security_publication(source_rows, previous=(), *, lifecycle_overrides=(), as_of_date=None):
     """Build from normalized source candidates with the existing identity and merge rules."""
     parsed = {}
     for source, rows in source_rows.items():
@@ -98,7 +156,9 @@ def prepare_security_publication(source_rows, previous=()):
             **row, "code": row.get("symbol", row.get("stock_code", row.get("code"))),
             "name": row.get("name", row.get("stock_name")),
         }, source=source) for row in rows]
-    return merge_security_sources(previous, parsed)
+    merged = merge_security_sources(previous, parsed)
+    return replace(merged, records=apply_security_lifecycle_overrides(merged.records,
+        lifecycle_overrides, as_of_date=as_of_date))
 
 
 def _as_date(value: Any) -> date | None:

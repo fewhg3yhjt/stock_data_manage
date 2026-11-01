@@ -70,8 +70,8 @@ node provider_validation/tests/build_interface_coverage_workbook.mjs --formal-sp
 | 来源合同 | 输入范围与请求身份 | 输出记录身份/字段合同 | 当前边界 |
 |---|---|---|---|
 | `CSI-INDEX-DAILY-001` | 配置列明的11个上海中证指数，CSI `index-perf` | 收盘点位，`close_only`；开高低和量额为空 | 既有精确样本有隔离验证；正式任务资格和调度仍不代表已开启 |
-| `CSI-INDEX-DAILY-OHLC-001` | 34个有明确并列代码材料的深圳名单指数，按`security_master.yaml`请求对应`sh000xxx` | 发布身份仍保留`sz399xxx`名单代码；`full_ohlc`；量额为空；任务与raw请求证据记录实际CSI代码 | 49项隔离批中34项完整四价候选并发布。配对材料不证明旧深圳代码仍在当前编制名单，也不构成退市/承接关系 |
-| `CSI-INDEX-DAILY-CLOSE-PAIR-001` | 13个有明确并列代码材料的深圳名单指数，按`security_master.yaml`请求对应`sh000xxx` | 发布身份仍保留`sz399xxx`名单代码；只要求有效`close`，`open/high/low`及量额留空，合同标为`close_only` | 49项隔离批中13项均发布为收盘序列；目标日原响应中开高低为空。代码关系不表示退市或证券承接 |
+| `CSI-INDEX-DAILY-OHLC-001` | 35个配置内深圳名单指数，按`security_master.yaml`请求对应`sh000xxx`；其中`sz399980→sh000980`按用户确认的第三方配对线索接入 | 发布身份仍保留`sz399xxx`名单代码；`full_ohlc`；量额为空；任务与raw请求证据记录实际CSI代码 | 原49项回放验证34项完整四价，不含新加的399980。2026-11-02的560项指数重放已实际发布`sz399980`：请求`sh000980`，记录身份`XSHE:399980`，OHLC完整；整批556/560条获准发布，但`complete_today=false`，详情见[整批结果](../../tmp/market-daily-20261029-index-replay-20261102/index-replay-result.json)。配对证据是用户接受的第三方线索，不是官方一手文件，也不构成退市/承接关系 |
+| `CSI-INDEX-DAILY-CLOSE-PAIR-001` | 13个配置内深圳名单指数，按`security_master.yaml`请求对应`sh000xxx` | 发布身份仍保留`sz399xxx`名单代码；只要求有效`close`，`open/high/low`及量额留空，合同标为`close_only` | 49项隔离批中13项均发布为收盘序列；目标日原响应中开高低为空。代码关系不表示退市或证券承接 |
 | `CNI-INDEX-DAILY-001` | 国证`sz399299`、`sz980070`，请求对应代码和单一目标日 | 当前代码作为记录身份；开高低收为`full_ohlc`；量额单位未核实，标准值为空 | 仅隔离回放；正式在线资格未通过前不发实时请求 |
 
 CSI与CNI响应格式不同，所以各自解析；它们并行进入同一批任务的来源采集阶段，等待采集屏障后分别解析。标准候选按名单业务身份、目标日和口径汇合。当前每个冻结证券单元只选一个来源；不把不同来源的字段拼成一条数据。发布记录中的`source_provider`用于说明取值来源；实际请求代码保存在冻结任务和raw请求证据中。路由、候选汇合和失败边界见[日线批任务设计](../pipeline/collection-tasks.md)。

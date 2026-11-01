@@ -67,7 +67,8 @@ def test_daily_routes_map_only_explicit_parallel_codes_and_keep_the_list_identit
 
     definition = resolve_daily_definition({"asset_type": "index", "universe": "static", "trade_date": DAY}, CONFIG)
     symbols = ("sz399904", "sz399920", "sz399939", "sz399941", "sz399961", "sz399980", "sz399299")
-    units = [{"key": symbol, "symbol": symbol, "asset_type": "index", "input_id": "ASTOCK-002-daily",
+    units = [{"key": symbol, "symbol": symbol, "instrument_id": f"XSHE:{symbol[2:]}",
+        "asset_type": "index", "input_id": "ASTOCK-002-daily",
         "context": {"request": {"symbol": symbol, "start_date": DAY, "end_date": DAY}}} for symbol in symbols]
     expanded = expand_daily_units(units, definition)
     by_symbol = {unit["symbol"]: unit for unit in expanded}
@@ -87,7 +88,11 @@ def test_daily_routes_map_only_explicit_parallel_codes_and_keep_the_list_identit
         assert by_symbol[logical]["source_symbol"] == source_code
         assert by_symbol[logical]["value_contract"] == "close_only"
     assert by_symbol["sz399961"]["input_id"] == "ASTOCK-002-daily"
-    assert by_symbol["sz399980"]["input_id"] == "ASTOCK-002-daily"
+    assert by_symbol["sz399980"]["input_id"] == "CSI-INDEX-DAILY-OHLC-001"
+    assert by_symbol["sz399980"]["symbol"] == "sz399980"
+    assert by_symbol["sz399980"]["instrument_id"] == "XSHE:399980"
+    assert by_symbol["sz399980"]["source_symbol"] == "sh000980"
+    assert by_symbol["sz399980"]["value_contract"] == "full_ohlc"
     assert by_symbol["sz399299"]["input_id"] == "CNI-INDEX-DAILY-001"
 
     contracts = {item.input_id: item for item in load_input_capabilities(CONFIG / "providers.yaml")}
@@ -96,6 +101,8 @@ def test_daily_routes_map_only_explicit_parallel_codes_and_keep_the_list_identit
     assert parameters["start"] == date.fromisoformat(DAY)
     close_parameters = contracts["CSI-INDEX-DAILY-CLOSE-PAIR-001"].bind_parameters(by_symbol["sz399920"]["context"])
     assert close_parameters["code"] == "sh000920"
+    super_cap_parameters = contracts["CSI-INDEX-DAILY-OHLC-001"].bind_parameters(by_symbol["sz399980"]["context"])
+    assert super_cap_parameters["code"] == "sh000980"
 
     from stock_data_manage.routing.factory import build_input_provider
     close_provider = build_input_provider(contracts["CSI-INDEX-DAILY-CLOSE-PAIR-001"],
@@ -103,7 +110,7 @@ def test_daily_routes_map_only_explicit_parallel_codes_and_keep_the_list_identit
     assert close_provider.value_contract == "close_only"
 
     daily_routes = {item["input_id"]: item for item in definition["source_policy"]["inputs"]}
-    assert len(daily_routes["CSI-INDEX-DAILY-OHLC-001"]["symbols"]) == 34
+    assert len(daily_routes["CSI-INDEX-DAILY-OHLC-001"]["symbols"]) == 35
     assert len(daily_routes["CSI-INDEX-DAILY-CLOSE-PAIR-001"]["symbols"]) == 13
 
 
