@@ -33,6 +33,117 @@ dataset:
       SECURITY-SZSE-STOCK-HISTORY-001: [[XSHE, stock]]
       SECURITY-SSE-DELIST-HISTORY-001: [[XSHG, stock]]
       SECURITY-SZSE-DELIST-HISTORY-001: [[XSHE, stock]]
+
+# 仅记录有直接承接证据的代码变化。日线任务在生效日及之后使用新代码请求，
+# 证券身份仍以旧代码作为稳定 instrument_id；未知关系不在此处推断。
+symbol_successions:
+  - market: XSHE
+    asset_type: index
+    old_symbol: "399427"
+    new_symbol: "980070"
+    effective_from: "2024-04-23"
+    evidence_refs:
+      - tmp/batch-remediation-20261029/interface-review/raw/cni-patent-code-revision-20240423/manifest.ndjson
+      - tmp/batch-remediation-20261029/interface-review/raw/cni-daily-980070/manifest.ndjson
+
+# 同一指数的跨市场并列行情代码，不代表退市、代码承接或证券主数据状态。
+# pairs 的键保留在证券名单中的业务身份，值为采集请求使用的完整来源代码；
+# 只有来源文件明确列出两种代码的关系才登记。来源接口输入和日线运行合同见 capabilities.yaml。
+symbol_parallel_codes:
+  - logical_market: XSHE
+    asset_type: index
+    request_market: XSHG
+    pairs: {"399904": sh000904, "399907": sh000907}
+    evidence_refs: [https://www.sse.com.cn/disclosure/fund/announcement/c/new/2024-05-31/512500_20240531_RMSX.pdf]
+  - logical_market: XSHE
+    asset_type: index
+    request_market: XSHG
+    pairs: {"399908": sh000908, "399909": sh000909, "399910": sh000910, "399911": sh000911, "399912": sh000912, "399915": sh000915, "399916": sh000916, "399917": sh000917}
+    evidence_refs: [https://www.szse.cn/disclosure/notice/general/t20070611_499843.html]
+  - logical_market: XSHE
+    asset_type: index
+    request_market: XSHG
+    pairs: {"399918": sh000918, "399919": sh000919, "399920": sh000920}
+    evidence_refs: [https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/211_000918_Index_Methodology_cn.pdf]
+  - logical_market: XSHE
+    asset_type: index
+    request_market: XSHG
+    pairs: {"399922": sh000922}
+    evidence_refs: [https://www.jjckb.cn/caijing/2008-05/14/content_96995.htm]
+  - logical_market: XSHE
+    asset_type: index
+    request_market: XSHG
+    pairs: {"399923": sh000923}
+    evidence_refs: [https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000923factsheet.pdf]
+  - logical_market: XSHE
+    asset_type: index
+    request_market: XSHG
+    pairs: {"399925": sh000925}
+    evidence_refs: [https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/20231208175416-000925_Index_Methodology_cn.pdf]
+  - logical_market: XSHE
+    asset_type: index
+    request_market: XSHG
+    pairs: {"399926": sh000926, "399927": sh000927}
+    evidence_refs: [https://www.sse.com.cn/aboutus/mediacenter/hotandd/c/c_20150912_3988280.shtml]
+  - logical_market: XSHE
+    asset_type: index
+    request_market: XSHG
+    pairs: {"399929": sh000929, "399930": sh000930, "399931": sh000931, "399936": sh000936, "399937": sh000937}
+    evidence_refs: [https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000841_Index_Methodology_cn.pdf]
+  - logical_market: XSHE
+    asset_type: index
+    request_market: XSHG
+    pairs: {"399938": sh000938, "399939": sh000939}
+    evidence_refs: [https://www.sse.com.cn/aboutus/mediacenter/hotandd/c/c_20150912_3988320.shtml]
+  - logical_market: XSHE
+    asset_type: index
+    request_market: XSHG
+    pairs: {"399941": sh000941}
+    evidence_refs: [https://www.sse.com.cn/aboutus/mediacenter/hotandd/c/c_20150912_3988320.shtml]
+  - logical_market: XSHE
+    asset_type: index
+    request_market: XSHG
+    pairs: {"399942": sh000942, "399944": sh000944, "399945": sh000945, "399947": sh000947, "399948": sh000948}
+    evidence_refs: [https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000942_Index_Methodology_cn.pdf]
+  - logical_market: XSHE
+    asset_type: index
+    request_market: XSHG
+    pairs: {"399943": sh000943, "399949": sh000949, "399950": sh000950, "399951": sh000951, "399952": sh000952}
+    evidence_refs: ['https://finance.sina.cn/sa/2009-10-13/detail-ikknscsi7772133.d.html?from=wap']
+  - logical_market: XSHE
+    asset_type: index
+    request_market: XSHG
+    pairs: {"399953": sh000953, "399954": sh000954, "399956": sh000956}
+    evidence_refs: [https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/20231208175403-000955_Index_Methodology_cn.pdf]
+  - logical_market: XSHE
+    asset_type: index
+    request_market: XSHG
+    pairs: {"399957": sh000957}
+    evidence_refs: [https://csi-web-dev.oss-cn-shanghai-finance-1-pub.aliyuncs.com/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000908_Index_Methodology_cn.pdf]
+  - logical_market: XSHE
+    asset_type: index
+    request_market: XSHG
+    pairs: {"399958": sh000958}
+    evidence_refs: [https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/20231208175408-000958_Index_Methodology_cn.pdf]
+  - logical_market: XSHE
+    asset_type: index
+    request_market: XSHG
+    pairs: {"399964": sh000964}
+    evidence_refs: [https://epaper.stcn.com/paper/zqsb/page/1/2010-04-08/B003/4301270662785658.pdf]
+  - logical_market: XSHE
+    asset_type: index
+    request_market: XSHG
+    pairs: {"399968": sh000968, "399969": sh000969}
+    evidence_refs: [https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000969_Index_Methodology_cn.pdf]
+  - logical_market: XSHE
+    asset_type: index
+    request_market: XSHG
+    pairs: {"399977": sh000977, "399978": sh000978, "399979": sh000979}
+    evidence_refs:
+      - https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/20231208175400-000977_Index_Methodology_cn.pdf
+      - https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/20231208175437-000978_Index_Methodology_cn.pdf
+      - https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000979hbook.pdf
+
 fields:
   instrument_id: {type: string, required: true}
   symbol: {type: string, required: true}

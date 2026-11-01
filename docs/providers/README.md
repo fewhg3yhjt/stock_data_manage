@@ -63,6 +63,21 @@ node provider_validation/tests/build_interface_coverage_workbook.mjs --formal-sp
 
 当前默认运行输出统一进入 `data/`，详细职责、命令和归档门禁见 [运行数据目录与归档](../storage/README.md)。标准化成功仍为候选完成，保留在工作区；63种输入数据集的正式发布和多来源构建尚未接通，生产路由与自动调度不因目录配置而启用。
 
+### CSI与CNI指数日线进入现有批任务（2026-11-01，隔离批次验收）
+
+该改动对应的业务问题是：部分指数在腾讯接口没有目标日记录，或只返回收盘值，导致发布检查把来源缺口误当成统一四价格式异常。任务现在按冻结的来源输入调用腾讯、CSI或CNI各自Provider；每份原文先留存，再由对应接口解析成标准候选，最后并入同一指数日线分区及同一发布检查。数据不会在“腾讯发布”和“指数来源发布”之间分叉。
+
+| 来源合同 | 输入范围与请求身份 | 输出记录身份/字段合同 | 当前边界 |
+|---|---|---|---|
+| `CSI-INDEX-DAILY-001` | 配置列明的11个上海中证指数，CSI `index-perf` | 收盘点位，`close_only`；开高低和量额为空 | 既有精确样本有隔离验证；正式任务资格和调度仍不代表已开启 |
+| `CSI-INDEX-DAILY-OHLC-001` | 34个有明确并列代码材料的深圳名单指数，按`security_master.yaml`请求对应`sh000xxx` | 发布身份仍保留`sz399xxx`名单代码；`full_ohlc`；量额为空；任务与raw请求证据记录实际CSI代码 | 49项隔离批中34项完整四价候选并发布。配对材料不证明旧深圳代码仍在当前编制名单，也不构成退市/承接关系 |
+| `CSI-INDEX-DAILY-CLOSE-PAIR-001` | 13个有明确并列代码材料的深圳名单指数，按`security_master.yaml`请求对应`sh000xxx` | 发布身份仍保留`sz399xxx`名单代码；只要求有效`close`，`open/high/low`及量额留空，合同标为`close_only` | 49项隔离批中13项均发布为收盘序列；目标日原响应中开高低为空。代码关系不表示退市或证券承接 |
+| `CNI-INDEX-DAILY-001` | 国证`sz399299`、`sz980070`，请求对应代码和单一目标日 | 当前代码作为记录身份；开高低收为`full_ohlc`；量额单位未核实，标准值为空 | 仅隔离回放；正式在线资格未通过前不发实时请求 |
+
+CSI与CNI响应格式不同，所以各自解析；它们并行进入同一批任务的来源采集阶段，等待采集屏障后分别解析。标准候选按名单业务身份、目标日和口径汇合。当前每个冻结证券单元只选一个来源；不把不同来源的字段拼成一条数据。发布记录中的`source_provider`用于说明取值来源；实际请求代码保存在冻结任务和raw请求证据中。路由、候选汇合和失败边界见[日线批任务设计](../pipeline/collection-tasks.md)。
+
+已保存的目标日原文入口：CSI配对请求[sh000904响应](../../tmp/batch-remediation-20261029/interface-review/raw/csi-daily-sh000904/manifest.ndjson)，原深圳代码失败对照[sz399904核对](../../tmp/batch-remediation-20261029/interface-review/raw/csi-pair-399904-20261029/manifest.ndjson)；CNI目标日样本[`sz399299`](../../tmp/batch-remediation-20261029/interface-review/raw/cni-daily-sz399299/manifest.ndjson)和[`sz980070`](../../tmp/batch-remediation-20261029/interface-review/raw/cni-daily-980070/manifest.ndjson)。49项最终批回放见[隔离结果](../../tmp/csi-cni-index-20261029-expanded-isolated/run-closeonly/README.md)，此前13项被错误四价合同拒绝的原始字段证据见[首次失败核对](../../tmp/csi-cni-index-20261029-expanded-isolated/run/README.md)。最终隔离批读取49份留存响应、无网络请求，发布49条记录到同一临时指数分区，缺失0；这不代表全市场或正式在线资格已完成。当前资格状态见[项目进度](../../PROJECT_PROGRESS.md)。
+
 ### 当前聚合版本小范围在线验证（2026-10-28）
 
 股票 `sh600519`、数据日 `2026-10-27` 的 `kline` 不复权及 `newfqkline` 前/后复权各取得一份真实响应；响应解析前留存并按哈希精确离线重放，之后通过现有 `stock_daily` 任务在隔离目录发布并回读一条完整聚合记录。来源返回窗口为1024/640/640条；本次只证明该证券、日期和三次接口请求。成交量单位未验证，成交额字段不可用；不因此扩展旧单位资格或开启生产路由。原始响应、请求清单、代码/配置指纹和验证结果见[验证报告](../../tmp/provider-probes/tencent-daily/2026-10-27/600519/run-2026-10-28-2158/README.md)。

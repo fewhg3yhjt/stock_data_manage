@@ -108,6 +108,77 @@ rules:
     evidence_refs: [tmp/batch-remediation-20261029/interface-review/raw/csi-daily-sh000816/manifest.ndjson]
     notes: 仅映射返回的close为指数点位；开高低、成交量和成交额不填，原始响应单独完整留存。
 
+  - id: csindex-index-perf-ohlc-v1
+    input_id: CSI-INDEX-DAILY-OHLC-001
+    provider: csindex
+    endpoint: index-perf
+    exchange: XSHE
+    asset_type: index
+    frequency: null
+    adjustment: none
+    field_mapping: {trade_date: trade_date, open: open, high: high, low: low, close: close}
+    context_fields: {instrument_id: instrument_id, adjustment: adjustment, value_contract: value_contract}
+    null_values: [null, "", "-", "--", "None", "null"]
+    source_required_numeric: [open, high, low, close]
+    positive_fields: [open, high, low, close]
+    unverified_fields: [volume, amount]
+    volume_multiplier: "1"
+    amount_multiplier: "1"
+    volume_semantics: unverified
+    status: pending_validation
+    version: csindex-index-perf-ohlc-v1
+    evidence_refs:
+      - tmp/batch-remediation-20261029/interface-review/raw/csi-daily-sh000904/manifest.ndjson
+    notes: 标准字段身份来自保留的深圳名单代码；请求参数使用security_master.yaml中明确配对的上海中证代码。映射OHLC四价，量额未核实，来源行按原响应保留。
+
+  - id: csindex-index-perf-close-pair-v1
+    input_id: CSI-INDEX-DAILY-CLOSE-PAIR-001
+    provider: csindex
+    endpoint: index-perf
+    exchange: XSHE
+    asset_type: index
+    frequency: null
+    adjustment: none
+    field_mapping: {trade_date: trade_date, open: open, high: high, low: low, close: close}
+    context_fields: {instrument_id: instrument_id, adjustment: adjustment, value_contract: value_contract}
+    null_values: [null, "", "-", "--", "None", "null"]
+    source_required_numeric: [close]
+    positive_fields: [close]
+    unverified_fields: [volume, amount]
+    volume_multiplier: "1"
+    amount_multiplier: "1"
+    volume_semantics: unverified
+    status: pending_validation
+    version: csindex-index-perf-close-pair-v1
+    evidence_refs:
+      - tmp/csi-cni-index-20261029-expanded-isolated/run/missing-csi-ohlc-evidence.json
+      - tmp/batch-remediation-20261029/interface-review/raw/csi-daily-sh000920/manifest.ndjson
+    notes: 仅对配置列明且来源原文只有收盘点位的官方并列代码使用；开高低与未核验量额留空，名单代码保持标准记录身份，实际CSI请求代码及证据单独留存。
+
+  - id: cnindex-index-daily-v1
+    input_id: CNI-INDEX-DAILY-001
+    provider: cnindex
+    endpoint: index-daily
+    exchange: XSHE
+    asset_type: index
+    frequency: null
+    adjustment: none
+    field_mapping: {trade_date: trade_date, open: open, high: high, low: low, close: close}
+    context_fields: {instrument_id: instrument_id, adjustment: adjustment, value_contract: value_contract}
+    null_values: [null, "", "-", "--", "None", "null"]
+    source_required_numeric: [open, high, low, close]
+    positive_fields: [open, high, low, close]
+    unverified_fields: [volume, amount]
+    volume_multiplier: "1"
+    amount_multiplier: "1"
+    volume_semantics: unverified
+    status: pending_validation
+    version: cnindex-index-daily-v1
+    evidence_refs:
+      - tmp/batch-remediation-20261029/interface-review/raw/cni-daily-sz399299/manifest.ndjson
+      - tmp/batch-remediation-20261029/interface-review/raw/cni-daily-980070/manifest.ndjson
+    notes: 只映射国证来源的四价；量额字段及其单位未经验证，标准日线不填量额，来源原行留存供复核。
+
   - id: fixture-daily-v1
     provider: fixture
     endpoint: daily_history

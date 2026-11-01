@@ -79,6 +79,7 @@ def capture_daily_unit(*, unit, contract, provider, paths, task_id, trade_date, 
     return {"task_id": task_id, "unit_key": unit["key"], "attempt": attempt,
         "attempt_id": task_id + ":" + unit["key"] + f":attempt-{attempt}",
         "key": unit["key"], "symbol": unit["symbol"], "asset_type": unit["asset_type"],
+        "request_symbol": parameters.get("code", unit["symbol"]),
         "input_id": contract.input_id, "provider": contract.provider, "endpoint": contract.endpoint,
         "capture_status": "captured", "process_status": "pending", "status": "captured",
         "raw_manifest": str(audit), "raw_hash": RawObjectStore.verify_manifest(audit),
@@ -108,8 +109,8 @@ def process_daily_unit(*, unit, entry, provider, contract, field_contract, rule,
     # after native redirects/allowed host fallback. Earlier failures stay raw.
     event = responses[-1]
     url = urlsplit(event["url"])
-    captured = {"symbol": unit["symbol"], "start": parameters["start"], "end": parameters["end"],
-        "adjust": parameters["adjust"], "api": parameters["api"], "path": url.path,
+    captured = {"symbol": parameters.get("code", unit["symbol"]), "start": parameters["start"], "end": parameters["end"],
+        **{name: parameters[name] for name in ("adjust", "api", "frequency") if name in parameters}, "path": url.path,
         "segments": ((parameters["start"], parameters["end"], HttpResponse(event["status_code"],
             event.get("response_headers", {}), RawObjectStore.read_response(manifest, event)), url.netloc),)}
     fetched = provider.parse_window(captured)
@@ -200,6 +201,38 @@ def _daily_market(symbol):
         raise ValueError(f"daily source policy cannot identify the market for {symbol!r}") from exc
 
 
+def _normalize_symbol_parallel_codes(groups):
+    """Expand the explicitly documented cross-market code pairs from security_master.yaml."""
+    import re
+    market_prefix = {"XSHG": "sh", "XSHE": "sz", "BSE": "bj"}
+    result, seen = {}, set()
+    for group in groups:
+        if not isinstance(group, dict):
+            raise ValueError("parallel-code group must be a mapping")
+        logical_market = str(group.get("logical_market", "")).upper()
+        request_market = str(group.get("request_market", "")).upper()
+        asset_type = str(group.get("asset_type", "")).lower()
+        if logical_market not in market_prefix or request_market not in market_prefix or asset_type != "index":
+            raise ValueError("parallel-code group requires supported markets and index asset type")
+        pairs, evidence = group.get("pairs"), group.get("evidence_refs")
+        if not isinstance(pairs, dict) or not pairs or not isinstance(evidence, (list, tuple)) or not evidence:
+            raise ValueError("parallel-code group requires explicit pairs and evidence references")
+        if any(not isinstance(ref, str) or not ref.strip() for ref in evidence):
+            raise ValueError("parallel-code evidence reference is empty")
+        for logical_code, request_symbol in pairs.items():
+            logical_code, request_symbol = str(logical_code), str(request_symbol).lower()
+            key = (logical_market, asset_type, logical_code)
+            if (not re.fullmatch(r"[0-9]{6}", logical_code)
+                    or not re.fullmatch(market_prefix[request_market] + r"[0-9]{6}", request_symbol)
+                    or key in seen):
+                raise ValueError("parallel code must be unique and use the declared request market")
+            seen.add(key)
+            result[key] = {"logical_market": logical_market, "asset_type": asset_type,
+                "logical_symbol": logical_code, "request_market": request_market,
+                "request_symbol": request_symbol, "evidence_refs": list(evidence)}
+    return result
+
+
 def resolve_daily_definition(definition, config_root):
     definition = deepcopy(definition)
     tasks = yaml.safe_load((config_root / "collection.yaml").read_text(encoding="utf-8")).get("tasks", {})
@@ -239,6 +272,10 @@ def resolve_daily_definition(definition, config_root):
     policy_name = definition.get("acquisition_policy", "daily_fixed")
     policies = yaml.safe_load((config_root / "capabilities.yaml").read_text(encoding="utf-8"))["acquisition_policies"]
     policy = deepcopy(policies[policy_name])
+    from ..service.instruments import normalize_symbol_successions
+    security_master = yaml.safe_load((config_root / "datasets/security_master.yaml").read_text(encoding="utf-8"))
+    symbol_successions = normalize_symbol_successions(security_master.get("symbol_successions", []))
+    symbol_parallel_codes = _normalize_symbol_parallel_codes(security_master.get("symbol_parallel_codes", []))
     if policy["mode"] not in {"fixed", "failover"} or not isinstance(policy.get("inputs"), list) or not policy["inputs"]:
         raise ValueError("daily source policy requires an explicit nonempty input list")
     contracts = {item.input_id: item for item in load_input_capabilities(config_root / "providers.yaml")}
@@ -262,16 +299,28 @@ def resolve_daily_definition(definition, config_root):
                     if (not isinstance(request, dict) or set(request) != {"api", "adjust"}
                             or request["adjust"] != _DAILY_ADJUSTMENT_TOKEN[adjustment]):
                         raise ValueError(f"daily source policy has an invalid {market}/{adjustment} request")
-        else:
+        elif input_id in {"CSI-INDEX-DAILY-001", "CSI-INDEX-DAILY-OHLC-001",
+                          "CSI-INDEX-DAILY-CLOSE-PAIR-001", "CNI-INDEX-DAILY-001"}:
             symbols = source.get("symbols")
-            if (input_id != "CSI-INDEX-DAILY-001" or not isinstance(symbols, list) or not symbols
-                    or source.get("asset_type") != "index" or source.get("value_contract") != "close_only"):
+            expected_contract = ("close_only" if input_id in {
+                "CSI-INDEX-DAILY-001", "CSI-INDEX-DAILY-CLOSE-PAIR-001"} else "full_ohlc")
+            csi_input = input_id != "CNI-INDEX-DAILY-001"
+            expected_market = "XSHG" if csi_input else "XSHE"
+            expected_prefix = "sh" if input_id == "CSI-INDEX-DAILY-001" else "sz"
+            if (not isinstance(symbols, list) or not symbols or source.get("asset_type") != "index"
+                    or source.get("value_contract") != expected_contract):
                 raise ValueError("non-default daily routes require explicit code scope and value contract")
-            if set(source.get("market_adjustment_requests", {})) != {"XSHG"} or set(source["market_adjustment_requests"]["XSHG"]) != {"none"}:
-                raise ValueError("CSI daily route must explicitly cover only XSHG unadjusted close")
+            if (set(source.get("market_adjustment_requests", {})) != {expected_market}
+                    or set(source["market_adjustment_requests"][expected_market]) != {"none"}):
+                raise ValueError("external index route must explicitly cover one market and unadjusted daily values")
             for symbol in symbols:
-                if not isinstance(symbol, str) or not symbol.startswith("sh") or not symbol[2:].isdigit() or len(symbol) != 8 or symbol in seen_symbols:
-                    raise ValueError("CSI daily route symbols must be unique six-digit Shanghai codes")
+                if (not isinstance(symbol, str) or not symbol.startswith(expected_prefix)
+                        or not symbol[2:].isdigit() or len(symbol) != 8 or symbol in seen_symbols):
+                    raise ValueError("external index route symbols must be unique six-digit codes for the configured market")
+                if input_id in {"CSI-INDEX-DAILY-OHLC-001", "CSI-INDEX-DAILY-CLOSE-PAIR-001"}:
+                    relation = symbol_parallel_codes.get(("XSHE", "index", symbol[2:]))
+                    if relation is None or relation["request_market"] != "XSHG":
+                        raise ValueError(f"CSI paired-code route lacks an evidenced parallel code for {symbol}")
                 seen_symbols.add(symbol)
         source["provider"], source["endpoint"] = capability.provider, capability.endpoint
     default = defaults[0]
@@ -279,6 +328,8 @@ def resolve_daily_definition(definition, config_root):
         raise ValueError("forced source is outside the configured default acquisition policy")
     return {**definition, "asset_type": asset, "input_id": default["input_id"],
             "acquisition_policy": policy_name, "source_policy": policy,
+            "symbol_successions": list(symbol_successions),
+            "symbol_parallel_codes": deepcopy(security_master.get("symbol_parallel_codes", [])),
             "quote_contract": contract, "schema_version": DAILY_SCHEMA_VERSION,
             "contract_versions": {name: file_hash(config_root / name) for name in
                 ("datasets/daily_bar.yaml", "normalization/daily_bar.yaml")},
@@ -302,6 +353,31 @@ def expand_daily_units(units, definition):
     units = [deepcopy(unit) for unit in units]
     sources = definition["source_policy"]["inputs"]
     default_source = next(source for source in sources if source.get("default") is True)
+    from datetime import date
+    from ..service.instruments import symbol_succession_for
+    parallel_codes = _normalize_symbol_parallel_codes(definition.get("symbol_parallel_codes", ()))
+    for unit in units:
+        symbol = str(unit.get("symbol", ""))
+        market = _daily_market(symbol)
+        request = unit.get("context", {}).get("request", {})
+        target = definition.get("trade_date") or request.get("end_date") or request.get("trade_date")
+        if not target:
+            continue
+        target_date = target if isinstance(target, date) else date.fromisoformat(str(target)[:10])
+        relation = symbol_succession_for(definition.get("symbol_successions", ()), market=market,
+            asset_type=unit.get("asset_type", definition["asset_type"]), symbol=symbol, as_of_date=target_date)
+        if relation is None:
+            continue
+        prefix = {"XSHG": "sh", "XSHE": "sz", "BSE": "bj"}[market]
+        new_symbol = prefix + str(relation["new_symbol"])
+        unit["symbol"] = new_symbol
+        unit["instrument_id"] = f"{market}:{relation['old_symbol']}"
+        if unit.get("key") == symbol:
+            unit["key"] = new_symbol
+        elif str(unit.get("key", "")).startswith(symbol + "__"):
+            unit["key"] = new_symbol + str(unit["key"])[len(symbol):]
+        unit.setdefault("context", {}).setdefault("request", {})["symbol"] = new_symbol
+        unit["symbol_relation"] = relation
     override_by_symbol = {symbol: source for source in sources if source is not default_source
                           for symbol in source["symbols"]}
     expanded = []
@@ -313,7 +389,21 @@ def expand_daily_units(units, definition):
         if source is not default_source and unit.get("asset_type", definition["asset_type"]) != source.get("asset_type"):
             raise ValueError(f"daily source route for {unit.get('symbol')} is restricted to {source.get('asset_type')}")
         requests_by_market = source["market_adjustment_requests"]
-        market = _daily_market(unit.get("symbol", ""))
+        logical_market = _daily_market(unit.get("symbol", ""))
+        source_symbol = unit.get("symbol")
+        market = logical_market
+        if source["input_id"] in {"CSI-INDEX-DAILY-OHLC-001", "CSI-INDEX-DAILY-CLOSE-PAIR-001"}:
+            relation = parallel_codes.get((logical_market, "index", str(unit["symbol"])[2:]))
+            if relation is None:
+                raise ValueError(f"CSI route has no evidenced paired request code for {unit.get('symbol')}")
+            source_symbol, market = relation["request_symbol"], relation["request_market"]
+            unit["source_symbol"] = source_symbol
+            unit["parallel_code_evidence"] = relation["evidence_refs"]
+            unit.setdefault("context", {}).setdefault("request", {})["source_symbol"] = source_symbol
+        else:
+            unit.pop("source_symbol", None)
+            unit.pop("parallel_code_evidence", None)
+            unit.setdefault("context", {}).setdefault("request", {}).pop("source_symbol", None)
         requests = requests_by_market.get(market)
         if requests is None:
             raise ValueError(f"daily source policy has no route for market {market}")
@@ -349,7 +439,8 @@ def expand_daily_units(units, definition):
             expanded.append(item)
     for unit in expanded:
         source = next((item for item in sources if item["input_id"] == unit["input_id"]), None)
-        market_requests = source["market_adjustment_requests"].get(_daily_market(unit.get("symbol", ""))) if source else None
+        request_market = _daily_market(unit.get("source_symbol") or unit.get("symbol", ""))
+        market_requests = source["market_adjustment_requests"].get(request_market) if source else None
         expected_request = market_requests.get(unit["adjustment"]) if market_requests else None
         optional_stock_adjustment = (
             unit.get("asset_type", definition["asset_type"]) == "stock"
@@ -382,7 +473,8 @@ def _source_capture_time(raw_manifest):
 def prepare_daily_task_publication(state, units, source_rows, paths, config_root, trade_date):
     definition = state["definition"]
     asset = AssetType(definition["asset_type"])
-    expected = {u["symbol"]: {"sh": "XSHG", "sz": "XSHE", "bj": "BSE"}[u["symbol"][:2]] + ":" + u["symbol"][2:] for u in units}
+    expected = {u["symbol"]: u.get("instrument_id") or
+        {"sh": "XSHG", "sz": "XSHE", "bj": "BSE"}[u["symbol"][:2]] + ":" + u["symbol"][2:] for u in units}
     selected = set(state.get("selected_symbols", ()))
     target_ids = {identity for symbol, identity in expected.items() if not selected or symbol in selected}
     groups, issues, unavailable_reasons = {}, [], {}

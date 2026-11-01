@@ -124,52 +124,110 @@ sequenceDiagram
 
 执行入口仍为collect-task。日线定义使用asset_types集合；单资产也是同一批执行器的范围子集。来源请求仍可包含none/forward/backward三个口径；发布合同统一要求none有效，forward/backward按真实返回值保存，缺少时保留未核验空值。阶段自动推进，开发验收分别展示输入输出，不增加人工运行暂停点。
 
-新日线批检查点使用`daily-batch-v2`：准备阶段按证券单元解析来源输入，冻结`input_id/provider/endpoint/value_contract`与请求参数；采集、处理和按类型发布仍是整批阶段，不恢复为逐证券串联发布。v1检查点继续按原冻结定义读取/续跑。`daily_fixed`的默认路线是腾讯完整四价；只有配置中精确列出的11个上海中证指数改走CSIndex收盘序列，合同为`close_only`，开高低及未核验量额保持空值，其他指数仍走默认完整四价合同。现有日线资格检查器对CSI单独校验：证券必须在`daily_fixed`精确清单内，资产类型为指数、市场为XSHG、接口为`index-perf`、不复权、单一目标日；资格证据还须核对收盘点位语义、原响应字节、配置和隔离聚合发布。批次授权只使用资格证明列出的精确代码，不把代码前缀扩大成新证券。资格没有匹配证据或超过有效期时，在线单元仍在请求前阻断；不自动回退腾讯、不将探针冒充生产资格。数据/路由配置位置见[能力路由](../../config/capabilities.yaml)、[来源输入合同](../../config/providers.yaml)与[日线标准化规则](../../config/normalization/daily_bar.yaml)，实际资格状态及验证边界见[项目进度](../../PROJECT_PROGRESS.md)。
+新日线批检查点使用`daily-batch-v2`：准备阶段按证券单元解析来源输入，冻结`input_id/provider/endpoint/value_contract`与请求参数；采集、处理和按类型发布仍是整批阶段，不恢复为逐证券串联发布。v1检查点继续按原冻结定义读取/续跑。`daily_fixed`默认由腾讯提供完整四价；指数另有四种精确路由：11个上海中证指数使用CSI收盘序列（`close_only`）；47个有明确官方并列代码证据的深圳名单指数保留深圳名单代码作为业务身份、改用对应`sh000xxx`请求CSI，其中34个走`full_ohlc`、13个走`close_only`；国证`sz399299`和`sz980070`使用CNI完整四价。收盘序列只要求目标日有效收盘值，开高低及未核实量额留空，不伪造四价。对2026-10-29留存原文的49项隔离批重放结果为：36项完整四价、13项收盘序列，49项全部生成候选并发布到同一隔离指数分区，缺失0项；此前13项失败是因为合同误设为`full_ohlc`，现已按用户确认修正。CSI量额、CNI量额单位尚未核实，标准值为空；来源原行仍保留。其他未明确映射的证券仍按冻结的腾讯默认合同处理，不因名称相似自动配对。CSI/CNI当前仍只做隔离回放，正式在线资格未通过时不执行真实联网任务。已登记的47组代码关系不改变名单记录身份，也不单独证明旧代码仍在当前编制名单中。数据/路由配置位置见[能力路由](../../config/capabilities.yaml)、[来源输入合同](../../config/providers.yaml)、[代码关系](../../config/datasets/security_master.yaml)与[日线标准化规则](../../config/normalization/daily_bar.yaml)，实际资格状态及验证边界见[项目进度](../../PROJECT_PROGRESS.md)。
 
-### 按来源并发采集（2026-11-01已实现；验证范围见下）
+### 多来源日线批处理：并发采集、分别解析、统一聚合（2026-11-01已实现；验证范围见下）
 
 #### 任务实际如何流转
 
 | 阶段 | 当前实际执行 | 业务效果与边界 |
 |---|---|---|
 | 冻结与资格 | 任务仍先冻结证券、日期、`input_id/provider/endpoint/value_contract`和请求参数；待采来源按`input_id`分组完成资格核验 | 请求不会因并发临时改变证券范围、来源或口径；不合格来源单元在发请求前记为阻断 |
-| 网络采集 | `_collect_daily_batch`为每个待采`input_id`启动一个工作线程；该组内仍按证券单元顺序调用`capture_daily_unit`，不同来源组可以同时请求 | 本批腾讯与中证可在同一采集阶段重叠等待；没有把同一来源的多个证券请求改成并发 |
+| 网络采集 | `_collect_daily_batch`按冻结来源输入分组并发调度；每个组内仍按证券单元顺序调用`capture_daily_unit` | 腾讯、CSI和CNI作为不同来源输入走各自请求；跨来源组可以重叠等待，同组证券仍顺序请求。共用主机的请求仍受主机限速，不承诺同一时刻都发出 |
 | 请求限速与原文 | 协调器先创建来源组要用的原文/归档父目录；传输层再将`requests.Session`请求钩子分派到各自线程的捕获上下文。原文及manifest逐请求、逐证券单元保存；共享`RequestPacer`按主机限速，批协调器独占更新单元状态、进度和检查点 | 两个Provider的响应不串档；Windows下不让工作线程竞争创建共享目录；同一物理主机不会因为不同来源组各建限速器而放大请求速率 |
-| 采集屏障与解析 | 协调器等待所有来源组成功、复用、失败或阻断后，才进入处理；处理阶段按冻结单元顺序调用对应Provider解析 | 只有网络请求按来源组并发；解析不和采集交错，也没有额外并发解析线程；腾讯和中证仍保留各自接口规则 |
-| 合并与发布 | 两类标准候选在`prepare_daily_task_publication`汇合，统一做身份、日期、口径和覆盖检查，再按证券类型走现有发布 | 只发布同一份聚合日线结果；不生成“腾讯发布”和“中证发布”两条数据路线，来源证据仍保留在对应口径组 |
+| 采集屏障与解析 | 协调器等待所有来源组成功、复用、失败或阻断后，才进入处理；处理阶段按冻结单元选择对应Provider | 腾讯、CSI、CNI分别按各自接口解析；解析不和采集交错，也没有额外并发解析线程 |
+| 合并与发布 | 各Provider产生的标准候选在`prepare_daily_task_publication`汇合，统一做身份、日期、口径和覆盖检查，再按证券类型走现有发布 | 同一任务只生成一份聚合日线结果；来源证据按记录保留`source_provider`及对应原响应引用，不建“腾讯发布/CSI发布/CNI发布”三条数据路线 |
 
-当前这两个来源输入的配置都是单并发：腾讯日线`request_interval_seconds=0.3、effective_concurrency=1`，中证指数日线为`3、1`（见`config/providers.yaml`中的`ASTOCK-002-daily`和`CSI-INDEX-DAILY-001`）。因此外层来源组并发只让两组等待时间重叠；同组请求仍逐个执行，且遵守主机级共享限速。
+当前来源输入都是单组内顺序请求：腾讯日线间隔`0.3秒`；CSI与CNI日线间隔`3秒`，配置均为`effective_concurrency=1`（见`config/providers.yaml`中的`ASTOCK-002-daily`、三个`CSI-INDEX-DAILY-*`合同和`CNI-INDEX-DAILY-001`）。不同来源组可并发调度；CSI收盘、CSI四价与CSI配对收盘合同共用CSIndex主机请求限速，不会绕过来源或主机限制。新增来源是否允许正式在线请求，仍由资格检查决定。
 
-本批所说的腾讯组和中证组，是由冻结的来源输入合同确定的两个`input_id`组，不是“一个证券一条流水线”。资格和健康状态由协调器在请求前检查；工作线程每完成一个请求都会等待协调器写入结果后再继续，因此403/429等状态更新会在该来源下一次请求前生效。来源内局部网络失败记在对应单元，其他已授权单元仍可继续；协调器异常则停止派发后续请求并等待在途工作结束。所有来源组结束后，处理循环仍按冻结单元顺序调用Provider解析，没有并发解析线程。
+本批来源组由冻结的`input_id`决定：腾讯日线、CSI直接收盘、CSI并列码完整四价、CSI并列码收盘序列、CNI完整四价。它们不是“一个证券一条流水线”。资格和健康状态由协调器在请求前检查；工作线程每完成一个请求都会等待协调器写入结果后再继续，因此403/429等状态更新会在该来源下一次请求前生效。来源内局部网络失败记在对应单元，其他已授权单元仍可继续；协调器异常则停止派发后续请求并等待在途工作结束。所有来源组结束后，处理循环仍按冻结单元顺序调用Provider解析，没有并发解析线程。
 
-#### 目标架构与实际数据汇合点
+#### 目标架构（隔离回放可执行；新来源正式在线资格仍未开放）
 
 ```mermaid
 flowchart LR
-    A[冻结日线单元<br/>代码、日期、口径、来源合同] --> B[按来源输入分组<br/>腾讯组 / 中证组]
-    B --> C[来源组资格核验]
-    C -->|合格组| D[批任务协调器<br/>按来源组并发派发]
-    C -->|未合格单元| X[记录阻断原因<br/>不发请求]
-    D -->|同一采集时段| T[腾讯来源组<br/>组内顺序请求]
-    D -->|同一采集时段| S[中证来源组<br/>组内顺序请求]
-    T --> RT[保存腾讯原始响应与单元结果]
-    S --> RS[保存中证原始响应与单元结果]
-    RT --> W[采集屏障<br/>每个冻结单元均已成功、复用、失败或阻断]
-    RS --> W
+    A[冻结任务单元<br/>名单代码 / 日期 / 口径 / 来源合同] --> B{按配置确定来源输入}
+    B -->|默认股票及未映射标的| T[腾讯来源输入]
+    B -->|11个CSI收盘指数| C0[CSI收盘合同]
+    B -->|34个并列码指数| C1[CSI完整四价合同<br/>full_ohlc]
+    B -->|13个并列码指数| C2[CSI收盘序列合同<br/>close_only]
+    B -->|国证指数 399299 / 980070| N[CNIndex来源输入]
+    T --> Q[请求前资格与健康检查]
+    C0 --> Q
+    C1 --> Q
+    C2 --> Q
+    N --> Q
+    Q -->|live/retained资格通过；replay命中留存原文| D[批任务协调器<br/>按来源输入并发调度]
+    Q -->|不符合| X[记录来源、证券与阻断原因<br/>不发送请求]
+    D -->|live请求 / replay读原文| RT[腾讯Provider输入与原文证据]
+    D -->|live请求 / replay读原文| R0[CSI收盘输入与原文证据]
+    D -->|配对码live请求 / replay读原文| R1[CSI完整四价输入与原文证据]
+    D -->|配对码live请求 / replay读原文| R2[CSI收盘序列输入与原文证据]
+    D -->|live请求 / replay读原文| RN[CNIndex输入与原文证据]
+    RT --> W[采集屏障<br/>每个冻结单元成功 / 复用 / 失败 / 阻断]
+    R0 --> W
+    R1 --> W
+    R2 --> W
+    RN --> W
     X --> W
-    W --> D[批任务按冻结单元顺序分派解析]
-    D -->|腾讯单元| PT[腾讯Provider按腾讯接口解析]
-    D -->|中证单元| PS[中证Provider按中证接口解析]
+    W --> P0[批任务按冻结单元派发解析]
+    P0 -->|腾讯合同| PT[Tencent Provider按腾讯字段解析]
+    P0 -->|CSI close_only / full_ohlc| PC[CSIndex Provider按指数接口解析]
+    P0 -->|CNIndex full_ohlc| PN[CNIndex Provider按国证接口解析]
     PT --> CT[腾讯标准候选]
-    PS --> CS[中证标准候选]
-    CT --> U[合并候选集合<br/>保留逐口径来源引用]
-    CS --> U
-    U --> Q[统一身份、日期、口径及覆盖检查]
-    Q --> P[按证券类型统一发布]
-    P --> V[现有查询API与页面]
+    PC --> CC[CSI标准候选<br/>保留名单代码、来源及请求证据]
+    PC -->|34个来源有四价| CCF[CSI完整四价候选]
+    PC -->|11个上海指数 + 13个并列指数| CCC[CSI收盘序列候选<br/>开高低留空]
+    PN --> CN[CNIndex标准候选<br/>保留来源及请求证据]
+    CT --> U[候选聚合<br/>按业务身份 + 日期 + 口径合并]
+    CCF --> U
+    CCC --> U
+    CN --> U
+    U --> V[统一覆盖与发布检查]
+    V --> PUB[按证券类型写入同一日线发布]
+    PUB --> WEB[现有查询API与页面]
 ```
 
-两个来源不是两条独立发布路线。分叉只发生在“网络请求”和“按接口解析”两处；两边产出的标准候选在`prepare_daily_task_publication`入口汇合，再统一做业务键、证券身份、日期、必需口径和覆盖检查，最后仍按资产类型发布。现有固定路由下，同一证券/日期/口径只选择一个来源；如果将来允许两个来源都给同一业务键，必须先另行定义冲突处理，当前设计不做来源择优或字段拼接。
+上图的三家来源不是三条发布路线。分叉发生在请求和解析阶段：每份原始响应由匹配的Provider解释，标准候选再进入`prepare_daily_task_publication`，统一按业务身份、日期、口径和覆盖检查，最后按资产类型发布。当前每个冻结单元只选择一个来源；官方并列代码只用于请求，输出仍归到名单中的逻辑代码，真实请求代码、来源和原文引用保留在任务及raw证据中。当前设计不对多个来源的同一业务键做字段拼接或自动择优。原先13个CSI并列指数已有目标日收盘值但缺少开高低，按`full_ohlc`检查时无法生成候选；用户确认后将这13项改为`close_only`，因此它们以收盘序列进入同一发布检查，不再因缺少开高低阻断。
+
+#### 实现架构：组件职责与依赖关系
+
+```mermaid
+flowchart TB
+    subgraph CFG[配置合同]
+        SM[security_master.yaml<br/>名单身份、代码并列关系、承接关系]
+        CAP[capabilities.yaml<br/>来源范围、路由、值合同]
+        PC[providers.yaml<br/>请求参数、限速、输入ID]
+        NM[daily_bar.yaml<br/>标准字段与单位规则]
+    end
+    CLI[现有 collect-task 入口] --> COORD[pipeline.inputs.py<br/>整批协调、检查点、来源分组]
+    CFG --> PLAN[pipeline.daily.py<br/>冻结请求单元、标准身份与来源代码]
+    COORD --> PLAN
+    PLAN --> FACTORY[routing.factory.py<br/>InputContract与Provider构建]
+    PC --> FACTORY
+    CAP --> PLAN
+    SM --> PLAN
+    FACTORY --> T[TencentDailyProvider]
+    FACTORY --> C[CsindexDailyProvider<br/>close_only / full_ohlc]
+    FACTORY --> N[CnindexDailyProvider<br/>full_ohlc]
+    T -->|live传输| TRANS[RequestsTransport]
+    C -->|live传输| TRANS
+    N -->|live传输| TRANS
+    TRANS -->|响应先落盘| RAW[RawObjectStore<br/>原始字节与请求manifest]
+    RAW -->|live留存或精确replay| PARSE[Provider按各自接口解析]
+    T --> PARSE
+    C --> PARSE
+    N --> PARSE
+    NM --> BUILD[pipeline.daily.py<br/>字段归一与标准候选]
+    PARSE --> BUILD
+    BUILD --> AGG[prepare_daily_task_publication<br/>统一身份、日期、口径与覆盖检查]
+    AGG --> QUALITY[quality/publication.py<br/>现有发布门槛]
+    QUALITY --> STORE[CanonicalPartitionStore<br/>按资产类型提交同一日线数据集]
+    STORE --> QUERY[service/market_data.py 与 service/web.py<br/>当前代码投影、查询API]
+    QUERY --> PAGE[现有只读页面]
+```
+
+这张架构图说明新增来源复用了哪些现有部件：配置决定冻结单元和字段合同；`routing.factory.py`按来源输入构建不同Provider；`pipeline.inputs.py`保留现有批次屏障和恢复；各Provider独立解析；`pipeline.daily.py`把各自标准候选统一交给已有发布和存储。没有新增第二套任务管理器或独立发布后端。当前CNI及CSI完整四价路由的实现/解析可做隔离重放，但它们的生产资格检查合同尚未扩展；图中的live路径表示目标数据流，不代表此刻允许联网。
 
 #### 并发、检查点与失败行为
 
@@ -186,12 +244,13 @@ flowchart LR
 
 | 验收点 | 本次证据 | 结论边界 |
 |---|---|---|
-| 不同来源组的请求可重叠，捕获上下文互不串档 | `tests/test_provider_contract_adapters.py::test_captured_requests_keep_live_concurrent_responses_in_their_own_contexts`；`tests/test_daily_collection_e2e.py::test_daily_batch_runs_tencent_and_csindex_capture_groups_before_shared_processing` | 离线模拟并发；没有访问实时来源 |
-| 处理等待所有来源组结束，两个Provider解析后共同发布 | 上述混合来源回放测试断言两个来源都完成后才调用处理，并从同一指数分区读回两条记录及各自`source_provider` | 验证固定样本的候选汇合与发布，不代表中证已获在线资格 |
+| 不同来源组请求可重叠、响应归档不串档 | `tests/test_provider_contract_adapters.py::test_captured_requests_keep_live_concurrent_responses_in_their_own_contexts`；`tests/test_daily_collection_e2e.py::test_daily_batch_runs_tencent_and_csindex_capture_groups_before_shared_processing` | 离线模拟腾讯/CSI并发调度；没有访问实时来源 |
+| CSI与CNI分别解析后并入同一日线发布 | `tests/test_daily_external_index_sources.py::test_csindex_and_cnindex_candidates_aggregate_into_one_index_publication`；2026-10-29真实原文小批回放4条记录 | 4条固定样本写入同一指数分区，来源分别为`csindex`和`cnindex`；49项结果见下一行 |
+| 47个CSI配对代码和2个CNI代码的真实原文批回放 | [49项最终隔离结果](../../tmp/csi-cni-index-20261029-expanded-isolated/run-closeonly/expanded-scope-result.json)及[运行说明](../../tmp/csi-cni-index-20261029-expanded-isolated/run-closeonly/README.md) | 原响应49/49重放成功、网络0次；36项完整四价、13项收盘序列；候选49/49，发布49条到同一隔离指数分区，缺失0。此前错误合同造成的失败证据保留在[首次失败结果](../../tmp/csi-cni-index-20261029-expanded-isolated/run/expanded-scope-result.json) |
 | 既有请求恢复、限速与整批采集屏障回归 | 本次定向6项覆盖请求重试/恢复、共享限速策略并发固定、捕获归属、整批采集后才解析；日线批次及端到端扩大测试共59项通过 | 扩大测试排除了`test_daily_web_defaults_validation_and_corrupt_partition`；它不是本次并发改动的Web消费路径验收 |
-| 真实在线腾讯与中证同时采集 | 中证输入仍为`implemented_validation_only`，正式资格未通过 | 未验证，也未发起实时中证请求；并发执行框架可用不等于中证来源可生产 |
+| 真实在线腾讯、CSI与CNI并发采集 | CSI完整四价和CNI仍为`implemented_validation_only`；其正式资格检查合同尚未扩展 | 本次不发实时新来源请求；并发调度和隔离回放可用不等于新来源已获正式在线资格 |
 
-所以本阶段完成的是“已有批任务采集阶段的跨来源组并发”；CSI来源的资格与数据合同沿用前序已确认设计，本次离线并发测试不替代在线来源认证。真实中证在线调用仍会在请求前被现有资格规则拦截。
+所以本阶段实现的是“现有批任务中的按来源输入调度、来源专属解析、统一候选聚合”。CSI/CNI原始响应的隔离重放证明代码路径与数据汇合合同可执行；它不替代实时语义认证或在线资格。正式在线采集仍会在请求前被现有资格规则拦截。
 
 冻结定义只写一次；既有请求级清单和单元manifest保存本条结果，任务元数据和summary只保存定义引用、阶段计数及产物引用。单元清单是恢复结果依据，摘要供显示。恢复按冻结计划核对产物一次，正常逐条执行不重写整份定义或已有报告。原文在采集阶段取得稳定归档引用，活动raw仍仅在完整分区发布后转正。已有原文仅按明确范围、时效和完整性复用，原始采集时间不改写。
 

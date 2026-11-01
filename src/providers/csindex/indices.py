@@ -9,21 +9,26 @@ from ..contracts import InputFetchResult
 
 
 class CsindexDailyProvider:
-    """Retained-response adapter for CSI index performance (daily close series)."""
+    """Retained-response adapter for the two explicit CSI daily value contracts."""
     name = "csindex"
     endpoint = "index-perf"
     capability_version = "csindex-index-perf-close-v1"
     input_hosts = ("https://www.csindex.com.cn",)
     url = "https://www.csindex.com.cn/csindex-home/perf/index-perf"
 
-    def __init__(self, transport):
+    def __init__(self, transport, *, value_contract="close_only"):
+        if value_contract not in {"close_only", "full_ohlc"}:
+            raise ValueError("CSI daily value contract must be close_only or full_ohlc")
         self.transport = transport
+        self.value_contract = value_contract
+        if value_contract == "full_ohlc":
+            self.capability_version = "csindex-index-perf-ohlc-v1"
 
     def capture_window(self, code, start, end, adjust="none", api="index-perf", asset_type=None):
         from datetime import date
         match = re.fullmatch(r"sh(\d{6})", str(code).lower())
         if not match or asset_type != "index" or adjust != "none" or api != "index-perf":
-            raise ValueError("CSI index-perf is restricted to configured Shanghai index close-only units")
+            raise ValueError("CSI index-perf is restricted to configured Shanghai index units")
         start_day = start.isoformat() if isinstance(start, date) else date.fromisoformat(str(start)).isoformat()
         end_day = end.isoformat() if isinstance(end, date) else date.fromisoformat(str(end)).isoformat()
         if end_day != start_day:
@@ -61,13 +66,32 @@ class CsindexDailyProvider:
                 raise ProviderContractError("CSI returned a different index code", FailureClass.SCHEMA_CHANGED, retryable=False)
             if str(item["tradeDate"]) != target:
                 continue
-            if any(item.get(name) is not None for name in ("open", "high", "low")):
-                raise ProviderContractError("CSI close-only response unexpectedly contains OHLC", FailureClass.SCHEMA_CHANGED, retryable=False)
+            prices = {name: item.get(name) for name in ("open", "high", "low", "close")}
+            if self.value_contract == "close_only":
+                if any(prices[name] is not None for name in ("open", "high", "low")):
+                    raise ProviderContractError("CSI close-only response unexpectedly contains OHLC", FailureClass.SCHEMA_CHANGED, retryable=False)
+                try:
+                    close = float(prices["close"])
+                except (TypeError, ValueError, OverflowError) as exc:
+                    raise ProviderContractError("CSI close-only response has an invalid close", FailureClass.SCHEMA_CHANGED, retryable=False) from exc
+                if isinstance(prices["close"], bool) or not math.isfinite(close) or close <= 0:
+                    raise ProviderContractError("CSI close-only response has an invalid close", FailureClass.SCHEMA_CHANGED, retryable=False)
+                prices.update(open=None, high=None, low=None)
+            else:
+                try:
+                    numeric = {name: float(value) for name, value in prices.items()}
+                except (TypeError, ValueError, OverflowError) as exc:
+                    raise ProviderContractError("CSI full OHLC response has a missing or nonnumeric price", FailureClass.SCHEMA_CHANGED, retryable=False) from exc
+                if any(isinstance(prices[name], bool) or not math.isfinite(value) or value <= 0
+                       for name, value in numeric.items()):
+                    raise ProviderContractError("CSI full OHLC response has an invalid price", FailureClass.SCHEMA_CHANGED, retryable=False)
+                if not numeric["low"] <= min(numeric["open"], numeric["close"]) <= max(numeric["open"], numeric["close"]) <= numeric["high"]:
+                    raise ProviderContractError("CSI full OHLC response has invalid price ordering", FailureClass.SCHEMA_CHANGED, retryable=False)
             rows.append({"symbol": captured["symbol"], "trade_date": captured["start"].isoformat(),
-                "open": None, "high": None, "low": None, "close": item["close"],
-                "volume": None, "amount": None, "adjustment": "none", "value_contract": "close_only"})
+                **prices, "volume": None, "amount": None, "adjustment": "none",
+                "value_contract": self.value_contract})
         return InputFetchResult(tuple(rows), source_url=self.url, source_rows=tuple(source_rows),
-            mapping_context={"adjustment": "none", "value_contract": "close_only", "returned_row_count": len(source_rows)})
+            mapping_context={"adjustment": "none", "value_contract": self.value_contract, "returned_row_count": len(source_rows)})
 
 
 class CsindexConstituentProvider:

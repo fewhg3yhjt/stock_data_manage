@@ -69,16 +69,19 @@ class MinuteQuery:
         return MinuteQueryResult(tuple(sorted(selected, key=lambda record: record.key)), tuple(conflicts))
 
 
-def query_daily(canonical_root, *, security="", start_date=None, end_date=None, asset_type="", adjustment="none", page=1, page_size=50):
+def query_daily(canonical_root, *, security="", start_date=None, end_date=None, asset_type="", adjustment="none", page=1, page_size=50,
+                symbol_successions=()):
     """Project published aggregate values only. Source-row evidence has a different consumer."""
     from pathlib import Path
     from ..domain import AssetType, QuoteStatus
+    from .instruments import normalize_symbol_successions, symbol_succession_for
     from ..storage.parquet import InvalidPartitionError
     if adjustment not in {a.value for a in Adjustment} or asset_type not in {"", *(a.value for a in AssetType)}:
         raise ValueError("unsupported daily asset or adjustment")
     if page < 1 or not 1 <= page_size <= 100 or (start_date and end_date and start_date > end_date):
         raise ValueError("invalid daily page or date range")
     root = Path(canonical_root).resolve()
+    relations = normalize_symbol_successions(symbol_successions)
     store = CanonicalPartitionStore(root)
     items, available = [], set()
     for descriptor in sorted(root.glob("*/daily_bar/*/manifest.json")):
@@ -90,12 +93,26 @@ def query_daily(canonical_root, *, security="", start_date=None, end_date=None, 
             continue
         for record in store.read_daily(kind, day.isoformat()):
             code = record.instrument_id.split(":")[1]
-            symbol = {"XSHG":"sh", "XSHE":"sz", "BSE":"bj"}[record.instrument_id.split(":")[0]] + code
-            if security and security.lower() not in {code, symbol, record.instrument_id.lower()}:
+            market = record.instrument_id.split(":")[0]
+            prefix = {"XSHG":"sh", "XSHE":"sz", "BSE":"bj"}[market]
+            symbol = prefix + code
+            relation = symbol_succession_for(relations, market=market, asset_type=record.asset_type.value,
+                symbol=code, as_of_date=day)
+            relation_detail = None
+            searchable = {code, symbol, record.instrument_id.lower()}
+            if relation:
+                old_symbol = prefix + str(relation["old_symbol"])
+                current_symbol = prefix + str(relation["new_symbol"])
+                symbol = current_symbol
+                searchable.update({str(relation["old_symbol"]), str(relation["new_symbol"]), old_symbol,
+                                   current_symbol, market.lower() + ":" + str(relation["old_symbol"])})
+                relation_detail = {**relation, "old_symbol": old_symbol, "new_symbol": current_symbol}
+            if security and security.lower() not in searchable:
                 continue
             available.update(name for name,q in record.quotes.items() if q.status is QuoteStatus.AVAILABLE)
             quote = record.quotes[adjustment]
-            items.append({"instrument_id": record.instrument_id, "symbol": symbol, "trade_date": day.isoformat(),
+            items.append({"instrument_id": record.instrument_id, "symbol": symbol, "symbol_relation": relation_detail,
+                "trade_date": day.isoformat(),
                 "asset_type": record.asset_type.value, "value_kind": record.value_kind, "quote_unit": record.quote_unit,
                 "adjustment": adjustment, "status": quote.status.value, "value_contract": quote.value_contract, "reason": quote.reason,
                 "values": {name: str(getattr(quote,name)) if getattr(quote,name) is not None else None

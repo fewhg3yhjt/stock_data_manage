@@ -2043,6 +2043,140 @@ input_capabilities:
     effective_concurrency: 1
     request_limit_enforcement: call_boundary_only
     base_requests_per_fetch: 1
+  CSI-INDEX-DAILY-OHLC-001:
+    dataset: daily_bar
+    runtime_method: capture_window
+    provider: csindex
+    endpoint: index-perf
+    display_name: 中证指数日线四价
+    data_kind: time_series
+    data_frequency: daily
+    request_shape: single_symbol
+    parameters:
+      code:
+        type: string
+        source: request.source_symbol
+        required: true
+      start:
+        type: date
+        source: request.start_date
+        required: true
+      end:
+        type: date
+        source: request.end_date
+        required: true
+      adjust:
+        type: string
+        source: config.adjust
+        required: true
+        default: none
+        choices: [none]
+      api:
+        type: string
+        source: config.api
+        required: true
+        default: index-perf
+        choices: [index-perf]
+    collection_profile: market_after_close
+    implementation_status: implemented_validation_only
+    evidence_refs:
+    - tmp/batch-remediation-20261029/interface-review/raw/csi-daily-sh000904/manifest.ndjson
+    - tmp/batch-remediation-20261029/interface-review/raw/csi-pair-399904-20261029/manifest.ndjson
+    limitations:
+    - 仅为名单中存在明确配对依据的深圳指数记录请求中证上海行情代码；发布身份仍保留名单代码。
+    - 只映射目标日完整OHLC；成交量、成交额单位未核实，标准记录为空，原始来源行完整保留。
+    - 仅允许隔离回放；Provider正式资格尚未通过，live/retained任务继续在请求前被现有资格检查阻断。
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    base_requests_per_fetch: 1
+  CSI-INDEX-DAILY-CLOSE-PAIR-001:
+    dataset: daily_bar
+    runtime_method: capture_window
+    provider: csindex
+    endpoint: index-perf
+    display_name: 中证并列指数日线收盘序列
+    data_kind: time_series
+    data_frequency: daily
+    request_shape: single_symbol
+    parameters:
+      code:
+        type: string
+        source: request.source_symbol
+        required: true
+      start:
+        type: date
+        source: request.start_date
+        required: true
+      end:
+        type: date
+        source: request.end_date
+        required: true
+      adjust:
+        type: string
+        source: config.adjust
+        required: true
+        default: none
+        choices: [none]
+      api:
+        type: string
+        source: config.api
+        required: true
+        default: index-perf
+        choices: [index-perf]
+    collection_profile: market_after_close
+    implementation_status: implemented_validation_only
+    evidence_refs:
+    - tmp/csi-cni-index-20261029-expanded-isolated/run/missing-csi-ohlc-evidence.json
+    limitations:
+    - 仅用于配置中明确列出的13个深圳名单指数并列代码；业务身份保留名单代码，CSI请求代码来自security_master.yaml。
+    - 原始响应目标日只提供收盘点位；开高低与未核验量额留空，不从其他字段或来源补造。
+    - 仅允许隔离回放；当前不授予live/retained在线资格。
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    base_requests_per_fetch: 1
+  CNI-INDEX-DAILY-001:
+    dataset: daily_bar
+    runtime_method: capture_window
+    provider: cnindex
+    endpoint: index-daily
+    display_name: 国证指数日线
+    data_kind: time_series
+    data_frequency: daily
+    request_shape: single_symbol
+    parameters:
+      code:
+        type: string
+        source: request.symbol
+        required: true
+      start:
+        type: date
+        source: request.start_date
+        required: true
+      end:
+        type: date
+        source: request.end_date
+        required: true
+      frequency:
+        type: string
+        source: config.frequency
+        required: true
+        default: day
+        choices: [day]
+    collection_profile: market_after_close
+    implementation_status: implemented_validation_only
+    evidence_refs:
+    - tmp/batch-remediation-20261029/interface-review/raw/cni-daily-sz399299/manifest.ndjson
+    - tmp/batch-remediation-20261029/interface-review/raw/cni-daily-980070/manifest.ndjson
+    limitations:
+    - 仅限daily_fixed显式列出的国证指数代码和一个目标日期；HTTP成功不代表该代码有行情。
+    - 映射开高低收；成交量和成交额来源单位尚未核验，正式标准候选保留空值，原响应保留在来源行。
+    - 只允许隔离回放；Provider资格未通过前，live及retained任务仍由现有资格门禁阻断。
+    request_interval_seconds: 3
+    effective_concurrency: 1
+    request_limit_enforcement: call_boundary_only
+    base_requests_per_fetch: 1
   ASTOCK-070:
     dataset: trading_calendar
     runtime_method: fetch

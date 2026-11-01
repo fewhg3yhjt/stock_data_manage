@@ -180,3 +180,24 @@ acquisition_policies:
         market_adjustment_requests:
           XSHG:
             none: {api: index-perf, adjust: none}
+      - input_id: CSI-INDEX-DAILY-OHLC-001
+        asset_type: index
+        symbols: [sz399904, sz399907, sz399908, sz399909, sz399910, sz399911, sz399912, sz399915, sz399916, sz399917, sz399918, sz399919, sz399922, sz399923, sz399925, sz399926, sz399927, sz399929, sz399930, sz399931, sz399936, sz399937, sz399941, sz399942, sz399944, sz399945, sz399948, sz399949, sz399952, sz399964, sz399969, sz399977, sz399978, sz399979]
+        value_contract: full_ohlc
+        market_adjustment_requests:
+          XSHG:
+            none: {api: index-perf, adjust: none}
+      - input_id: CSI-INDEX-DAILY-CLOSE-PAIR-001
+        asset_type: index
+        symbols: [sz399920, sz399938, sz399939, sz399943, sz399947, sz399950, sz399951, sz399953, sz399954, sz399956, sz399957, sz399958, sz399968]
+        value_contract: close_only
+        market_adjustment_requests:
+          XSHG:
+            none: {api: index-perf, adjust: none}
+      - input_id: CNI-INDEX-DAILY-001
+        asset_type: index
+        symbols: [sz399299, sz980070]
+        value_contract: full_ohlc
+        market_adjustment_requests:
+          XSHE:
+            none: {frequency: day}

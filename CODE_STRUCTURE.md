@@ -100,7 +100,8 @@
 | `providers/eastmoney/__init__.py` | EastMoney 适配器导出 |
 | `providers/akshare/session.py` | AkShare 可选依赖加载和代码转换 |
 | `providers/akshare/daily.py` | AkShare 股票、ETF、LOF、指数函数级历史日线 |
-| `providers/csindex/indices.py` | CSIndex 指数收盘序列和既有成分/估值工作簿适配；日线只接收明确配置的上海中证指数，在线资格尚未启用 |
+| `providers/csindex/indices.py` | CSIndex日线收盘序列及完整OHLC两种合同，并保留成分/估值工作簿适配；11个上海指数和13个深圳并列代码使用收盘序列合同，另34个深圳并列代码使用完整四价合同；请求代码与名单身份分开留存 |
+| `providers/cnindex/daily.py` | 国证指数日线响应捕获与字段解析；校验目标日和OHLC，量额单位未核验时只保留来源原行、不生成标准量额 |
 | `providers/sse/market.py` | 上交所既有风险指标和ETF份额；复用原SDK接入指定统计日普通ETF身份，复用已验证官网请求接入交易型货币ETF身份；原份额接口不变 |
 | `providers/exchanges/daily.py` | 交易所期货、期权和排名日数据；复用深交所原SDK接入指定统计日ETF身份，逐项核对原XLSX以防SDK删行掩盖问题 |
 | `providers/akshare/boards.py` | 原 AkShare 同花顺行业目录、行业指数日线和行业/概念资金流快照；YAML 名称映射、保留旧返回并提供 SDK 原列与身份上下文 |

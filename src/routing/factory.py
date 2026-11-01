@@ -466,6 +466,9 @@ def build_input_provider(contract, *, providers_path, client=None):
                         "ASTOCK-037-profile": "fetch", "ASTOCK-037-events": "fetch_company_events",
                         "ASTOCK-001": "fetch_snapshot", "ASTOCK-002-daily": "capture_window", "ASTOCK-002-5m": "fetch_recent",
                         "CSI-INDEX-DAILY-001": "capture_window",
+                        "CSI-INDEX-DAILY-OHLC-001": "capture_window",
+                        "CSI-INDEX-DAILY-CLOSE-PAIR-001": "capture_window",
+                        "CNI-INDEX-DAILY-001": "capture_window",
                         "ASTOCK-045": "fetch", "ASTOCK-070": "fetch",
                         "ASTOCK-026": "fetch_history", "ASTOCK-027": "fetch_history", "ASTOCK-028": "fetch_history",
                         "ASTOCK-046": "fetch", "ASTOCK-047": "fetch", "ASTOCK-048": "fetch", "ASTOCK-050": "fetch",
@@ -551,6 +554,17 @@ def build_input_provider(contract, *, providers_path, client=None):
     if contract.input_id == "CSI-INDEX-DAILY-001":
         from ..providers.csindex.indices import CsindexDailyProvider
         return CsindexDailyProvider(RequestsTransport({"User-Agent": "Mozilla/5.0", "Accept": "application/json"}))
+    if contract.input_id == "CSI-INDEX-DAILY-OHLC-001":
+        from ..providers.csindex.indices import CsindexDailyProvider
+        return CsindexDailyProvider(RequestsTransport({"User-Agent": "Mozilla/5.0", "Accept": "application/json"}),
+                                    value_contract="full_ohlc")
+    if contract.input_id == "CSI-INDEX-DAILY-CLOSE-PAIR-001":
+        from ..providers.csindex.indices import CsindexDailyProvider
+        return CsindexDailyProvider(RequestsTransport({"User-Agent": "Mozilla/5.0", "Accept": "application/json"}),
+                                    value_contract="close_only")
+    if contract.input_id == "CNI-INDEX-DAILY-001":
+        from ..providers.cnindex.daily import CnindexDailyProvider
+        return CnindexDailyProvider(RequestsTransport({"User-Agent": "python-requests"}))
     if contract.input_id == "ASTOCK-002-5m":
         config = next(c for c in load_provider_configs(providers_path) if c.provider == "tencent" and c.endpoint == "native_1m")
         capability = replace(config.capability(), endpoint=contract.endpoint, version="tencent-recent-5m-input-v1",

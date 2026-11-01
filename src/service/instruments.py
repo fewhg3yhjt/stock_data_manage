@@ -70,6 +70,74 @@ def stable_instrument_id(exchange: Exchange, symbol: str) -> str:
     return f"{exchange.value}:{symbol.removeprefix(prefix)}"
 
 
+def normalize_symbol_successions(relations: Iterable[Mapping[str, object]]) -> tuple[dict[str, object], ...]:
+    """Validate the small, explicit old-code to current-code list in security_master.yaml."""
+    result = []
+    old_keys, new_keys = set(), set()
+    for relation in relations:
+        if not isinstance(relation, Mapping):
+            raise ValueError("symbol succession must be a mapping")
+        market = Exchange(str(relation.get("market", "")).upper()).value
+        asset_type = AssetType(str(relation.get("asset_type", "")).lower()).value
+        old_symbol, new_symbol = str(relation.get("old_symbol", "")), str(relation.get("new_symbol", ""))
+        if (len(old_symbol) != 6 or not old_symbol.isdigit() or len(new_symbol) != 6
+                or not new_symbol.isdigit() or old_symbol == new_symbol):
+            raise ValueError("symbol succession requires distinct six-digit old and new codes")
+        effective_from = relation.get("effective_from")
+        effective_from = effective_from.isoformat() if isinstance(effective_from, date) else date.fromisoformat(str(effective_from)).isoformat()
+        evidence_refs = relation.get("evidence_refs")
+        if (not isinstance(evidence_refs, (list, tuple)) or not evidence_refs
+                or any(not isinstance(ref, str) or not ref.strip() for ref in evidence_refs)):
+            raise ValueError("symbol succession requires persistent evidence references")
+        old_key, new_key = (market, asset_type, old_symbol), (market, asset_type, new_symbol)
+        if old_key in old_keys or new_key in new_keys:
+            raise ValueError("symbol succession has an ambiguous old or new code")
+        old_keys.add(old_key)
+        new_keys.add(new_key)
+        result.append({"market": market, "asset_type": asset_type, "old_symbol": old_symbol,
+            "new_symbol": new_symbol, "effective_from": effective_from,
+            "evidence_refs": list(evidence_refs)})
+    return tuple(result)
+
+
+def symbol_succession_for(relations: Iterable[Mapping[str, object]], *, market: str,
+                          asset_type: str, symbol: str, as_of_date: date) -> dict[str, object] | None:
+    """Resolve an explicitly evidenced linear code succession to its current code."""
+    code = str(symbol).lower()
+    prefixes = {"XSHG": "sh", "XSHE": "sz", "BSE": "bj"}
+    prefix = prefixes.get(str(market).upper(), "")
+    if code.startswith(prefix) and prefix:
+        code = code[len(prefix):]
+    active = [relation for relation in normalize_symbol_successions(relations)
+        if relation["market"] == str(market).upper() and relation["asset_type"] == str(asset_type).lower()
+        and as_of_date >= date.fromisoformat(str(relation["effective_from"]))]
+    next_by_old = {str(relation["old_symbol"]): relation for relation in active}
+    previous_by_new = {str(relation["new_symbol"]): relation for relation in active}
+    if code not in next_by_old and code not in previous_by_new:
+        return None
+
+    root, visited = code, {code}
+    while root in previous_by_new:
+        root = str(previous_by_new[root]["old_symbol"])
+        if root in visited:
+            raise ValueError("symbol succession contains a cycle")
+        visited.add(root)
+
+    current, chain, visited = root, [], {root}
+    while current in next_by_old:
+        relation = next_by_old[current]
+        chain.append(relation)
+        current = str(relation["new_symbol"])
+        if current in visited:
+            raise ValueError("symbol succession contains a cycle")
+        visited.add(current)
+    if not chain:
+        return None
+    evidence_refs = list(dict.fromkeys(ref for relation in chain for ref in relation["evidence_refs"]))
+    return {**chain[0], "old_symbol": root, "new_symbol": current, "evidence_refs": evidence_refs,
+        "transitions": list(chain)}
+
+
 def merge_security_sources(
     previous: Iterable[SecurityRecord],
     sources: Mapping[str, Iterable[SecurityRecord]],
@@ -124,7 +192,6 @@ def merge_security_sources(
                 updates["delist_date"] = candidate.delist_date
             if source in official_sources and candidate.status in {"active", "delisted", "suspended", "prelisted"}:
                 updates["status"] = candidate.status
-            merged[candidate.instrument_id] = replace(existing, **updates)
             if existing.symbol != candidate.symbol:
                 aliases.append(
                     SymbolHistory(
@@ -137,6 +204,7 @@ def merge_security_sources(
                         source,
                     )
                 )
+            merged[candidate.instrument_id] = replace(existing, **updates)
     return SecurityMergeResult(
         tuple(sorted(merged.values(), key=lambda item: item.instrument_id)),
         tuple(aliases),

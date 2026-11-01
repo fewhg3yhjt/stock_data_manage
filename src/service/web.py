@@ -1051,8 +1051,10 @@ def create_app(
         from .market_data import query_daily
         from ..storage.parquet import InvalidPartitionError
         try:
+            security_policy = yaml.safe_load((reader.config_root / "datasets/security_master.yaml").read_text(encoding="utf-8")) or {}
             result = query_daily(reader.paths["canonical_root"], security=security, start_date=start_date,
-                end_date=end_date, asset_type=asset_type, adjustment=adjustment, page=page, page_size=page_size)
+                end_date=end_date, asset_type=asset_type, adjustment=adjustment, page=page, page_size=page_size,
+                symbol_successions=security_policy.get("symbol_successions", []))
             catalog = reader._security_catalog()
             for row in result["items"]:
                 known = catalog.get(reader._security_code(row["instrument_id"]), {})

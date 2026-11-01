@@ -54,6 +54,17 @@ def response_body_path(*, scope, fetched_at: datetime) -> Path:
     scope = scope if isinstance(scope, dict) else {}
     parameters = scope.get("parameters") if isinstance(scope.get("parameters"), dict) else scope
     stamp, clock = _local_capture_stamp(fetched_at)
+    symbol = parameters.get("symbol") or parameters.get("code")
+    adjustment = parameters.get("adjustment") or parameters.get("adjust") or parameters.get("frequency")
+    if symbol and adjustment and (parameters.get("start") or parameters.get("start_date")):
+        # Daily responses are copied below deeply nested task evidence paths on Windows.
+        # Parent paths identify the provider/endpoint and request unit; retain a compact,
+        # human-readable date/code/series/time label so archive copies stay below MAX_PATH.
+        match = re.fullmatch(r"(?:sh|sz|bj)?(\d{6})", str(symbol).lower())
+        code = match.group(1) if match else _safe_filename_part(symbol, limit=10)
+        series = {"none": "n", "qfq": "f", "hfq": "b", "day": "d"}.get(
+            str(adjustment).lower(), _safe_filename_part(adjustment, limit=3))
+        return Path("bodies", f"{stamp.replace('-', '')}_{code}_{series}_{clock[:6]}.bin")
     label = [stamp]
     if scope.get("input_id"):
         label.append(f"i-{_safe_filename_part(scope['input_id'], limit=18)}")
@@ -136,6 +147,13 @@ class RawObjectStore:
             start = _safe_filename_part(parameters["start"], limit=10)
             end = _safe_filename_part(parameters["end"], limit=10)
             return f"manifest.{_safe_filename_part(input_id, limit=24)}_{code}_{parameters['adjust']}_{start}_{end}.ndjson"
+        if (parameters.get("code") and parameters.get("start") and parameters.get("end")
+                and parameters.get("frequency")):
+            code = _safe_filename_part(parameters["code"], limit=12)
+            frequency = _safe_filename_part(parameters["frequency"], limit=12)
+            start = _safe_filename_part(parameters["start"], limit=10)
+            end = _safe_filename_part(parameters["end"], limit=10)
+            return f"manifest.{_safe_filename_part(input_id, limit=24)}_{code}_{frequency}_{start}_{end}.ndjson"
         parts = [quote(str(input_id), safe="-_.")]
         for key, value in sorted(parameters.items()):
             if isinstance(value, (list, tuple)):

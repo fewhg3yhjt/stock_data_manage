@@ -1246,9 +1246,9 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                         raise ValueError('daily unit requires a safe key and explicit exchange-prefixed security code')
                     contract = contracts[unit['input_id']]
                     parameters = contract.bind_parameters(unit['context'])
-                    if (parameters.get('code') != unit['symbol'] or parameters.get('start').isoformat() != resolved['trade_date']
+                    if (parameters.get('code') != unit.get('source_symbol', unit['symbol']) or parameters.get('start').isoformat() != resolved['trade_date']
                             or parameters.get('end') != parameters.get('start')):
-                        raise ValueError('daily batch units must match the single frozen date and security')
+                        raise ValueError('daily batch units must match the frozen logical security, request code and single date')
                     if mode in {'replay', 'retained'} and not unit.get('replay_manifest'):
                         raise ValueError('offline daily batch requires an explicit original response manifest for every unit')
                     if mode == 'live' and unit.get('replay_manifest'):
