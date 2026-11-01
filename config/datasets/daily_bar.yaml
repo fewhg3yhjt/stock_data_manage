@@ -1,4 +1,4 @@
-# Source candidates and published aggregates are distinct contracts. No ETF/index applicability is inferred.
+# Source candidates and published aggregates are distinct contracts. The unadjusted daily series is required; adjusted series are retained when available and otherwise remain unverified.
 dataset:
   name: daily_bar
   display_name: 日线
@@ -32,11 +32,11 @@ dataset:
 applicability:
   stock:
     none: required
-    forward: required
-    backward: required
+    forward: unverified
+    backward: unverified
   etf:
-    # ETF/index may publish a valid required none quote while the optional
-    # adjustment slots remain explicitly unverified; no copied prices.
+    # All asset types require a valid none quote; optional adjustment slots
+    # remain explicitly unverified when no source value is available.
     none: required
     forward: unverified
     backward: unverified

@@ -246,13 +246,11 @@ class DailyRecord:
     def complete(self):
         if self.none.status is not QuoteStatus.AVAILABLE:
             return False
-        if self.asset_type is AssetType.STOCK:
-            return all(q.status is QuoteStatus.AVAILABLE and q.value_contract == "full_ohlc" for q in self.quotes.values())
         allowed = {QuoteStatus.AVAILABLE, QuoteStatus.NOT_APPLICABLE}
-        if self.asset_type in {AssetType.ETF, AssetType.INDEX}:
-            # Their required default quote is publishable while optional
-            # adjustment slots explicitly retain unverified applicability.
-            allowed.add(QuoteStatus.UNVERIFIED)
+        # The unadjusted quote is required for every daily record. Adjusted
+        # quotes are optional and stay explicitly unverified when the source
+        # does not provide them; never copy unadjusted prices into those slots.
+        allowed.add(QuoteStatus.UNVERIFIED)
         if not all(q.status in allowed for q in self.quotes.values()):
             return False
         if self.none.value_contract == "close_only":

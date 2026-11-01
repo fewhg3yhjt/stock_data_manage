@@ -158,6 +158,7 @@ class TencentDailyProvider:
         adjustment = _adjustment_from_token(adjust)
         bar_key = _adjustment_bar_key(adjustment)
         by_date, hosts, source_rows = {}, [], []
+        optional_series_reason = None
         for cursor, stop, response, host in captured["segments"]:
             payload = EndpointContract(frozenset()).parse_json(response)
             if not isinstance(payload, dict) or not isinstance(payload.get("data"), dict):
@@ -167,9 +168,21 @@ class TencentDailyProvider:
             data = payload["data"]
             row_limit = 1024 if api == "kline" else 640
             node = data.get(symbol)
-            if not isinstance(node, dict) or not isinstance(node.get(bar_key), list):
+            if not isinstance(node, dict):
                 raise ProviderContractError("Tencent daily list changed", FailureClass.SCHEMA_CHANGED, retryable=False)
-            items = node[bar_key]
+            items = node.get(bar_key)
+            if (adjustment is not Adjustment.NONE and start == stop
+                    and (bar_key not in node or items == [])
+                    and isinstance(node.get("day"), list)
+                    and _contains_source_date(node["day"], start)):
+                optional_series_reason = (
+                    f"Tencent returned the target day row but did not provide the requested {bar_key} series; "
+                    "the unadjusted price was not copied"
+                )
+                hosts.append(host)
+                continue
+            if not isinstance(items, list):
+                raise ProviderContractError("Tencent daily list changed", FailureClass.SCHEMA_CHANGED, retryable=False)
             if adjustment is not Adjustment.NONE and not items and node.get("day"):
                 raise ProviderContractError(
                     "empty adjusted list cannot use unadjusted prices", FailureClass.SCHEMA_CHANGED, retryable=False
@@ -205,6 +218,15 @@ class TencentDailyProvider:
             if api == "kline" and len(items) == 1024 and segment_dates and start < min(segment_dates):
                 raise ProviderContractError("requested Tencent history exceeds retained 1024-bar window", FailureClass.TRUNCATED, retryable=False)
             hosts.append(host)
+        if not by_date and optional_series_reason:
+            return InputFetchResult((), " | ".join(host + path for host in dict.fromkeys(hosts)),
+                empty_is_valid=True, source_rows=tuple(source_rows),
+                mapping_context={"source_api": api, "adjustment": adjustment.value,
+                    "adjustment_parameter": adjust, "source_bar_key": bar_key,
+                    "source_total_count": 0, "selected_row_count": 0,
+                    "history_completeness_verified": False,
+                    "optional_series_status": "unavailable",
+                    "optional_series_reason": optional_series_reason})
         if not by_date:
             raise ProviderContractError("Tencent window has zero bars", FailureClass.TEMPORARY_EMPTY, retryable=False)
         return InputFetchResult(tuple(by_date[stamp] for stamp in sorted(by_date)),
@@ -224,6 +246,22 @@ def _adjustment_token(adjustment: Adjustment) -> str:
 
 def _adjustment_bar_key(adjustment: Adjustment) -> str:
     return {Adjustment.NONE: "day", Adjustment.FORWARD: "qfqday", Adjustment.BACKWARD: "hfqday"}[adjustment]
+
+
+def _contains_source_date(rows, target) -> bool:
+    from datetime import date
+    target_date = target if type(target) is date else date.fromisoformat(str(target)[:10])
+    for row in rows:
+        if not isinstance(row, list) or not row:
+            continue
+        text = str(row[0]).strip()
+        try:
+            stamp = datetime.strptime(text, "%Y%m%d" if len(text) == 8 and text.isdigit() else "%Y-%m-%d").date()
+        except ValueError:
+            continue
+        if stamp == target_date:
+            return True
+    return False
 
 
 def tencent_symbol(code: str, *, allow_bse: bool = False, asset_type: str | None = None) -> str:

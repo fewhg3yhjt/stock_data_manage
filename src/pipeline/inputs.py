@@ -1318,6 +1318,8 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                     if entry.get('process_status') == 'candidate_complete' and (
                             file_hash(Path(entry['artifact'])) != entry['artifact_hash'] or file_hash(Path(entry['report_path'])) != entry['report_hash']):
                         raise ValueError('daily processed artifact changed')
+                    if entry.get('process_status') == 'unverified' and file_hash(Path(entry['report_path'])) != entry['report_hash']:
+                        raise ValueError('daily unverified quote report changed')
             if state['status'] == 'published' and state.get('complete_today') and redo == 'resume':
                 if len(entries) != len(units):
                     raise ValueError('published daily batch unit index is incomplete')
@@ -1598,6 +1600,11 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                     if entry.get('process_status') == 'candidate_complete':
                         if file_hash(Path(entry['artifact'])) != entry['artifact_hash'] or file_hash(Path(entry['report_path'])) != entry['report_hash']:
                             raise ValueError('daily processed artifact changed')
+                        progress.finish('processing', unit['key'], 'reused')
+                        continue
+                    if entry.get('process_status') == 'unverified':
+                        if file_hash(Path(entry['report_path'])) != entry['report_hash']:
+                            raise ValueError('daily unverified quote report changed')
                         progress.finish('processing', unit['key'], 'reused')
                         continue
                     if entry.get('capture_status') != 'captured':

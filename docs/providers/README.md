@@ -75,6 +75,8 @@ node provider_validation/tests/build_interface_coverage_workbook.mjs --formal-sp
 
 日线曾有8只证券2026-10-09、`newfqkline` 前复权在线资格与正式发布；这些资格已过期，不能作为当前在线授权。当前 `ASTOCK-002-daily` 的 `daily_fixed` 采集策略在 `config/capabilities.yaml` 中按市场固定为：沪市、深市和北交所的三种口径均走 `newfqkline`。不复权请求显式带 `none` 并读取 `day`，前/后复权分别读取 `qfqday`、`hfqday`；响应完整留存后，Provider 按目标日期筛选，原始来源行仍保留完整窗口。`newfqkline` 最多返回640条，若所需历史早于返回窗口则明确报截断。标准日线只按字段合同提取，成交量和成交额在未核验范围内仍为空。`kline` 保留为显式接口，不作为此策略的不复权路线或自动回退；通用 `fetch_daily` 与ETF、LOF、指数的其他接口范围未随本次变更调整。直接使用 `collect-input` 时仍须显式配对 `adjust` 与 `api`。2026-10-29的v7已有2026-10-28三只股票、三种口径的精确留存资格及正式发布；2026-10-30规范化升级v8后，当前资格与单位规则分别按实际接口、配置和业务证据核验，不允许在线采集或市场范围推广。在线小样本和隔离回放本身不授予资格，最终四层证据与精确边界见[项目进度](../../PROJECT_PROGRESS.md#当前业务交付状态)。
 
+日线完整性现行合同已调整：所有证券只要求有效的不复权目标日记录；真实返回的qfqday/hfqday继续保存，来源未返回时记未核验并保留空值，不复制day数值、不因此拒绝发布。上文三口径请求合同仍说明接口参数和历史资格范围，不代表三组都是发布必需值。
+
 BaoStock 日线配置的 `field_selection_policy: all_supported_daily` 请求其日线接口公开的18个字段，并在 `FetchResult.source_rows` 保留 SDK 解码后的全部来源列；标准日线候选仍按数据集合同提取需要的字段。字段集合依据 [BaoStock Python API 日线字段说明](https://github.com/baostock/baostock/blob/master/docs/pythonAPI.md)（2026-10-29核对）。
 
 BaoStock SDK返回的是解码后的 `ResultSet`，本身不提供可直接保存的 TCP 原始响应。不过，2026-10-29成交量探针曾用透明 socket 包装器在SDK解码前保存 `recv` 返回字节；该历史证据仅覆盖 `sh600519`、`sz000001`、2026-10-28和9个字段。当前日线验证Provider要求通过现有 `captured_sdk_queries` 会话边界执行：捕获器在每次完整查询的 `recv` 字节交给SDK前留存，再由Provider在来源字段映射前归档SDK `fields/rows`；两种表示通过完整请求参数及哈希关联。`recv` 字节是SDK从 socket 读取的有序字节流，不是网络分组抓包。离线回放严格匹配证券、日期窗口、频率、复权标记及18字段，只从归档SDK解码结果重建 `ResultSet`，缺少匹配记录时失败且不联网。当前代码已对沪深两只股票、2026-10-28、前复权和18字段完成在线捕获、独立哈希重组校验及零网络隔离回放；详细原始证据见[本轮核验报告](../../data/task_workspace/_checks/baostock-daily-wire-capture-2026-10-29/README.md)。该验证不覆盖其他市场和窗口，BaoStock日线仍为 `validation_only`，不等同生产资格或正式任务启用。

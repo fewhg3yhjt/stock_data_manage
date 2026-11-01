@@ -120,6 +120,24 @@ def process_daily_unit(*, unit, entry, provider, contract, field_contract, rule,
         "asset_type": unit["asset_type"], "adjustment": unit["adjustment"], "value_contract": value_contract}
     if fetched.mapping_context.get("adjustment") != unit["adjustment"]:
         raise NormalizationError("requested adjustment differs from returned source series")
+    if fetched.mapping_context.get("optional_series_status") == "unavailable":
+        if unit["adjustment"] == "none":
+            raise NormalizationError("the required unadjusted daily series cannot be unavailable")
+        reason = fetched.mapping_context["optional_series_reason"]
+        artifact_paths = daily_unit_paths(work, unit)
+        report = {"dataset": "daily_bar", "data_date": parameters["start"].isoformat(),
+            "asset_type": unit["asset_type"], "input_id": contract.input_id,
+            "provider": contract.provider, "endpoint": contract.endpoint,
+            "status": "unverified", "row_count": 0, "parameters": parameters,
+            "value_contract": value_contract, "adapter_version": provider.capability_version,
+            "normalization_version": rule["version"], "source_response_hashes": entry["source_response_hashes"],
+            "raw_manifest": str(manifest), "reason": reason,
+            "coverage_denominator": 0, "validated_at_utc": datetime.now(timezone.utc),
+            "processing_http_calls": 0}
+        save_batch_json(artifact_paths["report"], report)
+        return {**entry, "process_status": "unverified", "status": "unverified", "error": reason,
+            "report_path": str(artifact_paths["report"]), "report_hash": file_hash(artifact_paths["report"]),
+            "row_count": 0}
     rows = [Normalizer.normalize_fields(row, rule=rule, fields=field_contract["fields"],
         context=context, allow_pending=True) for row in fetched.rows]
     if len(rows) != 1 or rows[0]["trade_date"] != parameters["start"]:
@@ -216,8 +234,8 @@ def resolve_daily_definition(definition, config_root):
         spec = contract[adjustment.value]
         if spec not in {"required", "unverified"}:
             raise ValueError("non-applicable scope requires independently verified applicability implementation; not inferred here")
-    if asset == "stock" and any(v != "required" for v in contract.values()):
-        raise ValueError("stock daily result requires all three source adjustments")
+    if contract.get("none") != "required":
+        raise ValueError("daily result requires the unadjusted quote")
     policy_name = definition.get("acquisition_policy", "daily_fixed")
     policies = yaml.safe_load((config_root / "capabilities.yaml").read_text(encoding="utf-8"))["acquisition_policies"]
     policy = deepcopy(policies[policy_name])
@@ -311,7 +329,14 @@ def expand_daily_units(units, definition):
         if unit.get("replay_manifest"):
             raise ValueError("aggregate replay requires explicit per-adjustment replay_manifests")
         for name, state in definition["quote_contract"].items():
-            if state != "required":
+            # Keep the existing stock collection behavior for all three
+            # Tencent series. Publication requires only `none`; adjusted
+            # stock series remain best-effort. ETF/index optional scopes are
+            # not expanded into new source requests here.
+            request_optional_stock_adjustment = (
+                definition["asset_type"] == "stock" and name in {"forward", "backward"}
+            )
+            if state != "required" and not request_optional_stock_adjustment:
                 continue
             item = deepcopy(unit)
             item.update(key=unit["symbol"] + "__" + name, adjustment=name, asset_type=definition["asset_type"],
@@ -326,7 +351,12 @@ def expand_daily_units(units, definition):
         source = next((item for item in sources if item["input_id"] == unit["input_id"]), None)
         market_requests = source["market_adjustment_requests"].get(_daily_market(unit.get("symbol", ""))) if source else None
         expected_request = market_requests.get(unit["adjustment"]) if market_requests else None
-        if (definition["quote_contract"].get(unit["adjustment"]) != "required"
+        optional_stock_adjustment = (
+            unit.get("asset_type", definition["asset_type"]) == "stock"
+            and unit["adjustment"] in {"forward", "backward"}
+            and definition["quote_contract"].get(unit["adjustment"]) == "unverified"
+        )
+        if ((definition["quote_contract"].get(unit["adjustment"]) != "required" and not optional_stock_adjustment)
                 or expected_request is None or unit["context"].get("config", {}) != expected_request
                 or unit.get("provider") != source["provider"] or unit.get("endpoint") != source["endpoint"]):
             raise ValueError("daily source unit conflicts with frozen acquisition policy")
@@ -355,7 +385,7 @@ def prepare_daily_task_publication(state, units, source_rows, paths, config_root
     expected = {u["symbol"]: {"sh": "XSHG", "sz": "XSHE", "bj": "BSE"}[u["symbol"][:2]] + ":" + u["symbol"][2:] for u in units}
     selected = set(state.get("selected_symbols", ()))
     target_ids = {identity for symbol, identity in expected.items() if not selected or symbol in selected}
-    groups, issues = {}, []
+    groups, issues, unavailable_reasons = {}, [], {}
     for unit in units:
         symbol, adjustment = unit["symbol"], unit["adjustment"]
         if selected and symbol not in selected:
@@ -364,13 +394,20 @@ def prepare_daily_task_publication(state, units, source_rows, paths, config_root
         if source is None:
             entry = state["units"].get(unit["key"], {})
             report = entry.get("report", {})
+            optional = definition["quote_contract"][adjustment] != "required"
+            reason = report.get("error") or entry.get("error") or (
+                "optional adjusted quote was not provided by the source" if optional else "required source quote is missing")
+            if optional:
+                unavailable_reasons[(symbol, adjustment)] = reason
             issues.append({"stage": entry.get("report", {}).get("failure_stage", "processing"), "symbol": symbol,
                 "trade_date": trade_date.isoformat(), "adjustment": adjustment, "input_id": unit["input_id"],
-                "code": report.get("failure_class") or entry.get("failure_class") or "missing",
-                "reason": report.get("error") or entry.get("error") or "required source quote is missing",
+                "code": ("optional_adjustment_unavailable" if optional else
+                    report.get("failure_class") or entry.get("failure_class") or "missing"),
+                "reason": reason,
                 "raw_ref": entry.get("raw_manifest"), "provider": report.get("provider"),
                 "endpoint": report.get("endpoint"), "record_locator": report.get("record_locator"),
-                "field": report.get("error_field"), "impact": "incomplete_daily_record"})
+                "field": report.get("error_field"),
+                "impact": "unverified_quote_group" if optional else "incomplete_daily_record"})
             continue
         report = source["entry"]["report"]
         rows = source["rows"]
@@ -398,8 +435,9 @@ def prepare_daily_task_publication(state, units, source_rows, paths, config_root
         for name, requirement in definition["quote_contract"].items():
             quotes[name] = groups.get((symbol, name)) or QuoteGroup(
                 QuoteStatus.MISSING if requirement == "required" else QuoteStatus.UNVERIFIED,
-                reason="required source quote missing" if requirement == "required" else "applicability has not been verified")
-            if requirement == "unverified":
+                reason=unavailable_reasons.get((symbol, name)) or
+                    ("required source quote missing" if requirement == "required" else "applicability has not been verified"))
+            if requirement == "unverified" and (symbol, name) not in unavailable_reasons:
                 issues.append({"stage": "quality", "symbol": symbol, "adjustment": name, "code": "unverified_applicability",
                                "reason": "asset/source applicability is unverified", "impact": "unverified_quote_group"})
         record = DailyRecord(identity, trade_date, asset, **quotes)

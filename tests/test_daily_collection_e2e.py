@@ -39,7 +39,7 @@ def record(asset=AssetType.STOCK):
     return DailyRecord("XSHG:600001", date.fromisoformat(DAY), asset, quote("10"), quote("9"), quote("11"))
 
 
-def source_task(tmp_path, *, corrupt=None, symbols=("sh600001",), task_id="aggregate"):
+def source_task(tmp_path, *, corrupt=None, day_only_adjustments=False, symbols=("sh600001",), task_id="aggregate"):
     from stock_data_manage.pipeline.daily import resolve_daily_definition
 
     policy = resolve_daily_definition({"task": "stock_daily"}, CONFIG)["source_policy"]["inputs"][0]["market_adjustment_requests"]
@@ -58,7 +58,9 @@ def source_task(tmp_path, *, corrupt=None, symbols=("sh600001",), task_id="aggre
             row = [DAY, price, price, price, price, "100"]
             if api == "newfqkline":
                 row += ["0", "0", "10", "0"]
-            body = json.dumps({"code": 0, "data": {symbol: { {"none":"day","forward":"qfqday","backward":"hfqday"}[name]: [row]}}}).encode()
+            series_key = {"none":"day","forward":"qfqday","backward":"hfqday"}[name]
+            node = {"day": [row]} if day_only_adjustments and name != "none" else {series_key: [row]}
+            body = json.dumps({"code": 0, "data": {symbol: node}}).encode()
             if corrupt == name:
                 body = b"<html>source error, still HTTP 200</html>"
             store = RawObjectStore(tmp_path / "fixture-responses" / symbol / name)
@@ -129,10 +131,13 @@ def test_nonstock_default_quote_publishes_without_certifying_optional_adjustment
         store.publish_daily(asset_type=asset.value, partition_key=DAY, new_records=[invalid], expected_count=1, run_id='missing')
 
 
-def test_stock_and_lof_do_not_inherit_unverified_adjustment_publication():
+def test_unverified_adjustments_do_not_block_stock_etf_or_lof_daily_records():
     unknown = QuoteGroup(QuoteStatus.UNVERIFIED, reason='not verified')
-    for asset in [AssetType.STOCK, AssetType.LOF]:
-        assert not DailyRecord('XSHG:600001', date.fromisoformat(DAY), asset, quote(), unknown, unknown).complete
+    for asset in [AssetType.STOCK, AssetType.ETF, AssetType.LOF]:
+        assert DailyRecord('XSHG:600001', date.fromisoformat(DAY), asset, quote(), unknown, unknown).complete
+    missing_none = QuoteGroup(QuoteStatus.MISSING, reason='required unadjusted quote missing')
+    assert not DailyRecord('XSHG:600001', date.fromisoformat(DAY), AssetType.STOCK,
+        missing_none, unknown, unknown).complete
 
 
 def test_verified_nonapplicable_index_roundtrip(tmp_path):
@@ -202,6 +207,45 @@ def test_formal_task_three_responses_one_record_and_resume(tmp_path):
         assert metadata.partition("daily_bar", "stock", DAY, adjustment="aggregate")["actual_count"] == 1
 
 
+def test_stock_day_only_response_publishes_unadjusted_and_keeps_adjustments_unverified(tmp_path):
+    from stock_data_manage.service.web import create_app
+
+    definition = source_task(tmp_path, day_only_adjustments=True)
+    state = execute(tmp_path, definition)
+    assert state["status"] == "published", state.get("error")
+    assert state["complete_today"] is True
+    assert state["missing_count"] == 0
+    assert state["progress"]["stages"]["processing"]["failed"] == 0
+    rows = CanonicalPartitionStore(tmp_path / "business/canonical").read_daily("stock", DAY)
+    assert len(rows) == 1
+    item = rows[0]
+    assert item.none.status is QuoteStatus.AVAILABLE and item.none.close == Decimal("10")
+    for name in ("forward", "backward"):
+        quote_group = item.quotes[name]
+        assert quote_group.status is QuoteStatus.UNVERIFIED
+        assert quote_group.close is None
+        assert "not provide the requested" in quote_group.reason
+    entries = batch_entries(state)
+    assert entries["sh600001__forward"]["process_status"] == "unverified"
+    assert entries["sh600001__backward"]["process_status"] == "unverified"
+    coverage = json.loads(Path(state["definition_ref"]["path"]).with_name("coverage.stock.json").read_text(encoding="utf-8"))
+    assert coverage["expected_count"] == coverage["actual_count"] == 1
+    assert sum(issue["code"] == "optional_adjustment_unavailable" for issue in coverage["issues"]) == 2
+
+    app = create_app(config_root=CONFIG, data_root=tmp_path / "business")
+    endpoint = next(route.endpoint for route in app.routes if getattr(route, "path", None) == "/api/daily")
+    result = endpoint(security="sh600001", start_date=None, end_date=None, asset_type="stock",
+        adjustment="forward", page=1, page_size=50)
+    assert result["total"] == 1
+    assert result["items"][0]["status"] == "unverified"
+    assert result["items"][0]["values"]["close"] is None
+    task_endpoint = next(route.endpoint for route in app.routes if getattr(route, "path", None) == "/api/tasks/{task_id}")
+    task = task_endpoint(task_id=state["task_id"])
+    assert task["partition_results"][0]["status"] == "published"
+    assert task["partition_results"][0]["unverified_count"] == 2
+    assert task["partition_results"][0]["issue_count"] == 2
+
+
 @pytest.mark.parametrize('asset_type', [None, 'stock'])
 def test_input_units_require_explicit_asset_and_report_actual_conversion(tmp_path, asset_type):
     from stock_data_manage.pipeline.inputs import collect_input
@@ -251,16 +295,16 @@ def test_invalid_unit_configuration_is_rejected_before_acquisition(tmp_path, mon
     assert not (tmp_path/'invalid-input').exists()
 
 
-def test_http_success_bad_body_stops_at_processing_and_does_not_publish(tmp_path):
-    definition = source_task(tmp_path, corrupt="backward")
+def test_http_success_bad_required_body_stops_at_processing_and_does_not_publish(tmp_path):
+    definition = source_task(tmp_path, corrupt="none")
     state = execute(tmp_path, definition)
     assert state["status"] == "failed"
     assert not (tmp_path / "business/canonical" / DAY / "daily_bar/stock/data.parquet").exists()
     assert len(batch_entries(state)) == 3
     coverage = json.loads(Path(state['definition_ref']['path']).with_name('coverage.stock.json').read_text(encoding='utf-8'))
-    assert any(issue['adjustment'] == 'backward' for issue in coverage['issues'])
+    assert any(issue['adjustment'] == 'none' for issue in coverage['issues'])
     assert coverage['actual_count'] == 0
-    failed = batch_entries(state)['sh600001__backward']
+    failed = batch_entries(state)['sh600001__none']
     assert failed['process_status'] == 'failed' and failed['capture_status'] == 'captured'
     assert len(failed['source_response_hashes']) == 1
 
@@ -320,7 +364,7 @@ def test_full_redo_missing_group_preserves_published_data_and_current_raw(tmp_pa
     first = execute(tmp_path, definition)
     data = Path(first["published_manifest"]).with_name("data.parquet")
     before = file_hash(data)
-    changed = source_task(tmp_path / "changed", corrupt="forward")
+    changed = source_task(tmp_path / "changed", corrupt="none")
     changed['task_id'] = 'changed-source-run'
     assert execute(tmp_path, changed, redo="full")["status"] == "failed"
     assert file_hash(data) == before

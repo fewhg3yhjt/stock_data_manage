@@ -654,7 +654,8 @@ class DashboardReader:
                 partition_results.append({'asset_type': asset, 'status': result['status'],
                     'expected_count': check.get('expected_count'), 'actual_count': check.get('actual_count'),
                     'issue_count': len(check.get('issues', [])),
-                    'unverified_count': sum(i.get('code') == 'unverified_applicability' for i in check.get('issues', [])),
+                    'unverified_count': sum(i.get('code') in {'unverified_applicability', 'optional_adjustment_unavailable'}
+                        for i in check.get('issues', [])),
                     'error': result.get('error')})
         return {
             **card,
