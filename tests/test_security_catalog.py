@@ -348,6 +348,40 @@ def test_bao_real_archived_snapshot_adds_etfs_without_reclassifying_indexes(tmp_
     assert manifest["publication_permitted"] is False
 
 
+def test_same_day_baostock_trade_status_updates_existing_security_record():
+    active = {"exchange": "XSHG", "symbol": "600001", "asset_type": "stock", "name": "样本股", "status": "active"}
+    suspended = {**active, "status": "suspended"}
+    previous = prepare_security_publication({"prior": [active]}).records
+    ignored = prepare_security_publication({"SECURITY-BS-UNIVERSE-001": [suspended]}, previous).records
+    refreshed = prepare_security_publication({"SECURITY-BS-UNIVERSE-001": [suspended]}, previous,
+        status_sources={"SECURITY-BS-UNIVERSE-001"}).records
+    assert ignored[0].status == "active"
+    assert refreshed[0].instrument_id == previous[0].instrument_id
+    assert refreshed[0].status == "suspended"
+
+
+def test_configured_symbol_succession_keeps_identity_and_updates_current_code():
+    import yaml
+    from datetime import date
+
+    policy = yaml.safe_load((ROOT / "config/datasets/security_master.yaml").read_text(encoding="utf-8"))
+    relations = policy["symbol_successions"]
+    old = {"exchange": "XSHE", "symbol": "399427", "asset_type": "index", "name": "国证专利领先指数", "status": "active"}
+    new = {**old, "symbol": "980070"}
+    previous = prepare_security_publication({"prior": [old]}).records
+
+    before_effective = prepare_security_publication({"snapshot": [old]}, symbol_successions=relations,
+        as_of_date=date(2024, 4, 22)).records
+    current = prepare_security_publication({"snapshot": [new]}, previous, symbol_successions=relations,
+        as_of_date=date(2026, 10, 29)).records
+
+    assert [(row.instrument_id, row.symbol) for row in before_effective] == [("XSHE:399427", "399427")]
+    assert len(current) == 1
+    assert (current[0].instrument_id, current[0].symbol) == ("XSHE:399427", "980070")
+    assert current[0].name == "国证专利领先指数"
+    assert not any(row["old_symbol"] == "399960" for row in relations)
+
+
 def test_user_confirmed_index_lifecycle_overrides_use_last_quote_as_inclusive_end():
     import yaml
     from datetime import date
@@ -365,7 +399,8 @@ def test_user_confirmed_index_lifecycle_overrides_use_last_quote_as_inclusive_en
         as_of_date=date(2026, 10, 29)).records
     by_symbol = {row.symbol: row for row in current}
     assert {symbol: by_symbol[symbol].delist_date.isoformat() for symbol in by_symbol} == {
-        "399946": "2016-06-03", "399961": "2019-01-25", "399963": "2019-01-25"}
+        "000999": "2018-07-10", "399332": "2016-11-29", "399946": "2016-06-03",
+        "399960": "2016-06-03", "399961": "2019-01-25", "399963": "2019-01-25"}
     assert all(by_symbol[symbol].status == "delisted" for symbol in by_symbol)
     assert all(not by_symbol[symbol].is_expected_on(date(2026, 10, 29)) for symbol in by_symbol)
 
@@ -377,6 +412,124 @@ def test_user_confirmed_index_lifecycle_overrides_use_last_quote_as_inclusive_en
     last_day_record = next(row for row in last_day if row.symbol == "399961")
     assert last_day_record.status == "active" and last_day_record.is_expected_on(date(2019, 1, 25))
     assert seeded.status == "delisted" and not seeded.is_expected_on(date(2019, 1, 26))
+
+    current_policy_exclusions = prepare_security_publication({}, lifecycle_overrides=overrides,
+        as_of_date=date(2026, 10, 29)).records
+    by_symbol = {row.symbol: row for row in current_policy_exclusions}
+    assert by_symbol["000999"].delist_date == date(2018, 7, 10)
+    assert by_symbol["399332"].delist_date == date(2016, 11, 29)
+    assert not by_symbol["000999"].is_expected_on(date(2026, 10, 29))
+    assert not by_symbol["399332"].is_expected_on(date(2026, 10, 29))
+
+
+def test_manual_security_status_intervals_apply_only_inside_their_inclusive_dates():
+    import yaml
+    from datetime import date
+    from stock_data_manage.service.instruments_update import (
+        prepare_security_publication, security_lifecycle_override_for)
+
+    policy = yaml.safe_load((ROOT / "config/datasets/security_master.yaml").read_text(encoding="utf-8"))
+    override = next(item for item in policy["symbol_lifecycle_overrides"] if item.get("symbol") == "002717")
+    row = {"exchange": "XSHE", "symbol": "002717", "asset_type": "stock", "name": "*ST岭南", "status": "active"}
+    prior = prepare_security_publication({"snapshot": [row]}, lifecycle_overrides=[override],
+        as_of_date=date(2026, 10, 12)).records[0]
+    suspended = prepare_security_publication({"snapshot": [row]}, lifecycle_overrides=[override],
+        as_of_date=date(2026, 10, 13)).records[0]
+
+    assert prior.status == "active"
+    assert suspended.status == "suspended"
+    assert suspended.is_expected_on(date(2026, 10, 29))
+    assert suspended.delist_date is None
+    assert security_lifecycle_override_for([override], market="XSHE", asset_type="stock",
+        symbol="002717", as_of_date=date(2026, 10, 12)) is None
+    selected = security_lifecycle_override_for([override], market="XSHE", asset_type="stock",
+        symbol="002717", as_of_date=date(2026, 10, 29))
+    assert selected["status"] == "suspended"
+    assert selected["effective_from"] == date(2026, 10, 13) and selected["effective_to"] is None
+
+
+def test_manual_listing_bounds_update_existing_security_record():
+    from datetime import date
+    from stock_data_manage.service.instruments_update import prepare_security_publication
+
+    override = {"market": "XSHE", "asset_type": "stock", "symbol": "600001", "name": "样本股",
+        "list_date": "2020-01-02", "delist_date": "2025-12-31", "evidence_refs": ["manual-evidence"]}
+    row = {"exchange": "XSHE", "symbol": "600001", "asset_type": "stock", "name": "样本股", "status": "active"}
+    during = prepare_security_publication({"snapshot": [row]}, lifecycle_overrides=[override],
+        as_of_date=date(2025, 1, 2)).records[0]
+    after = prepare_security_publication({"snapshot": [row]}, lifecycle_overrides=[override],
+        as_of_date=date(2026, 1, 1)).records[0]
+
+    assert during.list_date == date(2020, 1, 2) and during.delist_date == date(2025, 12, 31)
+    assert during.is_expected_on(date(2020, 1, 2)) and during.is_expected_on(date(2025, 12, 31))
+    assert not during.is_expected_on(date(2019, 12, 31)) and not during.is_expected_on(date(2026, 1, 1))
+    assert after.status == "delisted"
+
+
+def test_status_interval_can_coexist_with_listing_lifetime_bounds():
+    from datetime import date
+    from stock_data_manage.service.instruments_update import (
+        prepare_security_publication, security_lifecycle_override_for)
+
+    lifetime = {"market": "XSHE", "asset_type": "stock", "symbol": "600001", "name": "样本股",
+        "list_date": "2020-01-02", "delist_date": "2025-12-31", "evidence_refs": ["listing-evidence"]}
+    suspension = {"market": "XSHE", "asset_type": "stock", "symbol": "600001", "name": "样本股",
+        "status": "suspended", "effective_from": "2025-01-01", "effective_to": "2025-02-01",
+        "evidence_refs": ["suspension-evidence"]}
+    row = {"exchange": "XSHE", "symbol": "600001", "asset_type": "stock", "name": "样本股", "status": "active"}
+
+    suspended = prepare_security_publication({"snapshot": [row]}, lifecycle_overrides=[lifetime, suspension],
+        as_of_date=date(2025, 1, 15)).records[0]
+    delisted = prepare_security_publication({"snapshot": [row]}, lifecycle_overrides=[suspension, lifetime],
+        as_of_date=date(2026, 1, 1)).records[0]
+    decision = security_lifecycle_override_for([lifetime, suspension], market="XSHE", asset_type="stock",
+        symbol="600001", as_of_date=date(2025, 1, 15))
+
+    assert suspended.status == "suspended" and suspended.is_expected_on(date(2025, 1, 15))
+    assert delisted.status == "delisted" and not delisted.is_expected_on(date(2026, 1, 1))
+    assert decision["status"] == "suspended" and decision["override_kind"] == "status"
+
+    invalid = {**suspension, "effective_to": "2026-01-01"}
+    with pytest.raises(ValueError, match="outside configured listing-date bounds"):
+        prepare_security_publication({"snapshot": [row]}, lifecycle_overrides=[lifetime, invalid],
+            as_of_date=date(2025, 1, 15))
+
+
+def test_symbol_succession_resolves_only_effective_linear_chain_to_latest_code():
+    from datetime import date
+    from stock_data_manage.service.instruments import symbol_succession_for
+
+    relations = [
+        {"market": "XSHE", "asset_type": "index", "old_symbol": "399427", "new_symbol": "980070",
+            "effective_from": "2024-04-23", "evidence_refs": ["notice-1"]},
+        {"market": "XSHE", "asset_type": "index", "old_symbol": "980070", "new_symbol": "980071",
+            "effective_from": "2025-01-10", "evidence_refs": ["notice-2"]},
+    ]
+
+    first = symbol_succession_for(relations, market="XSHE", asset_type="index", symbol="399427",
+        as_of_date=date(2024, 12, 31))
+    latest_from_old = symbol_succession_for(relations, market="XSHE", asset_type="index", symbol="399427",
+        as_of_date=date(2025, 1, 10))
+    latest_from_middle = symbol_succession_for(relations, market="XSHE", asset_type="index", symbol="980070",
+        as_of_date=date(2025, 1, 10))
+
+    assert (first["old_symbol"], first["new_symbol"]) == ("399427", "980070")
+    assert (latest_from_old["old_symbol"], latest_from_old["new_symbol"]) == ("399427", "980071")
+    assert (latest_from_middle["old_symbol"], latest_from_middle["new_symbol"]) == ("399427", "980071")
+    assert latest_from_old["evidence_refs"] == ["notice-1", "notice-2"]
+    assert len(latest_from_old["transitions"]) == 2
+
+    final_record = prepare_security_publication({"snapshot": [{"exchange": "XSHE", "symbol": "980071",
+        "asset_type": "index", "name": "样本指数", "status": "active"}]}, symbol_successions=relations,
+        as_of_date=date(2025, 1, 10)).records[0]
+    assert (final_record.instrument_id, final_record.symbol) == ("XSHE:399427", "980071")
+
+    cycle = [dict(relations[0], new_symbol="980070"),
+        {"market": "XSHE", "asset_type": "index", "old_symbol": "980070", "new_symbol": "399427",
+            "effective_from": "2024-04-24", "evidence_refs": ["bad-cycle"]}]
+    with pytest.raises(ValueError, match="contains a cycle"):
+        symbol_succession_for(cycle, market="XSHE", asset_type="index", symbol="399427",
+            as_of_date=date(2025, 1, 10))
 
 
 def test_bse_real_archived_catalog_uses_source_capture_day_and_yaml_mapping(tmp_path, monkeypatch):

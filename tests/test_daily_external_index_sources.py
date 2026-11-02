@@ -66,7 +66,7 @@ def test_daily_routes_map_only_explicit_parallel_codes_and_keep_the_list_identit
     from stock_data_manage.config.loader import load_input_capabilities
 
     definition = resolve_daily_definition({"asset_type": "index", "universe": "static", "trade_date": DAY}, CONFIG)
-    symbols = ("sz399904", "sz399920", "sz399939", "sz399941", "sz399961", "sz399980", "sz399299")
+    symbols = ("sz399904", "sz399920", "sz399939", "sz399941", "sz399961", "sz399962", "sz399980", "sz399299")
     units = [{"key": symbol, "symbol": symbol, "instrument_id": f"XSHE:{symbol[2:]}",
         "asset_type": "index", "input_id": "ASTOCK-002-daily",
         "context": {"request": {"symbol": symbol, "start_date": DAY, "end_date": DAY}}} for symbol in symbols]
@@ -87,6 +87,11 @@ def test_daily_routes_map_only_explicit_parallel_codes_and_keep_the_list_identit
         assert by_symbol[logical]["symbol"] == logical
         assert by_symbol[logical]["source_symbol"] == source_code
         assert by_symbol[logical]["value_contract"] == "close_only"
+    assert by_symbol["sz399962"]["input_id"] == "CSI-INDEX-DAILY-CLOSE-PAIR-001"
+    assert by_symbol["sz399962"]["symbol"] == "sz399962"
+    assert by_symbol["sz399962"]["instrument_id"] == "XSHE:399962"
+    assert by_symbol["sz399962"]["source_symbol"] == "sh000962"
+    assert by_symbol["sz399962"]["value_contract"] == "close_only"
     assert by_symbol["sz399961"]["input_id"] == "ASTOCK-002-daily"
     assert by_symbol["sz399980"]["input_id"] == "CSI-INDEX-DAILY-OHLC-001"
     assert by_symbol["sz399980"]["symbol"] == "sz399980"
@@ -101,6 +106,8 @@ def test_daily_routes_map_only_explicit_parallel_codes_and_keep_the_list_identit
     assert parameters["start"] == date.fromisoformat(DAY)
     close_parameters = contracts["CSI-INDEX-DAILY-CLOSE-PAIR-001"].bind_parameters(by_symbol["sz399920"]["context"])
     assert close_parameters["code"] == "sh000920"
+    new_close_parameters = contracts["CSI-INDEX-DAILY-CLOSE-PAIR-001"].bind_parameters(by_symbol["sz399962"]["context"])
+    assert new_close_parameters["code"] == "sh000962"
     super_cap_parameters = contracts["CSI-INDEX-DAILY-OHLC-001"].bind_parameters(by_symbol["sz399980"]["context"])
     assert super_cap_parameters["code"] == "sh000980"
 
@@ -111,7 +118,44 @@ def test_daily_routes_map_only_explicit_parallel_codes_and_keep_the_list_identit
 
     daily_routes = {item["input_id"]: item for item in definition["source_policy"]["inputs"]}
     assert len(daily_routes["CSI-INDEX-DAILY-OHLC-001"]["symbols"]) == 35
-    assert len(daily_routes["CSI-INDEX-DAILY-CLOSE-PAIR-001"]["symbols"]) == 13
+    assert len(daily_routes["CSI-INDEX-DAILY-CLOSE-PAIR-001"]["symbols"]) == 14
+
+
+def test_csindex_399962_close_only_replay_publishes_with_logical_identity_and_unknown_units_empty(tmp_path):
+    row = {"tradeDate": "20261029", "indexCode": "000962", "indexNameCnAll": "中证中游制造产业指数",
+        "indexNameCn": "中证中游", "open": None, "high": None, "low": None, "close": 4044.15,
+        "tradingVol": 9685107219.0, "tradingValue": 3663.44}
+    manifest = _csi_manifest(tmp_path / "csi-962-source", code="000962", body_row=row)
+    result = collect_task(definition=_task("csi-399962-close-only", "sz399962", manifest),
+        config_root=CONFIG, data_root=tmp_path / "csi-962-business", mode="replay",
+        collector_options={"pacer": RequestPacer(wait=lambda _: None)})
+
+    assert result["status"] == "published" and result["complete_today"]
+    record = CanonicalPartitionStore(tmp_path / "csi-962-business/canonical").read_daily("index", DAY)[0]
+    assert record.instrument_id == "XSHE:399962"
+    assert record.none.source_provider == "csindex" and record.none.value_contract == "close_only"
+    assert record.none.open is None and record.none.high is None and record.none.low is None
+    assert record.none.close == Decimal("4044.15")
+    assert record.none.volume is None and record.none.amount is None
+
+
+def test_saved_csindex_399962_response_replays_through_the_daily_publication(tmp_path):
+    manifest = ROOT / "tmp/batch-remediation-20261029/interface-review/raw/csi-daily-sh000962/manifest.ndjson"
+    if not manifest.exists():
+        pytest.skip("the retained target-date CSI response is not present in this checkout")
+    result = collect_task(definition=_task("csi-399962-saved-response", "sz399962", str(manifest)),
+        config_root=CONFIG, data_root=tmp_path / "csi-962-saved-response", mode="replay",
+        collector_options={"pacer": RequestPacer(wait=lambda _: None)})
+
+    assert result["status"] == "published" and result["complete_today"]
+    assert result["verification_mode"] == "replay"
+    assert result["progress"]["stages"]["raw"]["reused"] == 1
+    record = CanonicalPartitionStore(tmp_path / "csi-962-saved-response/canonical").read_daily("index", DAY)[0]
+    assert record.instrument_id == "XSHE:399962"
+    assert record.none.source_provider == "csindex" and record.none.value_contract == "close_only"
+    assert record.none.open is None and record.none.high is None and record.none.low is None
+    assert record.none.close == Decimal("4044.15")
+    assert record.none.volume is None and record.none.amount is None
 
 
 def test_csindex_full_ohlc_parser_checks_prices_and_close_only_contract_stays_separate():

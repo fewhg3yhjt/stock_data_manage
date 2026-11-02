@@ -442,6 +442,107 @@ def test_daily_route_expansion_uses_market_and_adjustment_policy():
     assert routes_by_quote[("bj920001", "backward")] == {"api": "newfqkline", "adjust": "hfq"}
 
 
+def test_confirmed_successor_freezes_current_request_code_and_page_relation(tmp_path):
+    from stock_data_manage.pipeline.daily import resolve_daily_definition, expand_daily_units
+    from stock_data_manage.service.web import create_app
+
+    definition = resolve_daily_definition({"asset_type": "index", "universe": "static"}, CONFIG)
+    unit = {"key": "sz399427", "symbol": "sz399427", "instrument_id": "XSHE:399427", "asset_type": "index",
+        "input_id": "ASTOCK-002-daily", "context": {"request": {"symbol": "sz399427",
+            "start_date": "2026-10-29", "end_date": "2026-10-29"}}}
+    current = expand_daily_units([unit], definition)
+    assert len(current) == 1
+    assert (current[0]["symbol"], current[0]["instrument_id"], current[0]["key"]) == (
+        "sz980070", "XSHE:399427", "sz980070__none")
+    assert current[0]["context"]["request"]["symbol"] == "sz980070"
+    assert current[0]["symbol_relation"]["effective_from"] == "2024-04-23"
+
+    historical = {**unit, "context": {"request": {"symbol": "sz399427",
+        "start_date": "2024-04-22", "end_date": "2024-04-22"}}}
+    historical_unit = expand_daily_units([historical], definition)[0]
+    assert historical_unit["symbol"] == "sz399427" and historical_unit["instrument_id"] == "XSHE:399427"
+
+    record = DailyRecord("XSHE:399427", date(2026, 10, 29), AssetType.INDEX,
+        quote("10"), QuoteGroup(QuoteStatus.UNVERIFIED, reason="not verified"),
+        QuoteGroup(QuoteStatus.UNVERIFIED, reason="not verified"))
+    business = tmp_path / "business"
+    store = CanonicalPartitionStore(business / "canonical")
+    store.publish_daily(asset_type="index", partition_key="2026-10-29", new_records=[record],
+        expected_count=1, run_id="symbol-succession", item_statuses={"XSHE:399427": "success"})
+    app = create_app(config_root=CONFIG, data_root=business)
+    endpoint = next(route.endpoint for route in app.routes if getattr(route, "path", None) == "/api/daily")
+    result = endpoint(security="sz980070", start_date=None, end_date=None, asset_type="index",
+        adjustment="none", page=1, page_size=50)
+    assert result["total"] == 1
+    item = result["items"][0]
+    assert item["symbol"] == "sz980070"
+    assert item["instrument_id"] == "XSHE:399427"
+    assert item["symbol_relation"]["old_symbol"] == "sz399427"
+    assert item["symbol_relation"]["new_symbol"] == "sz980070"
+    assert item["symbol_relation"]["evidence_refs"]
+    old_code_result = endpoint(security="sz399427", start_date=None, end_date=None, asset_type="index",
+        adjustment="none", page=1, page_size=50)
+    assert old_code_result["total"] == 1
+
+
+def test_daily_publication_excludes_confirmed_suspension_and_rejects_task_assertion(tmp_path):
+    from stock_data_manage.pipeline.daily import resolve_daily_definition, prepare_daily_task_publication
+
+    fake_suspension = [{"symbol": "sh600002", "instrument_id": "XSHG:600002", "asset_type": "stock",
+        "status": "suspended", "status_evidence": {"basis": "user_assertion"}}]
+    resolved = resolve_daily_definition({"task": "stock_daily", "suspended_securities": fake_suspension}, CONFIG)
+    assert "suspended_securities" not in resolved
+
+    confirmed = {"symbol": "sh600002", "instrument_id": "XSHG:600002", "asset_type": "stock",
+        "status": "suspended", "status_evidence": {"basis": "same_day_baostock_tradeStatus",
+            "as_of_date": "2026-10-29", "security_master_manifest": "fixture"}}
+    definition = {"asset_type": "stock", "trade_date": "2026-10-29",
+        "quote_contract": {"none": "required", "forward": "required", "backward": "required"},
+        "publication_policy": {"max_missing_ratio": 1, "max_missing_count": 1},
+        "suspended_securities": [confirmed],
+        "lifecycle_exclusions": [{"symbol": "sz399960", "instrument_id": "XSHE:399960",
+            "asset_type": "index", "status": "delisted", "status_evidence": {"basis": "manual_security_lifecycle_override"},
+            "impact": "excluded_from_daily_universe"}]}
+    units = [{"key": f"sh600001__{adjustment}", "symbol": "sh600001", "instrument_id": "XSHG:600001",
+        "adjustment": adjustment, "asset_type": "stock", "input_id": "ASTOCK-002-daily"}
+        for adjustment in ("none", "forward", "backward")]
+    state = {"definition": definition, "units": {}, "redo": "resume"}
+    result = prepare_daily_task_publication(state, units, {}, {"canonical_root": tmp_path / "canonical"},
+        CONFIG, date(2026, 10, 29))
+    assert state["daily_check"]["expected_count"] == 1
+    assert state["daily_check"]["actual_count"] == 0
+    assert state["daily_check"]["suspended_count"] == 1
+    assert state["daily_check"]["item_statuses"]["XSHG:600002"] == "no_trade"
+    assert state["daily_check"]["item_statuses"]["XSHG:600001"] == "missing"
+    assert any(issue["code"] == "confirmed_suspended" for issue in state["daily_check"]["issues"])
+    exclusion = next(issue for issue in state["daily_check"]["issues"] if issue["code"] == "manual_lifecycle_exclusion")
+    assert exclusion["symbol"] == "sz399960" and exclusion["impact"] == "excluded_from_daily_universe"
+    assert state["daily_check"]["lifecycle_exclusions"][0]["symbol"] == "sz399960"
+    assert result["expected_count"] == 1
+
+
+def test_daily_route_uses_csi_close_only_for_the_explicit_eleven_indices():
+    from stock_data_manage.pipeline.daily import resolve_daily_definition, expand_daily_units
+    definition = resolve_daily_definition({"asset_type": "index", "universe": "static"}, CONFIG)
+    symbols = ("sh000816", "sh000833", "sh000842", "sh000939", "sh000940", "sh000950",
+        "sh000951", "sh000957", "sh000958", "sh000963", "sh000975")
+    units = [{"key": symbol, "symbol": symbol, "asset_type": "index", "input_id": "ASTOCK-002-daily",
+        "context": {"request": {"symbol": symbol, "start_date": DAY, "end_date": DAY}}}
+        for symbol in (*symbols, "sz399299")]
+    expanded = expand_daily_units(units, definition)
+    assert len(expanded) == 12
+    by_symbol = {unit["symbol"]: unit for unit in expanded}
+    for symbol in symbols:
+        assert by_symbol[symbol]["input_id"] == "CSI-INDEX-DAILY-001"
+        assert by_symbol[symbol]["provider"] == "csindex"
+        assert by_symbol[symbol]["value_contract"] == "close_only"
+        assert by_symbol[symbol]["adjustment"] == "none"
+        assert by_symbol[symbol]["context"]["config"] == {"api": "index-perf", "adjust": "none"}
+    assert by_symbol["sz399299"]["input_id"] == "CNI-INDEX-DAILY-001"
+    assert by_symbol["sz399299"]["provider"] == "cnindex"
+    assert by_symbol["sz399299"]["value_contract"] == "full_ohlc"
+
+
 def test_daily_route_expansion_never_falls_back_for_missing_market_or_conflicting_unit():
     from copy import deepcopy
     from stock_data_manage.pipeline.daily import resolve_daily_definition, expand_daily_units

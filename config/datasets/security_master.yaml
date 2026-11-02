@@ -46,8 +46,9 @@ symbol_successions:
       - tmp/batch-remediation-20261029/interface-review/raw/cni-patent-code-revision-20240423/manifest.ndjson
       - tmp/batch-remediation-20261029/interface-review/raw/cni-daily-980070/manifest.ndjson
 
-# 用户确认的指数历史有效期覆盖：delist_date 是最后有效行情日（含当日）；
-# 后续名单快照标记为 delisted。证据等级与不确定性记录在 docs/providers/security-catalog.md。
+# 人工证券生命周期覆盖：list_date/delist_date 含当日；delist_date 是最后有效行情日。
+# status 区间的 effective_from/effective_to 也含当日；只允许 active/suspended。
+# 覆盖仅改变对应市场、类型、代码在该日期的状态；证据等级见 docs/providers/security-catalog.md。
 symbol_lifecycle_overrides:
   - market: XSHE
     asset_type: index
@@ -76,6 +77,47 @@ symbol_lifecycle_overrides:
       - https://emt.18.cn/api/quant-help/data/indices.html
       - tmp/batch-remediation-20261029/status-policy-simulation-20261029.json
       - tmp/batch-remediation-20261029/interface-review/raw/csi-daily-sh000963/manifest.ndjson
+  - market: XSHE
+    asset_type: index
+    symbol: "399960"
+    name: "中证龙头企业指数"
+    delist_date: "2016-06-03"
+    evidence_refs:
+      - https://www.ricequant.com/doc/rqdata/python/indices-mod
+      - https://emt.18.cn/api/quant-help/data/indices.html
+      - tmp/batch-remediation-20261029/interface-review/raw/csi-daily-sh000960/manifest.ndjson
+  - market: XSHG
+    asset_type: index
+    symbol: "000999"
+    name: "中证两岸三地500指数"
+    delist_date: "2018-07-10"
+    evidence_refs:
+      - https://rqopen.ricequant.com/doc/rqdata/cli/manual
+      - https://emt.18.cn/api/quant-help/data/indices.html
+      - tmp/market-batch-20261029/task_archive/_raw_evidence/market-daily-20261029-batch/sh000999__none/attempt-1/manifest.ndjson
+      - tmp/batch-remediation-20261029/interface-review/raw/csi-daily-sh000999/manifest.ndjson
+  - market: XSHE
+    asset_type: index
+    symbol: "399332"
+    name: "深证创新价格指数（旧代码）"
+    delist_date: "2016-11-29"
+    evidence_refs:
+      - https://www.cnindex.com.cn/docs/gz_399332.pdf
+      - https://www.szse.cn/disclosure/notice/general/t20161201_501858.html
+      - https://emt.18.cn/api/quant-help/data/indices.html
+      - https://www.mytest.demo.joinquant.com/data/dict/indexData
+      - tmp/market-batch-20261029/task_archive/_raw_evidence/market-daily-20261029-batch/sz399332__none/attempt-1/manifest.ndjson
+      - tmp/batch-remediation-20261029/interface-review/raw/cni-daily-399332/manifest.ndjson
+  - market: XSHE
+    asset_type: stock
+    symbol: "002717"
+    name: "*ST岭南"
+    status: suspended
+    effective_from: "2026-10-13"
+    effective_to: null
+    evidence_refs:
+      - https://static.cninfo.com.cn/finalpage/2026-10-13/1225602315.PDF
+      - https://static.cninfo.com.cn/finalpage/2026-10-17/1225609701.PDF
 
 # 同一指数的跨市场并列行情代码，不代表退市、代码承接或证券主数据状态。
 # pairs 的键保留在证券名单中的业务身份，值为采集请求使用的完整来源代码；
@@ -183,6 +225,14 @@ symbol_parallel_codes:
     evidence_refs:
       - https://doc.xuehai.net/b9ba26d479cf79e15d9993a67.html
       - tmp/batch-remediation-20261029/interface-review/raw/csi-daily-sh000980/manifest.ndjson
+  - logical_market: XSHE
+    asset_type: index
+    request_market: XSHG
+    pairs: {"399962": sh000962}
+    evidence_refs:
+      - https://emt.18.cn/api/quant-help/data/indices.html
+      - https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000962factsheet.pdf
+      - tmp/batch-remediation-20261029/interface-review/raw/csi-daily-sh000962/manifest.ndjson
 
 fields:
   instrument_id: {type: string, required: true}

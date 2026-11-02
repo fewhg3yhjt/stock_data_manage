@@ -883,7 +883,8 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                     if adjustment is None or adjustment != fetched.mapping_context.get("adjustment"):
                         raise NormalizationError("requested adjustment and returned series do not match the normalization contract")
                 mapping_context.update(instrument_id=f"{exchange}:{symbol[2:]}",
-                                       adjustment=adjustment, exchange=exchange, asset_type=security_asset_type)
+                                       adjustment=adjustment, exchange=exchange, asset_type=security_asset_type,
+                                       value_contract="full_ohlc")
                 if input_id == "ASTOCK-002-daily":
                     report.update(source_metadata=_json_value(fetched.mapping_context),
                         requested_adjustment=parameters[parameter_name],
@@ -1179,6 +1180,7 @@ def _finish_daily_batch(state, paths, metadata, failure_hook=None):
 def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, mode, failure_hook, progress_callback, pacer=None):
     import json
     import re
+    import yaml
     import pyarrow.parquet as pq
     import requests
     from concurrent.futures import ThreadPoolExecutor
@@ -1235,6 +1237,22 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                 if len(resolved['asset_types']) == 1:
                     for unit in base:
                         unit.setdefault('asset_type', resolved['asset_types'][0])
+                security_policy = yaml.safe_load((config_root / 'datasets/security_master.yaml').read_text(encoding='utf-8')) or {}
+                base, lifecycle_exclusions = _apply_manual_security_lifecycle_overrides(
+                    base, security_policy.get('symbol_lifecycle_overrides', ()), trade_date=resolved['trade_date'])
+                if lifecycle_exclusions:
+                    resolved['lifecycle_exclusions'] = lifecycle_exclusions
+                # Exempt only dated master evidence or an explicit, dated manual override.
+                # Unknown or older status stays in the requested denominator.
+                suspended = [unit for unit in base if unit.get("status") == "suspended"
+                    and isinstance(unit.get("status_evidence"), dict)
+                    and unit["status_evidence"].get("basis") in {
+                        "same_day_baostock_tradeStatus", "manual_security_lifecycle_override"}
+                    and unit["status_evidence"].get("as_of_date") == resolved["trade_date"]]
+                if suspended:
+                    resolved["suspended_securities"] = [{key: unit.get(key) for key in
+                        ("symbol", "instrument_id", "asset_type", "status", "status_evidence")} for unit in suspended]
+                    base = [unit for unit in base if unit not in suspended]
                 units = expand_daily_units(base, resolved)
                 if not units:
                     raise ValueError('daily batch requires a nonempty security scope')
@@ -1271,7 +1289,9 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                 state = {'format_version': 'daily-batch-v2', 'task_id': task_id, 'dataset': 'daily_bar',
                     'definition_hash': row_hash(frozen), 'definition_ref': {'path': str(work / 'task.json'), 'sha256': file_hash(work / 'task.json')},
                     'status': 'collecting', 'phase': 'prepare', 'requested_date': resolved['trade_date'],
-                    'verification_mode': mode, 'source_unit_count': len(units), 'partitions': {}}
+                    'verification_mode': mode, 'source_unit_count': len(units), 'partitions': {},
+                    'lifecycle_exclusions': list(resolved.get('lifecycle_exclusions', ())),
+                    'suspended_securities': list(resolved.get('suspended_securities', ()))}
                 _save_daily_batch(state, paths, metadata)
             resolved, units = frozen['definition'], frozen['units']
             work = Path(state['definition_ref']['path']).parent
@@ -2063,7 +2083,12 @@ def _task_units(definition, paths):
     from ..storage.metadata import MetadataStore
     units = definition.get("units")
     if units is not None:
-        return json.loads(json.dumps(_json_value(units)))
+        explicit = json.loads(json.dumps(_json_value(units)))
+        # A task file cannot assert suspension and reduce its own denominator.
+        for unit in explicit:
+            unit.pop("status", None)
+            unit.pop("status_evidence", None)
+        return explicit
     if definition["dataset"] != "daily_bar":
         raise ValueError("security master requires explicit source-interface units")
     with MetadataStore(paths["metadata_path"]) as metadata:
@@ -2078,7 +2103,7 @@ def _task_units(definition, paths):
     manifest_path = Path(latest["manifest_path"])
     if not manifest_path.resolve().is_relative_to(paths["canonical_root"]):
         raise ValueError("published security master escaped canonical storage")
-    from ..storage.integrity import Manifest
+    from ..storage.integrity import Manifest, file_hash
     manifest = Manifest.load(manifest_path)
     source = manifest_path.parent / "data.parquet"
     if (manifest_path.parent / "task-commit.json").exists() or not manifest.verify(source):
@@ -2089,6 +2114,13 @@ def _task_units(definition, paths):
     wanted = definition.get('asset_types') if definition.get('universe') == 'all' else [universe_asset_types.get(definition.get("universe"))]
     if not wanted or None in wanted:
         raise ValueError("supported dynamic universes are all_stock, all_etf, and all_index")
+    master_metadata = getattr(manifest, "publication_metadata", {})
+    status_is_same_day_evidence = (
+        master_metadata.get("as_of_date") == day.isoformat()
+        and not master_metadata.get("fallback", False)
+        and any(item.get("input_id") == "SECURITY-BS-UNIVERSE-001"
+                for item in master_metadata.get("sources", ()) if isinstance(item, dict))
+    )
     for row in pq.read_table(source).to_pylist():
         if row["asset_type"] not in wanted or row["status"] == "prelisted":
             continue
@@ -2096,13 +2128,58 @@ def _task_units(definition, paths):
             continue
         prefix = {"XSHG": "sh", "XSHE": "sz", "BSE": "bj"}[row["exchange"]]
         symbol = prefix + row["symbol"]
-        selected.append({"key": symbol, "symbol": symbol, "asset_type": row['asset_type'], "input_id": definition["input_id"],
+        observed_status = row.get("status") if status_is_same_day_evidence else "unknown"
+        identity = row.get("instrument_id")
+        selected.append({"key": symbol, "symbol": symbol, "instrument_id": identity,
+            "asset_type": row['asset_type'], "status": observed_status, "input_id": definition["input_id"],
+            "status_evidence": ({"basis": "same_day_baostock_tradeStatus", "as_of_date": day.isoformat(),
+                "security_master_manifest": str(manifest_path), "security_master_manifest_sha256": file_hash(manifest_path)}
+                if status_is_same_day_evidence and observed_status == "suspended" else None),
             "context": {"request": {"symbol": symbol, "start_date": day.isoformat(), "end_date": day.isoformat()}}})
         if "config" in definition:
             if not isinstance(definition["config"], dict):
                 raise ValueError("daily task config must be a parameter mapping")
             selected[-1]["context"]["config"] = dict(definition["config"])
     return selected
+
+
+def _apply_manual_security_lifecycle_overrides(units, overrides, *, trade_date):
+    """Apply dated operator decisions before freezing the daily task universe."""
+    from datetime import date
+    from ..service.instruments_update import security_lifecycle_override_for
+
+    day = date.fromisoformat(str(trade_date))
+    retained, exclusions = [], []
+    market_by_prefix = {"sh": "XSHG", "sz": "XSHE", "bj": "BSE"}
+    for source_unit in units:
+        unit = dict(source_unit)
+        symbol = str(unit.get("symbol", ""))
+        market = market_by_prefix.get(symbol[:2].lower())
+        if market is None or not unit.get("asset_type"):
+            retained.append(unit)
+            continue
+        override = security_lifecycle_override_for(overrides, market=market,
+            asset_type=unit["asset_type"], symbol=symbol[2:], as_of_date=day)
+        if override is None:
+            retained.append(unit)
+            continue
+        evidence = {"basis": "manual_security_lifecycle_override", "as_of_date": day.isoformat(),
+            "status": override["status"], "evidence_refs": list(override.get("evidence_refs", ())),
+            "effective_from": (override.get("effective_from").isoformat()
+                if override.get("effective_from") else None),
+            "effective_to": (override.get("effective_to").isoformat()
+                if override.get("effective_to") else None),
+            "list_date": (override.get("list_date").isoformat() if override.get("list_date") else None),
+            "delist_date": (override.get("delist_date").isoformat() if override.get("delist_date") else None)}
+        if override["status"] in {"prelisted", "delisted"}:
+            exclusions.append({"symbol": symbol, "instrument_id": unit.get("instrument_id"),
+                "asset_type": unit["asset_type"], "status": override["status"],
+                "status_evidence": evidence, "impact": "excluded_from_daily_universe"})
+            continue
+        unit["status"] = override["status"]
+        unit["status_evidence"] = evidence
+        retained.append(unit)
+    return retained, exclusions
 
 
 def _task_unit_valid(entry):
@@ -2222,6 +2299,7 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
     previous_path = previous_dir / "data.parquet"
     policy = yaml.safe_load((config_root / "datasets/security_master.yaml").read_text(encoding="utf-8"))
     publication_policy = policy["dataset"]["publication"]
+    symbol_successions = policy.get("symbol_successions", [])
     lifecycle_overrides = policy.get("symbol_lifecycle_overrides", [])
     allowed_groups = {
         tuple(pair)
@@ -2256,7 +2334,7 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
     missing = [unit["key"] for unit in units if unit["key"] not in valid]
     # Inspect today's sources alone. Previous rows must not conceal omissions.
     merged = prepare_security_publication({key: value["rows"] for key, value in source_rows.items()},
-        lifecycle_overrides=lifecycle_overrides, as_of_date=day)
+        symbol_successions=symbol_successions, lifecycle_overrides=lifecycle_overrides, as_of_date=day)
     records = merged.records
     scripted = {key: value for key, value in source_rows.items()
                 if any(row.get('date_basis') for row in value['rows'])}
@@ -2308,7 +2386,7 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
         & required_groups for key, value in source_rows.items()}
     for key, value in source_rows.items():
         source_records = prepare_security_publication({key: value["rows"]},
-            lifecycle_overrides=lifecycle_overrides, as_of_date=day).records
+            symbol_successions=symbol_successions, as_of_date=day).records
         declared_groups = responsibilities[key]
         # A market/asset group can be supplied by complementary interfaces.
         # Compare their union to yesterday, while still checking each required unit.
@@ -2316,7 +2394,7 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
         for group in declared_groups:
             group_records = prepare_security_publication({other: source_rows[other]['rows']
                 for other, groups in responsibilities.items() if group in groups},
-                lifecycle_overrides=lifecycle_overrides, as_of_date=day).records
+                symbol_successions=symbol_successions, as_of_date=day).records
             source_previous = [item for item in comparable if (item.exchange.value, item.asset_type.value) == group]
             if not check_security_coverage(group_records, required_groups={group}, previous=source_previous)['passed']:
                 unit_check['passed'] = False
@@ -2356,7 +2434,10 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
                                 "previous_manifest_hash": file_hash(previous_dir / "manifest.json")}
     else:
         # Retain trusted descriptive fields, but never retain omitted identities.
-        records = prepare_security_publication({key: value["rows"] for key, value in source_rows.items()}, comparable,
+        status_sources = {key for key, value in source_rows.items()
+            if value['entry'].get('input_id') == 'SECURITY-BS-UNIVERSE-001'}
+        records = prepare_security_publication({key: value["rows"] for key, value in source_rows.items()},
+            comparable, status_sources=status_sources, symbol_successions=symbol_successions,
             lifecycle_overrides=lifecycle_overrides, as_of_date=day).records
         publication_metadata = {"as_of_date": day.isoformat(), "requested_date": day.isoformat(),
             "scope_hash": scope_hash, "coverage_passed": True, "fallback": False,

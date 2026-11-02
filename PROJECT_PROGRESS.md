@@ -1,6 +1,63 @@
 # 项目开发进度
 
-## 证券状态与发布整改计划（2026-11-01，尚未实施）
+## 证券有效期核对、人工状态控制与指数整批重放（2026-11-02）
+
+| 原问题 | 本次核对证据 | 处理及其作用 | 当前状态与剩余项 |
+|---|---|---|---|
+| 人工维护证券有效期/状态 | 现有批任务读取名单后直接展开请求；旧冻结任务范围不可由新配置静默改写 | 在现有`config/datasets/security_master.yaml`增加日期覆盖：`list_date/delist_date`、`active/suspended`有效区间在任务冻结前应用；停牌项不请求并单列`no_trade`，有效期外项不请求并记录排除原因。没有新增服务或管理台页面，仍由维护者编辑YAML | 代码在[批任务准备](src/pipeline/inputs.py)和[证券目录处理](src/service/instruments_update.py)。3项定向测试通过；旧冻结任务及正式数据未改 |
+| 002717行情停在2026-10-12 | 公司公告确认10-13起停牌；10-17披露深交所“拟决定终止”，这是事先告知，不是最终终止决定。[停牌公告](https://static.cninfo.com.cn/finalpage/2026-10-13/1225602315.PDF)、[事先告知书](https://static.cninfo.com.cn/finalpage/2026-10-17/1225609701.PDF)。本次检索截至11-02未找到最终终止上市决定公告 | 配置`XSHE/stock/002717`自2026-10-13起`suspended`且结束日未知。目标日2026-10-29新任务会跳过请求，记录停牌证据并移出当日缺失分母；不把它误标成已退市 | 实现已通过批任务冻结测试；尚未用新配置重跑股票整批，因此旧全量任务结果仍包含原21个失败单元中的002717三口径 |
+| 指数任务中的`sh000999` | RiceQuant目录把中证两岸三地500指数终止日期列为2018-07-11；项目保留的Tencent日线最后日期为2018-07-10；CSI对2026-10-29返回空。EastMoney目录未填终止日期，存在冲突 | 按用户允许的第三方历史目录规则，把项目有效截止日记为最后留存行情日2018-07-10；只代表本项目不再采集该旧代码，不宣称交易所公告确认退市。未将同名H11108自动合并 | 新指数任务不再请求`sh000999`；证据和冲突列于[证券目录说明](docs/providers/security-catalog.md#指数历史有效期与399980并列代码2026-11-02按用户确认接入)及`security_master.yaml` |
+| 指数任务中的`sz399332` | 国证2014方案确认旧代码399332；第三方目录标“深证创新(旧)”；项目Tencent留存最后日期2016-11-29，CNI目标日为空。深交所2016-12-01发布另一个代码399016；国证factsheet把SZSEIN映射到399016。EastMoney目录仍列399332且无终止日，来源冲突 | 按用户允许的人工有效期规则，将项目截止日记为2016-11-29；不把399016冒充399332，不自动建立代码承接关系，也不称交易所正式退市 | 证据、为何不能把搜索到的当前SZSEIN数据填给399332，见[证券目录说明](docs/providers/security-catalog.md#指数历史有效期与399980并列代码2026-11-02按用户确认接入) |
+| 指数整批的4项原缺口 | 原560项运行曾缺`sh000999`、`sz399332`、`sz399960`、`sz399962`；另有已核验失效项`sz399946/399961/399963` | 采用当前有效期配置排除6个旧代码；将`sz399962`按已确认配对码请求`sh000962`，并用已留存CSI响应的`close_only`合同处理 | 新隔离任务`market-daily-20261029-index-lifecycle-20261102`：原563 → 排除6 → 557；复用557/557份原响应、在线请求0；处理557/557；发布557行、缺失0、`complete_today=true`。来源腾讯495、中证60、国证2；完整OHLC 532、收盘序列25。发布清单及Parquet完整性通过；`399962`收盘4044.15，其他价量留空 |
+
+测试使用`D:\Program Files\Python\python.exe`（Python 3.13.0rc3；pytest 9.0.2、FastAPI 0.115.11、DuckDB 1.5.5、PyArrow 25.0.0、PyYAML 6.0.2、requests 2.34.2）。本次生命周期/批次目标日边界定向测试3/3通过，[JUnit](tmp/tsr/security-lifecycle-index-overrides-final-20261102.xml)；配置合同模块12/12通过，[JUnit](tmp/tsr/security-config-contract-final-20261102.xml)。配置合同首次运行1项失败，是期望集漏列当前CSI/CNI四个输入；只更新该测试期望后重跑全模块通过，未改生产路由。此前证券目录与外部指数两个模块共93项在缩短Windows临时路径后均通过，证据见[主运行](tmp/tsr/security-catalog-external-index-20261102.xml)和[路径复验](tmp/tsr/security-catalog-path-retest-20261102.xml)。更宽的5模块初测166项中仍有4项`daily_batch`旧断言与当前合同不一致，未计作本次通过，也未在本轮扩大修复。全量指数重放的结果文件是[运行结果](tmp/market-daily-20261029-index-lifecycle-replay-20261102/index-lifecycle-replay-result.json)，独立完整性核验见[核验记录](tmp/market-daily-20261029-index-lifecycle-replay-20261102/index-integrity-verification.json)。执行后审计脚本曾因稳定身份和Decimal格式假设报错，修正为按冻结稳定身份比较、按Decimal数值比较后重新核验成功；任务本身首次执行即发布成功。解释器与依赖记录见[环境记录](tmp/tsr/security-lifecycle-focused-environment-20261102.json)。
+
+该结果只完成**指数分区的隔离发布**，不是全市场单任务完整发布：此前股票/ETF来自旧运行；股票整批尚未按002717停牌配置重跑，旧结果的其他6只股票缺口也尚未重新核验。正式`data/`及当前浏览器快照未改。后续若继续追求三类在同一完整任务中的验收，需先复用现有原响应重跑股票/ETF/指数整批，并分别验收来源处理与页面新快照；本次不把指数分区结果扩大解释为三类全链路完成。
+
+## 2026-10-29股票/ETF/指数完整日线回放（2026-11-02，隔离发布部分完成）
+
+| 阶段 | 本次实际结果 | 证据与边界 |
+|---|---|---|
+| 任务范围与取数 | 目标日2026-10-29；股票5,577、ETF1,715、指数563；19,009个来源单元全部从历史留存响应重放，复用19,009/19,009，真实联网请求0次。采集整理32:49。 | 新冻结任务：`tmp/market-daily-20261029-full-replay-20261101/task.json`；运行摘要：`tmp/market-daily-20261029-full-replay-20261101/business/task_workspace/2026-10-29/daily_bar/market-daily-20261029-full-replay-20261101/summary.json`。 |
+| 解析处理 | 19,009单元处理完成：18,980成功、29失败，16:47。股票失败21单元，对应`sh601326`、`sh605258`、`sh688121`、`sh688496`、`sz002717`、`sz002827`、`sz301468`各自none/forward/backward均无目标日行情；指数另8单元无目标日行情。 | 7只股票在另有的同日BaoStock诊断中被标记停牌，但本次冻结主数据状态为unknown，不能把那份模拟诊断当成本任务已冻结状态；故本次仍计7只股票缺失。 |
+| 分区发布 | 股票5,570/5,577条，缺7条（0.13%，低于当前1%及50条门槛），已发布；ETF 1,715/1,715条，已发布；指数555/563条，缺8条（1.42%，超过1%），被质量门槛阻断。仅2/3分区发布，完整任务`failed`、`complete_today=false`；发布阶段16:54，全任务约67分钟。 | 已发布隔离分区：`tmp/market-daily-20261029-full-replay-20261101/business/canonical/2026-10-29/daily_bar/stock/`与`.../etf/`；两份manifest均通过完整性校验且行数与Parquet一致。指数未生成canonical分区。正式`data/`未写入。 |
+| 8项指数缺口 | 代码为`sh000999`、`sz399332`、`sz399946`、`sz399960`、`sz399961`、`sz399962`、`sz399963`、`sz399980`。其中399961/962/963/980有留存CSI目标日行，候选请求码为000961/962/963/980；962/963仅有close，另外两项有OHLC。它们未列入当前已确认配对配置，因此本次没有按同名自动合并。另4项留存来源没有有效目标日数据。 | 证据在`tmp/batch-remediation-20261029/interface-review/findings.json`及各代码的原始响应目录。直接代码配对/稳定身份需要先确认依据；不得把HTTP 200空响应当成行情。未修改发布阈值、证券身份或配置来绕过门槛。 |
+| 页面数据核对 | 旧任务发布的2026-10-29证券主数据7,855条已校验并复制到本次隔离根供页面名称关联；没有重新抓名单。实际调用页面`/api/daily`处理函数：股票、ETF各能按代码返回具名记录，13列中文字段；指数返回0条，因为该分区未发布。样例`bj920001`返回“纬达光电”、成交量1,182,900股、成交额1,167.14万元。ETF样例量额空且状态“单位未核验”。 | 本次只执行页面路由/API数据检查，未完成浏览器截图验收。隔离只读页面地址：`http://127.0.0.1:18771/`；运行台只绑定本机地址。应用使用的证券主数据来自`tmp/market-batch-20261029/canonical/2026-10-29/security_master/`，其manifest行数7,855且完整性通过。 |
+
+本次端到端运行复用了原始响应，但重新执行了解析与发布，因此不是“只读查看旧发布结果”。当前股票/ETF已有可检查隔离产物；指数发布仍阻断，不能称为全市场完整发布。缺口判断来自此次运行，不包含在线重抓、正式发布或浏览器视觉验收。
+
+状态语义复核：质量门槛决定各分区是否允许发布；整任务`complete_today`还要求所有分区已发布且处理阶段`failed=0`、`skipped=0`（见`src/pipeline/inputs.py`）。因此即使后续指数分区低于缺失比例门槛，仍须验证所有处理单元失败是否按已确认规则处理，不能把“所有分区有文件”直接当成整任务完成。另有7只股票在既有停牌策略模拟中记录了目标日来源状态`tradeStatus=0`，但本次冻结任务的`status/status_evidence`仍为`unknown/null`，本次运行没有据该模拟记录排除；模拟报告不是本次运行的冻结输入或原始来源响应。
+
+本轮规则接入与指数整批重放（2026-11-02）：按用户确认，在现有`security_master.yaml`维护`sz399946`、`sz399961`、`sz399963`的历史有效期，最后有效行情日分别为`2016-06-03`、`2019-01-25`、`2019-01-25`；名单快照日晚于该日期时标记`delisted`，有效期末日仍按有效处理。`sz399980`保留名单身份`XSHE:399980`，按`sh000980`向CSI请求日线，合同为`full_ohlc`。原563个指数单元按这三项规则过滤后剩560项；全部560份已有原始响应可重放，来源分布为腾讯499、中证59、国证2，真实联网请求0次。最终指数分区发布556/560条，缺4条（`sh000999`、`sz399332`、`sz399960`、`sz399962`），缺失率0.71%，低于每批50条且1%的发布门槛；分区状态`published`，但任务`complete_today=false`，不能称560项全成功。`sz399980`实际以中证来源、请求码`sh000980`发布为完整四价；单证券回放与整批结果见[399980回放记录](tmp/market-daily-20261029-399980-route-20261102/replay-result.json)及[560项指数结果](tmp/market-daily-20261029-index-replay-20261102/index-replay-result.json)。四项剩余缺失及原因见各单元报告；其中`sz399962`虽有留存CSI收盘数据，但当前没有经确认的并列码路由，因此未猜测身份而补入。配置和执行改动涉及`src/service/instruments_update.py`、`src/pipeline/inputs.py`及[证券目录说明](docs/providers/security-catalog.md#指数历史有效期与399980并列代码2026-11-02按用户确认接入)。
+
+本次模块/配置测试范围`test_security_catalog.py`、`test_daily_external_index_sources.py`和`test_config_contract.py`共97项，97通过、0失败；JUnit为`tmp/tsr/security-lifecycle-20261102.xml`。最终运行排除了两项已有环境/归档问题（ETF样本缺body；BaoStock样本Windows临时路径替换失败）及一项过期Provider清单断言，它们未判通过。前述49项回放仍是历史范围，不计入本次验收。
+
+为页面查看，将原任务已发布股票/ETF分区与本次指数分区复制到新的只读隔离快照，并逐个验证manifest和行数：股票5570/5577、ETF1715/1715、指数556/560，合计7841/7852。它们来自两个任务，不伪装成同一个全量任务；正式`data/`未写入。快照结果和边界见[展示快照说明](tmp/market-daily-20261029-display-snapshot-20261102/README.md)。本机页面`http://127.0.0.1:18772/`已显示7841条发布规范日线；按`sz399980`筛选实见“中证超级大盘指数”、中证来源及OHLC `3033.81/3058.79/3015.44/3056.53`。页面用旧证券主数据快照只做名称/类型关联；生命周期覆盖将在下一次正常名单发布中反映。指数任务仍`complete_today=false`，所以本阶段完成三类分区交付与展示，但不标记为无缺失的完整采集。
+
+## CSI/CNI指数接入现有日线批任务（2026-11-01，49项隔离批验收完成）
+
+| 检查项 | 实际改动与结果 | 证据及结论边界 |
+|---|---|---|
+| 来源请求与解析 | 日线准备阶段按冻结来源输入区分腾讯、CSI收盘、CSI完整四价、CSI配对收盘和CNI完整四价；分别调用对应Provider与解析器。CSI `sz399xxx→sh000xxx`配对只改变请求代码，输出身份保留名单代码；CNI按配置代码请求。不同来源候选最终进入同一聚合和发布检查，不拼接字段 | `config/capabilities.yaml`配置11个直接CSI收盘代码、47个有明确依据的CSI并列代码（34个`full_ohlc`、13个`close_only`）及2个CNI代码；关系证据在`config/datasets/security_master.yaml`，来源参数在`config/providers.yaml`，字段合同在`config/normalization/daily_bar.yaml`。业务流转与架构图见[日线批任务设计](docs/pipeline/collection-tasks.md) |
+| 真实原文隔离回放 | 初始4项样本确认CSI请求`000904`、`000941`后发布身份仍为`sz399904`、`sz399941`；CNI请求`399299`、`980070`。之后扩展到47个CSI配对代码和2个CNI代码的49项批任务，复用49份目标日原文：34项完整四价、13项收盘序列、2项CNI完整四价。49项候选全部发布到同一隔离指数分区，缺失0，`complete_today=true` | [49项最终运行结果](tmp/csi-cni-index-20261029-expanded-isolated/run-closeonly/expanded-scope-result.json)、[逐项身份/请求码/合同/响应哈希表](tmp/csi-cni-index-20261029-expanded-isolated/run-closeonly/README.md)、[执行入口](tmp/csi-cni-index-20261029-expanded-isolated/run_mapped_index_scope.py)、[解释器依赖记录](tmp/csi-cni-index-20261029-expanded-isolated/test-environment-final.json)。49份留存响应重放、真实联网0次、正式`data/`写入0 |
+| 13项合同修正依据 | 首轮以`full_ohlc`运行时，13个CSI目标日响应HTTP 200且目标日close有效，但`open/high/low=null`，所以四价候选被拒绝。用户确认它们属于收盘序列后，将对应输入配置为`close_only`；现在只要求有效close，开高低及未核实量额留空，不再因缺OHLC而丢掉目标日 | 失败前后结果分别见[首轮失败汇总](tmp/csi-cni-index-20261029-expanded-isolated/run/expanded-scope-result.json)和[最终通过汇总](tmp/csi-cni-index-20261029-expanded-isolated/run-closeonly/expanded-scope-result.json)；13条源字段与响应哈希见[核对表](tmp/csi-cni-index-20261029-expanded-isolated/run/README.md)及[逐项证据](tmp/csi-cni-index-20261029-expanded-isolated/run/missing-csi-ohlc-evidence.json)。旧失败证据保留，不作为当前状态 |
+| 编号承接与页面代码 | `sz980070`的日线仍以稳定身份`XSHE:399427`存储；现有查询投影按已确认承接关系显示当前代码`sz980070`。这与CSI并列码不同：`399941→000941`是请求别名，`399427→980070`是带生效日的承接 | 上述隔离结果同时核对稳定身份、当前显示码、Provider和URL中的实际请求码；原响应与发布raw manifest均可从JSON打开 |
+| 回归验证 | 显式使用Python 3.13.0rc3，对日线端到端、Provider合同、CSI/CNI新合同、原始数据存储及输入工厂执行127项：127通过、0失败、0跳过。排除曾在Windows本机socketpair卡住的`test_daily_web_defaults_validation_and_corrupt_partition`，该Web用例未验证 | [JUnit结果](tmp/csi-cni-index-20261029-expanded-isolated/run-closeonly/provider-regression.xml)、[测试解释器与依赖](tmp/csi-cni-index-20261029-expanded-isolated/test-environment-final.json)。仅代表上述定向测试范围 |
+| 正式在线资格与剩余范围 | 本轮只做隔离回放，没有登记正式资格、发起CSI/CNI在线批采集或重跑最初57项失败证券。CSI/CNI通过本次49项回放不等于新来源已获正式在线资格；也不能据此推断全市场、其他日期或57项原失败范围均已解决 | 资格和在线任务启用仍需独立验证；在此之前新来源正式联网仍由现有门禁阻断。本次不写正式`data/` |
+
+测试命令使用`D:\Program Files\Python\python.exe`，同一次运行前记录解释器、版本及pytest/FastAPI/DuckDB/PyArrow/PyYAML/requests版本；pytest临时根使用短路径以避开Windows深层隔离目录的MAX_PATH限制。原始来源响应保持在接口核对目录，本次派生结果只写`tmp/csi-cni-index-20261029-isolated/`与`tmp/csi-cni-index-20261029-expanded-isolated/`。
+
+## 股票复权口径改为可选（2026-11-01，已实现并隔离验收）
+
+| 核对项 | 实际改动与结果 | 证据和未覆盖范围 |
+|---|---|---|
+| 业务合同 | 股票仍按现有策略尝试none/forward/backward三种腾讯来源请求；发布完整性只要求none目标日数据有效。forward/backward有真实来源值则保留，无值记`unverified`并留空；不会复制day，也不推断“没有分红”。 | `config/datasets/daily_bar.yaml`现将股票forward/backward设为`unverified`；`DailyRecord.complete`、日线任务单元展开、Tencent目标日解析、聚合质量提示与页面计数已按合同调整。原缺失数量/比例门槛未改。 |
+| 143只原失败股票 | 从2026-10-29旧任务留存的429份响应做完整离线重放；结果143/143不复权记录通过并发布，前复权143/143和后复权143/143为空且状态未核验，0个价格跨口径复制；发布缺失0、`complete_today=true`。 | [隔离重放验收](tmp/day-only-stock-replay-20261029/verification.json)、[覆盖明细](tmp/day-only-stock-replay-20261029/business/task_workspace/2026-10-29/daily_bar/day-only-stock-replay-20261029/coverage.stock.json)、[隔离发布清单](tmp/day-only-stock-replay-20261029/business/canonical/2026-10-29/daily_bar/stock/manifest.json)。只处理143只原失败样本，不是5577只完整股票批次，也不是正式`data/`发布。 |
+| 实现验证 | 同一解释器执行`test_daily_collection_e2e.py`，排除两个会卡在Windows Starlette `TestClient`本地socketpair的HTTP测试后，32通过、0失败、2排除；新E2E还直接调用实际`/api/daily`和任务详情路由，确认复权值空、状态未核验、分区提示数为2。 | [测试环境](tmp/day-only-stock-replay-20261029/test-environment.json)。全模块第一次运行在旧HTTP客户端用例处卡住；最终定向运行通过。日志另有pytest缓存目录拒绝写入和pytest退出时pyreadline `WinError 0xc0000008`警告，不影响测试结果。未做浏览器视觉验收。 |
+
+旧冻结任务`market-daily-20261029-batch`及其失败摘要保持原样；新配置只对新任务/重放生效。143只问题已经在隔离样本范围验证不会再因缺前后复权拦截。股票全范围尚未按新合同重新生成，指数68项仍需单独处理；本轮未改正式数据、发布阈值、证券范围或来源资格。
+
+## 证券状态与发布整改（2026-11-01，已确认范围，分阶段实施）
 
 | 事项 | 用户确认及实施边界 | 验收或待决策项 |
 |---|---|---|
@@ -176,14 +233,6 @@
 | ETF/LOF/指数适用性、全市场容量和连续交易日 | 独立业务验收，不由三股证据推定 |
 | 代码指纹机制 | 已按本页当前任务删除生成及运行依赖；中央流程重构不在本次范围 |
 | 环境可重建和CI（待办，暂缓） | 用户要求暂缓环境复现改造；当前指定解释器依赖可支持已核验链路，但AkShare新闻对照在Pandas 3.0.6/PyArrow 25.0.0的正则处理中失败；依赖锁定、稳定版迁移和CI另行确认，不擅自安装；不据此宣称全套测试通过 |
-
-## 2026-11-02 指数有效期与并列代码处理
-
-本轮规则接入与指数整批重放（2026-11-02）：按用户确认，在现有`security_master.yaml`维护`sz399946`、`sz399961`、`sz399963`的历史有效期，最后有效行情日分别为`2016-06-03`、`2019-01-25`、`2019-01-25`；名单快照日晚于该日期时标记`delisted`，有效期末日仍按有效处理。`sz399980`保留名单身份`XSHE:399980`，按`sh000980`向CSI请求日线，合同为`full_ohlc`。原563个指数单元按这三项规则过滤后剩560项；全部560份已有原始响应可重放，来源分布为腾讯499、中证59、国证2，真实联网请求0次。最终指数分区发布556/560条，缺4条（`sh000999`、`sz399332`、`sz399960`、`sz399962`），缺失率0.71%，低于每批50条且1%的发布门槛；分区状态`published`，但任务`complete_today=false`，不能称560项全成功。`sz399980`实际以中证来源、请求码`sh000980`发布为完整四价；单证券回放与整批结果见[399980回放记录](tmp/market-daily-20261029-399980-route-20261102/replay-result.json)及[560项指数结果](tmp/market-daily-20261029-index-replay-20261102/index-replay-result.json)。四项剩余缺失及原因见各单元报告；其中`sz399962`虽有留存CSI收盘数据，但当前没有经确认的并列码路由，因此未猜测身份而补入。配置和执行改动涉及`src/service/instruments_update.py`、`src/pipeline/inputs.py`及[证券目录说明](docs/providers/security-catalog.md#指数历史有效期与399980并列代码2026-11-02按用户确认接入)。
-
-本次模块/配置测试范围`test_security_catalog.py`、`test_daily_external_index_sources.py`和`test_config_contract.py`共97项，97通过、0失败；JUnit为`tmp/tsr/security-lifecycle-20261102.xml`。最终运行排除了两项已有环境/归档问题（ETF样本缺body；BaoStock样本Windows临时路径替换失败）及一项过期Provider清单断言，它们未判通过。前述49项回放仍是历史范围，不计入本次验收。
-
-为页面查看，将原任务已发布股票/ETF分区与本次指数分区复制到新的只读隔离快照，并逐个验证manifest和行数：股票5570/5577、ETF1715/1715、指数556/560，合计7841/7852。它们来自两个任务，不伪装成同一个全量任务；正式`data/`未写入。快照结果和边界见[展示快照说明](tmp/market-daily-20261029-display-snapshot-20261102/README.md)。本机页面`http://127.0.0.1:18772/`已显示7841条发布规范日线；按`sz399980`筛选实见“中证超级大盘指数”、中证来源及OHLC `3033.81/3058.79/3015.44/3056.53`。页面用旧证券主数据快照只做名称/类型关联；生命周期覆盖将在下一次正常名单发布中反映。指数任务仍`complete_today=false`，所以本阶段完成三类分区交付与展示，但不标记为无缺失的完整采集。
 
 ## 已有证据与历史决策
 

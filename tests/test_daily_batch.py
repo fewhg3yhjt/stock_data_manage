@@ -248,6 +248,57 @@ def test_yaml_target_expands_stock_etf_and_index_and_freezes_published_master(tm
     assert all(u['context']['config']['adjust']=='none' for u in expanded if u['asset_type']!='stock')
 
 
+def test_manual_lifecycle_overrides_are_applied_to_the_dated_daily_scope():
+    import yaml
+    from stock_data_manage.pipeline.inputs import _apply_manual_security_lifecycle_overrides
+
+    policy = yaml.safe_load((CONFIG / "datasets/security_master.yaml").read_text(encoding="utf-8"))
+    units = [
+        {"symbol": "sz002717", "instrument_id": "XSHE:002717", "asset_type": "stock", "status": "unknown"},
+        {"symbol": "sz399960", "instrument_id": "XSHE:399960", "asset_type": "index", "status": "unknown"},
+        {"symbol": "sz399332", "instrument_id": "XSHE:399332", "asset_type": "index", "status": "unknown"},
+        {"symbol": "sh000999", "instrument_id": "XSHG:000999", "asset_type": "index", "status": "unknown"},
+    ]
+    retained, exclusions = _apply_manual_security_lifecycle_overrides(
+        units, policy["symbol_lifecycle_overrides"], trade_date="2026-10-29")
+    by_symbol = {unit["symbol"]: unit for unit in retained}
+
+    assert by_symbol["sz002717"]["status"] == "suspended"
+    assert by_symbol["sz002717"]["status_evidence"]["basis"] == "manual_security_lifecycle_override"
+    assert by_symbol["sz002717"]["status_evidence"]["effective_from"] == "2026-10-13"
+    assert not {"sz399960", "sz399332", "sh000999"} & set(by_symbol)
+    assert {item["symbol"] for item in exclusions} == {"sz399960", "sz399332", "sh000999"}
+    assert all(item["status"] == "delisted" for item in exclusions)
+
+
+def test_daily_batch_freezes_manual_suspension_and_does_not_request_that_security(tmp_path, monkeypatch):
+    import json
+    import test_daily_collection_e2e as fixtures
+
+    target_day = "2026-10-29"
+    monkeypatch.setattr(fixtures, "DAY", target_day)
+    definition = fixtures.source_task(tmp_path / "responses", symbols=("sh600001",), task_id="lifecycle-batch")
+    definition["units"].append({"key": "sz002717", "symbol": "sz002717", "instrument_id": "XSHE:002717",
+        "input_id": "ASTOCK-002-daily", "context": {"request": {"symbol": "sz002717",
+            "start_date": target_day, "end_date": target_day}}})
+
+    result = run(definition, tmp_path / "business")
+
+    assert result["status"] == "published" and result["complete_today"]
+    assert result["source_unit_count"] == 3
+    suspended = result["suspended_securities"]
+    assert len(suspended) == 1
+    assert suspended[0]["symbol"] == "sz002717"
+    assert suspended[0]["status_evidence"]["basis"] == "manual_security_lifecycle_override"
+    frozen = json.loads(Path(result["definition_ref"]["path"]).read_text(encoding="utf-8"))
+    assert all(unit["symbol"] != "sz002717" for unit in frozen["units"])
+    coverage = json.loads((Path(result["definition_ref"]["path"]).parent / "coverage.stock.json").read_text(encoding="utf-8"))
+    assert coverage["expected_count"] == 1 and coverage["suspended_count"] == 1
+    assert coverage["item_statuses"]["XSHE:002717"] == "no_trade"
+    assert any(issue["code"] == "confirmed_suspended" and issue["symbol"] == "sz002717"
+        for issue in coverage["issues"])
+
+
 @pytest.mark.parametrize('asset', ['stock','etf','index'])
 def test_explicit_source_parameter_conflicts_are_rejected_before_capture(tmp_path, monkeypatch, asset):
     definition = source_task(tmp_path)

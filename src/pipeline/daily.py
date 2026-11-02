@@ -235,6 +235,10 @@ def _normalize_symbol_parallel_codes(groups):
 
 def resolve_daily_definition(definition, config_root):
     definition = deepcopy(definition)
+    # Suspension exclusions are derived only from a fresh, non-fallback master
+    # publication; a task file cannot lower its own coverage denominator.
+    definition.pop("suspended_securities", None)
+    definition.pop("lifecycle_exclusions", None)
     tasks = yaml.safe_load((config_root / "collection.yaml").read_text(encoding="utf-8")).get("tasks", {})
     if "task" in definition:
         target = tasks[definition["task"]]
@@ -476,7 +480,10 @@ def prepare_daily_task_publication(state, units, source_rows, paths, config_root
     expected = {u["symbol"]: u.get("instrument_id") or
         {"sh": "XSHG", "sz": "XSHE", "bj": "BSE"}[u["symbol"][:2]] + ":" + u["symbol"][2:] for u in units}
     selected = set(state.get("selected_symbols", ()))
+    suspended = [] if selected else list(definition.get("suspended_securities", ()))
+    lifecycle_exclusions = [] if selected else list(definition.get("lifecycle_exclusions", ()))
     target_ids = {identity for symbol, identity in expected.items() if not selected or symbol in selected}
+    target_ids.update(item["instrument_id"] for item in suspended)
     groups, issues, unavailable_reasons = {}, [], {}
     for unit in units:
         symbol, adjustment = unit["symbol"], unit["adjustment"]
@@ -535,14 +542,32 @@ def prepare_daily_task_publication(state, units, source_rows, paths, config_root
         record = DailyRecord(identity, trade_date, asset, **quotes)
         if record.complete:
             records.append(record)
+    for item in suspended:
+        basis = item.get("status_evidence", {}).get("basis")
+        reason = ("manual lifecycle override marks the target date suspended"
+            if basis == "manual_security_lifecycle_override"
+            else "target-date BaoStock tradeStatus=0; no daily bar is required")
+        issues.append({"stage": "qualification", "symbol": item["symbol"], "instrument_id": item["instrument_id"],
+            "asset_type": item["asset_type"], "code": "confirmed_suspended", "status": "suspended",
+            "reason": reason,
+            "status_evidence": item["status_evidence"], "impact": "excluded_from_daily_denominator"})
+    for item in lifecycle_exclusions:
+        issues.append({"stage": "qualification", "symbol": item["symbol"],
+            "instrument_id": item.get("instrument_id"), "asset_type": item["asset_type"],
+            "code": "manual_lifecycle_exclusion", "status": item["status"],
+            "reason": "manual lifecycle override excludes the security from the target-date universe",
+            "status_evidence": item["status_evidence"], "impact": item["impact"]})
     store = CanonicalPartitionStore(paths["canonical_root"])
     existing = store.read_daily(asset.value, trade_date.isoformat())
     available = {r.instrument_id for r in records}
     if state["redo"] != "full":
         available.update(r.instrument_id for r in existing if r.instrument_id not in target_ids)
     statuses = {identity: ItemStatus.SUCCESS.value if identity in available else ItemStatus.MISSING.value for identity in expected.values()}
+    statuses.update({item["instrument_id"]: ItemStatus.NO_TRADE.value for item in suspended})
     state["daily_check"] = {"issues": issues, "item_statuses": statuses,
-        "expected_count": len(expected), "actual_count": len(set(expected.values()) & available)}
+        "expected_count": len(expected), "actual_count": len(set(expected.values()) & available),
+        "suspended_count": len(suspended), "suspended_securities": suspended,
+        "lifecycle_exclusions": lifecycle_exclusions}
     settings = definition["publication_policy"]
     policy = PublicationPolicy(Decimal(str(settings["max_missing_ratio"])), settings["max_missing_count"])
     if not policy.allows(expected_count=len(expected), actual_count=state["daily_check"]["actual_count"]):

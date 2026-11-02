@@ -54,7 +54,9 @@ def test_input_catalog_covers_successful_rows_without_granting_production_routes
     declarations = yaml.safe_load((PROJECT_ROOT / "config/providers.yaml").read_text(encoding="utf-8"))["input_capabilities"]
     script_inputs = {name for name, item in declarations.items() if item.get("script_source_keys")}
     assert {c.input_id for c in added_inputs} == script_inputs | {
-        'SECURITY-BSE-001', 'SECURITY-SSE-ETF-001', 'SECURITY-SSE-MONEY-ETF-HISTORY-001'}
+        'SECURITY-BSE-001', 'SECURITY-SSE-ETF-001', 'SECURITY-SSE-MONEY-ETF-HISTORY-001',
+        'CSI-INDEX-DAILY-001', 'CSI-INDEX-DAILY-CLOSE-PAIR-001',
+        'CSI-INDEX-DAILY-OHLC-001', 'CNI-INDEX-DAILY-001'}
     assert all(c.evidence_refs for c in added_inputs)
     assert all(c.implementation_status == 'implemented_validation_only' for c in added_inputs)
     assert len(successes) == 73

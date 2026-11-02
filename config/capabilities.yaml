@@ -189,7 +189,7 @@ acquisition_policies:
             none: {api: index-perf, adjust: none}
       - input_id: CSI-INDEX-DAILY-CLOSE-PAIR-001
         asset_type: index
-        symbols: [sz399920, sz399938, sz399939, sz399943, sz399947, sz399950, sz399951, sz399953, sz399954, sz399956, sz399957, sz399958, sz399968]
+        symbols: [sz399920, sz399938, sz399939, sz399943, sz399947, sz399950, sz399951, sz399953, sz399954, sz399956, sz399957, sz399958, sz399962, sz399968]
         value_contract: close_only
         market_adjustment_requests:
           XSHG:
