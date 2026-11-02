@@ -135,6 +135,22 @@ def test_daily_bar_execute_reports_unknown_calendar_as_blocked(tmp_path, monkeyp
     assert report["production_writes"] == 0
 
 
+def test_daily_bar_tick_reports_task_preparation_failure(tmp_path, monkeypatch):
+    import stock_data_manage.pipeline.inputs as inputs
+
+    def fail_preparation(**kwargs):
+        raise ValueError("daily batch has no securities for index")
+
+    monkeypatch.setattr(inputs, "collect_task", fail_preparation)
+    report = collect_due_inputs(now=stamp(16, 20), config_root=ROOT / "config",
+        data_root=tmp_path / "runtime", dataset="daily_bar",
+        calendar_days=[{"trade_date": DAY.isoformat(), "is_trading_day": True}],
+        execute=True, mode="live")
+    assert report["jobs"][0]["status"] == "failed"
+    assert report["jobs"][0]["error"] == "daily batch has no securities for index"
+    assert report["production_writes"] == 0
+
+
 def test_master_tick_without_evidence_does_not_call_sources_or_publish(tmp_path):
     def forbidden(**kwargs):
         raise AssertionError("unqualified source must not be called")

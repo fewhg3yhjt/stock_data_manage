@@ -2783,18 +2783,22 @@ def _collect_due_daily_bar(*, now, config_root, data_root, execute, mode, calend
 
     qualifications = {}
     if job["status"] == "ready" and execute:
-        result = collect_task(definition=job["definition"], config_root=root,
-            data_root=paths["data_root"], mode="live", redo="resume")
-        job.update(status=result["status"], complete_today=result.get("complete_today"),
-            no_op=result.get("no_op", False), error=result.get("error"), summary=result.get("summary"),
-            task_id=result.get("task_id", job["task_id"]))
-        qualification_ref = result.get("qualification_ref")
-        if isinstance(qualification_ref, dict):
-            qualification_path = Path(qualification_ref["path"])
-            if file_hash(qualification_path) != qualification_ref["sha256"]:
-                raise ValueError("daily qualification evidence changed after task execution")
-            qualifications = json.loads(qualification_path.read_text(encoding="utf-8"))
-            job["source_qualifications"] = qualifications
+        try:
+            result = collect_task(definition=job["definition"], config_root=root,
+                data_root=paths["data_root"], mode="live", redo="resume")
+        except (ValueError, KeyError, TypeError, OSError) as exc:
+            job.update(status="failed", error=str(exc))
+        else:
+            job.update(status=result["status"], complete_today=result.get("complete_today"),
+                no_op=result.get("no_op", False), error=result.get("error"), summary=result.get("summary"),
+                task_id=result.get("task_id", job["task_id"]))
+            qualification_ref = result.get("qualification_ref")
+            if isinstance(qualification_ref, dict):
+                qualification_path = Path(qualification_ref["path"])
+                if file_hash(qualification_path) != qualification_ref["sha256"]:
+                    raise ValueError("daily qualification evidence changed after task execution")
+                qualifications = json.loads(qualification_path.read_text(encoding="utf-8"))
+                job["source_qualifications"] = qualifications
 
     formal_root = load_storage_paths(root)["data_root"].resolve()
     wrote_formal = (job["status"] == "published" and not job.get("no_op", False)
