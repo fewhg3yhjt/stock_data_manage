@@ -99,7 +99,7 @@ def main(argv: list[str] | None = None) -> int:
     due.add_argument("--output-root", type=Path, help="explicit isolated validation output; historical evidence layout")
     due.add_argument("--data-root", type=Path, help="override configured runtime data root")
     due.add_argument("--now", type=_parse_datetime, help="aware schedule time; defaults to current UTC time")
-    due.add_argument("--dataset", choices=("inputs", "security_master"), default="inputs")
+    due.add_argument("--dataset", choices=("inputs", "security_master", "daily_bar"), default="inputs")
     due.add_argument("--calendar-file", type=Path, help="date rows; security_master also reads the existing calendar store")
     due.add_argument("--securities-file", type=Path, help="saved SecurityRecord array for all_stock scope")
     due.add_argument("--symbol", action="append", default=[], help="explicit watchlist/static symbol; repeat for multiple symbols")
@@ -153,16 +153,20 @@ def main(argv: list[str] | None = None) -> int:
         from .pipeline.inputs import collect_due_inputs
         from .service.instruments import SecurityRecord
         try:
-            if args.dataset == "security_master":
-                if args.securities_file or args.evidence_root:
+            if args.dataset in {"security_master", "daily_bar"}:
+                if args.dataset == "security_master" and (args.securities_file or args.evidence_root):
                     raise ValueError("security master scheduling uses full source scope and configured storage")
+                if args.dataset == "daily_bar" and (args.securities_file or args.evidence_root or args.symbol
+                        or args.replay_manifest):
+                    raise ValueError("daily_bar scheduling uses its configured full-market task")
                 rows = json.loads(args.calendar_file.read_text(encoding="utf-8")) if args.calendar_file else None
                 if rows is not None and not isinstance(rows, list):
                     raise ValueError("calendar file must contain date rows")
                 report = collect_due_inputs(now=args.now or datetime.now(timezone.utc), config_root=args.config_root,
                     data_root=args.data_root, output_root=args.output_root, execute=args.execute,
-                    mode=args.mode or "live", dataset="security_master", calendar_days=rows,
-                    symbols=args.symbol, replay_manifest=args.replay_manifest,
+                    mode=args.mode or "live", dataset=args.dataset, calendar_days=rows,
+                    symbols=args.symbol if args.dataset == "security_master" else (),
+                    replay_manifest=args.replay_manifest if args.dataset == "security_master" else None,
                     dependency_paths=[args.calendar_file] if args.calendar_file else [])
                 print(json.dumps(report, ensure_ascii=False, default=_json_default, indent=2))
                 return 2 if any(job["status"] in {"blocked", "failed"} for job in report["jobs"]) else 0

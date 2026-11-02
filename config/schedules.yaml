@@ -20,6 +20,6 @@ jobs:
   - name: minute_reconciliation
     time: "15:20"
   - name: daily_bar_sync
-    time: "16:20"
+    collection_profile: daily_bar_close
   - name: missing_partition_retry
     time: "20:00"

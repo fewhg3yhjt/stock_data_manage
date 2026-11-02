@@ -208,6 +208,63 @@ def plan_security_master_collection(config_root, *, now, is_trading_day):
             "definition": build_security_master_definition(root, trade_date=job['trade_date'], now=now, is_trading_day=True)}
 
 
+def build_daily_bar_definition(config_root, *, trade_date, now, is_trading_day, task_id=None):
+    """Create the configured daily business task; scope is frozen by collect_task."""
+    if now.tzinfo is None:
+        raise ValueError("task time must be timezone-aware")
+    day = date.fromisoformat(trade_date) if isinstance(trade_date, str) else trade_date
+    today = now.astimezone(SHANGHAI).date()
+    if day > today:
+        raise ValueError("daily task date cannot be in the future")
+    if is_trading_day is not True:
+        raise ValueError("daily task requires a confirmed trading calendar date")
+    root = Path(config_root)
+    config = yaml.safe_load((root / "collection.yaml").read_text(encoding="utf-8"))
+    scheduled = config.get("daily_bar")
+    if not isinstance(scheduled, dict) or not isinstance(scheduled.get("task"), str):
+        raise ValueError("daily_bar must reference a configured business task")
+    task_name = scheduled["task"]
+    target = config.get("tasks", {}).get(task_name)
+    if not isinstance(target, dict) or target.get("dataset") != "daily_bar":
+        raise ValueError("daily_bar schedule must reference a daily_bar task")
+    return {"task_id": task_id or "market-daily-" + day.strftime("%Y%m%d"),
+            "task": task_name, "trade_date": day.isoformat()}
+
+
+def plan_daily_bar_collection(config_root, *, now, is_trading_day):
+    """Plan the configured daily_bar task from its collection profile and schedule reference."""
+    if now.tzinfo is None:
+        raise ValueError("schedule time must be timezone-aware")
+    root = Path(config_root)
+    config = yaml.safe_load((root / "collection.yaml").read_text(encoding="utf-8"))
+    scheduled = config.get("daily_bar", {})
+    profile_name = scheduled.get("collection_profile")
+    local = now.astimezone(SHANGHAI)
+    job = {"dataset": "daily_bar", "profile": profile_name, "trade_date": local.date().isoformat(),
+           "task_id": "market-daily-" + local.strftime("%Y%m%d"), "status": "not_due", "slot": None}
+    jobs = {item.name: item for item in load_scheduled_jobs(root / "schedules.yaml")}
+    schedule_job = jobs.get("daily_bar_sync")
+    profiles = {profile.name: profile for profile in load_collection_profiles(root / "collection.yaml")}
+    profile = profiles.get(profile_name)
+    if (profile is None or not profile.scheduling_enabled or schedule_job is None
+            or schedule_job.local_time != profile.at_time):
+        return {**job, "status": "disabled", "reason": "daily_bar schedule is disabled or mismatched"}
+    if is_trading_day is None:
+        return {**job, "status": "blocked", "reason": "calendar coverage is missing for the requested day"}
+    if not is_trading_day:
+        return {**job, "reason": "confirmed non-trading day"}
+    collection = yaml.safe_load((root / "collection.yaml").read_text(encoding="utf-8"))
+    market = collection["markets"]["CN_A"]
+    schedule = MarketSchedule(timezone=ZoneInfo(market["timezone"]), sessions=tuple(
+        MarketSession(time.fromisoformat(start), time.fromisoformat(end)) for start, end in market["sessions"]))
+    slot = collection_slot(profile, now, schedule=schedule, trading_dates=(local.date(),))
+    if slot is None:
+        return job
+    definition = build_daily_bar_definition(root, trade_date=local.date(), now=now, is_trading_day=True,
+                                             task_id=job["task_id"])
+    return {**job, "slot": slot.isoformat(), "status": "ready", "definition": definition}
+
+
 DEFAULT_JOBS = (
     ScheduledJob("security_master_update", time(8, 0)),
     ScheduledJob("daily_reconciliation", time(8, 30)),

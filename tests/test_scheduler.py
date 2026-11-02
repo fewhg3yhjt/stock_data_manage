@@ -40,7 +40,7 @@ from stock_data_manage.domain.sessions import MarketSchedule
 from stock_data_manage.pipeline.inputs import collect_due_inputs
 from stock_data_manage.service.instruments import SecurityRecord
 from stock_data_manage.worker.scheduler import collection_slot, plan_input_collection
-from stock_data_manage.worker.scheduler import plan_security_master_collection
+from stock_data_manage.worker.scheduler import plan_security_master_collection, plan_daily_bar_collection
 from stock_data_manage.worker.scheduler import build_security_master_definition
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -77,6 +77,62 @@ def test_master_schedule_calendar_slot_and_single_frequency_source(tmp_path):
     root = edited_config(tmp_path, "security_master_daily", frequency={"unit": "day", "interval": 1, "at": "16:00"})
     assert next(j for j in load_scheduled_jobs(root / "schedules.yaml") if j.name == "security_master_update").local_time == time(16)
     assert plan_security_master_collection(root, now=stamp(8, 0), is_trading_day=True)["status"] == "not_due"
+
+
+def test_daily_bar_schedule_uses_configured_task_and_profile_time(tmp_path):
+    plan = lambda now, opened: plan_daily_bar_collection(ROOT / "config", now=now, is_trading_day=opened)
+    assert plan(stamp(16, 19), True)["status"] == "not_due"
+    assert plan(stamp(16, 20), False)["reason"] == "confirmed non-trading day"
+    job = plan(stamp(16, 20), True)
+    assert job["status"] == "ready"
+    assert job["task_id"] == "market-daily-20260930"
+    assert job["definition"] == {"task_id": "market-daily-20260930", "task": "market_daily",
+                                  "trade_date": DAY.isoformat()}
+    root = edited_config(tmp_path, "daily_bar_close", frequency={"unit": "day", "interval": 1, "at": "16:35"})
+    assert plan_daily_bar_collection(root, now=stamp(16, 20), is_trading_day=True)["status"] == "not_due"
+    assert plan_daily_bar_collection(root, now=stamp(16, 35), is_trading_day=True)["status"] == "ready"
+
+
+def test_daily_bar_tick_dispatches_configured_durable_batch(tmp_path, monkeypatch):
+    import stock_data_manage.pipeline.inputs as inputs
+    days = [{"trade_date": DAY.isoformat(), "is_trading_day": True}]
+    data_root = tmp_path / "runtime"
+    kwargs = dict(now=stamp(16, 20), config_root=ROOT / "config", data_root=data_root,
+                  dataset="daily_bar", calendar_days=days)
+
+    planned = collect_due_inputs(**kwargs)
+    assert planned["jobs"][0]["status"] == "ready"
+    assert not data_root.exists()
+    calls = []
+
+    def run_task(**arguments):
+        calls.append(arguments)
+        return {"task_id": "market-daily-20260930", "status": "published", "complete_today": True,
+                "no_op": False, "summary": {"status": "published"}}
+
+    monkeypatch.setattr(inputs, "collect_task", run_task)
+    report = collect_due_inputs(**kwargs, execute=True, mode="live")
+    assert len(calls) == 1
+    assert calls[0]["definition"] == {"task_id": "market-daily-20260930", "task": "market_daily",
+                                       "trade_date": DAY.isoformat()}
+    assert calls[0]["data_root"] == data_root
+    assert calls[0]["mode"] == "live"
+    assert report["jobs"][0]["status"] == "published"
+    assert report["jobs"][0]["complete_today"] is True
+    assert report["production_writes"] == 0
+
+
+def test_daily_bar_execute_reports_unknown_calendar_as_blocked(tmp_path, monkeypatch):
+    import stock_data_manage.pipeline.inputs as inputs
+    calls = []
+    monkeypatch.setattr(inputs, "collect_task", lambda **kwargs: calls.append(kwargs))
+    report = collect_due_inputs(now=stamp(16, 20), config_root=ROOT / "config",
+        data_root=tmp_path / "runtime", dataset="daily_bar", calendar_days=[],
+        execute=True, mode="live")
+    assert report["jobs"][0]["status"] == "blocked"
+    assert "calendar coverage is missing" in report["jobs"][0]["reason"]
+    assert calls == []
+    assert report["production_writes"] == 0
 
 
 def test_master_tick_without_evidence_does_not_call_sources_or_publish(tmp_path):
@@ -170,7 +226,9 @@ def test_tencent_profiles_separate_scope_frequency_and_request_speed():
     assert p["tencent_minute_5m"].refresh_interval_seconds == 300
     assert p["tencent_minute_1m"].refresh_interval_seconds == 60
     assert p["tencent_daily"].at_time == time(16, 20)
-    assert all(not v.scheduling_enabled for name, v in p.items() if name != "security_master_daily")
+    assert all(not v.scheduling_enabled for name, v in p.items()
+               if name not in {"security_master_daily", "daily_bar_close"})
+    assert p["daily_bar_close"].scheduling_enabled and p["daily_bar_close"].at_time == time(16, 20)
 
 
 @pytest.mark.parametrize("hour,minute,second,expected", [

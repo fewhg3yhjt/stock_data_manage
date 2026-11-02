@@ -1392,17 +1392,14 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                 if mode != 'replay' and pending_capture:
                     for input_id in sorted({unit['input_id'] for unit in pending_capture}):
                         grouped = [unit for unit in pending_capture if unit['input_id'] == input_id]
-                        if input_id == 'CSI-INDEX-DAILY-001':
-                            try:
-                                result = check_daily_batch_qualification(contracts[input_id], grouped, config_root=config_root,
-                                    metadata=metadata, now=datetime.now(timezone.utc), execution_mode=mode)
-                                qualifications[input_id] = {'eligible': True, **result}
-                            except (ValueError, KeyError, TypeError, OSError) as exc:
-                                qualifications[input_id] = {'eligible': False, 'input_id': input_id, 'reasons': [str(exc)]}
-                        else:
+                        try:
                             result = check_daily_batch_qualification(contracts[input_id], grouped, config_root=config_root,
                                 metadata=metadata, now=datetime.now(timezone.utc), execution_mode=mode)
-                            qualifications[input_id] = {'eligible': True, **result}
+                            qualifications[input_id] = {'eligible': result.get('eligible', True), **result}
+                        except (ValueError, KeyError, TypeError, OSError) as exc:
+                            # A known route without matching qualification is a
+                            # durable blocked source group, not a task-wide crash.
+                            qualifications[input_id] = {'eligible': False, 'input_id': input_id, 'reasons': [str(exc)]}
                     preparation = int(state.get('qualification_attempt', 0)) + 1
                     qualification_path = work / f'qualification.prepare-{preparation}.json'
                     while qualification_path.exists():
@@ -2596,7 +2593,13 @@ def _finish_task_commit(state, paths, metadata, failure_hook=None, progress=None
 def collect_due_inputs(*, now, config_root, output_root=None, data_root=None, trading_dates=(), securities=(), symbols=(),
                        execute=False, mode="replay", replay_manifest=None, evidence_root=None,
                        dependency_paths=(), collector=None, dataset="inputs", calendar_days=None):
-    """One durable tick: source candidates or the qualified security catalog task."""
+    """One configured scheduler tick: candidates, security catalog, or daily business task."""
+    if dataset == "daily_bar":
+        if (output_root is not None or replay_manifest is not None or evidence_root is not None
+                or trading_dates or securities or symbols or collector is not None):
+            raise ValueError("daily_bar scheduling uses its configured task, calendar and source policy")
+        return _collect_due_daily_bar(now=now, config_root=config_root, data_root=data_root,
+            execute=execute, mode=mode, calendar_days=calendar_days, dependency_paths=dependency_paths)
     if dataset == "security_master":
         if output_root is not None or replay_manifest is not None or securities or symbols:
             raise ValueError("security master scheduling uses configured storage and full source scope")
@@ -2706,6 +2709,107 @@ def collect_due_inputs(*, now, config_root, output_root=None, data_root=None, tr
     finally:
         if metadata is not None:
             metadata.close()
+    return report
+
+
+def _collect_due_daily_bar(*, now, config_root, data_root, execute, mode, calendar_days, dependency_paths):
+    """Drive the existing frozen daily batch from its configured after-close slot."""
+    import json
+    from datetime import date
+    from ..service.calendar import TradingCalendarStore
+    from ..service.calendar_update import TradingCalendarUpdater
+    from ..providers.baostock.industry import BaoStockIndustryMembershipProvider
+    from ..providers.contracts import ProviderContractError
+    from ..storage.integrity import file_hash
+    from ..worker.scheduler import plan_daily_bar_collection, SHANGHAI
+
+    if now.tzinfo is None:
+        raise ValueError("schedule time must be timezone-aware")
+    if execute and mode != "live":
+        raise ValueError("scheduled daily tasks require live mode; use collect-task for isolated replay")
+    root = Path(config_root).resolve()
+    paths = load_storage_paths(root, data_root=data_root)
+    _validate_business_root(paths["data_root"], root)
+    day = now.astimezone(SHANGHAI).date()
+    calendar_error = None
+    update = None
+
+    if calendar_days is None:
+        # A planning-only tick must not create a metadata database just to read
+        # an absent calendar. Execution updates an unknown date only after the
+        # configured daily slot is due.
+        if paths["metadata_path"].is_file():
+            with TradingCalendarStore(str(paths["metadata_path"])) as calendar:
+                is_open = calendar.is_trading_day(day)
+                planned_if_open = plan_daily_bar_collection(root, now=now, is_trading_day=True)
+                if execute and planned_if_open["status"] == "ready" and is_open is None:
+                    try:
+                        update = TradingCalendarUpdater(calendar, []).update_baostock_day(
+                            trade_date=day, provider=BaoStockIndustryMembershipProvider(),
+                            evidence_root=paths["workspace_root"] / "trading_calendar")
+                        is_open = calendar.is_trading_day(day)
+                    except (ProviderContractError, ValueError, KeyError, TypeError, OSError, RuntimeError) as exc:
+                        is_open = None
+                        calendar_error = str(exc)
+        elif execute and plan_daily_bar_collection(root, now=now, is_trading_day=True)["status"] == "ready":
+            paths["metadata_path"].parent.mkdir(parents=True, exist_ok=True)
+            with TradingCalendarStore(str(paths["metadata_path"])) as calendar:
+                try:
+                    update = TradingCalendarUpdater(calendar, []).update_baostock_day(
+                        trade_date=day, provider=BaoStockIndustryMembershipProvider(),
+                        evidence_root=paths["workspace_root"] / "trading_calendar")
+                    is_open = calendar.is_trading_day(day)
+                except (ProviderContractError, ValueError, KeyError, TypeError, OSError, RuntimeError) as exc:
+                    is_open = None
+                    calendar_error = str(exc)
+        else:
+            is_open = None
+    else:
+        days = {}
+        for row in calendar_days:
+            if type(row.get("is_trading_day")) is not bool:
+                raise ValueError("daily schedule calendar rows require explicit is_trading_day")
+            row_day = date.fromisoformat(str(row["trade_date"]))
+            if row_day in days:
+                raise ValueError("duplicate daily schedule calendar date")
+            days[row_day] = row["is_trading_day"]
+        is_open = days.get(day)
+
+    job = plan_daily_bar_collection(root, now=now, is_trading_day=is_open)
+    if calendar_days is None and execute and calendar_error:
+        job.update(status="blocked", reason="trading calendar update failed: " + calendar_error)
+    elif calendar_days is None and execute and update is not None and update.source_manifest:
+        job["calendar_evidence"] = str(update.source_manifest)
+
+    qualifications = {}
+    if job["status"] == "ready" and execute:
+        result = collect_task(definition=job["definition"], config_root=root,
+            data_root=paths["data_root"], mode="live", redo="resume")
+        job.update(status=result["status"], complete_today=result.get("complete_today"),
+            no_op=result.get("no_op", False), error=result.get("error"), summary=result.get("summary"),
+            task_id=result.get("task_id", job["task_id"]))
+        qualification_ref = result.get("qualification_ref")
+        if isinstance(qualification_ref, dict):
+            qualification_path = Path(qualification_ref["path"])
+            if file_hash(qualification_path) != qualification_ref["sha256"]:
+                raise ValueError("daily qualification evidence changed after task execution")
+            qualifications = json.loads(qualification_path.read_text(encoding="utf-8"))
+            job["source_qualifications"] = qualifications
+
+    formal_root = load_storage_paths(root)["data_root"].resolve()
+    wrote_formal = (job["status"] == "published" and not job.get("no_op", False)
+                    and paths["data_root"].resolve() == formal_root)
+    eligible = (all(item.get("eligible", False) for item in qualifications.values())
+                if execute and qualifications else None)
+    report = {"dataset": "daily_bar", "now": now.isoformat(), "execute": execute, "mode": mode,
+        "production_writes": int(wrote_formal), "eligible_for_production_routing": eligible,
+        "jobs": [job],
+        "dependencies": [{"path": str(Path(path).resolve()), "sha256": file_hash(Path(path))}
+                         for path in dependency_paths],
+        "config_files": [{"path": str((root / path).resolve()), "sha256": file_hash(root / path)}
+                         for path in ("collection.yaml", "schedules.yaml", "providers.yaml",
+                                      "capabilities.yaml", "datasets/daily_bar.yaml",
+                                      "datasets/security_master.yaml", "normalization/daily_bar.yaml")]}
     return report
 
 
