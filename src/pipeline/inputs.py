@@ -2020,6 +2020,7 @@ def _save_task_summary(state, paths, metadata):
         coverage = {"basis": check.get("basis"), "group_counts": check.get("group_counts", {}),
                     "missing_groups": check.get("missing_groups", []),
                     "missing_previous_securities": check.get("missing_previous_securities", []),
+                    "invalidated_previous_securities": check.get("invalidated_previous_securities", []),
                     "independent_full_market_coverage_verified": check.get("independent_full_market_coverage_verified", False),
                     "denominator": None, "ratio": None}
     else:
@@ -2119,7 +2120,7 @@ def _task_units(definition, paths):
                 for item in master_metadata.get("sources", ()) if isinstance(item, dict))
     )
     for row in pq.read_table(source).to_pylist():
-        if row["asset_type"] not in wanted or row["status"] == "prelisted":
+        if row["asset_type"] not in wanted or row["status"] in {"prelisted", "delisted"}:
             continue
         if row.get("list_date") and row["list_date"] > day or row.get("delist_date") and row["delist_date"] < day:
             continue
@@ -2331,7 +2332,7 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
     missing = [unit["key"] for unit in units if unit["key"] not in valid]
     # Inspect today's sources alone. Previous rows must not conceal omissions.
     merged = prepare_security_publication({key: value["rows"] for key, value in source_rows.items()},
-        symbol_successions=symbol_successions, lifecycle_overrides=lifecycle_overrides, as_of_date=day)
+        symbol_successions=symbol_successions, as_of_date=day)
     records = merged.records
     scripted = {key: value for key, value in source_rows.items()
                 if any(row.get('date_basis') for row in value['rows'])}
@@ -2365,16 +2366,30 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
             endpoint='provenance', fetched_at=datetime.now(timezone.utc), attempt_id='universe-review',
             relative_path='universe_review.json')
     comparable = previous if prior and prior.get("scope_hash") == scope_hash else ()
-    check = check_security_coverage(records, required_groups=required_groups, previous=comparable)
+    # A completed current source union is the security list for this date.
+    # Compare it with the previous identities, but omissions invalidate those
+    # rows instead of blocking publication. Explicitly scoped tasks only compare
+    # identities in their declared market/asset groups when the prior scope matches.
+    prior_records = prepare_security_publication({}, previous, symbol_successions=symbol_successions,
+        lifecycle_overrides=lifecycle_overrides, as_of_date=day).records
+    current_source_keys = set(source_rows)
+    current_records = {item.instrument_id: item for item in records
+                       if current_source_keys.intersection(item.evidence_sources)}
+    today_ids = set(current_records)
+    invalidated = sorted(item.instrument_id for item in prior_records
+        if (item.exchange.value, item.asset_type.value) in required_groups
+        and item.status not in {"delisted", "prelisted"}
+        and item.instrument_id not in today_ids)
+    check = check_security_coverage(records, required_groups=required_groups)
+    check["invalidated_previous_securities"] = invalidated
     check.update(missing_units=missing, requested_date=day.isoformat(), required_groups=sorted(required_groups),
                  classification_conflicts=[item.instrument_id for item in merged.classification_conflicts],
                  source_failures={key: {"failure_class": state["units"][key].get("failure_class"),
                                         "error": state["units"][key].get("error") or state["units"][key].get("report", {}).get("error")}
                                   for key in missing})
-    if comparable:
-        old_types = {item.instrument_id: item.asset_type for item in comparable}
-        check["classification_conflicts"].extend(item.instrument_id for item in records
-            if item.instrument_id in old_types and item.asset_type != old_types[item.instrument_id])
+    old_types = {item.instrument_id: item.asset_type for item in prior_records}
+    check["classification_conflicts"].extend(item.instrument_id for item in records
+        if item.instrument_id in old_types and item.asset_type != old_types[item.instrument_id])
     check["passed"] = check["passed"] and not missing and not check["classification_conflicts"]
     check["recollect_units"] = []
     responsibilities = {key: {tuple(pair) for pair in policy['dataset']['publication']['source_groups'].get(
@@ -2386,14 +2401,13 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
             symbol_successions=symbol_successions, as_of_date=day).records
         declared_groups = responsibilities[key]
         # A market/asset group can be supplied by complementary interfaces.
-        # Compare their union to yesterday, while still checking each required unit.
+        # Check the current union for this group while still checking each required unit.
         unit_check = check_security_coverage(source_records, required_groups=declared_groups)
         for group in declared_groups:
             group_records = prepare_security_publication({other: source_rows[other]['rows']
                 for other, groups in responsibilities.items() if group in groups},
                 symbol_successions=symbol_successions, as_of_date=day).records
-            source_previous = [item for item in comparable if (item.exchange.value, item.asset_type.value) == group]
-            if not check_security_coverage(group_records, required_groups={group}, previous=source_previous)['passed']:
+            if not check_security_coverage(group_records, required_groups={group})['passed']:
                 unit_check['passed'] = False
         conflicted_ids = set(check["classification_conflicts"])
         if not unit_check["passed"] or any(item.instrument_id in conflicted_ids for item in source_records):
@@ -2430,12 +2444,22 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
                                 "previous_age_days": age, "fallback_reason": check,
                                 "previous_manifest_hash": file_hash(previous_dir / "manifest.json")}
     else:
-        # Retain trusted descriptive fields, but never retain omitted identities.
-        status_sources = {key for key, value in source_rows.items()
-            if value['entry'].get('input_id') == 'SECURITY-BS-UNIVERSE-001'}
+        # Retain descriptive fields for present identities. Membership in the
+        # completed current union restores a previously invalidated identity.
+        status_sources = {value['entry']['input_id'] for value in source_rows.values()}
         records = prepare_security_publication({key: value["rows"] for key, value in source_rows.items()},
-            comparable, status_sources=status_sources, symbol_successions=symbol_successions,
+            previous, status_sources=status_sources, symbol_successions=symbol_successions,
             lifecycle_overrides=lifecycle_overrides, as_of_date=day).records
+        invalidated_ids = set(invalidated)
+        previously_invalid = {item.instrument_id for item in prior_records if item.status == "delisted"}
+        records = tuple(
+            replace(item, status="delisted") if item.instrument_id in invalidated_ids else
+            replace(item, status=(current_records[item.instrument_id].status
+                                  if current_records[item.instrument_id].status in {"active", "suspended"}
+                                  else "active"),
+                    delist_date=current_records[item.instrument_id].delist_date)
+            if item.instrument_id in today_ids and item.instrument_id in previously_invalid else item
+            for item in records)
         publication_metadata = {"as_of_date": day.isoformat(), "requested_date": day.isoformat(),
             "scope_hash": scope_hash, "coverage_passed": True, "fallback": False,
             "required_groups": sorted(required_groups), "coverage": check,
@@ -2712,6 +2736,40 @@ def collect_due_inputs(*, now, config_root, output_root=None, data_root=None, tr
     return report
 
 
+def _current_security_master(paths, trade_date, config_root):
+    """Return today's valid unified list when it is already published."""
+    import pyarrow.parquet as pq
+    import yaml
+    from ..storage.integrity import Manifest
+    from ..storage.metadata import MetadataStore
+
+    with MetadataStore(paths["metadata_path"]) as metadata:
+        latest = metadata.latest_partition(dataset="security_master", asset_type="security",
+                                          through_date=trade_date.isoformat())
+    if latest is None or latest["partition_key"] != trade_date.isoformat():
+        return None
+    manifest_path = Path(latest["manifest_path"]).resolve()
+    canonical_root = paths["canonical_root"].resolve()
+    if not manifest_path.is_relative_to(canonical_root):
+        raise ValueError("published security master escaped canonical storage")
+    manifest = Manifest.load(manifest_path)
+    data_path = manifest_path.parent / "data.parquet"
+    if ((manifest_path.parent / "task-commit.json").exists()
+            or not manifest.verify(data_path)):
+        raise ValueError("same-day security master is unavailable or pending")
+    publication = manifest.publication_metadata
+    if publication.get("as_of_date") != trade_date.isoformat() or publication.get("fallback", False):
+        return None
+    policy = yaml.safe_load((config_root / "datasets/security_master.yaml").read_text(encoding="utf-8"))
+    required = {tuple(group) for group in policy["dataset"]["publication"]["required_groups"]}
+    rows = pq.read_table(data_path, columns=["exchange", "asset_type", "status"]).to_pylist()
+    present = {(row["exchange"], row["asset_type"]) for row in rows
+               if row["status"] not in {"delisted", "prelisted"}}
+    if not required <= present:
+        return None
+    return str(manifest_path)
+
+
 def _collect_due_daily_bar(*, now, config_root, data_root, execute, mode, calendar_days, dependency_paths):
     """Drive the existing frozen daily batch from its configured after-close slot."""
     import json
@@ -2782,6 +2840,25 @@ def _collect_due_daily_bar(*, now, config_root, data_root, execute, mode, calend
         job["calendar_evidence"] = str(update.source_manifest)
 
     qualifications = {}
+    security_master_prerequisite = None
+    if job["status"] == "ready" and execute:
+        try:
+            security_manifest = _current_security_master(paths, day, root)
+            if security_manifest is not None:
+                security_master_prerequisite = {"status": "available", "manifest": security_manifest}
+            else:
+                master_report = _collect_due_security_master(now=now, config_root=root,
+                    data_root=paths["data_root"], execute=True, mode="live",
+                    calendar_days=[{"trade_date": day.isoformat(), "is_trading_day": True}],
+                    dependency_paths=dependency_paths, collector=None)
+                master_job = master_report["jobs"][0]
+                security_manifest = _current_security_master(paths, day, root)
+                security_master_prerequisite = {"status": "available" if security_manifest else master_job["status"],
+                    "manifest": security_manifest, "job": master_job}
+                if security_manifest is None:
+                    job.update(status="blocked", reason="same-day unified security master was not published")
+        except (ValueError, KeyError, TypeError, OSError) as exc:
+            job.update(status="failed", error="security master prerequisite failed: " + str(exc))
     if job["status"] == "ready" and execute:
         try:
             result = collect_task(definition=job["definition"], config_root=root,
@@ -2803,10 +2880,16 @@ def _collect_due_daily_bar(*, now, config_root, data_root, execute, mode, calend
     formal_root = load_storage_paths(root)["data_root"].resolve()
     wrote_formal = (job["status"] == "published" and not job.get("no_op", False)
                     and paths["data_root"].resolve() == formal_root)
+    master_job = (security_master_prerequisite or {}).get("job", {})
+    master_wrote_formal = (master_job.get("status") == "published" and not master_job.get("no_op", False)
+                           and not master_job.get("fallback_used", False)
+                           and paths["data_root"].resolve() == formal_root)
     eligible = (all(item.get("eligible", False) for item in qualifications.values())
                 if execute and qualifications else None)
     report = {"dataset": "daily_bar", "now": now.isoformat(), "execute": execute, "mode": mode,
-        "production_writes": int(wrote_formal), "eligible_for_production_routing": eligible,
+        "production_writes": int(wrote_formal) + int(master_wrote_formal),
+        "eligible_for_production_routing": eligible,
+        "security_master_prerequisite": security_master_prerequisite,
         "jobs": [job],
         "dependencies": [{"path": str(Path(path).resolve()), "sha256": file_hash(Path(path))}
                          for path in dependency_paths],
@@ -2877,10 +2960,11 @@ def _collect_due_security_master(*, now, config_root, data_root, execute, mode, 
                 unit["context"]["request"] = {contract.trading_date_parameter: day.isoformat()}
                 unit["context"]["calendar"] = {"trading_dates": [day.isoformat()]}
         with MetadataStore(paths["metadata_path"]) as metadata:
-            qualifications = [check_security_input_qualification(contracts[u["input_id"]], u["context"],
-                config_root=root, metadata=metadata, now=now) for u in job["definition"]["units"]]
-            job["source_qualifications"] = qualifications
             previous = metadata.load_collection_task(job["task_id"])
+            if not execute:
+                qualifications = [check_security_input_qualification(contracts[u["input_id"]], u["context"],
+                    config_root=root, metadata=metadata, now=now) for u in job["definition"]["units"]]
+                job["source_qualifications"] = qualifications
         # A previously published degraded task must retry; a complete task no-ops.
         if not execute and any(not q["eligible"] for q in qualifications):
             job.update(status="blocked", reason="formal routing qualification is missing")
@@ -2895,7 +2979,9 @@ def _collect_due_security_master(*, now, config_root, data_root, execute, mode, 
                        no_op=result.get("no_op", False), error=result.get("error"), summary=result.get("summary"))
     report = {"dataset": "security_master", "now": now.isoformat(), "execute": execute, "mode": mode,
               "production_writes": int(job["status"] == "published" and not job.get("no_op")),
-              "eligible_for_production_routing": bool(job.get("source_qualifications")) and all(q["eligible"] for q in job.get("source_qualifications", [])),
+              "eligible_for_production_routing": (
+                  all(q["eligible"] for q in job["source_qualifications"])
+                  if job.get("source_qualifications") else True if execute and job["status"] == "published" else None),
               "jobs": [job], "dependencies": [{"path": str(Path(p).resolve()), "sha256": file_hash(Path(p))} for p in dependency_paths],
               "config_files": [{"path": str(root / p), "sha256": file_hash(root / p)}
                                for p in ("collection.yaml", "schedules.yaml", "providers.yaml", "datasets/security_master.yaml")]}

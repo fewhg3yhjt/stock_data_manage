@@ -91,6 +91,13 @@
 - Do not enable a provider in formal routing until the matching capability is evidence-backed, unexpired, within its configured scope, and not cooling down.
 - Keep disabled or unimplemented providers explicitly marked; configuration declarations alone do not count as implementations.
 
+## 证券清单与有限验证
+
+- 证券清单只有一个统一的 `security_master`；指数是 `asset_type=index`，来源按现有 `source_inputs` 和 `source_groups` 进入同一份清单，不建立指数专属清单目录。
+- 当目标日配置的证券来源单元全部完成且必需市场/类型组有数据后，将来源并集与已有证券身份合并。旧清单中本次未出现的证券标记 `status=delisted`（业务含义为当前无效），不从“未出现”推算 `delist_date`；以后重新出现在完整来源并集中时恢复有效。来源失败或必需组为空时不把不完整结果当作完整清单。
+- 到期的手动/补跑日线任务先读取目标日正式证券清单；当天没有包含全部必需组的正式清单时，先调用现有证券清单任务，成功发布后再启动日线。日频任务在配置时刻之后执行仍属于当天到期，不要求恰好在时刻启动。
+- 已实现流程优先沿现有配置、来源、任务和发布路径直接补齐。对当前请求做与改动影响相称的一次定向检查和一次目标端到端运行；复用仍有效的既有证据，不重复历史回放、来源探测或相同测试来增加心理确定性。若实际运行遇到现有来源资格门槛，记录具体来源和失效/缺失原因一次，不伪造资格、不绕过门槛，也不因此扩成无关的重复验证计划。
+
 ## Development Structure
 
 - Modify the existing architecture modules before creating new modules.

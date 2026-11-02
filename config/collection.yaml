@@ -40,7 +40,8 @@ markets:
 # collection_profile 引用本文件 collection_profiles 的频率配置，不是数据集或目录名称。
 security_master:
   collection_profile: security_master_daily
-  source_inputs: [SDA-BOARD-005, SECURITY-BSE-001, SECURITY-SSE-ETF-001]
+  # 一份统一证券清单；各来源按各自覆盖的市场和证券类型提供记录。
+  source_inputs: [SDA-BOARD-005, SECURITY-BSE-001, SECURITY-SSE-ETF-001, SECURITY-BS-UNIVERSE-001]
   source_config:
     SDA-BOARD-005: {include_etf: true}
   # 历史任务使用指定日数据，不将当前上市目录改写成历史日期。

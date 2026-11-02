@@ -93,7 +93,7 @@ def test_missing_money_etf_unit_blocks_then_resumes_only_failed_unit(tmp_path):
     assert [call[0] for call in collector.calls] == ['money']
 
 
-def test_complementary_etf_union_still_rejects_missing_previous_security(tmp_path):
+def test_complementary_etf_union_marks_missing_previous_security_invalid(tmp_path):
     collector = FaultCollector()
     collector.catalog_rows = {
         'sse': [{'stock_code': '510300', 'exchange': 'XSHG', 'asset_type': 'etf'}],
@@ -102,12 +102,14 @@ def test_complementary_etf_union_still_rejects_missing_previous_security(tmp_pat
     definition = dated_etf_definition()
     assert run(tmp_path, definition, collector)['status'] == 'published'
     current = tmp_path / 'canonical' / DAY / 'security_master' / 'data.parquet'
-    original_hash = file_hash(current)
     collector.catalog_rows['money'] = collector.catalog_rows['money'][:1]
     result = run(tmp_path, definition, collector, redo='full')
-    assert result['status'] != 'published'
-    assert result['security_check']['missing_previous_securities'] == ['XSHG:511620']
-    assert file_hash(current) == original_hash
+    assert result['status'] == 'published' and result['complete_today']
+    assert result['security_check']['missing_previous_securities'] == []
+    assert result['security_check']['invalidated_previous_securities'] == ['XSHG:511620']
+    rows = {row['instrument_id']: row for row in pq.read_table(current).to_pylist()}
+    assert rows['XSHG:511620']['status'] == 'delisted'
+    assert rows['XSHG:511620']['delist_date'] is None
 
 
 class FaultCollector:
@@ -711,18 +713,25 @@ def test_invalid_catalog_date_refetched_instead_of_reusing_stale_response(tmp_pa
 
 
 @pytest.mark.parametrize("redo", ["resume", "full"])
-def test_disappearing_security_is_not_hidden_by_previous_rows(tmp_path, redo):
+def test_disappearing_security_becomes_invalid_and_reappearance_restores_it(tmp_path, redo):
     collector = full_catalog_collector()
     assert run(tmp_path, full_master_definition(), collector)["status"] == "published"
     collector.catalog_rows["shenzhen-shanghai"][0]["stock_code"] = "600002"
     result = run(tmp_path, full_master_definition("replacement"), collector, redo=redo)
-    assert result["security_check"]["missing_previous_securities"] == ["XSHG:600001"]
-    if redo == "full":
-        assert result["status"] == "failed"
-    else:
-        assert result["status"] == "published" and not result["complete_today"]
-    rows = pq.read_table(tmp_path / f"canonical/{DAY}/security_master/data.parquet").to_pylist()
-    assert {r["symbol"] for r in rows} == {"600001", "000001", "511600", "159003", "920001"}
+    assert result["status"] == "published" and result["complete_today"]
+    assert result["security_check"]["missing_previous_securities"] == []
+    assert result["security_check"]["invalidated_previous_securities"] == ["XSHG:600001"]
+    current = tmp_path / f"canonical/{DAY}/security_master/data.parquet"
+    rows = {r["instrument_id"]: r for r in pq.read_table(current).to_pylist()}
+    assert rows["XSHG:600001"]["status"] == "delisted"
+    assert rows["XSHG:600001"]["delist_date"] is None
+    assert "XSHG:600002" in rows
+    collector.catalog_rows["shenzhen-shanghai"][0]["stock_code"] = "600001"
+    restored = run(tmp_path, full_master_definition("replacement-restored"), collector, redo=redo)
+    assert restored["status"] == "published" and restored["complete_today"]
+    rows = {r["instrument_id"]: r for r in pq.read_table(current).to_pylist()}
+    assert rows["XSHG:600001"]["status"] == "active"
+    assert rows["XSHG:600001"]["delist_date"] is None
 
 
 @pytest.mark.parametrize("reason", ["expired", "scope", "disabled", "legacy", "evidence", "future"])

@@ -13,9 +13,6 @@ dataset:
       - [BSE, stock]
       - [XSHG, etf]
       - [XSHE, etf]
-    # Index groups are publishable after their source qualification is registered;
-    # they are not mandatory for today's production snapshot yet.
-    allowed_additional_groups:
       - [XSHG, index]
       - [XSHE, index]
     max_previous_age_days: 1

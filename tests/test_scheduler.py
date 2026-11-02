@@ -73,7 +73,8 @@ def test_master_schedule_calendar_slot_and_single_frequency_source(tmp_path):
     job = plan(stamp(8, 0), True)
     assert job["task_id"] == "security-master-20260930"
     assert job["definition"]["units"][0]["context"]["config"]["include_etf"]
-    assert [u["input_id"] for u in job["definition"]["units"]] == ["SDA-BOARD-005", "SECURITY-BSE-001", "SECURITY-SSE-ETF-001"]
+    assert [u["input_id"] for u in job["definition"]["units"]] == ["SDA-BOARD-005", "SECURITY-BSE-001", "SECURITY-SSE-ETF-001", "SECURITY-BS-UNIVERSE-001"]
+    assert len(job["definition"]["required_groups"]) == 7
     root = edited_config(tmp_path, "security_master_daily", frequency={"unit": "day", "interval": 1, "at": "16:00"})
     assert next(j for j in load_scheduled_jobs(root / "schedules.yaml") if j.name == "security_master_update").local_time == time(16)
     assert plan_security_master_collection(root, now=stamp(8, 0), is_trading_day=True)["status"] == "not_due"
@@ -95,6 +96,7 @@ def test_daily_bar_schedule_uses_configured_task_and_profile_time(tmp_path):
 
 def test_daily_bar_tick_dispatches_configured_durable_batch(tmp_path, monkeypatch):
     import stock_data_manage.pipeline.inputs as inputs
+    monkeypatch.setattr(inputs, "_current_security_master", lambda *args: "fixture-manifest.json")
     days = [{"trade_date": DAY.isoformat(), "is_trading_day": True}]
     data_root = tmp_path / "runtime"
     kwargs = dict(now=stamp(16, 20), config_root=ROOT / "config", data_root=data_root,
@@ -137,6 +139,7 @@ def test_daily_bar_execute_reports_unknown_calendar_as_blocked(tmp_path, monkeyp
 
 def test_daily_bar_tick_reports_task_preparation_failure(tmp_path, monkeypatch):
     import stock_data_manage.pipeline.inputs as inputs
+    monkeypatch.setattr(inputs, "_current_security_master", lambda *args: "fixture-manifest.json")
 
     def fail_preparation(**kwargs):
         raise ValueError("daily batch has no securities for index")
@@ -151,6 +154,31 @@ def test_daily_bar_tick_reports_task_preparation_failure(tmp_path, monkeypatch):
     assert report["production_writes"] == 0
 
 
+def test_daily_bar_tick_runs_security_master_first_and_stops_on_its_failure(tmp_path, monkeypatch):
+    import stock_data_manage.pipeline.inputs as inputs
+    master_calls, daily_calls = [], []
+    availability = iter([None, None])
+    monkeypatch.setattr(inputs, "_current_security_master", lambda *args: next(availability))
+
+    def fail_master(**kwargs):
+        master_calls.append(kwargs)
+        return {"jobs": [{"status": "failed", "error": "source qualification unavailable"}]}
+
+    def run_daily(**kwargs):
+        daily_calls.append(kwargs)
+        return {"task_id": "market-daily-20260930", "status": "published"}
+
+    monkeypatch.setattr(inputs, "_collect_due_security_master", fail_master)
+    monkeypatch.setattr(inputs, "collect_task", run_daily)
+    report = collect_due_inputs(now=stamp(16, 35), config_root=ROOT / "config",
+        data_root=tmp_path / "runtime", dataset="daily_bar",
+        calendar_days=[{"trade_date": DAY.isoformat(), "is_trading_day": True}],
+        execute=True, mode="live")
+    assert len(master_calls) == 1 and daily_calls == []
+    assert report["jobs"][0]["status"] == "blocked"
+    assert report["security_master_prerequisite"]["job"]["error"] == "source qualification unavailable"
+
+
 def test_master_tick_without_evidence_does_not_call_sources_or_publish(tmp_path):
     def forbidden(**kwargs):
         raise AssertionError("unqualified source must not be called")
@@ -162,7 +190,10 @@ def test_master_tick_without_evidence_does_not_call_sources_or_publish(tmp_path)
         dataset="security_master", calendar_days=days, execute=True, mode="live", collector=forbidden)
     assert actual["jobs"][0]["status"] == "failed" and actual["production_writes"] == 0
     assert not (tmp_path / "canonical").exists()
-    assert all(not q["eligible"] for q in actual["jobs"][0]["source_qualifications"])
+    summary = json.loads(Path(actual["jobs"][0]["summary"]["path"]).read_text(encoding="utf-8"))
+    assert all("formal routing qualification blocked" in unit["error"]
+               for unit in summary["source_units"] if unit["status"] == "failed")
+    assert actual["eligible_for_production_routing"] is None
 
 
 def test_master_tick_reads_existing_calendar_refreshes_unknown_day_and_refuses_replay_publication(tmp_path):
