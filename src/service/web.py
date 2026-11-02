@@ -651,11 +651,16 @@ class DashboardReader:
             for asset, result in document.get('partitions', {}).items():
                 coverage_path = path.with_name(f'coverage.{asset}.json')
                 check = _read_json(coverage_path) if _within(coverage_path, path.parent) and coverage_path.is_file() else {}
+                unverified_codes = {'unverified_applicability', 'optional_adjustment_unavailable'}
+                excluded_codes = {'confirmed_suspended', 'manual_lifecycle_exclusion'}
+                issue_codes = [item.get('code') for item in check.get('issues', [])
+                    if isinstance(item, dict)
+                    and (item.get('code') not in excluded_codes or item.get('asset_type') == asset)]
                 partition_results.append({'asset_type': asset, 'status': result['status'],
                     'expected_count': check.get('expected_count'), 'actual_count': check.get('actual_count'),
-                    'issue_count': len(check.get('issues', [])),
-                    'unverified_count': sum(i.get('code') in {'unverified_applicability', 'optional_adjustment_unavailable'}
-                        for i in check.get('issues', [])),
+                    'other_issue_count': sum(code not in unverified_codes | excluded_codes for code in issue_codes),
+                    'unverified_count': sum(code in unverified_codes for code in issue_codes),
+                    'excluded_count': sum(code in excluded_codes for code in issue_codes),
                     'error': result.get('error')})
         return {
             **card,
@@ -948,12 +953,29 @@ class DashboardReader:
         self,
         *,
         dataset: str | None = None,
+        asset_type: str | None = None,
+        partition_key: str | None = None,
         page: int = 1,
         page_size: int = 25,
+        include_evidence: bool = True,
     ) -> dict[str, Any]:
         root = self.paths["canonical_root"]
         records: list[dict[str, Any]] = []
         tasks = self._task_documents()
+        task_manifests: list[tuple[str, set[Path]]] = []
+        for task, _, _ in tasks:
+            references: list[str] = []
+            publication = task.get("publication")
+            if isinstance(publication, dict) and isinstance(publication.get("manifest"), str):
+                references.append(publication["manifest"])
+            partitions = task.get("partitions")
+            if isinstance(partitions, dict):
+                references.extend(
+                    result["published_manifest"]
+                    for result in partitions.values()
+                    if isinstance(result, dict) and isinstance(result.get("published_manifest"), str)
+                )
+            task_manifests.append((str(task["task_id"]), {Path(item).resolve() for item in references}))
         if root.exists():
             for path in root.rglob("manifest.json"):
                 if not _within(path, root):
@@ -963,6 +985,10 @@ class DashboardReader:
                 except ValueError:
                     continue
                 if dataset and document.get("dataset") != dataset:
+                    continue
+                if asset_type and document.get("asset_type") != asset_type:
+                    continue
+                if partition_key and document.get("partition_key") != partition_key:
                     continue
                 expected = document.get("expected_count")
                 actual = document.get("row_count")
@@ -979,12 +1005,11 @@ class DashboardReader:
                     "content_hash": document.get("content_hash"),
                     "size_bytes": document.get("size_bytes"),
                     "source_count": len(document.get("raw_refs", [])) if isinstance(document.get("raw_refs"), list) else 0,
-                    "tasks": [task["task_id"] for task, _, _ in tasks
-                              if (task.get("publication") or {}).get("manifest")
-                              and Path(task["publication"]["manifest"]).resolve() == path.resolve()],
-                    "evidence": [record for ref in document.get("raw_refs", [])
-                                 if isinstance(ref, str) and (manifest := self._evidence_path(ref))
-                                 for record in self._manifest_records(manifest)],
+                    "tasks": [task_id for task_id, manifests in task_manifests if path.resolve() in manifests],
+                    "evidence": ([record for ref in document.get("raw_refs", [])
+                                  if isinstance(ref, str) and (manifest := self._evidence_path(ref))
+                                  for record in self._manifest_records(manifest)]
+                                 if include_evidence else []),
                     "publication_metadata": _redact(document.get("publication_metadata", {})),
                     "updated_at_utc": datetime.fromtimestamp(path.stat().st_mtime, timezone.utc).isoformat(),
                 })
@@ -994,7 +1019,7 @@ class DashboardReader:
     def overview(self) -> dict[str, Any]:
         task_result = self.tasks(page=1, page_size=1_000_000)
         tasks = task_result["items"]
-        releases = self.publications(page=1, page_size=6)
+        releases = self.publications(page=1, page_size=6, include_evidence=False)
         counts: dict[str, int] = {}
         for task in tasks:
             key = str(task["display_status"])
@@ -1133,10 +1158,14 @@ def create_app(
     @app.get("/api/publications")
     def publications(
         dataset: str | None = None,
+        asset_type: str | None = None,
+        partition_key: str | None = None,
         page: int = Query(1, ge=1),
         page_size: int = Query(25, ge=1, le=100),
+        include_evidence: bool = True,
     ):
-        return reader.publications(dataset=dataset, page=page, page_size=page_size)
+        return reader.publications(dataset=dataset, asset_type=asset_type, partition_key=partition_key,
+                                   page=page, page_size=page_size, include_evidence=include_evidence)
 
     return app
 

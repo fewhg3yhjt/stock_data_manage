@@ -118,6 +118,63 @@ symbol_lifecycle_overrides:
     evidence_refs:
       - https://static.cninfo.com.cn/finalpage/2026-10-13/1225602315.PDF
       - https://static.cninfo.com.cn/finalpage/2026-10-17/1225609701.PDF
+  - market: XSHG
+    asset_type: stock
+    symbol: "601326"
+    name: "秦港股份"
+    status: suspended
+    effective_from: "2026-10-21"
+    effective_to: null
+    evidence_refs:
+      - https://static.cninfo.com.cn/finalpage/2026-10-21/1225612840.PDF
+      - https://static.cninfo.com.cn/finalpage/2026-10-28/1225632584.PDF
+  - market: XSHG
+    asset_type: stock
+    symbol: "605258"
+    name: "协和电子"
+    status: suspended
+    effective_from: "2026-10-26"
+    effective_to: "2026-10-30"
+    evidence_refs:
+      - https://static.cninfo.com.cn/finalpage/2026-10-24/1225620941.PDF
+      - https://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-10-31/605258_20261031_D5A8.pdf
+  - market: XSHG
+    asset_type: stock
+    symbol: "688121"
+    name: "*ST卓然"
+    status: suspended
+    effective_from: "2026-10-29"
+    effective_to: null
+    evidence_refs:
+      - https://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-10-29/688121_20261029_RG1T.pdf
+  - market: XSHG
+    asset_type: stock
+    symbol: "688496"
+    name: "*ST清越"
+    status: suspended
+    effective_from: "2026-09-11"
+    effective_to: null
+    evidence_refs:
+      - https://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-09-11/688496_20260911_OPB9.pdf
+  - market: XSHE
+    asset_type: stock
+    symbol: "002827"
+    name: "高争民爆"
+    status: suspended
+    effective_from: "2026-10-26"
+    effective_to: "2026-10-30"
+    evidence_refs:
+      - https://static.cninfo.com.cn/finalpage/2026-10-26/1225621271.PDF
+      - https://static.cninfo.com.cn/finalpage/2026-11-02/1225650638.PDF
+  - market: XSHE
+    asset_type: stock
+    symbol: "301468"
+    name: "博盈特焊"
+    status: suspended
+    effective_from: "2026-10-19"
+    effective_to: "2026-10-29"
+    evidence_refs:
+      - https://static.cninfo.com.cn/finalpage/2026-10-30/1225643546.PDF
 
 # 同一指数的跨市场并列行情代码，不代表退市、代码承接或证券主数据状态。
 # pairs 的键保留在证券名单中的业务身份，值为采集请求使用的完整来源代码；

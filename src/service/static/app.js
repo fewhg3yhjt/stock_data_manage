@@ -184,7 +184,7 @@ async function showTask(taskId, unitPage = 1, unitQuery = '', unitStatus = '') {
       ${task.stale ? '<p class="notice">持久化状态仍在执行阶段，但已超过 5 分钟没有更新；这不代表进程仍然存活。</p>' : ''}
       <div class="stack"><section><h3>任务信息</h3><div class="facts-grid">${facts.map(([a,b]) => `<div class="fact"><span>${esc(a)}</span><strong>${esc(b)}</strong></div>`).join('')}</div></section>
       <section><h3>阶段进度</h3><div class="stage-list">${stageList(task.progress)}</div></section>
-      ${(task.partition_results || []).length ? `<section><h3>按证券类型验收</h3><table><thead><tr><th>类型</th><th>状态</th><th>合格 / 应有证券数</th><th>异常 / 未验证提示</th><th>原因</th></tr></thead><tbody>${task.partition_results.map(p => `<tr><td>${esc({stock:'股票',etf:'ETF',index:'指数'}[p.asset_type] || p.asset_type)}</td><td>${status(p.status)}</td><td>${prettyNumber(p.actual_count)} / ${prettyNumber(p.expected_count)}</td><td>${prettyNumber(p.issue_count-p.unverified_count)} / ${prettyNumber(p.unverified_count)}</td><td>${esc(p.error === 'daily aggregate coverage rejected; see per-adjustment issues' ? '合格证券数未达到发布门槛' : p.error || '—')}</td></tr>`).join('')}</tbody></table></section>` : ''}
+      ${(task.partition_results || []).length ? `<section><h3>按证券类型验收</h3><table><thead><tr><th>类型</th><th>状态</th><th>合格 / 应有证券数</th><th>其他提示 / 未验证口径 / 停牌或有效期排除</th><th>原因</th></tr></thead><tbody>${task.partition_results.map(p => `<tr><td>${esc({stock:'股票',etf:'ETF',index:'指数'}[p.asset_type] || p.asset_type)}</td><td>${status(p.status)}</td><td>${prettyNumber(p.actual_count)} / ${prettyNumber(p.expected_count)}</td><td>${prettyNumber(p.other_issue_count)} / ${prettyNumber(p.unverified_count)} / ${prettyNumber(p.excluded_count)}</td><td>${esc(p.error === 'daily aggregate coverage rejected; see per-adjustment issues' ? '合格证券数未达到发布门槛' : p.error || '—')}</td></tr>`).join('')}</tbody></table></section>` : ''}
       ${task.error ? `<section><h3>任务错误</h3><div class="notice">${esc(task.error)}</div></section>` : ''}
       <section><h3>执行单元</h3><form id="unit-filters" class="filters"><input name="q" placeholder="证券或错误" value="${esc(unitQuery)}"><select name="status"><option value="">全部状态</option><option value="failed">失败</option><option value="pending">等待</option><option value="candidate_complete">候选完成</option></select><button class="primary">查询</button></form>
       <div class="table-wrap"><table><thead><tr><th>单元</th><th>状态</th><th>行数</th><th>错误</th><th>原始响应</th></tr></thead><tbody>
@@ -248,24 +248,32 @@ async function showRaw(id) {
 
 async function renderPublications() {
   const sequence = ++renderSequence;
-  const params = new URLSearchParams({ page: state.pages.publications, page_size: 25 });
+  const params = new URLSearchParams({ page: state.pages.publications, page_size: 25, include_evidence: 'false' });
   if (state.filters.publications.dataset) params.set('dataset', state.filters.publications.dataset);
   const data = await api(`/api/publications?${params}`);
   if (sequence !== renderSequence || state.view !== 'publications') return;
   app.innerHTML = `<form class="filters" id="publication-filters"><input name="dataset" placeholder="数据集，例如 daily_bar"><span></span><span></span><span></span><button class="primary" type="submit">查询</button></form>
   <section class="panel"><div class="panel-head"><h2>Canonical 发布分区</h2><small>来自现有 manifest，不读取 Parquet 内容</small></div><div class="table-wrap"><table><thead><tr><th>数据日期</th><th>数据集</th><th>资产类型</th><th>行数 / 预期</th><th>覆盖率</th><th>冲突 / 隔离</th><th>内容哈希</th></tr></thead><tbody>
   ${data.items.length ? data.items.map((item, index) => `<tr class="clickable publication-row" data-index="${index}"><td>${esc(item.partition_key)}</td><td><strong>${esc(item.dataset)}</strong></td><td>${esc(item.asset_type)}</td><td>${prettyNumber(item.row_count)} / ${prettyNumber(item.expected_count)}</td><td>${item.coverage_percent === null ? '—' : `${item.coverage_percent}%`}</td><td>${prettyNumber(item.conflict_count)} / ${prettyNumber(item.quarantined_count)}</td><td class="mono">${esc((item.content_hash || '—').slice(0,16))}</td></tr>`).join('') : '<tr><td colspan="7">暂无发布结果</td></tr>'}</tbody></table></div>${pager('publications', data)}</section>`;
-  document.querySelectorAll('.publication-row').forEach(row => row.addEventListener('click', () => {
-    const item = data.items[Number(row.dataset.index)];
+  document.querySelectorAll('.publication-row').forEach(row => row.addEventListener('click', async () => {
+    const summary = data.items[Number(row.dataset.index)];
+    if (!dialog.open) dialog.showModal();
+    dialogContent.innerHTML = '<div class="loading"><span></span>正在读取该发布分区…</div>';
+    try {
+    const detailParams = new URLSearchParams({dataset:summary.dataset, asset_type:summary.asset_type,
+      partition_key:summary.partition_key, page:1, page_size:1, include_evidence:'false'});
+    const detail = await api(`/api/publications?${detailParams}`);
+    const item = detail.items[0];
+    if (!item) throw new Error('发布分区不存在或已变更');
     dialogContent.innerHTML = `<h2 class="dialog-title">${esc(item.dataset)} · ${esc(item.partition_key)}</h2><p class="dialog-subtitle">${esc(item.asset_type)} · ${prettyNumber(item.row_count)} 行</p>
     <div class="notice">覆盖率按清单中的行数与预期数计算；发布记录不等同于独立全市场覆盖验证。</div>
     <h3>内容哈希</h3><pre class="code-block">${esc(item.content_hash)}</pre>
     <h3>关联任务</h3>${item.tasks.map(id => `<button class="secondary linked-task" data-task-id="${esc(id)}">${esc(id)}</button>`).join('') || '<p class="subtle">没有匹配的现存任务摘要</p>'}
-    <h3>来源响应</h3>${item.evidence.map((record, index) => `<button class="secondary linked-evidence" data-evidence-id="${esc(record.id)}">${esc(record.provider)} · 响应 ${index + 1}</button>`).join('') || '<p class="subtle">没有可读取的关联响应</p>'}
+    <h3>关联来源响应</h3><p class="subtle">该分区关联 ${prettyNumber(item.source_count)} 个原始响应。${item.tasks.length ? '点击上方关联任务，可在执行单元中按证券分页查看响应。' : '可在“原始数据”页按日期和来源筛选响应。'}</p>
     <h3>发布检查</h3><pre class="code-block">${esc(JSON.stringify(item.publication_metadata, null, 2))}</pre>`;
     if (!dialog.open) dialog.showModal();
     dialogContent.querySelectorAll('.linked-task').forEach(button => button.addEventListener('click', () => showTask(button.dataset.taskId)));
-    dialogContent.querySelectorAll('.linked-evidence').forEach(button => button.addEventListener('click', () => showRaw(button.dataset.evidenceId)));
+    } catch (error) { dialogContent.innerHTML = `<div class="empty">${esc(error.message || error)}</div>`; }
   }));
   const form = document.querySelector('#publication-filters');
   form.elements.namedItem('dataset').value = state.filters.publications.dataset;

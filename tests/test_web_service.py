@@ -130,6 +130,80 @@ def test_read_only_overview_marks_stale_task_and_lists_publication(tmp_path):
     assert payload["recent_publications"][0]["coverage_percent"] == 50.0
 
 
+def test_overview_does_not_expand_publication_raw_evidence(tmp_path):
+    reader, _, _, _ = web_fixture(tmp_path)
+
+    def evidence_should_not_be_read(_path):
+        raise AssertionError("overview must return publication summaries without raw evidence")
+
+    reader._manifest_records = evidence_should_not_be_read
+    payload = reader.overview()
+
+    assert payload["recent_publications"][0]["dataset"] == "daily_bar"
+    assert payload["recent_publications"][0]["row_count"] == 1
+    assert payload["recent_publications"][0]["evidence"] == []
+
+
+def test_publication_listing_keeps_raw_evidence_by_default(tmp_path):
+    reader, _, _, _ = web_fixture(tmp_path)
+
+    payload = reader.publications()
+    summary = reader.publications(include_evidence=False)
+    detail = reader.publications(dataset="daily_bar", asset_type="stock", partition_key="2026-10-09")
+    detail_summary = reader.publications(dataset="daily_bar", asset_type="stock", partition_key="2026-10-09",
+                                         include_evidence=False)
+
+    assert len(payload["items"][0]["evidence"]) == 1
+    assert payload["items"][0]["evidence"][0]["provider"] == "tencent"
+    assert summary["items"][0]["evidence"] == []
+    assert detail["total"] == 1
+    assert detail["items"][0]["evidence"][0]["provider"] == "tencent"
+    assert detail_summary["items"][0]["source_count"] == 1
+    assert detail_summary["items"][0]["evidence"] == []
+
+
+def test_daily_batch_partition_links_to_published_task(tmp_path):
+    reader, _, data, _ = web_fixture(tmp_path)
+    manifest = data / "canonical/2026-10-09/daily_bar/stock/manifest.json"
+    summary_path = data / "task_workspace/2026-10-09/daily_bar/summary.json"
+    summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    summary["status"] = "published"
+    summary["partitions"] = {
+        "stock": {"status": "published", "published_manifest": str(manifest)}
+    }
+    write_json(summary_path, summary)
+
+    payload = reader.publications(include_evidence=False)
+
+    assert payload["items"][0]["tasks"] == ["daily-2026-10-09"]
+
+
+def test_daily_batch_task_counts_quality_prompts_separately_from_exclusions(tmp_path):
+    reader, _, data, _ = web_fixture(tmp_path)
+    summary_path = data / "task_workspace/2026-10-09/daily_bar/summary.json"
+    summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    summary["format_version"] = "daily-batch-v2"
+    summary["partitions"] = {"stock": {"status": "published"}}
+    write_json(summary_path, summary)
+    write_json(summary_path.with_name("coverage.stock.json"), {
+        "expected_count": 2,
+        "actual_count": 2,
+        "issues": [
+            {"code": "unverified_applicability"},
+            {"asset_type": "stock", "code": "confirmed_suspended"},
+            {"asset_type": "index", "code": "manual_lifecycle_exclusion"},
+            {"asset_type": "stock", "code": "manual_lifecycle_exclusion"},
+            {"asset_type": "stock", "code": "unexpected_quality_issue"},
+        ],
+    })
+
+    result = reader.task("daily-2026-10-09")["partition_results"][0]
+
+    assert result["other_issue_count"] == 1
+    assert result["unverified_count"] == 1
+    assert result["excluded_count"] == 2
+
+
 def test_task_units_are_paginated_and_do_not_expose_managed_paths(tmp_path):
     reader, _, _, _ = web_fixture(tmp_path)
 
