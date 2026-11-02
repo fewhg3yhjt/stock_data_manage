@@ -698,6 +698,24 @@ def test_first_incomplete_catalog_keeps_raw_and_blocks_publication(tmp_path):
     assert raw_request(tmp_path, "", input_id="SECURITY-BSE-001").parent.exists()
 
 
+def test_incomplete_source_union_does_not_report_previous_securities_invalidated(tmp_path):
+    collector = full_catalog_collector()
+    assert run(tmp_path, full_master_definition(), collector)["status"] == "published"
+    collector.source_date = "2026-10-01"
+    collector.fail.add("beijing")
+    definition = full_master_definition("incomplete-next", collector.source_date)
+    definition["allow_previous"] = False
+
+    result = run(tmp_path, definition, collector)
+
+    assert result["status"] == "failed"
+    assert result["security_check"]["missing_units"] == ["beijing"]
+    assert result["security_check"]["invalidated_previous_securities"] == []
+    summary = json.loads(Path(result["summary"]["path"]).read_text(encoding="utf-8"))
+    assert summary["final_check"]["coverage"]["invalidated_previous_securities"] == []
+    assert not (tmp_path / "canonical/2026-10-01/security_master/manifest.json").exists()
+
+
 def test_invalid_catalog_date_refetched_instead_of_reusing_stale_response(tmp_path):
     collector = full_catalog_collector()
     run(tmp_path, full_master_definition(), collector)

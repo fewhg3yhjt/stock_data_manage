@@ -2376,12 +2376,8 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
     current_records = {item.instrument_id: item for item in records
                        if current_source_keys.intersection(item.evidence_sources)}
     today_ids = set(current_records)
-    invalidated = sorted(item.instrument_id for item in prior_records
-        if (item.exchange.value, item.asset_type.value) in required_groups
-        and item.status not in {"delisted", "prelisted"}
-        and item.instrument_id not in today_ids)
     check = check_security_coverage(records, required_groups=required_groups)
-    check["invalidated_previous_securities"] = invalidated
+    check["invalidated_previous_securities"] = []
     check.update(missing_units=missing, requested_date=day.isoformat(), required_groups=sorted(required_groups),
                  classification_conflicts=[item.instrument_id for item in merged.classification_conflicts],
                  source_failures={key: {"failure_class": state["units"][key].get("failure_class"),
@@ -2414,6 +2410,15 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
             value["entry"]["coverage_rejected"] = True
             check["recollect_units"].append(key)
             check["passed"] = False
+    # A missing identity is meaningful only after the full current source union
+    # has passed every configured unit and group check. Failed/partial runs must
+    # not report the old universe as invalidated.
+    invalidated = sorted(item.instrument_id for item in prior_records
+        if check["passed"]
+        and (item.exchange.value, item.asset_type.value) in required_groups
+        and item.status not in {"delisted", "prelisted"}
+        and item.instrument_id not in today_ids)
+    check["invalidated_previous_securities"] = invalidated
     check.update(validated_at_utc=datetime.now(timezone.utc).isoformat(),
                  policy_sha256=file_hash(config_root / "datasets/security_master.yaml"),
                  source_response_hashes={key: value["entry"]["raw_hash"] for key, value in source_rows.items()})
