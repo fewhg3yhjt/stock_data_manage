@@ -1,6 +1,6 @@
 # 运行数据目录与归档
 
-本文记录 **2026-10-25 核对的现有实现**。示例取自数据日期 `2026-10-09` 的已发布证券名单及其 BaoStock 来源文件；本机业务文件不随文档复制。历史文件保持原路径；新生成的原始响应和 SDK 证据文件使用可读名称，完整 SHA-256 仍记录在清单中。
+本文记录截至 **2026-11-03** 的存储实现。示例取自数据日期 `2026-10-09` 的历史证券名单及其 BaoStock 来源文件；本机业务文件不随文档复制。历史文件保持原路径；新生成的原始响应和 SDK 证据文件使用可读名称，完整 SHA-256 仍记录在清单中。
 
 阅读入口：[文件名与校验值](#文件名与校验值)、[原响应实例](#原响应实例)、[来源工作文件](#来源工作文件)、[任务文件](#任务文件)、[正式数据与数据库](#正式数据与数据库)、[重复内容与待实施方向](#重复内容与待实施方向)。运行命令、重做和进度规则见 [任务流程](../pipeline/collection-tasks.md)，本文解释实际落盘文件。
 
@@ -33,14 +33,18 @@ data/
 │   │   ├── sources/<来源>/<接口>/       # 解析、映射、候选及报告
 │   │   ├── task.json                   # 执行参数及冻结范围
 │   │   ├── prepared.parquet            # 本次待发布数据
+│   │   ├── prepared-security-master.json # 名单提交的固定候选与恢复输入
 │   │   ├── coverage.json               # 名单最终覆盖检查
 │   │   └── summary.json                # 状态、实际日期、检查及原响应引用
 │   ├── trading_calendar/<日期>/<来源>/<接口>/refresh-<时分秒>/ # 轻量日历响应
 │   ├── _checks/                        # 业务复核与验收记录
 │   └── _locks/                         # 既有文件锁
-├── canonical/<数据日期>/
-│   ├── security_master/{data.parquet,manifest.json}
-│   └── daily_bar/<资产类型>/{data.parquet,manifest.json} # 一证券一日一条，三组嵌套
+├── canonical/
+│   ├── security_master/current/
+│   │   ├── security_master.duckdb       # 唯一当前清单及字段变更历史
+│   │   └── manifest.json                # 最近一次完整更新的证据引用与数据库哈希
+│   └── <数据日期>/daily_bar/<资产类型>/
+│       └── {data.parquet,manifest.json} # 一证券一日一条，三组嵌套
 ├── task_archive/
 │   ├── _raw_evidence/<清单哈希>/        # 发布引用的不可变原响应
 │   ├── _raw_audit/<来源_日期_接口_范围>/ # 被替换或损坏的原响应证据
@@ -53,7 +57,9 @@ data/
 
 同接口可能请求不同证券、窗口、粒度或复权。新请求文件名使用输入标识及可读参数区分，例如 `manifest.ASTOCK-002-daily_symbol-sh600519_start-date-2026-10-01_end-date-2026-10-23_adjustment-qfq.ndjson`；较长的单值参数会缩短显示，列表参数显示条数和首尾项，完整值仍保存在 manifest。新正文文件名包含数据日期、输入标识、证券/日期/复权口径及采集时刻，来源和接口由父目录标明。名称不嵌入摘要。此前生成的带参数指纹文件名保留原样。接口层 `manifest.ndjson` 是索引，响应事件位于其指向的各请求清单。
 
-新规范日线存储路径为 `<日期>/daily_bar/<资产类型>/`，业务键是证券与交易日期；查询从同一条记录投影所选口径。来源参数 `qfq/hfq` 在候选映射为 `forward/backward`。历史 `adjustment=...` 文件和旧混合目录不自动迁移，也不参与新聚合查询；不存在聚合结果时不回退旧单口径文件。分钟热数据 `data/hot/minute_hot.db` 保持原结构。证券名单不再新写 `security_master/current`，通过既有元数据选择不晚于目标日的最新合格分区。
+新规范日线存储路径为 `<日期>/daily_bar/<资产类型>/`，业务键是证券与交易日期；查询从同一条记录投影所选口径。来源参数 `qfq/hfq` 在候选映射为 `forward/backward`。历史 `adjustment=...` 文件和旧混合目录不自动迁移，也不参与新聚合查询；不存在聚合结果时不回退旧单口径文件。分钟热数据 `data/hot/minute_hot.db` 保持原结构。
+
+证券清单是唯一的当前态资产，保存于 `canonical/security_master/current/security_master.duckdb`；每次完整来源刷新事务更新该库，并将字段变化写入 `security_master_history`，邻近 `manifest.json` 指向最新成功更新及其来源证据。来源失败时不写数据库或 manifest，所以旧证券状态继续有效。日线任务只读取 `as_of_date` 不晚于目标日且必需组齐全的清单，并把证券范围冻结进任务定义。任务工作区中的 `prepared-security-master.json` 只供已检查候选在提交中断后恢复；它不是正式按日清单，日线和Web均不读取。已有 `canonical/<日期>/security_master/{data.parquet,manifest.json}` 保留为历史文件；新成功更新不再创建每日全量名单分区。字段变更历史不保存每日全量快照，因此它不能按任意历史日期还原完整名单；若当前清单晚于历史目标日，只有保留的目标日前名单可供补跑，没有时任务停止并说明缺少名单，不会使用未来清单。
 
 ## 文件名与校验值
 

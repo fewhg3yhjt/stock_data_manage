@@ -1815,7 +1815,9 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
                 if file_hash(published) != state["published_hash"]:
                     raise ValueError("task publication has changed; use a new task or explicit redo")
                 from ..storage.integrity import Manifest
-                if not Manifest.load(published).verify(published.parent / "data.parquet"):
+                published_data = (published.parent / "security_master.duckdb" if dataset == "security_master"
+                                  else published.parent / "data.parquet")
+                if not Manifest.load(published).verify(published_data):
                     raise ValueError("published task data failed integrity verification")
                 if state.get("complete_today"):
                     frozen_units = state.get("execution_definition", {}).get("units", ())
@@ -2094,18 +2096,11 @@ def _task_units(definition, paths):
         if old:
             return old["definition"]["units"]
     import pyarrow.parquet as pq
-    with MetadataStore(paths["metadata_path"]) as metadata:
-        latest = metadata.latest_partition(dataset="security_master", asset_type="security", through_date=definition["trade_date"])
-    if latest is None:
-        raise ValueError("no dated published security master is available")
-    manifest_path = Path(latest["manifest_path"])
-    if not manifest_path.resolve().is_relative_to(paths["canonical_root"]):
-        raise ValueError("published security master escaped canonical storage")
-    from ..storage.integrity import Manifest, file_hash
-    manifest = Manifest.load(manifest_path)
-    source = manifest_path.parent / "data.parquet"
-    if (manifest_path.parent / "task-commit.json").exists() or not manifest.verify(source):
-        raise ValueError("published security master is unavailable or pending")
+    loaded = _load_security_master(paths, through_date=definition["trade_date"])
+    if loaded is None:
+        raise ValueError("no current or historical published security master is available")
+    manifest_path, manifest, records, current_store = loaded
+    from ..storage.integrity import file_hash
     day = date.fromisoformat(definition["trade_date"])
     selected = []
     universe_asset_types = {"all_stock": "stock", "all_etf": "etf", "all_index": "index"}
@@ -2119,7 +2114,15 @@ def _task_units(definition, paths):
         and any(item.get("input_id") == "SECURITY-BS-UNIVERSE-001"
                 for item in master_metadata.get("sources", ()) if isinstance(item, dict))
     )
-    for row in pq.read_table(source).to_pylist():
+    if current_store:
+        from ..service.instruments import security_record_to_mapping
+        master_rows = [security_record_to_mapping(record) for record in records]
+    else:
+        master_rows = pq.read_table(manifest_path.parent / "data.parquet").to_pylist()
+    for row in master_rows:
+        for field in ("list_date", "delist_date"):
+            if isinstance(row.get(field), str):
+                row[field] = date.fromisoformat(row[field])
         if row["asset_type"] not in wanted or row["status"] in {"prelisted", "delisted"}:
             continue
         if row.get("list_date") and row["list_date"] > day or row.get("delist_date") and row["delist_date"] < day:
@@ -2139,6 +2142,66 @@ def _task_units(definition, paths):
                 raise ValueError("daily task config must be a parameter mapping")
             selected[-1]["context"]["config"] = dict(definition["config"])
     return selected
+
+
+def _security_master_directory(paths):
+    return Path(paths["canonical_root"]) / "security_master" / "current"
+
+
+def _load_security_master(paths, *, through_date=None):
+    """Load the one current master, or the latest retained dated master during migration."""
+    from datetime import date
+    import pyarrow.parquet as pq
+    from ..storage.integrity import Manifest
+
+    root = Path(paths["canonical_root"]).resolve()
+    directory = _security_master_directory(paths)
+    current_manifest_path = directory / "manifest.json"
+    current_data_path = directory / "security_master.duckdb"
+    if (directory / "task-commit.json").exists():
+        raise ValueError("current security master has a pending publication")
+    if current_manifest_path.exists() or current_data_path.exists():
+        if not current_manifest_path.is_file() or not current_data_path.is_file():
+            raise ValueError("current security master database and manifest are incomplete")
+        manifest_path = current_manifest_path.resolve()
+        if not manifest_path.is_relative_to(root):
+            raise ValueError("current security master escaped canonical storage")
+        manifest = Manifest.load(manifest_path)
+        if (manifest.dataset != "security_master" or manifest.asset_type != "security"
+                or not manifest.verify(current_data_path)):
+            raise ValueError("current security master failed manifest verification")
+        as_of_date = manifest.publication_metadata.get("as_of_date") or manifest.partition_key
+        is_future_for_request = (through_date is not None and as_of_date
+                                 and date.fromisoformat(as_of_date) > date.fromisoformat(str(through_date)))
+        if not is_future_for_request:
+            from ..service.instruments import SecurityMasterStore
+            with SecurityMasterStore(str(current_data_path)) as store:
+                records = store.all()
+            if len(records) != manifest.row_count:
+                raise ValueError("current security master row count differs from its manifest")
+            return manifest_path, manifest, records, True
+
+    from ..storage.metadata import MetadataStore
+    cutoff = through_date or "9999-12-31"
+    with MetadataStore(paths["metadata_path"]) as metadata:
+        latest = metadata.latest_partition(dataset="security_master", asset_type="security", through_date=cutoff)
+    if latest is None:
+        return None
+    manifest_path = Path(latest["manifest_path"]).resolve()
+    if not manifest_path.is_relative_to(root):
+        raise ValueError("published security master escaped canonical storage")
+    manifest = Manifest.load(manifest_path)
+    source = manifest_path.parent / "data.parquet"
+    if ((manifest_path.parent / "task-commit.json").exists()
+            or manifest.dataset != "security_master" or manifest.asset_type != "security"
+            or not manifest.verify(source)):
+        raise ValueError("retained security master is unavailable or pending")
+    rows = pq.read_table(source).to_pylist()
+    from ..service.instruments import security_record_from_mapping
+    records = tuple(security_record_from_mapping(row) for row in rows)
+    if len(records) != manifest.row_count:
+        raise ValueError("retained security master row count differs from its manifest")
+    return manifest_path, manifest, records, False
 
 
 def _apply_manual_security_lifecycle_overrides(units, overrides, *, trade_date):
@@ -2242,11 +2305,9 @@ def _validate_task_candidate(artifact, unit, contract, dataset, day, adjustment)
 
 def _prepare_task_commit(state, units, contracts, paths, config_root, work, day):
     import json
-    import shutil
     import pyarrow.parquet as pq
-    from ..service.instruments_update import prepare_security_publication, parse_security_row
-    from ..storage.integrity import file_hash, row_hash, Manifest
-    from ..storage.parquet import write_normalized_rows, _records_to_table
+    from ..service.instruments_update import prepare_security_publication
+    from ..storage.integrity import file_hash, row_hash
     import yaml
 
     valid = {key: entry for key, entry in state["units"].items() if _task_unit_valid(entry)}
@@ -2285,16 +2346,16 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
     from ..quality.publication import check_security_coverage
     if (work / 'prepared.parquet').exists() or (work / 'universe_review.json').exists():
         RawObjectStore.preserve_work_files(work, archive_root=paths['archive_root'])
-    current_dir = paths["canonical_root"] / day.isoformat() / "security_master"
-    from ..storage.metadata import MetadataStore
-    with MetadataStore(paths["metadata_path"]) as store:
-        latest = store.latest_partition(dataset="security_master", asset_type="security", through_date=day.isoformat())
-    previous_dir = Path(latest["manifest_path"]).parent if latest else current_dir
-    if not previous_dir.resolve().is_relative_to(paths["canonical_root"]):
-        raise ValueError("prior publication escaped canonical storage")
-    previous = []
+    current_dir = _security_master_directory(paths)
+    loaded_previous = _load_security_master(paths)
+    previous_manifest_path = None
+    previous = ()
     prior = None
-    previous_path = previous_dir / "data.parquet"
+    if loaded_previous is not None:
+        previous_manifest_path, previous_manifest, previous, _ = loaded_previous
+        prior = previous_manifest.publication_metadata
+        if prior.get("as_of_date") and date.fromisoformat(prior["as_of_date"]) > day:
+            raise ValueError("cannot replace a newer current security master with an older task")
     policy = yaml.safe_load((config_root / "datasets/security_master.yaml").read_text(encoding="utf-8"))
     publication_policy = policy["dataset"]["publication"]
     symbol_successions = policy.get("symbol_successions", [])
@@ -2321,14 +2382,6 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
                      "parameters": {key: value for key, value in contracts[unit["input_id"]].bind_parameters(unit["context"]).items()
                                     if key != "trade_date"}} for unit in units]
     scope_hash = row_hash({"groups": sorted(required_groups), "sources": source_scope})
-    if (previous_dir / "manifest.json").exists():
-        manifest = Manifest.load(previous_dir / "manifest.json")
-        if (previous_dir / "task-commit.json").exists() or not manifest.verify(previous_path):
-            raise ValueError("existing security master failed hash verification")
-        previous = [parse_security_row(row, source="previous") for row in pq.read_table(previous_path).to_pylist()]
-        prior = manifest.publication_metadata
-        if prior.get("as_of_date") and date.fromisoformat(prior["as_of_date"]) > day:
-            raise ValueError("cannot replace a newer security master with an older task")
     missing = [unit["key"] for unit in units if unit["key"] not in valid]
     # Inspect today's sources alone. Previous rows must not conceal omissions.
     merged = prepare_security_publication({key: value["rows"] for key, value in source_rows.items()},
@@ -2365,11 +2418,9 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
         RawObjectStore(work).write_json(_json_value(review), dataset='universe_review', provider='pipeline',
             endpoint='provenance', fetched_at=datetime.now(timezone.utc), attempt_id='universe-review',
             relative_path='universe_review.json')
-    comparable = previous if prior and prior.get("scope_hash") == scope_hash else ()
-    # A completed current source union is the security list for this date.
-    # Compare it with the previous identities, but omissions invalidate those
-    # rows instead of blocking publication. Explicitly scoped tasks only compare
-    # identities in their declared market/asset groups when the prior scope matches.
+    # Only a complete, configured source union may change the current list.
+    # If collection is incomplete, the current database and its active states
+    # remain untouched; daily-bar tasks may continue using that last good list.
     prior_records = prepare_security_publication({}, previous, symbol_successions=symbol_successions,
         lifecycle_overrides=lifecycle_overrides, as_of_date=day).records
     current_source_keys = set(source_rows)
@@ -2423,96 +2474,75 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
                  policy_sha256=file_hash(config_root / "datasets/security_master.yaml"),
                  source_response_hashes={key: value["entry"]["raw_hash"] for key, value in source_rows.items()})
     state["security_check"] = check
-    max_age = policy["dataset"]["publication"]["max_previous_age_days"]
-    if type(max_age) is not int or max_age < 0:
-        raise ValueError("max_previous_age_days must be a nonnegative calendar-day count")
-    fallback = not check["passed"]
-    if fallback:
-        eligible = (state["redo"] != "full" and definition.get("allow_previous", True) and previous and prior
-                    and prior.get("scope_hash") == scope_hash and prior.get("coverage_passed")
-                    and prior.get("as_of_date"))
-        age = (day - date.fromisoformat(prior["as_of_date"])).days if eligible else None
-        if not eligible or not 0 <= age <= max_age:
-            check["fallback_rejection"] = "no matching dated valid publication within configured age, or fallback disabled"
-            raise ValueError("security source units or market/asset coverage are incomplete; no eligible previous publication")
-        if not check_security_coverage(previous, required_groups=required_groups)["passed"]:
-            raise ValueError("previous security master failed coverage verification")
-        if {source["raw_ref"] for source in prior["sources"]} != set(manifest.raw_refs):
-            raise ValueError("previous source metadata does not match raw evidence references")
-        for source in prior["sources"]:
-            raw_manifest = Path(source["raw_ref"]).resolve()
-            if not raw_manifest.is_relative_to(paths["archive_root"]) or RawObjectStore.verify_manifest(raw_manifest) != source["raw_hash"]:
-                raise ValueError("previous source evidence failed integrity verification")
-        records = tuple(previous)
-        promotions = []
-        publication_metadata = {**prior, "requested_date": day.isoformat(), "fallback": True,
-                                "previous_age_days": age, "fallback_reason": check,
-                                "previous_manifest_hash": file_hash(previous_dir / "manifest.json")}
-    else:
-        # Retain descriptive fields for present identities. Membership in the
-        # completed current union restores a previously invalidated identity.
-        status_sources = {value['entry']['input_id'] for value in source_rows.values()}
-        records = prepare_security_publication({key: value["rows"] for key, value in source_rows.items()},
-            previous, status_sources=status_sources, symbol_successions=symbol_successions,
-            lifecycle_overrides=lifecycle_overrides, as_of_date=day).records
-        invalidated_ids = set(invalidated)
-        previously_invalid = {item.instrument_id for item in prior_records if item.status == "delisted"}
-        records = tuple(
-            replace(item, status="delisted") if item.instrument_id in invalidated_ids else
-            replace(item, status=(current_records[item.instrument_id].status
-                                  if current_records[item.instrument_id].status in {"active", "suspended"}
-                                  else "active"),
-                    delist_date=current_records[item.instrument_id].delist_date)
-            if item.instrument_id in today_ids and item.instrument_id in previously_invalid else item
-            for item in records)
-        publication_metadata = {"as_of_date": day.isoformat(), "requested_date": day.isoformat(),
-            "scope_hash": scope_hash, "coverage_passed": True, "fallback": False,
-            "required_groups": sorted(required_groups), "coverage": check,
-            "sources": [{"unit_key": key, "input_id": value["entry"]["input_id"],
-                         "source_date": day.isoformat(), "raw_ref": value["raw_ref"],
-                         "raw_hash": value["entry"]["raw_hash"],
-                         "artifact_hash": value["entry"]["artifact_hash"],
-                         "adapter_version": value["entry"]["report"].get("adapter_version"),
-                         "normalization_version": value["entry"]["report"].get("normalization_version")}
-                        for key, value in source_rows.items()]}
-        if scripted:
-            publication_metadata.update(historical_universe_verified_complete=False,
-                universe_review_sha256=file_hash(work / 'universe_review.json'))
-    rows = [{name: _json_value(getattr(item, name)) if name not in {"list_date", "delist_date"} else getattr(item, name)
-             for name in ("instrument_id", "symbol", "exchange", "asset_type", "name", "list_date", "delist_date", "status")}
-            for item in records]
-    fields = yaml.safe_load((config_root / "datasets/security_master.yaml").read_text(encoding="utf-8"))["fields"]
-    candidate = work / "prepared.parquet"
-    if fallback:
-        shutil.copyfile(previous_path, candidate)
-    else:
-        write_normalized_rows(candidate, rows, fields)
+    if not check["passed"]:
+        check["publication_rejected"] = "incomplete security-list refresh; current master retained unchanged"
+        RawObjectStore(work).write_json(check, dataset="security_master", provider="pipeline", endpoint="coverage",
+            fetched_at=datetime.now(timezone.utc), attempt_id="coverage", relative_path="coverage.json")
+        raise ValueError("security-list refresh is incomplete; existing current master remains unchanged")
+
+    # Retain descriptive fields for present identities. Membership in the
+    # completed current union restores a previously invalidated identity.
+    status_sources = {value['entry']['input_id'] for value in source_rows.values()}
+    publication_merge = prepare_security_publication({key: value["rows"] for key, value in source_rows.items()},
+        previous, status_sources=status_sources, symbol_successions=symbol_successions,
+        lifecycle_overrides=lifecycle_overrides, as_of_date=day)
+    records = publication_merge.records
+    invalidated_ids = set(invalidated)
+    previously_invalid = {item.instrument_id for item in prior_records if item.status == "delisted"}
+    records = tuple(
+        replace(item, status="delisted") if item.instrument_id in invalidated_ids else
+        replace(item, status=(current_records[item.instrument_id].status
+                              if current_records[item.instrument_id].status in {"active", "suspended"}
+                              else "active"),
+                delist_date=current_records[item.instrument_id].delist_date)
+        if item.instrument_id in today_ids and item.instrument_id in previously_invalid else item
+        for item in records)
+    publication_metadata = {"as_of_date": day.isoformat(), "requested_date": day.isoformat(),
+        "scope_hash": scope_hash, "coverage_passed": True, "fallback": False,
+        "required_groups": sorted(required_groups), "coverage": check,
+        "sources": [{"unit_key": key, "input_id": value["entry"]["input_id"],
+                     "source_date": day.isoformat(), "raw_ref": value["raw_ref"],
+                     "raw_hash": value["entry"]["raw_hash"],
+                     "artifact_hash": value["entry"]["artifact_hash"],
+                     "adapter_version": value["entry"]["report"].get("adapter_version"),
+                     "normalization_version": value["entry"]["report"].get("normalization_version")}
+                    for key, value in source_rows.items()]}
+    if scripted:
+        publication_metadata.update(historical_universe_verified_complete=False,
+            universe_review_sha256=file_hash(work / 'universe_review.json'))
+    from ..service.instruments import security_record_to_mapping
+    candidate = work / "prepared-security-master.json"
+    candidate.write_text(json.dumps([security_record_to_mapping(item) for item in records],
+                                    ensure_ascii=False, sort_keys=True, indent=2), encoding="utf-8")
+    aliases = [{"instrument_id": item.instrument_id, "provider": item.provider, "symbol": item.symbol,
+                "effective_from": item.effective_from.isoformat(),
+                "effective_to": item.effective_to.isoformat() if item.effective_to else None,
+                "change_reason": item.change_reason, "evidence_source": item.evidence_source}
+               for item in publication_merge.symbol_history]
     RawObjectStore(work).write_json(check, dataset="security_master", provider="pipeline", endpoint="coverage",
         fetched_at=datetime.now(timezone.utc), attempt_id="coverage", relative_path="coverage.json")
     prepared = {"partition_directory": str(current_dir), "expected_count": len(records),
                 "row_count": len(records), "asset_type": "security", "partition_key": day.isoformat(),
-                "fallback_units": sorted(set(missing + check["recollect_units"])), "publication_metadata": publication_metadata,
+                "symbol_history": aliases, "previous_manifest": str(previous_manifest_path) if previous_manifest_path else None,
+                "publication_metadata": publication_metadata,
                 "item_statuses": {item.instrument_id: "success" for item in records}}
-    if fallback:
-        prepared["prior_raw_refs"] = list(manifest.raw_refs)
-        prepared["fallback_manifest"] = str(previous_dir / "manifest.json")
     prepared.update(candidate=str(candidate), candidate_hash=file_hash(candidate), promotions=promotions,
                     trade_date=day.isoformat(), raw_refs=list(dict.fromkeys(
-                        prepared["prior_raw_refs"] if "prior_raw_refs" in prepared else
                         [source["raw_ref"] for source in source_rows.values()])))
     state["commit"] = prepared
-    state["complete_today"] = len(valid) == len(units) and not prepared.get("publication_metadata", {}).get("fallback", False)
+    state["complete_today"] = len(valid) == len(units)
     if state["dataset"] == "security_master":
         state["data_date"] = prepared["publication_metadata"]["as_of_date"]
-        state["fallback_used"] = prepared["publication_metadata"]["fallback"]
+        state["fallback_used"] = False
 
 
 def _finish_task_commit(state, paths, metadata, failure_hook=None, progress=None, save_state=None):
     import json
     import pyarrow.parquet as pq
-    from ..domain import Dataset, Adjustment, ItemStatus
+    from datetime import date
+    from ..domain import ItemStatus
     from ..storage.integrity import Manifest, file_hash
-    from ..storage.parquet import CanonicalPartitionStore, _mapping_to_bar, _fsync_file
+    from ..storage.parquet import CanonicalPartitionStore
     if progress is None and state.get('progress'):
         from ..worker.progress import TaskProgress
         def recovered_progress(snapshot):
@@ -2573,19 +2603,54 @@ def _finish_task_commit(state, paths, metadata, failure_hook=None, progress=None
         if result.quarantined_keys:
             raise ValueError("publication contains quarantined source conflicts")
     else:
-        target = partition / ("data." + state["task_id"] + ".tmp.parquet")
-        import shutil
-        shutil.copyfile(candidate, target)
-        _fsync_file(target)
-        manifest = Manifest.from_file(target, dataset="security_master", asset_type="security", partition_key=commit["trade_date"],
-            row_count=commit["row_count"], expected_count=commit["expected_count"], first_key=None, last_key=None,
+        from ..service.instruments import SecurityMasterStore, SymbolHistory, security_record_from_mapping
+        database_path = partition / "security_master.duckdb"
+        candidate_rows = json.loads(candidate.read_text(encoding="utf-8"))
+        records = tuple(security_record_from_mapping(row) for row in candidate_rows)
+        with SecurityMasterStore(str(database_path)) as store:
+            previous_records = store.all()
+            if not previous_records and commit.get("previous_manifest"):
+                prior_manifest_path = Path(commit["previous_manifest"]).resolve()
+                if not prior_manifest_path.is_relative_to(paths["canonical_root"].resolve()):
+                    raise ValueError("prior security master escaped canonical storage")
+                prior_manifest = Manifest.load(prior_manifest_path)
+                prior_data = prior_manifest_path.parent / "data.parquet"
+                if prior_data.is_file() and prior_manifest.verify(prior_data):
+                    import pyarrow.parquet as pq
+                    previous_records = tuple(security_record_from_mapping(row)
+                        for row in pq.read_table(prior_data).to_pylist())
+            before = {record.instrument_id: record for record in previous_records}
+            changes = []
+            for record in records:
+                old = before.get(record.instrument_id)
+                if old is None:
+                    changes.append((record.instrument_id, "created", None, record.symbol,
+                                    date.fromisoformat(commit["trade_date"]), ",".join(record.evidence_sources)))
+                    continue
+                for field in ("symbol", "name", "asset_type", "status", "list_date", "delist_date"):
+                    old_value, new_value = getattr(old, field), getattr(record, field)
+                    if old_value != new_value:
+                        changes.append((record.instrument_id, field, old_value, new_value,
+                                        date.fromisoformat(commit["trade_date"]),
+                                        ",".join(record.evidence_sources)))
+            aliases = tuple(SymbolHistory(
+                instrument_id=item["instrument_id"], provider=item["provider"], symbol=item["symbol"],
+                effective_from=date.fromisoformat(item["effective_from"]),
+                effective_to=date.fromisoformat(item["effective_to"]) if item.get("effective_to") else None,
+                change_reason=item["change_reason"], evidence_source=item["evidence_source"])
+                for item in commit.get("symbol_history", ()))
+            store.publish(records, aliases=aliases, changes=changes)
+            row_count = len(store.all())
+        if row_count != commit["row_count"]:
+            raise ValueError("current security master row count differs from prepared candidate")
+        manifest = Manifest.from_file(database_path, dataset="security_master", asset_type="security",
+            partition_key=commit["trade_date"], row_count=row_count,
+            expected_count=commit["expected_count"], first_key=records[0].instrument_id if records else None,
+            last_key=records[-1].instrument_id if records else None,
             raw_refs=tuple(commit["raw_refs"]), item_statuses=commit["item_statuses"],
             publication_metadata=commit.get("publication_metadata", {}))
         temporary_manifest = partition / ("manifest." + state["task_id"] + ".tmp.json")
         manifest.write_atomic(temporary_manifest)
-        os.replace(target, partition / "data.parquet")
-        if failure_hook:
-            failure_hook("after_data_replace")
         manifest_path = partition / "manifest.json"
         os.replace(temporary_manifest, manifest_path)
     if failure_hook:
@@ -2606,9 +2671,12 @@ def _finish_task_commit(state, paths, metadata, failure_hook=None, progress=None
     if progress:
         progress.finish('publication', 'raw_promote')
         save(state)
-    if not manifest.verify(partition / "data.parquet"):
+    published_data = (partition / "security_master.duckdb" if state["dataset"] == "security_master"
+                      else partition / "data.parquet")
+    if not manifest.verify(published_data):
         raise ValueError("completed task publication is corrupt")
-    metadata.record_partition_publish(manifest=manifest, manifest_path=manifest_path)
+    if state["dataset"] != "security_master":
+        metadata.record_partition_publish(manifest=manifest, manifest_path=manifest_path)
     state.update(status="published", published_manifest=str(manifest_path),
                  published_hash=file_hash(manifest_path), row_count=manifest.row_count, error=None)
     if progress:
@@ -2742,37 +2810,29 @@ def collect_due_inputs(*, now, config_root, output_root=None, data_root=None, tr
 
 
 def _current_security_master(paths, trade_date, config_root):
-    """Return today's valid unified list when it is already published."""
-    import pyarrow.parquet as pq
+    """Return the verified current list; its last update need not be today's date."""
     import yaml
-    from ..storage.integrity import Manifest
-    from ..storage.metadata import MetadataStore
-
-    with MetadataStore(paths["metadata_path"]) as metadata:
-        latest = metadata.latest_partition(dataset="security_master", asset_type="security",
-                                          through_date=trade_date.isoformat())
-    if latest is None or latest["partition_key"] != trade_date.isoformat():
+    loaded = _load_security_master(paths, through_date=trade_date)
+    if loaded is None:
         return None
-    manifest_path = Path(latest["manifest_path"]).resolve()
-    canonical_root = paths["canonical_root"].resolve()
-    if not manifest_path.is_relative_to(canonical_root):
-        raise ValueError("published security master escaped canonical storage")
-    manifest = Manifest.load(manifest_path)
-    data_path = manifest_path.parent / "data.parquet"
-    if ((manifest_path.parent / "task-commit.json").exists()
-            or not manifest.verify(data_path)):
-        raise ValueError("same-day security master is unavailable or pending")
+    manifest_path, manifest, records, _ = loaded
     publication = manifest.publication_metadata
-    if publication.get("as_of_date") != trade_date.isoformat() or publication.get("fallback", False):
+    if not publication.get("coverage_passed") or publication.get("fallback", False):
         return None
     policy = yaml.safe_load((config_root / "datasets/security_master.yaml").read_text(encoding="utf-8"))
     required = {tuple(group) for group in policy["dataset"]["publication"]["required_groups"]}
-    rows = pq.read_table(data_path, columns=["exchange", "asset_type", "status"]).to_pylist()
-    present = {(row["exchange"], row["asset_type"]) for row in rows
-               if row["status"] not in {"delisted", "prelisted"}}
+    present = {(record.exchange.value, record.asset_type.value) for record in records
+               if record.status not in {"delisted", "prelisted"}}
     if not required <= present:
         return None
     return str(manifest_path)
+
+
+def _security_master_as_of_date(manifest_path):
+    from ..storage.integrity import Manifest
+    manifest = Manifest.load(Path(manifest_path))
+    value = manifest.publication_metadata.get("as_of_date")
+    return str(value) if value else manifest.partition_key or None
 
 
 def _collect_due_daily_bar(*, now, config_root, data_root, execute, mode, calendar_days, dependency_paths):
@@ -2849,7 +2909,9 @@ def _collect_due_daily_bar(*, now, config_root, data_root, execute, mode, calend
     if job["status"] == "ready" and execute:
         try:
             security_manifest = _current_security_master(paths, day, root)
-            if security_manifest is not None:
+            master_updated_today = (security_manifest is not None
+                                    and _security_master_as_of_date(security_manifest) == day.isoformat())
+            if master_updated_today:
                 security_master_prerequisite = {"status": "available", "manifest": security_manifest}
             else:
                 master_report = _collect_due_security_master(now=now, config_root=root,
@@ -2857,11 +2919,13 @@ def _collect_due_daily_bar(*, now, config_root, data_root, execute, mode, calend
                     calendar_days=[{"trade_date": day.isoformat(), "is_trading_day": True}],
                     dependency_paths=dependency_paths, collector=None)
                 master_job = master_report["jobs"][0]
-                security_manifest = _current_security_master(paths, day, root)
+                refreshed_manifest = _current_security_master(paths, day, root)
+                security_manifest = refreshed_manifest or security_manifest
                 security_master_prerequisite = {"status": "available" if security_manifest else master_job["status"],
-                    "manifest": security_manifest, "job": master_job}
+                    "manifest": security_manifest, "as_of_date": (_security_master_as_of_date(security_manifest)
+                        if security_manifest else None), "job": master_job}
                 if security_manifest is None:
-                    job.update(status="blocked", reason="same-day unified security master was not published")
+                    job.update(status="blocked", reason="no usable current security master is available")
         except (ValueError, KeyError, TypeError, OSError) as exc:
             job.update(status="failed", error="security master prerequisite failed: " + str(exc))
     if job["status"] == "ready" and execute:

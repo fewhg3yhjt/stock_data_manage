@@ -164,7 +164,7 @@
 | `storage/raw.py` | 原响应字节、按日期/来源/接口暂存及转正；请求级清单和接口索引，按请求替换、审计及共享字节保护；当前目录在解析前按原捕获日落盘；哈希复查、脱敏与缓存 |
 | `storage/hot.py` | SQLite WAL Hot Minute Store 和即时查询数据 |
 | `storage/parquet.py` | 来源字段合同的候选精确类型写入；Canonical Bar按日期/数据集/资产类型分区，复权保留记录主键；清单、文件锁和原子发布 |
-| `storage/metadata.py` | 既有DuckDB任务、分区、Attempt、调度占用、来源健康、证据和冲突；分区及证券状态同事务批量登记，保留未更新证券；查询不晚于目标日期的最新合格分区；不新增数据库 |
+| `storage/metadata.py` | 既有DuckDB任务、日线分区、Attempt、调度占用、来源健康、证据和冲突；不再维护每日证券名单分区索引 |
 | `storage/integrity.py` | 确定性 row hash、Manifest 生成和完整性校验 |
 | `storage/__init__.py` | 存储包说明，不承载业务实现 |
 
@@ -172,8 +172,8 @@
 
 | 文件 | 职责 |
 |---|---|
-| `service/instruments.py` | Security Master 本地存储、读取、合并和稳定 instrument ID |
-| `service/instruments_update.py` | Security Master 来源更新、缺失保留和变更审计 |
+| `service/instruments.py` | Security Master 唯一当前 DuckDB 清单、证券字段变更历史和代码别名历史；提供记录映射、读取与事务更新 |
+| `service/instruments_update.py` | Security Master来源归并、有效状态/明确代码承接处理、人工生命周期覆盖与更新差异计算 |
 | `service/calendar.py` | Trading Calendar 存储、读取和来源合并 |
 | `service/calendar_update.py` | 交易日历来源更新、单日开市/休市轻量采集及证据引用、官方优先级，以及校验原在线证据后的正向日期导入 |
 | `service/market_data.py` | Canonical + Hot 的统一分钟查询服务 |

@@ -180,7 +180,7 @@ def build_security_master_definition(config_root, *, trade_date, now, is_trading
     definition = {'task_id': task_id or 'security-master-' + day.strftime('%Y%m%d'),
                   'dataset': 'security_master', 'trade_date': day.isoformat(), 'units': units}
     if day < today:
-        definition.update(required_groups=selected['required_groups'], allow_previous=False)
+        definition.update(required_groups=selected['required_groups'])
     else:
         publication = yaml.safe_load((root / 'datasets/security_master.yaml').read_text(encoding='utf-8'))
         definition['required_groups'] = publication['dataset']['publication']['required_groups']

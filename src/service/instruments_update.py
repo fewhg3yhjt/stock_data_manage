@@ -265,8 +265,7 @@ class SecurityMasterUpdater:
                 new_value = getattr(record, field)
                 if old_value != new_value:
                     changes.append((record.instrument_id, field, old_value, new_value, effective_date, ",".join(record.evidence_sources)))
-        self.store.upsert(merged.records, merged.symbol_history)
-        self.store.record_changes(changes)
+        self.store.publish(merged.records, aliases=merged.symbol_history, changes=changes)
         return SecurityMasterUpdateResult(merged, errors, len(changes))
 
 

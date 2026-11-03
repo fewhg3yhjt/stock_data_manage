@@ -13,6 +13,7 @@ import yaml
 
 from stock_data_manage.domain import Dataset, ItemStatus
 from stock_data_manage.pipeline.inputs import collect_task
+from stock_data_manage.service.instruments import SecurityMasterStore, security_record_to_mapping
 from stock_data_manage.storage.integrity import Manifest, file_hash
 from stock_data_manage.storage.metadata import MetadataStore
 from stock_data_manage.storage.parquet import CanonicalPartitionStore, InvalidPartitionError, write_normalized_rows
@@ -56,7 +57,7 @@ def master_definition(task_id="master"):
 
 def dated_etf_definition():
     return {'task_id': 'dated-etf', 'dataset': 'security_master', 'trade_date': DAY,
-        'required_groups': [['XSHG', 'etf'], ['XSHE', 'etf']], 'allow_previous': False,
+        'required_groups': [['XSHG', 'etf'], ['XSHE', 'etf']],
         'units': [{'key': key, 'input_id': input_id, 'context': {'request': {'trade_date': DAY},
             'calendar': {'trading_dates': [DAY]}}} for key, input_id in (
                 ('sse', 'SECURITY-SSE-ETF-HISTORY-001'), ('money', 'SECURITY-SSE-MONEY-ETF-HISTORY-001'),
@@ -73,7 +74,7 @@ def test_complementary_etf_sources_repeat_without_false_coverage_loss(tmp_path, 
     definition = dated_etf_definition()
     assert run(tmp_path, definition, collector)['status'] == 'published'
     assert run(tmp_path, definition, collector, redo=redo)['status'] == 'published'
-    rows = pq.read_table(tmp_path / 'canonical' / DAY / 'security_master' / 'data.parquet').to_pylist()
+    rows = [security_record_to_mapping(record) for record in master_records(tmp_path)]
     assert len(rows) == 3 and len({row['instrument_id'] for row in rows}) == 3
 
 
@@ -101,15 +102,16 @@ def test_complementary_etf_union_marks_missing_previous_security_invalid(tmp_pat
         'szse': [{'stock_code': '159001', 'exchange': 'XSHE', 'asset_type': 'etf'}]}
     definition = dated_etf_definition()
     assert run(tmp_path, definition, collector)['status'] == 'published'
-    current = tmp_path / 'canonical' / DAY / 'security_master' / 'data.parquet'
+    current = tmp_path / 'canonical/security_master/current/security_master.duckdb'
+    assert current.is_file()
     collector.catalog_rows['money'] = collector.catalog_rows['money'][:1]
     result = run(tmp_path, definition, collector, redo='full')
     assert result['status'] == 'published' and result['complete_today']
     assert result['security_check']['missing_previous_securities'] == []
     assert result['security_check']['invalidated_previous_securities'] == ['XSHG:511620']
-    rows = {row['instrument_id']: row for row in pq.read_table(current).to_pylist()}
-    assert rows['XSHG:511620']['status'] == 'delisted'
-    assert rows['XSHG:511620']['delist_date'] is None
+    rows = {row.instrument_id: row for row in master_records(tmp_path)}
+    assert rows['XSHG:511620'].status == 'delisted'
+    assert rows['XSHG:511620'].delist_date is None
 
 
 class FaultCollector:
@@ -195,18 +197,39 @@ def read_bars(root):
 
 
 
-def test_security_dates_remain_separate_and_latest_never_uses_future(tmp_path):
+def test_security_master_replaces_one_current_list_without_daily_partitions(tmp_path):
     collector = full_catalog_collector()
-    first = run(tmp_path, full_master_definition(), collector)
+    collector.source_date = "2026-10-01"
+    first = run(tmp_path, full_master_definition(day=collector.source_date), collector)
     old_manifest = Path(first["published_manifest"])
     old_hash = file_hash(old_manifest)
-    collector.source_date = "2026-10-01"
+    collector.source_date = "2026-10-02"
     second = run(tmp_path, full_master_definition("next-date", collector.source_date), collector)
     assert second["status"] == "published" and second["complete_today"]
-    assert file_hash(old_manifest) == old_hash
+    assert Path(second["published_manifest"]) == old_manifest
+    assert file_hash(old_manifest) != old_hash
+    assert master_manifest(tmp_path).publication_metadata["as_of_date"] == "2026-10-02"
+    assert not list((tmp_path / "canonical").glob("*/security_master/manifest.json"))
     with MetadataStore(tmp_path / "metadata/metadata.duckdb") as metadata:
-        assert metadata.latest_partition(dataset="security_master", asset_type="security", through_date=DAY)["manifest_path"] == str(old_manifest)
-        assert metadata.latest_partition(dataset="security_master", asset_type="security", through_date="2026-10-02")["partition_key"] == "2026-10-01"
+        assert metadata.latest_partition(dataset="security_master", asset_type="security", through_date="9999-12-31") is None
+    from stock_data_manage.pipeline.inputs import _task_units
+    historical = {"task_id": "historical-universe", "dataset": "daily_bar", "trade_date": "2026-10-01",
+        "universe": "all", "asset_types": ["stock", "etf"], "input_id": "ASTOCK-002-daily"}
+    paths = {"metadata_path": tmp_path / "metadata/metadata.duckdb", "canonical_root": tmp_path / "canonical"}
+    with pytest.raises(ValueError, match="no current or historical published security master"):
+        _task_units(historical, paths)
+
+
+def test_daily_universe_reads_and_freezes_the_current_security_master(tmp_path):
+    from stock_data_manage.pipeline.inputs import _task_units
+    collector = full_catalog_collector()
+    assert run(tmp_path, full_master_definition(), collector)["status"] == "published"
+    definition = {"task_id": "daily-current-master", "dataset": "daily_bar", "trade_date": DAY,
+        "universe": "all", "asset_types": ["stock", "etf"], "input_id": "ASTOCK-002-daily"}
+    units = _task_units(definition, {"metadata_path": tmp_path / "metadata/metadata.duckdb",
+                                     "canonical_root": tmp_path / "canonical"})
+    assert {unit["symbol"] for unit in units} == {"sh600001", "sz000001", "bj920001", "sh511600", "sz159003"}
+    assert all(unit["instrument_id"] for unit in units)
 
 
 def test_another_task_failure_archives_old_build_and_keeps_its_summary(tmp_path, monkeypatch):
@@ -221,7 +244,6 @@ def test_another_task_failure_archives_old_build_and_keeps_its_summary(tmp_path,
     original_hash = file_hash(Path(original["published_manifest"]))
     collector.catalog_rows["shenzhen-shanghai"].pop()
     other = full_master_definition("different-task")
-    other["allow_previous"] = False
     failed = run(tmp_path, other, collector)
     assert failed["status"] == "failed"
     assert file_hash(Path(original["published_manifest"])) == original_hash
@@ -305,15 +327,17 @@ def test_all_index_universe_expands_only_published_index_rows(tmp_path, monkeypa
 
 
 
-def test_master_whole_source_failure_falls_back_without_claiming_today_complete(tmp_path):
+def test_master_whole_source_failure_keeps_current_list_unchanged(tmp_path):
     collector = FaultCollector()
-    run(tmp_path, master_definition(), collector)
+    initial = run(tmp_path, master_definition(), collector)
+    initial_hash = file_hash(Path(initial["published_manifest"]))
+    initial_records = master_records(tmp_path)
     collector.fail.add("shenzhen-shanghai")
     result = run(tmp_path, master_definition("master-next"), collector)
-    assert result["status"] == "published"
+    assert result["status"] == "failed"
     assert not result["complete_today"]
-    assert result["commit"]["fallback_units"] == ["shenzhen-shanghai"]
-    assert result["commit"]["raw_refs"]
+    assert file_hash(Path(initial["published_manifest"])) == initial_hash
+    assert master_records(tmp_path) == initial_records
 
 
 def test_master_does_not_claim_etf_and_bse_coverage(tmp_path):
@@ -347,7 +371,12 @@ def full_catalog_collector():
 
 
 def master_manifest(root):
-    return Manifest.load(sorted(root.glob("canonical/*/security_master/manifest.json"))[-1])
+    return Manifest.load(root / "canonical/security_master/current/manifest.json")
+
+
+def master_records(root):
+    with SecurityMasterStore(str(root / "canonical/security_master/current/security_master.duckdb")) as store:
+        return store.all()
 
 
 def save_fixture_qualification(root, input_id, context):
@@ -377,8 +406,13 @@ def save_fixture_qualification(root, input_id, context):
         "raw_manifest":{"path":str(raw),"sha256":file_hash(raw)},
         "config_files":[{"path":str(CONFIG/name),"sha256":file_hash(CONFIG/name)} for name in ("providers.yaml","collection.yaml","datasets/security_snapshot.yaml","normalization/security_snapshot.yaml")],
         "synthetic_fixture":True}
-    dated = input_id in {'SECURITY-SSE-ETF-HISTORY-001', 'SECURITY-SSE-MONEY-ETF-HISTORY-001', 'SECURITY-SZSE-ETF-HISTORY-001'}
-    rows = ([{"stock_code": "159001" if input_id == 'SECURITY-SZSE-ETF-HISTORY-001' else "511600",
+    dated = input_id in {'SECURITY-SSE-ETF-HISTORY-001', 'SECURITY-SSE-MONEY-ETF-HISTORY-001',
+                         'SECURITY-SZSE-ETF-HISTORY-001', 'SECURITY-BS-UNIVERSE-001'}
+    rows = ([{"stock_code": code, "exchange": exchange, "asset_type": asset, "status": "active"}
+             for code, exchange, asset in (("600001", "XSHG", "stock"), ("000001", "XSHE", "stock"),
+                                          ("000300", "XSHG", "index"), ("399001", "XSHE", "index"))]
+            if input_id == "SECURITY-BS-UNIVERSE-001" else
+            [{"stock_code": "159001" if input_id == 'SECURITY-SZSE-ETF-HISTORY-001' else "511600",
               "exchange": "XSHE" if input_id == 'SECURITY-SZSE-ETF-HISTORY-001' else "XSHG", "asset_type": "etf", "status": "unknown"}]
             if dated or input_id == "SECURITY-SSE-ETF-001" else full_catalog_collector().catalog_rows[
                 "beijing" if input_id=="SECURITY-BSE-001" else "shenzhen-shanghai"])
@@ -593,7 +627,7 @@ def test_qualification_resolves_dated_source_report_from_workspace(tmp_path, mis
         assert all("live raw manifest is missing" in r["reason"] for r in result["reasons"])
 
 
-def test_qualified_schedule_uses_same_task_for_idempotence_and_fallback_retry(tmp_path):
+def test_qualified_schedule_uses_same_task_for_idempotence_and_incomplete_retry(tmp_path):
     from stock_data_manage.pipeline.inputs import collect_due_inputs
     from stock_data_manage.worker.scheduler import SHANGHAI
     now = datetime.now(timezone.utc).astimezone(SHANGHAI).replace(hour=8,minute=0,second=0,microsecond=0)
@@ -603,10 +637,16 @@ def test_qualified_schedule_uses_same_task_for_idempotence_and_fallback_retry(tm
     collector=full_catalog_collector();collector.source_date=day
     collector.catalog_rows["SDA-BOARD-005"]=collector.catalog_rows["shenzhen-shanghai"]
     collector.catalog_rows["SECURITY-BSE-001"]=collector.catalog_rows["beijing"]
+    collector.catalog_rows["SECURITY-BS-UNIVERSE-001"] = [
+        {"stock_code": code, "exchange": exchange, "asset_type": asset}
+        for code, exchange, asset in (("600001", "XSHG", "stock"), ("000001", "XSHE", "stock"),
+                                      ("000300", "XSHG", "index"), ("399001", "XSHE", "index"))]
     collector.catalog_rows["SECURITY-SSE-ETF-001"] = [{"stock_code": "511600", "exchange": "XSHG", "asset_type": "etf", "status": "unknown"}]
     definition=full_master_definition(day=day)
     definition["units"].append({"key": "SECURITY-SSE-ETF-001", "input_id": "SECURITY-SSE-ETF-001", "context": {"request": {"trade_date": day}}})
     for unit in definition["units"]:save_fixture_qualification(tmp_path,unit["input_id"],unit["context"])
+    universe_context = {"request": {"trade_date": day}, "calendar": {"trading_dates": [day]}}
+    save_fixture_qualification(tmp_path, "SECURITY-BS-UNIVERSE-001", universe_context)
     prior={**definition,"task_id":"earlier-publication"}
     for unit in prior["units"]:unit["key"]=unit["input_id"]
     assert run(tmp_path,prior,collector)["status"]=="published"
@@ -615,14 +655,14 @@ def test_qualified_schedule_uses_same_task_for_idempotence_and_fallback_retry(tm
     args=dict(now=now,config_root=CONFIG,data_root=tmp_path,dataset="security_master",execute=True,mode="live",
               calendar_days=[{"trade_date":day,"is_trading_day":True}],collector=collector)
     first=collect_due_inputs(**args)
-    assert first["jobs"][0]["status"]=="published",first
-    assert not first["jobs"][0]["complete_today"] and first["jobs"][0]["fallback_used"]
+    assert first["jobs"][0]["status"]=="failed",first
+    assert not first["jobs"][0]["complete_today"] and not first["jobs"][0]["fallback_used"]
     collector.fail.clear()
     second=collect_due_inputs(**args)
-    assert second["jobs"][0]["complete_today"] and not second["jobs"][0]["fallback_used"]
-    assert len(collector.calls)==7
+    assert second["jobs"][0]["complete_today"] and not second["jobs"][0]["fallback_used"], second
+    assert len(collector.calls)==8
     third=collect_due_inputs(**args)
-    assert third["jobs"][0]["no_op"] and len(collector.calls)==7
+    assert third["jobs"][0]["no_op"] and len(collector.calls)==8
     assert third["production_writes"]==0
 
 
@@ -652,7 +692,7 @@ def test_catalog_live_http_failure_blocks_later_calls(tmp_path, http_status):
         assert health.http_429_count == int(http_status == 429)
 
 
-def test_five_groups_and_missing_etf_whole_fallback_then_resume(tmp_path):
+def test_missing_required_group_keeps_current_list_then_resume_publishes(tmp_path):
     collector = full_catalog_collector()
     assert run(tmp_path, full_master_definition(), collector)["status"] == "published"
     original = master_manifest(tmp_path)
@@ -662,21 +702,19 @@ def test_five_groups_and_missing_etf_whole_fallback_then_resume(tmp_path):
     collector.source_date = "2026-10-01"
     lost = collector.catalog_rows["shenzhen-shanghai"].pop()
     definition = full_master_definition("next", collector.source_date)
-    fallback = run(tmp_path, definition, collector)
-    assert fallback["status"] == "published" and not fallback["complete_today"]
-    summary = json.loads(Path(fallback["summary"]["path"]).read_text(encoding="utf-8"))
-    assert summary["requested_date"] == "2026-10-01" and summary["data_date"] == DAY
-    assert summary["fallback_used"] and summary["final_check"]["status"] == "failed"
+    failed = run(tmp_path, definition, collector)
+    assert failed["status"] == "failed" and not failed["complete_today"]
+    summary = json.loads(Path(failed["summary"]["path"]).read_text(encoding="utf-8"))
+    assert summary["requested_date"] == "2026-10-01" and summary["data_date"] is None
+    assert not summary["fallback_used"] and summary["final_check"]["status"] == "failed"
     assert summary["final_check"]["coverage"]["denominator"] is None
-    assert fallback["security_check"]["missing_groups"] == ["XSHE/etf"]
-    assert fallback["security_check"]["recollect_units"] == ["shenzhen-shanghai"]
+    assert failed["security_check"]["missing_groups"] == ["XSHE/etf"]
+    assert failed["security_check"]["recollect_units"] == ["shenzhen-shanghai"]
     previous = master_manifest(tmp_path)
     assert previous.content_hash == original.content_hash and previous.raw_refs == original.raw_refs
     assert previous.publication_metadata["as_of_date"] == DAY
     assert previous.publication_metadata["requested_date"] == DAY
     assert not (tmp_path / "canonical/2026-10-01/security_master/data.parquet").exists()
-    assert summary["previous_age_days"] == 1
-    assert fallback["commit"]["promotions"] == []
     assert raw_request(tmp_path, "", day="2026-10-01", input_id="SECURITY-BSE-001").parent.is_dir()
     collector.catalog_rows["shenzhen-shanghai"].append(lost)
     before = len(collector.calls)
@@ -685,6 +723,7 @@ def test_five_groups_and_missing_etf_whole_fallback_then_resume(tmp_path):
     assert collector.calls[before:] == [("shenzhen-shanghai", True, None)]
     assert master_manifest(tmp_path).publication_metadata["as_of_date"] == "2026-10-01"
     assert not master_manifest(tmp_path).publication_metadata["fallback"]
+    assert not list((tmp_path / "canonical").glob("*/security_master/manifest.json"))
     assert run(tmp_path, definition, collector)["no_op"]
 
 
@@ -694,17 +733,17 @@ def test_first_incomplete_catalog_keeps_raw_and_blocks_publication(tmp_path):
     result = run(tmp_path, full_master_definition(), collector)
     assert result["status"] == "failed"
     assert result["security_check"]["missing_groups"] == ["XSHE/etf"]
-    assert not (tmp_path / f"canonical/{DAY}/security_master/manifest.json").exists()
+    assert not (tmp_path / "canonical/security_master/current/manifest.json").exists()
     assert raw_request(tmp_path, "", input_id="SECURITY-BSE-001").parent.exists()
 
 
 def test_incomplete_source_union_does_not_report_previous_securities_invalidated(tmp_path):
     collector = full_catalog_collector()
     assert run(tmp_path, full_master_definition(), collector)["status"] == "published"
+    initial_records = master_records(tmp_path)
     collector.source_date = "2026-10-01"
     collector.fail.add("beijing")
     definition = full_master_definition("incomplete-next", collector.source_date)
-    definition["allow_previous"] = False
 
     result = run(tmp_path, definition, collector)
 
@@ -713,7 +752,8 @@ def test_incomplete_source_union_does_not_report_previous_securities_invalidated
     assert result["security_check"]["invalidated_previous_securities"] == []
     summary = json.loads(Path(result["summary"]["path"]).read_text(encoding="utf-8"))
     assert summary["final_check"]["coverage"]["invalidated_previous_securities"] == []
-    assert not (tmp_path / "canonical/2026-10-01/security_master/manifest.json").exists()
+    assert master_manifest(tmp_path).publication_metadata["as_of_date"] == DAY
+    assert master_records(tmp_path) == initial_records
 
 
 def test_invalid_catalog_date_refetched_instead_of_reusing_stale_response(tmp_path):
@@ -721,8 +761,8 @@ def test_invalid_catalog_date_refetched_instead_of_reusing_stale_response(tmp_pa
     run(tmp_path, full_master_definition(), collector)
     definition = full_master_definition("next", "2026-10-01")
     stale = run(tmp_path, definition, collector)
-    assert stale["status"] == "published" and stale["fallback_used"]
-    assert stale["data_date"] == DAY
+    assert stale["status"] == "failed" and not stale.get("fallback_used", False)
+    assert master_manifest(tmp_path).publication_metadata["as_of_date"] == DAY
     collector.source_date = "2026-10-01"
     before = len(collector.calls)
     resumed = run(tmp_path, definition, collector)
@@ -739,62 +779,43 @@ def test_disappearing_security_becomes_invalid_and_reappearance_restores_it(tmp_
     assert result["status"] == "published" and result["complete_today"]
     assert result["security_check"]["missing_previous_securities"] == []
     assert result["security_check"]["invalidated_previous_securities"] == ["XSHG:600001"]
-    current = tmp_path / f"canonical/{DAY}/security_master/data.parquet"
-    rows = {r["instrument_id"]: r for r in pq.read_table(current).to_pylist()}
-    assert rows["XSHG:600001"]["status"] == "delisted"
-    assert rows["XSHG:600001"]["delist_date"] is None
+    current = tmp_path / "canonical/security_master/current/security_master.duckdb"
+    assert current.is_file()
+    rows = {r.instrument_id: r for r in master_records(tmp_path)}
+    assert rows["XSHG:600001"].status == "delisted"
+    assert rows["XSHG:600001"].delist_date is None
     assert "XSHG:600002" in rows
     collector.catalog_rows["shenzhen-shanghai"][0]["stock_code"] = "600001"
     restored = run(tmp_path, full_master_definition("replacement-restored"), collector, redo=redo)
     assert restored["status"] == "published" and restored["complete_today"]
-    rows = {r["instrument_id"]: r for r in pq.read_table(current).to_pylist()}
-    assert rows["XSHG:600001"]["status"] == "active"
-    assert rows["XSHG:600001"]["delist_date"] is None
-
-
-@pytest.mark.parametrize("reason", ["expired", "scope", "disabled", "legacy", "evidence", "future"])
-def test_unusable_previous_catalog_is_rejected(tmp_path, reason):
-    collector = full_catalog_collector()
-    run(tmp_path, full_master_definition(), collector)
-    original = master_manifest(tmp_path)
-    collector.fail.add("beijing")
-    day = "2026-10-02" if reason == "expired" else "2026-09-29" if reason == "future" else "2026-10-01"
-    collector.source_date = day
-    definition = full_master_definition("retry", day)
-    if reason == "scope":
-        definition["units"][0]["context"]["request"]["symbols"] = ["sh600001"]
-    if reason == "disabled":
-        definition["allow_previous"] = False
-    if reason == "legacy":
-        manifest_path = tmp_path / f"canonical/{DAY}/security_master/manifest.json"
-        payload = json.loads(manifest_path.read_text())
-        payload.pop("publication_metadata")
-        manifest_path.write_text(json.dumps(payload))
-    if reason == "evidence":
-        source = original.publication_metadata["sources"][0]
-        Path(source["raw_ref"]).write_text("corrupt")
-    result = run(tmp_path, definition, collector)
-    assert result["status"] == "failed"
-    assert master_manifest(tmp_path).content_hash == original.content_hash
+    rows = {r.instrument_id: r for r in master_records(tmp_path)}
+    assert rows["XSHG:600001"].status == "active"
+    assert rows["XSHG:600001"].delist_date is None
+    with SecurityMasterStore(str(current)) as store:
+        status_history = store.connection.execute(
+            "SELECT old_value, new_value FROM security_master_history "
+            "WHERE instrument_id='XSHG:600001' AND field_name='status' ORDER BY effective_date"
+        ).fetchall()
+    assert ("active", "delisted") in status_history and ("delisted", "active") in status_history
 
 
 @pytest.mark.parametrize("stage", ["after_publish"])
-def test_master_fallback_commit_recovers_with_date_and_no_refetch(tmp_path, stage):
+def test_master_current_commit_recovers_without_refetch(tmp_path, stage):
     collector = full_catalog_collector()
-    run(tmp_path, full_master_definition(), collector)
-    collector.fail.add("beijing")
+    collector.source_date = DAY
+    run(tmp_path, full_master_definition(day=DAY), collector)
     collector.source_date = "2026-10-01"
     def crash(current):
         if current == stage:
-            raise RuntimeError("simulated master fallback crash")
+            raise RuntimeError("simulated current security master publication crash")
     with pytest.raises(RuntimeError):
         run(tmp_path, full_master_definition("retry", collector.source_date), collector, failure_hook=crash)
     calls = len(collector.calls)
     assert recover_collection_tasks(config_root=CONFIG, data_root=tmp_path) == ("retry",)
     manifest = master_manifest(tmp_path)
-    assert manifest.publication_metadata["as_of_date"] == DAY and not manifest.publication_metadata["fallback"]
+    assert manifest.publication_metadata["as_of_date"] == "2026-10-01" and not manifest.publication_metadata["fallback"]
     with MetadataStore(tmp_path / "metadata/metadata.duckdb") as metadata:
-        assert metadata.load_collection_task("retry")["fallback_used"]
+        assert not metadata.load_collection_task("retry")["fallback_used"]
     assert len(collector.calls) == calls
 
 
@@ -893,7 +914,7 @@ def test_same_day_real_catalog_task_adds_sse_etfs_without_duplicate_versions(tmp
         collector_options={"pacer": RequestPacer(wait=lambda _: None)})
     assert result["status"] == "published", result.get("error")
     assert result["row_count"] == 7267 and result["complete_today"]
-    rows = pq.read_table(tmp_path / "canonical/2026-10-09/security_master/data.parquet").to_pylist()
+    rows = [security_record_to_mapping(record) for record in master_records(tmp_path)]
     assert len({row["instrument_id"] for row in rows}) == 7267
     preserved = next(row for row in rows if row["instrument_id"] == "XSHG:512390")
     assert preserved["status"] == "unknown" and preserved["list_date"] == date(2018, 7, 13)

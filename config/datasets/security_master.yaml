@@ -6,7 +6,6 @@ dataset:
   display_name: 证券主数据
   primary_key: [instrument_id]
   publication:
-    mode: atomic_replace
     required_groups:
       - [XSHG, stock]
       - [XSHE, stock]
@@ -15,7 +14,6 @@ dataset:
       - [XSHE, etf]
       - [XSHG, index]
       - [XSHE, index]
-    max_previous_age_days: 1
     source_groups:
       SDA-BOARD-005: [[XSHG, stock], [XSHE, stock], [XSHE, etf]]
       SECURITY-BSE-001: [[BSE, stock]]

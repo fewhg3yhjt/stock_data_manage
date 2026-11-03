@@ -372,6 +372,29 @@ def source_query_fixture(tmp_path):
         {"symbol": "sh000001", "name": "上证指数", "asset_type": "index"},
         {"symbol": "sz000001", "name": "平安银行", "asset_type": "stock"},
     ]), master)
+    from stock_data_manage.domain import AssetType, Exchange
+    from stock_data_manage.service.instruments import SecurityMasterStore, SecurityRecord
+    from stock_data_manage.storage.integrity import Manifest
+    legacy_manifest = Manifest.from_file(master, dataset="security_master", asset_type="security",
+        partition_key="2026-10-09", row_count=3, first_key=None, last_key=None,
+        publication_metadata={"as_of_date": "2026-10-09", "coverage_passed": True})
+    legacy_manifest.write_atomic(master.parent / "manifest.json")
+    current_dir = data / "canonical/security_master/current"
+    current_dir.mkdir(parents=True)
+    current_store_path = current_dir / "security_master.duckdb"
+    with SecurityMasterStore(str(current_store_path)) as store:
+        store.upsert((
+            SecurityRecord("XSHG:600519", "600519", Exchange.XSHG, AssetType.STOCK,
+                name="贵州茅台", evidence_sources=("fixture",)),
+            SecurityRecord("XSHG:000001", "000001", Exchange.XSHG, AssetType.INDEX,
+                name="上证指数", evidence_sources=("fixture",)),
+            SecurityRecord("XSHE:000001", "000001", Exchange.XSHE, AssetType.STOCK,
+                name="平安银行", evidence_sources=("fixture",)),
+        ))
+    current_manifest = Manifest.from_file(current_store_path, dataset="security_master", asset_type="security",
+        partition_key="2026-10-10", row_count=3, first_key=None, last_key=None,
+        publication_metadata={"as_of_date": "2026-10-10", "coverage_passed": True})
+    current_manifest.write_atomic(current_dir / "manifest.json")
 
     def add(symbol, rows, *, dataset="daily_bar", parameters=None):
         directory = data / f"task_workspace/2026-10-09/{dataset}/sources/tencent/kline_daily"
@@ -389,6 +412,16 @@ def source_query_fixture(tmp_path):
     add("sh600519", [{"0":day,"2":price,"5":"7061.00","symbol":"sh600519"}
                      for day,price in [("2026-10-08","100.00"),("2026-10-09","101.00"),("2026-10-10","102.00")]])
     return reader, app, data, add
+
+
+def test_security_catalog_and_publications_use_single_current_master(tmp_path):
+    reader, _, _, _ = source_query_fixture(tmp_path)
+    catalog = reader._security_catalog()
+    assert catalog[("sh", "600519")] == {
+        "name": "贵州茅台", "asset_type": "stock", "name_source_date": "2026-10-10"}
+    publications = reader.publications(dataset="security_master", include_evidence=False)
+    assert publications["total"] == 1
+    assert publications["items"][0]["partition_key"] == "2026-10-10"
 
 
 def test_record_query_filters_business_date_name_and_keeps_source_values(tmp_path):

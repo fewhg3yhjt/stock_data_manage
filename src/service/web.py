@@ -308,24 +308,46 @@ class DashboardReader:
 
     def _security_catalog(self) -> dict[tuple[str, str], dict[str, str]]:
         import pyarrow.parquet as parquet
+        from ..service.instruments import SecurityMasterStore, security_record_to_mapping
+        from ..storage.integrity import Manifest
 
         catalog = {}
         root = self.paths["canonical_root"]
-        candidates = sorted(root.glob("*/security_master/data.parquet"), reverse=True)
-        for path in candidates:
-            if not _within(path, root):
-                continue
+        current_dir = root / "security_master" / "current"
+        current_manifest = current_dir / "manifest.json"
+        current_data = current_dir / "security_master.duckdb"
+        rows, source_date = None, None
+        if (current_manifest.is_file() and current_data.is_file()
+                and not (current_dir / "task-commit.json").exists()):
             try:
-                for row in parquet.read_table(path).to_pylist():
-                    code = self._security_code(row.get("instrument_id") or row.get("symbol"))
-                    if not code[0]:
-                        market = {"XSHG": "sh", "XSHE": "sz", "BSE": "bj"}.get(row.get("exchange"), "")
-                        code = (market, code[1])
-                    if code[1] and code not in catalog:
-                        catalog[code] = {"name": str(row.get("name") or ""),
-                                         "asset_type": str(row.get("asset_type") or ""), "name_source_date": path.parent.parent.name}
+                manifest = Manifest.load(current_manifest)
+                if manifest.verify(current_data) and manifest.dataset == "security_master":
+                    with SecurityMasterStore(str(current_data)) as store:
+                        rows = [security_record_to_mapping(record) for record in store.all()]
+                    source_date = manifest.publication_metadata.get("as_of_date") or manifest.partition_key
             except (OSError, ValueError):
-                continue
+                rows = None
+        if rows is None and not current_manifest.exists() and not current_data.exists():
+            legacy = sorted(root.glob("*/security_master/manifest.json"), reverse=True)
+            if legacy:
+                manifest_path = legacy[0]
+                data_path = manifest_path.parent / "data.parquet"
+                try:
+                    manifest = Manifest.load(manifest_path)
+                    if manifest.verify(data_path) and manifest.dataset == "security_master":
+                        rows = parquet.read_table(data_path).to_pylist()
+                        source_date = manifest.publication_metadata.get("as_of_date") or manifest.partition_key
+                except (OSError, ValueError):
+                    rows = None
+        for row in rows or ():
+            code = self._security_code(row.get("instrument_id") or row.get("symbol"))
+            if not code[0]:
+                market = {"XSHG": "sh", "XSHE": "sz", "BSE": "bj"}.get(row.get("exchange"), "")
+                code = (market, code[1])
+            if code[1] and code not in catalog:
+                catalog[code] = {"name": str(row.get("name") or ""),
+                                 "asset_type": str(row.get("asset_type") or ""),
+                                 "name_source_date": str(source_date or "")}
         return catalog
 
     def data_records(self, *, dataset: str, security: str = "", start_date: date | None = None,
@@ -960,6 +982,14 @@ class DashboardReader:
         include_evidence: bool = True,
     ) -> dict[str, Any]:
         root = self.paths["canonical_root"]
+        current_master_manifest = root / "security_master" / "current" / "manifest.json"
+        current_master_data = current_master_manifest.parent / "security_master.duckdb"
+        current_master_pending = current_master_manifest.parent / "task-commit.json"
+        current_master_present = (current_master_manifest.exists() or current_master_data.exists()
+                                  or current_master_pending.exists())
+        current_master_ready = (current_master_manifest.is_file() and current_master_data.is_file()
+                                and not current_master_pending.exists())
+        legacy_master_manifests = sorted(root.glob("*/security_master/manifest.json"), reverse=True)
         records: list[dict[str, Any]] = []
         tasks = self._task_documents()
         task_manifests: list[tuple[str, set[Path]]] = []
@@ -986,6 +1016,12 @@ class DashboardReader:
                     continue
                 if dataset and document.get("dataset") != dataset:
                     continue
+                if document.get("dataset") == "security_master":
+                    if current_master_present:
+                        if not current_master_ready or path.resolve() != current_master_manifest.resolve():
+                            continue
+                    elif legacy_master_manifests and path.resolve() != legacy_master_manifests[0].resolve():
+                        continue
                 if asset_type and document.get("asset_type") != asset_type:
                     continue
                 if partition_key and document.get("partition_key") != partition_key:

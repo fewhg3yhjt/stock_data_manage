@@ -37,6 +37,56 @@ class SecurityRecord:
         )
 
 
+def security_record_to_mapping(record: SecurityRecord) -> dict[str, object]:
+    return {
+        "instrument_id": record.instrument_id,
+        "symbol": record.symbol,
+        "exchange": record.exchange.value,
+        "asset_type": record.asset_type.value,
+        "name": record.name,
+        "list_date": record.list_date.isoformat() if record.list_date else None,
+        "delist_date": record.delist_date.isoformat() if record.delist_date else None,
+        "status": record.status,
+        "lot_size": record.lot_size,
+        "canonical_volume_unit": record.canonical_volume_unit,
+        "canonical_amount_unit": record.canonical_amount_unit,
+        "publisher": record.publisher,
+        "publish_date": record.publish_date.isoformat() if record.publish_date else None,
+        "calculation_start_date": (record.calculation_start_date.isoformat()
+                                    if record.calculation_start_date else None),
+        "is_backfilled_history": record.is_backfilled_history,
+        "classification_conflict": record.classification_conflict,
+        "evidence_sources": list(record.evidence_sources),
+    }
+
+
+def security_record_from_mapping(row: Mapping[str, object]) -> SecurityRecord:
+    def as_date(value):
+        if value is None or value == "":
+            return None
+        return value if isinstance(value, date) else date.fromisoformat(str(value))
+
+    return SecurityRecord(
+        instrument_id=str(row["instrument_id"]),
+        symbol=str(row["symbol"]),
+        exchange=Exchange(str(row["exchange"])),
+        asset_type=AssetType(str(row["asset_type"])),
+        name=None if row.get("name") is None else str(row["name"]),
+        list_date=as_date(row.get("list_date")),
+        delist_date=as_date(row.get("delist_date")),
+        status=str(row.get("status") or "unknown"),
+        lot_size=int(row.get("lot_size") or (1 if str(row.get("asset_type")) == "index" else 100)),
+        canonical_volume_unit=str(row.get("canonical_volume_unit") or "share"),
+        canonical_amount_unit=str(row.get("canonical_amount_unit") or "CNY"),
+        publisher=None if row.get("publisher") is None else str(row["publisher"]),
+        publish_date=as_date(row.get("publish_date")),
+        calculation_start_date=as_date(row.get("calculation_start_date")),
+        is_backfilled_history=bool(row.get("is_backfilled_history", False)),
+        classification_conflict=bool(row.get("classification_conflict", False)),
+        evidence_sources=tuple(str(item) for item in (row.get("evidence_sources") or ())),
+    )
+
+
 @dataclass(frozen=True, slots=True)
 class SymbolHistory:
     instrument_id: str
@@ -291,6 +341,18 @@ class SecurityMasterStore(AbstractContextManager["SecurityMasterStore"]):
                 "INSERT INTO security_master_history VALUES (?, ?, ?, ?, ?, ?, ?)",
                 [instrument_id, field_name, None if old_value is None else str(old_value), None if new_value is None else str(new_value), effective_date, detected_at, source],
             )
+
+    def publish(self, records: Iterable[SecurityRecord], *, aliases: Iterable[SymbolHistory] = (),
+                changes: Iterable[tuple[str, str, object, object, date, str]] = ()) -> None:
+        """Apply one complete master update and its history in one transaction."""
+        self.connection.execute("BEGIN TRANSACTION")
+        try:
+            self.upsert(records, aliases)
+            self.record_changes(changes)
+            self.connection.execute("COMMIT")
+        except Exception:
+            self.connection.execute("ROLLBACK")
+            raise
 
     def all(self) -> tuple[SecurityRecord, ...]:
         rows = self.connection.execute("SELECT * FROM security_master ORDER BY instrument_id").fetchall()

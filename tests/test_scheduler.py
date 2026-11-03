@@ -54,7 +54,6 @@ def test_historical_master_selects_typed_stocks_bse_candidates_and_dated_etfs():
         'SECURITY-SSE-ETF-HISTORY-001', 'SECURITY-SSE-MONEY-ETF-HISTORY-001', 'SECURITY-SZSE-ETF-HISTORY-001']
     assert len(definition['required_groups']) == 5
     assert ['BSE', 'stock'] in definition['required_groups']
-    assert definition['allow_previous'] is False
     assert all(u['context']['request']['trade_date'] == DAY.isoformat() for u in definition['units'])
 
 
@@ -97,6 +96,7 @@ def test_daily_bar_schedule_uses_configured_task_and_profile_time(tmp_path):
 def test_daily_bar_tick_dispatches_configured_durable_batch(tmp_path, monkeypatch):
     import stock_data_manage.pipeline.inputs as inputs
     monkeypatch.setattr(inputs, "_current_security_master", lambda *args: "fixture-manifest.json")
+    monkeypatch.setattr(inputs, "_security_master_as_of_date", lambda path: DAY.isoformat())
     days = [{"trade_date": DAY.isoformat(), "is_trading_day": True}]
     data_root = tmp_path / "runtime"
     kwargs = dict(now=stamp(16, 20), config_root=ROOT / "config", data_root=data_root,
@@ -140,6 +140,7 @@ def test_daily_bar_execute_reports_unknown_calendar_as_blocked(tmp_path, monkeyp
 def test_daily_bar_tick_reports_task_preparation_failure(tmp_path, monkeypatch):
     import stock_data_manage.pipeline.inputs as inputs
     monkeypatch.setattr(inputs, "_current_security_master", lambda *args: "fixture-manifest.json")
+    monkeypatch.setattr(inputs, "_security_master_as_of_date", lambda path: DAY.isoformat())
 
     def fail_preparation(**kwargs):
         raise ValueError("daily batch has no securities for index")
@@ -177,6 +178,33 @@ def test_daily_bar_tick_runs_security_master_first_and_stops_on_its_failure(tmp_
     assert len(master_calls) == 1 and daily_calls == []
     assert report["jobs"][0]["status"] == "blocked"
     assert report["security_master_prerequisite"]["job"]["error"] == "source qualification unavailable"
+
+
+def test_daily_bar_uses_last_good_master_when_refresh_fails(tmp_path, monkeypatch):
+    import stock_data_manage.pipeline.inputs as inputs
+    master_calls, daily_calls = [], []
+    availability = iter(["prior-current-manifest.json", "prior-current-manifest.json"])
+    monkeypatch.setattr(inputs, "_current_security_master", lambda *args: next(availability))
+    monkeypatch.setattr(inputs, "_security_master_as_of_date", lambda path: "2026-09-29")
+
+    def fail_master(**kwargs):
+        master_calls.append(kwargs)
+        return {"jobs": [{"status": "failed", "error": "source qualification unavailable"}]}
+
+    def run_daily(**kwargs):
+        daily_calls.append(kwargs)
+        return {"task_id": "market-daily-20260930", "status": "published"}
+
+    monkeypatch.setattr(inputs, "_collect_due_security_master", fail_master)
+    monkeypatch.setattr(inputs, "collect_task", run_daily)
+    report = collect_due_inputs(now=stamp(16, 35), config_root=ROOT / "config",
+        data_root=tmp_path / "runtime", dataset="daily_bar",
+        calendar_days=[{"trade_date": DAY.isoformat(), "is_trading_day": True}],
+        execute=True, mode="live")
+    assert len(master_calls) == 1 and len(daily_calls) == 1
+    assert report["jobs"][0]["status"] == "published"
+    assert report["security_master_prerequisite"]["status"] == "available"
+    assert report["security_master_prerequisite"]["job"]["status"] == "failed"
 
 
 def test_master_tick_without_evidence_does_not_call_sources_or_publish(tmp_path):
