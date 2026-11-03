@@ -33,7 +33,7 @@ def test_cli_accepts_in_memory_stream_without_reconfigure(monkeypatch):
     assert exc.value.code == 0 and "stock-data" in stream.getvalue()
 
 
-def test_security_due_cli_reports_calendar_and_qualification_blocks(tmp_path, capsys):
+def test_security_due_cli_plans_configured_sources_without_route_qualification(tmp_path, capsys):
     import json
     args = ["collect-due-inputs", "--dataset", "security_master", "--now", "2026-10-09T08:05:00+08:00",
             "--data-root", str(tmp_path / "data")]
@@ -42,9 +42,11 @@ def test_security_due_cli_reports_calendar_and_qualification_blocks(tmp_path, ca
     assert report["mode"] == "live" and "calendar" in report["jobs"][0]["reason"]
     calendar = tmp_path / "calendar.json"
     calendar.write_text(json.dumps([{"trade_date": "2026-10-09", "is_trading_day": True}]))
-    assert main(args + ["--calendar-file", str(calendar)]) == 2
+    assert main(args + ["--calendar-file", str(calendar)]) == 0
     report = json.loads(capsys.readouterr().out)
-    assert all(not q["eligible"] for q in report["jobs"][0]["source_qualifications"])
+    assert report["jobs"][0]["status"] == "ready"
+    assert "source_qualifications" not in report["jobs"][0]
+    assert report["eligible_for_production_routing"] is None
     assert "report_path" not in report
     assert not (tmp_path / "data/canonical").exists()
 

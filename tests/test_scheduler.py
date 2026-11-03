@@ -209,19 +209,24 @@ def test_daily_bar_uses_last_good_master_when_refresh_fails(tmp_path, monkeypatc
     assert report["security_master_prerequisite"]["job"]["status"] == "failed"
 
 
-def test_master_tick_without_evidence_does_not_call_sources_or_publish(tmp_path):
-    def forbidden(**kwargs):
-        raise AssertionError("unqualified source must not be called")
+def test_master_tick_uses_configured_sources_without_dynamic_route_qualification(tmp_path):
+    calls = []
+    def failing_source(**kwargs):
+        calls.append(kwargs["input_id"])
+        raise RuntimeError("fixture stops before network")
     days = [{"trade_date": DAY.isoformat(), "is_trading_day": True}]
     dry = collect_due_inputs(now=stamp(8, 0), config_root=ROOT / "config", data_root=tmp_path,
         dataset="security_master", calendar_days=days)
-    assert dry["jobs"][0]["status"] == "blocked" and dry["production_writes"] == 0
+    assert dry["jobs"][0]["status"] == "ready" and dry["production_writes"] == 0
+    assert "source_qualifications" not in dry["jobs"][0]
     actual = collect_due_inputs(now=stamp(8, 0), config_root=ROOT / "config", data_root=tmp_path,
-        dataset="security_master", calendar_days=days, execute=True, mode="live", collector=forbidden)
+        dataset="security_master", calendar_days=days, execute=True, mode="live", collector=failing_source)
     assert actual["jobs"][0]["status"] == "failed" and actual["production_writes"] == 0
+    planned_ids = {unit["input_id"] for unit in dry["jobs"][0]["definition"]["units"]}
+    assert set(calls) == planned_ids and len(calls) == len(planned_ids)
     assert not (tmp_path / "canonical").exists()
     summary = json.loads(Path(actual["jobs"][0]["summary"]["path"]).read_text(encoding="utf-8"))
-    assert all("formal routing qualification blocked" in unit["error"]
+    assert all(unit["error"] == "fixture stops before network"
                for unit in summary["source_units"] if unit["status"] == "failed")
     assert actual["eligible_for_production_routing"] is None
 

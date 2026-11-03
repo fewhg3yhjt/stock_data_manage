@@ -90,7 +90,7 @@ def main(argv: list[str] | None = None) -> int:
     task.add_argument("--redo", choices=("resume", "full", "selected"), default="resume")
     task.add_argument("--symbol", action="append", default=[])
     task.add_argument("--mode", choices=("replay", "live", "retained"), default="live",
-                      help="retained reuses qualified original responses in configured formal storage; replay stays isolated")
+                      help="retained uses explicitly supplied saved responses without network fallback; replay stays isolated")
     task.add_argument('--progress', action=argparse.BooleanOptionalAction, default=True,
                       help='show stage counts, percentages and elapsed time on stderr')
 

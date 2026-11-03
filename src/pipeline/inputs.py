@@ -130,7 +130,8 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
         from ..storage.metadata import MetadataStore
         with MetadataStore(paths['metadata_path']) as qualification_metadata:
             _check_retained_input(contract, context, retained_asset_type, config_root,
-                                  qualification_metadata, replay_manifest)
+                                  qualification_metadata, replay_manifest,
+                                  security_master_task=bool(task_unit and contract.dataset == 'security_snapshot'))
     from zoneinfo import ZoneInfo
     if (task_unit is not None and mode == "live" and input_id in {"SECURITY-BSE-001", "SECURITY-SSE-ETF-001"}
             and data_date != datetime.now(ZoneInfo("Asia/Shanghai")).date().isoformat()):
@@ -1087,19 +1088,21 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
         return {**report, "run_directory": str(directory.resolve()), "report_path": str(report_ref.path.resolve())}
 
 
-def _check_retained_input(contract, context, asset_type, config_root, metadata, manifest):
+def _check_retained_input(contract, context, asset_type, config_root, metadata, manifest, *, security_master_task=False):
     import json
-    from ..routing.factory import check_security_input_qualification, check_daily_input_qualification
+    from ..routing.factory import check_daily_input_qualification
     now = datetime.now(timezone.utc)
-    if contract.dataset == 'security_snapshot':
+    qualification = None
+    if contract.dataset == 'security_snapshot' and not security_master_task:
+        from ..routing.factory import check_security_input_qualification
         qualification = check_security_input_qualification(contract, context, config_root=config_root, metadata=metadata, now=now)
-    else:
+    elif contract.dataset != 'security_snapshot':
         qualification = check_daily_input_qualification(contract, context, asset_type=asset_type,
             config_root=config_root, metadata=metadata, now=now)
-    if not qualification['eligible']:
+    if qualification is not None and not qualification['eligible']:
         raise ValueError('formal retained qualification blocked: '+json.dumps(qualification['reasons'],ensure_ascii=False))
     RawObjectStore.verify_manifest(manifest)
-    if contract.dataset == 'daily_bar':
+    if contract.dataset == 'daily_bar' and qualification is not None:
         events = [json.loads(line) for line in Path(manifest).read_text(encoding='utf-8').splitlines() if line.strip()]
         hashes = [e['body_sha256'] for e in events if e.get('event')=='http_response' and e.get('status_code')==200]
         if hashes != qualification['source_response_hashes']:
@@ -1772,7 +1775,6 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
         if mode == 'retained' and not unit.get('replay_manifest'):
             raise ValueError('retained task units require explicit original response manifests')
         if mode == "live":
-            # Both supported datasets pass their exact qualification before each call.
             if unit.get("replay_manifest"):
                 raise ValueError("live tasks must not supply an external replay manifest")
     if redo == "selected":
@@ -1906,24 +1908,21 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
                     raw_manifest = temporary
                     if mode == 'retained':
                         _check_retained_input(contracts[unit['input_id']], unit['context'], definition.get('asset_type'),
-                            config_root, metadata, replay)
-                    if mode == "live" and dataset == "security_master":
-                        from ..routing.factory import check_security_input_qualification
-                        qualification = check_security_input_qualification(contracts[unit["input_id"]], unit["context"],
-                            config_root=config_root, metadata=metadata, now=datetime.now(timezone.utc))
-                        if not qualification["eligible"]:
-                            raise ValueError("formal routing qualification blocked: " + json.dumps(qualification["reasons"], ensure_ascii=False))
+                            config_root, metadata, replay, security_master_task=dataset == 'security_master')
                     report = executor(**options)
                     if mode == "live" and dataset == "security_master":
-                        # Only newly observed HTTP throttling/forbidden responses
-                        # affect health; qualification failures and replay do not.
+                        # Explicit task inputs do not use dynamic route qualifications.
+                        # Actual HTTP throttling/forbidden responses still update provider health.
                         bad_http = next((event["status_code"] for event in report.get("responses", [])
                             if event.get("mode") == "live" and event.get("status_code") in {403, 429}), None)
                         if bad_http is not None:
-                            for group in qualification["verified_groups"]:
-                                exchange, asset = group.split("/")
+                            import yaml
+                            publication = yaml.safe_load((config_root / 'datasets/security_master.yaml').read_text(encoding='utf-8'))
+                            groups = publication['dataset']['publication']['source_groups'].get(unit['input_id'], ())
+                            capability_version = report.get('adapter_version') or report.get('code_version')
+                            for exchange, asset in groups:
                                 metadata.record_provider_failure(provider=contracts[unit["input_id"]].provider,
-                                    endpoint=contracts[unit["input_id"]].endpoint, capability_version=qualification["capability_version"],
+                                    endpoint=contracts[unit["input_id"]].endpoint, capability_version=capability_version,
                                     dataset="security_master", market=exchange, asset_type=asset,
                                     failure_class="rate_limited" if bad_http == 429 else "forbidden", error=f"HTTP {bad_http}",
                                     now=datetime.now(timezone.utc), http_status=bad_http, cooldown_seconds=30)
@@ -2971,14 +2970,12 @@ def _collect_due_daily_bar(*, now, config_root, data_root, execute, mode, calend
 
 def _collect_due_security_master(*, now, config_root, data_root, execute, mode, calendar_days, dependency_paths, collector):
     """Existing tick entry drives one durable business task, without starting a daemon."""
-    import json
     from datetime import date
     from ..service.calendar import TradingCalendarStore
     from ..service.calendar_update import TradingCalendarUpdater
     from ..providers.baostock.industry import BaoStockIndustryMembershipProvider
     from ..storage.metadata import MetadataStore
     from ..worker.scheduler import plan_security_master_collection, SHANGHAI
-    from ..routing.factory import check_security_input_qualification
     from ..storage.integrity import file_hash
     if now.tzinfo is None:
         raise ValueError("schedule time must be timezone-aware")
@@ -3028,16 +3025,12 @@ def _collect_due_security_master(*, now, config_root, data_root, execute, mode, 
             if contract.trading_date_parameter:
                 unit["context"]["request"] = {contract.trading_date_parameter: day.isoformat()}
                 unit["context"]["calendar"] = {"trading_dates": [day.isoformat()]}
-        with MetadataStore(paths["metadata_path"]) as metadata:
-            previous = metadata.load_collection_task(job["task_id"])
-            if not execute:
-                qualifications = [check_security_input_qualification(contracts[u["input_id"]], u["context"],
-                    config_root=root, metadata=metadata, now=now) for u in job["definition"]["units"]]
-                job["source_qualifications"] = qualifications
+        previous = None
+        if execute:
+            with MetadataStore(paths["metadata_path"]) as metadata:
+                previous = metadata.load_collection_task(job["task_id"])
         # A previously published degraded task must retry; a complete task no-ops.
-        if not execute and any(not q["eligible"] for q in qualifications):
-            job.update(status="blocked", reason="formal routing qualification is missing")
-        elif execute:
+        if execute:
             if previous and previous["status"] == "committing":
                 # collect_task owns recovery and the same partition lock.
                 job["reason"] = "resume interrupted publication"
@@ -3048,9 +3041,8 @@ def _collect_due_security_master(*, now, config_root, data_root, execute, mode, 
                        no_op=result.get("no_op", False), error=result.get("error"), summary=result.get("summary"))
     report = {"dataset": "security_master", "now": now.isoformat(), "execute": execute, "mode": mode,
               "production_writes": int(job["status"] == "published" and not job.get("no_op")),
-              "eligible_for_production_routing": (
-                  all(q["eligible"] for q in job["source_qualifications"])
-                  if job.get("source_qualifications") else True if execute and job["status"] == "published" else None),
+              # Explicit security-master task inputs do not grant generic route eligibility.
+              "eligible_for_production_routing": None,
               "jobs": [job], "dependencies": [{"path": str(Path(p).resolve()), "sha256": file_hash(Path(p))} for p in dependency_paths],
               "config_files": [{"path": str(root / p), "sha256": file_hash(root / p)}
                                for p in ("collection.yaml", "schedules.yaml", "providers.yaml", "datasets/security_master.yaml")]}

@@ -302,8 +302,37 @@
 | 原问题 | 实际原因与动作 | 本次结果、证据及边界 |
 |---|---|---|
 | Codex执行环境连接不上配置的本机代理，导致历史名单来源无法请求 | Windows主机上的v2rayN/xray运行正常，监听`127.0.0.1:20171`；Codex命令执行环境的网络命名空间没有主机回环路由，因此它访问自己的`127.0.0.1`时连不到主机代理。没有更改代理、端口或LAN暴露；通过主机网络环境按现有代理配置采集。 | [主机/执行环境对照](data/task_workspace/_checks/security-index-history-20261103/proxy-host-vs-sandbox-20261103.json)记录主机端口可达而隔离环境不可达。该项解释传输失败，不代表任何来源拒绝请求。 |
-| 2026-11-02证券清单没有七组来源数据 | 复用已有五个配置来源，一次取得目标日实时响应并先保存原始字节；BaoStock 5,786行、北交所候选354行、上交所普通ETF 923行、货币ETF 24行、深交所ETF 770行。未新增来源或改变正式来源路由。 | 五份原始manifest及采集记录位于`tmp/security-master-qualification-20261102/source-candidates/`；[隔离任务运行摘要](tmp/security-master-20261102-bulk/task_workspace/2026-11-02/security_master/summary.json)记录七组业务回放。 |
+| 2026-11-02证券清单没有七组来源数据 | 复用已有五个配置来源，一次取得目标日来源响应并保存证据；BaoStock 5,786行、北交所候选354行、上交所普通ETF 923行、货币ETF 24行、深交所ETF 770行。未新增来源或改变正式来源路由。 | 五份原始manifest及采集记录位于`tmp/security-master-qualification-20261102/source-candidates/`；[隔离任务运行摘要](tmp/security-master-20261102-bulk/task_workspace/2026-11-02/security_master/summary.json)记录七组业务回放。 |
 | 发布阶段长时间停在写库 | `SecurityMasterStore`原先逐条执行证券、别名及变更历史写入；本次改为Arrow批量注册、证券批量MERGE、别名批量去重插入、历史批量追加，保留现有更新/忽略重复/追加语义。 | [定向回归记录](data/task_workspace/_checks/security-index-history-20261103/security-master-store-bulk-test-20261104.json)对应`test_disappearing_security_becomes_invalid_and_reappearance_restores_it`两种参数均通过。之前中断的隔离任务从待恢复阶段续跑后成功发布；[只读回读](data/task_workspace/_checks/security-index-history-20261103/security-master-20261102-readback.json)确认7,857条、7,857个唯一身份，七个必需组齐全，发布清单SHA-256为`0bf5ee5360e94e272c186bff344063a92d97dc062283a3ee176c75985d7f8da4`。 |
 | 资格刷新与正式日线尚未完成 | 旧五项名单资格在2026-10-19到期，两个BaoStock指数组无资格记录；现有历史BSE/ETF来源分别是当前名单/事件候选或当日份额记录，不能证明历史上市目录完整。新回放的业务覆盖检查通过，但`historical_universe_verified_complete=false`，现有正式资格核验要求该项为真。 | 未把隔离候选或发布登记成正式资格；未写正式`data/`证券清单或日线分区，未启动依赖日线任务。资格门槛与用户确认的名单业务合同不一致，故没有伪造“历史全市场已独立核验”或绕过门槛。 |
 
 本阶段修正仅涉及现有证券清单存储模块的批量写入性能；模块职责与证券身份、状态、日期及发布语义未改变。隔离回放根中没有既有正式证券主数据，因此7,857条只证明五份来源从处理到隔离发布成功，不证明与生产旧清单的失效证券比对已完成。资格阻断原因只记录一次，未重复探测或绕过门槛。
+
+## 证券清单资格阻断修正与正式发布（2026-11-04）
+
+本轮修复的是前一节 2026-11-02 清单任务被拦在来源请求之前的问题。该任务的五个来源已经由 `config/collection.yaml` 的历史 `source_inputs` 明确选定；执行器却把动态来源路由的资格表套到这些固定任务输入上，资格过期/缺失时在请求前拒绝执行。资格记录仍用于动态路由，未伪造或续期任何记录。
+
+```mermaid
+flowchart LR
+  subgraph before[改动前：固定清单来源被动态路由资格拦截]
+    A[collection.yaml: security_master.source_inputs] --> B{动态资格有效且完整?}
+    B -->|否：过期/缺失| C[请求前结束<br/>不采集、不发布]
+    B -->|是| D[来源请求]
+  end
+  subgraph after[改动后：按清单任务合同执行]
+    E[显式 source_inputs] --> F[请求并解析每个来源单元]
+    F --> G{所有来源完成且七个必需组齐全?}
+    G -->|否| H[记录来源/覆盖失败<br/>现有正式清单不变]
+    G -->|是| I[合并身份并更新有效状态]
+    I --> J[发布唯一 security_master]
+  end
+```
+
+| 原问题 | 可核验证据 | 处理及对原问题的影响 | 当前结果与剩余项 |
+|---|---|---|---|
+| 清单来源资格为何不过 | [本次只读资格结果](data/task_workspace/_checks/security-index-history-20261103/security-qualification-current-check-20261104.json)：BaoStock股票资格于2026-10-19过期；BaoStock XSHG/index、XSHE/index无登记；BSE股票、SSE ETF、货币ETF、SZSE ETF资格也于2026-10-19过期。`check_security_input_qualification` 位于 `src/routing/factory.py`，旧调用点在 `src/pipeline/inputs.py` 的 live/retained 来源执行及调度计划；它还要求独立全市场覆盖证明。 | 移除资格表对 `security_master` 显式输入的请求前预检，以及调度计划上的资格拦截。资格表不自动更新、不新增资格；显式来源请求后仍执行单元成功、七组覆盖、身份合并和事务发布检查。HTTP 403/429仍写既有来源健康记录；日线动态路由的资格检查保持原样。 | 调度计划不再因五个名单来源资格过期而显示 blocked；生产路由资格字段保持 `null`，表示此次固定清单任务发布未授权其他动态路由。`docs/pipeline/collection-tasks.md` 与CLI帮助文本同步解释这个边界。 |
+| 2026-11-02目标清单是否走完 | 修复前 [机器运行记录](data/task_workspace/_checks/security-index-history-20261103/security-master-run-20261102.json)记录5/5个来源在请求前因资格失败；五份对应响应已保存在 [原来源证据目录](tmp/security-master-qualification-20261102/source-candidates/)，并逐一校验manifest。复用同一冻结任务定义哈希 `0c1772eb1d6318698438381d9d6a4100d50ed02e42f4c9aae6228bf49c156653`，以retained模式执行，不重新请求网络。 | 通过已有 `collect-task` 正式任务入口续跑旧失败任务；五来源完成、七组齐全，来源并集合并到现有证券主数据表。 | 任务 `security-master-20261102-index-history-20261103` 状态 `published`、`complete_today=true`。正式当前数据库为7,862行、7,862个唯一 `instrument_id`；组计数为XSHG/stock=2,318、XSHE/stock=2,905、BSE/stock=354、XSHG/etf=947、XSHE/etf=770、XSHG/index=222、XSHE/index=341。此前正式清单中本次来源并集未出现的5项标为 `delisted`，分别是`XSHE:000016`、`XSHE:301139`、`XSHG:512390`、`XSHG:601059`、`XSHG:601198`；`delist_date`均为空，缺失组为0。正式清单manifest SHA-256为`b009de1cf8fea6918f973497ae51417e136eb359038d14fd515afb10ed30a88c`，数据库回读校验通过。机器回读和测试结果见[资格修复验收](data/task_workspace/_checks/security-index-history-20261103/security-master-qualification-fix-20261104.json)。 |
+| 覆盖结论边界 | 任务摘要 `final_check.status=passed`，七个已配置必需组均有数据、无来源缺失；该次 `historical_universe_verified_complete=false`。 | 按用户确认的任务合同，以五个显式来源完成和七个组完整作为发布条件；不把动态路由所需的独立全市场证明当作重复发布门槛。 | 正式清单已发布；这不宣称独立历史市场普查通过。BaoStock底层传输字节在其SDK中不可得，本次复用保留的SDK解码表示；该来源证据限制保留于任务报告。 |
+| 验证与运行范围 | 使用 `D:\Program Files\Python\python.exe`（Python 3.13.0rc3；pytest 9.0.2、FastAPI 0.115.11、DuckDB 1.5.5、PyArrow 25.0.0、PyYAML 6.0.2、requests 2.34.2）。 | 两个受影响的调度计划和命令行定向测试通过；随后只读核对正式manifest及DuckDB行数、唯一键、七组计数和5个失效状态。 | 2项测试通过；pytest默认临时目录在隔离环境不可写，显式指定项目`tmp/`作为临时根后测试通过。日线行情任务本轮未启动；其动态来源资格不因证券清单发布而自动改变。 |
+
+后续实时来源执行应按 [代理环境说明](AGENTS.md#项目python环境与测试执行) 在Codex主机网络上下文走现有代理；本次正式任务使用已留存来源响应，无新增实时请求。 |
