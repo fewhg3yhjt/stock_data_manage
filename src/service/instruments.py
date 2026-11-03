@@ -299,48 +299,146 @@ class SecurityMasterStore(AbstractContextManager["SecurityMasterStore"]):
         )
 
     def upsert(self, records: Iterable[SecurityRecord], aliases: Iterable[SymbolHistory] = ()) -> None:
+        from uuid import uuid4
+
+        import pyarrow as pa
+
         now = datetime.now(timezone.utc)
-        for record in records:
-            self.connection.execute(
-                """
-                INSERT INTO security_master VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ON CONFLICT (instrument_id) DO UPDATE SET
-                    symbol=excluded.symbol, exchange=excluded.exchange,
-                    asset_type=excluded.asset_type, name=excluded.name,
-                    list_date=excluded.list_date, delist_date=excluded.delist_date,
-                    status=excluded.status, lot_size=excluded.lot_size,
-                    canonical_volume_unit=excluded.canonical_volume_unit,
-                    canonical_amount_unit=excluded.canonical_amount_unit,
-                    publisher=excluded.publisher, publish_date=excluded.publish_date,
-                    calculation_start_date=excluded.calculation_start_date,
-                    is_backfilled_history=excluded.is_backfilled_history,
-                    classification_conflict=excluded.classification_conflict,
-                    evidence_sources=excluded.evidence_sources, updated_at=excluded.updated_at
-                """,
-                [
-                    record.instrument_id, record.symbol, record.exchange.value, record.asset_type.value,
-                    record.name, record.list_date, record.delist_date, record.status, record.lot_size,
-                    record.canonical_volume_unit, record.canonical_amount_unit, record.publisher,
-                    record.publish_date, record.calculation_start_date, record.is_backfilled_history,
-                    record.classification_conflict, list(record.evidence_sources), now,
-                ],
-            )
+        # MERGE requires at most one source row per instrument. Preserve the old
+        # sequential-upsert behavior by retaining the last record for each ID.
+        record_rows = {
+            record.instrument_id: {
+                "instrument_id": record.instrument_id,
+                "symbol": record.symbol,
+                "exchange": record.exchange.value,
+                "asset_type": record.asset_type.value,
+                "name": record.name,
+                "list_date": record.list_date,
+                "delist_date": record.delist_date,
+                "status": record.status,
+                "lot_size": record.lot_size,
+                "canonical_volume_unit": record.canonical_volume_unit,
+                "canonical_amount_unit": record.canonical_amount_unit,
+                "publisher": record.publisher,
+                "publish_date": record.publish_date,
+                "calculation_start_date": record.calculation_start_date,
+                "is_backfilled_history": record.is_backfilled_history,
+                "classification_conflict": record.classification_conflict,
+                "evidence_sources": list(record.evidence_sources),
+                "updated_at": now,
+            }
+            for record in records
+        }
+        if record_rows:
+            relation_name = f"security_master_input_{uuid4().hex}"
+            self.connection.register(relation_name, pa.Table.from_pylist(list(record_rows.values())))
+            try:
+                self.connection.execute(
+                    f"""
+                    MERGE INTO security_master AS target
+                    USING {relation_name} AS source
+                    ON target.instrument_id = source.instrument_id
+                    WHEN MATCHED THEN UPDATE SET
+                        symbol=source.symbol, exchange=source.exchange,
+                        asset_type=source.asset_type, name=source.name,
+                        list_date=source.list_date, delist_date=source.delist_date,
+                        status=source.status, lot_size=source.lot_size,
+                        canonical_volume_unit=source.canonical_volume_unit,
+                        canonical_amount_unit=source.canonical_amount_unit,
+                        publisher=source.publisher, publish_date=source.publish_date,
+                        calculation_start_date=source.calculation_start_date,
+                        is_backfilled_history=source.is_backfilled_history,
+                        classification_conflict=source.classification_conflict,
+                        evidence_sources=source.evidence_sources,
+                        updated_at=source.updated_at
+                    WHEN NOT MATCHED THEN INSERT (
+                        instrument_id, symbol, exchange, asset_type, name, list_date, delist_date,
+                        status, lot_size, canonical_volume_unit, canonical_amount_unit, publisher,
+                        publish_date, calculation_start_date, is_backfilled_history,
+                        classification_conflict, evidence_sources, updated_at
+                    ) VALUES (
+                        source.instrument_id, source.symbol, source.exchange, source.asset_type,
+                        source.name, source.list_date, source.delist_date, source.status,
+                        source.lot_size, source.canonical_volume_unit, source.canonical_amount_unit,
+                        source.publisher, source.publish_date, source.calculation_start_date,
+                        source.is_backfilled_history, source.classification_conflict,
+                        source.evidence_sources, source.updated_at
+                    )
+                    """
+                )
+            finally:
+                self.connection.unregister(relation_name)
+
+        alias_rows = {}
         for alias in aliases:
-            self.connection.execute(
-                "INSERT OR IGNORE INTO security_symbol_history VALUES (?, ?, ?, ?, ?, ?, ?)",
-                [alias.instrument_id, alias.provider, alias.symbol, alias.effective_from, alias.effective_to, alias.change_reason, alias.evidence_source],
-            )
+            key = (alias.instrument_id, alias.provider, alias.symbol, alias.effective_from)
+            alias_rows.setdefault(key, {
+                "instrument_id": alias.instrument_id,
+                "provider": alias.provider,
+                "symbol": alias.symbol,
+                "effective_from": alias.effective_from,
+                "effective_to": alias.effective_to,
+                "change_reason": alias.change_reason,
+                "evidence_source": alias.evidence_source,
+            })
+        if alias_rows:
+            relation_name = f"security_alias_input_{uuid4().hex}"
+            self.connection.register(relation_name, pa.Table.from_pylist(list(alias_rows.values())))
+            try:
+                self.connection.execute(
+                    f"""
+                    INSERT INTO security_symbol_history
+                    SELECT source.instrument_id, source.provider, source.symbol,
+                           source.effective_from, source.effective_to,
+                           source.change_reason, source.evidence_source
+                    FROM {relation_name} AS source
+                    WHERE NOT EXISTS (
+                        SELECT 1 FROM security_symbol_history AS target
+                        WHERE target.instrument_id=source.instrument_id
+                          AND target.provider=source.provider
+                          AND target.symbol=source.symbol
+                          AND target.effective_from=source.effective_from
+                    )
+                    """
+                )
+            finally:
+                self.connection.unregister(relation_name)
 
     def record_changes(
         self,
         changes: Iterable[tuple[str, str, object, object, date, str]],
     ) -> None:
+        from uuid import uuid4
+
+        import pyarrow as pa
+
         detected_at = datetime.now(timezone.utc)
-        for instrument_id, field_name, old_value, new_value, effective_date, source in changes:
-            self.connection.execute(
-                "INSERT INTO security_master_history VALUES (?, ?, ?, ?, ?, ?, ?)",
-                [instrument_id, field_name, None if old_value is None else str(old_value), None if new_value is None else str(new_value), effective_date, detected_at, source],
-            )
+        rows = [
+            {
+                "instrument_id": instrument_id,
+                "field_name": field_name,
+                "old_value": None if old_value is None else str(old_value),
+                "new_value": None if new_value is None else str(new_value),
+                "effective_date": effective_date,
+                "detected_at": detected_at,
+                "source": source,
+            }
+            for instrument_id, field_name, old_value, new_value, effective_date, source in changes
+        ]
+        if rows:
+            relation_name = f"security_history_input_{uuid4().hex}"
+            self.connection.register(relation_name, pa.Table.from_pylist(rows))
+            try:
+                self.connection.execute(
+                    f"""
+                    INSERT INTO security_master_history
+                    SELECT instrument_id, field_name, old_value, new_value,
+                           effective_date, detected_at, source
+                    FROM {relation_name}
+                    """
+                )
+            finally:
+                self.connection.unregister(relation_name)
 
     def publish(self, records: Iterable[SecurityRecord], *, aliases: Iterable[SymbolHistory] = (),
                 changes: Iterable[tuple[str, str, object, object, date, str]] = ()) -> None:
