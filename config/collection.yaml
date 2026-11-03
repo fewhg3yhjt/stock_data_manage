@@ -48,7 +48,7 @@ security_master:
   # 北交所按当前上市名单及上市日期推算候选，完整性检查不省略。
   historical:
     source_inputs: [SECURITY-BS-UNIVERSE-001, SECURITY-BSE-LIST-HISTORY-001, SECURITY-SSE-ETF-HISTORY-001, SECURITY-SSE-MONEY-ETF-HISTORY-001, SECURITY-SZSE-ETF-HISTORY-001]
-    required_groups: [[XSHG, stock], [XSHE, stock], [BSE, stock], [XSHG, etf], [XSHE, etf]]
+    required_groups: [[XSHG, stock], [XSHE, stock], [BSE, stock], [XSHG, etf], [XSHE, etf], [XSHG, index], [XSHE, index]]
 
 # 日线业务任务引用现有的多资产目标；任务准备会读取已发布证券主数据并冻结范围。
 daily_bar:

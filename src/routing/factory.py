@@ -171,19 +171,62 @@ def check_security_input_qualification(contract, context, *, config_root, metada
             "verified_groups": accepted, "reasons": reasons}
 
 
-def _configured_csindex_daily_symbols(config_root):
+_INDEX_DAILY_INPUTS = {
+    "CSI-INDEX-DAILY-001",
+    "CSI-INDEX-DAILY-OHLC-001",
+    "CSI-INDEX-DAILY-CLOSE-PAIR-001",
+    "CNI-INDEX-DAILY-001",
+}
+_CSI_DAILY_INPUTS = {
+    "CSI-INDEX-DAILY-001",
+    "CSI-INDEX-DAILY-OHLC-001",
+    "CSI-INDEX-DAILY-CLOSE-PAIR-001",
+}
+_CLOSE_ONLY_INDEX_INPUTS = {
+    "CSI-INDEX-DAILY-001",
+    "CSI-INDEX-DAILY-CLOSE-PAIR-001",
+}
+
+
+def _configured_index_daily_symbols(config_root, input_id):
+    """Map each configured index identity to the exact code sent to its source."""
     import yaml
-    document = yaml.safe_load((Path(config_root) / 'capabilities.yaml').read_text(encoding='utf-8'))
-    policy = document.get('acquisition_policies', {}).get('daily_fixed', {})
-    routes = [item for item in policy.get('inputs', ()) if item.get('input_id') == 'CSI-INDEX-DAILY-001']
-    if len(routes) != 1 or routes[0].get('asset_type') != 'index' or routes[0].get('value_contract') != 'close_only':
-        raise ValueError('CSI daily route is not explicitly configured as an index close-only scope')
+    root = Path(config_root)
+    document = yaml.safe_load((root / "capabilities.yaml").read_text(encoding="utf-8"))
+    policy = document.get("acquisition_policies", {}).get("daily_fixed", {})
+    routes = [item for item in policy.get("inputs", ()) if item.get("input_id") == input_id]
+    if len(routes) != 1 or routes[0].get("asset_type") != "index":
+        raise ValueError("daily index route must have one explicit configured index scope")
+    route = routes[0]
+    expected_contract = "close_only" if input_id in _CLOSE_ONLY_INDEX_INPUTS else "full_ohlc"
+    if route.get("value_contract") != expected_contract:
+        raise ValueError("daily index route value contract differs from its configured input")
     symbols = routes[0].get('symbols')
-    if (not isinstance(symbols, list) or not symbols
-            or any(not isinstance(symbol, str) or not re.fullmatch(r'sh[0-9]{6}', symbol) for symbol in symbols)
-            or len(symbols) != len(set(symbols))):
-        raise ValueError('CSI daily route has an invalid exact symbol list')
-    return frozenset(symbols)
+    if not isinstance(symbols, list) or not symbols or len(symbols) != len(set(symbols)):
+        raise ValueError("daily index route has an invalid exact symbol list")
+    if input_id == "CSI-INDEX-DAILY-001":
+        if any(not isinstance(symbol, str) or not re.fullmatch(r"sh[0-9]{6}", symbol) for symbol in symbols):
+            raise ValueError("direct CSI route must list Shanghai index request codes")
+        return {symbol: symbol for symbol in symbols}
+    if input_id in {"CSI-INDEX-DAILY-OHLC-001", "CSI-INDEX-DAILY-CLOSE-PAIR-001"}:
+        security = yaml.safe_load((root / "datasets/security_master.yaml").read_text(encoding="utf-8"))
+        pairs = {}
+        for item in security.get("symbol_parallel_codes", ()):
+            if (item.get("logical_market"), item.get("asset_type"), item.get("request_market")) != ("XSHE", "index", "XSHG"):
+                continue
+            for logical_code, request_code in item.get("pairs", {}).items():
+                pairs["sz" + str(logical_code)] = str(request_code).lower()
+        if any(not isinstance(symbol, str) or not re.fullmatch(r"sz[0-9]{6}", symbol) for symbol in symbols):
+            raise ValueError("paired CSI route must list Shenzhen index identities")
+        result = {symbol: pairs[symbol] for symbol in symbols if symbol in pairs}
+        if len(result) != len(symbols) or any(not re.fullmatch(r"sh[0-9]{6}", code) for code in result.values()):
+            raise ValueError("paired CSI route has an unconfigured source-code relationship")
+        return result
+    if input_id == "CNI-INDEX-DAILY-001":
+        if any(not isinstance(symbol, str) or not re.fullmatch(r"sz[0-9]{6}", symbol) for symbol in symbols):
+            raise ValueError("CNI route must list Shenzhen index request codes")
+        return {symbol: symbol for symbol in symbols}
+    raise ValueError("unsupported configured index route")
 
 
 def check_daily_input_qualification(contract, context, *, asset_type, config_root, metadata, now, execution_mode='retained', _allow_scope=True):
@@ -195,32 +238,40 @@ def check_daily_input_qualification(contract, context, *, asset_type, config_roo
     from ..storage.raw import RawObjectStore
     from ..providers.tencent.daily import tencent_symbol
     try:
-        is_csindex = contract.input_id == 'CSI-INDEX-DAILY-001'
-        if contract.input_id not in {'ASTOCK-002-daily', 'CSI-INDEX-DAILY-001'} or asset_type not in {'stock', 'etf', 'index'}:
+        is_index_source = contract.input_id in _INDEX_DAILY_INPUTS
+        is_close_only = contract.input_id in _CLOSE_ONLY_INDEX_INPUTS
+        if contract.input_id not in {'ASTOCK-002-daily', *_INDEX_DAILY_INPUTS} or asset_type not in {'stock', 'etf', 'index'}:
             raise ValueError('unsupported daily input or asset type')
         parameters = contract.bind_parameters(context)
         adjustment_values = {"none": "none", "qfq": "forward", "hfq": "backward"}
-        requested_adjustment = parameters.get("adjust", "qfq")
+        requested_adjustment = parameters.get("adjust", "none" if is_index_source else "qfq")
         adjustment = adjustment_values.get(requested_adjustment)
         if adjustment is None:
             raise ValueError("unsupported daily adjustment parameter")
-        if is_csindex:
-            if (asset_type != 'index' or contract.provider != 'csindex' or contract.endpoint != 'index-perf'
-                    or not re.fullmatch(r'sh[0-9]{6}', str(parameters.get('code', '')).lower())
-                    or adjustment != 'none' or parameters.get('api') != 'index-perf'
-                    or parameters.get('start') != parameters.get('end')):
-                raise ValueError('CSI qualification is restricted to one-day Shanghai index close-only requests')
+        if is_index_source:
+            expected_provider = "csindex" if contract.input_id in _CSI_DAILY_INPUTS else "cnindex"
+            expected_endpoint = "index-perf" if expected_provider == "csindex" else "index-daily"
+            source_symbol = str(parameters.get("code", "")).lower()
+            logical_symbol = str(context.get("request", {}).get("symbol", source_symbol)).lower()
+            configured_symbols = _configured_index_daily_symbols(config_root, contract.input_id)
+            if (asset_type != "index" or contract.provider != expected_provider or contract.endpoint != expected_endpoint
+                    or adjustment != "none" or parameters.get("start") != parameters.get("end")
+                    or configured_symbols.get(logical_symbol) != source_symbol):
+                raise ValueError("index qualification must match one configured source code and one unadjusted target date")
+            if expected_provider == "csindex" and parameters.get("api") != "index-perf":
+                raise ValueError("CSI qualification requires its configured index-perf endpoint")
+            if expected_provider == "cnindex" and parameters.get("frequency") != "day":
+                raise ValueError("CNI qualification requires its configured daily frequency")
             symbol = str(parameters['code']).lower()
-            configured_symbols = _configured_csindex_daily_symbols(config_root)
-            if symbol not in configured_symbols:
-                raise ValueError('CSI symbol is outside the configured daily index scope')
         elif asset_type == 'index' and adjustment != 'none':
             raise ValueError('Tencent index daily input is qualified only for unadjusted bars')
         else:
             symbol = tencent_symbol(parameters['code'], allow_bse=parameters.get('api') in {'kline', 'newfqkline'},
                                     asset_type=asset_type)
         exchange = {'sh':'XSHG','sz':'XSHE','bj':'BSE'}[symbol[:2]]
-        identity = exchange + ':' + symbol[2:]
+        logical_symbol = str(context.get("request", {}).get("symbol", symbol)).lower()
+        logical_exchange = {"sh": "XSHG", "sz": "XSHE", "bj": "BSE"}[logical_symbol[:2]]
+        identity = logical_exchange + ':' + logical_symbol[2:]
         adapter = build_input_provider(contract, providers_path=Path(config_root)/'providers.yaml')
         evidence = metadata.latest_probe(provider=contract.provider, endpoint=contract.endpoint,
             capability_version=adapter.capability_version, dataset='daily_bar', market=exchange,
@@ -240,10 +291,10 @@ def check_daily_input_qualification(contract, context, *, asset_type, config_roo
                         if grant.get('market') != exchange or grant.get('asset_type') != asset_type:
                             continue
                         prefixes = grant.get('symbol_prefixes')
-                        if is_csindex:
+                        if is_index_source:
                             scope_matches = (isinstance(prefixes, list) and bool(prefixes)
-                                and all(isinstance(p, str) and re.fullmatch(r'sh[0-9]{6}', p) for p in prefixes)
-                                and all(p in configured_symbols for p in prefixes)
+                                and all(isinstance(p, str) and re.fullmatch(r'(?:sh|sz)[0-9]{6}', p) for p in prefixes)
+                                and all(p in configured_symbols.values() for p in prefixes)
                                 and symbol in prefixes)
                         else:
                             scope_matches = (isinstance(prefixes, list) and bool(prefixes)
@@ -266,7 +317,9 @@ def check_daily_input_qualification(contract, context, *, asset_type, config_roo
                     except (ValueError, KeyError, TypeError, OSError, StopIteration):
                         continue
             raise ValueError('matching routing-eligible daily evidence is missing')
-        required_semantics = {'trade_date', 'close', 'value_contract'} if is_csindex else {'trade_date','open','high','low','close','adjustment'}
+        required_semantics = ({'trade_date', 'close', 'value_contract'} if is_close_only else
+                              {'trade_date', 'open', 'high', 'low', 'close', 'value_contract', 'adjustment'}
+                              if is_index_source else {'trade_date','open','high','low','close','adjustment'})
         expected_unit = 'index_points:point' if asset_type == 'index' else 'price:CNY'
         if (not required_semantics <= set(json.loads(evidence['field_semantics_json']))
                 or expected_unit not in json.loads(evidence['units_json'])):
@@ -305,7 +358,7 @@ def check_daily_input_qualification(contract, context, *, asset_type, config_roo
             if file_hash(Path(descriptor['path']))!=descriptor['sha256']:
                 raise ValueError('daily capability configuration changed')
         required_paths = ['providers.yaml','collection.yaml','datasets/daily_bar.yaml','normalization/daily_bar.yaml']
-        if is_csindex:
+        if is_index_source:
             required_paths.append('capabilities.yaml')
         required={str((Path(config_root)/p).resolve()) for p in required_paths}
         if not required <= {str(Path(d['path']).resolve()) for d in current['config_files']}:
@@ -317,10 +370,15 @@ def check_daily_input_qualification(contract, context, *, asset_type, config_roo
         if not hashes or hashes!=live['output']['source_response_hashes'] or hashes!=current['output']['source_response_hashes']:
             raise ValueError('daily revalidation does not retain live response bytes')
         semantic=json.loads(artifacts['semantic_check'].read_text(encoding='utf-8'))
-        semantic_contract_ok = (semantic.get('value_contract') == 'close_only'
-            and semantic.get('close') is not None
-            and all(semantic.get(name) is None for name in ('open','high','low','volume','amount'))
-            if is_csindex else True)
+        if is_close_only:
+            semantic_contract_ok = (semantic.get('value_contract') == 'close_only'
+                and semantic.get('close') is not None
+                and all(semantic.get(name) is None for name in ('open','high','low','volume','amount')))
+        elif is_index_source:
+            semantic_contract_ok = (semantic.get('value_contract') == 'full_ohlc'
+                and all(semantic.get(name) is not None for name in ('open','high','low','close')))
+        else:
+            semantic_contract_ok = True
         if (not semantic.get('passed') or semantic.get('instrument_id')!=identity or semantic.get('asset_type')!=asset_type
                 or semantic.get('parameters')!=serialized or semantic.get('source_response_hashes')!=hashes
                 or not semantic_contract_ok):
@@ -341,7 +399,12 @@ def check_daily_input_qualification(contract, context, *, asset_type, config_roo
             quote = row['quotes'][adjustment]
             if quote['source_provider'] != contract.provider or quote['endpoint'] != contract.endpoint:
                 raise ValueError('daily publication quote source differs')
-            if is_csindex and (quote.get('value_contract') != 'close_only' or quote.get('close') is None
+            if is_index_source and quote.get('value_contract') != semantic.get('value_contract'):
+                raise ValueError('daily published index value contract differs from the qualification')
+            if is_index_source and not is_close_only and any(
+                    quote.get(name) is None for name in ('open', 'high', 'low', 'close')):
+                raise ValueError('daily published index row does not satisfy the full-OHLC contract')
+            if is_close_only and (quote.get('value_contract') != 'close_only' or quote.get('close') is None
                     or any(quote.get(name) is not None for name in ('open','high','low','volume','amount'))):
                 raise ValueError('CSI publication does not satisfy the close-only contract')
             RawObjectStore.verify_manifest(quote['raw_object_path'])
@@ -371,28 +434,31 @@ def check_daily_batch_qualification(contract, units, *, config_root, metadata, n
     """Validate each evidence grant once, then check frozen units against its explicit scope."""
     import json
     from ..storage.integrity import file_hash
-    is_csindex = contract.input_id == "CSI-INDEX-DAILY-001"
-    if contract.input_id not in {"ASTOCK-002-daily", "CSI-INDEX-DAILY-001"}:
+    is_index_source = contract.input_id in _INDEX_DAILY_INPUTS
+    if contract.input_id not in {"ASTOCK-002-daily", *_INDEX_DAILY_INPUTS}:
         return {"eligible": False, "input_id": contract.input_id,
             "reasons": ["daily qualification checker has no verified contract for this Provider"]}
-    if is_csindex:
-        configured_symbols = _configured_csindex_daily_symbols(config_root)
+    configured_symbols = _configured_index_daily_symbols(config_root, contract.input_id) if is_index_source else None
+    frozen = [contract.bind_parameters(u['context']) for u in units]
+    if is_index_source:
         if not units or any(u.get('asset_type') != 'index' or u.get('adjustment') != 'none'
-                or not re.fullmatch(r'sh[0-9]{6}', str(u.get('symbol', '')).lower())
-                or str(u.get('symbol', '')).lower() not in configured_symbols for u in units):
-            raise ValueError('CSI batch qualification accepts only Shanghai index close-only units')
-        frozen = [contract.bind_parameters(u['context']) for u in units]
-        if any(p.get('api') != 'index-perf' or p.get('adjust') != 'none' or p.get('start') != p.get('end')
-                or str(p.get('code', '')).lower() != str(u['symbol']).lower() for p, u in zip(frozen, units)):
-            raise ValueError('CSI batch qualification requires each exact symbol and one frozen date')
+                or configured_symbols.get(str(u.get('symbol', '')).lower()) != str(p.get('code', '')).lower()
+                or p.get('start') != p.get('end') for u, p in zip(units, frozen)):
+            raise ValueError('index batch qualification requires configured index codes and one unadjusted target date')
+        if contract.input_id in _CSI_DAILY_INPUTS:
+            if any(p.get('api') != 'index-perf' or p.get('adjust') != 'none' for p in frozen):
+                raise ValueError('CSI batch qualification requires index-perf and no adjustment')
+        elif any(p.get('frequency') != 'day' for p in frozen):
+            raise ValueError('CNI batch qualification requires daily frequency')
         if len({(p['start'], p['end']) for p in frozen}) != 1:
-            raise ValueError('CSI batch qualification cannot mix target dates')
+            raise ValueError('index batch qualification cannot mix target dates')
     adapter = build_input_provider(contract, providers_path=Path(config_root) / "providers.yaml")
     candidates = metadata.capability_evidence(provider=contract.provider, endpoint=contract.endpoint,
         capability_version=adapter.capability_version)
     grants = []
     seen = set()
-    needed = {({'sh': 'XSHG', 'sz': 'XSHE', 'bj': 'BSE'}[u['symbol'][:2]], u['asset_type'], u['adjustment']) for u in units}
+    needed = {({'sh': 'XSHG', 'sz': 'XSHE', 'bj': 'BSE'}[p['code'][:2]], u['asset_type'], u['adjustment'])
+              for u, p in zip(units, frozen)}
     for candidate in candidates:
         if execution_mode != 'live':
             break
@@ -420,9 +486,9 @@ def check_daily_batch_qualification(contract, units, *, config_root, metadata, n
                 and grant.get('asset_type') == proof['asset_type']):
             parameters = contract.bind_parameters(context)
             symbol_prefixes = grant.get('symbol_prefixes', [])
-            if is_csindex and (not isinstance(symbol_prefixes, list)
-                    or not all(isinstance(p, str) and re.fullmatch(r'sh[0-9]{6}', p) for p in symbol_prefixes)
-                    or not all(p in configured_symbols for p in symbol_prefixes)
+            if is_index_source and (not isinstance(symbol_prefixes, list)
+                    or not all(isinstance(p, str) and re.fullmatch(r'(?:sh|sz)[0-9]{6}', p) for p in symbol_prefixes)
+                    or not all(p in configured_symbols.values() for p in symbol_prefixes)
                     or parameters['code'] not in symbol_prefixes):
                 continue
             grants.append({'proof': str(path), 'proof_hash': candidate['evidence_hash'],
@@ -433,13 +499,13 @@ def check_daily_batch_qualification(contract, units, *, config_root, metadata, n
     matches = {}
     for unit in units:
         parameters = contract.bind_parameters(unit['context'])
-        market = {'sh': 'XSHG', 'sz': 'XSHE', 'bj': 'BSE'}[unit['symbol'][:2]]
+        market = {'sh': 'XSHG', 'sz': 'XSHE', 'bj': 'BSE'}[parameters['code'][:2]]
         match = next((index for index, grant in enumerate(grants)
             if grant['asset_type'] == unit['asset_type'] and grant['market'] == market
             and {k: v for k, v in parameters.items() if k != 'code'} == grant.get('parameters')
             and (parameters['code'] == grant['sample_symbol'] or
                  execution_mode == 'live' and grant['symbol_prefixes']
-                 and (parameters['code'] in grant['symbol_prefixes'] if is_csindex else
+                 and (parameters['code'] in grant['symbol_prefixes'] if is_index_source else
                       all(isinstance(p, str) and len(p) >= 3 for p in grant['symbol_prefixes'])
                       and parameters['code'].startswith(tuple(grant['symbol_prefixes']))))), None)
         if match is None:
@@ -449,7 +515,7 @@ def check_daily_batch_qualification(contract, units, *, config_root, metadata, n
                 raise ValueError('formal routing qualification blocked for ' + unit['key'] + ': ' + str(gate['reasons']))
             evidence = metadata.latest_probe(provider=contract.provider, endpoint=contract.endpoint,
                 capability_version=adapter.capability_version, dataset='daily_bar', market=market,
-                asset_type=unit['asset_type'], code_prefix=unit['symbol'], frequency='daily', adjustment=unit['adjustment'])
+                asset_type=unit['asset_type'], code_prefix=parameters['code'], frequency='daily', adjustment=unit['adjustment'])
             grants.append({'asset_type': unit['asset_type'], 'market': market,
                 'expires_at': evidence['validation_expires_at'].isoformat(), 'exact_symbol': unit['symbol'],
                 'source_response_hashes': gate['source_response_hashes']})

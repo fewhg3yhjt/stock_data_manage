@@ -112,6 +112,7 @@ def test_daily_routes_map_only_explicit_parallel_codes_and_keep_the_list_identit
     assert super_cap_parameters["code"] == "sh000980"
 
     from stock_data_manage.routing.factory import build_input_provider
+    from stock_data_manage.routing.factory import _configured_index_daily_symbols
     close_provider = build_input_provider(contracts["CSI-INDEX-DAILY-CLOSE-PAIR-001"],
         providers_path=CONFIG / "providers.yaml")
     assert close_provider.value_contract == "close_only"
@@ -119,6 +120,10 @@ def test_daily_routes_map_only_explicit_parallel_codes_and_keep_the_list_identit
     daily_routes = {item["input_id"]: item for item in definition["source_policy"]["inputs"]}
     assert len(daily_routes["CSI-INDEX-DAILY-OHLC-001"]["symbols"]) == 35
     assert len(daily_routes["CSI-INDEX-DAILY-CLOSE-PAIR-001"]["symbols"]) == 14
+    assert _configured_index_daily_symbols(CONFIG, "CSI-INDEX-DAILY-001")["sh000816"] == "sh000816"
+    assert _configured_index_daily_symbols(CONFIG, "CSI-INDEX-DAILY-OHLC-001")["sz399904"] == "sh000904"
+    assert _configured_index_daily_symbols(CONFIG, "CSI-INDEX-DAILY-CLOSE-PAIR-001")["sz399962"] == "sh000962"
+    assert _configured_index_daily_symbols(CONFIG, "CNI-INDEX-DAILY-001")["sz399299"] == "sz399299"
 
 
 def test_csindex_399962_close_only_replay_publishes_with_logical_identity_and_unknown_units_empty(tmp_path):
