@@ -544,18 +544,23 @@ class DashboardReader:
         for root, location in roots:
             if not root.exists():
                 continue
-            for path in root.rglob("summary.json"):
-                if not _within(path, root):
+            # Task summaries live below date/task folders. Avoid recursively
+            # walking private evidence and check directories (notably the
+            # per-unit raw archive) that can contain many thousands of files.
+            for scope in root.iterdir():
+                if (not scope.is_dir()
+                        or (scope.name.startswith("_")
+                            and not (location == "archive" and scope.name == "_workspace_audit"))):
                     continue
-                relative = path.relative_to(root)
-                if relative.parts[0].startswith("_") and relative.parts[0] != "_workspace_audit":
-                    continue
-                try:
-                    document = _read_json(path)
-                except ValueError:
-                    continue
-                if isinstance(document.get("task_id"), str):
-                    candidates.append((document, path, location))
+                for path in scope.rglob("summary.json"):
+                    if not _within(path, root):
+                        continue
+                    try:
+                        document = _read_json(path)
+                    except ValueError:
+                        continue
+                    if isinstance(document.get("task_id"), str):
+                        candidates.append((document, path, location))
         latest: dict[str, tuple[dict[str, Any], Path, str]] = {}
         for document, path, location in candidates:
             task_id = document["task_id"]
@@ -980,6 +985,7 @@ class DashboardReader:
         page: int = 1,
         page_size: int = 25,
         include_evidence: bool = True,
+        task_documents: list[tuple[dict[str, Any], Path, str]] | None = None,
     ) -> dict[str, Any]:
         root = self.paths["canonical_root"]
         current_master_manifest = root / "security_master" / "current" / "manifest.json"
@@ -991,7 +997,7 @@ class DashboardReader:
                                 and not current_master_pending.exists())
         legacy_master_manifests = sorted(root.glob("*/security_master/manifest.json"), reverse=True)
         records: list[dict[str, Any]] = []
-        tasks = self._task_documents()
+        tasks = task_documents if task_documents is not None else self._task_documents()
         task_manifests: list[tuple[str, set[Path]]] = []
         for task, _, _ in tasks:
             references: list[str] = []
@@ -1053,9 +1059,11 @@ class DashboardReader:
         return _page(records, page, page_size)
 
     def overview(self) -> dict[str, Any]:
-        task_result = self.tasks(page=1, page_size=1_000_000)
-        tasks = task_result["items"]
-        releases = self.publications(page=1, page_size=6, include_evidence=False)
+        task_documents = self._task_documents()
+        tasks = [self._task_card(document, location) for document, _, location in task_documents]
+        tasks.sort(key=lambda item: str(item.get("generated_at_utc") or ""), reverse=True)
+        releases = self.publications(page=1, page_size=6, include_evidence=False,
+                                     task_documents=task_documents)
         counts: dict[str, int] = {}
         for task in tasks:
             key = str(task["display_status"])
