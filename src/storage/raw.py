@@ -350,9 +350,19 @@ class RawObjectStore:
 
     @staticmethod
     def promote_unit(*, temporary: str | Path, current: str | Path, raw_root: str | Path,
-                     archive_root: str | Path, expected_hash: str, defer_cleanup: bool = False) -> None:
+                     archive_root: str | Path, expected_hash: str, defer_cleanup: bool = False,
+                     _resolved_path_context: tuple[Path, Path, Path, Path, Path] | None = None) -> None:
         """Idempotent finalization; current data is a single managed source result."""
-        temporary, current, root = Path(temporary).resolve(), Path(current).resolve(), Path(raw_root).resolve()
+        temporary_input, current_input = Path(temporary), Path(current)
+        if _resolved_path_context is None:
+            temporary, current, root = temporary_input.resolve(), current_input.resolve(), Path(raw_root).resolve()
+        else:
+            root, temporary_input_parent, temporary_parent, current_input_parent, current_parent = _resolved_path_context
+            if temporary_input.parent != temporary_input_parent or current_input.parent != current_input_parent:
+                raise ValueError("resolved raw promotion paths do not match their original parents")
+            if temporary_input.is_symlink() or current_input.is_symlink():
+                raise ValueError("raw promotion refuses symbolic-link request manifests")
+            temporary, current = temporary_parent / temporary_input.name, current_parent / current_input.name
         if not temporary.is_relative_to(root / "_tmp") or temporary == root / "_tmp":
             raise ValueError("raw promotion requires a scoped _tmp directory")
         if not current.is_relative_to(root) or current == root or current.is_relative_to(root / "_tmp"):
@@ -364,7 +374,7 @@ class RawObjectStore:
                 or date.fromisoformat(temporary_parts[0]).isoformat() != temporary_parts[0]):
             raise ValueError("raw promotion requires matching data-date partitions")
         if not temporary.exists():
-            if RawObjectStore.verify_manifest(current) != expected_hash:
+            if not defer_cleanup and RawObjectStore.verify_manifest(current) != expected_hash:
                 raise ValueError("completed raw promotion does not match commit")
             return
         if RawObjectStore.verify_manifest(temporary) != expected_hash:
@@ -373,6 +383,10 @@ class RawObjectStore:
         from .parquet import PartitionLock
         with PartitionLock(current.parent / ".raw.lock", recover_stale=True):
             if current.exists():
+                if defer_cleanup:
+                    # Batch finalization verifies the complete destination set once
+                    # after all promotions; avoid hashing this copy twice.
+                    return
                 if RawObjectStore.verify_manifest(current) == expected_hash:
                     if not defer_cleanup:
                         RawObjectStore.refresh_index(current)
@@ -381,7 +395,9 @@ class RawObjectStore:
                 if not (current.parent / "manifest.ndjson").is_file():
                     raise ValueError("refusing to replace unmanaged existing raw data")
                 RawObjectStore.preserve_request(current, permitted_root=root, archive_root=archive_root)
-            RawObjectStore.copy_request(temporary, current)
+            # The temporary response was verified above. Batch finalization
+            # validates the copied destination, so don't hash the source again.
+            RawObjectStore.copy_request(temporary, current, verify=not defer_cleanup)
             if not defer_cleanup:
                 RawObjectStore.refresh_index(current)
                 RawObjectStore.remove_request(temporary)
@@ -392,19 +408,41 @@ class RawObjectStore:
         root = Path(raw_root).resolve()
         removals = {}
         current_directories = set()
+        resolved_parents = {}
         for promotion in promotions:
-            temporary, current = Path(promotion['temporary']).resolve(), Path(promotion['current']).resolve()
+            temporary_input, current_input = Path(promotion['temporary']), Path(promotion['current'])
+            if temporary_input.is_symlink() or current_input.is_symlink():
+                raise ValueError('batch raw finalization refuses symbolic-link request manifests')
+            if temporary_input.parent not in resolved_parents:
+                resolved_parents[temporary_input.parent] = temporary_input.parent.resolve()
+            if current_input.parent not in resolved_parents:
+                resolved_parents[current_input.parent] = current_input.parent.resolve()
+            temporary_parent = resolved_parents[temporary_input.parent]
+            current_parent = resolved_parents[current_input.parent]
+            temporary = temporary_parent / temporary_input.name
+            current = current_parent / current_input.name
             if not temporary.is_relative_to(root / '_tmp') or not current.is_relative_to(root) or current.is_relative_to(root / '_tmp'):
                 raise ValueError('batch raw finalization escaped raw storage')
-            if RawObjectStore.verify_manifest(current) != promotion['raw_hash']:
+            temporary_exists = temporary.exists()
+            if not temporary_exists and current.is_file():
+                # Recovery after a completed promotion can reuse the already
+                # verified immutable manifest. Its hash binds the exact body
+                # references; rereading every large response body adds no new
+                # task evidence on an idempotent retry.
+                current_hash = hashlib.sha256(current.read_bytes()).hexdigest()
+                if current_hash != promotion['raw_hash']:
+                    raise ValueError('batch raw finalization has no matching promoted response')
+            elif RawObjectStore.verify_manifest(current) != promotion['raw_hash']:
                 raise ValueError('batch raw finalization has no matching promoted response')
-            removals.setdefault(temporary.parent, set()).add(temporary)
+            owned = removals.setdefault(temporary.parent, set())
+            if temporary_exists:
+                owned.add(temporary)
             current_directories.add(current.parent)
         for directory, owned in removals.items():
             retained_bodies, removed_bodies = set(), set()
             for manifest in directory.glob('manifest.*.ndjson'):
                 bodies = {event['body_storage'] for event in map(json.loads, manifest.read_text(encoding='utf-8').splitlines()) if event.get('body_storage')}
-                (removed_bodies if manifest.resolve() in owned else retained_bodies).update(bodies)
+                (removed_bodies if manifest in owned else retained_bodies).update(bodies)
             for manifest in owned:
                 manifest.unlink(missing_ok=True)
                 label = manifest.name.removeprefix('manifest.').removesuffix('.ndjson')

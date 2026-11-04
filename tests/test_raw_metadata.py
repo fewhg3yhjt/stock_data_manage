@@ -270,3 +270,67 @@ def test_interrupted_raw_copy_rebuilds_index_before_removing_temporary(tmp_path)
         archive_root=tmp_path/'archive',expected_hash=expected)
     assert current.with_name('manifest.ndjson').is_file()
     assert not temporary.exists() and RawObjectStore.verify_manifest(current)==expected
+
+
+def test_batch_raw_promotion_checks_source_and_destination_once(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+    root = tmp_path / 'raw'
+    temporary = root / '_tmp/2026-10-29/tencent/kline_daily/manifest.request.ndjson'
+    current = root / '2026-10-29/tencent/kline_daily/manifest.request.ndjson'
+    store = RawObjectStore(temporary.parent, manifest_name=temporary.name)
+    store.record_response(response=SimpleNamespace(content=b'{"bars":[1]}', status_code=200,
+            headers={}, encoding='utf-8'), url='https://fixture.invalid/daily', method='GET',
+        request_headers={}, scope={}, provider='fixture', endpoint='daily',
+        code_version='fixture-v1', mode='fixture')
+    expected = RawObjectStore.verify_manifest(temporary)
+    original_verify, original_copy = RawObjectStore.verify_manifest, RawObjectStore.copy_request
+    verified, copy_options = [], []
+
+    def track_verify(path):
+        verified.append(str(path))
+        return original_verify(path)
+
+    def track_copy(source, destination, *, verify=True):
+        copy_options.append(verify)
+        return original_copy(source, destination, verify=verify)
+
+    monkeypatch.setattr(RawObjectStore, 'verify_manifest', staticmethod(track_verify))
+    monkeypatch.setattr(RawObjectStore, 'copy_request', staticmethod(track_copy))
+    promotion = {'temporary': str(temporary), 'current': str(current), 'raw_hash': expected}
+
+    resolved_context = (root.resolve(), temporary.parent, temporary.parent.resolve(),
+        current.parent, current.parent.resolve())
+    RawObjectStore.promote_unit(temporary=temporary, current=current, raw_root=root,
+        archive_root=tmp_path / 'archive', expected_hash=expected, defer_cleanup=True,
+        _resolved_path_context=resolved_context)
+    assert copy_options == [False]
+    assert verified == [str(temporary)]
+
+    RawObjectStore.finalize_promotions([promotion], raw_root=root)
+    assert verified == [str(temporary), str(current)]
+    assert not temporary.exists()
+    assert RawObjectStore.verify_manifest(current) == expected
+
+
+def test_batch_raw_finalization_reuses_already_promoted_manifest_hash(tmp_path, monkeypatch):
+    import hashlib
+    from types import SimpleNamespace
+
+    root = tmp_path / 'raw'
+    current = root / '2026-10-29/tencent/kline_daily/manifest.request.ndjson'
+    temporary = root / '_tmp/2026-10-29/tencent/kline_daily/manifest.request.ndjson'
+    store = RawObjectStore(current.parent, manifest_name=current.name)
+    store.record_response(response=SimpleNamespace(content=b'{"bars":[1]}', status_code=200,
+            headers={}, encoding='utf-8'), url='https://fixture.invalid/daily', method='GET',
+        request_headers={}, scope={}, provider='fixture', endpoint='daily',
+        code_version='fixture-v1', mode='fixture')
+    expected = hashlib.sha256(current.read_bytes()).hexdigest()
+
+    monkeypatch.setattr(RawObjectStore, 'verify_manifest', staticmethod(
+        lambda path: pytest.fail('already promoted response bodies must not be reread on task recovery')))
+
+    RawObjectStore.finalize_promotions([{'temporary': str(temporary), 'current': str(current),
+        'raw_hash': expected}], raw_root=root)
+
+    assert current.with_name('manifest.ndjson').is_file()
+    assert not temporary.exists()

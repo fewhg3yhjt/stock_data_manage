@@ -161,34 +161,45 @@ class TencentDailyProvider:
         optional_series_reason = None
         for cursor, stop, response, host in captured["segments"]:
             payload = EndpointContract(frozenset()).parse_json(response)
-            if not isinstance(payload, dict) or not isinstance(payload.get("data"), dict):
+            if not isinstance(payload, dict):
                 raise ProviderContractError("Tencent daily envelope changed", FailureClass.SCHEMA_CHANGED, retryable=False)
             if payload.get("code", 0) != 0:
+                message = str(payload.get("msg", "unknown"))
+                if (adjustment is not Adjustment.NONE and start == stop
+                        and str(payload.get("code")) == "11"
+                        and message.lower().startswith("mysql connect failed")):
+                    optional_series_reason = (
+                        f"Tencent upstream returned code 11 for the optional {bar_key} series: {message}; "
+                        "the unadjusted price was not copied"
+                    )
+                    hosts.append(host)
+                    continue
                 raise ProviderContractError("Tencent rejected the daily request parameters: " + str(payload.get("msg", "unknown")), FailureClass.SCHEMA_CHANGED, retryable=False)
+            if not isinstance(payload.get("data"), dict):
+                raise ProviderContractError("Tencent daily envelope changed", FailureClass.SCHEMA_CHANGED, retryable=False)
             data = payload["data"]
             row_limit = 1024 if api == "kline" else 640
             node = data.get(symbol)
+            if node is None and adjustment is not Adjustment.NONE and start == stop:
+                optional_series_reason = (
+                    f"Tencent did not return the requested optional {bar_key} series for {symbol}; "
+                    "the unadjusted price was not copied"
+                )
+                hosts.append(host)
+                continue
             if not isinstance(node, dict):
                 raise ProviderContractError("Tencent daily list changed", FailureClass.SCHEMA_CHANGED, retryable=False)
             items = node.get(bar_key)
             if (adjustment is not Adjustment.NONE and start == stop
-                    and (bar_key not in node or items == [])
-                    and isinstance(node.get("day"), list)
-                    and _contains_source_date(node["day"], start)):
+                    and (bar_key not in node or items is None)):
                 optional_series_reason = (
-                    f"Tencent returned the target day row but did not provide the requested {bar_key} series; "
+                    f"Tencent omitted the requested optional {bar_key} series for {symbol}; "
                     "the unadjusted price was not copied"
                 )
                 hosts.append(host)
                 continue
             if not isinstance(items, list):
                 raise ProviderContractError("Tencent daily list changed", FailureClass.SCHEMA_CHANGED, retryable=False)
-            if adjustment is not Adjustment.NONE and not items and node.get("day"):
-                raise ProviderContractError(
-                    "empty adjusted list cannot use unadjusted prices", FailureClass.SCHEMA_CHANGED, retryable=False
-                )
-            if len(items) > row_limit:
-                raise ProviderContractError("Tencent daily row limit changed", FailureClass.TRUNCATED, retryable=False)
             segment_dates = set()
             for item in items:
                 if not isinstance(item, list) or len(item) < 6:
@@ -213,6 +224,16 @@ class TencentDailyProvider:
                 if stamp in by_date:
                     raise ProviderContractError("duplicate Tencent daily date", FailureClass.SCHEMA_CHANGED, retryable=False)
                 by_date[stamp] = source
+            if start == stop and start not in segment_dates:
+                if adjustment is not Adjustment.NONE:
+                    optional_series_reason = (
+                        f"Tencent {bar_key} did not contain the requested target day {start.isoformat()}; "
+                        "the unadjusted price was not copied"
+                    )
+                hosts.append(host)
+                continue
+            if len(items) > row_limit and not (start == stop and start in segment_dates):
+                raise ProviderContractError("Tencent daily row limit changed", FailureClass.TRUNCATED, retryable=False)
             if api == "newfqkline" and len(items) == 640 and segment_dates and start < min(segment_dates):
                 raise ProviderContractError("requested Tencent history exceeds retained 640-bar window", FailureClass.TRUNCATED, retryable=False)
             if api == "kline" and len(items) == 1024 and segment_dates and start < min(segment_dates):
@@ -223,7 +244,7 @@ class TencentDailyProvider:
                 empty_is_valid=True, source_rows=tuple(source_rows),
                 mapping_context={"source_api": api, "adjustment": adjustment.value,
                     "adjustment_parameter": adjust, "source_bar_key": bar_key,
-                    "source_total_count": 0, "selected_row_count": 0,
+                    "source_total_count": len(source_rows), "selected_row_count": 0,
                     "history_completeness_verified": False,
                     "optional_series_status": "unavailable",
                     "optional_series_reason": optional_series_reason})
@@ -246,22 +267,6 @@ def _adjustment_token(adjustment: Adjustment) -> str:
 
 def _adjustment_bar_key(adjustment: Adjustment) -> str:
     return {Adjustment.NONE: "day", Adjustment.FORWARD: "qfqday", Adjustment.BACKWARD: "hfqday"}[adjustment]
-
-
-def _contains_source_date(rows, target) -> bool:
-    from datetime import date
-    target_date = target if type(target) is date else date.fromisoformat(str(target)[:10])
-    for row in rows:
-        if not isinstance(row, list) or not row:
-            continue
-        text = str(row[0]).strip()
-        try:
-            stamp = datetime.strptime(text, "%Y%m%d" if len(text) == 8 and text.isdigit() else "%Y-%m-%d").date()
-        except ValueError:
-            continue
-        if stamp == target_date:
-            return True
-    return False
 
 
 def tencent_symbol(code: str, *, allow_bse: bool = False, asset_type: str | None = None) -> str:

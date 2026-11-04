@@ -3,6 +3,8 @@ from __future__ import annotations
 from contextlib import contextmanager
 from typing import Iterator
 from threading import RLock
+import math
+from types import SimpleNamespace
 
 from ..contracts import FailureClass, ProviderContractError
 
@@ -148,6 +150,67 @@ class _RecordingSocket:
         return getattr(self._inner, name)
 
 
+class _TimeoutRecordingSocket:
+    """Apply a bounded SDK socket operation and retain the exact timeout stage."""
+
+    def __init__(self, inner, on_timeout):
+        self._inner = inner
+        self._on_timeout = on_timeout
+
+    def _call(self, operation, method, *args):
+        try:
+            return getattr(self._inner, method)(*args)
+        except TimeoutError as exc:
+            self._on_timeout(operation, exc)
+            raise
+
+    def connect(self, address):
+        return self._call("connect", "connect", address)
+
+    def send(self, data, *args):
+        return self._call("send", "send", data, *args)
+
+    def sendall(self, data, *args):
+        return self._call("send", "sendall", data, *args)
+
+    def recv(self, size, *args):
+        return self._call("read", "recv", size, *args)
+
+    def recv_into(self, buffer, nbytes=None, *args):
+        if nbytes is None:
+            return self._call("read", "recv_into", buffer, *args)
+        return self._call("read", "recv_into", buffer, nbytes, *args)
+
+    def __getattr__(self, name):
+        return getattr(self._inner, name)
+
+
+@contextmanager
+def _sdk_socket_timeout(seconds, on_timeout):
+    """Scope the timeout to BaoStock's socket module, leaving HTTP and other sockets alone."""
+    if seconds is None:
+        yield
+        return
+    import baostock.util.socketutil as socket_util
+
+    original_socket_module = socket_util.socket
+
+    def create_socket(*args, **kwargs):
+        sock = original_socket_module.socket(*args, **kwargs)
+        sock.settimeout(seconds)
+        return _TimeoutRecordingSocket(sock, on_timeout)
+
+    socket_util.socket = SimpleNamespace(
+        AF_INET=original_socket_module.AF_INET,
+        SOCK_STREAM=original_socket_module.SOCK_STREAM,
+        socket=create_socket,
+    )
+    try:
+        yield
+    finally:
+        socket_util.socket = original_socket_module
+
+
 class _CapturedResultSet:
     """Finalize the active receive stream only after BaoStock has exhausted this result set."""
 
@@ -181,12 +244,16 @@ class _CapturedResultSet:
 
 @contextmanager
 def captured_sdk_queries(store, *, mode, replay_manifest, evidence_roots, scope, code_version,
-                         trade_date, pacer, interval_seconds, max_age_seconds, client=None, query_requests=None):
+                         trade_date, pacer, interval_seconds, max_age_seconds, client=None, query_requests=None,
+                         socket_timeout_seconds: float | None = None):
     """Capture existing BaoStock SDK requests and replay only exact archived ResultSets.
 
     Daily validation requests additionally persist socket ``recv`` bytes before the SDK
     decodes them. Other supported queries retain their existing decoded-payload contract.
     """
+    if (socket_timeout_seconds is not None
+            and (not math.isfinite(socket_timeout_seconds) or socket_timeout_seconds <= 0)):
+        raise ValueError("BaoStock socket timeout must be a positive finite number")
     with _SDK_SESSION_LOCK:
         from datetime import datetime, timezone
         from pathlib import Path
@@ -197,6 +264,7 @@ def captured_sdk_queries(store, *, mode, replay_manifest, evidence_roots, scope,
         events, used, selected = [], set(), {}
         last_payload_time = None
         active_capture = None
+        active_call = {"stage": "session", "endpoint": "login", "parameters": None}
         query_scope = ({"trade_date": trade_date.isoformat(), "exchange_scope": "SH+SZ A shares"}
                        if trade_date else {"code_name": "ST", "exchange_scope": "SH+SZ"})
         if query_requests and 'query_trade_dates' in query_requests:
@@ -211,6 +279,20 @@ def captured_sdk_queries(store, *, mode, replay_manifest, evidence_roots, scope,
         def request_key(name, parameters):
             return json.dumps([name, sanitized_metadata(parameters)], ensure_ascii=False, sort_keys=True, separators=(",", ":"))
 
+        def record_socket_timeout(operation, exc):
+            event = {"event": "sdk_transport_failure", "provider": "baostock",
+                     "input_id": scope.get("input_id"), "endpoint": active_call["endpoint"],
+                     "method": active_call["stage"],
+                     "request_parameters": sanitized_metadata(active_call["parameters"]),
+                     "scope": query_scope, "input_scope": sanitized_metadata(scope),
+                     "code_version": code_version, "mode": "live", "outcome": "timeout",
+                     "failure_class": "connection_timeout", "operation": operation,
+                     "timeout_seconds": socket_timeout_seconds,
+                     "error_type": type(exc).__name__, "error_message": str(exc),
+                     "fetched_at_utc": datetime.now(timezone.utc).isoformat()}
+            store.append_event(event)
+            events.append(event)
+
         def matches(record, name, parameters):
             return (record.get("event") == "source_payload" and record.get("provider") == "baostock"
                     and record.get("endpoint") == name
@@ -223,34 +305,36 @@ def captured_sdk_queries(store, *, mode, replay_manifest, evidence_roots, scope,
 
         def lookup(name, parameters):
             if mode == "replay":
+                resolved_manifest = manifest.resolve()
                 found = next(((number, record) for number, record in archive_records
-                              if (manifest.resolve(), number) not in used and matches(record, name, parameters)), None)
+                              if (resolved_manifest, number) not in used and matches(record, name, parameters)), None)
                 if found is None:
                     return None
                 number, record = found
-                used.add((manifest.resolve(), number))
-                return manifest, number, record, "replay"
+                used.add((resolved_manifest, number))
+                return resolved_manifest, number, record, "replay"
             candidates = []
             now = datetime.now(timezone.utc)
             for root in evidence_roots:
                 for path in Path(root).rglob("manifest.ndjson") if Path(root).exists() else ():
+                    resolved_path = path.resolve()
                     for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
                         try:
                             record = json.loads(line)
-                            if ((path.resolve(), number) in used or not matches(record, name, parameters) or record.get("mode") != "live"
+                            if ((resolved_path, number) in used or not matches(record, name, parameters) or record.get("mode") != "live"
                                     or record.get("scope") != query_scope
                                     or record.get("sdk_status_code") != "0" or record.get("outcome") != "response"):
                                 continue
                             age = (now - datetime.fromisoformat(record["fetched_at_utc"])).total_seconds()
                             if 0 <= age <= max_age_seconds:
-                                candidates.append((age, path, number, record))
+                                candidates.append((age, resolved_path, number, record))
                         except (KeyError, ValueError, TypeError):
                             continue
             if not candidates:
                 return None
-            _, path, number, record = min(candidates, key=lambda item: item[0])
-            used.add((path.resolve(), number))
-            return path.resolve(), number, record, "cached"
+            _, resolved_path, number, record = min(candidates, key=lambda item: item[0])
+            used.add((resolved_path, number))
+            return resolved_path, number, record, "cached"
 
         requests = query_requests or {"query_all_stock": {"day": trade_date.isoformat()}, "query_stock_industry": {"date": trade_date.isoformat()}}
         request_plan = []
@@ -329,7 +413,8 @@ def captured_sdk_queries(store, *, mode, replay_manifest, evidence_roots, scope,
                          "tcp_response_chunks": tcp_chunks} if tcp_hash else {}),
                      "request_options": {"minimum_query_interval_seconds": max(3, interval_seconds),
                                          "effective_concurrency": 1, "physical_requests_visible": daily_plan,
-                                         "tcp_wire_bytes_visible": bool(tcp_hash)}}
+                                         "tcp_wire_bytes_visible": bool(tcp_hash),
+                                         "sdk_socket_timeout_seconds": socket_timeout_seconds}}
             store.append_event(event)
             events.append(event)
             return event
@@ -427,6 +512,7 @@ def captured_sdk_queries(store, *, mode, replay_manifest, evidence_roots, scope,
             expected_name, expected_parameters = request_plan[request_cursor]
             if name != expected_name or parameters != expected_parameters:
                 raise ValueError("SDK request order or parameters disagree with the frozen capture plan")
+            active_call.update(stage="query", endpoint=name, parameters=parameters)
             found = cached[request_cursor]
             request_cursor += 1
             key = request_key(name, parameters)
@@ -522,6 +608,7 @@ def captured_sdk_queries(store, *, mode, replay_manifest, evidence_roots, scope,
             last_payload_time = pacer.clock()
 
         def session_call(name):
+            active_call.update(stage="session", endpoint=name, parameters=None)
             try:
                 result = getattr(client, name)() if needs_live else SimpleNamespace(error_code="0", error_msg="")
             except Exception as exc:
@@ -539,7 +626,8 @@ def captured_sdk_queries(store, *, mode, replay_manifest, evidence_roots, scope,
                                         for name in dict.fromkeys(name for name, _ in request_plan)})
         archive = SimpleNamespace(store_source_payload=persist_decoded, captures_tcp_wire=daily_plan)
         try:
-            yield sdk_client, archive, events
+            with _sdk_socket_timeout(socket_timeout_seconds if needs_live else None, record_socket_timeout):
+                yield sdk_client, archive, events
         finally:
             if active_capture is not None:
                 finish_tcp_capture(active_capture, outcome="capture_context_closed_before_result_exhaustion")

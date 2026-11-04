@@ -177,6 +177,50 @@ def test_baostock_daily_requires_capture_context():
         BaoStockDailyProvider().fetch_daily(["sh600519"], date(2026, 9, 11))
 
 
+def test_baostock_sdk_socket_timeout_is_recorded_before_sdk_handles_it(monkeypatch, tmp_path):
+    import baostock.util.socketutil as socket_util
+
+    class TimedOutSocket:
+        timeout = None
+
+        def settimeout(self, value):
+            self.timeout = value
+
+        def connect(self, _address):
+            return None
+
+        def recv(self, _size):
+            raise TimeoutError("fixture read timed out")
+
+    socket = TimedOutSocket()
+    monkeypatch.setattr(socket_util, "socket", SimpleNamespace(
+        AF_INET=2, SOCK_STREAM=1, socket=lambda *_args, **_kwargs: socket))
+
+    class TimeoutClient:
+        def login(self):
+            connection = socket_util.socket.socket(socket_util.socket.AF_INET, socket_util.socket.SOCK_STREAM)
+            connection.connect(("fixture.invalid", 80))
+            connection.recv(8192)
+
+    raw = RawObjectStore(tmp_path / "raw")
+    with captured_sdk_queries(raw, mode="live", replay_manifest=None, evidence_roots=(),
+            scope={"input_id": "SDA-BOARD-005", "parameters": {"trade_date": "2026-11-04"}},
+            code_version="baostock-timeout-test-v1", trade_date=date(2026, 11, 4),
+            pacer=RequestPacer(wait=lambda _: None), interval_seconds=3, max_age_seconds=0,
+            client=TimeoutClient(), query_requests={"query_stock_basic": {"code_name": "ST"}},
+            socket_timeout_seconds=60) as (sdk_client, _archive, _events):
+        with pytest.raises(TimeoutError, match="fixture read timed out"):
+            sdk_client.login()
+
+    assert socket.timeout == 60
+    events = [json.loads(line) for line in raw.manifest.read_text(encoding="utf-8").splitlines()]
+    timeout = next(event for event in events if event["event"] == "sdk_transport_failure")
+    assert timeout["endpoint"] == "login"
+    assert timeout["operation"] == "read"
+    assert timeout["failure_class"] == "connection_timeout"
+    assert timeout["timeout_seconds"] == 60
+
+
 def test_baostock_5m_normalizes_rows_and_closes_to_response_shape(monkeypatch):
     client = FakeBaoStock()
     monkeypatch.setattr(minute_module, "logged_in_session", lambda: fake_session(client))

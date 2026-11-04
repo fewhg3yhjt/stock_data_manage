@@ -33,6 +33,16 @@ def test_cli_accepts_in_memory_stream_without_reconfigure(monkeypatch):
     assert exc.value.code == 0 and "stock-data" in stream.getvalue()
 
 
+def test_run_scheduler_cli_passes_configured_runtime_options(tmp_path, monkeypatch):
+    calls = []
+    monkeypatch.setattr("stock_data_manage.worker.scheduler.run_scheduler",
+        lambda config_root, **kwargs: calls.append((config_root, kwargs)))
+    assert main(["run-scheduler", "--config-root", str(tmp_path / "config"),
+        "--data-root", str(tmp_path / "data"), "--poll-interval-seconds", "15"]) == 0
+    assert calls == [(tmp_path / "config", {"data_root": tmp_path / "data",
+        "poll_interval_seconds": 15.0})]
+
+
 def test_security_due_cli_plans_configured_sources_without_route_qualification(tmp_path, capsys):
     import json
     args = ["collect-due-inputs", "--dataset", "security_master", "--now", "2026-10-09T08:05:00+08:00",

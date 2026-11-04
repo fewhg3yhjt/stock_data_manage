@@ -292,7 +292,7 @@ def verify_partition(root):
     manifest = Manifest.load(path)
     assert manifest.verify(path.parent / "data.parquet")
     assert manifest.row_count == manifest.expected_count == 3
-    assert manifest.schema_version == "daily-aggregate-v1" and manifest.adjustment == "aggregate"
+    assert manifest.schema_version == "daily-aggregate-v2" and manifest.adjustment == "aggregate"
     assert not (path.parent / "task-commit.json").exists()
     records = CanonicalPartitionStore(root / "canonical").read_daily("stock", DAY)
     assert len(records) == len({record.key for record in records}) == 3

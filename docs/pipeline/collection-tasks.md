@@ -308,10 +308,119 @@ flowchart TB
 | 入口 | 结果及边界 |
 |---|---|
 | collect-input | 单输入的原始证据、来源行及候选；不自动发布 |
-| collect-task | 证券名单或单日日线；证券名单按冻结定义调用显式来源单元，日线动态来源须通过其路由资格；replay须使用隔离根目录 |
-| collect-due-inputs | 单次到期检查；execute才执行，不启动常驻服务 |
+| collect-task | 证券名单或单日日线；命名配置任务按冻结定义调用显式来源单元，`daily_fixed` live任务不预查逐证券资格；通用动态/独立输入仍按资格合同处理；replay须使用隔离根目录 |
+| collect-due-inputs | 单次到期检查；`execute`才执行，不启动常驻服务 |
+| run-scheduler | 常驻轮询`security_master_update`和`daily_bar_sync`，从现有YAML读取时间并调用`collect-due-inputs`对应的同一业务任务 |
 | update-trading-calendar | 指定日期的轻量日历更新，写既有日历及证据 |
 | recover | 续接已准备且可验证的发布，不绕过质量或重抓来源 |
+
+### 日线收盘任务单次分派（2026-11-02，已实现）
+
+原问题是配置中的 `daily_bar_sync` 只有独立的 `16:20` 时间，`collect-due-inputs` 没有把它转换为日线业务任务；现有 `market_daily` 批任务因此不会从该调度入口启动。现已在现有配置和执行器之间接通分派，没有增加行情来源：日历补查仍调用既有 BaoStock 交易日历更新能力，行情来源仍由 `market_daily` 和现有日线路由配置决定。
+
+```mermaid
+flowchart LR
+  subgraph before[改造前]
+    S0[schedules.yaml: daily_bar_sync 16:20] --> J0[仅作为时间项加载]
+    C0[collect-due-inputs] --> I0[输入候选或证券主数据分支]
+    J0 -. 没有日线任务分派 .-> X0[market_daily 不会启动]
+  end
+  subgraph after[改造后]
+    Y1[collection.yaml: daily_bar → daily_bar_close + market_daily] --> S1[schedules.yaml 引用 daily_bar_close]
+    S1 --> P1[collect-due-inputs --dataset daily_bar]
+    P1 --> CAL{当日交易日已确认?}
+    CAL -- 未知且仅计划 --> B1[blocked，不写运行数据]
+    CAL -- 未知且到期执行 --> UP[既有 BaoStock 单日历更新并留证]
+    UP --> CAL
+    CAL -- 休市 --> SKIP[不启动批任务]
+    CAL -- 开市且未到时 --> WAIT[not_due]
+    CAL -- 开市且已到时 --> SM{目标日七组security_master已发布?}
+    SM -- 否 --> SMRUN[先运行现有security_master任务]
+    SMRUN --> SMCHECK{清单正式发布?}
+    SMCHECK -- 否 --> SMBLOCK[记录名单来源/发布状态<br/>不启动日线]
+    SMCHECK -- 是 --> T1[冻结 market_daily 任务定义]
+    SM -- 是 --> T1
+    T1 --> E1[collect_task live / resume]
+    E1 --> Q{逐来源检查资格}
+    Q -- 不合格 --> G1[对应来源组阻断并留任务证据]
+    Q -- 合格 --> R1[采集原文 → 处理与质量检查]
+    G1 --> PUB[按既有覆盖和发布门槛决定各资产类型]
+    R1 --> PUB
+    PUB --> OUT[data/raw, task_workspace, canonical, metadata]
+  end
+```
+
+配置关系为 `collection.yaml.daily_bar.collection_profile=daily_bar_close`、`collection.yaml.daily_bar.task=market_daily`，而 `schedules.yaml.daily_bar_sync` 只引用该 profile，避免重复维护 `16:20`。入口示例：
+
+日频周期的到期判断是“当日当前时间已达到或超过配置时刻”，不是要求命令恰好在16:20启动；例如当天21:31仍会返回该日的到期任务。每天使用稳定任务ID，未完成运行按`resume`续接，已发布任务重复触发则沿用现有无操作恢复行为。此规则由`collection_slot`计算，单测覆盖16:35晚于配置时刻的情况。
+
+```powershell
+& 'D:\Program Files\Python\python.exe' -m stock_data_manage.cli collect-due-inputs --dataset daily_bar
+& 'D:\Program Files\Python\python.exe' -m stock_data_manage.cli collect-due-inputs --dataset daily_bar --execute --mode live
+```
+
+第一条只返回单次计划；第二条会运行真实来源请求，并写入配置的正式 `data/` 根目录。缺少当日日历时先调用既有单日更新并保存日历证据；证券清单没有更新到目标日时，会调用既有证券清单任务。刷新成功则使用新清单；刷新失败但最后一份完整清单仍可用于目标日时，继续用原状态和原清单执行日线，不把证券标记为无效；只有没有可用正式清单时才阻断。需要隔离运行时必须明确传入独立 `--data-root`，并遵守任务入口对正式目录的保护。
+
+已执行的定向检查覆盖配置解析、收盘时刻计算、任务定义、计划/执行分派及未知日历阻断。它验证调度路径，不代表本次执行了行情采集或发布。之前的隔离批运行记录显示 ETF 达到发布条件，部分股票与指数仍被来源资格或数据质量门槛阻断；本次没有更改这些门槛。`ASTOCK-002` 与 `CSI-INDEX-DAILY-001` 之外的日线来源仍须按已配置的合同和证据取得资格，`validation_only` 来源不会因调度开启而变为生产可用。
+
+截至2026-11-02，本节只启用单次CLI调度入口，尚未创建常驻调度进程；管理台仍不能启动或跟踪这类长任务。常驻调度当前状态见下方2026-11-04记录。
+
+### 每日正式日线任务与常驻调度（2026-11-04）
+
+用户目标是每天自动更新有效证券的日线并完成正式发布。此前只有单次分派入口，操作系统没有持续运行的调度进程；即使手动启动日线周期，来源请求前仍会因逐证券资格记录缺失或过期而停在采集前。此次在现有`schedules.yaml`、`collection.yaml`和`PhaseOneScheduler`上增加常驻轮询入口，并让命名配置任务使用其已声明的`daily_fixed`来源；没有新增Provider、名单目录或任务状态库。
+
+```mermaid
+flowchart LR
+  subgraph before[改造前：配置可计划，不能自动触发]
+    Y0[schedules.yaml + collection.yaml] --> C0[collect-due-inputs 单次调用]
+    C0 --> F0[没有常驻进程<br/>无人调用时不运行]
+    C0 --> Q0{逐证券资格存在且未过期?}
+    Q0 -->|否| B0[来源单元阻断<br/>没有日线发布]
+  end
+  subgraph after[改造后：同一业务任务自动执行]
+    L1[Windows用户登录触发] --> R1[run-scheduler常驻轮询<br/>每30秒读取现有时间配置]
+    R1 --> S1{到期任务}
+    S1 -->|08:00| M1[collect-due-inputs<br/>security_master]
+    S1 -->|16:20或之后启动| D1[collect-due-inputs<br/>daily_bar 当日日期]
+    D1 --> CAL{交易日已确认?}
+    CAL -->|缺失| CU[现有BaoStock日历更新并留证]
+    CU --> CAL
+    CAL -->|休市/未知| STOP[记录跳过或阻断<br/>不发起行情请求]
+    CAL -->|开市| SM{有目标日或更早的完整正式清单?}
+    SM -->|没有可用清单| M2[执行现有security_master更新任务]
+    M2 -->|成功发布完整清单| F1
+    M2 -->|失败且无旧清单| STOP
+    M2 -->|失败但旧清单完整且日期不晚于目标日| OLD[保留旧证券有效状态<br/>继续使用最后成功清单]
+    SM -->|存在可用清单| M3{清单已更新到目标日?}
+    M3 -->|否| RETRY{当日清单任务是否已失败?}
+    RETRY -->|是| OLD
+    RETRY -->|否| M4[尝试更新security_master]
+    M4 -->|成功| F1
+    M4 -->|失败，保留旧清单| OLD
+    M3 -->|是| F1
+    OLD --> F1[冻结market_daily范围<br/>读取daily_fixed来源配置]
+    F1 --> H{来源健康且不在冷却?}
+    H -->|否| STOP
+    H -->|是| RAW[按股票/ETF/指数及固定来源<br/>请求并留存原始响应]
+    RAW --> V[逐单元检查目标日期、字段和值<br/>保留来源失败证据]
+    V --> P{现有覆盖与发布门槛}
+    P -->|通过| OUT[写data/raw、task_workspace、canonical、metadata]
+    P -->|未通过| STOP
+  end
+```
+
+配置数据和对用户行为的影响如下：
+
+| 对象 | 输入及职责 | 产物/行为 |
+|---|---|---|
+| `config/schedules.yaml`与`config/collection.yaml` | 08:00证券清单、16:20日线配置；常驻进程每30秒读取，时间不复制到操作系统计划任务 | 到点启动对应的现有业务入口；进程登录晚于时刻时，仍执行当日已到期任务 |
+| `config/capabilities.yaml`的`daily_fixed` | 腾讯沪深北股票/ETF日线及明确列出的CSI/CNI指数输入 | 只调用配置内固定输入；不自动换源、不扩代码范围，也不通过资格记录为其他动态路由授权 |
+| 来源健康和逐单元质量 | Provider冷却状态、实际响应原文、目标日值、字段合同及当前发布门槛 | 来源失效仍形成任务失败证据；响应不合格或覆盖不足时不伪装成功、不越过发布门槛 |
+| 证券清单与正式发布 | 使用最后一次成功发布、日期不晚于目标日且七组完整的清单；目标日尚未刷新时尝试原清单任务 | 刷新成功用新清单；刷新失败仍用原清单及其有效状态，只有无可用清单时阻断。同一日期已有失败任务摘要时直接复用失败结果，避免在日线启动前立即重复同一来源请求。正式日线按资产类型写到目标交易日分区，工作区与元数据保留恢复记录 |
+
+这里取消的是命名`daily_fixed`任务请求前按每只证券查询可过期资格记录的阻断；保留固定路由配置校验、Provider健康/冷却、原始响应留证、逐单元日期/字段/值检查、覆盖及正式发布门槛。`collect-input`和未命名的通用/动态任务仍按原资格合同运行；该业务任务的成功也不会授予通用路由资格。当前不补跑未执行的过往日期；操作员可按现有手动指定日期入口启动明确的历史任务，任务日期和范围照旧冻结。
+
+系统启动方式为Windows任务计划程序的当前用户登录触发，执行`D:\Program Files\Python\python.exe -m stock_data_manage.cli run-scheduler --config-root config`，工作目录为项目根目录；不在Windows中再配置08:00/16:20两个触发器，避免双重触发。项目内没有独立Windows服务或进程看门狗：`run-scheduler`是前台轮询循环，单个到期业务任务同步运行；业务处理异常会被记录并让轮询继续，进程本身退出后项目内没有另一个进程负责重启它。已注册的Windows计划任务是否配置失败重启或机器启动恢复，必须以操作系统任务属性为准；当前执行环境无法读取这些属性，因此不能宣称外部自动恢复已验证。该入口当前只分派证券清单与日线两类业务任务；既有分钟和校准时间项不在本次范围内。进程以当前用户会话运行，可使用该会话配置的现有网络代理。目标端到端运行及正式任务注册状态写入[项目进度](../../PROJECT_PROGRESS.md#当前业务交付状态)。
 
 现有日线任务首次从不晚于目标日的正式名单展开范围，并保存定义；已有任务由 `_task_units` 读取原冻结单元，不因新上市证券改变续跑范围。规则或请求合同变化仍要求新任务；不能将当前YAML覆盖旧定义。动态范围all_stock/all_etf/all_index只表示展开能力，不授予对应资产生产资格。
 

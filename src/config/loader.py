@@ -140,12 +140,16 @@ class InputCapabilityConfig:
     effective_concurrency: int = 1
     request_limit_enforcement: str = "unimplemented"
     base_requests_per_fetch: int = 1
+    sdk_socket_timeout_seconds: float | None = None
     dataset: str | None = None
     runtime_method: str | None = None
 
     def __post_init__(self) -> None:
         if not math.isfinite(self.request_interval_seconds) or self.request_interval_seconds < 0 or self.effective_concurrency < 1 or self.base_requests_per_fetch < 1:
             raise ValueError("invalid input request policy")
+        if (self.sdk_socket_timeout_seconds is not None
+                and (not math.isfinite(self.sdk_socket_timeout_seconds) or self.sdk_socket_timeout_seconds <= 0)):
+            raise ValueError("invalid SDK socket timeout")
         if self.request_limit_enforcement not in {"unimplemented", "call_boundary_only", "physical_request"}:
             raise ValueError("invalid input request enforcement")
         if self.request_shape not in {"single_symbol", "symbol_batch", "date_snapshot", "full_snapshot", "file_package", "paged_list"}:
@@ -195,6 +199,8 @@ def load_input_capabilities(path: str | Path) -> tuple[InputCapabilityConfig, ..
             effective_concurrency=int(item.get("effective_concurrency", 1)),
             request_limit_enforcement=str(item.get("request_limit_enforcement", "unimplemented")),
             base_requests_per_fetch=int(item.get("base_requests_per_fetch", 1)),
+            sdk_socket_timeout_seconds=(float(item["sdk_socket_timeout_seconds"])
+                                        if item.get("sdk_socket_timeout_seconds") is not None else None),
             dataset=item.get("dataset"),
             runtime_method=item.get("runtime_method"),
         ))

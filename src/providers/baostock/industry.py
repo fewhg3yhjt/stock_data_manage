@@ -97,7 +97,8 @@ class BaoStockIndustryMembershipProvider:
                 continue
             prefix, _, code = row['code'].partition('.')
             item = {'trade_date': trade_date, 'stock_code': code, 'stock_name': row['code_name'],
-                'exchange': {'sh':'XSHG','sz':'XSHE','bj':'BSE'}[prefix], 'asset_type': 'index' if str(meta['type']) == '2' else 'stock', 'status':'unknown',
+                'exchange': {'sh':'XSHG','sz':'XSHE','bj':'BSE'}[prefix], 'asset_type': 'index' if str(meta['type']) == '2' else 'stock',
+                'status': {'1': 'active', '0': 'suspended'}.get(str(row.get('tradeStatus', '')), 'unknown'),
                 'list_date': script_date(meta['ipoDate']), 'delist_date': script_date(meta['outDate']),
                 'date_basis': 'direct_historical_type_checked', 'script_sources':'bs_all_stock'}
             details.append(dict(item))

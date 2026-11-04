@@ -90,6 +90,10 @@ class CsindexDailyProvider:
             rows.append({"symbol": captured["symbol"], "trade_date": captured["start"].isoformat(),
                 **prices, "volume": None, "amount": None, "adjustment": "none",
                 "value_contract": self.value_contract})
+        if not rows:
+            raise ProviderContractError(
+                "CSI daily response has no target-date row", FailureClass.TEMPORARY_EMPTY, retryable=False
+            )
         return InputFetchResult(tuple(rows), source_url=self.url, source_rows=tuple(source_rows),
             mapping_context={"adjustment": "none", "value_contract": self.value_contract, "returned_row_count": len(source_rows)})
 

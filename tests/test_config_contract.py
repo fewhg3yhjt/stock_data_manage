@@ -113,7 +113,11 @@ def test_recent_minute_contract_rejects_history_and_invalid_count():
 
 
 def test_snapshot_requires_known_trading_date_and_separates_local_filter():
-    contract = next(c for c in load_input_capabilities(PROJECT_ROOT / "config/providers.yaml") if c.input_id == "SDA-BOARD-005")
+    baostock_inputs = [c for c in load_input_capabilities(PROJECT_ROOT / "config/providers.yaml")
+                       if c.provider == "baostock"]
+    contract = next(c for c in baostock_inputs if c.input_id == "SDA-BOARD-005")
+    assert contract.sdk_socket_timeout_seconds == 60
+    assert all(c.sdk_socket_timeout_seconds == 60 for c in baostock_inputs)
     context = {"request": {"trade_date": "2026-09-30"}, "calendar": {"trading_dates": [date(2026, 9, 30)]}}
     assert contract.bind_parameters(context) == {"trade_date": date(2026, 9, 30), "include_etf": False}
     with pytest.raises(ValueError, match="calendar coverage"):

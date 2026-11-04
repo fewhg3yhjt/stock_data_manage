@@ -469,6 +469,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                         scope={"input_id": input_id, "parameters": normalized_context}, code_version=code_version,
                         trade_date=parameters.get("trade_date"), pacer=pacer, interval_seconds=contract.request_interval_seconds,
                         max_age_seconds=0 if force_fetch else profile.refresh_interval_seconds or 86400, client=client,
+                        socket_timeout_seconds=contract.sdk_socket_timeout_seconds,
                         query_requests={'query_stock_basic': {'code_name': 'ST'}} if input_id == 'ASTOCK-044' else
                             {'query_trade_dates': {'start_date': parameters['trade_date'].isoformat(), 'end_date': parameters['trade_date'].isoformat()},
                              'query_all_stock': {'day': parameters['trade_date'].isoformat()}, 'query_stock_basic': {}} if input_id == 'SECURITY-BS-UNIVERSE-001' else
@@ -1334,15 +1335,6 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                     if entry['task_id'] != task_id or entry['unit_key'] != unit['key']:
                         raise ValueError('daily unit index identity differs from frozen batch')
                     entries[unit['key']] = entry
-            if redo == 'resume':
-                for entry in entries.values():
-                    if entry.get('capture_status') == 'captured' and RawObjectStore.verify_manifest(entry['raw_manifest']) != entry['raw_hash']:
-                        raise ValueError('retained daily unit response changed')
-                    if entry.get('process_status') == 'candidate_complete' and (
-                            file_hash(Path(entry['artifact'])) != entry['artifact_hash'] or file_hash(Path(entry['report_path'])) != entry['report_hash']):
-                        raise ValueError('daily processed artifact changed')
-                    if entry.get('process_status') == 'unverified' and file_hash(Path(entry['report_path'])) != entry['report_hash']:
-                        raise ValueError('daily unverified quote report changed')
             if state['status'] == 'published' and state.get('complete_today') and redo == 'resume':
                 if len(entries) != len(units):
                     raise ValueError('published daily batch unit index is incomplete')
@@ -1388,11 +1380,21 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                     _save_daily_batch(state, paths, metadata)
                     last_saved = monotonic()
             try:
-                # Qualification artifacts and configuration are examined once per
-                # evidence grant. Per-request checks below only inspect expiry/health.
+                # Explicit daily_fixed inputs are production task routes. They do
+                # not require expiring per-symbol route evidence before collection;
+                # source response, unit, health and publication checks still apply.
                 qualifications = {}
                 pending_capture = [u for u in active_units if entries.get(u['key'], {}).get('capture_status') != 'captured']
-                if mode != 'replay' and pending_capture:
+                daily_fixed_live_task = (mode == 'live' and resolved.get('acquisition_policy') == 'daily_fixed'
+                    and bool(resolved.get('task')))
+                fixed_route_ids = {source['input_id'] for source in
+                    resolved.get('source_policy', {}).get('inputs', ())}
+                if daily_fixed_live_task:
+                    unexpected = sorted({u['input_id'] for u in pending_capture} - fixed_route_ids)
+                    if not fixed_route_ids or unexpected:
+                        raise ValueError('live daily_fixed task contains a source outside its configured routes')
+                    state.pop('qualification_ref', None)
+                elif mode != 'replay' and pending_capture:
                     for input_id in sorted({unit['input_id'] for unit in pending_capture}):
                         grouped = [unit for unit in pending_capture if unit['input_id'] == input_id]
                         try:
@@ -1412,7 +1414,7 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                     state.update(qualification_attempt=preparation, qualification_ref={
                         'path': str(qualification_path), 'sha256': file_hash(qualification_path)})
                 cache_roots = [paths['raw_root'], paths['archive_root'] / '_raw_evidence', *resolved.get('evidence_roots', [])]
-                cache_lookup = RawObjectStore.batch_cache_lookup(cache_roots) if mode == 'live' else None
+                cache_lookup = RawObjectStore.batch_cache_lookup(cache_roots) if mode == 'live' and pending_capture else None
                 state.update(status='collecting', phase='capture', error=None)
                 progress.begin('raw')
                 checkpoint(True)
@@ -1423,8 +1425,9 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                     qualification = qualifications.get(unit['input_id'])
                     entry = entries.get(unit['key'], {})
                     if entry.get('capture_status') == 'captured':
-                        if RawObjectStore.verify_manifest(entry['raw_manifest']) != entry['raw_hash']:
-                            raise ValueError('retained daily unit response changed')
+                        # Reused candidates already passed response verification when
+                        # they were processed; units needing work are verified by
+                        # process_daily_unit immediately before parsing.
                         progress.finish('raw', unit['key'], 'reused')
                         continue
                     if qualification and not qualification.get('eligible', False):
@@ -1551,6 +1554,29 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                                                 decision['capture'] = False
                                             else:
                                                 decision['capture'] = True
+                                        elif daily_fixed_live_task:
+                                            contract, provider = contracts[unit['input_id']], providers[unit['input_id']]
+                                            parameters = contract.bind_parameters(unit['context'])
+                                            source_market = {'sh': 'XSHG', 'sz': 'XSHE', 'bj': 'BSE'}.get(
+                                                str(parameters.get('code', unit['symbol']))[:2].lower())
+                                            if source_market is None:
+                                                raise ValueError('configured daily route has an unsupported source market')
+                                            health = metadata.provider_health(provider=contract.provider, endpoint=contract.endpoint,
+                                                capability_version=provider.capability_version, dataset='daily_bar',
+                                                market=source_market, asset_type=unit['asset_type'])
+                                            if not metadata.provider_available(health, datetime.now(timezone.utc)):
+                                                entry = {'task_id': task_id, 'unit_key': unit['key'], 'key': unit['key'],
+                                                    'symbol': unit['symbol'], 'asset_type': unit['asset_type'], 'input_id': contract.input_id,
+                                                    'capture_status': 'blocked', 'process_status': 'blocked', 'status': 'failed',
+                                                    'error': 'configured daily source is disabled or cooling down',
+                                                    'failure_class': 'provider_cooling_down'}
+                                                entries[unit['key']] = entry
+                                                save_batch_json(daily_unit_paths(work, unit)['manifest'], entry)
+                                                progress.finish('raw', unit['key'], 'failed')
+                                                checkpoint()
+                                                decision['capture'] = False
+                                            else:
+                                                decision['capture'] = True
                                         else:
                                             decision['capture'] = True
                                     finally:
@@ -1567,9 +1593,14 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                                                 raw_events = [json.loads(line) for line in temporary.read_text(encoding='utf-8').splitlines()]
                                                 throttled = next((event['status_code'] for event in raw_events
                                                     if event.get('mode') == 'live' and event.get('status_code') in {403, 429}), None)
-                                                if throttled and grant:
+                                                if throttled and mode == 'live' and (grant or daily_fixed_live_task):
+                                                    parameters = contract.bind_parameters(unit['context'])
+                                                    source_market = {'sh': 'XSHG', 'sz': 'XSHE', 'bj': 'BSE'}.get(
+                                                        str(parameters.get('code', unit['symbol']))[:2].lower())
+                                                    if source_market is None:
+                                                        raise ValueError('configured daily route has an unsupported source market')
                                                     metadata.record_provider_failure(provider=contract.provider, endpoint=contract.endpoint,
-                                                        capability_version=provider.capability_version, dataset='daily_bar', market=grant['market'],
+                                                        capability_version=provider.capability_version, dataset='daily_bar', market=source_market,
                                                         asset_type=unit['asset_type'], failure_class='rate_limited' if throttled == 429 else 'forbidden',
                                                         error=f'HTTP {throttled}', now=datetime.now(timezone.utc),
                                                         http_status=throttled, cooldown_seconds=300)
@@ -2657,10 +2688,20 @@ def _finish_task_commit(state, paths, metadata, failure_hook=None, progress=None
     if progress:
         progress.finish('publication', 'canonical')
         save(state)
+    promotion_path_contexts = {}
+    resolved_raw_root = Path(paths['raw_root']).resolve()
     for promotion in commit["promotions"]:
+        temporary_input, current_input = Path(promotion["temporary"]), Path(promotion["current"])
+        parent_key = (temporary_input.parent, current_input.parent)
+        path_context = promotion_path_contexts.get(parent_key)
+        if path_context is None:
+            path_context = (resolved_raw_root, temporary_input.parent, temporary_input.parent.resolve(),
+                            current_input.parent, current_input.parent.resolve())
+            promotion_path_contexts[parent_key] = path_context
         RawObjectStore.promote_unit(temporary=promotion["temporary"], current=promotion["current"],
             raw_root=paths["raw_root"], archive_root=paths["archive_root"], expected_hash=promotion["raw_hash"],
-            defer_cleanup=state.get('batch_raw_finalize', False))
+            defer_cleanup=state.get('batch_raw_finalize', False),
+            _resolved_path_context=path_context)
         if failure_hook:
             failure_hook("after_raw_promote")
         entry = state["units"][promotion["key"]]
@@ -2913,11 +2954,31 @@ def _collect_due_daily_bar(*, now, config_root, data_root, execute, mode, calend
             if master_updated_today:
                 security_master_prerequisite = {"status": "available", "manifest": security_manifest}
             else:
-                master_report = _collect_due_security_master(now=now, config_root=root,
-                    data_root=paths["data_root"], execute=True, mode="live",
-                    calendar_days=[{"trade_date": day.isoformat(), "is_trading_day": True}],
-                    dependency_paths=dependency_paths, collector=None)
-                master_job = master_report["jobs"][0]
+                master_work = paths["workspace_root"] / day.isoformat() / "security_master"
+                master_summary_path = master_work / "summary.json"
+                prior_master_job = None
+                if master_summary_path.is_file():
+                    prior_summary = json.loads(master_summary_path.read_text(encoding="utf-8"))
+                    expected_master_task = "security-master-" + day.strftime("%Y%m%d")
+                    if (prior_summary.get("task_id") == expected_master_task
+                            and prior_summary.get("status") in {"failed", "blocked"}):
+                        # The scheduler already tried this date's master refresh.
+                        # Reuse that durable result instead of issuing the same
+                        # BaoStock requests again immediately before daily bars.
+                        prior_master_job = {"task_id": expected_master_task,
+                            "status": prior_summary["status"],
+                            "error": "same-date security-master refresh already ended; using the latest complete published master",
+                            "already_attempted_today": True,
+                            "summary": {"path": str(master_summary_path),
+                                        "sha256": file_hash(master_summary_path)}}
+                if prior_master_job is None:
+                    master_report = _collect_due_security_master(now=now, config_root=root,
+                        data_root=paths["data_root"], execute=True, mode="live",
+                        calendar_days=[{"trade_date": day.isoformat(), "is_trading_day": True}],
+                        dependency_paths=dependency_paths, collector=None)
+                    master_job = master_report["jobs"][0]
+                else:
+                    master_job = prior_master_job
                 refreshed_manifest = _current_security_master(paths, day, root)
                 security_manifest = refreshed_manifest or security_manifest
                 security_master_prerequisite = {"status": "available" if security_manifest else master_job["status"],

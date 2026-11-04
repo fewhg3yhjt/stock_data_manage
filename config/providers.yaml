@@ -749,7 +749,8 @@ input_capabilities:
     - fqkline与newfqkline的比较仅覆盖8只证券、12组窗口和76条共同日期记录；数值差异、字段差异及精度已记录，不构成全市场或单位认证。
     - newfqkline显式none的历史单日样本以请求结束日为窗口边界，但仍返回640条日线，开始日期不裁剪响应；Provider保留原响应全部来源行，仅筛选目标日期。若请求起日早于640条返回窗口，明确报截断。
     - 成交量和成交额单位未认证，标准输出置空；复权价格使用来源返回序列，不在本地重算。
-    - 请求间隔0.3秒、单并发；参考原项目节流，不代表持续容量已验证，不自动启用路由
+    - 显式配置的stock_daily或market_daily任务可按daily_fixed执行live采集；这些任务不依赖逐证券资格记录，通用动态/独立输入路由仍按资格合同控制
+    - 请求间隔0.3秒、单并发；参考原项目节流，不代表持续容量已验证，不扩展为未配置范围
     request_interval_seconds: 0.3
     effective_concurrency: 1
     request_limit_enforcement: call_boundary_only
@@ -1463,6 +1464,7 @@ input_capabilities:
     request_interval_seconds: 3
     effective_concurrency: 1
     request_limit_enforcement: call_boundary_only
+    sdk_socket_timeout_seconds: 60
     dataset: st_name_list
     runtime_method: fetch_st_list
     forbidden_sources:
@@ -2038,7 +2040,7 @@ input_capabilities:
     evidence_refs: [tmp/batch-remediation-20261029/interface-review/raw/csi-daily-sh000816/manifest.ndjson]
     limitations:
     - 仅用于daily_fixed中显式列出的11个上海中证指数；来源只返回收盘点位，开高低及量额均保留空值
-    - 该接口有已保存的目标日原始响应；尚未完成正式Provider资格验证，不允许live/retained正式采集
+    - market_daily按daily_fixed配置的11个上海指数可执行live任务；每个目标日仍须通过响应、收盘值、候选与发布检查，通用动态/独立输入仍受资格合同控制
     request_interval_seconds: 3
     effective_concurrency: 1
     request_limit_enforcement: call_boundary_only
@@ -2085,7 +2087,7 @@ input_capabilities:
     limitations:
     - 仅为名单中存在明确配对依据的深圳指数记录请求中证上海行情代码；发布身份仍保留名单代码。
     - 只映射目标日完整OHLC；成交量、成交额单位未核实，标准记录为空，原始来源行完整保留。
-    - 仅允许隔离回放；Provider正式资格尚未通过，live/retained任务继续在请求前被现有资格检查阻断。
+    - market_daily按daily_fixed配置的深圳配对代码可执行live任务；请求代码映射和目标日完整OHLC仍逐单元检查，通用动态/独立输入仍受资格合同控制。
     request_interval_seconds: 3
     effective_concurrency: 1
     request_limit_enforcement: call_boundary_only
@@ -2131,7 +2133,7 @@ input_capabilities:
     limitations:
     - 仅用于配置中明确列出的13个深圳名单指数并列代码；业务身份保留名单代码，CSI请求代码来自security_master.yaml。
     - 原始响应目标日只提供收盘点位；开高低与未核验量额留空，不从其他字段或来源补造。
-    - 仅允许隔离回放；当前不授予live/retained在线资格。
+    - market_daily按daily_fixed配置的深圳配对代码可执行live任务；只要求目标日有效收盘点位，开高低与未核验量额保持空值，通用动态/独立输入仍受资格合同控制。
     request_interval_seconds: 3
     effective_concurrency: 1
     request_limit_enforcement: call_boundary_only
@@ -2172,7 +2174,7 @@ input_capabilities:
     limitations:
     - 仅限daily_fixed显式列出的国证指数代码和一个目标日期；HTTP成功不代表该代码有行情。
     - 映射开高低收；成交量和成交额来源单位尚未核验，正式标准候选保留空值，原响应保留在来源行。
-    - 只允许隔离回放；Provider资格未通过前，live及retained任务仍由现有资格门禁阻断。
+    - market_daily按daily_fixed配置的sz399299和sz980070可执行live任务；实际数据仍须通过目标日、完整四价、候选与发布检查，通用动态/独立输入仍受资格合同控制。
     request_interval_seconds: 3
     effective_concurrency: 1
     request_limit_enforcement: call_boundary_only
@@ -2966,6 +2968,7 @@ input_capabilities:
     limitations:
     - 默认筛选沪深A股，名单支持302代码段；config.include_etf=true 时保留ETF交易代码范围内记录，含简称没有ETF的货币ETF。ETF指数、LOF及联接基金不混入ETF；该分类不证明独立全量覆盖。BaoStock TCP原始帧不对SDK调用方开放。2026-10-02非交易日空返回已保存在 provider_validation/results/live-probes/baostock-industry-20261003/result.json。
     - 采集节奏和3秒间隔为初始保守配置；没有持续容量验证，不自动启用路由
+    - SDK TCP连接与读取均限制为60秒；超时作为本次来源失败留证，不切换网络路径或来源
     base_requests_per_fetch: 2
     trading_date_parameter: trade_date
     evidence_refs:
@@ -2973,6 +2976,7 @@ input_capabilities:
     request_interval_seconds: 3
     effective_concurrency: 1
     request_limit_enforcement: call_boundary_only
+    sdk_socket_timeout_seconds: 60
   SDA-BOARD-006:
     provider: baostock
     endpoint: industry_membership
@@ -3006,6 +3010,7 @@ input_capabilities:
     request_interval_seconds: 3
     effective_concurrency: 1
     request_limit_enforcement: call_boundary_only
+    sdk_socket_timeout_seconds: 60
 
   ASTOCK-037-profile:
     provider: cninfo
@@ -3250,6 +3255,7 @@ input_capabilities:
     request_interval_seconds: 3
     effective_concurrency: 1
     request_limit_enforcement: call_boundary_only
+    sdk_socket_timeout_seconds: 60
     script_source_keys:
     - bs_calendar
     - bs_all_stock
@@ -3278,6 +3284,7 @@ input_capabilities:
     request_interval_seconds: 3
     effective_concurrency: 1
     request_limit_enforcement: call_boundary_only
+    sdk_socket_timeout_seconds: 60
     script_source_keys:
     - bs_calendar
     evidence_refs:

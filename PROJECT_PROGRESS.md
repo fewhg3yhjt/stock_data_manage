@@ -336,3 +336,19 @@ flowchart LR
 | 验证与运行范围 | 使用 `D:\Program Files\Python\python.exe`（Python 3.13.0rc3；pytest 9.0.2、FastAPI 0.115.11、DuckDB 1.5.5、PyArrow 25.0.0、PyYAML 6.0.2、requests 2.34.2）。 | 两个受影响的调度计划和命令行定向测试通过；随后只读核对正式manifest及DuckDB行数、唯一键、七组计数和5个失效状态。 | 2项测试通过；pytest默认临时目录在隔离环境不可写，显式指定项目`tmp/`作为临时根后测试通过。日线行情任务本轮未启动；其动态来源资格不因证券清单发布而自动改变。 |
 
 后续实时来源执行应按 [代理环境说明](AGENTS.md#项目python环境与测试执行) 在Codex主机网络上下文走现有代理；本次正式任务使用已留存来源响应，无新增实时请求。 |
+
+## 2026-11-04 每日自动日线采集（到期任务已运行，股票/ETF发布，指数未通过覆盖门槛）
+
+本次处理用户提出的“每天自动抓取有效证券日K线并发布”。此前命名`daily_fixed`任务受逐证券资格记录阻断；08:00证券清单刷新也可能一直等BaoStock TCP响应，导致同日16:20日线排在后面。没有新增行情来源，仍使用腾讯、CSI、CNI及已有证券清单输入。
+
+| 原问题/功能 | 可核验证据 | 处理及对原问题的影响 | 当前状态与剩余项 |
+|---|---|---|---|
+| 周期配置不会自动执行 | `config/schedules.yaml`声明08:00证券清单、16:20日线；`src/worker/scheduler.py`新增`run-scheduler`并每30秒重读现有YAML。延迟启动的调度用例覆盖当天两个已到期任务 | 常驻CLI曾在22:24启动并补派08:00清单任务。发现日线前置会对同一天失败的清单再次请求后，停止这次重复请求；修复后通过原`collect-due-inputs --dataset daily_bar --execute --mode live`正式入口完成同日16:20任务，任务报告`now=2026-11-04T14:53:00Z`、slot=`2026-11-04T16:20:00+08:00` | 日线业务入口及晚到期判断实际运行；未在一个未中断的`run-scheduler`进程内完成整条链路。项目没有独立Windows服务/进程看门狗，任务异常会记录并继续轮询，但调度进程退出后的自动重启未实现于项目代码。Windows任务历史上曾查询为`Ready`；2026-11-04当前查询因“无法从客户端中访问CIM资源”失败，未能读取当前状态或失败重启属性，因此宿主守护状态未验收 |
+| 固定日线来源被资格记录挡在请求前 | 命名`market_daily`的18,993个冻结来源单元及[任务摘要](data/task_workspace/2026-11-04/daily_bar/market-daily-20261104/summary.json) | 已配置的`daily_fixed` live任务不再按每只证券查询动态资格；仍执行来源合同、目标日、值/字段、覆盖、质量及发布门槛。没有放宽结果门槛，也没有授予动态路由资格 | 现有配置来源进入日线任务；无新Provider、自动切源或代码范围扩展 |
+| 清单请求失败时有效证券状态与日线范围 | 11-04 [清单摘要](data/task_workspace/2026-11-04/security_master/summary.json)；11-02最后完整清单7,862条，七组完整，见[历史任务摘要](data/task_workspace/2026-11-02/security_master/security-master-20261102-index-history-20261103/summary.json) | 在现有BaoStock输入配置中增加60秒socket连接/读写限制，并在超时留存`connection_timeout`事件；清单失败不更新当前主表。日线读取11-02正式清单，失败任务的同日摘要已存在时复用其结果，不再次请求同一清单来源 | 本次两项BaoStock登录TCP请求都在`send`阶段触发60秒超时；对应原始事件在[证券快照manifest](data/raw/_tmp/2026-11-04/baostock/security_snapshot/manifest.SDA-BOARD-005_include_etf-true_trade_date-%222026-11-04%22.ndjson)和[用户证券清单manifest](data/raw/_tmp/2026-11-04/baostock/typed_security_universe/manifest.SECURITY-BS-UNIVERSE-001_trade_date-%222026-11-04%22.ndjson)。未切换网络或来源；11-04清单失败，当前正式清单未被覆盖 |
+| 日线实际运行和发布 | [11-04批次摘要](data/task_workspace/2026-11-04/daily_bar/market-daily-20261104/summary.json)、股票/ETF规范分区manifest、[指数覆盖记录](data/task_workspace/2026-11-04/daily_bar/market-daily-20261104/coverage.index.json) | 18,993个raw单元全部复用；处理18,928项复用、65项缺目标日记录；新增行情HTTP请求0。股票分区发布5,570/5,573，ETF发布1,717/1,717；股票缺`sz000831`、`sz002129`、`sz002623`。指数495/557，缺62（CSI 60、CNI 2） | 股票/ETF正式发布完成；指数超出配置`max_missing_count=50`和`max_missing_ratio=1%`，保留阻断。批次最终`status=failed`、`complete_today=false`，因此未完成全市场日线发布 |
+| 指数缺失的直接原因 | [CSI原响应manifest](data/task_archive/_raw_evidence/market-daily-20261104/sz399904__none/attempt-1/manifest.ndjson)对应HTTP 200、`success=true`、`data=[]` | 按来源原响应标记空数据，不生成行情；覆盖门槛保持原值 | 失败阶段是指数覆盖/发布，不是资格过期，也没有证据表明HTTP代理导致该响应 |
+| 重复耗时与恢复行为 | 缓存路径查找栈曾停在逐记录`Path.resolve`；发布恢复栈曾逐单元重复解析/读取或删除已晋升原始文件 | 修复BaoStock缓存查找每份manifest只解析一次路径；原始晋升复用已解析父目录，已晋升manifest哈希匹配时不重读整批响应体，清理只遍历实际存在的临时文件。保持首次晋升的响应完整性核对 | 本次恢复在处理后完成股票/ETF发布并落下任务最终状态；后续重试可直接续接已完成分区和原始索引 |
+| 定向验证 | 使用`D:\Program Files\Python\python.exe`（Python 3.13.0rc3）；pytest 9.0.2、FastAPI 0.115.11、DuckDB 1.5.5、PyArrow 25.0.0、PyYAML 6.0.2、requests 2.34.2 | BaoStock缓存/超时、清单同日失败复用、raw批量晋升/恢复三个范围分别定向执行 | 2+2+2项通过；不代表全套测试或全市场通过。CSI请求留证仍显示`trust_env=true`；BaoStock用既有TCP路径，不因本次超时改变代理或来源 |
+
+剩余项是指数来源在目标日返回的空数据，按当前覆盖门槛未发布；常驻进程退出后的Windows自动重启属性也尚未核实。2026-11-04本次到期业务入口有真实执行记录，但因指数覆盖失败，不能报告每日全市场日线自动发布已完成。

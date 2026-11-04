@@ -322,6 +322,24 @@ def test_tencent_unadjusted_newfqkline_retained_window_reports_truncation():
     assert exc.value.failure_class is FailureClass.TRUNCATED and not exc.value.retryable
 
 
+def test_tencent_unadjusted_newfqkline_accepts_single_target_from_641_rows():
+    target = date(2026, 11, 4)
+    bars = [
+        [(target - timedelta(days=640 - index)).isoformat(), "10", "10", "10", "10", "100",
+         {}, "0", "0", "0", "0"]
+        for index in range(641)
+    ]
+    provider = TencentDailyProvider(FakeTransport([response({"code": 0, "data": {"bj920000": {"day": bars}}})]))
+
+    result = provider.parse_window(provider.capture_window(
+        "bj920000", target, target, adjust="none", api="newfqkline"
+    ))
+
+    assert len(result.rows) == 1
+    assert result.rows[0]["0"] == target.isoformat()
+    assert result.mapping_context["source_total_count"] == 641
+
+
 def test_tencent_unadjusted_window_reports_retained_history_truncation():
     first = date(2020, 1, 1)
     bars = [
@@ -341,7 +359,7 @@ def test_tencent_bad_params_is_reported_as_request_rejection():
 
 
 @pytest.mark.parametrize('damage,expected', [('duplicate',FailureClass.SCHEMA_CHANGED),
-    ('shape',FailureClass.SCHEMA_CHANGED),('empty_qfq',FailureClass.SCHEMA_CHANGED),('outside_only',FailureClass.TEMPORARY_EMPTY)])
+    ('shape',FailureClass.SCHEMA_CHANGED),('outside_only',FailureClass.TEMPORARY_EMPTY)])
 def test_tencent_alternative_rejects_bad_or_empty_window(damage,expected):
     bar=['2026-10-09','10','11','12','9','100',{},'1','1000','']
     node={'qfqday':[bar]}
@@ -353,6 +371,33 @@ def test_tencent_alternative_rejects_bad_or_empty_window(damage,expected):
     with pytest.raises(ProviderContractError) as exc:
         provider.parse_window(provider.capture_window('bj920001',date(2026,10,9),date(2026,10,9),api='newfqkline'))
     assert exc.value.failure_class is expected
+
+
+def test_tencent_alternative_marks_missing_adjusted_target_series_unverified_when_day_exists():
+    old_bar=['2026-10-08','10','11','12','9','100',{},'1','1000','']
+    payload=response({'code':0,'data':{'bj920001':{'qfqday':[old_bar]}}})
+    provider=TencentDailyProvider(FakeTransport([payload]))
+    result=provider.parse_window(provider.capture_window('bj920001',date(2026,10,9),date(2026,10,9),
+        adjust='qfq',api='newfqkline'))
+    assert result.rows == ()
+    assert result.empty_is_valid
+    assert result.mapping_context['optional_series_status'] == 'unavailable'
+    assert 'unadjusted price was not copied' in result.mapping_context['optional_series_reason']
+    assert result.mapping_context['source_total_count'] == 1
+
+
+def test_tencent_optional_adjustment_marks_known_backend_failure_unverified():
+    provider = TencentDailyProvider(FakeTransport([response({"code": 11, "data": "",
+        "msg": "mysql connect failed, host:11.148.203.84,port:40126"})]))
+
+    result = provider.parse_window(provider.capture_window(
+        "bj920808", date(2026, 11, 4), date(2026, 11, 4), adjust="hfq", api="newfqkline"
+    ))
+
+    assert result.rows == () and result.empty_is_valid
+    assert result.mapping_context["optional_series_status"] == "unavailable"
+    assert "code 11" in result.mapping_context["optional_series_reason"]
+    assert "mysql connect failed" in result.mapping_context["optional_series_reason"]
 
 
 def test_tencent_alternative_rejects_unrecoverable_history_limit():

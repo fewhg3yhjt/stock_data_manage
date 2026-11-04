@@ -10,13 +10,13 @@
 
 新规范日线按证券与交易日期保存一条聚合记录，内含证券类型、价格或指数点数语义，以及不复权、前复权、后复权组的数值、状态和证据引用。候选与来源清单仍按证券、日期、口径留存；最终 Parquet 物理分区不再按口径拆开。字段和完整性以[专项设计](../../stock-data-design-qfq-history-rebuild.md)为准，不在本文维护第二套 schema。
 
-规范路径为 `canonical/<日期>/daily_bar/<资产类型>/{data.parquet,manifest.json}`。文件中 `quotes.none/forward/backward` 是固定嵌套组；manifest 标记 `daily-aggregate-v1` 与 `adjustment=aggregate`。恢复复用现有任务提交标记和原子发布流程。旧 `adjustment=...` 分区与业务数据保持原位，不自动合并、不迁移，也不作为新查询的回退路径。
+规范路径为 `canonical/<日期>/daily_bar/<资产类型>/{data.parquet,manifest.json}`。文件中 `quotes.none/forward/backward` 是固定嵌套组；新发布使用`daily-aggregate-v2`与`adjustment=aggregate`。每个口径记录明确保存`value_contract=full_ohlc/close_only`；旧`daily-aggregate-v1`分区按原字段校验并继续读取，缺少合同字段时按旧完整四价语义读取，不重写旧文件。恢复复用现有任务提交标记和原子发布流程。旧 `adjustment=...` 分区与业务数据保持原位，不自动合并、不迁移，也不作为新查询的回退路径。
 
 2026-10-29已在 `data/canonical/2026-10-28/daily_bar/stock/` 正式发布3条v7三口径样本，9份活动原响应请求清单位于 `data/raw/2026-10-28/tencent/kline_daily/`。精确资格的直接证据依赖位于data，隔离重做与故障验收仍在tmp；具体范围、哈希和回读结论由[项目进度](../../PROJECT_PROGRESS.md#当前业务交付状态)维护。重做可以更新被重做证券的审计引用，业务值与源响应哈希需独立检查，不能以Parquet字节不变替代业务验收。
 
 ## 目录约定
 
-日线批记录使用`daily-batch-v1`：`task_workspace/<日期>/daily_bar/<任务名>/task.json`只保存一次冻结定义，逐单元manifest保存采集/处理状态和稳定原文/候选引用；metadata.collection_task与summary保存轻量阶段、计数、定义引用及分区提交信息，不内嵌全部单元报告。工作区使用`prepared.<类型>.parquet`、`coverage.<类型>.json`和`commit.<类型>.json`承接多类型构建及恢复，正式分区布局不变。摘要和页面是派生视图，恢复以冻结计划及单元产物完整性为依据。稳定原文位于`task_archive/_raw_evidence/<任务名>/<证券及口径>/attempt-<次数>/manifest.ndjson`，在采集阶段建立，活动raw仍在对应类型发布成功后转正。旧格式只读留存，新批使用新任务标识和隔离根，不自动迁移旧检查点。现有归档命令校验完整发布及产物后移动工作区，更新运行索引路径；原文、冻结定义与原始报告字节保留。
+新日线批记录使用`daily-batch-v2`：`task_workspace/<日期>/daily_bar/<任务名>/task.json`只保存一次冻结定义，其中按来源输入ID记录合同版本；每个单元冻结选用的`input_id/provider/endpoint/value_contract`、请求代码、稳定身份和代码承接依据。逐单元manifest保存采集/处理状态和稳定原文/候选引用；metadata.collection_task与summary保存轻量阶段、计数、定义引用及分区提交信息，不内嵌全部单元报告。v1检查点按其原合同读取和续跑，不在恢复时套用新版路由。工作区使用`prepared.<类型>.parquet`、`coverage.<类型>.json`和`commit.<类型>.json`承接多类型构建及恢复，正式分区布局不变。摘要和页面是派生视图，恢复以冻结计划及单元产物完整性为依据。稳定原文位于`task_archive/_raw_evidence/<任务名>/<证券及口径>/attempt-<次数>/manifest.ndjson`，在采集阶段建立，活动raw仍在对应类型发布成功后转正。旧格式只读留存，新批使用新任务标识和隔离根，不自动迁移旧检查点。现有归档命令校验完整发布及产物后移动工作区，更新运行索引路径；原文、冻结定义与原始报告字节保留。
 
 2026-10-11按用户确认的结构修改现有代码并迁移旧业务目录。正式运行根目录为 `data/`；离线回放、故障注入及实现验收使用 `tmp/` 下独立运行根目录，内部结构相同。`provider_validation/` 中的历史验证证据保留原位，不新增业务产物。
 

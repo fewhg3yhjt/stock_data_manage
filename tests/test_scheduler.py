@@ -1,7 +1,15 @@
-from datetime import datetime
+from datetime import datetime, time
 from zoneinfo import ZoneInfo
 
-from stock_data_manage.worker.scheduler import PhaseOneScheduler, load_scheduled_jobs
+import pytest
+
+from stock_data_manage.worker.scheduler import (
+    PhaseOneScheduler,
+    ScheduledJob,
+    load_business_scheduled_jobs,
+    load_scheduled_jobs,
+    run_scheduler,
+)
 
 
 SHANGHAI = ZoneInfo("Asia/Shanghai")
@@ -24,6 +32,67 @@ def test_schedule_yaml_skips_disabled_tdx_delayed_jobs() -> None:
     jobs = load_scheduled_jobs("config/schedules.yaml")
     assert jobs[0].name == "security_master_update"
     assert not [job for job in jobs if job.name.startswith("tdx_")]
+
+
+def test_failed_schedule_attempt_is_not_repeated_in_same_process():
+    scheduler = PhaseOneScheduler(jobs=(ScheduledJob("daily_bar_sync", time(16, 20)),), timezone=SHANGHAI)
+    now = datetime(2026, 11, 4, 17, 0, tzinfo=SHANGHAI)
+    calls = []
+
+    def fail():
+        calls.append("failed")
+        raise RuntimeError("captured task failure")
+
+    with pytest.raises(RuntimeError, match="captured task failure"):
+        scheduler.run_due(now, {"daily_bar_sync": fail})
+    assert scheduler.run_due(now, {"daily_bar_sync": fail}) == ()
+    assert calls == ["failed"]
+
+
+def test_business_runner_uses_configured_jobs_and_runs_missed_slots_for_today(monkeypatch):
+    import stock_data_manage.worker.scheduler as module
+
+    jobs = load_business_scheduled_jobs(ROOT / "config")
+    assert {job.name: job.local_time for job in jobs} == {
+        "security_master_update": time(8, 0), "daily_bar_sync": time(16, 20)}
+    calls = []
+    monkeypatch.setattr(module, "execute_business_schedule",
+        lambda name, **kwargs: calls.append((name, kwargs["now"].astimezone(SHANGHAI).date())))
+
+    class StopAfterOneTick:
+        stopped = False
+        def is_set(self):
+            return self.stopped
+        def wait(self, _seconds):
+            self.stopped = True
+
+    run_scheduler(ROOT / "config", poll_interval_seconds=1,
+        stop_event=StopAfterOneTick(), clock=lambda: datetime(2026, 11, 4, 9, 0, tzinfo=SHANGHAI))
+    assert calls == [("security_master_update", datetime(2026, 11, 4).date())]
+
+
+def test_business_runner_dispatches_daily_job_when_started_after_1620(monkeypatch):
+    import stock_data_manage.worker.scheduler as module
+    calls = []
+
+    def dispatch(name, **kwargs):
+        calls.append((name, kwargs["now"].astimezone(SHANGHAI).date()))
+        if name == "security_master_update":
+            raise RuntimeError("one scheduled task failed")
+
+    monkeypatch.setattr(module, "execute_business_schedule", dispatch)
+
+    class StopAfterOneTick:
+        stopped = False
+        def is_set(self):
+            return self.stopped
+        def wait(self, _seconds):
+            self.stopped = True
+
+    run_scheduler(ROOT / "config", poll_interval_seconds=1,
+        stop_event=StopAfterOneTick(), clock=lambda: datetime(2026, 11, 4, 17, 0, tzinfo=SHANGHAI))
+    assert calls == [("security_master_update", datetime(2026, 11, 4).date()),
+                     ("daily_bar_sync", datetime(2026, 11, 4).date())]
 
 
 from dataclasses import replace
@@ -207,6 +276,35 @@ def test_daily_bar_uses_last_good_master_when_refresh_fails(tmp_path, monkeypatc
     assert report["jobs"][0]["status"] == "published"
     assert report["security_master_prerequisite"]["status"] == "available"
     assert report["security_master_prerequisite"]["job"]["status"] == "failed"
+
+
+def test_daily_bar_reuses_same_day_failed_master_attempt_without_repeating_source_requests(tmp_path, monkeypatch):
+    import json
+    import stock_data_manage.pipeline.inputs as inputs
+
+    runtime = tmp_path / "runtime"
+    master_work = runtime / "task_workspace" / DAY.isoformat() / "security_master"
+    master_work.mkdir(parents=True)
+    summary_path = master_work / "summary.json"
+    summary_path.write_text(json.dumps({"task_id": "security-master-20260930", "status": "failed"}), encoding="utf-8")
+    monkeypatch.setattr(inputs, "_current_security_master", lambda *args: "prior-current-manifest.json")
+    monkeypatch.setattr(inputs, "_security_master_as_of_date", lambda path: "2026-09-29")
+    monkeypatch.setattr(inputs, "_collect_due_security_master",
+        lambda **kwargs: pytest.fail("same-day failed refresh must not be requested a second time"))
+    monkeypatch.setattr(inputs, "collect_task", lambda **kwargs: {
+        "task_id": "market-daily-20260930", "status": "published", "complete_today": True,
+        "no_op": False, "summary": {"status": "published"}})
+
+    report = collect_due_inputs(now=stamp(16, 35), config_root=ROOT / "config", data_root=runtime,
+        dataset="daily_bar", calendar_days=[{"trade_date": DAY.isoformat(), "is_trading_day": True}],
+        execute=True, mode="live")
+
+    prerequisite = report["security_master_prerequisite"]
+    assert prerequisite["status"] == "available"
+    assert prerequisite["as_of_date"] == "2026-09-29"
+    assert prerequisite["job"]["already_attempted_today"] is True
+    assert prerequisite["job"]["summary"]["path"] == str(summary_path)
+    assert report["jobs"][0]["status"] == "published"
 
 
 def test_master_tick_uses_configured_sources_without_dynamic_route_qualification(tmp_path):

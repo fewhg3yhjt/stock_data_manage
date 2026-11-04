@@ -108,6 +108,11 @@ def main(argv: list[str] | None = None) -> int:
     due.add_argument("--replay-manifest", type=Path)
     due.add_argument("--evidence-root", type=Path)
 
+    run_scheduler = subcommands.add_parser("run-scheduler", help="run configured business schedules continuously")
+    run_scheduler.add_argument("--config-root", type=Path, default=Path("config"))
+    run_scheduler.add_argument("--data-root", type=Path, help="override configured runtime data root")
+    run_scheduler.add_argument("--poll-interval-seconds", type=float, default=30.0)
+
     calendar_update = subcommands.add_parser("update-trading-calendar", help="refresh one date in the trading calendar store")
     calendar_update.add_argument("--trade-date", type=date.fromisoformat)
     calendar_update.add_argument("--config-root", type=Path, default=Path("config"))
@@ -149,6 +154,18 @@ def main(argv: list[str] | None = None) -> int:
             parser.error(str(exc))
         print(json.dumps(report, ensure_ascii=False, default=_json_default, indent=2))
         return 0 if report["status"] == "published" else 2
+    if args.command == "run-scheduler":
+        import logging
+        from .worker.scheduler import run_scheduler
+        logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+        try:
+            run_scheduler(args.config_root, data_root=args.data_root,
+                          poll_interval_seconds=args.poll_interval_seconds)
+        except KeyboardInterrupt:
+            return 0
+        except (ValueError, OSError) as exc:
+            parser.error(str(exc))
+        return 0
     if args.command == "collect-due-inputs":
         from .pipeline.inputs import collect_due_inputs
         from .service.instruments import SecurityRecord

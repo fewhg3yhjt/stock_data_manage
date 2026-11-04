@@ -77,7 +77,7 @@
 |---|---|
 | `providers/base.py` | 日线、分钟等 Provider 协议以及 Fixture Provider 基础实现 |
 | `providers/contracts.py` | HTTP 响应、失败分类、返回窗口和 Provider Contract |
-| `providers/transport.py` | 公共 HTTP 传输、线程隔离的请求捕获、共享主机限速与严格回放；保留来源会话/代理并复用原验证重试策略 |
+| `providers/transport.py` | 公共 HTTP 传输、共享请求组限速、单项输入会话捕获与严格回放、快照和 TDX 行解析；保留来源会话/代理并复用原验证重试策略 |
 | `providers/tencent/daily.py` | 腾讯日线响应采集与纯解析分离；保留来源窗口原行和失败合同，默认复权探测使用`newfqkline`；窗口采集只因明确的连接、超时或5xx故障按接口对应主机顺序切换，不因业务内容问题换源 |
 | `providers/tencent/snapshot.py` | Tencent 指定证券分批快照、原脚本来源字段、代码/格式/重复验证及请求范围覆盖；GBK解码和旧行情行保留，全市场在线验证待完成 |
 | `providers/tencent/minute.py` | Tencent 原生 1m 分钟线与最近 5m 候选输入 |
@@ -87,7 +87,7 @@
 | `providers/sina/snapshot.py` | Sina 批量收盘快照 |
 | `providers/sina/minute.py` | Sina 原生 5m 分钟线 |
 | `providers/tdx/minute.py` | 注入式 TDX 延迟 1m 分钟线 |
-| `providers/baostock/session.py` | BaoStock SDK 登录至登出的会话串行、代码映射和结果集读取；已验证查询的解码载荷留证、严格回放、缓存及查询边界限速；日线验证路径还捕获 socket `recv` 字节并与解码结果关联 |
+| `providers/baostock/session.py` | BaoStock SDK 登录至登出的会话串行、代码映射和结果集读取；解码载荷留证、严格回放、缓存、查询边界限速，以及按输入合同限定连接/读取超时并记录传输失败；日线验证路径还捕获 socket `recv` 字节并与解码结果关联 |
 | `providers/baostock/daily.py` | BaoStock 历史日线；按完整日线字段策略请求，捕获/回放原始接收字节与完整SDK解码来源行后再生成标准候选，初始角色为校验来源 |
 | `providers/baostock/minute.py` | BaoStock 原生 5m，初始角色为校验来源 |
 | `providers/baostock/industry.py` | 原 BaoStock 两查询、沪深A股筛选与行业合并；分别提供证券快照/行业归属的 YAML 映射候选，保留旧默认返回与覆盖缺失；TCP帧不可见 |
@@ -146,8 +146,8 @@
 
 | 文件 | 职责 |
 |---|---|
-| `pipeline/daily.py` | 日线规则冻结、按证券单元选用配置来源和显式 `full_ohlc/close_only` 合同；独立响应采集与零联网解析/归一化；逐单元产物命名和原子保存；完整记录聚合和覆盖检查 |
-| `pipeline/inputs.py` | 正式日线批执行入口：一次准备、按来源组并发采集、整批处理、按类型发布；检查点按输入来源冻结合同并复用现有发布恢复；单输入诊断、证券名单与其他流程保留各自职责 |
+| `pipeline/daily.py` | 日线规则冻结、按证券单元选用配置来源和显式`full_ohlc/close_only`合同；独立响应采集与零联网解析/归一化；逐单元产物命名、原子保存、稳定身份/当前代码冻结；完整记录聚合和停牌分母检查 |
+| `pipeline/inputs.py` | 正式日线批执行入口及证券名单来源任务；日线周期先读/刷新唯一当前证券清单并冻结范围，名单成功后更新当前库和字段变更历史；名单失败保留现状，日线可继续使用不晚于目标日的上次可用清单；复用现有任务状态和发布恢复 |
 | `pipeline/daily_reconciliation.py` | 只接收范围完整的三口径日线记录，并复用规范分区发布；快照候选不在此提升为正式日线 |
 | `pipeline/minute.py` | Watchlist 实时分钟采集和 Hot Store 写入 |
 | `pipeline/minute_reconciliation.py` | 分钟盘后校准、final 提升、冲突隔离和完整性处理 |
@@ -188,7 +188,7 @@
 | `worker/attempts.py` | Collection Attempt 状态机和租约状态 |
 | `worker/progress.py` | 三阶段统一采集单元计数，发布整批完成后计入；内部动作和旧快照恢复、失败与复用、耗时及节流；CLI stderr展示，不管理调度或业务数据 |
 | `worker/recovery.py` | 既有提交、临时文件和元数据恢复；日期工作区归档前复核候选、原响应及发布，归档后更新元数据和摘要；保留旧材料归档校验 |
-| `worker/scheduler.py` | 既有任务时间表及频率计算；构建证券任务时按目标日期选择当前或历史来源，绑定请求日期、日历和检查范围；定时名单继续使用当前目录 |
+| `worker/scheduler.py` | 既有任务时间表及频率计算；计划证券名单和日线任务；常驻入口按YAML时间轮询并调用现有业务任务，晚启动仍派发当日已到期任务 |
 | `worker/acceptance.py` | 合成组件的存储重放、恢复和容量估算自检；逐项预期/实际值、范围和证据，不能签署项目M1/M2 |
 | `worker/__init__.py` | Worker 包说明，不承载业务实现 |
 
@@ -196,8 +196,8 @@
 
 腾讯窗口输入沿用同一输入ID。单输入诊断保留来源完整行及请求日期映射；日线批次的来源参数由冻结的采集策略决定。`routing/factory.py`按精确样本或显式市场/资产/窗口授权准备一次，物理请求前检查到期与健康；已采齐后的纯处理不要求重新取得采集资格。`tests/test_daily_batch.py`和`tests/test_retained_daily.py`承接批范围、恢复及原传输回退合同，逐项旧测试承接见本轮验收记录。
 
-证券任务省略units时，`pipeline/inputs.py` 查询既有交易日历并调用 `worker/scheduler.py` 按collection.yaml构建来源；`routing/factory.py` 对历史ETF按完整日期参数及互补发布数量检查资格。新增行为在既有 `tests/test_scheduler.py`、`tests/test_collection_tasks.py` 验证，不新增任务管理模块。
-| `cli.py` | `collect-due-inputs`（默认返回单次计划）、`collect-input`（默认分层落盘，支持 JSON 参数上下文及隔离验证输出）、`probe-*`、`recover`、`acceptance-offline` 等入口，负责参数解析、UTF-8结果与进度输出和现有流程组装 |
+证券任务省略units时，`pipeline/inputs.py` 查询既有交易日历并调用 `worker/scheduler.py` 按collection.yaml构建来源；日线常驻调度按`daily_bar`配置和`schedules.yaml`分派至`market_daily`。命名`daily_fixed` live任务跳过逐证券资格前置检查，但保留固定来源配置、健康/冷却、响应和发布检查；独立输入资格逻辑不变。对应行为由既有 `tests/test_scheduler.py`、`tests/test_daily_batch.py`、`tests/test_cli.py` 验证，不新增任务管理模块。
+| `cli.py` | `run-scheduler`常驻轮询现有YAML时刻并派发已配置的名单/日线任务；`collect-due-inputs`仍提供单次计划或显式执行；另有`collect-input`、`collect-task`、`probe-*`、`recover`、`acceptance-offline`入口，负责参数解析、UTF-8结果及现有流程组装 |
 | `__init__.py` | 包级公共领域模型导出 |
 
 ## 维护约束

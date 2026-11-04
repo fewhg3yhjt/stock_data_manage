@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime, time, timedelta, timezone
+import logging
+import math
 from pathlib import Path
 from typing import Callable, Iterable
+from threading import Event
 from zoneinfo import ZoneInfo
 
 import yaml
@@ -309,7 +312,102 @@ class PhaseOneScheduler:
             handler = handlers.get(job.name)
             if handler is None:
                 continue
-            handler()
+            # A scheduled attempt runs once per business date, even when the
+            # handler reports failure or raises. Durable task state owns resume;
+            # the polling loop must not repeat source requests every few seconds.
             self._last_run[(job.name, local.date())] = now
+            handler()
             completed.append(job.name)
         return tuple(completed)
+
+
+_BUSINESS_TASK_DATASETS = {
+    "security_master_update": "security_master",
+    "daily_bar_sync": "daily_bar",
+}
+
+
+def load_business_scheduled_jobs(config_root: str | Path) -> tuple[ScheduledJob, ...]:
+    """Load the two configured daily production jobs from the schedule source of truth."""
+    root = Path(config_root)
+    configured = {job.name: job for job in load_scheduled_jobs(root / "schedules.yaml")}
+    missing = sorted(set(_BUSINESS_TASK_DATASETS) - set(configured))
+    if missing:
+        raise ValueError("required business schedules are missing or disabled: " + ", ".join(missing))
+    return tuple(sorted((configured[name] for name in _BUSINESS_TASK_DATASETS),
+                        key=lambda job: (job.local_time, job.name)))
+
+
+def execute_business_schedule(job_name: str, *, config_root: str | Path,
+                              data_root: str | Path | None = None,
+                              now: datetime | None = None, collector=None) -> dict[str, object]:
+    """Run one configured business schedule through its existing task entry."""
+    try:
+        dataset = _BUSINESS_TASK_DATASETS[job_name]
+    except KeyError as exc:
+        raise ValueError(f"unsupported business schedule: {job_name}") from exc
+    if collector is None:
+        from ..pipeline.inputs import collect_due_inputs
+        collector = collect_due_inputs
+    report = collector(now=now or datetime.now(timezone.utc), config_root=config_root,
+        data_root=data_root, execute=True, mode="live", dataset=dataset)
+    failed = [job for job in report.get("jobs", ()) if job.get("status") in {"blocked", "failed"}]
+    if failed:
+        logging.error("scheduled %s returned %s", dataset, failed)
+    else:
+        logging.info("scheduled %s returned %s", dataset,
+                     [(job.get("status"), job.get("task_id")) for job in report.get("jobs", ())])
+    return report
+
+
+def run_scheduler(config_root: str | Path, *, data_root: str | Path | None = None,
+                  poll_interval_seconds: float = 30.0, stop_event: Event | None = None,
+                  clock: Callable[[], datetime] | None = None) -> None:
+    """Poll the existing YAML schedules and dispatch daily business jobs once per date."""
+    if not math.isfinite(poll_interval_seconds) or poll_interval_seconds <= 0:
+        raise ValueError("scheduler poll interval must be a positive finite number")
+    root = Path(config_root).resolve()
+    schedule_path = root / "schedules.yaml"
+    jobs = load_business_scheduled_jobs(root)
+    payload = yaml.safe_load(schedule_path.read_text(encoding="utf-8")) or {}
+    if not isinstance(payload, dict):
+        raise ValueError("schedule config must be a mapping")
+    timezone_name = payload.get("timezone", "Asia/Shanghai")
+    try:
+        schedule_timezone = ZoneInfo(str(timezone_name))
+    except (KeyError, ValueError) as exc:
+        raise ValueError(f"unknown scheduler timezone: {timezone_name}") from exc
+    scheduler = PhaseOneScheduler(jobs, timezone=schedule_timezone)
+    clock = clock or (lambda: datetime.now(timezone.utc))
+    stop_event = stop_event or Event()
+    def build_handler(selected):
+        def handler():
+            try:
+                execute_business_schedule(selected, config_root=root, data_root=data_root, now=clock())
+            except Exception:
+                # Keep the resident process available for the next configured
+                # job. run_due has already reserved this job/date, and the
+                # durable business task remains the only resume record.
+                logging.exception("scheduled job %s raised unexpectedly", selected)
+        return handler
+
+    handlers = {name: build_handler(name) for name in _BUSINESS_TASK_DATASETS}
+    logging.info("business scheduler started; timezone=%s poll_interval_seconds=%s",
+                 timezone_name, poll_interval_seconds)
+    while not stop_event.is_set():
+        try:
+            # Reload times from YAML so schedule edits apply without duplicating
+            # trigger times in Windows Task Scheduler.
+            scheduler.jobs = load_business_scheduled_jobs(root)
+            payload = yaml.safe_load(schedule_path.read_text(encoding="utf-8")) or {}
+            if not isinstance(payload, dict):
+                raise ValueError("schedule config must be a mapping")
+            timezone_name = payload.get("timezone", "Asia/Shanghai")
+            try:
+                scheduler.timezone = ZoneInfo(str(timezone_name))
+            except (KeyError, ValueError) as exc:
+                raise ValueError(f"unknown scheduler timezone: {timezone_name}") from exc
+            scheduler.run_due(clock(), handlers)
+        except (OSError, ValueError, yaml.YAMLError):
+            logging.exception("business scheduler tick failed")
+        stop_event.wait(poll_interval_seconds)

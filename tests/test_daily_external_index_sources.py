@@ -193,6 +193,20 @@ def test_csindex_full_ohlc_parser_checks_prices_and_close_only_contract_stays_se
     assert close.rows[0]["open"] is None and close.rows[0]["close"] == 2061.1
 
 
+def test_csindex_successful_empty_response_is_classified_as_temporary_empty():
+    provider = CsindexDailyProvider(object(), value_contract="full_ohlc")
+    day = date.fromisoformat(DAY)
+    response = HttpResponse(200, {"Content-Type": "application/json"},
+        json.dumps({"code": "200", "msg": "Success", "data": [], "success": True}).encode())
+    captured = {"symbol": "sh000904", "start": day, "end": day,
+        "segments": ((day, day, response, "www.csindex.com.cn"),)}
+
+    with pytest.raises(ProviderContractError) as error:
+        provider.parse_window(captured)
+
+    assert error.value.failure_class is FailureClass.TEMPORARY_EMPTY
+
+
 def test_csindex_paired_code_replay_publishes_full_ohlc_under_the_retained_list_identity(tmp_path):
     manifest = _csi_manifest(tmp_path / "csi-source")
     result = collect_task(definition=_task("csi-paired-ohlc", "sz399904", manifest),

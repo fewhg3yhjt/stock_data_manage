@@ -44,6 +44,36 @@ def test_entire_batch_captured_before_any_parse_and_processing_has_no_http(tmp_p
     assert plan.stat().st_mtime_ns == stamp
 
 
+def test_live_daily_fixed_route_does_not_require_expiring_symbol_qualification(tmp_path, monkeypatch):
+    import requests
+    import stock_data_manage.pipeline.daily as daily
+    import stock_data_manage.routing.factory as routing
+    from stock_data_manage.providers.transport import RequestPacer
+
+    definition = source_task(tmp_path)
+    definition["task"] = "stock_daily"
+    definition["units"][0].pop("replay_manifests")
+    captured = []
+    qualified = []
+
+    def capture(**kwargs):
+        captured.append(kwargs["unit"]["key"])
+        raise requests.ConnectionError("synthetic stop before network")
+
+    def qualification(*args, **kwargs):
+        qualified.append(kwargs.get("input_id"))
+        raise AssertionError("explicit daily_fixed task must not pre-block on symbol qualification")
+
+    monkeypatch.setattr(daily, "capture_daily_unit", capture)
+    monkeypatch.setattr(routing, "check_daily_batch_qualification", qualification)
+    result = collect_task(definition=definition, config_root=CONFIG, data_root=tmp_path / "live",
+        mode="live", collector_options={"pacer": RequestPacer(wait=lambda _: None)})
+    assert result["status"] == "failed"
+    assert len(captured) == 3 and not qualified
+    work = Path(result["definition_ref"]["path"]).parent
+    assert not list(work.glob("qualification.prepare-*.json"))
+
+
 @pytest.mark.parametrize('boundary', ['after_raw_before_unit_index', 'after_candidate_before_checkpoint',
     'before_publish', 'after_data_replace', 'after_publish', 'after_raw_promote'])
 def test_resume_at_real_stage_boundaries(tmp_path, boundary):
@@ -130,7 +160,7 @@ def test_pending_commit_blocks_another_task_before_capture(tmp_path, monkeypatch
         run({**definition, 'task_id':'other'}, tmp_path/'run')
 
 
-def test_partial_publication_keeps_missing_visible_without_backwards_network_flow(tmp_path, monkeypatch):
+def test_missing_required_unadjusted_response_stays_visible_without_refetch_on_resume(tmp_path, monkeypatch):
     import shutil
     import yaml
     config = tmp_path/'config'
@@ -140,7 +170,7 @@ def test_partial_publication_keeps_missing_visible_without_backwards_network_flo
     doc['dataset']['publication'].update(max_missing_ratio=0.5, max_missing_count=1)
     path.write_text(yaml.safe_dump(doc), encoding='utf-8')
     definition = source_task(tmp_path, symbols=('sh600001','sh600002'))
-    bad = Path(definition['units'][1]['replay_manifests']['forward'])
+    bad = Path(definition['units'][1]['replay_manifests']['none'])
     event = json.loads(bad.read_text(encoding='utf-8').splitlines()[0])
     import hashlib
     body = bad.parent/event['body_storage']
@@ -154,8 +184,16 @@ def test_partial_publication_keeps_missing_visible_without_backwards_network_flo
     def forbidden(*args, **kwargs):
         raise AssertionError('processing failures must not automatically refetch')
     monkeypatch.setattr(TencentDailyProvider, 'capture_window', forbidden)
+    from stock_data_manage.storage.raw import RawObjectStore
+    original_verify = RawObjectStore.verify_manifest
+    verified = []
+    def track_verify(path):
+        verified.append(str(path))
+        return original_verify(path)
+    monkeypatch.setattr(RawObjectStore, 'verify_manifest', staticmethod(track_verify))
     resumed = collect_task(definition=definition, config_root=config, data_root=tmp_path/'run', mode='replay')
     assert not resumed.get('no_op') and not resumed['complete_today']
+    assert len(verified) < 20
 
 
 @pytest.mark.parametrize('tampered', [False, True])

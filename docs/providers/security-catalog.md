@@ -154,7 +154,7 @@ BaoStock `query_stock_basic()` 的 `type=1` 归为股票，`type=2` 归为指数
 
 历史ETF接入改变了Provider、工厂、流程及YAML指纹，当次未重登记资格。后续已按当时版本重新复核三项现时目录来源，见上述当前资格索引；历史ETF输入的实际生产资格尚未授予。当前历史选源和日期资格检查已接通，运行前仍需当前版本的真实证据复核，不将隔离回放当作资格登记。
 
-沪深输入保留原 BaoStock 登录/退出、`query_all_stock(day)`、`query_stock_industry(date)` 两次查询及SDK留证边界；没有替换传输方式。参数仍由 [providers.yaml](../../config/providers.yaml) 定义：`trade_date` 来自请求并需要已知交易日，`symbols` 是本地筛选，`include_etf` 来自配置，默认 `false`，保持原股票调用方式。全量股票与ETF名单显式配置 `include_etf: true`。
+所有通过`captured_sdk_queries`执行的BaoStock输入（证券快照、行业、交易日历和类型清单）保留原SDK连接、登录/退出和查询顺序；不替换传输方式。YAML逐输入声明60秒连接/读取超时；超时在原始manifest记录为来源传输失败，不改代理路径、不自动切换来源。`SDA-BOARD-005`参数仍由 [providers.yaml](../../config/providers.yaml) 定义：`trade_date` 来自请求并需要已知交易日，`symbols` 是本地筛选，`include_etf` 来自配置，默认 `false`，保持原股票调用方式。全量股票与ETF名单显式配置 `include_etf: true`。
 
 股票名单补正了旧规则遗漏的 `302132`。ETF 根据来源记录中的交易代码类别选择，沪市使用51/52/53/55/56/58开头的交易代码，深市使用158/159；名称不要求包含“ETF”。指数、LOF和联接基金不会因名字含ETF而混入。源头股票和ETF之外的507条记录保留原响应，并另保存排除行及原因，不能把它们当作已经验证的ETF。
 

@@ -102,7 +102,7 @@ def recover_collection_tasks(*, config_root, data_root=None) -> tuple[str, ...]:
     completed = []
     with MetadataStore(paths["metadata_path"]) as metadata:
         for state in metadata.collection_tasks():
-            if state.get('format_version') == 'daily-batch-v1':
+            if state.get('format_version') in {'daily-batch-v1', 'daily-batch-v2'}:
                 if state['status'] == 'committing':
                     with PartitionLock(paths['workspace_root'] / '_locks' / 'collection.lock', recover_stale=True):
                         _finish_daily_batch(state, paths, metadata)
@@ -138,7 +138,7 @@ def archive_published_task(task_directory: str | Path, *, workspace_root: str | 
     relative = task.relative_to(workspace)
     if (task / 'summary.json').is_file():
         document = json.loads((task / 'summary.json').read_text(encoding='utf-8'))
-        if document.get('format_version') == 'daily-batch-v1':
+        if document.get('format_version') in {'daily-batch-v1', 'daily-batch-v2'}:
             from ..pipeline.inputs import _save_daily_batch
             from ..pipeline.daily import daily_unit_paths, save_batch_json
             from ..storage.raw import RawObjectStore
