@@ -1,6 +1,6 @@
 # Stock Data Manage
 
-证券数据采集与管理项目。当前日线以“证券+交易日”一条聚合记录保存不复权及可用的前/后复权口径；不复权是发布必需数据，缺少复权值时保留未核验空槽，不复制价格。旧单口径数据保持原样。2026-10-28的沪深北三只样本已完成v7正式留存发布与查询验收。2026-10-30单位规则升级为v8并完成留存响应隔离验收。2026-11-04正式日线任务已运行：股票5,570/5,573条、ETF 1,717/1,717条已发布；指数62条未得到目标日记录，按既有覆盖门槛阻断，任务`complete_today=false`。两项BaoStock证券清单请求已分别在60秒处超时，未切换代理或来源；本次完整日线任务通过既有到期任务入口手动执行，不能证明`run-scheduler`进程连续运行或Windows任务会在进程退出后重启。固定日线业务任务按配置使用既有来源，并保留健康、原始响应、数据质量和正式发布检查。最新状态和证据见[项目进度与待办](PROJECT_PROGRESS.md#当前业务交付状态)。
+证券数据采集与管理项目。当前日线以“证券+交易日”一条聚合记录保存不复权及可用的前/后复权口径；不复权是发布必需数据，缺少复权值时保留未核验空槽，不复制价格。旧单口径数据保持原样。2026-10-28的沪深北三只样本已完成v7正式留存发布与查询验收。2026-10-30单位规则升级为v8并完成留存响应隔离验收。2026-11-04正式日线任务已运行：股票5,570/5,573条、ETF 1,717/1,717条已发布；指数62条未得到目标日记录，按既有覆盖门槛阻断，任务`complete_today=false`。两项BaoStock证券清单请求已分别在60秒处超时，未切换代理或来源；本次完整日线任务通过既有到期任务入口手动执行，不能证明`run-scheduler`进程连续运行。Windows登录启动任务已于2026-11-05移除，当前由操作员手动启动；未实现调度进程退出后的自动重启。固定日线业务任务按配置使用既有来源，并保留健康、原始响应、数据质量和正式发布检查。最新状态和证据见[项目进度与待办](PROJECT_PROGRESS.md#当前业务交付状态)。
 
 | 需要了解什么 | 文档入口 |
 |---|---|
@@ -55,7 +55,7 @@
 
 正式代码直接放在 `src/` 下，模块按职责分目录，不再套一层项目同名目录。Python 导入名仍为 `stock_data_manage`，由 `pyproject.toml` 将该包映射到 `src/`；`stock_data_manage.providers` 对应 `src/providers/`。根目录 `config/` 保存 YAML，`src/config/` 保存读取和校验配置的代码。
 
-来源可行性证据位于 `provider_validation/results/`。通用输入入口 `collect-input` 默认将原响应保存到 `data/raw/`，来源解析和标准化结果保存到 `data/task_workspace/`，任务元数据库保存到 `data/metadata/metadata.duckdb`。证券主数据通过 `collect-task` 更新到 `data/canonical/security_master/current/security_master.duckdb` 这一份当前清单；完整来源成功时写入状态及字段变更历史，失败时保留现状。日线任务使用目标日以前最近一份成功完整的清单；当天刷新失败不会把现有证券改成无效，也不会阻止仍有可用清单的日线继续执行。Windows登录任务启动 `run-scheduler` 后每30秒读取现有YAML周期；登录晚于配置时刻时仍分派当天到期任务。项目内没有独立进程看门狗；`run-scheduler`是同步前台轮询进程，业务异常会记录后继续轮询，进程退出后的自动重启取决于Windows任务属性。该任务曾查询为`Ready`，但本次环境无法读取当前状态和失败重启设置，仍需在[任务流程](docs/pipeline/collection-tasks.md)及[项目进度](PROJECT_PROGRESS.md)查看当前验收结论。离线回放须显式指定独立的 `--data-root`，业务任务输出禁止放入 `provider_validation/`。显式 `--output-root` 保留隔离验证布局；历史报告中的旧路径及哈希不改写。
+来源可行性证据位于 `provider_validation/results/`。通用输入入口 `collect-input` 默认将原响应保存到 `data/raw/`，来源解析和标准化结果保存到 `data/task_workspace/`，任务元数据库保存到 `data/metadata/metadata.duckdb`。证券主数据通过 `collect-task` 更新到 `data/canonical/security_master/current/security_master.duckdb` 这一份当前清单；完整来源成功时写入状态及字段变更历史，失败时保留现状。日线任务使用目标日以前最近一份成功完整的清单；当天刷新失败不会把现有证券改成无效，也不会阻止仍有可用清单的日线继续执行。`run-scheduler`是每30秒读取YAML周期的前台Python轮询进程，当前由操作员手动启动；它不是Windows登录任务或项目内服务，看门狗也未实现。登录触发任务已于2026-11-05从本机Windows任务计划程序移除。手动启动命令及停止行为见[任务流程](docs/pipeline/collection-tasks.md)。离线回放须显式指定独立的 `--data-root`，业务任务输出禁止放入 `provider_validation/`。显式 `--output-root` 保留隔离验证布局；历史报告中的旧路径及哈希不改写。
 
 2026-10-09确认的开发边界进一步限定：`provider_validation/` 仅服务正式实现前的接口可行性确认；进入业务开发后，业务原始响应、Provider联调、来源复核及端到端验收都使用 `data/` 或 `tmp/` 下独立运行布局，不向该验证区新增产物。历史证据只读保留，业务代码位于 `src/`、实现测试位于 `tests/`。
 
@@ -63,7 +63,7 @@
 
 ## 日线当前实现范围（2026-10-31）
 
-股票、ETF和已纳入当前证券清单的指数日线均按YAML任务及固定输入配置逐证券采集，再聚合为“证券+交易日”记录；实际完成范围和发布状态以各任务摘要为准。`run-scheduler`由Windows登录任务启动，每30秒轮询并同步分派到期业务任务；项目内没有独立进程看门狗，进程退出后的自动重启取决于Windows任务属性。2026-11-04正式日线入口已运行：股票5,570/5,573、ETF1,717/1,717分区发布；指数495/557，因62条缺失超过现有覆盖门槛而阻断，整批未完成。当前Windows任务失败重启属性尚未核实。详见[聚合设计和实施现状](stock-data-design-qfq-history-rebuild.md)、[任务流程](docs/pipeline/collection-tasks.md)及[项目进度](PROJECT_PROGRESS.md)。
+股票、ETF和已纳入当前证券清单的指数日线均按YAML任务及固定输入配置逐证券采集，再聚合为“证券+交易日”记录；实际完成范围和发布状态以各任务摘要为准。`run-scheduler`由操作员手动启动，每30秒轮询并同步分派到期业务任务；当前未配置Windows登录触发或项目内进程看门狗，进程退出后需再次手动启动。2026-11-04正式日线入口已运行：股票5,570/5,573、ETF1,717/1,717分区发布；指数495/557，因62条缺失超过现有覆盖门槛而阻断，整批未完成。详见[聚合设计和实施现状](stock-data-design-qfq-history-rebuild.md)、[任务流程](docs/pipeline/collection-tasks.md)及[项目进度](PROJECT_PROGRESS.md)。
 
 本次已完成[配置驱动的日线展示整改](docs/service/read-only-web.md#展示字段合同与整改实现2026-10-30已确认并验收)：列映射以[展示YAML](config/presentation.yaml)为准，来源映射与单位换算仍归原配置；[本轮实际结果与截图](tmp/presentation-20261029/README.md)限定三股单日，不扩展为各类型生产验收。
 

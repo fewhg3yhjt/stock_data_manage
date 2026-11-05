@@ -378,7 +378,7 @@ flowchart LR
     Q0 -->|否| B0[来源单元阻断<br/>没有日线发布]
   end
   subgraph after[改造后：同一业务任务自动执行]
-    L1[Windows用户登录触发] --> R1[run-scheduler常驻轮询<br/>每30秒读取现有时间配置]
+    L1[操作员手动启动Python进程] --> R1[run-scheduler常驻轮询<br/>每30秒读取现有时间配置]
     R1 --> S1{到期任务}
     S1 -->|08:00| M1[collect-due-inputs<br/>security_master]
     S1 -->|16:20或之后启动| D1[collect-due-inputs<br/>daily_bar 当日日期]
@@ -420,7 +420,7 @@ flowchart LR
 
 这里取消的是命名`daily_fixed`任务请求前按每只证券查询可过期资格记录的阻断；保留固定路由配置校验、Provider健康/冷却、原始响应留证、逐单元日期/字段/值检查、覆盖及正式发布门槛。`collect-input`和未命名的通用/动态任务仍按原资格合同运行；该业务任务的成功也不会授予通用路由资格。当前不补跑未执行的过往日期；操作员可按现有手动指定日期入口启动明确的历史任务，任务日期和范围照旧冻结。
 
-系统启动方式为Windows任务计划程序的当前用户登录触发，执行`D:\Program Files\Python\python.exe -m stock_data_manage.cli run-scheduler --config-root config`，工作目录为项目根目录；不在Windows中再配置08:00/16:20两个触发器，避免双重触发。项目内没有独立Windows服务或进程看门狗：`run-scheduler`是前台轮询循环，单个到期业务任务同步运行；业务处理异常会被记录并让轮询继续，进程本身退出后项目内没有另一个进程负责重启它。已注册的Windows计划任务是否配置失败重启或机器启动恢复，必须以操作系统任务属性为准；当前执行环境无法读取这些属性，因此不能宣称外部自动恢复已验证。该入口当前只分派证券清单与日线两类业务任务；既有分钟和校准时间项不在本次范围内。进程以当前用户会话运行，可使用该会话配置的现有网络代理。目标端到端运行及正式任务注册状态写入[项目进度](../../PROJECT_PROGRESS.md#当前业务交付状态)。
+`run-scheduler`由操作员从项目根目录手动启动，是每30秒读取YAML周期的前台Python轮询进程；当前不注册Windows登录/启动触发器。命令为`& 'D:\Program Files\Python\python.exe' -B -X utf8 -m stock_data_manage.cli run-scheduler --config-root config --poll-interval-seconds 30`。该进程同步运行单个到期业务任务，业务处理异常会记录并继续轮询；关闭命令窗口或进程退出后，需操作员再次手动运行。项目内没有进程看门狗或自动重启。2026-11-05已从本机Windows任务计划程序移除`StockDataManage-Daily-Collector`登录任务；移除记录见[项目进度](../../PROJECT_PROGRESS.md#2026-11-05-移除本机-windows-登录启动任务手动启停)。该入口当前只分派证券清单与日线两类业务任务；既有分钟和校准时间项不在本次范围内。进程以当前用户会话运行，可使用该会话配置的现有网络代理。云平台部署时应由平台进程管理器运行同一Python入口；目前没有配置云平台部署。
 
 现有日线任务首次从不晚于目标日的正式名单展开范围，并保存定义；已有任务由 `_task_units` 读取原冻结单元，不因新上市证券改变续跑范围。规则或请求合同变化仍要求新任务；不能将当前YAML覆盖旧定义。动态范围all_stock/all_etf/all_index只表示展开能力，不授予对应资产生产资格。
 
