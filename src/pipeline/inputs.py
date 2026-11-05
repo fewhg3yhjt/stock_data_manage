@@ -1038,6 +1038,16 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
             result_store = RawObjectStore(directory)
         report_ref = write_result(report, dataset="input_report", provider=contract.provider, endpoint=contract.endpoint,
                                             fetched_at=datetime.now(timezone.utc), attempt_id="report")
+        if runtime and isinstance(report.get("source_rows"), dict):
+            from ..storage.read_index import append_source_report
+            from ..storage.parquet import PartitionLockedError
+            try:
+                append_source_report(report_ref.path, run_root=directory, config_root=config_root,
+                                     field_mapping=rule.get("field_mapping", {}))
+            except (OSError, ValueError, TypeError, KeyError, IndexError, UnicodeError,
+                    PartitionLockedError) as exc:
+                import warnings
+                warnings.warn(f"source query index refresh failed for {report_ref.path.name}: {exc}", RuntimeWarning)
         if runtime:
             from ..domain import AttemptStatus
             from ..storage.metadata import MetadataStore
@@ -1664,7 +1674,8 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                     try:
                         processing = frozen['processing_contracts'][unit['input_id']]
                         entry = process_daily_unit(unit=unit, entry=entry, provider=provider, contract=contract,
-                            field_contract=processing['field_contract'], rule=processing['rule'], work=work)
+                            field_contract=processing['field_contract'], rule=processing['rule'], work=work,
+                            config_root=config_root)
                         if failure_hook:
                             failure_hook('after_candidate_before_checkpoint')
                     except (ProviderContractError, NormalizationError) as exc:

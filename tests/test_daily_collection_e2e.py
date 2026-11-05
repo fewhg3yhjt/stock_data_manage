@@ -4,6 +4,7 @@ from decimal import Decimal
 from pathlib import Path
 from types import SimpleNamespace
 import json
+import time
 
 import pytest
 import requests
@@ -412,6 +413,58 @@ def test_daily_web_defaults_validation_and_corrupt_partition(tmp_path):
     assert client.get("/api/daily?start_date=invalid").status_code == 422
     Path(state["published_manifest"]).with_name("data.parquet").write_bytes(b"corrupt fixture")
     assert client.get("/api/daily").status_code == 409
+
+
+def test_daily_api_skips_retired_row_partition_before_reading_parquet(tmp_path, monkeypatch, record_property):
+    from fastapi.testclient import TestClient
+    from stock_data_manage.service.web import create_app
+    from stock_data_manage.storage.integrity import Manifest
+    from stock_data_manage.storage.parquet import CanonicalPartitionStore
+
+    definition = source_task(tmp_path)
+    execute(tmp_path, definition)
+    root = tmp_path / "business/canonical"
+    retired = root / "2026-10-09/daily_bar/etf"
+    retired.mkdir(parents=True)
+    old_data = retired / "data.parquet"
+    old_data.write_bytes(b"retired row-oriented daily partition")
+    Manifest.from_file(old_data, dataset="daily_bar", asset_type="etf", partition_key="2026-10-09",
+        schema_version="v1", adjustment="none", row_count=0, first_key=None,
+        last_key=None).write_atomic(retired / "manifest.json")
+
+    calls = []
+    original_read_daily = CanonicalPartitionStore.read_daily
+
+    def tracked_read_daily(store, asset_type, partition_key):
+        calls.append((asset_type, partition_key))
+        return original_read_daily(store, asset_type, partition_key)
+
+    monkeypatch.setattr(CanonicalPartitionStore, "read_daily", tracked_read_daily)
+    app = create_app(config_root=CONFIG, data_root=tmp_path / "business")
+    endpoint = next(route.endpoint for route in app.routes if getattr(route, "path", "") == "/api/daily")
+    started = time.perf_counter()
+    response = endpoint(security="", start_date=None, end_date=None, asset_type="",
+        adjustment="none", page=1, page_size=50)
+    elapsed = time.perf_counter() - started
+    record_property("daily_api_seconds_one_supported_one_retired_partition", round(elapsed, 3))
+    assert response["total"] == 1 and response["items"][0]["trade_date"] == DAY
+    assert calls == [("stock", DAY)]
+    assert elapsed < 2.0
+
+
+def test_source_query_index_failure_does_not_block_daily_publication(tmp_path, monkeypatch):
+    from stock_data_manage.storage.parquet import PartitionLockedError
+    import stock_data_manage.storage.read_index as read_index
+
+    definition = source_task(tmp_path)
+
+    def unavailable_index(*args, **kwargs):
+        raise PartitionLockedError("synthetic sidecar contention")
+
+    monkeypatch.setattr(read_index, "append_source_report", unavailable_index)
+    with pytest.warns(RuntimeWarning, match="source query index refresh failed"):
+        result = execute(tmp_path, definition)
+    assert result["status"] == "published" and result["complete_today"]
 
 
 def test_old_single_adjustment_task_is_explicitly_rejected(tmp_path):

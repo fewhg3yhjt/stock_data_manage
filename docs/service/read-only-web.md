@@ -18,7 +18,7 @@
 
 ### 配置边界与对象关系
 
-现由**一份**[config/presentation.yaml](../../config/presentation.yaml)供现有Web服务加载，保存当前视图的字段中文说明、列引用与顺序、格式和详情字段。不新增配置服务、注册表、视图管理器、通用表达式引擎或持久化前端索引；先实现日线两种视图，不为所有数据集预建模板。
+现由**一份**[config/presentation.yaml](../../config/presentation.yaml)供现有Web服务加载，保存当前视图的字段中文说明、列引用与顺序、格式和详情字段。展示配置不维护查询索引；查询API使用由既有来源报告和Raw请求清单派生的只读索引，索引维护规则见下文。不新增配置服务、注册表、视图管理器或通用表达式引擎；先实现日线两种视图，不为所有数据集预建模板。
 
 独立文件的必要性：当前任务冻结`datasets/daily_bar.yaml`和`normalization/daily_bar.yaml`，来源核验也检查这些生产合同。把列顺序塞进其中会让纯展示修改影响生产合同及续跑。展示文件不参与采集、单位换算、来源资格或候选复用；不为它引入另一种指纹或管理关卡。
 
@@ -116,7 +116,55 @@
 - 证券名称和资产类型可以借助已发布证券名单补充查询元信息，来源记录自身的字段不被覆盖；辅助名称不代表历史名称回溯。带市场标识的证券代码不因裸代码相同而合并。
 - 不同请求或来源返回的记录分别保留，页面不进行质量仲裁，不选择“正确价格”，也不把展示结果发布到 Canonical。同份报告证据的重复工作区副本在查询中去重。
 
-来源报告的查询元信息只缓存在内存中，按文件修改时间及大小更新；来源行仍在每次查询时核验，不生成新的持久化索引。大目录的首次查询可能需要数秒。缺文件、哈希异常和无法读取的来源文件不会伪装成成功空数据，页面显示相应检查问题。
+来源报告不再由页面请求递归扫描。采集完成来源行和报告后，`pipeline/inputs.py` 与 `pipeline/daily.py` 将证券代码、名称、日期、资产类型和来源行号写入同一工作根下的 `source_rows_query_index.ndjson`；索引只保存筛选字段与原文件定位，不复制行情原值。服务按索引修改时间和长度做进程内缓存，先筛选并分页，再打开当前页所需的来源行文件，重新核对SHA-256和报告行数。索引更新失败只记警告，不阻止来源采集或Canonical发布；完整性错误在被查看的当前页明确返回。总数按匹配的索引行计算，当前页发现损坏时该行不返回、原因进入 `issues`，不会为了计算总数而重读所有来源行文件。
+
+原始响应列表读取Raw目录已有的 `manifest.ndjson` 请求索引。每条索引记录带请求清单名、原文SHA-256和脱敏后的响应摘要；详情或下载时才打开命名请求清单并校验原始响应字节。列表只检查当前页响应体文件是否存在，不逐条打开全部响应清单或响应体。Raw写入、替换和删除沿现有请求级清单路径更新索引；历史数据使用一次性命令重建。
+
+升级现有数据根时，在项目根目录、与运行Web服务相同的配置和数据根下执行一次：
+
+```powershell
+stock-data-web --config-root config --rebuild-query-index
+```
+
+若服务使用了显式隔离数据根，将 `--data-root <同一数据根>` 加到命令上。该命令从现存来源报告、来源行和命名Raw请求清单重建两种派生索引并打印处理数量；它不请求Provider、不改Canonical分区、不删除原始证据。之后新采集和Raw发布沿现有工作流增量更新索引。没有索引时API不退回全目录扫描，因此首次升级要先执行此命令。
+
+实际读取路径如下；失败的来源行索引更新不影响生产，手动重建是已有数据的修复入口：
+
+```mermaid
+flowchart LR
+  subgraph Before[此前：每次页面读取]
+    B1[数据查询API] --> B2[递归扫描报告文件]
+    B2 --> B3[逐份打开来源行并校验]
+    B3 --> B4[最后才分页]
+    R1[原始数据API] --> R2[逐个打开命名请求清单和响应摘要]
+    D1[规范日线API] --> D2[把旧行式与聚合清单都交给新格式校验]
+  end
+  subgraph After[现在：增量派生索引 + 按页读取]
+    C1[来源采集写报告与来源行] --> C2[source_rows_query_index.ndjson]
+    C2 --> C3[数据查询API筛选、排序、分页]
+    C3 --> C4[仅打开当前页来源行并校验]
+    W1[Raw请求发布/替换/删除] --> W2[接口目录manifest.ndjson]
+    W2 --> W3[原始数据API分页响应摘要]
+    W3 --> W4[详情/下载时读取命名清单与原始响应]
+    M1[升级重建命令] --> C2
+    M1 --> W2
+    P1[规范日线API] --> P2{manifest为受支持的聚合合同?}
+    P2 -->|否，旧行式| P3[跳过，不读取旧Parquet]
+    P2 -->|是| P4[核验manifest与聚合Parquet]
+  end
+```
+
+### 受影响API的功能与性能验收边界
+
+| 路由 | 业务返回与错误合同 | 性能数据量、冷/热预算及工作量边界 | 本次自动化验收 |
+|---|---|---|---|
+| `/api/data/options` | 只列出确有来源报告的类型、来源和日期；空数据返回空列表 | 23,852份报告索引；冷读≤5秒，缓存复用≤2.5秒；只读索引，不打开来源行文件 | `test_source_query_indexes_bound_page_reads_at_current_report_scale` |
+| `/api/data` | 日期/代码/名称/来源/类型/复权筛选，稳定分页；空结果与日期错误有明确响应；所选原值与来源行逐项对应 | 23,852份报告索引；冷读≤5秒、复用≤2.5秒；页面大小1时只打开命中页面的1个来源行文件，并核验SHA和行数 | 同上；`test_record_query_filters_business_date_name_and_keeps_source_values`；`test_record_query_snapshot_date_is_explicit_and_integrity_failure_visible` |
+| `/api/raw/options`、`/api/raw/sources` | 返回日期、来源及接口层级；未知日期返回404 | 只枚举所选层级的目录；不打开请求清单或响应体 | `test_http_read_only_routes_headers_filters_and_frozen_parameters`、Raw日期/来源用例 |
+| `/api/raw` | 日期/来源/接口/文本筛选，分页总数和响应摘要；非法组合返回400；当前页准确报告响应体是否存在 | 17,592条响应索引；冷读≤5秒、缓存复用≤1.5秒；只打开对应Endpoint索引，列表不打开命名请求清单；仅对当前页做响应体存在检查 | `test_raw_listing_uses_cached_manifest_index_at_production_scale`；`test_raw_query_index_rebuild_is_idempotent_and_excludes_catalog`；`test_raw_detail_redacts_secrets_previews_and_downloads_exact_bytes` |
+| `/api/daily` | 仅返回支持的聚合Schema；日期、资产类型和复权筛选按既有合同；受支持分区损坏仍返回409 | 一份有效聚合分区加一份旧行式分区；旧分区不交给新格式读取器，有效分区只读一次；本地页查询预算≤2秒 | `test_daily_api_skips_retired_row_partition_before_reading_parquet`；`test_daily_web_defaults_validation_and_corrupt_partition` |
+
+上述时间预算是隔离自动化验收阈值，不是生产机实测时延承诺。当前样本实测：23,852份来源索引下，`/api/data/options`冷/热为0.513/0.129秒、`/api/data`冷/热为0.643/0.100秒；17,592条Raw响应下，`/api/raw`冷/热为0.143/0.074秒；`/api/daily`在1个支持分区加1个旧行式分区时为0.033秒。合成索引规模与此前实际待读数量对齐，目录列表检查直接断言请求清单打开次数为0、来源行打开次数受页面大小约束。当前环境中Starlette `TestClient` 在请求进入应用前卡在Windows asyncio本机socketpair初始化，因此性能计时直接调用FastAPI注册的路由处理函数；耗时不含ASGI序列化和HTTP往返。HTTP级合同用例仍保留，但本轮未完成其执行。
 
 ## 为什么
 
@@ -173,7 +221,7 @@ Docker/Compose 部署及无需重建镜像的代码更新方式见[容器部署�
 
 ## 当前取舍
 
-任务和大型 manifest 采用服务端分页，但任务列表仍需解析找到的 summary，原始列表仍需读取所选日期和来源范围内的 manifest。为控制扫描成本，原始数据默认选择最新日期，并鼓励先选择 Provider 和 Endpoint；当前不增加另一套查询数据库。
+任务和大型 manifest 采用服务端分页，但任务列表仍需解析找到的 summary，原始列表读取所选日期和来源范围的接口摘要索引。为控制扫描成本，原始数据默认选择最新日期，并鼓励先选择 Provider 和 Endpoint；当前不增加另一套查询数据库。
 
 页面没有任务启停、重做、配置修改、数据删除、Provider 健康、登录或多用户权限。云端部署、鉴权和反向代理属于后续明确确认的范围。
 

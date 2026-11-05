@@ -1,5 +1,6 @@
 import hashlib
 import json
+import time
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
@@ -101,6 +102,8 @@ realtime_minute:
     ]
     manifest = raw_dir / "manifest.sh600519.ndjson"
     manifest.write_text("".join(json.dumps(item) + "\n" for item in events), encoding="utf-8")
+    from stock_data_manage.storage.raw import RawObjectStore
+    RawObjectStore.refresh_index(manifest)
 
     write_json(
         data / "canonical/2026-10-09/daily_bar/stock/manifest.json",
@@ -223,6 +226,7 @@ def test_raw_detail_redacts_secrets_previews_and_downloads_exact_bytes(tmp_path)
     )
     evidence_id = listing["items"][0]["id"]
 
+    assert listing["items"][0]["has_body"] is True
     payload = reader.raw_detail(evidence_id, preview_bytes=64 * 1024)
     serialized = json.dumps(payload, ensure_ascii=False)
     assert "visible-secret" not in serialized
@@ -235,6 +239,148 @@ def test_raw_detail_redacts_secrets_previews_and_downloads_exact_bytes(tmp_path)
     assert '"close": 1820.0' in payload["preview"]["text"]
     download, content_type, _ = reader.raw_body(evidence_id)
     assert download.read_bytes() == body and content_type == "application/json"
+
+
+def test_raw_listing_uses_cached_manifest_index_at_production_scale(tmp_path, monkeypatch, record_property):
+    """A 17.5k response index is listed without opening the 17.5k request manifests."""
+    _, app, data, _ = web_fixture(tmp_path)
+    index = data / "raw/2026-10-09/tencent/kline_daily/manifest.ndjson"
+    original = json.loads(index.read_text(encoding="utf-8").splitlines()[0])
+    response = {
+        "event": "http_response", "provider": "tencent", "endpoint": "kline_daily",
+        "method": "GET", "url": "https://example.test/kline", "outcome": "response",
+        "status_code": 200, "fetched_at_utc": "2026-10-09T08:00:00+00:00",
+        "body_bytes": 0, "body_sha256": "0" * 64,
+    }
+    index.parent.mkdir(parents=True, exist_ok=True)
+    with index.open("w", encoding="utf-8") as stream:
+        for number in range(17_591):
+            item = {
+                "event": "request_manifest", "request_manifest": f"manifest.sample-{number:05d}.ndjson",
+                "sha256": "0" * 64,
+                "responses": [{"event_index": 0, "response": {
+                    **response, "fetched_at_utc": (datetime(2026, 10, 9, 8, tzinfo=timezone.utc)
+                        + timedelta(seconds=number)).isoformat()}}],
+            }
+            stream.write(json.dumps(item, separators=(",", ":")) + "\n")
+        stream.write(json.dumps(original, separators=(",", ":")) + "\n")
+
+    opened_request_manifests = []
+    opened_indexes = []
+    original_open = Path.open
+
+    def guarded_open(path, *args, **kwargs):
+        if path.name.startswith("manifest.sample-"):
+            opened_request_manifests.append(path)
+            raise AssertionError("listing must use the endpoint index, not each request manifest")
+        if path == index:
+            opened_indexes.append(path)
+        return original_open(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "open", guarded_open)
+    endpoint = next(route.endpoint for route in app.routes if getattr(route, "path", "") == "/api/raw")
+    started = time.perf_counter()
+    first = endpoint(data_date="2026-10-09", provider=None, endpoint=None,
+                     q=None, page=1, page_size=25)
+    cold_seconds = time.perf_counter() - started
+    assert first["total"] == 17_592 and len(first["items"]) == 25
+    started = time.perf_counter()
+    second = endpoint(data_date="2026-10-09", provider=None, endpoint=None,
+                      q=None, page=2, page_size=25)
+    warm_seconds = time.perf_counter() - started
+    assert len(second["items"]) == 25
+    record_property("raw_listing_cold_seconds_17592_responses", round(cold_seconds, 3))
+    record_property("raw_listing_warm_seconds_17592_responses", round(warm_seconds, 3))
+    assert cold_seconds < 5.0
+    assert warm_seconds < 1.5
+    assert opened_request_manifests == []
+    assert len(opened_indexes) == 1
+
+
+def test_raw_query_index_rebuild_is_idempotent_and_excludes_catalog(tmp_path):
+    from stock_data_manage.storage.raw import RawObjectStore
+
+    root = tmp_path / "raw"
+    endpoint = root / "2026-10-09/tencent/kline_daily"
+    endpoint.mkdir(parents=True)
+    request = endpoint / "manifest.sample-00001.ndjson"
+    request.write_text(json.dumps({"event": "http_response", "provider": "tencent",
+        "endpoint": "kline_daily", "outcome": "response", "status_code": 200,
+        "url": "https://example.test/kline", "fetched_at_utc": "2026-10-09T08:00:00+00:00",
+        "body_bytes": 2, "body_sha256": "ab"}) + "\n", encoding="utf-8")
+    RawObjectStore.refresh_index(request)
+
+    assert RawObjectStore.rebuild_indexes(root) == 1
+    index = endpoint / "manifest.ndjson"
+    records = [json.loads(line) for line in index.read_text(encoding="utf-8").splitlines()]
+    assert len(records) == 1 and records[0]["request_manifest"] == request.name
+    assert RawObjectStore.rebuild_indexes(root) == 1
+    records = [json.loads(line) for line in index.read_text(encoding="utf-8").splitlines()]
+    assert len(records) == 1 and records[0]["request_manifest"] == request.name
+
+
+def test_source_query_indexes_bound_page_reads_at_current_report_scale(tmp_path, monkeypatch, record_property):
+    """The source API reads 23,852 indexed reports and opens only the selected row file."""
+    _, app, data, add = source_query_fixture(tmp_path)
+    add("sh600519", [{"0": "2026-10-09", "2": "101.00", "5": "7061.00", "symbol": "sh600519"}])
+    from stock_data_manage.storage.read_index import SOURCE_QUERY_INDEX
+    index = next(data.rglob(SOURCE_QUERY_INDEX))
+    actual = json.loads(index.read_text(encoding="utf-8").splitlines()[-1])
+    with index.open("w", encoding="utf-8") as stream:
+        for number in range(23_851):
+            item = {
+                "event": "upsert", "report_path": f"sources/tencent/kline_daily/report-{number:05d}.report.json",
+                "report": {"dataset": "daily_bar", "input_id": f"PERF-{number}", "provider": "tencent",
+                    "endpoint": "kline_daily", "data_date": "2026-10-09",
+                    "parameters": {"symbol": "sh000000", "adjust": "qfq"},
+                    "source_rows": {"path": f"sources/tencent/kline_daily/rows-{number:05d}.json",
+                        "sha256": "0" * 64, "row_count": 0}},
+                "selectors": [],
+            }
+            stream.write(json.dumps(item, separators=(",", ":")) + "\n")
+        stream.write(json.dumps(actual, ensure_ascii=False, separators=(",", ":")) + "\n")
+    selected_source = data / "task_workspace/2026-10-09/daily_bar/sources/tencent/kline_daily/sh600519.source-rows.json"
+    reads = []
+    original_read_bytes = Path.read_bytes
+
+    def tracked_read_bytes(path):
+        if path.name.endswith(".source-rows.json"):
+            reads.append(path.resolve())
+        return original_read_bytes(path)
+
+    monkeypatch.setattr(Path, "read_bytes", tracked_read_bytes)
+    options_endpoint = next(route.endpoint for route in app.routes if getattr(route, "path", "") == "/api/data/options")
+    started = time.perf_counter()
+    options = options_endpoint()
+    options_cold_seconds = time.perf_counter() - started
+    assert options["datasets"][0]["id"] == "daily_bar"
+    started = time.perf_counter()
+    options_warm = options_endpoint()
+    options_warm_seconds = time.perf_counter() - started
+    assert options_warm["datasets"][0]["id"] == "daily_bar"
+
+    query_params = {"dataset": "daily_bar", "security": "sh600519", "start_date": "2026-10-09",
+        "end_date": "2026-10-09", "page_size": 1}
+    data_app = create_app(config_root=tmp_path / "config", data_root=data)
+    data_endpoint = next(route.endpoint for route in data_app.routes if getattr(route, "path", "") == "/api/data")
+    typed_params = {**query_params, "start_date": date(2026, 10, 9), "end_date": date(2026, 10, 9), "page": 1}
+    started = time.perf_counter()
+    query = data_endpoint(**typed_params)
+    query_cold_seconds = time.perf_counter() - started
+    assert query["total"] == 1 and query["items"][0]["values"]["2"] == "101.00"
+    started = time.perf_counter()
+    warm_query = data_endpoint(**typed_params)
+    query_warm_seconds = time.perf_counter() - started
+    assert warm_query["total"] == 1
+    record_property("source_options_cold_seconds_23852_reports", round(options_cold_seconds, 3))
+    record_property("source_options_warm_seconds_23852_reports", round(options_warm_seconds, 3))
+    record_property("source_query_cold_seconds_23852_reports", round(query_cold_seconds, 3))
+    record_property("source_query_warm_seconds_23852_reports", round(query_warm_seconds, 3))
+    assert options_cold_seconds < 5.0
+    assert options_warm_seconds < 2.5
+    assert query_cold_seconds < 5.0
+    assert query_warm_seconds < 2.5
+    assert reads == [selected_source.resolve(), selected_source.resolve()]
 
 
 def test_raw_token_cannot_escape_managed_root_and_app_is_read_only(tmp_path):
@@ -293,6 +439,8 @@ def test_each_response_in_manifest_is_visible_and_task_links_exact_evidence(tmp_
                "fetched_at_utc": "2026-10-09T07:59:00+00:00", "outcome": "transport_error",
                "error": "timeout", "url": "https://example.test/kline"}
     manifest.write_text("".join(json.dumps(item) + "\n" for item in [failure, *events]), encoding="utf-8")
+    from stock_data_manage.storage.raw import RawObjectStore
+    RawObjectStore.refresh_index(manifest)
     summary_path = data / "task_workspace/2026-10-09/daily_bar/summary.json"
     summary = json.loads(summary_path.read_text(encoding="utf-8"))
     summary["source_units"][0]["raw_manifest"] = str(manifest)
@@ -347,6 +495,8 @@ def test_sdk_payload_is_not_labeled_as_http_or_transport_bytes(tmp_path):
              "body_storage": "bodies/sdk.bin", "body_sha256": digest,
              "representation": "SDK-decoded fields and rows", "original_transport_bytes_available": False}
     (directory / "manifest.sdk.ndjson").write_text(json.dumps(event) + "\n", encoding="utf-8")
+    from stock_data_manage.storage.raw import RawObjectStore
+    RawObjectStore.refresh_index(directory / "manifest.sdk.ndjson")
     listing = reader.raw_records(data_date=None, provider="baostock", endpoint=None, query=None, page=1, page_size=25)
     assert listing["total"] == 1
     item = reader.raw_detail(listing["items"][0]["id"], preview_bytes=1024)
@@ -407,7 +557,11 @@ def source_query_fixture(tmp_path):
                   "data_date": "2026-10-09", "parameters": parameters if parameters is not None else {"code": symbol,"adjust":"qfq"},
                   "source_rows": descriptor, "normalization_version": "test-v1", "code_version": "fixture",
                   "raw_manifest": {"path": str(data / "raw/2026-10-09/tencent/kline_daily/manifest.sh600519.ndjson")}}
-        write_json(directory / f"{symbol}.report.json", report)
+        report_path = directory / f"{symbol}.report.json"
+        write_json(report_path, report)
+        from stock_data_manage.storage.read_index import append_source_report
+        append_source_report(report_path, run_root=directory.parents[2], config_root=config,
+                             field_mapping={"trade_date": "0", "close": "2", "volume": "5"})
         return source
     add("sh600519", [{"0":day,"2":price,"5":"7061.00","symbol":"sh600519"}
                      for day,price in [("2026-10-08","100.00"),("2026-10-09","101.00"),("2026-10-10","102.00")]])
@@ -441,6 +595,26 @@ def test_record_query_filters_business_date_name_and_keeps_source_values(tmp_pat
         assert second["items"][0]["record_date"] == "2026-10-09"
         assert client.get("/api/data",params={**query,"provider":"missing"}).json()["total"] == 0
         assert client.get("/api/data",params={**query,"adjustment":"hfq"}).json()["total"] == 0
+
+
+def test_source_query_rebuild_keeps_retained_workspace_audit_reports(tmp_path):
+    import shutil
+    reader, _, data, _ = source_query_fixture(tmp_path)
+    source_dir = data / "task_workspace/2026-10-09/daily_bar/sources/tencent/kline_daily"
+    report_root = data / "task_archive/_workspace_audit/retained-daily"
+    report_dir = report_root / "sources/tencent/kline_daily"
+    report_dir.mkdir(parents=True)
+    for name in ("sh600519.source-rows.json", "sh600519.report.json"):
+        shutil.copy2(source_dir / name, report_dir / name)
+
+    from stock_data_manage.storage.read_index import rebuild_source_query_indexes
+    rebuilt = rebuild_source_query_indexes(workspace_root=data / "task_workspace",
+        archive_root=data / "task_archive", config_root=tmp_path / "config")
+    assert rebuilt == {"indexed_reports": 2, "index_files": 2}
+    indexed_paths = {str(path) for path, _ in reader._query_reports()}
+    assert str(report_dir / "sh600519.report.json") in indexed_paths
+    # The archived copy is retained evidence of the same report, not a second result.
+    assert reader.data_records(dataset="daily_bar", security="sh600519")["total"] == 3
 
 
 def test_record_query_distinguishes_exchanges_and_does_not_use_capture_date(tmp_path):
@@ -504,6 +678,9 @@ def test_source_projection_preserves_values_and_uses_config_order(tmp_path):
     report = json.loads(report_path.read_text(encoding="utf-8"))
     report["applied_unit_contract"] = {"source_units": {"volume":"lot"}}
     write_json(report_path, report)
+    from stock_data_manage.storage.read_index import append_source_report
+    append_source_report(report_path, run_root=report_path.parents[3], config_root=tmp_path / "config",
+                         field_mapping={"trade_date": "0", "close": "2", "volume": "5"})
     result = reader.data_records(dataset="daily_bar")
     assert len(result["columns"]) == 12
     row = result["items"][0]
@@ -511,7 +688,7 @@ def test_source_projection_preserves_values_and_uses_config_order(tmp_path):
     assert row["source_field_labels"]["9"] == "来源字段9（含义未核验）"
     assert row["display_values"]["volume"] == "0.00" and row["field_metadata"]["volume"]["unit"] == "lot"
     assert row["field_metadata"]["amount"]["status"] == "unverified"
-    assert row["name_source_date"] == "2026-10-09"
+    assert row["name_source_date"] == "2026-10-10"
     config_path = tmp_path / "config/presentation.yaml"
     config = yaml.safe_load(config_path.read_text(encoding="utf-8"))
     config["views"]["daily_source"]["columns"] = ["close", "symbol"]
@@ -565,7 +742,8 @@ def test_record_query_snapshot_date_is_explicit_and_integrity_failure_visible(tm
         assert client.get("/api/data?dataset=daily_bar&start_date=2026-10-10&end_date=2026-10-09").status_code == 422
         assert client.get("/api/data?dataset=daily_bar&start_date=bad").status_code == 422
         all_rows = client.get("/api/data?dataset=daily_bar").json()
-        assert all_rows["total"] == 3
+        assert all_rows["total"] == 4 and len(all_rows["items"]) == 3
+        assert "total_basis" in all_rows and all_rows["issues"]
         assert client.get("/api/data?dataset=../../metadata").status_code == 404
 
 
@@ -576,6 +754,9 @@ def test_record_query_retains_historical_tencent_date_without_new_unit_mapping(t
     report = json.loads(report_path.read_bytes())
     report["normalization_version"] = "tencent-window-input-v1"
     write_json(report_path, report)
+    from stock_data_manage.storage.read_index import append_source_report
+    append_source_report(report_path, run_root=report_path.parents[3], config_root=tmp_path / "config",
+                         field_mapping={})
     result = reader.data_records(dataset="daily_bar",security="sh600002",start_date=date(2026,10,9))
     assert result["total"] == 1
     row = result["items"][0]

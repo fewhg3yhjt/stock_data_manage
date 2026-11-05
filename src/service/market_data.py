@@ -75,7 +75,8 @@ def query_daily(canonical_root, *, security="", start_date=None, end_date=None, 
     from pathlib import Path
     from ..domain import AssetType, QuoteStatus
     from .instruments import normalize_symbol_successions, symbol_succession_for
-    from ..storage.parquet import InvalidPartitionError
+    from ..storage.integrity import Manifest
+    from ..storage.parquet import DAILY_SCHEMA_V1_VERSION, DAILY_SCHEMA_VERSION, InvalidPartitionError
     if adjustment not in {a.value for a in Adjustment} or asset_type not in {"", *(a.value for a in AssetType)}:
         raise ValueError("unsupported daily asset or adjustment")
     if page < 1 or not 1 <= page_size <= 100 or (start_date and end_date and start_date > end_date):
@@ -90,6 +91,15 @@ def query_daily(canonical_root, *, security="", start_date=None, end_date=None, 
         day = date.fromisoformat(descriptor.parents[2].name)
         kind = descriptor.parent.name
         if (start_date and day < start_date) or (end_date and day > end_date) or (asset_type and kind != asset_type):
+            continue
+        try:
+            manifest = Manifest.load(descriptor)
+        except (OSError, ValueError) as exc:
+            raise InvalidPartitionError(f"daily manifest is unreadable: {descriptor}") from exc
+        # Retired row-oriented partitions are not aggregate daily data. Ignore
+        # them before CanonicalPartitionStore validates the current contract.
+        if (manifest.dataset != "daily_bar" or manifest.adjustment != "aggregate"
+                or manifest.schema_version not in {DAILY_SCHEMA_V1_VERSION, DAILY_SCHEMA_VERSION}):
             continue
         for record in store.read_daily(kind, day.isoformat()):
             code = record.instrument_id.split(":")[1]

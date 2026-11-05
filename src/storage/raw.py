@@ -16,6 +16,7 @@ from zoneinfo import ZoneInfo
 
 _SECRET_NAME = re.compile(r"token|secret|password|api[-_]?key|authorization|cookie|credential|signature|enckey|^sign$|^ut$|^hexin-v$", re.I)
 _SECRET_BODY = re.compile(rb'''(?i)["']?(?:access[_-]?token|refresh[_-]?token|api[_-]?key|client[_-]?secret|authorization|password|session[_-]?token)["']?\s*[:=]\s*["']''')
+_RESPONSE_EVENTS = frozenset({"http_response", "source_payload", "sdk_query_failure"})
 
 
 def sanitized_url(url: str) -> str:
@@ -38,6 +39,16 @@ def sanitized_metadata(value):
     if isinstance(value, (tuple, list)):
         return [sanitized_metadata(v) for v in value]
     return sanitized_url(value) if isinstance(value, str) and value.startswith(("http://", "https://")) else value
+
+
+def _request_index_row(path: Path) -> dict[str, Any]:
+    """Compact listing projection; exact response events remain in the named manifest."""
+    payload = path.read_bytes()
+    events = [json.loads(line) for line in payload.decode("utf-8").splitlines() if line]
+    responses = [{"event_index": index, "response": sanitized_metadata(event)}
+                 for index, event in enumerate(events) if event.get("event") in _RESPONSE_EVENTS]
+    return {"event": "request_manifest", "request_manifest": path.name,
+            "sha256": hashlib.sha256(payload).hexdigest(), "responses": responses}
 
 
 def _safe_filename_part(value: object, *, limit: int = 32) -> str:
@@ -234,8 +245,7 @@ class RawObjectStore:
         if removed:
             records.pop(path.name, None)
         else:
-            records[path.name] = {"event": "request_manifest", "request_manifest": path.name,
-                                  "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+            records[path.name] = _request_index_row(path)
         temporary = index.with_suffix(".tmp")
         if records:
             temporary.write_text("".join(json.dumps(records[key]) + "\n" for key in sorted(records)), encoding="utf-8")
@@ -247,6 +257,31 @@ class RawObjectStore:
                 bodies.rmdir()
             if path.parent.exists() and not any(path.parent.iterdir()):
                 path.parent.rmdir()
+
+    @staticmethod
+    def rebuild_indexes(raw_root: str | Path) -> int:
+        """Rebuild response-list projections from retained named request manifests."""
+        root = Path(raw_root).resolve()
+        rebuilt = 0
+        for current, dirs, files in os.walk(root):
+            dirs[:] = [name for name in dirs if not name.startswith("_")]
+            manifests = sorted(Path(current) / name for name in files
+                               if name != "manifest.ndjson" and name.startswith("manifest.")
+                               and name.endswith(".ndjson"))
+            if not manifests:
+                continue
+            index = Path(current) / "manifest.ndjson"
+            temporary = index.with_name("manifest.index.tmp")
+            with temporary.open("wb") as stream:
+                for manifest in manifests:
+                    row = _request_index_row(manifest)
+                    stream.write((json.dumps(row, ensure_ascii=False, sort_keys=True,
+                                             separators=(",", ":")) + "\n").encode("utf-8"))
+                stream.flush()
+                os.fsync(stream.fileno())
+            os.replace(temporary, index)
+            rebuilt += 1
+        return rebuilt
 
     @staticmethod
     def preserve_request(manifest: str | Path, *, permitted_root: str | Path, archive_root: str | Path) -> Path | None:
@@ -457,8 +492,8 @@ class RawObjectStore:
             target = directory / 'manifest.ndjson'
             if manifests:
                 temporary = directory / 'manifest.index.tmp'
-                temporary.write_text(''.join(json.dumps({'event': 'request_manifest', 'request_manifest': p.name,
-                    'sha256': hashlib.sha256(p.read_bytes()).hexdigest()}) + '\n' for p in manifests), encoding='utf-8')
+                temporary.write_text(''.join(json.dumps(_request_index_row(path), ensure_ascii=False,
+                    sort_keys=True, separators=(',', ':')) + '\n' for path in manifests), encoding='utf-8')
                 os.replace(temporary, target)
             else:
                 target.unlink(missing_ok=True)
