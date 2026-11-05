@@ -426,6 +426,8 @@ def test_capture_preserves_native_host_fallback_before_processing(tmp_path, monk
     events=[json.loads(line) for line in Path(entry['raw_manifest']).read_text().splitlines()]
     assert [e['status_code'] for e in events if e.get('outcome')=='response']==[503,200]
     field_contract,rule=load_input_field_contract(CONFIG,contract)
+    from stock_data_manage.storage.read_index import SOURCE_QUERY_DATABASE
     result=process_daily_unit(unit=unit,entry=entry,provider=provider,contract=contract,field_contract=field_contract,
-        rule=rule,work=tmp_path/'processing')
+        rule=rule,work=tmp_path/'processing',config_root=CONFIG,
+        query_db_path=paths['data_root']/SOURCE_QUERY_DATABASE)
     assert result['process_status']=='candidate_complete'

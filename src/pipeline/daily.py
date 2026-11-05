@@ -88,7 +88,7 @@ def capture_daily_unit(*, unit, contract, provider, paths, task_id, trade_date, 
         "captured_at_utc": datetime.now(timezone.utc).isoformat()}
 
 
-def process_daily_unit(*, unit, entry, provider, contract, field_contract, rule, work, config_root):
+def process_daily_unit(*, unit, entry, provider, contract, field_contract, rule, work, config_root, query_db_path):
     """Interpret retained bytes, normalize and check one candidate; no transport is used."""
     import json
     from datetime import timezone
@@ -185,6 +185,7 @@ def process_daily_unit(*, unit, entry, provider, contract, field_contract, rule,
     from ..storage.parquet import PartitionLockedError
     try:
         append_source_report(artifact_paths["report"], run_root=work, config_root=config_root,
+                             query_db_path=query_db_path,
                              field_mapping=rule.get("field_mapping", {}))
     except (OSError, ValueError, TypeError, KeyError, IndexError, UnicodeError,
             PartitionLockedError) as exc:

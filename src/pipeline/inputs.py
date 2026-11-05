@@ -1039,10 +1039,11 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
         report_ref = write_result(report, dataset="input_report", provider=contract.provider, endpoint=contract.endpoint,
                                             fetched_at=datetime.now(timezone.utc), attempt_id="report")
         if runtime and isinstance(report.get("source_rows"), dict):
-            from ..storage.read_index import append_source_report
+            from ..storage.read_index import SOURCE_QUERY_DATABASE, append_source_report
             from ..storage.parquet import PartitionLockedError
             try:
                 append_source_report(report_ref.path, run_root=directory, config_root=config_root,
+                                     query_db_path=paths["data_root"] / SOURCE_QUERY_DATABASE,
                                      field_mapping=rule.get("field_mapping", {}))
             except (OSError, ValueError, TypeError, KeyError, IndexError, UnicodeError,
                     PartitionLockedError) as exc:
@@ -1207,6 +1208,7 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
     from ..providers.contracts import ProviderContractError
     from ..routing.factory import check_daily_batch_qualification
     from ..worker.progress import TaskProgress
+    from ..storage.read_index import SOURCE_QUERY_DATABASE
     from .daily import (resolve_daily_definition, expand_daily_units, daily_unit_paths, save_batch_json,
         capture_daily_unit, process_daily_unit, prepare_daily_task_publication, PublicationThresholdExceeded)
 
@@ -1675,7 +1677,8 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                         processing = frozen['processing_contracts'][unit['input_id']]
                         entry = process_daily_unit(unit=unit, entry=entry, provider=provider, contract=contract,
                             field_contract=processing['field_contract'], rule=processing['rule'], work=work,
-                            config_root=config_root)
+                            config_root=config_root,
+                            query_db_path=paths['data_root'] / SOURCE_QUERY_DATABASE)
                         if failure_hook:
                             failure_hook('after_candidate_before_checkpoint')
                     except (ProviderContractError, NormalizationError) as exc:

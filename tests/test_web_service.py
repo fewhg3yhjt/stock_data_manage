@@ -320,25 +320,48 @@ def test_raw_query_index_rebuild_is_idempotent_and_excludes_catalog(tmp_path):
 
 
 def test_source_query_indexes_bound_page_reads_at_current_report_scale(tmp_path, monkeypatch, record_property):
-    """The source API reads 23,852 indexed reports and opens only the selected row file."""
+    """23,852 report/row selectors are filtered and paged in SQLite; only page rows are opened."""
     _, app, data, add = source_query_fixture(tmp_path)
+    import stock_data_manage.storage.read_index as read_index
+
+    def recursive_scan_forbidden(*args, **kwargs):
+        raise AssertionError("source query requests must not walk the evidence tree")
+
+    monkeypatch.setattr(read_index.os, "walk", recursive_scan_forbidden)
     add("sh600519", [{"0": "2026-10-09", "2": "101.00", "5": "7061.00", "symbol": "sh600519"}])
-    from stock_data_manage.storage.read_index import SOURCE_QUERY_INDEX
-    index = next(data.rglob(SOURCE_QUERY_INDEX))
-    actual = json.loads(index.read_text(encoding="utf-8").splitlines()[-1])
-    with index.open("w", encoding="utf-8") as stream:
+    database = data / read_index.SOURCE_QUERY_DATABASE
+    run_root = (data / "task_workspace/2026-10-09/daily_bar").resolve()
+    import sqlite3
+    with sqlite3.connect(database) as connection:
+        # Model the common case where the indexed report already carries its asset type.
+        connection.execute("UPDATE source_reports SET report_asset_type='stock' WHERE request_code='600519'")
+        report_rows = []
+        selector_rows = []
         for number in range(23_851):
-            item = {
-                "event": "upsert", "report_path": f"sources/tencent/kline_daily/report-{number:05d}.report.json",
-                "report": {"dataset": "daily_bar", "input_id": f"PERF-{number}", "provider": "tencent",
-                    "endpoint": "kline_daily", "data_date": "2026-10-09",
-                    "parameters": {"symbol": "sh000000", "adjust": "qfq"},
-                    "source_rows": {"path": f"sources/tencent/kline_daily/rows-{number:05d}.json",
-                        "sha256": "0" * 64, "row_count": 0}},
-                "selectors": [],
-            }
-            stream.write(json.dumps(item, separators=(",", ":")) + "\n")
-        stream.write(json.dumps(actual, ensure_ascii=False, separators=(",", ":")) + "\n")
+            report_path = str(run_root / f"synthetic/report-{number:05d}.report.json")
+            descriptor = {"path": f"synthetic/rows-{number:05d}.json", "sha256": "0" * 64, "row_count": 1}
+            params = {"code": "sh000000", "adjust": "qfq"}
+            report = {"dataset": "daily_bar", "input_id": f"PERF-{number}", "provider": "tencent",
+                      "endpoint": "kline_daily", "data_date": "2026-10-09", "parameters": params,
+                      "source_rows": descriptor, "normalization_version": "test-v1"}
+            report_json = json.dumps(report, separators=(",", ":"))
+            identity = json.dumps(["daily_bar", f"PERF-{number}", "2026-10-09", "0" * 64, params],
+                                  sort_keys=True, separators=(",", ":"))
+            report_rows.append((report_path, str(run_root), report_json, identity, "daily_bar", f"PERF-{number}",
+                "tencent", "kline_daily", "2026-10-09", json.dumps(params, sort_keys=True, separators=(",", ":")),
+                "sh000000", "sh", "000000", "qfq", "stock", descriptor["path"], "0" * 64, 1, None))
+            selector_rows.append((report_path, 0, "sh000000", "", "", "", "", "2026-10-09",
+                                  "来源行日期", "sh", "000000"))
+        connection.executemany("""INSERT INTO source_reports(report_path,run_root,report_json,report_identity,
+            dataset,input_id,provider,endpoint,data_date,parameters_json,request_symbol,request_market,request_code,
+            adjustment,report_asset_type,source_rows_path,source_rows_sha256,source_row_count,index_error)
+            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""", report_rows)
+        selector_rows = [(connection.execute("SELECT report_id FROM source_reports WHERE report_path=?",
+                         (row[0],)).fetchone()[0], *row[1:]) for row in selector_rows]
+        connection.executemany("""INSERT INTO source_selectors(report_id,source_row_index,raw_symbol,raw_name,
+            raw_name_folded,exchange,row_asset_type,record_date,date_basis,row_market,row_code)
+            VALUES(?,?,?,?,?,?,?,?,?,?,?)""", selector_rows)
+
     selected_source = data / "task_workspace/2026-10-09/daily_bar/sources/tencent/kline_daily/sh600519.source-rows.json"
     reads = []
     original_read_bytes = Path.read_bytes
@@ -360,8 +383,11 @@ def test_source_query_indexes_bound_page_reads_at_current_report_scale(tmp_path,
     assert options_warm["datasets"][0]["id"] == "daily_bar"
 
     query_params = {"dataset": "daily_bar", "security": "sh600519", "start_date": "2026-10-09",
-        "end_date": "2026-10-09", "page_size": 1}
+                    "end_date": "2026-10-09", "page_size": 1}
     data_app = create_app(config_root=tmp_path / "config", data_root=data)
+    def frozen_context_scan_forbidden():
+        raise AssertionError("date-bounded daily queries with indexed asset context must not scan task definitions")
+    data_app.state.reader._task_documents = frozen_context_scan_forbidden
     data_endpoint = next(route.endpoint for route in data_app.routes if getattr(route, "path", "") == "/api/data")
     typed_params = {**query_params, "start_date": date(2026, 10, 9), "end_date": date(2026, 10, 9), "page": 1}
     started = time.perf_counter()
@@ -372,15 +398,30 @@ def test_source_query_indexes_bound_page_reads_at_current_report_scale(tmp_path,
     warm_query = data_endpoint(**typed_params)
     query_warm_seconds = time.perf_counter() - started
     assert warm_query["total"] == 1
+    broad_params = {"dataset": "daily_bar", "security": "", "start_date": date(2026, 10, 9),
+                    "end_date": date(2026, 10, 9), "provider": "", "asset_type": "", "adjustment": "",
+                    "page": 1, "page_size": 1}
+    started = time.perf_counter()
+    broad_query = data_endpoint(**broad_params)
+    broad_query_cold_seconds = time.perf_counter() - started
+    assert broad_query["total"] == 23_852 and broad_query["items"][0]["symbol"] == "sh600519"
+    started = time.perf_counter()
+    broad_warm_query = data_endpoint(**broad_params)
+    broad_query_warm_seconds = time.perf_counter() - started
+    assert broad_warm_query["total"] == 23_852
     record_property("source_options_cold_seconds_23852_reports", round(options_cold_seconds, 3))
     record_property("source_options_warm_seconds_23852_reports", round(options_warm_seconds, 3))
     record_property("source_query_cold_seconds_23852_reports", round(query_cold_seconds, 3))
     record_property("source_query_warm_seconds_23852_reports", round(query_warm_seconds, 3))
+    record_property("source_default_date_cold_seconds_23852_selectors", round(broad_query_cold_seconds, 3))
+    record_property("source_default_date_warm_seconds_23852_selectors", round(broad_query_warm_seconds, 3))
     assert options_cold_seconds < 5.0
     assert options_warm_seconds < 2.5
     assert query_cold_seconds < 5.0
     assert query_warm_seconds < 2.5
-    assert reads == [selected_source.resolve(), selected_source.resolve()]
+    assert broad_query_cold_seconds < 5.0
+    assert broad_query_warm_seconds < 2.5
+    assert reads == [selected_source.resolve()] * 4
 
 
 def test_raw_token_cannot_escape_managed_root_and_app_is_read_only(tmp_path):
@@ -559,8 +600,9 @@ def source_query_fixture(tmp_path):
                   "raw_manifest": {"path": str(data / "raw/2026-10-09/tencent/kline_daily/manifest.sh600519.ndjson")}}
         report_path = directory / f"{symbol}.report.json"
         write_json(report_path, report)
-        from stock_data_manage.storage.read_index import append_source_report
+        from stock_data_manage.storage.read_index import SOURCE_QUERY_DATABASE, append_source_report
         append_source_report(report_path, run_root=directory.parents[2], config_root=config,
+                             query_db_path=data / SOURCE_QUERY_DATABASE,
                              field_mapping={"trade_date": "0", "close": "2", "volume": "5"})
         return source
     add("sh600519", [{"0":day,"2":price,"5":"7061.00","symbol":"sh600519"}
@@ -607,10 +649,11 @@ def test_source_query_rebuild_keeps_retained_workspace_audit_reports(tmp_path):
     for name in ("sh600519.source-rows.json", "sh600519.report.json"):
         shutil.copy2(source_dir / name, report_dir / name)
 
-    from stock_data_manage.storage.read_index import rebuild_source_query_indexes
+    from stock_data_manage.storage.read_index import SOURCE_QUERY_DATABASE, rebuild_source_query_indexes
     rebuilt = rebuild_source_query_indexes(workspace_root=data / "task_workspace",
-        archive_root=data / "task_archive", config_root=tmp_path / "config")
-    assert rebuilt == {"indexed_reports": 2, "index_files": 2}
+        archive_root=data / "task_archive", config_root=tmp_path / "config",
+        query_db_path=data / SOURCE_QUERY_DATABASE)
+    assert rebuilt == {"indexed_reports": 2, "index_databases": 1}
     indexed_paths = {str(path) for path, _ in reader._query_reports()}
     assert str(report_dir / "sh600519.report.json") in indexed_paths
     # The archived copy is retained evidence of the same report, not a second result.
@@ -623,6 +666,7 @@ def test_record_query_distinguishes_exchanges_and_does_not_use_capture_date(tmp_
     add("sz000001", [{"date":"2026-10-09","symbol":"sz000001","close":"12"}])
     assert reader.data_records(dataset="daily_bar",security="XSHG:000001")["total"] == 1
     assert reader.data_records(dataset="daily_bar",security="000001")["total"] == 2
+    assert reader.data_records(dataset="daily_bar",security="贵州茅台")["total"] == 3
     add("sh600000", [{"symbol":"sh600000","close":"20"}])
     result = reader.data_records(dataset="daily_bar",security="sh600000",start_date=date(2026,10,9))
     assert result["total"] == 0 and result["excluded_unknown_date_count"] == 1
@@ -678,8 +722,9 @@ def test_source_projection_preserves_values_and_uses_config_order(tmp_path):
     report = json.loads(report_path.read_text(encoding="utf-8"))
     report["applied_unit_contract"] = {"source_units": {"volume":"lot"}}
     write_json(report_path, report)
-    from stock_data_manage.storage.read_index import append_source_report
+    from stock_data_manage.storage.read_index import SOURCE_QUERY_DATABASE, append_source_report
     append_source_report(report_path, run_root=report_path.parents[3], config_root=tmp_path / "config",
+                         query_db_path=data / SOURCE_QUERY_DATABASE,
                          field_mapping={"trade_date": "0", "close": "2", "volume": "5"})
     result = reader.data_records(dataset="daily_bar")
     assert len(result["columns"]) == 12
@@ -748,14 +793,15 @@ def test_record_query_snapshot_date_is_explicit_and_integrity_failure_visible(tm
 
 
 def test_record_query_retains_historical_tencent_date_without_new_unit_mapping(tmp_path):
-    reader, _, _, add = source_query_fixture(tmp_path)
+    reader, _, data, add = source_query_fixture(tmp_path)
     source = add("sh600002", [{"0":"2026-10-09","2":"12.000","5":"77.00","symbol":"sh600002"}])
     report_path = source.with_name("sh600002.report.json")
     report = json.loads(report_path.read_bytes())
     report["normalization_version"] = "tencent-window-input-v1"
     write_json(report_path, report)
-    from stock_data_manage.storage.read_index import append_source_report
+    from stock_data_manage.storage.read_index import SOURCE_QUERY_DATABASE, append_source_report
     append_source_report(report_path, run_root=report_path.parents[3], config_root=tmp_path / "config",
+                         query_db_path=data / SOURCE_QUERY_DATABASE,
                          field_mapping={})
     result = reader.data_records(dataset="daily_bar",security="sh600002",start_date=date(2026,10,9))
     assert result["total"] == 1

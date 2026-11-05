@@ -19,7 +19,9 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from ..config.loader import load_storage_paths
-from ..storage.read_index import load_source_query_records, rebuild_source_query_indexes
+from ..storage.read_index import (SOURCE_QUERY_DATABASE, load_source_query_records,
+                                  query_source_data_page, rebuild_source_query_indexes,
+                                  source_query_has_missing_asset_context)
 
 
 ACTIVE_TASK_STATES = frozenset({"collecting", "checking", "committing"})
@@ -238,21 +240,17 @@ class DashboardReader:
     def __init__(self, config_root: str | Path, data_root: str | Path | None = None) -> None:
         self.paths = load_storage_paths(config_root, data_root=data_root)
         self.config_root = Path(config_root).resolve()
-        self._query_index_cache: dict[Path, tuple[tuple[int, int], list[tuple[Path, dict[str, Any]]]]] = {}
         self._raw_query_index_cache: dict[Path, tuple[tuple[int, int], list[dict[str, Any]]]] = {}
 
     def _query_reports(self) -> list[tuple[Path, dict[str, Any]]]:
         """Read per-run selector indexes; source reports are opened only for selected rows."""
-        indexed = load_source_query_records(workspace_root=self.paths["workspace_root"],
-                                            archive_root=self.paths["archive_root"],
-                                            cache=self._query_index_cache)
+        indexed = load_source_query_records(
+            query_db_path=self.paths["data_root"] / SOURCE_QUERY_DATABASE)
         result = []
-        for report_path, entry in indexed:
-            report = entry.get("report")
+        for report_path, report in indexed:
             if not isinstance(report, dict) or not isinstance(report.get("source_rows"), dict):
                 continue
             report = dict(report)
-            report["_query_index"] = entry
             result.append((report_path, report))
         return result
 
@@ -342,19 +340,36 @@ class DashboardReader:
         presentation_columns = _presentation(self.config_root, "daily_source") if dataset == "daily_bar" else None
         target_market, target_code = self._security_code(security)
         references = {}
-        for document, summary_path, _ in self._task_documents():
-            definition_path = summary_path.with_name("task.json")
-            definition = _read_json(definition_path) if _within(definition_path, summary_path.parent) and definition_path.is_file() else {}
-            frozen_units = {unit.get("key"): unit for unit in definition.get("units", []) if isinstance(unit, dict)}
-            for unit in document.get("source_units", []):
-                if isinstance(unit, dict) and unit.get("report_path"):
-                    frozen_asset = frozen_units.get(unit.get("key"), {}).get("asset_type") or definition.get("asset_type")
-                    references[str(Path(unit["report_path"]).resolve())] = {**unit, "frozen_asset_type": frozen_asset}
+        needs_frozen_context = dataset != "daily_bar" or start_date is None or end_date is None
+        if dataset == "daily_bar" and start_date is not None and end_date is not None:
+            needs_frozen_context = source_query_has_missing_asset_context(
+                self.paths["data_root"] / SOURCE_QUERY_DATABASE, dataset=dataset,
+                start_date=start_date.isoformat(), end_date=end_date.isoformat(), provider=provider,
+                adjustment=adjustment, target_market=target_market, target_code=target_code)
+        if needs_frozen_context:
+            for document, summary_path, _ in self._task_documents():
+                definition_path = summary_path.with_name("task.json")
+                definition = _read_json(definition_path) if _within(definition_path, summary_path.parent) and definition_path.is_file() else {}
+                frozen_units = {unit.get("key"): unit for unit in definition.get("units", []) if isinstance(unit, dict)}
+                for unit in document.get("source_units", []):
+                    if isinstance(unit, dict) and unit.get("report_path"):
+                        frozen_asset = frozen_units.get(unit.get("key"), {}).get("asset_type") or definition.get("asset_type")
+                        references[str(Path(unit["report_path"]).resolve())] = {**unit, "frozen_asset_type": frozen_asset}
 
-        issues = []
-        unknown_dates = 0
-        seen = set()
-        candidates = []
+        query_result = query_source_data_page(
+            self.paths["data_root"] / SOURCE_QUERY_DATABASE, dataset=dataset, security=security,
+            target_market=target_market, target_code=target_code,
+            start_date=start_date.isoformat() if start_date else None,
+            end_date=end_date.isoformat() if end_date else None, provider=provider,
+            asset_type=asset_type, adjustment=adjustment, catalog=catalog,
+            references=references, page=page, page_size=page_size)
+        if query_result["conflict"]:
+            raise HTTPException(409, query_result["conflict"])
+        total = query_result["total"]
+        unknown_dates = query_result["unknown_dates"]
+        issues = [{"provider": item.get("provider"), "input_id": item.get("input_id"),
+                   "reason": _redact(str(item.get("index_error") or "来源行查询索引不可用"))}
+                  for item in query_result["issues"]]
         titles = {"trade_date": "日期", "bar_time": "时间", "stock_code": "证券代码",
                   "stock_name": "证券名称", "open": "开盘价", "close": "收盘价",
                   "high": "最高价", "low": "最低价", "volume": "成交量（来源单位）",
@@ -362,100 +377,20 @@ class DashboardReader:
         if presentation_columns is not None:
             titles.update({column["key"]: column["label"] for column in presentation_columns})
 
-        for report_path, report in self._query_reports():
-            if report.get("dataset") != dataset or (provider and report.get("provider") != provider):
-                continue
-            parameters = report.get("parameters") or {}
-            request_symbol = parameters.get("symbol") or parameters.get("code") or ""
-            request_market, request_code = self._security_code(request_symbol)
-            if target_code and request_code and (target_code != request_code or
-                    (target_market and request_market and target_market != request_market)):
-                continue
-            if security and not target_code and request_code:
-                requested_security = catalog.get((request_market, request_code), {})
-                if requested_security.get("name") and security.casefold() not in requested_security["name"].casefold():
-                    continue
-            source_adjustment = str(parameters.get("adjust") or parameters.get("adjustment") or "")
-            comparable_adjustment = {"forward": "qfq", "backward": "hfq"}.get(source_adjustment, source_adjustment)
-            if adjustment and comparable_adjustment != adjustment:
-                continue
-            descriptor = report["source_rows"]
-            identity = (dataset, report.get("input_id"), report.get("data_date"),
-                        descriptor.get("sha256"), json.dumps(parameters, sort_keys=True))
-            if identity in seen:
-                continue
-            seen.add(identity)
-            index_record = report.get("_query_index", {})
-            if index_record.get("index_error"):
-                issues.append({"provider": report.get("provider"), "input_id": report.get("input_id"),
-                               "reason": _redact(str(index_record["index_error"]))})
-                continue
-            selectors = index_record.get("selectors")
-            if not isinstance(selectors, list):
-                issues.append({"provider": report.get("provider"), "input_id": report.get("input_id"),
-                               "reason": "来源行查询索引缺少行定位信息；请重建查询索引"})
-                continue
-            task_context = references.get(str(report_path.resolve()), {})
-            for selector in selectors:
-                if not isinstance(selector, dict):
-                    continue
-                raw_symbol = selector.get("raw_symbol") or request_symbol
-                row_market, row_code = self._security_code(raw_symbol)
-                exchange = str(selector.get("exchange") or "").lower()
-                if not row_market:
-                    row_market = {"xshg": "sh", "xshe": "sz", "bse": "bj"}.get(exchange, request_market)
-                if not row_market:
-                    row_market = {"sse": "sh", "szse": "sz", "bse": "bj"}.get(str(report.get("provider")), "")
-                if not row_market:
-                    markets = {market for market, code in catalog if code == row_code}
-                    if len(markets) == 1:
-                        row_market = markets.pop()
-                known = catalog.get((row_market, row_code), {})
-                name = str(selector.get("raw_name") or known.get("name") or "")
-                if target_code and (row_code != target_code or (target_market and row_market != target_market)):
-                    continue
-                if security and not target_code and security.casefold() not in name.casefold():
-                    continue
-                declared_assets = {kind for kind in (selector.get("row_asset_type"), known.get("asset_type"),
-                    report.get("asset_type"), task_context.get("frozen_asset_type")) if kind}
-                if len(declared_assets) > 1:
-                    raise HTTPException(409, "证券类型上下文冲突: " + (row_market + row_code))
-                row_asset = str(selector.get("row_asset_type") or known.get("asset_type") or report.get("asset_type")
-                                or task_context.get("frozen_asset_type") or "")
-                if asset_type and row_asset != asset_type:
-                    continue
-                record_date_text = selector.get("record_date")
-                if (start_date or end_date) and not record_date_text:
-                    unknown_dates += 1
-                    continue
-                record_date = date.fromisoformat(record_date_text) if record_date_text else None
-                if record_date and ((start_date and record_date < start_date) or (end_date and record_date > end_date)):
-                    continue
-                candidates.append({
-                    "report_path": report_path, "report": report, "descriptor": descriptor,
-                    "source_row_index": selector.get("source_row_index"), "record_date": record_date,
-                    "date_basis": selector.get("date_basis") or "未提供可筛选业务日期",
-                    "row_market": row_market, "row_code": row_code,
-                    "symbol": (row_market + row_code) if row_code else str(raw_symbol or request_symbol),
-                    "name": name, "known": known, "asset_type": row_asset,
-                    "request_symbol": request_symbol, "source_adjustment": source_adjustment,
-                })
-
-        candidates.sort(key=lambda row: (row["record_date"].isoformat() if row["record_date"] else "",
-                                         row["symbol"], row["report"].get("provider") or ""), reverse=True)
-        total = len(candidates)
-        start = (page - 1) * page_size
-        selected = candidates[start:start + page_size]
         row_cache: dict[Path, list[dict[str, Any]] | str] = {}
         items = []
         column_labels = {}
-
-        for candidate in selected:
+        for candidate in query_result["items"]:
             report_path = candidate["report_path"]
+            run_root = candidate["run_root"]
+            if not report_path.is_file() and run_root.is_relative_to(self.paths["workspace_root"]):
+                archived_root = (self.paths["archive_root"] / run_root.relative_to(self.paths["workspace_root"])).resolve()
+                archived_report = archived_root / report_path.relative_to(run_root)
+                if archived_report.is_file():
+                    run_root, report_path = archived_root, archived_report
             report = candidate["report"]
-            descriptor = candidate["descriptor"]
-            run_root = report_path.parents[3].resolve()
-            source = (run_root / str(descriptor.get("path", ""))).resolve()
+            descriptor = report["source_rows"]
+            source = (run_root / str(candidate["source_rows_path"])).resolve()
             if source not in row_cache:
                 try:
                     if not _within(source, run_root) or not source.is_file():
@@ -470,7 +405,7 @@ class DashboardReader:
                     row_cache[source] = rows
                 except (OSError, ValueError) as exc:
                     row_cache[source] = str(exc)
-                    issues.append({"provider": report.get("provider"), "input_id": report.get("input_id"),
+                    issues.append({"provider": candidate["provider"], "input_id": report.get("input_id"),
                                    "reason": _redact(str(exc))})
                     continue
             loaded = row_cache[source]
@@ -478,7 +413,7 @@ class DashboardReader:
                 continue
             row_index = candidate["source_row_index"]
             if not isinstance(row_index, int) or row_index < 0 or row_index >= len(loaded):
-                issues.append({"provider": report.get("provider"), "input_id": report.get("input_id"),
+                issues.append({"provider": candidate["provider"], "input_id": report.get("input_id"),
                                "reason": "来源行索引超出文件范围"})
                 continue
             row = loaded[row_index]
@@ -499,10 +434,14 @@ class DashboardReader:
             for reference in (unit.get("raw_manifest"), unit.get("current_raw")):
                 if reference and (evidence_path := self._evidence_path(str(reference))):
                     break
-            if not evidence_path and isinstance(report.get("raw_manifest"), dict):
-                reference = report["raw_manifest"].get("path")
+            if not evidence_path:
+                raw_reference = report.get("raw_manifest")
+                reference = (raw_reference.get("path") if isinstance(raw_reference, dict)
+                             else raw_reference if isinstance(raw_reference, str) else None)
                 if reference:
-                    evidence_path = self._evidence_path(str(run_root / reference))
+                    reference_path = Path(reference)
+                    evidence_path = self._evidence_path(str(reference_path if reference_path.is_absolute()
+                                                             else run_root / reference_path))
             evidence = self._manifest_records(evidence_path) if evidence_path else []
             record_date = candidate["record_date"]
             row_market, row_code = candidate["row_market"], candidate["row_code"]
@@ -510,7 +449,7 @@ class DashboardReader:
             display_values = {field: value(row, field, []) for field in DISPLAY_NUMBERS}
             display_values.update(trade_date=record_date.isoformat() if record_date else None,
                 symbol=candidate["symbol"], security_name=name, asset_type=row_asset,
-                adjustment=candidate["source_adjustment"], provider=report.get("provider"))
+                adjustment=candidate["adjustment"], provider=candidate["provider"])
             source_units = (report.get("applied_unit_contract") or {}).get("source_units", {})
             field_metadata = {field: {"unit": source_units.get(field, ""),
                 "status": "available" if field in source_units else "unverified",
@@ -521,8 +460,8 @@ class DashboardReader:
                 field_metadata = {}
             items.append({"record_date": record_date.isoformat() if record_date else None,
                 "date_basis": candidate["date_basis"], "symbol": candidate["symbol"],
-                "security_name": name, "asset_type": row_asset, "provider": report.get("provider"),
-                "endpoint": report.get("endpoint"), "adjustment": candidate["source_adjustment"],
+                "security_name": name, "asset_type": row_asset, "provider": candidate["provider"],
+                "endpoint": candidate["endpoint"], "adjustment": candidate["adjustment"],
                 "values": _redact(row), "name_source_date": known.get("name_source_date", ""),
                 "display_values": _redact(display_values), "field_metadata": field_metadata,
                 "source_field_labels": {key: next((titles[canonical] for canonical, original in mapping.items()
@@ -1305,7 +1244,8 @@ def main(argv: list[str] | None = None) -> None:
         paths = load_storage_paths(args.config_root, data_root=args.data_root)
         source_result = rebuild_source_query_indexes(
             workspace_root=paths["workspace_root"], archive_root=paths["archive_root"],
-            config_root=args.config_root)
+            config_root=args.config_root,
+            query_db_path=paths["data_root"] / SOURCE_QUERY_DATABASE)
         from ..storage.raw import RawObjectStore
         raw_indexes = RawObjectStore.rebuild_indexes(paths["raw_root"])
         print(json.dumps({**source_result, "raw_index_directories": raw_indexes}, ensure_ascii=False))
