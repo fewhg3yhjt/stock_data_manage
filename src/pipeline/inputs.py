@@ -249,12 +249,13 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                 "provider": contract.provider, "input_id": input_id, "created_at": now.isoformat()},
                 dataset="task_start", provider=contract.provider, endpoint=contract.endpoint,
                 fetched_at=now, attempt_id="started", relative_path=source_directory / (request_key + ".started.json"))
-        report["response_freshness_seconds"] = profile.refresh_interval_seconds or 86400
         is_universe_baostock = input_id in {'SECURITY-BS-UNIVERSE-001', 'CALENDAR-BS-001'}
         is_baostock = input_id in {"SDA-BOARD-005", "SDA-BOARD-006", "ASTOCK-044"} or is_universe_baostock
         is_bse_catalog = input_id == "SECURITY-BSE-001"
         is_sse_etf_catalog = input_id == "SECURITY-SSE-ETF-001"
         is_current_catalog = is_bse_catalog or is_sse_etf_catalog
+        response_freshness_seconds = 0 if is_bse_catalog else profile.refresh_interval_seconds or 86400
+        report["response_freshness_seconds"] = response_freshness_seconds
         if is_bse_catalog:
             import requests
             import urllib3
@@ -265,6 +266,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                 "headers": "original Mozilla/5.0, quotation-page Referer and JSON Accept",
                 "page_timeout_seconds": 20, "api_timeout_seconds": 30, "allow_redirects": False,
                 "http_adapter_retries": 0, "redirect_retry": "refresh page, then repeat same POST once",
+                "response_cache": "bypassed for live requests because the page and API share a stateful session",
                 "page_pause_seconds": 0.25, "request_body_matching": True, "source_fallback": False}
         is_actual_data = input_id in {'ASTOCK-014', 'ASTOCK-037-profile', 'ASTOCK-037-events', 'ASTOCK-087'}
         is_tencent_snapshot = input_id == "ASTOCK-001"
@@ -509,7 +511,7 @@ def collect_input(*, input_id, context, config_root, output_root=None, data_root
                         scope={"input_id": input_id, "parameters": normalized_context}, code_version=code_version, pacer=pacer,
                         interval_seconds=contract.request_interval_seconds,
                         replay_manifest=replay_manifest,
-                        evidence_roots=(evidence_root, output_root), max_age_seconds=0 if force_fetch else profile.refresh_interval_seconds or 86400,
+                        evidence_roots=(evidence_root, output_root), max_age_seconds=0 if force_fetch else response_freshness_seconds,
                         sdk_retry_policy=is_stock_pool or is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or (is_source_sdk and not is_universe_sdk) or input_id in {"ASTOCK-001", "ASTOCK-045", "ASTOCK-070", "ASTOCK-026", "ASTOCK-027", "ASTOCK-028"},
                         probe_host_pause=is_sdk_news or is_sdk_macro or is_factor or is_market_events or is_reports_seats or is_source_sdk,require_empty_post_body=input_id=="ASTOCK-061",response_validator=response_validator,
                         cache_ignored_query_parameters=("_",) if is_reportapi else (),

@@ -50,6 +50,14 @@ class BseSecurityListProvider:
                 if 300 <= response.status_code < 400:
                     session.get(self.page_url, timeout=20, allow_redirects=False)
                     response = session.post(self.api_url, data=form, timeout=30, allow_redirects=False)
+                    if 300 <= response.status_code < 400:
+                        raise ProviderContractError(
+                            f"BSE HTTP {response.status_code} redirect remained after refreshing the quotation page "
+                            f"and retrying page {page}",
+                            FailureClass.HTTP_ERROR,
+                            retryable=True,
+                            http_status=response.status_code,
+                        )
                 response.raise_for_status()
                 body = response.text.strip()
                 match = re.fullmatch(r"[A-Za-z_$][\w$]*\((.*)\);?", body, re.S)

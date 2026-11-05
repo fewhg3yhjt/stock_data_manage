@@ -302,6 +302,57 @@ def test_bse_full_pages_preserve_requests_and_refresh_session_on_redirect(monkey
     assert session.headers["Referer"] == BseSecurityListProvider.page_url
 
 
+def test_bse_redirect_after_page_refresh_is_reported_as_http_failure(monkeypatch):
+    monkeypatch.setattr("stock_data_manage.providers.exchanges.security.sleep", lambda _: None)
+
+    class RedirectingSession(CatalogSession):
+        def __init__(self):
+            super().__init__([])
+
+        def post(self, url, **kwargs):
+            self.calls.append(("POST", url, kwargs))
+            return self.response(307, "<html>redirect</html>")
+
+    session = RedirectingSession()
+    with pytest.raises(ProviderContractError, match="BSE HTTP 307 redirect remained") as error:
+        BseSecurityListProvider(client=session).fetch_snapshot()
+
+    assert error.value.failure_class.value == "http_error"
+    assert error.value.http_status == 307 and error.value.retryable
+    assert [call[0] for call in session.calls] == ["GET", "POST", "GET", "POST"]
+
+
+def test_bse_live_page_refresh_bypasses_cached_catalog_response(tmp_path, monkeypatch):
+    calls = []
+
+    def fixture_send(adapter, request, **kwargs):
+        calls.append((request.method, request.url))
+        if request.method == "GET":
+            response = CatalogSession.response(200, "<html>quotation page</html>")
+            response.headers["Content-Type"] = "text/html"
+        elif sum(method == "POST" for method, _ in calls) == 1:
+            response = CatalogSession.response(307, "<html>redirect</html>")
+            response.headers["Location"] = request.url
+        else:
+            block = page(0, ["920001"], total=1, last=True)
+            block["totalPages"] = 1
+            response = CatalogSession.response(200, "null(" + json.dumps([block]) + ");")
+            response.headers["Content-Type"] = "text/html;charset=utf-8"
+        response.url = request.url
+        response.request = request
+        return response
+
+    monkeypatch.setattr(requests.adapters.HTTPAdapter, "send", fixture_send)
+    report = collect_input(input_id="SECURITY-BSE-001", config_root=ROOT / "config", data_root=tmp_path / "data",
+        context={}, mode="live", pacer=RequestPacer(wait=lambda _: None))
+
+    assert report["status"] == "candidate_complete", report.get("error")
+    assert report["response_freshness_seconds"] == 0
+    assert [method for method, _ in calls] == ["GET", "POST", "GET", "POST"]
+    assert report["live_http_calls"] == 4
+    assert all(response["mode"] == "live" for response in report["responses"])
+
+
 @pytest.mark.parametrize("problem", ["total_changed", "duplicate", "early_end", "wrong_page", "empty",
                                    "count_changed", "wrong_identity", "boolean_total", "wrong_last", "bad_date"])
 def test_bse_incomplete_or_invalid_pages_are_rejected(monkeypatch, problem):

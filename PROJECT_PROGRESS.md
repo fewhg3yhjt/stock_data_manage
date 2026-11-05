@@ -1,5 +1,11 @@
 # 项目开发进度
 
+## 2026-11-05 BSE证券清单重定向与会话刷新修正
+
+| 原问题 | 可核验证据与处理动作 | 对原问题的实际影响 | 当前状态与剩余项 |
+|---|---|---|---|
+| 今日证券清单因 `SECURITY-BSE-001` 返回内容无法解析为JSON失败 | [来源报告](data/task_workspace/2026-11-05/security_master/sources/bse/security_snapshot/SECURITY-BSE-001.report.json)记录13次实时HTTP调用失败。对应[原始响应manifest](data/raw/_tmp/2026-11-05/bse/security_snapshot/manifest.SECURITY-BSE-001.ndjson)显示BSE前6/18页、354条声明总量均返回可解析响应；第7页先返回307，按现有流程刷新页面后重试仍收到307及164字节HTML重定向页。代码只用`raise_for_status()`，它不会拒绝3xx，因而把HTML交给JSON解析器并误报`JSONDecodeError`。同时，页面刷新GET被24小时响应缓存复用，没有重新请求远端页面 | `src/pipeline/inputs.py` 对BSE当前名单请求关闭响应缓存，使Session中的页面刷新确实发出请求；`src/providers/exchanges/security.py` 保留原有刷新一次、POST重试一次的合同，若仍为3xx则抛出带状态码的可重试HTTP错误，不再伪装成JSON解析失败。未改变来源、代理、请求头、页间间隔或重试次数 | 3项定向用例通过：原有重定向恢复、重试后仍重定向的错误分类、采集入口接线用例（HTTP由测试夹具模拟）确认刷新GET不命中缓存。解释器`D:\Program Files\Python\python.exe`（Python 3.13.0rc3），pytest 9.0.2、requests 2.34.2；`git diff --check`通过。没有重新发起实时请求，今日清单仍未发布；BSE剩余12页没有来源响应，代码修正不补造缺失页。当前日线任务仍处于`collecting`，继续使用既有完整证券清单；本次未中断或重启常驻进程。下一次启动/补跑的BSE名单任务将使用修正后的缓存与重定向处理 |
+
 ## 2026-11-05 常驻调度前台进度输出补齐
 
 | 原问题 | 可核验证据与处理动作 | 对原问题的实际影响 | 当前状态与剩余项 |
