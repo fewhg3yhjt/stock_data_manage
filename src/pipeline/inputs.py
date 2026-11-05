@@ -2743,19 +2743,22 @@ def _finish_task_commit(state, paths, metadata, failure_hook=None, progress=None
 
 def collect_due_inputs(*, now, config_root, output_root=None, data_root=None, trading_dates=(), securities=(), symbols=(),
                        execute=False, mode="replay", replay_manifest=None, evidence_root=None,
-                       dependency_paths=(), collector=None, dataset="inputs", calendar_days=None):
+                       dependency_paths=(), collector=None, dataset="inputs", calendar_days=None,
+                       progress_callback=None):
     """One configured scheduler tick: candidates, security catalog, or daily business task."""
     if dataset == "daily_bar":
         if (output_root is not None or replay_manifest is not None or evidence_root is not None
                 or trading_dates or securities or symbols or collector is not None):
             raise ValueError("daily_bar scheduling uses its configured task, calendar and source policy")
         return _collect_due_daily_bar(now=now, config_root=config_root, data_root=data_root,
-            execute=execute, mode=mode, calendar_days=calendar_days, dependency_paths=dependency_paths)
+            execute=execute, mode=mode, calendar_days=calendar_days, dependency_paths=dependency_paths,
+            progress_callback=progress_callback)
     if dataset == "security_master":
         if output_root is not None or replay_manifest is not None or securities or symbols:
             raise ValueError("security master scheduling uses configured storage and full source scope")
         return _collect_due_security_master(now=now, config_root=config_root, data_root=data_root, execute=execute,
-            mode=mode, calendar_days=calendar_days, dependency_paths=dependency_paths, collector=collector)
+            mode=mode, calendar_days=calendar_days, dependency_paths=dependency_paths, collector=collector,
+            progress_callback=progress_callback)
     if dataset != "inputs":
         raise ValueError("unsupported scheduled dataset")
     from ..domain import AttemptStatus
@@ -2889,7 +2892,8 @@ def _security_master_as_of_date(manifest_path):
     return str(value) if value else manifest.partition_key or None
 
 
-def _collect_due_daily_bar(*, now, config_root, data_root, execute, mode, calendar_days, dependency_paths):
+def _collect_due_daily_bar(*, now, config_root, data_root, execute, mode, calendar_days, dependency_paths,
+                           progress_callback=None):
     """Drive the existing frozen daily batch from its configured after-close slot."""
     import json
     from datetime import date
@@ -2989,7 +2993,8 @@ def _collect_due_daily_bar(*, now, config_root, data_root, execute, mode, calend
                     master_report = _collect_due_security_master(now=now, config_root=root,
                         data_root=paths["data_root"], execute=True, mode="live",
                         calendar_days=[{"trade_date": day.isoformat(), "is_trading_day": True}],
-                        dependency_paths=dependency_paths, collector=None)
+                        dependency_paths=dependency_paths, collector=None,
+                        progress_callback=progress_callback)
                     master_job = master_report["jobs"][0]
                 else:
                     master_job = prior_master_job
@@ -3005,7 +3010,8 @@ def _collect_due_daily_bar(*, now, config_root, data_root, execute, mode, calend
     if job["status"] == "ready" and execute:
         try:
             result = collect_task(definition=job["definition"], config_root=root,
-                data_root=paths["data_root"], mode="live", redo="resume")
+                data_root=paths["data_root"], mode="live", redo="resume",
+                progress_callback=progress_callback)
         except (ValueError, KeyError, TypeError, OSError) as exc:
             job.update(status="failed", error=str(exc))
         else:
@@ -3043,7 +3049,8 @@ def _collect_due_daily_bar(*, now, config_root, data_root, execute, mode, calend
     return report
 
 
-def _collect_due_security_master(*, now, config_root, data_root, execute, mode, calendar_days, dependency_paths, collector):
+def _collect_due_security_master(*, now, config_root, data_root, execute, mode, calendar_days, dependency_paths,
+                                 collector, progress_callback=None):
     """Existing tick entry drives one durable business task, without starting a daemon."""
     from datetime import date
     from ..service.calendar import TradingCalendarStore
@@ -3110,7 +3117,7 @@ def _collect_due_security_master(*, now, config_root, data_root, execute, mode, 
                 # collect_task owns recovery and the same partition lock.
                 job["reason"] = "resume interrupted publication"
             result = collect_task(definition=job["definition"], config_root=root, data_root=paths["data_root"],
-                                  mode="live", collector=collector)
+                                  mode="live", collector=collector, progress_callback=progress_callback)
             job.update(status=result["status"], complete_today=result["complete_today"],
                        data_date=result.get("data_date"), fallback_used=result.get("fallback_used", False),
                        no_op=result.get("no_op", False), error=result.get("error"), summary=result.get("summary"))

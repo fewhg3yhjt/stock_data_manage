@@ -5,6 +5,7 @@ from datetime import date, datetime, time, timedelta, timezone
 import logging
 import math
 from pathlib import Path
+import sys
 from typing import Callable, Iterable
 from threading import Event
 from zoneinfo import ZoneInfo
@@ -340,7 +341,8 @@ def load_business_scheduled_jobs(config_root: str | Path) -> tuple[ScheduledJob,
 
 def execute_business_schedule(job_name: str, *, config_root: str | Path,
                               data_root: str | Path | None = None,
-                              now: datetime | None = None, collector=None) -> dict[str, object]:
+                              now: datetime | None = None, collector=None,
+                              progress_callback=None) -> dict[str, object]:
     """Run one configured business schedule through its existing task entry."""
     try:
         dataset = _BUSINESS_TASK_DATASETS[job_name]
@@ -349,8 +351,10 @@ def execute_business_schedule(job_name: str, *, config_root: str | Path,
     if collector is None:
         from ..pipeline.inputs import collect_due_inputs
         collector = collect_due_inputs
+    logging.info("scheduled %s started", dataset)
     report = collector(now=now or datetime.now(timezone.utc), config_root=config_root,
-        data_root=data_root, execute=True, mode="live", dataset=dataset)
+        data_root=data_root, execute=True, mode="live", dataset=dataset,
+        progress_callback=progress_callback)
     failed = [job for job in report.get("jobs", ()) if job.get("status") in {"blocked", "failed"}]
     if failed:
         logging.error("scheduled %s returned %s", dataset, failed)
@@ -383,7 +387,9 @@ def run_scheduler(config_root: str | Path, *, data_root: str | Path | None = Non
     def build_handler(selected):
         def handler():
             try:
-                execute_business_schedule(selected, config_root=root, data_root=data_root, now=clock())
+                from .progress import ConsoleProgress
+                execute_business_schedule(selected, config_root=root, data_root=data_root, now=clock(),
+                                          progress_callback=ConsoleProgress(sys.stderr))
             except Exception:
                 # Keep the resident process available for the next configured
                 # job. run_due has already reserved this job/date, and the
