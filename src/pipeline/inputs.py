@@ -1194,6 +1194,78 @@ def _finish_daily_batch(state, paths, metadata, failure_hook=None):
     return _save_daily_batch(state, paths, metadata)
 
 
+def _process_daily_batch_queue(process_queue, event_queue, stop_capture, processor_failed_event, *, contracts,
+                               providers, frozen, work, config_root, query_db_path, attempt,
+                               failure_hook, sentinel):
+    """Process captured daily units while capture continues; persist candidates by bounded batch."""
+    from queue import Empty
+    from .daily import process_daily_unit, write_daily_candidate_batches, daily_unit_paths, save_batch_json
+    from ..providers.contracts import ProviderContractError
+
+    batch_size = 50
+    idle_flush_seconds = 1.0
+    pending_candidates = []
+    sequences = {}
+    units_since_flush = 0
+    last_flush = monotonic()
+
+    def flush_candidates():
+        nonlocal units_since_flush, last_flush
+        if pending_candidates:
+            finalized = write_daily_candidate_batches(pending_candidates, work=work, attempt=attempt,
+                sequences=sequences, config_root=config_root, query_db_path=query_db_path)
+            if failure_hook:
+                for _unit, _entry in finalized:
+                    failure_hook('after_candidate_before_checkpoint')
+            event_queue.put(('processed_batch', finalized))
+            pending_candidates.clear()
+        units_since_flush = 0
+        last_flush = monotonic()
+
+    try:
+        while True:
+            try:
+                item = process_queue.get(timeout=0.1)
+            except Empty:
+                if pending_candidates and monotonic() - last_flush >= idle_flush_seconds:
+                    flush_candidates()
+                continue
+            if item is sentinel:
+                flush_candidates()
+                return
+            unit, entry = item
+            try:
+                if entry.get('capture_status') != 'captured':
+                    event_queue.put(('processed_item', unit, entry, 'skipped'))
+                    continue
+                contract = contracts[unit['input_id']]
+                provider = providers[unit['input_id']]
+                processing = frozen['processing_contracts'][unit['input_id']]
+                result = process_daily_unit(unit=unit, entry=entry, provider=provider, contract=contract,
+                    field_contract=processing['field_contract'], rule=processing['rule'], work=work,
+                    config_root=config_root, query_db_path=query_db_path, defer_candidate=True)
+            except (ProviderContractError, NormalizationError) as exc:
+                report_path = daily_unit_paths(work, unit)['report']
+                result = {**entry, 'process_status': 'failed', 'status': 'failed',
+                    'error': str(exc), 'failure_class': str(getattr(exc, 'failure_class', type(exc).__name__))}
+                save_batch_json(report_path, result)
+                event_queue.put(('processed_item', unit, result, 'failed'))
+            else:
+                if result.get('process_status') == 'candidate_pending':
+                    pending_candidates.append((unit, result))
+                else:
+                    event_queue.put(('processed_item', unit, result, 'success'))
+            units_since_flush += 1
+            if units_since_flush >= batch_size:
+                flush_candidates()
+    except Exception as exc:
+        processor_failed_event.set()
+        stop_capture.set()
+        event_queue.put(('process_fatal', exc))
+    finally:
+        event_queue.put(('process_done',))
+
+
 def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, mode, failure_hook, progress_callback, pacer=None):
     import json
     import re
@@ -1201,8 +1273,8 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
     import pyarrow.parquet as pq
     import requests
     from concurrent.futures import ThreadPoolExecutor
-    from queue import Queue
-    from threading import Event
+    from queue import Empty, Full, Queue
+    from threading import Event, Thread
     from ..config.loader import InputCapabilityConfig, ParameterBinding
     from ..storage.integrity import row_hash, file_hash
     from ..storage.metadata import MetadataStore
@@ -1212,7 +1284,7 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
     from ..worker.progress import TaskProgress
     from ..storage.read_index import SOURCE_QUERY_DATABASE
     from .daily import (resolve_daily_definition, expand_daily_units, daily_unit_paths, save_batch_json,
-        capture_daily_unit, process_daily_unit, prepare_daily_task_publication, PublicationThresholdExceeded)
+        capture_daily_unit, prepare_daily_task_publication, PublicationThresholdExceeded)
 
     config_root = Path(config_root).resolve()
     paths = load_storage_paths(config_root, data_root=data_root)
@@ -1394,6 +1466,26 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                     _save_daily_batch(state, paths, metadata)
                     last_saved = monotonic()
             try:
+                verified_candidate_batches = {}
+                progress.begin('processing')
+                for unit in active_units:
+                    entry = entries.get(unit['key'], {})
+                    if entry.get('process_status') == 'candidate_complete':
+                        artifact = str(Path(entry['artifact']).resolve())
+                        expected_hash = entry['artifact_hash']
+                        actual_hash = verified_candidate_batches.get(artifact)
+                        if actual_hash is None:
+                            actual_hash = file_hash(Path(artifact))
+                            verified_candidate_batches[artifact] = actual_hash
+                        if actual_hash != expected_hash:
+                            raise ValueError('daily processed artifact changed')
+                        if file_hash(Path(entry['report_path'])) != entry['report_hash']:
+                            raise ValueError('daily processed report changed')
+                        progress.finish('processing', unit['key'], 'reused')
+                    elif entry.get('process_status') == 'unverified':
+                        if file_hash(Path(entry['report_path'])) != entry['report_hash']:
+                            raise ValueError('daily unverified quote report changed')
+                        progress.finish('processing', unit['key'], 'reused')
                 # Explicit daily_fixed inputs are production task routes. They do
                 # not require expiring per-symbol route evidence before collection;
                 # source response, unit, health and publication checks still apply.
@@ -1429,7 +1521,7 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                         'path': str(qualification_path), 'sha256': file_hash(qualification_path)})
                 cache_roots = [paths['raw_root'], paths['archive_root'] / '_raw_evidence', *resolved.get('evidence_roots', [])]
                 cache_lookup = RawObjectStore.batch_cache_lookup(cache_roots) if mode == 'live' and pending_capture else None
-                state.update(status='collecting', phase='capture', error=None)
+                state.update(status='collecting', phase='capture_process', error=None)
                 progress.begin('raw')
                 checkpoint(True)
                 capture_groups, grants_by_key, capture_entries_by_key = {}, {}, {}
@@ -1462,7 +1554,10 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                     capture_groups.setdefault(unit['input_id'], []).append(unit)
 
                 capture_events = Queue()
+                process_queue = Queue(maxsize=32)
+                process_sentinel = object()
                 stop_capture = Event()
+                processor_failed_event = Event()
                 redo_attempt_number = int(state.get('redo_attempt', 0)) + 1
 
                 def capture_source_group(input_id, group_units):
@@ -1533,14 +1628,77 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                             data_date=resolved['trade_date'])
                         (raw_directory / 'bodies').mkdir(parents=True, exist_ok=True)
                     (paths['archive_root'] / '_raw_evidence' / task_id).mkdir(parents=True, exist_ok=True)
-                    with ThreadPoolExecutor(max_workers=len(source_groups), thread_name_prefix='daily-source') as executor:
+
+                capture_keys = {unit['key'] for _input_id, group in source_groups for unit in group}
+                def pending_existing_processing():
+                    for unit in active_units:
+                        entry = entries.get(unit['key'], {})
+                        if (unit['key'] not in capture_keys
+                                and entry.get('process_status') not in {'candidate_complete', 'unverified'}):
+                            yield unit, entry
+                existing_processing = iter(pending_existing_processing())
+                existing_processing_done = False
+                processor_done = False
+                sentinel_sent = False
+                completed_groups = 0
+                fatal_error = None
+                pending_signals = set()
+                processor = Thread(target=_process_daily_batch_queue,
+                    args=(process_queue, capture_events, stop_capture, processor_failed_event),
+                    kwargs={'contracts': contracts, 'providers': providers, 'frozen': frozen, 'work': work,
+                        'config_root': config_root, 'query_db_path': paths['data_root'] / SOURCE_QUERY_DATABASE,
+                        'attempt': redo_attempt_number, 'failure_hook': failure_hook, 'sentinel': process_sentinel},
+                    name='daily-batch-processor')
+                processor.start()
+
+                def save_processed(unit, entry, progress_status):
+                    entries[unit['key']] = entry
+                    save_batch_json(daily_unit_paths(work, unit)['manifest'], entry)
+                    progress.finish('processing', unit['key'], progress_status)
+                    checkpoint(progress_status == 'failed')
+
+                def dispatch_process(unit, entry):
+                    while not stop_capture.is_set() and not processor_failed_event.is_set():
+                        try:
+                            process_queue.put((unit, entry), timeout=0.1)
+                            return True
+                        except Full:
+                            continue
+                    return False
+
+                try:
+                    with ThreadPoolExecutor(max_workers=max(1, len(source_groups)),
+                                            thread_name_prefix='daily-source') as executor:
                         futures = [executor.submit(capture_source_group, input_id, group_units)
                             for input_id, group_units in source_groups]
-                        completed_groups, fatal_error = 0, None
-                        pending_signals = set()
                         try:
-                            while completed_groups < len(source_groups):
-                                message = capture_events.get()
+                            while not (completed_groups == len(source_groups) and existing_processing_done
+                                       and sentinel_sent and processor_done):
+                                if (fatal_error is None and not stop_capture.is_set()
+                                        and not processor_failed_event.is_set() and not existing_processing_done):
+                                    if not process_queue.full():
+                                        try:
+                                            process_queue.put_nowait(next(existing_processing))
+                                        except StopIteration:
+                                            existing_processing_done = True
+                                if fatal_error is not None:
+                                    existing_processing_done = True
+                                if (not sentinel_sent and completed_groups == len(source_groups)
+                                        and existing_processing_done):
+                                    while not processor_failed_event.is_set():
+                                        try:
+                                            process_queue.put(process_sentinel, timeout=0.1)
+                                            break
+                                        except Full:
+                                            continue
+                                    sentinel_sent = True
+                                if completed_groups == len(source_groups) and state.get('phase') != 'process':
+                                    state.update(phase='process')
+                                    checkpoint(True)
+                                try:
+                                    message = capture_events.get(timeout=0.05)
+                                except Empty:
+                                    continue
                                 kind = message[0]
                                 if kind == 'before':
                                     _, unit, permit, decision = message
@@ -1566,6 +1724,7 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                                                 progress.finish('raw', unit['key'], 'failed')
                                                 checkpoint()
                                                 decision['capture'] = False
+                                                dispatch_process(unit, entry)
                                             else:
                                                 decision['capture'] = True
                                         elif daily_fixed_live_task:
@@ -1589,6 +1748,7 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                                                 progress.finish('raw', unit['key'], 'failed')
                                                 checkpoint()
                                                 decision['capture'] = False
+                                                dispatch_process(unit, entry)
                                             else:
                                                 decision['capture'] = True
                                         else:
@@ -1623,16 +1783,38 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                                         progress.finish('raw', unit['key'], 'failed' if entry['capture_status'] == 'failed' else
                                             'success' if entry.get('live_http_calls') else 'reused')
                                         checkpoint(entry['capture_status'] == 'failed')
+                                        dispatch_process(unit, entry)
                                     finally:
                                         acknowledged.set()
                                         pending_signals.discard(acknowledged)
-                                elif kind == 'fatal':
-                                    _, unit, exc = message
+                                elif kind == 'processed_item':
+                                    _, unit, entry, progress_status = message
+                                    save_processed(unit, entry, progress_status)
+                                elif kind == 'processed_batch':
+                                    for unit, entry in message[1]:
+                                        save_processed(unit, entry, 'success')
+                                elif kind == 'process_fatal':
+                                    _, exc = message
                                     if fatal_error is None:
                                         fatal_error = exc
+                                    existing_processing_done = True
                                     stop_capture.set()
+                                    for signal in tuple(pending_signals):
+                                        signal.set()
+                                elif kind == 'process_done':
+                                    processor_done = True
+                                elif kind == 'fatal':
+                                    _, _unit, exc = message
+                                    if fatal_error is None:
+                                        fatal_error = exc
+                                    existing_processing_done = True
+                                    stop_capture.set()
+                                    for signal in tuple(pending_signals):
+                                        signal.set()
                                 elif kind == 'done':
                                     completed_groups += 1
+                            for future in futures:
+                                future.result()
                         except Exception:
                             stop_capture.set()
                             for signal in tuple(pending_signals):
@@ -1652,56 +1834,39 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                                 except Exception:
                                     pass
                             raise
-                        for future in futures:
-                            future.result()
-                    if fatal_error is not None:
-                        raise fatal_error
-                state.update(status='checking', phase='process')
+                finally:
+                    if processor.is_alive() and not sentinel_sent and not processor_failed_event.is_set():
+                        while not processor_failed_event.is_set():
+                            try:
+                                process_queue.put(process_sentinel, timeout=0.1)
+                                break
+                            except Full:
+                                continue
+                    processor.join()
+                if fatal_error is not None:
+                    raise fatal_error
+                state.update(status='checking', phase='build')
                 checkpoint(True)
-                for unit in active_units:
-                    contract = contracts[unit['input_id']]
-                    provider = providers[unit['input_id']]
-                    entry = entries[unit['key']]
-                    if entry.get('process_status') == 'candidate_complete':
-                        if file_hash(Path(entry['artifact'])) != entry['artifact_hash'] or file_hash(Path(entry['report_path'])) != entry['report_hash']:
-                            raise ValueError('daily processed artifact changed')
-                        progress.finish('processing', unit['key'], 'reused')
-                        continue
-                    if entry.get('process_status') == 'unverified':
-                        if file_hash(Path(entry['report_path'])) != entry['report_hash']:
-                            raise ValueError('daily unverified quote report changed')
-                        progress.finish('processing', unit['key'], 'reused')
-                        continue
-                    if entry.get('capture_status') != 'captured':
-                        progress.finish('processing', unit['key'], 'skipped')
-                        continue
-                    try:
-                        processing = frozen['processing_contracts'][unit['input_id']]
-                        entry = process_daily_unit(unit=unit, entry=entry, provider=provider, contract=contract,
-                            field_contract=processing['field_contract'], rule=processing['rule'], work=work,
-                            config_root=config_root,
-                            query_db_path=paths['data_root'] / SOURCE_QUERY_DATABASE)
-                        if failure_hook:
-                            failure_hook('after_candidate_before_checkpoint')
-                    except (ProviderContractError, NormalizationError) as exc:
-                        entry = {**entry, 'process_status': 'failed', 'status': 'failed',
-                            'error': str(exc), 'failure_class': str(getattr(exc, 'failure_class', type(exc).__name__))}
-                        save_batch_json(daily_unit_paths(work, unit)['report'], entry)
-                    entries[unit['key']] = entry
-                    save_batch_json(daily_unit_paths(work, unit)['manifest'], entry)
-                    progress.finish('processing', unit['key'], 'failed' if entry['process_status'] == 'failed' else 'success')
-                    checkpoint(entry['process_status'] == 'failed')
                 # No partition may publish until all units have completed processing.
                 state.update(phase='build', partitions={})
                 for asset in resolved['asset_types']:
                     group = [u for u in units if u['asset_type'] == asset]
-                    source_rows, promotions = {}, []
+                    source_rows, promotions, candidate_cache = {}, [], {}
                     for unit in group:
                         contract = contracts[unit['input_id']]
                         entry = entries.get(unit['key'], {})
                         if entry.get('process_status') != 'candidate_complete':
                             continue
-                        source_rows[unit['key']] = {'rows': pq.read_table(entry['artifact']).to_pylist(),
+                        artifact = str(Path(entry['artifact']).resolve())
+                        if artifact not in candidate_cache:
+                            if file_hash(Path(artifact)) != entry['artifact_hash']:
+                                raise ValueError('daily candidate batch changed before aggregate build')
+                            candidate_cache[artifact] = pq.read_table(artifact).to_pylist()
+                        row_index = int(entry.get('artifact_row_index', 0))
+                        candidate_rows = candidate_cache[artifact]
+                        if row_index < 0 or row_index >= len(candidate_rows):
+                            raise ValueError('daily candidate row locator is outside its batch artifact')
+                        source_rows[unit['key']] = {'rows': [candidate_rows[row_index]],
                             'entry': {'report': json.loads(Path(entry['report_path']).read_text(encoding='utf-8'))},
                             'contract': contract, 'raw_ref': entry['raw_manifest']}
                         parameters = contract.bind_parameters(unit['context'])

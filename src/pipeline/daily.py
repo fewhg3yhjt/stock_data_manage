@@ -88,7 +88,8 @@ def capture_daily_unit(*, unit, contract, provider, paths, task_id, trade_date, 
         "captured_at_utc": datetime.now(timezone.utc).isoformat()}
 
 
-def process_daily_unit(*, unit, entry, provider, contract, field_contract, rule, work, config_root, query_db_path):
+def process_daily_unit(*, unit, entry, provider, contract, field_contract, rule, work, config_root,
+                       query_db_path, defer_candidate=False):
     """Interpret retained bytes, normalize and check one candidate; no transport is used."""
     import json
     from datetime import timezone
@@ -158,12 +159,12 @@ def process_daily_unit(*, unit, entry, provider, contract, field_contract, rule,
         raise NormalizationError("close-only data is permitted only for a positive index close with empty OHLC and volume/amount")
     unit_contract = Normalizer.match_unit_contract(rule, context)
     artifact_paths = daily_unit_paths(work, unit)
-    if artifact_paths["candidate"].exists():
+    if not defer_candidate and artifact_paths["candidate"].exists():
         import pyarrow.parquet as pq
         if pq.read_table(artifact_paths["candidate"]).to_pylist() != rows:
             raise ValueError("retained daily candidate differs from reprocessed source bytes")
         descriptor = {"sha256": file_hash(artifact_paths["candidate"])}
-    else:
+    elif not defer_candidate:
         descriptor = write_normalized_rows(artifact_paths["candidate"], rows, field_contract["fields"])
     save_batch_json(artifact_paths["source"], fetched.source_rows)
     report = {"dataset": "daily_bar", "data_date": parameters['start'].isoformat(), "asset_type": unit['asset_type'],
@@ -180,6 +181,14 @@ def process_daily_unit(*, unit, entry, provider, contract, field_contract, rule,
         "unverified_fields": [name for name in rule.get("unverified_fields", ()) if row.get(name) is None],
         "original_row_count": len(fetched.source_rows), "selected_row_count": len(rows),
         "coverage_denominator": 1, "validated_at_utc": datetime.now(timezone.utc), "processing_http_calls": 0}
+    if defer_candidate:
+        report["status"] = "candidate_pending"
+        save_batch_json(artifact_paths["report"], report)
+        return {**entry, "process_status": "candidate_pending", "status": "candidate_pending",
+            "report_path": str(artifact_paths["report"]), "row_count": 1,
+            "_candidate_rows": rows, "_candidate_report": report,
+            "_candidate_fields": field_contract["fields"],
+            "_candidate_field_mapping": rule.get("field_mapping", {})}
     save_batch_json(artifact_paths["report"], report)
     from ..storage.read_index import append_source_report
     from ..storage.parquet import PartitionLockedError
@@ -194,6 +203,66 @@ def process_daily_unit(*, unit, entry, provider, contract, field_contract, rule,
     return {**entry, "process_status": "candidate_complete", "status": "candidate_complete",
         "artifact": str(artifact_paths["candidate"]), "artifact_hash": descriptor["sha256"],
         "report_path": str(artifact_paths["report"]), "report_hash": file_hash(artifact_paths["report"]), "row_count": 1}
+
+
+def write_daily_candidate_batches(items, *, work, attempt, sequences, config_root, query_db_path):
+    """Persist normalized unit rows and their query selectors in bounded batches."""
+    import warnings
+    from collections import defaultdict
+    from ..storage.integrity import file_hash
+    from ..storage.parquet import write_normalized_rows, PartitionLockedError
+
+    groups = defaultdict(list)
+    for unit, entry in items:
+        groups[(unit["asset_type"], unit["input_id"])].append((unit, entry))
+    finalized = []
+    index_specs = []
+    for (asset_type, input_id), group in groups.items():
+        sequence_key = (attempt, asset_type, input_id)
+        directory = Path(work) / "candidates" / asset_type / input_id
+        directory.mkdir(parents=True, exist_ok=True)
+        sequence = sequences.get(sequence_key, 0) + 1
+        path = directory / f"candidate-batch-attempt-{attempt:03d}-{sequence:06d}.parquet"
+        while path.exists():
+            sequence += 1
+            path = directory / f"candidate-batch-attempt-{attempt:03d}-{sequence:06d}.parquet"
+        sequences[sequence_key] = sequence
+        rows = [entry["_candidate_rows"][0] for _unit, entry in group]
+        fields = group[0][1]["_candidate_fields"]
+        if any(entry["_candidate_fields"] != fields for _unit, entry in group):
+            raise ValueError("daily candidate batch contains different normalized field contracts")
+        descriptor = write_normalized_rows(path, rows, fields)
+        batch_hash = descriptor["sha256"]
+        for row_index, (unit, entry) in enumerate(group):
+            report = dict(entry.pop("_candidate_report"))
+            field_mapping = entry.pop("_candidate_field_mapping")
+            entry.pop("_candidate_fields", None)
+            entry.pop("_candidate_rows", None)
+            report.update(status="candidate_complete", candidate_artifact=str(path),
+                candidate_row_index=row_index, candidate_hash=batch_hash)
+            report_path = Path(entry["report_path"])
+            save_batch_json(report_path, report)
+            entry.update(process_status="candidate_complete", status="candidate_complete",
+                artifact=str(path), artifact_hash=batch_hash, artifact_row_index=row_index,
+                report_hash=file_hash(report_path), row_count=1)
+            finalized.append((unit, entry))
+            index_specs.append((report_path, field_mapping))
+
+    if index_specs:
+        from ..storage.read_index import append_source_reports
+        try:
+            outcomes = append_source_reports(index_specs, run_root=work, config_root=config_root,
+                                             query_db_path=query_db_path)
+        except (OSError, ValueError, TypeError, KeyError, IndexError, UnicodeError,
+                PartitionLockedError) as exc:
+            warnings.warn(f"source query index batch refresh failed for {len(index_specs)} reports: {exc}",
+                          RuntimeWarning)
+        else:
+            for report_path, _indexed, error in outcomes:
+                if error is not None:
+                    warnings.warn(f"source query index refresh failed for {Path(report_path).name}: {error}",
+                                  RuntimeWarning)
+    return finalized
 
 
 class PublicationThresholdExceeded(ValueError):

@@ -15,33 +15,70 @@ def run(definition, root, **kwargs):
     return collect_task(definition=definition, config_root=CONFIG, data_root=root, mode='replay', **kwargs)
 
 
-def test_entire_batch_captured_before_any_parse_and_processing_has_no_http(tmp_path, monkeypatch):
+def test_daily_batch_processes_while_capture_continues_and_writes_candidate_batches(tmp_path, monkeypatch):
+    from threading import Event
+
     definition = source_task(tmp_path, symbols=('sh600001', 'sz000001'))
     calls = []
+    first_parse = Event()
     capture, parse = TencentDailyProvider.capture_window, TencentDailyProvider.parse_window
     def captured(self, *args, **kwargs):
+        if calls.count('capture') == 1:
+            assert first_parse.wait(5), 'processing did not start while the next request was pending'
         calls.append('capture')
         return capture(self, *args, **kwargs)
     def parsed(self, *args, **kwargs):
-        assert calls.count('capture') == 6
         calls.append('parse')
-        return parse(self, *args, **kwargs)
+        result = parse(self, *args, **kwargs)
+        first_parse.set()
+        return result
     monkeypatch.setattr(TencentDailyProvider, 'capture_window', captured)
     monkeypatch.setattr(TencentDailyProvider, 'parse_window', parsed)
     result = run(definition, tmp_path / 'run')
     assert result['status'] == 'published'
     assert result['data_date'] == DAY
-    assert calls == ['capture'] * 6 + ['parse'] * 6
+    assert calls.count('capture') == 6 and calls.count('parse') == 6
+    assert calls.index('parse') < calls.index('capture', 1)
     assert 'units' not in result and 'definition' not in result
     work = Path(result['definition_ref']['path']).parent
     assert (work / 'summary.json').stat().st_size < 12000
     assert len(list(work.rglob('*.manifest.json'))) == 6
+    candidates = [json.loads(path.read_text(encoding='utf-8')) for path in work.rglob('*.manifest.json')]
+    candidates = [entry for entry in candidates if entry.get('process_status') == 'candidate_complete']
+    assert len(candidates) >= 2
+    assert len({entry['artifact'] for entry in candidates}) < len(candidates)
+    for entry in candidates:
+        assert Path(entry['artifact']).is_file()
+        assert isinstance(entry['artifact_row_index'], int)
     for path in work.rglob('*.report.json'):
         assert json.loads(path.read_text(encoding='utf-8'))['processing_http_calls'] == 0
     plan = work / 'task.json'
     stamp = plan.stat().st_mtime_ns
     assert run(definition, tmp_path / 'run')['no_op']
     assert plan.stat().st_mtime_ns == stamp
+
+
+def test_selected_redo_replaces_selected_batch_and_preserves_other_raw(tmp_path):
+    from test_daily_collection_e2e import batch_entries
+
+    definition = source_task(tmp_path / 'fixtures', symbols=('sh600001', 'sh600002'))
+    root = tmp_path / 'run'
+    run(definition, root)
+    paths = load_storage_paths(CONFIG, data_root=root)
+    unchanged = {path: file_hash(path) for path in (paths['raw_root'] / DAY).rglob(
+        'manifest.*sh600002*.ndjson')}
+    assert len(unchanged) == 3
+
+    selected = run(definition, root, redo='selected', symbols=['sh600001'])
+
+    assert selected['status'] == 'published'
+    assert selected['selected_symbols'] == ['sh600001']
+    assert all(file_hash(path) == digest for path, digest in unchanged.items())
+    entries = batch_entries(selected)
+    selected_entries = [entry for key, entry in entries.items() if key.startswith('sh600001__')]
+    assert len(selected_entries) == 3
+    assert all(entry['process_status'] == 'candidate_complete' for entry in selected_entries)
+    assert len({entry['artifact'] for entry in selected_entries}) == 1
 
 
 def test_live_daily_fixed_route_does_not_require_expiring_symbol_qualification(tmp_path, monkeypatch):

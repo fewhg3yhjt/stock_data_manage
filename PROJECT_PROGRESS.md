@@ -404,3 +404,18 @@ flowchart LR
 | 原问题 | 可核验证据 | 处理动作及对原问题的影响 | 当前结果与剩余项 |
 |---|---|---|---|
 | 总览长期停留在“正在读取现有运行记录” | `DashboardReader.overview()`原先先调用任务列表扫描，再由发布列表重复扫描任务摘要；`_task_documents()`对工作区和归档根递归遍历。实测任务扫描24.481秒、发布列表19.469秒（其中再次扫描任务摘要）、原始数据日期0.041秒 | 任务摘要只从允许的日期/归档工作区目录递归读取，跳过顶层私有原始证据和检查目录；一次总览只读取一份任务快照，并传给发布列表复用。数据来源、排序、计数和页面合同不变 | 修复后本地直接构建总览0.791秒；Windows页面接口`/api/overview`返回HTTP 200，耗时2.12秒，返回最近6个任务及6个发布项，原始数据日期为2026-11-04。没有运行全套测试；没有改动行情数据 |
+
+## 2026-11-06 日线处理与持久化批量化
+
+未通过的7个旧断言为：`test_published_resume_rechecks_evidence_and_never_overwrites_good_publication[raw_corrupt|raw_missing|candidate_corrupt]`、`test_failed_required_stock_group_blocks_only_its_asset_partition`、`test_one_frozen_plan_small_checkpoints_shared_pacer_and_immediate_failure`、`test_different_dates_and_selected_redo_preserve_other_current_raw`、`test_failed_scope_and_live_gate_do_not_capture_or_write_production`。其中选定重跑测试内“所选证券发布成功且其他证券raw不变”的断言已通过，失败发生在后续可选复权单元状态断言。
+
+用户指出大批日线在采集后仍以约14项/秒处理，并质疑单证券文件与串行路径。检查`_collect_daily_batch`发现此前先等待全部来源请求结束，再逐单元解析、单独写候选Parquet，并逐份报告单独更新SQLite查询索引。现有证券×口径请求形状和来源限速属于来源合同，本次没有改动。
+
+| 原问题/影响 | 可核验证据与处理 | 本次结果 | 未覆盖/剩余 |
+|---|---|---|---|
+| 采集与处理之间有整批屏障；候选与索引重复开销按单元累积 | 在现有日线执行器加入容量32队列及单处理线程；来源请求完成后立即派发解析，采集和处理交错。成功候选按资产/来源每批最多50个或队列空闲1秒写入Parquet；同批报告共用一次SQLite连接与事务。仍保留逐单元manifest、报告及完整来源行JSON，查询API和来源行定位口径不变 | `tests/test_daily_batch.py`及`tests/test_daily_collection_e2e.py`相关13项通过，含并行交错、候选批行号、失败恢复、归档续跑、选定重跑且其他证券raw不变、跨来源采集及索引失败不阻断发布 | 单处理线程仍逐单元解析；网络请求仍遵守原供应商请求形状及限速。同一来源组不并发提速。本次没有用18,993个生产单元跑完整端到端耗时，因此不宣称整个生产任务可按某个倍数提速 |
+| SQLite来源查询索引逐单元事务 | 新增50份固定离线报告、每份641条原始来源行，共32,050个选择器的隔离性能验收；数据库从空状态建立，随后回读分页结果 | 实测1.014秒；单个数据库连接、1次`BEGIN IMMEDIATE`；50份报告与32,050个选择器完整写入，查询返回`sh600000`预期来源行 | 该结果仅代表本机新建隔离库和此数据规模；不等于生产数据库整体/API端到端性能 |
+| 选定重跑时新raw无法替换已有正式raw | 选定重跑测试暴露`storage/raw.py`在延迟清理模式下发现旧目标文件便直接返回，导致新暂存文件未复制，收尾时新旧manifest哈希不匹配。改为先比较当前manifest；不匹配时按现有托管文件规则归档旧请求并复制新响应，最后仍由整批收尾核验目标 | 新增单独回归用例，选定证券重跑发布成功且未选证券的3份raw manifest哈希不变 | 不验证新的实时行情请求；此修复只处理已冻结任务的raw晋升/重做合同 |
+| 代码与现行流程文档 | 更新`docs/pipeline/collection-tasks.md`中调整前后流转、并行/串行、批次大小、失败和验收范围；`CODE_STRUCTURE.md`说明现有模块职责；本阶段记录在本文 | `py_compile`覆盖本次修改的4个业务模块和3个测试文件；`git diff --check`通过 | 本次没有生产任务重跑、实时Provider请求或常驻进程重启。修改对已有运行中的Python进程不热加载；需要由操作员重启后才会被进程载入 |
+
+另对`tests/test_daily_batch.py`相关整组执行发现7个旧断言未通过：3个断言要求已发布任务resume重新扫描所有raw body/候选；3个将可发布不复权记录但复权单元失败的状态要求为整体`failed`；1个资格测试通过固定`mode='replay'`的辅助函数检查live阻断。它们与本次13项目标验收分开记录，未据此改变发布语义或增加已完成任务的全量重复扫描。全套测试未通过，不能表述为全套通过。

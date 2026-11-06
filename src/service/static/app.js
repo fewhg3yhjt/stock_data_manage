@@ -23,7 +23,7 @@ const statusLabels = {
   candidate_complete: '候选完成', captured: '响应已保存', reused: '已复用', skipped: '已跳过',
 };
 const stageLabels = { raw: '整批原响应采集', processing: '整批解析与映射', publication: '按类型检查与发布' };
-const phaseLabels = { prepare: '冻结范围与资格准备', capture: '整批采集', process: '整批处理', build: '按类型构建', publish: '按类型发布', finished: '执行结束' };
+const phaseLabels = { prepare: '冻结范围与资格准备', capture: '整批采集', capture_process: '采集与处理并行', process: '整批处理', build: '按类型构建', publish: '按类型发布', finished: '执行结束' };
 
 function esc(value) {
   return String(value ?? '').replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));

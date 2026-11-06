@@ -461,8 +461,8 @@ def test_source_query_index_failure_does_not_block_daily_publication(tmp_path, m
     def unavailable_index(*args, **kwargs):
         raise PartitionLockedError("synthetic sidecar contention")
 
-    monkeypatch.setattr(read_index, "append_source_report", unavailable_index)
-    with pytest.warns(RuntimeWarning, match="source query index refresh failed"):
+    monkeypatch.setattr(read_index, "append_source_reports", unavailable_index)
+    with pytest.warns(RuntimeWarning, match="source query index batch refresh failed"):
         result = execute(tmp_path, definition)
     assert result["status"] == "published" and result["complete_today"]
 
@@ -673,8 +673,8 @@ def test_csi_live_route_is_blocked_before_any_provider_request(tmp_path, monkeyp
     assert entry["failure_class"] == "qualification_blocked" and entry["capture_status"] == "blocked"
 
 
-def test_daily_batch_runs_tencent_and_csindex_capture_groups_before_shared_processing(tmp_path, monkeypatch):
-    from threading import Barrier, Lock
+def test_daily_batch_processes_completed_source_while_other_capture_is_pending(tmp_path, monkeypatch):
+    from threading import Barrier, Event, Lock
     import stock_data_manage.pipeline.daily as daily
     from stock_data_manage.providers.csindex.indices import CsindexDailyProvider
 
@@ -699,6 +699,7 @@ def test_daily_batch_runs_tencent_and_csindex_capture_groups_before_shared_proce
     both_sources_entered_capture = Barrier(2, timeout=5)
     completion_lock = Lock()
     completed_sources = set()
+    processing_started = Event()
     original_tencent_capture = TencentDailyProvider.capture_window
     original_csindex_capture = CsindexDailyProvider.capture_window
     original_process = daily.process_daily_unit
@@ -707,13 +708,18 @@ def test_daily_batch_runs_tencent_and_csindex_capture_groups_before_shared_proce
         def capture(self, *args, **kwargs):
             both_sources_entered_capture.wait()
             result = original(self, *args, **kwargs)
+            if name == "tencent":
+                assert processing_started.wait(5), "daily processing waited for every source group"
             with completion_lock:
                 completed_sources.add(name)
             return result
         return capture
 
     def process_after_capture_barrier(**kwargs):
-        assert completed_sources == {"tencent", "csindex"}
+        unit = kwargs["unit"]
+        if unit["input_id"] == "CSI-INDEX-DAILY-001":
+            assert "tencent" not in completed_sources
+            processing_started.set()
         return original_process(**kwargs)
 
     monkeypatch.setattr(TencentDailyProvider, "capture_window", record_source_capture("tencent", original_tencent_capture))

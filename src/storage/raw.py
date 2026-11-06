@@ -419,10 +419,12 @@ class RawObjectStore:
         with PartitionLock(current.parent / ".raw.lock", recover_stale=True):
             if current.exists():
                 if defer_cleanup:
-                    # Batch finalization verifies the complete destination set once
-                    # after all promotions; avoid hashing this copy twice.
-                    return
-                if RawObjectStore.verify_manifest(current) == expected_hash:
+                    # Compare the manifest only here; batch finalization verifies
+                    # the copied response bodies once after all promotions.
+                    current_matches = hashlib.sha256(current.read_bytes()).hexdigest() == expected_hash
+                else:
+                    current_matches = RawObjectStore.verify_manifest(current) == expected_hash
+                if current_matches:
                     if not defer_cleanup:
                         RawObjectStore.refresh_index(current)
                         RawObjectStore.remove_request(temporary)

@@ -151,20 +151,67 @@ def append_source_report(
     query_db_path: str | Path,
     field_mapping: dict[str, Any] | None = None,
 ) -> bool:
-    """Upsert one source report and row selectors into the rebuildable query database."""
+    """Upsert one source report through the same transaction used by batch callers."""
+    outcomes = append_source_reports(
+        [(report_path, field_mapping)], run_root=run_root, config_root=config_root,
+        query_db_path=query_db_path,
+    )
+    return bool(outcomes and outcomes[0][1])
+
+
+def append_source_reports(
+    report_specs: Iterable[tuple[str | Path, dict[str, Any] | None]],
+    *,
+    run_root: str | Path,
+    config_root: str | Path,
+    query_db_path: str | Path,
+) -> list[tuple[str, bool, Exception | None]]:
+    """Upsert report selectors in one bounded SQLite transaction.
+
+    Each report retains the same file-backed row locator and is isolated with a
+    savepoint, so one malformed report does not discard its batch neighbours.
+    """
     root = Path(run_root).resolve()
-    record = source_report_record(report_path, run_root=root, config_root=config_root,
-                                  field_mapping=field_mapping)
-    if record is None:
-        return False
+    from .parquet import PartitionLockedError
+
+    record_errors = (OSError, ValueError, TypeError, KeyError, IndexError, UnicodeError,
+                     PartitionLockedError)
+    prepared: list[tuple[str, dict[str, Any]]] = []
+    outcomes: list[tuple[str, bool, Exception | None]] = []
+    for report_path, field_mapping in report_specs:
+        label = str(report_path)
+        try:
+            record = source_report_record(report_path, run_root=root, config_root=config_root,
+                                          field_mapping=field_mapping)
+        except record_errors as exc:
+            outcomes.append((label, False, exc))
+            continue
+        if record is None:
+            outcomes.append((label, False, None))
+            continue
+        prepared.append((label, record))
+        outcomes.append((label, True, None))
+    if not prepared:
+        return outcomes
+
     database = Path(query_db_path).resolve()
     database.parent.mkdir(parents=True, exist_ok=True)
+    result_by_path = {path: (indexed, error) for path, indexed, error in outcomes}
     with closing(_connect_query_database(database)) as connection:
         _ensure_query_schema(connection)
         connection.execute("BEGIN IMMEDIATE")
-        _store_query_record(connection, record, root)
+        for index, (path, record) in enumerate(prepared):
+            savepoint = f"source_report_{index}"
+            connection.execute(f"SAVEPOINT {savepoint}")
+            try:
+                _store_query_record(connection, record, root)
+            except record_errors as exc:
+                connection.execute(f"ROLLBACK TO {savepoint}")
+                result_by_path[path] = (False, exc)
+            finally:
+                connection.execute(f"RELEASE {savepoint}")
         connection.commit()
-    return True
+    return [(path, *result_by_path[path]) for path, _indexed, _error in outcomes]
 
 
 def _connect_query_database(path: Path, *, read_only: bool = False) -> sqlite3.Connection:
