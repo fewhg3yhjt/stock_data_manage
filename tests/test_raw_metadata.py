@@ -1,5 +1,5 @@
 from dataclasses import replace
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import pytest
 
@@ -143,7 +143,7 @@ def test_metadata_round_trips_attempt_and_completed_no_trade_partition(tmp_path)
         item_statuses={"a": "success", "b": "no_trade"},
         source_providers={"a": "fixture", "b": None},
     )
-    with MetadataStore(tmp_path / "metadata.duckdb") as metadata:
+    with MetadataStore(tmp_path / "metadata.sqlite3") as metadata:
         metadata.save_attempt(attempt, updated_at=now)
         assert metadata.load_attempt("attempt-1") == attempt
         metadata.record_partition_publish(manifest=manifest, manifest_path=tmp_path / "manifest.json")
@@ -156,13 +156,24 @@ def test_metadata_round_trips_attempt_and_completed_no_trade_partition(tmp_path)
         }
 
 
+def test_metadata_datetime_storage_normalizes_offsets_to_utc(tmp_path):
+    local_time = datetime(2026, 10, 9, 17, 30, tzinfo=timezone(timedelta(hours=8)))
+    with MetadataStore(tmp_path / "metadata.sqlite3") as metadata:
+        metadata.save_attempt(CollectionAttempt("offset-time"), updated_at=local_time)
+        stored = metadata.connection.execute(
+            "SELECT updated_at FROM collection_attempt WHERE attempt_id=?", ["offset-time"]
+        ).fetchone()[0]
+        assert stored == datetime(2026, 10, 9, 9, 30, tzinfo=timezone.utc)
+        assert stored.tzinfo == timezone.utc
+
+
 def test_conflict_log_is_deduplicated(tmp_path, minute_bar, final_minute_bar) -> None:
     from dataclasses import replace
     from decimal import Decimal
 
     conflict = replace(final_minute_bar, close=Decimal("120"), high=Decimal("121"))
     conflicts = resolve_records([minute_bar, conflict]).conflicts
-    with MetadataStore(tmp_path / "metadata.duckdb") as metadata:
+    with MetadataStore(tmp_path / "metadata.sqlite3") as metadata:
         metadata.record_conflicts(
             dataset="minute_bar_1m", partition_key="2026-09-11", conflicts=conflicts
         )
@@ -179,7 +190,7 @@ def test_partition_batch_updates_preserve_other_items_and_rollback(tmp_path):
                         row_count=7267, expected_count=7267, first_key=None, last_key=None,
                         content_hash="original", size_bytes=0, raw_refs=(), item_statuses=statuses,
                         source_providers={key: "tencent" for key in statuses})
-    with MetadataStore(tmp_path / "metadata.duckdb") as metadata:
+    with MetadataStore(tmp_path / "metadata.sqlite3") as metadata:
         metadata.record_partition_publish(manifest=manifest, manifest_path="manifest.json", updated_at=now)
         assert len(metadata.item_statuses("daily_bar", "2026-10-09")) == 7267
         key = "XSHG:000000"
@@ -194,8 +205,8 @@ def test_partition_batch_updates_preserve_other_items_and_rollback(tmp_path):
                 manifest_path="new.json", item_statuses={key: "invalid-enum"}, updated_at=now)
         assert metadata.partition("daily_bar", "stock", "2026-10-09") == previous
         assert len(metadata.item_statuses("daily_bar", "2026-10-09")) == 7267
-        import duckdb
-        with pytest.raises(duckdb.ConstraintException):
+        import sqlite3
+        with pytest.raises(sqlite3.IntegrityError):
             metadata.record_partition_publish(manifest=replace(manifest, content_hash="sql-rollback"),
                 manifest_path="new.json", item_statuses={None: ItemStatus.SUCCESS}, updated_at=now)
         assert metadata.partition("daily_bar", "stock", "2026-10-09") == previous
@@ -205,34 +216,33 @@ def test_partition_batch_updates_preserve_other_items_and_rollback(tmp_path):
         assert len(metadata.item_statuses("daily_bar", "2026-10-09")) == 7267
 
 
-def test_metadata_schema_upgrade_preserves_legacy_mixed_daily_status(tmp_path):
-    import duckdb
+def test_metadata_read_only_missing_database_does_not_create_files(tmp_path):
+    path = tmp_path / "missing" / "metadata.sqlite3"
+    with pytest.raises(FileNotFoundError, match="does not exist"):
+        MetadataStore(path, read_only=True)
+    assert not path.parent.exists()
+    with pytest.raises(FileNotFoundError, match="does not exist"):
+        MetadataStore(read_only=True)
 
+
+def test_metadata_read_only_open_does_not_write_business_data_or_schema(tmp_path):
+    path = tmp_path / "metadata.sqlite3"
+    with MetadataStore(path):
+        pass
+    with MetadataStore(path, read_only=True) as metadata:
+        assert metadata.connection.execute("SELECT count(*) FROM collection_task").fetchone() == (0,)
+        assert metadata.connection.execute(
+            "SELECT count(*) FROM sqlite_master WHERE type='table'"
+        ).fetchone() == (9,)
+
+
+def test_metadata_rejects_legacy_database_without_changing_bytes(tmp_path):
     path = tmp_path / "legacy-metadata.duckdb"
-    connection = duckdb.connect(str(path))
-    connection.execute("""
-        CREATE TABLE partition_status (
-            dataset VARCHAR NOT NULL, asset_type VARCHAR NOT NULL, partition_key VARCHAR NOT NULL,
-            expected_count BIGINT NOT NULL, actual_count BIGINT NOT NULL, status VARCHAR NOT NULL,
-            manifest_path VARCHAR NOT NULL, content_hash VARCHAR NOT NULL, conflict_count BIGINT NOT NULL,
-            quarantined_count BIGINT NOT NULL, updated_at TIMESTAMPTZ NOT NULL,
-            PRIMARY KEY (dataset, asset_type, partition_key))""")
-    connection.execute("""
-        CREATE TABLE partition_item (
-            dataset VARCHAR NOT NULL, partition_key VARCHAR NOT NULL, instrument_id VARCHAR NOT NULL,
-            status VARCHAR NOT NULL, source_provider VARCHAR, updated_at TIMESTAMPTZ NOT NULL,
-            PRIMARY KEY (dataset, partition_key, instrument_id))""")
-    now = datetime.now(timezone.utc)
-    connection.execute("INSERT INTO partition_status VALUES ('daily_bar','stock','2026-10-09',1,1,'complete_clean','old.json','hash',0,0,?)", [now])
-    connection.execute("INSERT INTO partition_item VALUES ('daily_bar','2026-10-09','XSHG:600001','success','tencent',?)", [now])
-    connection.close()
-
-    with MetadataStore(path) as metadata:
-        assert metadata.partition("daily_bar", "stock", "2026-10-09", adjustment="legacy_mixed")["manifest_path"] == "old.json"
-        assert metadata.item_statuses("daily_bar", "2026-10-09", adjustment="legacy_mixed") == {
-            "XSHG:600001": ItemStatus.SUCCESS
-        }
-        assert metadata.partition("daily_bar", "stock", "2026-10-09", adjustment="none") is None
+    original = b"DuckDB legacy database bytes; migration is not supported"
+    path.write_bytes(original)
+    with pytest.raises(ValueError, match="legacy DuckDB is not migrated"):
+        MetadataStore(path)
+    assert path.read_bytes() == original
 
 
 @pytest.mark.parametrize("relative", ["../escape.json", "/absolute.json", "nested/../../escape.json", "."])

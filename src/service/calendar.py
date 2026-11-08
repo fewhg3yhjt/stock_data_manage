@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from datetime import date, datetime, timezone
 from typing import Iterable, Mapping
 
-import duckdb
+from ..storage.metadata import open_runtime_database
 
 
 @dataclass(frozen=True, slots=True)
@@ -48,9 +48,15 @@ def merge_calendar_sources(
 
 
 class TradingCalendarStore(AbstractContextManager["TradingCalendarStore"]):
-    def __init__(self, path: str = ":memory:") -> None:
-        self.connection = duckdb.connect(path)
-        self.connection.execute(
+    def __init__(self, path: str = ":memory:", *, read_only: bool = False) -> None:
+        self.path = str(path)
+        self.read_only = read_only
+        self.connection = open_runtime_database(self.path, read_only=read_only, purpose="calendar")
+        if not read_only:
+            self._create_schema()
+
+    def _create_schema(self) -> None:
+        self.connection.executescript(
             """
             CREATE TABLE IF NOT EXISTS trading_calendar (
                 trade_date DATE PRIMARY KEY, is_trading_day BOOLEAN NOT NULL,
@@ -62,8 +68,10 @@ class TradingCalendarStore(AbstractContextManager["TradingCalendarStore"]):
 
     def upsert(self, days: Iterable[CalendarDay]) -> None:
         now = datetime.now(timezone.utc)
-        for day in days:
-            self.connection.execute(
+        batch = tuple(days)
+        self.connection.execute("BEGIN IMMEDIATE")
+        try:
+            self.connection.executemany(
                 """
                 INSERT INTO trading_calendar VALUES (?, ?, ?, ?, ?, ?)
                 ON CONFLICT (trade_date) DO UPDATE SET
@@ -71,8 +79,13 @@ class TradingCalendarStore(AbstractContextManager["TradingCalendarStore"]):
                     priority=excluded.priority, evidence=excluded.evidence,
                     updated_at=excluded.updated_at
                 """,
-                [day.trade_date, day.is_trading_day, day.source, day.priority, day.evidence, now],
+                ([day.trade_date, day.is_trading_day, day.source, day.priority, day.evidence, now]
+                 for day in batch),
             )
+            self.connection.execute("COMMIT")
+        except Exception:
+            self.connection.execute("ROLLBACK")
+            raise
 
     def is_trading_day(self, value: date) -> bool | None:
         row = self.connection.execute(
@@ -92,7 +105,7 @@ class TradingCalendarStore(AbstractContextManager["TradingCalendarStore"]):
         rows = self.connection.execute(
             "SELECT trade_date, is_trading_day, source, priority, evidence FROM trading_calendar ORDER BY trade_date"
         ).fetchall()
-        return tuple(CalendarDay(row[0], row[1], row[2], row[3], row[4]) for row in rows)
+        return tuple(CalendarDay(row[0], bool(row[1]), row[2], row[3], row[4]) for row in rows)
 
     def close(self) -> None:
         self.connection.close()

@@ -333,7 +333,7 @@ def test_master_tick_reads_existing_calendar_refreshes_unknown_day_and_refuses_r
     from stock_data_manage.service.calendar import TradingCalendarStore, CalendarDay
     missing = collect_due_inputs(now=stamp(8, 0), config_root=ROOT / "config", data_root=tmp_path, dataset="security_master")
     assert "calendar coverage" in missing["jobs"][0]["reason"]
-    with TradingCalendarStore(str(tmp_path / "metadata/metadata.duckdb")) as calendar:
+    with TradingCalendarStore(str(tmp_path / "metadata/metadata.sqlite3")) as calendar:
         calendar.upsert([CalendarDay(DAY, False, "fixture", 1)])
     closed = collect_due_inputs(now=stamp(8, 0), config_root=ROOT / "config", data_root=tmp_path, dataset="security_master")
     assert closed["jobs"][0]["reason"] == "confirmed non-trading day"
@@ -354,7 +354,7 @@ def test_master_execute_with_known_calendar_never_refreshes(tmp_path, monkeypatc
     from stock_data_manage.service.calendar import TradingCalendarStore, CalendarDay
     from stock_data_manage.service.calendar_update import TradingCalendarUpdater
     (tmp_path / "metadata").mkdir()
-    with TradingCalendarStore(str(tmp_path / "metadata/metadata.duckdb")) as calendar:
+    with TradingCalendarStore(str(tmp_path / "metadata/metadata.sqlite3")) as calendar:
         calendar.upsert([CalendarDay(DAY, opened, "fixture", 1)])
     def forbidden(*args, **kwargs):
         raise AssertionError("known calendar must not be refreshed")
@@ -593,6 +593,6 @@ def test_runtime_scheduler_uses_unified_metadata_and_survives_restart(tmp_path):
     second=collect_due_inputs(now=stamp(9,35,6),**args)
     assert first["jobs"][0]["status"]=="candidate_complete"
     assert second["jobs"][0]["status"]=="already_attempted" and len(calls)==1
-    assert (tmp_path/"data/metadata/metadata.duckdb").exists()
+    assert (tmp_path/"data/metadata/metadata.sqlite3").exists()
     assert "report_path" not in first
     assert not (tmp_path/"data/task_archive").exists() and not (tmp_path/"data/canonical").exists()

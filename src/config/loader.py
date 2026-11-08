@@ -22,7 +22,7 @@ def load_storage_paths(config_root: str | Path, *, data_root: str | Path | None 
     configured = (project / settings.get("data_root", "data")).resolve()
     runtime = Path(data_root).resolve() if data_root is not None else configured
     defaults = {"raw_root": "raw", "workspace_root": "task_workspace", "archive_root": "task_archive",
-                "canonical_root": "canonical", "metadata_path": "metadata/metadata.duckdb"}
+                "canonical_root": "canonical", "metadata_path": "metadata/metadata.sqlite3"}
     paths = {"data_root": runtime}
     for name, default in defaults.items():
         configured_path = (project / settings.get(name, str(configured / default))).resolve()

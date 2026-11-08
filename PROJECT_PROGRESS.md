@@ -1,5 +1,22 @@
 # 项目开发进度
 
+## 2026-11-09 SQLite运行库实施（阶段1验收完成，后续链路继续实施）
+
+本阶段解决长任务持有DuckDB运行库连接会妨碍其他进程访问的存储基础，不把它当成FIFO或管理台已完成。用户已认可并发方案及必要版本替换，明确不迁移旧数据、只用隔离测试数据验证。Luna medium实现/执行测试，主模型设计与差异复核：现有MetadataStore九类表和同文件TradingCalendarStore改用SQLite；共享现有存储模块中的连接/类型辅助，单个调用上下文拥有连接，无隐式连接池；显式read_only、1秒busy_timeout、WAL/FULL、UTC/date/Decimal合同；attempt预占、任务不可变性检查、健康计数和日历批写使用短事务。默认路径改为`metadata/metadata.sqlite3`，旧DuckDB或不支持格式清楚拒绝、不覆盖、不自动迁移；移除原迁移分支及对应迁移测试。
+
+| 对原问题的验证 | 本次范围、方法及实际结果 | 证据/边界 |
+|---|---|---|
+| 空闲运行连接与另一进程读写共存 | 独立进程持有连接并模拟等待；另一独立进程读取同库日历、保存另一任务，业务值正确 | `test_runtime_sqlite`实际进程测试；没有把长事务跨网络等待 |
+| 原子占用及计数 | 两进程竞争同attempt仅一方成功；同Provider两次并发失败最终计数2；事务/批写异常无半份状态 | 含健康、分区、日历及不可变定义测试，不只检查请求返回 |
+| 类型、只读与旧数据保护 | 日期/UTC时区/Decimal、九类表读写、只读无业务表/行变化，旧库拒绝后原字节不变 | 不承诺SQLite引擎不创建必要协调sidecar，不使用immutable绕过在线一致性 |
+| 定向回归 | `test_raw_metadata`、`test_runtime_sqlite`、`test_provider_health`、`test_eastmoney_dividend`、完整`test_scheduler`共89项，89通过/0失败/0错误/0跳过，pytest18.18秒 | [JUnit](tmp/sqlite-runtime-implementation/stage-1/junit-targeted.xml)、[阶段证据](tmp/sqlite-runtime-implementation/stage-1/implementation-checks.json)；没有重跑无关全套或实时Provider |
+
+环境已隔离完成：`D:\Project\PythonProgram\stock_data_manage\tmp\runtime-sqlite-env\python.exe`，同进程实测Python3.13.18稳定/SQLite3.54.1，核心及test/web依赖齐全。原四个解释器均不合要求；uv与官方隔离Python候选均测得SQLite3.50.4，随后通过Conda仅在该隔离前缀约束修复版SQLite并用uv安装项目。首次pytest collection因现有contracts顶层pandas漏声明而未执行任何用例；已补`pyproject.toml`必需pandas声明并安装，保留首次错误证据，未把它计为89项业务失败。[环境及依赖记录](tmp/design-implementation-review-20261108/task-capability/sqlite-environment.json)。未修改系统PATH、原有解释器或生产数据；AGENTS默认测试解释器同步更新。
+
+设计对照符合本阶段存储合同，主模型复核后移除无实际调用必要的线程连接池、合并重复SQLite规则，修正UTC写入、读改写原子性与批日历回滚；静态语法错误也在实际测试前修正并留证。最终差异/空白/暂存范围检查通过；12个原有未提交修改文件有字节快照，相关loader只纳入本次默认路径，不相关改动不提交。新增测试文件职责同步CODE_STRUCTURE。没有新业务模块、兼容后端、迁移脚本、生产运行或来源切换。
+
+剩余：FIFO/范围受理、管理台及恢复接线、分区/索引/原文协调继续按确认方案实施；本阶段89项不证明18个API、28类场景、全市场生产或性能预算已通过。原640请求和小文件问题仍未修复。
+
 ## 2026-11-09 管理台与采集全链路并发场景梳理（设计提案，未实施）
 
 本阶段处理“长任务执行时，其他任务能否登记等待、管理台能否继续查询”的访问职责问题，不是修复75,132文件/2.61GB的实现阶段。静态检查当前工作树110个Python源文件，定位36处存储构造/底层连接（含非数据库的Parquet存储对象），逐项追踪19个Web路由中的18个API，形成28类并发场景。真实留存例子：11月5日日线summary已记录published/finished、7842行；同日股票分区5569/5573，当前证券清单manifest为11月2日7862条。读到留存状态不证明此刻任务在执行，未实际制造数据库争用；[访问清单及范围](tmp/design-implementation-review-20261108/task-capability/concurrency-access-inventory.json)。

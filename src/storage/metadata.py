@@ -5,15 +5,94 @@ from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
 import json
 from pathlib import Path
+import sqlite3
+from decimal import Decimal
 from typing import Mapping
-
-import duckdb
+from urllib.parse import quote
 
 from ..providers.probes import ProbeEvidence
 from ..quality.resolution import Conflict
 from ..domain import AttemptStatus, DividendEvent, ItemStatus
 from ..worker.attempts import CollectionAttempt
 from .integrity import Manifest, row_hash
+
+
+sqlite3.register_adapter(date, lambda value: value.isoformat())
+
+
+def _adapt_datetime_utc(value: datetime) -> str:
+    normalized = value.replace(tzinfo=timezone.utc) if value.tzinfo is None else value.astimezone(timezone.utc)
+    return normalized.isoformat()
+
+
+sqlite3.register_adapter(datetime, _adapt_datetime_utc)
+sqlite3.register_adapter(Decimal, str)
+sqlite3.register_converter("DATE", lambda value: date.fromisoformat(value.decode("ascii")))
+sqlite3.register_converter("BOOLEAN", lambda value: bool(int(value)))
+
+
+def _convert_datetime_utc(value: bytes) -> datetime:
+    parsed = datetime.fromisoformat(value.decode("ascii"))
+    return parsed.replace(tzinfo=timezone.utc) if parsed.tzinfo is None else parsed.astimezone(timezone.utc)
+
+
+sqlite3.register_converter("TIMESTAMPTZ", _convert_datetime_utc)
+sqlite3.register_converter("DECIMAL_TEXT", lambda value: Decimal(value.decode("ascii")))
+
+
+RUNTIME_DATABASE_BUSY_TIMEOUT_MS = 1_000
+
+
+def open_runtime_database(
+    path: str | Path,
+    *,
+    read_only: bool = False,
+    purpose: str = "metadata",
+) -> sqlite3.Connection:
+    """Open one caller-owned SQLite connection with the runtime durability contract."""
+    version = sqlite3.sqlite_version_info
+    if not (version >= (3, 51, 3) or version in {(3, 50, 7), (3, 44, 6)}):
+        raise RuntimeError(
+            f"SQLite {sqlite3.sqlite_version} lacks the required WAL-reset fix "
+            "(need >=3.51.3 or backported 3.50.7/3.44.6)"
+        )
+    database_path = str(path)
+    if database_path == ":memory:":
+        if read_only:
+            raise FileNotFoundError(f"SQLite {purpose} database does not exist: {database_path}")
+        target, uri = database_path, False
+    else:
+        file_path = Path(database_path)
+        if read_only and not file_path.is_file():
+            raise FileNotFoundError(f"SQLite {purpose} database does not exist: {database_path}")
+        if not read_only:
+            file_path.parent.mkdir(parents=True, exist_ok=True)
+        if file_path.exists():
+            with file_path.open("rb") as stream:
+                header = stream.read(16)
+            if header and header != b"SQLite format 3\x00":
+                raise ValueError(
+                    f"unsupported {purpose} database (expected SQLite; legacy DuckDB is not migrated): {database_path}"
+                )
+        if read_only:
+            resolved_path = str(file_path.resolve()).replace(chr(92), "/")
+            target = f"file:{quote(resolved_path, safe='/:')}?mode=ro"
+            uri = True
+        else:
+            target, uri = database_path, False
+    connection = sqlite3.connect(
+        target,
+        uri=uri,
+        timeout=RUNTIME_DATABASE_BUSY_TIMEOUT_MS / 1000,
+        isolation_level=None,
+        detect_types=sqlite3.PARSE_DECLTYPES,
+        check_same_thread=True,
+    )
+    connection.execute(f"PRAGMA busy_timeout={RUNTIME_DATABASE_BUSY_TIMEOUT_MS}")
+    if not read_only:
+        connection.execute("PRAGMA journal_mode=WAL")
+        connection.execute("PRAGMA synchronous=FULL")
+    return connection
 
 
 @dataclass(frozen=True, slots=True)
@@ -40,14 +119,15 @@ class ProviderHealth:
 
 
 class MetadataStore(AbstractContextManager["MetadataStore"]):
-    def __init__(self, path: str | Path = ":memory:") -> None:
-        if path != ":memory:":
-            Path(path).parent.mkdir(parents=True, exist_ok=True)
-        self.connection = duckdb.connect(str(path))
-        self._create_schema()
+    def __init__(self, path: str | Path = ":memory:", *, read_only: bool = False) -> None:
+        self.path = str(path)
+        self.read_only = read_only
+        self.connection = open_runtime_database(self.path, read_only=read_only)
+        if not read_only:
+            self._create_schema()
 
     def _create_schema(self) -> None:
-        self.connection.execute(
+        self.connection.executescript(
             """
             CREATE TABLE IF NOT EXISTS partition_status (
                 dataset VARCHAR NOT NULL,
@@ -177,9 +257,9 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
                 source_security_code VARCHAR NOT NULL,
                 ex_dividend_date DATE NOT NULL,
                 record_date DATE,
-                pretax_bonus_rmb DECIMAL(38, 12),
-                bonus_ratio DECIMAL(38, 12),
-                transfer_ratio DECIMAL(38, 12),
+                pretax_bonus_rmb DECIMAL_TEXT,
+                bonus_ratio DECIMAL_TEXT,
+                transfer_ratio DECIMAL_TEXT,
                 assignment_progress VARCHAR,
                 notice_date DATE,
                 source_provider VARCHAR NOT NULL,
@@ -191,35 +271,33 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
             );
             """
         )
-        self._migrate_partition_adjustment_dimension()
-        for statement in (
-            "ALTER TABLE capability_registry ADD COLUMN IF NOT EXISTS request_scope_json VARCHAR DEFAULT '[]'",
-            "ALTER TABLE capability_registry ADD COLUMN IF NOT EXISTS response_status INTEGER",
-            "ALTER TABLE capability_registry ADD COLUMN IF NOT EXISTS returned_window VARCHAR",
-            "ALTER TABLE capability_registry ADD COLUMN IF NOT EXISTS field_semantics_json VARCHAR DEFAULT '[]'",
-            "ALTER TABLE capability_registry ADD COLUMN IF NOT EXISTS units_json VARCHAR DEFAULT '[]'",
-            "ALTER TABLE capability_registry ADD COLUMN IF NOT EXISTS adjustment VARCHAR DEFAULT 'none'",
-        ):
-            self.connection.execute(statement)
+        # A new SQLite file gets only the current schema. Legacy database
+        # formats and older SQLite schemas require an explicit migration tool.
 
     def save_collection_task(self, state: dict) -> None:
         """Durable business progress in the existing database, not a second queue."""
         from .raw import sanitized_metadata
         if state["status"] not in {"collecting", "checking", "committing", "failed", "published"}:
             raise ValueError("invalid collection task status")
-        previous = self.connection.execute(
-            "SELECT definition_hash FROM collection_task WHERE task_id=?", [state["task_id"]]
-        ).fetchone()
-        if previous and previous[0] != state["definition_hash"]:
-            raise ValueError("task definition is immutable; use a new task ID")
-        self.connection.execute(
-            """INSERT INTO collection_task VALUES (?, ?, ?, ?, ?, ?)
-               ON CONFLICT(task_id) DO UPDATE SET status=excluded.status,
-                   state_json=excluded.state_json, updated_at=excluded.updated_at""",
-            [state["task_id"], state["definition_hash"], state["dataset"], state["status"],
-             json.dumps(sanitized_metadata(state), ensure_ascii=False, default=str),
-             datetime.now(timezone.utc)],
-        )
+        state_json = json.dumps(sanitized_metadata(state), ensure_ascii=False, default=str)
+        self.connection.execute("BEGIN IMMEDIATE")
+        try:
+            previous = self.connection.execute(
+                "SELECT definition_hash FROM collection_task WHERE task_id=?", [state["task_id"]]
+            ).fetchone()
+            if previous and previous[0] != state["definition_hash"]:
+                raise ValueError("task definition is immutable; use a new task ID")
+            self.connection.execute(
+                """INSERT INTO collection_task VALUES (?, ?, ?, ?, ?, ?)
+                   ON CONFLICT(task_id) DO UPDATE SET status=excluded.status,
+                       state_json=excluded.state_json, updated_at=excluded.updated_at""",
+                [state["task_id"], state["definition_hash"], state["dataset"], state["status"],
+                 state_json, datetime.now(timezone.utc)],
+            )
+            self.connection.execute("COMMIT")
+        except Exception:
+            self.connection.execute("ROLLBACK")
+            raise
 
     def load_collection_task(self, task_id: str) -> dict | None:
         row = self.connection.execute(
@@ -307,7 +385,7 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
 
     def claim_attempt(self, attempt: CollectionAttempt, *, updated_at: datetime) -> bool:
         """Reserve a new scheduler slot atomically using the existing attempt table."""
-        self.connection.execute("BEGIN TRANSACTION")
+        self.connection.execute("BEGIN IMMEDIATE")
         try:
             if self.load_attempt(attempt.attempt_id) is not None:
                 self.connection.execute("ROLLBACK")
@@ -337,57 +415,6 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
             raw_object_path=row[5],
             raw_content_hash=row[6],
         )
-
-    def _migrate_partition_adjustment_dimension(self) -> None:
-        """Preserve old status rows while marking mixed daily partitions as legacy."""
-        status_columns = {row[1] for row in self.connection.execute(
-            "PRAGMA table_info('partition_status')").fetchall()}
-        if "adjustment" not in status_columns:
-            self.connection.execute("BEGIN TRANSACTION")
-            try:
-                self.connection.execute("ALTER TABLE partition_status RENAME TO partition_status_legacy_adjustment_v1")
-                self.connection.execute("""
-                    CREATE TABLE partition_status (
-                        dataset VARCHAR NOT NULL, asset_type VARCHAR NOT NULL, partition_key VARCHAR NOT NULL,
-                        adjustment VARCHAR NOT NULL DEFAULT 'none', expected_count BIGINT NOT NULL,
-                        actual_count BIGINT NOT NULL, status VARCHAR NOT NULL, manifest_path VARCHAR NOT NULL,
-                        content_hash VARCHAR NOT NULL, conflict_count BIGINT NOT NULL, quarantined_count BIGINT NOT NULL,
-                        updated_at TIMESTAMPTZ NOT NULL,
-                        PRIMARY KEY (dataset, asset_type, partition_key, adjustment))""")
-                self.connection.execute("""
-                    INSERT INTO partition_status SELECT dataset, asset_type, partition_key,
-                        CASE WHEN dataset='daily_bar' THEN 'legacy_mixed' ELSE 'none' END,
-                        expected_count, actual_count, status, manifest_path, content_hash,
-                        conflict_count, quarantined_count, updated_at
-                    FROM partition_status_legacy_adjustment_v1""")
-                self.connection.execute("DROP TABLE partition_status_legacy_adjustment_v1")
-                self.connection.execute("COMMIT")
-            except Exception:
-                self.connection.execute("ROLLBACK")
-                raise
-
-        item_columns = {row[1] for row in self.connection.execute(
-            "PRAGMA table_info('partition_item')").fetchall()}
-        if "adjustment" not in item_columns:
-            self.connection.execute("BEGIN TRANSACTION")
-            try:
-                self.connection.execute("ALTER TABLE partition_item RENAME TO partition_item_legacy_adjustment_v1")
-                self.connection.execute("""
-                    CREATE TABLE partition_item (
-                        dataset VARCHAR NOT NULL, partition_key VARCHAR NOT NULL,
-                        adjustment VARCHAR NOT NULL DEFAULT 'none', instrument_id VARCHAR NOT NULL,
-                        status VARCHAR NOT NULL, source_provider VARCHAR, updated_at TIMESTAMPTZ NOT NULL,
-                        PRIMARY KEY (dataset, partition_key, adjustment, instrument_id))""")
-                self.connection.execute("""
-                    INSERT INTO partition_item SELECT dataset, partition_key,
-                        CASE WHEN dataset='daily_bar' THEN 'legacy_mixed' ELSE 'none' END,
-                        instrument_id, status, source_provider, updated_at
-                    FROM partition_item_legacy_adjustment_v1""")
-                self.connection.execute("DROP TABLE partition_item_legacy_adjustment_v1")
-                self.connection.execute("COMMIT")
-            except Exception:
-                self.connection.execute("ROLLBACK")
-                raise
 
     def item_statuses(self, dataset: str, partition_key: str, *, adjustment: str = "none") -> dict[str, ItemStatus]:
         rows = self.connection.execute(
@@ -465,28 +492,26 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
                 ],
             )
             if resolved_statuses:
-                # Aligned lists become one relation; keep the partition and all
-                # item updates in the same transaction, including partial redo.
+                # Keep all item updates in the same transaction as the summary.
                 instrument_ids = list(resolved_statuses)
-                self.connection.execute(
-                    """
-                    INSERT INTO partition_item (dataset, partition_key, adjustment, instrument_id, status, source_provider, updated_at)
-                    SELECT ?, ?, ?, unnest(?::VARCHAR[]), unnest(?::VARCHAR[]),
-                           unnest(?::VARCHAR[]), ?
-                    ON CONFLICT (dataset, partition_key, adjustment, instrument_id) DO UPDATE SET
+                self.connection.executemany(
+                    """INSERT INTO partition_item (
+                           dataset, partition_key, adjustment, instrument_id, status, source_provider, updated_at
+                       ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                       ON CONFLICT (dataset, partition_key, adjustment, instrument_id) DO UPDATE SET
                         status=excluded.status,
                         source_provider=excluded.source_provider,
                         updated_at=excluded.updated_at
                     """,
-                    [
+                    ([
                         manifest.dataset,
                         manifest.partition_key,
                         manifest.adjustment,
-                        instrument_ids,
-                        [resolved_statuses[key].value for key in instrument_ids],
-                        [resolved_providers.get(key) for key in instrument_ids],
+                        key,
+                        resolved_statuses[key].value,
+                        resolved_providers.get(key),
                         now,
-                    ],
+                    ] for key in instrument_ids)
                 )
             self.connection.execute("COMMIT")
         except Exception:
@@ -607,71 +632,77 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
         failure_threshold: int = 3,
         http_status: int | None = None,
     ) -> ProviderHealth:
-        current = self.provider_health(
-            provider=provider,
-            endpoint=endpoint,
-            market=market,
-            asset_type=asset_type,
-            dataset=dataset,
-            capability_version=capability_version,
-        )
-        failures = (current.consecutive_failures if current else 0) + 1
-        immediate_open = http_status in {403, 429} or failure_class == "rate_limited"
-        should_open = immediate_open or failures >= failure_threshold
-        opened_at = now if should_open else (current.opened_at if current else None)
-        open_until = (
-            now + timedelta(seconds=cooldown_seconds)
-            if should_open
-            else (current.open_until if current else None)
-        )
-        self.connection.execute(
-            """
-            INSERT INTO provider_status VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT (provider, endpoint, market, asset_type, dataset, capability_version)
-            DO UPDATE SET
-                last_failure_at=excluded.last_failure_at,
-                opened_at=excluded.opened_at,
-                open_until=excluded.open_until,
-                cooldown_seconds=excluded.cooldown_seconds,
-                consecutive_failures=excluded.consecutive_failures,
-                http_403_count=excluded.http_403_count,
-                http_429_count=excluded.http_429_count,
-                last_failure_class=excluded.last_failure_class,
-                last_error=excluded.last_error
-            """,
-            [
-                provider,
-                endpoint,
-                market,
-                asset_type,
-                dataset,
-                capability_version,
-                current.enabled if current else True,
-                current.last_success_at if current else None,
-                now,
-                opened_at,
-                open_until,
-                cooldown_seconds,
-                failures,
-                current.last_probe_at if current else None,
-                current.probe_expires_at if current else None,
-                current.last_success_coverage if current else None,
-                (current.http_403_count if current else 0) + (1 if http_status == 403 else 0),
-                (current.http_429_count if current else 0) + (1 if http_status == 429 else 0),
-                failure_class,
-                error,
-            ],
-        )
-        result = self.provider_health(
-            provider=provider,
-            endpoint=endpoint,
-            market=market,
-            asset_type=asset_type,
-            dataset=dataset,
-            capability_version=capability_version,
-        )
-        assert result is not None
-        return result
+        self.connection.execute("BEGIN IMMEDIATE")
+        try:
+            current = self.provider_health(
+                provider=provider,
+                endpoint=endpoint,
+                market=market,
+                asset_type=asset_type,
+                dataset=dataset,
+                capability_version=capability_version,
+            )
+            failures = (current.consecutive_failures if current else 0) + 1
+            immediate_open = http_status in {403, 429} or failure_class == "rate_limited"
+            should_open = immediate_open or failures >= failure_threshold
+            opened_at = now if should_open else (current.opened_at if current else None)
+            open_until = (
+                now + timedelta(seconds=cooldown_seconds)
+                if should_open
+                else (current.open_until if current else None)
+            )
+            self.connection.execute(
+                """
+                INSERT INTO provider_status VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT (provider, endpoint, market, asset_type, dataset, capability_version)
+                DO UPDATE SET
+                    last_failure_at=excluded.last_failure_at,
+                    opened_at=excluded.opened_at,
+                    open_until=excluded.open_until,
+                    cooldown_seconds=excluded.cooldown_seconds,
+                    consecutive_failures=excluded.consecutive_failures,
+                    http_403_count=excluded.http_403_count,
+                    http_429_count=excluded.http_429_count,
+                    last_failure_class=excluded.last_failure_class,
+                    last_error=excluded.last_error
+                """,
+                [
+                    provider,
+                    endpoint,
+                    market,
+                    asset_type,
+                    dataset,
+                    capability_version,
+                    current.enabled if current else True,
+                    current.last_success_at if current else None,
+                    now,
+                    opened_at,
+                    open_until,
+                    cooldown_seconds,
+                    failures,
+                    current.last_probe_at if current else None,
+                    current.probe_expires_at if current else None,
+                    current.last_success_coverage if current else None,
+                    (current.http_403_count if current else 0) + (1 if http_status == 403 else 0),
+                    (current.http_429_count if current else 0) + (1 if http_status == 429 else 0),
+                    failure_class,
+                    error,
+                ],
+            )
+            result = self.provider_health(
+                provider=provider,
+                endpoint=endpoint,
+                market=market,
+                asset_type=asset_type,
+                dataset=dataset,
+                capability_version=capability_version,
+            )
+            assert result is not None
+            self.connection.execute("COMMIT")
+            return result
+        except Exception:
+            self.connection.execute("ROLLBACK")
+            raise
 
     def record_provider_success(
         self,
@@ -688,62 +719,68 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
     ) -> ProviderHealth:
         if not 0 <= coverage <= 1:
             raise ValueError("coverage must be between zero and one")
-        current = self.provider_health(
-            provider=provider,
-            endpoint=endpoint,
-            market=market,
-            asset_type=asset_type,
-            dataset=dataset,
-            capability_version=capability_version,
-        )
-        probe_success = probe_ttl is not None
-        self.connection.execute(
-            """
-            INSERT INTO provider_status VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT (provider, endpoint, market, asset_type, dataset, capability_version)
-            DO UPDATE SET
-                last_success_at=excluded.last_success_at,
-                opened_at=excluded.opened_at,
-                open_until=excluded.open_until,
-                consecutive_failures=0,
-                last_probe_at=excluded.last_probe_at,
-                probe_expires_at=excluded.probe_expires_at,
-                last_success_coverage=excluded.last_success_coverage,
-                last_error=NULL
-            """,
-            [
-                provider,
-                endpoint,
-                market,
-                asset_type,
-                dataset,
-                capability_version,
-                current.enabled if current else True,
-                now,
-                current.last_failure_at if current else None,
-                None if probe_success else (current.opened_at if current else None),
-                None if probe_success else (current.open_until if current else None),
-                0,
-                0,
-                now if probe_success else (current.last_probe_at if current else None),
-                now + probe_ttl if probe_success and probe_ttl is not None else (current.probe_expires_at if current else None),
-                coverage,
-                current.http_403_count if current else 0,
-                current.http_429_count if current else 0,
-                current.last_failure_class if current else None,
-                None,
-            ],
-        )
-        result = self.provider_health(
-            provider=provider,
-            endpoint=endpoint,
-            market=market,
-            asset_type=asset_type,
-            dataset=dataset,
-            capability_version=capability_version,
-        )
-        assert result is not None
-        return result
+        self.connection.execute("BEGIN IMMEDIATE")
+        try:
+            current = self.provider_health(
+                provider=provider,
+                endpoint=endpoint,
+                market=market,
+                asset_type=asset_type,
+                dataset=dataset,
+                capability_version=capability_version,
+            )
+            probe_success = probe_ttl is not None
+            self.connection.execute(
+                """
+                INSERT INTO provider_status VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT (provider, endpoint, market, asset_type, dataset, capability_version)
+                DO UPDATE SET
+                    last_success_at=excluded.last_success_at,
+                    opened_at=excluded.opened_at,
+                    open_until=excluded.open_until,
+                    consecutive_failures=0,
+                    last_probe_at=excluded.last_probe_at,
+                    probe_expires_at=excluded.probe_expires_at,
+                    last_success_coverage=excluded.last_success_coverage,
+                    last_error=NULL
+                """,
+                [
+                    provider,
+                    endpoint,
+                    market,
+                    asset_type,
+                    dataset,
+                    capability_version,
+                    current.enabled if current else True,
+                    now,
+                    current.last_failure_at if current else None,
+                    None if probe_success else (current.opened_at if current else None),
+                    None if probe_success else (current.open_until if current else None),
+                    0,
+                    0,
+                    now if probe_success else (current.last_probe_at if current else None),
+                    now + probe_ttl if probe_success and probe_ttl is not None else (current.probe_expires_at if current else None),
+                    coverage,
+                    current.http_403_count if current else 0,
+                    current.http_429_count if current else 0,
+                    current.last_failure_class if current else None,
+                    None,
+                ],
+            )
+            result = self.provider_health(
+                provider=provider,
+                endpoint=endpoint,
+                market=market,
+                asset_type=asset_type,
+                dataset=dataset,
+                capability_version=capability_version,
+            )
+            assert result is not None
+            self.connection.execute("COMMIT")
+            return result
+        except Exception:
+            self.connection.execute("ROLLBACK")
+            raise
 
     @staticmethod
     def provider_available(health: ProviderHealth | None, now: datetime, *, for_probe: bool = False) -> bool:

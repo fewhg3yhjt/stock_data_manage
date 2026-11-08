@@ -6,6 +6,7 @@
 
 ## 当前目录约定
 
+- `tests/test_runtime_sqlite.py`用隔离运行库检验跨进程空闲连接共存、唯一attempt预占、健康计数原子更新及日历批次回滚；不启动来源或生产调度，不是迁移工具。
 - `.codex/config.toml`只配置本项目开发协作的子代理默认模型和推理强度；不设置主对话模型，不进入采集、存储或调度的运行配置。职责分工与交接要求由根目录`AGENTS.md`维护。
 - 正式代码直接位于 `src/`，不再建立 `src/stock_data_manage/` 或 `src/stockdata/`，各模块职责不变。
 - `src/__init__.py` 是逻辑包 `stock_data_manage` 的初始化文件，`src/cli.py` 是命令入口。`pyproject.toml` 显式将逻辑包映射到 `src/` 并列出Python包；新增含 `__init__.py` 的子包时同步更新该清单。
@@ -166,7 +167,7 @@
 | `storage/read_index.py` | 将来源报告和行选择器批量写入可重建的SQLite查询索引；以报告ID关联、按证券/业务日期筛选和分页，只保存定位与筛选字段，不复制业务原值或作为采集/发布门槛 |
 | `storage/hot.py` | SQLite WAL Hot Minute Store 和即时查询数据 |
 | `storage/parquet.py` | 来源字段合同的候选精确类型写入；Canonical Bar按日期/数据集/资产类型分区，复权保留记录主键；清单、文件锁和原子发布 |
-| `storage/metadata.py` | 既有DuckDB任务、日线分区、Attempt、调度占用、来源健康、证据和冲突；不再维护每日证券名单分区索引 |
+| `storage/metadata.py` | SQLite任务、日线分区、Attempt、调度占用、来源健康、证据和冲突；共享运行库连接/类型与只读合同，不迁移旧DuckDB，不维护每日证券名单分区索引 |
 | `storage/integrity.py` | 确定性 row hash、Manifest 生成和完整性校验 |
 | `storage/__init__.py` | 存储包说明，不承载业务实现 |
 
@@ -176,7 +177,7 @@
 |---|---|
 | `service/instruments.py` | Security Master 唯一当前 DuckDB 清单、证券字段变更历史和代码别名历史；提供记录映射、读取与事务更新 |
 | `service/instruments_update.py` | Security Master来源归并、有效状态/明确代码承接处理、人工生命周期覆盖与更新差异计算 |
-| `service/calendar.py` | Trading Calendar 存储、读取和来源合并 |
+| `service/calendar.py` | Trading Calendar在同一SQLite运行库的事务写入、只读查询和来源合并；复用storage.metadata连接合同 |
 | `service/calendar_update.py` | 交易日历来源更新、单日开市/休市轻量采集及证据引用、官方优先级，以及校验原在线证据后的正向日期导入 |
 | `service/market_data.py` | Canonical + Hot 的统一分钟查询服务 |
 | `service/web.py` | 只读运行台入口；从现有任务摘要、Raw manifest/body 和 Canonical manifest 生成展示接口；按类型、证券及业务日期查询已核验来源行，复用 YAML 字段说明和已发布证券名称辅助检索，不读写任务数据库 |

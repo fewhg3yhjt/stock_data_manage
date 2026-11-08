@@ -42,7 +42,8 @@
 ## 项目Python环境与测试执行
 
 - 项目 `pyproject.toml` 要求 Python `>=3.11`。每次测试前必须在即将运行测试的同一个解释器中记录 `sys.executable`、Python版本，并检查该次测试所需依赖；不能仅凭已激活环境、其他终端或机器上某个环境安装了依赖，就假定当前解释器可用。
-- 最近核验可完整运行本项目定向测试的解释器是 `D:\Program Files\Python\python.exe`（Python 3.13.0rc3）；该解释器同时具备 pytest、FastAPI、DuckDB、PyArrow、PyYAML 和 requests，并满足项目最低版本要求。运行项目测试时显式调用该绝对路径。它是预发布版本；若之后发现依赖齐全的稳定版项目环境，应先核对并更新本条约定。
+- 当前项目隔离测试解释器为 `D:\Project\PythonProgram\stock_data_manage\tmp\runtime-sqlite-env\python.exe`（2026-11-09同进程核实Python 3.13.18稳定版、SQLite 3.54.1）；已安装本项目`.[test,web]`，含pytest、FastAPI、httpx、DuckDB、PyArrow、PyYAML、pytz、requests、uvicorn及现有Provider合同需要的pandas。运行项目测试时显式调用该绝对路径，不依赖激活环境或PATH。环境就绪不等于业务测试通过，实际范围和结果见阶段进度；该隔离前缀不修改原有Python环境。
+- 旧解释器 `D:\Program Files\Python\python.exe` 为Python 3.13.0rc3、SQLite 3.45.3，不再作为SQLite运行库测试默认环境；不得用它执行新增WAL并发验收。可用于不导入业务运行库的只读静态检查，但不能把静态通过当作运行验证。
 - Windows机器级 `PATH` 已包含 `D:\Program Files\Python`，无需为了此次问题修改系统 PATH。但Codex的PowerShell执行进程在登录与非登录模式下都未继承任何Python/Conda PATH项，虽然进程变量 `CONDA_PREFIX` 指向 `D:\Program Files\miniconda3`；因此 `Get-Command python` 无法解析。Codex命令必须显式使用上面的解释器路径，不以进程默认 `python` 或 `CONDA_PREFIX` 推断实际解释器。
 - `D:\tools\miniconda3\python.exe`（Python 3.13.12）有 pytest、DuckDB、PyArrow、PyYAML 和 requests，但没有 FastAPI；它是核心测试依赖不完整的另一解释器，不作为完整日线测试的默认环境。
 - `D:\Program Files\miniconda3\python.exe`（Python 3.9.21）有 FastAPI，但低于项目要求，且没有 pytest、DuckDB 和 PyArrow；不要用它运行项目测试。`D:\Program Files\miniconda3\envs\ailearn\python.exe`（Python 3.11.15）有 pytest 和 FastAPI，但缺少 DuckDB 与 PyArrow，也不能单独运行完整日线测试。
