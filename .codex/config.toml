@@ -1,0 +1,6 @@
+# Keep the primary chat's model selection unchanged.
+# Approved implementation and test work is delegated to Luna at medium effort.
+[agents]
+enabled = true
+default_subagent_model = "gpt-6-luna"
+default_subagent_reasoning_effort = "medium"

@@ -6,6 +6,7 @@
 
 ## 当前目录约定
 
+- `.codex/config.toml`只配置本项目开发协作的子代理默认模型和推理强度；不设置主对话模型，不进入采集、存储或调度的运行配置。职责分工与交接要求由根目录`AGENTS.md`维护。
 - 正式代码直接位于 `src/`，不再建立 `src/stock_data_manage/` 或 `src/stockdata/`，各模块职责不变。
 - `src/__init__.py` 是逻辑包 `stock_data_manage` 的初始化文件，`src/cli.py` 是命令入口。`pyproject.toml` 显式将逻辑包映射到 `src/` 并列出Python包；新增含 `__init__.py` 的子包时同步更新该清单。
 - 根目录 `config/` 保存 YAML 参数、调度意图、字段模板和字段映射；`src/config/` 保存配置读取与校验代码。
