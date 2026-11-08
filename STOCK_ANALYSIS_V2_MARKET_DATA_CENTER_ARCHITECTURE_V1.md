@@ -32,7 +32,7 @@ market.fundamentals(...)
 market.market_snapshot(...)
 ```
 
-市场数据中心负责：数据源管理、能力路由、失败降级、字段与单位标准化、质量检查、原始数据留存、缺失补数、重跑、版本、发布、查询、运行状态和审计。
+市场数据中心负责：数据源管理、能力路由、失败降级、字段与单位标准化、质量检查、原始数据留存、缺失补数、重跑、合同版本追溯、发布、查询、运行状态和审计。正式行情仅维护当前数据，不提供旧行情快照。
 
 ---
 
@@ -72,7 +72,7 @@ market.market_snapshot(...)
 - 多来源管理
 - 数据标准化
 - 数据质量与修复
-- 数据持久化与版本
+- 数据持久化与合同版本追溯
 - 数据发布
 - 对外数据访问
 
@@ -112,40 +112,43 @@ pd.read_parquet("/data/...")
 
 ## 职责、对象关系与阶段合同
 
-以下图表达已确认的职责与设计，不强制为每个方框建立类、表或服务。当前正式任务只接通证券名单与单日日线；多来源策略和其他数据集须分别完成实现与验收。
+以下图表达目标职责与对象合同，不强制为每个方框建立类、表、进程或服务。2026-11-08补齐任务提交、FIFO等待和区间请求关系；当前正式任务仍只接通证券名单与单日日线，不能把目标架构当成已部署能力。正式行情只有一份当前数据，同一业务日期按授权范围覆盖，不设计旧行情快照；本轮不做按状态/时间的产物清理，后续清理需求单独设计。
 
 ### 4.1 逻辑架构框图：表达职责依赖
 
-框代表逻辑模块，箭头代表调用或依赖，不表示执行先后。虚线是配置绑定。采集策略只依赖来源的采集接口；解析与检查没有调用采集策略的依赖。
+框代表逻辑模块及现有承接位置，箭头代表职责依赖；具体执行顺序见任务流程与时序图。虚线是配置或证据引用。提交协调、等待与区间计划尚待实现，优先在现有worker/pipeline/storage职责内承接，不新增通用任务管理层。采集策略只处理获取，质量检查不反向联网。图不预设新的部署进程或消息服务，跨进程提交和元数据写入需在实施设计中给出明确承接。
 
 ```mermaid
 flowchart TB
-    CFG[配置装配<br/>任务、数据集、来源、策略与调度] -. 配置 .-> TASK[采集任务<br/>面向最终数据结果]
-    ENTRY[命令入口与调度<br/>触发同一个任务入口] --> TASK
-    TASK --> ACQ[采集策略<br/>指定来源或自动切源]
-    TASK --> PARSE[解析与标准化]
-    TASK --> CHECK[数据检查与构建]
-    TASK --> PUB[发布]
-    ACQ --> FETCH[来源适配器的采集行为]
-    PARSE --> DECODE[同一来源适配器的解析行为]
-    PARSE --> MAP[YAML 字段与单位映射]
-    CHECK --> DS[独立数据集合同<br/>字段、主键、分区与质量]
-    PUB --> DS
-    FETCH --> RAW[原始证据存储]
-    DECODE --> RAW
-    CHECK --> RESULT[候选结果与问题引用]
-    PUB --> CAN[规范数据与发布清单]
-    TASK --> META[既有执行记录与断点]
-    VIEW[只读查询与运行台] --> RESULT
-    VIEW --> RAW
-    VIEW --> CAN
+    CFG[config及loader<br/>任务、周期、来源和数据合同] -.-> SUB
+    CFG -.-> PLAN
+    CFG -.-> ACQ
+    UI[运行台及CLI<br/>手动范围、覆盖确认、状态查询] --> SUB[现有pipeline提交与准备职责<br/>范围冲突、授权、冻结，待补齐]
+    SCH[worker调度<br/>启用且到期时提交目标周期] --> SUB
+    SUB --> META[storage.metadata及运行文件<br/>等待、占用范围、断点和结果记录]
+    META --> FIFO[worker及pipeline执行协调<br/>整任务FIFO，待补齐]
+    FIFO --> TASK[pipeline.inputs<br/>运行生命周期与恢复]
+    TASK --> PLAN[pipeline.history及daily<br/>目标日期、来源窗口和请求量]
+    PLAN --> ACQ[routing及providers<br/>来源策略、健康、限速、协议获取]
+    ACQ --> RAW[storage.raw<br/>完整实际响应及请求证据]
+    RAW --> PARSE[同一Provider解析<br/>quality按配置标准化]
+    PARSE --> BUILD[pipeline.daily及quality<br/>批候选、逐日期聚合和覆盖检查]
+    BUILD --> PUB[storage.parquet及metadata<br/>日期分区合并、原子发布与收尾]
+    PUB --> CAN[canonical<br/>唯一当前行情，不保存旧行情快照]
+    TASK --> META
+    PUB --> META
+    CAN -. 原文引用 .-> RAW
+    UI --> QUERY[service查询及派生索引<br/>周期结果、当前行情、原始证据]
+    QUERY --> CAN
+    QUERY --> META
+    QUERY --> RAW
 ```
 
 数据集、来源和任务是核心业务概念；调度、执行记录、存储是支持机制，不为每个概念新增管理器或后台服务。数据检查可以使用既有文件和候选，但不发网络请求。未来本地导入可直接提供符合合同的候选，复用检查和发布，不需要伪造采集任务或来源。
 
 ### 4.2 UML 对象关联：数据与任务解耦
 
-类名是拟议合同，不要求每个方框新建一个Python类或数据表。实线箭头是引用，空心菱形是聚合；数据结果不由任务组合拥有，任务结束不销毁数据。基数说明多个任务可以写同一数据集、一个数据集可以有多个日期及范围结果。
+类名是逻辑领域对象，不要求每个方框新建一个Python类或数据表。任务定义、调度规则、运行记录、请求窗口和正式分区必须区分：一个任务定义可有多次运行，一次运行可包含多个来源窗口和日期结果；多次运行引用并更新同一当前正式分区，不各自拥有行情副本。空心菱形表达当前分区包含记录，运行结果记录只保存覆盖、状态及引用，不是旧行情快照。
 
 ```mermaid
 classDiagram
@@ -157,12 +160,17 @@ classDiagram
         partition_dimensions
         publication_rules
     }
-    class CollectionTask["采集任务"] {
+    class CollectionTask["任务定义"] {
         name
         target_scope
         dataset_ref
         acquisition_policy_ref
-        execute()
+        date_scope_rule
+    }
+    class ScheduleRule["调度规则"] {
+        task_ref
+        frequency
+        enabled
     }
     class SourceContract["来源输入合同"] {
         input_id
@@ -181,12 +189,19 @@ classDiagram
         manifest_ref
         representation
     }
-    class DataResult["数据结果"] {
+    class DataResult["本次运行结果记录"] {
         dataset_ref
         partition_scope
-        artifact_ref
+        current_partition_ref
         quality_summary
         issue_refs
+    }
+    class CanonicalPartition["唯一当前正式分区"] {
+        dataset_ref
+        bar_period
+        trade_date
+        asset_type
+        current_data_ref
     }
     class DataRecord["数据记录"] {
         business_key
@@ -195,20 +210,36 @@ classDiagram
     }
     class ExecutionRecord["内部执行记录"] {
         task_id
+        submitted_at
         frozen_scope
         target_dates
-        request_windows
+        overwrite_scope
+        status
         stage
         acquisition_attempts
     }
+    class RequestWindow["来源请求窗口"] {
+        source_ref
+        security_scope
+        start_date
+        end_date
+        requested_rows
+    }
     CollectionTask "0..*" --> "1" DataSet : 目标数据合同
+    ScheduleRule "0..*" --> "1" CollectionTask : 引用任务
     CollectionTask "0..*" --> "1" AcquisitionPolicy : 采用
     AcquisitionPolicy "0..*" --> "1..*" SourceContract : 允许的来源
     CollectionTask "1" --> "0..*" ExecutionRecord : 留存执行历史
+    ExecutionRecord "1" --> "1..*" RequestWindow : 冻结来源计划
+    RequestWindow "0..*" --> "1" SourceContract : 遵循协议和容量
+    RequestWindow "0..*" --> "0..*" RawResponse : 取得或复用响应
     ExecutionRecord "0..*" --> "0..*" RawResponse : 记录实际取得的证据
     ExecutionRecord "0..*" --> "0..*" DataResult : 记录处理与交付结果
     DataResult "0..*" --> "1" DataSet : 遵循
-    DataResult "1" o-- "0..*" DataRecord : 包含
+    DataResult "0..*" --> "0..*" CanonicalPartition : 记录本次更新及当前引用
+    DataSet "1" --> "0..*" CanonicalPartition : 按日期及类型组织
+    CanonicalPartition "1" o-- "0..*" DataRecord : 只保存当前记录
+    CanonicalPartition "0..*" --> "0..*" RawResponse : 当前值的来源证据
     DataResult "0..*" --> "0..*" RawResponse : 可追溯来源
     RawResponse "0..*" --> "1" SourceContract : 来自
 ```
