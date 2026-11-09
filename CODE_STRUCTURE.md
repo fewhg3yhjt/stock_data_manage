@@ -54,7 +54,7 @@
 | `docs/providers/源头采集接口说明.xlsx.inspect.ndjson` | 既有接口说明表的逐行 JSON 检查快照，记录工作表、单元格样式与公式，不作为当前配置或生产资格依据 |
 | `docs/providers/security-catalog.md` | 当前股票和ETF来源范围、日期、分类与差异 |
 | `docs/pipeline/collection-tasks.md` | 获取、检查、发布、重做、证券清单调度和恢复；分别维护设计稿的阶段时序、故障决策表与当前入口、名单、日线、分钟及恢复流程框图 |
-| `docs/storage/README.md` | 数据分层、日期唯一、实际文件名与内容示例、字段解读、生成/读取/保留规则、原始引用与归档；精简方向与当前实现分开标注 |
+| `docs/storage/README.md` | 数据分层、历史文件实例、原始引用与归档；正式日K入表目标的表结构、发布事务、独立覆盖基准、归属恢复及替换验收主要维护位置，设计与当前实现分开标注 |
 | `docs/service/read-only-web.md` | 本机只读运行台的用途、读取来源、启动方式、状态语义、安全边界与云端部署前置条件 |
 | `docs/service/container-deployment.md` | 只读运行台的 Docker/Compose 部署、代码挂载更新、持久数据只读挂载及网络安全边界 |
 | `PROVIDER_CAPABILITY_MATRIX.md` | 2026-10-03历史抽样及证据索引，不是当前能力清单 |

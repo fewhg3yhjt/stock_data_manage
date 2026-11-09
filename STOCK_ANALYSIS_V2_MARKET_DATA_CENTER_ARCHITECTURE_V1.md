@@ -133,8 +133,8 @@ flowchart TB
     ACQ --> RAW[storage.raw<br/>完整实际响应及请求证据]
     RAW --> PARSE[同一Provider解析<br/>quality按配置标准化]
     PARSE --> BUILD[pipeline.daily及quality<br/>批候选、逐日期聚合和覆盖检查]
-    BUILD --> PUB[storage.parquet及metadata<br/>日期分区合并、原子发布与收尾]
-    PUB --> CAN[canonical<br/>唯一当前行情，不保存旧行情快照]
+    BUILD --> PUB[storage日K表发布及metadata<br/>按日期资产事务覆盖、摘要与回执]
+    PUB --> CAN[同机SQLite正式日K表<br/>唯一当前行情，不保存旧行情快照]
     TASK --> META
     PUB --> META
     CAN -. 原文引用 .-> RAW
@@ -146,7 +146,9 @@ flowchart TB
 
 数据集、来源和任务是核心业务概念；调度、执行记录、存储是支持机制，不为每个概念新增管理器或后台服务。数据检查可以使用既有文件和候选，但不发网络请求。未来本地导入可直接提供符合合同的候选，复用检查和发布，不需要伪造采集任务或来源。
 
-2026-11-09用户已确认并发细化方案：运行库承接短事务任务/日历/资格健康状态，从DuckDB替换为本机SQLite，允许必要版本调整，不做旧数据迁移；不另建排队数据库或常驻服务。管理台任务读取、手动日历预检、证券名称、Parquet当前行情、来源行索引和原文下载分别访问不同资源，不能以一个数据库选型替代所有协调。唯一执行权与数据库短事务、分区读写协调分开，环境及新库初始化合同见[存储边界](docs/storage/README.md#并发访问与资源边界)，28类并发场景及当前/目标流向见[任务设计](docs/pipeline/collection-tasks.md#并发访问场景清单及执行流程2026-11-08提案未实施)，18个API的资源映射见[管理台设计](docs/service/read-only-web.md#管理台并发访问逐接口检查2026-11-08提案未实施)。这些是确认目标，各阶段实际实现及隔离测试结果在PROJECT_PROGRESS记录；没有实际通过的能力不能算完成。
+2026-11-09运行库SQLite替换已完成隔离定向验收，但不证明FIFO、管理台和正式日K已完成。用户随后确认正式日K、证券日期状态和分区摘要入表方向：任务进度与当前数据覆盖分离，按日期＋资产类型分别发布，覆盖采集失败保持已有有效行情；正式数据不双写Parquet，不迁移旧数据。上图已改为该目标，源码日K仍是文件实现。逻辑日期/资产分区仍存在，不代表继续创建日期行情目录。表结构、事务、精度、覆盖基准、首次执行归属及替换/验收清单只在[入表合同](docs/storage/README.md#正式日k入表与覆盖统计2026-11-09方向及业务边界已确认设计细化稿未实施)维护，不在总体设计复制字段规则。证券主清单、原文与来源索引各自资源合同继续适用，未因此一并迁库。
+
+运行库环境及初始化见[存储边界](docs/storage/README.md#并发访问与资源边界)，任务FIFO与活动范围见[任务设计](docs/pipeline/collection-tasks.md#并发访问场景清单及执行流程2026-11-08提案未实施)，18个API的目标资源映射见[管理台设计](docs/service/read-only-web.md#管理台并发访问逐接口检查2026-11-08提案未实施)。各阶段实际实现、偏差和隔离结果以PROJECT_PROGRESS为准。
 
 ### 4.2 UML 对象关联：数据与任务解耦
 
@@ -203,7 +205,8 @@ classDiagram
         bar_period
         trade_date
         asset_type
-        current_data_ref
+        data_revision
+        current_publication_ref
     }
     class DataRecord["数据记录"] {
         business_key
@@ -361,7 +364,7 @@ HTTP 200但HTML错误页、无效JSON、空业务数组、重复日期或价格�
 | 标准对象 | domain中的数据类和枚举；没有以Pydantic替代现有模型 |
 | 配置与标准化 | YAML、config/loader.py、quality/normalization.py |
 | 任务与构建 | pipeline/inputs.py、pipeline/daily.py；名单、分钟等模块各自承接业务 |
-| 持久化 | DuckDB元数据、Parquet正式数据、SQLite分钟热存储、文件原始证据 |
+| 持久化 | 已实现SQLite运行元数据/日历、DuckDB证券清单、Parquet正式日K及其他分区、SQLite分钟热存储、文件原始证据；日K入表是已确认方向，尚未实现 |
 | 查询与观察 | 现有FastAPI只读运行台、规范日线与分钟查询 |
 | 调度 | 到期判断与单次触发；配置启用不表示已部署常驻进程 |
 
