@@ -5,6 +5,7 @@ from copy import deepcopy
 from dataclasses import asdict
 from datetime import date, datetime
 from decimal import Decimal
+import json
 from pathlib import Path
 
 import yaml
@@ -12,7 +13,7 @@ import yaml
 from ..domain import Adjustment, AssetType, DailyRecord, QuoteGroup, QuoteStatus, ItemStatus
 from ..quality.publication import PublicationPolicy
 from ..storage.integrity import file_hash, row_hash
-from ..storage.parquet import CanonicalPartitionStore, DAILY_SCHEMA_VERSION
+from ..storage.parquet import DAILY_SCHEMA_VERSION
 from ..config.loader import load_input_capabilities
 
 
@@ -222,10 +223,13 @@ def write_daily_candidate_batches(items, *, work, attempt, sequences, config_roo
         directory = Path(work) / "candidates" / asset_type / input_id
         directory.mkdir(parents=True, exist_ok=True)
         sequence = sequences.get(sequence_key, 0) + 1
-        path = directory / f"candidate-batch-attempt-{attempt:03d}-{sequence:06d}.parquet"
+        # Keep the leaf short enough for Windows roots that include a long
+        # temporary/test workspace path. The parent already names the asset
+        # and source input; attempt and sequence identify this immutable batch.
+        path = directory / f"candidate-{attempt:03d}-{sequence:06d}.parquet"
         while path.exists():
             sequence += 1
-            path = directory / f"candidate-batch-attempt-{attempt:03d}-{sequence:06d}.parquet"
+            path = directory / f"candidate-{attempt:03d}-{sequence:06d}.parquet"
         sequences[sequence_key] = sequence
         rows = [entry["_candidate_rows"][0] for _unit, entry in group]
         fields = group[0][1]["_candidate_fields"]
@@ -556,10 +560,12 @@ def _source_capture_time(raw_manifest):
 def prepare_daily_task_publication(state, units, source_rows, paths, config_root, trade_date):
     definition = state["definition"]
     asset = AssetType(definition["asset_type"])
-    expected = {u["symbol"]: u.get("instrument_id") or
-        {"sh": "XSHG", "sz": "XSHE", "bj": "BSE"}[u["symbol"][:2]] + ":" + u["symbol"][2:] for u in units}
     selected = set(state.get("selected_symbols", ()))
-    suspended = [] if selected else list(definition.get("suspended_securities", ()))
+    expected = {u["symbol"]: u.get("instrument_id") or
+        {"sh": "XSHG", "sz": "XSHE", "bj": "BSE"}[u["symbol"][:2]] + ":" + u["symbol"][2:]
+        for u in units if not selected or u["symbol"] in selected}
+    suspended = [item for item in definition.get("suspended_securities", ())
+                 if item.get("asset_type") == asset.value and (not selected or item["symbol"] in selected)]
     lifecycle_exclusions = [] if selected else list(definition.get("lifecycle_exclusions", ()))
     target_ids = {identity for symbol, identity in expected.items() if not selected or symbol in selected}
     target_ids.update(item["instrument_id"] for item in suspended)
@@ -636,11 +642,7 @@ def prepare_daily_task_publication(state, units, source_rows, paths, config_root
             "code": "manual_lifecycle_exclusion", "status": item["status"],
             "reason": "manual lifecycle override excludes the security from the target-date universe",
             "status_evidence": item["status_evidence"], "impact": item["impact"]})
-    store = CanonicalPartitionStore(paths["canonical_root"])
-    existing = store.read_daily(asset.value, trade_date.isoformat())
     available = {r.instrument_id for r in records}
-    if state["redo"] != "full":
-        available.update(r.instrument_id for r in existing if r.instrument_id not in target_ids)
     statuses = {identity: ItemStatus.SUCCESS.value if identity in available else ItemStatus.MISSING.value for identity in expected.values()}
     statuses.update({item["instrument_id"]: ItemStatus.NO_TRADE.value for item in suspended})
     state["daily_check"] = {"issues": issues, "item_statuses": statuses,
@@ -649,9 +651,32 @@ def prepare_daily_task_publication(state, units, source_rows, paths, config_root
         "lifecycle_exclusions": lifecycle_exclusions}
     settings = definition["publication_policy"]
     policy = PublicationPolicy(Decimal(str(settings["max_missing_ratio"])), settings["max_missing_count"])
-    if not policy.allows(expected_count=len(expected), actual_count=state["daily_check"]["actual_count"]):
+    if not expected and suspended:
+        # An all-suspended universe has no price denominator, but it still has
+        # explicit per-security business facts to publish below.
+        pass
+    elif not policy.allows(expected_count=len(expected), actual_count=state["daily_check"]["actual_count"]):
         raise PublicationThresholdExceeded("daily aggregate coverage rejected; see per-adjustment issues")
-    return {"records": records, "partition_directory": str(store.daily_directory(asset.value, trade_date.isoformat())),
-        "asset_type": asset.value, "partition_key": trade_date.isoformat(), "expected_count": len(expected),
-        "item_statuses": statuses, "replace_ids": sorted(target_ids), "adjustment": "aggregate",
+    publication_statuses = {identity: statuses[identity] for identity in target_ids}
+    from ..storage.daily import NoTradeFact
+    no_trade = {}
+    task_id = state.get("task_id")
+    evidence = state.get("definition_ref")
+    if suspended and (not isinstance(task_id, str) or not task_id.strip()
+            or not isinstance(evidence, dict) or not evidence.get("path")
+            or not isinstance(evidence.get("sha256"), str) or not evidence["sha256"].strip()):
+        raise ValueError("confirmed no_trade publication requires a persisted task ID and hashed frozen definition")
+    for item in suspended:
+        if item["asset_type"] != asset.value:
+            continue
+        basis = item.get("status_evidence", {}).get("basis")
+        reason = ("manual lifecycle override marks the target date suspended"
+            if basis == "manual_security_lifecycle_override"
+            else "target-date BaoStock tradeStatus=0; no daily bar is required")
+        evidence_ref = json.dumps({"task_id": task_id, "path": "task.json",
+            "sha256": evidence["sha256"], "instrument_id": item["instrument_id"]},
+            sort_keys=True, separators=(",", ":"))
+        no_trade[item["instrument_id"]] = NoTradeFact(reason, evidence_ref)
+    return {"records": records, "asset_type": asset.value, "partition_key": trade_date.isoformat(),
+        "item_statuses": publication_statuses, "scope_ids": sorted(target_ids), "no_trade": no_trade,
         "publication_metadata": {"schema_version": DAILY_SCHEMA_VERSION, "issues": issues}}

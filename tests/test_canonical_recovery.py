@@ -80,17 +80,19 @@ def test_recovery_finishes_replace_and_repairs_metadata(tmp_path, final_minute_b
     assert not list(partition_dir.glob("*.tmp.*"))
 
 
-def test_recovery_quarantines_unverifiable_orphan_temp_file(tmp_path) -> None:
+def test_recovery_reports_legacy_daily_file_without_moving_or_importing_it(tmp_path) -> None:
     canonical_root = tmp_path / "canonical"
     partition = canonical_root / "daily_bar" / "asset_type=stock" / "trade_date=2026-09-11"
     partition.mkdir(parents=True)
     orphan = partition / "data.crashed.tmp.parquet"
     orphan.write_bytes(b"partial")
+    original = orphan.read_bytes()
     with MetadataStore() as metadata:
         report = RecoveryScanner(canonical_root, metadata).recover()
-    assert report.quarantined_files == 1
-    assert not orphan.exists()
-    assert list((canonical_root / "_quarantine").rglob("data.crashed.tmp.parquet"))
+    assert report.quarantined_files == 0
+    assert str(orphan) in report.legacy_daily_files
+    assert orphan.exists() and orphan.read_bytes() == original
+    assert not (canonical_root / "_quarantine").exists()
 
 
 

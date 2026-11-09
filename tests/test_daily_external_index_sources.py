@@ -13,13 +13,36 @@ from stock_data_manage.providers.contracts import FailureClass, HttpResponse, Pr
 from stock_data_manage.providers.cnindex.daily import CnindexDailyProvider
 from stock_data_manage.providers.csindex.indices import CsindexDailyProvider
 from stock_data_manage.providers.transport import RequestPacer
-from stock_data_manage.storage.parquet import CanonicalPartitionStore
+from stock_data_manage.domain.models import AssetType
+from stock_data_manage.storage.daily import DailyBarStore
+from stock_data_manage.storage.metadata import MetadataStore
 from stock_data_manage.storage.raw import RawObjectStore
 
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG = ROOT / "config"
 DAY = "2026-10-29"
+
+
+def _published_index_rows(data_root, task_id):
+    """Return persisted current index rows and their task delivery receipts."""
+    with MetadataStore(data_root / "metadata" / "metadata.sqlite3", read_only=True) as metadata:
+        store = DailyBarStore(metadata.connection)
+        rows, total = store.list_records(asset_type=AssetType.INDEX,
+            date_from=date.fromisoformat(DAY), date_to=date.fromisoformat(DAY), limit=100)
+        receipts = store.publication_receipts(task_id=task_id, trade_date=date.fromisoformat(DAY),
+            asset_type=AssetType.INDEX)
+    return rows, total, receipts
+
+
+def _assert_publication_result(result, total, receipts):
+    refs = result["publication_refs"]
+    assert len(refs) == len(receipts) == 1
+    assert refs[0]["publication_id"] == receipts[0]["publication_id"]
+    assert refs[0]["row_count"] == receipts[0]["written_count"] == total
+    assert refs[0]["current_partition_count"] == total
+    assert result["publication_id"] == refs[0]["publication_id"]
+    assert result["current_partition_count"] == total
 
 
 def _response_manifest(tmp_path, *, provider, endpoint, url, body, parameters):
@@ -136,7 +159,10 @@ def test_csindex_399962_close_only_replay_publishes_with_logical_identity_and_un
         collector_options={"pacer": RequestPacer(wait=lambda _: None)})
 
     assert result["status"] == "published" and result["complete_today"]
-    record = CanonicalPartitionStore(tmp_path / "csi-962-business/canonical").read_daily("index", DAY)[0]
+    rows, total, receipts = _published_index_rows(tmp_path / "csi-962-business", "csi-399962-close-only")
+    assert total == 1 and len(rows) == 1 and len(receipts) == 1
+    _assert_publication_result(result, total, receipts)
+    record = rows[0]
     assert record.instrument_id == "XSHE:399962"
     assert record.none.source_provider == "csindex" and record.none.value_contract == "close_only"
     assert record.none.open is None and record.none.high is None and record.none.low is None
@@ -148,14 +174,17 @@ def test_saved_csindex_399962_response_replays_through_the_daily_publication(tmp
     manifest = ROOT / "tmp/batch-remediation-20261029/interface-review/raw/csi-daily-sh000962/manifest.ndjson"
     if not manifest.exists():
         pytest.skip("the retained target-date CSI response is not present in this checkout")
-    result = collect_task(definition=_task("csi-399962-saved-response", "sz399962", str(manifest)),
-        config_root=CONFIG, data_root=tmp_path / "csi-962-saved-response", mode="replay",
+    result = collect_task(definition=_task("saved-csi-962", "sz399962", str(manifest)),
+        config_root=CONFIG, data_root=tmp_path / "business", mode="replay",
         collector_options={"pacer": RequestPacer(wait=lambda _: None)})
 
     assert result["status"] == "published" and result["complete_today"]
     assert result["verification_mode"] == "replay"
     assert result["progress"]["stages"]["raw"]["reused"] == 1
-    record = CanonicalPartitionStore(tmp_path / "csi-962-saved-response/canonical").read_daily("index", DAY)[0]
+    rows, total, receipts = _published_index_rows(tmp_path / "business", "saved-csi-962")
+    assert total == 1 and len(rows) == 1 and len(receipts) == 1
+    _assert_publication_result(result, total, receipts)
+    record = rows[0]
     assert record.instrument_id == "XSHE:399962"
     assert record.none.source_provider == "csindex" and record.none.value_contract == "close_only"
     assert record.none.open is None and record.none.high is None and record.none.low is None
@@ -214,7 +243,9 @@ def test_csindex_paired_code_replay_publishes_full_ohlc_under_the_retained_list_
         collector_options={"pacer": RequestPacer(wait=lambda _: None)})
 
     assert result["status"] == "published" and result["complete_today"]
-    records = CanonicalPartitionStore(tmp_path / "csi-business/canonical").read_daily("index", DAY)
+    records, total, receipts = _published_index_rows(tmp_path / "csi-business", "csi-paired-ohlc")
+    assert total == 1 and len(receipts) == 1
+    _assert_publication_result(result, total, receipts)
     assert len(records) == 1
     record = records[0]
     assert record.instrument_id == "XSHE:399904"
@@ -233,7 +264,10 @@ def test_cnindex_replay_maps_four_prices_and_leaves_unverified_amount_volume_emp
         collector_options={"pacer": RequestPacer(wait=lambda _: None)})
 
     assert result["status"] == "published" and result["complete_today"]
-    record = CanonicalPartitionStore(tmp_path / "cni-business/canonical").read_daily("index", DAY)[0]
+    rows, total, receipts = _published_index_rows(tmp_path / "cni-business", "cni-index-daily")
+    assert total == 1 and len(rows) == 1 and len(receipts) == 1
+    _assert_publication_result(result, total, receipts)
+    record = rows[0]
     assert record.instrument_id == "XSHE:399299"
     assert record.none.source_provider == "cnindex" and record.none.value_contract == "full_ohlc"
     assert (record.none.open, record.none.high, record.none.low, record.none.close) == tuple(
@@ -258,6 +292,11 @@ def test_csindex_and_cnindex_candidates_aggregate_into_one_index_publication(tmp
         mode="replay", collector_options={"pacer": RequestPacer(wait=lambda _: None)})
 
     assert result["status"] == "published" and result["complete_today"]
-    rows = CanonicalPartitionStore(tmp_path / "mixed-business/canonical").read_daily("index", DAY)
+    rows, total, receipts = _published_index_rows(tmp_path / "mixed-business", "mixed-csi-cnindex-20261029")
+    assert total == 2 and len(receipts) == 1
+    assert len(result["publication_refs"]) == 1
+    assert result["publication_refs"][0]["publication_id"] == receipts[0]["publication_id"]
+    assert result["publication_refs"][0]["row_count"] == total
+    assert result["publication_refs"][0]["current_partition_count"] == total
     assert {row.instrument_id for row in rows} == {"XSHE:399904", "XSHE:399299"}
     assert {row.none.source_provider for row in rows} == {"csindex", "cnindex"}

@@ -133,9 +133,42 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
     def __init__(self, path: str | Path = ":memory:", *, read_only: bool = False) -> None:
         self.path = str(path)
         self.read_only = read_only
+        self._preflight_task_schema()
         self.connection = open_runtime_database(self.path, read_only=read_only)
+        self.connection.execute("PRAGMA foreign_keys=ON")
+        if self.connection.execute("PRAGMA foreign_keys").fetchone()[0] != 1:
+            raise RuntimeError("SQLite foreign key enforcement is required")
         if not read_only:
             self._create_schema()
+
+    def _preflight_task_schema(self) -> None:
+        """Inspect existing files read-only so rejected legacy roots remain byte-identical."""
+        if self.path == ":memory:" or not Path(self.path).is_file():
+            return
+        with Path(self.path).open("rb") as stream:
+            header = stream.read(16)
+        if header and header != b"SQLite format 3\x00":
+            # Let open_runtime_database preserve its established DuckDB/legacy error.
+            return
+        resolved = str(Path(self.path).resolve()).replace(chr(92), "/")
+        probe = sqlite3.connect(f"file:{quote(resolved, safe='/:')}?mode=ro", uri=True)
+        try:
+            table = probe.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='collection_task'").fetchone()
+            if table is None:
+                return
+            columns = {row[1] for row in probe.execute("PRAGMA table_info(collection_task)")}
+            if {"scope_json", "snapshot_json", "active_scope_json"} & columns:
+                raise ValueError("unsupported collection_task schema; fresh isolated runtime root required (no migration)")
+            context = probe.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='collection_task_context'").fetchone()
+            if context is None:
+                raise ValueError("collection_task_context is missing; fresh isolated runtime root required (no migration)")
+            context_columns = {row[1] for row in probe.execute("PRAGMA table_info(collection_task_context)")}
+            if not {"task_id", "scope_json", "snapshot_json", "active_scope_json"} <= context_columns:
+                raise ValueError("unsupported collection_task_context schema; fresh isolated runtime root required (no migration)")
+        finally:
+            probe.close()
 
     def _create_schema(self) -> None:
         self.connection.executescript(
@@ -201,10 +234,13 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
                 queue_order INTEGER,
                 first_accepted_at TIMESTAMPTZ,
                 queued_at TIMESTAMPTZ,
-                scope_json VARCHAR,
-                snapshot_json VARCHAR,
-                active_scope_json VARCHAR,
                 first_execution_order BIGINT
+            );
+            CREATE TABLE IF NOT EXISTS collection_task_context (
+                task_id VARCHAR PRIMARY KEY REFERENCES collection_task(task_id) ON DELETE CASCADE,
+                scope_json VARCHAR NOT NULL,
+                snapshot_json VARCHAR NOT NULL,
+                active_scope_json VARCHAR NOT NULL
             );
             CREATE INDEX IF NOT EXISTS collection_task_queue_idx
                 ON collection_task(status, queue_order, task_id);
@@ -311,8 +347,8 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
             );
             """
         )
-        # A new SQLite file gets only the current schema. Legacy database
-        # formats and older SQLite schemas require an explicit migration tool.
+        # Initialize only fresh isolated roots. Legacy formats and older schemas
+        # are rejected; this module does not migrate user data.
 
     def save_collection_task(self, state: dict) -> None:
         """Durable business progress in the existing database, not a second queue."""
@@ -328,7 +364,8 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
                 raise ValueError("task definition is immutable; use a new task ID")
             if previous and previous[1] is not None:
                 state = {**state, "first_execution_order": int(previous[1])}
-            state_json = json.dumps(sanitized_metadata(state), ensure_ascii=False, default=str)
+            persisted_state = {key: value for key, value in state.items() if key != "daily_overwrite_grant"}
+            state_json = json.dumps(sanitized_metadata(persisted_state), ensure_ascii=False, default=str)
             self.connection.execute(
                 """INSERT INTO collection_task (
                        task_id, definition_hash, dataset, status, state_json, updated_at
@@ -361,6 +398,20 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
             if common_ids:
                 conflicts.append({"trade_date": trade_date, "securities": common_ids})
         return tuple(conflicts)
+
+    def active_scope_conflict(self, scope: dict, *, exclude_task_id: str) -> tuple[str, tuple[dict, ...]] | None:
+        """Return the first overlapping active task; transaction ownership stays with the caller."""
+        active_rows = self.connection.execute(
+            "SELECT t.task_id,c.active_scope_json FROM collection_task t "
+            "JOIN collection_task_context c USING(task_id) "
+            "WHERE t.status IN ('waiting','collecting','checking','committing') "
+            "AND t.task_id<>? ORDER BY t.queue_order,t.task_id", [exclude_task_id]).fetchall()
+        for active_id, active_scope in active_rows:
+            if active_scope:
+                overlaps = self._scope_overlaps(scope, json.loads(active_scope))
+                if overlaps:
+                    return active_id, overlaps
+        return None
 
     @staticmethod
     def _scope_is_subset(candidate: dict, frozen: dict) -> bool:
@@ -397,7 +448,8 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
         return row_hash(rows)
 
     def enqueue_collection_task(self, state: dict, scope: dict, *, snapshot: dict,
-                                frozen_scope: dict | None = None) -> dict:
+                                frozen_scope: dict | None = None,
+                                daily_owner_refs: tuple[dict, ...] | None = None) -> dict:
         """Atomically validate a frozen scope and persist its FIFO position in the task row."""
         from .raw import sanitized_metadata
 
@@ -414,10 +466,13 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
         self.connection.execute("BEGIN IMMEDIATE")
         try:
             existing = self.connection.execute(
-                "SELECT definition_hash, status, state_json, queue_order, first_accepted_at, scope_json, snapshot_json, first_execution_order "
-                "FROM collection_task WHERE task_id=?", [task_id]
+                "SELECT t.definition_hash, t.status, t.state_json, t.queue_order, t.first_accepted_at, "
+                "c.scope_json, c.snapshot_json, t.first_execution_order "
+                "FROM collection_task t LEFT JOIN collection_task_context c USING(task_id) WHERE t.task_id=?", [task_id]
             ).fetchone()
             if existing:
+                if existing[5] is None or existing[6] is None:
+                    raise ValueError("collection task context is missing")
                 if existing[0] != state["definition_hash"]:
                     raise ValueError("task ID is frozen to a different definition")
                 if existing[5] and not self._scope_is_subset(frozen_scope or scope, json.loads(existing[5])):
@@ -427,21 +482,42 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
                     state = {**json.loads(existing[2]), "queue_order": existing[3], "already_queued": True}
                     if existing[7] is not None:
                         state["first_execution_order"] = int(existing[7])
+                    if existing[6]:
+                        frozen_snapshot = json.loads(existing[6])
+                        if "daily_overwrite_grant" in frozen_snapshot:
+                            state["daily_overwrite_grant"] = frozen_snapshot["daily_overwrite_grant"]
                     return state
 
-            if snapshot.get("registry_hash") != self.partition_registry_snapshot(scope):
+            if scope.get("dataset") == "daily_bar":
+                if scope.get("frequency") != "1d" or daily_owner_refs is None:
+                    raise ValueError("daily task admission requires a confirmed current-owner preview")
+                from .daily import DailyBarStore
+                current_owners = DailyBarStore(self.connection).current_owners(scope)
+                normalize = lambda refs: tuple(sorted(
+                    (json.dumps(ref, sort_keys=True, ensure_ascii=False, separators=(",", ":")) for ref in refs)))
+                if normalize(current_owners) != normalize(daily_owner_refs):
+                    raise CollectionTaskSnapshotChanged(
+                        "current daily bar/no_trade owners changed; preview and confirm again")
+                if existing and existing[6]:
+                    frozen_snapshot = json.loads(existing[6])
+                    authorization = frozen_snapshot.get("daily_overwrite_grant")
+                    if not isinstance(authorization, dict) or not isinstance(authorization.get("owners"), list):
+                        raise ValueError("daily task snapshot lacks its frozen overwrite grant")
+                    snapshot = frozen_snapshot
+                else:
+                    authorization = {"scope_hash": __import__("hashlib").sha256(
+                        json.dumps(scope, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode()).hexdigest(),
+                        "owners": list(current_owners)}
+                    snapshot = {**snapshot, "daily_overwrite_grant": authorization}
+                # Avoid the generic sanitizer's secret-key match on "authorization";
+                # this is a reviewed owner reference set, not a credential.
+                state["daily_overwrite_grant"] = authorization
+            elif snapshot.get("registry_hash") != self.partition_registry_snapshot(scope):
                 raise CollectionTaskSnapshotChanged("published partition registrations changed; preview and confirm again")
 
-            active_rows = self.connection.execute(
-                "SELECT task_id, active_scope_json FROM collection_task "
-                "WHERE status IN ('waiting','collecting','checking','committing') AND task_id<>? ORDER BY queue_order, task_id",
-                [task_id],
-            ).fetchall()
-            for active_id, active_scope in active_rows:
-                if active_scope:
-                    conflicts = self._scope_overlaps(scope, json.loads(active_scope))
-                    if conflicts:
-                        raise CollectionTaskScopeConflict(active_id, conflicts)
+            active_conflict = self.active_scope_conflict(scope, exclude_task_id=task_id)
+            if active_conflict:
+                raise CollectionTaskScopeConflict(*active_conflict)
 
             next_order = self.connection.execute(
                 "SELECT coalesce(max(queue_order), 0) + 1 FROM collection_task"
@@ -450,19 +526,26 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
             queued_at = datetime.now(timezone.utc)
             state.update(queue_order=next_order, first_accepted_at=first_accepted_at.isoformat(),
                          queued_at=queued_at.isoformat())
-            state_json = json.dumps(sanitized_metadata(state), ensure_ascii=False, default=str)
+            persisted_state = {key: value for key, value in state.items() if key != "daily_overwrite_grant"}
+            state_json = json.dumps(sanitized_metadata(persisted_state), ensure_ascii=False, default=str)
+            if scope.get("dataset") == "daily_bar":
+                snapshot_json = json.dumps(snapshot, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
             self.connection.execute(
                 """INSERT INTO collection_task (
                        task_id, definition_hash, dataset, status, state_json, updated_at,
-                       queue_order, first_accepted_at, queued_at, scope_json, snapshot_json, active_scope_json
-                   ) VALUES (?, ?, ?, 'waiting', ?, ?, ?, ?, ?, ?, ?, ?)
+                       queue_order, first_accepted_at, queued_at
+                   ) VALUES (?, ?, ?, 'waiting', ?, ?, ?, ?, ?)
                    ON CONFLICT(task_id) DO UPDATE SET
                        status='waiting', state_json=excluded.state_json, updated_at=excluded.updated_at,
-                       queue_order=excluded.queue_order, queued_at=excluded.queued_at,
-                       active_scope_json=excluded.active_scope_json""",
+                       queue_order=excluded.queue_order, queued_at=excluded.queued_at""",
                 [task_id, state["definition_hash"], state["dataset"], state_json, queued_at,
-                 next_order, first_accepted_at, queued_at, frozen_scope_json, snapshot_json, active_scope_json],
+                 next_order, first_accepted_at, queued_at],
             )
+            self.connection.execute(
+                """INSERT INTO collection_task_context(task_id,scope_json,snapshot_json,active_scope_json)
+                   VALUES (?,?,?,?) ON CONFLICT(task_id) DO UPDATE SET
+                   active_scope_json=excluded.active_scope_json""",
+                [task_id, frozen_scope_json, snapshot_json, active_scope_json])
             self.connection.execute("COMMIT")
             return state
         except Exception:
@@ -474,20 +557,26 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
         self.connection.execute("BEGIN IMMEDIATE")
         try:
             row = self.connection.execute(
-                    "SELECT task_id, status, state_json, first_execution_order FROM collection_task "
-                "WHERE status IN ('committing','collecting','checking') AND queue_order IS NOT NULL "
-                "ORDER BY queue_order, task_id LIMIT 1"
+                "SELECT t.task_id, t.status, t.state_json, t.first_execution_order, c.snapshot_json "
+                "FROM collection_task t JOIN collection_task_context c USING(task_id) "
+                "WHERE t.status IN ('committing','collecting','checking') AND t.queue_order IS NOT NULL "
+                "ORDER BY t.queue_order, t.task_id LIMIT 1"
             ).fetchone()
             if row is None:
                 row = self.connection.execute(
-                    "SELECT task_id, status, state_json, first_execution_order FROM collection_task WHERE status='waiting' "
-                    "AND queue_order IS NOT NULL ORDER BY queue_order, task_id LIMIT 1"
+                    "SELECT t.task_id, t.status, t.state_json, t.first_execution_order, c.snapshot_json "
+                    "FROM collection_task t JOIN collection_task_context c USING(task_id) "
+                    "WHERE t.status='waiting' AND t.queue_order IS NOT NULL ORDER BY t.queue_order, t.task_id LIMIT 1"
                 ).fetchone()
             if row is None:
                 self.connection.execute("COMMIT")
                 return None
-            task_id, status, state_json, first_execution_order = row
+            task_id, status, state_json, first_execution_order, snapshot_json = row
             state = json.loads(state_json)
+            if snapshot_json:
+                snapshot = json.loads(snapshot_json)
+                if "daily_overwrite_grant" in snapshot:
+                    state["daily_overwrite_grant"] = snapshot["daily_overwrite_grant"]
             if first_execution_order is None:
                 first_execution_order = self.connection.execute(
                     "SELECT coalesce(max(first_execution_order), 0) + 1 FROM collection_task"
@@ -497,14 +586,15 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
                     [first_execution_order, task_id],
                 )
             state["first_execution_order"] = first_execution_order
-            state_json = json.dumps(state, ensure_ascii=False, default=str)
+            persist_state = {key: value for key, value in state.items() if key != "daily_overwrite_grant"}
+            state_json = json.dumps(persist_state, ensure_ascii=False, default=str)
             self.connection.execute("UPDATE collection_task SET state_json=? WHERE task_id=?", [state_json, task_id])
             if status == "waiting":
                 state["status"] = "collecting"
-                state_json = json.dumps(state, ensure_ascii=False, default=str)
+                persist_state = {key: value for key, value in state.items() if key != "daily_overwrite_grant"}
                 self.connection.execute(
                     "UPDATE collection_task SET status='collecting', state_json=?, updated_at=? WHERE task_id=?",
-                    [json.dumps(state, ensure_ascii=False, default=str), datetime.now(timezone.utc), task_id],
+                    [json.dumps(persist_state, ensure_ascii=False, default=str), datetime.now(timezone.utc), task_id],
                 )
             self.connection.execute("COMMIT")
             return state
@@ -514,13 +604,18 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
 
     def load_collection_task(self, task_id: str) -> dict | None:
         row = self.connection.execute(
-            "SELECT state_json,first_execution_order FROM collection_task WHERE task_id=?", [task_id]
+            "SELECT t.state_json,t.first_execution_order,c.snapshot_json FROM collection_task t "
+            "LEFT JOIN collection_task_context c USING(task_id) WHERE t.task_id=?", [task_id]
         ).fetchone()
         if row is None:
             return None
         state = json.loads(row[0])
         if row[1] is not None:
             state["first_execution_order"] = int(row[1])
+        if row[2]:
+            snapshot = json.loads(row[2])
+            if "daily_overwrite_grant" in snapshot:
+                state["daily_overwrite_grant"] = snapshot["daily_overwrite_grant"]
         return state
 
     def collection_tasks(self, *, status: str | None = None) -> tuple[dict, ...]:

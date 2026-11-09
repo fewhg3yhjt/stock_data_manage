@@ -9,9 +9,9 @@ import pytest
 
 from stock_data_manage.storage.metadata import (
     CollectionTaskScopeConflict,
-    CollectionTaskSnapshotChanged,
     MetadataStore,
 )
+from stock_data_manage.storage.daily import initialize_schema
 
 
 DAY = "2026-10-09"
@@ -33,15 +33,16 @@ def _submit_from_process(path: str, barrier, task_id: str, scope: dict, results)
         snapshot = {"registry_hash": metadata.partition_registry_snapshot(scope)}
         barrier.wait(15)
         try:
-            accepted = metadata.enqueue_collection_task(_task(task_id, scope), scope, snapshot=snapshot)
+            accepted = metadata.enqueue_collection_task(_task(task_id, scope), scope, snapshot=snapshot,
+                daily_owner_refs=())
             results.put(("accepted", accepted["status"], accepted["queue_order"]))
         except CollectionTaskScopeConflict as exc:
             results.put(("conflict", exc.task_id, exc.conflicts))
 
 
 def _initialize(path: Path) -> None:
-    with MetadataStore(path):
-        pass
+    with MetadataStore(path) as metadata:
+        initialize_schema(metadata.connection)
 
 
 def test_overlapping_submission_from_two_processes_accepts_exactly_one(tmp_path: Path) -> None:
@@ -115,19 +116,21 @@ def test_failed_task_can_requeue_distinct_frozen_scope_subsets(tmp_path: Path) -
     second_subset = _scope("XSHE:000001")
     with MetadataStore(path) as metadata:
         accepted = metadata.enqueue_collection_task(_task("subset-retry", frozen), frozen,
-            snapshot={"registry_hash": metadata.partition_registry_snapshot(frozen)})
+            snapshot={"registry_hash": metadata.partition_registry_snapshot(frozen)}, daily_owner_refs=())
         state = metadata.load_collection_task("subset-retry")
         state["status"] = "failed"
         metadata.save_collection_task(state)
         first = metadata.enqueue_collection_task(_task("subset-retry", frozen), first_subset,
-            snapshot={"registry_hash": metadata.partition_registry_snapshot(first_subset)}, frozen_scope=frozen)
+            snapshot={"registry_hash": metadata.partition_registry_snapshot(first_subset)}, frozen_scope=frozen,
+            daily_owner_refs=())
         state = metadata.load_collection_task("subset-retry")
         state["status"] = "failed"
         metadata.save_collection_task(state)
         second = metadata.enqueue_collection_task(_task("subset-retry", frozen), second_subset,
-            snapshot={"registry_hash": metadata.partition_registry_snapshot(second_subset)}, frozen_scope=frozen)
+            snapshot={"registry_hash": metadata.partition_registry_snapshot(second_subset)}, frozen_scope=frozen,
+            daily_owner_refs=())
         row = metadata.connection.execute(
-            "SELECT scope_json, active_scope_json FROM collection_task WHERE task_id=?", ["subset-retry"]
+            "SELECT scope_json, active_scope_json FROM collection_task_context WHERE task_id=?", ["subset-retry"]
         ).fetchone()
         assert first["queue_order"] == 2 and second["queue_order"] == 3
         assert first["first_accepted_at"] == accepted["first_accepted_at"]
@@ -141,9 +144,9 @@ def test_fifo_claim_and_requeue_keep_first_acceptance_but_get_new_order(tmp_path
     scopes = [_scope(f"XSHG:60000{i}") for i in (1, 2)]
     with MetadataStore(path) as metadata:
         accepted = metadata.enqueue_collection_task(_task("fifo-a", scopes[0]), scopes[0],
-            snapshot={"registry_hash": metadata.partition_registry_snapshot(scopes[0])})
+            snapshot={"registry_hash": metadata.partition_registry_snapshot(scopes[0])}, daily_owner_refs=())
         metadata.enqueue_collection_task(_task("fifo-b", scopes[1]), scopes[1],
-            snapshot={"registry_hash": metadata.partition_registry_snapshot(scopes[1])})
+            snapshot={"registry_hash": metadata.partition_registry_snapshot(scopes[1])}, daily_owner_refs=())
         duplicate = metadata.enqueue_collection_task(_task("fifo-a", scopes[0]), scopes[0],
             snapshot={"registry_hash": "stale-is-ignored-for-the-same-active-id"})
         assert duplicate["already_queued"] and duplicate["queue_order"] == 1
@@ -153,13 +156,13 @@ def test_fifo_claim_and_requeue_keep_first_acceptance_but_get_new_order(tmp_path
         failed["status"] = "failed"
         metadata.save_collection_task(failed)
         requeued = metadata.enqueue_collection_task(_task("fifo-a", scopes[0]), scopes[0],
-            snapshot={"registry_hash": metadata.partition_registry_snapshot(scopes[0])})
+            snapshot={"registry_hash": metadata.partition_registry_snapshot(scopes[0])}, daily_owner_refs=())
         assert requeued["queue_order"] == 3
         assert requeued["first_accepted_at"] == accepted["first_accepted_at"]
         assert metadata.claim_next_collection_task()["task_id"] == "fifo-b"
 
 
-def test_final_admission_rejects_changed_partition_snapshot(tmp_path: Path) -> None:
+def test_daily_admission_uses_owner_preview_not_legacy_partition_status(tmp_path: Path) -> None:
     path = tmp_path / "metadata.sqlite3"
     _initialize(path)
     scope = _scope("XSHG:600001")
@@ -174,6 +177,7 @@ def test_final_admission_rejects_changed_partition_snapshot(tmp_path: Path) -> N
             ["daily_bar", "stock", DAY, "aggregate", 1, 1, "complete_clean", "manifest.json",
              "evidence", 0, 0, now],
         )
-        with pytest.raises(CollectionTaskSnapshotChanged, match="registrations changed"):
-            metadata.enqueue_collection_task(_task("stale-snapshot", scope), scope, snapshot=snapshot)
-        assert metadata.load_collection_task("stale-snapshot") is None
+        accepted = metadata.enqueue_collection_task(_task("stale-snapshot", scope), scope, snapshot=snapshot,
+            daily_owner_refs=())
+        assert accepted["status"] == "waiting"
+        assert metadata.load_collection_task("stale-snapshot")["daily_overwrite_grant"]["owners"] == []

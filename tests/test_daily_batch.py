@@ -1,7 +1,10 @@
 """Batch boundaries and crash recovery, using explicitly synthetic archived HTTP bytes."""
 import json
+from datetime import date
 from pathlib import Path
+import shutil
 import pytest
+import yaml
 
 from test_daily_collection_e2e import source_task, CONFIG, DAY
 from stock_data_manage.pipeline.inputs import collect_task
@@ -11,8 +14,19 @@ from stock_data_manage.config.loader import load_storage_paths
 from stock_data_manage.storage.integrity import file_hash
 
 
-def run(definition, root, **kwargs):
-    return collect_task(definition=definition, config_root=CONFIG, data_root=root, mode='replay', **kwargs)
+def run(definition, root, *, config_root=CONFIG, **kwargs):
+    return collect_task(definition=definition, config_root=config_root, data_root=root, mode='replay', **kwargs)
+
+
+def strict_daily_config(tmp_path):
+    config = tmp_path / 'strict-config'
+    shutil.copytree(CONFIG, config)
+    path = config / 'datasets' / 'daily_bar.yaml'
+    document = yaml.safe_load(path.read_text(encoding='utf-8'))
+    document['dataset']['publication']['max_missing_ratio'] = 0
+    document['dataset']['publication']['max_missing_count'] = 0
+    path.write_text(yaml.safe_dump(document, sort_keys=False, allow_unicode=True), encoding='utf-8')
+    return config
 
 
 def test_daily_batch_processes_while_capture_continues_and_writes_candidate_batches(tmp_path, monkeypatch):
@@ -81,6 +95,72 @@ def test_selected_redo_replaces_selected_batch_and_preserves_other_raw(tmp_path)
     assert len({entry['artifact'] for entry in selected_entries}) == 1
 
 
+def test_selected_redo_does_not_complete_frozen_scope_and_resume_processes_remaining_asset(tmp_path, monkeypatch):
+    from stock_data_manage.providers.tencent.daily import TencentDailyProvider
+    from stock_data_manage.quality.normalization import NormalizationError
+    from stock_data_manage.storage.daily import DailyBarStore
+    from datetime import date
+
+    definition = source_task(tmp_path / 'stock-fixtures', symbols=('sh600001', 'sh600002', 'sh600003'),
+        task_id='selected-frozen-scope')
+    for unit in definition['units']:
+        unit['asset_type'] = 'stock'
+    etf_unit = source_task(tmp_path / 'etf-fixtures', symbols=('sh510300',), task_id='etf-fixture')['units'][0]
+    etf_unit['asset_type'] = 'etf'
+    definition.pop('asset_type')
+    definition['asset_types'] = ['stock', 'etf']
+    definition['universe'] = 'static'
+    definition['units'].extend([etf_unit])
+    config = strict_daily_config(tmp_path)
+    import yaml
+    policy_path = config / 'datasets' / 'daily_bar.yaml'
+    policy = yaml.safe_load(policy_path.read_text(encoding='utf-8'))
+    policy['dataset']['publication'].update(max_missing_ratio=0.67, max_missing_count=2)
+    policy_path.write_text(yaml.safe_dump(policy, sort_keys=False, allow_unicode=True), encoding='utf-8')
+
+    original_parse = TencentDailyProvider.parse_window
+    def fail_two_stock_symbols(provider, captured):
+        if captured['symbol'] in {'sh600002', 'sh600003'}:
+            raise NormalizationError('synthetic candidate processing failure')
+        return original_parse(provider, captured)
+    monkeypatch.setattr(TencentDailyProvider, 'parse_window', fail_two_stock_symbols)
+    root = tmp_path / 'run'
+    first = run(definition, root, config_root=config)
+    assert first['status'] == 'published' and first['complete_today'] is False
+    assert sum(item['row_count'] for item in first['publication_refs']) == 2
+    assert (first['frozen_security_count'], first['delivered_security_count'],
+        first['undelivered_security_count']) == (4, 2, 2)
+
+    monkeypatch.setattr(TencentDailyProvider, 'parse_window', original_parse)
+    selected = run(definition, root, config_root=config, redo='selected', symbols=['sh600002'])
+    assert selected['status'] == 'published' and selected['complete_today'] is False
+    assert [item['asset_type'] for item in selected['publication_refs']] == ['stock']
+    assert selected['partitions']['stock']['row_count'] == 1
+    assert (selected['frozen_security_count'], selected['delivered_security_count'],
+        selected['undelivered_security_count']) == (4, 3, 1)
+    assert selected['row_count'] == 1
+
+    seen = []
+    def track_remaining(provider, captured):
+        seen.append(captured['symbol'])
+        return original_parse(provider, captured)
+    monkeypatch.setattr(TencentDailyProvider, 'parse_window', track_remaining)
+    resumed = run(definition, root, config_root=config, redo='resume')
+    assert resumed['status'] == 'published' and resumed['complete_today'] is True
+    assert (resumed['frozen_security_count'], resumed['delivered_security_count'],
+        resumed['undelivered_security_count']) == (4, 4, 0)
+    assert resumed['row_count'] == 1
+    assert set(seen) == {'sh600003'}
+    paths = load_storage_paths(config, data_root=root)
+    with MetadataStore(paths['metadata_path'], read_only=True) as metadata:
+        store = DailyBarStore(metadata.connection)
+        assert metadata.partition('daily_bar', 'stock', DAY, adjustment='aggregate')['actual_count'] == 3
+        assert metadata.partition('daily_bar', 'etf', DAY, adjustment='aggregate')['actual_count'] == 1
+        records, total = store.list_records(date_from=date.fromisoformat(DAY), date_to=date.fromisoformat(DAY),
+            asset_type=None, adjustment='none')
+        assert len(records) == total == 4
+
+
 def test_live_daily_fixed_route_does_not_require_expiring_symbol_qualification(tmp_path, monkeypatch):
     import requests
     import stock_data_manage.pipeline.daily as daily
@@ -112,7 +192,7 @@ def test_live_daily_fixed_route_does_not_require_expiring_symbol_qualification(t
 
 
 @pytest.mark.parametrize('boundary', ['after_raw_before_unit_index', 'after_candidate_before_checkpoint',
-    'before_publish', 'after_data_replace', 'after_publish', 'after_raw_promote'])
+    'after_receipt_commit', 'after_daily_projection', 'after_raw_promote'])
 def test_resume_at_real_stage_boundaries(tmp_path, boundary):
     definition = source_task(tmp_path)
     def failure(stage):
@@ -129,7 +209,7 @@ def test_resume_at_real_stage_boundaries(tmp_path, boundary):
 
 
 def test_failed_required_stock_group_blocks_only_its_asset_partition(tmp_path):
-    definition = source_task(tmp_path, corrupt='forward')
+    definition = source_task(tmp_path, corrupt='none')
     definition.pop('asset_type', None)
     definition.pop('task', None)
     definition['asset_types'] = ['stock', 'etf']
@@ -138,11 +218,12 @@ def test_failed_required_stock_group_blocks_only_its_asset_partition(tmp_path):
     etf = source_task(tmp_path, symbols=('sh510300',))['units'][0]
     etf['asset_type'] = 'etf'
     definition['units'].append(etf)
-    result = run(definition, tmp_path / 'run')
+    config = strict_daily_config(tmp_path)
+    result = run(definition, tmp_path / 'run', config_root=config)
     assert result['status'] == 'failed'
     assert result['partitions']['stock']['status'] == 'blocked'
     assert result['partitions']['etf']['status'] == 'published'
-    paths = load_storage_paths(CONFIG, data_root=tmp_path / 'run')
+    paths = load_storage_paths(config, data_root=tmp_path / 'run')
     assert not (paths['canonical_root'] / DAY / 'daily_bar' / 'stock' / 'data.parquet').exists()
 
 
@@ -160,19 +241,22 @@ def test_frozen_request_rejects_scope_changes_and_old_checkpoints(tmp_path):
         run(definition, tmp_path / 'run')
 
 
-@pytest.mark.parametrize('kind', ['raw_corrupt', 'raw_missing', 'candidate_corrupt', 'index_missing'])
+@pytest.mark.parametrize('kind', ['raw_corrupt', 'raw_missing', 'candidate_corrupt'])
 def test_published_resume_rechecks_evidence_and_never_overwrites_good_publication(tmp_path, kind):
     from test_daily_collection_e2e import batch_entries
     from stock_data_manage.storage.raw import RawObjectStore
+    from stock_data_manage.storage.daily import DailyBarStore
     definition = source_task(tmp_path)
     state = run(definition, tmp_path/'run')
-    canonical = Path(state['published_manifest']).with_name('data.parquet')
-    before = file_hash(canonical)
+    paths = load_storage_paths(CONFIG, data_root=tmp_path/'run')
+    with MetadataStore(paths['metadata_path'], read_only=True) as metadata:
+        before = DailyBarStore(metadata.connection).get('XSHG:600001', date.fromisoformat(DAY))
     entry = next(iter(batch_entries(state).values()))
     if kind == 'candidate_corrupt':
-        Path(entry['artifact']).write_bytes(b'corrupt synthetic candidate')
-    elif kind == 'index_missing':
-        next(Path(state['definition_ref']['path']).parent.rglob('*.manifest.json')).unlink()
+        work = Path(state['definition_ref']['path']).parent
+        descriptor_ref = state['partitions']['stock']['descriptor_ref']
+        descriptor = json.loads((work / descriptor_ref['path']).read_text(encoding='utf-8'))
+        (work / descriptor['candidate']['path']).write_bytes(b'corrupt synthetic candidate')
     else:
         manifest = Path(entry['raw_manifest'])
         event = json.loads(manifest.read_text(encoding='utf-8').splitlines()[0])
@@ -180,21 +264,124 @@ def test_published_resume_rechecks_evidence_and_never_overwrites_good_publicatio
         body.unlink() if kind == 'raw_missing' else body.write_bytes(b'corrupt synthetic body')
     with pytest.raises((ValueError, OSError)):
         run(definition, tmp_path/'run')
-    assert file_hash(canonical) == before
+    with MetadataStore(paths['metadata_path'], read_only=True) as metadata:
+        after = DailyBarStore(metadata.connection).get('XSHG:600001', date.fromisoformat(DAY))
+    assert after == before
 
 
-def test_pending_commit_blocks_another_task_before_capture(tmp_path, monkeypatch):
-    definition = source_task(tmp_path)
+def test_same_date_pending_commit_allows_disjoint_waiter_and_rejects_overlap(tmp_path, monkeypatch):
+    from stock_data_manage.domain import AssetType
+    from stock_data_manage.pipeline.inputs import submit_collection_task, run_collection_queue_once
+    from stock_data_manage.storage.daily import DailyBarStore
+    from stock_data_manage.storage.metadata import CollectionTaskScopeConflict
+    from stock_data_manage.providers.transport import RequestPacer
+
+    original_pacer_init = RequestPacer.__init__
+    monkeypatch.setattr(RequestPacer, '__init__',
+        lambda self, **kwargs: original_pacer_init(self, wait=lambda _seconds: None, **kwargs))
+    business = tmp_path / 'run'
+    first_definition = source_task(tmp_path / 'first-fixtures', task_id='commit-a')
     def stop(stage):
-        if stage == 'before_publish':
+        if stage == 'after_receipt_commit':
             raise RuntimeError('power loss')
     with pytest.raises(RuntimeError):
-        run(definition, tmp_path/'run', failure_hook=stop)
+        run(first_definition, business, failure_hook=stop)
+
+    paths = load_storage_paths(CONFIG, data_root=business)
+    scope_a = {'dataset': 'daily_bar', 'frequency': '1d', 'asset_types': ['stock'],
+        'securities_by_date': {DAY: ['XSHG:600001']}}
+    with MetadataStore(paths['metadata_path'], read_only=True) as metadata:
+        state_a = metadata.load_collection_task('commit-a')
+        assert state_a['status'] == 'committing'
+        store = DailyBarStore(metadata.connection)
+        receipt_a = store.publication_receipts(task_id='commit-a')
+        records, count = store.list_records(asset_type=AssetType.STOCK,
+            date_from=date.fromisoformat(DAY), date_to=date.fromisoformat(DAY))
+        owners_a = store.current_owners(scope_a)
+    assert len(receipt_a) == 1
+    assert count == len(records) == 1 and records[0].instrument_id == 'XSHG:600001'
+    assert len(owners_a) == 1 and owners_a[0]['task_id'] == 'commit-a'
+
+    second_definition = source_task(tmp_path / 'second-fixtures', symbols=('sh600002',), task_id='waiter-b')
+    conflict_definition = source_task(tmp_path / 'conflict-fixtures', task_id='conflict-c')
+    capture = TencentDailyProvider.capture_window
+    raw_root = paths['raw_root']
+    raw_before_submissions = {path.relative_to(raw_root).as_posix(): file_hash(path)
+        for path in raw_root.rglob('*') if path.is_file()}
     def forbidden(*args, **kwargs):
-        raise AssertionError('pending commit must block capture')
+        raise AssertionError('submission must not capture provider data')
     monkeypatch.setattr(TencentDailyProvider, 'capture_window', forbidden)
-    with pytest.raises(ValueError, match='pending commit'):
-        run({**definition, 'task_id':'other'}, tmp_path/'run')
+    accepted_b = submit_collection_task(definition=second_definition, config_root=CONFIG, data_root=business,
+        mode='replay', collector_options={'pacer': None})
+    assert accepted_b['task_id'] == 'waiter-b' and accepted_b['status'] == 'waiting'
+
+    with pytest.raises(CollectionTaskScopeConflict) as captured:
+        submit_collection_task(definition=conflict_definition, config_root=CONFIG, data_root=business,
+            mode='replay',
+            collector_options={'pacer': None})
+    assert captured.value.task_id == 'commit-a'
+    with pytest.raises(CollectionTaskScopeConflict) as captured_overwrite:
+        submit_collection_task(definition=conflict_definition, config_root=CONFIG, data_root=business,
+            mode='replay', overwrite=True, confirmed_conflicts=owners_a,
+            collector_options={'pacer': None})
+    assert captured_overwrite.value.task_id == 'commit-a'
+    paths = load_storage_paths(CONFIG, data_root=business)
+    assert not (paths['workspace_root'] / DAY / 'daily_bar' / 'conflict-c').exists()
+    assert {path.relative_to(raw_root).as_posix(): file_hash(path)
+        for path in raw_root.rglob('*') if path.is_file()} == raw_before_submissions
+    with MetadataStore(paths['metadata_path'], read_only=True) as metadata:
+        assert metadata.load_collection_task('conflict-c') is None
+        assert metadata.load_collection_task('waiter-b')['status'] == 'waiting'
+        assert len(DailyBarStore(metadata.connection).publication_receipts(task_id='conflict-c')) == 0
+
+    monkeypatch.setattr(TencentDailyProvider, 'capture_window', capture)
+    recovered_a = run_collection_queue_once(config_root=CONFIG, data_root=business)
+    assert recovered_a['task_id'] == 'commit-a' and recovered_a['status'] == 'published'
+    published_b = run(second_definition, business)
+    assert published_b['task_id'] == 'waiter-b' and published_b['status'] == 'published'
+    with MetadataStore(paths['metadata_path'], read_only=True) as metadata:
+        store = DailyBarStore(metadata.connection)
+        records, count = store.list_records(asset_type=AssetType.STOCK,
+            date_from=date.fromisoformat(DAY), date_to=date.fromisoformat(DAY))
+        assert {record.instrument_id for record in records} == {'XSHG:600001', 'XSHG:600002'}
+        assert count == 2
+        assert metadata.load_collection_task('commit-a')['status'] == 'published'
+        assert metadata.load_collection_task('waiter-b')['status'] == 'published'
+        assert metadata.load_collection_task('conflict-c') is None
+        assert not store.publication_receipts(task_id='conflict-c')
+
+
+def test_recovery_reloads_daily_state_after_execution_lock_is_acquired(tmp_path, monkeypatch):
+    import stock_data_manage.storage.parquet as parquet
+    import stock_data_manage.worker.recovery as recovery
+
+    business = tmp_path / 'recovery-race'
+    paths = load_storage_paths(CONFIG, data_root=business)
+    initial = {'task_id': 'recovery-race', 'dataset': 'daily_bar', 'definition_hash': 'frozen',
+        'format_version': 'daily-table-batch-v1', 'status': 'committing', 'definition': {'trade_date': DAY}}
+    with MetadataStore(paths['metadata_path']) as metadata:
+        metadata.save_collection_task(initial)
+
+    class CompletingLock:
+        def __init__(self, *_args, **_kwargs):
+            pass
+        def __enter__(self):
+            with MetadataStore(paths['metadata_path']) as metadata:
+                state = metadata.load_collection_task('recovery-race')
+                state['status'] = 'published'
+                metadata.save_collection_task(state)
+            return self
+        def __exit__(self, *_args):
+            return False
+
+    def forbidden(*_args, **_kwargs):
+        raise AssertionError('recovery must recheck state after locking')
+    monkeypatch.setattr(parquet, 'PartitionLock', CompletingLock)
+    import stock_data_manage.pipeline.inputs as inputs
+    monkeypatch.setattr(inputs, '_finish_daily_batch', forbidden)
+    assert recovery.recover_collection_tasks(config_root=CONFIG, data_root=business) == ()
+    with MetadataStore(paths['metadata_path'], read_only=True) as metadata:
+        assert metadata.load_collection_task('recovery-race')['status'] == 'published'
 
 
 def test_missing_required_unadjusted_response_stays_visible_without_refetch_on_resume(tmp_path, monkeypatch):
@@ -277,7 +464,7 @@ def test_preparation_freezes_current_rules_and_resume_uses_them(tmp_path):
     assert result['status'] == 'published'
 
 
-def test_one_frozen_plan_small_checkpoints_shared_pacer_and_immediate_failure(tmp_path, monkeypatch):
+def test_one_frozen_plan_optional_processing_failure_keeps_partial_publish_status(tmp_path, monkeypatch):
     import stock_data_manage.pipeline.inputs as inputs
     import stock_data_manage.pipeline.daily as daily
     definition = source_task(tmp_path, symbols=('sh600001','sz000001'), corrupt='backward')
@@ -297,7 +484,8 @@ def test_one_frozen_plan_small_checkpoints_shared_pacer_and_immediate_failure(tm
     monkeypatch.setattr(daily, 'capture_daily_unit', observed_capture)
     monkeypatch.setattr(daily, 'save_batch_json', observed_json)
     result = run(definition, tmp_path/'run')
-    assert result['status'] == 'failed'
+    assert result['status'] == 'published' and result['complete_today'] is False
+    assert result['missing_count'] == 2
     assert len(definitions) == 1 and len(set(pacers)) == 1 and len(pacers) == 6
     assert all(size < 12000 for _,size,_ in saves)
     assert any(phase == 'process' and failures for phase,_,failures in saves)
@@ -367,7 +555,8 @@ def test_daily_batch_freezes_manual_suspension_and_does_not_request_that_securit
     assert suspended[0]["status_evidence"]["basis"] == "manual_security_lifecycle_override"
     frozen = json.loads(Path(result["definition_ref"]["path"]).read_text(encoding="utf-8"))
     assert all(unit["symbol"] != "sz002717" for unit in frozen["units"])
-    coverage = json.loads((Path(result["definition_ref"]["path"]).parent / "coverage.stock.json").read_text(encoding="utf-8"))
+    coverage_path = next(Path(result["definition_ref"]["path"]).parent.glob("coverage.stock.attempt-*.json"))
+    coverage = json.loads(coverage_path.read_text(encoding="utf-8"))
     assert coverage["expected_count"] == 1 and coverage["suspended_count"] == 1
     assert coverage["item_statuses"]["XSHE:002717"] == "no_trade"
     assert any(issue["code"] == "confirmed_suspended" and issue["symbol"] == "sz002717"
@@ -399,7 +588,8 @@ def test_different_dates_and_selected_redo_preserve_other_current_raw(tmp_path, 
     first_date = {p:file_hash(p) for p in (paths['raw_root']/DAY).rglob('manifest.*.ndjson')}
     monkeypatch.setattr(fixtures,'DAY','2026-10-12')
     later = fixtures.source_task(tmp_path/'later', corrupt='forward', task_id='later')
-    assert run(later,root)['status'] == 'failed'
+    later_result = run(later,root)
+    assert later_result['status'] == 'published' and later_result['complete_today'] is False
     assert all(file_hash(p) == digest for p,digest in first_date.items())
 
 
@@ -417,8 +607,10 @@ def test_failed_scope_and_live_gate_do_not_capture_or_write_production(tmp_path,
     live = json.loads(json.dumps(definition))
     for unit in live['units']:
         unit.pop('replay_manifests')
-    with pytest.raises(ValueError,match='qualification blocked'):
-        collect_task(definition=live,config_root=CONFIG,data_root=tmp_path/'live',mode='live')
+    live_result = collect_task(definition=live,config_root=CONFIG,data_root=tmp_path/'live',mode='live')
+    assert live_result['status'] == 'failed'
+    gate = json.loads(Path(live_result['qualification_ref']['path']).read_text(encoding='utf-8'))
+    assert all(not item['eligible'] for item in gate.values())
     assert not list((tmp_path/'live/raw').rglob('*.ndjson'))
     with pytest.raises(ValueError,match='isolated'):
         collect_task(definition=definition,config_root=CONFIG,data_root=CONFIG.parent/'data',mode='replay')

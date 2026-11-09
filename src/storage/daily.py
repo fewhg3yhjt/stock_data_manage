@@ -154,17 +154,100 @@ class DailyBarStore:
     def __init__(self, connection: sqlite3.Connection) -> None:
         self.connection = connection
 
+    @staticmethod
+    def _identity_chunks(values: list[str], size: int = 400):
+        for start in range(0, len(values), size):
+            yield values[start:start + size]
+
+    def current_owners(self, scope: Mapping[str, object]) -> tuple[dict[str, object], ...]:
+        """Return only current bars/no-trade facts inside a validated dated identity scope."""
+        if scope.get("dataset") != "daily_bar" or scope.get("frequency") != "1d":
+            raise ValueError("owner preview requires a daily_bar/1d scope")
+        by_date = scope.get("securities_by_date")
+        if not isinstance(by_date, Mapping) or not by_date:
+            raise ValueError("owner preview requires dated identities")
+        result: dict[tuple[str, str], dict[str, object]] = {}
+        with self._read_snapshot():
+            for day_text, identities_value in sorted(by_date.items()):
+                day = date.fromisoformat(str(day_text))
+                if type(day) is not date:
+                    raise ValueError("owner preview date must be ISO date")
+                identities = sorted(set(identities_value))
+                if not identities or any(not isinstance(identity, str) or not re.fullmatch(r"(?:XSHG|XSHE|BSE):[0-9]{6}", identity)
+                                         for identity in identities):
+                    raise ValueError("owner preview identities must be stable market-qualified IDs")
+                for batch in self._identity_chunks(identities):
+                    placeholders = ",".join("?" for _ in batch)
+                    bars = self.connection.execute(
+                        f"""SELECT b.instrument_id,b.trade_date,b.asset_type,b.last_publication_id,
+                                   p.task_id,p.first_execution_order
+                            FROM daily_bar b LEFT JOIN daily_publication p ON p.publication_id=b.last_publication_id
+                            WHERE b.trade_date=? AND b.instrument_id IN ({placeholders})""",
+                        [day, *batch]).fetchall()
+                    no_trades = self.connection.execute(
+                        f"""SELECT i.instrument_id,i.partition_key,i.asset_type,i.last_publication_id,
+                                   p.task_id,p.first_execution_order
+                            FROM partition_item i LEFT JOIN daily_publication p ON p.publication_id=i.last_publication_id
+                            WHERE i.dataset='daily_bar' AND i.adjustment='aggregate' AND i.status='no_trade'
+                              AND i.partition_key=? AND i.instrument_id IN ({placeholders})""",
+                        [day.isoformat(), *batch]).fetchall()
+                    for row, status in [*((row, "bar") for row in bars), *((row, "no_trade") for row in no_trades)]:
+                        identity = str(row[0])
+                        key = (day.isoformat(), identity)
+                        if key in result:
+                            raise RuntimeError("daily identity has conflicting current bar and no_trade facts")
+                        if row[4] is None or row[5] is None:
+                            raise RuntimeError(f"current daily fact references missing publication: {identity}")
+                        result[key] = {"trade_date": day.isoformat(), "asset_type": str(row[2]),
+                            "instrument_id": identity, "publication_id": str(row[3]),
+                            "task_id": str(row[4]), "first_execution_order": int(row[5]),
+                            "status": status}
+        return tuple(result[key] for key in sorted(result))
+
+    def publication_receipts(self, *, task_id: str, trade_date: date | None = None,
+                             asset_type: AssetType | None = None) -> tuple[dict[str, object], ...]:
+        """Read this task's immutable delivery receipts without reading current bar snapshots."""
+        if not task_id or (trade_date is not None and type(trade_date) is not date):
+            raise ValueError("receipt query requires task ID and typed optional date")
+        if asset_type is not None and not isinstance(asset_type, AssetType):
+            raise ValueError("receipt query asset type must be typed")
+        clauses, params = ["task_id=?"], [task_id]
+        if trade_date is not None:
+            clauses.append("trade_date=?")
+            params.append(trade_date)
+        if asset_type is not None:
+            clauses.append("asset_type=?")
+            params.append(asset_type.value)
+        with self._read_snapshot():
+            rows = self.connection.execute(
+                "SELECT publication_id,idempotency_key,request_hash,task_id,first_execution_order,trade_date,asset_type,scope_json,candidate_ref,raw_evidence_refs_json,written_count,no_trade_count,superseded_count,superseded_identities_json,committed_at FROM daily_publication WHERE "
+                + " AND ".join(clauses) + " ORDER BY committed_at,publication_id", params).fetchall()
+        return tuple({"publication_id": row[0], "idempotency_key": row[1], "request_hash": row[2],
+            "task_id": row[3], "first_execution_order": int(row[4]), "trade_date": row[5],
+            "asset_type": AssetType(str(row[6])), "scope": tuple(json.loads(row[7])),
+            "candidate_ref": row[8], "raw_evidence_refs": tuple(json.loads(row[9])),
+            "written_count": int(row[10]), "no_trade_count": int(row[11]),
+            "superseded_count": int(row[12]), "superseded_identities": tuple(json.loads(row[13])),
+            "committed_at": row[14]} for row in rows)
+
     def _assert_task(self, task_id: str, order: int, day: date, asset: AssetType,
-                     identities: set[str]) -> None:
+                     identities: set[str]) -> dict[str, object]:
         row = self.connection.execute(
-            "SELECT status, first_execution_order, scope_json, active_scope_json FROM collection_task WHERE task_id=?",
+            "SELECT t.status, t.first_execution_order, c.scope_json, c.active_scope_json, c.snapshot_json, t.state_json "
+            "FROM collection_task t LEFT JOIN collection_task_context c USING(task_id) WHERE t.task_id=?",
             [task_id]).fetchone()
         if row is None or row[1] is None or int(row[1]) != order:
             raise ValueError("daily publication task has no matching persisted first execution order")
+        if row[2] is None or row[3] is None or row[4] is None:
+            raise ValueError("daily publication task context is missing")
         if row[0] not in {"collecting", "checking", "committing"}:
             raise ValueError("daily publication requires a currently claimed task")
         frozen = json.loads(row[2] or "{}")
         active = json.loads(row[3] or "{}")
+        state = json.loads(row[5])
+        snapshot = json.loads(row[4] or "{}")
+        if "daily_overwrite_grant" in snapshot:
+            state["daily_overwrite_grant"] = snapshot["daily_overwrite_grant"]
         for scope in (frozen, active):
             if scope.get("dataset") != "daily_bar" or scope.get("frequency") != "1d":
                 raise ValueError("task scope is not a daily-bar scope")
@@ -173,12 +256,14 @@ class DailyBarStore:
             allowed = set(scope.get("securities_by_date", {}).get(day.isoformat(), ()))
             if not allowed or "*" in allowed or not identities <= allowed:
                 raise ValueError("publication identity is outside frozen/current task scope")
+        return state
 
     def publish_partition(self, *, trade_date: date, asset_type: AssetType, task_id: str,
                           first_execution_order: int, publication_id: str, idempotency_key: str,
                           scope: frozenset[str], records: tuple[DailyRecord, ...],
                           no_trade: Mapping[str, NoTradeFact], raw_evidence_refs: tuple[str, ...],
-                          candidate_ref: str, committed_at: datetime) -> DailyPublicationResult:
+                          candidate_ref: str, committed_at: datetime,
+                          authorization: Mapping[str, object] | None = None) -> DailyPublicationResult:
         if type(trade_date) is not date or not isinstance(asset_type, AssetType):
             raise ValueError("publication needs typed date and asset type")
         if committed_at.utcoffset() is None:
@@ -203,6 +288,19 @@ class DailyBarStore:
                 raise ValueError("daily candidate must match date/asset and satisfy DailyRecord.complete")
         if any(not isinstance(fact, NoTradeFact) for fact in no_trade.values()):
             raise ValueError("no_trade values must carry explicit evidence")
+        if self.connection.in_transaction:
+            raise RuntimeError("daily publication owns its complete transaction and cannot nest")
+        snapshot_row = self.connection.execute(
+            "SELECT snapshot_json FROM collection_task_context WHERE task_id=?", [task_id]).fetchone()
+        if snapshot_row is None:
+            raise ValueError("daily publication task is not persisted")
+        snapshot = json.loads(snapshot_row[0] or "{}")
+        persisted_authorization = snapshot.get("daily_overwrite_grant")
+        if not isinstance(persisted_authorization, Mapping) or not isinstance(persisted_authorization.get("owners"), list):
+            raise ValueError("daily task snapshot lacks its frozen overwrite grant")
+        if authorization is not None and authorization != persisted_authorization:
+            raise ValueError("publication authorization differs from the persisted enqueue authorization")
+        authorization = persisted_authorization
         record_by_identity = {record.instrument_id: record for record in records}
         prepared_quotes = {identity: tuple(_quote_values(record, adjustment, quote)
             for adjustment, quote in record.quotes.items())
@@ -211,11 +309,10 @@ class DailyBarStore:
                    "asset": asset_type.value, "scope": sorted(scope),
                    "records": [_record_signature(record) for record in records],
                    "no_trade": {key: [value.reason, value.evidence_ref] for key, value in sorted(no_trade.items())},
-                   "raw": raw_evidence_refs, "candidate": candidate_ref}
+                   "raw": raw_evidence_refs, "candidate": candidate_ref,
+                   "authorization": authorization}
         request_hash = hashlib.sha256(json.dumps(request, sort_keys=True, ensure_ascii=False,
                                                  separators=(",", ":")).encode()).hexdigest()
-        if self.connection.in_transaction:
-            raise RuntimeError("daily publication owns its complete transaction and cannot nest")
         self.connection.execute("PRAGMA foreign_keys=ON")
         if self.connection.execute("PRAGMA foreign_keys").fetchone()[0] != 1:
             raise RuntimeError("SQLite foreign key enforcement is required")
@@ -232,7 +329,10 @@ class DailyBarStore:
                 result = self._result(prior[0], True)
                 self.connection.execute("COMMIT")
                 return result
-            self._assert_task(task_id, first_execution_order, trade_date, asset_type, set(scope))
+            persisted_task = self._assert_task(task_id, first_execution_order, trade_date, asset_type, set(scope))
+            transaction_authorization = persisted_task.get("daily_overwrite_grant")
+            if authorization != transaction_authorization:
+                raise ValueError("publication authorization differs from the persisted enqueue authorization")
             if not all_ids <= set(scope):
                 raise ValueError("candidate identity is outside persisted task scope")
             self.connection.execute("""INSERT INTO daily_publication VALUES
@@ -241,24 +341,38 @@ class DailyBarStore:
                  trade_date, asset_type.value, json.dumps(sorted(scope)), candidate_ref,
                  json.dumps(raw_evidence_refs), committed_at])
             written, no_trade_written, superseded = 0, 0, []
+            authorized_owners = {
+                (str(owner["trade_date"]), str(owner["instrument_id"])): owner
+                for owner in (authorization or {}).get("owners", ())
+            }
             for identity in sorted(all_ids):
-                existing = self.connection.execute(
+                existing_bar = self.connection.execute(
                     "SELECT last_publication_id,asset_type FROM daily_bar WHERE instrument_id=? AND trade_date=?",
                     [identity, trade_date]).fetchone()
-                if existing is None:
-                    existing = self.connection.execute(
-                        "SELECT last_publication_id,asset_type FROM partition_item WHERE dataset='daily_bar' AND partition_key=? AND adjustment='aggregate' AND instrument_id=? AND status='no_trade'",
-                        [trade_date.isoformat(), identity]).fetchone()
+                existing_no_trade = self.connection.execute(
+                    "SELECT last_publication_id,asset_type FROM partition_item WHERE dataset='daily_bar' AND partition_key=? AND adjustment='aggregate' AND instrument_id=? AND status='no_trade'",
+                    [trade_date.isoformat(), identity]).fetchone()
+                if existing_bar and existing_no_trade:
+                    raise RuntimeError(f"daily identity has both bar and no_trade facts: {identity}")
+                existing = existing_bar or existing_no_trade
+                owner_ref = None
                 if existing:
                     old = self.connection.execute(
-                        "SELECT first_execution_order FROM daily_publication WHERE publication_id=?", [existing[0]]).fetchone()
+                        "SELECT task_id,first_execution_order FROM daily_publication WHERE publication_id=?", [existing[0]]).fetchone()
                     if old is None:
                         raise RuntimeError(f"current daily ownership references missing publication {existing[0]}")
                     if existing[1] != asset_type.value:
                         raise ValueError("current identity is already published under a different asset type")
-                    if int(old[0]) > first_execution_order:
+                    status = "bar" if existing_bar else "no_trade"
+                    owner_ref = {"trade_date": trade_date.isoformat(), "asset_type": existing[1],
+                        "instrument_id": identity, "publication_id": existing[0], "task_id": old[0],
+                        "first_execution_order": int(old[1]), "status": status}
+                    authorized = authorized_owners.get((trade_date.isoformat(), identity))
+                    if old[0] != task_id and (int(old[1]) > first_execution_order or authorized != owner_ref):
                         superseded.append(identity)
                         continue
+                elif (trade_date.isoformat(), identity) in authorized_owners:
+                    raise ValueError(f"daily owner disappeared since overwrite preview for {identity}; re-preview required")
                 if identity in no_trade:
                     self.connection.execute("DELETE FROM daily_bar WHERE instrument_id=? AND trade_date=?", [identity, trade_date])
                     fact = no_trade[identity]

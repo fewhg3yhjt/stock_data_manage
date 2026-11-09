@@ -113,6 +113,7 @@ def test_recent_minute_contract_rejects_history_and_invalid_count():
 
 
 def test_snapshot_requires_known_trading_date_and_separates_local_filter():
+    import json
     baostock_inputs = [c for c in load_input_capabilities(PROJECT_ROOT / "config/providers.yaml")
                        if c.provider == "baostock"]
     contract = next(c for c in baostock_inputs if c.input_id == "SDA-BOARD-005")
@@ -120,10 +121,15 @@ def test_snapshot_requires_known_trading_date_and_separates_local_filter():
     assert all(c.sdk_socket_timeout_seconds == 60 for c in baostock_inputs)
     context = {"request": {"trade_date": "2026-09-30"}, "calendar": {"trading_dates": [date(2026, 9, 30)]}}
     assert contract.bind_parameters(context) == {"trade_date": date(2026, 9, 30), "include_etf": False}
+    json_calendar = json.loads(json.dumps([date(2026, 9, 30).isoformat()]))
+    assert contract.bind_parameters({**context, "calendar": {"trading_dates": json_calendar}}) == {
+        "trade_date": date(2026, 9, 30), "include_etf": False}
     with pytest.raises(ValueError, match="calendar coverage"):
         contract.bind_parameters({"request": {"trade_date": "2026-09-30"}})
     with pytest.raises(ValueError, match="known trading day"):
         contract.bind_parameters({**context, "request": {"trade_date": "2026-10-02"}})
+    with pytest.raises(ValueError, match="invalid date"):
+        contract.bind_parameters({**context, "calendar": {"trading_dates": ["2026-02-30"]}})
     config = next(c for c in load_provider_configs(PROJECT_ROOT / "config/providers.yaml") if c.provider == "baostock" and c.endpoint == "industry_membership")
     assert next(p for p in config.parameters if p.name == "symbols").applied_at == "local_filter"
     assert config.request_shape == "full_snapshot"

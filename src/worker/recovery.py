@@ -15,6 +15,7 @@ class RecoveryReport:
     repaired_metadata_partitions: int
     quarantined_files: int
     invalid_final_partitions: tuple[str, ...]
+    legacy_daily_files: tuple[str, ...] = ()
 
 
 class RecoveryScanner:
@@ -22,11 +23,15 @@ class RecoveryScanner:
         self.canonical_root = Path(canonical_root)
         self.metadata = metadata
         self.quarantine_root = self.canonical_root / "_quarantine"
+        self.legacy_daily_files: set[str] = set()
 
     def recover(self) -> RecoveryReport:
         promoted = 0
         quarantined = 0
         invalid_final: list[str] = []
+        if self.canonical_root.exists():
+            self.legacy_daily_files = {str(path) for path in self.canonical_root.rglob("*")
+                if path.is_file() and "daily_bar" in path.relative_to(self.canonical_root).parts}
 
         for temporary_manifest in self._files("manifest.*.tmp.json"):
             partition = temporary_manifest.parent
@@ -68,14 +73,23 @@ class RecoveryScanner:
             except Exception:
                 invalid_final.append(str(manifest_path.parent))
 
-        return RecoveryReport(promoted, repaired, quarantined, tuple(invalid_final))
+        return RecoveryReport(promoted, repaired, quarantined, tuple(invalid_final),
+                              tuple(sorted(self.legacy_daily_files)))
 
     def _files(self, pattern: str) -> list[Path]:
-        return sorted(
-            path
-            for path in self.canonical_root.rglob(pattern)
-            if self.quarantine_root not in path.parents and not (path.parent / "task-commit.json").exists()
-        )
+        selected = []
+        for path in self.canonical_root.rglob(pattern):
+            if self.quarantine_root in path.parents or (path.parent / "task-commit.json").exists():
+                continue
+            try:
+                relative = path.relative_to(self.canonical_root)
+            except ValueError:
+                continue
+            if "daily_bar" in relative.parts:
+                self.legacy_daily_files.add(str(path))
+                continue
+            selected.append(path)
+        return sorted(selected)
 
     def _quarantine(self, *paths: Path) -> int:
         moved = 0
@@ -102,19 +116,31 @@ def recover_collection_tasks(*, config_root, data_root=None) -> tuple[str, ...]:
     completed = []
     with MetadataStore(paths["metadata_path"]) as metadata:
         for state in metadata.collection_tasks():
-            if state.get('format_version') in {'daily-batch-v1', 'daily-batch-v2'}:
-                if state['status'] == 'committing':
-                    with PartitionLock(paths['workspace_root'] / '_locks' / 'collection.lock', recover_stale=True):
-                        _finish_daily_batch(state, paths, metadata)
-                    completed.append(state['task_id'])
+            if state.get('format_version') == 'daily-table-batch-v1':
+                if state['status'] != 'committing':
+                    continue
+                with PartitionLock(paths['workspace_root'] / '_locks' / 'collection.lock', recover_stale=True):
+                    current = metadata.load_collection_task(state['task_id'])
+                    if current and current.get('format_version') == 'daily-table-batch-v1' and current['status'] == 'committing':
+                        _finish_daily_batch(current, paths, metadata)
+                        completed.append(current['task_id'])
+                continue
+            if state.get('dataset') == 'daily_bar':
+                # Historical Parquet daily checkpoints stay in place and are not imported.
                 continue
             marker = Path(state.get("published_manifest", "missing")).parent / "task-commit.json"
             owned_marker = (marker.exists() and json.loads(marker.read_text(encoding="utf-8")).get("task_id") == state["task_id"])
             if state["status"] != "committing" and not (state["status"] == "published" and owned_marker):
                 continue
             with PartitionLock(paths["workspace_root"] / "_locks" / "collection.lock", recover_stale=True):
-                _finish_task_commit(state, paths, metadata)
-            completed.append(state["task_id"])
+                current = metadata.load_collection_task(state['task_id'])
+                if not current:
+                    continue
+                marker = Path(current.get("published_manifest", "missing")).parent / "task-commit.json"
+                owned_marker = (marker.exists() and json.loads(marker.read_text(encoding="utf-8")).get("task_id") == current["task_id"])
+                if current["status"] == "committing" or (current["status"] == "published" and owned_marker):
+                    _finish_task_commit(current, paths, metadata)
+                    completed.append(current["task_id"])
     return tuple(completed)
 
 
@@ -139,9 +165,12 @@ def archive_published_task(task_directory: str | Path, *, workspace_root: str | 
     if (task / 'summary.json').is_file():
         document = json.loads((task / 'summary.json').read_text(encoding='utf-8'))
         if document.get('format_version') in {'daily-batch-v1', 'daily-batch-v2'}:
+            raise ValueError('legacy Parquet daily tasks are retained in place and cannot be archived as table publications')
+        if document.get('format_version') == 'daily-table-batch-v1':
             from ..pipeline.inputs import _save_daily_batch
             from ..pipeline.daily import daily_unit_paths, save_batch_json
             from ..storage.raw import RawObjectStore
+            from ..storage.daily import DailyBarStore
             from ..storage.parquet import PartitionLock
             with PartitionLock(workspace / '_locks' / 'collection.lock', recover_stale=True):
                 state = metadata.load_collection_task(document['task_id'])
@@ -163,13 +192,28 @@ def archive_published_task(task_directory: str | Path, *, workspace_root: str | 
                     if RawObjectStore.verify_manifest(entry['raw_manifest']) != entry['raw_hash']:
                         raise ValueError('task raw evidence changed')
                     entries.append((index, entry))
+                receipts = DailyBarStore(metadata.connection).publication_receipts(task_id=document['task_id'])
+                receipts_by_id = {receipt['publication_id']: receipt for receipt in receipts}
                 for partition in state['partitions'].values():
-                    publication = Path(partition['published_manifest']).resolve()
-                    if (not publication.is_relative_to(canonical)
-                            or file_hash(publication) != partition['published_hash']
-                            or not Manifest.load(publication).verify(publication.parent / 'data.parquet')
-                            or (publication.parent / 'task-commit.json').exists()):
-                        raise ValueError('canonical publication reference is invalid')
+                    publication_id = partition.get('publication_id')
+                    receipt = receipts_by_id.get(publication_id)
+                    reference = partition.get('descriptor_ref', {})
+                    descriptor = (task / reference.get('path', '')).resolve()
+                    if (not receipt or not descriptor.is_relative_to(task) or not descriptor.is_file()
+                            or file_hash(descriptor) != reference.get('sha256')):
+                        raise ValueError('daily SQLite receipt or immutable descriptor is invalid')
+                    descriptor_data = json.loads(descriptor.read_text(encoding='utf-8'))
+                    candidate = (task / descriptor_data['candidate']['path']).resolve()
+                    if (not candidate.is_relative_to(task) or not candidate.is_file()
+                            or file_hash(candidate) != descriptor_data['candidate']['sha256']):
+                        raise ValueError('daily publication candidate changed before archive')
+                    expected_ref = json.dumps({'task_id': document['task_id'], 'path': reference['path'],
+                        'sha256': reference['sha256']}, sort_keys=True, ensure_ascii=False, separators=(',', ':'))
+                    if receipt['candidate_ref'] != expected_ref:
+                        raise ValueError('daily receipt does not reference the task descriptor')
+                    for evidence in descriptor_data['raw_evidence']:
+                        if RawObjectStore.verify_manifest(evidence['path']) != evidence['sha256']:
+                            raise ValueError('daily publication raw evidence changed before archive')
                 destination = archive / relative
                 if destination.exists():
                     raise ValueError('archive destination already exists')
@@ -184,8 +228,6 @@ def archive_published_task(task_directory: str | Path, *, workspace_root: str | 
                 state['definition_ref']['path'] = str(destination / 'task.json')
                 if state.get('qualification_ref'):
                     state['qualification_ref']['path'] = str(destination / Path(state['qualification_ref']['path']).relative_to(task))
-                for partition in state['partitions'].values():
-                    partition['commit_ref']['path'] = str(destination / Path(partition['commit_ref']['path']).relative_to(task))
                 _save_daily_batch(state, {'archive_root': archive, 'workspace_root': workspace}, metadata)
                 return destination
     if len(relative.parts) == 2 and (task / "summary.json").is_file():

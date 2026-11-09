@@ -16,7 +16,7 @@ from stock_data_manage.pipeline.inputs import collect_task
 from stock_data_manage.service.instruments import SecurityMasterStore, security_record_to_mapping
 from stock_data_manage.storage.integrity import Manifest, file_hash
 from stock_data_manage.storage.metadata import MetadataStore
-from stock_data_manage.storage.parquet import CanonicalPartitionStore, InvalidPartitionError, write_normalized_rows
+from stock_data_manage.storage.parquet import write_normalized_rows
 from stock_data_manage.storage.raw import RawObjectStore
 from stock_data_manage.worker.recovery import RecoveryScanner, recover_collection_tasks
 
@@ -183,20 +183,6 @@ def run(root, definition, collector, **options):
     return result
 
 
-def read_bars(root):
-    return CanonicalPartitionStore(root / "canonical").read_daily("stock", DAY)
-
-
-
-
-
-
-
-
-
-
-
-
 def test_security_master_replaces_one_current_list_without_daily_partitions(tmp_path):
     collector = full_catalog_collector()
     collector.source_date = "2026-10-01"
@@ -271,46 +257,28 @@ def test_another_task_failure_archives_old_build_and_keeps_its_summary(tmp_path,
 
 
 
-def test_all_index_universe_expands_only_published_index_rows(tmp_path, monkeypatch):
-    from types import SimpleNamespace
-    import stock_data_manage.storage.integrity as integrity
-    import stock_data_manage.storage.metadata as metadata_module
-
-    canonical = tmp_path / "canonical"
-    manifest_path = canonical / DAY / "security_master" / "manifest.json"
-
-    class FakeMetadataStore:
-        def __init__(self, path):
-            pass
-        def __enter__(self):
-            return self
-        def __exit__(self, *args):
-            return False
-        def load_collection_task(self, task_id):
-            return None
-        def latest_partition(self, **kwargs):
-            return {"manifest_path": str(manifest_path)}
-
-    class FakeManifest:
-        @classmethod
-        def load(cls, path):
-            return cls()
-        def verify(self, path):
-            return True
-
-    monkeypatch.setattr(metadata_module, "MetadataStore", FakeMetadataStore)
-    monkeypatch.setattr(integrity, "Manifest", FakeManifest)
-    monkeypatch.setattr("pyarrow.parquet.read_table", lambda path: SimpleNamespace(to_pylist=lambda: [
-        {"asset_type": "stock", "status": "active", "exchange": "XSHG", "symbol": "600519"},
-        {"asset_type": "index", "status": "active", "exchange": "XSHG", "symbol": "000001"},
-        {"asset_type": "index", "status": "active", "exchange": "XSHE", "symbol": "399001"},
-    ]))
+def test_all_index_universe_expands_only_published_index_rows(tmp_path):
+    from stock_data_manage.config.loader import load_storage_paths
     definition = {"task_id": "index-expansion", "dataset": "daily_bar", "trade_date": DAY, "universe": "all_index",
                   "input_id": "ASTOCK-002-daily"}
+    collector = FaultCollector()
+    collector.catalog_rows = {
+        "shenzhen-shanghai": [
+            {"stock_code": "600519", "exchange": "XSHG", "asset_type": "stock"},
+            {"stock_code": "000001", "exchange": "XSHE", "asset_type": "stock"},
+            {"stock_code": "511600", "exchange": "XSHG", "asset_type": "etf"},
+            {"stock_code": "159003", "exchange": "XSHE", "asset_type": "etf"},
+            {"stock_code": "000001", "exchange": "XSHG", "asset_type": "index"},
+            {"stock_code": "399001", "exchange": "XSHE", "asset_type": "index"},
+        ],
+        "beijing": [{"stock_code": "920001", "exchange": "BSE", "asset_type": "stock"}],
+    }
+    published = run(tmp_path, full_master_definition("index-source-master"), collector)
+    assert published["status"] == "published" and published["complete_today"]
     units = __import__("stock_data_manage.pipeline.inputs", fromlist=["_task_units"])._task_units(
-        definition, {"metadata_path": tmp_path / "metadata.duckdb", "canonical_root": canonical})
-    assert [(unit["symbol"], unit["asset_type"]) for unit in units] == [
-        ("sh000001", "index"), ("sz399001", "index")]
+        definition, load_storage_paths(CONFIG, data_root=tmp_path))
+    assert {(unit["symbol"], unit["asset_type"]) for unit in units} == {
+        ("sh000001", "index"), ("sz399001", "index")}
 
 
 

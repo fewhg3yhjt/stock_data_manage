@@ -1130,7 +1130,7 @@ def _save_daily_batch(state, paths, metadata):
     from ..storage.integrity import file_hash
     target = Path(state['definition_ref']['path']).with_name('summary.json')
     state['generated_at_utc'] = datetime.now(timezone.utc).isoformat()
-    summary = {k: v for k, v in state.items() if k != 'summary'}
+    summary = {k: v for k, v in state.items() if k not in {'summary', 'daily_overwrite_grant'}}
     save_batch_json(target, summary)
     state['summary'] = {'path': str(target), 'sha256': file_hash(target)}
     metadata.save_collection_task(state)
@@ -1148,49 +1148,165 @@ def _load_daily_batch_definition(state, paths):
 
 
 def _finish_daily_batch(state, paths, metadata, failure_hook=None):
-    """Recover only already-prepared partition commits; never fetch or reinterpret data."""
+    """Publish prepared daily candidates through SQLite; recover from receipts without recapture."""
     import json
+    import pyarrow.parquet as pq
     from ..storage.integrity import file_hash
+    from ..storage.daily import DailyBarStore, NoTradeFact
+    from ..storage.parquet import mapping_to_daily
+    from ..storage.raw import RawObjectStore
+    from ..domain import AssetType
+
     already_finished = state.get('phase') == 'finished'
+    frozen_definition = _load_daily_batch_definition(state, paths)
+    store = DailyBarStore(metadata.connection)
+    persisted_task = metadata.load_collection_task(state['task_id'])
+    if persisted_task is None or not isinstance(persisted_task.get('daily_overwrite_grant'), dict):
+        raise ValueError('daily task is missing its admission snapshot owner grant')
+    owner_grant = persisted_task['daily_overwrite_grant']
+    total_rows = 0
+    delivered_any = False
+    run_root = Path(state['definition_ref']['path']).resolve().parent
     for asset, partition in state['partitions'].items():
-        if partition['status'] == 'blocked':
+        if partition.get('status') == 'blocked':
             continue
-        if partition['status'] == 'published':
-            from ..storage.integrity import Manifest
-            manifest_path = Path(partition['published_manifest'])
-            if file_hash(manifest_path) != partition['published_hash'] or not Manifest.load(manifest_path).verify(manifest_path.parent / 'data.parquet'):
-                raise ValueError('daily batch published partition changed')
-            marker = manifest_path.parent / 'task-commit.json'
-            if not marker.exists():
-                continue
-        descriptor = partition['commit_ref']
-        path = Path(descriptor['path'])
-        if not path.resolve().is_relative_to(paths['workspace_root']) or file_hash(path) != descriptor['sha256']:
-            raise ValueError('daily partition commit changed before recovery')
-        commit_state = json.loads(path.read_text(encoding='utf-8'))
-        def saved(substate):
-            if substate['status'] == 'published':
-                partition.update(status='published', published_manifest=substate['published_manifest'],
-                    published_hash=substate['published_hash'], row_count=substate['row_count'])
-            _save_daily_batch(state, paths, metadata)
-        _finish_task_commit(commit_state, paths, metadata, failure_hook, save_state=saved)
-    published_all = all(p['status'] == 'published' for p in state['partitions'].values())
-    processing = state['progress']['stages']['processing']
-    state.update(status='published' if published_all else 'failed',
-        phase='finished', complete_today=published_all and processing['failed'] == 0 and processing['skipped'] == 0,
-        data_date=state['requested_date'] if any(p['status'] == 'published' for p in state['partitions'].values()) else None,
-        row_count=sum(p.get('row_count', 0) for p in state['partitions'].values()))
+        descriptor_ref = partition.get('descriptor_ref')
+        if not descriptor_ref:
+            raise ValueError('daily partition has no immutable publication descriptor')
+        descriptor_path = (run_root / descriptor_ref['path']).resolve()
+        if (not descriptor_path.is_relative_to(run_root)
+                or not descriptor_path.is_file() or file_hash(descriptor_path) != descriptor_ref['sha256']):
+            raise ValueError('daily immutable publication descriptor is missing or changed')
+        descriptor = json.loads(descriptor_path.read_text(encoding='utf-8'))
+        owner_grant_hash = hashlib.sha256(json.dumps(owner_grant, sort_keys=True, ensure_ascii=False,
+            separators=(',', ':')).encode()).hexdigest()
+        if descriptor.get('daily_owner_grant_hash') != owner_grant_hash:
+            raise ValueError('daily attempt descriptor does not match the immutable admission owner grant')
+        candidate = (run_root / descriptor['candidate']['path']).resolve()
+        if (not candidate.is_relative_to(run_root)
+                or not candidate.is_file() or file_hash(candidate) != descriptor['candidate']['sha256']):
+            raise ValueError('daily prepared candidate is missing or changed')
+        candidate_ref = json.dumps({"task_id": state['task_id'], "path": descriptor_ref['path'],
+                                    "sha256": descriptor_ref['sha256']},
+                                   sort_keys=True, ensure_ascii=False, separators=(',', ':'))
+        receipts = store.publication_receipts(task_id=state['task_id'],
+            trade_date=datetime.fromisoformat(descriptor['trade_date']).date(), asset_type=AssetType(asset))
+        receipt = next((row for row in receipts if row['idempotency_key'] == descriptor['idempotency_key']), None)
+        if receipt:
+            if receipt['candidate_ref'] != candidate_ref:
+                raise ValueError('daily publication key points to a different immutable descriptor')
+            delivery = {"publication_id": receipt['publication_id'], "written_count": receipt['written_count'],
+                "no_trade_count": receipt['no_trade_count'], "superseded_count": receipt['superseded_count'],
+                "superseded_identities": list(receipt['superseded_identities']), "idempotent": True}
+        else:
+            records = tuple(mapping_to_daily(row) for row in pq.read_table(candidate).to_pylist())
+            facts = {identity: NoTradeFact(value['reason'], value['evidence_ref'])
+                     for identity, value in descriptor['no_trade'].items()}
+            for evidence in descriptor['raw_evidence']:
+                if RawObjectStore.verify_manifest(evidence['path']) != evidence['sha256']:
+                    raise ValueError('daily source response changed before SQLite publication')
+            delivery_result = store.publish_partition(trade_date=datetime.fromisoformat(descriptor['trade_date']).date(),
+                asset_type=AssetType(asset), task_id=state['task_id'],
+                first_execution_order=int(descriptor['first_execution_order']),
+                publication_id=descriptor['publication_id'], idempotency_key=descriptor['idempotency_key'],
+                scope=frozenset(descriptor['scope_ids']), records=records, no_trade=facts,
+                raw_evidence_refs=tuple(item['path'] for item in descriptor['raw_evidence']),
+                candidate_ref=candidate_ref, committed_at=datetime.now(timezone.utc),
+                authorization=owner_grant)
+            delivery = {"publication_id": delivery_result.publication_id,
+                "written_count": delivery_result.written_count, "no_trade_count": delivery_result.no_trade_count,
+                "superseded_count": delivery_result.superseded_count,
+                "superseded_identities": list(delivery_result.superseded_identities), "idempotent": False}
+            if failure_hook:
+                failure_hook('after_receipt_commit')
+        summary = store.partition_summary(datetime.fromisoformat(descriptor['trade_date']).date(), AssetType(asset))
+        if summary is None:
+            raise RuntimeError('daily receipt committed without a current summary')
+        partition.update(receipt=delivery, publication_id=delivery['publication_id'],
+            row_count=delivery['written_count'], no_trade_count=delivery['no_trade_count'],
+            superseded_count=delivery['superseded_count'],
+            superseded_identities=delivery['superseded_identities'],
+            actual_count=int(summary['actual_count']), data_revision=int(summary['data_revision']))
+        has_delivery = delivery['written_count'] > 0 or delivery['no_trade_count'] > 0
+        if has_delivery:
+            partition['status'] = 'published'
+            delivered_any = True
+        elif delivery['superseded_count']:
+            partition['status'] = 'superseded'
+        else:
+            raise RuntimeError('daily publication receipt has no delivery or superseded candidate')
+        state.setdefault('execution_delivery', {})[delivery['publication_id']] = {
+            'written_count': delivery['written_count'], 'no_trade_count': delivery['no_trade_count'],
+            'superseded_count': delivery['superseded_count']}
+        total_rows = sum(item['written_count'] for item in state['execution_delivery'].values())
+        # Persist the receipt projection before post-commit raw promotion. A crash
+        # here is repaired from the immutable SQLite receipt on the next recovery.
+        state['phase'] = 'receipt_committed'
+        _save_daily_batch(state, paths, metadata)
+        promotions = descriptor.get('promotions', ())
+        if partition.get('projection_status') != 'complete':
+            owner_scope = {'dataset': 'daily_bar', 'frequency': '1d',
+                'asset_types': [asset], 'securities_by_date': {descriptor['trade_date']: descriptor['scope_ids']}}
+            current_owners = {owner['instrument_id']: owner for owner in store.current_owners(owner_scope)}
+            publishable_promotions = [promotion for promotion in promotions
+                if current_owners.get(promotion.get('instrument_id'), {}).get('publication_id') == delivery['publication_id']
+                and current_owners.get(promotion.get('instrument_id'), {}).get('status') == 'bar']
+        else:
+            publishable_promotions = []
+        for promotion in publishable_promotions:
+            audit = Path(promotion['audit_manifest'])
+            if RawObjectStore.verify_manifest(audit) != promotion['raw_hash']:
+                raise ValueError('daily source response changed after publication receipt')
+            RawObjectStore.promote_unit(temporary=promotion['temporary'], current=promotion['current'],
+                raw_root=paths['raw_root'], archive_root=paths['archive_root'],
+                expected_hash=promotion['raw_hash'], defer_cleanup=True)
+        if publishable_promotions:
+            RawObjectStore.finalize_promotions(publishable_promotions, raw_root=paths['raw_root'])
+            for promotion in publishable_promotions:
+                entry = state.get('units', {}).get(promotion['key'])
+                if entry is not None:
+                    entry.update(raw_manifest=promotion['audit_manifest'], current_raw=promotion['current'], promoted=True)
+        if failure_hook:
+            failure_hook('after_raw_promote')
+        partition['projection_status'] = 'complete'
+        _save_daily_batch(state, paths, metadata)
+        if failure_hook:
+            failure_hook('after_daily_projection')
+
+    statuses = [part.get('status') for part in state['partitions'].values()]
+    all_resolved = bool(statuses) and all(status in {'published', 'superseded'} for status in statuses)
+    all_superseded = all_resolved and not delivered_any
+    published_all = all_resolved and delivered_any
+    processing = state.get('progress', {}).get('stages', {}).get('processing', {})
+    frozen_ids = ({_stable_identity(unit) for unit in frozen_definition['units']} |
+        {str(item['instrument_id']) for item in frozen_definition['definition'].get('suspended_securities', ())})
+    delivered_ids = _published_daily_security_ids(state, frozen_definition, paths, include_later_owners=False)
+    frozen_delivery_complete = bool(frozen_ids) and frozen_ids <= delivered_ids
+    current_execution = state.get('execution_delivery', {}).values()
+    current_no_trade_count = sum(item['no_trade_count'] for item in current_execution)
+    current_superseded_count = sum(item['superseded_count'] for item in current_execution)
+    state.update(status='published' if published_all else 'failed', phase='finished',
+        complete_today=published_all and frozen_delivery_complete
+            and processing.get('failed', 0) == 0 and processing.get('skipped', 0) == 0,
+        frozen_security_count=len(frozen_ids), delivered_security_count=len(frozen_ids & delivered_ids),
+        undelivered_security_count=len(frozen_ids - delivered_ids),
+        no_op=all_superseded, superseded_only=all_superseded,
+        data_date=state['requested_date'] if delivered_any else None,
+        row_count=total_rows,
+        no_trade_count=current_no_trade_count, superseded_count=current_superseded_count)
+    if all_superseded:
+        state['error'] = 'all eligible candidates were protected by later publication ownership'
     stage = state['progress']['stages']['publication']
-    stage.update(status='completed' if published_all else 'failed',
-        completed=sum(p['status'] == 'published' for p in state['partitions'].values()),
-        failed=sum(p['status'] == 'blocked' for p in state['partitions'].values()),
-        success=sum(p['status'] == 'published' for p in state['partitions'].values()),
-        success_percent=round(100 * sum(p['status'] == 'published' for p in state['partitions'].values()) / len(state['partitions']), 2),
-        percent=100 if published_all else round(100 * sum(p['status'] == 'published' for p in state['partitions'].values()) / len(state['partitions']), 2))
+    resolved_count = sum(status in {'published', 'superseded'} for status in statuses)
+    stage.update(status='completed' if published_all else 'failed', completed=resolved_count,
+        failed=sum(status == 'blocked' for status in statuses), success=sum(status == 'published' for status in statuses),
+        success_percent=round(100 * resolved_count / len(statuses), 2),
+        percent=round(100 * resolved_count / len(statuses), 2))
     if not already_finished:
         stage['elapsed_seconds'] = round((datetime.now(timezone.utc) - datetime.fromisoformat(state['publication_started_at_utc'])).total_seconds(), 3)
-        state['progress']['elapsed_seconds'] = round((datetime.now(timezone.utc) - datetime.fromisoformat(state['progress']['started_at_utc'])).total_seconds(), 3)
-    state['missing_count'] = state['progress']['stages']['processing']['failed'] + state['progress']['stages']['processing']['skipped']
+        if state.get('progress', {}).get('started_at_utc'):
+            state['progress']['elapsed_seconds'] = round((datetime.now(timezone.utc) - datetime.fromisoformat(state['progress']['started_at_utc'])).total_seconds(), 3)
+    state['missing_count'] = processing.get('failed', 0) + processing.get('skipped', 0)
     return _save_daily_batch(state, paths, metadata)
 
 
@@ -1266,13 +1382,15 @@ def _process_daily_batch_queue(process_queue, event_queue, stop_capture, process
         event_queue.put(('process_done',))
 
 
-def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, mode, failure_hook, progress_callback, pacer=None):
+def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, mode, failure_hook, progress_callback,
+                         pacer=None, _prepare_only=False, _collection_lock_held=False):
     import json
     import re
     import yaml
     import pyarrow.parquet as pq
     import requests
     from concurrent.futures import ThreadPoolExecutor
+    from contextlib import nullcontext
     from queue import Empty, Full, Queue
     from threading import Event, Thread
     from ..config.loader import InputCapabilityConfig, ParameterBinding
@@ -1298,16 +1416,16 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
     if not re.fullmatch(r'[A-Za-z0-9_-]{1,64}', task_id):
         raise ValueError('invalid task ID')
     paths['metadata_path'].parent.mkdir(parents=True, exist_ok=True)
-    with PartitionLock(paths['workspace_root'] / '_locks' / 'collection.lock', recover_stale=True):
+    lock_context = (nullcontext() if _prepare_only or _collection_lock_held else
+        PartitionLock(paths['workspace_root'] / '_locks' / 'collection.lock', recover_stale=True))
+    with lock_context:
         with MetadataStore(paths['metadata_path']) as metadata:
-            for pending in metadata.collection_tasks(status='committing'):
-                pending_day = pending.get('requested_date') or pending.get('definition', {}).get('trade_date')
-                if pending['task_id'] != task_id and pending['dataset'] == 'daily_bar' and pending_day == definition['trade_date']:
-                    raise ValueError('recover the pending commit before starting another daily batch for this date')
+            from ..storage.daily import initialize_schema
+            initialize_schema(metadata.connection)
             state = metadata.load_collection_task(task_id)
             if state:
-                if state.get('format_version') not in {'daily-batch-v1', 'daily-batch-v2'}:
-                    raise ValueError('historical daily checkpoints are read-only; create a new batch task ID/root')
+                if state.get('format_version') != 'daily-table-batch-v1':
+                    raise ValueError('legacy Parquet daily checkpoints are retained read-only; create a new task ID/root')
                 frozen = _load_daily_batch_definition(state, paths)
                 # An explicit new scope cannot be smuggled into a resume operation.
                 if row_hash(definition) != frozen.get('request_hash'):
@@ -1317,6 +1435,8 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                 if state['status'] == 'committing':
                     if redo != 'resume':
                         raise ValueError('recover pending publication before any redo')
+                    if _prepare_only:
+                        return {"_prepared_submission": True, "state": state, "frozen": frozen}
                     return _daily_batch_result(_finish_daily_batch(state, paths, metadata, failure_hook))
             else:
                 resolved = resolve_daily_definition(definition, config_root)
@@ -1343,8 +1463,8 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                     resolved["suspended_securities"] = [{key: unit.get(key) for key in
                         ("symbol", "instrument_id", "asset_type", "status", "status_evidence")} for unit in suspended]
                     base = [unit for unit in base if unit not in suspended]
-                units = expand_daily_units(base, resolved)
-                if not units:
+                units = expand_daily_units(base, resolved) if base else []
+                if not units and not resolved.get('suspended_securities'):
                     raise ValueError('daily batch requires a nonempty security scope')
                 available_contracts = {c.input_id: c for c in load_input_capabilities(config_root / 'providers.yaml')}
                 used_input_ids = {unit['input_id'] for unit in units}
@@ -1368,7 +1488,7 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                     profile = profiles[contract.collection_profile]
                     processing_contracts[input_id] = {'field_contract': field_contract, 'rule': rule,
                         'cache_max_age_seconds': profile.refresh_interval_seconds or 86400}
-                frozen = {'request': {k: v for k, v in definition.items() if k != 'units'},
+                frozen = {'request': definition,
                     'request_hash': row_hash(definition), 'definition': {k: v for k, v in resolved.items() if k != 'units'},
                     'units': units, 'contracts': {input_id: asdict(contract) for input_id, contract in contracts.items()},
                     'processing_contracts': processing_contracts, 'mode': mode}
@@ -1376,18 +1496,23 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                 if work.exists():
                     raise ValueError('unmanaged daily workspace exists; use a new task ID/root')
                 save_batch_json(work / 'task.json', frozen)
-                state = {'format_version': 'daily-batch-v2', 'task_id': task_id, 'dataset': 'daily_bar',
+                state = {'format_version': 'daily-table-batch-v1', 'task_id': task_id, 'dataset': 'daily_bar',
                     'definition_hash': row_hash(frozen), 'definition_ref': {'path': str(work / 'task.json'), 'sha256': file_hash(work / 'task.json')},
                     'status': 'collecting', 'phase': 'prepare', 'requested_date': resolved['trade_date'],
                     'verification_mode': mode, 'source_unit_count': len(units), 'partitions': {},
                     'lifecycle_exclusions': list(resolved.get('lifecycle_exclusions', ())),
                     'suspended_securities': list(resolved.get('suspended_securities', ()))}
-                _save_daily_batch(state, paths, metadata)
+                if not _prepare_only:
+                    _save_daily_batch(state, paths, metadata)
+            if _prepare_only:
+                return {"_prepared_submission": True, "state": state, "frozen": frozen}
             resolved, units = frozen['definition'], frozen['units']
             work = Path(state['definition_ref']['path']).parent
             if work.is_relative_to(paths['archive_root']) and redo != 'resume':
                 raise ValueError('archived daily batch is read-only; create a new task ID/root for redo')
-            raw_contracts = frozen.get('contracts') or {frozen['contract']['input_id']: frozen['contract']}
+            raw_contracts = frozen.get('contracts')
+            if raw_contracts is None:
+                raw_contracts = {frozen['contract']['input_id']: frozen['contract']}
             contracts = {}
             for input_id, raw_contract in raw_contracts.items():
                 contract_values = dict(raw_contract)
@@ -1409,10 +1534,16 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                     raise ValueError('selected securities must belong to the frozen scope')
             elif symbols:
                 raise ValueError('symbols require selected redo')
-            if redo != 'resume' or 'execution_redo' not in state:
+            if redo == 'resume':
+                state.update(execution_redo='resume', selected_symbols=[])
+            else:
                 state.update(execution_redo=redo, selected_symbols=list(symbols))
+            state['execution_delivery'] = {}
             selected_symbols = set(state.get('selected_symbols', ()))
-            active_units = [u for u in units if not selected_symbols or u['symbol'] in selected_symbols]
+            completed_security_ids = (_published_daily_security_ids(state, frozen, paths)
+                if redo == 'resume' else set())
+            active_units = [u for u in units if (not selected_symbols or u['symbol'] in selected_symbols)
+                            and _stable_identity(u) not in completed_security_ids]
             entries = {}
             for unit in units:
                 path = daily_unit_paths(work, unit)['manifest']
@@ -1424,6 +1555,15 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
             if state['status'] == 'published' and state.get('complete_today') and redo == 'resume':
                 if len(entries) != len(units):
                     raise ValueError('published daily batch unit index is incomplete')
+                for entry in entries.values():
+                    if entry.get('process_status') != 'candidate_complete':
+                        raise ValueError('published daily batch contains an incomplete source unit')
+                    artifact, report_path = Path(entry['artifact']), Path(entry['report_path'])
+                    if (not artifact.is_file() or file_hash(artifact) != entry['artifact_hash']
+                            or not report_path.is_file() or file_hash(report_path) != entry['report_hash']):
+                        raise ValueError('published daily batch candidate or report changed')
+                    if RawObjectStore.verify_manifest(entry['raw_manifest']) != entry['raw_hash']:
+                        raise ValueError('published daily batch raw evidence changed')
                 _finish_daily_batch(state, paths, metadata)
                 return {**_daily_batch_result(state), 'no_op': True}
             if redo in {'full', 'selected'}:
@@ -1851,8 +1991,17 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                 state.update(phase='build', partitions={})
                 for asset in resolved['asset_types']:
                     group = [u for u in units if u['asset_type'] == asset]
+                    group_active = [u for u in active_units if u['asset_type'] == asset]
+                    group_suspended = [item for item in resolved.get('suspended_securities', ())
+                        if item['asset_type'] == asset and item['instrument_id'] not in completed_security_ids
+                        and (not selected_symbols or item['symbol'] in selected_symbols)]
+                    if not group_active and not group_suspended:
+                        continue
+                    publish_symbols = (set(selected_symbols) if selected_symbols else
+                        ({u['symbol'] for u in group_active} | {item['symbol'] for item in group_suspended}
+                         if completed_security_ids else set()))
                     source_rows, promotions, candidate_cache = {}, [], {}
-                    for unit in group:
+                    for unit in group_active:
                         contract = contracts[unit['input_id']]
                         entry = entries.get(unit['key'], {})
                         if entry.get('process_status') != 'candidate_complete':
@@ -1872,11 +2021,13 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                         parameters = contract.bind_parameters(unit['context'])
                         current = paths['raw_root'] / resolved['trade_date'] / contract.provider / contract.endpoint / Path(entry['temporary_raw']).name
                         promotions.append({'key': unit['key'], 'temporary': entry['temporary_raw'], 'current': str(current),
-                            'audit_manifest': entry['raw_manifest'], 'raw_hash': entry['raw_hash']})
+                            'audit_manifest': entry['raw_manifest'], 'raw_hash': entry['raw_hash'],
+                            'instrument_id': _stable_identity(unit)})
                     substate = {'task_id': task_id, 'dataset': 'daily_bar', 'definition_hash': state['definition_hash'],
                         'definition': {**resolved, 'asset_type': asset, 'quote_contract': resolved['quote_contracts'][asset]},
-                        'redo': state['execution_redo'], 'selected_symbols': list(selected_symbols),
-                        'units': {u['key']: entries.get(u['key'], {}) for u in group}, 'status': 'committing', 'batch_raw_finalize': True}
+                        'redo': state['execution_redo'], 'selected_symbols': sorted(publish_symbols),
+                        'units': {u['key']: entries.get(u['key'], {}) for u in group}, 'status': 'committing',
+                        'definition_ref': state['definition_ref'], 'first_execution_order': state.get('first_execution_order')}
                     try:
                         prepared = prepare_daily_task_publication(substate, group, source_rows, paths, config_root,
                             datetime.fromisoformat(resolved['trade_date']).date())
@@ -1884,19 +2035,54 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                         state['partitions'][asset] = {'status': 'blocked', 'error': str(exc)}
                         save_batch_json(work / f'coverage.{asset}.json', substate['daily_check'])
                         continue
-                    save_batch_json(work / f'coverage.{asset}.json', substate['daily_check'])
-                    candidate = work / f'prepared.{asset}.parquet'
-                    table = daily_records_to_table(prepared.pop('records'))
+                    attempt = int(state.get('publication_attempt', 0)) + 1
+                    evidence_root = work / 'publication-evidence' / resolved['trade_date'] / asset
+                    while (evidence_root / f'attempt-{attempt:04d}' / 'descriptor.json').exists():
+                        attempt += 1
+                    attempt_dir = evidence_root / f'attempt-{attempt:04d}'
+                    attempt_dir.mkdir(parents=True, exist_ok=True)
+                    state['publication_attempt'] = attempt
+                    coverage_path = work / f'coverage.{asset}.attempt-{attempt:04d}.json'
+                    save_batch_json(coverage_path, substate['daily_check'])
+                    candidate = attempt_dir / f'prepared.{asset}.parquet'
+                    records = tuple(prepared['records'])
+                    no_trade = prepared['no_trade']
+                    if not records and not no_trade:
+                        state['partitions'][asset] = {'status': 'blocked',
+                            'error': 'no eligible candidate or confirmed no_trade fact; no publication receipt created'}
+                        continue
+                    table = daily_records_to_table(records)
                     if candidate.exists():
-                        if pq.read_table(candidate) != table:
-                            raise ValueError('prepared partition differs; explicit redo requires a new task ID/root')
-                    else:
-                        pq.write_table(table, candidate, compression='zstd')
-                    prepared.update(candidate=str(candidate), candidate_hash=file_hash(candidate), promotions=promotions)
-                    substate['commit'] = prepared
-                    commit_path = work / f'commit.{asset}.json'
-                    save_batch_json(commit_path, substate)
-                    state['partitions'][asset] = {'status': 'prepared', 'commit_ref': {'path': str(commit_path), 'sha256': file_hash(commit_path)}}
+                        raise ValueError('immutable daily attempt candidate path already exists')
+                    pq.write_table(table, candidate, compression='zstd')
+                    raw_evidence, seen_raw = [], set()
+                    for promotion in promotions:
+                        audit = Path(promotion['audit_manifest'])
+                        if promotion['audit_manifest'] not in seen_raw:
+                            actual_hash = RawObjectStore.verify_manifest(audit)
+                            if actual_hash != promotion['raw_hash']:
+                                raise ValueError('daily source evidence changed before publication preparation')
+                            raw_evidence.append({'path': str(audit), 'sha256': actual_hash})
+                            seen_raw.add(promotion['audit_manifest'])
+                    idempotency_key = f"{task_id}:{resolved['trade_date']}:{asset}:attempt-{attempt:04d}"
+                    descriptor = {'task_id': task_id, 'trade_date': resolved['trade_date'], 'asset_type': asset,
+                        'first_execution_order': int(state['first_execution_order']),
+                        'scope_ids': prepared['scope_ids'], 'record_ids': sorted(record.instrument_id for record in records),
+                        'no_trade': {identity: {'reason': fact.reason, 'evidence_ref': fact.evidence_ref}
+                                     for identity, fact in sorted(no_trade.items())},
+                        'daily_owner_grant_hash': hashlib.sha256(json.dumps(state.get('daily_overwrite_grant'),
+                            sort_keys=True, ensure_ascii=False, separators=(',', ':')).encode()).hexdigest(),
+                        'raw_evidence': raw_evidence, 'promotions': promotions,
+                        'candidate': {'path': candidate.relative_to(work).as_posix(), 'sha256': file_hash(candidate)},
+                        'idempotency_key': idempotency_key,
+                        'publication_id': f"{task_id}:{resolved['trade_date']}:{asset}:attempt-{attempt:04d}",
+                        'coverage_ref': {'path': coverage_path.relative_to(work).as_posix(), 'sha256': file_hash(coverage_path)}}
+                    descriptor_path = attempt_dir / 'descriptor.json'
+                    save_batch_json(descriptor_path, descriptor)
+                    descriptor_ref = {'path': descriptor_path.relative_to(work).as_posix(), 'sha256': file_hash(descriptor_path)}
+                    state['partitions'][asset] = {'status': 'prepared', 'attempt': attempt,
+                        'descriptor_ref': descriptor_ref, 'candidate_ref': str(candidate),
+                        'scope_count': len(prepared['scope_ids'])}
                 state.update(status='committing', phase='publish')
                 state['publication_started_at_utc'] = datetime.now(timezone.utc).isoformat()
                 progress.begin('publication')
@@ -1917,15 +2103,382 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
 
 
 def _daily_batch_result(state):
-    """Expose the existing single-partition result to real callers; persistence stays thin."""
-    if len(state['partitions']) == 1:
-        partition = next(iter(state['partitions'].values()))
-        return {**state, **{key: partition[key] for key in ('published_manifest', 'published_hash') if key in partition}}
-    return state
+    """Expose SQLite receipt IDs and distinguish task delivery from current partition size."""
+    refs = []
+    for asset, partition in sorted(state.get('partitions', {}).items()):
+        if not partition.get('publication_id'):
+            continue
+        refs.append({'trade_date': state.get('requested_date'), 'asset_type': asset,
+            'publication_id': partition['publication_id'], 'row_count': partition.get('row_count', 0),
+            'no_trade_count': partition.get('no_trade_count', 0),
+            'superseded_count': partition.get('superseded_count', 0),
+            'current_partition_count': partition.get('actual_count'),
+            'data_revision': partition.get('data_revision')})
+    result = {key: value for key, value in state.items()
+        if key not in {'published_manifest', 'published_hash', 'daily_overwrite_grant'}}
+    result['publication_refs'] = refs
+    if len(refs) == 1:
+        result['publication_id'] = refs[0]['publication_id']
+        result['current_partition_count'] = refs[0]['current_partition_count']
+        result['data_revision'] = refs[0]['data_revision']
+    return result
 
 
-def collect_task(*, definition, config_root, data_root=None, redo="resume", symbols=(),
-                 mode="live", collector=None, collector_options=None, failure_hook=None, progress_callback=None):
+def _stable_identity(unit):
+    identity = unit.get('instrument_id')
+    if identity:
+        return str(identity)
+    symbol = unit.get('symbol', '')
+    exchange = {'sh': 'XSHG', 'sz': 'XSHE', 'bj': 'BSE'}.get(symbol[:2])
+    if not exchange or len(symbol) != 8 or not symbol[2:].isdigit():
+        raise ValueError('collection scope requires a stable exchange-qualified security identity')
+    return exchange + ':' + symbol[2:]
+
+
+def _published_daily_security_ids(state, frozen, paths, *, include_later_owners=True):
+    """Derive delivered and later-owned identities from receipts, descriptors and current owners."""
+    import json
+    import pyarrow.parquet as pq
+    from ..storage.daily import DailyBarStore
+    from ..storage.integrity import file_hash
+    from ..storage.raw import RawObjectStore
+    from ..storage.metadata import MetadataStore
+
+    completed: set[str] = set()
+    all_ids = sorted({_stable_identity(unit) for unit in frozen['units']} |
+        {str(item['instrument_id']) for item in frozen['definition'].get('suspended_securities', ())})
+    owner_assets = ({unit['asset_type'] for unit in frozen['units']} |
+        {item['asset_type'] for item in frozen['definition'].get('suspended_securities', ())})
+    owner_scope = {'dataset': 'daily_bar', 'frequency': '1d',
+        'asset_types': sorted(owner_assets),
+        'securities_by_date': {frozen['definition']['trade_date']: all_ids}}
+    with MetadataStore(paths['metadata_path'], read_only=True) as metadata:
+        store = DailyBarStore(metadata.connection)
+        persisted_state = metadata.load_collection_task(state['task_id'])
+        if persisted_state is None:
+            return set()
+        grant = (persisted_state or {}).get('daily_overwrite_grant')
+        if not isinstance(grant, dict) or not isinstance(grant.get('owners'), list):
+            raise ValueError('daily task has no immutable overwrite grant in its admission snapshot')
+        receipts = store.publication_receipts(task_id=state['task_id'])
+        own_order = state.get('first_execution_order')
+        if own_order is None and persisted_state:
+            own_order = persisted_state.get('first_execution_order')
+        run_root = Path(state['definition_ref']['path']).resolve().parent
+        for receipt in receipts:
+            own_order = receipt['first_execution_order'] if own_order is None else own_order
+            reference = json.loads(receipt['candidate_ref'])
+            if reference.get('task_id') != state['task_id']:
+                raise ValueError('daily receipt descriptor task identity differs')
+            descriptor_path = (run_root / reference['path']).resolve()
+            if (not descriptor_path.is_relative_to(run_root)
+                    or not descriptor_path.is_file() or file_hash(descriptor_path) != reference['sha256']):
+                raise ValueError('daily receipt publication descriptor is missing or changed')
+            descriptor = json.loads(descriptor_path.read_text(encoding='utf-8'))
+            candidate = (run_root / descriptor['candidate']['path']).resolve()
+            if (not candidate.is_relative_to(run_root)
+                    or not candidate.is_file() or file_hash(candidate) != descriptor['candidate']['sha256']):
+                raise ValueError('daily receipt candidate is missing or changed')
+            candidate_ids = {str(row['instrument_id']) for row in pq.read_table(candidate).to_pylist()}
+            if candidate_ids != set(descriptor['record_ids']):
+                raise ValueError('daily receipt candidate identities differ from its descriptor')
+            for evidence in descriptor['raw_evidence']:
+                if RawObjectStore.verify_manifest(evidence['path']) != evidence['sha256']:
+                    raise ValueError('daily receipt original response evidence changed')
+            delivered = candidate_ids | set(descriptor['no_trade'])
+            delivered.difference_update(receipt['superseded_identities'])
+            completed.update(delivered)
+        if include_later_owners:
+            current_owners = store.current_owners(owner_scope)
+            grant_by_identity = {(owner['trade_date'], owner['instrument_id']): owner
+                                 for owner in grant['owners']}
+            current_by_identity = {(owner['trade_date'], owner['instrument_id']): owner
+                                   for owner in current_owners}
+            for key, original_owner in grant_by_identity.items():
+                if key not in current_by_identity:
+                    raise RuntimeError(f'frozen daily overwrite owner disappeared for {key[1]}')
+            for key, owner in current_by_identity.items():
+                original_owner = grant_by_identity.get(key)
+                if owner['task_id'] != state['task_id'] and (
+                        original_owner != owner or (own_order is not None and
+                        owner['first_execution_order'] > int(own_order))):
+                    completed.add(owner['instrument_id'])
+    return completed
+
+
+def _daily_scope(frozen, *, redo, symbols, completed_security_ids=()):
+    definition = frozen['definition']
+    units = frozen['units']
+    selected = set(symbols or ())
+    completed = set(completed_security_ids) if redo == 'resume' else set()
+    active = [unit for unit in units if (not selected or unit['symbol'] in selected)
+              and _stable_identity(unit) not in completed]
+    suspended = [item for item in definition.get('suspended_securities', ())
+                 if (not selected or item['symbol'] in selected)
+                 and item['instrument_id'] not in completed]
+    identities = sorted({_stable_identity(unit) for unit in active} |
+                        {str(item['instrument_id']) for item in suspended})
+    return {'dataset': 'daily_bar', 'frequency': '1d',
+        'asset_types': sorted({unit['asset_type'] for unit in active} | {item['asset_type'] for item in suspended}),
+        'securities_by_date': {definition['trade_date']: identities}}
+
+
+def _canonical_scope_conflicts(paths, scope):
+    conflicts = []
+    if scope['dataset'] == 'daily_bar':
+        from ..storage.daily import DailyBarStore, initialize_schema
+        from ..storage.metadata import MetadataStore
+        with MetadataStore(paths['metadata_path']) as metadata:
+            initialize_schema(metadata.connection)
+            conflicts.extend(DailyBarStore(metadata.connection).current_owners(scope))
+    elif scope['dataset'] == 'security_master':
+        from ..service.instruments import read_published_security_master
+        directory = Path(paths['canonical_root']) / 'security_master' / 'current'
+        if directory.exists():
+            _, records = read_published_security_master(directory)
+            if records:
+                conflicts.append({'trade_date': next(iter(scope['securities_by_date'])),
+                                  'securities': tuple(sorted({r.instrument_id for r in records}))})
+    return tuple(conflicts)
+
+
+def _daily_active_scope_conflict(metadata_path, task_id, scope):
+    """Preflight dated identity overlap so an active owner wins over owner confirmation.
+
+    The enqueue transaction repeats this check atomically; this read only selects
+    the user-facing rejection when a publication receipt already exists for the
+    still-active task.
+    """
+    from ..storage.metadata import MetadataStore
+
+    path = Path(metadata_path)
+    if not path.is_file():
+        return None
+    with MetadataStore(path, read_only=True) as metadata:
+        return metadata.active_scope_conflict(scope, exclude_task_id=task_id)
+
+
+def submit_collection_task(*, definition, config_root, data_root=None, redo='resume', symbols=(), mode='live',
+                           collector=None, collector_options=None, failure_hook=None, progress_callback=None,
+                           overwrite=False, confirmed_conflicts=()):
+    """Freeze and persist one task in the SQLite FIFO without acquiring the execution lock."""
+    import json
+    from ..storage.integrity import file_hash, row_hash
+    from ..storage.metadata import CollectionTaskScopeConflict, CollectionTaskSnapshotChanged, MetadataStore
+
+    root = Path(config_root).resolve()
+    paths = load_storage_paths(root, data_root=data_root)
+    task_id = definition.get('task_id')
+    if not isinstance(task_id, str) or not task_id:
+        raise ValueError('collection task requires an explicit task ID')
+    if redo not in {'resume', 'full', 'selected'}:
+        raise ValueError('unsupported collection redo mode')
+    existing = None
+    if paths['metadata_path'].is_file():
+        with MetadataStore(paths['metadata_path'], read_only=True) as metadata:
+            existing = metadata.load_collection_task(task_id)
+    is_daily = definition.get('dataset') == 'daily_bar' or 'task' in definition
+    if existing and redo == 'resume' and existing.get('status') == 'published' and existing.get('complete_today'):
+        if is_daily:
+            if existing.get('format_version') != 'daily-table-batch-v1':
+                raise ValueError('legacy Parquet daily checkpoints are retained read-only; create a new task ID/root')
+            from ..storage.integrity import row_hash
+            frozen = _load_daily_batch_definition(existing, paths)
+            if row_hash(definition) != frozen.get('request_hash'):
+                raise ValueError('daily batch request differs from frozen scope; create a new task ID')
+            if mode != frozen.get('mode'):
+                raise ValueError('daily batch execution mode is frozen; create a new task ID')
+            _published_daily_security_ids(existing, frozen, paths)
+            return {**_daily_batch_result(existing), 'no_op': True}
+        return _execute_task_body(definition=definition, config_root=root, data_root=paths['data_root'],
+            redo=redo, symbols=symbols, mode=mode, collector=collector, collector_options=collector_options,
+            failure_hook=failure_hook, progress_callback=progress_callback)
+
+    created_daily_workspace = False
+    if is_daily:
+        if collector is not None or set(collector_options or {}) - {'pacer'}:
+            raise ValueError('daily batch uses its separate capture and processing operations')
+        prepared = _collect_daily_batch(definition=definition, config_root=root, data_root=paths['data_root'],
+            redo=redo, symbols=symbols, mode=mode, failure_hook=failure_hook, progress_callback=progress_callback,
+            pacer=(collector_options or {}).get('pacer'), _prepare_only=True)
+        if not prepared.get('_prepared_submission'):
+            return prepared
+        state, frozen = prepared['state'], prepared['frozen']
+        created_daily_workspace = existing is None
+        task_json = Path(state['definition_ref']['path'])
+        frozen_suspended = list(frozen['definition'].get('suspended_securities', ()))
+        frozen_symbols = ({unit['symbol'] for unit in frozen['units']} |
+            {item['symbol'] for item in frozen_suspended})
+        if redo == 'selected':
+            if not symbols or set(symbols) - frozen_symbols:
+                _discard_unaccepted_daily_task(state, existing is None)
+                raise ValueError('selected securities must belong to the frozen scope')
+        elif symbols:
+            _discard_unaccepted_daily_task(state, existing is None)
+            raise ValueError('symbols require selected redo')
+        frozen_scope = {'dataset': 'daily_bar', 'frequency': '1d',
+            'asset_types': sorted({unit['asset_type'] for unit in frozen['units']} |
+                {item['asset_type'] for item in frozen_suspended}),
+            'securities_by_date': {frozen['definition']['trade_date']:
+                sorted({_stable_identity(unit) for unit in frozen['units']} |
+                    {str(item['instrument_id']) for item in frozen_suspended})}}
+        recovering_commit = state.get('status') == 'committing'
+        completed_security_ids = (_published_daily_security_ids(state, frozen, paths)
+            if redo == 'resume' and not recovering_commit else ())
+        scope = (_daily_scope(frozen, redo='full', symbols=()) if recovering_commit else
+            _daily_scope(frozen, redo=redo, symbols=symbols, completed_security_ids=completed_security_ids))
+        if not any(scope['securities_by_date'].values()) and not recovering_commit:
+            from ..storage.daily import DailyBarStore
+            with MetadataStore(paths['metadata_path'], read_only=True) as metadata:
+                daily_store = DailyBarStore(metadata.connection)
+                receipts = daily_store.publication_receipts(task_id=task_id)
+                order = state.get('first_execution_order') or next((item['first_execution_order'] for item in receipts), None)
+                all_ids = sorted({_stable_identity(unit) for unit in frozen['units']} |
+                    {str(item['instrument_id']) for item in frozen['definition'].get('suspended_securities', ())})
+                all_assets = sorted({unit['asset_type'] for unit in frozen['units']} |
+                    {item['asset_type'] for item in frozen['definition'].get('suspended_securities', ())})
+                owner_scope = {'dataset': 'daily_bar', 'frequency': '1d', 'asset_types': all_assets,
+                    'securities_by_date': {frozen['definition']['trade_date']: all_ids}}
+                grant = state.get('daily_overwrite_grant')
+                if not isinstance(grant, dict) or not isinstance(grant.get('owners'), list):
+                    raise ValueError('daily task has no immutable overwrite grant in its admission snapshot')
+                original_owners = {(owner['trade_date'], owner['instrument_id']): owner
+                                   for owner in grant['owners']}
+                superseded = sorted(owner['instrument_id'] for owner in daily_store.current_owners(owner_scope)
+                    if owner['task_id'] != task_id and (
+                        original_owners.get((owner['trade_date'], owner['instrument_id'])) != owner
+                        or (order is not None and owner['first_execution_order'] > int(order))))
+            return {'task_id': task_id, 'dataset': 'daily_bar', 'status': state.get('status', 'failed'),
+                'no_op': True, 'superseded_identities': superseded,
+                'reason': 'all frozen daily identities were already delivered or protected by a later publication'}
+        state.update(execution_redo=redo, selected_symbols=list(symbols))
+        queue_definition = json.loads(task_json.read_text(encoding='utf-8'))['request']
+    else:
+        import re
+        if not re.fullmatch(r'[A-Za-z0-9_-]{1,64}', task_id):
+            raise ValueError('invalid task ID')
+        if mode not in {'live', 'replay', 'retained'}:
+            raise ValueError('unsupported task execution mode')
+        if definition.get('dataset') == 'security_master' and definition.get('units') is None:
+            from ..worker.scheduler import build_security_master_definition
+            from ..service.calendar import TradingCalendarStore
+            target_day = datetime.strptime(definition['trade_date'], '%Y-%m-%d').date()
+            paths['metadata_path'].parent.mkdir(parents=True, exist_ok=True)
+            with TradingCalendarStore(str(paths['metadata_path'])) as calendar:
+                is_open = calendar.is_trading_day(target_day)
+            generated = build_security_master_definition(root, trade_date=target_day,
+                now=datetime.now(timezone.utc), is_trading_day=is_open, task_id=task_id)
+            definition = {**generated, **definition, 'units': generated['units']}
+        dataset = definition.get('dataset')
+        if dataset != 'security_master':
+            raise ValueError('only security_master and daily_bar tasks are supported')
+        if mode == 'replay' and (paths['data_root'].is_relative_to(load_storage_paths(root)['data_root'])
+                                 or load_storage_paths(root)['data_root'].is_relative_to(paths['data_root'])):
+            raise ValueError('task replay publication requires an isolated --data-root')
+        contracts = {item.input_id: item for item in load_input_capabilities(root / 'providers.yaml')}
+        units = _task_units(definition, paths)
+        if not units or len({unit['key'] for unit in units}) != len(units):
+            raise ValueError('task requires nonempty, unique source units')
+        for unit in units:
+            contract = contracts[unit['input_id']]
+            if contract.dataset != 'security_snapshot':
+                raise ValueError('input dataset does not match business task')
+            contract.bind_parameters(unit['context'])
+            if mode == 'retained' and not unit.get('replay_manifest'):
+                raise ValueError('retained task units require explicit original response manifests')
+            if mode == 'live' and unit.get('replay_manifest'):
+                raise ValueError('live tasks must not supply an external replay manifest')
+        immutable = {**definition, 'units': [{k: v for k, v in unit.items() if k != 'replay_manifest'} for unit in units]}
+        definition_hash = row_hash(immutable)
+        day = datetime.strptime(definition['trade_date'], '%Y-%m-%d').date()
+        work = paths['workspace_root'] / day.isoformat() / dataset / task_id
+        task_json = work / 'task.json'
+        if existing is None and work.exists():
+            raise ValueError('unmanaged task workspace exists; choose a new task ID')
+        if not task_json.exists():
+            from .daily import save_batch_json
+            save_batch_json(task_json, {'definition': immutable,
+                'execution_definition': {**definition, 'units': units}})
+        state = (existing if existing else {'task_id': task_id, 'dataset': dataset,
+            'definition_hash': definition_hash, 'definition': _json_value(immutable),
+            'execution_definition': _json_value({**definition, 'units': units}),
+            'definition_ref': {'path': str(task_json), 'sha256': file_hash(task_json)},
+            'units': {}, 'status': 'waiting'})
+        state.update(redo=redo, selected_symbols=list(symbols), verification_mode=mode,
+                     definition_ref={'path': str(task_json), 'sha256': file_hash(task_json)})
+        frozen_scope = {'dataset': dataset, 'frequency': 'snapshot', 'asset_types': ['security'],
+            'securities_by_date': {definition['trade_date']: ['*']}}
+        scope = frozen_scope
+        queue_definition = {**definition, 'units': units}
+
+    if task_json.is_file() and file_hash(task_json) != state['definition_ref']['sha256']:
+        raise ValueError('frozen task definition changed before queue admission')
+    if is_daily:
+        active_conflict = _daily_active_scope_conflict(paths['metadata_path'], task_id, scope)
+        if active_conflict:
+            _discard_unaccepted_daily_task(state, created_daily_workspace)
+            raise CollectionTaskScopeConflict(*active_conflict)
+    actual = _canonical_scope_conflicts(paths, scope)
+    daily_owner_refs = None
+    if is_daily:
+        actual_keys = {json.dumps(ref, sort_keys=True, ensure_ascii=False, separators=(',', ':')) for ref in actual}
+        confirmed = tuple(confirmed_conflicts)
+        confirmed_keys = {json.dumps(ref, sort_keys=True, ensure_ascii=False, separators=(',', ':'))
+                          for ref in confirmed if isinstance(ref, dict)}
+        if len(confirmed_keys) != len(confirmed):
+            raise ValueError('daily overwrite confirmation must contain exact current owner references')
+        continuing_run = existing is not None
+        if actual and not overwrite and not continuing_run:
+            _discard_unaccepted_daily_task(state, created_daily_workspace)
+            raise CollectionTaskScopeConflict('published-data', tuple(actual))
+        if overwrite and not continuing_run and actual_keys != confirmed_keys:
+            _discard_unaccepted_daily_task(state, created_daily_workspace)
+            raise ValueError('daily overwrite confirmation differs from the reviewed date/asset/identity owners')
+        if not overwrite and confirmed and not continuing_run:
+            _discard_unaccepted_daily_task(state, created_daily_workspace)
+            raise ValueError('daily owner references require explicit overwrite confirmation')
+        # A resumed run rechecks the exact present refs atomically at enqueue, but
+        # its original snapshot grant remains authoritative inside the store.
+        daily_owner_refs = tuple(actual) if (overwrite or continuing_run) else ()
+    else:
+        overwrite_allowed = overwrite or redo in {'full', 'selected'}
+        if actual and not overwrite_allowed:
+            raise CollectionTaskScopeConflict('published-data', actual)
+        confirmed = tuple(confirmed_conflicts)
+        if overwrite and confirmed and set(confirmed) != {
+                identity for conflict in actual for identity in conflict['securities']}:
+            raise ValueError('overwrite confirmation differs from the reviewed canonical conflicts')
+    with MetadataStore(paths['metadata_path']) as metadata:
+        snapshot = {'registry_hash': metadata.partition_registry_snapshot(scope)}
+        try:
+            return metadata.enqueue_collection_task(state, scope, snapshot=snapshot, frozen_scope=frozen_scope,
+                daily_owner_refs=daily_owner_refs)
+        except (CollectionTaskScopeConflict, CollectionTaskSnapshotChanged):
+            _discard_unaccepted_daily_task(state, created_daily_workspace)
+            raise
+
+
+def _discard_unaccepted_daily_task(state, created_here: bool) -> None:
+    """Remove only this call's untouched frozen descriptor after admission rejection."""
+    if not created_here:
+        return
+    from ..storage.integrity import file_hash
+    reference = state.get('definition_ref', {})
+    path = Path(reference.get('path', ''))
+    if (path.name != 'task.json' or not path.is_file() or file_hash(path) != reference.get('sha256')):
+        return
+    task_root = path.parent
+    path.unlink()
+    try:
+        task_root.rmdir()
+    except OSError:
+        # Preserve any directory content not created by this preparation call.
+        pass
+
+
+def _execute_task_body(*, definition, config_root, data_root=None, redo="resume", symbols=(),
+                       mode="live", collector=None, collector_options=None, failure_hook=None,
+                       progress_callback=None, _collection_lock_held=False):
     """One durable source-to-publication task, using the existing input executor."""
     if definition.get('dataset') == 'daily_bar' or definition.get('task'):
         root = Path(data_root) if data_root is not None else load_storage_paths(Path(config_root))['data_root']
@@ -1934,9 +2487,10 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
             raise ValueError('daily batch uses its separate capture and processing operations, not a per-input collector')
         return _collect_daily_batch(definition=definition, config_root=config_root, data_root=data_root,
             redo=redo, symbols=symbols, mode=mode, failure_hook=failure_hook, progress_callback=progress_callback,
-            pacer=(collector_options or {}).get('pacer'))
+            pacer=(collector_options or {}).get('pacer'), _collection_lock_held=_collection_lock_held)
     import json
     import re
+    from contextlib import nullcontext
     from ..storage.integrity import file_hash, row_hash
     from ..storage.metadata import MetadataStore
     from ..storage.parquet import PartitionLock
@@ -1995,8 +2549,10 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
         raise ValueError("symbols are only accepted for selected redo")
     immutable = {**definition, "units": [{k: v for k, v in unit.items() if k != "replay_manifest"} for unit in units]}
     definition_hash = row_hash(immutable)
-    work = paths["workspace_root"] / day.isoformat() / dataset
-    with PartitionLock(paths["workspace_root"] / "_locks" / "collection.lock", recover_stale=True):
+    work = paths["workspace_root"] / day.isoformat() / dataset / task_id
+    lock_context = (nullcontext() if _collection_lock_held else
+        PartitionLock(paths["workspace_root"] / "_locks" / "collection.lock", recover_stale=True))
+    with lock_context:
         with MetadataStore(paths["metadata_path"]) as metadata:
             for pending in metadata.collection_tasks(status="committing"):
                 if (pending["task_id"] != task_id and pending["dataset"] == dataset
@@ -2202,6 +2758,118 @@ def collect_task(*, definition, config_root, data_root=None, redo="resume", symb
             return _finish_task_commit(state, paths, metadata, failure_hook, progress=progress)
 
 
+def run_collection_queue_once(*, config_root, data_root=None, collector=None, failure_hook=None,
+                              progress_callback=None):
+    """Claim and execute at most one FIFO task while holding the existing execution lock."""
+    import json
+    from ..storage.metadata import MetadataStore
+    from ..storage.parquet import PartitionLock, PartitionLockedError
+    from ..storage.integrity import file_hash
+
+    root = Path(config_root).resolve()
+    paths = load_storage_paths(root, data_root=data_root)
+    lock = PartitionLock(paths['workspace_root'] / '_locks' / 'collection.lock', recover_stale=True)
+    try:
+        lock.__enter__()
+    except PartitionLockedError:
+        return None
+    try:
+        with MetadataStore(paths['metadata_path']) as metadata:
+            state = metadata.claim_next_collection_task()
+        if state is None:
+            return None
+        task_id = state['task_id']
+        try:
+            task_path = Path(state.get('definition_ref', {}).get('path', ''))
+            if not task_path.is_file() or file_hash(task_path) != state.get('definition_ref', {}).get('sha256'):
+                raise ValueError('queued task definition is missing or changed')
+            document = json.loads(task_path.read_text(encoding='utf-8'))
+            if state.get('format_version') == 'daily-table-batch-v1':
+                definition = document['request']
+                redo = state.get('execution_redo', 'resume')
+                symbols = state.get('selected_symbols', ())
+                result = _collect_daily_batch(definition=definition, config_root=root, data_root=paths['data_root'],
+                    redo=redo, symbols=symbols, mode=state.get('verification_mode', 'live'),
+                    failure_hook=failure_hook, progress_callback=progress_callback,
+                    _collection_lock_held=True)
+            else:
+                definition = document.get('execution_definition') or state.get('execution_definition')
+                if not definition:
+                    raise ValueError('queued task has no frozen execution definition')
+                result = _execute_task_body(definition=definition, config_root=root, data_root=paths['data_root'],
+                    redo=state.get('redo', 'resume'), symbols=state.get('selected_symbols', ()),
+                    mode=state.get('verification_mode', 'live'), collector=collector,
+                    failure_hook=failure_hook, progress_callback=progress_callback,
+                    _collection_lock_held=True)
+            return result
+        except Exception as exc:
+            with MetadataStore(paths['metadata_path']) as metadata:
+                current = metadata.load_collection_task(task_id)
+                if current and current.get('status') not in {'committing', 'published'}:
+                    current.update(status='failed', error=str(exc))
+                    metadata.save_collection_task(current)
+            return {'task_id': task_id, 'status': 'failed', '_error': exc}
+    finally:
+        lock.__exit__(None, None, None)
+
+
+def run_collection_worker(*, config_root, data_root=None, stop_event=None, poll_interval_seconds=0.5,
+                          collector=None):
+    """Persistently consume waiting tasks until stopped; no per-task daemon is created."""
+    import logging
+    import math
+    from threading import Event
+    if not isinstance(poll_interval_seconds, (int, float)) or not math.isfinite(poll_interval_seconds) or poll_interval_seconds <= 0:
+        raise ValueError('collection worker poll interval must be a positive finite number')
+    stop_event = stop_event or Event()
+    while not stop_event.is_set():
+        try:
+            result = run_collection_queue_once(config_root=config_root, data_root=data_root, collector=collector)
+            if result is None:
+                stop_event.wait(poll_interval_seconds)
+            elif result.get('_error'):
+                logging.error('queued collection task %s failed: %s', result.get('task_id'), result['_error'])
+        except (OSError, ValueError, RuntimeError):
+            logging.exception('collection queue polling failed')
+            stop_event.wait(poll_interval_seconds)
+
+
+def collect_task(*, definition, config_root, data_root=None, redo='resume', symbols=(), mode='live',
+                 collector=None, collector_options=None, failure_hook=None, progress_callback=None,
+                 overwrite=False, confirmed_conflicts=()):
+    """Synchronous compatibility contract implemented by submitting and draining the same FIFO."""
+    from threading import Event
+    from time import sleep
+    from ..storage.metadata import MetadataStore
+
+    accepted = submit_collection_task(definition=definition, config_root=config_root, data_root=data_root,
+        redo=redo, symbols=symbols, mode=mode, collector=collector, collector_options=collector_options,
+        failure_hook=failure_hook, progress_callback=progress_callback, overwrite=overwrite,
+        confirmed_conflicts=confirmed_conflicts)
+    if accepted.get('no_op'):
+        return accepted
+    task_id = accepted['task_id']
+    paths = load_storage_paths(Path(config_root), data_root=data_root)
+    while True:
+        with MetadataStore(paths['metadata_path'], read_only=True) as metadata:
+            current = metadata.load_collection_task(task_id)
+        if current is None:
+            if 'no_op' in accepted:
+                return accepted
+            raise RuntimeError('accepted collection task disappeared from metadata')
+        if current['status'] in {'published', 'failed'} and current.get('phase') == 'finished':
+            return _daily_batch_result(current) if current.get('format_version') == 'daily-table-batch-v1' else current
+        if current['status'] in {'published', 'failed'} and current.get('dataset') == 'security_master':
+            return current
+        result = run_collection_queue_once(config_root=config_root, data_root=data_root, collector=collector,
+            failure_hook=failure_hook, progress_callback=progress_callback)
+        if result and result.get('task_id') == task_id and result.get('_error'):
+            raise result['_error']
+        if result and result.get('task_id') == task_id:
+            return result
+        Event().wait(0.05)
+
+
 def _save_task_summary(state, paths, metadata):
     """One generated task result; source evidence remains in the existing stores."""
     import json
@@ -2369,27 +3037,16 @@ def _load_security_master(paths, *, through_date=None):
     directory = _security_master_directory(paths)
     current_manifest_path = directory / "manifest.json"
     current_data_path = directory / "security_master.duckdb"
-    if (directory / "task-commit.json").exists():
-        raise ValueError("current security master has a pending publication")
     if current_manifest_path.exists() or current_data_path.exists():
-        if not current_manifest_path.is_file() or not current_data_path.is_file():
-            raise ValueError("current security master database and manifest are incomplete")
+        from ..service.instruments import read_published_security_master
+        manifest, records = read_published_security_master(directory)
         manifest_path = current_manifest_path.resolve()
         if not manifest_path.is_relative_to(root):
             raise ValueError("current security master escaped canonical storage")
-        manifest = Manifest.load(manifest_path)
-        if (manifest.dataset != "security_master" or manifest.asset_type != "security"
-                or not manifest.verify(current_data_path)):
-            raise ValueError("current security master failed manifest verification")
         as_of_date = manifest.publication_metadata.get("as_of_date") or manifest.partition_key
         is_future_for_request = (through_date is not None and as_of_date
                                  and date.fromisoformat(as_of_date) > date.fromisoformat(str(through_date)))
         if not is_future_for_request:
-            from ..service.instruments import SecurityMasterStore
-            with SecurityMasterStore(str(current_data_path)) as store:
-                records = store.all()
-            if len(records) != manifest.row_count:
-                raise ValueError("current security master row count differs from its manifest")
             return manifest_path, manifest, records, True
 
     from ..storage.metadata import MetadataStore
@@ -2458,23 +3115,6 @@ def _task_unit_valid(entry):
     from ..storage.integrity import file_hash
     try:
         report = entry.get("report", {})
-        if entry.get('revalidation_report'):
-            descriptor = entry['revalidation_report']
-            if file_hash(Path(descriptor['path'])) != descriptor['sha256']:
-                return False
-            import json
-            import pyarrow.parquet as pq
-            current = json.loads(Path(descriptor['path']).read_text(encoding='utf-8'))
-            if (current['status'] != 'candidate_complete' or current['input_id'] != report['input_id']
-                    or current['parameters'] != report['parameters']
-                    or current['output']['source_response_hashes'] != report['output']['source_response_hashes']):
-                return False
-            artifact = Path(current['run_directory']) / current['output']['path']
-            if file_hash(artifact) != current['output']['sha256']:
-                return False
-            if json.loads(artifact.read_text(encoding='utf-8')) != _json_value(pq.read_table(entry['artifact']).to_pylist()):
-                return False
-            report = current
         config_ok = all(file_hash(Path(item["path"])) == item["sha256"]
                         for item in report.get("config_files", ()))
         return (config_ok and not entry.get("coverage_rejected") and entry["status"] == "candidate_complete"
@@ -2749,11 +3389,10 @@ def _prepare_task_commit(state, units, contracts, paths, config_root, work, day)
 
 def _finish_task_commit(state, paths, metadata, failure_hook=None, progress=None, save_state=None):
     import json
-    import pyarrow.parquet as pq
     from datetime import date
-    from ..domain import ItemStatus
     from ..storage.integrity import Manifest, file_hash
-    from ..storage.parquet import CanonicalPartitionStore
+    if state.get('dataset') != 'security_master':
+        raise ValueError('daily_bar publication must use the SQLite daily table receipt contract')
     if progress is None and state.get('progress'):
         from ..worker.progress import TaskProgress
         def recovered_progress(snapshot):
@@ -2791,79 +3430,62 @@ def _finish_task_commit(state, paths, metadata, failure_hook=None, progress=None
         attempt_id="commit", relative_path="task-commit.json")
     if failure_hook:
         failure_hook("before_publish")
-    if state["dataset"] == "daily_bar":
-        # A crash may leave the new data paired with the previous manifest.
-        # Complete this task's verified pair before reading/merging the partition.
-        pending_manifest = partition / ("manifest." + state["task_id"] + ".tmp.json")
-        if pending_manifest.exists():
-            pending = Manifest.load(pending_manifest)
-            pending_data = partition / ("data." + state["task_id"] + ".tmp.parquet")
-            if pending_data.exists() and pending.verify(pending_data):
-                os.replace(pending_data, partition / "data.parquet")
-            elif not pending.verify(partition / "data.parquet"):
-                raise ValueError("interrupted task publication failed integrity verification")
-            os.replace(pending_manifest, partition / "manifest.json")
-        from ..storage.parquet import mapping_to_daily
-        result = CanonicalPartitionStore(paths["canonical_root"]).publish_daily(
-            asset_type=commit["asset_type"], partition_key=commit["partition_key"],
-            new_records=[mapping_to_daily(row) for row in pq.read_table(candidate).to_pylist()],
-            expected_count=commit["expected_count"], run_id=state["task_id"],
-            item_statuses={key: ItemStatus(value) for key, value in commit["item_statuses"].items()},
-            replace_instrument_ids=frozenset(commit["replace_ids"]), failure_hook=failure_hook)
-        manifest_path, manifest = result.manifest_path, result.manifest
-        if result.quarantined_keys:
-            raise ValueError("publication contains quarantined source conflicts")
+    if state["dataset"] != "security_master":
+        raise ValueError("unsupported task commit dataset")
     else:
-        from ..service.instruments import SecurityMasterStore, SymbolHistory, security_record_from_mapping
-        database_path = partition / "security_master.duckdb"
-        candidate_rows = json.loads(candidate.read_text(encoding="utf-8"))
-        records = tuple(security_record_from_mapping(row) for row in candidate_rows)
-        with SecurityMasterStore(str(database_path)) as store:
-            previous_records = store.all()
-            if not previous_records and commit.get("previous_manifest"):
-                prior_manifest_path = Path(commit["previous_manifest"]).resolve()
-                if not prior_manifest_path.is_relative_to(paths["canonical_root"].resolve()):
-                    raise ValueError("prior security master escaped canonical storage")
-                prior_manifest = Manifest.load(prior_manifest_path)
-                prior_data = prior_manifest_path.parent / "data.parquet"
-                if prior_data.is_file() and prior_manifest.verify(prior_data):
-                    import pyarrow.parquet as pq
-                    previous_records = tuple(security_record_from_mapping(row)
-                        for row in pq.read_table(prior_data).to_pylist())
-            before = {record.instrument_id: record for record in previous_records}
-            changes = []
-            for record in records:
-                old = before.get(record.instrument_id)
-                if old is None:
-                    changes.append((record.instrument_id, "created", None, record.symbol,
-                                    date.fromisoformat(commit["trade_date"]), ",".join(record.evidence_sources)))
-                    continue
-                for field in ("symbol", "name", "asset_type", "status", "list_date", "delist_date"):
-                    old_value, new_value = getattr(old, field), getattr(record, field)
-                    if old_value != new_value:
-                        changes.append((record.instrument_id, field, old_value, new_value,
-                                        date.fromisoformat(commit["trade_date"]),
-                                        ",".join(record.evidence_sources)))
-            aliases = tuple(SymbolHistory(
-                instrument_id=item["instrument_id"], provider=item["provider"], symbol=item["symbol"],
-                effective_from=date.fromisoformat(item["effective_from"]),
-                effective_to=date.fromisoformat(item["effective_to"]) if item.get("effective_to") else None,
-                change_reason=item["change_reason"], evidence_source=item["evidence_source"])
-                for item in commit.get("symbol_history", ()))
-            store.publish(records, aliases=aliases, changes=changes)
-            row_count = len(store.all())
-        if row_count != commit["row_count"]:
-            raise ValueError("current security master row count differs from prepared candidate")
-        manifest = Manifest.from_file(database_path, dataset="security_master", asset_type="security",
-            partition_key=commit["trade_date"], row_count=row_count,
-            expected_count=commit["expected_count"], first_key=records[0].instrument_id if records else None,
-            last_key=records[-1].instrument_id if records else None,
-            raw_refs=tuple(commit["raw_refs"]), item_statuses=commit["item_statuses"],
-            publication_metadata=commit.get("publication_metadata", {}))
-        temporary_manifest = partition / ("manifest." + state["task_id"] + ".tmp.json")
-        manifest.write_atomic(temporary_manifest)
-        manifest_path = partition / "manifest.json"
-        os.replace(temporary_manifest, manifest_path)
+        from ..storage.parquet import PartitionLock
+        with PartitionLock(partition / ".master-access.lock", timeout_seconds=1,
+                           recover_stale=True):
+            from ..service.instruments import SecurityMasterStore, SymbolHistory, security_record_from_mapping
+            database_path = partition / "security_master.duckdb"
+            candidate_rows = json.loads(candidate.read_text(encoding="utf-8"))
+            records = tuple(security_record_from_mapping(row) for row in candidate_rows)
+            with SecurityMasterStore(str(database_path)) as store:
+                previous_records = store.all()
+                if not previous_records and commit.get("previous_manifest"):
+                    prior_manifest_path = Path(commit["previous_manifest"]).resolve()
+                    if not prior_manifest_path.is_relative_to(paths["canonical_root"].resolve()):
+                        raise ValueError("prior security master escaped canonical storage")
+                    prior_manifest = Manifest.load(prior_manifest_path)
+                    prior_data = prior_manifest_path.parent / "data.parquet"
+                    if prior_data.is_file() and prior_manifest.verify(prior_data):
+                        import pyarrow.parquet as pq
+                        previous_records = tuple(security_record_from_mapping(row)
+                            for row in pq.read_table(prior_data).to_pylist())
+                before = {record.instrument_id: record for record in previous_records}
+                changes = []
+                for record in records:
+                    old = before.get(record.instrument_id)
+                    if old is None:
+                        changes.append((record.instrument_id, "created", None, record.symbol,
+                                        date.fromisoformat(commit["trade_date"]), ",".join(record.evidence_sources)))
+                        continue
+                    for field in ("symbol", "name", "asset_type", "status", "list_date", "delist_date"):
+                        old_value, new_value = getattr(old, field), getattr(record, field)
+                        if old_value != new_value:
+                            changes.append((record.instrument_id, field, old_value, new_value,
+                                            date.fromisoformat(commit["trade_date"]),
+                                            ",".join(record.evidence_sources)))
+                aliases = tuple(SymbolHistory(
+                    instrument_id=item["instrument_id"], provider=item["provider"], symbol=item["symbol"],
+                    effective_from=date.fromisoformat(item["effective_from"]),
+                    effective_to=date.fromisoformat(item["effective_to"]) if item.get("effective_to") else None,
+                    change_reason=item["change_reason"], evidence_source=item["evidence_source"])
+                    for item in commit.get("symbol_history", ()))
+                store.publish(records, aliases=aliases, changes=changes)
+                row_count = len(store.all())
+            if row_count != commit["row_count"]:
+                raise ValueError("current security master row count differs from prepared candidate")
+            manifest = Manifest.from_file(database_path, dataset="security_master", asset_type="security",
+                partition_key=commit["trade_date"], row_count=row_count,
+                expected_count=commit["expected_count"], first_key=records[0].instrument_id if records else None,
+                last_key=records[-1].instrument_id if records else None,
+                raw_refs=tuple(commit["raw_refs"]), item_statuses=commit["item_statuses"],
+                publication_metadata=commit.get("publication_metadata", {}))
+            temporary_manifest = partition / ("manifest." + state["task_id"] + ".tmp.json")
+            manifest.write_atomic(temporary_manifest)
+            manifest_path = partition / "manifest.json"
+            os.replace(temporary_manifest, manifest_path)
     if failure_hook:
         failure_hook("after_publish")
     if progress:
@@ -2892,12 +3514,9 @@ def _finish_task_commit(state, paths, metadata, failure_hook=None, progress=None
     if progress:
         progress.finish('publication', 'raw_promote')
         save(state)
-    published_data = (partition / "security_master.duckdb" if state["dataset"] == "security_master"
-                      else partition / "data.parquet")
+    published_data = partition / "security_master.duckdb"
     if not manifest.verify(published_data):
         raise ValueError("completed task publication is corrupt")
-    if state["dataset"] != "security_master":
-        metadata.record_partition_publish(manifest=manifest, manifest_path=manifest_path)
     state.update(status="published", published_manifest=str(manifest_path),
                  published_hash=file_hash(manifest_path), row_count=manifest.row_count, error=None)
     if progress:
@@ -3284,7 +3903,8 @@ def _collect_due_security_master(*, now, config_root, data_root, execute, mode, 
                 # collect_task owns recovery and the same partition lock.
                 job["reason"] = "resume interrupted publication"
             result = collect_task(definition=job["definition"], config_root=root, data_root=paths["data_root"],
-                                  mode="live", collector=collector, progress_callback=progress_callback)
+                                  mode="live", collector=collector, progress_callback=progress_callback,
+                                  overwrite=True)
             job.update(status=result["status"], complete_today=result["complete_today"],
                        data_date=result.get("data_date"), fallback_used=result.get("fallback_used", False),
                        no_op=result.get("no_op", False), error=result.get("error"), summary=result.get("summary"))

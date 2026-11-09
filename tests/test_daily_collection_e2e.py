@@ -19,6 +19,7 @@ from stock_data_manage.storage.raw import RawObjectStore
 from stock_data_manage.storage.parquet import CanonicalPartitionStore, InvalidPartitionError, DAILY_SCHEMA_V1, _write_partition
 from stock_data_manage.storage.integrity import file_hash, Manifest
 from stock_data_manage.storage.metadata import MetadataStore
+from stock_data_manage.storage.daily import DailyBarStore
 
 CONFIG = Path(__file__).resolve().parents[1] / "config"
 DAY = "2026-10-09"
@@ -80,6 +81,18 @@ def source_task(tmp_path, *, corrupt=None, day_only_adjustments=False, symbols=(
 def execute(root, definition, **kwargs):
     return collect_task(definition=definition, config_root=CONFIG, data_root=root / "business", mode="replay",
         collector_options={"pacer": RequestPacer(wait=lambda _: None)}, **kwargs)
+
+
+def read_published_daily(business_root, asset_type, trade_date):
+    """Read the public daily fact from SQLite, not the retired Parquet projection."""
+    with MetadataStore(Path(business_root) / "metadata/metadata.sqlite3", read_only=True) as metadata:
+        store = DailyBarStore(metadata.connection)
+        records, count = store.list_records(asset_type=AssetType(asset_type),
+            date_from=date.fromisoformat(trade_date), date_to=date.fromisoformat(trade_date), limit=100)
+        receipts = metadata.connection.execute(
+            "SELECT count(*) FROM daily_publication WHERE trade_date=? AND asset_type=?",
+            [trade_date, AssetType(asset_type).value]).fetchone()[0]
+        return records, count, int(receipts)
 
 
 def batch_entries(state):
@@ -196,55 +209,51 @@ def test_formal_task_three_responses_one_record_and_resume(tmp_path):
     assert state["status"] == "published", state.get("error")
     assert len(batch_entries(state)) == 3 and 'units' not in state
     assert state["row_count"] == 1
-    rows = CanonicalPartitionStore(tmp_path / "business/canonical").read_daily("stock", DAY)
-    assert [rows[0].quotes[a.value].close for a in Adjustment] == [Decimal("10"), Decimal("9"), Decimal("11")]
-    for quote in rows[0].quotes.values():
+    with MetadataStore(tmp_path / "business/metadata/metadata.sqlite3", read_only=True) as metadata:
+        stored = DailyBarStore(metadata.connection).get("XSHG:600001", date.fromisoformat(DAY))
+        assert metadata.partition("daily_bar", "stock", DAY, adjustment="aggregate")["actual_count"] == 1
+    assert stored is not None
+    assert [stored.quotes[a.value].close for a in Adjustment] == [Decimal("10"), Decimal("9"), Decimal("11")]
+    for quote in stored.quotes.values():
         assert quote.volume == Decimal('10000') and quote.amount == Decimal('100000')
         assert set(quote.flags) == {'source_volume_rounded_to_100_shares', 'source_amount_rounded_to_100_CNY'}
-    assert all(Path(q.raw_object_path).exists() for q in rows[0].quotes.values())
-    assert all(q.fetch_time is not None for q in rows[0].quotes.values())
+    assert all(Path(q.raw_object_path).exists() for q in stored.quotes.values())
+    assert all(q.fetch_time is not None for q in stored.quotes.values())
     assert execute(tmp_path, definition)["no_op"]
-    with MetadataStore(tmp_path / "business/metadata/metadata.duckdb") as metadata:
+    with MetadataStore(tmp_path / "business/metadata/metadata.sqlite3", read_only=True) as metadata:
         assert metadata.partition("daily_bar", "stock", DAY, adjustment="aggregate")["actual_count"] == 1
 
 
 def test_stock_day_only_response_publishes_unadjusted_and_keeps_adjustments_unverified(tmp_path):
-    from stock_data_manage.service.web import create_app
-
     definition = source_task(tmp_path, day_only_adjustments=True)
     state = execute(tmp_path, definition)
     assert state["status"] == "published", state.get("error")
     assert state["complete_today"] is True
     assert state["missing_count"] == 0
     assert state["progress"]["stages"]["processing"]["failed"] == 0
-    rows = CanonicalPartitionStore(tmp_path / "business/canonical").read_daily("stock", DAY)
-    assert len(rows) == 1
-    item = rows[0]
+    with MetadataStore(tmp_path / "business/metadata/metadata.sqlite3", read_only=True) as metadata:
+        item = DailyBarStore(metadata.connection).get("XSHG:600001", date.fromisoformat(DAY))
+    assert item is not None
     assert item.none.status is QuoteStatus.AVAILABLE and item.none.close == Decimal("10")
     for name in ("forward", "backward"):
         quote_group = item.quotes[name]
         assert quote_group.status is QuoteStatus.UNVERIFIED
         assert quote_group.close is None
-        assert "not provide the requested" in quote_group.reason
+        assert "omitted the requested optional" in quote_group.reason
     entries = batch_entries(state)
     assert entries["sh600001__forward"]["process_status"] == "unverified"
     assert entries["sh600001__backward"]["process_status"] == "unverified"
-    coverage = json.loads(Path(state["definition_ref"]["path"]).with_name("coverage.stock.json").read_text(encoding="utf-8"))
+    work = Path(state["definition_ref"]["path"]).parent
+    coverage_path = next(work.glob("coverage.stock.attempt-*.json"))
+    coverage = json.loads(coverage_path.read_text(encoding="utf-8"))
     assert coverage["expected_count"] == coverage["actual_count"] == 1
     assert sum(issue["code"] == "optional_adjustment_unavailable" for issue in coverage["issues"]) == 2
 
-    app = create_app(config_root=CONFIG, data_root=tmp_path / "business")
-    endpoint = next(route.endpoint for route in app.routes if getattr(route, "path", None) == "/api/daily")
-    result = endpoint(security="sh600001", start_date=None, end_date=None, asset_type="stock",
-        adjustment="forward", page=1, page_size=50)
-    assert result["total"] == 1
-    assert result["items"][0]["status"] == "unverified"
-    assert result["items"][0]["values"]["close"] is None
-    task_endpoint = next(route.endpoint for route in app.routes if getattr(route, "path", None) == "/api/tasks/{task_id}")
-    task = task_endpoint(task_id=state["task_id"])
-    assert task["partition_results"][0]["status"] == "published"
-    assert task["partition_results"][0]["unverified_count"] == 2
-    assert task["partition_results"][0]["issue_count"] == 2
+    with MetadataStore(tmp_path / "business/metadata/metadata.sqlite3", read_only=True) as metadata:
+        item = DailyBarStore(metadata.connection).get("XSHG:600001", date.fromisoformat(DAY))
+    assert item is not None
+    assert item.forward.status is QuoteStatus.UNVERIFIED and item.forward.close is None
+    assert item.backward.status is QuoteStatus.UNVERIFIED and item.backward.close is None
 
 
 @pytest.mark.parametrize('asset_type', [None, 'stock'])
@@ -310,7 +319,7 @@ def test_http_success_bad_required_body_stops_at_processing_and_does_not_publish
     assert len(failed['source_response_hashes']) == 1
 
 
-@pytest.mark.parametrize("stage", ["after_data_replace", "after_publish", "after_raw_promote"])
+@pytest.mark.parametrize("stage", ["after_receipt_commit", "after_daily_projection", "after_raw_promote"])
 def test_aggregate_task_recovery_never_fetches_again(tmp_path, stage):
     from stock_data_manage.worker.recovery import recover_collection_tasks
     definition = source_task(tmp_path)
@@ -320,7 +329,8 @@ def test_aggregate_task_recovery_never_fetches_again(tmp_path, stage):
     with pytest.raises(RuntimeError, match="power loss"):
         execute(tmp_path, definition, failure_hook=interrupt)
     assert recover_collection_tasks(config_root=CONFIG, data_root=tmp_path / "business") == ("aggregate",)
-    assert len(CanonicalPartitionStore(tmp_path / "business/canonical").read_daily("stock", DAY)) == 1
+    with MetadataStore(tmp_path / "business/metadata/metadata.sqlite3", read_only=True) as metadata:
+        assert DailyBarStore(metadata.connection).get("XSHG:600001", date.fromisoformat(DAY)) is not None
     assert execute(tmp_path, definition)["no_op"]
 
 
@@ -363,23 +373,42 @@ def test_failover_only_catches_acquisition_faults():
 def test_full_redo_missing_group_preserves_published_data_and_current_raw(tmp_path):
     definition = source_task(tmp_path)
     first = execute(tmp_path, definition)
-    data = Path(first["published_manifest"]).with_name("data.parquet")
-    before = file_hash(data)
+    business = tmp_path / "business"
+    before, before_count, before_receipts = read_published_daily(business, "stock", DAY)
+    assert before_count == 1 and first["status"] == "published"
+    raw_date_root = business / "raw" / DAY
+    before_raw = {path.relative_to(raw_date_root).as_posix(): file_hash(path)
+                  for path in raw_date_root.rglob("*") if path.is_file()}
+    assert before_raw
     changed = source_task(tmp_path / "changed", corrupt="none")
     changed['task_id'] = 'changed-source-run'
-    assert execute(tmp_path, changed, redo="full")["status"] == "failed"
-    assert file_hash(data) == before
+    with MetadataStore(business / "metadata/metadata.sqlite3", read_only=True) as metadata:
+        scope = {"dataset": "daily_bar", "frequency": "1d", "asset_types": ["stock"],
+            "securities_by_date": {DAY: ["XSHG:600001"]}}
+        owners = DailyBarStore(metadata.connection).current_owners(scope)
+    rejected = execute(tmp_path, changed, overwrite=True, confirmed_conflicts=owners)
+    assert rejected["status"] == "failed"
+    after, after_count, after_receipts = read_published_daily(business, "stock", DAY)
+    assert after_count == before_count and after == before
+    assert after_receipts == before_receipts
+    after_raw = {path.relative_to(raw_date_root).as_posix(): file_hash(path)
+                 for path in raw_date_root.rglob("*") if path.is_file()}
+    assert after_raw == before_raw
 
 
 def test_selected_redo_keeps_other_security_and_uses_three_units(tmp_path):
     definition = source_task(tmp_path, symbols=("sh600001", "sh600002"))
     first = execute(tmp_path, definition)
-    original = CanonicalPartitionStore(tmp_path / "business/canonical").read_daily("stock", DAY)
+    business = tmp_path / "business"
+    original, original_count, _ = read_published_daily(business, "stock", DAY)
     second = execute(tmp_path, definition, redo="selected", symbols=["sh600001"])
     assert first["status"] == second["status"] == "published"
     assert second["selected_symbols"] == ["sh600001"]
-    rows = CanonicalPartitionStore(tmp_path / "business/canonical").read_daily("stock", DAY)
-    assert len(rows) == 2 and rows[1] == original[1]
+    rows, count, _ = read_published_daily(business, "stock", DAY)
+    assert count == original_count == len(rows) == 2
+    by_id = {item.instrument_id: item for item in rows}
+    original_by_id = {item.instrument_id: item for item in original}
+    assert by_id["XSHG:600002"] == original_by_id["XSHG:600002"]
 
 
 def test_daily_query_defaults_to_none_and_switches_without_provider_calls(tmp_path, monkeypatch):
@@ -497,7 +526,6 @@ def test_daily_route_expansion_uses_market_and_adjustment_policy():
 
 def test_confirmed_successor_freezes_current_request_code_and_page_relation(tmp_path):
     from stock_data_manage.pipeline.daily import resolve_daily_definition, expand_daily_units
-    from stock_data_manage.service.web import create_app
 
     definition = resolve_daily_definition({"asset_type": "index", "universe": "static"}, CONFIG)
     unit = {"key": "sz399427", "symbol": "sz399427", "instrument_id": "XSHE:399427", "asset_type": "index",
@@ -514,6 +542,10 @@ def test_confirmed_successor_freezes_current_request_code_and_page_relation(tmp_
         "start_date": "2024-04-22", "end_date": "2024-04-22"}}}
     historical_unit = expand_daily_units([historical], definition)[0]
     assert historical_unit["symbol"] == "sz399427" and historical_unit["instrument_id"] == "XSHE:399427"
+
+
+def test_confirmed_successor_api_reader_uses_current_and_legacy_symbols(tmp_path):
+    from stock_data_manage.service.web import create_app
 
     record = DailyRecord("XSHE:399427", date(2026, 10, 29), AssetType.INDEX,
         quote("10"), QuoteGroup(QuoteStatus.UNVERIFIED, reason="not verified"),
@@ -560,6 +592,10 @@ def test_daily_publication_excludes_confirmed_suspension_and_rejects_task_assert
         "adjustment": adjustment, "asset_type": "stock", "input_id": "ASTOCK-002-daily"}
         for adjustment in ("none", "forward", "backward")]
     state = {"definition": definition, "units": {}, "redo": "resume"}
+    task_path = tmp_path / "frozen-task.json"
+    task_path.write_text("{\"fixture\":true}", encoding="utf-8")
+    from stock_data_manage.storage.integrity import file_hash
+    state.update(task_id="suspension-fixture", definition_ref={"path": str(task_path), "sha256": file_hash(task_path)})
     result = prepare_daily_task_publication(state, units, {}, {"canonical_root": tmp_path / "canonical"},
         CONFIG, date(2026, 10, 29))
     assert state["daily_check"]["expected_count"] == 1
@@ -571,7 +607,119 @@ def test_daily_publication_excludes_confirmed_suspension_and_rejects_task_assert
     exclusion = next(issue for issue in state["daily_check"]["issues"] if issue["code"] == "manual_lifecycle_exclusion")
     assert exclusion["symbol"] == "sz399960" and exclusion["impact"] == "excluded_from_daily_universe"
     assert state["daily_check"]["lifecycle_exclusions"][0]["symbol"] == "sz399960"
-    assert result["expected_count"] == 1
+    assert "expected_count" not in result
+    assert result["no_trade"]["XSHG:600002"].evidence_ref == json.dumps({
+        "task_id": "suspension-fixture", "path": "task.json", "sha256": file_hash(task_path),
+        "instrument_id": "XSHG:600002"}, sort_keys=True, separators=(",", ":"))
+
+
+def test_all_confirmed_suspended_daily_task_publishes_without_source_and_keeps_archived_evidence(tmp_path, monkeypatch):
+    import stock_data_manage.pipeline.inputs as inputs
+    from stock_data_manage.storage.daily import initialize_schema
+    from stock_data_manage.worker.recovery import archive_published_task
+    from stock_data_manage.config.loader import load_storage_paths
+
+    def suspended_units(_definition, _paths):
+        return [{"key": "sh600009", "symbol": "sh600009", "instrument_id": "XSHG:600009",
+            "asset_type": "stock", "status": "suspended",
+            "status_evidence": {"basis": "same_day_baostock_tradeStatus", "as_of_date": DAY}}]
+
+    def no_transport(*_args, **_kwargs):
+        raise AssertionError("confirmed suspended-only scope must not request a source")
+
+    monkeypatch.setattr(inputs, "_task_units", suspended_units)
+    monkeypatch.setattr(requests.Session, "send", no_transport)
+    business = tmp_path / "business"
+    definition = {"task_id": "suspended-only", "dataset": "daily_bar", "asset_type": "stock",
+        "trade_date": DAY, "universe": "static"}
+    result = collect_task(definition=definition, config_root=CONFIG, data_root=business,
+        mode="live", collector_options={"pacer": RequestPacer(wait=lambda _: None)})
+    assert result["status"] == "published" and result["complete_today"] is True
+    assert "daily_overwrite_grant" not in result
+    assert result["publication_refs"][0]["row_count"] == 0
+    assert result["publication_refs"][0]["no_trade_count"] == 1
+    paths = load_storage_paths(CONFIG, data_root=business)
+    task_root = Path(result["definition_ref"]["path"]).parent
+    descriptor_ref = result["partitions"]["stock"]["descriptor_ref"]
+    descriptor_path = task_root / descriptor_ref["path"]
+    descriptor_bytes = descriptor_path.read_bytes()
+    task_bytes = (task_root / "task.json").read_bytes()
+    with MetadataStore(paths["metadata_path"]) as metadata:
+        evidence_ref = metadata.connection.execute(
+            "SELECT evidence_ref FROM partition_item WHERE dataset='daily_bar' AND partition_key=? AND instrument_id=?",
+            [DAY, "XSHG:600009"]).fetchone()[0]
+        receipt_before = DailyBarStore(metadata.connection).publication_receipts(task_id="suspended-only")[0]
+        target = archive_published_task(task_root, workspace_root=paths["workspace_root"],
+            archive_root=paths["archive_root"], canonical_root=paths["canonical_root"],
+            raw_root=paths["raw_root"], metadata=metadata)
+        current = metadata.load_collection_task("suspended-only")
+        receipt_after = DailyBarStore(metadata.connection).publication_receipts(task_id="suspended-only")[0]
+        evidence_after = metadata.connection.execute(
+            "SELECT evidence_ref FROM partition_item WHERE dataset='daily_bar' AND partition_key=? AND instrument_id=?",
+            [DAY, "XSHG:600009"]).fetchone()[0]
+    ref = json.loads(evidence_ref)
+    assert ref == {"task_id": "suspended-only", "path": "task.json",
+        "sha256": file_hash(target / "task.json"), "instrument_id": "XSHG:600009"}
+    assert target.joinpath(ref["path"]).read_bytes() == task_bytes
+    assert evidence_after == evidence_ref and receipt_after["candidate_ref"] == receipt_before["candidate_ref"]
+    assert (target / descriptor_ref["path"]).read_bytes() == descriptor_bytes
+    assert file_hash(target / descriptor_ref["path"]) == descriptor_ref["sha256"]
+    assert current["definition_ref"]["path"] == str(target / "task.json")
+
+
+def test_rejected_daily_overwrite_can_retry_same_task_id_with_exact_current_owner(tmp_path, monkeypatch):
+    from stock_data_manage.pipeline.inputs import submit_collection_task
+    from stock_data_manage.storage.metadata import CollectionTaskScopeConflict
+
+    monkeypatch.setattr(requests.Session, "send", lambda *_a, **_k: (_ for _ in ()).throw(
+        AssertionError("submission must not issue provider requests")))
+    business = tmp_path / "business"
+    baseline = source_task(tmp_path / "baseline-fixtures", task_id="baseline")
+    execute(tmp_path, baseline)
+    candidate = source_task(tmp_path / "candidate-fixtures", task_id="same-overwrite-id")
+    paths = __import__('stock_data_manage.config.loader', fromlist=['load_storage_paths']).load_storage_paths(
+        CONFIG, data_root=business)
+    with MetadataStore(paths['metadata_path'], read_only=True) as metadata:
+        scope = {"dataset": "daily_bar", "frequency": "1d", "asset_types": ["stock"],
+            "securities_by_date": {DAY: ["XSHG:600001"]}}
+        owners = DailyBarStore(metadata.connection).current_owners(scope)
+    workspace = paths['workspace_root'] / DAY / 'daily_bar' / 'same-overwrite-id'
+    with pytest.raises(CollectionTaskScopeConflict):
+        submit_collection_task(definition=candidate, config_root=CONFIG, data_root=business,
+            mode='replay', collector_options={"pacer": RequestPacer(wait=lambda _: None)})
+    assert not workspace.exists()
+    raw_before = {path.relative_to(paths['raw_root']).as_posix() for path in paths['raw_root'].rglob('*') if path.is_file()}
+    accepted = submit_collection_task(definition=candidate, config_root=CONFIG, data_root=business,
+        mode='replay', overwrite=True, confirmed_conflicts=owners,
+        collector_options={"pacer": RequestPacer(wait=lambda _: None)})
+    assert accepted['task_id'] == 'same-overwrite-id' and accepted['status'] == 'waiting'
+    with MetadataStore(paths['metadata_path'], read_only=True) as metadata:
+        stored = metadata.load_collection_task('same-overwrite-id')
+        assert stored['daily_overwrite_grant']['owners'] == list(owners)
+    assert {path.relative_to(paths['raw_root']).as_posix() for path in paths['raw_root'].rglob('*') if path.is_file()} == raw_before
+
+
+def test_daily_active_overlap_rejection_removes_only_new_unaccepted_workspace(tmp_path, monkeypatch):
+    from stock_data_manage.pipeline.inputs import submit_collection_task
+    from stock_data_manage.storage.metadata import CollectionTaskScopeConflict
+
+    monkeypatch.setattr(requests.Session, "send", lambda *_a, **_k: (_ for _ in ()).throw(
+        AssertionError("submission must not issue provider requests")))
+    business = tmp_path / "business"
+    first = source_task(tmp_path / "first-fixtures", task_id="active-first")
+    second = source_task(tmp_path / "second-fixtures", task_id="active-second")
+    from stock_data_manage.config.loader import load_storage_paths
+    paths = load_storage_paths(CONFIG, data_root=business)
+    submit_collection_task(definition=first, config_root=CONFIG, data_root=business, mode='replay',
+        collector_options={"pacer": RequestPacer(wait=lambda _: None)})
+    rejected_workspace = paths['workspace_root'] / DAY / 'daily_bar' / 'active-second'
+    with pytest.raises(CollectionTaskScopeConflict):
+        submit_collection_task(definition=second, config_root=CONFIG, data_root=business, mode='replay',
+            collector_options={"pacer": RequestPacer(wait=lambda _: None)})
+    assert not rejected_workspace.exists()
+    with MetadataStore(paths['metadata_path'], read_only=True) as metadata:
+        assert metadata.load_collection_task('active-second') is None
+        assert metadata.load_collection_task('active-first') is not None
 
 
 def test_daily_route_uses_csi_close_only_for_the_explicit_eleven_indices():
@@ -643,20 +791,16 @@ def csi_task(manifest=None, *, task_id="csi-close-only"):
 
 
 def test_csi_close_only_runs_through_existing_daily_batch_and_publishes_index_points(tmp_path):
-    from stock_data_manage.service.market_data import query_daily
     manifest = csi_response_manifest(tmp_path / "source")
     result = collect_task(definition=csi_task(manifest), config_root=CONFIG, data_root=tmp_path / "business",
         mode="replay", collector_options={"pacer": RequestPacer(wait=lambda _: None)})
     assert result["status"] == "published" and result["complete_today"]
-    records = CanonicalPartitionStore(tmp_path / "business/canonical").read_daily("index", "2026-10-29")
-    assert len(records) == 1
+    records, count, receipts = read_published_daily(tmp_path / "business", "index", "2026-10-29")
+    assert count == len(records) == receipts == 1
     quote = records[0].none
     assert (quote.source_provider, quote.endpoint, quote.value_contract) == ("csindex", "index-perf", "close_only")
     assert quote.close == Decimal("2061.1") and all(getattr(quote, name) is None for name in ("open", "high", "low", "volume", "amount"))
     assert records[0].quote_unit == "point"
-    response = query_daily(tmp_path / "business/canonical", asset_type="index")
-    assert response["items"][0]["value_contract"] == "close_only"
-    assert response["items"][0]["values"]["close"] == "2061.10000000"
 
 
 def test_csi_live_route_is_blocked_before_any_provider_request(tmp_path, monkeypatch):
@@ -730,7 +874,8 @@ def test_daily_batch_processes_completed_source_while_other_capture_is_pending(t
         mode="replay", collector_options={"pacer": RequestPacer(wait=lambda _: None)})
 
     assert result["status"] == "published" and result["row_count"] == 2
-    records = CanonicalPartitionStore(tmp_path / "business/canonical").read_daily("index", day)
+    records, count, _ = read_published_daily(tmp_path / "business", "index", day)
+    assert count == len(records) == 2
     by_id = {record.instrument_id: record for record in records}
     assert by_id["XSHG:000816"].none.source_provider == "csindex"
     assert by_id["XSHG:000816"].none.value_contract == "close_only"

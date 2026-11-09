@@ -8,6 +8,7 @@
 
 - `tests/test_runtime_sqlite.py`用隔离运行库检验跨进程空闲连接共存、唯一attempt预占、健康计数原子更新及日历批次回滚；不启动来源或生产调度，不是迁移工具。
 - `tests/test_daily_table_storage.py`验证当前日K三口径入表、精确小数/空值、局部覆盖/no_trade、发布回执幂等、首次执行归属、回滚及跨连接/进程读快照；`tests/test_task_queue.py`验证运行库层FIFO与日期/证券范围受理原子性，不代表页面和调度已接线。
+- `tests/test_storage_access.py`本阶段提交通用锁的有界等待/死进程回收及证券清单只读/发布读取4项；原文/来源索引和旧日K文件方案的其余工作树检查不计本阶段交付。
 - `.codex/config.toml`只配置本项目开发协作的子代理默认模型和推理强度；不设置主对话模型，不进入采集、存储或调度的运行配置。职责分工与交接要求由根目录`AGENTS.md`维护。
 - 正式代码直接位于 `src/`，不再建立 `src/stock_data_manage/` 或 `src/stockdata/`，各模块职责不变。
 - `src/__init__.py` 是逻辑包 `stock_data_manage` 的初始化文件，`src/cli.py` 是命令入口。`pyproject.toml` 显式将逻辑包映射到 `src/` 并列出Python包；新增含 `__init__.py` 的子包时同步更新该清单。
@@ -121,8 +122,8 @@
 
 | 文件 | 职责 |
 |---|---|
-| `config/loader.py` | 加载来源、输入契约、参数来源、字段选择策略、采集意图、字段模板、路由与映射/状态/范围配置；参数绑定与类型/范围校验、统一运行路径及隔离层校验；配置不生成验证有效期 |
-| `routing/factory.py` | 按现有端点创建 Provider，保留来源传输并共享限速；按实际范围、有效期及四层证据检查资格和冷却。日期工作区的来源报告按工作区基准解析原响应引用，缺失或哈希不符明确拒绝；原响应与SDK派生载荷分别核验 |
+| `config/loader.py` | 加载来源、输入契约、参数来源、字段选择策略、采集意图、字段模板、路由与映射/状态/范围配置；参数绑定与类型/范围校验、统一运行路径及隔离层校验；显式日历支持date与ISO日期的JSON往返，配置不生成验证有效期 |
+| `routing/factory.py` | 按现有端点创建 Provider，保留来源传输并共享限速；按实际范围、有效期及四层证据检查资格和冷却；日K的正式交付证据改读SQLite回执及其审计候选/原文，任务状态不代替数据交付。其他日期工作区的来源报告按工作区基准解析原响应引用，缺失或哈希不符明确拒绝；原响应与SDK派生载荷分别核验 |
 
 日线留存资格在同一文件按证券、资产类别和完整参数精确核验，保存真实来源、当前版本复核、语义及端到端证据，不推广样本资格。
 
@@ -149,9 +150,8 @@
 
 | 文件 | 职责 |
 |---|---|
-| `pipeline/daily.py` | 日线规则冻结、按证券单元选用配置来源和显式`full_ohlc/close_only`合同；独立响应采集与零联网解析/归一化；逐单元原文、来源行和报告原子保存；标准候选按资产/来源写入批量Parquet，单元以批文件行号恢复；完整记录聚合和停牌分母检查 |
-| `pipeline/inputs.py` | 正式日线批执行入口及证券名单来源任务；日线周期先读/刷新唯一当前证券清单并冻结范围，名单成功后更新当前库和字段变更历史；名单失败保留现状，日线可继续使用不晚于目标日的上次可用清单；来源请求经有界队列与单处理线程交错运行，复用现有任务状态和发布恢复 |
-| `pipeline/daily_reconciliation.py` | 只接收范围完整的三口径日线记录，并复用规范分区发布；快照候选不在此提升为正式日线 |
+| `pipeline/daily.py` | 日线规则冻结、按证券单元选用配置来源和显式full_ohlc/close_only合同；独立采集与零联网解析/归一化；标准候选按资产/来源批写并以行号恢复；形成合格记录及有证据no_trade交给表发布，不生成正式行情文件 |
+| `pipeline/inputs.py` | 单日业务任务统一受理、范围/覆盖复核、整任务FIFO消费、冻结与恢复；日K按日期/资产调用SQLite事务和回执，本次/累计交付与当前分区数量分离；证券清单复用原生产链；来源采集/处理在任务内部有界交错，不并行写多任务 |
 | `pipeline/minute.py` | Watchlist 实时分钟采集和 Hot Store 写入 |
 | `pipeline/minute_reconciliation.py` | 分钟盘后校准、final 提升、冲突隔离和完整性处理 |
 | `pipeline/snapshot_daily.py` | 收盘快照构建 provisional 日线 |
@@ -167,9 +167,9 @@
 | `storage/raw.py` | 原响应字节、按日期/来源/接口暂存及转正；请求级清单和接口索引，按请求替换、审计及共享字节保护；当前目录在解析前按原捕获日落盘；哈希复查、脱敏与缓存 |
 | `storage/read_index.py` | 将来源报告和行选择器批量写入可重建的SQLite查询索引；以报告ID关联、按证券/业务日期筛选和分页，只保存定位与筛选字段，不复制业务原值或作为采集/发布门槛 |
 | `storage/hot.py` | SQLite WAL Hot Minute Store 和即时查询数据 |
-| `storage/parquet.py` | 来源字段合同的候选精确类型写入；Canonical Bar按日期/数据集/资产类型分区，复权保留记录主键；清单、文件锁和原子发布 |
-| `storage/metadata.py` | SQLite任务、日线分区、Attempt、调度占用、来源健康、证据和冲突；共享运行库连接/类型与只读合同，不迁移旧DuckDB，不维护每日证券名单分区索引 |
-| `storage/daily.py` | 正式日K表的显式初始化、日期/资产事务发布、三口径精确值、no_trade业务事实、当前摘要、发布回执和归属保护；按索引分页、短一致读快照；模块已隔离验证，正式pipeline/Web尚未接入 |
+| `storage/parquet.py` | 候选精确类型写入、共享文件锁有界等待/死进程回收、分钟等数据集文件发布；单日日K新生产已退出正式文件写入，旧日K文件读取/工具待服务切换退出 |
+| `storage/metadata.py` | SQLite任务及一对一冻结上下文、分区、Attempt、调度占用、来源健康、证据和冲突；进度与大上下文分行，受理预检/入队事务复用活动范围查询；共享连接/类型与只读合同，不迁移旧DuckDB |
+| `storage/daily.py` | 正式日K表显式初始化、日期/资产事务发布、三口径精确值、no_trade事实、当前摘要、发布回执和归属保护；SQL分页、短一致读快照；单日pipeline及直接资格消费者已离线验收，Web尚未接入 |
 | `storage/integrity.py` | 确定性 row hash、Manifest 生成和完整性校验 |
 | `storage/__init__.py` | 存储包说明，不承载业务实现 |
 
@@ -177,7 +177,7 @@
 
 | 文件 | 职责 |
 |---|---|
-| `service/instruments.py` | Security Master 唯一当前 DuckDB 清单、证券字段变更历史和代码别名历史；提供记录映射、读取与事务更新 |
+| `service/instruments.py` | Security Master唯一当前DuckDB清单及字段/代码历史；记录映射、事务更新、发布清单只读/完整性/行数复核及同资源访问协调 |
 | `service/instruments_update.py` | Security Master来源归并、有效状态/明确代码承接处理、人工生命周期覆盖与更新差异计算 |
 | `service/calendar.py` | Trading Calendar在同一SQLite运行库的事务写入、只读查询和来源合并；复用storage.metadata连接合同 |
 | `service/calendar_update.py` | 交易日历来源更新、单日开市/休市轻量采集及证据引用、官方优先级，以及校验原在线证据后的正向日期导入 |
@@ -192,9 +192,9 @@
 |---|---|
 | `worker/attempts.py` | Collection Attempt 状态机和租约状态 |
 | `worker/progress.py` | 三阶段统一采集单元计数，发布整批完成后计入；内部动作和旧快照恢复、失败与复用、耗时及节流；CLI stderr展示，不管理调度或业务数据 |
-| `worker/recovery.py` | 既有提交、临时文件和元数据恢复；日期工作区归档前复核候选、原响应及发布，归档后更新元数据和摘要；保留旧材料归档校验 |
+| `worker/recovery.py` | 表日K按回执恢复、归档前复核不可变候选/原响应/回执，归档只更新运行定位；旧日K文件保留报告而不导入，其他数据集沿既有临时文件与元数据恢复 |
 | `worker/scheduler.py` | 既有任务时间表及频率计算；计划证券名单和日线任务；常驻入口按YAML时间轮询并调用现有业务任务，晚启动仍派发当日已到期任务 |
-| `worker/acceptance.py` | 合成组件的存储重放、恢复和容量估算自检；逐项预期/实际值、范围和证据，不能签署项目M1/M2 |
+| `worker/acceptance.py` | 合成组件的日K表重放/回执幂等/事务回滚重试及分钟容量估算自检；逐项预期/实际值、范围和证据，不能签署项目M1/M2 |
 | `worker/__init__.py` | Worker 包说明，不承载业务实现 |
 
 任务入口 `pipeline/inputs.py` 支持正式留存响应模式及持久化进度；`cli.py` 提供 `--mode retained`、`--progress/--no-progress`。实现测试新增 `tests/test_task_progress.py`（进度、未知总量、失败和恢复计数）与 `tests/test_retained_daily.py`（合成四层资格、范围及哈希拒绝、零网络发布和恢复）；测试只写tmp，不作为真实来源资格。

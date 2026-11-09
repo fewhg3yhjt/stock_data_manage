@@ -129,6 +129,10 @@ class PartitionLockedError(RuntimeError):
     pass
 
 
+class PartitionBusyError(PartitionLockedError):
+    """A partition is temporarily unavailable while publication is finishing."""
+
+
 class InvalidPartitionError(RuntimeError):
     pass
 
@@ -200,19 +204,38 @@ def write_normalized_rows(path: str | Path, rows: Iterable[Mapping], fields: Map
 
 
 class PartitionLock(AbstractContextManager["PartitionLock"]):
-    def __init__(self, path: Path, *, recover_stale: bool = False) -> None:
+    def __init__(self, path: Path, *, recover_stale: bool = False,
+                 timeout_seconds: float = 0) -> None:
         self.path = path
         self._acquired = False
         self.recover_stale = recover_stale
+        import math
+        if not isinstance(timeout_seconds, (int, float)) or not math.isfinite(timeout_seconds) or timeout_seconds < 0:
+            raise ValueError("timeout_seconds must be a finite non-negative number")
+        self.timeout_seconds = timeout_seconds
 
     def __enter__(self) -> "PartitionLock":
         self.path.parent.mkdir(parents=True, exist_ok=True)
         if self.recover_stale and self.path.exists():
             self._clear_dead_owner()
-        try:
-            descriptor = os.open(self.path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
-        except FileExistsError as exc:
-            raise PartitionLockedError(f"partition is already locked: {self.path}") from exc
+        import time
+        deadline = time.monotonic() + self.timeout_seconds
+        while True:
+            if self.recover_stale and self.path.exists():
+                self._clear_dead_owner()
+            try:
+                descriptor = os.open(self.path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+                break
+            except (FileExistsError, PermissionError) as exc:
+                # Windows can report an existing O_EXCL target as access denied
+                # during a concurrent unlink/open. Only classify it as lock
+                # contention when the path actually exists; unrelated ACL or
+                # directory errors still propagate unchanged.
+                if isinstance(exc, PermissionError) and not self.path.exists():
+                    raise
+                if time.monotonic() >= deadline:
+                    raise PartitionLockedError(f"partition is already locked: {self.path}") from exc
+                time.sleep(min(0.025, max(0.0, deadline - time.monotonic())))
         with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
             stream.write(f"pid={os.getpid()}\n")
             stream.flush()
@@ -223,7 +246,10 @@ class PartitionLock(AbstractContextManager["PartitionLock"]):
     def _clear_dead_owner(self) -> None:
         """Reclaim only a well-formed lock whose owning process is proven dead."""
         import re
-        original = self.path.read_bytes()
+        try:
+            original = self.path.read_bytes()
+        except FileNotFoundError:
+            return
         matched = re.fullmatch(rb"pid=([1-9][0-9]*)\r?\n", original)
         if not matched:
             return
@@ -251,8 +277,11 @@ class PartitionLock(AbstractContextManager["PartitionLock"]):
                 pass
             except PermissionError:
                 return
-        if self.path.read_bytes() == original:
-            self.path.unlink()
+        try:
+            if self.path.read_bytes() == original:
+                self.path.unlink()
+        except FileNotFoundError:
+            return
 
     def __exit__(self, exc_type: object, exc: object, traceback: object) -> None:
         if self._acquired:

@@ -229,12 +229,120 @@ def _configured_index_daily_symbols(config_root, input_id):
     raise ValueError("unsupported configured index route")
 
 
+def _read_daily_publication_rows(publication_ref, *, identity, trade_date, asset_type,
+                                 adjustment, expected_provider):
+    """Resolve one immutable SQLite receipt to its audited candidate and raw evidence."""
+    import json
+    from datetime import date
+    import pyarrow.parquet as pq
+    from ..domain import AssetType
+    from ..storage.daily import DailyBarStore
+    from ..storage.integrity import file_hash
+    from ..storage.metadata import MetadataStore
+    from ..storage.parquet import mapping_to_daily
+    from ..storage.raw import RawObjectStore
+
+    if (not isinstance(publication_ref, dict)
+            or not isinstance(publication_ref.get('database_path'), str)
+            or not isinstance(publication_ref.get('task_id'), str)
+            or not isinstance(publication_ref.get('publication_id'), str)
+            or not isinstance(publication_ref.get('request_hash'), str)
+            or not re.fullmatch(r'[0-9a-f]{64}', publication_ref.get('request_hash', ''))):
+        raise ValueError('daily publication reference is incomplete')
+    task_id = publication_ref['task_id']
+    request_hash = publication_ref['request_hash']
+    day = date.fromisoformat(str(trade_date))
+    asset = AssetType(asset_type)
+    with MetadataStore(publication_ref['database_path'], read_only=True) as evidence_metadata:
+        store = DailyBarStore(evidence_metadata.connection)
+        matches = [receipt for receipt in store.publication_receipts(task_id=task_id,
+            trade_date=day, asset_type=asset)
+            if receipt['publication_id'] == publication_ref['publication_id']]
+        if len(matches) != 1:
+            raise ValueError('daily publication receipt is missing or ambiguous')
+        receipt = matches[0]
+        if receipt['request_hash'] != request_hash:
+            raise ValueError('daily publication receipt request hash differs')
+        state = evidence_metadata.load_collection_task(task_id)
+        if state is None or state.get('dataset') != 'daily_bar':
+            raise ValueError('daily publication task definition is missing')
+        definition_ref = state.get('definition_ref')
+        if not isinstance(definition_ref, dict) or not isinstance(definition_ref.get('path'), str):
+            raise ValueError('daily publication task has no current definition reference')
+        definition_path = Path(definition_ref['path']).resolve()
+        run_root = definition_path.parent
+        if (not definition_path.is_file()
+                or file_hash(definition_path) != definition_ref.get('sha256')):
+            raise ValueError('daily publication task definition is missing or changed')
+        reference = json.loads(receipt['candidate_ref'])
+        if reference.get('task_id') != task_id or not isinstance(reference.get('path'), str):
+            raise ValueError('daily publication descriptor task identity differs')
+        descriptor_path = (run_root / reference['path']).resolve()
+        if (not descriptor_path.is_relative_to(run_root) or not descriptor_path.is_file()
+                or file_hash(descriptor_path) != reference.get('sha256')):
+            raise ValueError('daily publication descriptor is missing or changed')
+        descriptor = json.loads(descriptor_path.read_text(encoding='utf-8'))
+        if (descriptor.get('task_id') != task_id
+                or descriptor.get('publication_id') != receipt['publication_id']
+                or descriptor.get('idempotency_key') != receipt['idempotency_key']
+                or descriptor.get('trade_date') != day.isoformat()
+                or descriptor.get('asset_type') != asset.value
+                or sorted(descriptor.get('scope_ids', ())) != sorted(receipt['scope'])):
+            raise ValueError('daily publication descriptor does not match its receipt')
+        candidate_ref = descriptor.get('candidate')
+        if (not isinstance(candidate_ref, dict) or not isinstance(candidate_ref.get('path'), str)):
+            raise ValueError('daily publication candidate reference is missing')
+        candidate_path = (run_root / candidate_ref['path']).resolve()
+        if (not candidate_path.is_relative_to(run_root) or not candidate_path.is_file()
+                or file_hash(candidate_path) != candidate_ref.get('sha256')):
+            raise ValueError('daily publication candidate is missing or changed')
+        candidate_rows = pq.read_table(candidate_path).to_pylist()
+        records = [mapping_to_daily(row) for row in candidate_rows]
+        candidate_ids = {record.instrument_id for record in records}
+        no_trade_ids = set(descriptor.get('no_trade', {}))
+        superseded = set(receipt['superseded_identities'])
+        if (len(candidate_ids) != len(records)
+                or candidate_ids != set(descriptor.get('record_ids', ()))
+                or candidate_ids & no_trade_ids
+                or not (candidate_ids | no_trade_ids) <= set(receipt['scope'])
+                or any(record.trade_date != day or record.asset_type is not asset for record in records)
+                or len(candidate_ids - superseded) != receipt['written_count']
+                or len(no_trade_ids - superseded) != receipt['no_trade_count']
+                or len(superseded) != receipt['superseded_count']):
+            raise ValueError('daily publication delivered identity counts differ from its candidate')
+        if identity not in set(receipt['scope']) or identity not in candidate_ids - superseded:
+            raise ValueError('daily publication did not write the requested security')
+        if not any(record.instrument_id == identity and record.trade_date == day
+                   and record.asset_type is asset for record in records):
+            raise ValueError('daily publication candidate identity/date/asset differs')
+        evidence_entries = descriptor.get('raw_evidence', ())
+        evidence_paths = tuple(item.get('path') for item in evidence_entries if isinstance(item, dict))
+        if (len(evidence_paths) != len(evidence_entries)
+                or set(evidence_paths) != set(receipt['raw_evidence_refs'])):
+            raise ValueError('daily publication original response references differ from its receipt')
+        published_hashes = set()
+        for evidence in evidence_entries:
+            evidence_path = Path(evidence['path'])
+            if RawObjectStore.verify_manifest(evidence_path) != evidence.get('sha256'):
+                raise ValueError('daily publication original response evidence changed')
+            for line in evidence_path.read_text(encoding='utf-8').splitlines():
+                if not line.strip():
+                    continue
+                event = json.loads(line)
+                if (event.get('provider') == expected_provider
+                        and event.get('event') in {'http_response', 'source_payload'}
+                        and event.get('body_sha256')):
+                    published_hashes.add(event['body_sha256'])
+    return [record for record in records if record.instrument_id == identity
+            and record.trade_date == day and record.quotes[adjustment].status.value == 'available'], published_hashes
+
+
 def check_daily_input_qualification(contract, context, *, asset_type, config_root, metadata, now, execution_mode='retained', _allow_scope=True):
     """Check exact evidence, or an explicitly granted live scope backed by samples."""
     from datetime import date
+    import sqlite3
     import xml.etree.ElementTree as ET
-    import pyarrow.parquet as pq
-    from ..storage.integrity import file_hash, row_hash, Manifest
+    from ..storage.integrity import file_hash, row_hash
     from ..storage.raw import RawObjectStore
     from ..providers.tencent.daily import tencent_symbol
     try:
@@ -338,7 +446,7 @@ def check_daily_input_qualification(contract, context, *, asset_type, config_roo
         if (proof['input_id'],proof['capability_version'],proof['asset_type']) != (contract.input_id,adapter.capability_version,asset_type):
             raise ValueError('daily qualification identity differs')
         artifacts = {}
-        for layer in ['contract_tests','live_report','revalidation_report','semantic_check','publication_manifest','raw_manifest']:
+        for layer in ['contract_tests','live_report','revalidation_report','semantic_check','raw_manifest']:
             descriptor = proof[layer]; path = Path(descriptor['path'])
             if file_hash(path) != descriptor['sha256']:
                 raise ValueError('daily qualification layer hash differs: '+layer)
@@ -383,41 +491,33 @@ def check_daily_input_qualification(contract, context, *, asset_type, config_roo
                 or semantic.get('parameters')!=serialized or semantic.get('source_response_hashes')!=hashes
                 or not semantic_contract_ok):
             raise ValueError('daily price/date semantics have not been verified')
-        published=Manifest.load(artifacts['publication_manifest'])
-        partition=artifacts['publication_manifest'].parent
-        if not published.verify(partition/'data.parquet') or (partition/'task-commit.json').exists():
-            raise ValueError('daily end-to-end publication is missing or pending')
-        if published.schema_version not in {'daily-aggregate-v1', 'daily-aggregate-v2'} or published.adjustment != 'aggregate':
-            raise ValueError('daily qualification requires aggregate publication evidence')
-        from ..storage.parquet import mapping_to_daily
-        rows=pq.read_table(partition/'data.parquet').to_pylist()
-        for row in rows:
-            mapping_to_daily(row)
-        wanted=[r for r in rows if r['instrument_id']==identity and r['quotes'][adjustment]['status']=='available'
-                and str(parameters['start'])<=r['trade_date'].isoformat()<=str(parameters['end'])]
-        for row in wanted:
-            quote = row['quotes'][adjustment]
-            if quote['source_provider'] != contract.provider or quote['endpoint'] != contract.endpoint:
+        publication_ref = proof.get('publication_ref')
+        if not isinstance(publication_ref, dict):
+            raise ValueError('daily publication reference is missing')
+        wanted, published_hashes = _read_daily_publication_rows(publication_ref,
+            identity=identity, trade_date=parameters['start'], asset_type=asset_type,
+            adjustment=adjustment, expected_provider=contract.provider)
+        wanted = [record for record in wanted if str(parameters['start']) <= record.trade_date.isoformat()
+                  <= str(parameters['end'])]
+        for record in wanted:
+            quote = record.quotes[adjustment]
+            if quote.source_provider != contract.provider or quote.endpoint != contract.endpoint:
                 raise ValueError('daily publication quote source differs')
-            if is_index_source and quote.get('value_contract') != semantic.get('value_contract'):
+            if is_index_source and quote.value_contract != semantic.get('value_contract'):
                 raise ValueError('daily published index value contract differs from the qualification')
             if is_index_source and not is_close_only and any(
-                    quote.get(name) is None for name in ('open', 'high', 'low', 'close')):
+                    getattr(quote, name) is None for name in ('open', 'high', 'low', 'close')):
                 raise ValueError('daily published index row does not satisfy the full-OHLC contract')
-            if is_close_only and (quote.get('value_contract') != 'close_only' or quote.get('close') is None
-                    or any(quote.get(name) is not None for name in ('open','high','low','volume','amount'))):
+            if is_close_only and (quote.value_contract != 'close_only' or quote.close is None
+                    or any(getattr(quote, name) is not None for name in ('open','high','low','volume','amount'))):
                 raise ValueError('CSI publication does not satisfy the close-only contract')
-            RawObjectStore.verify_manifest(quote['raw_object_path'])
-            quote_hashes={json.loads(line).get('body_sha256') for line in Path(quote['raw_object_path']).read_text(encoding='utf-8').splitlines() if line.strip()}
+            RawObjectStore.verify_manifest(quote.raw_object_path)
+            quote_hashes={json.loads(line).get('body_sha256') for line in Path(quote.raw_object_path).read_text(encoding='utf-8').splitlines() if line.strip()}
             if not set(hashes) <= quote_hashes:
                 raise ValueError('daily published adjustment source bytes differ')
         if not wanted or len(wanted)!=evidence['row_count']:
             raise ValueError('daily publication scope differs')
-        published_hashes=set()
-        for reference in published.raw_refs:
-            RawObjectStore.verify_manifest(reference)
-            published_hashes.update(json.loads(line).get('body_sha256') for line in Path(reference).read_text(encoding='utf-8').splitlines() if line.strip())
-        if not set(hashes)<=published_hashes:
+        if not set(hashes) <= published_hashes:
             raise ValueError('daily publication source bytes differ')
         health=metadata.provider_health(provider=contract.provider,endpoint=contract.endpoint,capability_version=adapter.capability_version,
             dataset='daily_bar',market=exchange,asset_type=asset_type)
@@ -426,7 +526,7 @@ def check_daily_input_qualification(contract, context, *, asset_type, config_roo
         return {'eligible':True,'input_id':contract.input_id,'capability_version':adapter.capability_version,
                 'symbol':symbol,'market':exchange,'asset_type':asset_type,'execution_mode':execution_mode,
                 'source_response_hashes':hashes,'reasons':[]}
-    except (ValueError,KeyError,TypeError,AttributeError,OSError,StopIteration,ET.ParseError) as exc:
+    except (ValueError,KeyError,TypeError,AttributeError,OSError,StopIteration,ET.ParseError,sqlite3.Error) as exc:
         return {'eligible':False,'input_id':contract.input_id,'reasons':[str(exc)]}
 
 

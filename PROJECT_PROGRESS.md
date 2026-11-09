@@ -1,5 +1,27 @@
 # 项目开发进度
 
+## 2026-11-09 单日日K采集、范围受理与表发布接线（本阶段离线验收完成）
+
+本阶段解决正式日K与任务统计耦合、发布/恢复仍依赖文件清单，以及其他任务无法按证券范围登记等待的问题。单日collect_task已进入统一提交/FIFO，正式行情、业务状态、基础摘要与发布回执使用同库SQLite短事务；按日期＋资产分别发布，覆盖失败保留旧值，未选中证券保持。没有新增来源、切源规则、数据库服务、行情旧快照或期限清理；没有实时Provider请求、生产运行、旧数据迁移或默认生产库初始化。原75132文件/2612719186字节来源目录及写死640请求问题仍未修复，不能把入表当作原始数据膨胀已解决。
+
+任务本次来源单元进度、冻结范围累计交付、当前分区行数分别记录。实际跨资产用例从2/4→selected后3/4→resume后4/4，只有最后才完整；no_trade与行情数量分列。已提交任务的冻结授权不刷新，其他运行即使更早启动、后来再发布该身份也受保护。A已有回执但仍committing时，异证券B可waiting；相交C不论是否勾覆盖都优先因活动范围拒绝，队列先恢复A再执行B。回执是交付事实，任务整体failed/committing不抹除已经发布的合格资产。
+
+| 本次实际范围/分母 | 版本、结果与证据 | 判断和未覆盖项 |
+|---|---|---|
+| 拟提交核心树113节点 | CoreOnly v2整组112通过、1失败、0错误/跳过，JUnit112.754秒；唯一错误为测试把整数receipt count调用len。v3仅修此断言并复查CSI节点1/1，JUnit1.382秒；v2/v3仅该测试文件不同 | `tmp/sqlite-runtime-implementation/daily-table-pipeline-stage-1/intended-core-verification/run-3/`、`run-4/`；不是一次113/113整组重跑。含表存储19、队列6、运行库6、共享锁/清单4、日历1、日采31、acceptance7、minute/legacy恢复17、e2e15、index来源5、名单2。API节点另留未执行 |
+| 最后活动范围改动 | 最终delivery树queue6＋真实committing准入/恢复1，共7/7通过，JUnit7.445秒；元数据活动查询由一个方法维护，受理只读预检与入队事务内复查共用 | `same-date-commit-fix/intended-run-4/`；6队列节点与核心组重叠，不相加。最终源移除错误的整日committing拦截，未恢复旧文件互斥 |
+| 无消费者旧分支退出 | 删除_task_unit_valid从无生产赋值的旧日Krevalidation_report分支；普通证券清单config/raw/artifact校验保持。approved-delivery树真实名单→日K冻结节点1/1，JUnit1.726秒 | `old-revalidation-branch/intended-run-2/`；此节点重复核心范围，只复查实际受影响行为。旧日Kreconciliation无生产调用，其组件及2项旧测试退出；独有完整历史范围/快照禁提升要求留在原历史重建合同 |
+| 留存/动态日K资格的实际消费 | 原文件发布证明改为不可变SQLite回执＋相对descriptor/候选＋稳定原文。意向树round-06共45节点43通过2失败，失败均为错用非日Khelper比较1行JSON与3行批候选；旧6错域case退出，其中4个原通过不计最终分母。剩余39个有效通过＋approved-delivery新增3节点通过，最终42个不同资格/retained/gate节点有匹配证据 | `tmp/sqlite-runtime-implementation/daily-table-pipeline-direct-consumers/intended-final/round-06/retained-and-gate-junit.xml`、`round-08/new-qualification-invalid-evidence-junit.xml`（3/3，13.096秒）。不是一次42项全量通过。内层报告hash、源hash、参数错误均先证明正常基线eligible，再断言准确拒绝原因且无新成功HTTP/行情/回执 |
+| 环境、实际被测树与失败记录 | 指定隔离Python3.13.18/SQLite3.54.1，同进程预检后pytest.main；规范包模块路径来自对应导出tree/src，22个最终文件清单前后匹配。未带入尚未验收的UI/settings、raw/read_index门控或旧日K文件合并代码 | 初期runner缺Windows spawn主入口保护，产生递归执行和混合报告，不作为业务验收；guard修正后另用新根/报告。路径过深的WinError、漏导入、旧事件/断言等失败保留，个别早期JUnit被覆写已在first-run-failure说明，没有补造原报告。最后复查只重跑实际受影响节点 |
+
+成本复核：7862合成证券/23586口径行的一次分区发布方法约0.789625秒；实际持写锁证据下界0.411172秒、上界0.444410秒，并发只读0.000672秒、登记等待0.433772秒后waiting。第一次0.699秒方法测量没有证明锁窗口重叠，原记录保留不当作并发通过；修正分析见`daily-table-pipeline-stage/measurement-7862-write-window-analysis.json`。不是生产/多年数据/p95结论。
+
+另外发现1651138字节冻结归属与进度同一行时，进度每增1字节追加约1.9MB WAL；分到collection_task_context后，同一既有样本副本的9→10→100→1000只追加8272/8240/8240字节，共24752字节，快照不变；仅诊断连接关闭自动checkpoint，生产参数未改。见`daily-table-pipeline-stage-1/context-split-write-volume-result.json`。此结果只证明本样本进度写放大修正；100日可能线性放大的约165MB授权仍需在区间引擎前收敛，不把100写成业务上限。
+
+设计对照：正式日K不双写Parquet；有证据的全停牌范围零HTTP即可交付no_trade，归档后按业务task_id和相对文件校验证据；被替代范围不算本任务新采。JSON日期与date统一为明确日历成员比较，不补造交易日。原证券清单及其他数据集的文件合同保持。资格其余报告/请求/语义/范围/有效期/冷却检查保留，旧源码指纹不参与资格；无正式消费者的单输入审计JSON不额外变成日K门槛。原正式文档、流程/关系图、职责清单同步更新，没有新增长期设计文档。
+
+剩余：Web行情/任务读取、独立覆盖基准及缓存更新、CLI显式覆盖交互、调度联合验收、区间生产与请求窗口/小文件优化未完成；API功能/性能和代表性历史容量不在本阶段通过声明内。旧行情文件读取/库内旧日K文件工具仍待服务切换退出，完整历史复权重建未实现。不迁移或删除旧数据。两次Luna代理曾被usage limit打断；北京时间19:39账户允许请求后按原Luna medium恢复，未换模型、未购买或使用额度重置。
+
 ## 2026-11-09 日K表存储第一阶段（模块验收完成，正式入口尚未接线）
 
 入表设计文档已单独提交推送`21fa96f`，6份原正式文档更新、新增引用6项检查通过、代码围栏配对检查通过；未渲染Mermaid、未把文档检查称为业务测试。本阶段由Luna medium完成`storage/daily.py`、metadata必要schema/首次执行序号及对应隔离测试，主模型逐段设计对照及独立读取JUnit；先验收核心持久化，pipeline、Web、CLI、完整FIFO及区间引擎尚未接入新表，不更改正式来源或生产数据。

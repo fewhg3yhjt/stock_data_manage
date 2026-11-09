@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import date, datetime, timezone
 from decimal import Decimal
 import json
+import hashlib
 import multiprocessing
 
 import pytest
@@ -44,11 +45,13 @@ def _scope(identities: list[str], asset: str = "stock") -> dict:
 def _seed_task(connection, task_id: str, order: int, identities: list[str], status="collecting", asset="stock") -> None:
     scope = _scope(identities, asset)
     connection.execute("""INSERT INTO collection_task
-        (task_id,definition_hash,dataset,status,state_json,updated_at,queue_order,scope_json,active_scope_json,first_execution_order)
-        VALUES (?,?,? ,?,?,?,1,?,?,?)""",
+        (task_id,definition_hash,dataset,status,state_json,updated_at,queue_order,first_execution_order)
+        VALUES (?,?,? ,?,?,?,1,?)""",
         [task_id, "frozen", "daily_bar", status,
          json.dumps({"task_id": task_id, "status": status, "first_execution_order": order}), NOW,
-         json.dumps(scope), json.dumps(scope), order])
+         order])
+    connection.execute("INSERT INTO collection_task_context VALUES (?,?,?,?)",
+        [task_id, json.dumps(scope), json.dumps({}), json.dumps(scope)])
 
 
 @pytest.fixture
@@ -64,11 +67,24 @@ def _publish(store, *, task="task-a", order=1, records=(), no_trade=None, scope=
              key="commit-1", publication="pub-1", asset_type=None):
     if asset_type is None:
         asset_type = records[0].asset_type if records else ASSET
+    task_row = store.connection.execute("SELECT t.state_json,c.active_scope_json,c.snapshot_json FROM collection_task t "
+        "JOIN collection_task_context c USING(task_id) WHERE t.task_id=?", [task]).fetchone()
+    task_state = json.loads(task_row[0])
+    task_snapshot = json.loads(task_row[2] or "{}")
+    if "daily_overwrite_grant" not in task_snapshot:
+        active_scope = json.loads(task_row[1])
+        owners = store.current_owners(active_scope)
+        task_snapshot["daily_overwrite_grant"] = {"scope_hash": hashlib.sha256(
+            json.dumps(active_scope, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode()).hexdigest(),
+            "owners": list(owners)}
+        store.connection.execute("UPDATE collection_task_context SET snapshot_json=? WHERE task_id=?",
+            [json.dumps(task_snapshot, sort_keys=True, ensure_ascii=False), task])
+    authorization = task_snapshot["daily_overwrite_grant"]
     return store.publish_partition(trade_date=DAY, asset_type=asset_type, task_id=task,
         first_execution_order=order, publication_id=publication, idempotency_key=key,
         scope=frozenset(scope or [r.instrument_id for r in records] + list((no_trade or {}).keys())),
         records=tuple(records), no_trade=no_trade or {}, raw_evidence_refs=("raw/2026-11-05.json",),
-        candidate_ref="candidate/2026-11-05.parquet", committed_at=NOW)
+        candidate_ref="candidate/2026-11-05.parquet", committed_at=NOW, authorization=authorization)
 
 
 def test_all_quote_fields_decimal_boundaries_nulls_roundtrip(database):
@@ -218,6 +234,83 @@ def test_a_b_a_protects_identity_ownership(database):
     assert (store.get(a, DAY).none.close, store.get(b, DAY).none.close) == (Decimal("20.00000000"), Decimal("21.00000000"))
 
 
+def test_frozen_grant_blocks_a_resume_after_original_owner_republishes(database):
+    path, connection = database
+    identity = "XSHG:600000"
+    scope = _scope([identity])
+
+    def enqueue(task_id, refs):
+        with MetadataStore(path) as metadata:
+            state = metadata.enqueue_collection_task(
+                {"task_id": task_id, "dataset": "daily_bar", "definition_hash": f"frozen-{task_id}",
+                 "status": "waiting"}, scope, snapshot={}, frozen_scope=scope,
+                daily_owner_refs=tuple(refs))
+            return state
+
+    def publish(task_id, key, publication_id, close):
+        with MetadataStore(path) as metadata:
+            state = metadata.claim_next_collection_task()
+            assert state["task_id"] == task_id
+            state = metadata.load_collection_task(task_id)
+            store = DailyBarStore(metadata.connection)
+            return store.publish_partition(
+                trade_date=DAY, asset_type=ASSET, task_id=task_id,
+                first_execution_order=state["first_execution_order"], publication_id=publication_id,
+                idempotency_key=key, scope=frozenset([identity]), records=(_record(identity, close),),
+                no_trade={}, raw_evidence_refs=("raw/2026-11-05.json",),
+                candidate_ref=f"candidate/{key}.parquet", committed_at=NOW,
+                authorization=state["daily_overwrite_grant"])
+
+    # C's first task is accepted with no owner, then publishes the original value.
+    enqueue("task-c", ())
+    publish("task-c", "C-1", "pub-C-1", "12.00")
+    connection.execute("UPDATE collection_task SET status='failed' WHERE task_id='task-c'")
+
+    # A is explicitly admitted against C-1 and freezes that exact owner reference.
+    owner_c1 = DailyBarStore(connection).current_owners(scope)
+    state_a = enqueue("task-a", owner_c1)
+    grant_a = state_a["daily_overwrite_grant"]
+    assert grant_a["owners"] == list(owner_c1)
+    from stock_data_manage.pipeline.inputs import _save_daily_batch
+    summary_root = path.parent / "summary-check"
+    summary_root.mkdir()
+    task_path = summary_root / "task.json"
+    task_path.write_text("{}", encoding="utf-8")
+    state_a["definition_ref"] = {"path": str(task_path)}
+    with MetadataStore(path) as metadata:
+        _save_daily_batch(state_a, {}, metadata)
+        persisted = metadata.connection.execute(
+            "SELECT t.state_json,c.snapshot_json FROM collection_task t JOIN collection_task_context c USING(task_id) "
+            "WHERE t.task_id='task-a'").fetchone()
+        assert "daily_overwrite_grant" not in json.loads(persisted[0])
+        assert json.loads(persisted[1])["daily_overwrite_grant"] == grant_a
+        summary = json.loads((summary_root / "summary.json").read_text(encoding="utf-8"))
+        assert "daily_overwrite_grant" not in summary
+        claimed = metadata.claim_next_collection_task()
+        assert claimed["task_id"] == "task-a"
+        loaded = metadata.load_collection_task("task-a")
+        loaded["daily_overwrite_grant"] = {"owners": []}  # state projection is not authoritative
+        metadata.save_collection_task(loaded)
+        assert metadata.load_collection_task("task-a")["daily_overwrite_grant"] == grant_a
+        metadata.connection.execute("UPDATE collection_task SET status='failed' WHERE task_id='task-a'")
+
+    # C resumes at its original execution order and publishes a newer receipt.
+    owner_c1 = DailyBarStore(connection).current_owners(scope)
+    enqueue("task-c", owner_c1)
+    result_c2 = publish("task-c", "C-2", "pub-C-2", "14.00")
+    assert result_c2.written_count == 1
+    connection.execute("UPDATE collection_task SET status='failed' WHERE task_id='task-c'")
+
+    # Re-enqueue A against the current C-2 ref for concurrency safety, but keep its C-1 grant.
+    owner_c2 = DailyBarStore(connection).current_owners(scope)
+    state_a = enqueue("task-a", owner_c2)
+    assert state_a["daily_overwrite_grant"] == grant_a
+    result_a = publish("task-a", "A-resume", "pub-A-resume", "99.00")
+    assert result_a.written_count == 0
+    assert result_a.superseded_identities == (identity,)
+    assert DailyBarStore(connection).get(identity, DAY).none.close == Decimal("14.00")
+
+
 def test_summary_counts_current_rows_no_trade_and_unknown_denominator(database):
     _, connection = database
     a, b = "XSHG:600000", "XSHE:000001"
@@ -330,9 +423,9 @@ def test_claim_assigns_and_resume_preserves_first_execution_order(database):
     path, connection = database
     scope = json.dumps(_scope(["XSHG:600000"]))
     connection.execute("""INSERT INTO collection_task
-        (task_id,definition_hash,dataset,status,state_json,updated_at,queue_order,scope_json,active_scope_json)
-        VALUES ('claim-a','definition','daily_bar','waiting','{"task_id":"claim-a","status":"waiting"}',?,1,?,?)""",
-        [NOW, scope, scope])
+        (task_id,definition_hash,dataset,status,state_json,updated_at,queue_order)
+        VALUES ('claim-a','definition','daily_bar','waiting','{"task_id":"claim-a","status":"waiting"}',?,1)""", [NOW])
+    connection.execute("INSERT INTO collection_task_context VALUES ('claim-a',?,?,?)", [scope, "{}", scope])
     metadata = MetadataStore(path)
     first = metadata.claim_next_collection_task()
     first_order = first["first_execution_order"]

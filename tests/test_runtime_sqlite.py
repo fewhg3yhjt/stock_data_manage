@@ -3,10 +3,28 @@ from __future__ import annotations
 from datetime import date
 import multiprocessing
 from pathlib import Path
+import sqlite3
 
 from stock_data_manage.service.calendar import CalendarDay, TradingCalendarStore
 from stock_data_manage.storage.metadata import MetadataStore
 from stock_data_manage.worker.attempts import CollectionAttempt
+
+
+def test_old_collection_task_schema_is_rejected_without_changing_bytes(tmp_path: Path) -> None:
+    path = tmp_path / "legacy-task-schema.sqlite3"
+    connection = sqlite3.connect(path)
+    connection.execute("CREATE TABLE collection_task(task_id TEXT PRIMARY KEY, scope_json TEXT, snapshot_json TEXT, active_scope_json TEXT)")
+    connection.execute("INSERT INTO collection_task VALUES ('legacy','{}','{}','{}')")
+    connection.commit()
+    connection.close()
+    before = path.read_bytes()
+    try:
+        MetadataStore(path)
+    except ValueError as exc:
+        assert "fresh isolated runtime root" in str(exc)
+    else:
+        raise AssertionError("legacy collection task schema must not be migrated implicitly")
+    assert path.read_bytes() == before
 
 
 def _idle_open_store(path: str, ready, release) -> None:

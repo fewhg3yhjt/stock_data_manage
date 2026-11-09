@@ -8,6 +8,8 @@ from typing import Iterable, Mapping
 import duckdb
 
 from ..domain import AssetType, Exchange
+from ..storage.integrity import Manifest
+from ..storage.parquet import InvalidPartitionError, PartitionBusyError, PartitionLock
 
 
 @dataclass(frozen=True, slots=True)
@@ -268,8 +270,20 @@ def expected_security_set(records: Iterable[SecurityRecord], trade_date: date) -
 
 
 class SecurityMasterStore(AbstractContextManager["SecurityMasterStore"]):
-    def __init__(self, path: str = ":memory:") -> None:
-        self.connection = duckdb.connect(path)
+    def __init__(self, path: str = ":memory:", *, read_only: bool = False) -> None:
+        from pathlib import Path
+
+        self.read_only = read_only
+        if read_only and path != ":memory:" and not Path(path).is_file():
+            raise FileNotFoundError(f"published security master database is missing: {path}")
+        try:
+            self.connection = duckdb.connect(path, read_only=read_only)
+        except duckdb.Error as exc:
+            if read_only:
+                raise InvalidPartitionError(f"security master is not a readable published database: {path}") from exc
+            raise
+        if read_only:
+            return
         self.connection.execute(
             """
             CREATE TABLE IF NOT EXISTS security_master (
@@ -299,6 +313,8 @@ class SecurityMasterStore(AbstractContextManager["SecurityMasterStore"]):
         )
 
     def upsert(self, records: Iterable[SecurityRecord], aliases: Iterable[SymbolHistory] = ()) -> None:
+        if self.read_only:
+            raise PermissionError("security master store is read-only")
         from uuid import uuid4
 
         import pyarrow as pa
@@ -408,6 +424,8 @@ class SecurityMasterStore(AbstractContextManager["SecurityMasterStore"]):
         self,
         changes: Iterable[tuple[str, str, object, object, date, str]],
     ) -> None:
+        if self.read_only:
+            raise PermissionError("security master store is read-only")
         from uuid import uuid4
 
         import pyarrow as pa
@@ -443,6 +461,8 @@ class SecurityMasterStore(AbstractContextManager["SecurityMasterStore"]):
     def publish(self, records: Iterable[SecurityRecord], *, aliases: Iterable[SymbolHistory] = (),
                 changes: Iterable[tuple[str, str, object, object, date, str]] = ()) -> None:
         """Apply one complete master update and its history in one transaction."""
+        if self.read_only:
+            raise PermissionError("security master store is read-only")
         self.connection.execute("BEGIN TRANSACTION")
         try:
             self.upsert(records, aliases)
@@ -473,3 +493,36 @@ class SecurityMasterStore(AbstractContextManager["SecurityMasterStore"]):
 
     def __exit__(self, exc_type: object, exc: object, traceback: object) -> None:
         self.close()
+
+
+def read_published_security_master(directory: str | "Path") -> tuple[Manifest, tuple[SecurityRecord, ...]]:
+    """Read a complete published master for task preparation and web name enrichment."""
+    from pathlib import Path
+
+    root = Path(directory)
+    if not root.exists():
+        raise FileNotFoundError(f"published security master directory is missing: {root}")
+    with PartitionLock(root / ".master-access.lock", recover_stale=True, timeout_seconds=1.0):
+        if (root / "task-commit.json").exists():
+            raise PartitionBusyError("security master publication is pending task finalization")
+        descriptor = root / "manifest.json"
+        database = root / "security_master.duckdb"
+        if not descriptor.is_file() and not database.is_file():
+            raise FileNotFoundError(f"published security master is missing: {root}")
+        if not descriptor.is_file() or not database.is_file():
+            raise InvalidPartitionError("published security master is incomplete")
+        try:
+            manifest = Manifest.load(descriptor)
+        except (ValueError, TypeError, KeyError) as exc:
+            raise InvalidPartitionError(f"security master manifest is invalid: {descriptor}") from exc
+        if (manifest.dataset != "security_master" or manifest.asset_type != "security"
+                or not manifest.verify(database)):
+            raise InvalidPartitionError("security master manifest is incompatible or corrupt")
+        try:
+            with SecurityMasterStore(str(database), read_only=True) as store:
+                records = store.all()
+        except duckdb.Error as exc:
+            raise InvalidPartitionError(f"published security master cannot be read: {database}") from exc
+        if len(records) != manifest.row_count:
+            raise InvalidPartitionError("security master row count differs from manifest")
+        return manifest, records

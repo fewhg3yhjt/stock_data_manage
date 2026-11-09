@@ -22,8 +22,8 @@ def test_offline_acceptance_report_covers_replay_capacity_and_recovery(tmp_path)
     assert report.metrics["replay_weekdays"] == 20
     assert report.metrics["replay_partition_no_ops"] == 20
     assert report.metrics["watchlist_symbols"] == 200
-    assert report.metrics["recovery_promoted_temporary_partitions"] == 1
-    assert report.metrics["recovery_invalid_final_partitions"] == 0
+    assert report.metrics["daily_table_transaction_rollback"] is True
+    assert report.metrics["daily_table_retry_written_count"] == 1
     assert report.gates["B"].startswith("NOT_RUN")
     assert report.gates["F"].startswith("NOT_STARTED")
 
@@ -38,11 +38,11 @@ def test_offline_acceptance_cli_can_write_report(tmp_path, capsys) -> None:
 
 
 def test_offline_acceptance_rejects_failed_idempotency(tmp_path, monkeypatch):
-    from stock_data_manage.storage.parquet import CanonicalPartitionStore
-    original = CanonicalPartitionStore.publish
+    from stock_data_manage.storage.daily import DailyBarStore
+    original = DailyBarStore.publish_partition
     def changed(*args, **kwargs):
-        return replace(original(*args, **kwargs), no_op=False)
-    monkeypatch.setattr(CanonicalPartitionStore, "publish", changed)
+        return replace(original(*args, **kwargs), idempotent=False)
+    monkeypatch.setattr(DailyBarStore, "publish_partition", changed)
     report = run_offline_acceptance(tmp_path)
     assert report.checks["storage_replay"]["actual"]["no_op_partitions"] == 0
     assert report.checks["storage_replay"]["status"] == "FAIL"
@@ -51,25 +51,34 @@ def test_offline_acceptance_rejects_failed_idempotency(tmp_path, monkeypatch):
 
 
 def test_offline_acceptance_rejects_invalid_recovery(tmp_path, monkeypatch):
-    from stock_data_manage.worker.recovery import RecoveryScanner
-    original = RecoveryScanner.recover
+    from stock_data_manage.storage.daily import DailyBarStore, DailyPublicationResult
+    original = DailyBarStore.publish_partition
+    skipped = set()
     def changed(*args, **kwargs):
-        return replace(original(*args, **kwargs), invalid_final_partitions=("broken-partition",))
-    monkeypatch.setattr(RecoveryScanner, "recover", changed)
+        task_id = kwargs["task_id"]
+        if "-transaction-retry-" in task_id and task_id not in skipped:
+            skipped.add(task_id)
+            return DailyPublicationResult("not-written", False, 0, 0, 0, (), 0, {}, 0)
+        return original(*args, **kwargs)
+    monkeypatch.setattr(DailyBarStore, "publish_partition", changed)
     report = run_offline_acceptance(tmp_path)
-    assert report.checks["publication_recovery"]["status"] == "FAIL"
+    assert report.checks["daily_table_transaction_recovery"]["status"] == "FAIL"
     assert report.gates["D"] == "FAIL_COMPONENT_CHECK"
     assert report.conclusion == "OFFLINE_COMPONENT_CHECKS_FAILED"
 
 
 def test_offline_acceptance_does_not_hide_programming_errors(tmp_path, monkeypatch):
-    from stock_data_manage.storage.parquet import CanonicalPartitionStore
-    original = CanonicalPartitionStore.publish
+    from stock_data_manage.storage.daily import DailyBarStore
+    original = DailyBarStore.publish_partition
+    calls = {}
     def changed(*args, **kwargs):
-        if kwargs["run_id"].endswith("-recovery"):
-            raise RuntimeError("unexpected programming failure")
+        task_id = kwargs["task_id"]
+        if "-transaction-retry-" in task_id:
+            calls[task_id] = calls.get(task_id, 0) + 1
+            if calls[task_id] == 2:
+                raise RuntimeError("unexpected programming failure")
         return original(*args, **kwargs)
-    monkeypatch.setattr(CanonicalPartitionStore, "publish", changed)
+    monkeypatch.setattr(DailyBarStore, "publish_partition", changed)
     with pytest.raises(RuntimeError, match="unexpected programming failure"):
         run_offline_acceptance(tmp_path)
 
@@ -84,11 +93,23 @@ def test_offline_acceptance_cli_returns_nonzero_for_failed_check(tmp_path, monke
     assert json.loads(capsys.readouterr().out)["conclusion"] == failed.conclusion
 
 
-def test_repeated_component_runs_preserve_prior_fault_evidence(tmp_path):
+def test_repeated_component_runs_preserve_prior_publication_receipts(tmp_path):
+    from stock_data_manage.storage.metadata import MetadataStore
     first = run_offline_acceptance(tmp_path, test_run_id="first-run")
-    evidence = Path(first.checks["publication_recovery"]["evidence"]["root"])
-    original = {path.relative_to(evidence): path.read_bytes() for path in evidence.rglob("*") if path.is_file()}
+    first_evidence = first.checks["daily_table_transaction_recovery"]["evidence"]
+    descriptor_ref = json.loads(first_evidence["candidate_ref"])
+    descriptor = Path(descriptor_ref["path"])
+    original_bytes = descriptor.read_bytes()
+    with MetadataStore(tmp_path / "metadata.sqlite3", read_only=True) as metadata:
+        original_receipts = metadata.connection.execute(
+            "SELECT publication_id,request_hash FROM daily_publication WHERE task_id=?",
+            [first_evidence["task_id"]]).fetchall()
     second = run_offline_acceptance(tmp_path, test_run_id="first-run")
-    assert second.checks["publication_recovery"]["evidence"]["root"] != str(evidence)
+    second_evidence = second.checks["daily_table_transaction_recovery"]["evidence"]
+    assert second_evidence["task_id"] != first_evidence["task_id"]
+    assert descriptor.read_bytes() == original_bytes
+    with MetadataStore(tmp_path / "metadata.sqlite3", read_only=True) as metadata:
+        assert metadata.connection.execute(
+            "SELECT publication_id,request_hash FROM daily_publication WHERE task_id=?",
+            [first_evidence["task_id"]]).fetchall() == original_receipts
     assert all(check["status"] == "PASS" for check in second.checks.values())
-    assert {path.relative_to(evidence): path.read_bytes() for path in evidence.rglob("*") if path.is_file()} == original

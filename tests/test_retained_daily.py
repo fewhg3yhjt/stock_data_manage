@@ -1,17 +1,20 @@
 """Synthetic transport fixtures validate exact scope and production-write guards."""
 import json
 from copy import deepcopy
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
+from decimal import Decimal
 from pathlib import Path
 import requests
 import pytest
 from test_daily_collection_e2e import batch_entries
 from stock_data_manage.config.loader import load_input_capabilities
+from stock_data_manage.domain import AssetType
 from stock_data_manage.pipeline.inputs import collect_input, collect_task
 from stock_data_manage.providers.probes import ProbeEvidence
 from stock_data_manage.providers.transport import RequestPacer
 from stock_data_manage.routing.factory import build_input_provider, check_daily_input_qualification
 from stock_data_manage.storage.integrity import file_hash, row_hash
+from stock_data_manage.storage.daily import DailyBarStore
 from stock_data_manage.storage.metadata import MetadataStore
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -55,6 +58,14 @@ def qualified(tmp_path, monkeypatch):
     result=collect_task(definition=definition,config_root=CONFIG,data_root=tmp_path/'replayed',mode='replay',
         collector_options={'pacer':RequestPacer(wait=lambda _:None)})
     assert result['status']=='published',result.get('error')
+    evidence_db=tmp_path/'replayed'/'metadata'/'metadata.sqlite3'
+    with MetadataStore(evidence_db,read_only=True) as metadata:
+        receipt=next(row for row in DailyBarStore(metadata.connection).publication_receipts(
+            task_id=definition['task_id'],trade_date=date.fromisoformat(definition['trade_date']),
+            asset_type=AssetType.STOCK)
+            if row['publication_id']==result['publication_id'])
+    publication_ref={'database_path':str(evidence_db),'task_id':definition['task_id'],
+        'publication_id':receipt['publication_id'],'request_hash':receipt['request_hash']}
     contract=next(c for c in load_input_capabilities(CONFIG/'providers.yaml') if c.input_id=='ASTOCK-002-daily')
     version=build_input_provider(contract,providers_path=CONFIG/'providers.yaml').capability_version
     for name,(context,live,current,raw) in pairs.items():
@@ -64,9 +75,10 @@ def qualified(tmp_path, monkeypatch):
         (tmp_path/'contract.xml').write_text('<testsuites><testsuite tests="1" failures="0" errors="0" skipped="0"/></testsuites>')
         artifacts={'contract_tests':tmp_path/'contract.xml','semantic_check':tmp_path/(name+'-semantic.json'),
             'live_report':Path(live['report_path']),'revalidation_report':Path(current['report_path']),
-            'publication_manifest':Path(result['published_manifest']),'raw_manifest':raw}
+            'raw_manifest':raw}
         proof={'input_id':contract.input_id,'capability_version':version,'asset_type':'stock',
             'allowed_modes':['retained','live'],
+            'publication_ref':publication_ref,
             **{k:{'path':str(p),'sha256':file_hash(p)} for k,p in artifacts.items()}}
         proof_path=tmp_path/(name+'-qualification.json');proof_path.write_text(json.dumps(proof),encoding='utf-8')
         now=datetime.now(timezone.utc)
@@ -76,7 +88,7 @@ def qualified(tmp_path, monkeypatch):
             request_scope=('input:'+contract.input_id,'parameters:'+row_hash(contract.bind_parameters(context)),
                            'qualification:'+str(proof_path)),field_semantics=('trade_date','open','high','low','close','adjustment'),units=('price:CNY',))
         root=tmp_path/'formal'
-        with MetadataStore(root/'metadata/metadata.duckdb') as metadata:
+        with MetadataStore(root/'metadata/metadata.sqlite3') as metadata:
             metadata.save_probe_evidence(evidence,dataset='daily_bar',market='XSHG',asset_type='stock',
                 code_prefix='sh600519',adjustment=name)
     return contract,root,definition,pairs['forward'][3],tmp_path/'forward-qualification.json'
@@ -127,18 +139,30 @@ def test_typed_index_daily_input_rejects_adjusted_capture_before_network(tmp_pat
     assert 'only without adjustment' in report['error']
 
 
-def test_exact_live_task_publishes_and_blocks_retained_only_qualification(qualified):
+def test_exact_live_task_publishes_and_blocks_retained_only_qualification(qualified,monkeypatch):
     contract,root,definition,raw,proof=qualified
     [unit.pop('replay_manifest',None) for unit in definition['units']]
     result=collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='live',redo='full',
         collector_options={'pacer':RequestPacer(wait=lambda _:None)})
     assert result['status']=='published'
     assert batch_entries(result)['sh600519']['live_http_calls']==1
+    with MetadataStore(root/'metadata/metadata.sqlite3',read_only=True) as metadata:
+        initial_receipts=DailyBarStore(metadata.connection).publication_receipts(task_id=definition['task_id'])
+    assert len(initial_receipts)==1
     p=json.loads(proof.read_text());p['allowed_modes']=['retained'];proof.write_text(json.dumps(p))
-    with MetadataStore(root/'metadata/metadata.duckdb') as metadata:
+    with MetadataStore(root/'metadata/metadata.sqlite3') as metadata:
         metadata.connection.execute("UPDATE capability_registry SET evidence_hash=? WHERE adjustment='forward'",[file_hash(proof)])
-    with pytest.raises(ValueError,match='execution mode'):
-        collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='live',redo='full')
+    calls=[];send=requests.Session.send
+    def observed(session,request,**kwargs):
+        calls.append(request.url)
+        return send(session,request,**kwargs)
+    monkeypatch.setattr(requests.Session,'send',observed)
+    blocked=collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='live',redo='full')
+    assert blocked['status']=='failed' and not blocked['complete_today'] and calls==[]
+    reasons=json.loads(Path(blocked['qualification_ref']['path']).read_text(encoding='utf-8'))
+    assert 'execution mode' in ' '.join(reasons['ASTOCK-002-daily']['reasons'])
+    with MetadataStore(root/'metadata/metadata.sqlite3',read_only=True) as metadata:
+        assert DailyBarStore(metadata.connection).publication_receipts(task_id=definition['task_id'])==initial_receipts
 
 
 def test_daily_input_uses_yaml_interval_across_requests(qualified,monkeypatch):
@@ -157,27 +181,6 @@ def test_daily_input_uses_yaml_interval_across_requests(qualified,monkeypatch):
     assert starts==[0.0,0.3]
 
 
-@pytest.mark.parametrize('damage',['none','hash','source','parameters','code','artifact'])
-def test_checkpoint_revalidation_checks_data_and_ignores_old_code_fingerprints(qualified,damage):
-    from stock_data_manage.pipeline.inputs import _task_unit_valid
-    contract,root,definition,raw,proof=qualified
-    with MetadataStore(root.parent/'replayed/metadata/metadata.duckdb') as metadata:
-        entry=batch_entries(metadata.load_collection_task(definition['task_id']))['sh600519']
-    p=json.loads(proof.read_text());report=Path(p['revalidation_report']['path'])
-    current=json.loads(report.read_text())
-    current['run_directory']=str(report.parents[4])
-    entry['report'] = deepcopy(current)
-    entry['report']['code_files']=[{'path':'missing-old-source.py','sha256':'prior-runtime-code'}]
-    if damage=='source':current['output']['source_response_hashes']=['different-response']
-    elif damage=='parameters':current['parameters']['code']='sh600000'
-    elif damage=='code':current['code_files']=[{'path':'missing-source.py','sha256':'different-code'}]
-    elif damage=='artifact':current['output']['sha256']='different-artifact'
-    path=root.parent/'checkpoint-revalidation.json';path.write_text(json.dumps(current))
-    entry['revalidation_report']={'path':str(path),'sha256':file_hash(path)}
-    if damage=='hash':path.write_text('{}')
-    assert _task_unit_valid(entry)==(damage in {'none','code'})
-
-
 @pytest.mark.parametrize('boundary',['allowed','date','api','market','asset','symbol_type','retained','expired','hash','cooldown','code'])
 def test_live_market_scope_preserves_evidence_and_request_boundaries(qualified,boundary):
     contract,root,definition,raw,path=qualified
@@ -186,7 +189,7 @@ def test_live_market_scope_preserves_evidence_and_request_boundaries(qualified,b
     path.write_text(json.dumps(proof),encoding='utf-8')
     context={'request':{'symbol':'sh600000','start_date':'2026-10-09','end_date':'2026-10-09'},'config':dict(CONTEXT['config'])}
     asset='stock';mode='live';now=datetime.now(timezone.utc)
-    with MetadataStore(root/'metadata/metadata.duckdb') as metadata:
+    with MetadataStore(root/'metadata/metadata.sqlite3') as metadata:
         metadata.connection.execute("UPDATE capability_registry SET evidence_hash=? WHERE adjustment='forward'",[file_hash(path)])
         if boundary=='date':context['request']['start_date']='2026-10-08'
         elif boundary=='api':context['config']={'api':'fqkline','adjust':'qfq'}
@@ -228,8 +231,10 @@ def test_live_throttling_opens_existing_cooldown_and_blocks_next_call(qualified,
         collector_options={'pacer':RequestPacer(wait=lambda _:None)})
     assert result['status']=='failed' and count
     previous=len(count)
-    with pytest.raises(ValueError,match='cooling down'):
-        collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='live',redo='resume')
+    blocked=collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='live',redo='resume')
+    assert blocked['status']=='failed' and not blocked['complete_today']
+    reasons=json.loads(Path(blocked['qualification_ref']['path']).read_text(encoding='utf-8'))
+    assert 'cooling down' in ' '.join(reasons['ASTOCK-002-daily']['reasons'])
     assert len(count)==previous
 
 
@@ -261,49 +266,192 @@ def test_qualified_retained_task_publishes_with_zero_network_and_complete_progre
     result=collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='retained',
         collector_options={'pacer':RequestPacer(wait=lambda _:None)})
     assert result['status']=='published' and result['verification_mode']=='retained'
+    assert len(result['publication_refs'])==1
+    assert result['publication_id']==result['publication_refs'][0]['publication_id']
+    assert result['publication_refs'][0]['row_count']==1
+    assert result['current_partition_count']==result['publication_refs'][0]['current_partition_count']==1
     assert batch_entries(result)['sh600519']['live_http_calls']==0
     summary=json.loads(Path(result['summary']['path']).read_text(encoding='utf-8'))
     assert all(s['percent']==100 for s in summary['progress']['stages'].values())
     assert (root/'raw/2026-10-09/tencent/kline_daily/manifest.ndjson').exists()
+    with MetadataStore(root/'metadata/metadata.sqlite3',read_only=True) as metadata:
+        record=DailyBarStore(metadata.connection).get('XSHG:600519',date(2026,10,9))
+        assert record is not None and record.forward.close==Decimal('11')
+        receipts=DailyBarStore(metadata.connection).publication_receipts(task_id=definition['task_id'])
+        assert len(receipts)==1 and receipts[0]['publication_id']==result['publication_id']
 
 
-def test_interrupted_retained_publication_recovers_all_four_progress_steps(qualified):
+@pytest.mark.parametrize('task_status',['failed','committing'])
+def test_daily_qualification_uses_committed_receipt_when_task_is_partial(qualified,task_status):
+    contract,root,definition,raw,proof=qualified
+    evidence_db=root.parent/'replayed'/'metadata'/'metadata.sqlite3'
+    with MetadataStore(evidence_db) as metadata:
+        state=metadata.load_collection_task(definition['task_id'])
+        assert state['status']=='published'
+        state['status']=task_status
+        metadata.connection.execute('UPDATE collection_task SET status=?,state_json=? WHERE task_id=?',
+            [task_status,json.dumps(state,ensure_ascii=False,default=str),definition['task_id']])
+        receipt=DailyBarStore(metadata.connection).publication_receipts(task_id=definition['task_id'])
+        assert len(receipt)==1 and receipt[0]['written_count']==1
+    result=collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='retained',
+        collector_options={'pacer':RequestPacer(wait=lambda _:None)})
+    assert result['status']=='published'
+
+
+def test_interrupted_retained_receipt_commit_recovers_without_republishing(qualified):
     from stock_data_manage.worker.recovery import recover_collection_tasks
     contract,root,definition,raw,proof=qualified
     def interrupt(stage):
-        if stage=='before_publish':raise RuntimeError('fixture interruption')
-    with pytest.raises(RuntimeError,match='fixture interruption'):
+        if stage=='after_receipt_commit':raise RuntimeError('fixture receipt interruption')
+    with pytest.raises(RuntimeError,match='fixture receipt interruption'):
         collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='retained',failure_hook=interrupt)
     assert recover_collection_tasks(config_root=CONFIG,data_root=root)==(definition['task_id'],)
-    with MetadataStore(root/'metadata/metadata.duckdb') as metadata:
+    with MetadataStore(root/'metadata/metadata.sqlite3') as metadata:
         result=metadata.load_collection_task(definition['task_id'])
     assert result['status']=='published'
     assert result['progress']['stages']['publication']['completed']==1
     assert result['progress']['stages']['raw']['reused']==3
+    with MetadataStore(root/'metadata/metadata.sqlite3',read_only=True) as metadata:
+        receipts=DailyBarStore(metadata.connection).publication_receipts(task_id=definition['task_id'])
+        record=DailyBarStore(metadata.connection).get('XSHG:600519',date(2026,10,9))
+    assert len(receipts)==1 and receipts[0]['written_count']==1
+    assert record is not None and record.forward.close==Decimal('11')
 
 
-@pytest.mark.parametrize('damage',['expired','scope','hash','configuration','cooldown'])
+@pytest.mark.parametrize('damage',['expired','scope','hash','configuration','cooldown',
+    'missing_receipt','wrong_request_hash','candidate','raw','revalidation_report_hash',
+    'revalidation_source_hashes','revalidation_parameters'])
 def test_retained_qualification_rejects_invalid_evidence_before_raw_writes(qualified, damage):
     contract,root,definition,raw,proof=qualified
-    with MetadataStore(root/'metadata/metadata.duckdb') as metadata:
+    with MetadataStore(root/'metadata/metadata.sqlite3') as metadata:
+        if damage.startswith('revalidation_'):
+            baseline=check_daily_input_qualification(contract,CONTEXT,asset_type='stock',config_root=CONFIG,
+                metadata=metadata,now=datetime.now(timezone.utc),execution_mode='retained')
+            assert baseline['eligible'],baseline
         if damage=='expired':metadata.connection.execute("UPDATE capability_registry SET validation_expires_at=?",[datetime.now(timezone.utc)-timedelta(seconds=1)])
         elif damage=='scope':definition['units'][0]['context']={'request':{'symbol':'sh600519','start_date':'2026-10-08','end_date':'2026-10-09'},'config':dict(CONTEXT['config'])}
         elif damage=='hash':proof.write_text('{}')
+        elif damage.startswith('revalidation_'):
+            p=json.loads(proof.read_text());current=Path(p['revalidation_report']['path'])
+            if damage=='revalidation_report_hash':
+                current.write_text(current.read_text(encoding='utf-8')+' ',encoding='utf-8')
+            else:
+                report=json.loads(current.read_text(encoding='utf-8'))
+                if damage=='revalidation_source_hashes':
+                    report['output']['source_response_hashes']=['0'*64]
+                else:
+                    report['parameters']['code']='sh600000'
+                current.write_text(json.dumps(report),encoding='utf-8')
+                p['revalidation_report']['sha256']=file_hash(current)
+                proof.write_text(json.dumps(p),encoding='utf-8')
+                metadata.connection.execute('UPDATE capability_registry SET evidence_hash=? WHERE adjustment=?',
+                    [file_hash(proof),'forward'])
         elif damage=='configuration':
             p=json.loads(proof.read_text());current=Path(p['revalidation_report']['path']);r=json.loads(current.read_text());r['config_files'][0]['sha256']='bad'
             current.write_text(json.dumps(r));p['revalidation_report']['sha256']=file_hash(current);proof.write_text(json.dumps(p))
             metadata.connection.execute('UPDATE capability_registry SET evidence_hash=?',[file_hash(proof)])
+        elif damage in {'missing_receipt','wrong_request_hash','candidate','raw'}:
+            p=json.loads(proof.read_text())
+            publication=p['publication_ref']
+            if damage=='missing_receipt':
+                publication['publication_id']='missing-publication'
+            elif damage=='wrong_request_hash':
+                publication['request_hash']='0'*64
+            else:
+                with MetadataStore(publication['database_path'],read_only=True) as evidence_metadata:
+                    receipt=DailyBarStore(evidence_metadata.connection).publication_receipts(
+                        task_id=publication['task_id'],trade_date=date.fromisoformat(definition['trade_date']),
+                        asset_type=AssetType.STOCK)[0]
+                    task_state=evidence_metadata.load_collection_task(publication['task_id'])
+                run_root=Path(task_state['definition_ref']['path']).parent
+                descriptor_ref=json.loads(receipt['candidate_ref'])
+                descriptor_path=run_root/descriptor_ref['path']
+                descriptor=json.loads(descriptor_path.read_text(encoding='utf-8'))
+                if damage=='candidate':
+                    target=run_root/descriptor['candidate']['path']
+                    with target.open('ab') as stream: stream.write(b'corruption')
+                else:
+                    target=Path(descriptor['raw_evidence'][0]['path'])
+                    events=[json.loads(line) for line in target.read_text(encoding='utf-8').splitlines() if line.strip()]
+                    events[-1]['url']=str(events[-1].get('url',''))+'?changed=1'
+                    target.write_text('\n'.join(json.dumps(event,ensure_ascii=False) for event in events)+'\n',encoding='utf-8')
+            proof.write_text(json.dumps(p),encoding='utf-8')
+            metadata.connection.execute('UPDATE capability_registry SET evidence_hash=? WHERE adjustment=?',
+                [file_hash(proof),'forward'])
         else:
             metadata.record_provider_failure(provider=contract.provider,endpoint=contract.endpoint,
                 capability_version=build_input_provider(contract,providers_path=CONFIG/'providers.yaml').capability_version,
                 dataset='daily_bar',market='XSHG',asset_type='stock',failure_class='forbidden',error='fixture',
                 now=datetime.now(timezone.utc),cooldown_seconds=300,failure_threshold=1)
     reasons = {'expired':'expired or not yet valid','scope':'single frozen date','hash':'hash differs',
-        'configuration':'configuration changed','cooldown':'cooling down'}
-    with pytest.raises(ValueError,match=reasons[damage]):
-        collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='retained')
+        'configuration':'configuration changed','cooldown':'cooling down',
+        'missing_receipt':'daily publication receipt is missing or ambiguous',
+        'wrong_request_hash':'daily publication receipt request hash differs',
+        'candidate':'daily publication candidate is missing or changed',
+        'raw':'daily publication original response evidence changed',
+        'revalidation_report_hash':'daily qualification layer hash differs: revalidation_report',
+        'revalidation_source_hashes':'daily revalidation does not retain live response bytes',
+        'revalidation_parameters':'daily Provider report scope differs'}
+    if damage=='scope':
+        with pytest.raises(ValueError,match='frozen logical security, request code and single date'):
+            collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='retained')
+    else:
+        result=collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='retained')
+        assert result['status']=='failed' and not result['complete_today']
+        qualification=json.loads(Path(result['qualification_ref']['path']).read_text(encoding='utf-8'))
+        assert reasons[damage] in ' '.join(qualification['ASTOCK-002-daily']['reasons'])
     assert not list((root/'raw').rglob('*a-qfq*.bin'))
-    assert not (root/'canonical/2026-10-09/daily_bar/stock/manifest.json').exists()
+    response_events=[]
+    if (root/'raw').exists():
+        for manifest in (root/'raw').rglob('manifest.ndjson'):
+            for line in manifest.read_text(encoding='utf-8').splitlines():
+                if line.strip():
+                    event=json.loads(line)
+                    if event.get('event')=='http_response' and event.get('status_code')==200:
+                        response_events.append(event)
+    assert response_events==[]
+    with MetadataStore(root/'metadata/metadata.sqlite3',read_only=True) as metadata:
+        rows,total=DailyBarStore(metadata.connection).list_records(asset_type=AssetType.STOCK,
+            date_from=date(2026,10,9),date_to=date(2026,10,9),limit=10)
+        assert rows==() and total==0
+        assert DailyBarStore(metadata.connection).publication_receipts(task_id=definition['task_id'])==()
+
+
+def test_daily_qualification_rejects_candidate_without_committed_receipt(qualified):
+    contract,root,definition,raw,proof=qualified
+    candidate_definition=deepcopy(definition)
+    candidate_definition['task_id']='candidate-only'
+    evidence_db=root.parent/'replayed'/'metadata'/'metadata.sqlite3'
+    with MetadataStore(evidence_db,read_only=True) as evidence_metadata:
+        owners=DailyBarStore(evidence_metadata.connection).current_owners({
+            'dataset':'daily_bar','frequency':'1d','asset_types':['stock'],
+            'securities_by_date':{definition['trade_date']:['XSHG:600519']}})
+    assert len(owners)==1
+    def interrupt(stage):
+        if stage=='after_candidate_before_checkpoint':
+            raise RuntimeError('fixture candidate without receipt')
+    with pytest.raises(RuntimeError,match='candidate without receipt'):
+        collect_task(definition=candidate_definition,config_root=CONFIG,data_root=root.parent/'replayed',
+            mode='replay',failure_hook=interrupt,overwrite=True,confirmed_conflicts=owners)
+    with MetadataStore(evidence_db,read_only=True) as evidence_metadata:
+        state=evidence_metadata.load_collection_task('candidate-only')
+        assert state is not None
+        assert DailyBarStore(evidence_metadata.connection).publication_receipts(task_id='candidate-only')==()
+    p=json.loads(proof.read_text())
+    p['publication_ref']['task_id']='candidate-only'
+    p['publication_ref']['publication_id']='candidate-only-publication'
+    proof.write_text(json.dumps(p),encoding='utf-8')
+    with MetadataStore(root/'metadata/metadata.sqlite3') as metadata:
+        metadata.connection.execute('UPDATE capability_registry SET evidence_hash=? WHERE adjustment=?',
+            [file_hash(proof),'forward'])
+    result=collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='retained')
+    assert result['status']=='failed' and not result['complete_today']
+    qualification=json.loads(Path(result['qualification_ref']['path']).read_text(encoding='utf-8'))
+    assert 'daily publication receipt is missing or ambiguous' in ' '.join(
+        qualification['ASTOCK-002-daily']['reasons'])
+    assert not list((root/'raw').rglob('*a-qfq*.bin'))
+    with MetadataStore(root/'metadata/metadata.sqlite3',read_only=True) as metadata:
+        assert DailyBarStore(metadata.connection).publication_receipts(task_id=definition['task_id'])==()
 
 
 def test_processing_resume_uses_existing_capture_qualification_without_renewing_it(qualified, monkeypatch):
@@ -313,7 +461,7 @@ def test_processing_resume_uses_existing_capture_qualification_without_renewing_
             raise RuntimeError('synthetic processing interruption')
     with pytest.raises(RuntimeError):
         collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='retained',failure_hook=interrupt)
-    with MetadataStore(root/'metadata/metadata.duckdb') as metadata:
+    with MetadataStore(root/'metadata/metadata.sqlite3') as metadata:
         state=metadata.load_collection_task(definition['task_id'])
         original=dict(state['qualification_ref'])
         metadata.connection.execute('UPDATE capability_registry SET validation_expires_at=?',[datetime.now(timezone.utc)-timedelta(seconds=1)])
@@ -328,6 +476,12 @@ def test_existing_archive_preserves_retained_qualification_references(qualified)
     from stock_data_manage.worker.recovery import archive_published_task
     from stock_data_manage.config.loader import load_storage_paths
     contract,root,definition,raw,proof=qualified
+    evidence_root=root.parent/'replayed'
+    evidence_paths=load_storage_paths(CONFIG,data_root=evidence_root)
+    with MetadataStore(evidence_paths['metadata_path']) as evidence_metadata:
+        evidence_task=evidence_metadata.load_collection_task(definition['task_id'])
+        archive_published_task(Path(evidence_task['definition_ref']['path']).parent,metadata=evidence_metadata,
+            **{name:evidence_paths[name] for name in ['workspace_root','archive_root','canonical_root','raw_root']})
     state=collect_task(definition=definition,config_root=CONFIG,data_root=root,mode='retained')
     paths=load_storage_paths(CONFIG,data_root=root)
     with MetadataStore(paths['metadata_path']) as metadata:
@@ -345,7 +499,7 @@ def test_live_batch_checks_each_market_grant_once_then_matches_all_units(qualifi
     import stock_data_manage.routing.factory as factory
     contract,root,definition,raw,proof=qualified
     units=[]
-    with MetadataStore(root/'metadata/metadata.duckdb') as metadata:
+    with MetadataStore(root/'metadata/metadata.sqlite3') as metadata:
         for unit in definition['units']:
             name=unit['adjustment']
             path=root.parent/(name+'-qualification.json')

@@ -174,7 +174,26 @@ class InputCapabilityConfig:
             known_dates = context.get("calendar", {}).get("trading_dates")
             if known_dates is None:
                 raise ValueError("explicit trading calendar coverage is required")
-            if values[self.trading_date_parameter] not in known_dates:
+            if not isinstance(known_dates, (list, tuple, set, frozenset)):
+                raise ValueError("explicit trading calendar dates must be a collection")
+            normalized_dates = set()
+            for known_date in known_dates:
+                if isinstance(known_date, datetime):
+                    raise ValueError("explicit trading calendar contains an invalid date")
+                if isinstance(known_date, date):
+                    normalized_dates.add(known_date)
+                    continue
+                if isinstance(known_date, str):
+                    try:
+                        parsed = date.fromisoformat(known_date)
+                    except ValueError as exc:
+                        raise ValueError("explicit trading calendar contains an invalid date") from exc
+                    if parsed.isoformat() != known_date:
+                        raise ValueError("explicit trading calendar contains an invalid date")
+                    normalized_dates.add(parsed)
+                    continue
+                raise ValueError("explicit trading calendar contains an invalid date")
+            if values[self.trading_date_parameter] not in normalized_dates:
                 raise ValueError("requested date is not a known trading day")
         return values
 
