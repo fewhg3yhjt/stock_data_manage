@@ -43,6 +43,17 @@ sqlite3.register_converter("DECIMAL_TEXT", lambda value: Decimal(value.decode("a
 RUNTIME_DATABASE_BUSY_TIMEOUT_MS = 1_000
 
 
+class CollectionTaskScopeConflict(ValueError):
+    def __init__(self, task_id: str, conflicts: tuple[dict, ...]) -> None:
+        self.task_id = task_id
+        self.conflicts = conflicts
+        super().__init__(f"collection scope overlaps active task {task_id}: {conflicts!r}")
+
+
+class CollectionTaskSnapshotChanged(ValueError):
+    pass
+
+
 def open_runtime_database(
     path: str | Path,
     *,
@@ -134,13 +145,25 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
                 asset_type VARCHAR NOT NULL,
                 partition_key VARCHAR NOT NULL,
                 adjustment VARCHAR NOT NULL DEFAULT 'none',
-                expected_count BIGINT NOT NULL,
+                expected_count BIGINT,
                 actual_count BIGINT NOT NULL,
                 status VARCHAR NOT NULL,
-                manifest_path VARCHAR NOT NULL,
-                content_hash VARCHAR NOT NULL,
+                manifest_path VARCHAR,
+                content_hash VARCHAR,
                 conflict_count BIGINT NOT NULL,
                 quarantined_count BIGINT NOT NULL,
+                no_trade_count BIGINT,
+                none_available_count BIGINT,
+                none_unverified_count BIGINT,
+                none_not_applicable_count BIGINT,
+                forward_available_count BIGINT,
+                forward_unverified_count BIGINT,
+                forward_not_applicable_count BIGINT,
+                backward_available_count BIGINT,
+                backward_unverified_count BIGINT,
+                backward_not_applicable_count BIGINT,
+                data_revision BIGINT,
+                coverage_reason VARCHAR,
                 updated_at TIMESTAMPTZ NOT NULL,
                 PRIMARY KEY (dataset, asset_type, partition_key, adjustment)
             );
@@ -151,6 +174,10 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
                 instrument_id VARCHAR NOT NULL,
                 status VARCHAR NOT NULL,
                 source_provider VARCHAR,
+                asset_type VARCHAR,
+                business_reason VARCHAR,
+                evidence_ref VARCHAR,
+                last_publication_id VARCHAR,
                 updated_at TIMESTAMPTZ NOT NULL,
                 PRIMARY KEY (dataset, partition_key, adjustment, instrument_id)
             );
@@ -170,8 +197,21 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
                 dataset VARCHAR NOT NULL,
                 status VARCHAR NOT NULL,
                 state_json VARCHAR NOT NULL,
-                updated_at TIMESTAMPTZ NOT NULL
+                updated_at TIMESTAMPTZ NOT NULL,
+                queue_order INTEGER,
+                first_accepted_at TIMESTAMPTZ,
+                queued_at TIMESTAMPTZ,
+                scope_json VARCHAR,
+                snapshot_json VARCHAR,
+                active_scope_json VARCHAR,
+                first_execution_order BIGINT
             );
+            CREATE INDEX IF NOT EXISTS collection_task_queue_idx
+                ON collection_task(status, queue_order, task_id);
+            CREATE INDEX IF NOT EXISTS collection_task_queue_order_idx
+                ON collection_task(queue_order);
+            CREATE UNIQUE INDEX IF NOT EXISTS collection_task_first_execution_order_idx
+                ON collection_task(first_execution_order);
             CREATE TABLE IF NOT EXISTS conflict_log (
                 conflict_id VARCHAR PRIMARY KEY,
                 dataset VARCHAR NOT NULL,
@@ -277,18 +317,22 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
     def save_collection_task(self, state: dict) -> None:
         """Durable business progress in the existing database, not a second queue."""
         from .raw import sanitized_metadata
-        if state["status"] not in {"collecting", "checking", "committing", "failed", "published"}:
+        if state["status"] not in {"waiting", "collecting", "checking", "committing", "failed", "published"}:
             raise ValueError("invalid collection task status")
-        state_json = json.dumps(sanitized_metadata(state), ensure_ascii=False, default=str)
         self.connection.execute("BEGIN IMMEDIATE")
         try:
             previous = self.connection.execute(
-                "SELECT definition_hash FROM collection_task WHERE task_id=?", [state["task_id"]]
+                "SELECT definition_hash, first_execution_order FROM collection_task WHERE task_id=?", [state["task_id"]]
             ).fetchone()
             if previous and previous[0] != state["definition_hash"]:
                 raise ValueError("task definition is immutable; use a new task ID")
+            if previous and previous[1] is not None:
+                state = {**state, "first_execution_order": int(previous[1])}
+            state_json = json.dumps(sanitized_metadata(state), ensure_ascii=False, default=str)
             self.connection.execute(
-                """INSERT INTO collection_task VALUES (?, ?, ?, ?, ?, ?)
+                """INSERT INTO collection_task (
+                       task_id, definition_hash, dataset, status, state_json, updated_at
+                   ) VALUES (?, ?, ?, ?, ?, ?)
                    ON CONFLICT(task_id) DO UPDATE SET status=excluded.status,
                        state_json=excluded.state_json, updated_at=excluded.updated_at""",
                 [state["task_id"], state["definition_hash"], state["dataset"], state["status"],
@@ -299,18 +343,198 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
             self.connection.execute("ROLLBACK")
             raise
 
+    @staticmethod
+    def _scope_overlaps(left: dict, right: dict) -> tuple[dict, ...]:
+        if left.get("dataset") != right.get("dataset") or left.get("frequency") != right.get("frequency"):
+            return ()
+        left_by_date = left.get("securities_by_date", {})
+        right_by_date = right.get("securities_by_date", {})
+        conflicts = []
+        for trade_date in sorted(set(left_by_date) & set(right_by_date)):
+            left_ids, right_ids = set(left_by_date[trade_date]), set(right_by_date[trade_date])
+            if "*" in left_ids:
+                common_ids = tuple(sorted(right_ids))
+            elif "*" in right_ids:
+                common_ids = tuple(sorted(left_ids))
+            else:
+                common_ids = tuple(sorted(left_ids & right_ids))
+            if common_ids:
+                conflicts.append({"trade_date": trade_date, "securities": common_ids})
+        return tuple(conflicts)
+
+    @staticmethod
+    def _scope_is_subset(candidate: dict, frozen: dict) -> bool:
+        if candidate.get("dataset") != frozen.get("dataset") or candidate.get("frequency") != frozen.get("frequency"):
+            return False
+        candidate_by_date = candidate.get("securities_by_date", {})
+        frozen_by_date = frozen.get("securities_by_date", {})
+        for day, identities in candidate_by_date.items():
+            allowed = set(frozen_by_date.get(day, ()))
+            requested = set(identities)
+            if not allowed or ("*" not in allowed and ("*" in requested or not requested <= allowed)):
+                return False
+        return True
+
+    def partition_registry_snapshot(self, scope: dict) -> str:
+        """Hash only the small SQLite publication registrations relevant to a scope."""
+        dates = tuple(sorted(scope.get("securities_by_date", {})))
+        assets = tuple(sorted(set(scope.get("asset_types", ()))))
+        if not dates:
+            return row_hash(())
+        date_placeholders = ",".join("?" for _ in dates)
+        clauses = [f"partition_key IN ({date_placeholders})"]
+        parameters: list[object] = [*dates]
+        if assets:
+            clauses.append(f"asset_type IN ({','.join('?' for _ in assets)})")
+            parameters.extend(assets)
+        rows = self.connection.execute(
+            """SELECT dataset, asset_type, partition_key, adjustment, status,
+                      manifest_path, content_hash, updated_at
+               FROM partition_status WHERE dataset=? AND """ + " AND ".join(clauses)
+            + " ORDER BY dataset, asset_type, partition_key, adjustment",
+            [scope["dataset"], *parameters],
+        ).fetchall()
+        return row_hash(rows)
+
+    def enqueue_collection_task(self, state: dict, scope: dict, *, snapshot: dict,
+                                frozen_scope: dict | None = None) -> dict:
+        """Atomically validate a frozen scope and persist its FIFO position in the task row."""
+        from .raw import sanitized_metadata
+
+        by_date = scope.get("securities_by_date")
+        if (not scope.get("dataset") or not scope.get("frequency") or not isinstance(by_date, dict)
+                or not by_date or any(not identities for identities in by_date.values())):
+            raise ValueError("collection scope requires dated, nonempty stable security identities")
+        task_id = state["task_id"]
+        frozen_scope_json = json.dumps(frozen_scope or scope, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+        active_scope_json = json.dumps(scope, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+        snapshot_json = json.dumps(snapshot, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+        state = {**state, "status": "waiting"}
+        state_json = json.dumps(sanitized_metadata(state), ensure_ascii=False, default=str)
+        self.connection.execute("BEGIN IMMEDIATE")
+        try:
+            existing = self.connection.execute(
+                "SELECT definition_hash, status, state_json, queue_order, first_accepted_at, scope_json, snapshot_json, first_execution_order "
+                "FROM collection_task WHERE task_id=?", [task_id]
+            ).fetchone()
+            if existing:
+                if existing[0] != state["definition_hash"]:
+                    raise ValueError("task ID is frozen to a different definition")
+                if existing[5] and not self._scope_is_subset(frozen_scope or scope, json.loads(existing[5])):
+                    raise ValueError("task ID retry scope is outside its frozen collection scope")
+                if existing[1] in {"waiting", "collecting", "checking", "committing"}:
+                    self.connection.execute("COMMIT")
+                    state = {**json.loads(existing[2]), "queue_order": existing[3], "already_queued": True}
+                    if existing[7] is not None:
+                        state["first_execution_order"] = int(existing[7])
+                    return state
+
+            if snapshot.get("registry_hash") != self.partition_registry_snapshot(scope):
+                raise CollectionTaskSnapshotChanged("published partition registrations changed; preview and confirm again")
+
+            active_rows = self.connection.execute(
+                "SELECT task_id, active_scope_json FROM collection_task "
+                "WHERE status IN ('waiting','collecting','checking','committing') AND task_id<>? ORDER BY queue_order, task_id",
+                [task_id],
+            ).fetchall()
+            for active_id, active_scope in active_rows:
+                if active_scope:
+                    conflicts = self._scope_overlaps(scope, json.loads(active_scope))
+                    if conflicts:
+                        raise CollectionTaskScopeConflict(active_id, conflicts)
+
+            next_order = self.connection.execute(
+                "SELECT coalesce(max(queue_order), 0) + 1 FROM collection_task"
+            ).fetchone()[0]
+            first_accepted_at = existing[4] if existing else datetime.now(timezone.utc)
+            queued_at = datetime.now(timezone.utc)
+            state.update(queue_order=next_order, first_accepted_at=first_accepted_at.isoformat(),
+                         queued_at=queued_at.isoformat())
+            state_json = json.dumps(sanitized_metadata(state), ensure_ascii=False, default=str)
+            self.connection.execute(
+                """INSERT INTO collection_task (
+                       task_id, definition_hash, dataset, status, state_json, updated_at,
+                       queue_order, first_accepted_at, queued_at, scope_json, snapshot_json, active_scope_json
+                   ) VALUES (?, ?, ?, 'waiting', ?, ?, ?, ?, ?, ?, ?, ?)
+                   ON CONFLICT(task_id) DO UPDATE SET
+                       status='waiting', state_json=excluded.state_json, updated_at=excluded.updated_at,
+                       queue_order=excluded.queue_order, queued_at=excluded.queued_at,
+                       active_scope_json=excluded.active_scope_json""",
+                [task_id, state["definition_hash"], state["dataset"], state_json, queued_at,
+                 next_order, first_accepted_at, queued_at, frozen_scope_json, snapshot_json, active_scope_json],
+            )
+            self.connection.execute("COMMIT")
+            return state
+        except Exception:
+            self.connection.execute("ROLLBACK")
+            raise
+
+    def claim_next_collection_task(self) -> dict | None:
+        """With collection.lock held, return the active head or promote one FIFO waiter."""
+        self.connection.execute("BEGIN IMMEDIATE")
+        try:
+            row = self.connection.execute(
+                    "SELECT task_id, status, state_json, first_execution_order FROM collection_task "
+                "WHERE status IN ('committing','collecting','checking') AND queue_order IS NOT NULL "
+                "ORDER BY queue_order, task_id LIMIT 1"
+            ).fetchone()
+            if row is None:
+                row = self.connection.execute(
+                    "SELECT task_id, status, state_json, first_execution_order FROM collection_task WHERE status='waiting' "
+                    "AND queue_order IS NOT NULL ORDER BY queue_order, task_id LIMIT 1"
+                ).fetchone()
+            if row is None:
+                self.connection.execute("COMMIT")
+                return None
+            task_id, status, state_json, first_execution_order = row
+            state = json.loads(state_json)
+            if first_execution_order is None:
+                first_execution_order = self.connection.execute(
+                    "SELECT coalesce(max(first_execution_order), 0) + 1 FROM collection_task"
+                ).fetchone()[0]
+                self.connection.execute(
+                    "UPDATE collection_task SET first_execution_order=? WHERE task_id=? AND first_execution_order IS NULL",
+                    [first_execution_order, task_id],
+                )
+            state["first_execution_order"] = first_execution_order
+            state_json = json.dumps(state, ensure_ascii=False, default=str)
+            self.connection.execute("UPDATE collection_task SET state_json=? WHERE task_id=?", [state_json, task_id])
+            if status == "waiting":
+                state["status"] = "collecting"
+                state_json = json.dumps(state, ensure_ascii=False, default=str)
+                self.connection.execute(
+                    "UPDATE collection_task SET status='collecting', state_json=?, updated_at=? WHERE task_id=?",
+                    [json.dumps(state, ensure_ascii=False, default=str), datetime.now(timezone.utc), task_id],
+                )
+            self.connection.execute("COMMIT")
+            return state
+        except Exception:
+            self.connection.execute("ROLLBACK")
+            raise
+
     def load_collection_task(self, task_id: str) -> dict | None:
         row = self.connection.execute(
-            "SELECT state_json FROM collection_task WHERE task_id=?", [task_id]
+            "SELECT state_json,first_execution_order FROM collection_task WHERE task_id=?", [task_id]
         ).fetchone()
-        return json.loads(row[0]) if row else None
+        if row is None:
+            return None
+        state = json.loads(row[0])
+        if row[1] is not None:
+            state["first_execution_order"] = int(row[1])
+        return state
 
     def collection_tasks(self, *, status: str | None = None) -> tuple[dict, ...]:
         rows = self.connection.execute(
-            "SELECT state_json FROM collection_task" + (" WHERE status=?" if status else "")
+            "SELECT state_json,first_execution_order FROM collection_task" + (" WHERE status=?" if status else "")
             + " ORDER BY task_id", [status] if status else [],
         ).fetchall()
-        return tuple(json.loads(row[0]) for row in rows)
+        result = []
+        for row in rows:
+            state = json.loads(row[0])
+            if row[1] is not None:
+                state["first_execution_order"] = int(row[1])
+            result.append(state)
+        return tuple(result)
 
     def save_dividend_events(self, events: list[DividendEvent]) -> int:
         for event in events:
@@ -496,8 +720,9 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
                 instrument_ids = list(resolved_statuses)
                 self.connection.executemany(
                     """INSERT INTO partition_item (
-                           dataset, partition_key, adjustment, instrument_id, status, source_provider, updated_at
-                       ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                           dataset, partition_key, adjustment, instrument_id, status, source_provider, asset_type,
+                           business_reason, evidence_ref, last_publication_id, updated_at
+                       ) VALUES (?, ?, ?, ?, ?, ?, NULL, NULL, NULL, NULL, ?)
                        ON CONFLICT (dataset, partition_key, adjustment, instrument_id) DO UPDATE SET
                         status=excluded.status,
                         source_provider=excluded.source_provider,

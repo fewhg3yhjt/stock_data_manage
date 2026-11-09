@@ -7,6 +7,7 @@
 ## 当前目录约定
 
 - `tests/test_runtime_sqlite.py`用隔离运行库检验跨进程空闲连接共存、唯一attempt预占、健康计数原子更新及日历批次回滚；不启动来源或生产调度，不是迁移工具。
+- `tests/test_daily_table_storage.py`验证当前日K三口径入表、精确小数/空值、局部覆盖/no_trade、发布回执幂等、首次执行归属、回滚及跨连接/进程读快照；`tests/test_task_queue.py`验证运行库层FIFO与日期/证券范围受理原子性，不代表页面和调度已接线。
 - `.codex/config.toml`只配置本项目开发协作的子代理默认模型和推理强度；不设置主对话模型，不进入采集、存储或调度的运行配置。职责分工与交接要求由根目录`AGENTS.md`维护。
 - 正式代码直接位于 `src/`，不再建立 `src/stock_data_manage/` 或 `src/stockdata/`，各模块职责不变。
 - `src/__init__.py` 是逻辑包 `stock_data_manage` 的初始化文件，`src/cli.py` 是命令入口。`pyproject.toml` 显式将逻辑包映射到 `src/` 并列出Python包；新增含 `__init__.py` 的子包时同步更新该清单。
@@ -168,6 +169,7 @@
 | `storage/hot.py` | SQLite WAL Hot Minute Store 和即时查询数据 |
 | `storage/parquet.py` | 来源字段合同的候选精确类型写入；Canonical Bar按日期/数据集/资产类型分区，复权保留记录主键；清单、文件锁和原子发布 |
 | `storage/metadata.py` | SQLite任务、日线分区、Attempt、调度占用、来源健康、证据和冲突；共享运行库连接/类型与只读合同，不迁移旧DuckDB，不维护每日证券名单分区索引 |
+| `storage/daily.py` | 正式日K表的显式初始化、日期/资产事务发布、三口径精确值、no_trade业务事实、当前摘要、发布回执和归属保护；按索引分页、短一致读快照；模块已隔离验证，正式pipeline/Web尚未接入 |
 | `storage/integrity.py` | 确定性 row hash、Manifest 生成和完整性校验 |
 | `storage/__init__.py` | 存储包说明，不承载业务实现 |
 
