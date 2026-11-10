@@ -1,5 +1,23 @@
 # 项目开发进度
 
+## 2026-11-10 管理台任务列表切表（实现及隔离验收完成）
+
+本阶段解决“任务已受理但无summary时列表不可见，以及全历史读文件后才分页”的问题。GET `/api/tasks`现以collection_task为事实源，在短只读快照中SQL筛选/计数/分页；waiting无summary也可见，不展开冻结上下文。状态年龄和排序取最后持久化时间，原摘要生成时间另行保留；等待不因久等判中断，记录时间不充当执行进程心跳。页面增加“等待执行”及筛选。任务状态与当前行情继续分开，不变更FIFO、覆盖或部分发布规则。Luna medium实现/测试，主模型复核合同、实际差异及证据。
+
+| 本阶段实际检查/分母 | 结果及证据 | 判断及未检查范围 |
+|---|---|---|
+| HEAD加6个本阶段源/测试文件的最终首轮树，6个新增节点及1个既有HTTP联合节点 | 7项中6通过、1失败，4.511秒；新增6项全部通过，既有节点失败于读取后SQLite新增-shm/-wal的文件集合断言。[JUnit](tmp/sqlite-runtime-implementation/dashboard-table-queries/final-run-01/evidence/tasks-api-junit.xml)、[同进程环境及实际模块导入](tmp/sqlite-runtime-implementation/dashboard-table-queries/final-run-01/evidence/final-tests-20261110-223602-217.stdout.log)、[408文件清单](tmp/sqlite-runtime-implementation/dashboard-table-queries/final-run-01/manifest.json) | 真实submit_collection_task受理→无summary→ASGI等待态0/3及queue_order通过；筛选/分页/空结果、精确300秒、缺库不初始化/旧schema不迁移、坏JSON和非object409、注入busy503与意外SQL错误不隐藏均覆盖。busy仅验证错误映射，不称真实锁竞争通过；不是7/7或全管理台通过 |
+| 只复查受影响的既有HTTP联合节点 | 修正协调文件断言后1/1通过，0.413秒。[单项JUnit](tmp/sqlite-runtime-implementation/dashboard-table-queries/final-run-02/evidence/tasks-api-junit.xml)、[实际导入/同进程环境](tmp/sqlite-runtime-implementation/dashboard-table-queries/final-run-02/evidence/affected-test-20261110-223947-903.stdout.log)、[最终文件清单](tmp/sqlite-runtime-implementation/dashboard-table-queries/final-run-02/manifest.json) | 主模型逐文件核实408项哈希，前后树仅test_web_service.py断言不同；6项新增节点证据继续匹配，7个不同节点分别取得通过结果，不描述成一次7/7整组重跑 |
+| 10000条合成任务，1条1000457字节state及1条1050039字节context，page_size=100 | 首次单样本0.019092秒；复用5次0.014453/0.015835/0.013517/0.016356/0.015184秒，最近秩p95=0.016356；第100页0.013910秒。实际页查询用collection_task_updated_idx，每页最多解析100条state，未查询context/任务摘要。[性能及实际SQL](tmp/sqlite-runtime-implementation/dashboard-table-queries/final-run-01/tree/tmp/sqlite-runtime-implementation/dashboard-table-queries/tasks-page-performance-20261110-223604-662889.json) | 首次不是冷p95；COUNT、搜索及深页OFFSET仍有随历史行数增长的索引工作量，不称常数成本。只有一条大state/context，不推广为所有任务都1MB的负载，也不证明多年规模或生产容量 |
+
+首轮失败只调整旧联合测试对SQLite读协调文件的判定：既有业务文件仍必须完全不变，仅允许该fixture精确数据库路径新增空WAL和共享内存协调文件；不能用immutable模式忽略WAL，也不放宽任何业务写入。修正后仅复查该节点，保留首轮失败日志。更早工作树联合节点在Raw预览断言失败，见[原日志](tmp/sqlite-runtime-implementation/dashboard-table-queries/test-run.log)；工作树Raw/UI/settings等改动未纳入本阶段最终树，也没有借本阶段修改或宣称其通过。工作树首轮5项通过不累加进最终节点数。
+
+设计对照：列表已按任务事实与当前行情分离、短只读连接、页内投影及等待态合同实现；没有新增服务、来源、动态切源、兼容后端或生产迁移。环境为项目隔离Python3.13.18/SQLite3.54.1，实际依赖导入后在同一进程执行pytest.main，模块均来自对应导出树；默认生产metadata.sqlite3仍未创建。未做真实Provider请求、生产任务或浏览器视觉验收；未运行全套测试。正式设计沿本机运行台说明更新前后流程和职责，CODE_STRUCTURE同步更新，不增长期批次文档。
+
+发布列表/总览随后接线；只读调查发现security_master在现有_finish_task_commit完成后没有登记partition_status，切换前必须补齐，不得静默漏项或从历史文件扫描回填。旧发布接口默认展开所有原始响应，而页面已显式关闭展开；留存2026-11-05股票分区5569行、16423个raw引用，manifest2807494字节，见[本次只读记录](tmp/sqlite-runtime-implementation/dashboard-table-queries/baseline-48432e5c/publication-expansion-observation.json)。已向用户询问是否统一摘要和按需追溯；未答复前不改变该接口的原文展开合同。任务列表可独立继续。
+
+风险/后续：任务详情及单元按ID定位、全市场单元状态筛选成本、当前清单发布登记/恢复和其他管理台接口尚未完成；本阶段列表通过也不代表这些接口通过。独立覆盖统计、区间生产、640及原文小文件问题继续待实施；不新增来源/管理服务/TTL，不迁移或写生产数据。原UI、配置、Raw/index及其他未提交改动已保存基线，交付仍按HEAD加本阶段差异的隔离树验证。
+
 ## 2026-11-10 日K查询切表（实现及隔离验收完成）
 
 本阶段解决“单日采集已入表，运行台日K查询仍读取旧正式文件”的消费断点。GET `/api/daily`现从配置的SQLite运行库只读查询，保持证券/日期/资产/三口径筛选、稳定分页、精确十进制字符串及空值；按页内稳定身份补当前证券清单名称，显示名称日期及不可用原因。任务状态不决定行情是否存在；不扫描任务或旧行情文件，不创建库、不回填、不迁移生产数据。没有引入来源、切源、旧行情快照、缓存服务或清理模块。640和75,132文件/2.61GB原始来源问题仍未修复。

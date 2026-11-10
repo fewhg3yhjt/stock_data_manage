@@ -9,6 +9,7 @@
 - `tests/test_runtime_sqlite.py`用隔离运行库检验跨进程空闲连接共存、唯一attempt预占、健康计数原子更新及日历批次回滚；不启动来源或生产调度，不是迁移工具。
 - `tests/test_daily_table_storage.py`验证当前日K三口径入表、精确小数/空值、局部覆盖/no_trade、发布回执幂等、首次执行归属、回滚及跨连接/进程读快照；`tests/test_task_queue.py`验证运行库层FIFO与日期/证券范围受理原子性，不代表页面和调度已接线。
 - `tests/test_daily_table_query.py`承接正式日K表查询的参数、代码承接、精确值、SQL分页、页内名称、只读及错误合同；实际执行范围以阶段进度及JUnit为准。
+- `tests/test_dashboard_table_queries.py`承接任务列表的SQL筛选/分页、等待态、持久化更新时间及错误/只读合同；状态与实际行情分开，按阶段进度记录实际功能及规模执行范围。
 - `tests/test_daily_table_query_performance.py`用7862证券×100个合成日期的完整三口径，以及单证券1000日期检查日K接口的首次/复用、默认/范围/深页查询、实际SQL计划、虚拟机工作量与页内对象数；直接SQL造数只证明读取负载，不代表来源资格、全市场发布或生产容量通过。
 - `tests/test_storage_access.py`本阶段提交通用锁的有界等待/死进程回收及证券清单只读/发布读取4项；原文/来源索引和旧日K文件方案的其余工作树检查不计本阶段交付。
 - `.codex/config.toml`只配置本项目开发协作的子代理默认模型和推理强度；不设置主对话模型，不进入采集、存储或调度的运行配置。职责分工与交接要求由根目录`AGENTS.md`维护。
@@ -170,7 +171,7 @@
 | `storage/read_index.py` | 将来源报告和行选择器批量写入可重建的SQLite查询索引；以报告ID关联、按证券/业务日期筛选和分页，只保存定位与筛选字段，不复制业务原值或作为采集/发布门槛 |
 | `storage/hot.py` | SQLite WAL Hot Minute Store 和即时查询数据 |
 | `storage/parquet.py` | 候选精确类型写入、共享文件锁有界等待/死进程回收、分钟等数据集文件发布；单日日K新生产已退出正式文件写入，旧日K文件读取/工具待服务切换退出 |
-| `storage/metadata.py` | SQLite任务及一对一冻结上下文、分区、Attempt、调度占用、来源健康、证据和冲突；进度与大上下文分行，受理预检/入队事务复用活动范围查询；共享连接/类型与只读合同，不迁移旧DuckDB |
+| `storage/metadata.py` | SQLite任务及一对一冻结上下文、分区、Attempt、调度占用、来源健康、证据和冲突；进度与大上下文分行，受理预检/入队事务复用活动范围查询；任务列表在短只读快照中按SQL筛选计数和分页，不读取冻结上下文；共享连接/类型与只读合同，不迁移旧DuckDB |
 | `storage/daily.py` | 正式日K表显式初始化、日期/资产事务发布、三口径精确值、no_trade事实、当前摘要、发布回执和归属保护；SQL筛选/分页、全匹配口径集合、页内quote批读及短一致读快照，不从任务进度推导当前行情覆盖 |
 | `storage/integrity.py` | 确定性 row hash、Manifest 生成和完整性校验 |
 | `storage/__init__.py` | 存储包说明，不承载业务实现 |
@@ -184,7 +185,7 @@
 | `service/calendar.py` | Trading Calendar在同一SQLite运行库的事务写入、只读查询和来源合并；复用storage.metadata连接合同 |
 | `service/calendar_update.py` | 交易日历来源更新、单日开市/休市轻量采集及证据引用、官方优先级，以及校验原在线证据后的正向日期导入 |
 | `service/market_data.py` | Canonical + Hot分钟查询；正式日K从配置的SQLite库只读查询，按市场/资产/生效日筛选代码承接范围并在SQL分页后投影精确值，区分输入、未就绪、忙与完整性错误 |
-| `service/web.py` | 只读运行台入口；从现有任务摘要、Raw manifest/body 和 Canonical manifest 生成展示接口；按类型、证券及业务日期查询已核验来源行，复用 YAML 字段说明和已发布证券名称辅助检索，日K价格接口只读SQLite业务表，其他任务/发布列表尚待切表 |
+| `service/web.py` | 只读运行台入口；从现有任务摘要、Raw manifest/body 和 Canonical manifest 生成展示接口；按类型、证券及业务日期查询已核验来源行，复用 YAML 字段说明和已发布证券名称辅助检索，日K价格及任务列表只读SQLite，任务详情/单元、发布列表及总览尚待切表 |
 | `service/static/` | 只读运行台的原生 HTML、CSS 和 JavaScript 页面资源，无独立前端构建或持久化状态 |
 | `service/__init__.py` | 服务包说明，不承载业务实现 |
 

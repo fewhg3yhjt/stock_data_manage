@@ -54,6 +54,21 @@ class CollectionTaskSnapshotChanged(ValueError):
     pass
 
 
+class CollectionTaskDataError(ValueError):
+    """A persisted collection task row cannot be projected into a valid state object."""
+
+
+def _collection_task_row_to_view(row) -> dict[str, object]:
+    try:
+        state = json.loads(row[3])
+    except (TypeError, json.JSONDecodeError) as exc:
+        raise CollectionTaskDataError("collection task state_json is not valid JSON") from exc
+    if not isinstance(state, dict):
+        raise CollectionTaskDataError("collection task state_json must contain an object")
+    return {"task_id": row[0], "dataset": row[1], "status": row[2], "state": state,
+            "updated_at": row[4], "queue_order": row[5], "first_execution_order": row[6]}
+
+
 def open_runtime_database(
     path: str | Path,
     *,
@@ -151,7 +166,8 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
             # Let open_runtime_database preserve its established DuckDB/legacy error.
             return
         resolved = str(Path(self.path).resolve()).replace(chr(92), "/")
-        probe = sqlite3.connect(f"file:{quote(resolved, safe='/:')}?mode=ro", uri=True)
+        probe = sqlite3.connect(f"file:{quote(resolved, safe='/:')}?mode=ro", uri=True,
+                                timeout=RUNTIME_DATABASE_BUSY_TIMEOUT_MS / 1000)
         try:
             table = probe.execute(
                 "SELECT 1 FROM sqlite_master WHERE type='table' AND name='collection_task'").fetchone()
@@ -246,6 +262,8 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
                 ON collection_task(status, queue_order, task_id);
             CREATE INDEX IF NOT EXISTS collection_task_queue_order_idx
                 ON collection_task(queue_order);
+            CREATE INDEX IF NOT EXISTS collection_task_updated_idx
+                ON collection_task(updated_at DESC, task_id ASC);
             CREATE UNIQUE INDEX IF NOT EXISTS collection_task_first_execution_order_idx
                 ON collection_task(first_execution_order);
             CREATE TABLE IF NOT EXISTS conflict_log (
@@ -630,6 +648,86 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
                 state["first_execution_order"] = int(row[1])
             result.append(state)
         return tuple(result)
+
+    def query_collection_tasks(self, *, now: datetime, stale_after_seconds: int,
+                               status: str | None = None, dataset: str | None = None,
+                               query: str | None = None, page: int = 1,
+                               page_size: int = 25) -> dict[str, object]:
+        """Read one bounded task page and its count from a single SQLite snapshot."""
+        if page < 1 or not 1 <= page_size <= 100:
+            raise ValueError("page must be positive and page_size must be between 1 and 100")
+        cutoff = now - timedelta(seconds=stale_after_seconds)
+        where: list[str] = []
+        values: list[object] = []
+        if status == "stale":
+            where.append("status IN ('collecting','checking','committing') AND updated_at<?")
+            values.append(cutoff)
+        elif status:
+            where.append("status=?")
+            values.append(status)
+        if dataset:
+            where.append("dataset=?")
+            values.append(dataset)
+        if query:
+            where.append("(instr(lower(task_id),lower(?))>0 OR instr(lower(dataset),lower(?))>0)")
+            values.extend((query, query))
+        predicate = " WHERE " + " AND ".join(where) if where else ""
+        owned_snapshot = not self.connection.in_transaction
+        if owned_snapshot:
+            self.connection.execute("BEGIN")
+        try:
+            total = int(self.connection.execute(
+                "SELECT count(*) FROM collection_task" + predicate, values).fetchone()[0])
+            offset = (page - 1) * page_size
+            rows = self.connection.execute(
+                "SELECT task_id,dataset,status,state_json,updated_at,queue_order,first_execution_order "
+                "FROM collection_task" + predicate +
+                " ORDER BY updated_at DESC,task_id ASC LIMIT ? OFFSET ?",
+                [*values, page_size, offset]).fetchall() if offset < total else []
+            if owned_snapshot:
+                self.connection.execute("COMMIT")
+        except Exception:
+            if owned_snapshot:
+                self.connection.execute("ROLLBACK")
+            raise
+        items = []
+        items.extend(_collection_task_row_to_view(row) for row in rows)
+        return {"items": items, "total": total}
+
+    def collection_task_dashboard(self, *, now: datetime, stale_after_seconds: int = 300,
+                                  limit: int = 6) -> dict[str, object]:
+        """Return grouped persisted statuses and a bounded newest-task sample."""
+        if not 1 <= limit <= 100:
+            raise ValueError("task dashboard limit must be between 1 and 100")
+        cutoff = now - timedelta(seconds=stale_after_seconds)
+        owned_snapshot = not self.connection.in_transaction
+        if owned_snapshot:
+            self.connection.execute("BEGIN")
+        try:
+            counts = self.connection.execute(
+                "SELECT CASE WHEN status IN ('collecting','checking','committing') AND updated_at<? "
+                "THEN 'stale' ELSE status END AS display_status,count(*) FROM collection_task "
+                "GROUP BY display_status ORDER BY display_status", [cutoff]).fetchall()
+            rows = self.connection.execute(
+                "SELECT task_id,dataset,status,state_json,updated_at,queue_order,first_execution_order "
+                "FROM collection_task ORDER BY updated_at DESC,task_id ASC LIMIT ?", [limit]).fetchall()
+            if owned_snapshot:
+                self.connection.execute("COMMIT")
+        except Exception:
+            if owned_snapshot:
+                self.connection.execute("ROLLBACK")
+            raise
+        return {"counts": {str(status): int(count) for status, count in counts},
+                "items": [_collection_task_row_to_view(row) for row in rows]}
+
+    def collection_task_by_id(self, task_id: str) -> dict[str, object] | None:
+        """Fetch only the requested task row, without its potentially large frozen context."""
+        row = self.connection.execute(
+            "SELECT task_id,dataset,status,state_json,updated_at,queue_order,first_execution_order "
+            "FROM collection_task WHERE task_id=?", [task_id]).fetchone()
+        if row is None:
+            return None
+        return _collection_task_row_to_view(row)
 
     def save_dividend_events(self, events: list[DividendEvent]) -> int:
         for event in events:

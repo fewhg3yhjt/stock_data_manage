@@ -7,7 +7,9 @@ import codecs
 import hashlib
 import json
 import logging
+import os
 import re
+import sqlite3
 from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
@@ -530,13 +532,17 @@ class DashboardReader:
         return list(latest.values())
 
     @staticmethod
-    def _task_card(document: dict[str, Any], location: str) -> dict[str, Any]:
-        updated = _parse_time(document.get("generated_at_utc"))
+    def _task_card(document: dict[str, Any], location: str, *,
+                   persisted_updated_at: datetime | None = None,
+                   now: datetime | None = None) -> dict[str, Any]:
+        now = now or datetime.now(timezone.utc)
+        updated = persisted_updated_at or _parse_time(document.get("generated_at_utc"))
         age = None
         if updated is not None:
-            age = max(0, int((datetime.now(timezone.utc) - updated).total_seconds()))
+            age = max(0, int((now - updated).total_seconds()))
         status = str(document.get("status", "unknown"))
-        stale = status in ACTIVE_TASK_STATES and (age is None or age > STALE_AFTER_SECONDS)
+        stale = status in ACTIVE_TASK_STATES and (
+            age is None or (now - updated).total_seconds() > STALE_AFTER_SECONDS)
         progress = document.get("progress") if isinstance(document.get("progress"), dict) else {}
         stages = progress.get("stages") if isinstance(progress.get("stages"), dict) else {}
         raw = stages.get("raw") if isinstance(stages.get("raw"), dict) else {}
@@ -552,12 +558,13 @@ class DashboardReader:
             "data_date": document.get("data_date"),
             "requested_date": document.get("requested_date"),
             "generated_at_utc": document.get("generated_at_utc"),
+            "updated_at_utc": persisted_updated_at.isoformat() if persisted_updated_at is not None else None,
             "age_seconds": age,
             "verification_mode": document.get("verification_mode"),
             "progress": progress,
             "completed_units": raw.get("completed"),
             "total_units": raw.get("total"),
-            "missing_count": len(missing) if isinstance(missing, list) else 0,
+            "missing_count": document.get("missing_count", len(missing) if isinstance(missing, list) else 0),
             "source_unit_count": len(source_units) if isinstance(source_units, list) else document.get('source_unit_count', 0),
             "phase": document.get('phase'),
             "partitions": _redact(document.get('partitions', {})),
@@ -574,20 +581,68 @@ class DashboardReader:
         page: int = 1,
         page_size: int = 25,
     ) -> dict[str, Any]:
-        cards = [self._task_card(document, location) for document, _, location in self._task_documents()]
-        if status:
-            cards = [item for item in cards if item["display_status"] == status or item["status"] == status]
-        if dataset:
-            cards = [item for item in cards if item["dataset"] == dataset]
-        if query:
-            needle = query.casefold()
-            cards = [
-                item
-                for item in cards
-                if needle in str(item["task_id"]).casefold() or needle in str(item["dataset"]).casefold()
-            ]
-        cards.sort(key=lambda item: str(item.get("generated_at_utc") or ""), reverse=True)
-        return _page(cards, page, page_size)
+        from ..storage.metadata import CollectionTaskDataError, MetadataStore
+        try:
+            now = datetime.now(timezone.utc)
+            with MetadataStore(self.paths["metadata_path"], read_only=True) as metadata:
+                result = metadata.query_collection_tasks(now=now, stale_after_seconds=STALE_AFTER_SECONDS,
+                    status=status, dataset=dataset, query=query, page=page, page_size=page_size)
+        except FileNotFoundError as exc:
+            raise HTTPException(503, "运行记录数据库尚未创建") from exc
+        except CollectionTaskDataError as exc:
+            logging.getLogger(__name__).error("task state JSON is corrupt", exc_info=True)
+            raise HTTPException(409, "任务记录格式损坏") from exc
+        except ValueError as exc:
+            logging.getLogger(__name__).warning("task list database schema is unavailable", exc_info=True)
+            raise HTTPException(503, "运行记录数据库尚未就绪") from exc
+        except sqlite3.OperationalError as exc:
+            code = getattr(exc, "sqlite_errorcode", None)
+            if isinstance(code, int) and (code & 0xFF) in {sqlite3.SQLITE_BUSY, sqlite3.SQLITE_LOCKED}:
+                raise HTTPException(503, "运行记录暂时繁忙，请稍后重试", headers={"Retry-After": "1"}) from exc
+            if "no such table: collection_task" in str(exc).lower():
+                raise HTTPException(503, "运行记录数据库尚未就绪") from exc
+            raise
+        items = [self._task_row_card(row, now) for row in result["items"]]
+        return {"items": items, "page": page, "page_size": page_size, "total": result["total"],
+                "pages": (result["total"] + page_size - 1) // page_size}
+
+    def _task_row_card(self, row: dict[str, Any], now: datetime) -> dict[str, Any]:
+        state = row["state"] if isinstance(row.get("state"), dict) else {}
+        updated = row.get("updated_at")
+        if isinstance(updated, datetime):
+            updated = updated.replace(tzinfo=timezone.utc) if updated.tzinfo is None else updated.astimezone(timezone.utc)
+        else:
+            updated = _parse_time(str(updated))
+        definition = state.get("definition") if isinstance(state.get("definition"), dict) else {}
+        execution = state.get("execution_definition") if isinstance(state.get("execution_definition"), dict) else {}
+        definition_units = definition.get("units") if isinstance(definition.get("units"), list) else execution.get("units")
+        source_units = state.get("source_units")
+        location = "unknown"
+        definition_ref = state.get("definition_ref") if isinstance(state.get("definition_ref"), dict) else {}
+        summary_ref = state.get("summary") if isinstance(state.get("summary"), dict) else {}
+        candidate = definition_ref.get("path") or summary_ref.get("path")
+        if isinstance(candidate, str):
+            path = Path(os.path.abspath(candidate))
+            if path.is_relative_to(self.paths["workspace_root"]):
+                location = "workspace"
+            elif path.is_relative_to(self.paths["archive_root"]):
+                location = "archive"
+        requested_date = state.get("requested_date")
+        if requested_date is None:
+            requested_date = definition.get("trade_date")
+        source_unit_count = (len(definition_units) if isinstance(definition_units, list)
+                             else state.get("source_unit_count", len(source_units) if isinstance(source_units, list) else 0))
+        if state.get("source_unit_count") is None and isinstance(definition_units, list):
+            state = {**state, "source_unit_count": len(definition_units)}
+        document = {**state, "task_id": row["task_id"], "dataset": row["dataset"],
+                    "status": row["status"], "requested_date": requested_date}
+        card = self._task_card(document, location, persisted_updated_at=updated, now=now)
+        if row["status"] == "waiting" and not document.get("progress"):
+            card["completed_units"] = 0
+            card["total_units"] = card["source_unit_count"]
+        card["queue_order"] = row.get("queue_order")
+        card["first_execution_order"] = row.get("first_execution_order")
+        return card
 
     def _find_task(self, task_id: str) -> tuple[dict[str, Any], Path, str]:
         for document, path, location in self._task_documents():

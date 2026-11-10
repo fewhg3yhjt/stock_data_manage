@@ -70,6 +70,13 @@ realtime_minute:
     write_json(data / "task_workspace/2026-10-09/daily_bar/summary.json", summary)
     write_json(data / "task_workspace/2026-10-09/daily_bar/task.json",
                {"dataset": "daily_bar", "trade_date": "2026-10-09", "asset_type": "stock", "units": []})
+    from stock_data_manage.storage.metadata import MetadataStore
+    metadata_path = data / "metadata/metadata.duckdb"
+    with MetadataStore(metadata_path) as metadata:
+        persisted = {**summary, "definition_hash": "fixture-definition"}
+        metadata.save_collection_task(persisted)
+        metadata.connection.execute("UPDATE collection_task SET updated_at=? WHERE task_id=?",
+            [datetime.fromisoformat(stale), summary["task_id"]])
 
     body = b'{"code":"sh600519","close":1820.0}'
     digest = hashlib.sha256(body).hexdigest()
@@ -445,6 +452,10 @@ def test_raw_token_cannot_escape_managed_root_and_app_is_read_only(tmp_path):
 
 def test_http_read_only_routes_headers_filters_and_frozen_parameters(tmp_path):
     _, app, data, _ = web_fixture(tmp_path)
+    sqlite_coordination_files = {
+        Path("metadata/metadata.duckdb-shm"),
+        Path("metadata/metadata.duckdb-wal"),
+    }
     before = {path.relative_to(data): path.read_bytes() for path in data.rglob("*") if path.is_file()}
     with TestClient(app) as client:
         assert client.get("/").status_code == 200
@@ -469,7 +480,14 @@ def test_http_read_only_routes_headers_filters_and_frozen_parameters(tmp_path):
         assert download.status_code == 200
         assert "attachment" in download.headers["content-disposition"]
     after = {path.relative_to(data): path.read_bytes() for path in data.rglob("*") if path.is_file()}
-    assert before == after
+    business_before = {path: content for path, content in before.items() if path not in sqlite_coordination_files}
+    business_after = {path: content for path, content in after.items() if path not in sqlite_coordination_files}
+    assert business_before == business_after
+    added = after.keys() - before.keys()
+    assert added <= sqlite_coordination_files
+    wal_path = Path("metadata/metadata.duckdb-wal")
+    if wal_path in added:
+        assert after[wal_path] == b""
 
 
 def test_each_response_in_manifest_is_visible_and_task_links_exact_evidence(tmp_path):

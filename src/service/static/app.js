@@ -19,7 +19,7 @@ const labels = {
 const statusLabels = {
   published: '已发布', completed: '已完成', collecting: '采集中', checking: '检查中',
   committing: '发布中', running: '进行中', failed: '失败', stale: '疑似中断',
-  blocked: '阻塞', partial: '部分完成', pending: '等待', unknown: '未知',
+  blocked: '阻塞', partial: '部分完成', pending: '等待', waiting: '等待执行', unknown: '未知',
   candidate_complete: '候选完成', captured: '响应已保存', reused: '已复用', skipped: '已跳过',
 };
 const stageLabels = { raw: '整批原响应采集', processing: '整批解析与映射', publication: '按类型检查与发布' };
@@ -111,7 +111,7 @@ function taskRow(task) {
     <td>${status(task.display_status)}</td>
     <td><div class="progress"><small>${prettyNumber(done)} / ${prettyNumber(total)}</small><progress max="100" value="${value}"></progress></div></td>
     <td>${prettyNumber(task.missing_count)}</td>
-    <td>${formatTime(task.generated_at_utc)}<br><span class="subtle">${esc(ageText(task.age_seconds))}</span></td>
+    <td>${formatTime(task.updated_at_utc || task.generated_at_utc)}<br><span class="subtle">${esc(ageText(task.age_seconds))}</span></td>
   </tr>`;
 }
 function publicationCard(item) {
@@ -148,10 +148,10 @@ async function renderTasks() {
   if (sequence !== renderSequence || state.view !== 'tasks') return;
   app.innerHTML = `<form class="filters" id="task-filters">
     <input name="q" placeholder="搜索任务编号或数据集">
-    <select name="status"><option value="">全部状态</option><option value="collecting">采集中</option><option value="stale">疑似中断</option><option value="failed">失败</option><option value="published">已发布</option></select>
+    <select name="status"><option value="">全部状态</option><option value="waiting">等待执行</option><option value="collecting">采集中</option><option value="stale">疑似中断</option><option value="failed">失败</option><option value="published">已发布</option></select>
     <input name="dataset" placeholder="数据集，例如 daily_bar">
     <span></span><button class="primary" type="submit">查询</button>
-  </form><section class="panel"><div class="panel-head"><h2>任务记录</h2><small>来自现有任务摘要，不读取运行进程</small></div>
+  </form><section class="panel"><div class="panel-head"><h2>任务记录</h2><small>来自已持久化任务记录</small></div>
   <div class="table-wrap"><table><thead><tr><th>任务</th><th>数据集</th><th>状态</th><th>采集进度</th><th>缺失</th><th>最后记录</th></tr></thead>
   <tbody>${data.items.length ? data.items.map(taskRow).join('') : '<tr><td colspan="6">没有符合条件的任务</td></tr>'}</tbody></table></div>${pager('tasks', data)}</section>`;
   bindTaskRows();
