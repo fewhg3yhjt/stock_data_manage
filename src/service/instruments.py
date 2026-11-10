@@ -3,6 +3,7 @@ from __future__ import annotations
 from contextlib import AbstractContextManager
 from dataclasses import dataclass, replace
 from datetime import date, datetime, timezone
+import re
 from typing import Iterable, Mapping
 
 import duckdb
@@ -474,6 +475,10 @@ class SecurityMasterStore(AbstractContextManager["SecurityMasterStore"]):
 
     def all(self) -> tuple[SecurityRecord, ...]:
         rows = self.connection.execute("SELECT * FROM security_master ORDER BY instrument_id").fetchall()
+        return self._records(rows)
+
+    @staticmethod
+    def _records(rows) -> tuple[SecurityRecord, ...]:
         return tuple(
             SecurityRecord(
                 instrument_id=row[0], symbol=row[1], exchange=Exchange(row[2]), asset_type=AssetType(row[3]),
@@ -485,6 +490,27 @@ class SecurityMasterStore(AbstractContextManager["SecurityMasterStore"]):
             for row in rows
         )
 
+    def count(self) -> int:
+        return int(self.connection.execute("SELECT count(*) FROM security_master").fetchone()[0])
+
+    def select_identities(self, identities: Iterable[tuple[str, str]]) -> tuple[SecurityRecord, ...]:
+        keys = tuple(dict.fromkeys(identities))
+        if len(keys) > 100 or any(
+                not isinstance(identity, str)
+                or re.fullmatch(r"(?:XSHG|XSHE|BSE):[0-9]{6}", identity) is None
+                or asset not in {item.value for item in AssetType}
+                for identity, asset in keys):
+            raise ValueError("security master page identities are invalid")
+        if not keys:
+            return ()
+        values = ",".join("(?,?)" for _ in keys)
+        params = [value for key in keys for value in key]
+        rows = self.connection.execute(
+            f"WITH requested(instrument_id,asset_type) AS (VALUES {values}) "
+            "SELECT security_master.* FROM security_master JOIN requested "
+            "USING(instrument_id,asset_type) ORDER BY instrument_id", params).fetchall()
+        return self._records(rows)
+
     def close(self) -> None:
         self.connection.close()
 
@@ -495,8 +521,10 @@ class SecurityMasterStore(AbstractContextManager["SecurityMasterStore"]):
         self.close()
 
 
-def read_published_security_master(directory: str | "Path") -> tuple[Manifest, tuple[SecurityRecord, ...]]:
-    """Read a complete published master for task preparation and web name enrichment."""
+def read_published_security_master(directory: str | "Path", *,
+                                   identities: Iterable[tuple[str, str]] | None = None
+                                   ) -> tuple[Manifest, tuple[SecurityRecord, ...]]:
+    """Verify the complete published master, optionally returning only requested identities."""
     from pathlib import Path
 
     root = Path(directory)
@@ -520,9 +548,10 @@ def read_published_security_master(directory: str | "Path") -> tuple[Manifest, t
             raise InvalidPartitionError("security master manifest is incompatible or corrupt")
         try:
             with SecurityMasterStore(str(database), read_only=True) as store:
-                records = store.all()
+                row_count = store.count()
+                records = store.all() if identities is None else store.select_identities(identities)
         except duckdb.Error as exc:
             raise InvalidPartitionError(f"published security master cannot be read: {database}") from exc
-        if len(records) != manifest.row_count:
+        if row_count != manifest.row_count:
             raise InvalidPartitionError("security master row count differs from manifest")
         return manifest, records

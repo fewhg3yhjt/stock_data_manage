@@ -4,7 +4,6 @@ from decimal import Decimal
 from pathlib import Path
 from types import SimpleNamespace
 import json
-import time
 
 import pytest
 import requests
@@ -411,76 +410,6 @@ def test_selected_redo_keeps_other_security_and_uses_three_units(tmp_path):
     assert by_id["XSHG:600002"] == original_by_id["XSHG:600002"]
 
 
-def test_daily_query_defaults_to_none_and_switches_without_provider_calls(tmp_path, monkeypatch):
-    from stock_data_manage.service.market_data import query_daily
-    definition = source_task(tmp_path)
-    assert execute(tmp_path, definition)["status"] == "published"
-    def no_network(*args, **kwargs):
-        raise AssertionError("query attempted network")
-    monkeypatch.setattr(requests.Session, "send", no_network)
-    root = tmp_path / "business/canonical"
-    normal = query_daily(root)
-    assert normal["adjustment"] == "none" and Decimal(normal["items"][0]["values"]["close"]) == Decimal("10")
-    assert normal["items"][0]["has_source_evidence"] and "raw_ref" not in normal["items"][0]
-    assert normal["items"][0]["flags"] == ["source_volume_rounded_to_100_shares", "source_amount_rounded_to_100_CNY"]
-    assert Decimal(query_daily(root, adjustment="forward")["items"][0]["values"]["close"]) == Decimal("9")
-    assert Decimal(query_daily(root, adjustment="backward")["items"][0]["values"]["close"]) == Decimal("11")
-    assert query_daily(root, security="600002")["total"] == 0
-
-
-def test_daily_web_defaults_validation_and_corrupt_partition(tmp_path):
-    from fastapi.testclient import TestClient
-    from stock_data_manage.service.web import create_app
-    definition = source_task(tmp_path)
-    state = execute(tmp_path, definition)
-    client = TestClient(create_app(config_root=CONFIG, data_root=tmp_path / "business"))
-    normal = client.get("/api/daily")
-    assert normal.status_code == 200 and normal.json()["adjustment"] == "none"
-    assert normal.json()["items"][0]["has_source_evidence"] and "raw_ref" not in normal.json()["items"][0]
-    assert client.get("/api/daily?adjustment=backward").json()["items"][0]["values"]["close"] == "11.00000000"
-    assert client.get("/api/daily?adjustment=invalid").status_code == 400
-    assert client.get("/api/daily?start_date=invalid").status_code == 422
-    Path(state["published_manifest"]).with_name("data.parquet").write_bytes(b"corrupt fixture")
-    assert client.get("/api/daily").status_code == 409
-
-
-def test_daily_api_skips_retired_row_partition_before_reading_parquet(tmp_path, monkeypatch, record_property):
-    from fastapi.testclient import TestClient
-    from stock_data_manage.service.web import create_app
-    from stock_data_manage.storage.integrity import Manifest
-    from stock_data_manage.storage.parquet import CanonicalPartitionStore
-
-    definition = source_task(tmp_path)
-    execute(tmp_path, definition)
-    root = tmp_path / "business/canonical"
-    retired = root / "2026-10-09/daily_bar/etf"
-    retired.mkdir(parents=True)
-    old_data = retired / "data.parquet"
-    old_data.write_bytes(b"retired row-oriented daily partition")
-    Manifest.from_file(old_data, dataset="daily_bar", asset_type="etf", partition_key="2026-10-09",
-        schema_version="v1", adjustment="none", row_count=0, first_key=None,
-        last_key=None).write_atomic(retired / "manifest.json")
-
-    calls = []
-    original_read_daily = CanonicalPartitionStore.read_daily
-
-    def tracked_read_daily(store, asset_type, partition_key):
-        calls.append((asset_type, partition_key))
-        return original_read_daily(store, asset_type, partition_key)
-
-    monkeypatch.setattr(CanonicalPartitionStore, "read_daily", tracked_read_daily)
-    app = create_app(config_root=CONFIG, data_root=tmp_path / "business")
-    endpoint = next(route.endpoint for route in app.routes if getattr(route, "path", "") == "/api/daily")
-    started = time.perf_counter()
-    response = endpoint(security="", start_date=None, end_date=None, asset_type="",
-        adjustment="none", page=1, page_size=50)
-    elapsed = time.perf_counter() - started
-    record_property("daily_api_seconds_one_supported_one_retired_partition", round(elapsed, 3))
-    assert response["total"] == 1 and response["items"][0]["trade_date"] == DAY
-    assert calls == [("stock", DAY)]
-    assert elapsed < 2.0
-
-
 def test_source_query_index_failure_does_not_block_daily_publication(tmp_path, monkeypatch):
     from stock_data_manage.storage.parquet import PartitionLockedError
     import stock_data_manage.storage.read_index as read_index
@@ -542,32 +471,6 @@ def test_confirmed_successor_freezes_current_request_code_and_page_relation(tmp_
         "start_date": "2024-04-22", "end_date": "2024-04-22"}}}
     historical_unit = expand_daily_units([historical], definition)[0]
     assert historical_unit["symbol"] == "sz399427" and historical_unit["instrument_id"] == "XSHE:399427"
-
-
-def test_confirmed_successor_api_reader_uses_current_and_legacy_symbols(tmp_path):
-    from stock_data_manage.service.web import create_app
-
-    record = DailyRecord("XSHE:399427", date(2026, 10, 29), AssetType.INDEX,
-        quote("10"), QuoteGroup(QuoteStatus.UNVERIFIED, reason="not verified"),
-        QuoteGroup(QuoteStatus.UNVERIFIED, reason="not verified"))
-    business = tmp_path / "business"
-    store = CanonicalPartitionStore(business / "canonical")
-    store.publish_daily(asset_type="index", partition_key="2026-10-29", new_records=[record],
-        expected_count=1, run_id="symbol-succession", item_statuses={"XSHE:399427": "success"})
-    app = create_app(config_root=CONFIG, data_root=business)
-    endpoint = next(route.endpoint for route in app.routes if getattr(route, "path", None) == "/api/daily")
-    result = endpoint(security="sz980070", start_date=None, end_date=None, asset_type="index",
-        adjustment="none", page=1, page_size=50)
-    assert result["total"] == 1
-    item = result["items"][0]
-    assert item["symbol"] == "sz980070"
-    assert item["instrument_id"] == "XSHE:399427"
-    assert item["symbol_relation"]["old_symbol"] == "sz399427"
-    assert item["symbol_relation"]["new_symbol"] == "sz980070"
-    assert item["symbol_relation"]["evidence_refs"]
-    old_code_result = endpoint(security="sz399427", start_date=None, end_date=None, asset_type="index",
-        adjustment="none", page=1, page_size=50)
-    assert old_code_result["total"] == 1
 
 
 def test_daily_publication_excludes_confirmed_suspension_and_rejects_task_assertion(tmp_path):

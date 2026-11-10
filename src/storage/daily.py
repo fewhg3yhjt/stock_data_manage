@@ -38,6 +38,13 @@ class DailyPublicationResult:
     data_revision: int
 
 
+@dataclass(frozen=True, slots=True)
+class DailyRecordPage:
+    records: tuple[DailyRecord, ...]
+    total: int
+    available_adjustments: tuple[str, ...]
+
+
 def initialize_schema(connection: sqlite3.Connection) -> None:
     """Create daily tables on an explicitly writable runtime connection."""
     if connection.in_transaction:
@@ -56,6 +63,8 @@ def initialize_schema(connection: sqlite3.Connection) -> None:
         );
         CREATE INDEX IF NOT EXISTS daily_bar_asset_date_idx
             ON daily_bar(asset_type, trade_date, instrument_id);
+        CREATE INDEX IF NOT EXISTS daily_bar_trade_date_identity_idx
+            ON daily_bar(trade_date, instrument_id);
         CREATE TABLE IF NOT EXISTS daily_quote (
             instrument_id TEXT NOT NULL,
             trade_date DATE NOT NULL,
@@ -489,33 +498,131 @@ class DailyBarStore:
                      date_to: date | None = None, instrument_id: str | None = None,
                      adjustment: str = "none", status: str | None = None,
                      limit: int = 100, offset: int = 0) -> tuple[tuple[DailyRecord, ...], int]:
-        """Count and SQL-page first; then load quote groups for page rows only (2 + page-size SELECTs)."""
+        """Count and SQL-page first; then load quote groups for page rows only."""
+        result = self._query_page(asset_type=asset_type, date_from=date_from, date_to=date_to,
+            instrument_id=instrument_id, identity_date_ranges=None, adjustment=adjustment,
+            status=status, limit=limit, offset=offset,
+            include_available_adjustments=False)
+        return result.records, result.total
+
+    def query_page(self, *, asset_type: AssetType | None = None, date_from: date | None = None,
+                   date_to: date | None = None, instrument_id: str | None = None,
+                   identity_date_ranges: tuple[tuple[str, date | None, date | None, str | None], ...] | None = None,
+                   adjustment: str = "none", status: str | None = None,
+                   limit: int = 100, offset: int = 0) -> DailyRecordPage:
+        """Return a filtered page and whole-result adjustment summary from one read snapshot."""
+        return self._query_page(asset_type=asset_type, date_from=date_from, date_to=date_to,
+            instrument_id=instrument_id, identity_date_ranges=identity_date_ranges,
+            adjustment=adjustment, status=status, limit=limit, offset=offset,
+            include_available_adjustments=True)
+
+    def _query_page(self, *, asset_type: AssetType | None, date_from: date | None, date_to: date | None,
+                    instrument_id: str | None, identity_date_ranges,
+                    adjustment: str, status: str | None, limit: int, offset: int,
+                    include_available_adjustments: bool) -> DailyRecordPage:
         if (adjustment not in {"none", "forward", "backward"} or limit < 1 or limit > 100
                 or offset < 0 or (asset_type is not None and not isinstance(asset_type, AssetType))
                 or (date_from is not None and type(date_from) is not date)
                 or (date_to is not None and type(date_to) is not date)
                 or (date_from is not None and date_to is not None and date_from > date_to)
-                or (status is not None and status not in {item.value for item in QuoteStatus})):
+                or (status is not None and status not in {item.value for item in QuoteStatus})
+                or (instrument_id is not None and identity_date_ranges is not None)):
             raise ValueError("invalid daily query pagination or adjustment")
         clauses, params = [], []
+        identity_ranges = (tuple(dict.fromkeys(identity_date_ranges))
+                           if identity_date_ranges is not None else None)
         if asset_type is not None:
             clauses.append("b.asset_type=?")
             params.append(asset_type.value)
         if date_from is not None: clauses.append("b.trade_date>=?"); params.append(date_from)
         if date_to is not None: clauses.append("b.trade_date<=?"); params.append(date_to)
         if instrument_id is not None: clauses.append("b.instrument_id=?"); params.append(instrument_id)
-        if status is not None: clauses.append("q.status=?"); params.append(status)
+        if identity_date_ranges is not None:
+            if not identity_ranges:
+                clauses.append("0=1")
+            else:
+                scope_clauses, scope_params = [], []
+                for identity, first, last, scoped_asset in identity_ranges:
+                    if (not isinstance(identity, str) or not re.fullmatch(r"(?:XSHG|XSHE|BSE):[0-9]{6}", identity)
+                            or (first is not None and type(first) is not date)
+                            or (last is not None and type(last) is not date)
+                            or (first is not None and last is not None and first > last)
+                            or (scoped_asset is not None and scoped_asset not in {item.value for item in AssetType})):
+                        raise ValueError("invalid daily identity date scope")
+                    parts = ["b.instrument_id=?"]
+                    values: list[object] = [identity]
+                    if scoped_asset is not None:
+                        parts.append("b.asset_type=?"); values.append(scoped_asset)
+                    if first is not None:
+                        parts.append("b.trade_date>=?"); values.append(first)
+                    if last is not None:
+                        parts.append("b.trade_date<=?"); values.append(last)
+                    scope_clauses.append("(" + " AND ".join(parts) + ")")
+                    scope_params.extend(values)
+                clauses.append("(" + " OR ".join(scope_clauses) + ")")
+                params.extend(scope_params)
         where = " AND ".join(clauses) if clauses else "1=1"
+        if status is not None:
+            where += " AND EXISTS (SELECT 1 FROM daily_quote selected WHERE selected.instrument_id=b.instrument_id " \
+                     "AND selected.trade_date=b.trade_date AND selected.adjustment=? AND selected.status=?)"
+            selection_params = [adjustment, status]
+        else:
+            selection_params = []
         with self._read_snapshot():
-            total = int(self.connection.execute(f"SELECT count(*) FROM daily_bar b JOIN daily_quote q USING(instrument_id,trade_date) WHERE {where} AND q.adjustment=?", [*params, adjustment]).fetchone()[0])
-            bars = self.connection.execute(f"SELECT b.instrument_id,b.trade_date,b.asset_type,b.last_publication_id FROM daily_bar b JOIN daily_quote q USING(instrument_id,trade_date) WHERE {where} AND q.adjustment=? ORDER BY b.trade_date,b.instrument_id LIMIT ? OFFSET ?", [*params, adjustment, limit, offset]).fetchall()
-            page_quotes = [self.connection.execute("SELECT instrument_id,trade_date,adjustment,status,open_text,high_text,low_text,close_text,volume_text,amount_text,source_provider,endpoint,raw_object_path,fetch_time,normalizer_version,capability_version,reason,evidence_ref,flags_json,value_contract FROM daily_quote WHERE instrument_id=? AND trade_date=? ORDER BY adjustment", [bar[0], bar[1]]).fetchall() for bar in bars]
+            total = int(self.connection.execute(f"SELECT count(*) FROM daily_bar b WHERE {where}",
+                [*params, *selection_params]).fetchone()[0])
+            if include_available_adjustments:
+                available_values = []
+                if total:
+                    for candidate_adjustment in ("none", "forward", "backward"):
+                        quote_clauses = ["q.adjustment=?", "q.status=?"]
+                        quote_params: list[object] = [candidate_adjustment, QuoteStatus.AVAILABLE.value]
+                        if instrument_id is not None:
+                            quote_clauses.append("q.instrument_id=?"); quote_params.append(instrument_id)
+                        if date_from is not None:
+                            quote_clauses.append("q.trade_date>=?"); quote_params.append(date_from)
+                        if date_to is not None:
+                            quote_clauses.append("q.trade_date<=?"); quote_params.append(date_to)
+                        if identity_ranges is not None:
+                            quote_scopes, quote_scope_params = [], []
+                            for identity, first, last, _ in identity_ranges:
+                                parts = ["q.instrument_id=?"]
+                                values: list[object] = [identity]
+                                if first is not None:
+                                    parts.append("q.trade_date>=?"); values.append(first)
+                                if last is not None:
+                                    parts.append("q.trade_date<=?"); values.append(last)
+                                quote_scopes.append("(" + " AND ".join(parts) + ")")
+                                quote_scope_params.extend(values)
+                            quote_clauses.append("(" + " OR ".join(quote_scopes) + ")"
+                                if quote_scopes else "0=1")
+                            quote_params.extend(quote_scope_params)
+                        available_sql = f"SELECT 1 FROM daily_quote q JOIN daily_bar b USING(instrument_id,trade_date) " \
+                            f"WHERE {where} AND {' AND '.join(quote_clauses)} LIMIT 1"
+                        available_params = [*params, *selection_params, *quote_params]
+                        if self.connection.execute(available_sql, available_params).fetchone():
+                            available_values.append(candidate_adjustment)
+                available = tuple(available_values)
+            else:
+                available = ()
+            bars = self.connection.execute(f"SELECT b.instrument_id,b.trade_date,b.asset_type,b.last_publication_id FROM daily_bar b WHERE {where} ORDER BY b.trade_date,b.instrument_id LIMIT ? OFFSET ?", [*params, *selection_params, limit, offset]).fetchall()
+            page_quotes = {}
+            if bars:
+                pairs = ",".join("(?,?)" for _ in bars)
+                pair_params = [value for bar in bars for value in (bar[0], bar[1])]
+                rows = self.connection.execute(
+                    "SELECT instrument_id,trade_date,adjustment,status,open_text,high_text,low_text,close_text,volume_text,amount_text,source_provider,endpoint,raw_object_path,fetch_time,normalizer_version,capability_version,reason,evidence_ref,flags_json,value_contract "
+                    f"FROM daily_quote WHERE (instrument_id,trade_date) IN ({pairs}) ORDER BY instrument_id,trade_date,adjustment",
+                    pair_params).fetchall()
+                for row in rows:
+                    page_quotes.setdefault((row[0], row[1]), []).append(row)
         records = []
-        for bar, quotes in zip(bars, page_quotes):
+        for bar in bars:
+            quotes = page_quotes.get((bar[0], bar[1]), ())
             if len(quotes) != 3:
                 raise RuntimeError("stored daily bar does not have exactly three quote groups")
             records.append(_row_to_record(bar, quotes))
-        return tuple(records), total
+        return DailyRecordPage(tuple(records), total, available)
 
     def partition_summary(self, trade_date: date, asset_type: AssetType) -> dict[str, object] | None:
         cursor = self.connection.execute("SELECT * FROM partition_status WHERE dataset='daily_bar' AND asset_type=? AND partition_key=? AND adjustment='aggregate'", [asset_type.value, trade_date.isoformat()])

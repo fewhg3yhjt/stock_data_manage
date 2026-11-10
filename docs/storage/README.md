@@ -4,11 +4,11 @@
 
 ### 目标、当前证据与范围
 
-用户已确认任务与实际证券数据分离，本节是正式日K、证券日期状态及分区摘要入表合同的主要维护位置。2026-11-09单日collect_task写入、受理/FIFO、回执恢复及直接资格消费者已接线并完成隔离定向验收；Web行情读取、独立覆盖分母缓存、完整CLI覆盖交互、调度联合验收和区间生产仍未完成。下文带日期的Parquet目录、清单及历史实例说明当时实现，不是新目标的并行后端。任务负责执行、冻结及恢复；行情对象不以任务ID为业务主键，当前数据覆盖不从任务成功/失败数计算。
+用户已确认任务与实际证券数据分离，本节是正式日K、证券日期状态及分区摘要入表合同的主要维护位置。2026-11-09单日collect_task写入、受理/FIFO、回执恢复及直接资格消费者已接线并完成隔离定向验收；GET `/api/daily`已完成只读接线及隔离功能/代表规模验收；独立覆盖分母缓存、其他Web列表、完整CLI覆盖交互、调度联合验收和区间生产仍未完成。下文带日期的Parquet目录、清单及历史实例说明当时实现，不是新目标的并行后端。任务负责执行、冻结及恢复；行情对象不以任务ID为业务主键，当前数据覆盖不从任务成功/失败数计算。
 
-初始化为明确写调用，读取只接收既有连接；单日流水线不再正式双写行情Parquet/manifest，发布回执是交付事实，任务展示可由回执恢复。旧文件读取/库内旧日K文件工具尚待服务切换时退出，不能据单日写入验收宣称全部生产路径已切换。实际范围与证据见CODE_STRUCTURE及PROJECT_PROGRESS；本节全部目标尚未完成，不另维护平行设计。
+初始化为明确写调用，读取只接收既有连接；单日流水线不再正式双写行情Parquet/manifest，发布回执是交付事实，任务展示可由回执恢复。日K价格接口已退出旧文件读取；其余列表和库内旧日K文件工具仍待收敛，不能据单一路由及单日写入验收宣称全部生产路径已切换。实际范围与证据见CODE_STRUCTURE及PROJECT_PROGRESS；本节全部目标尚未完成，不另维护平行设计。
 
-本次处理原故障中的正式数据访问、覆盖统计与发布一致性；不会修复腾讯写死640窗口、全部来源派生小文件或原始证据累计。静态工作树检查：`service.market_data.query_daily`读取匹配分区全部记录再分页，`DashboardReader.publications`遍历清单并关联任务摘要；2026-11-09读取的8个aggregate分区共报告22,419行、Parquet 2,304,025字节，清单9,170,082字节。这是文件/代码检查，不是接口耗时或完整性复验，证据见[读取成本记录](../../tmp/design-implementation-review-20261108/task-capability/daily-statistics-cost-review-20261109.json)。11月5日股票正式清单记5,569行/5,573应有、4项no_trade和4项missing；不能用任务全部资产7,842行或18,993来源单元当股票覆盖分母，见[口径检查](../../tmp/design-implementation-review-20261108/task-capability/daily-statistics-review-20261109.json)。
+本次处理原故障中的正式数据访问、覆盖统计与发布一致性；不会修复腾讯写死640窗口、全部来源派生小文件或原始证据累计。切换前的静态检查：`service.market_data.query_daily`读取匹配分区全部记录再分页，`DashboardReader.publications`遍历清单并关联任务摘要；2026-11-09读取的8个aggregate分区共报告22,419行、Parquet 2,304,025字节，清单9,170,082字节。这是文件/代码检查，不是接口耗时或完整性复验，证据见[读取成本记录](../../tmp/design-implementation-review-20261108/task-capability/daily-statistics-cost-review-20261109.json)。11月5日股票正式清单记5,569行/5,573应有、4项no_trade和4项missing；不能用任务全部资产7,842行或18,993来源单元当股票覆盖分母，见[口径检查](../../tmp/design-implementation-review-20261108/task-capability/daily-statistics-review-20261109.json)。
 
 范围：沿现有同机SQLite运行库增加日K业务表及必要发布回执，独立于任务表；不新增数据库服务、另一套执行器、缓存服务或多后端兼容层。日K不再正式双写Parquet/manifest，不迁移、删除、自动导入旧文件；旧数据仍保留，代码/隔离根切换明确报告未初始化或无当前表数据，不自动回退读旧行情。原始响应、规范化候选与任务证据继续保留，分钟和其他数据集的既有Parquet合同不随本节改变。SQLite选型沿已修复版本、WAL、短事务合同；日K容量与并发预算仍须独立验收，阶段1的89项运行库测试不能替代。
 
@@ -22,7 +22,7 @@
 
 | 对象/承接表 | 键与主要字段 | 写入者、读取者及限制 |
 |---|---|---|
-| 日K聚合身份 `daily_bar`（新业务表） | PK `(instrument_id, trade_date)`；asset_type；`last_publication_id`；对应索引 `(asset_type,trade_date,instrument_id)` | 存储层只接受合格DailyRecord；行情查询、覆盖查询、受理重叠检查读取。资产和日期索引不改变现有业务键，不复制任务定义或证券名称 |
+| 日K聚合身份 `daily_bar`（新业务表） | PK `(instrument_id, trade_date)`；asset_type；`last_publication_id`；对应索引 `(asset_type,trade_date,instrument_id)`与`(trade_date,instrument_id)` | 存储层只接受合格DailyRecord；行情查询、覆盖查询、受理重叠检查读取。资产和日期索引不改变现有业务键，不复制任务定义或证券名称 |
 | 口径值 `daily_quote`（日K组成表） | PK `(instrument_id,trade_date,adjustment)`，FK到daily_bar；none/forward/backward三组；六项数值、状态、value_contract、原因、来源/原文/时间/版本/flags/evidence_ref | 保留现有QuoteGroup所有字段。每个逻辑DailyRecord始终一起写入三组，parent与quote不允许半份提交；拆表用于口径筛选和避免把全部业务字段塞JSON，不是三条独立业务行情 |
 | 证券日业务状态 `partition_item`（收敛日K职责） | 日期＋证券；日K使用aggregate口径；明确的no_trade等事实、证据引用、`last_publication_id` | 只存独立可证的业务状态；行情存在由daily_bar证明，不再复制一份success。来源失败、任务missing、重试进度不写为证券业务事实。其他数据集使用不变 |
 | 当前日期/资产摘要 `partition_status`（复用） | 原分区键；actual_count；各口径available/unverified/not_applicable数量；当前数据修订号；可空覆盖分母及基准引用/修订、计算状态 | 由正式表生成的可重建摘要；页面及范围统计读取。日K不依赖manifest_path/content_hash，字段结构须允许日K无文件定位，不能伪造空路径；其他数据集原字段合同保留 |
@@ -156,7 +156,7 @@ flowchart TD
 
 | 文件/职责 | 改造前→目标输入输出 | 依赖与验收 |
 |---|---|---|
-| `src/storage/daily.py`（拟新增，尚未创建） | 当前日K由parquet模块负责→接收DailyRecord/明确业务事实/覆盖授权，事务发布并返回回执；索引查询日K及覆盖 | 独立日K持久化业务模块，不是新服务/后端选择框架；复用现有SQLite连接合同；保留所有数值、口径与证据字段 |
+| `src/storage/daily.py`（已实现，含日K价格接口读取） | 接收DailyRecord/明确业务事实/覆盖授权，事务发布并返回回执；索引查询日K，独立覆盖依据仍待实现 | 独立日K持久化业务模块，不是新服务/后端选择框架；复用现有SQLite连接合同；保留所有数值、口径与证据字段 |
 | `src/storage/metadata.py` | 日Kmanifest登记→同库表初始化、不可变首次执行序号及任务结果事务承接 | 不把Provider解析、行情拼装继续堆入MetadataStore；事务所有权由一次发布统一持有，内部函数不各自BEGIN/COMMIT |
 | `src/storage/parquet.py` | 正式日K分区读/写→退出正式日K路由；保留候选序列化和其他数据集 | 删除日K旧后端调用与仅为双轨兼容的分支，不删除历史数据和证据；测试迁到表合同，不靠兼容入口保旧测试 |
 | `src/pipeline/daily.py`、`inputs.py` | 生成文件分区commit→形成合格记录与独立质量结论；调用表事务/回执恢复 | 受理从表检查重叠；来源和冻结/质量门槛不变；旧manifest差异不当作数据损坏 |

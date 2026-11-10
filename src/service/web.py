@@ -6,6 +6,7 @@ import base64
 import codecs
 import hashlib
 import json
+import logging
 import re
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -1127,24 +1128,57 @@ def create_app(
     def daily_records(security: str = "", start_date: date | None = None, end_date: date | None = None,
                       asset_type: str = "", adjustment: str = "none", page: int = Query(1, ge=1),
                       page_size: int = Query(50, ge=1, le=100)):
-        from .market_data import query_daily
-        from ..storage.parquet import InvalidPartitionError
+        from .market_data import (DailyQueryBusy, DailyQueryInputError, DailyQueryIntegrityError,
+                                  DailyQueryNotReady, query_daily)
+        from ..service.instruments import read_published_security_master
+        from ..storage.parquet import (InvalidPartitionError, PartitionBusyError,
+                                       PartitionLockedError)
         try:
             security_policy = yaml.safe_load((reader.config_root / "datasets/security_master.yaml").read_text(encoding="utf-8")) or {}
-            result = query_daily(reader.paths["canonical_root"], security=security, start_date=start_date,
+            result = query_daily(reader.paths["metadata_path"], security=security, start_date=start_date,
                 end_date=end_date, asset_type=asset_type, adjustment=adjustment, page=page, page_size=page_size,
                 symbol_successions=security_policy.get("symbol_successions", []))
-            catalog = reader._security_catalog()
+            name_status, name_reason, name_date, catalog = "not_loaded", "当前页没有行情记录", "", {}
+            if result["items"]:
+                keys = []
+                for row in result["items"]:
+                    keys.append((row["instrument_id"], row["asset_type"]))
+                current_dir = reader.paths["canonical_root"] / "security_master" / "current"
+                try:
+                    manifest, records = read_published_security_master(current_dir, identities=keys)
+                    name_date = str(manifest.publication_metadata.get("as_of_date") or manifest.partition_key)
+                    catalog = {(record.instrument_id, record.asset_type.value): record
+                               for record in records}
+                    name_status, name_reason = "available", ""
+                except FileNotFoundError:
+                    name_status, name_reason = "unavailable", "正式证券清单不存在"
+                except (PartitionBusyError, PartitionLockedError):
+                    name_status, name_reason = "updating", "证券清单正在更新，名称暂不可读"
+                except (InvalidPartitionError, OSError):
+                    name_status, name_reason = "unavailable", "正式证券清单未通过完整性检查"
             for row in result["items"]:
-                known = catalog.get(reader._security_code(row["instrument_id"]), {})
-                row.update(security_name=known.get("name", ""), name_source_date=known.get("name_source_date", ""),
+                key = (row["instrument_id"], row["asset_type"])
+                known = catalog.get(key)
+                row.update(security_name=(known.name or "") if known else "",
+                           name_source_date=name_date if known else "",
+                           security_name_status=("available" if known else
+                               "missing" if name_status == "available" else name_status),
+                           security_name_reason=("证券清单中没有该市场/资产类型/代码" if not known and name_status == "available"
+                               else name_reason),
                            field_metadata=_daily_field_metadata(row))
             result["columns"] = _presentation(reader.config_root, "daily")
             return result
-        except ValueError as exc:
+        except DailyQueryInputError as exc:
             raise HTTPException(400, str(exc)) from exc
-        except (InvalidPartitionError, OSError) as exc:
-            raise HTTPException(409, "规范日线分区未通过完整性检查") from exc
+        except DailyQueryNotReady as exc:
+            logging.getLogger(__name__).warning("daily table is not ready", exc_info=True)
+            raise HTTPException(503, "正式日K数据库未就绪") from exc
+        except DailyQueryBusy as exc:
+            logging.getLogger(__name__).warning("daily table read was busy", exc_info=True)
+            raise HTTPException(503, "日K查询繁忙，请稍后重试", headers={"Retry-After": "1"}) from exc
+        except DailyQueryIntegrityError as exc:
+            logging.getLogger(__name__).exception("daily table integrity check failed")
+            raise HTTPException(409, "正式日K数据完整性检查失败") from exc
 
     @app.get("/api/tasks")
     def tasks(
