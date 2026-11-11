@@ -26,6 +26,7 @@
 | 口径值 `daily_quote`（日K组成表） | PK `(instrument_id,trade_date,adjustment)`，FK到daily_bar；none/forward/backward三组；六项数值、状态、value_contract、原因、来源/原文/时间/版本/flags/evidence_ref | 保留现有QuoteGroup所有字段。每个逻辑DailyRecord始终一起写入三组，parent与quote不允许半份提交；拆表用于口径筛选和避免把全部业务字段塞JSON，不是三条独立业务行情 |
 | 证券日业务状态 `partition_item`（收敛日K职责） | 日期＋证券；日K使用aggregate口径；明确的no_trade等事实、证据引用、`last_publication_id` | 只存独立可证的业务状态；行情存在由daily_bar证明，不再复制一份success。来源失败、任务missing、重试进度不写为证券业务事实。其他数据集使用不变 |
 | 当前日期/资产摘要 `partition_status`（复用） | 原分区键；actual_count；各口径available/unverified/not_applicable数量；当前数据修订号；可空覆盖分母及基准引用/修订、计算状态 | 由正式表生成的可重建摘要；页面及范围统计读取。日K不依赖manifest_path/content_hash，字段结构须允许日K无文件定位，不能伪造空路径；其他数据集原字段合同保留 |
+| 摘要的最近更新任务 `partition_status.last_task_id` | 可空任务ID，属于同一分区摘要 | 日K只有有效写入/no_trade变更时与当前摘要同事务更新；Master是最近确认的当前清单任务。用于按需追溯最近更新，不代表该分区全部当前证券都来自这一任务；未登记来源数或原文引用不伪造为0 |
 | 发布回执 `daily_publication`（新业务回执） | 唯一提交键；task_id/业务运行引用、不可变首次执行序号、日期/资产、实际写入/替代计数、候选与稳定原文引用、提交时间 | 同一候选提交重试据唯一键幂等，当前记录通过回执追溯。只保存交付事实，不存旧价格/全量行情副本，不另建版本查询服务；回执与当前行情同事务 |
 | `collection_task`（复用） | 队列、状态、不可变 `first_execution_order`；任务自己的进度及结果 | 首次取得执行权时短事务分配首次执行顺序，resume只改变本次queue_order，不能刷新首次执行顺序取得覆盖优势。进度更新只写小行；任务不提供行情覆盖分母，归档不删发布归属 |
 | `collection_task_context`（任务的一对一组成表） | PK/FK task_id；冻结范围scope_json、冻结快照snapshot_json、当前占用范围active_scope_json | 首次受理与任务行同事务保存；再次入队只调整当前占用范围，不刷新原始目标或覆盖授权。执行及发布按需读取，不复制进度或另建任务系统 |
@@ -44,6 +45,31 @@ erDiagram
 ```
 
 图的关系用于说明归属，不要求对任务/原文使用删除级联外键。删除任务页面记录、归档工作区或替换旧值不能删除当前行情、发布回执或仍被引用原文；本轮不实现删除/保留期限。daily_quote可对自己的daily_bar使用受控组成关系。
+
+### 当前证券清单摘要的跨资源发布
+
+当前证券清单仍由唯一DuckDB文件及manifest承载，不把它迁入日K表。发布列表需要SQLite登记，因此沿现有`_finish_task_commit`、任务committing状态与`task-commit.json`完成跨资源顺序；不新增恢复入口或逐证券状态副本。通用`record_partition_publish`会根据item_statuses算完整性并写partition_item，不能传空statuses把完整Master误判partial，也不能为了摘要复制7862个success。当前清单只登记一行摘要，完成时替换旧日期的Master摘要索引；保留清单字段历史、旧文件及任务/来源证据。
+
+```mermaid
+sequenceDiagram
+  participant T as 现有Master任务/恢复器
+  participant S as SQLite任务与摘要
+  participant F as 当前清单文件及marker
+  participant R as 已采原文
+  T->>S: 持久committing；已有Master摘要标updating，短写后关闭事务
+  T->>F: 写marker，更新唯一DuckDB与manifest并校验
+  T->>R: 转正本次原文，保留既有证据
+  T->>S: 保存committing进度，无文件操作跨SQL事务
+  T->>F: 文件和原文完整后移除marker
+  Note over T,S: 此处中断，任务仍committing，可沿既有恢复重入，无需重采
+  T->>S: 单个短事务登记唯一当前摘要及published任务
+  S-->>T: 提交成功，当前摘要可见
+  T->>F: 生成派生任务summary，不参与SQL原子事务
+```
+
+发布前仅改已有摘要的可用状态，不写候选为正式0行分区；首次无摘要时由committing任务说明正在发布。更新中或待恢复的Master不计为可读的已完成分区；其他分区和任务查询照常返回。移除marker后、SQL提交前崩溃时，已持久的committing任务仍触发现有恢复，重新校验/收尾后补齐登记；不把marker不存在等同于SQL登记完成。摘要与published任务状态须在同一个SQLite事务提交，失败整笔回滚；任务行写入在外层事务中不得提前提交或回滚调用者事务。文件哈希、DuckDB写入、原文转正及summary文件均在SQL事务之外。
+
+SQL提交后已经有交付事实，派生summary异常不能抹除正式数据；任务详情后续按任务表定位，不以派生文件决定行情存在。传统Parquet恢复扫描不处理证券清单：`security_master/current`由上述任务路径恢复，不因没有data.parquet误报损坏；按日旧清单留在原位，仍供既有历史读取，不导入摘要、不移动或删除。否则旧日期会在唯一当前清单旁形成第二条发布记录。不同目标日正常刷新唯一当前清单；正式重叠比较当前清单的实际数据日期与申请范围，同日期相交才要求覆盖确认。只在隔离新运行根验证，不自动迁移或回扫生产文件。发布摘要消费、输出及验收由[运行台说明](../service/read-only-web.md#发布摘要与总览的接线合同)维护。
 
 任务上下文与进度分行的必要性已有隔离实测：7862证券的当前归属授权约1.65MB；与进度同一SQLite行时，进度JSON增加1字节的三次更新分别产生约1.9MB WAL追加。仅从state_json去掉授权重复副本仍不足以避免同一行溢出页重写。因此在现有存储模块内按生命周期拆分物理行，不修改授权、队列或发布规则；进度保存不更新上下文，任务列表不展开授权。原记录见`tmp/sqlite-runtime-implementation/daily-table-pipeline-stage/grant-state-length-deltas-result.json`。修正后在同一既有合成样本的独立新schema副本中，将进度预置9、WAL checkpoint到0，仅对诊断连接关闭自动checkpoint，9→10→100→1000的三个1字节增长分别追加8272/8240/8240字节，共24752字节；1651138字节授权快照不变，显式checkpoint后WAL为0。证据见`tmp/sqlite-runtime-implementation/daily-table-pipeline-stage-1/context-split-write-volume-result.json`；没有改生产参数或原样本，不把该样本结果推广为所有进度更新恒定8KB或长期负载通过。功能联合验收仍另列。
 

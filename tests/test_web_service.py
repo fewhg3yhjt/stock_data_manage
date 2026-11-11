@@ -77,6 +77,15 @@ realtime_minute:
         metadata.save_collection_task(persisted)
         metadata.connection.execute("UPDATE collection_task SET updated_at=? WHERE task_id=?",
             [datetime.fromisoformat(stale), summary["task_id"]])
+        metadata.connection.execute("""INSERT INTO partition_status (
+            dataset,asset_type,partition_key,adjustment,expected_count,actual_count,status,manifest_path,content_hash,
+            conflict_count,quarantined_count,no_trade_count,none_available_count,none_unverified_count,
+            none_not_applicable_count,forward_available_count,forward_unverified_count,
+            forward_not_applicable_count,backward_available_count,backward_unverified_count,
+            backward_not_applicable_count,data_revision,coverage_reason,updated_at,last_task_id)
+            VALUES ('daily_bar','stock','2026-10-09','aggregate',NULL,1,'published',NULL,'abc123',0,0,0,
+                    1,0,0,0,1,0,0,0,0,1,'fixture lacks independent denominator',?,?)""",
+            [datetime.now(timezone.utc), summary["task_id"]])
 
     body = b'{"code":"sh600519","close":1820.0}'
     digest = hashlib.sha256(body).hexdigest()
@@ -130,6 +139,38 @@ realtime_minute:
     return DashboardReader(config, data), create_app(config_root=config, data_root=data), data, body
 
 
+def test_raw_options_filter_names_and_respect_date_directory_boundaries(tmp_path):
+    import os
+    reader, app, data, _ = web_fixture(tmp_path)
+    raw_root = reader.paths["raw_root"]
+    (raw_root / "2026-11-10").mkdir()
+    (raw_root / "not-a-date").mkdir()
+    (raw_root / "2026-11-11").write_text("not a directory", encoding="utf-8")
+    outside = tmp_path / "outside-date"
+    outside.mkdir()
+    linked_inside = raw_root / "2026-11-12"
+    escaped = raw_root / "2026-11-13"
+    try:
+        if os.name == "nt":
+            import _winapi
+            _winapi.CreateJunction(str(raw_root / "2026-11-10"), str(linked_inside))
+            _winapi.CreateJunction(str(outside), str(escaped))
+        else:
+            linked_inside.symlink_to(raw_root / "2026-11-10", target_is_directory=True)
+            escaped.symlink_to(outside, target_is_directory=True)
+    except OSError as exc:
+        pytest.skip(f"directory link boundary could not be created: {exc}")
+    expected = ["2026-11-12", "2026-11-10", "2026-10-09"]
+    assert reader.raw_options()["dates"] == expected
+    with TestClient(app) as client:
+        response = client.get("/api/raw/options")
+    assert response.status_code == 200 and response.json()["dates"] == expected
+    empty_app = create_app(config_root=tmp_path / "config", data_root=tmp_path / "empty-runtime")
+    with TestClient(empty_app) as client:
+        empty = client.get("/api/raw/options")
+    assert empty.status_code == 200 and empty.json() == {"dates": [], "latest_date": None}
+
+
 def test_read_only_overview_marks_stale_task_and_lists_publication(tmp_path):
     reader, _, _, _ = web_fixture(tmp_path)
 
@@ -137,7 +178,10 @@ def test_read_only_overview_marks_stale_task_and_lists_publication(tmp_path):
     assert payload["task_counts"] == {"stale": 1}
     assert payload["recent_tasks"][0]["display_status"] == "stale"
     assert payload["recent_tasks"][0]["completed_units"] == 1
-    assert payload["recent_publications"][0]["coverage_percent"] == 50.0
+    assert payload["recent_publications"][0]["coverage_percent"] is None
+    assert payload["recent_publications"][0]["coverage_reason"] == "fixture lacks independent denominator"
+    assert payload["publication_scope"] == "registered_publications"
+    assert payload["recent_publications"][0]["latest_task_id"] == "daily-2026-10-09"
 
 
 def test_overview_does_not_expand_publication_raw_evidence(tmp_path):
@@ -151,25 +195,22 @@ def test_overview_does_not_expand_publication_raw_evidence(tmp_path):
 
     assert payload["recent_publications"][0]["dataset"] == "daily_bar"
     assert payload["recent_publications"][0]["row_count"] == 1
-    assert payload["recent_publications"][0]["evidence"] == []
+    assert "evidence" not in payload["recent_publications"][0]
 
 
-def test_publication_listing_keeps_raw_evidence_by_default(tmp_path):
+def test_publication_listing_returns_registered_summary_only(tmp_path):
     reader, _, _, _ = web_fixture(tmp_path)
 
     payload = reader.publications()
-    summary = reader.publications(include_evidence=False)
     detail = reader.publications(dataset="daily_bar", asset_type="stock", partition_key="2026-10-09")
-    detail_summary = reader.publications(dataset="daily_bar", asset_type="stock", partition_key="2026-10-09",
-                                         include_evidence=False)
 
-    assert len(payload["items"][0]["evidence"]) == 1
-    assert payload["items"][0]["evidence"][0]["provider"] == "tencent"
-    assert summary["items"][0]["evidence"] == []
-    assert detail["total"] == 1
-    assert detail["items"][0]["evidence"][0]["provider"] == "tencent"
-    assert detail_summary["items"][0]["source_count"] == 1
-    assert detail_summary["items"][0]["evidence"] == []
+    assert payload["scope"] == "registered_publications"
+    assert payload["total"] == detail["total"] == 1
+    assert detail["items"][0]["latest_task_id"] == "daily-2026-10-09"
+    assert detail["items"][0]["row_count"] == 1
+    assert detail["items"][0]["coverage_percent"] is None
+    assert not ({"evidence", "tasks", "source_count", "size_bytes", "publication_metadata"}
+                & detail["items"][0].keys())
 
 
 def test_daily_batch_partition_links_to_published_task(tmp_path):
@@ -183,9 +224,10 @@ def test_daily_batch_partition_links_to_published_task(tmp_path):
     }
     write_json(summary_path, summary)
 
-    payload = reader.publications(include_evidence=False)
+    payload = reader.publications()
 
-    assert payload["items"][0]["tasks"] == ["daily-2026-10-09"]
+    # Associations come from the persisted summary row, never from scanning summary files.
+    assert payload["items"][0]["latest_task_id"] == "daily-2026-10-09"
 
 
 def test_daily_batch_task_counts_quality_prompts_separately_from_exclusions(tmp_path):
@@ -465,6 +507,14 @@ def test_http_read_only_routes_headers_filters_and_frozen_parameters(tmp_path):
         assert response.headers["cache-control"] == "no-store"
         assert "script-src 'self'" in response.headers["content-security-policy"]
         assert client.get("/api/tasks?q=does-not-exist").json()["total"] == 0
+        publication = client.get("/api/publications?dataset=daily_bar&asset_type=stock&partition_key=2026-10-09")
+        assert publication.status_code == 200 and publication.json()["total"] == 1
+        assert publication.json()["items"][0]["latest_task_id"] == "daily-2026-10-09"
+        assert "evidence" not in publication.json()["items"][0]
+        assert client.get("/api/publications?dataset=does_not_exist").json()["total"] == 0
+        # The retired query parameter is ignored; it cannot expand source manifests.
+        assert "evidence" not in client.get("/api/publications?include_evidence=true").json()["items"][0]
+        assert client.get("/api/publications?page_size=101").status_code == 422
         task = client.get("/api/tasks/daily-2026-10-09").json()
         assert task["definition"]["trade_date"] == "2026-10-09"
         assert task["row_count"] == 1 and task["published_hash"] == "frozen-hash"
@@ -536,9 +586,9 @@ def test_empty_root_and_unterminated_multibyte_preview(tmp_path):
     assert preview["text"].startswith("你好")
     empty_app = create_app(config_root=tmp_path / "config", data_root=tmp_path / "empty-runtime")
     with TestClient(empty_app) as client:
-        assert client.get("/api/overview").json()["task_counts"] == {}
+        assert client.get("/api/overview").status_code == 503
         assert client.get("/api/raw").json()["total"] == 0
-        assert client.get("/api/publications").json()["total"] == 0
+        assert client.get("/api/publications").status_code == 503
     assert not (tmp_path / "empty-runtime").exists()
 
 
@@ -633,9 +683,9 @@ def test_security_catalog_and_publications_use_single_current_master(tmp_path):
     catalog = reader._security_catalog()
     assert catalog[("sh", "600519")] == {
         "name": "贵州茅台", "asset_type": "stock", "name_source_date": "2026-10-10"}
-    publications = reader.publications(dataset="security_master", include_evidence=False)
-    assert publications["total"] == 1
-    assert publications["items"][0]["partition_key"] == "2026-10-10"
+    publications = reader.publications(dataset="security_master")
+    assert publications["total"] == 0
+    assert publications["security_master_status"] == "not_registered"
 
 
 def test_record_query_filters_business_date_name_and_keeps_source_values(tmp_path):

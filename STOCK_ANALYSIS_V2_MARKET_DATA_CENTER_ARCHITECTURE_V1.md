@@ -116,17 +116,17 @@ pd.read_parquet("/data/...")
 
 ### 4.1 逻辑架构框图：表达职责依赖
 
-框代表逻辑模块及现有承接位置，箭头代表职责依赖；具体执行顺序见任务流程与时序图。虚线是配置或证据引用。提交协调、等待与区间计划尚待实现，优先在现有worker/pipeline/storage职责内承接，不新增通用任务管理层。采集策略只处理获取，质量检查不反向联网。图不预设新的部署进程或消息服务，跨进程提交和元数据写入需在实施设计中给出明确承接。
+框代表逻辑模块及现有承接位置，箭头代表职责依赖；具体执行顺序见任务流程与时序图。虚线是配置或证据引用。受理、等待与执行协调由现有worker/pipeline/storage承接，不新增通用任务管理层；区间及页面/调度接线的实际完成范围见PROJECT_PROGRESS。采集策略只处理获取，质量检查不反向联网。图不预设新的部署进程或消息服务。
 
 ```mermaid
 flowchart TB
     CFG[config及loader<br/>任务、周期、来源和数据合同] -.-> SUB
     CFG -.-> PLAN
     CFG -.-> ACQ
-    UI[运行台及CLI<br/>手动范围、覆盖确认、状态查询] --> SUB[现有pipeline提交与准备职责<br/>范围冲突、授权、冻结，待补齐]
+    UI[运行台及CLI<br/>手动范围、覆盖确认、状态查询] --> SUB[现有pipeline提交与准备职责<br/>范围冲突、授权、冻结]
     SCH[worker调度<br/>启用且到期时提交目标周期] --> SUB
-    SUB --> META[storage.metadata及运行文件<br/>等待、占用范围、断点和结果记录]
-    META --> FIFO[worker及pipeline执行协调<br/>整任务FIFO，待补齐]
+    SUB --> META[storage.metadata同机SQLite<br/>任务、占用范围、摘要及回执<br/>冻结定义引用现有运行文件]
+    META --> FIFO[worker及pipeline执行协调<br/>整任务FIFO]
     FIFO --> TASK[pipeline.inputs<br/>运行生命周期与恢复]
     TASK --> PLAN[pipeline.history及daily<br/>目标日期、来源窗口和请求量]
     PLAN --> ACQ[routing及providers<br/>来源策略、健康、限速、协议获取]
@@ -134,19 +134,23 @@ flowchart TB
     RAW --> PARSE[同一Provider解析<br/>quality按配置标准化]
     PARSE --> BUILD[pipeline.daily及quality<br/>批候选、逐日期聚合和覆盖检查]
     BUILD --> PUB[storage日K表发布及metadata<br/>按日期资产事务覆盖、摘要与回执]
-    PUB --> CAN[同机SQLite正式日K表<br/>唯一当前行情，不保存旧行情快照]
+    PUB --> CAN[同一SQLite中的正式日K表<br/>唯一当前行情，不保存旧行情快照]
+    TASK --> MPUB[现有Master文件提交及恢复<br/>文件与原文完成后短事务登记]
+    MPUB --> MASTER[唯一当前证券清单DuckDB及manifest]
+    MPUB --> META
     TASK --> META
     PUB --> META
     CAN -. 原文引用 .-> RAW
     UI --> QUERY[service查询及派生索引<br/>周期结果、当前行情、原始证据]
     QUERY --> CAN
     QUERY --> META
+    QUERY --> MASTER
     QUERY --> RAW
 ```
 
 数据集、来源和任务是核心业务概念；调度、执行记录、存储是支持机制，不为每个概念新增管理器或后台服务。数据检查可以使用既有文件和候选，但不发网络请求。未来本地导入可直接提供符合合同的候选，复用检查和发布，不需要伪造采集任务或来源。
 
-2026-11-09运行库SQLite替换已完成隔离定向验收，但不证明FIFO、管理台和正式日K已完成。用户随后确认正式日K、证券日期状态和分区摘要入表方向：任务进度与当前数据覆盖分离，按日期＋资产类型分别发布，覆盖采集失败保持已有有效行情；正式数据不双写Parquet，不迁移旧数据。上图说明入表目标；单日采集写入与直接资格消费者已完成隔离验收，GET `/api/daily`表读取已完成隔离功能及代表规模验收；其他Web列表、CLI覆盖交互和区间生产仍待接线。逻辑日期/资产分区仍存在，不代表继续创建日期行情目录。表结构、事务、精度、覆盖基准、首次执行归属及替换/验收清单只在[入表合同](docs/storage/README.md#正式日k入表与覆盖统计)维护，不在总体设计复制字段规则。证券主清单、原文与来源索引各自资源合同继续适用，未因此一并迁库。
+运行库、正式日K及发布摘要共用SQLite，但运行记录、当前行情和覆盖依据是不同领域对象。用户确认按日期＋资产类型分别发布，覆盖采集失败保持已有有效行情；正式数据不双写Parquet，不迁移旧数据。发布列表只读已登记摘要，原文按需追溯；当前清单仍为独立DuckDB文件，在原提交/恢复链中登记唯一摘要，不复制逐证券每日状态。各生产入口、Web路由、CLI覆盖交互和区间生产的实际交付与验收范围只在PROJECT_PROGRESS维护。逻辑日期/资产分区仍存在，不代表继续创建日期行情目录。表结构、事务、精度、覆盖基准、首次执行归属及替换/验收清单只在[入表合同](docs/storage/README.md#正式日k入表与覆盖统计)维护，不在总体设计复制字段规则；摘要接口合同见[运行台说明](docs/service/read-only-web.md#发布摘要与总览的接线合同)。原文与来源索引各自资源合同继续适用，未因此一并迁库。
 
 运行库环境及初始化见[存储边界](docs/storage/README.md#并发访问与资源边界)，任务FIFO与活动范围见[任务设计](docs/pipeline/collection-tasks.md#并发访问场景清单及执行流程2026-11-08提案未实施)，18个API的目标资源映射见[管理台设计](docs/service/read-only-web.md#管理台并发访问逐接口检查2026-11-08提案未实施)。各阶段实际实现、偏差和隔离结果以PROJECT_PROGRESS为准。
 
@@ -364,7 +368,7 @@ HTTP 200但HTML错误页、无效JSON、空业务数组、重复日期或价格�
 | 标准对象 | domain中的数据类和枚举；没有以Pydantic替代现有模型 |
 | 配置与标准化 | YAML、config/loader.py、quality/normalization.py |
 | 任务与构建 | pipeline/inputs.py、pipeline/daily.py；名单、分钟等模块各自承接业务 |
-| 持久化 | SQLite运行元数据/日历及正式日K、DuckDB证券清单、Parquet候选及其他数据集分区、SQLite分钟热存储、文件原始证据；单日日K事务发布及日K价格API已隔离验收，其他Web列表与独立覆盖依据仍在实施，不迁移历史文件 |
+| 持久化 | SQLite运行元数据/日历、正式日K及当前摘要，DuckDB证券清单，Parquet候选及其他数据集分区，SQLite分钟热存储，文件原始证据；不迁移历史文件，实际接线和验证边界见PROJECT_PROGRESS |
 | 查询与观察 | 现有FastAPI只读运行台、规范日线与分钟查询 |
 | 调度 | 到期判断与单次触发；配置启用不表示已部署常驻进程 |
 

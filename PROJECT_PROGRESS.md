@@ -1,5 +1,30 @@
 # 项目开发进度
 
+## 2026-11-10 发布摘要、总览及当前清单登记（11月11日完成隔离验收）
+
+用户确认发布列表统一仅摘要和追溯入口、原文按需查看。已接GET `/api/publications`的partition_status筛选/计数/分页，及GET `/api/overview`同一SQLite短快照中的任务计数/最近6条、发布最近6条；原文最新日期仍来自一级日期目录。两个API不再扫描历史manifest/任务summary或展开原文。任务结果、当前数据和覆盖分母保持分离；日K独立分母未知时不拿任务名单补足。
+
+当前Master原先完成唯一DuckDB/manifest及原文转正后缺SQLite登记。已沿现有_finish_task_commit及恢复路径补齐：发布前将旧摘要置updating，文件/原文完整后移除marker，再短事务登记唯一当前摘要和published任务/进度；删marker后SQL提交前仍有committing任务恢复。不同日期正常刷新，同日范围相交仍提示覆盖。RecoveryScanner不再按Parquet处理当前清单或登记按日旧清单。仅增加摘要最近实际更新任务last_task_id，不复制逐证券成功快照、原文引用或完整清单JSON，不迁移旧文件。
+
+合同已更新现有[运行台说明](docs/service/read-only-web.md#发布摘要与总览的接线合同)、[存储说明](docs/storage/README.md#当前证券清单摘要的跨资源发布)及总体架构，包含前后流程、文件与SQL失败边界、输出与验收预算。Luna medium实施/测试，主模型复核。11月10日首轮导出源码基于a2a0e238加本阶段覆盖，25项20通过、5失败、0错误/跳过，85.504秒；复查运行日志发现pytest相对路径仍使用工作区测试与配置，首轮及11月11日同类启动的8项都仅作诊断，不计入交付验收。[首轮JUnit](tmp/sqlite-runtime-implementation/publication-table-query/final-run-01/junit.xml)、[环境/实际配置路径](tmp/sqlite-runtime-implementation/publication-table-query/final-run-01/stdout.log)、[第二轮启动日志](tmp/sqlite-runtime-implementation/publication-table-query/final-run-02/wrong-cwd-run/stdout.log)。
+
+| 首轮诊断范围 | 结果与对原目标的影响 | 11月11日处理 |
+|---|---|---|
+| 发布/总览功能与任务列表共用读取逻辑 | 功能节点通过：摘要字段与非零冲突/隔离、筛选/分页、未知覆盖、无原文展开、两连接一致快照、旧结构拒绝、事务回滚；6个任务列表节点及同库日K合成候选A部分→B补齐→旧A被保护的节点通过 | 功能通过不替代性能或真实Master发布/恢复；首次版本未提交 |
+| 10000合成任务、3资产×1000合成工作日摘要及1000原文日期目录 | 发布列表首次0.018519秒、复用5次p95=0.035728、最后页0.025424；实际排序索引，页内100。总览首次0.865578，复用p95=1.213553超过1秒。[性能记录](tmp/sqlite-runtime-implementation/publication-table-query/final-run-01/publication-table-performance.json) | 保持预算，核对原始日期枚举的成本；普通日期目录用一次一级枚举的属性，链接/重解析项保留目录边界检查，不新增索引服务或删掉原文日期信息 |
+| 4个真实Master生产/恢复节点 | 均在不同日期正常刷新提交时被`_canonical_scope_conflicts`判为`published-data`；该分支忽略当前清单真实日期，把新任务日期填进冲突。没有走到所验收的发布或恢复故障点 | 按实际日期及相交范围判断正式重叠；不同日期正常刷新，同日仍需覆盖确认。不通过给测试强勾overwrite掩盖业务缺陷 |
+| 当前与历史Master文件并存（只读调查） | 实际10月9日旧清单manifest记7267行，旁Parquet 185520字节与清单大小/hash匹配；当前清单manifest另记11月2日7862行。[只读记录](tmp/sqlite-runtime-implementation/publication-table-query/root-baseline-a2a0e238/legacy-master-observation.json)。静态推断：旧扫描器会把前者再登记为第二条Master | 修正旧Parquet扫描的Master职责；当前归任务恢复，按日旧清单只保留，禁止导入/移动/删除。首轮只通过current跳过节点，不能替代这一新增场景验收 |
+
+首轮之后实施代理因用量限制停止，11月11日继续沿指定Luna medium修复。以下才是有效交付树结果；验收固定源码、测试、配置路径，核对实际收集文件和规范包导入，不能只看模块路径或pytest输出总数。
+
+| 有效交付树检查 | 实际结果与证据 | 范围及限制 |
+|---|---|---|
+| 同树的27项定向节点 | 26通过、1失败、0错误/跳过，61.148秒；唯一失败是新增raw日期测试缺os导入。仅修测试导入及Windows junction参数后，单项1/1通过、0跳过，0.425秒，源码未变。[整组JUnit](tmp/sqlite-runtime-implementation/publication-table-query/final-run-03/evidence/junit.xml)、[实际源码/测试/配置路径](tmp/sqlite-runtime-implementation/publication-table-query/final-run-03/evidence/stdout.log)、[单项JUnit](tmp/sqlite-runtime-implementation/publication-table-query/final-run-03/evidence/raw-options-recheck/junit.xml)、[最终文件清单](tmp/sqlite-runtime-implementation/publication-table-query/final-run-03/tree-manifest.json) | 27个不同节点分别有通过结果，不称一次27/27或全套通过。覆盖新发布/总览、共用任务读取、只读/旧结构/事务回滚、原文日期及受影响恢复；同进程Python3.13.18/SQLite3.54.1与依赖核对通过 |
+| 生产与恢复的离线样本 | 4个Master节点验证不同日期刷新、同日重叠拒绝、发布后及摘要事务前/后中断；11个合成证券、2个来源单元，当前清单最终只有1个摘要，无逐证券success快照，恢复未重采。日K合成候选在同一运行库A部分发布1条、B补至2条、旧A不能覆盖B；接口仍显示2条、独立分母null、最近更新任务B。旧Master日期文件保持字节不变且不登记；既有分钟Parquet恢复通过 | Master为真实任务执行器与ASGI链路，来源为隔离测试替身；日K为存储发布到ASGI，非全市场采集验收。清单日期样本10月1日/2日；不是生产发布、真实Provider或历史资格通过 |
+| 发布列表、总览及原文日期规模 | 10000合成任务、3资产×1000合成工作日摘要、1000原文日期目录。发布首次0.018861秒、复用5次p95=0.017338、最后页0.018069；总览首次0.026260、复用5次p95=0.029415；原文日期路由单次0.008827秒。[测量与实际SQL](tmp/sqlite-runtime-implementation/publication-table-query/final-run-03/evidence/publication-table-performance.json) | 首次单样本不是冷p95；发布页≤100摘要，实际排序用partition_status_publication_idx，COUNT/深页仍有索引工作；总览每次仅6条任务投影/6条发布，最旧1,000,198字节state不入最近页，1,050,013字节context未查询。普通目录路径解析0次，仍枚举1000一级目录；另有真实Windows根内junction可见/根外排除及空根检查 |
+
+设计复核：保留任务与当前数据分离、日期/证券覆盖授权、按需原文以及Master唯一当前态，没有新增服务、来源、迁移或旧行情快照。未做生产运行、真实Provider请求、浏览器视觉验收或全套测试；默认生产库仍未创建。原工作区未验收的设置/UI、Raw和来源索引变更未纳入交付。任务详情/单元、独立覆盖统计、区间采集及调度联合验收仍待接线；原始640窗口与75132小文件问题未修复。
+
 ## 2026-11-10 管理台任务列表切表（实现及隔离验收完成）
 
 本阶段解决“任务已受理但无summary时列表不可见，以及全历史读文件后才分页”的问题。GET `/api/tasks`现以collection_task为事实源，在短只读快照中SQL筛选/计数/分页；waiting无summary也可见，不展开冻结上下文。状态年龄和排序取最后持久化时间，原摘要生成时间另行保留；等待不因久等判中断，记录时间不充当执行进程心跳。页面增加“等待执行”及筛选。任务状态与当前行情继续分开，不变更FIFO、覆盖或部分发布规则。Luna medium实现/测试，主模型复核合同、实际差异及证据。
@@ -14,7 +39,7 @@
 
 设计对照：列表已按任务事实与当前行情分离、短只读连接、页内投影及等待态合同实现；没有新增服务、来源、动态切源、兼容后端或生产迁移。环境为项目隔离Python3.13.18/SQLite3.54.1，实际依赖导入后在同一进程执行pytest.main，模块均来自对应导出树；默认生产metadata.sqlite3仍未创建。未做真实Provider请求、生产任务或浏览器视觉验收；未运行全套测试。正式设计沿本机运行台说明更新前后流程和职责，CODE_STRUCTURE同步更新，不增长期批次文档。
 
-发布列表/总览随后接线；只读调查发现security_master在现有_finish_task_commit完成后没有登记partition_status，切换前必须补齐，不得静默漏项或从历史文件扫描回填。旧发布接口默认展开所有原始响应，而页面已显式关闭展开；留存2026-11-05股票分区5569行、16423个raw引用，manifest2807494字节，见[本次只读记录](tmp/sqlite-runtime-implementation/dashboard-table-queries/baseline-48432e5c/publication-expansion-observation.json)。已向用户询问是否统一摘要和按需追溯；未答复前不改变该接口的原文展开合同。任务列表可独立继续。
+本阶段收尾时发布列表/总览仍待接线；只读记录中2026-11-05股票分区5569行、16423个raw引用，manifest2807494字节，见[读取记录](tmp/sqlite-runtime-implementation/dashboard-table-queries/baseline-48432e5c/publication-expansion-observation.json)。随后用户已确认仅摘要、原文按需，转入上方独立阶段；任务列表本身不扩大为发布接口通过。
 
 风险/后续：任务详情及单元按ID定位、全市场单元状态筛选成本、当前清单发布登记/恢复和其他管理台接口尚未完成；本阶段列表通过也不代表这些接口通过。独立覆盖统计、区间生产、640及原文小文件问题继续待实施；不新增来源/管理服务/TTL，不迁移或写生产数据。原UI、配置、Raw/index及其他未提交改动已保存基线，交付仍按HEAD加本阶段差异的隔离树验证。
 

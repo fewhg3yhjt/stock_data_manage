@@ -4,11 +4,11 @@
 
 任务页只展示执行进度、当时结果、失败与恢复；数据页查询当前正式业务表，不以任务成功数、工作区summary或冻结任务名单推导实际行情覆盖。正式日K只有数据库一份，不在查询失败时回退扫描旧Parquet。表结构、发布事务、精度与覆盖依据以[入表合同](../storage/README.md#正式日k入表与覆盖统计)为主，本节维护消费合同与验收。
 
-实施边界：单日采集写入与直接资格消费者、`GET /api/daily`已完成隔离验收；`GET /api/tasks`的SQL列表接线已保存，当前阶段结果和交付边界见[阶段进度](../../PROJECT_PROGRESS.md)。覆盖查询、发布列表、总览、任务详情/单元及任务提交的表消费尚未完成，不能把日K或任务列表单一路由当作整个管理台通过。
+实施边界：单日采集写入与直接资格消费者、`GET /api/daily`、`GET /api/tasks`、`GET /api/publications`和`GET /api/overview`已在对应隔离范围验收，实际数据、版本与结果见[阶段进度](../../PROJECT_PROGRESS.md)。覆盖查询、任务详情/单元及任务提交的表消费尚未完成，不能把上述路由当作整个管理台通过。
 
 ### 任务列表与发布列表接线边界
 
-后续开发沿本章已确认的表消费合同推进，先实现不依赖原文展开选择的任务列表。`collection_task`是已受理运行的事实源；waiting任务可能还没有summary，不能因目录中未发现摘要就漏掉它。列表按SQL列中的状态、数据集、任务编号筛选，以`updated_at DESC, task_id`稳定排序，在同一短只读快照中取得总数和当前页。仅解析当前页状态字段，不连接`collection_task_context`、不读取冻结覆盖授权或全历史摘要。详情和单元查询的逐任务定位、状态筛选成本须单独验收，不能由列表通过替代。
+`collection_task`是已受理运行的事实源；waiting任务可能还没有summary，不能因目录中未发现摘要就漏掉它。列表按SQL列中的状态、数据集、任务编号筛选，以`updated_at DESC, task_id`稳定排序，在同一短只读快照中取得总数和当前页。仅解析当前页状态字段，不连接`collection_task_context`、不读取冻结覆盖授权或全历史摘要。详情和单元查询的逐任务定位、状态筛选成本须单独验收，不能由列表通过替代。
 
 只读连接不初始化或修改业务表；SQLite在现有WAL模式库上读取时可能创建该库的空`-wal`及`-shm`协调文件。只读验收仍要求原有业务文件完全不变，不能以忽略所有日志文件代替检查，也不能用`immutable=1`忽略活动WAL中的已提交数据。
 
@@ -17,8 +17,8 @@
 | `storage.metadata`任务查询、`DashboardReader.tasks` | 全历史summary发现后分页→从唯一任务表先筛选/分页，再形成最多100张卡片；waiting也可见 | 10000条运行下检查页内解析数、实际SQL计划、首次/复用耗时；查询不访问context或任务文件，不改变任务状态 |
 | 状态及时间 | 原摘要生成时间参与疑似中断判断→SQL状态/updated_at决定已持久化进度的年龄，返回明确updated_at_utc | 原generated_at_utc只保留原生成时间，等待时可缺省；collecting/checking/committing超原阈值才标疑似中断，waiting不因久等标中断。不把记录时间称作心跳或据此接管运行 |
 | 任务页显示 | 等待状态目前可能显示英文，过滤器遗漏waiting | 增加“等待执行”标签及筛选，说明来自持久化任务记录；不新增任务启动、停止或调度行为 |
-| 发布摘要的上游登记 | 日K已有同库分区摘要；证券清单实际发布后尚未登记partition_status | 切换发布列表前补齐既有生产/恢复链登记及唯一当前清单语义；不从空索引推断无正式清单，不扫描历史回填，不迁移生产数据 |
-| 发布原文展开 | 当前页面已请求include_evidence=false，旧API默认仍可批量展开所有引用 | 该接口行为待本次用户选择；日K数据和原始响应均继续保留，不能以列表改造为由删除证据或改变来源资格 |
+| 发布摘要的上游登记 | 日K已有同库分区摘要；原证券清单发布缺partition_status登记 | 现沿既有生产/恢复链登记唯一当前清单；不从空索引推断无旧清单，不扫描历史回填，不迁移生产数据 |
+| 发布原文展开 | 2026-11-10用户确认统一只返回摘要和追溯入口，原文按需查看 | 移除include_evidence展开能力；日K数据和原始响应均继续保留，不能以列表改造为由删除证据或改变来源资格；具体接线见下节 |
 
 ```mermaid
 flowchart TD
@@ -38,6 +38,53 @@ flowchart TD
 ```
 
 任务记录不读取当前分区来改写执行结果：A采集失败后B补齐了数据，A仍保持当时失败；当前数据由发布列表和数据查询体现。已持久化受理和开始执行是两件事；无运行心跳事实时不生成“执行者活跃”等新结论。本节是实施范围，不代表本轮功能或性能已通过，实际结果在PROJECT_PROGRESS记载。
+
+### 发布摘要与总览的接线合同
+
+发布列表回答当前正式日期/资产分区有什么数据，总览并列展示任务执行与已登记数据。它们的事实来源是SQLite中的`partition_status`及`collection_task`，不再由历史manifest、任务summary或本次任务写入数量拼接。2026-11-05股票旧清单5569行、16423个原文引用的只读样本见[记录](../../tmp/sqlite-runtime-implementation/dashboard-table-queries/baseline-48432e5c/publication-expansion-observation.json)；摘要接口不为生成列表展开这些引用。原文、任务证据和旧文件保留，来源及资格规则不变。
+
+| 具体模块/对象 | 改造前→目标输入输出 | 约束、失败与验收 |
+|---|---|---|
+| `storage.metadata`发布查询与`DashboardReader.publications` | 扫所有manifest/任务摘要→SQL按dataset/asset_type/partition_key筛选，COUNT与分页同一短快照；按partition_key降序、dataset/asset_type/adjustment升序稳定排序 | 页内最多100条摘要，不读行情、任务上下文、原文引用或manifest；COUNT/深页OFFSET仍有索引工作量。范围明确为registered_publications，旧文件未登记不自动回填，不把空登记称为没有历史文件 |
+| `partition_status.last_task_id`及`storage.daily` | 任务关联原靠历史summary路径匹配→摘要只保存最近一次实际更新任务ID | 日K有有效写入或no_trade变更才与摘要同事务更新；零写入、失败或被后续归属保护时保持原值。它不是全分区的全部来源清单；发布回执与逐证券当前归属仍在原业务表 |
+| `pipeline.inputs._finish_task_commit`与Master登记 | current清单成功却无SQL登记→复用现有表保存唯一当前清单摘要与最近发布任务 | 不复制逐证券success状态到partition_item，不新增每日证券快照。完成登记替换的是旧Master摘要索引行，证券库、字段历史、原始证据与旧文件不删除；跨资源顺序见存储合同 |
+| 更新中的Master | 原靠文件扫描跳过marker→SQL摘要updating或Master任务committing时明确报告更新/待恢复，暂不展示Master为已完成分区 | 其他日K/任务摘要正常返回，不将中断期间的旧头误称为当前可读清单。首次发布尚无摘要时不制造0行正式记录；任务恢复沿原入口 |
+| `DashboardReader.overview` | 全历史任务文件/manifest计数排序→一次SQLite快照读取任务计数、最近6个任务、最近6个已登记分区及Master状态 | 关闭连接后才组装卡片及调用既有raw_options；最新原始日期仍来自raw根一级日期目录，区别于正式发布日期；普通目录不逐个解析路径，链接/重解析项保留原根目录约束；不新增索引或读取响应内容 |
+| 现有发布页面 | 请求include_evidence=false后仍读取旧manifest字段→只呈现当前摘要、登记时间、最近更新任务及原文日期筛选入口 | 去除evidence、source_count、size_bytes、publication_metadata、tasks全量关联及include_evidence参数；不伪造日K文件hash。Master文件hash可空展示，但不再作为日K页面主列；原文数量未统计时不显示为0 |
+
+返回当前行数、可空预期数及其依据/原因、状态、no_trade、口径状态计数、修订号与登记时间。日K独立证券/日期依据未建立时，expected_count及coverage_percent继续为null；不得从任务证券数补分母。其他数据集原登记预期仅说明发布检查口径，不代表全市场覆盖验证。最近更新任务入口与“按数据日期查看原文”入口明确区分，原文日期入口可能没有结果，不代表本分区原文数量为0。
+
+```mermaid
+flowchart TD
+  subgraph OLD_PUBLICATIONS[改造前发布与总览]
+    A[GET publications或overview] --> B[扫描全部canonical manifest]
+    A --> C[读取历史task summary并关联路径]
+    B --> D[读取raw_refs及清单元数据]
+    C --> E[全量构造后分页]
+    D --> E
+    E -->|include_evidence默认true| F[批量读取原文清单]
+  end
+  subgraph SQL_PUBLICATIONS[本阶段发布与总览]
+    G[筛选参数或总览请求] --> H[打开既有只读SQLite并开始短快照]
+    H --> I[SQL发布COUNT与有索引的页查询，Master更新中明确排除]
+    H -->|仅overview| J[任务状态计数及最近6条，不读context]
+    I --> K[关闭连接，组装摘要和追溯入口]
+    J --> K
+    K -->|仅overview| L[现有raw一级日期查询后合并]
+    K --> M[用户按需进入任务或原文页]
+    H -->|缺库或结构未就绪| X[503，不初始化、不回扫文件]
+    H -->|忙超时| Y[503并提示重试]
+  end
+```
+
+两个对外路由分别列入验收：功能覆盖真实离线生产到API、资产/日期/数据集筛选、分页/空结果及错误；总览检验同一读快照内的任务与数据结果，不能把任务成功与行情存在互相推导。代表规模为10000条任务与3资产×1000个合成业务日摘要；先说明造数不代表真实行情发布，记录首次单样本、5次复用p95、最后一页、实际SQL计划、页内对象数和文件读取范围。沿既定预算首次≤2秒、复用p95≤1秒、深页≤1秒；不将单次首次称冷p95。只重复修复实际影响的检查，不进行真实Provider重探或全市场重采。
+
+| 本阶段受影响路由 | 对应检查入口 | 业务与工作量边界 |
+|---|---|---|
+| GET `/api/publications` | `test_publication_table_queries.py`及既有Web摘要节点；真实Master边界节点在`test_collection_tasks.py` | 筛选/分页/空结果、未知覆盖分母、真实冲突值、拒绝原文展开；3000个合成日期/资产摘要，页内≤100，实际SQL计划和最后一页 |
+| GET `/api/overview` | 同一新测试文件的快照/性能节点及既有Web总览节点 | 并发写入前后任务与分区均来自同一快照，分别最近6条；10000任务、3000摘要及1000原文日期目录，首次与5次复用分别测量 |
+| GET `/api/tasks`（共用只读上下文改变） | 既有`test_dashboard_table_queries.py`的6个节点 | 10000条任务及页内大state、等待态/实际受理、精确300秒及错误/不初始化合同；不因此重跑无关来源或全套测试 |
+| GET `/api/raw/options`（总览共用目录枚举） | `test_web_service.py`的原文日期边界节点；复用`test_publication_table_queries.py`规模样本 | 合法目录排序、非法名称/同名文件、空根与链接边界；1000日期目录直接测一次并记录共享枚举成本和路径解析次数，不递归读取清单或正文 |
 
 ### 日K查询接线的实施与验收边界
 
@@ -105,15 +152,15 @@ flowchart TD
 
 | 现有API（逐路由） | 当前实际读取/写入 | 推荐并发边界与用户可见行为 |
 |---|---|---|
-| GET `/api/overview` | task/summary、发布manifest、raw接口索引 | 小状态页；任务改从唯一运行库摘要查询，限制最近条数，不随运行历史递归打开全部摘要；采集时仍可刷新 |
-| GET `/api/tasks` | 发现工作区/归档summary后分页 | 运行库筛选/排序/分页及总数；只读取当前页运行，不读取全历史JSON |
+| GET `/api/overview` | 本阶段接线：SQLite任务与发布摘要；raw根一级日期目录 | 一个短读快照取任务计数/最近6条与发布最近6条，关闭连接后补原文日期；不递归读取历史摘要；本阶段实际验收见PROJECT_PROGRESS |
+| GET `/api/tasks` | SQLite collection_task筛选/计数/分页 | 已完成隔离验收；只读取当前页运行，不读取全历史JSON或冻结上下文 |
 | GET `/api/tasks/{task_id}` | summary、冻结定义和运行单元汇总 | 状态以运行库为准，定义/证据仍引用已有文件；显示最后确认更新时间及可能中断，不凭页面超时接管任务 |
 | GET `/api/tasks/{task_id}/units` | 当前运行单元manifest及报告 | 按页读取对应单元/批定位；批写未完成显示处理中，不当成数据缺失或任务失败 |
 | GET `/api/task-options` | collection/schedules/providers/capabilities等YAML | 配置读取，不获取任务执行锁，不因GET联网探测来源；当前没有调度启停API，不将该路由当成已能修改调度 |
 | POST `/api/tasks/run` | 本机写保护、本地日历（同运行SQLite）、任务构建、线程启动 | 本地准备后短受理事务：明确活动冲突、正式重叠及覆盖授权；成功回执前运行已持久化可查询。目标是等待，不是在页面线程直接抢整任务执行锁 |
 | POST `/api/tasks/{task_id}/resume` | 冻结task及工作区位置，然后启动线程 | 校验冻结定义和实际待恢复范围，再登记受理/等待；不能跳过当前占用和新增数据确认，不重做已完成日期 |
 | GET `/api/daily` | 本阶段读取：SQLite日K业务表、页内稳定身份的清单名称和展示YAML | 已完成只读接线、定向功能和代表规模性能检查；不保留正式行情文件回退，名称不可用单独标明 |
-| GET `/api/publications` | 当前源码：canonical manifest、任务摘要；新目标：SQLite当前逻辑分区摘要 | 从摘要表过滤分页，任务回执只供追溯，不扫描目录推导当前覆盖 |
+| GET `/api/publications` | 本阶段接线：SQLite已登记逻辑分区摘要 | 摘要表过滤分页，当前清单更新中暂不显示旧摘要；最近更新任务与原文按需追溯，不扫描目录或展开引用；本阶段实际验收见PROJECT_PROGRESS |
 | GET `/api/data/options` | SQLite来源索引中的报告描述及数据集YAML | 查询小型分组/选项集合，不加载全部来源行；索引缺失明确未就绪，GET不重建 |
 | GET `/api/data` | SQLite选择器、页内来源行/候选文件、证券清单补名称 | 与增量写并行读已提交内容；关闭游标/读事务后再组装响应。索引重建切换短暂忙碌单独说明；名称读取与来源行读取分开 |
 | GET `/api/raw/options` | raw/workspace/archive接口manifest索引 | 读已完成接口摘要，避免扫描每个正文；索引正在替换读取完整一份或提示刷新 |
@@ -126,7 +173,7 @@ flowchart TD
 
 静态首页及静态资源不访问业务数据库，不与采集排队。页面关闭/慢网络不会延长API已经完成的数据库事务；数据库连接不交给Streaming/FileResponse延后释放。页面可能并发发出多个请求，每个请求/工作线程独立使用连接，不跨线程共享SQLite连接。
 
-性能预算草案：以7862证券、100交易日目标、10000条历史运行、分页上限100为代表性范围，状态/配置小查询冷2秒、复用1秒；本地范围提交/续跑5秒（不含来源网络）；原文预览保持已有256KiB上限，下载响应大小与实际正文一致，单独测首字节与全量传输，不用固定2秒要求所有大下载。日K/来源筛选/发布列表按选择日期、分区和页大小限定工作量，完整耗时与行组/报告/manifest扫描预算须在对应查询实施合同确认并实测，不能把小状态预算机械套给100日期全量数据。日K查询已完成SQL筛选和分页的代表规模验收，实际首次样本、复用及深页范围见阶段进度；任务列表先发现摘要再分页的行为尚待修正，本轮不宣称其性能通过。
+性能预算草案：以7862证券、100交易日目标、10000条历史运行、分页上限100为代表性范围，状态/配置小查询首次2秒、复用1秒；本地范围提交/续跑5秒（不含来源网络）；原文预览保持已有256KiB上限，下载响应大小与实际正文一致，单独测首字节与全量传输，不用固定2秒要求所有大下载。日K/来源筛选/发布列表按选择日期、分区和页大小限定工作量，完整耗时与行组/报告/manifest扫描预算须在对应查询合同确认并实测，不能把小状态预算机械套给100日期全量数据。日K与任务列表已有对应规模的隔离结果；发布/总览本阶段目标数据量、首次/复用及深页标准见上方接线合同，实际执行与限制统一记录在PROJECT_PROGRESS，不把首次单样本称为冷p95。
 
 错误合同区分：实际活动范围冲突为409并列出范围；覆盖未授权/提示已变化返回需确认内容；数据库忙/资源切换超限拟为503及Retry-After；非法参数为400/422；真实数据完整性失败明确报错；缺库/索引/协调权限报告未就绪或只读限制。不能把以上情况静默返回items=[]、缺失价格或启动成功。此处接口变化尚未实现，也未改变本机同源及可写目录保护。
 
@@ -286,17 +333,21 @@ flowchart LR
 
 ### 受影响API的功能与性能验收边界
 
-| 路由 | 业务返回与错误合同 | 性能数据量、冷/热预算及工作量边界 | 本次自动化验收 |
+来源/Raw各行保留其原阶段范围，不代表本轮重跑；日K读取及任务/发布摘要的当前验收以表查询章节与PROJECT_PROGRESS为准。
+
+| 路由 | 业务返回与错误合同 | 性能数据量、冷/热预算及工作量边界 | 对应测试/证据范围 |
 |---|---|---|---|
 | `/api/data/options` | 只列出确有来源报告的类型、来源和日期；空数据返回空列表 | 自动化样本23,852份报告；冷读≤5秒，复用≤2.5秒；正式数据根22,915份报告，只读摘要索引，不打开来源行文件 | `test_source_query_indexes_bound_page_reads_at_current_report_scale` |
 | `/api/data` | 日期/代码/名称/来源/类型/复权筛选，稳定分页；空结果与日期错误有明确响应；所选原值与来源行逐项对应 | 自动化样本23,852条选择器；冷读≤5秒、复用≤2.5秒；页面大小1时只打开所选来源行文件。正式数据根13,503,448条选择器，精确最新日范围只处理该日期的18,086条，再读取当前页并核验SHA和行数 | 同上；`test_record_query_filters_business_date_name_and_keeps_source_values`；`test_record_query_snapshot_date_is_explicit_and_integrity_failure_visible` |
 | `/api/raw/options`、`/api/raw/sources` | 返回日期、来源及接口层级；未知日期返回404 | 只枚举所选层级的目录；不打开请求清单或响应体 | `test_http_read_only_routes_headers_filters_and_frozen_parameters`、Raw日期/来源用例 |
 | `/api/raw` | 日期/来源/接口/文本筛选，分页总数和响应摘要；非法组合返回400；当前页准确报告响应体是否存在 | 17,592条响应索引；冷读≤5秒、缓存复用≤1.5秒；只打开对应Endpoint索引，列表不打开命名请求清单；仅对当前页做响应体存在检查 | `test_raw_listing_uses_cached_manifest_index_at_production_scale`；`test_raw_query_index_rebuild_is_idempotent_and_excludes_catalog`；`test_raw_detail_redacts_secrets_previews_and_downloads_exact_bytes` |
-| `/api/daily` | 仅返回支持的聚合Schema；日期、资产类型和复权筛选按既有合同；受支持分区损坏仍返回409 | 一份有效聚合分区加一份旧行式分区；旧分区不交给新格式读取器，有效分区只读一次；本地页查询预算≤2秒 | `test_daily_api_skips_retired_row_partition_before_reading_parquet`；`test_daily_web_defaults_validation_and_corrupt_partition` |
+| `/api/daily` | SQLite正式行情；参数/代码承接/口径、空值与精确数值、分页及明确错误 | 7862证券×100合成日期三口径，另单证券1000日；页内最多100父/300子；实际首次及复用、索引/深页成本见PROJECT_PROGRESS | `tests/test_daily_table_query.py`及`tests/test_daily_table_query_performance.py`；旧文件样本不作当前实现证明 |
 
 上述时间预算是隔离自动化验收阈值，不是生产机实测时延承诺。SQLite改造前，正式数据根最新日线页的路由处理函数耗时16.131秒；改造后在22,915份报告、13,503,448条选择器的当前数据根，`/api/data/options`为0.380秒，最新日（2026-11-04）首页返回18,086条总数和25条当前页、耗时1.390秒；从首页证券代码继续按证券+日期筛选耗时0.148秒、返回1条。该首页含6条历史来源索引问题提示，原因是旧报告引用的来源行文件不存在，不影响其余行的分页显示；本次没有改写或删除这些来源报告。自动化样本23,852份报告/选择器下，性能用例还断言证券+日期及默认日期查询不扫描冻结任务定义，且每次只打开当前页来源行。Raw生产列表17,591条记录、最新页既有实测0.462秒；`/api/daily`在1个支持分区加1个旧行式分区时为0.033秒。性能计时直接调用FastAPI注册的路由处理函数，不含ASGI序列化和HTTP往返；HTTP级合同用例保留，但本轮未重跑浏览器/HTTP传输验收。
 
 ## 为什么
+
+本节保留切表前的文件展示方案动机及原消费关系。当前日K、任务与发布摘要的职责和实施状态以上方表消费合同及PROJECT_PROGRESS为准，不能把下列“SQLite仅为查询索引”沿用为当前运行库定义。
 
 任务进度已经由 `task_workspace/<日期>/<数据集>/summary.json` 持久化，原始请求与响应已经由 `raw/<日期>/<来源>/<接口>/` 留证，发布结果已经由 `canonical/` 的 manifest 记录。运行台直接读取这些现有产物，避免再维护一份可能漂移的前端状态。
 

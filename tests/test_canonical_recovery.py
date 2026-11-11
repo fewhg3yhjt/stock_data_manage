@@ -95,6 +95,39 @@ def test_recovery_reports_legacy_daily_file_without_moving_or_importing_it(tmp_p
     assert not (canonical_root / "_quarantine").exists()
 
 
+def test_recovery_scanner_leaves_unique_current_master_to_task_recovery(tmp_path) -> None:
+    from stock_data_manage.storage.integrity import Manifest
+
+    canonical_root = tmp_path / "canonical"
+    current = canonical_root / "security_master" / "current"
+    current.mkdir(parents=True)
+    database = current / "security_master.duckdb"
+    database.write_bytes(b"current master bytes")
+    manifest = Manifest.from_file(database, dataset="security_master", asset_type="security",
+        partition_key="2026-11-05", row_count=1, first_key="XSHG:600000", last_key="XSHG:600000")
+    manifest.write_atomic(current / "manifest.json")
+    legacy = canonical_root / "2026-10-09" / "security_master"
+    legacy.mkdir(parents=True)
+    legacy_data = legacy / "data.parquet"
+    legacy_data.write_bytes(b"retained dated security master bytes")
+    legacy_manifest = Manifest.from_file(legacy_data, dataset="security_master", asset_type="security",
+        partition_key="2026-10-09", row_count=1, first_key="XSHG:600000", last_key="XSHG:600000")
+    legacy_manifest_path = legacy / "manifest.json"
+    legacy_manifest.write_atomic(legacy_manifest_path)
+    legacy_files_before = {path.name: path.read_bytes() for path in (legacy_data, legacy_manifest_path)}
+
+    with MetadataStore() as metadata:
+        report = RecoveryScanner(canonical_root, metadata).recover()
+        master_rows = metadata.connection.execute(
+            "SELECT count(*) FROM partition_status WHERE dataset='security_master'"
+        ).fetchone()[0]
+
+    assert report.repaired_metadata_partitions == 0
+    assert report.invalid_final_partitions == ()
+    assert master_rows == 0
+    assert {path.name: path.read_bytes() for path in (legacy_data, legacy_manifest_path)} == legacy_files_before
+
+
 
 def test_normalized_parquet_roundtrips_precision_time_and_nulls(tmp_path):
     from datetime import date, datetime, timezone

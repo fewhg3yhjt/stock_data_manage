@@ -196,8 +196,23 @@ def test_security_master_replaces_one_current_list_without_daily_partitions(tmp_
     assert file_hash(old_manifest) != old_hash
     assert master_manifest(tmp_path).publication_metadata["as_of_date"] == "2026-10-02"
     assert not list((tmp_path / "canonical").glob("*/security_master/manifest.json"))
-    with MetadataStore(tmp_path / "metadata/metadata.duckdb") as metadata:
-        assert metadata.latest_partition(dataset="security_master", asset_type="security", through_date="9999-12-31") is None
+    from stock_data_manage.config.loader import load_storage_paths
+    metadata_path = load_storage_paths(CONFIG, data_root=tmp_path)["metadata_path"]
+    with MetadataStore(metadata_path, read_only=True) as metadata:
+        current = metadata.partition("security_master", "security", "2026-10-02")
+        latest = metadata.latest_partition(dataset="security_master", asset_type="security", through_date="9999-12-31")
+        assert current is not None and current["actual_count"] == second["row_count"]
+        assert current["last_task_id"] == "next-date" and current["status"] == "complete_clean"
+        assert latest is not None and latest["partition_key"] == "2026-10-02"
+        assert latest["last_task_id"] == "next-date"
+        assert metadata.connection.execute(
+            "SELECT count(*) FROM partition_status WHERE dataset='security_master'"
+        ).fetchone()[0] == 1
+    from stock_data_manage.pipeline.inputs import submit_collection_task
+    from stock_data_manage.storage.metadata import CollectionTaskScopeConflict
+    with pytest.raises(CollectionTaskScopeConflict, match="published-data"):
+        submit_collection_task(definition=full_master_definition("same-date", "2026-10-02"),
+            config_root=CONFIG, data_root=tmp_path, mode="replay")
     from stock_data_manage.pipeline.inputs import _task_units
     historical = {"task_id": "historical-universe", "dataset": "daily_bar", "trade_date": "2026-10-01",
         "universe": "all", "asset_types": ["stock", "etf"], "input_id": "ASTOCK-002-daily"}
@@ -790,9 +805,72 @@ def test_master_current_commit_recovers_without_refetch(tmp_path, stage):
     assert recover_collection_tasks(config_root=CONFIG, data_root=tmp_path) == ("retry",)
     manifest = master_manifest(tmp_path)
     assert manifest.publication_metadata["as_of_date"] == "2026-10-01" and not manifest.publication_metadata["fallback"]
-    with MetadataStore(tmp_path / "metadata/metadata.duckdb") as metadata:
+    from stock_data_manage.config.loader import load_storage_paths
+    metadata_path = load_storage_paths(CONFIG, data_root=tmp_path)["metadata_path"]
+    with MetadataStore(metadata_path, read_only=True) as metadata:
         assert not metadata.load_collection_task("retry")["fallback_used"]
+        header = metadata.connection.execute(
+            "SELECT count(*),max(last_task_id),max(status) FROM partition_status WHERE dataset='security_master'"
+        ).fetchone()
+        assert header == (1, "retry", "complete_clean")
+        assert metadata.connection.execute(
+            "SELECT count(*) FROM partition_item WHERE dataset='security_master'"
+        ).fetchone()[0] == 0
+    from stock_data_manage.service.web import DashboardReader
+    api_result = DashboardReader(CONFIG, tmp_path).publications(dataset="security_master")
+    assert api_result["total"] == 1
+    assert api_result["items"][0]["latest_task_id"] == "retry"
+    assert "evidence" not in api_result["items"][0]
     assert len(collector.calls) == calls
+
+
+@pytest.mark.parametrize("stage", ["before_master_metadata", "after_master_metadata"])
+def test_master_metadata_commit_boundary_recovers_or_stays_published(tmp_path, stage):
+    collector = full_catalog_collector()
+    run(tmp_path, full_master_definition(), collector)
+    collector.source_date = "2026-10-01"
+
+    def crash(current):
+        if current == stage:
+            raise RuntimeError("simulated metadata boundary crash")
+
+    with pytest.raises(RuntimeError):
+        run(tmp_path, full_master_definition("retry", collector.source_date), collector, failure_hook=crash)
+    calls = len(collector.calls)
+    current = tmp_path / "canonical/security_master/current"
+    assert not (current / "task-commit.json").exists()
+    from stock_data_manage.config.loader import load_storage_paths
+    metadata_path = load_storage_paths(CONFIG, data_root=tmp_path)["metadata_path"]
+    with MetadataStore(metadata_path, read_only=True) as metadata:
+        task = metadata.load_collection_task("retry")
+        header = metadata.connection.execute(
+            "SELECT count(*),max(last_task_id),max(status) FROM partition_status WHERE dataset='security_master'"
+        ).fetchone()
+    if stage == "before_master_metadata":
+        assert task["status"] == "committing"
+        assert header == (1, "complete-master", "updating")
+        assert recover_collection_tasks(config_root=CONFIG, data_root=tmp_path) == ("retry",)
+        assert len(collector.calls) == calls
+    else:
+        assert task["status"] == "published"
+        assert task["progress"]["stages"]["publication"]["status"] == "completed"
+        assert header == (1, "retry", "complete_clean")
+        assert recover_collection_tasks(config_root=CONFIG, data_root=tmp_path) == ()
+        assert len(collector.calls) == calls
+    from stock_data_manage.service.web import create_app
+    from fastapi.testclient import TestClient
+    with TestClient(create_app(config_root=CONFIG, data_root=tmp_path)) as client:
+        response = client.get("/api/publications?dataset=security_master")
+        assert response.status_code == 200
+        payload = response.json()
+        assert payload["total"] == 1
+        assert payload["items"][0]["partition_key"] == "2026-10-01"
+        assert payload["items"][0]["latest_task_id"] == "retry"
+        assert payload["items"][0]["row_count"] == len(master_records(tmp_path))
+    with MetadataStore(metadata_path, read_only=True) as metadata:
+        persisted = metadata.collection_task_by_id("retry")
+        assert persisted["status"] == "published"
+        assert persisted["state"]["progress"]["stages"]["publication"]["status"] == "completed"
 
 
 def test_real_source_catalog_pairs_and_incompatible_dates(tmp_path):

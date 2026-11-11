@@ -126,7 +126,7 @@ async function renderOverview() {
   refreshTime.textContent = `刷新于 ${new Date(data.generated_at_utc).toLocaleTimeString('zh-CN', { hour12: false })}`;
   const counts = data.task_counts || {};
   const active = (counts.collecting || 0) + (counts.checking || 0) + (counts.committing || 0);
-  app.innerHTML = `<section class="metric-grid">
+  app.innerHTML = `${data.security_master_status === 'updating' ? '<p class="notice">证券清单正在发布或等待恢复。</p>' : ''}<section class="metric-grid">
     <article class="metric"><div class="metric-label">近期活跃任务</div><div class="metric-value">${prettyNumber(active)}</div><div class="metric-foot">最近 5 分钟仍有状态更新</div></article>
     <article class="metric"><div class="metric-label">疑似中断</div><div class="metric-value">${prettyNumber(counts.stale || 0)}</div><div class="metric-foot">采集中但超过 5 分钟未更新</div></article>
     <article class="metric"><div class="metric-label">已发布任务</div><div class="metric-value">${prettyNumber(counts.published || 0)}</div><div class="metric-foot">当前可见任务记录</div></article>
@@ -135,7 +135,7 @@ async function renderOverview() {
   <section class="section-grid"><div class="panel"><div class="panel-head"><h2>最近任务</h2><small>点击查看执行详情</small></div>
     <div class="table-wrap"><table><thead><tr><th>任务</th><th>数据集</th><th>状态</th><th>采集进度</th><th>缺失</th><th>最后记录</th></tr></thead>
     <tbody>${data.recent_tasks.length ? data.recent_tasks.map(taskRow).join('') : '<tr><td colspan="6">暂无任务记录</td></tr>'}</tbody></table></div></div>
-    <div class="panel"><div class="panel-head"><h2>最近发布</h2><small>Canonical</small></div><div class="panel-body release-list">
+    <div class="panel"><div class="panel-head"><h2>最近发布</h2><small>已登记正式数据</small></div><div class="panel-body release-list">
     ${data.recent_publications.length ? data.recent_publications.map(publicationCard).join('') : '<div class="subtle">暂无发布结果</div>'}</div></div></section>`;
   bindTaskRows();
 }
@@ -248,32 +248,32 @@ async function showRaw(id) {
 
 async function renderPublications() {
   const sequence = ++renderSequence;
-  const params = new URLSearchParams({ page: state.pages.publications, page_size: 25, include_evidence: 'false' });
+  const params = new URLSearchParams({ page: state.pages.publications, page_size: 25 });
   if (state.filters.publications.dataset) params.set('dataset', state.filters.publications.dataset);
   const data = await api(`/api/publications?${params}`);
   if (sequence !== renderSequence || state.view !== 'publications') return;
+  const adjustmentName = value => ({aggregate:'三口径汇总', none:'不复权', forward:'前复权', backward:'后复权'}[value] || value);
+  const publicationStatus = value => ({complete_clean:'完整发布', complete_with_conflicts:'存在冲突', partial:'部分发布', published:'已发布'}[value] || statusLabels[value] || '已登记');
   app.innerHTML = `<form class="filters" id="publication-filters"><input name="dataset" placeholder="数据集，例如 daily_bar"><span></span><span></span><span></span><button class="primary" type="submit">查询</button></form>
-  <section class="panel"><div class="panel-head"><h2>Canonical 发布分区</h2><small>来自现有 manifest，不读取 Parquet 内容</small></div><div class="table-wrap"><table><thead><tr><th>数据日期</th><th>数据集</th><th>资产类型</th><th>行数 / 预期</th><th>覆盖率</th><th>冲突 / 隔离</th><th>内容哈希</th></tr></thead><tbody>
-  ${data.items.length ? data.items.map((item, index) => `<tr class="clickable publication-row" data-index="${index}"><td>${esc(item.partition_key)}</td><td><strong>${esc(item.dataset)}</strong></td><td>${esc(item.asset_type)}</td><td>${prettyNumber(item.row_count)} / ${prettyNumber(item.expected_count)}</td><td>${item.coverage_percent === null ? '—' : `${item.coverage_percent}%`}</td><td>${prettyNumber(item.conflict_count)} / ${prettyNumber(item.quarantined_count)}</td><td class="mono">${esc((item.content_hash || '—').slice(0,16))}</td></tr>`).join('') : '<tr><td colspan="7">暂无发布结果</td></tr>'}</tbody></table></div>${pager('publications', data)}</section>`;
+  <section class="panel"><div class="panel-head"><h2>正式发布记录</h2><small>仅显示已登记的正式数据，旧文件未自动导入</small></div>${data.security_master_status === 'updating' ? '<p class="notice">证券清单正在更新或等待恢复。</p>' : ''}<div class="table-wrap"><table><thead><tr><th>数据日期</th><th>数据集</th><th>资产类型</th><th>复权口径</th><th>行数 / 预期</th><th>覆盖率</th><th>更新时间</th></tr></thead><tbody>
+  ${data.items.length ? data.items.map((item, index) => `<tr class="clickable publication-row" data-index="${index}"><td>${esc(item.partition_key)}</td><td><strong>${esc(item.dataset)}</strong></td><td>${esc(item.asset_type)}</td><td>${esc(adjustmentName(item.adjustment))}</td><td>${prettyNumber(item.row_count)} / ${prettyNumber(item.expected_count)}</td><td>${item.coverage_percent === null ? '—' : `${item.coverage_percent}%`}</td><td>${formatTime(item.updated_at_utc)}</td></tr>`).join('') : '<tr><td colspan="7">暂无已登记发布结果</td></tr>'}</tbody></table></div>${pager('publications', data)}</section>`;
   document.querySelectorAll('.publication-row').forEach(row => row.addEventListener('click', async () => {
     const summary = data.items[Number(row.dataset.index)];
     if (!dialog.open) dialog.showModal();
-    dialogContent.innerHTML = '<div class="loading"><span></span>正在读取该发布分区…</div>';
-    try {
-    const detailParams = new URLSearchParams({dataset:summary.dataset, asset_type:summary.asset_type,
-      partition_key:summary.partition_key, page:1, page_size:1, include_evidence:'false'});
-    const detail = await api(`/api/publications?${detailParams}`);
-    const item = detail.items[0];
-    if (!item) throw new Error('发布分区不存在或已变更');
-    dialogContent.innerHTML = `<h2 class="dialog-title">${esc(item.dataset)} · ${esc(item.partition_key)}</h2><p class="dialog-subtitle">${esc(item.asset_type)} · ${prettyNumber(item.row_count)} 行</p>
-    <div class="notice">覆盖率按清单中的行数与预期数计算；发布记录不等同于独立全市场覆盖验证。</div>
-    <h3>内容哈希</h3><pre class="code-block">${esc(item.content_hash)}</pre>
-    <h3>关联任务</h3>${item.tasks.map(id => `<button class="secondary linked-task" data-task-id="${esc(id)}">${esc(id)}</button>`).join('') || '<p class="subtle">没有匹配的现存任务摘要</p>'}
-    <h3>关联来源响应</h3><p class="subtle">该分区关联 ${prettyNumber(item.source_count)} 个原始响应。${item.tasks.length ? '点击上方关联任务，可在执行单元中按证券分页查看响应。' : '可在“原始数据”页按日期和来源筛选响应。'}</p>
-    <h3>发布检查</h3><pre class="code-block">${esc(JSON.stringify(item.publication_metadata, null, 2))}</pre>`;
-    if (!dialog.open) dialog.showModal();
-    dialogContent.querySelectorAll('.linked-task').forEach(button => button.addEventListener('click', () => showTask(button.dataset.taskId)));
-    } catch (error) { dialogContent.innerHTML = `<div class="empty">${esc(error.message || error)}</div>`; }
+    const quoteNames = {available:'可用', unverified:'未核验', not_applicable:'不适用'};
+    const quoteRows = ['none','forward','backward'].map(key => `<tr><td>${esc(adjustmentName(key))}</td>${['available','unverified','not_applicable'].map(status => `<td>${prettyNumber(summary.quote_counts?.[key]?.[status])}</td>`).join('')}</tr>`).join('');
+    dialogContent.innerHTML = `<h2 class="dialog-title">${esc(summary.dataset)} · ${esc(summary.partition_key)}</h2><p class="dialog-subtitle">${esc(summary.asset_type)} · ${esc(adjustmentName(summary.adjustment))}</p>
+    <p class="notice">${summary.coverage_percent === null ? '尚缺独立的证券范围依据，暂不能计算覆盖率。' : `登记范围内覆盖率 ${summary.coverage_percent}%。这不代表独立全市场覆盖验证。`}</p>
+    <h3>发布摘要</h3><p>状态：${esc(publicationStatus(summary.status))} · 当前行数：${prettyNumber(summary.row_count)} · 预期：${prettyNumber(summary.expected_count)}</p>
+    <p>无需行情：${prettyNumber(summary.no_trade_count)} · 冲突：${prettyNumber(summary.conflict_count)} · 隔离：${prettyNumber(summary.quarantined_count)} · 修订号：${prettyNumber(summary.data_revision)} · 发布时间：${formatTime(summary.updated_at_utc)}</p>
+    <table><thead><tr><th>口径</th>${Object.values(quoteNames).map(name => `<th>${name}</th>`).join('')}</tr></thead><tbody>${quoteRows}</tbody></table>
+    <h3>追溯入口</h3><p class="subtle">最近更新任务：${summary.latest_task_id ? '<button class="secondary linked-task">查看任务</button>' : '未记录'}。分区内数据可能来自多次采集，以上仅为最近更新任务。原始响应可在“原始数据”页按 ${esc(summary.raw_date)} 日期筛选。</p>
+    <button class="secondary publication-raw" data-date="${esc(summary.raw_date)}">按此日期查看原始数据</button>`;
+    dialogContent.querySelector('.linked-task')?.addEventListener('click', () => showTask(summary.latest_task_id));
+    dialogContent.querySelector('.publication-raw')?.addEventListener('click', button => {
+      state.rawDate = button.currentTarget.dataset.date; state.filters.raw = {provider:'', endpoint:'', q:''};
+      state.pages.raw = 1; state.view = 'raw'; dialog.close(); render().catch(fail);
+    });
   }));
   const form = document.querySelector('#publication-filters');
   form.elements.namedItem('dataset').value = state.filters.publications.dataset;

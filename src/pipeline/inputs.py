@@ -2235,10 +2235,18 @@ def _canonical_scope_conflicts(paths, scope):
         from ..service.instruments import read_published_security_master
         directory = Path(paths['canonical_root']) / 'security_master' / 'current'
         if directory.exists():
-            _, records = read_published_security_master(directory)
-            if records:
-                conflicts.append({'trade_date': next(iter(scope['securities_by_date'])),
-                                  'securities': tuple(sorted({r.instrument_id for r in records}))})
+            manifest, records = read_published_security_master(directory)
+            current_date = (manifest.publication_metadata.get('as_of_date')
+                            or manifest.partition_key)
+            target_dates = scope.get('securities_by_date', {})
+            target_date = current_date if current_date in target_dates else None
+            target_securities = set(target_dates.get(target_date, ())) if target_date else set()
+            if current_date == target_date and records:
+                published_securities = {record.instrument_id for record in records}
+                overlap = published_securities if '*' in target_securities else published_securities & target_securities
+                if overlap:
+                    conflicts.append({'trade_date': target_date,
+                                      'securities': tuple(sorted(overlap))})
     return tuple(conflicts)
 
 
@@ -3399,6 +3407,7 @@ def _finish_task_commit(state, paths, metadata, failure_hook=None, progress=None
             state['progress'] = snapshot
         progress = TaskProgress.restore(state['progress'], callback=recovered_progress)
     save = save_state or (lambda value: _save_task_summary(value, paths, metadata))
+    state['status'] = 'committing'
     save(state)
     commit = state["commit"]
     candidate = Path(commit["candidate"])
@@ -3421,6 +3430,7 @@ def _finish_task_commit(state, paths, metadata, failure_hook=None, progress=None
         return save(state)
     if not partition.resolve().is_relative_to(paths["canonical_root"]):
         raise ValueError("commit partition escaped canonical root")
+    metadata.mark_current_master_updating()
     partition.mkdir(parents=True, exist_ok=True)
     marker = partition / "task-commit.json"
     if marker.exists() and json.loads(marker.read_text(encoding="utf-8"))["task_id"] != state["task_id"]:
@@ -3517,14 +3527,41 @@ def _finish_task_commit(state, paths, metadata, failure_hook=None, progress=None
     published_data = partition / "security_master.duckdb"
     if not manifest.verify(published_data):
         raise ValueError("completed task publication is corrupt")
-    state.update(status="published", published_manifest=str(manifest_path),
-                 published_hash=file_hash(manifest_path), row_count=manifest.row_count, error=None)
+    published_hash = file_hash(manifest_path)
+    marker.unlink()
+    if failure_hook:
+        failure_hook("before_master_metadata")
+    previous_progress = state.get("progress")
+    if progress:
+        from ..worker.progress import TaskProgress
+        completed_progress = TaskProgress.restore(progress.snapshot())
+        completed_progress.finish("publication", "metadata")
+        state["progress"] = completed_progress.snapshot()
+    metadata.connection.execute("BEGIN IMMEDIATE")
+    try:
+        state.update(status="published", published_manifest=str(manifest_path),
+                     published_hash=published_hash, row_count=manifest.row_count, error=None)
+        metadata.record_current_master_publish(manifest=manifest, manifest_path=manifest_path,
+                                               task_id=state["task_id"])
+        metadata.save_collection_task(state)
+        metadata.connection.execute("COMMIT")
+    except Exception:
+        if metadata.connection.in_transaction:
+            metadata.connection.execute("ROLLBACK")
+        state["status"] = "committing"
+        for key in ("published_manifest", "published_hash", "row_count"):
+            state.pop(key, None)
+        if previous_progress is None:
+            state.pop("progress", None)
+        else:
+            state["progress"] = previous_progress
+        raise
+    if failure_hook:
+        failure_hook("after_master_metadata")
     if progress:
         progress.finish('publication', 'metadata')
         progress.emit(force=True)
-    save(state)
-    marker.unlink()
-    return state
+    return save(state)
 
 
 def collect_due_inputs(*, now, config_root, output_root=None, data_root=None, trading_dates=(), securities=(), symbols=(),

@@ -132,6 +132,8 @@ def test_identity_local_overwrite_and_failed_candidate_retains_existing(database
              scope=[a, b], key="commit-2", publication="pub-2")
     assert store.get(a, DAY).none.close == Decimal("15.00000000")
     assert store.get(b, DAY).none.close == Decimal("12.34000000")
+    current_summary = connection.execute("SELECT last_task_id,expected_count,coverage_reason FROM partition_status WHERE dataset='daily_bar'").fetchone()
+    assert current_summary == ("task-b", None, "independent security-range evidence unavailable")
     connection.execute("UPDATE collection_task SET status='failed' WHERE task_id='task-b'")
     _seed_task(connection, "task-c", 3, [a])
     before = connection.execute("SELECT data_revision FROM partition_status WHERE dataset='daily_bar'").fetchone()[0]
@@ -141,6 +143,58 @@ def test_identity_local_overwrite_and_failed_candidate_retains_existing(database
     with pytest.raises(ValueError, match="empty candidate"):
         _publish(store, task="task-b", order=2, records=(), no_trade={}, scope=[a], key="failed", publication="pub-failed")
     assert store.get(a, DAY).none.close == Decimal("15.00000000")
+
+
+def test_partial_daily_update_refreshes_latest_task_only_when_current_facts_change(tmp_path):
+    runtime = tmp_path / "runtime"
+    metadata_path = runtime / "metadata" / "metadata.sqlite3"
+    metadata_path.parent.mkdir(parents=True)
+    metadata = MetadataStore(metadata_path)
+    initialize_schema(metadata.connection)
+    connection = metadata.connection
+    a, b = "XSHG:600000", "XSHE:000001"
+    store = DailyBarStore(connection)
+    _seed_task(connection, "partial-a", 1, [a, b])
+    _publish(store, task="partial-a", order=1, records=[_record(a)], scope=[a, b],
+             key="partial-a-commit", publication="partial-a-pub")
+    connection.execute("UPDATE collection_task SET status='failed' WHERE task_id='partial-a'")
+    before = connection.execute("SELECT actual_count,last_task_id,expected_count,coverage_reason FROM partition_status WHERE dataset='daily_bar'").fetchone()
+    assert before == (1, "partial-a", None, "independent security-range evidence unavailable")
+
+    _seed_task(connection, "complete-b", 2, [a, b])
+    _publish(store, task="complete-b", order=2, records=[_record(b)], scope=[a, b],
+             key="complete-b-commit", publication="complete-b-pub")
+    completed = connection.execute("SELECT actual_count,last_task_id,expected_count FROM partition_status WHERE dataset='daily_bar'").fetchone()
+    assert completed == (2, "complete-b", None)
+    assert connection.execute("SELECT status FROM collection_task WHERE task_id='partial-a'").fetchone()[0] == "failed"
+
+    connection.execute("UPDATE collection_task SET status='collecting' WHERE task_id='partial-a'")
+    receipt = _publish(store, task="partial-a", order=1, records=[_record(b, "99.00000000")],
+                       scope=[a, b], key="partial-a-retry", publication="partial-a-retry-pub")
+    unchanged = connection.execute("SELECT actual_count,last_task_id,data_revision FROM partition_status WHERE dataset='daily_bar'").fetchone()
+    assert receipt.superseded_count == 1
+    assert unchanged == (2, "complete-b", 2)
+
+    from fastapi.testclient import TestClient
+    from stock_data_manage.service.web import create_app
+    config = tmp_path / "config"
+    config.mkdir()
+    (config / "collection.yaml").write_text("""storage:
+  data_root: runtime
+  raw_root: runtime/raw
+  workspace_root: runtime/task_workspace
+  archive_root: runtime/task_archive
+  canonical_root: runtime/canonical
+  metadata_path: runtime/metadata/metadata.sqlite3
+""", encoding="utf-8")
+    with TestClient(create_app(config_root=config, data_root=runtime)) as client:
+        response = client.get("/api/publications?dataset=daily_bar&asset_type=stock&partition_key=2026-11-05")
+        assert response.status_code == 200
+        item = response.json()["items"][0]
+        assert item["row_count"] == 2 and item["expected_count"] is None
+        assert item["coverage_percent"] is None
+        assert item["latest_task_id"] == "complete-b"
+    metadata.close()
 
 
 def test_no_trade_replaces_bar_and_later_bar_clears_no_trade(database):

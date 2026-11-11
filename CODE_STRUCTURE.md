@@ -10,6 +10,7 @@
 - `tests/test_daily_table_storage.py`验证当前日K三口径入表、精确小数/空值、局部覆盖/no_trade、发布回执幂等、首次执行归属、回滚及跨连接/进程读快照；`tests/test_task_queue.py`验证运行库层FIFO与日期/证券范围受理原子性，不代表页面和调度已接线。
 - `tests/test_daily_table_query.py`承接正式日K表查询的参数、代码承接、精确值、SQL分页、页内名称、只读及错误合同；实际执行范围以阶段进度及JUnit为准。
 - `tests/test_dashboard_table_queries.py`承接任务列表的SQL筛选/分页、等待态、持久化更新时间及错误/只读合同；状态与实际行情分开，按阶段进度记录实际功能及规模执行范围。
+- `tests/test_publication_table_queries.py`承接已登记发布摘要与总览的HTTP筛选/分页、同快照、旧结构拒绝及代表规模性能；真实Master登记/恢复和日K局部更新分别由现有collection_tasks与daily_table_storage测试承接，实际执行范围见阶段进度。
 - `tests/test_daily_table_query_performance.py`用7862证券×100个合成日期的完整三口径，以及单证券1000日期检查日K接口的首次/复用、默认/范围/深页查询、实际SQL计划、虚拟机工作量与页内对象数；直接SQL造数只证明读取负载，不代表来源资格、全市场发布或生产容量通过。
 - `tests/test_storage_access.py`本阶段提交通用锁的有界等待/死进程回收及证券清单只读/发布读取4项；原文/来源索引和旧日K文件方案的其余工作树检查不计本阶段交付。
 - `.codex/config.toml`只配置本项目开发协作的子代理默认模型和推理强度；不设置主对话模型，不进入采集、存储或调度的运行配置。职责分工与交接要求由根目录`AGENTS.md`维护。
@@ -154,7 +155,7 @@
 | 文件 | 职责 |
 |---|---|
 | `pipeline/daily.py` | 日线规则冻结、按证券单元选用配置来源和显式full_ohlc/close_only合同；独立采集与零联网解析/归一化；标准候选按资产/来源批写并以行号恢复；形成合格记录及有证据no_trade交给表发布，不生成正式行情文件 |
-| `pipeline/inputs.py` | 单日业务任务统一受理、范围/覆盖复核、整任务FIFO消费、冻结与恢复；日K按日期/资产调用SQLite事务和回执，本次/累计交付与当前分区数量分离；证券清单复用原生产链；来源采集/处理在任务内部有界交错，不并行写多任务 |
+| `pipeline/inputs.py` | 单日业务任务统一受理、范围/覆盖复核、整任务FIFO消费、冻结与恢复；日K按日期/资产调用SQLite事务和回执，本次/累计交付与当前分区数量分离；当前证券清单沿原文件/原文链完成后原子登记唯一摘要及任务状态，中断复用原恢复入口；来源采集/处理在任务内部有界交错，不并行写多任务 |
 | `pipeline/minute.py` | Watchlist 实时分钟采集和 Hot Store 写入 |
 | `pipeline/minute_reconciliation.py` | 分钟盘后校准、final 提升、冲突隔离和完整性处理 |
 | `pipeline/snapshot_daily.py` | 收盘快照构建 provisional 日线 |
@@ -171,8 +172,8 @@
 | `storage/read_index.py` | 将来源报告和行选择器批量写入可重建的SQLite查询索引；以报告ID关联、按证券/业务日期筛选和分页，只保存定位与筛选字段，不复制业务原值或作为采集/发布门槛 |
 | `storage/hot.py` | SQLite WAL Hot Minute Store 和即时查询数据 |
 | `storage/parquet.py` | 候选精确类型写入、共享文件锁有界等待/死进程回收、分钟等数据集文件发布；单日日K新生产已退出正式文件写入，旧日K文件读取/工具待服务切换退出 |
-| `storage/metadata.py` | SQLite任务及一对一冻结上下文、分区、Attempt、调度占用、来源健康、证据和冲突；进度与大上下文分行，受理预检/入队事务复用活动范围查询；任务列表在短只读快照中按SQL筛选计数和分页，不读取冻结上下文；共享连接/类型与只读合同，不迁移旧DuckDB |
-| `storage/daily.py` | 正式日K表显式初始化、日期/资产事务发布、三口径精确值、no_trade事实、当前摘要、发布回执和归属保护；SQL筛选/分页、全匹配口径集合、页内quote批读及短一致读快照，不从任务进度推导当前行情覆盖 |
+| `storage/metadata.py` | SQLite任务及一对一冻结上下文、分区、Attempt、调度占用、来源健康、证据和冲突；进度与大上下文分行，受理预检/入队事务复用活动范围查询；任务/发布列表在短只读快照中SQL筛选计数分页，当前清单只登记一行摘要；任务行可由外层发布事务原子保存，不提前提交调用者事务；不迁移旧格式或结构 |
+| `storage/daily.py` | 正式日K表显式初始化、日期/资产事务发布、三口径精确值、no_trade事实、当前摘要、发布回执和归属保护；有实际更新才同事务刷新摘要的最近任务引用；SQL筛选/分页、全匹配口径集合、页内quote批读及短一致读快照，不从任务进度推导当前行情覆盖 |
 | `storage/integrity.py` | 确定性 row hash、Manifest 生成和完整性校验 |
 | `storage/__init__.py` | 存储包说明，不承载业务实现 |
 
@@ -185,7 +186,7 @@
 | `service/calendar.py` | Trading Calendar在同一SQLite运行库的事务写入、只读查询和来源合并；复用storage.metadata连接合同 |
 | `service/calendar_update.py` | 交易日历来源更新、单日开市/休市轻量采集及证据引用、官方优先级，以及校验原在线证据后的正向日期导入 |
 | `service/market_data.py` | Canonical + Hot分钟查询；正式日K从配置的SQLite库只读查询，按市场/资产/生效日筛选代码承接范围并在SQL分页后投影精确值，区分输入、未就绪、忙与完整性错误 |
-| `service/web.py` | 只读运行台入口；从现有任务摘要、Raw manifest/body 和 Canonical manifest 生成展示接口；按类型、证券及业务日期查询已核验来源行，复用 YAML 字段说明和已发布证券名称辅助检索，日K价格及任务列表只读SQLite，任务详情/单元、发布列表及总览尚待切表 |
+| `service/web.py` | 只读运行台入口；从现有任务摘要、Raw manifest/body 和 Canonical manifest 生成展示接口；按类型、证券及业务日期查询已核验来源行，复用 YAML 字段说明和已发布证券名称辅助检索，日K价格、任务与发布列表及总览只读SQLite，摘要原文按需追溯；任务详情/单元尚待切表 |
 | `service/static/` | 只读运行台的原生 HTML、CSS 和 JavaScript 页面资源，无独立前端构建或持久化状态 |
 | `service/__init__.py` | 服务包说明，不承载业务实现 |
 
@@ -195,7 +196,7 @@
 |---|---|
 | `worker/attempts.py` | Collection Attempt 状态机和租约状态 |
 | `worker/progress.py` | 三阶段统一采集单元计数，发布整批完成后计入；内部动作和旧快照恢复、失败与复用、耗时及节流；CLI stderr展示，不管理调度或业务数据 |
-| `worker/recovery.py` | 表日K按回执恢复、归档前复核不可变候选/原响应/回执，归档只更新运行定位；旧日K文件保留报告而不导入，其他数据集沿既有临时文件与元数据恢复 |
+| `worker/recovery.py` | 表日K按回执恢复、归档前复核不可变候选/原响应/回执，归档只更新运行定位；当前证券清单由任务提交恢复，传统Parquet扫描跳过当前及按日旧清单；旧文件保留而不导入，其他数据集沿既有临时文件与元数据恢复 |
 | `worker/scheduler.py` | 既有任务时间表及频率计算；计划证券名单和日线任务；常驻入口按YAML时间轮询并调用现有业务任务，晚启动仍派发当日已到期任务 |
 | `worker/acceptance.py` | 合成组件的日K表重放/回执幂等/事务回滚重试及分钟容量估算自检；逐项预期/实际值、范围和证据，不能签署项目M1/M2 |
 | `worker/__init__.py` | Worker 包说明，不承载业务实现 |

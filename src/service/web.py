@@ -10,6 +10,8 @@ import logging
 import os
 import re
 import sqlite3
+import stat
+from contextlib import contextmanager
 from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
@@ -581,30 +583,48 @@ class DashboardReader:
         page: int = 1,
         page_size: int = 25,
     ) -> dict[str, Any]:
+        now = datetime.now(timezone.utc)
+        with self._runtime_read_snapshot() as metadata:
+            result = metadata.query_collection_tasks(now=now, stale_after_seconds=STALE_AFTER_SECONDS,
+                status=status, dataset=dataset, query=query, page=page, page_size=page_size)
+        items = [self._task_row_card(row, now) for row in result["items"]]
+        return {"items": items, "page": page, "page_size": page_size, "total": result["total"],
+                "pages": (result["total"] + page_size - 1) // page_size}
+
+    @contextmanager
+    def _runtime_read_snapshot(self):
         from ..storage.metadata import CollectionTaskDataError, MetadataStore
         try:
-            now = datetime.now(timezone.utc)
             with MetadataStore(self.paths["metadata_path"], read_only=True) as metadata:
-                result = metadata.query_collection_tasks(now=now, stale_after_seconds=STALE_AFTER_SECONDS,
-                    status=status, dataset=dataset, query=query, page=page, page_size=page_size)
+                metadata.connection.execute("BEGIN")
+                try:
+                    yield metadata
+                    metadata.connection.execute("COMMIT")
+                except Exception:
+                    if metadata.connection.in_transaction:
+                        metadata.connection.execute("ROLLBACK")
+                    raise
         except FileNotFoundError as exc:
             raise HTTPException(503, "运行记录数据库尚未创建") from exc
         except CollectionTaskDataError as exc:
-            logging.getLogger(__name__).error("task state JSON is corrupt", exc_info=True)
-            raise HTTPException(409, "任务记录格式损坏") from exc
+            logging.getLogger(__name__).error("runtime record JSON is corrupt", exc_info=True)
+            raise HTTPException(409, "运行记录格式损坏") from exc
         except ValueError as exc:
-            logging.getLogger(__name__).warning("task list database schema is unavailable", exc_info=True)
+            logging.getLogger(__name__).warning("runtime database schema is unavailable", exc_info=True)
             raise HTTPException(503, "运行记录数据库尚未就绪") from exc
         except sqlite3.OperationalError as exc:
             code = getattr(exc, "sqlite_errorcode", None)
             if isinstance(code, int) and (code & 0xFF) in {sqlite3.SQLITE_BUSY, sqlite3.SQLITE_LOCKED}:
                 raise HTTPException(503, "运行记录暂时繁忙，请稍后重试", headers={"Retry-After": "1"}) from exc
-            if "no such table: collection_task" in str(exc).lower():
+            message = str(exc).lower()
+            if "no such table" in message or "no such column" in message:
                 raise HTTPException(503, "运行记录数据库尚未就绪") from exc
             raise
-        items = [self._task_row_card(row, now) for row in result["items"]]
-        return {"items": items, "page": page, "page_size": page_size, "total": result["total"],
-                "pages": (result["total"] + page_size - 1) // page_size}
+        except sqlite3.DatabaseError as exc:
+            code = getattr(exc, "sqlite_errorcode", None)
+            if isinstance(code, int) and (code & 0xFF) in {sqlite3.SQLITE_CORRUPT, sqlite3.SQLITE_NOTADB}:
+                raise HTTPException(409, "运行记录数据库损坏") from exc
+            raise
 
     def _task_row_card(self, row: dict[str, Any], now: datetime) -> dict[str, Any]:
         state = row["state"] if isinstance(row.get("state"), dict) else {}
@@ -806,11 +826,21 @@ class DashboardReader:
         root = self.paths["raw_root"]
         dates: list[str] = []
         if root.exists():
-            dates = sorted(
-                [path.name for path in root.iterdir() if path.is_dir() and _within(path, root)
-                 and re.fullmatch(r"\d{4}-\d{2}-\d{2}", path.name)],
-                reverse=True,
-            )
+            with os.scandir(root) as entries:
+                for entry in entries:
+                    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", entry.name):
+                        continue
+                    reparse = entry.is_symlink()
+                    if os.name == "nt" and not reparse:
+                        reparse = bool(entry.stat(follow_symlinks=False).st_file_attributes
+                                       & stat.FILE_ATTRIBUTE_REPARSE_POINT)
+                    if reparse:
+                        path = Path(entry.path)
+                        if path.is_dir() and _within(path, root):
+                            dates.append(entry.name)
+                    elif entry.is_dir(follow_symlinks=False):
+                        dates.append(entry.name)
+            dates.sort(reverse=True)
         latest = dates[0] if dates else None
         return {"dates": dates, "latest_date": latest}
 
@@ -1050,95 +1080,57 @@ class DashboardReader:
         partition_key: str | None = None,
         page: int = 1,
         page_size: int = 25,
-        include_evidence: bool = True,
-        task_documents: list[tuple[dict[str, Any], Path, str]] | None = None,
     ) -> dict[str, Any]:
-        root = self.paths["canonical_root"]
-        current_master_manifest = root / "security_master" / "current" / "manifest.json"
-        current_master_data = current_master_manifest.parent / "security_master.duckdb"
-        current_master_pending = current_master_manifest.parent / "task-commit.json"
-        current_master_present = (current_master_manifest.exists() or current_master_data.exists()
-                                  or current_master_pending.exists())
-        current_master_ready = (current_master_manifest.is_file() and current_master_data.is_file()
-                                and not current_master_pending.exists())
-        legacy_master_manifests = sorted(root.glob("*/security_master/manifest.json"), reverse=True)
-        records: list[dict[str, Any]] = []
-        tasks = task_documents if task_documents is not None else self._task_documents()
-        task_manifests: list[tuple[str, set[Path]]] = []
-        for task, _, _ in tasks:
-            references: list[str] = []
-            publication = task.get("publication")
-            if isinstance(publication, dict) and isinstance(publication.get("manifest"), str):
-                references.append(publication["manifest"])
-            partitions = task.get("partitions")
-            if isinstance(partitions, dict):
-                references.extend(
-                    result["published_manifest"]
-                    for result in partitions.values()
-                    if isinstance(result, dict) and isinstance(result.get("published_manifest"), str)
-                )
-            task_manifests.append((str(task["task_id"]), {Path(item).resolve() for item in references}))
-        if root.exists():
-            for path in root.rglob("manifest.json"):
-                if not _within(path, root):
-                    continue
-                try:
-                    document = _read_json(path)
-                except ValueError:
-                    continue
-                if dataset and document.get("dataset") != dataset:
-                    continue
-                if document.get("dataset") == "security_master":
-                    if current_master_present:
-                        if not current_master_ready or path.resolve() != current_master_manifest.resolve():
-                            continue
-                    elif legacy_master_manifests and path.resolve() != legacy_master_manifests[0].resolve():
-                        continue
-                if asset_type and document.get("asset_type") != asset_type:
-                    continue
-                if partition_key and document.get("partition_key") != partition_key:
-                    continue
-                expected = document.get("expected_count")
-                actual = document.get("row_count")
-                coverage = round(actual / expected * 100, 2) if isinstance(actual, int) and isinstance(expected, int) and expected else None
-                records.append({
-                    "dataset": document.get("dataset"),
-                    "asset_type": document.get("asset_type"),
-                    "partition_key": document.get("partition_key"),
-                    "row_count": actual,
-                    "expected_count": expected,
-                    "coverage_percent": coverage,
-                    "conflict_count": document.get("conflict_count"),
-                    "quarantined_count": document.get("quarantined_count"),
-                    "content_hash": document.get("content_hash"),
-                    "size_bytes": document.get("size_bytes"),
-                    "source_count": len(document.get("raw_refs", [])) if isinstance(document.get("raw_refs"), list) else 0,
-                    "tasks": [task_id for task_id, manifests in task_manifests if path.resolve() in manifests],
-                    "evidence": ([record for ref in document.get("raw_refs", [])
-                                  if isinstance(ref, str) and (manifest := self._evidence_path(ref))
-                                  for record in self._manifest_records(manifest)]
-                                 if include_evidence else []),
-                    "publication_metadata": _redact(document.get("publication_metadata", {})),
-                    "updated_at_utc": datetime.fromtimestamp(path.stat().st_mtime, timezone.utc).isoformat(),
-                })
-        records.sort(key=lambda item: (str(item.get("partition_key") or ""), str(item.get("dataset") or "")), reverse=True)
-        return _page(records, page, page_size)
+        with self._runtime_read_snapshot() as metadata:
+            result = metadata.query_publications(dataset=dataset, asset_type=asset_type,
+                partition_key=partition_key, page=page, page_size=page_size)
+        items = [self._publication_row(row) for row in result["items"]]
+        return {"scope": "registered_publications", "items": items, "page": page,
+                "page_size": page_size, "total": result["total"],
+                "pages": (result["total"] + page_size - 1) // page_size,
+                "security_master_status": result["security_master_status"]}
+
+    @staticmethod
+    def _publication_row(row: dict[str, Any]) -> dict[str, Any]:
+        expected, actual = row["expected_count"], row["actual_count"]
+        coverage = (round(actual / expected * 100, 2)
+                    if isinstance(actual, int) and isinstance(expected, int) and expected > 0 else None)
+        updated = row["updated_at"]
+        if isinstance(updated, datetime):
+            updated = updated.replace(tzinfo=timezone.utc) if updated.tzinfo is None else updated.astimezone(timezone.utc)
+            updated = updated.isoformat()
+        return {"dataset": row["dataset"], "asset_type": row["asset_type"],
+                "partition_key": row["partition_key"], "adjustment": row["adjustment"],
+                "status": row["status"], "row_count": actual,
+                "expected_count": expected, "coverage_percent": coverage,
+                "coverage_reason": row["coverage_reason"], "no_trade_count": row["no_trade_count"],
+                "quote_counts": {"none": {"available": row["none_available_count"],
+                    "unverified": row["none_unverified_count"], "not_applicable": row["none_not_applicable_count"]},
+                    "forward": {"available": row["forward_available_count"],
+                    "unverified": row["forward_unverified_count"], "not_applicable": row["forward_not_applicable_count"]},
+                    "backward": {"available": row["backward_available_count"],
+                    "unverified": row["backward_unverified_count"], "not_applicable": row["backward_not_applicable_count"]}},
+                "conflict_count": row["conflict_count"],
+                "quarantined_count": row["quarantined_count"],
+                "data_revision": row["data_revision"], "updated_at_utc": updated,
+                "content_hash": row["content_hash"], "latest_task_id": row["latest_task_id"],
+                "raw_date": row["partition_key"]}
 
     def overview(self) -> dict[str, Any]:
-        task_documents = self._task_documents()
-        tasks = [self._task_card(document, location) for document, _, location in task_documents]
-        tasks.sort(key=lambda item: str(item.get("generated_at_utc") or ""), reverse=True)
-        releases = self.publications(page=1, page_size=6, include_evidence=False,
-                                     task_documents=task_documents)
-        counts: dict[str, int] = {}
-        for task in tasks:
-            key = str(task["display_status"])
-            counts[key] = counts.get(key, 0) + 1
+        now = datetime.now(timezone.utc)
+        with self._runtime_read_snapshot() as metadata:
+            task_snapshot = metadata.collection_task_dashboard(now=now, stale_after_seconds=STALE_AFTER_SECONDS,
+                                                                limit=6)
+            release_snapshot = metadata.query_publications(page=1, page_size=6)
+        tasks = [self._task_row_card(row, now) for row in task_snapshot["items"]]
+        releases = [self._publication_row(row) for row in release_snapshot["items"]]
         return {
-            "generated_at_utc": datetime.now(timezone.utc).isoformat(),
-            "task_counts": counts,
-            "recent_tasks": tasks[:6],
-            "recent_publications": releases["items"],
+            "generated_at_utc": now.isoformat(),
+            "task_counts": task_snapshot["counts"],
+            "recent_tasks": tasks,
+            "recent_publications": releases,
+            "publication_scope": "registered_publications",
+            "security_master_status": release_snapshot["security_master_status"],
             "raw_latest_date": self.raw_options()["latest_date"],
         }
 
@@ -1305,10 +1297,9 @@ def create_app(
         partition_key: str | None = None,
         page: int = Query(1, ge=1),
         page_size: int = Query(25, ge=1, le=100),
-        include_evidence: bool = True,
     ):
         return reader.publications(dataset=dataset, asset_type=asset_type, partition_key=partition_key,
-                                   page=page, page_size=page_size, include_evidence=include_evidence)
+                                   page=page, page_size=page_size)
 
     return app
 

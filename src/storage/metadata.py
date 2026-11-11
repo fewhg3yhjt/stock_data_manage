@@ -171,18 +171,23 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
         try:
             table = probe.execute(
                 "SELECT 1 FROM sqlite_master WHERE type='table' AND name='collection_task'").fetchone()
-            if table is None:
-                return
-            columns = {row[1] for row in probe.execute("PRAGMA table_info(collection_task)")}
-            if {"scope_json", "snapshot_json", "active_scope_json"} & columns:
-                raise ValueError("unsupported collection_task schema; fresh isolated runtime root required (no migration)")
-            context = probe.execute(
-                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='collection_task_context'").fetchone()
-            if context is None:
-                raise ValueError("collection_task_context is missing; fresh isolated runtime root required (no migration)")
-            context_columns = {row[1] for row in probe.execute("PRAGMA table_info(collection_task_context)")}
-            if not {"task_id", "scope_json", "snapshot_json", "active_scope_json"} <= context_columns:
-                raise ValueError("unsupported collection_task_context schema; fresh isolated runtime root required (no migration)")
+            if table is not None:
+                columns = {row[1] for row in probe.execute("PRAGMA table_info(collection_task)")}
+                if {"scope_json", "snapshot_json", "active_scope_json"} & columns:
+                    raise ValueError("unsupported collection_task schema; fresh isolated runtime root required (no migration)")
+                context = probe.execute(
+                    "SELECT 1 FROM sqlite_master WHERE type='table' AND name='collection_task_context'").fetchone()
+                if context is None:
+                    raise ValueError("collection_task_context is missing; fresh isolated runtime root required (no migration)")
+                context_columns = {row[1] for row in probe.execute("PRAGMA table_info(collection_task_context)")}
+                if not {"task_id", "scope_json", "snapshot_json", "active_scope_json"} <= context_columns:
+                    raise ValueError("unsupported collection_task_context schema; fresh isolated runtime root required (no migration)")
+            partition_table = probe.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='partition_status'").fetchone()
+            if partition_table is not None:
+                partition_columns = {row[1] for row in probe.execute("PRAGMA table_info(partition_status)")}
+                if "last_task_id" not in partition_columns:
+                    raise ValueError("partition_status lacks last_task_id; fresh isolated runtime root required (no migration)")
         finally:
             probe.close()
 
@@ -213,6 +218,7 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
                 backward_not_applicable_count BIGINT,
                 data_revision BIGINT,
                 coverage_reason VARCHAR,
+                last_task_id VARCHAR,
                 updated_at TIMESTAMPTZ NOT NULL,
                 PRIMARY KEY (dataset, asset_type, partition_key, adjustment)
             );
@@ -365,6 +371,10 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
             );
             """
         )
+        self.connection.execute(
+            "CREATE INDEX IF NOT EXISTS partition_status_publication_idx "
+            "ON partition_status(partition_key DESC,dataset,asset_type,adjustment)"
+        )
         # Initialize only fresh isolated roots. Legacy formats and older schemas
         # are rejected; this module does not migrate user data.
 
@@ -373,7 +383,9 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
         from .raw import sanitized_metadata
         if state["status"] not in {"waiting", "collecting", "checking", "committing", "failed", "published"}:
             raise ValueError("invalid collection task status")
-        self.connection.execute("BEGIN IMMEDIATE")
+        owns_transaction = not self.connection.in_transaction
+        if owns_transaction:
+            self.connection.execute("BEGIN IMMEDIATE")
         try:
             previous = self.connection.execute(
                 "SELECT definition_hash, first_execution_order FROM collection_task WHERE task_id=?", [state["task_id"]]
@@ -393,10 +405,100 @@ class MetadataStore(AbstractContextManager["MetadataStore"]):
                 [state["task_id"], state["definition_hash"], state["dataset"], state["status"],
                  state_json, datetime.now(timezone.utc)],
             )
-            self.connection.execute("COMMIT")
+            if owns_transaction:
+                self.connection.execute("COMMIT")
         except Exception:
-            self.connection.execute("ROLLBACK")
+            if owns_transaction:
+                self.connection.execute("ROLLBACK")
             raise
+
+    def mark_current_master_updating(self) -> None:
+        """Hide the prior current-master summary while its protected file commit is in progress."""
+        self.connection.execute(
+            "UPDATE partition_status SET status='updating' WHERE dataset='security_master'"
+        )
+
+    def record_current_master_publish(self, *, manifest: Manifest, manifest_path: str | Path,
+                                      task_id: str, updated_at: datetime | None = None) -> None:
+        """Replace the unique current-master summary without creating per-security item snapshots."""
+        now = updated_at or datetime.now(timezone.utc)
+        status = ("complete_with_conflicts" if manifest.conflict_count or manifest.quarantined_count
+                  else "complete_clean" if manifest.row_count >= manifest.expected_count else "partial")
+        owns_transaction = not self.connection.in_transaction
+        if owns_transaction:
+            self.connection.execute("BEGIN IMMEDIATE")
+        try:
+            self.connection.execute("DELETE FROM partition_status WHERE dataset='security_master'")
+            self.connection.execute(
+                """INSERT INTO partition_status (
+                       dataset,asset_type,partition_key,adjustment,expected_count,actual_count,status,
+                       manifest_path,content_hash,conflict_count,quarantined_count,updated_at,last_task_id
+                   ) VALUES ('security_master',?,?,?,?,?,?,?,?,?,?,?,?)""",
+                [manifest.asset_type, manifest.partition_key, manifest.adjustment, manifest.expected_count,
+                 manifest.row_count, status, str(manifest_path), manifest.content_hash,
+                 manifest.conflict_count, manifest.quarantined_count, now, task_id],
+            )
+            if owns_transaction:
+                self.connection.execute("COMMIT")
+        except Exception:
+            if owns_transaction:
+                self.connection.execute("ROLLBACK")
+            raise
+
+    def query_publications(self, *, dataset: str | None = None, asset_type: str | None = None,
+                           partition_key: str | None = None, page: int = 1,
+                           page_size: int = 25) -> dict[str, object]:
+        """Read registered publication summaries and current-master state from one short snapshot."""
+        if page < 1 or not 1 <= page_size <= 100:
+            raise ValueError("page must be positive and page_size must be between 1 and 100")
+        clauses: list[str] = []
+        parameters: list[object] = []
+        for column, value in (("dataset", dataset), ("asset_type", asset_type), ("partition_key", partition_key)):
+            if value:
+                clauses.append(f"{column}=?")
+                parameters.append(value)
+        owned_snapshot = not self.connection.in_transaction
+        if owned_snapshot:
+            self.connection.execute("BEGIN")
+        try:
+            master_status_row = self.connection.execute(
+                "SELECT status FROM partition_status WHERE dataset='security_master' LIMIT 1").fetchone()
+            committing = int(self.connection.execute(
+                "SELECT count(*) FROM collection_task WHERE dataset='security_master' AND status='committing'"
+            ).fetchone()[0])
+            status = ("updating" if committing or (master_status_row and master_status_row[0] == "updating")
+                      else "registered" if master_status_row else "not_registered")
+            if status == "updating":
+                clauses.append("dataset<>'security_master'")
+            elif master_status_row:
+                clauses.append("(dataset<>'security_master' OR status<>'updating')")
+            predicate = " WHERE " + " AND ".join(clauses) if clauses else ""
+            total = int(self.connection.execute(
+                "SELECT count(*) FROM partition_status" + predicate, parameters).fetchone()[0])
+            offset = (page - 1) * page_size
+            rows = self.connection.execute(
+                "SELECT dataset,asset_type,partition_key,adjustment,expected_count,actual_count,status,"
+                "conflict_count,quarantined_count,no_trade_count,none_available_count,none_unverified_count,none_not_applicable_count,"
+                "forward_available_count,forward_unverified_count,forward_not_applicable_count,"
+                "backward_available_count,backward_unverified_count,backward_not_applicable_count,"
+                "data_revision,coverage_reason,updated_at,content_hash,last_task_id "
+                "FROM partition_status" + predicate +
+                " ORDER BY partition_key DESC,dataset ASC,asset_type ASC,adjustment ASC LIMIT ? OFFSET ?",
+                [*parameters, page_size, offset]).fetchall() if offset < total else []
+            if owned_snapshot:
+                self.connection.execute("COMMIT")
+        except Exception:
+            if owned_snapshot:
+                self.connection.execute("ROLLBACK")
+            raise
+        return {"items": [dict(zip(
+                    ("dataset","asset_type","partition_key","adjustment","expected_count","actual_count",
+                     "status","conflict_count","quarantined_count","no_trade_count","none_available_count","none_unverified_count",
+                     "none_not_applicable_count","forward_available_count","forward_unverified_count",
+                     "forward_not_applicable_count","backward_available_count","backward_unverified_count",
+                     "backward_not_applicable_count","data_revision","coverage_reason","updated_at",
+                     "content_hash","latest_task_id"), row)) for row in rows],
+                "total": total, "security_master_status": status}
 
     @staticmethod
     def _scope_overlaps(left: dict, right: dict) -> tuple[dict, ...]:

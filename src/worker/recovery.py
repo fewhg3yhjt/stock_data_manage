@@ -85,6 +85,8 @@ class RecoveryScanner:
                 relative = path.relative_to(self.canonical_root)
             except ValueError:
                 continue
+            if "security_master" in relative.parts:
+                continue
             if "daily_bar" in relative.parts:
                 self.legacy_daily_files.add(str(path))
                 continue

@@ -401,7 +401,7 @@ class DailyBarStore:
                     written += 1
             self.connection.execute("""UPDATE daily_publication SET written_count=?,no_trade_count=?,superseded_count=?,superseded_identities_json=? WHERE publication_id=?""",
                 [written, no_trade_written, len(superseded), json.dumps(superseded), publication_id])
-            summary = self._rebuild_summary(trade_date, asset_type, committed_at) if written or no_trade_written else self._current_summary_values(trade_date, asset_type)
+            summary = self._rebuild_summary(trade_date, asset_type, committed_at, task_id) if written or no_trade_written else self._current_summary_values(trade_date, asset_type)
             self.connection.execute("COMMIT")
             return DailyPublicationResult(publication_id, False, written, no_trade_written, len(superseded),
                 tuple(superseded), summary[0], summary[1], summary[2])
@@ -409,7 +409,8 @@ class DailyBarStore:
             self.connection.execute("ROLLBACK")
             raise
 
-    def _rebuild_summary(self, day: date, asset: AssetType, now: datetime) -> tuple[int, Mapping[str, Mapping[str, int]], int, int]:
+    def _rebuild_summary(self, day: date, asset: AssetType, now: datetime,
+                         task_id: str) -> tuple[int, Mapping[str, Mapping[str, int]], int, int]:
         actual = int(self.connection.execute("SELECT count(*) FROM daily_bar WHERE trade_date=? AND asset_type=?", [day, asset.value]).fetchone()[0])
         no_trade_count = int(self.connection.execute("SELECT count(*) FROM partition_item WHERE dataset='daily_bar' AND partition_key=? AND adjustment='aggregate' AND asset_type=? AND status='no_trade'", [day.isoformat(), asset.value]).fetchone()[0])
         counts: dict[str, dict[str, int]] = {}
@@ -430,8 +431,8 @@ class DailyBarStore:
              none_available_count,none_unverified_count,none_not_applicable_count,
              forward_available_count,forward_unverified_count,forward_not_applicable_count,
              backward_available_count,backward_unverified_count,backward_not_applicable_count,data_revision,
-             coverage_reason,updated_at)
-            VALUES ('daily_bar',?,?, 'aggregate',NULL,?,'published',NULL,NULL,0,0,?,?,?,?,?,?,?,?,?,?,?,'independent security-range evidence unavailable',?)
+             coverage_reason,updated_at,last_task_id)
+            VALUES ('daily_bar',?,?, 'aggregate',NULL,?,'published',NULL,NULL,0,0,?,?,?,?,?,?,?,?,?,?,?,'independent security-range evidence unavailable',?,?)
             ON CONFLICT(dataset,asset_type,partition_key,adjustment) DO UPDATE SET expected_count=excluded.expected_count,
              actual_count=excluded.actual_count,
              status='published',no_trade_count=excluded.no_trade_count,data_revision=excluded.data_revision,
@@ -440,8 +441,9 @@ class DailyBarStore:
              forward_unverified_count=excluded.forward_unverified_count,forward_not_applicable_count=excluded.forward_not_applicable_count,
              backward_available_count=excluded.backward_available_count,backward_unverified_count=excluded.backward_unverified_count,
              backward_not_applicable_count=excluded.backward_not_applicable_count,
-             expected_count=NULL,coverage_reason=excluded.coverage_reason,updated_at=excluded.updated_at""",
-             [asset.value, day.isoformat(), actual, no_trade_count, *flattened, revision, now])
+             expected_count=NULL,coverage_reason=excluded.coverage_reason,updated_at=excluded.updated_at,
+             last_task_id=excluded.last_task_id""",
+             [asset.value, day.isoformat(), actual, no_trade_count, *flattened, revision, now, task_id])
         return actual, counts, revision, no_trade_count
 
     def _current_summary_values(self, day: date, asset: AssetType) -> tuple[int, Mapping[str, Mapping[str, int]], int, int]:
