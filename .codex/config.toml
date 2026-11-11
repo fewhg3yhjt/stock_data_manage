@@ -1,5 +1,5 @@
 # Keep the primary chat's model selection unchanged.
-# Approved implementation and test work is delegated to Luna at medium effort.
+# Keep agents available; when the user opts into delegation, use Luna at medium effort.
 [agents]
 enabled = true
 default_subagent_model = "gpt-6-luna"
