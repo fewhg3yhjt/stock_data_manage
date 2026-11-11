@@ -10,7 +10,8 @@ let renderSequence = 0;
 
 const labels = {
   overview: ['运行总览', 'OPERATIONS OVERVIEW'],
-  tasks: ['任务中心', 'TASK EXECUTION'],
+  'task-management': ['任务管理', 'CONFIGURED TASKS · MANUAL RUN'],
+  tasks: ['运行记录', 'PERSISTED TASK RUNS'],
   daily: ['规范日线', '同一记录的源头口径投影'],
   data: ['数据查询', '按类型、证券和日期查询来源记录'],
   raw: ['原始数据', 'RAW EVIDENCE'],
@@ -95,6 +96,12 @@ async function api(path) {
   }
   return response.json();
 }
+async function submitJson(path, body) {
+  const response = await fetch(path, { method: 'POST', headers: { Accept: 'application/json', 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.detail || `提交失败（${response.status}）`);
+  return result;
+}
 function loading() { app.innerHTML = '<div class="loading"><span></span>正在读取现有运行记录…</div>'; }
 function fail(error) { app.innerHTML = `<div class="empty">${esc(error.message || error)}</div>`; }
 function pager(kind, data) {
@@ -160,6 +167,49 @@ async function renderTasks() {
   form.addEventListener('submit', event => { event.preventDefault(); state.filters.tasks = Object.fromEntries(new FormData(form)); state.pages.tasks = 1; renderTasks().catch(fail); });
 }
 
+async function renderTaskManagement() {
+  const sequence = ++renderSequence;
+  const data = await api('/api/task-options');
+  if (sequence !== renderSequence || state.view !== 'task-management') return;
+  const available = data.items.filter(item => item.configured);
+  const choices = available.map(item => `<option value="${esc(item.dataset)}">${esc(item.label)}</option>`).join('');
+  const date = new Intl.DateTimeFormat('fr-CA', { timeZone: 'Asia/Shanghai' }).format(new Date());
+  app.innerHTML = `<section class="panel"><div class="panel-head"><h2>已配置任务</h2><small>任务定义读取现有配置</small></div>
+    <div class="table-wrap"><table><thead><tr><th>业务任务</th><th>数据集</th><th>目标范围</th><th>配置来源（不代表资格通过）</th><th>周期配置</th><th>当前运行方式</th></tr></thead><tbody>
+    ${available.map(item => `<tr><td><strong>${esc(item.label)}</strong><br><small>${esc(item.profile || '')}</small></td><td>${esc(item.dataset)}</td><td>${esc(item.scope_summary || '范围未显示')}</td><td>${Object.entries(item.source_summary || {}).map(([group,sources]) => `<div><strong>${esc(group)}</strong><br>${sources.map(esc).join('<br>') || '未配置'}</div>`).join('<hr>')}</td><td>${item.schedule_configured ? `${item.schedule_enabled ? '规则启用' : '规则停用'} · ${esc(item.schedule_time || '时间见配置')}` : '未配置'}</td><td>${item.scheduler_active ? '自动调度运行中' : '未启动自动调度，可手动运行'}</td></tr>`).join('') || '<tr><td colspan="6">当前没有可运行任务</td></tr>'}
+    </tbody></table></div></section>
+    <section class="panel"><div class="panel-head"><h2>手动启动或续跑</h2><small>先持久受理，再由后台按FIFO顺序执行</small></div>
+      <form class="filters" id="task-run-form">
+        <label>业务任务<select name="dataset" required>${choices}</select></label>
+        <label>目标交易日<input name="trade_date" type="date" max="${esc(date)}" value="${esc(date)}" required></label>
+        <button class="primary" type="submit" ${available.length && data.manual_run_enabled ? '' : 'disabled'}>启动任务</button>
+      </form>
+      <p class="subtle">启动前会核对本地交易日历。新运行使用现有配置并冻结本次范围；同一任务已有记录时按该记录的冻结范围续跑。任务写入当前运行台配置的数据目录。</p>
+      ${data.manual_run_enabled ? '' : '<p class="notice">当前数据目录为只读或无写入权限；本运行台只能查看，不能启动或续跑任务。</p>'}
+      <p class="notice">关闭浏览器页面不会中断任务。正常关闭运行台时会等当前任务结束，后续队列任务保留等待；强制结束进程可能中断当前任务，已保存的进度可从“运行记录”续跑。周期配置目前只是配置，项目没有常驻调度器，不会自动触发。</p>
+      <p id="task-run-result" role="status"></p>
+    </section>`;
+  const form = document.querySelector('#task-run-form');
+  if (!form) return;
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+    const button = form.querySelector('button'); button.disabled = true;
+    const result = document.querySelector('#task-run-result'); result.textContent = '正在提交任务…';
+    try {
+      const submitted = await submitJson('/api/tasks/run', Object.fromEntries(new FormData(form)));
+      const stateLabel = ({waiting:'等待执行', collecting:'采集中', checking:'检查中', committing:'发布收尾'})[submitted.status] || submitted.status;
+      const queueLabel = submitted.queue_order ? `，队列序号 ${submitted.queue_order}` : '';
+      result.textContent = submitted.no_op
+        ? `${submitted.message}：${submitted.task_id}`
+        : `${submitted.message}：${submitted.task_id}（${stateLabel}${queueLabel}${submitted.resumed ? '，续跑' : ''}）`;
+      showToast(submitted.no_op ? '任务已完成' : '任务已持久受理');
+      state.view = 'tasks';
+      await render();
+    } catch (error) { result.textContent = error.message; }
+    finally { button.disabled = false; }
+  });
+}
+
 function stageList(progress) {
   const stages = progress?.stages || {};
   return Object.entries(stageLabels).map(([key, label]) => {
@@ -186,6 +236,7 @@ async function showTask(taskId, unitPage = 1, unitQuery = '', unitStatus = '') {
       <section><h3>阶段进度</h3><div class="stage-list">${stageList(task.progress)}</div></section>
       ${(task.partition_results || []).length ? `<section><h3>按证券类型验收</h3><table><thead><tr><th>类型</th><th>状态</th><th>合格 / 应有证券数</th><th>其他提示 / 未验证口径 / 停牌或有效期排除</th><th>原因</th></tr></thead><tbody>${task.partition_results.map(p => `<tr><td>${esc({stock:'股票',etf:'ETF',index:'指数'}[p.asset_type] || p.asset_type)}</td><td>${status(p.status)}</td><td>${prettyNumber(p.actual_count)} / ${prettyNumber(p.expected_count)}</td><td>${prettyNumber(p.other_issue_count)} / ${prettyNumber(p.unverified_count)} / ${prettyNumber(p.excluded_count)}</td><td>${esc(p.error === 'daily aggregate coverage rejected; see per-adjustment issues' ? '合格证券数未达到发布门槛' : p.error || '—')}</td></tr>`).join('')}</tbody></table></section>` : ''}
       ${task.error ? `<section><h3>任务错误</h3><div class="notice">${esc(task.error)}</div></section>` : ''}
+      ${task.location === 'workspace' && ['failed', 'stale'].includes(task.display_status) ? `<section><h3>恢复</h3><p class="subtle">将读取已保存的任务定义，保持原目标日期、证券范围、来源和规则。</p><button class="primary" id="resume-task">按原范围续跑</button><p id="resume-result" role="status"></p></section>` : ''}
       <section><h3>执行单元</h3><form id="unit-filters" class="filters"><input name="q" placeholder="证券或错误" value="${esc(unitQuery)}"><select name="status"><option value="">全部状态</option><option value="failed">失败</option><option value="pending">等待</option><option value="candidate_complete">候选完成</option></select><button class="primary">查询</button></form>
       <div class="table-wrap"><table><thead><tr><th>单元</th><th>状态</th><th>行数</th><th>错误</th><th>原始响应</th></tr></thead><tbody>
       ${units.items.length ? units.items.map(item => `<tr><td>${esc(item.symbol || item.key || item.input_id || '—')}</td><td>${status(item.status)}</td><td>${prettyNumber(item.row_count)}</td><td class="error-text" title="${esc(item.error || '')}">${esc(item.error || '—')}</td><td>${(item.evidence || []).map((record, index) => `<button class="secondary evidence-button" data-evidence-id="${esc(record.id)}">响应 ${index + 1}</button>`).join('') || '尚未留存'}</td></tr>`).join('') : '<tr><td colspan="5">暂无匹配执行单元</td></tr>'}</tbody></table></div>${pager('units', units)}</section>
@@ -195,6 +246,14 @@ async function showTask(taskId, unitPage = 1, unitQuery = '', unitStatus = '') {
     unitForm.addEventListener('submit', event => { event.preventDefault(); showTask(taskId, 1, unitForm.elements.namedItem('q').value, unitForm.elements.namedItem('status').value); });
     dialogContent.querySelectorAll('[data-page-kind="units"]').forEach(button => button.addEventListener('click', () => showTask(taskId, Number(button.dataset.page), unitQuery, unitStatus)));
     dialogContent.querySelectorAll('.evidence-button').forEach(button => button.addEventListener('click', () => showRaw(button.dataset.evidenceId)));
+    dialogContent.querySelector('#resume-task')?.addEventListener('click', async event => {
+      const button = event.currentTarget; button.disabled = true;
+      const result = dialogContent.querySelector('#resume-result'); result.textContent = '正在提交续跑…';
+      try {
+        const submitted = await submitJson(`/api/tasks/${encodeURIComponent(taskId)}/resume`, {});
+        result.textContent = `${submitted.message}：${submitted.task_id}`;
+      } catch (error) { result.textContent = error.message; button.disabled = false; }
+    });
   } catch (error) { dialogContent.innerHTML = `<div class="empty">${esc(error.message)}</div>`; }
 }
 function bindTaskRows() { document.querySelectorAll('.task-row').forEach(row => row.addEventListener('click', () => showTask(row.dataset.taskId))); }
@@ -367,6 +426,7 @@ async function render() {
   document.querySelectorAll('.nav-item').forEach(item => item.classList.toggle('active', item.dataset.view === state.view));
   try {
     if (state.view === 'overview') await renderOverview();
+    if (state.view === 'task-management') await renderTaskManagement();
     if (state.view === 'tasks') await renderTasks();
     if (state.view === 'daily') await renderDaily();
     if (state.view === 'data') await renderData();
@@ -385,4 +445,8 @@ document.addEventListener('click', event => {
   state.pages[button.dataset.pageKind] = Number(button.dataset.page); render();
 });
 render();
-setInterval(() => { if (!document.hidden && !dialog.open && state.view === 'overview') renderOverview().catch(() => {}); }, 15000);
+setInterval(() => {
+  if (document.hidden || dialog.open) return;
+  if (state.view === 'overview') renderOverview().catch(() => {});
+  if (state.view === 'tasks') renderTasks().catch(() => {});
+}, 10000);

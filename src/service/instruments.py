@@ -156,12 +156,20 @@ def normalize_symbol_successions(relations: Iterable[Mapping[str, object]]) -> t
 def symbol_succession_for(relations: Iterable[Mapping[str, object]], *, market: str,
                           asset_type: str, symbol: str, as_of_date: date) -> dict[str, object] | None:
     """Resolve an explicitly evidenced linear code succession to its current code."""
+    return _symbol_succession_for_normalized(normalize_symbol_successions(relations), market=market,
+        asset_type=asset_type, symbol=symbol, as_of_date=as_of_date)
+
+
+def _symbol_succession_for_normalized(relations: Iterable[Mapping[str, object]], *, market: str,
+                                      asset_type: str, symbol: str,
+                                      as_of_date: date) -> dict[str, object] | None:
+    """Resolve a previously validated relation set without revalidating it per security."""
     code = str(symbol).lower()
     prefixes = {"XSHG": "sh", "XSHE": "sz", "BSE": "bj"}
     prefix = prefixes.get(str(market).upper(), "")
     if code.startswith(prefix) and prefix:
         code = code[len(prefix):]
-    active = [relation for relation in normalize_symbol_successions(relations)
+    active = [relation for relation in relations
         if relation["market"] == str(market).upper() and relation["asset_type"] == str(asset_type).lower()
         and as_of_date >= date.fromisoformat(str(relation["effective_from"]))]
     next_by_old = {str(relation["old_symbol"]): relation for relation in active}

@@ -11,11 +11,15 @@ from pathlib import Path
 from typing import Any
 
 
-def row_hash(value: Any) -> str:
-    payload = json.dumps(
+def canonical_json_bytes(value: Any) -> bytes:
+    """Serialize a value using the same stable representation used by row_hash."""
+    return json.dumps(
         _jsonable(value), ensure_ascii=False, sort_keys=True, separators=(",", ":")
     ).encode("utf-8")
-    return hashlib.sha256(payload).hexdigest()
+
+
+def row_hash(value: Any) -> str:
+    return hashlib.sha256(canonical_json_bytes(value)).hexdigest()
 
 
 def file_hash(path: Path) -> str:

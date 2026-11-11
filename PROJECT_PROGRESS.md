@@ -1,5 +1,17 @@
 # 项目开发进度
 
+## 2026-11-11/12 Web单日任务持久受理与FIFO（实现及定向验收完成）
+
+回到最初的问题：Web点击启动后若仅先创建每请求后台线程，HTTP受理回执可能早于任务真正进入持久队列；并发提交会创建多个执行循环，页面刷新或服务进程退出时也无法据回执判断任务是否可靠等待。本阶段将Web入口改为“先将冻结定义和队列顺序持久化，再回202；由一个可写Web实例生命周期worker消费既有SQLite FIFO”。只读Web不消费；停机后未执行项保留在队列中，运行中的任务结束或进程被强制中止仍遵循现有执行与恢复边界。没有新增队列服务、状态库或来源。
+
+| 原问题 | 可核验证据与本次处理 | 对原问题的实际影响及当前状态 |
+|---|---|---|
+| 回执不保证持久受理，多个POST各自启动线程 | `/api/tasks/run`与`/resume`现先调用`submit_collection_task`完成持久受理，返回202时可读到waiting及`queue_order`；FastAPI可写实例生命周期启动一个既有`run_collection_worker`，只读实例不启动消费者。重复提交waiting任务返回原队列项，不重复排队；已发布/归档定义与范围快照变化有明确拒绝。 | 一项受理现在以SQLite提交为准；退出或当前没有可用worker时，队列记录仍可由之后的可写Web实例继续消费。仅覆盖本机、单日的两个已有数据集入口；区间交互、覆盖确认界面和完整并发矩阵未完成。 |
+| 单日受理在代表规模下超过5秒预算 | 输入为单日`2026-10-28`、7862条合成证券清单（5573 stock、1694 ETF、595 index）、10000条历史任务。先前排查已共享本次解析的YAML文档并按资产组正规化继承配置；一次复跑仍量到7.729604秒。随后对隔离POST做cProfile，发现单任务JSON分别经完整规范化/序列化来算定义hash和落盘，及expand_daily_units对每条证券反复深拷贝整棵嵌套单位。将新日线task.json写为row_hash使用的规范JSON，并直接复用同一字节SHA；流水线仅对其刚构造且独占的单位使用轻量复制，公开函数默认深拷贝保持不变。daily续跑校验冻结definition wrapper，不依赖request重复携带dataset。 | 修正后同一代表范围HTTP计时：GET `/api/task-options`首读0.382705秒、5次热读最大0.527160秒；日线持久受理3.632325秒、按冻结定义续跑1.267116秒，均满足首读/热读/受理2/1/5秒合同。并断言task JSON `row_hash`及文件SHA等于登记hash。实测仅单日，不代表100日或真实来源网络耗时。cProfile：[诊断记录](tmp/web-task-admission-profile-20261112/runtime/web-task-admission-profile.json)、[性能JSON](tmp/pytest-web-fifo-final-20261112/test_web_task_options_and_dail0/web-task-performance.json)。 |
+| 多任务次序和Web生命周期缺少HTTP证据 | 隔离ASGI测试中，首任务被离线执行替身阻塞，随后持久提交10个waiting任务；检查queue_order 2–11、真实消费顺序、重复`/run`与`/resume`幂等、单worker启动。另检查只读Web不消费、缺日历/错误来源请求/错误数据集、范围冲突、SQLite忙及冻结定义续跑。 | 消费顺序与提交顺序一致；无Provider请求。最终10项通过、0失败/错误/跳过，耗时30.530秒：[JUnit](tmp/web-persistent-fifo-final-20261112/junit.xml)。运行前同进程导入检查指定解释器Python 3.13.18/SQLite 3.54.1及pytest、FastAPI、httpx、DuckDB、PyArrow、PyYAML、pytz、requests、uvicorn、pandas。使用隔离SQLite、合成DuckDB证券清单和离线执行替身，不是生产采集或多Web进程争抢验收。 |
+
+设计对照：Web只作为既有任务队列的持久受理入口和单实例消费者；任务定义/来源/发布语义仍由原构建器和执行模块处理，队列状态仍在原`collection_task`表。规范JSON合并任务hash与task文件完整性计算保持相同字节合同；已有冻结任务不会被重写。新任务实际执行仍可能走`live`请求并写入运行台配置的数据根；本次验收替身禁止任何Provider请求，没有触碰生产数据。没有改动日期/证券范围、FIFO排序或质量/发布门槛。未覆盖长时间真实网络任务停机、多个独立Web进程同时启动、所有C01–C28并发场景、区间/显式覆盖页面、浏览器视觉及真实行情发布；不能据此宣称Web管理台整体或生产路由已验收。
+
 ## 2026-11-10 发布摘要、总览及当前清单登记（11月11日完成隔离验收）
 
 用户确认发布列表统一仅摘要和追溯入口、原文按需查看。已接GET `/api/publications`的partition_status筛选/计数/分页，及GET `/api/overview`同一SQLite短快照中的任务计数/最近6条、发布最近6条；原文最新日期仍来自一级日期目录。两个API不再扫描历史manifest/任务summary或展开原文。任务结果、当前数据和覆盖分母保持分离；日K独立分母未知时不拿任务名单补足。

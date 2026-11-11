@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import asyncio
 import base64
 import codecs
 import hashlib
@@ -11,7 +12,8 @@ import os
 import re
 import sqlite3
 import stat
-from contextlib import contextmanager
+from contextlib import asynccontextmanager, contextmanager
+from threading import Event, Lock, Thread
 from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
@@ -19,9 +21,10 @@ from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 import yaml
 
-from fastapi import FastAPI, HTTPException, Query
-from fastapi.responses import FileResponse
+from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.concurrency import run_in_threadpool
 
 from ..config.loader import load_storage_paths
 from ..storage.read_index import (SOURCE_QUERY_DATABASE, load_source_query_records,
@@ -1139,16 +1142,171 @@ def create_app(
     *, config_root: str | Path = Path("config"), data_root: str | Path | None = None
 ) -> FastAPI:
     reader = DashboardReader(config_root, data_root)
+    @asynccontextmanager
+    async def lifespan(app: FastAPI):
+        app.state.collection_worker_stop_event = Event()
+        app.state.collection_worker_thread = None
+        try:
+            if can_write_data_root() and collection_queue_available():
+                start_collection_worker()
+            yield
+        finally:
+            app.state.collection_worker_stop_event.set()
+            worker = app.state.collection_worker_thread
+            if worker is not None:
+                await asyncio.to_thread(worker.join)
+            app.state.collection_worker_thread = None
+
     app = FastAPI(
         title="证券数据运行台",
-        description="现有任务、原始证据和发布结果的只读视图",
+        description="查询任务、原始证据及发布结果；本机可启动已配置任务",
         version="1.0",
         docs_url=None,
         redoc_url=None,
+        lifespan=lifespan,
     )
     app.state.reader = reader
+    app.state.collection_worker_guard = Lock()
+    app.state.collection_worker_stop_event = Event()
+    app.state.collection_worker_thread = None
     app.add_middleware(SecurityHeadersMiddleware)
     app.mount("/static", StaticFiles(directory=ASSET_ROOT), name="static")
+
+    def require_local_admin_request(request: Request) -> None:
+        if (request.client is None or request.client.host not in {"127.0.0.1", "::1"}
+                or request.url.hostname not in {"127.0.0.1", "localhost", "::1"}):
+            raise HTTPException(403, "只能从本机管理任务")
+        origin = request.headers.get("origin")
+        if origin and origin.rstrip("/") != str(request.base_url).rstrip("/"):
+            raise HTTPException(403, "请求页面与当前运行台不一致")
+
+    def can_write_data_root() -> bool:
+        candidate = reader.paths["data_root"]
+        while not candidate.exists() and candidate.parent != candidate:
+            candidate = candidate.parent
+        return os.access(candidate, os.W_OK | os.X_OK)
+
+    def collection_queue_available() -> bool:
+        metadata_path = reader.paths["metadata_path"]
+        if not metadata_path.is_file():
+            return False
+        try:
+            from ..storage.metadata import MetadataStore
+            with MetadataStore(metadata_path, read_only=True) as metadata:
+                metadata.connection.execute("SELECT 1 FROM collection_task LIMIT 0")
+                metadata.connection.execute("SELECT 1 FROM collection_task_context LIMIT 0")
+            return True
+        except (OSError, ValueError, sqlite3.Error):
+            logging.getLogger(__name__).warning("collection queue is unavailable; Web will not consume tasks",
+                                                exc_info=True)
+            return False
+
+    def start_collection_worker() -> bool:
+        if not can_write_data_root():
+            return False
+        with app.state.collection_worker_guard:
+            stop_event = app.state.collection_worker_stop_event
+            if stop_event.is_set():
+                return False
+            current = app.state.collection_worker_thread
+            if current is not None and current.is_alive():
+                return True
+            from ..pipeline.inputs import run_collection_worker
+            worker = Thread(
+                target=run_collection_worker,
+                kwargs={"config_root": reader.config_root, "data_root": reader.paths["data_root"],
+                        "stop_event": stop_event, "poll_interval_seconds": 0.5},
+                name="web-collection-worker",
+                daemon=False,
+            )
+            try:
+                worker.start()
+            except RuntimeError:
+                logging.getLogger(__name__).exception("Web collection worker could not start")
+                return False
+            app.state.collection_worker_thread = worker
+            return True
+
+    def task_acceptance_response(accepted: dict[str, Any], *, dataset: str, resumed: bool) -> JSONResponse:
+        task_id = str(accepted.get("task_id", ""))
+        status = str(accepted.get("status", "waiting"))
+        if accepted.get("no_op"):
+            return JSONResponse(status_code=200, content={
+                "task_id": task_id,
+                "dataset": dataset,
+                "status": status,
+                "resumed": resumed,
+                "already_queued": False,
+                "no_op": True,
+                "queue_order": accepted.get("queue_order"),
+                "message": accepted.get("reason", "任务已经完成，无需重复提交"),
+            })
+        worker_active = start_collection_worker()
+        if worker_active:
+            message = ("任务已持久受理并进入FIFO队列；可在运行记录中查看等待或执行状态")
+        else:
+            message = ("任务已持久受理并保留在FIFO队列；当前没有可用执行worker，后续可写运行台启动后继续")
+        return JSONResponse(status_code=202, content={
+            "task_id": task_id,
+            "dataset": dataset,
+            "status": status,
+            "resumed": resumed,
+            "already_queued": bool(accepted.get("already_queued")),
+            "queue_order": accepted.get("queue_order"),
+            "worker_active": worker_active,
+            "message": message,
+        })
+
+    def runtime_task(task_id: str) -> dict[str, Any] | None:
+        metadata_path = reader.paths["metadata_path"]
+        if not metadata_path.is_file():
+            return None
+        from ..storage.metadata import MetadataStore
+        try:
+            with MetadataStore(metadata_path, read_only=True) as metadata:
+                return metadata.load_collection_task(task_id)
+        except (OSError, ValueError, sqlite3.Error) as exc:
+            raise HTTPException(503, "任务运行库不可读取") from exc
+
+    def frozen_task_for_resume(task_id: str, state: dict[str, Any]) -> tuple[dict[str, Any], str]:
+        dataset = state.get("dataset")
+        if dataset not in {"daily_bar", "security_master"}:
+            raise HTTPException(409, "当前页面只支持续跑证券名单和日线任务")
+        reference = state.get("definition_ref")
+        task_path = Path(reference.get("path", "")) if isinstance(reference, dict) else Path()
+        if (task_path.name != "task.json" or not _within(task_path, reader.paths["workspace_root"])
+                or not task_path.is_file()):
+            raise HTTPException(409, "归档任务或缺少冻结定义的任务不能从页面续跑")
+        if not isinstance(reference.get("sha256"), str):
+            raise HTTPException(409, "冻结任务定义缺少完整性记录，不能安全续跑")
+        from ..storage.integrity import file_hash
+        try:
+            if file_hash(task_path) != reference["sha256"]:
+                raise HTTPException(409, "冻结任务定义已变化，不能安全续跑")
+            frozen = _read_json(task_path)
+        except (OSError, ValueError) as exc:
+            raise HTTPException(409, "冻结任务定义无法读取，不能安全续跑") from exc
+        if dataset == "daily_bar":
+            definition = frozen.get("request")
+            mode = frozen.get("mode") or state.get("verification_mode")
+            resolved_definition = frozen.get("definition")
+            definition_matches_dataset = (
+                isinstance(resolved_definition, dict)
+                and resolved_definition.get("dataset") == dataset
+                and isinstance(definition, dict)
+                and definition.get("dataset") in {None, dataset}
+            )
+        else:
+            definition = frozen.get("execution_definition") or state.get("execution_definition")
+            mode = state.get("verification_mode")
+            definition_matches_dataset = (isinstance(definition, dict)
+                                          and definition.get("dataset") == dataset)
+        if (not isinstance(definition, dict) or definition.get("task_id") != task_id
+                or not definition_matches_dataset):
+            raise HTTPException(409, "冻结任务编号或数据集不匹配，不能安全续跑")
+        if mode not in {"live", "replay", "retained"}:
+            raise HTTPException(409, "冻结任务缺少有效运行模式，不能安全续跑")
+        return definition, mode
 
     @app.get("/", include_in_schema=False)
     def index():
@@ -1236,6 +1394,173 @@ def create_app(
         page_size: int = Query(25, ge=1, le=100),
     ):
         return reader.tasks(status=status, dataset=dataset, query=q, page=page, page_size=page_size)
+
+    @app.get("/api/task-options")
+    def task_options():
+        try:
+            from ..config.loader import load_input_capabilities
+            collection = yaml.safe_load((reader.config_root / "collection.yaml").read_text(encoding="utf-8")) or {}
+            schedules = yaml.safe_load((reader.config_root / "schedules.yaml").read_text(encoding="utf-8")) or {}
+            capabilities = yaml.safe_load((reader.config_root / "capabilities.yaml").read_text(encoding="utf-8")) or {}
+            jobs = {item.get("name"): item for item in schedules.get("jobs", []) if isinstance(item, dict)}
+            profiles = collection.get("collection_profiles", {})
+            input_labels = {item.input_id: f"{item.provider}/{item.endpoint} · {item.input_id}"
+                            for item in load_input_capabilities(reader.config_root / "providers.yaml")}
+            definitions = []
+            for key, label in (("security_master", "证券名单更新"), ("daily_bar", "全市场日线")):
+                configured = collection.get(key, {})
+                profile_name = configured.get("collection_profile")
+                profile = profiles.get(profile_name, {})
+                schedule_name = "security_master_update" if key == "security_master" else "daily_bar_sync"
+                if key == "security_master":
+                    source_summary = {
+                        "当日名单": [input_labels.get(item, item) for item in configured.get("source_inputs", [])],
+                        "历史名单": [input_labels.get(item, item) for item in configured.get("historical", {}).get("source_inputs", [])],
+                    }
+                    scope_summary = "按目标日期选择当日或历史名单配置"
+                else:
+                    task_name = configured.get("task")
+                    target = collection.get("tasks", {}).get(task_name, {})
+                    policy_name = target.get("acquisition_policy")
+                    policy = capabilities.get("acquisition_policies", {}).get(policy_name, {})
+                    source_summary = {policy_name or "未配置来源策略": [
+                        input_labels.get(item.get("input_id"), item.get("input_id"))
+                        for item in policy.get("inputs", []) if isinstance(item, dict)]}
+                    assets = target.get("asset_types", [target.get("asset_type", "stock")])
+                    scope_summary = f"{target.get('universe', '未配置')}：" + "、".join(assets)
+                definitions.append({
+                    "dataset": key,
+                    "label": label,
+                    "configured": isinstance(configured, dict) and bool(configured),
+                    "profile": profile_name,
+                    "scope_summary": scope_summary,
+                    "source_summary": source_summary,
+                    "schedule_configured": schedule_name in jobs,
+                    "schedule_enabled": (bool(profile.get("scheduling_enabled")) and schedule_name in jobs
+                                         and jobs[schedule_name].get("enabled", True) is not False),
+                    "schedule_time": (profile.get("frequency") or {}).get("at"),
+                    "scheduler_active": False,
+                })
+            return {"items": definitions, "scheduler_active": False,
+                    "storage_target": "当前运行台配置的数据根目录",
+                    "manual_run_enabled": can_write_data_root()}
+        except (OSError, yaml.YAMLError, AttributeError, TypeError) as exc:
+            raise HTTPException(409, "任务配置不可读取") from exc
+
+    @app.post("/api/tasks/run", status_code=202)
+    async def run_configured_task(request: Request):
+        require_local_admin_request(request)
+        if not can_write_data_root():
+            raise HTTPException(409, "当前运行台配置的数据目录不可写；只读部署不能启动采集任务")
+        if request.headers.get("content-type", "").split(";", 1)[0].strip() != "application/json":
+            raise HTTPException(415, "请使用JSON提交任务")
+        try:
+            body = await request.json()
+            if not isinstance(body, dict) or set(body) != {"dataset", "trade_date"}:
+                raise ValueError("必须选择已支持的数据集和目标日期")
+            dataset = body["dataset"]
+            if dataset not in {"daily_bar", "security_master"}:
+                raise ValueError("当前只支持证券名单更新和全市场日线任务")
+            target_day = date.fromisoformat(body["trade_date"])
+            task_id = ("market-daily-" if dataset == "daily_bar" else "security-master-") + target_day.strftime("%Y%m%d")
+            existing = runtime_task(task_id)
+            if existing is not None:
+                if existing.get("dataset") != dataset:
+                    raise HTTPException(409, "同一任务编号已用于其他数据集，拒绝覆盖")
+                reference = existing.get("definition_ref", {})
+                path = Path(reference.get("path", "")) if isinstance(reference, dict) else Path()
+                if not _within(path, reader.paths["workspace_root"]):
+                    raise HTTPException(409, "该日期的任务已归档；页面不会覆盖或改写归档记录")
+                if existing.get("status") in {"waiting", "collecting", "checking", "committing"}:
+                    return task_acceptance_response({**existing, "already_queued": True},
+                                                    dataset=dataset, resumed=False)
+                definition, mode = frozen_task_for_resume(task_id, existing)
+                if definition.get("trade_date") != target_day.isoformat():
+                    raise HTTPException(409, "该任务编号的冻结目标日期不匹配，拒绝覆盖")
+                resumed = True
+            else:
+                try:
+                    reader._find_task(task_id)
+                except HTTPException as exc:
+                    if exc.status_code != 404:
+                        raise
+                else:
+                    raise HTTPException(409, "已有任务文件未登记在当前运行库；页面不会覆盖该记录")
+                metadata_path = reader.paths["metadata_path"]
+                if not metadata_path.is_file():
+                    raise HTTPException(409, "本地交易日历尚未初始化；请先完成交易日历导入")
+                try:
+                    from .calendar import TradingCalendarStore
+                    with TradingCalendarStore(str(metadata_path), read_only=True) as calendar:
+                        is_trading_day = calendar.is_trading_day(target_day)
+                except (OSError, ValueError, sqlite3.Error) as exc:
+                    raise HTTPException(409, "本地交易日历不可读取；任务未受理") from exc
+                if is_trading_day is not True:
+                    raise HTTPException(409, "目标日期没有已确认的交易日记录；任务未受理")
+                from ..worker.scheduler import build_daily_bar_definition, build_security_master_definition
+                builder = build_daily_bar_definition if dataset == "daily_bar" else build_security_master_definition
+                definition = builder(reader.config_root, trade_date=target_day,
+                    now=datetime.now(timezone.utc), is_trading_day=True, task_id=task_id)
+                mode = "live"
+                resumed = False
+
+            from ..pipeline.inputs import submit_collection_task
+            from ..storage.metadata import CollectionTaskScopeConflict, CollectionTaskSnapshotChanged
+            try:
+                accepted = await run_in_threadpool(submit_collection_task,
+                    definition=definition, config_root=reader.config_root, data_root=reader.paths["data_root"],
+                    redo="resume", mode=mode)
+            except CollectionTaskScopeConflict as exc:
+                raise HTTPException(409, f"任务范围冲突，未受理：{exc}") from exc
+            except CollectionTaskSnapshotChanged as exc:
+                raise HTTPException(409, f"正式数据已变化，请刷新后重试：{exc}") from exc
+            return task_acceptance_response(accepted, dataset=dataset, resumed=resumed)
+        except HTTPException:
+            raise
+        except sqlite3.OperationalError as exc:
+            code = getattr(exc, "sqlite_errorcode", None)
+            if isinstance(code, int) and (code & 0xFF) in {sqlite3.SQLITE_BUSY, sqlite3.SQLITE_LOCKED}:
+                raise HTTPException(503, "任务队列繁忙，请稍后重试", headers={"Retry-After": "1"}) from exc
+            raise HTTPException(409, "任务队列或运行库不可用") from exc
+        except (ValueError, KeyError, TypeError, OSError) as exc:
+            raise HTTPException(400, str(exc)) from exc
+
+    @app.post("/api/tasks/{task_id}/resume", status_code=202)
+    async def resume_task(task_id: str, request: Request):
+        require_local_admin_request(request)
+        if not can_write_data_root():
+            raise HTTPException(409, "当前运行台配置的数据目录不可写；只读部署不能续跑任务")
+        state = runtime_task(task_id)
+        if state is None:
+            raise HTTPException(404, "任务不存在")
+        if state.get("status") == "published":
+            raise HTTPException(409, "已发布任务不能续跑；如需重做，请创建新任务")
+        reference = state.get("definition_ref", {})
+        path = Path(reference.get("path", "")) if isinstance(reference, dict) else Path()
+        if not _within(path, reader.paths["workspace_root"]):
+            raise HTTPException(409, "归档任务只读，不能从页面续跑")
+        if state.get("status") in {"waiting", "collecting", "checking", "committing"}:
+            return task_acceptance_response({**state, "already_queued": True},
+                                            dataset=state.get("dataset", ""), resumed=True)
+        definition, mode = frozen_task_for_resume(task_id, state)
+        try:
+            from ..pipeline.inputs import submit_collection_task
+            from ..storage.metadata import CollectionTaskScopeConflict, CollectionTaskSnapshotChanged
+            accepted = await run_in_threadpool(submit_collection_task,
+                definition=definition, config_root=reader.config_root, data_root=reader.paths["data_root"],
+                redo="resume", mode=mode)
+        except CollectionTaskScopeConflict as exc:
+            raise HTTPException(409, f"续跑范围冲突，未受理：{exc}") from exc
+        except CollectionTaskSnapshotChanged as exc:
+            raise HTTPException(409, f"正式数据已变化，请重新核对后续跑：{exc}") from exc
+        except sqlite3.OperationalError as exc:
+            code = getattr(exc, "sqlite_errorcode", None)
+            if isinstance(code, int) and (code & 0xFF) in {sqlite3.SQLITE_BUSY, sqlite3.SQLITE_LOCKED}:
+                raise HTTPException(503, "任务队列繁忙，请稍后重试", headers={"Retry-After": "1"}) from exc
+            raise HTTPException(409, "任务队列或运行库不可用") from exc
+        except (ValueError, KeyError, TypeError, OSError) as exc:
+            raise HTTPException(409, f"冻结任务无法续跑：{exc}") from exc
+        return task_acceptance_response(accepted, dataset=state.get("dataset", ""), resumed=True)
 
     @app.get("/api/tasks/{task_id}")
     def task(task_id: str):

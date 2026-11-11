@@ -17,19 +17,26 @@ from ..storage.parquet import DAILY_SCHEMA_VERSION
 from ..config.loader import load_input_capabilities
 
 
-def save_batch_json(path, value):
+def save_batch_json(path, value, *, canonical=False):
     """Atomic durable artifact replacement; persistent names describe their contents."""
+    import hashlib
     import json
     import os
     from .inputs import _json_value
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix + ".tmp")
+    if canonical:
+        from ..storage.integrity import canonical_json_bytes
+        payload = canonical_json_bytes(value)
+    else:
+        payload = json.dumps(_json_value(value), ensure_ascii=False, sort_keys=True).encode("utf-8")
     with temporary.open("wb") as stream:
-        stream.write(json.dumps(_json_value(value), ensure_ascii=False, sort_keys=True).encode("utf-8"))
+        stream.write(payload)
         stream.flush()
         os.fsync(stream.fileno())
     os.replace(temporary, path)
+    return hashlib.sha256(payload).hexdigest() if canonical else None
 
 
 def daily_unit_paths(work, unit):
@@ -316,13 +323,25 @@ def _normalize_symbol_parallel_codes(groups):
     return result
 
 
-def resolve_daily_definition(definition, config_root):
+def resolve_daily_definition(definition, config_root, *, input_capabilities=None, _documents=None):
+    config_root = Path(config_root)
+    if _documents is None:
+        _documents = {}
+
+    def load_document(relative_path):
+        if relative_path not in _documents:
+            _documents[relative_path] = yaml.safe_load(
+                (config_root / relative_path).read_text(encoding="utf-8"))
+        return _documents[relative_path]
+
+    if input_capabilities is None:
+        input_capabilities = load_input_capabilities(config_root / "providers.yaml")
     definition = deepcopy(definition)
     # Suspension exclusions are derived only from a fresh, non-fallback master
     # publication; a task file cannot lower its own coverage denominator.
     definition.pop("suspended_securities", None)
     definition.pop("lifecycle_exclusions", None)
-    tasks = yaml.safe_load((config_root / "collection.yaml").read_text(encoding="utf-8")).get("tasks", {})
+    tasks = load_document("collection.yaml").get("tasks", {})
     if "task" in definition:
         target = tasks[definition["task"]]
         if target["dataset"] != "daily_bar":
@@ -339,7 +358,8 @@ def resolve_daily_definition(definition, config_root):
                 or definition.get("universe") not in {"static", "all"}):
             raise ValueError("daily batch requires explicit unique asset_types and universe static/all")
         resolved = {asset: resolve_daily_definition({**{k: v for k, v in definition.items()
-                    if k not in {"asset_types", "task"}}, "asset_type": asset, "universe": "static"}, config_root)
+                    if k not in {"asset_types", "task"}}, "asset_type": asset, "universe": "static"},
+                    config_root, input_capabilities=input_capabilities, _documents=_documents)
                     for asset in assets}
         first = next(iter(resolved.values()))
         return {**{k: v for k, v in first.items() if k not in {"asset_type", "quote_contract"}},
@@ -348,7 +368,7 @@ def resolve_daily_definition(definition, config_root):
     if definition.get("asset_type", asset) != asset:
         raise ValueError("daily asset_type conflicts with universe")
     AssetType(asset)
-    document = yaml.safe_load((config_root / "datasets/daily_bar.yaml").read_text(encoding="utf-8"))
+    document = load_document("datasets/daily_bar.yaml")
     contract = deepcopy(document["applicability"][asset])
     for adjustment in Adjustment:
         spec = contract[adjustment.value]
@@ -357,15 +377,15 @@ def resolve_daily_definition(definition, config_root):
     if contract.get("none") != "required":
         raise ValueError("daily result requires the unadjusted quote")
     policy_name = definition.get("acquisition_policy", "daily_fixed")
-    policies = yaml.safe_load((config_root / "capabilities.yaml").read_text(encoding="utf-8"))["acquisition_policies"]
+    policies = load_document("capabilities.yaml")["acquisition_policies"]
     policy = deepcopy(policies[policy_name])
     from ..service.instruments import normalize_symbol_successions
-    security_master = yaml.safe_load((config_root / "datasets/security_master.yaml").read_text(encoding="utf-8"))
+    security_master = load_document("datasets/security_master.yaml")
     symbol_successions = normalize_symbol_successions(security_master.get("symbol_successions", []))
     symbol_parallel_codes = _normalize_symbol_parallel_codes(security_master.get("symbol_parallel_codes", []))
     if policy["mode"] not in {"fixed", "failover"} or not isinstance(policy.get("inputs"), list) or not policy["inputs"]:
         raise ValueError("daily source policy requires an explicit nonempty input list")
-    contracts = {item.input_id: item for item in load_input_capabilities(config_root / "providers.yaml")}
+    contracts = {item.input_id: item for item in input_capabilities}
     defaults = [item for item in policy["inputs"] if item.get("default") is True]
     if len(defaults) != 1 or defaults[0]["input_id"] != "ASTOCK-002-daily":
         raise ValueError("daily source policy requires exactly one Tencent default route")
@@ -424,7 +444,7 @@ def resolve_daily_definition(definition, config_root):
             "publication_policy": deepcopy(document["dataset"]["publication"])}
 
 
-def expand_daily_units(units, definition):
+def expand_daily_units(units, definition, *, _owned_units=False):
     if "asset_types" in definition:
         expanded = []
         for asset in definition["asset_types"]:
@@ -433,16 +453,17 @@ def expand_daily_units(units, definition):
                 raise ValueError(f"daily batch has no securities for {asset}")
             typed = {k: v for k, v in definition.items() if k != "asset_types"}
             typed.update(asset_type=asset, quote_contract=definition["quote_contracts"][asset])
-            expanded.extend(expand_daily_units(group, typed))
+            expanded.extend(expand_daily_units(group, typed, _owned_units=_owned_units))
         if len({u["key"] for u in expanded}) != len(expanded):
             raise ValueError("daily batch source units must be unique")
         return expanded
-    units = [deepcopy(unit) for unit in units]
+    units = list(units) if _owned_units else [deepcopy(unit) for unit in units]
     sources = definition["source_policy"]["inputs"]
     default_source = next(source for source in sources if source.get("default") is True)
     from datetime import date
-    from ..service.instruments import symbol_succession_for
+    from ..service.instruments import normalize_symbol_successions, _symbol_succession_for_normalized
     parallel_codes = _normalize_symbol_parallel_codes(definition.get("symbol_parallel_codes", ()))
+    normalized_successions = None
     for unit in units:
         symbol = str(unit.get("symbol", ""))
         market = _daily_market(symbol)
@@ -451,7 +472,9 @@ def expand_daily_units(units, definition):
         if not target:
             continue
         target_date = target if isinstance(target, date) else date.fromisoformat(str(target)[:10])
-        relation = symbol_succession_for(definition.get("symbol_successions", ()), market=market,
+        if normalized_successions is None:
+            normalized_successions = normalize_symbol_successions(definition.get("symbol_successions", ()))
+        relation = _symbol_succession_for_normalized(normalized_successions, market=market,
             asset_type=unit.get("asset_type", definition["asset_type"]), symbol=symbol, as_of_date=target_date)
         if relation is None:
             continue
@@ -496,7 +519,8 @@ def expand_daily_units(units, definition):
             raise ValueError(f"daily source policy has no route for market {market}")
         value_contract = source.get("value_contract", "full_ohlc")
         if "adjustment" in unit:
-            item = deepcopy(unit)
+            item = ({**unit, "context": deepcopy(unit.get("context", {}))}
+                    if _owned_units else deepcopy(unit))
             item.update(input_id=source["input_id"], provider=source["provider"], endpoint=source["endpoint"],
                         value_contract=value_contract)
             expanded.append(item)
@@ -515,7 +539,8 @@ def expand_daily_units(units, definition):
             )
             if state != "required" and not request_optional_stock_adjustment:
                 continue
-            item = deepcopy(unit)
+            item = ({**unit, "context": deepcopy(unit.get("context", {}))}
+                    if _owned_units else deepcopy(unit))
             item.update(key=unit["symbol"] + "__" + name, adjustment=name, asset_type=definition["asset_type"],
                         input_id=source["input_id"], provider=source["provider"], endpoint=source["endpoint"],
                         value_contract=value_contract)

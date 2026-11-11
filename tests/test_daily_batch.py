@@ -492,6 +492,7 @@ def test_one_frozen_plan_optional_processing_failure_keeps_partial_publish_statu
 
 
 def test_yaml_target_expands_stock_etf_and_index_and_freezes_published_master(tmp_path):
+    from copy import deepcopy
     from test_collection_tasks import run as master_run, master_definition, FaultCollector
     from stock_data_manage.pipeline.daily import resolve_daily_definition, expand_daily_units
     from stock_data_manage.pipeline.inputs import _task_units
@@ -506,6 +507,9 @@ def test_yaml_target_expands_stock_etf_and_index_and_freezes_published_master(tm
     definition = resolve_daily_definition({'task_id':'whole-market','task':'market_daily','trade_date':master['trade_date']},CONFIG)
     units = _task_units(definition, load_storage_paths(CONFIG,data_root=tmp_path))
     expanded = expand_daily_units(units, definition)
+    owned_units = deepcopy(units)
+    expanded_owned = expand_daily_units(owned_units, definition, _owned_units=True)
+    assert expanded_owned == expanded
     assert len(units) == 3 and len(expanded) == 5
     assert {u['context']['config']['adjust'] for u in expanded if u['asset_type']=='stock'} == {'none','qfq','hfq'}
     assert all(u['context']['config']['adjust']=='none' for u in expanded if u['asset_type']!='stock')

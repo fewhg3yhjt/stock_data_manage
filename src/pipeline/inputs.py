@@ -1393,7 +1393,7 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
     from contextlib import nullcontext
     from queue import Empty, Full, Queue
     from threading import Event, Thread
-    from ..config.loader import InputCapabilityConfig, ParameterBinding
+    from ..config.loader import InputCapabilityConfig, ParameterBinding, load_input_capabilities
     from ..storage.integrity import row_hash, file_hash
     from ..storage.metadata import MetadataStore
     from ..storage.parquet import PartitionLock, daily_records_to_table
@@ -1439,7 +1439,9 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                         return {"_prepared_submission": True, "state": state, "frozen": frozen}
                     return _daily_batch_result(_finish_daily_batch(state, paths, metadata, failure_hook))
             else:
-                resolved = resolve_daily_definition(definition, config_root)
+                available_capabilities = load_input_capabilities(config_root / 'providers.yaml')
+                resolved = resolve_daily_definition(definition, config_root,
+                    input_capabilities=available_capabilities)
                 if 'asset_types' not in resolved:
                     resolved['asset_types'] = [resolved.pop('asset_type')]
                     resolved['quote_contracts'] = {resolved['asset_types'][0]: resolved.pop('quote_contract')}
@@ -1463,10 +1465,10 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                     resolved["suspended_securities"] = [{key: unit.get(key) for key in
                         ("symbol", "instrument_id", "asset_type", "status", "status_evidence")} for unit in suspended]
                     base = [unit for unit in base if unit not in suspended]
-                units = expand_daily_units(base, resolved) if base else []
+                units = expand_daily_units(base, resolved, _owned_units=True) if base else []
                 if not units and not resolved.get('suspended_securities'):
                     raise ValueError('daily batch requires a nonempty security scope')
-                available_contracts = {c.input_id: c for c in load_input_capabilities(config_root / 'providers.yaml')}
+                available_contracts = {c.input_id: c for c in available_capabilities}
                 used_input_ids = {unit['input_id'] for unit in units}
                 contracts = {input_id: available_contracts[input_id] for input_id in used_input_ids}
                 for unit in units:
@@ -1495,9 +1497,9 @@ def _collect_daily_batch(*, definition, config_root, data_root, redo, symbols, m
                 work = paths['workspace_root'] / resolved['trade_date'] / 'daily_bar' / task_id
                 if work.exists():
                     raise ValueError('unmanaged daily workspace exists; use a new task ID/root')
-                save_batch_json(work / 'task.json', frozen)
+                frozen_sha256 = save_batch_json(work / 'task.json', frozen, canonical=True)
                 state = {'format_version': 'daily-table-batch-v1', 'task_id': task_id, 'dataset': 'daily_bar',
-                    'definition_hash': row_hash(frozen), 'definition_ref': {'path': str(work / 'task.json'), 'sha256': file_hash(work / 'task.json')},
+                    'definition_hash': frozen_sha256, 'definition_ref': {'path': str(work / 'task.json'), 'sha256': frozen_sha256},
                     'status': 'collecting', 'phase': 'prepare', 'requested_date': resolved['trade_date'],
                     'verification_mode': mode, 'source_unit_count': len(units), 'partitions': {},
                     'lifecycle_exclusions': list(resolved.get('lifecycle_exclusions', ())),

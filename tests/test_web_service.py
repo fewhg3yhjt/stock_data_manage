@@ -1,14 +1,19 @@
 import hashlib
 import json
+import asyncio
 import time
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
+from threading import Event, Lock
 
 import pytest
 from fastapi import HTTPException
 from fastapi.testclient import TestClient
 
 from stock_data_manage.service.web import DashboardReader, create_app
+
+if hasattr(asyncio, "WindowsSelectorEventLoopPolicy"):
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
 def write_json(path: Path, value: dict) -> None:
@@ -482,7 +487,9 @@ def test_raw_token_cannot_escape_managed_root_and_app_is_read_only(tmp_path):
     api_methods = {
         method
         for route in app.routes
-        if getattr(route, "path", "").startswith("/api/")
+        if (getattr(route, "path", "").startswith("/api/")
+            and route.path != "/api/tasks/run"
+            and not route.path.endswith("/resume"))
         for method in (getattr(route, "methods", set()) or set())
     }
     after = sorted((path.relative_to(data), path.read_bytes()) for path in data.rglob("*") if path.is_file())
@@ -891,3 +898,455 @@ def test_record_query_is_read_only_and_sees_changed_source_report(tmp_path):
     add("sh600519", [{"0":"2026-10-09","2":"999.00","symbol":"sh600519"}])
     result = reader.data_records(dataset="daily_bar",security="600519")
     assert result["total"] == 1 and result["items"][0]["values"]["2"] == "999.00"
+
+
+def _task_api_runtime(tmp_path, calendar_days=(date(2026, 10, 28), date(2026, 10, 29))):
+    import shutil
+    from stock_data_manage.config.loader import load_storage_paths
+    from stock_data_manage.service.calendar import CalendarDay, TradingCalendarStore
+    from stock_data_manage.storage.metadata import MetadataStore
+
+    config = tmp_path / "config"
+    shutil.copytree(Path(__file__).resolve().parents[1] / "config", config)
+    data = tmp_path / "runtime"
+    metadata_path = load_storage_paths(config, data_root=data)["metadata_path"]
+    metadata_path.parent.mkdir(parents=True, exist_ok=True)
+    with MetadataStore(metadata_path):
+        pass
+    with TradingCalendarStore(str(metadata_path)) as calendar:
+        calendar.upsert(CalendarDay(day, True, "offline-test-calendar", 100) for day in calendar_days)
+    return config, data, metadata_path
+
+
+def _wait_for_web_task_status(metadata_path, task_id, expected, timeout=5.0):
+    from stock_data_manage.storage.metadata import MetadataStore
+
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        with MetadataStore(metadata_path, read_only=True) as metadata:
+            state = metadata.load_collection_task(task_id)
+        if state and state.get("status") == expected:
+            return state
+        time.sleep(0.01)
+    raise AssertionError(f"task {task_id} did not reach {expected!r} within {timeout}s")
+
+
+def test_task_options_and_unconfirmed_calendar_have_no_runtime_side_effect(tmp_path):
+    import shutil
+
+    config = tmp_path / "config"
+    shutil.copytree(Path(__file__).resolve().parents[1] / "config", config)
+    runtime = tmp_path / "runtime"
+    with TestClient(create_app(config_root=config, data_root=runtime),
+                    base_url="http://127.0.0.1", client=("127.0.0.1", 5000)) as client:
+        options = client.get("/api/task-options")
+        assert options.status_code == 200
+        assert {item["dataset"] for item in options.json()["items"] if item["configured"]} == {
+            "daily_bar", "security_master"}
+        assert options.json()["manual_run_enabled"] is True
+        assert options.json()["scheduler_active"] is False
+        response = client.post("/api/tasks/run", json={"dataset": "security_master", "trade_date": "2026-10-29"})
+        assert response.status_code == 409
+        assert "交易日历" in response.json()["detail"]
+    assert not runtime.exists()
+
+
+def test_task_routes_reject_remote_invalid_and_unknown_requests_without_side_effect(tmp_path):
+    import shutil
+
+    config = tmp_path / "config"
+    shutil.copytree(Path(__file__).resolve().parents[1] / "config", config)
+    runtime = tmp_path / "runtime"
+    app = create_app(config_root=config, data_root=runtime)
+    with TestClient(app, base_url="http://127.0.0.1", client=("127.0.0.1", 5000)) as client:
+        cross_origin = client.post("/api/tasks/run", json={
+            "dataset": "security_master", "trade_date": "2026-10-28"},
+            headers={"origin": "http://untrusted.example"})
+        assert cross_origin.status_code == 403
+        wrong_media_type = client.post("/api/tasks/run", content="{}",
+            headers={"content-type": "text/plain"})
+        assert wrong_media_type.status_code == 415
+        unsupported = client.post("/api/tasks/run", json={"dataset": "minute_bar", "trade_date": "2026-10-28"})
+        assert unsupported.status_code == 400
+        invalid_date = client.post("/api/tasks/run", json={"dataset": "security_master", "trade_date": "not-a-date"})
+        assert invalid_date.status_code == 400
+        missing_resume = client.post("/api/tasks/not-present/resume", json={})
+        assert missing_resume.status_code == 404
+    with TestClient(app, base_url="http://127.0.0.1", client=("192.0.2.10", 5000)) as remote_client:
+        remote = remote_client.post("/api/tasks/run", json={
+            "dataset": "security_master", "trade_date": "2026-10-28"})
+        assert remote.status_code == 403
+    assert not runtime.exists()
+
+
+@pytest.mark.parametrize(
+    ("task_status", "outside_workspace", "expected_detail"),
+    [("published", False, "已发布"), ("failed", True, "归档")],
+)
+def test_web_resume_rejects_published_and_archived_tasks(
+        tmp_path, task_status, outside_workspace, expected_detail):
+    from stock_data_manage.storage.metadata import MetadataStore
+
+    config, data, metadata_path = _task_api_runtime(tmp_path)
+    task_id = "security-master-20261028" if not outside_workspace else "security-master-20261029"
+    if outside_workspace:
+        definition_path = tmp_path / "archive" / task_id / "task.json"
+    else:
+        definition_path = data / "task_workspace" / "2026-10-28" / "security_master" / task_id / "task.json"
+    with MetadataStore(metadata_path) as metadata:
+        metadata.save_collection_task({
+            "task_id": task_id, "dataset": "security_master", "definition_hash": "frozen-hash",
+            "definition_ref": {"path": str(definition_path), "sha256": "frozen-file-hash"},
+            "status": task_status, "verification_mode": "live",
+        })
+    app = create_app(config_root=config, data_root=data)
+    with TestClient(app, base_url="http://127.0.0.1", client=("127.0.0.1", 5000)) as client:
+        response = client.post(f"/api/tasks/{task_id}/resume", json={})
+    assert response.status_code == 409
+    assert expected_detail in response.json()["detail"]
+
+
+def test_web_task_submissions_are_durable_and_worker_consumes_fifo(tmp_path, monkeypatch):
+    from stock_data_manage.pipeline import inputs
+    from stock_data_manage.storage.metadata import MetadataStore
+
+    calendar_days = []
+    candidate = date(2026, 10, 28)
+    while len(calendar_days) < 11:
+        if candidate.weekday() < 5:
+            calendar_days.append(candidate)
+        candidate = date.fromordinal(candidate.toordinal() + 1)
+    config, data, metadata_path = _task_api_runtime(tmp_path, calendar_days=tuple(calendar_days))
+    task_ids = ["security-master-" + day.strftime("%Y%m%d") for day in calendar_days]
+    first_id = task_ids[0]
+    first_started, release_first = Event(), Event()
+    executed, executed_lock = [], Lock()
+    worker_starts = []
+    enqueue_seconds = []
+
+    actual_worker = inputs.run_collection_worker
+
+    def counted_worker(**kwargs):
+        worker_starts.append(True)
+        return actual_worker(**kwargs)
+
+    def offline_execute(*, definition, config_root, data_root=None, **_kwargs):
+        task_id = definition["task_id"]
+        with executed_lock:
+            executed.append(task_id)
+        if task_id == first_id:
+            first_started.set()
+            if not release_first.wait(30):
+                raise TimeoutError("FIFO fixture did not release the first task")
+        paths = __import__("stock_data_manage.config.loader", fromlist=["load_storage_paths"]).load_storage_paths(
+            config_root, data_root=data_root)
+        with MetadataStore(paths["metadata_path"]) as metadata:
+            state = metadata.load_collection_task(task_id)
+            state.update(status="published", phase="finished", error=None,
+                         updated_at=datetime.now(timezone.utc).isoformat())
+            metadata.save_collection_task(state)
+        return state
+
+    monkeypatch.setattr(inputs, "_execute_task_body", offline_execute)
+    monkeypatch.setattr(inputs, "run_collection_worker", counted_worker)
+    app = create_app(config_root=config, data_root=data)
+    with TestClient(app, base_url="http://127.0.0.1", client=("127.0.0.1", 5000)) as client:
+        try:
+            first_started_at = time.perf_counter()
+            first = client.post("/api/tasks/run", json={
+                "dataset": "security_master", "trade_date": calendar_days[0].isoformat()})
+            enqueue_seconds.append(time.perf_counter() - first_started_at)
+            assert first.status_code == 202, first.text
+            assert first.json()["status"] == "waiting"
+            assert first.json()["queue_order"] == 1
+            assert first_started.wait(5), "the application-lifetime worker did not claim the first task"
+
+            for queue_order, (day, task_id) in enumerate(zip(calendar_days[1:], task_ids[1:]), start=2):
+                started_at = time.perf_counter()
+                response = client.post("/api/tasks/run", json={
+                    "dataset": "security_master", "trade_date": day.isoformat()})
+                enqueue_seconds.append(time.perf_counter() - started_at)
+                assert response.status_code == 202, response.text
+                assert response.json()["status"] == "waiting"
+                assert response.json()["queue_order"] == queue_order
+
+            repeated = client.post("/api/tasks/run", json={
+                "dataset": "security_master", "trade_date": calendar_days[-1].isoformat()})
+            assert repeated.status_code == 202, repeated.text
+            assert repeated.json()["already_queued"] is True
+            assert repeated.json()["resumed"] is False
+            assert repeated.json()["queue_order"] == 11
+            resumed_waiter = client.post(f"/api/tasks/{task_ids[-1]}/resume", json={})
+            assert resumed_waiter.status_code == 202, resumed_waiter.text
+            assert resumed_waiter.json()["already_queued"] is True
+            assert resumed_waiter.json()["queue_order"] == 11
+            assert len(worker_starts) == 1
+            with MetadataStore(metadata_path, read_only=True) as metadata:
+                persisted = [metadata.load_collection_task(task_id) for task_id in task_ids[1:]]
+            assert [state["status"] for state in persisted] == ["waiting"] * 10
+            assert [state["queue_order"] for state in persisted] == list(range(2, 12))
+        finally:
+            release_first.set()
+
+        for task_id in task_ids:
+            _wait_for_web_task_status(metadata_path, task_id, "published")
+        assert executed == task_ids
+    assert len(worker_starts) == 1
+    assert max(enqueue_seconds) < 5.0
+
+
+def _publish_web_test_security_master(config, data_root):
+    from stock_data_manage.config.loader import load_storage_paths
+    from stock_data_manage.domain import AssetType, Exchange
+    from stock_data_manage.service.instruments import SecurityMasterStore, SecurityRecord
+    from stock_data_manage.storage.integrity import Manifest
+
+    records = []
+
+    def add_records(exchange, asset_type, start, count):
+        for index in range(count):
+            symbol = f"{start + index:06d}"
+            records.append(SecurityRecord(
+                instrument_id=f"{exchange.value}:{symbol}", symbol=symbol, exchange=exchange,
+                asset_type=asset_type, name=f"离线证券-{symbol}"))
+
+    add_records(Exchange.XSHG, AssetType.STOCK, 600000, 2787)
+    add_records(Exchange.XSHE, AssetType.STOCK, 1, 2786)
+    add_records(Exchange.XSHG, AssetType.ETF, 510000, 1694)
+    add_records(Exchange.XSHG, AssetType.INDEX, 1, 595)
+    directory = load_storage_paths(config, data_root=data_root)["canonical_root"] / "security_master" / "current"
+    directory.mkdir(parents=True, exist_ok=True)
+    database = directory / "security_master.duckdb"
+    with SecurityMasterStore(str(database)) as store:
+        store.publish(records)
+        actual_count = store.count()
+    identities = sorted(record.instrument_id for record in records)
+    manifest = Manifest.from_file(database, dataset="security_master", asset_type="security",
+        partition_key="2026-10-27", row_count=actual_count, expected_count=actual_count,
+        first_key=identities[0], last_key=identities[-1],
+        publication_metadata={"as_of_date": "2026-10-27", "required_groups": ["offline-fixture"]})
+    manifest.write_atomic(directory / "manifest.json")
+    return actual_count
+
+
+def _seed_web_task_history(metadata_path, *, count=10000):
+    from stock_data_manage.storage.metadata import MetadataStore
+
+    now = datetime.now(timezone.utc)
+    updated_at = now.isoformat()
+    rows = []
+    for index in range(count):
+        task_id = f"history-{index:05d}"
+        state = json.dumps({"task_id": task_id, "dataset": "daily_bar", "status": "published",
+                            "updated_at_utc": updated_at}, ensure_ascii=False)
+        rows.append((task_id, f"definition-{index:05d}", "daily_bar", "published", state, now))
+    with MetadataStore(metadata_path) as metadata:
+        metadata.connection.execute("BEGIN IMMEDIATE")
+        metadata.connection.executemany(
+            "INSERT INTO collection_task (task_id,definition_hash,dataset,status,state_json,updated_at) "
+            "VALUES (?,?,?,?,?,?)", rows)
+        metadata.connection.execute("COMMIT")
+
+
+def test_web_task_options_and_daily_admission_meet_documented_budgets(tmp_path, monkeypatch):
+    import requests
+    from stock_data_manage.pipeline import inputs
+    from stock_data_manage.storage.metadata import MetadataStore
+
+    trade_day = date(2026, 10, 28)
+    config, data, metadata_path = _task_api_runtime(tmp_path, calendar_days=(trade_day,))
+    master_count = _publish_web_test_security_master(config, data)
+    historical_count = 10000
+    _seed_web_task_history(metadata_path, count=historical_count)
+
+    worker_started = Event()
+    worker_starts = []
+
+    def idle_worker(*, stop_event, **_kwargs):
+        worker_starts.append(True)
+        worker_started.set()
+        stop_event.wait()
+
+    def deny_provider_request(*_args, **_kwargs):
+        raise AssertionError("Web task admission must not perform a Provider request")
+
+    monkeypatch.setattr(inputs, "run_collection_worker", idle_worker)
+    monkeypatch.setattr(requests.Session, "send", deny_provider_request)
+    app = create_app(config_root=config, data_root=data)
+    with TestClient(app, base_url="http://127.0.0.1", client=("127.0.0.1", 5000)) as client:
+        assert worker_started.wait(2), "the writable app did not start its single queue worker"
+        option_times = []
+        for _ in range(6):
+            started_at = time.perf_counter()
+            response = client.get("/api/task-options")
+            option_times.append(time.perf_counter() - started_at)
+            assert response.status_code == 200
+            assert response.json()["manual_run_enabled"] is True
+        first_options, warm_options = option_times[0], option_times[1:]
+        assert first_options <= 2.0
+        assert max(warm_options) <= 1.0
+
+        run_started = time.perf_counter()
+        accepted = client.post("/api/tasks/run", json={
+            "dataset": "daily_bar", "trade_date": trade_day.isoformat()})
+        run_seconds = time.perf_counter() - run_started
+        assert accepted.status_code == 202, accepted.text
+        assert accepted.json()["status"] == "waiting"
+        assert accepted.json()["queue_order"] == 1
+        task_id = accepted.json()["task_id"]
+        with MetadataStore(metadata_path, read_only=True) as metadata:
+            admitted = metadata.load_collection_task(task_id)
+        assert admitted["status"] == "waiting"
+        frozen_hash = admitted["definition_hash"]
+        frozen_reference = dict(admitted["definition_ref"])
+        from stock_data_manage.storage.integrity import file_hash, row_hash
+        frozen_path = Path(frozen_reference["path"])
+        frozen_document = json.loads(frozen_path.read_text(encoding="utf-8"))
+        assert row_hash(frozen_document) == frozen_hash
+        assert file_hash(frozen_path) == frozen_reference["sha256"] == frozen_hash
+        timing = {"task_options_first_seconds": round(first_options, 6),
+                  "task_options_warm_max_seconds": round(max(warm_options), 6),
+                  "daily_admission_http_seconds": round(run_seconds, 6),
+                  "daily_resume_http_seconds": None,
+                  "synthetic_security_master_rows": master_count,
+                  "historical_task_rows": historical_count,
+                  "provider_requests": 0}
+        (tmp_path / "web-task-performance.json").write_text(
+            json.dumps(timing, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        assert run_seconds <= 5.0
+
+        with MetadataStore(metadata_path) as metadata:
+            failed = metadata.load_collection_task(task_id)
+            failed.update(status="failed", error="offline admission timing fixture")
+            metadata.save_collection_task(failed)
+        resume_started = time.perf_counter()
+        resumed = client.post(f"/api/tasks/{task_id}/resume", json={})
+        resume_seconds = time.perf_counter() - resume_started
+        assert resumed.status_code == 202, resumed.text
+        assert resumed.json()["status"] == "waiting"
+        assert resumed.json()["resumed"] is True
+        assert resume_seconds <= 5.0
+        with MetadataStore(metadata_path, read_only=True) as metadata:
+            requeued = metadata.load_collection_task(task_id)
+            history_rows = metadata.connection.execute(
+                "SELECT count(*) FROM collection_task WHERE task_id LIKE 'history-%'").fetchone()[0]
+        assert requeued["status"] == "waiting"
+        assert requeued["definition_hash"] == frozen_hash
+        assert requeued["definition_ref"] == frozen_reference
+        assert history_rows == historical_count
+        assert len(worker_starts) == 1
+
+    performance = {**timing, "daily_resume_http_seconds": round(resume_seconds, 6),
+                   "historical_task_rows": history_rows}
+    (tmp_path / "web-task-performance.json").write_text(
+        json.dumps(performance, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print(performance)
+
+
+def test_read_only_web_instance_leaves_persisted_queue_waiting(tmp_path, monkeypatch):
+    import os
+    from stock_data_manage.pipeline.inputs import submit_collection_task
+    from stock_data_manage.storage.metadata import MetadataStore
+    from stock_data_manage.worker.scheduler import build_security_master_definition
+
+    trade_day = date(2026, 10, 28)
+    config, data, metadata_path = _task_api_runtime(tmp_path, calendar_days=(trade_day,))
+    task_id = "security-master-" + trade_day.strftime("%Y%m%d")
+    definition = build_security_master_definition(config, trade_date=trade_day,
+        now=datetime(2026, 11, 11, 12, tzinfo=timezone.utc), is_trading_day=True, task_id=task_id)
+    submit_collection_task(definition=definition, config_root=config, data_root=data, mode="live")
+    real_access = os.access
+
+    def read_only_root(path, mode):
+        if Path(path).resolve() == data.resolve():
+            return False
+        return real_access(path, mode)
+
+    monkeypatch.setattr("stock_data_manage.service.web.os.access", read_only_root)
+    app = create_app(config_root=config, data_root=data)
+    with TestClient(app, base_url="http://127.0.0.1", client=("127.0.0.1", 5000)) as client:
+        assert app.state.collection_worker_thread is None
+        options = client.get("/api/task-options")
+        assert options.status_code == 200
+        assert options.json()["manual_run_enabled"] is False
+        blocked = client.post("/api/tasks/run", json={
+            "dataset": "security_master", "trade_date": trade_day.isoformat()})
+        assert blocked.status_code == 409
+        assert "不可写" in blocked.json()["detail"]
+    with MetadataStore(metadata_path, read_only=True) as metadata:
+        queued = metadata.load_collection_task(task_id)
+    assert queued["status"] == "waiting"
+    assert queued["queue_order"] == 1
+
+
+@pytest.mark.parametrize("failure", ["scope_conflict", "sqlite_busy"])
+def test_task_run_reports_admission_conflict_and_busy_without_persisting(
+        tmp_path, monkeypatch, failure):
+    import sqlite3
+    from stock_data_manage.pipeline import inputs
+    from stock_data_manage.storage.metadata import CollectionTaskScopeConflict, MetadataStore
+
+    trade_day = date(2026, 10, 28)
+    config, data, metadata_path = _task_api_runtime(tmp_path, calendar_days=(trade_day,))
+
+    def fail_admission(**_kwargs):
+        if failure == "scope_conflict":
+            raise CollectionTaskScopeConflict("other-task", ({"trade_date": trade_day.isoformat()},))
+        error = sqlite3.OperationalError("database is locked")
+        error.sqlite_errorcode = sqlite3.SQLITE_BUSY
+        raise error
+
+    monkeypatch.setattr(inputs, "submit_collection_task", fail_admission)
+    app = create_app(config_root=config, data_root=data)
+    task_id = "security-master-" + trade_day.strftime("%Y%m%d")
+    with TestClient(app, base_url="http://127.0.0.1", client=("127.0.0.1", 5000)) as client:
+        response = client.post("/api/tasks/run", json={
+            "dataset": "security_master", "trade_date": trade_day.isoformat()})
+    expected = 409 if failure == "scope_conflict" else 503
+    assert response.status_code == expected
+    if failure == "sqlite_busy":
+        assert response.headers.get("Retry-After") == "1"
+        assert "繁忙" in response.json()["detail"]
+    else:
+        assert "范围冲突" in response.json()["detail"]
+    with MetadataStore(metadata_path, read_only=True) as metadata:
+        assert metadata.load_collection_task(task_id) is None
+
+
+def test_web_resume_requeues_the_frozen_task_definition(tmp_path, monkeypatch):
+    from stock_data_manage.pipeline import inputs
+    from stock_data_manage.storage.metadata import MetadataStore
+    from stock_data_manage.worker.scheduler import build_security_master_definition
+
+    config, data, metadata_path = _task_api_runtime(tmp_path, calendar_days=(date(2026, 10, 28),))
+    task_id = "security-master-20261028"
+    definition = build_security_master_definition(config, trade_date=date(2026, 10, 28),
+        now=datetime(2026, 11, 11, 12, tzinfo=timezone.utc), is_trading_day=True, task_id=task_id)
+    from stock_data_manage.pipeline.inputs import submit_collection_task
+    submit_collection_task(definition=definition, config_root=config, data_root=data, mode="live")
+    with MetadataStore(metadata_path) as metadata:
+        failed = metadata.load_collection_task(task_id)
+        definition_hash = failed["definition_hash"]
+        failed.update(status="failed", error="offline fixture failure")
+        metadata.save_collection_task(failed)
+    executed = Event()
+
+    def offline_execute(*, definition, config_root, data_root=None, **_kwargs):
+        with MetadataStore(metadata_path) as metadata:
+            state = metadata.load_collection_task(definition["task_id"])
+            state.update(status="published", phase="finished", error=None,
+                         updated_at=datetime.now(timezone.utc).isoformat())
+            metadata.save_collection_task(state)
+        executed.set()
+        return state
+
+    monkeypatch.setattr(inputs, "_execute_task_body", offline_execute)
+    app = create_app(config_root=config, data_root=data)
+    with TestClient(app, base_url="http://127.0.0.1", client=("127.0.0.1", 5000)) as client:
+        response = client.post(f"/api/tasks/{task_id}/resume", json={})
+        assert response.status_code == 202, response.text
+        assert response.json()["resumed"] is True
+        assert response.json()["status"] == "waiting"
+        assert executed.wait(5), "the requeued frozen task was not consumed"
+        state = _wait_for_web_task_status(metadata_path, task_id, "published")
+        assert state["definition_hash"] == definition_hash
