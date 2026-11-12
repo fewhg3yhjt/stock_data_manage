@@ -261,9 +261,9 @@ flowchart TB
 
 数据库只保存等待事实，不会自己执行任务。目标合同复用现有worker模块提供同一个取队首/执行循环：scheduler的到期轮询只负责受理；可写Web实例在应用生命周期内消费；CLI正式采集入口先受理并等待/驱动同一FIFO。`/api/tasks/run`与`/resume`调用`submit_collection_task`，把冻结定义和顺序写入现有SQLite后才返回202；可写应用生命周期启动一个`run_collection_worker`，由其调用`run_collection_queue_once`消费队首。只读Web不参与消费，waiting任务留在持久表中。两进程提交、两进程消费者、两个Web实例与实际CLI入口共享隔离SQLite/FIFO的组合已通过离线验收；scheduler常驻进程接线、独立Web服务进程以及完整并发场景仍未验收。所有消费者争用同一个现有整任务执行锁，只有取得执行权的一方能领取队首并运行；不增加新服务、消息中间件或另一套内存权威队列。
 
-Web worker目前以0.5秒轮询既有FIFO；不以线程唤醒作为交付保证。应用退出时先发出停止信号，再等待当前worker结束；尚未消费的任务仍在库中，下次可写Web启动后可继续看见。HTTP 202表示已持久受理，不表示采集已开始或完成；没有可用worker时，接口仍说明队列已保留。调度轮询继续按既有有限间隔判断到期，不能被网络线程阻塞。
+Web worker目前以0.5秒轮询既有FIFO；不以线程唤醒作为交付保证。应用退出时先发出停止信号，再等待当前worker结束；尚未消费的任务仍在库中，下次可写Web启动后可继续看见。2026-11-12隔离验收在同一运行根登记两个security_master任务，首项执行期间请求正常关闭：生命周期等待首项结束，第二项保持`waiting`；新建另一个Web应用生命周期后第二项按原`queue_order`消费。该测试使用离线执行替身更新任务元数据，不采集来源、不写业务分区；Web应用在同一操作系统进程内重建，不代表独立服务进程重启或强制退出恢复。HTTP 202表示已持久受理，不表示采集已开始或完成；没有可用worker时，接口仍说明队列已保留。调度轮询继续按既有有限间隔判断到期，不能被网络线程阻塞。
 
-进入下一普通运行前先处理已确认原执行者退出的committing恢复；浏览器关闭不停止后台，Web后端正常停止与强制退出分别沿既有生命周期/恢复合同，不凭前端断开释放执行权。已验收证据包含独立提交进程、独立消费者进程，以及同一隔离运行根中两个Web应用实例和实际CLI命令；两个Web应用在同一测试进程内，不能据此宣称多台/多个独立Web服务部署已经验收。调度常驻进程、服务关闭/重启恢复和其他生命周期边界仍须单独验证。
+进入下一普通运行前先处理已确认原执行者退出的committing恢复；浏览器关闭不停止后台，Web后端正常停机等待当前任务结束，不凭前端断开释放执行权。已验收证据包含独立提交进程、独立消费者进程，以及同一隔离运行根中两个Web应用实例和实际CLI命令；两个Web应用在同一测试进程内，不能据此宣称多台/多个独立Web服务部署已经验收。正常关闭后的未领取任务由新建Web应用生命周期续消费也已通过同进程隔离检查；scheduler常驻进程协作、独立操作系统服务重启、强制退出/committing恢复和其他生命周期边界仍须单独验证。
 
 ### 并发验收范围（Web受理与跨进程FIFO子集已验收，其余待执行）
 
@@ -271,12 +271,13 @@ Web worker目前以0.5秒轮询既有FIFO；不以线程唤醒作为交付保证
 |---|---|---|
 | Web受理/FIFO（已验收） | 单一隔离Web实例；首项执行被离线替身阻塞，后续10项逐个HTTP受理并核对waiting/queue_order；释放后核对执行顺序、重复`/run`与`/resume`幂等及唯一worker；另检查只读Web不消费 | `tests/test_web_service.py::test_web_task_submissions_are_durable_and_worker_consumes_fifo`及`test_read_only_web_instance_leaves_persisted_queue_waiting`；只代表单Web实例生命周期 |
 | 多入口受理与跨进程FIFO（已验收） | 两个独立提交进程对同日security_master竞争时只登记一项、另一项返回具体冲突；不同日期均受理且分配queue_order 1/2。三个任务由两个独立消费者进程竞争同一队列：首任务的离线执行替身被阻塞时，第二进程观察到执行锁占用；释放后替身按持久queue_order依次将三项任务状态更新为`published`，最大替身并发数为1。另用两个Web应用实例及实际`stock-data collect-task`命令竞争同一隔离FIFO，核对重复提交幂等、不同范围冲突、共用顺序及单一执行。 | `tests/test_web_service.py::test_collection_task_submission_is_serialized_across_processes`、`test_collection_queue_worker_processes_claim_fifo_one_at_a_time`、`test_two_web_instances_and_cli_share_fifo_and_single_execution`；4个参数化用例全部通过。离线替身不采集来源、不写业务分区，故该项只验收持久受理、领取顺序和全局执行权。证据见`tmp/web-multi-entry-acceptance-20261112-v6/`。Web实例和CLI组合在同一个测试进程；独立Web服务进程、scheduler常驻进程和停机/恢复仍未覆盖 |
+| Web正常停机与等待项续消费（已验收） | 同一隔离SQLite先登记2026-10-28/29两个security_master任务（queue_order 1/2）；Web生命周期worker领取首项并被离线执行替身阻塞。请求正常关闭后断言stop_event已置位、当前执行线程仍在运行且服务尚未退出；释放后服务退出，首项状态完成、第二项仍`waiting`。新建Web应用生命周期读取同一SQLite并消费第二项；最终顺序1/2、无任务丢失、替身最大并发数1。 | `tests/test_web_service.py::test_web_worker_shutdown_preserves_waiting_fifo_for_restart`；1通过、59未选，运行1.792秒。证据见`tmp/web-lifecycle-restart-20261112-v2/`。执行替身仅更新任务元数据，不请求Provider或写业务分区；两个应用生命周期在同一操作系统进程中，不能代表进程崩溃、强制退出或跨进程重启恢复 |
 | 页面/进度 | 代表7862证券、100交易日目标、10000条历史运行；列表页100项，持续保存进度并并发刷新各受影响API | 所有18个API的映射见运行台文档；任务列表不能解析10000份summary，来源查询不能先读全来源行再分页 |
 | 文件发布 | 2个证券子集更新同一日期资产；并发查询该分区及另一日期；在data替换后、manifest替换后、元数据登记前注入中断 | 只出现完整当前数据或明确更新中；其他证券不变，失败分区不伪装成功，覆盖后不提供旧行情快照 |
 | 清单/索引/原文 | 页面补名称时刷新完整清单；来源索引重建时分页查询；原文转正/归档时查看与下载固定事件 | 不丢索引新增项，不在只读查询建表，原文事件与正文逐字节对应，索引失败不抹掉正式行情 |
-| 生命周期/维护 | 重复worker、进程强制退出、恢复/归档与执行冲突、停调与受理先后各一次、只读和独立隔离根；长任务跨过下一周期、入队与空闲退出交错、所有执行进程关闭后重启 | 超时不等于进程死亡；维护不形成锁环；停调不取消既有运行；长任务不堵到期受理，不丢唤醒或假运行；未涉及的分钟生产/多机不算通过 |
+| 尚未验收的生命周期/维护场景 | 独立Web操作系统进程启动、强制退出及committing恢复；恢复/归档与执行冲突；scheduler停止与受理先后；长任务跨过下一周期、入队与空闲退出交错；所有进程关闭后的实际服务进程重启 | 同进程新建Web应用并续消费已由上一行验证；它不证明进程死亡、文件锁回收或committing恢复。超时不等于进程死亡；维护不形成锁环；停调不取消既有运行；长任务不堵到期受理，不丢唤醒或假运行；未涉及的分钟生产/多机不算通过 |
 
-除上表明确标为已验收的两个FIFO子集外，其余并发与生命周期场景仅完成静态设计。性能合同为小型状态/配置读首读≤2秒、复用≤1秒，手动本地范围受理/续跑≤5秒，短写事务目标100毫秒且不包含网络/文件大读取；忙碌等待必须有上限并返回原因，不能沿用索引30秒等待作为页面默认。Web已在单日、7862条合成证券清单与10000条历史运行的范围内通过上述计时；范围、结果和局限见[阶段进度](../../PROJECT_PROGRESS.md)。它不代表100交易日受理，也不代替其他API工作量边界和剩余并发场景验收。已通过的既有来源证据复用，不为并发验收重新进行全市场网络采集。
+除上表明确标为已验收的FIFO与Web正常停机子集外，其余并发与生命周期场景仅完成静态设计。性能合同为小型状态/配置读首读≤2秒、复用≤1秒，手动本地范围受理/续跑≤5秒，短写事务目标100毫秒且不包含网络/文件大读取；忙碌等待必须有上限并返回原因，不能沿用索引30秒等待作为页面默认。Web已在单日、7862条合成证券清单与10000条历史运行的范围内通过上述计时；范围、结果和局限见[阶段进度](../../PROJECT_PROGRESS.md)。它不代表100交易日受理，也不代替其他API工作量边界和剩余并发场景验收。已通过的既有来源证据复用，不为并发验收重新进行全市场网络采集。
 
 ```mermaid
 flowchart TB
@@ -300,6 +301,7 @@ flowchart TB
         WWORKER[Web生命周期worker] --> CONSUME[run_collection_queue_once]
         CWORKER[CLI同步驱动] --> CONSUME
         SWORKER[调度器执行循环] --> CONSUME
+        WWORKER -. 正常关闭 .-> APP_STOP[Web lifespan设置stop_event]
         CONSUME --> LOCK{现有 collection.lock<br/>是否取得执行权?}
         LOCK -->|是| CLAIM[claim_next_collection_task<br/>原子领取FIFO队首]
         LOCK -->|否/已被其他进程持有| BUSY[本轮不领取<br/>等待下一次轮询]
@@ -307,8 +309,15 @@ flowchart TB
         BUSY -->|下一次消费循环| CONSUME
         CLAIM --> EXEC[按冻结定义运行既有任务执行模块]
         EXEC --> SAVE[保存进度及最终状态<br/>成功发布 / 失败可续跑]
+        SAVE --> STOP_CHECK{stop_event是否已设置?}
+        APP_STOP --> STOP_CHECK
+        STOP_CHECK -->|否| CONSUME
+        STOP_CHECK -->|是| EXIT[当前任务收尾后worker退出]
+        EXIT --> WAIT
         CHECK -. 校验/范围/SQLite错误 .-> REJECT[明确拒绝，不返回受理]
         ACCEPT -. 没有消费者或服务关闭 .-> WAIT[任务仍为waiting<br/>之后的可写入口可见]
+        WAIT --> RESTART[新建可写Web应用生命周期]
+        RESTART --> CONSUME
     end
     subgraph PROPOSAL[数据窗口与批处理提案，待确认]
         I[冻结日期、证券、来源策略] --> W[按目标交易日及容量规划窗口与条数]

@@ -1691,3 +1691,138 @@ def test_two_web_instances_and_cli_share_fifo_and_single_execution(tmp_path, mon
     queue_order = {task_id: accepted["queue_order"] for task_id, accepted in accepted_elsewhere.items()}
     assert set(queue_order) == {first_id, web_id, cli_id}
     assert executed == sorted((first_id, web_id, cli_id), key=queue_order.__getitem__)
+
+
+def test_web_worker_shutdown_preserves_waiting_fifo_for_restart(tmp_path, monkeypatch):
+    from threading import Event, Lock, Thread
+    import requests
+    from stock_data_manage.config.loader import load_storage_paths
+    from stock_data_manage.pipeline import inputs
+    from stock_data_manage.pipeline.inputs import submit_collection_task
+    from stock_data_manage.storage.metadata import MetadataStore
+    from stock_data_manage.worker.scheduler import build_security_master_definition
+
+    days = (date(2026, 10, 28), date(2026, 10, 29))
+    config, data, metadata_path = _task_api_runtime(tmp_path, calendar_days=days)
+    now = datetime(2026, 11, 12, 12, tzinfo=timezone.utc)
+    definitions = [build_security_master_definition(
+        config, trade_date=day, now=now, is_trading_day=True,
+        task_id=f"restart-security-master-{day:%Y%m%d}") for day in days]
+    accepted = [submit_collection_task(definition=definition, config_root=config,
+        data_root=data, mode="live") for definition in definitions]
+    task_ids = [definition["task_id"] for definition in definitions]
+    assert [item["queue_order"] for item in accepted] == [1, 2]
+    assert [item["status"] for item in accepted] == ["waiting", "waiting"]
+
+    first_started, release_first, second_started = Event(), Event(), Event()
+    executor_lock = Lock()
+    execution_order = []
+    active_count = 0
+    maximum_active = 0
+    thread_errors = []
+
+    def deny_provider_request(*_args, **_kwargs):
+        raise AssertionError("offline lifecycle acceptance must not call a Provider")
+
+    def offline_execute(*, definition, config_root, data_root=None, **_kwargs):
+        nonlocal active_count, maximum_active
+        task_id = definition["task_id"]
+        with executor_lock:
+            active_count += 1
+            maximum_active = max(maximum_active, active_count)
+            execution_order.append(task_id)
+        try:
+            if task_id == task_ids[0]:
+                first_started.set()
+                if not release_first.wait(15):
+                    raise TimeoutError("the first task was not released during Web shutdown")
+            elif task_id == task_ids[1]:
+                second_started.set()
+            else:
+                raise AssertionError(f"unexpected task reached the executor: {task_id}")
+            paths = load_storage_paths(config_root, data_root=data_root)
+            with MetadataStore(paths["metadata_path"]) as metadata:
+                state = metadata.load_collection_task(task_id)
+                state.update(status="published", phase="finished", error=None,
+                             updated_at=datetime.now(timezone.utc).isoformat())
+                metadata.save_collection_task(state)
+            return state
+        finally:
+            with executor_lock:
+                active_count -= 1
+
+    def serve_app(app, ready, shutdown_requested, closed):
+        try:
+            with TestClient(app, base_url="http://127.0.0.1", client=("127.0.0.1", 5000)):
+                ready.set()
+                if not shutdown_requested.wait(15):
+                    raise TimeoutError("the Web lifecycle was not asked to shut down")
+        except BaseException as exc:
+            thread_errors.append(exc)
+        finally:
+            closed.set()
+
+    monkeypatch.setattr(requests.Session, "send", deny_provider_request)
+    monkeypatch.setattr(inputs, "_execute_task_body", offline_execute)
+    first_app = create_app(config_root=config, data_root=data)
+    first_ready, first_shutdown, first_closed = Event(), Event(), Event()
+    first_server = Thread(target=serve_app,
+        args=(first_app, first_ready, first_shutdown, first_closed), daemon=True)
+    second_app = None
+    second_shutdown = None
+    second_server = None
+    try:
+        first_server.start()
+        assert first_ready.wait(5), "the first writable Web lifespan did not start"
+        assert first_started.wait(5), "the first waiting task was not consumed"
+        with MetadataStore(metadata_path, read_only=True) as metadata:
+            before_shutdown = [metadata.load_collection_task(task_id) for task_id in task_ids]
+        assert [state["status"] for state in before_shutdown] == ["collecting", "waiting"]
+        assert [state["queue_order"] for state in before_shutdown] == [1, 2]
+
+        first_shutdown.set()
+        assert first_app.state.collection_worker_stop_event.wait(5), "Web shutdown did not signal its worker"
+        assert first_app.state.collection_worker_thread.is_alive(), "shutdown did not wait for the active task"
+        assert not first_closed.is_set(), "Web shutdown completed before the active task finished"
+        release_first.set()
+        assert first_closed.wait(10), "the first Web lifespan did not finish after its task was released"
+        first_server.join(5)
+        assert not first_server.is_alive()
+        assert not thread_errors, thread_errors
+
+        with MetadataStore(metadata_path, read_only=True) as metadata:
+            after_shutdown = [metadata.load_collection_task(task_id) for task_id in task_ids]
+        assert after_shutdown[0]["status"] == "published"
+        assert after_shutdown[1]["status"] == "waiting"
+        assert [state["queue_order"] for state in after_shutdown] == [1, 2]
+        assert execution_order == [task_ids[0]]
+
+        second_app = create_app(config_root=config, data_root=data)
+        second_ready, second_shutdown, second_closed = Event(), Event(), Event()
+        second_server = Thread(target=serve_app,
+            args=(second_app, second_ready, second_shutdown, second_closed), daemon=True)
+        second_server.start()
+        assert second_ready.wait(5), "the restarted writable Web lifespan did not start"
+        assert second_started.wait(5), "the restarted worker did not consume the preserved task"
+        resumed = _wait_for_web_task_status(metadata_path, task_ids[1], "published", timeout=10)
+        assert resumed["queue_order"] == 2
+        second_shutdown.set()
+        assert second_closed.wait(10), "the restarted Web lifespan did not stop cleanly"
+        second_server.join(5)
+        assert not second_server.is_alive()
+    finally:
+        release_first.set()
+        first_shutdown.set()
+        if second_shutdown is not None:
+            second_shutdown.set()
+        for server in (first_server, second_server):
+            if server is not None and server.is_alive():
+                server.join(10)
+
+    assert not thread_errors, thread_errors
+    with MetadataStore(metadata_path, read_only=True) as metadata:
+        final_states = [metadata.load_collection_task(task_id) for task_id in task_ids]
+    assert [state["status"] for state in final_states] == ["published", "published"]
+    assert [state["queue_order"] for state in final_states] == [1, 2]
+    assert execution_order == task_ids
+    assert active_count == 0 and maximum_active == 1

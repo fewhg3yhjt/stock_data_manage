@@ -11,7 +11,19 @@
 | 多任务次序和Web生命周期缺少HTTP证据 | 隔离ASGI测试中，首任务被离线执行替身阻塞，随后持久提交10个waiting任务；检查queue_order 2–11、真实消费顺序、重复`/run`与`/resume`幂等、单worker启动。另检查只读Web不消费、缺日历/错误来源请求/错误数据集、范围冲突、SQLite忙及冻结定义续跑。 | 消费顺序与提交顺序一致；无Provider请求。最终10项通过、0失败/错误/跳过，耗时30.530秒：[JUnit](tmp/web-persistent-fifo-final-20261112/junit.xml)。运行前同进程导入检查指定解释器Python 3.13.18/SQLite 3.54.1及pytest、FastAPI、httpx、DuckDB、PyArrow、PyYAML、pytz、requests、uvicorn、pandas。使用隔离SQLite、合成DuckDB证券清单和离线执行替身，不是生产采集或多Web进程争抢验收。 |
 | 独立提交与消费者进程是否共用持久FIFO/全局执行权 | 新增三组隔离用例：两个spawn进程经真实`submit_collection_task`提交同范围/不同日期；两个spawn消费者竞争同一SQLite队列，首任务由事件阻塞以强制第二进程观察锁争用；两个Web应用实例加实际`stock-data collect-task` CLI竞争队列，Provider HTTP传输由fixture直接拒绝。 | 指定隔离解释器Python 3.13.18、SQLite 3.54.1及pytest/FastAPI/httpx/DuckDB/PyArrow/PyYAML/pytz/requests/uvicorn/pandas在运行前同进程核验。4个用例全通过（2种提交参数+跨进程消费者+Web/CLI），55项未选，14.169秒；同范围仅登记1项并回具体冲突，不同范围得到queue_order 1/2，两个消费者按持久顺序调用离线执行替身，三项任务状态更新为`published`且替身最大并发数为1；Web/CLI共用队列顺序及同范围幂等。替身不采集来源或写业务分区。证据：[JUnit](tmp/web-multi-entry-acceptance-20261112-v6/junit.xml)、[pytest日志](tmp/web-multi-entry-acceptance-20261112-v6/pytest.log)、[解释器与依赖](tmp/web-multi-entry-acceptance-20261112-v6/runtime-environment.json)。 |
 
-设计对照：Web和CLI都是既有持久队列的受理入口；Web单实例启动生命周期worker，CLI同步驱动同一个`run_collection_queue_once`，不同进程通过现有`collection.lock`串行取得队首。任务定义/来源/发布语义仍由原构建器和执行模块处理，队列状态仍在原`collection_task`表。规范JSON合并任务hash与task文件完整性计算保持相同字节合同；已有冻结任务不会被重写。新任务实际执行仍可能走`live`请求并写入运行台配置的数据根；本次验收替身禁止任何Provider请求，没有触碰生产数据。没有改动日期/证券范围、FIFO排序或质量/发布门槛。仍未覆盖独立Web服务进程启动、scheduler常驻进程协作、服务停止/强制退出与重启恢复、所有C01–C28并发场景、区间/显式覆盖页面、浏览器视觉及真实行情发布；不能据此宣称Web管理台整体或生产路由已验收。
+设计对照：Web和CLI都是既有持久队列的受理入口；Web单实例启动生命周期worker，CLI同步驱动同一个`run_collection_queue_once`，不同进程通过现有`collection.lock`串行取得队首。任务定义/来源/发布语义仍由原构建器和执行模块处理，队列状态仍在原`collection_task`表。规范JSON合并任务hash与task文件完整性计算保持相同字节合同；已有冻结任务不会被重写。新任务实际执行仍可能走`live`请求并写入运行台配置的数据根；本次验收替身禁止任何Provider请求，没有触碰生产数据。没有改动日期/证券范围、FIFO排序或质量/发布门槛。仍未覆盖独立Web服务进程启动、scheduler常驻进程协作、强制退出/committing恢复、所有C01–C28并发场景、区间/显式覆盖页面、浏览器视觉及真实行情发布；不能据此宣称Web管理台整体或生产路由已验收。
+
+## 2026-11-12 Web正常停机与FIFO续消费（隔离验收完成）
+
+回到原Web问题中的“服务退出后排队任务是否还可靠”：单实例 FIFO 和跨进程消费已分别验证；本阶段专门检查可写Web正常关闭时，当前任务是否收尾、后续任务是否仍留在SQLite，以及新Web应用生命周期是否能接着消费。没有修改生产执行逻辑、任务状态合同或队列实现。
+
+| 原问题/输入 | 实际动作与可核验证据 | 对原问题的结论及未覆盖项 |
+|---|---|---|
+| 正常关闭会不会中断当前任务或丢掉未领取任务 | 隔离运行根预先通过真实`submit_collection_task`登记两个`security_master`定义，目标日为2026-10-28和2026-10-29，`queue_order`为1/2。第一个Web应用生命周期启动真实worker；离线执行替身阻塞任务1后，请求关闭。观察到`stop_event`已设置、worker仍运行且Web生命周期尚未退出。释放任务1后，首应用关闭，SQLite中任务1状态由替身写为`published`、任务2仍是`waiting`。 | 当前任务结束后正常退出、未领取项保留，符合生命周期合同；这是任务元数据的隔离验证，不代表行情或证券数据已发布。 |
+| 新Web应用能否从既有队列继续消费 | 使用相同配置根、数据根和SQLite新建第二个`create_app`，重新进入可写生命周期。任务2被原worker消费，最终状态由离线替身更新为`published`；执行顺序为任务1、任务2，替身最大并发数为1。 | 证明新应用生命周期在同一操作系统进程内可从持久等待项继续消费；没有验证独立Web服务进程重启、主机进程重启或强制终止恢复。 |
+| 本次运行环境与验收结果 | 指定解释器`D:\Project\PythonProgram\stock_data_manage\tmp\runtime-sqlite-env\python.exe`，同进程核验Python 3.13.18、SQLite 3.54.1及pytest/FastAPI/httpx/DuckDB/PyArrow/PyYAML/pytz/requests/uvicorn/pandas。 | `test_web_worker_shutdown_preserves_waiting_fifo_for_restart`：1通过、59未选，1.792秒；唯一警告为Starlette对当前httpx/TestClient组合的弃用提示。[JUnit](tmp/web-lifecycle-restart-20261112-v2/junit.xml)、[运行日志](tmp/web-lifecycle-restart-20261112-v2/pytest.log)、[环境与依赖](tmp/web-lifecycle-restart-20261112-v2/runtime-environment.json)。Provider调用被拒绝，执行替身只更新任务元数据，未写业务分区。 |
+
+设计对照：Web lifespan的既有顺序是设置停止事件并等待worker线程结束；`run_collection_worker`完成正在运行的一项后再次检查停止事件，因而不领取下一项。该行为在同一隔离SQLite根以两个不同日期任务实际验证。此次只新增验收用例和记录，没有修复或改变`src/service/web.py`、`src/pipeline/inputs.py`的执行行为。强制退出/`committing`恢复、独立操作系统服务进程重启、scheduler常驻进程协作及更广生命周期矩阵仍未覆盖；离线任务状态不等于正式业务发布。
 
 ## 2026-11-10 发布摘要、总览及当前清单登记（11月11日完成隔离验收）
 
