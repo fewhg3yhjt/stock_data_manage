@@ -90,7 +90,7 @@ def preflight():
                     param = parse_qs(urlsplit(event.get("url", "")).query).get("param", [""])[0].split(",")
                     if (event.get("provider"), event.get("endpoint"), event.get("mode"), event.get("status_code")) != ("tencent", "kline_daily", "live", 200):
                         continue
-                    if len(param) != 6 or param[0] not in SYMBOLS or param[1:5] != ["day", DAY, DAY, "640"] or param[5] not in TOKENS.values():
+                    if len(param) != 6 or param[0] not in SYMBOLS or param[1:5] != ["day", DAY, DAY, "1"] or param[5] not in TOKENS.values():
                         continue
                     stamp = datetime.fromisoformat(event["fetched_at_utc"])
                     age = (now - stamp).total_seconds()
@@ -221,7 +221,7 @@ def process():
         assert len(responses) == 1
         event = responses[0]
         assert event["status_code"] == 200 and event["mode"] == "live"
-        assert parse_qs(urlsplit(event["url"]).query)["param"] == [f"{symbol},day,{DAY},{DAY},640,{TOKENS[adjustment]}"]
+        assert parse_qs(urlsplit(event["url"]).query)["param"] == [f"{symbol},day,{DAY},{DAY},1,{TOKENS[adjustment]}"]
         body = RawObjectStore.read_response(raw, event)
         payload = json.loads((gzip.decompress(body) if body[:2] == b"\x1f\x8b" else body).decode("utf-8-sig"))
         assert payload["code"] in (0, "0")

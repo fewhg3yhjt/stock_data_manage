@@ -52,7 +52,8 @@ def source_task(tmp_path, *, corrupt=None, day_only_adjustments=False, symbols=(
             name = adjustment.value
             request = policy[market_by_prefix[symbol[:2]]][name]
             api, token = request["api"], request["adjust"]
-            params = f"{symbol},day,,,1024" if api == "kline" else f"{symbol},day,{DAY},{DAY},640,{token}"
+            row_count = 1 if api == "newfqkline" else 640
+            params = f"{symbol},day,,,1024" if api == "kline" else f"{symbol},day,{DAY},{DAY},{row_count},{token}"
             host = "https://proxy.finance.qq.com/ifzqgtimg" if api == "newfqkline" else "https://web.ifzq.gtimg.cn"
             endpoint = "/appstock/app/kline/kline" if api == "kline" else f"/appstock/app/{api}/get"
             price = {"none": "10", "forward": "9", "backward": "11"}[name]
@@ -345,7 +346,7 @@ def test_capture_does_not_parse_or_switch_on_bad_business_payload(body):
     captured = provider.capture_window("sh600001", date.fromisoformat(DAY), date.fromisoformat(DAY), adjust="none", api="newfqkline")
     assert transport.calls == [(
         "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/newfqkline/get",
-        "sh600001,day,2026-10-09,2026-10-09,640,none",
+        "sh600001,day,2026-10-09,2026-10-09,1,none",
     )]
     with pytest.raises(ProviderContractError):
         provider.parse_window(captured)
@@ -729,7 +730,7 @@ def test_daily_batch_processes_completed_source_while_other_capture_is_pending(t
     csi_manifest = csi_response_manifest(tmp_path / "csi-source")
     tencent_body = json.dumps({"code": 0, "data": {tencent_symbol: {"day": [[
         day, "100", "100", "100", "100", "100", "0", "0", "100", "0"]]}}}).encode("utf-8")
-    tencent_params = {"param": f"{tencent_symbol},day,{day},{day},640,none"}
+    tencent_params = {"param": f"{tencent_symbol},day,{day},{day},1,none"}
     tencent_url = "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/newfqkline/get"
     tencent_url = requests.Request("GET", tencent_url, params=tencent_params).prepare().url
     tencent_store = RawObjectStore(tmp_path / "tencent-source")

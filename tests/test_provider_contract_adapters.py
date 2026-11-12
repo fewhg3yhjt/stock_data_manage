@@ -260,7 +260,7 @@ def test_tencent_unadjusted_window_uses_newfqkline_and_selects_requested_date():
     assert result.mapping_context["adjustment_parameter"] == "none"
     assert transport.calls == [
         ("https://proxy.finance.qq.com/ifzqgtimg/appstock/app/newfqkline/get",
-         {"param": "sh600519,day,2026-10-23,2026-10-23,640,none"}, (8, 20))
+         {"param": "sh600519,day,2026-10-23,2026-10-23,1,none"}, (8, 20))
     ]
 
 
@@ -314,12 +314,13 @@ def test_tencent_unadjusted_newfqkline_retained_window_reports_truncation():
         [(first + timedelta(days=index)).isoformat(), "10", "10", "10", "10", "100", {}, "0", "0", "0", "0"]
         for index in range(640)
     ]
-    provider = TencentDailyProvider(FakeTransport([response({"code": 0, "data": {"sh600519": {"day": bars}}})]))
+    transport = FakeTransport([response({"code": 0, "data": {"sh600519": {"day": bars}}})])
+    provider = TencentDailyProvider(transport)
     with pytest.raises(ProviderContractError) as exc:
         provider.parse_window(provider.capture_window(
-            "sh600519", date(2023, 1, 1), date(2026, 10, 20), adjust="none", api="newfqkline"
-        ))
+            "sh600519", date(2023, 1, 1), date(2026, 10, 20), adjust="none", api="newfqkline"))
     assert exc.value.failure_class is FailureClass.TRUNCATED and not exc.value.retryable
+    assert transport.calls[0][1]["param"] == "sh600519,day,2023-01-01,2026-10-20,640,none"
 
 
 def test_tencent_unadjusted_newfqkline_accepts_single_target_from_641_rows():
@@ -329,7 +330,8 @@ def test_tencent_unadjusted_newfqkline_accepts_single_target_from_641_rows():
          {}, "0", "0", "0", "0"]
         for index in range(641)
     ]
-    provider = TencentDailyProvider(FakeTransport([response({"code": 0, "data": {"bj920000": {"day": bars}}})]))
+    transport = FakeTransport([response({"code": 0, "data": {"bj920000": {"day": bars}}})])
+    provider = TencentDailyProvider(transport)
 
     result = provider.parse_window(provider.capture_window(
         "bj920000", target, target, adjust="none", api="newfqkline"
@@ -338,6 +340,7 @@ def test_tencent_unadjusted_newfqkline_accepts_single_target_from_641_rows():
     assert len(result.rows) == 1
     assert result.rows[0]["0"] == target.isoformat()
     assert result.mapping_context["source_total_count"] == 641
+    assert transport.calls[0][1]["param"] == f"bj920000,day,{target.isoformat()},{target.isoformat()},1,none"
 
 
 def test_tencent_unadjusted_window_reports_retained_history_truncation():

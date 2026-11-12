@@ -144,7 +144,11 @@ class TencentDailyProvider:
         input_hosts = self.alternative_input_hosts if api == "newfqkline" else self.input_hosts
         while cursor <= end:
             stop = end if api in {"kline", "newfqkline"} else min(cursor + timedelta(days=699), end)
-            param = f"{symbol},day,,,1024" if api == "kline" else f"{symbol},day,{cursor.isoformat()},{stop.isoformat()},640,{adjust}"
+            if api == "kline":
+                param = f"{symbol},day,,,1024"
+            else:
+                row_count = 1 if api == "newfqkline" and start == end else 640
+                param = f"{symbol},day,{cursor.isoformat()},{stop.isoformat()},{row_count},{adjust}"
             response, host = tencent_kline_call(self.transport, path, param, input_hosts, self.host_down_until)
             segments.append((cursor, stop, response, host))
             cursor = stop + timedelta(days=1)
