@@ -1350,3 +1350,344 @@ def test_web_resume_requeues_the_frozen_task_definition(tmp_path, monkeypatch):
         assert executed.wait(5), "the requeued frozen task was not consumed"
         state = _wait_for_web_task_status(metadata_path, task_id, "published")
         assert state["definition_hash"] == definition_hash
+
+
+def _run_collection_queue_worker_process(
+        config_root, data_root, first_task_id, task_count, barrier, release_first,
+        first_started, contended, stop, execution_order, outcomes, counter_lock,
+        active_count, maximum_active, completed_count):
+    import os
+    import time
+    import requests
+    from stock_data_manage.config.loader import load_storage_paths
+    from stock_data_manage.pipeline import inputs
+    from stock_data_manage.storage.metadata import MetadataStore
+
+    def deny_provider_request(*_args, **_kwargs):
+        raise AssertionError("offline queue workers must not perform a Provider request")
+
+    requests.Session.send = deny_provider_request
+
+    def offline_execute(*, definition, config_root, data_root=None, **_kwargs):
+        task_id = definition["task_id"]
+        with counter_lock:
+            active_count.value += 1
+            maximum_active.value = max(maximum_active.value, active_count.value)
+            if active_count.value > 1:
+                outcomes.put(("overlap", task_id, os.getpid()))
+                stop.set()
+        execution_order.put(task_id)
+        try:
+            if task_id == first_task_id:
+                first_started.set()
+                if not release_first.wait(15):
+                    raise TimeoutError("first cross-process task was not released")
+            paths = load_storage_paths(config_root, data_root=data_root)
+            with MetadataStore(paths["metadata_path"]) as metadata:
+                state = metadata.load_collection_task(task_id)
+                state.update(status="published", phase="finished", error=None,
+                             updated_at=datetime.now(timezone.utc).isoformat())
+                metadata.save_collection_task(state)
+            with counter_lock:
+                completed_count.value += 1
+            return state
+        finally:
+            with counter_lock:
+                active_count.value -= 1
+
+    inputs._execute_task_body = offline_execute
+    try:
+        barrier.wait(10)
+        while completed_count.value < task_count and not stop.is_set():
+            result = inputs.run_collection_queue_once(config_root=config_root, data_root=data_root)
+            if result and result.get("_error"):
+                outcomes.put(("error", result.get("task_id"), repr(result["_error"])))
+                stop.set()
+                break
+            if result is None:
+                if first_started.is_set() and not release_first.is_set():
+                    contended.set()
+                time.sleep(0.01)
+        outcomes.put(("done", os.getpid()))
+    except BaseException as exc:
+        outcomes.put(("error", os.getpid(), f"{type(exc).__name__}: {exc}"))
+        stop.set()
+
+
+def _submit_collection_task_from_process(definition, config_root, data_root, barrier, results):
+    import requests
+    from stock_data_manage.pipeline.inputs import submit_collection_task
+    from stock_data_manage.storage.metadata import CollectionTaskScopeConflict
+
+    def deny_provider_request(*_args, **_kwargs):
+        raise AssertionError("task admission must not perform a Provider request")
+
+    requests.Session.send = deny_provider_request
+    try:
+        barrier.wait(10)
+        accepted = submit_collection_task(
+            definition=definition, config_root=config_root, data_root=data_root, mode="live")
+        results.put({"task_id": definition["task_id"], "result": "accepted",
+                     "status": accepted["status"], "queue_order": accepted["queue_order"]})
+    except CollectionTaskScopeConflict as exc:
+        results.put({"task_id": definition["task_id"], "result": "conflict",
+                     "conflict_task_id": exc.task_id, "conflicts": exc.conflicts})
+    except BaseException as exc:
+        results.put({"task_id": definition["task_id"], "result": "error",
+                     "error": f"{type(exc).__name__}: {exc}"})
+
+
+@pytest.mark.parametrize("same_date", [False, True], ids=["non-overlapping", "overlapping"])
+def test_collection_task_submission_is_serialized_across_processes(tmp_path, same_date):
+    import multiprocessing
+    from stock_data_manage.worker.scheduler import build_security_master_definition
+    from stock_data_manage.storage.metadata import MetadataStore
+
+    days = (date(2026, 10, 28), date(2026, 10, 28) if same_date else date(2026, 10, 29))
+    config, data, metadata_path = _task_api_runtime(
+        tmp_path, calendar_days=tuple(dict.fromkeys(days)))
+    now = datetime(2026, 11, 12, 12, tzinfo=timezone.utc)
+    definitions = [build_security_master_definition(
+        config, trade_date=day, now=now, is_trading_day=True, task_id=f"process-submit-{index}-{day:%Y%m%d}")
+        for index, day in enumerate(days)]
+
+    context = multiprocessing.get_context("spawn")
+    barrier, results = context.Barrier(2), context.Queue()
+    processes = [context.Process(target=_submit_collection_task_from_process,
+        args=(definition, str(config), str(data), barrier, results)) for definition in definitions]
+    outcomes = []
+    try:
+        for process in processes:
+            process.start()
+        outcomes = [results.get(timeout=20), results.get(timeout=20)]
+    finally:
+        for process in processes:
+            process.join(10)
+            if process.is_alive():
+                process.terminate()
+                process.join(5)
+
+    assert all(process.exitcode == 0 for process in processes)
+    assert all(item["result"] != "error" for item in outcomes), outcomes
+    with MetadataStore(metadata_path, read_only=True) as metadata:
+        waiting = metadata.collection_tasks(status="waiting")
+        orders = {item["task_id"]: item["queue_order"] for item in waiting}
+    if same_date:
+        assert [item["result"] for item in outcomes].count("accepted") == 1
+        assert [item["result"] for item in outcomes].count("conflict") == 1
+        assert len(waiting) == 1 and list(orders.values()) == [1]
+        rejected = next(item for item in outcomes if item["result"] == "conflict")
+        accepted = next(item for item in outcomes if item["result"] == "accepted")
+        assert rejected["conflict_task_id"] == accepted["task_id"]
+    else:
+        assert all(item["result"] == "accepted" and item["status"] == "waiting" for item in outcomes)
+        assert len(waiting) == 2
+        assert sorted(orders.values()) == [1, 2]
+
+
+def test_collection_queue_worker_processes_claim_fifo_one_at_a_time(tmp_path):
+    import multiprocessing
+    from stock_data_manage.pipeline.inputs import submit_collection_task
+    from stock_data_manage.storage.metadata import MetadataStore
+    from stock_data_manage.worker.scheduler import build_security_master_definition
+
+    days = (date(2026, 10, 28), date(2026, 10, 29), date(2026, 10, 30))
+    config, data, metadata_path = _task_api_runtime(tmp_path, calendar_days=days)
+    now = datetime(2026, 11, 12, 12, tzinfo=timezone.utc)
+    definitions = [build_security_master_definition(
+        config, trade_date=day, now=now, is_trading_day=True,
+        task_id=f"process-worker-{index}-{day:%Y%m%d}") for index, day in enumerate(days)]
+    accepted = [submit_collection_task(definition=definition, config_root=config,
+        data_root=data, mode="live") for definition in definitions]
+    expected_order = [item["task_id"] for item in sorted(accepted, key=lambda item: item["queue_order"])]
+
+    context = multiprocessing.get_context("spawn")
+    barrier = context.Barrier(2)
+    release_first, first_started, contended, stop = (context.Event() for _ in range(4))
+    execution_order, outcomes = context.Queue(), context.Queue()
+    counter_lock = context.Lock()
+    active_count, maximum_active, completed_count = (context.Value("i", 0) for _ in range(3))
+    process_args = (str(config), str(data), expected_order[0], len(expected_order), barrier,
+                    release_first, first_started, contended, stop, execution_order, outcomes,
+                    counter_lock, active_count, maximum_active, completed_count)
+    processes = [context.Process(target=_run_collection_queue_worker_process, args=process_args)
+                 for _ in range(2)]
+    outcome_rows = []
+    try:
+        for process in processes:
+            process.start()
+        assert first_started.wait(10), "neither process claimed the FIFO head"
+        assert contended.wait(10), "the second process did not observe the held execution lock"
+        assert completed_count.value == 0
+        assert maximum_active.value == 1
+        release_first.set()
+        for process in processes:
+            process.join(20)
+            if process.is_alive():
+                process.terminate()
+                process.join(5)
+        outcome_rows = [outcomes.get(timeout=5) for _ in processes]
+    finally:
+        release_first.set()
+        stop.set()
+        for process in processes:
+            if process.is_alive():
+                process.terminate()
+                process.join(5)
+
+    assert all(process.exitcode == 0 for process in processes)
+    assert [row[0] for row in outcome_rows].count("done") == 2, outcome_rows
+    assert not any(row[0] in {"error", "overlap"} for row in outcome_rows), outcome_rows
+    assert completed_count.value == len(expected_order)
+    assert active_count.value == 0 and maximum_active.value == 1
+    actual_order = [execution_order.get(timeout=5) for _ in expected_order]
+    assert actual_order == expected_order
+    with MetadataStore(metadata_path, read_only=True) as metadata:
+        published = metadata.collection_tasks(status="published")
+    assert {state["task_id"] for state in published} == set(expected_order)
+
+
+def test_two_web_instances_and_cli_share_fifo_and_single_execution(tmp_path, monkeypatch):
+    from threading import Barrier, Event, Lock, Thread
+    import requests
+    from stock_data_manage.pipeline import inputs
+    from stock_data_manage.storage.metadata import CollectionTaskScopeConflict, MetadataStore
+    from stock_data_manage.worker.scheduler import build_security_master_definition
+    from stock_data_manage.cli import main as cli_main
+
+    days = (date(2026, 10, 28), date(2026, 10, 29), date(2026, 10, 30))
+    config, data, metadata_path = _task_api_runtime(tmp_path, calendar_days=days)
+    first_id, web_id, cli_id = (f"security-master-{day:%Y%m%d}" for day in days)
+    first_started, release_first = Event(), Event()
+    execution_guard = Lock()
+    executed = []
+    active_count = 0
+    max_active = 0
+    overlap_detected = Event()
+
+    def deny_provider_request(*_args, **_kwargs):
+        raise AssertionError("offline multi-entry acceptance must not call a Provider")
+
+    def offline_execute(*, definition, config_root, data_root=None, **_kwargs):
+        nonlocal active_count, max_active
+        task_id = definition["task_id"]
+        with execution_guard:
+            active_count += 1
+            max_active = max(max_active, active_count)
+            if active_count > 1:
+                overlap_detected.set()
+            executed.append(task_id)
+        try:
+            if task_id == first_id:
+                first_started.set()
+                if not release_first.wait(15):
+                    raise TimeoutError("first offline task was not released")
+            paths = __import__("stock_data_manage.config.loader", fromlist=["load_storage_paths"]).load_storage_paths(
+                config_root, data_root=data_root)
+            with MetadataStore(paths["metadata_path"]) as metadata:
+                state = metadata.load_collection_task(task_id)
+                state.update(status="published", phase="finished", error=None,
+                             updated_at=datetime.now(timezone.utc).isoformat())
+                metadata.save_collection_task(state)
+            return state
+        finally:
+            with execution_guard:
+                active_count -= 1
+
+    monkeypatch.setattr(requests.Session, "send", deny_provider_request)
+    monkeypatch.setattr(inputs, "_execute_task_body", offline_execute)
+    app_a = create_app(config_root=config, data_root=data)
+    app_b = create_app(config_root=config, data_root=data)
+    cli_definition = build_security_master_definition(
+        config, trade_date=days[2], now=datetime(2026, 11, 12, 12, tzinfo=timezone.utc),
+        is_trading_day=True, task_id=cli_id)
+    task_file = tmp_path / "cli-task.json"
+    write_json(task_file, cli_definition)
+    accepted_elsewhere = {first_id: {"queue_order": 1}}
+    accepted_lock = Lock()
+    both_submitted = Event()
+    actual_submit = inputs.submit_collection_task
+
+    def observe_submission(**kwargs):
+        accepted = actual_submit(**kwargs)
+        with accepted_lock:
+            accepted_elsewhere[accepted["task_id"]] = accepted
+            if web_id in accepted_elsewhere and cli_id in accepted_elsewhere:
+                both_submitted.set()
+        return accepted
+
+    race = Barrier(2)
+    web_response = {}
+    cli_result = {}
+    thread_errors = []
+
+    with TestClient(app_a, base_url="http://127.0.0.1", client=("127.0.0.1", 5000)) as client_a, \
+            TestClient(app_b, base_url="http://127.0.0.1", client=("127.0.0.1", 5001)) as client_b:
+        monkeypatch.setattr(inputs, "submit_collection_task", observe_submission)
+        first = client_a.post("/api/tasks/run", json={
+            "dataset": "security_master", "trade_date": days[0].isoformat()})
+        assert first.status_code == 202, first.text
+        assert first.json()["queue_order"] == 1
+        assert first_started.wait(10), "neither Web instance consumed the first queued task"
+
+        duplicate = client_b.post("/api/tasks/run", json={
+            "dataset": "security_master", "trade_date": days[0].isoformat()})
+        assert duplicate.status_code == 202, duplicate.text
+        assert duplicate.json()["already_queued"] is True
+        assert duplicate.json()["queue_order"] == 1
+
+        overlapping = build_security_master_definition(
+            config, trade_date=days[0], now=datetime(2026, 11, 12, 12, tzinfo=timezone.utc),
+            is_trading_day=True, task_id="security-master-overlap-shadow")
+        with pytest.raises(CollectionTaskScopeConflict) as conflict:
+            actual_submit(definition=overlapping, config_root=config, data_root=data, mode="live")
+        assert conflict.value.task_id == first_id
+        with MetadataStore(metadata_path, read_only=True) as metadata:
+            assert metadata.load_collection_task("security-master-overlap-shadow") is None
+
+        def submit_web():
+            try:
+                race.wait(10)
+                web_response["response"] = client_b.post("/api/tasks/run", json={
+                    "dataset": "security_master", "trade_date": days[1].isoformat()})
+            except BaseException as exc:
+                thread_errors.append(exc)
+
+        def submit_cli():
+            try:
+                race.wait(10)
+                cli_result["exit_code"] = cli_main([
+                    "collect-task", "--task-file", str(task_file), "--config-root", str(config),
+                    "--data-root", str(data), "--mode", "live", "--no-progress"])
+            except BaseException as exc:
+                thread_errors.append(exc)
+
+        web_thread, cli_thread = Thread(target=submit_web), Thread(target=submit_cli)
+        web_thread.start()
+        cli_thread.start()
+        try:
+            assert both_submitted.wait(20), "the concurrent Web/CLI admissions did not finish"
+            web_thread.join(10)
+            assert not web_thread.is_alive()
+            assert not thread_errors, thread_errors
+            assert web_response["response"].status_code == 202, web_response.get("response")
+            assert web_response["response"].json()["queue_order"] in {2, 3}
+            with MetadataStore(metadata_path, read_only=True) as metadata:
+                queued = [metadata.load_collection_task(task_id) for task_id in (first_id, web_id, cli_id)]
+            assert sorted(state["queue_order"] for state in queued) == [1, 2, 3]
+            assert [state["status"] for state in queued] == ["collecting", "waiting", "waiting"]
+        finally:
+            release_first.set()
+            web_thread.join(15)
+            cli_thread.join(20)
+
+        for task_id in (first_id, web_id, cli_id):
+            _wait_for_web_task_status(metadata_path, task_id, "published", timeout=20)
+        assert not cli_thread.is_alive(), "the synchronous CLI entry did not finish its accepted task"
+
+    assert not thread_errors, thread_errors
+    assert cli_result["exit_code"] == 0
+    assert max_active == 1 and not overlap_detected.is_set()
+    queue_order = {task_id: accepted["queue_order"] for task_id, accepted in accepted_elsewhere.items()}
+    assert set(queue_order) == {first_id, web_id, cli_id}
+    assert executed == sorted((first_id, web_id, cli_id), key=queue_order.__getitem__)

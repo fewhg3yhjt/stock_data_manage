@@ -257,26 +257,26 @@ flowchart TB
 
 该图中数据库事务和文件协调是分段关系，不是在事务内等待文件锁；OWN覆盖整任务但不阻止SUB或VIEW。维护需要OWN，普通页面读取不需要OWN。清单DuckDB和来源行索引仍各自处理连接，不假定替换运行库就解决所有资源。
 
-### 执行循环与入口的承接（2026-11-09已确认；Web单日受理/FIFO子集已实施）
+### 执行循环与入口的承接（2026-11-09已确认；Web单日受理与共用FIFO已隔离验收）
 
-数据库只保存等待事实，不会自己执行任务。目标合同复用现有worker模块提供同一个取队首/执行循环：scheduler的到期轮询只负责受理，由其执行线程消费；允许写操作且数据根可写的Web实例在自身生命周期内保持一个执行循环；CLI正式采集入口也先受理并等待/驱动同一FIFO。Web单日入口已按此合同落地：`/api/tasks/run`与`/resume`先调用`submit_collection_task`把冻结定义和顺序写入现有SQLite，再返回202；可写应用生命周期启动一个`run_collection_worker`，由其调用`run_collection_queue_once`消费队首。只读Web不参与消费，waiting任务留在持久表中。scheduler/CLI生命周期组合、多进程消费者和完整并发场景仍未验收。各入口可以共存，但只有取得现有整任务执行权的一方实际执行；不增加新服务、消息中间件或另一套内存权威队列。
+数据库只保存等待事实，不会自己执行任务。目标合同复用现有worker模块提供同一个取队首/执行循环：scheduler的到期轮询只负责受理；可写Web实例在应用生命周期内消费；CLI正式采集入口先受理并等待/驱动同一FIFO。`/api/tasks/run`与`/resume`调用`submit_collection_task`，把冻结定义和顺序写入现有SQLite后才返回202；可写应用生命周期启动一个`run_collection_worker`，由其调用`run_collection_queue_once`消费队首。只读Web不参与消费，waiting任务留在持久表中。两进程提交、两进程消费者、两个Web实例与实际CLI入口共享隔离SQLite/FIFO的组合已通过离线验收；scheduler常驻进程接线、独立Web服务进程以及完整并发场景仍未验收。所有消费者争用同一个现有整任务执行锁，只有取得执行权的一方能领取队首并运行；不增加新服务、消息中间件或另一套内存权威队列。
 
 Web worker目前以0.5秒轮询既有FIFO；不以线程唤醒作为交付保证。应用退出时先发出停止信号，再等待当前worker结束；尚未消费的任务仍在库中，下次可写Web启动后可继续看见。HTTP 202表示已持久受理，不表示采集已开始或完成；没有可用worker时，接口仍说明队列已保留。调度轮询继续按既有有限间隔判断到期，不能被网络线程阻塞。
 
-进入下一普通运行前先处理已确认原执行者退出的committing恢复；浏览器关闭不停止后台，Web后端正常停止与强制退出分别沿既有生命周期/恢复合同，不凭前端断开释放执行权。Web单日入口的持久受理和单实例FIFO已有隔离HTTP证据；CLI/scheduler组合、多进程竞争与强制退出恢复仍须按表中范围验证，不能由单Web实例结果替代。
+进入下一普通运行前先处理已确认原执行者退出的committing恢复；浏览器关闭不停止后台，Web后端正常停止与强制退出分别沿既有生命周期/恢复合同，不凭前端断开释放执行权。已验收证据包含独立提交进程、独立消费者进程，以及同一隔离运行根中两个Web应用实例和实际CLI命令；两个Web应用在同一测试进程内，不能据此宣称多台/多个独立Web服务部署已经验收。调度常驻进程、服务关闭/重启恢复和其他生命周期边界仍须单独验证。
 
-### 并发验收范围（Web子集已验收，其余待执行）
+### 并发验收范围（Web受理与跨进程FIFO子集已验收，其余待执行）
 
 | 验收组 | 代表性范围、动作与预期 | 明确未被替代的检查 |
 |---|---|---|
-| Web受理/FIFO（已验收） | 单一隔离Web实例；首项执行被离线替身阻塞，后续10项逐个HTTP受理并核对waiting/queue_order；释放后逐一核对执行顺序、重复提交幂等及唯一worker；另检查只读Web不消费 | 见`tests/test_web_service.py::test_web_task_submissions_are_durable_and_worker_consumes_fifo`及`test_read_only_web_instance_leaves_persisted_queue_waiting`；这不是两个Web进程或全局唯一消费者验收 |
-| 多入口受理/顺序（待验收） | 同一隔离根，2个独立提交进程提交重叠/不重叠日期与证券；比较持久提交顺序及所有冲突回执 | 必须断言只受理一份重叠范围、唯一执行者和真正FIFO；单Web实例HTTP结果不能替代进程竞争 |
+| Web受理/FIFO（已验收） | 单一隔离Web实例；首项执行被离线替身阻塞，后续10项逐个HTTP受理并核对waiting/queue_order；释放后核对执行顺序、重复`/run`与`/resume`幂等及唯一worker；另检查只读Web不消费 | `tests/test_web_service.py::test_web_task_submissions_are_durable_and_worker_consumes_fifo`及`test_read_only_web_instance_leaves_persisted_queue_waiting`；只代表单Web实例生命周期 |
+| 多入口受理与跨进程FIFO（已验收） | 两个独立提交进程对同日security_master竞争时只登记一项、另一项返回具体冲突；不同日期均受理且分配queue_order 1/2。三个任务由两个独立消费者进程竞争同一队列：首任务的离线执行替身被阻塞时，第二进程观察到执行锁占用；释放后替身按持久queue_order依次将三项任务状态更新为`published`，最大替身并发数为1。另用两个Web应用实例及实际`stock-data collect-task`命令竞争同一隔离FIFO，核对重复提交幂等、不同范围冲突、共用顺序及单一执行。 | `tests/test_web_service.py::test_collection_task_submission_is_serialized_across_processes`、`test_collection_queue_worker_processes_claim_fifo_one_at_a_time`、`test_two_web_instances_and_cli_share_fifo_and_single_execution`；4个参数化用例全部通过。离线替身不采集来源、不写业务分区，故该项只验收持久受理、领取顺序和全局执行权。证据见`tmp/web-multi-entry-acceptance-20261112-v6/`。Web实例和CLI组合在同一个测试进程；独立Web服务进程、scheduler常驻进程和停机/恢复仍未覆盖 |
 | 页面/进度 | 代表7862证券、100交易日目标、10000条历史运行；列表页100项，持续保存进度并并发刷新各受影响API | 所有18个API的映射见运行台文档；任务列表不能解析10000份summary，来源查询不能先读全来源行再分页 |
 | 文件发布 | 2个证券子集更新同一日期资产；并发查询该分区及另一日期；在data替换后、manifest替换后、元数据登记前注入中断 | 只出现完整当前数据或明确更新中；其他证券不变，失败分区不伪装成功，覆盖后不提供旧行情快照 |
 | 清单/索引/原文 | 页面补名称时刷新完整清单；来源索引重建时分页查询；原文转正/归档时查看与下载固定事件 | 不丢索引新增项，不在只读查询建表，原文事件与正文逐字节对应，索引失败不抹掉正式行情 |
 | 生命周期/维护 | 重复worker、进程强制退出、恢复/归档与执行冲突、停调与受理先后各一次、只读和独立隔离根；长任务跨过下一周期、入队与空闲退出交错、所有执行进程关闭后重启 | 超时不等于进程死亡；维护不形成锁环；停调不取消既有运行；长任务不堵到期受理，不丢唤醒或假运行；未涉及的分钟生产/多机不算通过 |
 
-除上表Web受理/FIFO子集外，其余仅完成静态场景设计。性能合同为小型状态/配置读首读≤2秒、复用≤1秒，手动本地范围受理/续跑≤5秒，短写事务目标100毫秒且不包含网络/文件大读取；忙碌等待必须有上限并返回原因，不能沿用索引30秒等待作为页面默认。Web已在单日、7862条合成证券清单与10000条历史运行的范围内通过上述计时；范围、结果和局限见[阶段进度](../../PROJECT_PROGRESS.md)。它不代表100交易日受理，也不代替其他API工作量边界和剩余并发场景验收。已通过的既有来源证据复用，不为并发验收重新进行全市场网络采集。
+除上表明确标为已验收的两个FIFO子集外，其余并发与生命周期场景仅完成静态设计。性能合同为小型状态/配置读首读≤2秒、复用≤1秒，手动本地范围受理/续跑≤5秒，短写事务目标100毫秒且不包含网络/文件大读取；忙碌等待必须有上限并返回原因，不能沿用索引30秒等待作为页面默认。Web已在单日、7862条合成证券清单与10000条历史运行的范围内通过上述计时；范围、结果和局限见[阶段进度](../../PROJECT_PROGRESS.md)。它不代表100交易日受理，也不代替其他API工作量边界和剩余并发场景验收。已通过的既有来源证据复用，不为并发验收重新进行全市场网络采集。
 
 ```mermaid
 flowchart TB
@@ -286,17 +286,29 @@ flowchart TB
         MANY --> ONE[只构建目标单日]
         DIRECT[Web每次POST启动线程调用collect_task] --> BUSY[回执先于持久受理；多请求可各起执行线程]
     end
-    subgraph IMPLEMENTED[Web单日持久受理/FIFO，已隔离验收]
-        UI[本机Web POST] --> CHECK[同源、可写、交易日与冻结定义检查]
-        CHECK --> SUBMIT[submit_collection_task持久写入SQLite FIFO]
-        SUBMIT --> ACCEPT[返回202及queue_order]
-        SUBMIT --> FIFO[持久等待项]
-        WORKER[可写Web生命周期单worker] --> LOCK[取得现有整任务执行权]
-        LOCK --> CLAIM[run_collection_queue_once取队首]
-        CLAIM --> EXEC[按冻结定义运行既有任务执行模块]
+    subgraph IMPLEMENTED[Web持久受理与共用FIFO，隔离验收]
+        WA[Web实例A POST] --> CHECK[同源、可写、交易日与冻结定义检查]
+        WB[Web实例B POST] --> CHECK
+        CLI[collect-task命令] --> CHECKCLI[读取/构建冻结任务定义]
+        AUTO[调度到期提交] --> CHECKAUTO[已有任务定义及到期检查]
+        CHECK --> SUBMIT[submit_collection_task<br/>短SQLite事务检查范围并登记queue_order]
+        CHECKCLI --> SUBMIT
+        CHECKAUTO --> SUBMIT
+        SUBMIT --> ACCEPT[HTTP返回202<br/>queue_order已持久化]
+        SUBMIT --> FIFO[(现有SQLite collection_task<br/>waiting任务按queue_order排序)]
+        SUBMIT -. 同范围活动任务 .-> DUP[返回现有等待项或范围冲突<br/>不产生重复受理]
+        WWORKER[Web生命周期worker] --> CONSUME[run_collection_queue_once]
+        CWORKER[CLI同步驱动] --> CONSUME
+        SWORKER[调度器执行循环] --> CONSUME
+        CONSUME --> LOCK{现有 collection.lock<br/>是否取得执行权?}
+        LOCK -->|是| CLAIM[claim_next_collection_task<br/>原子领取FIFO队首]
+        LOCK -->|否/已被其他进程持有| BUSY[本轮不领取<br/>等待下一次轮询]
         FIFO --> CLAIM
+        BUSY -->|下一次消费循环| CONSUME
+        CLAIM --> EXEC[按冻结定义运行既有任务执行模块]
+        EXEC --> SAVE[保存进度及最终状态<br/>成功发布 / 失败可续跑]
         CHECK -. 校验/范围/SQLite错误 .-> REJECT[明确拒绝，不返回受理]
-        SUBMIT -. 已提交但无worker/服务关闭 .-> WAIT[保留waiting，之后的可写实例可消费]
+        ACCEPT -. 没有消费者或服务关闭 .-> WAIT[任务仍为waiting<br/>之后的可写入口可见]
     end
     subgraph PROPOSAL[数据窗口与批处理提案，待确认]
         I[冻结日期、证券、来源策略] --> W[按目标交易日及容量规划窗口与条数]
